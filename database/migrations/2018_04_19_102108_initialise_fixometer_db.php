@@ -177,7 +177,8 @@ class InitialiseFixometerDb extends Migration
                           `name` varchar(255) NOT NULL,
                           `role` int(11) NOT NULL DEFAULT "3",
                           `created_at` timestamp NULL DEFAULT NULL,
-                          `modified_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                          `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                          `deleted_at` timestamp NULL DEFAULT NULL
                         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
           );
 
