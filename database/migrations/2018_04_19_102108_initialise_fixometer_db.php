@@ -171,7 +171,7 @@ class InitialiseFixometerDb extends Migration
 
           //Users
           DB::statement('CREATE TABLE IF NOT EXISTS `users` (
-                          `idusers` int(11) NOT NULL,
+                          `id` int(11) NOT NULL,
                           `email` varchar(255) NOT NULL,
                           `password` varchar(60) NOT NULL,
                           `name` varchar(255) NOT NULL,
@@ -300,7 +300,7 @@ class InitialiseFixometerDb extends Migration
 
             //Users
             DB::statement('ALTER TABLE `users`
-                            ADD PRIMARY KEY (`idusers`),
+                            ADD PRIMARY KEY (`id`),
                             ADD UNIQUE KEY `email_UNIQUE` (`email`),
                             ADD KEY `idxUserRole` (`role`);'
             );
@@ -392,7 +392,7 @@ class InitialiseFixometerDb extends Migration
 
             //Users
             DB::statement('ALTER TABLE `users`
-                            MODIFY `idusers` int(11) NOT NULL AUTO_INCREMENT;'
+                            MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;'
             );
 
             //User Groups
@@ -420,7 +420,7 @@ class InitialiseFixometerDb extends Migration
                             ADD CONSTRAINT `fkDeviceCategory` FOREIGN KEY (`category`) REFERENCES `categories` (`idcategories`) ON DELETE NO ACTION ON UPDATE NO ACTION,
                             ADD CONSTRAINT `fkDeviceCategoryCreation` FOREIGN KEY (`category_creation`) REFERENCES `categories` (`idcategories`) ON DELETE NO ACTION ON UPDATE NO ACTION,
                             ADD CONSTRAINT `fkDeviceEvent` FOREIGN KEY (`event`) REFERENCES `events` (`idevents`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-                            ADD CONSTRAINT `fkDeviceUser` FOREIGN KEY (`repaired_by`) REFERENCES `users` (`idusers`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
+                            ADD CONSTRAINT `fkDeviceUser` FOREIGN KEY (`repaired_by`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
             );
 
             //Events
@@ -431,7 +431,7 @@ class InitialiseFixometerDb extends Migration
             //Event Users
             DB::statement('ALTER TABLE `events_users`
                             ADD CONSTRAINT `fkEventsUsersEvent` FOREIGN KEY (`event`) REFERENCES `events` (`idevents`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-                            ADD CONSTRAINT `fkEventsUsersUser` FOREIGN KEY (`user`) REFERENCES `users` (`idusers`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
+                            ADD CONSTRAINT `fkEventsUsersUser` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
             );
 
             //Role Permissions
@@ -442,7 +442,7 @@ class InitialiseFixometerDb extends Migration
 
             //Sessions
             DB::statement('ALTER TABLE `sessions`
-                            ADD CONSTRAINT `fkSessionsUsers` FOREIGN KEY (`user`) REFERENCES `users` (`idusers`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
+                            ADD CONSTRAINT `fkSessionsUsers` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
             );
 
             //Users
@@ -453,7 +453,7 @@ class InitialiseFixometerDb extends Migration
             //User Groups
             DB::statement('ALTER TABLE `users_groups`
                             ADD CONSTRAINT `fkGroupGroups` FOREIGN KEY (`group`) REFERENCES `groups` (`idgroups`) ON DELETE CASCADE ON UPDATE NO ACTION,
-                            ADD CONSTRAINT `fkUserUsers` FOREIGN KEY (`user`) REFERENCES `users` (`idusers`) ON DELETE CASCADE ON UPDATE NO ACTION;'
+                            ADD CONSTRAINT `fkUserUsers` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;'
             );
 
           //EO Foreign Keys

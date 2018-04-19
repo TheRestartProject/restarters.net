@@ -34,7 +34,7 @@ class DeviceListView extends Migration
                         	JOIN `categories` ON `categories`.`idcategories` = `devices`.`category`
                         	JOIN `events` ON `events`.`idevents` = `devices`.`event`
                           JOIN `groups` ON `groups`.`idgroups` = `events`.`group`
-                          JOIN `users` ON `users`.`idusers` = `devices`.`repaired_by`
+                          JOIN `users` ON `users`.`id` = `devices`.`repaired_by`
                         ;'
         );
     }
