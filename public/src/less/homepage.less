@@ -1,0 +1,77 @@
+.homepage-header {
+    background: @blue;
+    .border-radius(0px);
+    min-height: 70px;
+    
+    .brand {
+        margin-top: 10px;
+        display: block;
+        text-align: center;
+    }
+}
+
+#homepage-contents {
+    .row {
+        margin-bottom: 25px; 
+    }
+}
+
+#groups {
+    background: transparent url('/assets/images/dashboard_2.jpg') no-repeat center center; 
+}
+#parties {
+    background: transparent url('/assets/images/dashboard_1.jpg') no-repeat center center; 
+}
+
+
+#groups, #parties {
+    h3 { color: white; }
+    ul {
+        list-style: none;
+        padding: 0px;
+        margin: 0px;
+        li {
+            display: block;
+            background: rgba(255,255,255,0.5);
+            margin: 3px 0px;
+            padding: 2px 6px; 
+            time { font-size: 10px; color: lighten(@darkgray, 15%); }
+            h4 { margin-top: 0px; }
+        }
+    }
+}
+
+
+.widget {
+    background: fadeout(@litegray, 90%); 
+    display: block;
+    padding: 8px;
+    
+    table {
+        width: 100%; 
+    }
+    .bar-wrap {
+        display: block;
+        margin: 5px 0px;
+        padding: 0px;
+        background: #ececec;
+    }
+    .bar {
+        
+        min-height: 18px;
+        z-index: 500;
+        padding: 4px; 
+        //display: block;
+        
+        
+        &.color-1 {
+            background-color: @fixed;
+        }
+        &.color-2 {
+            background-color: @repairable;
+        }
+        &.color-3 {
+            background-color: @dead;
+        }
+    }
+}

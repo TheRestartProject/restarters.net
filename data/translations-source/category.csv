@@ -1,0 +1,12 @@
+id,en,it,no,de,a,b,c,Added in code?
+category.index.legend,Legend,,,,,,,
+category.index.very_poor,Very poor,,,,,,,
+category.index.poor,Poor,,,,,,,
+category.index.fair,Fair,,,,,,,
+category.index.good,Good,,,,,,,
+category.index.very_good,Very good,,,,,,,
+category.index.id,ID,,,,,,,
+category.index.name,Name,,,,,,,
+category.index.weight,Weight,,,,,,,
+category.index.footprint,CO<sub>2</sub> Footprint,,,,,,,
+category.index.reliability,Reliability,,,,,,,

@@ -1,0 +1,37 @@
+{
+  "name": "Fixometer",
+  "version": "0.0.1",
+  "homepage": "https://github.com/TheRestartProject/Fixometer",
+  "authors": [
+    "Alan Zard <tech@alanzard.com>"
+  ],
+  "description": "Building a tool to track impact of repaired electronic devices",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/components/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-sortable": "~1.11.1",
+    "bootstrap": "~3.3.4",
+    "fontawesome": "~4.3.0",
+    "bootstrap-select": "~1.12.2",
+    "summernote-cleaner": "*"
+  },
+  "devDependencies": {
+    "eonasdan-bootstrap-datetimepicker": "~4.17.45",
+    "summernote": "latest",
+    "bootstrap-fileinput": "~4.2.0",
+    "Chart.js": "~1.0.2",
+    "jquery.floatThead": "~1.2.12",
+    "chained": "^1.0.1",
+    "jquery.bootgrid": "^1.3.1"
+  }
+}

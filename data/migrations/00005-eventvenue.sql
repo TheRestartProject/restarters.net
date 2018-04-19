@@ -1,0 +1,2 @@
+ALTER TABLE `events` 
+ADD COLUMN `venue` VARCHAR(255) NULL AFTER `end`;
