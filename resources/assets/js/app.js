@@ -9,6 +9,8 @@ require('./jquery.min');
 require('./bootstrap.min');
 require('./bootstrap');
 require('./main.js');
+require('./misc/geocoder.js');
+require('./misc/markers.js');
 
 window.Vue = require('vue');
 

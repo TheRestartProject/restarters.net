@@ -1,0 +1,68 @@
+/** All Dasboard Objects **/
+.dbObject {
+    margin-bottom: 25px;
+
+    h3 {
+        color: $blue;
+        margin: 0px 0px 15px;
+        line-height: 120%;
+    }
+    ul {
+        list-style: none; padding: 0px; margin: 0px;
+    }
+
+    a.cta {
+
+        padding: 4px 12px;
+
+        box-shadow: 0;
+        -moz-box-shadow: 0;
+        -webkit-box-shadow: 0;
+        background: $blue;
+        color: white;
+        text-decoration: none;
+
+        @include transition(all, 0.65s);
+
+
+        &:hover {
+            background: $orange;
+            color: $darkgray;
+            box-shadow: 2px 1px 3px rgba(0,0,0,0.5);
+            -moz-box-shadow: 2px 1px 3px rgba(0,0,0,0.5);
+            -webkit-box-shadow: 2px 1px 3px rgba(0,0,0,0.5);
+        }
+    }
+}
+
+.party-opt-in {
+    min-height: 350px;
+    padding: 15px;
+    background: url('../images/dashboard_1.jpg') no-repeat center center;
+
+    li {
+        margin: 0px 0px 10px;
+        display: block;
+        padding: 8px;
+        background: fadeout($litegray, 15%);
+        time {
+            display: block;
+            color: white;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        a.location { display: inline-block; float: left; color: $orange; padding: 4px 0px; }
+        a.cta { display: inline-block; float: right;  }
+
+        .map-wrap {
+            display: none; height: 250px; width: 100%;
+        }
+    }
+}
+
+#parties-tab .media {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #BBB;
+  height: 90px; 
+}

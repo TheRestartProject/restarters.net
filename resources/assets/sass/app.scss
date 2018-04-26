@@ -8,6 +8,19 @@
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
 
+@import 'variables';
+@import 'mixins';
+@import 'main';
+@import 'navigation';
+@import 'forms';
+@import 'footer';
+@import 'profile';
+@import 'dashboard';
+@import 'ctrl-box';
+@import 'homepage';
+@import 'host';
+@import 'outbound';
+
 .navbar-laravel {
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
