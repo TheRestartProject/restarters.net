@@ -12,6 +12,15 @@ require('./main.js');
 require('./misc/geocoder.js');
 require('./misc/markers.js');
 
+// Plugins
+require('../../../node_modules/moment/min/locales.min.js');
+require('../../../node_modules/bootstrap-select/dist/js/bootstrap-select.min.js');
+require('../../../node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js');
+require('../../../node_modules/summernote/dist/summernote.js');
+require('../../../node_modules/summernote-cleaner/summernote-cleaner.js');
+require('../../../node_modules/bootstrap-fileinput/js/fileinput.js');
+require('../../../node_modules/chart.js/dist/Chart.min.js');
+
 window.Vue = require('vue');
 
 /**
