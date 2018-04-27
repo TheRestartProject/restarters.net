@@ -20,7 +20,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'role', 'recovery', 'recovery_expires', 'location', 'age', 'gender'
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'location', 'age', 'gender'
     ];
 
     /**
@@ -154,34 +154,6 @@ class User extends Authenticatable
     }
 
     //This create user function is already done by the RegisterController
-    // public function create($data){
-    //     $sql = 'INSERT INTO `' . $this->table . '` (`created_at`, `name`, `email`, `password`, `role`, `recovery`, `recovery_expires`)
-    //             VALUES (:created_at, :name, :email, :password, :role, :recovery, :recovery_expires)';
-    //
-    //     $data['created_at'] = date('Y-m-d H:i:s', time() );
-    //
-    //     $stmt = $this->database->prepare($sql);
-    //     $stmt->bindParam(':name', $data['name'], PDO::PARAM_STR);
-    //     $stmt->bindParam(':email', $data['email'], PDO::PARAM_STR);
-    //     $stmt->bindParam(':password', $data['password'], PDO::PARAM_STR);
-    //     $stmt->bindParam(':role', $data['role'], PDO::PARAM_INT);
-    //     $stmt->bindParam(':created_at', $data['created_at']);
-    //     $stmt->bindParam(':recovery', $data['recovery']);
-    //     $stmt->bindParam(':recovery_expires', $data['recovery_expires']);
-    //
-    //     $q = $stmt->execute();
-    //
-    //     if(!$q){
-    //         $einfo = $stmt->errorInfo();
-    //         $response = false;
-    //         new Error(602, $einfo[2]);
-    //     }
-    //     else {
-    //         $response = $this->database->lastInsertId();
-    //     }
-    //
-    //     return $response;
-    // }
 
     /** check if email is already in the database **/
     public function checkEmail($email){//Tested!
