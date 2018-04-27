@@ -18,6 +18,22 @@ class FixometerHelper {
 
   }
 
+  /** checks if user has a role **/
+  public static function hasRole($user, $role){
+
+        if($user->role()->first()->role == 'Root'){
+            return true;
+        }
+        else {
+            if($user->role()->first()->role == ucwords($role)){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
 }
 
 ?>

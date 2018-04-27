@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\User;
+use App\Session;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -63,7 +64,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
@@ -71,5 +72,9 @@ class RegisterController extends Controller
             'recovery' => substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 ),
             'recovery_expires' => strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60)),
         ]);
+
+        Session::createSession($user->id);
+
+        return $user;
     }
 }
