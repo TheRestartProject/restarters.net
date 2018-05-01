@@ -24,7 +24,7 @@
                         <th><?php _t("ID");?></th>
                         <th><?php _t("Name");?></th>
                         <th><?php _t("Weight");?> [kg]</th>
-                        <th><?php _t("CO<sub>2</sub> Footprint)";?> [kg]</th>
+                        <th><?php _t("CO<sub>2</sub> Footprint)");?> [kg]</th>
                         <th width="145"><?php _t("Reliability");?></th>
 
                     </tr>
