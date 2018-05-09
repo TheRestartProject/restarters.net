@@ -12,13 +12,13 @@
           <label for="category">Category:</label>
           <select id="category" name="category" class="form-control selectpicker" data-live-search="true" title="Choose category...">
             @if(isset($categories))
-              <?php foreach($categories as $cluster){ ?>
+              @foreach($categories as $cluster)
               <optgroup label="<?php echo $cluster->name; ?>">
-                <?php foreach($cluster->categories as $c){ ?>
+                @foreach($cluster->categories as $c)
                 <option value="<?php echo $c->idcategories; ?>" <?php if($c->idcategories == $formdata->category){ echo " selected"; } ?>><?php echo $c->name; ?></option>
-                <?php } ?>
+                @endforeach
               </optgroup>
-              <?php } ?>
+              @endforeach
             @endif
             <option value="46" <?php if($formdata->category == 46){ echo " selected"; } ?>>Misc</option>
           </select>

@@ -3,59 +3,73 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\User;
 use App\Group;
+use App\Party;
+use App\Device;
 
 use Auth;
+use FixometerHelper;
 
 class GroupController extends Controller
 {
-  public function __construct($model, $controller, $action){
-      parent::__construct($model, $controller, $action);
-
-      $Auth = new Auth($url);
-      if(!$Auth->isLoggedIn() && $action != 'stats'){
-          header('Location: /user/login');
-      }
-      else {
-
-          $user = $Auth->getProfile();
-          $this->user = $user;
-          $this->set('user', $user);
-          $this->set('header', true);
-
-
-          if(hasRole($this->user, 'Host')){
-              $User = new User;
-              $this->set('profile', $User->profilePage($this->user->id));
-          }
-      }
-  }
+  // public function __construct($model, $controller, $action){
+  //     parent::__construct($model, $controller, $action);
+  //
+  //     $Auth = new Auth($url);
+  //     if(!$Auth->isLoggedIn() && $action != 'stats'){
+  //         header('Location: /user/login');
+  //     }
+  //     else {
+  //
+  //         $user = $Auth->getProfile();
+  //         $this->user = $user;
+  //         $this->set('user', $user);
+  //         $this->set('header', true);
+  //
+  //
+  //         if(FixometerHelper::hasRole($this->user, 'Host')){
+  //             $User = new User;
+  //             $this->set('profile', $User->profilePage($this->user->id));
+  //         }
+  //     }
+  // }
 
   public function index($response = null){
 
-      $this->set('title', 'Groups');
-      $this->set('list', $this->Group->findAll());
+      // $this->set('title', 'Groups');
+      // $this->set('list', $this->Group->findAll());
 
-      if(!is_null($response)){
-          $this->set('response', $response);
-      }
+      // if(!is_null($response)){
+      //     $this->set('response', $response);
+      // }
+
+      $Group = new Group;
+
+      return view('groups.index', [
+        'title' => 'Groups',
+        'list' => $Group->findAll(),
+        'response' => $response,
+      ]);
 
   }
 
   public function create(){
 
-      // Administrators can add Groups.
-      if(hasRole($this->user, 'Administrator')){
-          $this->set('title', 'New Group');
-          $this->set('gmaps', true);
-          $this->set('js',
-                      array('head' => array(
-                                      '/ext/geocoder.js'
-                      )));
+      $user = User::find(Auth::id());
 
+      // Administrators can add Groups.
+      if(FixometerHelper::hasRole($user, 'Administrator')){
+          // $this->set('title', 'New Group');
+          // $this->set('gmaps', true);
+          // $this->set('js',
+          //             array('head' => array(
+          //                             '/ext/geocoder.js'
+          //             )));
 
           if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
               $error = array();
+              $Group = new Group;
 
               // We got data! Elaborate.
               $name       =       $_POST['name'];
@@ -96,26 +110,26 @@ class GroupController extends Controller
                                   'longitude'     => $longitude,
                                   'free_text'     => $text,
                                   );
-                  $idGroup = $this->Group->create($data);
+                  $idGroup = $Group->create($data);
                   if( is_numeric($idGroup) && $idGroup !== false ){
 
                       $response['success'] = 'Group created correctly.';
 
                       if(isset($_FILES) && !empty($_FILES)){
                           $file = new File;
-                          $group_avatar = $file->upload('image', 'image', $idGroup, TBL_GROUPS, false, true);
+                          $group_avatar = $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true);
                       }
 
                       /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
-                      $Host = $this->Group->findHost($idGroup);
+                      $Host = $Group->findHost($idGroup);
 
                       $custom_fields = array(
                                       array('key' => 'group_city',            'value' => $area),
                                       array('key' => 'group_host',            'value' => $Host->hostname),
                                       array('key' => 'group_website',         'value' => $website),
-                                      array('key' => 'group_hostavatarurl',   'value' => UPLOADS_URL . 'mid_' .$Host->path),
+                                      array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' .$Host->path),
                                       array('key' => 'group_hash',            'value' => $idGroup),
-                                      array('key' => 'group_avatar_url',      'value' => UPLOADS_URL . 'mid_' . $group_avatar ),
+                                      array('key' => 'group_avatar_url',      'value' => env('UPLOADS_URL') . 'mid_' . $group_avatar ),
                                       array('key' => 'group_latitude',        'value' => $data['latitude']),
                                       array('key' => 'group_longitude',       'value' => $data['longitude']),
                                       );
@@ -145,11 +159,38 @@ class GroupController extends Controller
               }
 
 
-              $this->set('response', $response);
-              $this->set('error', $error);
-              $this->set('udata', $_POST);
+              // $this->set('response', $response);
+              // $this->set('error', $error);
+              // $this->set('udata', $_POST);
+
+              if (!isset($response)) {
+                $response = null;
+              }
+
+              if (!isset($error)) {
+                $error = null;
+              }
+
+              if (!isset($_POST)) {
+                $udata = null;
+              } else {
+                $udata = $_POST;
+              }
+
+              return view('group.create', [
+                'title' => 'New Group',
+                'gmaps' => true,
+                'response' => $response,
+                'error' => $error,
+                'udata' => $udata,
+              ]);
 
           }
+
+          return view('group.create', [
+            'title' => 'New Group',
+            'gmaps' => true,
+          ]);
 
       }
       else {
@@ -213,7 +254,10 @@ class GroupController extends Controller
 
   public function edit($id) {
 
-      if(hasRole($this->user, 'Administrator') || hasRole($this->user, 'Host')){
+      $user = User::find(Auth::id());
+      $Group = new Group;
+
+      if(FixometerHelper::hasRole($user, 'Administrator') || hasRole($user, 'Host')){
 
           if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
 
@@ -223,7 +267,7 @@ class GroupController extends Controller
               unset($data['files']);
               unset($data['image']);
 
-              $u = $this->Group->update($data, $id);
+              $u = $Group->update($data, $id);
               // echo "Updated---";
               if(!$u) {
 
@@ -238,18 +282,18 @@ class GroupController extends Controller
 
                   if(isset($_FILES['image']) && !empty($_FILES['image']) && $_FILES['image']['error'] != 4){
                      // echo "uploading image ... ";
-                      $existing_image = $this->Group->hasImage($id, true);
+                      $existing_image = $Group->hasImage($id, true);
                       if(count($existing_image) > 0){
-                          $this->Group->removeImage($id, $existing_image[0]);
+                          $Group->removeImage($id, $existing_image[0]);
                       }
                       $file = new File;
-                      $group_avatar = $file->upload('image', 'image', $id, TBL_GROUPS, false, true);
-                      $group_avatar = UPLOADS_URL . 'mid_' . $group_avatar ;
+                      $group_avatar = $file->upload('image', 'image', $id, env('TBL_GROUPS'), false, true);
+                      $group_avatar = env('UPLOADS_URL') . 'mid_' . $group_avatar ;
                   }
                   else {
-                      $existing_image = $this->Group->hasImage($id, true);
+                      $existing_image = $Group->hasImage($id, true);
                       if( count($existing_image) > 0 ) {
-                          $group_avatar = UPLOADS_URL . 'mid_' . $existing_image[0]->path;
+                          $group_avatar = env('UPLOADS_URL') . 'mid_' . $existing_image[0]->path;
                       }
                       else {
                           $group_avatar = 'null';
@@ -257,13 +301,13 @@ class GroupController extends Controller
                   }
 
                    /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
-                  $Host = $this->Group->findHost($id);
+                  $Host = $Group->findHost($id);
 
                   $custom_fields = array(
                                       array('key' => 'group_city',            'value' => $data['area']),
                                       array('key' => 'group_host',            'value' => $Host->hostname),
                                       array('key' => 'group_website',         'value' => $data['website']),
-                                      array('key' => 'group_hostavatarurl',   'value' => UPLOADS_URL . 'mid_' . $Host->path),
+                                      array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
                                       array('key' => 'group_hash',            'value' => $id),
                                       array('key' => 'group_avatar_url',      'value' => $group_avatar ),
                                       array('key' => 'group_latitude',        'value' => $data['latitude']),
@@ -284,7 +328,7 @@ class GroupController extends Controller
 
 
                   // Check for WP existence in DB
-                  $theGroup = $this->Group->findOne($id);
+                  $theGroup = $Group->findOne($id);
                   if(!empty($theGroup->wordpress_post_id)){
 
                       // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
@@ -306,26 +350,36 @@ class GroupController extends Controller
                       $this->Group->update(array('wordpress_post_id' => $wpid), $id);
                   }
 
-                  if(hasRole($this->user, 'Host')){
+                  if(FixometerHelper::hasRole($this->user, 'Host')){
                   //    header('Location: /host?action=gu&code=200');
                   }
               }
 
-              $this->set('response', $response);
+              // $this->set('response', $response);
           }
       }
-      $this->set('gmaps', true);
-      $this->set('js', array( 'head' => array( '/ext/geocoder.js')));
+      // $this->set('gmaps', true);
+      // $this->set('js', array( 'head' => array( '/ext/geocoder.js')));
 
-      $Group = $this->Group->findOne($id);
-      $this->set('title', 'Edit Group ' . $Group->name );
-      $this->set('formdata', $Group);
+      $group = $Group->findOne($id);
+      // $this->set('title', 'Edit Group ' . $Group->name );
+      // $this->set('formdata', $Group);
 
+      if (!isset($response)) {
+        $response = null;
+      }
+
+      return view('group.edit', [
+        'response' => $response,
+        'gmaps' => true,
+        'title' => 'Edit Group ' . $Group->name,
+        'formdata' => $group,
+      ]);
 
   }
 
   public function delete($id){
-      if(hasRole($this->user, 'Administrator')){
+      if(FixometerHelper::hasRole($this->user, 'Administrator')){
           $r = $this->Group->delete($id);
           if(!$r){
               $response = 'd:err';
@@ -386,10 +440,19 @@ class GroupController extends Controller
       $this->set('waste', $waste);
       $this->set('format', $format);
 
+      return view('groups.stats', [
+        'pax' => $participants,
+        'hours' => $hours_volunteered,
+        'parties' => count($allparties),
+        'co2' => $co2,
+        'waste' => $waste,
+        'format' => $format,
+      ]);
+
   }
 
-  public function test() {
-    $g = new Group;
-    dd($g->findOne('1'));
-  }
+  // public function test() {
+  //   $g = new Group;
+  //   dd($g->findOne('1'));
+  // }
 }

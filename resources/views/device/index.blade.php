@@ -21,9 +21,9 @@
                 <div class="form-group">
                   <select id="categories" name="categories[]" class="selectpicker form-control" multiple data-live-search="true" title="Choose categories...">
                     @if(isset($categories))
-                      <?php foreach($categories as $cluster){ ?>
+                      @foreach($categories as $cluster)
                       <optgroup label="<?php echo $cluster->name; ?>">
-                        <?php foreach($cluster->categories as $c){ ?>
+                        @foreach($cluster->categories as $c)
                         <option value="<?php echo $c->idcategories; ?>"
                           <?php
                           if(isset($_GET['categories']) && !empty($_GET['categories'])){
@@ -35,9 +35,9 @@
                         >
                         <?php echo $c->name; ?>
                         </option>
-                        <?php } ?>
+                        @endforeach
                       </optgroup>
-                      <?php } ?>
+                      @endforeach
                     @endif
                     <option value="46">Misc</option>
                   </select>
@@ -48,7 +48,7 @@
                 <div class="form-group">
                   <select id="groups" name="groups[]" class="selectpicker form-control" multiple data-live-search="true" title="Choose groups...">
                     @if(isset($groups))
-                      <?php foreach($groups as $g){ ?>
+                      @foreach($groups as $g)
                         <option value="<?php echo $g->id; ?>"
                           <?php
                           if(isset($_GET['groups']) && !empty($_GET['groups'])){
@@ -60,7 +60,7 @@
                         >
                         <?php echo $g->name; ?>
                         </option>
-                      <?php } ?>
+                      @endforeach
                     @endif
                   </select>
                 </div>
@@ -134,7 +134,7 @@
 
                 <tbody>
                   @if(isset($list))
-                    <?php foreach($list as $device){ ?>
+                    @foreach($list as $device)
                     <tr>
                       <td><?php echo $device->id; ?></td>
                       <td><?php echo $device->category_name; ?></td>
@@ -147,7 +147,7 @@
                       <td><?php echo $device->repair_status; ?></td>
                       <td><a href="/device/edit/<?php echo $device->id; ?>">edit</a></td>
                     </tr>
-                    <?php } ?>
+                    @endforeach
                   @endif
                 </tbody>
             </table>

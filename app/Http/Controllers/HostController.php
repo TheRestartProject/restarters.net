@@ -2,49 +2,56 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use App\Device;
+use App\Group;
+use App\Party;
+
+use Auth;
+
 class HostController extends Controller
 {
   public $TotalWeight;
   public $TotalEmission;
   public $EmissionRatio;
 
-  public function __construct($model, $controller, $action){
-      parent::__construct($model, $controller, $action);
-
-      $Auth = new Auth($url);
-      if(!$Auth->isLoggedIn()){
-          header('Location: /user/login');
-      }
-      else {
-          $user = $Auth->getProfile();
-          $this->user = $user;
-          $this->set('user', $user);
-          $this->set('header', true);
-
-          if(!hasRole($this->user, 'Host') && !hasRole($this->user, 'Administrator')) {
-              header('Location: /user/forbidden');
-          }
-          else {
-              $Device = new Device;
-              $weights = $Device->getWeights();
-
-              $this->TotalWeight = $weights[0]->total_weights;
-              $this->TotalEmission = $weights[0]->total_footprints;
-              $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
-
-
-          }
-      }
-  }
+  // public function __construct($model, $controller, $action){
+  //     parent::__construct($model, $controller, $action);
+  //
+  //     $Auth = new Auth($url);
+  //     if(!$Auth->isLoggedIn()){
+  //         header('Location: /user/login');
+  //     }
+  //     else {
+  //         $user = $Auth->getProfile();
+  //         $this->user = $user;
+  //         $this->set('user', $user);
+  //         $this->set('header', true);
+  //
+  //         if(!hasRole($this->user, 'Host') && !hasRole($this->user, 'Administrator')) {
+  //             header('Location: /user/forbidden');
+  //         }
+  //         else {
+  //             $Device = new Device;
+  //             $weights = $Device->getWeights();
+  //
+  //             $this->TotalWeight = $weights[0]->total_weights;
+  //             $this->TotalEmission = $weights[0]->total_footprints;
+  //             $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
+  //
+  //
+  //         }
+  //     }
+  // }
 
   public function index($groupid = null){
 
-      $this->set('title', 'Host Dashboard');
-      $this->set('showbadges', true);
-      $this->set('charts', false);
+      // $this->set('title', 'Host Dashboard');
+      // $this->set('showbadges', true);
+      // $this->set('charts', false);
 
-      $this->set('css', array('/components/perfect-scrollbar/css/perfect-scrollbar.min.css'));
-      $this->set('js', array('foot' => array('/components/perfect-scrollbar/js/min/perfect-scrollbar.jquery.min.js')));
+      // $this->set('css', array('/components/perfect-scrollbar/css/perfect-scrollbar.min.css'));
+      // $this->set('js', array('foot' => array('/components/perfect-scrollbar/js/min/perfect-scrollbar.jquery.min.js')));
 
       if(isset($_GET['action']) && isset($_GET['code'])){
           $actn = $_GET['action'];
@@ -70,15 +77,17 @@ class HostController extends Controller
                   break;
           }
 
-          $this->set('response', $response);
+          // $this->set('response', $response);
       }
+
+      $user = User::find(Auth::id());
 
       //Object Instances
       $Group  = new Group;
       $User   = new User;
       $Party  = new Party;
       $Device = new Device;
-      $groups = $Group->ofThisUser($this->user->id);
+      $groups = $Group->ofThisUser($user->id);
 
       // get list of ids to check in if condition
       $gids = array();
@@ -90,7 +99,7 @@ class HostController extends Controller
 
           //$group = (object) array_fill_keys( array('idgroups') , $groupid);
           $group = $Group->findOne($groupid);
-          $this->set('grouplist', $Group->findList());
+          // $this->set('grouplist', $Group->findList());
 
 
 
@@ -99,7 +108,7 @@ class HostController extends Controller
           $group = $groups[0];
           unset($groups[0]);
       }
-      $this->set('userGroups', $groups);
+      // $this->set('userGroups', $groups);
 
       $allparties = $Party->ofThisGroup($group->idgroups, true, true);
 
@@ -121,7 +130,7 @@ class HostController extends Controller
           $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
 
           foreach($party->devices as $device){
-              if($device->repair_status == DEVICE_FIXED){
+              if($device->repair_status == env('DEVICE_FIXED')){
                   $party->co2 += (!empty($device->estimate) && $device->category == 46 ? ($device->estimate * $this->EmissionRatio) : $device->footprint);
 
               }
@@ -141,10 +150,10 @@ class HostController extends Controller
 
           $party->co2 = number_format(round($party->co2 * $Device->displacement), 0, '.' , ',');
       }
-      $this->set('pax', $participants);
-      $this->set('hours', $hours_volunteered);
+      // $this->set('pax', $participants);
+      // $this->set('hours', $hours_volunteered);
       $weights = $Device->getWeights($group->idgroups);
-      $this->set('weights', $weights);
+      // $this->set('weights', $weights);
 
       $devices = $Device->ofThisGroup($group->idgroups);
 
@@ -154,53 +163,53 @@ class HostController extends Controller
       }
       */
 
-      $this->set('need_attention', $need_attention);
-
-      $this->set('group', $group);
-      $this->set('profile', $User->profilePage($this->user->id));
-
-      $this->set('upcomingparties', $Party->findNextParties($group->idgroups));
-      $this->set('allparties', $allparties);
-
-      $this->set('devices', $Device->ofThisGroup($group->idgroups));
-
-
-      $this->set('device_count_status', $Device->statusCount());
-      $this->set('group_device_count_status', $Device->statusCount($group->idgroups));
+      // $this->set('need_attention', $need_attention);
+      //
+      // $this->set('group', $group);
+      // $this->set('profile', $User->profilePage($this->user->id));
+      //
+      // $this->set('upcomingparties', $Party->findNextParties($group->idgroups));
+      // $this->set('allparties', $allparties);
+      //
+      // $this->set('devices', $Device->ofThisGroup($group->idgroups));
+      //
+      //
+      // $this->set('device_count_status', $Device->statusCount());
+      // $this->set('group_device_count_status', $Device->statusCount($group->idgroups));
 
       // more stats...
 
       /** co2 counters **/
       $co2_years = $Device->countCO2ByYear($group->idgroups);
-      $this->set('year_data', $co2_years);
+      // $this->set('year_data', $co2_years);
       $stats = array();
       foreach($co2_years as $year){
           $stats[$year->year] = $year->co2;
       }
-      $this->set('bar_chart_stats', array_reverse($stats, true));
+      // $this->set('bar_chart_stats', array_reverse($stats, true));
 
       $waste_years = $Device->countWasteByYear($group->idgroups);
 
       //dbga($waste_years);
 
-      $this->set('waste_year_data', $waste_years);
+      // $this->set('waste_year_data', $waste_years);
       $wstats = array();
       foreach($waste_years as $year){
           $wstats[$year->year] = $year->waste;
       }
-      $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
+      // $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
 
 
       // $co2Total = $Device->getWeights();
       $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
 
-      $this->set('co2Total', $this->TotalEmission);
-      $this->set('co2ThisYear', $co2ThisYear[0]->co2);
+      // $this->set('co2Total', $this->TotalEmission);
+      // $this->set('co2ThisYear', $co2ThisYear[0]->co2);
 
       $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
 
-      $this->set('wasteTotal', $this->TotalWeight);
-      $this->set('wasteThisYear', $wasteThisYear[0]->waste);
+      // $this->set('wasteTotal', $this->TotalWeight);
+      // $this->set('wasteThisYear', $wasteThisYear[0]->waste);
 
 
       $clusters = array();
@@ -230,7 +239,7 @@ class HostController extends Controller
               $clusters[$y][$i] = $cluster;
           }
       }
-      $this->set('clusters', $clusters);
+      // $this->set('clusters', $clusters);
 
       // most/least stats for clusters
       $mostleast = array();
@@ -241,10 +250,45 @@ class HostController extends Controller
 
       }
 
-      $this->set('mostleast', $mostleast);
+      // $this->set('mostleast', $mostleast);
+      //
+      // $this->set('top', $Device->findMostSeen(1, null, $group->idgroups));
 
-      $this->set('top', $Device->findMostSeen(1, null, $group->idgroups));
+      if (!isset($response)) {
+        $response = null;
+      }
 
+      return view('host.index', [
+        'title' => 'Host Dashboard',
+        'showbadges' => true,
+        'charts' => false,
+        'response' => $response,
+        'grouplist' => $Group->findList(),
+        'userGroups' => $groups,
+        'pax' => $participants,
+        'hours' => $hours_volunteered,
+        'weights' => $weights,
+        'need_attention' => $need_attention,
+        'group' => $group,
+        'profile' => $User->getProfile($user->id),
+        'upcomingparties' => $Party->findNextParties($group->idgroups),
+        'allparties' => $allparties,
+        'devices' => $Device->ofThisGroup($group->idgroups),
+        'device_count_status' => $Device->statusCount(),
+        'group_device_count_status' => $Device->statusCount($group->idgroups),
+        'year_data' => $co2_years,
+        'bar_chart_stats' => array_reverse($stats, true),
+        'waste_year_data' => $waste_years,
+        'waste_bar_chart_stats' => array_reverse($wstats, true),
+        'co2Total' => $this->TotalEmission,
+        'co2ThisYear' => $co2ThisYear[0]->co2,
+        'wasteTotal' => $this->TotalWeight,
+        'wasteThisYear' => $wasteThisYear[0]->waste,
+        'clusters' => $clusters,
+        'mostleast' => $mostleast,
+        'top' => $Device->findMostSeen(1, null, $group->idgroups),
+        'user' => $user,
+      ]);
 
   }
 }

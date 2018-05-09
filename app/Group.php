@@ -45,7 +45,7 @@ class Group extends Model
                     GROUP_CONCAT(`u`.`name` ORDER BY `u`.`name` ASC SEPARATOR ", "  )  AS `user_list`
                 FROM `' . $this->table . '` AS `g`
                 LEFT JOIN `users_groups` AS `ug` ON `g`.`idgroups` = `ug`.`group`
-                LEFT JOIN `users` AS `u` ON `ug`.`user` = `u`.`idusers`
+                LEFT JOIN `users` AS `u` ON `ug`.`user` = `u`.`id`
                 GROUP BY `g`.`idgroups`
                 ORDER BY `g`.`idgroups` ASC'));
       } catch (\Illuminate\Database\QueryException $e) {
@@ -89,6 +89,7 @@ class Group extends Model
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
                         AND `xref`.`reference_type` = ' . env('TBL_GROUPS') . '
+                        GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
                 WHERE `id' . $this->table . '` = :id'), array('id' => $id));
@@ -110,7 +111,7 @@ class Group extends Model
                 INNER JOIN `users_groups` AS `ug`
                     ON `ug`.`group` = `g`.`idgroups`
                 INNER JOIN `users` AS `u`
-                    ON `u`.`idusers` = `ug`.`user`
+                    ON `u`.`id` = `ug`.`user`
                 LEFT JOIN (
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
@@ -118,7 +119,7 @@ class Group extends Model
                         AND `xref`.`reference_type` = ' . env('TBL_USERS') . '
                         GROUP BY `images`.`path`
                 ) AS `xi`
-                ON `xi`.`reference` = `u`.`idusers`
+                ON `xi`.`reference` = `u`.`id`
 
                 WHERE `g`.`idgroups` = :id
                 AND `u`.`role` = 3'), array('id' => $id));

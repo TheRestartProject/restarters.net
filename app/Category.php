@@ -34,7 +34,7 @@ class Category extends Model
     //Getters
     public function findAll() {
       try {
-        DB::select(DB::raw('SELECT * FROM `' . $this->table . '` WHERE `revision` = :rev'), array('rev' => $this->revision));
+        return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` WHERE `revision` = :rev'), array('rev' => $this->revision));
       } catch (\Illuminate\Database\QueryException $e) {
         return false;
       }

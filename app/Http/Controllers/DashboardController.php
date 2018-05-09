@@ -2,34 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+
 use Auth;
 
 class DashboardController extends Controller
 {
-  public function __construct($model, $controller, $action){
-      parent::__construct($model, $controller, $action);
-
-      $Auth = new Auth($url);
-      if(!$Auth->isLoggedIn()){
-          header('Location: /user/login');
-      }
-      else {
-
-          $user = $Auth->getProfile();
-          $this->user = $user;
-          $this->set('user', $user);
-          $this->set('header', true);
-      }
-  }
+  // public function __construct($model, $controller, $action){
+  //     parent::__construct($model, $controller, $action);
+  //
+  //     $Auth = new Auth($url);
+  //     if(!$Auth->isLoggedIn()){
+  //         header('Location: /user/login');
+  //     }
+  //     else {
+  //
+  //         $user = $Auth->getProfile();
+  //         $this->user = $user;
+  //         $this->set('user', $user);
+  //         $this->set('header', true);
+  //     }
+  // }
 
 
   public function index() {
-      /** js setup **/
-      $this->set('gmaps', true);
 
-      if(hasRole($user, 'Host')){
-          self::hostdashboard();
-      }
+      $user = User::getProfile(Auth::id());
+
+      // if(hasRole($user, 'Host')){
+      //     self::hostdashboard();
+      // }
+
+      return view('dashboard.index', [
+        'gmaps' => true,
+        'user' => $user,
+        'header' => true,
+      ]);
 
       /*
       $this->set('title', 'Dashboard');

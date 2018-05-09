@@ -12,7 +12,9 @@
             <div class="row">
                 <div class="col-md-12">
 
-                    <?php if(isset($response)) { printResponse($response); } ?>
+                    @if(isset($response))
+                      @php( printResponse($response) )
+                    @endif
 
                     <form action="/device/create" method="post">
                         <div class="row">
@@ -24,9 +26,9 @@
                                     <select id="event" name="event"  class="form-control selectpicker" data-live-search="true">
                                         <option></option>
                                         @if(isset($events))
-                                          <?php foreach($events as $event){ ?>
+                                          @foreach($events as $event)
                                           <option value="<?php echo $event->idevents; ?>"><?php echo $event->name . ' [' . date('d/m/Y', strtotime($event->event_date)) . ']'; ?></option>
-                                          <?php } ?>
+                                          @endforeach
                                         @endif
                                     </select>
                                     <?php if(isset($error) && isset($error['event']) && !empty($error['event'])) { echo '<span class="help-block text-danger">' . $error['event'] . '</span>'; } ?>

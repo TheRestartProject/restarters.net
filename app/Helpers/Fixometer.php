@@ -34,6 +34,23 @@ class FixometerHelper {
         }
     }
 
+  public static function barChartValue($portion, $total){
+      if((int)$portion > 0){
+          return round((($portion / $total) * 100) , 2) - 15;
+      }else {
+          return -15 ;
+      }
+  }
+
+  public static function featureIsEnabled($feature) {
+        return $feature === true;
+  }
+
+  public static function dateFormat($timestamp){
+      return date('D, j M Y, H:i', $timestamp);
+  }
+
+
 }
 
 ?>

@@ -79,6 +79,8 @@ class ExportController extends Controller
         $data = array_merge($header, $data);
 
         $this->set('data', $data);
+
+        return $data;
     }
 
 
@@ -198,6 +200,8 @@ class ExportController extends Controller
         $data = array_merge($headers, $PartyArray);
 
         $this->set('data', $data);
+
+        return $data;
     }
   }
 }

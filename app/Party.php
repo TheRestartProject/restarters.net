@@ -16,7 +16,7 @@ class Party extends Model
      *
      * @var array
      */
-    protected $fillable = ['devices'];
+    protected $fillable = ['devices', 'co2', 'ewaste', 'fixed_devices', 'repairable_devices', 'dead_devices'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -105,7 +105,7 @@ class Party extends Model
 
         if($devices){
             $devices = new Device;
-            $party->devices = $devices->ofThisEvent($party->idevents);
+            $party[0]->devices = $devices->ofThisEvent($party[0]->id);
         }
 
         return $party;

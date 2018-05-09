@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Party;
+use App\Group;
+use App\User;
+use App\Category;
+use App\Device;
 
+use FixometerHelper;
 use Auth;
 
 class PartyController extends Controller
@@ -16,68 +21,80 @@ class PartyController extends Controller
   public $TotalEmission;
   public $EmissionRatio;
 
-  public function __construct($model, $controller, $action)
-  {
-      parent::__construct($model, $controller, $action);
-
-      $Auth = new Auth($url);
-      if(!$Auth->isLoggedIn() && $action != 'stats'){
-          header('Location: /user/login');
-      }
-
-      $user = $Auth->getProfile();
-      $this->user = $user;
-      $this->set('user', $user);
-      $this->set('header', true);
-
-      if (hasRole($this->user, 'Host'))
-      {
-          $Group = new Group;
-          $group = $Group->ofThisUser($this->user->id);
-          $this->set('usergroup', $group[0]);
-          $parties = $this->Party->ofThisGroup($group[0]->idgroups);
-
-          foreach($parties as $party){
-              $this->hostParties[] = $party->idevents;
-          }
-          $User = new User;
-          $this->set('profile', $User->profilePage($this->user->id));
-
-          $Device = new Device;
-          $weights = $Device->getWeights();
-
-          $this->TotalWeight = $weights[0]->total_weights;
-          $this->TotalEmission = $weights[0]->total_footprints;
-          $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
-      }
-
-      $this->permissionsChecker = new PermissionsChecker($this->user, $this->hostParties);
-  }
+  // public function __construct($model, $controller, $action)
+  // {
+  //     parent::__construct($model, $controller, $action);
+  //
+  //     $Auth = new Auth($url);
+  //     if(!$Auth->isLoggedIn() && $action != 'stats'){
+  //         header('Location: /user/login');
+  //     }
+  //
+  //     $user = $Auth->getProfile();
+  //     $this->user = $user;
+  //     $this->set('user', $user);
+  //     $this->set('header', true);
+  //
+  //     if (hasRole($this->user, 'Host'))
+  //     {
+  //         $Group = new Group;
+  //         $group = $Group->ofThisUser($this->user->id);
+  //         $this->set('usergroup', $group[0]);
+  //         $parties = $this->Party->ofThisGroup($group[0]->idgroups);
+  //
+  //         foreach($parties as $party){
+  //             $this->hostParties[] = $party->idevents;
+  //         }
+  //         $User = new User;
+  //         $this->set('profile', $User->profilePage($this->user->id));
+  //
+  //         $Device = new Device;
+  //         $weights = $Device->getWeights();
+  //
+  //         $this->TotalWeight = $weights[0]->total_weights;
+  //         $this->TotalEmission = $weights[0]->total_footprints;
+  //         $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
+  //     }
+  //
+  //     $this->permissionsChecker = new PermissionsChecker($this->user, $this->hostParties);
+  // }
 
   public function index()
   {
-      $this->set('title', 'Parties');
-      $this->set('list', $this->Party->findAll());
+      // $this->set('title', 'Parties');
+      // $this->set('list', $this->Party->findAll());
+
+      $Party = new Party;
+      $user = User::find(Auth::id());
+
+      return view('party.index', [
+        'title' => 'Parties',
+        'list' => $Party->findAll(),
+        'user' => $user,
+      ]);
   }
 
   public function create()
   {
-      if (!$this->permissionsChecker->userHasCreatePartyPermission()) {
-          header('Location: /user/forbidden');
-      }
+      $user = User::find(Auth::id());
+
+      // if (!FixometerHelper::hasRole($user, 'Administrator') || !FixometerHelper::hasRole($user, 'Host')) {
+      //     header('Location: /user/forbidden');
+      // }
 
       $Groups = new Group;
+      $Party = new Party;
 
-      $this->set('grouplist', $Groups->findList());
-
-      $this->set('title', 'New Party');
-      $this->set('gmaps', true);
-      $this->set('js',
-                  array('head' => array(
-                                  '/ext/geocoder.js'
-                  )));
-
-      $this->set('group_list', $Groups->findAll());
+      // $this->set('grouplist', $Groups->findList());
+      //
+      // $this->set('title', 'New Party');
+      // $this->set('gmaps', true);
+      // $this->set('js',
+      //             array('head' => array(
+      //                             '/ext/geocoder.js'
+      //             )));
+      //
+      // $this->set('group_list', $Groups->findAll());
 
       if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
           $error = array();
@@ -153,7 +170,7 @@ class PartyController extends Controller
                               'hours'         => $hours,
                               'volunteers'    => $volunteers
                               );
-              $idParty = $this->Party->create($data);
+              $idParty = $Party->create($data);
 
 
 
@@ -163,23 +180,23 @@ class PartyController extends Controller
                   $_POST['users'][] = 29;
                   if(isset($_POST['users']) && !empty($_POST['users'])){
                       $users = $_POST['users'];
-                      $this->Party->createUserList($idParty, $users);
+                      $Party->createUserList($idParty, $users);
                   }
 
 
                   /** let's create the image attachment! **/
                   if(isset($_FILES) && !empty($_FILES)){
                       $file = new File;
-                      $file->upload('file', 'image', $idParty, TBL_EVENTS);
+                      $file->upload('file', 'image', $idParty, env('TBL_EVENTS'));
                   }
 
-                  if(SYSTEM_STATUS != 'development') {
+                  if(env('APP_ENV') != 'development' || env('APP_ENV') != 'local') {
                       /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                       $Host = $Groups->findHost($group);
 
                       $custom_fields = array(
                                       array('key' => 'party_host',            'value' => $Host->hostname),
-                                      array('key' => 'party_hostavatarurl',   'value' => UPLOADS_URL . 'mid_' .$Host->path),
+                                      array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' .$Host->path),
                                       array('key' => 'party_grouphash',       'value' => $group),
                                       array('key' => 'party_venue',           'value' => $venue),
                                       array('key' => 'party_location',        'value' => $location),
@@ -206,15 +223,15 @@ class PartyController extends Controller
                       $party_name = !empty($data['venue']) ? $data['venue'] : $data['location'];
                       $wpid = $wpClient->newPost($party_name, $free_text, $content);
 
-                      $this->Party->update(array('wordpress_post_id' => $wpid), $idParty);
+                      $Party->update(array('wordpress_post_id' => $wpid), $idParty);
                   }
 
-                  if(hasRole($this->user, 'Host')){
+                  if(FixometerHelper::hasRole($this->user, 'Host')){
 
                       $this->sendCreationNotificationEmail($venue, $location, $event_date, $start, $end, $group);
                       header('Location: /host?action=pc&code=200');
 
-                    }else if(hasRole($this->user, 'Administrator')){
+                    }else if(FixometerHelper::hasRole($this->user, 'Administrator')){
                       header('Location: /admin?action=pc&code=200');
                     }
                }
@@ -226,10 +243,41 @@ class PartyController extends Controller
           else {
               $response['danger'] = 'Party could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.';
           }
-          $this->set('response', $response);
-          $this->set('error', $error);
-          $this->set('udata', $_POST);
+          // $this->set('response', $response);
+          // $this->set('error', $error);
+          // $this->set('udata', $_POST);
+
+          if (!isset($response)) {
+            $response = null;
+          }
+          if (!isset($error)) {
+            $error = null;
+          }
+          if (!isset($_POST)) {
+            $udata = null;
+          } else {
+            $udata = $_POST;
+          }
+
+          return view('party.create', [
+            'title' => 'New Party',
+            'grouplist' => $Groups->findList(),
+            'gmaps' => true,
+            'group_list' => $Groups->findAll(),
+            'response' => $response,
+            'error' => $error,
+            'udata' => $_POST,
+            'user' => $user,
+          ]);
       }
+
+      return view('party.create', [
+        'title' => 'New Party',
+        'grouplist' => $Groups->findList(),
+        'gmaps' => true,
+        'group_list' => $Groups->findAll(),
+        'user' => $user,
+      ]);
 
   }
 
@@ -404,7 +452,7 @@ class PartyController extends Controller
                   else { }
               }
           }
-          if(hasRole($this->user, 'Host')){
+          if(FixometerHelper::hasRole($this->user, 'Host')){
               header('Location: /host?action=pe&code=200');
           }
           $this->set('response', $response);
@@ -425,33 +473,48 @@ class PartyController extends Controller
       $this->set('remotePost', $remotePost);
 
       $this->set('grouplist', $Groups->findList());
+
+      return view('parties.edit', [
+        'response' => $response,
+        'gmaps' => true,
+        'images' => $images,
+        'title' => 'Edit Party',
+        'group_list' => $Groups->findAll(),
+        'formdata' => $Party,
+        'remotePost' => $remotePost,
+        'grouplist' => $Groups->findList(),
+      ]);
   }
 
 
   public function manage($id){
-      if( !hasRole($this->user, 'Host') && !hasRole($this->user, 'Administrator')){
+
+      $user = User::find(Auth::id());
+
+      if( !FixometerHelper::hasRole($user, 'Host') && !FixometerHelper::hasRole($user, 'Administrator')){
           header('Location: /user/forbidden');
       }
       else {
 
-          $this->set('js',
-                      array('foot' => array(
-                                      '/components/jquery.floatThead/dist/jquery.floatThead.min.js'
-                      )));
+          // $this->set('js',
+          //             array('foot' => array(
+          //                             '/components/jquery.floatThead/dist/jquery.floatThead.min.js'
+          //             )));
 
           $Device     = new Device;
           $Category   = new Category;
           $User       = new User;
           $Group      = new Group;
+          $Party      = new Party;
 
-          $this->set('grouplist', $Group->findList());
+          // $this->set('grouplist', $Group->findList());
 
           if(isset($_POST) && !empty($_POST) && is_numeric($_POST['idparty']) && ($_POST['idparty'] > 0) ) {
               $response = null;
 
               $partydata = $_POST['party'];
               $idparty = $_POST['idparty'];
-              $this->Party->update($partydata, $idparty);
+              $Party->update($partydata, $idparty);
 
               if(isset($_POST['device'])){
                   $devices = $_POST['device'];
@@ -487,7 +550,7 @@ class PartyController extends Controller
                       if($method == 'update'){
                           //echo "updating---";
                           $Device->update($device, $iddevice);
-                          if (featureIsEnabled(FEATURE__DEVICE_PHOTOS)) {
+                          if (FixometerHelper::featureIsEnabled(env('FEATURE__DEVICE_PHOTOS'))) {
                             if($files[$i]['error'] == 0){
                               $File->simpleUpload($files[$i], 'device', $iddevice, 'Device S/N Image');
                             }
@@ -498,7 +561,7 @@ class PartyController extends Controller
                           //echo "creating---";
                           $device['category_creation'] = $device['category'];
                           $iddevice = $Device->create($device);
-                          if (featureIsEnabled(FEATURE__DEVICE_PHOTOS)) {
+                          if (FixometerHelper::featureIsEnabled(env('FEATURE__DEVICE_PHOTOS'))) {
                             if($files[$i]['error'] == 0){
                               $File->simpleUpload($files[$i], 'device', $iddevice, 'Device S/N Image');
                             }
@@ -510,9 +573,9 @@ class PartyController extends Controller
               }
 
 
-              if(SYSTEM_STATUS != 'development') {
+              if(env('APP_ENV') != 'development' || env('APP_ENV') != 'local') {
                   /** WP Sync **/
-                  $party = $this->Party->findThis($idparty, true);
+                  $party = $Party->findThis($idparty, true);
 
                   $Groups = new Group;
                   $partygroup = $party->group;
@@ -592,14 +655,15 @@ class PartyController extends Controller
 
               }
               */
-            $this->set('response', $response);
+            // $this->set('response', $response);
           }
 
 
-          $party      = $this->Party->findThis($id, true);
+          $party      = $Party->findThis($id, true);
           $categories = $Category->listed();
           $restarters = $User->find(array('idroles' => 4));
 
+          $party = $party[0];
 
           $party->co2 = 0;
           $party->ewaste = 0;
@@ -611,7 +675,7 @@ class PartyController extends Controller
           if(!empty($party->devices)){
               foreach($party->devices as $device){
 
-                  if($device->repair_status == DEVICE_FIXED){
+                  if($device->repair_status == env('DEVICE_FIXED')){
                       $party->co2     += (!empty($device->estimate) && $device->category==46 ? ($device->estimate * $this->EmissionRatio) : $device->footprint);
                       $party->ewaste  += (!empty($device->estimate) && $device->category==46 ? $device->estimate : $device->weight);
                   }
@@ -632,16 +696,30 @@ class PartyController extends Controller
 
           $party->co2 = number_format(round($party->co2 * $Device->displacement), 0, '.' , ',');
 
-          $this->set('party', $party);
-          $this->set('devices', $party->devices);
-          $this->set('categories', $categories);
-          $this->set('restarters', $restarters);
+          // $this->set('party', $party);
+          // $this->set('devices', $party->devices);
+          // $this->set('categories', $categories);
+          // $this->set('restarters', $restarters);
+
+          if (!isset($response)) {
+            $response = null;
+          }
+
+          return view('party.manage', [
+            'grouplist' => $Group->findList(),
+            'response' => $response,
+            'party' => $party,
+            'devices' => $party->devices,
+            'categories' => $categories,
+            'restarters' => $restarters,
+            'user' => $user,
+          ]);
       }
   }
 
 
   public function delete($id){
-      if(hasRole($this->user, 'Administrator') || (hasRole($this->user, 'Host') && in_array($id, $this->hostParties))){
+      if(FixometerHelper::hasRole($this->user, 'Administrator') || (hasRole($this->user, 'Host') && in_array($id, $this->hostParties))){
           // fetch the postID in WP to delete it later
           $party = $this->Party->findOne($id);
           $wpId = $party->wordpress_post_id;
@@ -673,7 +751,7 @@ class PartyController extends Controller
 
           }
 
-          if(hasRole($this->user, 'Host')){
+          if(FixometerHelper::hasRole($this->user, 'Host')){
               header('Location: /host?' . $response);
           }
           else {
@@ -691,7 +769,7 @@ class PartyController extends Controller
   public function stats($id, $class = null){
       $Device = new Device;
 
-      $this->set('framed', true);
+      // $this->set('framed', true);
       $party = $this->Party->findThis($id, true);
 
       if($party->device_count == 0){
@@ -729,6 +807,12 @@ class PartyController extends Controller
       if(!is_null($class)) {
           $this->set('class', 'wide');
       }
+
+      return view('party.stats', [
+        'framed' => true,
+        'party' => $party,
+        'class' => 'wide',
+      ]);
 
   }
 

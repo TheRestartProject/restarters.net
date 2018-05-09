@@ -35,7 +35,7 @@
 
                 <tbody>
                   @if(isset($list))
-                    <?php foreach($list as $p){ ?>
+                    @foreach($list as $p)
                     <tr>
                         <td><?php echo $p->idcategories; ?></td>
                         <td><?php echo $p->name; ?></td>
@@ -44,7 +44,7 @@
                         <td><span class="indicator indicator-<?php echo $p->footprint_reliability; ?>"><?php echo $p->footprint_reliability; ?></span></td>
 
                     </tr>
-                    <?php } ?>
+                    @endforeach
                   @endif
                 </tbody>
             </table>

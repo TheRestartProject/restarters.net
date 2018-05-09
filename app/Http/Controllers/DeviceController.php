@@ -3,58 +3,72 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
+use App\User;
 use App\Device;
+use App\Category;
+use App\Group;
+use App\Party;
 
 use Auth;
+use FixometerHelper;
 
 class DeviceController extends Controller
 {
-  public function __construct($model, $controller, $action){
-      parent::__construct($model, $controller, $action);
-
-      $Auth = new Auth($url);
-      if(!$Auth->isLoggedIn()){
-          header('Location: /user/login');
-      }
-      else {
-
-          $user = $Auth->getProfile();
-          $this->user = $user;
-          $this->set('user', $user);
-          $this->set('header', true);
-
-          if(hasRole($this->user, 'Host')){
-              $Group = new Group;
-              $Party = new Party;
-              $group = $Group->ofThisUser($this->user->id);
-              $this->set('usergroup', $group[0]);
-              $parties = $Party->ofThisGroup($group[0]->idgroups);
-
-              foreach($parties as $party){
-                  $this->hostParties[] = $party->idevents;
-              }
-              $User = new User;
-              $this->set('profile', $User->profilePage($this->user->id));
-          }
-      }
-  }
+  // public function __construct($model, $controller, $action){
+  //     parent::__construct($model, $controller, $action);
+  //
+  //     $Auth = new Auth($url);
+  //     if(!$Auth->isLoggedIn()){
+  //         header('Location: /user/login');
+  //     }
+  //     else {
+  //
+  //         $user = $Auth->getProfile();
+  //         $this->user = $user;
+  //         $this->set('user', $user);
+  //         $this->set('header', true);
+  //
+  //         if(FixometerHelper::hasRole($this->user, 'Host')){
+  //             $Group = new Group;
+  //             $Party = new Party;
+  //             $group = $Group->ofThisUser($this->user->id);
+  //             $this->set('usergroup', $group[0]);
+  //             $parties = $Party->ofThisGroup($group[0]->idgroups);
+  //
+  //             foreach($parties as $party){
+  //                 $this->hostParties[] = $party->idevents;
+  //             }
+  //             $User = new User;
+  //             $this->set('profile', $User->profilePage($this->user->id));
+  //
+  //             return view('device.index', [
+  //               'user' => $user,
+  //               'header' => true,
+  //               'usergroup' => $group[0],
+  //               'profile' => $User->profilePage($this->user->id),
+  //             ]);
+  //         }
+  //     }
+  // }
 
   public function index(){
 
-      $this->set('title', 'Devices');
-      $this->set('css', array('/components/jquery.bootgrid/dist/jquery.bootgrid.min.css'));
-      $this->set('js', array('head' => array(
-        '/components/jquery.bootgrid/dist/jquery.bootgrid.js',
-        '/components/jquery.bootgrid/dist/jquery.bootgrid.fa.js',
-        '/dist/js/device_list.js'
-      )));
+      // $this->set('title', 'Devices');
+      // $this->set('css', array('/components/jquery.bootgrid/dist/jquery.bootgrid.min.css'));
+      // $this->set('js', array('head' => array(
+      //   '/components/jquery.bootgrid/dist/jquery.bootgrid.js',
+      //   '/components/jquery.bootgrid/dist/jquery.bootgrid.fa.js',
+      //   '/dist/js/device_list.js'
+      // )));
 
       $Category   = new Category;
       $Group      = new Group;
+      $Device     = new Device;
 
       $categories = $Category->listed();
-      $this->set('categories', $categories);
-      $this->set('groups', $Group->findAll());
+      // $this->set('categories', $categories);
+      // $this->set('groups', $Group->findAll());
 
       if(isset($_GET['fltr']) && !empty($_GET['fltr'])){
 
@@ -100,20 +114,29 @@ class DeviceController extends Controller
         );
 
 
-        $list = $this->Device->getList($params);
+        $list = $Device->getList($params);
 
       } else {
-        $list = $this->Device->getList();
+        $list = $Device->getList();
       }
 
-      $this->set('list', $list);
+      // $this->set('list', $list);
+
+      return view('device.index', [
+        'title' => 'Devices',
+        'categories' => $categories,
+        'groups' => $Group->findAll(),
+        'list' => $list,
+      ]);
 
   }
 
   public function edit($id){
-      $this->set('title', 'Edit Device');
-      if(hasRole($this->user, 'Administrator') || hasRole($this->user, 'Host') ){
+      // $this->set('title', 'Edit Device');
+      $user = User::find(Auth::id());
+      if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host') ){
 
+          $Device = new Device;
 
           if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)){
 
@@ -126,7 +149,7 @@ class DeviceController extends Controller
               //$data['event_date'] = dbDateNoTime($data['event_date']);
 
 
-              $u = $this->Device->update($data, $id);
+              $u = $Device->update($data, $id);
 
               if(!$u) {
                   $response['danger'] = 'Something went wrong. Please check the data and try again.';
@@ -143,7 +166,7 @@ class DeviceController extends Controller
 
               }
 
-              $this->set('response', $response);
+              // $this->set('response', $response);
           }
           $Events = New Party;
           $Categories = New Category;
@@ -151,12 +174,24 @@ class DeviceController extends Controller
           $UserEvents = $Events->findAll();
 
 
-          $this->set('categories', $Categories->findAll());
-          $this->set('events', $UserEvents);
+          // $this->set('categories', $Categories->findAll());
+          // $this->set('events', $UserEvents);
 
-          $Device = $this->Device->findOne($id);
-          $this->set('title', 'Edit Device');
-          $this->set('formdata', $Device);
+          $device = $Device->findOne($id);
+          // $this->set('title', 'Edit Device');
+          // $this->set('formdata', $Device);
+
+          if (!isset($response)) {
+            $response = null;
+          }
+
+          return view('device.edit', [
+            'title' => 'Edit Device',
+            'response' => $response,
+            'categories' => $Categories->findAll(),
+            'events' => $UserEvents,
+            'formdata' => $device,
+          ]);
 
       }
       else {
@@ -174,6 +209,12 @@ class DeviceController extends Controller
           $this->set('title', 'Edit Device');
           $this->set('categories', $Categories->listed());
           $this->set('formdata', $Device);
+
+          return view('device.edit', [
+            'title' => 'Edit Device',
+            'categories' => $Categories->findAll(),
+            'formdata' => $Device,
+          ]);
 
       }
       else {
@@ -207,7 +248,9 @@ class DeviceController extends Controller
 
 
   public function create(){
-      if(hasRole($user, 'Guest')){
+      $user = User::find(Auth::id());
+
+      if(FixometerHelper::hasRole($user, 'Guest')){
           header('Location: /user/forbidden');
 
       }
@@ -215,22 +258,23 @@ class DeviceController extends Controller
           $Events = New Party;
           $Categories = New Category;
 
-          $UserEvents = $Events->ofThisUser($this->user->id);
+          $UserEvents = $Events->ofThisUser($user->id);
 
 
-          $this->set('categories', $Categories->findAll());
-          $this->set('events', $UserEvents);
+          // $this->set('categories', $Categories->findAll());
+          // $this->set('events', $UserEvents);
 
           if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
               $error = array();
               $data = array_filter($_POST);
+              $Device = new Device;
 
               if(!verify($data['event'])){ $error['event'] = 'Please select a Restart party.'; }
               if(!verify($data['category'])){ $error['category'] = 'Please select a category for this device'; }
               if(!verify($data['repair_status'])){ $error['repair_status'] = 'Please select a repair status.'; }
 
               if(!empty($error)){
-                  $this->set('error', $error);
+                  // $this->set('error', $error);
                   $response['danger'] = 'The device repair has <strong>not</strong> been saved.';
               }
               else {
@@ -240,7 +284,7 @@ class DeviceController extends Controller
                   $data['category_creation'] = $data['category'];
 
                   // save this!
-                  $insert = $this->Device->create($data);
+                  $insert = $Device->create($data);
                   if(!$insert){
                       $response['danger'] = 'Error while saving the device tot he DB.';
                   }
@@ -250,11 +294,33 @@ class DeviceController extends Controller
 
               }
 
-              $this->set('response', $response);
-              $this->set('udata', $data);
+              // $this->set('response', $response);
+              // $this->set('udata', $data);
           }
 
-          $this->set('title', 'New Device');
+          // $this->set('title', 'New Device');
+
+          if (!isset($error)) {
+            $error = null;
+          }
+
+          if (!isset($response)) {
+            $response = null;
+          }
+
+          if (!isset($data)) {
+            $data = null;
+          }
+
+          return view('device.create', [
+            'title' => 'New Device',
+            'categories' => $Categories->findAll(),
+            'events' => $UserEvents,
+            'response' => $response,
+            'udata' => $data,
+            'error' => $error,
+          ]);
+
       }
 
 
@@ -263,7 +329,7 @@ class DeviceController extends Controller
 
 
   public function delete($id){
-      if(hasRole($this->user, 'Administrator') || (hasRole($this->user, 'Host')) ){
+      if(FixometerHelper::hasRole($this->user, 'Administrator') || (FixometerHelper::hasRole($this->user, 'Host')) ){
           // get device party
           $curr = $this->Device->findOne($id);
           $party = $curr->event;
@@ -279,14 +345,15 @@ class DeviceController extends Controller
 
           header('Location: /party/manage/' . $party . '/' . $response);
 
+
       }
       else {
           header('Location: /user/forbidden');
       }
   }
 
-    public function test() {
-      $g = new Device;
-      dd($g->export());
-    }
+    // public function test() {
+    //   $g = new Device;
+    //   dd($g->export());
+    // }
 }

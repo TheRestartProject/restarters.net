@@ -2,55 +2,70 @@
 
 namespace App\Http\Controllers;
 
+use App\Group;
+use App\Party;
+use App\Device;
+
 class OutboundController extends Controller
 {
-  public function __construct($model, $controller, $action){
-
-	  parent::__construct($model, $controller, $action);
-
-	  $this->groups = new Group;
-		$this->parties = new Party;
-		$this->devices = new Device;
-
-		$weights = $this->devices->getWeights();
-
-		$this->TotalWeight = $weights[0]->total_weights;
-		$this->TotalEmission = $weights[0]->total_footprints;
-		$this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
-  }
+  // public function __construct($model, $controller, $action){
+  //
+	//   parent::__construct($model, $controller, $action);
+  //
+	//   $this->groups = new Group;
+	// 	$this->parties = new Party;
+	// 	$this->devices = new Device;
+  //
+	// 	$weights = $this->devices->getWeights();
+  //
+	// 	$this->TotalWeight = $weights[0]->total_weights;
+	// 	$this->TotalEmission = $weights[0]->total_footprints;
+	// 	$this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
+  // }
 
 	public function index(){
 
-		$counters = array();
-		$counters['groups'] = $this->groups->howMany();
-		$counters['parties'] = $this->parties->howMany();
-		$counters['pax'] = $this->parties->attendees();
+    $groups = new Group;
+		$parties = new Party;
+		$devices = new Device;
 
-		$allParties = $this->parties->ofThisGroup('admin', true, true);
+		$counters = array();
+		$counters['groups'] = $groups->howMany();
+		$counters['parties'] = $parties->howMany();
+		$counters['pax'] = $parties->attendees();
+
+		$allParties = $parties->ofThisGroup('admin', true, true);
 		$hours_volunteered = 0;
 		foreach($allParties as $party){
 			$hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
 		}
 
 		$counters['hours'] = $hours_volunteered;
-		$counters['devices'] = $this->devices->howMany();
-		$counters['statuses'] = $this->devices->statusCount();
-		$counters['most_seen'] = $this->devices->findMostSeen();
+		$counters['devices'] = $devices->howMany();
+		$counters['statuses'] = $devices->statusCount();
+		$counters['most_seen'] = $devices->findMostSeen();
 
 		$rates = array();
 		$mostseen = array();
 		$states = array();
 		for($i = 1; $i < 5; $i++){
-			$mostseen[$i] = $this->devices->findMostSeen(null, $i);
-			$rates['most'][$i] = $this->devices->successRates($i);
-			$rates['least'][$i] = $this->devices->successRates($i, 'ASC');
-			$states[$i] = $this->devices->clusterCount($i);
+			$mostseen[$i] = $devices->findMostSeen(null, $i);
+			$rates['most'][$i] = $devices->successRates($i);
+			$rates['least'][$i] = $devices->successRates($i, 'ASC');
+			$states[$i] = $devices->clusterCount($i);
 		}
 
-		$this->set('mostseen', $mostseen);
-		$this->set('counters', $counters);
-		$this->set('rates', $rates);
-		$this->set('states', $states);
+		// $this->set('mostseen', $mostseen);
+		// $this->set('counters', $counters);
+		// $this->set('rates', $rates);
+		// $this->set('states', $states);
+
+    return view('outbound.index', [
+      'mostseen' => $mostseen,
+  		'counters' => $counters,
+  		'rates' => $rates,
+  		'states' => $states,
+    ]);
 
 	}
 
@@ -122,6 +137,11 @@ class OutboundController extends Controller
 			}
 			$this->set('info', $info);
 			$this->set('co2', $co2);
+
+      return view('outbound.info', [
+        'info' => $info,
+  			'co2' => $co2,
+      ]);
 		}
 
 	}

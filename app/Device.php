@@ -68,7 +68,11 @@ class Device extends Model
 
         $sql .= ' ORDER BY `sorter` DESC';
 
-        return DB::select(DB::raw($sql), $params);
+        if ($params != null) {
+          return DB::select(DB::raw($sql), $params);
+        } else {
+          return DB::select(DB::raw($sql));
+        }
     }
 
     public function getWeights($group = null){
@@ -299,7 +303,7 @@ class Device extends Model
                     ON `d`.`event` = `e`.`idevents`
                 INNER JOIN `categories` AS `c`
                     ON `d`.`category` = `c`.`idcategories`
-                WHERE 1=1 and `c`.`idcategories` <> ' . MISC_CATEGORY_ID;
+                WHERE 1=1 and `c`.`idcategories` <> ' . env('MISC_CATEGORY_ID');
 
         if(!is_null($status) && is_numeric($status)){
             $sql .= ' AND `d`.`repair_status` = :status ';
@@ -403,6 +407,10 @@ class Device extends Model
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`
                 INNER JOIN `groups` AS `g` ON `g`.`idgroups` = `e`.`group`'));
+    }
+
+    public function findOne($id) {
+        return $this->where('iddevices', $id)->first();
     }
 
 }

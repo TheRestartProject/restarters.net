@@ -59,9 +59,9 @@ class User extends Authenticatable
 
     public function getUserGroups($user){
         return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `u`
-                INNER JOIN `users_groups` AS `ug` ON `ug`.`user` = `u`.`idusers`
+                INNER JOIN `users_groups` AS `ug` ON `ug`.`user` = `u`.`id`
                 INNER JOIN `groups` AS `g` ON `ug`.`group` = `g`.`idgroups`
-                WHERE `u`.`idusers` = :id'), array('id' => $user));
+                WHERE `u`.`id` = :id'), array('id' => $user));
     }
 
     // Setters
@@ -70,7 +70,7 @@ class User extends Authenticatable
     }
 
     //Getters
-    public static function profilePage($id) {//Tested!
+    public static function getProfile($id) {//Tested!
 
       try {
         return User::where('users.id', '=', $id)
@@ -88,22 +88,22 @@ class User extends Authenticatable
 
     }
 
-    public function find($params){//Laravel method called find already. Need Solution!!//Tested!
-        $sql = 'SELECT * FROM ' . $this->table . '
-                INNER JOIN roles ON roles.idroles = ' . $this->table . '.role
-                WHERE ';
-        $clauses = array();
-        foreach($params as $field => $value) {
-            $clauses[] = $field . ' = :' . $field;
-        }
-        $sql .= implode(' AND ', $clauses);
-
-        try {
-          return DB::select(DB::raw($sql), $params);
-        } catch (\Illuminate\Database\QueryException $e) {
-          return false;
-        }
-    }
+    // public function find($params){//Laravel method called find already. Need Solution!!//Tested!
+    //     $sql = 'SELECT * FROM ' . $this->table . '
+    //             INNER JOIN roles ON roles.idroles = ' . $this->table . '.role
+    //             WHERE ';
+    //     $clauses = array();
+    //     foreach($params as $field => $value) {
+    //         $clauses[] = $field . ' = :' . $field;
+    //
+    //     $sql .= implode(' AND ', $clauses);
+    //
+    //     try {
+    //       return DB::select(DB::raw($sql), $params);
+    //     } catch (\Illuminate\Database\QueryException $e) {
+    //       return false;
+    //     }
+    // }
 
     public function getUserList() {//Tested!
 

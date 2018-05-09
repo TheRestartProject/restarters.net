@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\User;
 use App\Role;
 use App\RolePermissions;
 
@@ -16,31 +17,44 @@ class RoleController extends Controller
      *
      * @return void
      */
-    public function __construct($model, $controller, $action)
-    {
-        parent::__construct($model, $controller, $action);
-
-        $this->middleware('auth');
-
-        $user = Auth::getProfile();
-        $this->user = $user;
-        $this->set('user', $user);
-        $this->set('header', true);
-    }
+    // public function __construct($model, $controller, $action)
+    // {
+    //     parent::__construct($model, $controller, $action);
+    //
+    //     $this->middleware('auth');
+    //
+    //     $user = Auth::getProfile();
+    //     $this->user = $user;
+    //     $this->set('user', $user);
+    //     $this->set('header', true);
+    // }
 
     //Custom Functions
     public function index() {
-        if(FixometerHelper::hasRole($this->user, 'Administrator')){
+
+        $user = User::find(Auth::id());
+
+        if(FixometerHelper::hasRole($user, 'Administrator')){
             //Send user to roles page
             // $this->set('title', 'Roles');
             // $this->set('roleList', $this->Role->findAll());
+
+            $Role = new Role;
+
+            return view('role.index', [
+              'title' => 'Roles',
+              'roleList' => $Role->findAll(),
+            ]);
         }
     }
 
     public function edit($id){
-        if(FixometerHelper::hasRole($this->user, 'Administrator')){
 
-            $role = Role::find($id);
+        $user = User::find(Auth::id());
+
+        if(FixometerHelper::hasRole($user, 'Administrator')){
+
+            $role = Role::where('idroles', $id)->first();
 
             if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
 
@@ -54,11 +68,11 @@ class RoleController extends Controller
                 else {
                     $response['success'] = 'Permissions for this Role have been updated.';
                 }
-                $this->set('response', $response);
+                // $this->set('response', $response);
 
             }
 
-            $this->set('title', 'Edit <span class="orange">' . $role->role . '</span> Role');
+            // $this->set('title', 'Edit <span class="orange">' . $role->role . '</span> Role');
 
             $permissionsList = $role->rolePermissions($role->idroles);
             $activePerms = array();
@@ -66,15 +80,27 @@ class RoleController extends Controller
                 $activePerms[] = $p->permission;
             }
 
-            $this->set('formId', $role->idroles);
-            $this->set('permissions', $role->permissions());
-            $this->set('activePermissions', $activePerms);
+            // $this->set('formId', $role->idroles);
+            // $this->set('permissions', $role->permissions());
+            // $this->set('activePermissions', $activePerms);
+
+            if (!isset($response)) {
+              $response = null;
+            }
+
+            return view('role.edit', [
+              'response' => $response,
+              'title' => 'Edit <span class="orange">' . $role->role . '</span> Role',
+              'formId' => $role->idroles,
+              'permissions' => $role->permissions(),
+              'activePermissions' => $activePerms,
+            ]);
 
         }
     }
 
-    public function test() {
-      $r = new Role;
-      dd($r->permissions());//NB::findAll on Role isn't working
-    }
+    // public function test() {
+    //   $r = new Role;
+    //   dd($r->permissions());//NB::findAll on Role isn't working
+    // }
 }
