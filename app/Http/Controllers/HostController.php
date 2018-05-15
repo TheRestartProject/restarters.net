@@ -8,6 +8,7 @@ use App\Group;
 use App\Party;
 
 use Auth;
+use FixometerHelper;
 
 class HostController extends Controller
 {
@@ -95,7 +96,7 @@ class HostController extends Controller
         $gids[] = $group->idgroups;
       }
 
-      if( isset($groupid) && is_numeric($groupid) && ( hasRole($this->user, 'Administrator') || in_array($groupid, $gids) ) ) { //
+      if( isset($groupid) && is_numeric($groupid) && ( FixometerHelper::hasRole($user, 'Administrator') || in_array($groupid, $gids) ) ) { //
 
           //$group = (object) array_fill_keys( array('idgroups') , $groupid);
           $group = $Group->findOne($groupid);

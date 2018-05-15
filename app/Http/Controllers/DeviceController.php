@@ -133,7 +133,7 @@ class DeviceController extends Controller
 
   public function edit($id){
       // $this->set('title', 'Edit Device');
-      $user = User::find(Auth::id());
+      $user = Auth::user();
       if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host') ){
 
           $Device = new Device;
@@ -148,8 +148,18 @@ class DeviceController extends Controller
               // formatting dates for the DB
               //$data['event_date'] = dbDateNoTime($data['event_date']);
 
+              $update = array(
+                              'event'             => $data['event'],
+                              'category'          => $data['category'],
+                              'category_creation' => $data['category'],
+                              'repair_status'     => $data['repair_status'],
+                              'spare_parts'       => $data['spare_parts'],
+                              'brand'             => $data['brand'],
+                              'model'             => $data['model'],
+                              'problem'           => $data['problem'],
+                              );
 
-              $u = $Device->update($data, $id);
+              $u = $Device->where('iddevices', $id)->update($update);
 
               if(!$u) {
                   $response['danger'] = 'Something went wrong. Please check the data and try again.';
@@ -159,10 +169,10 @@ class DeviceController extends Controller
 
 
                   /** let's create the image attachment! **/
-                  if(isset($_FILES) && !empty($_FILES)){
-                      $file = new File;
-                      $file->upload('file', 'image', $id, TBL_EVENTS);
-                  }
+                  // if(isset($_FILES) && !empty($_FILES)){
+                  //     $file = new File;
+                  //     $file->upload('file', 'image', $id, TBL_EVENTS);
+                  // }
 
               }
 
@@ -248,7 +258,7 @@ class DeviceController extends Controller
 
 
   public function create(){
-      $user = User::find(Auth::id());
+      $user = Auth::user();
 
       if(FixometerHelper::hasRole($user, 'Guest')){
           header('Location: /user/forbidden');
@@ -260,31 +270,38 @@ class DeviceController extends Controller
 
           $UserEvents = $Events->ofThisUser($user->id);
 
-
-          // $this->set('categories', $Categories->findAll());
-          // $this->set('events', $UserEvents);
-
           if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
               $error = array();
               $data = array_filter($_POST);
               $Device = new Device;
 
-              if(!verify($data['event'])){ $error['event'] = 'Please select a Restart party.'; }
-              if(!verify($data['category'])){ $error['category'] = 'Please select a category for this device'; }
-              if(!verify($data['repair_status'])){ $error['repair_status'] = 'Please select a repair status.'; }
+              if(!FixometerHelper::verify($data['event'])){ $error['event'] = 'Please select a Restart party.'; }
+              if(!FixometerHelper::verify($data['category'])){ $error['category'] = 'Please select a category for this device'; }
+              if(!FixometerHelper::verify($data['repair_status'])){ $error['repair_status'] = 'Please select a repair status.'; }
 
               if(!empty($error)){
-                  // $this->set('error', $error);
                   $response['danger'] = 'The device repair has <strong>not</strong> been saved.';
               }
               else {
                   // add user id
-                  $data['repaired_by'] = $this->user->id;
+                  $data['repaired_by'] = $user->id;
                   // add initial category (for backlogging upon revision)
                   $data['category_creation'] = $data['category'];
 
+                  $insert = array(
+                                  'event'             => $data['event'],
+                                  'category'          => $data['category'],
+                                  'category_creation' => $data['category'],
+                                  'repair_status'     => $data['repair_status'],
+                                  'spare_parts'       => $data['spare_parts'],
+                                  'brand'             => $data['brand'],
+                                  'model'             => $data['model'],
+                                  'problem'           => $data['problem'],
+                                  'repaired_by'       => $data['repaired_by'],
+                                  );
+
                   // save this!
-                  $insert = $Device->create($data);
+                  $insert = $Device->create($insert);
                   if(!$insert){
                       $response['danger'] = 'Error while saving the device tot he DB.';
                   }
@@ -293,12 +310,7 @@ class DeviceController extends Controller
                   }
 
               }
-
-              // $this->set('response', $response);
-              // $this->set('udata', $data);
           }
-
-          // $this->set('title', 'New Device');
 
           if (!isset($error)) {
             $error = null;

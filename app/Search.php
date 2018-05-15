@@ -12,7 +12,7 @@ class Search extends Model
   public function parties($list = array(), $groups = array(), $from = null, $to = null){
       $conditions = array();
 
-      $sql .= 'SELECT
+      $sql = 'SELECT
                 *,
                 `e`.`location` AS `venue`,
                 UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`

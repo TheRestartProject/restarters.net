@@ -2,6 +2,9 @@
 
 namespace App\Helpers;
 
+use App;
+use Auth;
+
 class FixometerHelper {
 
   public static function allAges() {
@@ -48,6 +51,102 @@ class FixometerHelper {
 
   public static function dateFormat($timestamp){
       return date('D, j M Y, H:i', $timestamp);
+  }
+
+  public static function userHasEditPartyPermission($partyId, $userId)
+  {
+      if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        return true;
+      } else {
+        if (FixometerHelper::hasRole(Auth::user(), 'Host')) {
+          if (empty(DB::table('event_users')->where('event', $partyId)->where('user', $userId)->first())) {
+            return false;
+          } else {
+            return true;
+          }
+        } else {
+          return false;
+        }
+      }
+  }
+
+  /** Prints out Bootstrap alerts
+   * finds key of response and
+   * uses it to format the alert
+   * as wished
+   * */
+  public static function printResponse($response){
+      foreach($response as $type => $text){
+          switch($type) {
+              case 'success':
+                  $icon = 'check';
+                  break;
+              case 'danger':
+                  $icon = 'exclamation-triangle';
+                  break;
+              case 'warning':
+                  $icon = 'exclamation-circle';
+                  break;
+              case 'info':
+                  $icon = 'info';
+                  break;
+          }
+          echo '<div class="alert alert-' . $type . '  alert-dismissible" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <i class="fa fa-' . $icon . '"></i> ' . $text . '
+
+              </div>';
+      }
+  }
+
+  /**
+   * verify that an array index exists and is not empty or null.
+   * can also do some type control.
+   * */
+  public static function verify($var, $strict = false, $type = 'string'){
+      if(!isset($var) || empty($var) || is_null($var)){
+          return false;
+      }
+      else {
+          if($strict){
+              switch($type){
+                  case 'number':
+                      if(is_numeric($var)){
+                          return true;
+                      }
+                      break;
+                  case 'string':
+                      return true;
+                      break;
+                  case 'array':
+                      if(is_array($var)){
+                          return true;
+                      }
+                      break;
+                  default:
+                      return false;
+                      break;
+              }
+          }
+          else {
+              return true;
+          }
+
+      }
+  }
+
+  public static function dbDateNoTime($string){
+      $d = explode('/', $string);
+      return implode('-', array_reverse($d));
+  }
+
+  public static function translate($key) {
+      $translation = __(App::getLocale().'.'.$key);
+      if ( strpos($translation, App::getLocale().'.') !== false ) {
+        return $key;
+      } else {
+        return $translation;
+      }
   }
 
 

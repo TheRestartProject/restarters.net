@@ -13,16 +13,16 @@
                 <div class="col-md-12">
 
                     @if(isset($response))
-                      @php( printResponse($response))
+                      @php( FixometerHelper::printResponse($response))
                     @endif
 
                     <div class="alert alert-warning">
                         <i class="fa fa-exclamation-circle fa-lg"></i> Please be advised that your name and avatar will be shared on your group's public page on our website. (You can use a nickname or another image if you prefer.)
                     </div>
 
-                    <form action="/user/edit/<?php echo $data->idusers; ?>" method="post" enctype="multipart/form-data">
-
-                        <input type="hidden" name="id" id="id" value="<?php echo $data->idusers; ?>">
+                    <form action="/user/edit/<?php echo $data->id; ?>" method="post" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="id" id="id" value="<?php echo $data->id; ?>">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group <?php if(isset($error) && isset($error['name']) && !empty($error['name'])) { echo "has-error"; } ?>">

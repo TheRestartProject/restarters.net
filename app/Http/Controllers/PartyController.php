@@ -11,6 +11,8 @@ use App\Device;
 
 use FixometerHelper;
 use Auth;
+use File;
+use DateTime;
 
 class PartyController extends Controller
 {
@@ -76,7 +78,7 @@ class PartyController extends Controller
 
   public function create()
   {
-      $user = User::find(Auth::id());
+      $user = Auth::user();
 
       // if (!FixometerHelper::hasRole($user, 'Administrator') || !FixometerHelper::hasRole($user, 'Host')) {
       //     header('Location: /user/forbidden');
@@ -125,12 +127,12 @@ class PartyController extends Controller
           $wp_date = $event_date;
 
           // formatting dates for the DB
-          $event_date = date('Y-m-d', strtotime(engDate($event_date)));
+          $event_date = date('Y-m-d', strtotime($event_date));
 
-          if(!verify($event_date)){
+          if(!FixometerHelper::verify($event_date)){
               $error['event_date'] = 'We must have a starting date and time.';
           }
-          if(!verify($start)){
+          if(!FixometerHelper::verify($start)){
               $error['name'] = 'We must have a starting date and time.';
           }
           if(!empty($latitude) || !empty($longitude)) {
@@ -147,13 +149,17 @@ class PartyController extends Controller
 
           if(empty($error)) {
 
-              $startTime = date('Y-m-d', $event_date) . ' ' . $start;
-              $endTime = date('Y-m-d', $event_date) . ' ' . $end;
+              $startTime = $event_date . ' ' . $start;
+              $endTime = $event_date . ' ' . $end;
 
               $dtStart = new DateTime($startTime);
               $dtDiff = $dtStart->diff(new DateTime($endTime));
 
               $hours = $dtDiff->h;
+
+              $group = Group::where('idgroups', $group)->first();
+
+              // dd($group);
 
               // No errors. We can proceed and create the Party.
               $data = array(
@@ -170,7 +176,7 @@ class PartyController extends Controller
                               'hours'         => $hours,
                               'volunteers'    => $volunteers
                               );
-              $idParty = $Party->create($data);
+              $idParty = $Party->create($data)->id;
 
 
 
@@ -231,9 +237,9 @@ class PartyController extends Controller
                       $this->sendCreationNotificationEmail($venue, $location, $event_date, $start, $end, $group);
                       header('Location: /host?action=pc&code=200');
 
-                    }else if(FixometerHelper::hasRole($this->user, 'Administrator')){
-                      header('Location: /admin?action=pc&code=200');
-                    }
+                  } else if(FixometerHelper::hasRole($this->user, 'Administrator')){
+                    header('Location: /admin?action=pc&code=200');
+                  }
                }
               else {
                   $response['danger'] = 'Party could <strong>not</strong> be created. Something went wrong with the database.';
@@ -287,7 +293,7 @@ class PartyController extends Controller
       $group = $Groups->findOne($group_id);
       $group_name = $group->name;
 
-      $hostname = $this->user->name;
+      $hostname = Auth::user()->name;
 
       // send email to Admin
       $message = "<p>Hi,</p>" .
@@ -299,10 +305,10 @@ class PartyController extends Controller
       "<p><strong>Party Start Time:</strong> ". $start ." </p>" .
       "<p><strong>Party End Time:</strong> ". $end ." </p>" ;
 
-      $subject = APPNAME . ": Party created by the host : " . $hostname . " ";
-      $headers = "From: " . APPEMAIL . "\r\n";
+      $subject = env('APP_NAME') . ": Party created by the host : " . $hostname . " ";
+      $headers = "From: " . env('APP_EMAIL') . "\r\n";
       $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-      $email= NOTIFICATION_EMAIL;
+      $email= env('NOTIFICATION_EMAIL');
       $sender = mail($email, $subject, $message, $headers);
   }
 
@@ -343,16 +349,18 @@ class PartyController extends Controller
   }
 
   public function edit($id) {
+      $user = Auth::user();
 
-      if (!$this->permissionsChecker->userHasEditPartyPermission($id)) {
+      if (!FixometerHelper::userHasEditPartyPermission($id, $user->id)) {
           header('Location: /user/forbidden');
       }
 
-      $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-      $wpClient->setCredentials(WP_XMLRPC_ENDPOINT, WP_XMLRPC_USER, WP_XMLRPC_PSWD);
+      // $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
+      // $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
       $Groups = new Group;
       $File = new File;
+      $Party = new Party;
 
       if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
           $id = $_POST['id'];
@@ -372,10 +380,24 @@ class PartyController extends Controller
           $wp_date = $data['event_date'];
 
           // formatting dates for the DB
-          $data['event_date'] = dbDateNoTime($data['event_date']);
+          $data['event_date'] = FixometerHelper::dbDateNoTime($data['event_date']);
           $timestamp = strtotime($data['event_date']);
 
-          $u = $this->Party->update($data, $id);
+          $update = array(
+                          'event_date'  => $data['event_date'],
+                          'start'       => $data['start'],
+                          'end'         => $data['end'],
+                          'free_text'   => $data['free_text'],
+                          'pax'         => $data['pax'],
+                          'volunteers'  => $data['volunteers'],
+                          'group'       => $data['group'],
+                          'venue'       => $data['venue'],
+                          'location'    => $data['location'],
+                          'latitude'    => $data['latitude'],
+                          'longitude'   => $data['longitude'],
+                          );
+
+          $u = $Party->where('idevents', $id)->update($update);
 
           if(!$u) {
               $response['danger'] = 'Something went wrong. Please check the data and try again.';
@@ -383,13 +405,13 @@ class PartyController extends Controller
           else {
               $response['success'] = 'Party updated!';
 
-              if(SYSTEM_STATUS != 'development') {
+              if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
                   /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
-                  $theParty = $this->Party->findThis($id);
+                  $theParty = $Party->findThis($id);
                   $Host = $Groups->findHost($data['group']);
                   $custom_fields = array(
                                   array('key' => 'party_host',            'value' => $Host->hostname),
-                                  array('key' => 'party_hostavatarurl',   'value' => UPLOADS_URL . 'mid_' . $Host->path),
+                                  array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
                                   array('key' => 'party_grouphash',       'value' => $data['group']),
                                   array('key' => 'party_venue',           'value' => $data['venue']),
                                   array('key' => 'party_location',        'value' => $data['location']),
@@ -431,58 +453,83 @@ class PartyController extends Controller
                   else {
                       // Brand new post -> we send it up and update the Fixometer
                       $wpid = $wpClient->newPost($Host->groupname, $free_text, $content);
-                      $this->Party->update(array('wordpress_post_id' => $wpid), $id);
+                      $Party->update(array('wordpress_post_id' => $wpid), $id);
                   }
               }
 
               if(isset($_POST['users']) && !empty($_POST['users'])){
                   $users = $_POST['users'];
-                  $this->Party->createUserList($id, $users);
+                  $Party->createUserList($id, $users);
               }
 
 
               /** let's create the image attachment! **/
-              if(isset($_FILES) && !empty($_FILES)){
-                  if(is_array($_FILES['file']['name'])) {
-                      $files = rearrange($_FILES['file']);
-                      foreach($files as $upload){
-                          $File->upload($upload, 'image', $id, TBL_EVENTS);
-                      }
-                  }
-                  else { }
-              }
+              // if(isset($_FILES) && !empty($_FILES)){
+              //     if(is_array($_FILES['file']['name'])) {
+              //         $files = rearrange($_FILES['file']);
+              //         foreach($files as $upload){
+              //             $File->upload($upload, 'image', $id, env('TBL_EVENTS'));
+              //         }
+              //     }
+              //     else { }
+              // }
           }
-          if(FixometerHelper::hasRole($this->user, 'Host')){
+          if(FixometerHelper::hasRole($user, 'Host')){
               header('Location: /host?action=pe&code=200');
           }
-          $this->set('response', $response);
+          // $this->set('response', $response);
+
+          if (!isset($images)) {
+            $images = null;
+          }
+
+          if (!isset($remotePost)) {
+            $remotePost = null;
+          }
+
+          $party = $Party->findThis($id)[0];
+
+          return view('party.edit', [
+            'response' => $response,
+            'gmaps' => true,
+            'images' => $images,
+            'title' => 'Edit Party',
+            'group_list' => $Groups->findAll(),
+            'formdata' => $party,
+            'remotePost' => $remotePost,
+            'grouplist' => $Groups->findList(),
+            'user' => Auth::user(),
+          ]);
       }
 
-      $images = $File->findImages(TBL_EVENTS, $id);
+      // $images = $File->findImages(env('TBL_EVENTS'), $id);//NB: File facade can't find findImages may need to add
+      $images = null;
 
-      $this->set('gmaps', true);
-      $this->set('js', array( 'head' => array( '/ext/geocoder.js')));
+      // $this->set('gmaps', true);
+      // $this->set('js', array( 'head' => array( '/ext/geocoder.js')));
 
-      $Party = $this->Party->findOne($id);
-      $this->set('images', $images);
-      $this->set('title', 'Edit Party');
-      $this->set('group_list', $Groups->findAll());
-      $this->set('formdata', $Party);
+      $party = $Party->findThis($id)[0];
+      // $this->set('images', $images);
+      // $this->set('title', 'Edit Party');
+      // $this->set('group_list', $Groups->findAll());
+      // $this->set('formdata', $Party);
 
-      $remotePost = $wpClient->getPost($Party->wordpress_post_id);
-      $this->set('remotePost', $remotePost);
+      // $remotePost = $wpClient->getPost($Party->wordpress_post_id);//NB: Add back in when wordpress stuff is fixed
+      $remotePost = null;
 
-      $this->set('grouplist', $Groups->findList());
+      // $this->set('remotePost', $remotePost);
+      //
+      // $this->set('grouplist', $Groups->findList());
 
-      return view('parties.edit', [
-        'response' => $response,
+      return view('party.edit', [
         'gmaps' => true,
         'images' => $images,
         'title' => 'Edit Party',
         'group_list' => $Groups->findAll(),
-        'formdata' => $Party,
+        'formdata' => $party,
         'remotePost' => $remotePost,
         'grouplist' => $Groups->findList(),
+        'user' => Auth::user(),
       ]);
   }
 

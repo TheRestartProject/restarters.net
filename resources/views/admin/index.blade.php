@@ -16,7 +16,7 @@
     <!-- Profiles -->
     <section class="row profiles">
         <div class="col-md-12">
-            <h5>Admin Console</h5>
+            <h5>{{ FixometerHelper::translate('admin_console') }}</h5>
         </div>
 
         <div class="col-md-5">
@@ -25,7 +25,7 @@
 
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Groups
+                        {{ FixometerHelper::translate('groups') }}
                       <span class="fa fa-chevron-down"></span>
                     </button>
                     <ul id ="group-dropdown" class="dropdown-menu">
@@ -49,17 +49,17 @@
                     </ul>
                 </div>
 
-                <a class="btn btn-default" href="/group/create">Add Group</a>
+                <a class="btn btn-default" href="/group/create">{{ FixometerHelper::translate('add_group') }}</a>
             </div>
         </div>
         <div class="col-md-5">
             <div class="btn-group btn-group-justified">
-                <a class="btn btn-default" href="/user/all">Users</a>
-                <a class="btn btn-default" href="/user/create">Add User</a>
+                <a class="btn btn-default" href="/user/all">{{ FixometerHelper::translate('users') }}</a>
+                <a class="btn btn-default" href="/user/create">{{ FixometerHelper::translate('add_user') }}</a>
             </div>
         </div>
         <div class="col-md-2">
-          <a class="btn btn-default btn-block" href="/device">Manage Devices</a>
+          <a class="btn btn-default btn-block" href="/device">{{ FixometerHelper::translate('manage_devices') }}</a>
         </div>
 
     </section>
@@ -67,29 +67,29 @@
         <div class="col-md-12">
             <div class="row" id="group-main-stats">
                 <div class="col">
-                    <h5>participants</h5>
+                    <h5>{{ FixometerHelper::translate('participants') }}</h5>
                     <span class="largetext"><?php echo $pax; ?></span>
                 </div>
 
                 <div class="col">
-                    <h5>hours volunteered</h5>
+                    <h5>{{ FixometerHelper::translate('hours_volunteered') }}</h5>
                     <span class="largetext"><?php echo $hours; ?></span>
                 </div>
 
                 <div class="col">
-                    <h5>parties thrown</h5>
+                    <h5>{{ FixometerHelper::translate('parties_thrown') }}</h5>
                     <span class="largetext"><?php echo count($allparties); ?></span>
                 </div>
 
                 <div class="col">
-                    <h5>waste prevented</h5>
+                    <h5>{{ FixometerHelper::translate('waste_prevented') }}</h5>
                     <span class="largetext">
                         <?php echo number_format(round($wasteTotal), 0, '.', ','); ?> kg
                     </span>
                 </div>
 
                 <div class="col">
-                    <h5>CO<sub>2</sub> emission prevented</h5>
+                    <h5>{!! html_entity_decode(FixometerHelper::translate('emission_prevented')) !!}</h5>
 
                     <span class="largetext">
                         <?php echo number_format(round($co2Total), 0, '.', ','); ?> kg
@@ -99,7 +99,7 @@
             </div>
         </div>
         <div class="col-md-12 text-center">
-            <a class="btn btn-default" href="/search"><i class="fa fa-filter"></i>Filter Parties</a>
+            <a class="btn btn-default" href="/search"><i class="fa fa-filter"></i> {{ FixometerHelper::translate('filter_parties') }}</a>
         </div>
     </section>
 
@@ -109,9 +109,9 @@
      <!-- Tabs -->
     <!-- Nav tabs -->
     <ul class="nav nav-pills nav-justified" role="tablist">
-        <li role="presentation" class="active"><a href="#parties-tab" aria-controls="Parties" role="tab" data-toggle="pill">Parties</a></li>
-        <li role="presentation"><a href="#impact-tab" aria-controls="Impact" role="tab" data-toggle="pill">Impact</a></li>
-        <li role="presentation"><a href="#details-tab" aria-controls="Details" role="tab" data-toggle="pill">Details</a></li>
+        <li role="presentation" class="active"><a href="#parties-tab" aria-controls="Parties" role="tab" data-toggle="pill">{{ FixometerHelper::translate('parties') }}</a></li>
+        <li role="presentation"><a href="#impact-tab" aria-controls="Impact" role="tab" data-toggle="pill">{{ FixometerHelper::translate('impact') }}</a></li>
+        <li role="presentation"><a href="#details-tab" aria-controls="Details" role="tab" data-toggle="pill">{{ FixometerHelper::translate('details') }}</a></li>
     </ul>
 
 
@@ -126,7 +126,7 @@
             <section class="row parties">
                 <header>
                 <div class="col-md-12" id="upcomingparties">
-                    <h2>Upcoming Restart Parties
+                    <h2>{{ FixometerHelper::translate('upcoming_restart_parties') }}
                         <a class="btn btn-primary btn-sm" href="/party/create"><i class="fa fa-plus"></i>New Party</a></h2>
                 </div>
                 </header>
@@ -139,7 +139,7 @@
                         </div>
                         <div class="media-body">
                             <div class="body">
-                                <time datetime="<?php echo $party->event_date ?>"><?php echo strftime('%a, %d %b %Y %H:%M',  $party->event_timestamp); ?></time>
+                                <time datetime="<?php echo $party->plain_date ?>"><?php echo strftime('%a, %d %b %Y %H:%M',  $party->event_timestamp); ?></time>
                                 <span clasS="location"><?php  echo (!empty($party->venue) ? $party->venue : $party->location); ?></span>
                             </div>
                             <div class="links">
@@ -175,7 +175,7 @@
                 <div class="col-md-12" id="party-list-header">
                     <div class="header-col header-col-2">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-primary btn-sm party-switch active" data-target="all">All Partie</button>
+                                <button type="button" class="btn btn-primary btn-sm party-switch active" data-target="all">All Parties</button>
                                 <button type="button" class="btn btn-primary btn-sm party-switch" data-target=".no-data-wrap">Need Attention</button>
                                 <button type="button" class="btn btn-primary btn-sm party-switch" data-target=".guesstimates">Guesstimated</button>
                             </div>
@@ -222,7 +222,7 @@
                     ?>
                     @foreach($allparties as $party)
                         @php( $partyYear = date('Y', $party->event_timestamp) )
-                        @if( $partyYear < $currentYear)
+                        @if( $partyYear < $currentYear )
                     <div class="year-break">
                         <?php echo $partyYear; ?>
                     </div>

@@ -17,7 +17,7 @@
                         <th>Location</th>
                         <th>Frequency</th>
                         <th>Restarters</th>
-                        @if(hasRole($user, 'Administrator')){ ?>
+                        @if(FixometerHelper::hasRole($user, 'Administrator'))
                         <th><i class="fa fa-pencil"></i></th>
                         <th><i class="fa fa-trash"></i></th>
                         @endif

@@ -9,6 +9,7 @@ use App\User;
 use App\Role;
 use App\Group;
 use App\UserGroups;
+use App\Session;
 
 use FixometerHelper;
 use Auth;
@@ -390,7 +391,7 @@ class UserController extends Controller
           $user = $this->User->find(array('recovery' => $recovery));
           if(!empty($user)){
             $data = array(
-              'password' => crypt($pwd, '$1$'.SECRET)
+              'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY'))))
             );
             $update = $this->User->update($data, $user[0]->idusers);
             if($update){
@@ -451,11 +452,8 @@ class UserController extends Controller
     }
 
     public function create() {
-        // $this->set('title', 'New User');
 
-        $user = User::find(Auth::id());
-        // $this->set('user', $user);
-        // $this->set('header', true);
+        $user = Auth::user();
 
         // Administrators can add users.
         if(FixometerHelper::hasRole($user, 'Administrator')){
@@ -466,8 +464,7 @@ class UserController extends Controller
             $Groups = new Group;
             $Groups = $Groups->findAll();
 
-            // $this->set('roles', $Roles);
-            // $this->set('groups', $Groups);
+            $User = new User;
 
             if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
                 $error = array();
@@ -501,7 +498,7 @@ class UserController extends Controller
                 if(empty($group)){
                     $group = NULL;
                 }
-                if(!$this->User->checkEmail($email)){
+                if(!$User->checkEmail($email)){
                     $error['email'] = 'This email is already in use in our database. Please use another one.';
                 }
 
@@ -512,7 +509,7 @@ class UserController extends Controller
                     // No errors. We can proceed and create the User.
                     $data = array(  'name'     => $name,
                                     'email'    => $email,
-                                    'password' => crypt($pwd, '$1$'.SECRET),
+                                    'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
                                     'role'     => $role,
                                     //'group'    => $group
                                 );
@@ -524,42 +521,42 @@ class UserController extends Controller
                     $data['recovery_expires'] = strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60));
 
 
-                    $idUser = $this->User->create($data);
+                    $idUser = $User->create($data)->id;
                     if($idUser){
 
                         if(isset($groups) && !empty($groups)){
-                            $Usersgroups = new Usersgroups;
+                            $Usersgroups = new UserGroups;
                             $Usersgroups->createUsersGroups($idUser, $groups);
                         }
 
                         $Session = new Session;
                         $Session->createSession($idUser);
 
-                        if(isset($_FILES) && !empty($_FILES)){
-                            $file = new File;
-                            $file->upload('profile', 'image', $idUser, TBL_USERS, false, true);
-                        }
+                        // if(isset($_FILES) && !empty($_FILES)){
+                        //     $file = new File;
+                        //     $file->upload('profile', 'image', $idUser, TBL_USERS, false, true);
+                        // }
 
                     }
                     if($idUser){
                       //Send out email
 
                       // send email to User
-                      $message = "<p>Hi,</p>" .
-                               "<p>This is an automatic email to let you know that we have just created an account for you on the <strong>" . APPNAME . "</strong>.</p>" .
-                               "<p>Please click on this link to set your password: <a href=\"" . BASE_URL . "/user/reset/?recovery=" . $data['recovery'] . "\">" . BASE_URL . "/user/reset/?recovery=" . $data['recovery'] . "</a>.</p>" .
-                               "<p>If the link doesn't work, please copy and paste it in the address bar of your browser.</p>" .
-                               "<p>The link will be active for the next 24 hours.</p>" .
-                      "<p>If you have any issues, please contact <a href='mailto:" . SUPPORT_CONTACT_EMAIL . "'>" . SUPPORT_CONTACT_EMAIL . "</a>.</p>" .
-                               "<p>Thanks for using the " . APPNAME . "!</p>" .
-                               "<p><em>The Restart Project</em></p>";
-                      $subject = APPNAME . ": Account created - please set your password";
-                      $headers = "From: " . APPEMAIL . "\r\n";
-                      $headers .= "MIME-Version: 1.0\r\n";
-                      $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-                      $headers .= "Bcc: " . SUPPORT_CONTACT_EMAIL . "\r\n";
-
-                      $sender = mail($email, $subject, $message, $headers);
+                      // $message = "<p>Hi,</p>" .
+                      //          "<p>This is an automatic email to let you know that we have just created an account for you on the <strong>" . APPNAME . "</strong>.</p>" .
+                      //          "<p>Please click on this link to set your password: <a href=\"" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "\">" . BASE_URL . "/user/reset/?recovery=" . $data['recovery'] . "</a>.</p>" .
+                      //          "<p>If the link doesn't work, please copy and paste it in the address bar of your browser.</p>" .
+                      //          "<p>The link will be active for the next 24 hours.</p>" .
+                      // "<p>If you have any issues, please contact <a href='mailto:" . env('SUPPORT_CONTACT_EMAIL') . "'>" . env('SUPPORT_CONTACT_EMAIL') . "</a>.</p>" .
+                      //          "<p>Thanks for using the " . env('APP_NAME') . "!</p>" .
+                      //          "<p><em>The Restart Project</em></p>";
+                      // $subject = env('APP_NAME') . ": Account created - please set your password";
+                      // $headers = "From: " . env('APP_EMAIL') . "\r\n";
+                      // $headers .= "MIME-Version: 1.0\r\n";
+                      // $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+                      // $headers .= "Bcc: " . env('SUPPORT_CONTACT_EMAIL') . "\r\n";
+                      //
+                      // $sender = mail($email, $subject, $message, $headers);
 
                       $response['success'] = 'User created correctly.  <strong>An email has been sent to the user to ask them to set their password.</strong>';
                     }
@@ -572,9 +569,9 @@ class UserController extends Controller
 
                 }
 
-                $this->set('response', $response);
-                $this->set('error', $error);
-                $this->set('originalData', $data);
+                if (!isset($data)) {
+                  $data = null;
+                }
 
                 return view('user.create', [
                   'title' => 'New User',
@@ -605,18 +602,20 @@ class UserController extends Controller
 
 
     public function edit($id){
-        // $this->set('title', 'Edit User');
 
         global $fixometer_languages;
-        // $this->set('langs', $fixometer_languages);
 
-        $user = User::find(Auth::id());
+        $user = Auth::user();
         $User = new User;
-        // $this->set('user', $user);
-        // $this->set('header', true);
 
         // Administrators can edit users.
         if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host')){
+
+            $Roles = new Role;
+            $Roles = $Roles->findAll();
+
+            $Groups = new Group;
+            $Groups = $Groups->findAll();
 
             if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
                 $data = $_POST;
@@ -627,7 +626,7 @@ class UserController extends Controller
 
                 $error = false;
                 // check for email in use
-                $editingUser = $this->User->findOne($id);
+                $editingUser = $User->find($id);
                 if($editingUser->email !== $data['email']){
                     if(!$User->checkEmail($data['email'])){
                         $error['email'] = 'The email you entered is already in use in our database. Please use another one.';
@@ -653,20 +652,20 @@ class UserController extends Controller
 
 
                 if(!is_array($error)){
-                    $u = $User->update($data, $id);
+                    $u = $User->find($id)->update($data);
 
                     $expire = time() + (60 * 60 * 24 * 365 * 10);
-                    setcookie(env('LANGUAGE_COOKIE'), $data['language'], $time, '/', $_SERVER['HTTP_HOST']);
+                    // setcookie(env('LANGUAGE_COOKIE'), $data['language'], $time, '/', $_SERVER['HTTP_HOST']);
 
-                    $ug = new Usersgroups;
+                    $ug = new UserGroups;
                     $ug->createUsersGroups($id, $sent_groups);
 
 
 
-                    if(isset($_FILES) && !empty($_FILES)){
-                        $file = new File;
-                        $file->upload('profile', 'image', $id, env('TBL_USERS'), false, true);
-                    }
+                    // if(isset($_FILES) && !empty($_FILES)){
+                    //     $file = new File;
+                    //     $file->upload('profile', 'image', $id, env('TBL_USERS'), false, true);
+                    // }
 
                     if(!$u) {
                         $response['danger'] = 'Something went wrong. Please check the data and try again.';
@@ -679,7 +678,16 @@ class UserController extends Controller
 
 
                     }
-                    // $this->set('response', $response);
+
+                    $userdata = User::find($id);
+
+                    $usergroups = array();
+                    $ugroups = $User->getUserGroups($id);
+                    foreach($ugroups as $g){
+                        $usergroups[] = $g->group;
+                    }
+
+                    $userdata->groups = $usergroups;
 
                     return view('user.edit', [
                       'title' => 'Edit User',
@@ -693,7 +701,16 @@ class UserController extends Controller
                     ]);
                 }
                 else {
-                    // $this->set('error', $error);
+                    $userdata = User::find($id);
+
+                    $usergroups = array();
+                    $ugroups = $User->getUserGroups($id);
+                    foreach($ugroups as $g){
+                        $usergroups[] = $g->group;
+                    }
+
+                    $userdata->groups = $usergroups;
+
                     return view('user.edit', [
                       'title' => 'Edit User',
                       'langs' => $fixometer_languages,
@@ -708,15 +725,6 @@ class UserController extends Controller
 
             }
 
-            $Roles = new Role;
-            $Roles = $Roles->findAll();
-
-            $Groups = new Group;
-            $Groups = $Groups->findAll();
-
-            // $this->set('roles', $Roles);
-            // $this->set('groups', $Groups);
-
             $userdata = User::find($id);
 
             $usergroups = array();
@@ -726,7 +734,6 @@ class UserController extends Controller
             }
 
             $userdata->groups = $usergroups;
-            // $this->set('data', $userdata);
 
             return view('user.edit', [
               'title' => 'Edit User',

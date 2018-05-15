@@ -13,7 +13,68 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
-
+                      @if (!is_null(Auth::user()) && FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+                        <li class="nav-item">
+                          <a class="nav-link" href="/admin">
+                            Dashboard
+                          </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a id="userDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                Users <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="userDropdown">
+                              <a class="dropdown-item" href="/user/all">
+                                  {{ __('All Users') }}
+                              </a>
+                              <a class="dropdown-item" href="/user/create">
+                                  {{ __('Create User') }}
+                              </a>
+                              <a class="dropdown-item" href="/role">
+                                  {{ __('Roles') }}
+                              </a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a id="partyDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                Parties <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="partyDropdown">
+                              <a class="dropdown-item" href="/party">
+                                  {{ __('All Parties') }}
+                              </a>
+                              <a class="dropdown-item" href="/party/create">
+                                  {{ __('New Party') }}
+                              </a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a id="deviceDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                Devices <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="deviceDropdown">
+                              <a class="dropdown-item" href="/device">
+                                  {{ __('All Devices') }}
+                              </a>
+                              <a class="dropdown-item" href="/device/create">
+                                  {{ __('New Device') }}
+                              </a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a id="deviceDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                Taxonomies <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="deviceDropdown">
+                              <a class="dropdown-item" href="/group">
+                                  {{ __('Groups') }}
+                              </a>
+                              <a class="dropdown-item" href="/category">
+                                  {{ __('Categories') }}
+                              </a>
+                            </div>
+                        </li>
+                      @endif
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -29,6 +90,12 @@
                                 </a>
 
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+                                      <a class="dropdown-item" href="/admin">
+                                          {{ __('Dashboard') }}
+                                      </a>
+                                      <hr>
+                                    @endif
                                     <a class="dropdown-item" href="/profile">
                                         {{ __('Profile') }}
                                     </a>

@@ -37,12 +37,10 @@ class CategoryController extends Controller
 
       $Category = new Category;
 
-      $user = User::getProfile(Auth::id());
-
       return view('category.index', [
         'title' => 'Categories',
-        'header' => $Category->findAll(),
-        'user' => $user,
+        'list' => $Category->findAll(),
+        'user' => Auth::user(),
       ]);
   }
 }

@@ -13,17 +13,18 @@
                 <div class="col-md-12">
 
                     @if(isset($response))
-                      @php( printResponse($response) )
+                      @php( FixometerHelper::printResponse($response) )
                     @endif
 
                     <form action="/device/create" method="post">
+                      @csrf
                         <div class="row">
                             <div class="col-md-6">
 
                                 <div class="form-group <?php if(isset($error) && isset($error['event']) && !empty($error['event'])) { echo "has-error"; } ?>">
 
                                     <label for="event">Restart Party:</label>
-                                    <select id="event" name="event"  class="form-control selectpicker" data-live-search="true">
+                                    <select id="event" name="event"  class="form-control" data-live-search="true"><!-- REMOVED selectpicker -->
                                         <option></option>
                                         @if(isset($events))
                                           @foreach($events as $event)
@@ -37,7 +38,7 @@
                                 <div class="form-group <?php if(isset($error) && isset($error['category']) && !empty($error['category'])) { echo "has-error"; } ?>">
 
                                     <label for="category">Category:</label>
-                                    <select id="category" name="category"  class="form-control selectpicker" data-live-search="true">
+                                    <select id="category" name="category"  class="form-control" data-live-search="true"><!-- REMOVED selectpicker -->
                                         <option></option>
                                         @if(isset($categories))
                                           <?php foreach($categories as $category){ ?>

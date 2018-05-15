@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+use DB;
+
 class UserGroups extends Model
 {
 
@@ -65,7 +67,7 @@ class UserGroups extends Model
     public function deleteUsersGroups($iduser){
         $sql = 'DELETE FROM `users_groups` WHERE `user` = :id';
         try {
-          DB::delete(DB::raw($sql), array('user' => $iduser));
+          DB::delete(DB::raw($sql), array('id' => $iduser));
           return true;
         } catch (\Illuminate\Database\QueryException $e) {
           if (env('APP_ENV') == "local" || env('APP_ENV') == "development") {

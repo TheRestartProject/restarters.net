@@ -15,7 +15,7 @@ class Group extends Model
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = ['name', 'website', 'area', 'location', 'latitude', 'latitude', 'longitude', 'free_text'];
 
     /**
      * The attributes that should be hidden for arrays.

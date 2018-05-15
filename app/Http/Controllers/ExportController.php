@@ -2,27 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Device;
+use App\Group;
+use App\Party;
+use App\Search;
+
 use Auth;
 
 class ExportController extends Controller
 {
 
-  public $TotalWeight;
-  public $TotalEmission;
-  public $EmissionRatio;
-  public function __construct($model, $controller, $action){
-      parent::__construct($model, $controller, $action);
-
-
-              $Device = new Device;
-              $weights = $Device->getWeights();
-
-              $this->TotalWeight = $weights[0]->total_weights;
-              $this->TotalEmission = $weights[0]->total_footprints;
-              $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
-
-
-  }
+  // public $TotalWeight;
+  // public $TotalEmission;
+  // public $EmissionRatio;
+  // public function __construct($model, $controller, $action){
+  //     parent::__construct($model, $controller, $action);
+  //
+  //
+  //             $Device = new Device;
+  //             $weights = $Device->getWeights();
+  //
+  //             $this->TotalWeight = $weights[0]->total_weights;
+  //             $this->TotalEmission = $weights[0]->total_footprints;
+  //             $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
+  //
+  //
+  // }
 
     public function devices(){
 
@@ -30,37 +35,36 @@ class ExportController extends Controller
 
         $data = $Device->export();
         foreach($data as $i => $d){
-
             /** Fix date **/
-            $data[$i]['event_date'] = date('d/m/Y', $d['event_timestamp']);
-            unset($data[$i]['event_timestamp']);
+            $data[$i]->event_date = date('d/m/Y', $d->event_timestamp);
+            unset($data[$i]->event_timestamp);
             /** Readable status **/
-            switch($d['repair_status']) {
+            switch($d->repair_status) {
                 case 1:
-                    $data[$i]['repair_status'] = 'Fixed';
+                    $data[$i]->repair_status = 'Fixed';
                     break;
                 case 2:
-                    $data[$i]['repair_status'] = 'Repairable';
+                    $data[$i]->repair_status = 'Repairable';
                     break;
                 case 3:
-                    $data[$i]['repair_status'] = 'End of life';
+                    $data[$i]->repair_status = 'End of life';
                     break;
                 default:
-                    $data[$i]['repair_status'] = 'Unknown';
+                    $data[$i]->repair_status = 'Unknown';
                     break;
             }
 
             /** Spare parts parser **/
-            $data[$i]['spare_parts'] = ($d['spare_parts'] == 1 ? 'Yes' : 'No');
+            $data[$i]->spare_parts = ($d->spare_parts == 1 ? 'Yes' : 'No');
 
             /** clean up linebreaks and commas **/
-            $data[$i]['brand'] = '"' . preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d['brand']))) . '"' ;
-            $data[$i]['model'] = '"' . preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d['model']))) . '"' ;
-            $data[$i]['problem'] = '"' . preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d['problem']))) . '"' ;
-            $data[$i]['location'] = '"' . preg_replace( "/\r|\n/", "", utf8_encode($d['location'])) . '"' ;
-            $data[$i]['category'] = utf8_encode($d['category']);
+            $data[$i]->brand = '"' . preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d->brand))) . '"' ;
+            $data[$i]->model = '"' . preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d->model))) . '"' ;
+            $data[$i]->problem = '"' . preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d->problem))) . '"' ;
+            $data[$i]->location = '"' . preg_replace( "/\r|\n/", "", utf8_encode($d->location)) . '"' ;
+            $data[$i]->category = utf8_encode($d->category);
             /** empty group ? **/
-            $data[$i]['group_name'] = (empty($d['group_name']) ? 'Unknown' : $d['group_name']);
+            $data[$i]->group_name = (empty($d->group_name) ? 'Unknown' : $d->group_name);
 
         }
         $header = array(
@@ -78,9 +82,9 @@ class ExportController extends Controller
                     );
         $data = array_merge($header, $data);
 
-        $this->set('data', $data);
-
-        return $data;
+        return view('export.devices', [
+          'data' => $data,
+        ]);
     }
 
 
@@ -128,6 +132,10 @@ class ExportController extends Controller
 
         $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp);
         $PartyArray = array();
+        $need_attention = 0;
+        $participants = 0;
+        $hours_volunteered = 0;
+        $totalCO2 = 0;
         foreach($PartyList as $i => $party){
 
             if($party->device_count == 0){
@@ -199,9 +207,15 @@ class ExportController extends Controller
         );
         $data = array_merge($headers, $PartyArray);
 
-        $this->set('data', $data);
-
-        return $data;
+        return view('export.parties', [
+          'data' => $data,
+        ]);
     }
+    $data = array('No data to return');
+
+    return view('export.parties', [
+      'data' => $data,
+    ]);
   }
+
 }

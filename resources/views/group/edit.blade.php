@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-md-12">
             @if(isset($response))
-              @php( printResponse($response) )
+              @php( FixometerHelper::printResponse($response) )
             @endif
 
             <div class="alert alert-info" >
@@ -24,6 +24,7 @@
             </div>
 
             <form action="/group/edit/<?php echo $formdata->idgroups; ?>" method="post" enctype="multipart/form-data">
+                @csrf
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group <?php if(isset($error) && isset($error['name']) && !empty($error['name'])) { echo "has-error"; } ?>">

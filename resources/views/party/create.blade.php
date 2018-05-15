@@ -70,7 +70,9 @@
             <div class="row">
                 <div class="col-md-12">
 
-                    <?php if(isset($response)) { printResponse($response); } ?>
+                    @if(isset($response))
+                      @php( FixometerHelper::printResponse($response) )
+                    @endif
                     <div class="alert alert-info">
                         <p>
                         This page allows you to create a party for your group.  You can find more detailed information about how to use this page <a href="https://therestartproject.org/welcome-to-our-community-space/#Create_an_upcoming_Restart_Party_to_announce_it" class="alert-link" target="_blank">here</a>.
@@ -86,6 +88,7 @@
                         </p>
                     </div>
                     <form action="/party/create" method="post" enctype="multipart/form-data">
+                        @csrf
                         <div class="row">
                             <div class="col-md-6">
 
@@ -157,7 +160,7 @@
                                 <div class="form-group <?php if(isset($error) && isset($error['group']) && !empty($error['group'])) { echo "has-error"; } ?>">
                                     <label for="group">Group: </label>
                                     <i class="fa fa-question-circle" data-toggle="popover" title="Group hosting the party" data-content="This is the Restart group that is hosting the party."></i>
-                                    <select id="group" name="group"  class="form-control selectpicker users_group">
+                                    <select id="group" name="group"  class="form-control users_group"><!-- REMOVED selectpicker as it is making group not appear -->
                                         <option></option>
                                         @foreach($group_list as $group)
                                         <option value="<?php echo $group->id; ?>"><?php echo $group->name; ?></option>

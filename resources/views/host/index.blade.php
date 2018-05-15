@@ -4,10 +4,10 @@
 <div class="container" id="host-dashboard">
 
 
-    @f(isset($response))
+    @if(isset($response))
     <div class="row">
         <div class="col-md-12">
-            <?php printResponse($response);  ?>
+            @php( printResponse($response) )
         </div>
     </div>
     @endif
@@ -31,21 +31,21 @@
                       <span class="fa fa-chevron-down"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <?php foreach($grouplist as $g) { ?>
+                        @foreach($grouplist as $g)
                         <li class="group-list clearfix">
                             <div class="pull-left">
-                                <?php if(!empty($g->path)) { ?>
+                                @if(!empty($g->path))
                                 <img src="/uploads/thumbnail_<?php echo $g->path; ?>" width="40" height="40" alt="<?php echo $g->name; ?> Image" class="profile-pic" />
-                                <?php } else { ?>
+                                @else
                                 <img src="/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg" width="40" height="40" alt="<?php echo $group->name; ?> Image" class="profile-pic clearfix"/>
-                                <?php } ?>
+                                @endif
                             </div>
                             <div class="pull-left">
                                 <a  href="/host/index/<?php echo $g->id; ?>" ><?php echo $g->name; ?></a>
                             </div>
                         </li>
 
-                        <?php } ?>
+                        @endforeach
                     </ul>
                 </div>
 
@@ -249,18 +249,17 @@
                     <?php
                     $nodata = 0;
                     $currentYear = date('Y', time());
-                    foreach($allparties as $party){
-                        $partyYear = date('Y', $party->event_timestamp);
-                        if( $partyYear < $currentYear){
                     ?>
+                    @foreach($allparties as $party)
+                    @php( $partyYear = date('Y', $party->event_timestamp) )
+                        @if( $partyYear < $currentYear)
                     <div class="year-break">
                         <?php echo $partyYear; ?>
                     </div>
-                    <?php
-                            $currentYear = $partyYear;
-                        }
-                    ?>
-                    <?php if($party->device_count < 1){ $nodata++; ?>
+                            @php( $currentYear = $partyYear )
+                        @endif
+                    @if($party->device_count < 1)
+                      @php( $nodata++ )
                     <a class="no-data-wrap party" href="/party/manage/<?php echo $party->idevents; ?>" <?php echo ($nodata == 1 ? 'id="attention"' : ''); ?>>
 
                         <div class="header-col header-col-2">
@@ -294,7 +293,7 @@
                         </div>
 
                     </a>
-                    <?php } else {  ?>
+                    @else
                     <a class="party"  href="/party/manage/<?php echo $party->idevents; ?>">
                         <div class="header-col header-col-2">
                             <div class="date">
@@ -347,8 +346,8 @@
                         </div>
 
                     </a>
-                    <?php } ?>
-                <?php } ?>
+                    @endif
+                @endforeach
                 </div>
 
             </section>
@@ -368,7 +367,11 @@
                     <h2><?php echo $group->name; ?></h2>
 
                     <p class="big">
-                        <span class="big blue"><?php echo $pax; ?> participants</span> aided by <span class="big blue"><?php echo $hours; ?>hours of volunteered time</span> worked on <span class="big blue"><?php echo ($group_device_count_status[0]->counter + $group_device_count_status[1]->counter + $group_device_count_status[2]->counter) ?> devices.</span>
+                        @if( !empty($group_device_count_status) )
+                          <span class="big blue"><?php echo $pax; ?> participants</span> aided by <span class="big blue"><?php echo $hours; ?>hours of volunteered time</span> worked on <span class="big blue"><?php echo ($group_device_count_status[0]->counter + $group_device_count_status[1]->counter + $group_device_count_status[2]->counter) ?> devices.</span>
+                        @else
+                          <span class="big blue"><?php echo $pax; ?> participants</span> aided by <span class="big blue"><?php echo $hours; ?>hours of volunteered time</span> worked on <span class="big blue">0 devices.</span>
+                        @endif
                     </p>
 
                 </div>
@@ -379,19 +382,31 @@
 
                     <div class="impact-devices-1">
                         <img src="/assets/icons/impact_device_1.jpg" class="" width="200">
-                        <span class="title"><?php echo (int)$group_device_count_status[0]->counter;?></span>
+                        @if ( isset( $group_device_count_status[0] ) )
+                          <span class="title"><?php echo (int)$group_device_count_status[0]->counter;?></span>
+                        @else
+                          <span class="title">0</span>
+                        @endif
                         <span class="legend">were fixed</span>
                     </div>
 
                     <div class="impact-devices-2">
                         <img src="/assets/icons/impact_device_2.jpg" class="" width="200">
-                        <span class="title"><?php echo (int)$group_device_count_status[1]->counter;?></span>
+                        @if ( isset( $group_device_count_status[1] ) )
+                          <span class="title"><?php echo (int)$group_device_count_status[1]->counter;?></span>
+                        @else
+                          <span class="title">0</span>
+                        @endif
                         <span class="legend">were still repairable</span>
                     </div>
 
                     <div class="impact-devices-3">
                         <img src="/assets/icons/impact_device_3.jpg" class="" width="200">
-                        <span class="title"><?php echo (int)$group_device_count_status[2]->counter;?></span>
+                        @if ( isset( $group_device_count_status[1] ) )
+                          <span class="title"><?php echo (int)$group_device_count_status[2]->counter;?></span>
+                        @else
+                          <span class="title">0</span>
+                        @endif
                         <span class="legend">were dead</span>
                     </div>
 
@@ -401,9 +416,13 @@
                     <h2><span class="title-text">Most Repaired Devices</span></h2>
 
                     <div class="row">
-                        <div class="col-md-4"><div class="topper  text-center"><?php echo $top[0]->name . ' [' . $top[0]->counter . ']'; ?></div></div>
-                        <div class="col-md-4"><div class="topper  text-center"><?php echo $top[1]->name . ' [' . $top[1]->counter . ']'; ?></div></div>
-                        <div class="col-md-4"><div class="topper  text-center"><?php echo $top[2]->name . ' [' . $top[2]->counter . ']'; ?></div></div>
+                        @for ($i=0; $i < 3; $i++)
+                          @if (isset($top[$i]))
+                            <div class="col-md-4"><div class="topper  text-center"><?php echo $top[$i]->name . ' [' . $top[$i]->counter . ']'; ?></div></div>
+                          @else
+                            <div class="col-md-4"><div class="topper  text-center">N/A</div></div>
+                          @endif
+                        @endfor
                     </div>
                 </div>
 
@@ -411,23 +430,19 @@
 
             <section class="row" id="impact-dataviz">
                 <div class="col-md-12 text-center texter">
-                    <?php
-                        $sum = 0;
-                        foreach($waste_year_data as $y){
-                            $sum += $y->waste;
-                        }
-                    ?>
+                    @php( $sum = 0 )
+                        @foreach($waste_year_data as $y)
+                            @php( $sum += $y->waste )
+                        @endforeach
                     <span class="datalabel">Total waste prevented:</span><span class="blue">  <?php echo $weights[0]->total_weights; ?> kg </span>
 
                 </div>
                 <div class="col-md-12 text-center texter">
-                    <?php
-                        $sum = 0;
-                        foreach($year_data as $y){
-                            $sum += $y->co2;
-                        }
-                        //$di_co2 = number_format(round($sum), 0, '.', ',');
-                    ?>
+                    @php( $sum = 0 )
+                        @foreach($year_data as $y)
+                            @php( $sum += $y->co2 )
+                        @endforeach
+                        <!-- //$di_co2 = number_format(round($sum), 0, '.', ','); -->
                     <span class="datalabel">Total CO<sub>2</sub> emission prevented: </span><span class="blue"><?php echo $weights[0]->total_footprints; ?> kg</span>
 
                 </div>
@@ -530,12 +545,10 @@
 
             <div class="col-md-6">
                 <h5 class="text-center">CO<sub>2</sub> emission prevented to date</h5>
-                <?php
-                    $sum = 0;
-                    foreach($year_data as $y){
-                        $sum += $y->co2;
-                    }
-                ?>
+                @php( $sum = 0 )
+                    @foreach($year_data as $y)
+                        @php( $sum += $y->co2 )
+                    @endforeach
                 <span class="largetext">
                     <?php echo number_format(round($sum), 0, '.', ','); ?> kg of CO<sub>2</sub>
                 </span>
@@ -573,7 +586,11 @@
                         <div class="col">
                             <span class="status_title">Fixed</span>
                             <span class="largetext fixed">
-                                <?php echo (int)$group_device_count_status[0]->counter; ?>
+                                @if (isset($group_device_count_status[0]))
+                                  <?php echo (int)$group_device_count_status[0]->counter; ?>
+                                @else
+                                  0
+                                @endif
                             </span>
                             <span class="subtext textblue">total: <?php echo $device_count_status[0]->counter; ?></span>
                         </div>
@@ -586,7 +603,11 @@
                         <div class="col">
                             <span class="status_title">Repairable</span>
                             <span class="largetext repairable">
-                                <?php echo (int)$group_device_count_status[1]->counter; ?>
+                                @if (isset($group_device_count_status[1]))
+                                  <?php echo (int)$group_device_count_status[1]->counter; ?>
+                                @else
+                                  0
+                                @endif
                             </span>
                             <span class="subtext textblue">total: <?php echo $device_count_status[1]->counter; ?></span>
                         </div>
@@ -600,7 +621,11 @@
                         <div class="col">
                             <span class="status_title">Dead</span>
                             <span class="largetext dead">
-                                <?php echo (int)$group_device_count_status[2]->counter; ?>
+                                @if (isset($group_device_count_status[2]))
+                                  <?php echo (int)$group_device_count_status[2]->counter; ?>
+                                @else
+                                  0
+                                @endif
                             </span>
                             <span class="subtext textblue">total: <?php echo $device_count_status[2]->counter; ?></span>
                         </div>
@@ -643,15 +668,25 @@
                 </div>
                 <div class="col-md-4">
                     <div class="col3">
-                        <span class="largetext fixed"><?php echo (int)$clusters['all'][1][0]->counter; ?></span>
+                        @if (isset($clusters['all'][1][0]))
+                          <span class="largetext fixed"><?php echo (int)$clusters['all'][1][0]->counter; ?></span>
+                        @else
+                          <span class="largetext fixed">0</span>
+                        @endif
                     </div>
                     <div class="col3">
-
-                        <span class="largetext repairable"><?php echo (int)$clusters['all'][1][1]->counter; ?></span>
+                        @if (isset($clusters['all'][1][1]))
+                          <span class="largetext repairable"><?php echo (int)$clusters['all'][1][1]->counter; ?></span>
+                        @else
+                          <span class="largetext repairable">0</span>
+                        @endif
                     </div>
                     <div class="col3">
-
-                        <span class="largetext dead"><?php echo (int)$clusters['all'][1][2]->counter; ?></span>
+                        @if (isset($clusters['all'][1][2]))
+                          <span class="largetext dead"><?php echo (int)$clusters['all'][1][2]->counter; ?></span>
+                        @else
+                          <span class="largetext dead">0</span>
+                        @endif
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -668,18 +703,33 @@
                             <tbody>
                                 <tr>
                                     <td class="table-label">Most seen:</td>
-                                    <td class="table-data"><?php echo $mostleast[1]['most_seen'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[1]['most_seen'][0]->counter; ?></td>
+                                    @if (isset($mostleast[1]['most_seen'][0]))
+                                      <td class="table-data"><?php echo $mostleast[1]['most_seen'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[1]['most_seen'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                                 <tr>
                                     <td class="table-label">Most repaired:</td>
-                                    <td class="table-data"><?php echo $mostleast[1]['most_repaired'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[1]['most_repaired'][0]->counter; ?></td>
+                                    @if (isset($mostleast[1]['most_repaired'][0]))
+                                      <td class="table-data"><?php echo $mostleast[1]['most_repaired'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[1]['most_repaired'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                                 <tr>
                                     <td class="table-label">Least repaired:</td>
-                                    <td class="table-data"><?php echo $mostleast[1]['least_repaired'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[1]['least_repaired'][0]->counter; ?></td>
+                                    @if (isset($mostleast[1]['least_repaired'][0]))
+                                      <td class="table-data"><?php echo $mostleast[1]['least_repaired'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[1]['least_repaired'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                             </tbody>
                         </table>
@@ -698,16 +748,25 @@
                 </div>
                 <div class="col-md-4">
                     <div class="col3">
-
-                        <span class="largetext fixed"><?php echo (int)$clusters['all'][2][0]->counter; ?></span>
+                        @if (isset($clusters['all'][2][0]))
+                          <span class="largetext fixed"><?php echo (int)$clusters['all'][2][0]->counter; ?></span>
+                        @else
+                          <span class="largetext fixed">0</span>
+                        @endif
                     </div>
                     <div class="col3">
-
-                        <span class="largetext repairable"><?php echo (int)$clusters['all'][2][1]->counter; ?></span>
+                        @if (isset($clusters['all'][2][1]))
+                          <span class="largetext repairable"><?php echo (int)$clusters['all'][2][1]->counter; ?></span>
+                        @else
+                          <span class="largetext repairable">0</span>
+                        @endif
                     </div>
                     <div class="col3">
-
-                        <span class="largetext dead"><?php echo (int)$clusters['all'][2][2]->counter; ?></span>
+                        @if (isset($clusters['all'][2][2]))
+                          <span class="largetext dead"><?php echo (int)$clusters['all'][2][2]->counter; ?></span>
+                        @else
+                          <span class="largetext dead">0</span>
+                        @endif
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -723,18 +782,33 @@
                             <tbody>
                                 <tr>
                                     <td class="table-label">Most seen:</td>
-                                    <td class="table-data"><?php echo $mostleast[2]['most_seen'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[2]['most_seen'][0]->counter; ?></td>
+                                    @if (isset($mostleast[2]['most_seen'][0]))
+                                      <td class="table-data"><?php echo $mostleast[2]['most_seen'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[2]['most_seen'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                                 <tr>
                                     <td class="table-label">Most repaired:</td>
-                                    <td class="table-data"><?php echo $mostleast[2]['most_repaired'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[2]['most_repaired'][0]->counter; ?></td>
+                                    @if (isset($mostleast[2]['most_repaired'][0]))
+                                      <td class="table-data"><?php echo $mostleast[2]['most_repaired'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[2]['most_repaired'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                                 <tr>
                                     <td class="table-label">Least repaired:</td>
-                                    <td class="table-data"><?php echo $mostleast[2]['least_repaired'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[2]['least_repaired'][0]->counter; ?></td>
+                                    @if (isset($mostleast[2]['least_repaired'][0]))
+                                      <td class="table-data"><?php echo $mostleast[2]['least_repaired'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[2]['least_repaired'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                             </tbody>
                         </table>
@@ -751,16 +825,25 @@
                 </div>
                 <div class="col-md-4">
                     <div class="col3">
-
-                        <span class="largetext fixed"><?php echo (int)$clusters['all'][3][0]->counter; ?></span>
+                        @if (isset($clusters['all'][3][0]))
+                          <span class="largetext fixed"><?php echo (int)$clusters['all'][3][0]->counter; ?></span>
+                        @else
+                          <span class="largetext fixed">0</span>
+                        @endif
                     </div>
                     <div class="col3">
-
-                        <span class="largetext repairable"><?php echo (int)$clusters['all'][3][1]->counter; ?></span>
+                        @if (isset($clusters['all'][3][1]))
+                          <span class="largetext repairable"><?php echo (int)$clusters['all'][3][1]->counter; ?></span>
+                        @else
+                          <span class="largetext repairable">0</span>
+                        @endif
                     </div>
                     <div class="col3">
-
-                        <span class="largetext dead"><?php echo (int)$clusters['all'][3][2]->counter; ?></span>
+                        @if (isset($clusters['all'][3][2]))
+                          <span class="largetext dead"><?php echo (int)$clusters['all'][3][2]->counter; ?></span>
+                        @else
+                          <span class="largetext dead">0</span>
+                        @endif
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -776,18 +859,33 @@
                             <tbody>
                                 <tr>
                                     <td class="table-label">Most seen:</td>
-                                    <td class="table-data"><?php echo $mostleast[3]['most_seen'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[3]['most_seen'][0]->counter; ?></td>
+                                    @if (isset($mostleast[3]['most_seen'][0]))
+                                      <td class="table-data"><?php echo $mostleast[3]['most_seen'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[3]['most_seen'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                                 <tr>
                                     <td class="table-label">Most repaired:</td>
-                                    <td class="table-data"><?php echo $mostleast[3]['most_repaired'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[3]['most_repaired'][0]->counter; ?></td>
+                                    @if (isset($mostleast[3]['most_repaired'][0]))
+                                      <td class="table-data"><?php echo $mostleast[3]['most_repaired'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[3]['most_repaired'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                                 <tr>
                                     <td class="table-label">Least repaired:</td>
-                                    <td class="table-data"><?php echo $mostleast[3]['least_repaired'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[3]['least_repaired'][0]->counter; ?></td>
+                                    @if (isset($mostleast[3]['least_repaired'][0]))
+                                      <td class="table-data"><?php echo $mostleast[3]['least_repaired'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[3]['least_repaired'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                             </tbody>
                         </table>
@@ -802,16 +900,25 @@
                 </div>
                 <div class="col-md-4">
                     <div class="col3">
-
-                        <span class="largetext fixed"><?php echo (int)$clusters['all'][4][0]->counter; ?></span>
+                        @if (isset($clusters['all'][4][0]))
+                          <span class="largetext fixed"><?php echo (int)$clusters['all'][4][0]->counter; ?></span>
+                        @else
+                          <span class="largetext fixed">0</span>
+                        @endif
                     </div>
                     <div class="col3">
-
-                        <span class="largetext repairable"><?php echo (int)$clusters['all'][4][1]->counter; ?></span>
+                        @if (isset($clusters['all'][4][1]))
+                          <span class="largetext repairable"><?php echo (int)$clusters['all'][4][1]->counter; ?></span>
+                        @else
+                          <span class="largetext repairable">0</span>
+                        @endif
                     </div>
                     <div class="col3">
-
-                        <span class="largetext dead"><?php echo (int)$clusters['all'][4][2]->counter; ?></span>
+                        @if (isset($clusters['all'][4][2]))
+                          <span class="largetext dead"><?php echo (int)$clusters['all'][4][2]->counter; ?></span>
+                        @else
+                          <span class="largetext dead">0</span>
+                        @endif
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -828,18 +935,33 @@
                             <tbody>
                                 <tr>
                                     <td class="table-label">Most seen:</td>
-                                    <td class="table-data"><?php echo $mostleast[4]['most_seen'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[4]['most_seen'][0]->counter; ?></td>
+                                    @if (isset($mostleast[4]['most_seen'][0]))
+                                      <td class="table-data"><?php echo $mostleast[4]['most_seen'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[4]['most_seen'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                                 <tr>
                                     <td class="table-label">Most repaired:</td>
-                                    <td class="table-data"><?php echo $mostleast[4]['most_repaired'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[4]['most_repaired'][0]->counter; ?></td>
+                                    @if (isset($mostleast[4]['most_repaired'][0]))
+                                      <td class="table-data"><?php echo $mostleast[4]['most_repaired'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[4]['most_repaired'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                                 <tr>
                                     <td class="table-label">Least repaired:</td>
-                                    <td class="table-data"><?php echo $mostleast[4]['least_repaired'][0]->name; ?></td>
-                                    <td class="table-count"><?php echo $mostleast[4]['least_repaired'][0]->counter; ?></td>
+                                    @if (isset($mostleast[4]['least_repaired'][0]))
+                                      <td class="table-data"><?php echo $mostleast[4]['least_repaired'][0]->name; ?></td>
+                                      <td class="table-count"><?php echo $mostleast[4]['least_repaired'][0]->counter; ?></td>
+                                    @else
+                                      <td class="table-data">N/A</td>
+                                      <td class="table-count">0</td>
+                                    @endif
                                 </tr>
                             </tbody>
                         </table>
@@ -862,50 +984,56 @@
             <div class="col-md-10 <?php echo($c == 1 ? 'show' : 'hide'); ?> bargroup" id="<?php echo $key; ?>">
 
                 <div class="row">
+                    @for ($i = 1; $i <= 2; $i++)
                     <div class="col-md-2">
                         <!-- <span class="cluster big cluster-1"></span> -->
-                        <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-01.png">
+                        <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-0<?php echo $i ?>.png">
                     </div>
                     <div class="col-md-4">
-                        <div class="barpiece fixed" style="width :<?php echo FixometerHelper::barChartValue($cluster[1][0]->counter, $cluster[1]['total']); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo FixometerHelper::barChartValue($cluster[1][0]->counter, $cluster[1]['total']) + 15; ?>%</div>
-                        <div class="barpiece repairable" style="width :<?php echo FixometerHelper::barChartValue($cluster[1][1]->counter, $cluster[1]['total']); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo FixometerHelper::barChartValue($cluster[1][1]->counter, $cluster[1]['total']) + 15; ?>%</div>
-                        <div class="barpiece end-of-life" style="width :<?php echo FixometerHelper::barChartValue($cluster[1][2]->counter, $cluster[1]['total']); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo FixometerHelper::barChartValue($cluster[1][2]->counter, $cluster[1]['total']) + 15; ?>%</div>
+                        @if (array_key_exists(0, $cluster[$i]))
+                          <div class="barpiece fixed" style="width :<?php echo FixometerHelper::barChartValue($cluster[1][0]->counter, $cluster[1]['total']); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo FixometerHelper::barChartValue($cluster[1][0]->counter, $cluster[1]['total']) + 15; ?>%</div>
+                        @else
+                          <div class="barpiece fixed" style="width :0%">&nbsp;</div><div class="barpiece-label fixed">0%</div>
+                        @endif
+                        @if (array_key_exists(1, $cluster[$i]))
+                          <div class="barpiece repairable" style="width :<?php echo FixometerHelper::barChartValue($cluster[1][1]->counter, $cluster[1]['total']); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo FixometerHelper::barChartValue($cluster[1][1]->counter, $cluster[1]['total']) + 15; ?>%</div>
+                        @else
+                          <div class="barpiece repairable" style="width :0%">&nbsp;</div><div class="barpiece-label repairable">0%</div>
+                        @endif
+                        @if (array_key_exists(2, $cluster[$i]))
+                          <div class="barpiece end-of-life" style="width :<?php echo FixometerHelper::barChartValue($cluster[1][2]->counter, $cluster[1]['total']); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo FixometerHelper::barChartValue($cluster[1][2]->counter, $cluster[1]['total']) + 15; ?>%</div>
+                        @else
+                          <div class="barpiece end-of-life" style="width :0%">&nbsp;</div><div class="barpiece-label dead">0%</div>
+                        @endif
                     </div>
-
-
-                    <div class="col-md-2">
-                        <!-- <span class="cluster big cluster-2"></span> -->
-                        <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-02.png">
-                    </div>
-                    <div class="col-md-4">
-                        <div class="barpiece fixed" style="width: <?php echo FixometerHelper::barChartValue($cluster[2][0]->counter, $cluster[2]['total']); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo FixometerHelper::barChartValue($cluster[2][0]->counter, $cluster[2]['total']) + 15; ?>%</div>
-                        <div class="barpiece repairable" style="width: <?php echo FixometerHelper::barChartValue($cluster[2][1]->counter, $cluster[2]['total']); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo FixometerHelper::barChartValue($cluster[2][1]->counter, $cluster[2]['total']) + 15; ?>%</div>
-                        <div class="barpiece end-of-life" style="width: <?php echo FixometerHelper::barChartValue($cluster[2][2]->counter, $cluster[2]['total']); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo FixometerHelper::barChartValue($cluster[2][2]->counter, $cluster[2]['total']) + 15; ?>%</div>
-                    </div>
+                    @endfor
 
                 </div>
 
                 <div class="row">
+                    @for ($i = 3; $i <= 4; $i++)
                     <div class="col-md-2">
                         <!-- <span class="cluster big cluster-3"></span> -->
-                        <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-03.png">
+                        <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-0<?php echo $i ?>.png">
                     </div>
                     <div class="col-md-4">
-                        <div class="barpiece fixed" style="width :<?php echo FixometerHelper::barChartValue($cluster[3][0]->counter, $cluster[3]['total']); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo FixometerHelper::barChartValue($cluster[3][0]->counter, $cluster[3]['total']) + 15; ?>%</div>
-                        <div class="barpiece repairable" style="width :<?php echo FixometerHelper::barChartValue($cluster[3][1]->counter, $cluster[3]['total']); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo FixometerHelper::barChartValue($cluster[3][1]->counter, $cluster[3]['total']) + 15; ?>%</div>
-                        <div class="barpiece end-of-life" style="width :<?php echo FixometerHelper::barChartValue($cluster[3][2]->counter, $cluster[3]['total']); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo FixometerHelper::barChartValue($cluster[3][2]->counter, $cluster[3]['total']) + 15; ?>%</div>
+                        @if (array_key_exists(0, $cluster[$i]))
+                          <div class="barpiece fixed" style="width :<?php echo FixometerHelper::barChartValue($cluster[3][0]->counter, $cluster[3]['total']); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo FixometerHelper::barChartValue($cluster[3][0]->counter, $cluster[3]['total']) + 15; ?>%</div>
+                        @else
+                          <div class="barpiece fixed" style="width :0%">&nbsp;</div><div class="barpiece-label fixed">0%</div>
+                        @endif
+                        @if (array_key_exists(0, $cluster[$i]))
+                          <div class="barpiece repairable" style="width :<?php echo FixometerHelper::barChartValue($cluster[3][1]->counter, $cluster[3]['total']); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo FixometerHelper::barChartValue($cluster[3][1]->counter, $cluster[3]['total']) + 15; ?>%</div>
+                        @else
+                          <div class="barpiece repairable" style="width :0%">&nbsp;</div><div class="barpiece-label repairable">0%</div>
+                        @endif
+                        @if (array_key_exists(0, $cluster[$i]))
+                          <div class="barpiece end-of-life" style="width :<?php echo FixometerHelper::barChartValue($cluster[3][2]->counter, $cluster[3]['total']); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo FixometerHelper::barChartValue($cluster[3][2]->counter, $cluster[3]['total']) + 15; ?>%</div>
+                        @else
+                          <div class="barpiece end-of-life" style="width :0%">&nbsp;</div><div class="barpiece-label dead">0%</div>
+                        @endif
                     </div>
-
-
-                    <div class="col-md-2">
-                        <!-- <span class="cluster big cluster-4"></span> -->
-                        <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-04.png">
-                    </div>
-                    <div class="col-md-4">
-                        <div class="barpiece fixed" style="width : <?php echo FixometerHelper::barChartValue($cluster[4][0]->counter, $cluster[4]['total']); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo FixometerHelper::barChartValue($cluster[4][0]->counter, $cluster[4]['total']) + 15; ?>%</div>
-                        <div class="barpiece repairable" style="width :<?php echo FixometerHelper::barChartValue($cluster[4][1]->counter, $cluster[4]['total']); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo FixometerHelper::barChartValue($cluster[4][1]->counter, $cluster[4]['total']) + 15; ?>%</div>
-                        <div class="barpiece end-of-life" style="width :<?php echo FixometerHelper::barChartValue($cluster[4][2]->counter, $cluster[4]['total']); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo FixometerHelper::barChartValue($cluster[4][2]->counter, $cluster[4]['total']) + 15; ?>%</div>
-                    </div>
+                    @endfor
 
 
                 </div>

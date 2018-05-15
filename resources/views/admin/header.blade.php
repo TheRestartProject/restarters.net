@@ -28,9 +28,9 @@
                 </button>
 
                  <ul class="dropdown-menu" aria-labelledby="profileDropDown">
-                    <li><a href="/user/edit/<?php echo $profile->idusers; ?>" class="small"><i class="fa fa-edit"></i> Edit Profile</a></li>
-                    <li><a href="https://www.facebook.com/groups/RestartHosts/" target="_blank"><i class="fa fa-facebook"></i>Facebook Group</a></li>
-                    <li><a class="" href="/user/logout"><i class="fa fa-sign-out"></i>Logout</a></li>
+                    <li><a href="/user/edit/<?php echo $profile->idusers; ?>" class="small"><i class="fa fa-edit"></i> {{ FixometerHelper::translate('edit_profile') }}</a></li>
+                    <li><a href="https://www.facebook.com/groups/RestartHosts/" target="_blank"><i class="fa fa-facebook"></i> {{ FixometerHelper::translate('facebook_group')</a></li>
+                    <li><a class="" href="/user/logout"><i class="fa fa-sign-out"></i> {{ FixometerHelper::translate('Logout') }}</a></li>
                   </ul>
 
             </div>

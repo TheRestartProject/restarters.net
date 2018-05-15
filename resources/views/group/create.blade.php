@@ -10,7 +10,9 @@
 
     <div class="row">
         <div class="col-md-12">
-            <?php if(isset($response)) { printResponse($response); } ?>
+            @if(isset($response))
+              @php( FixometerHelper::printResponse($response) )
+            @endif
 
             <div class="alert alert-info" >
                 <p>
@@ -22,6 +24,7 @@
             </div>
 
             <form action="/group/create" method="post" enctype="multipart/form-data">
+                @csrf
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group <?php if(isset($error) && isset($error['name']) && !empty($error['name'])) { echo "has-error"; } ?>">
@@ -53,7 +56,7 @@
                             <div class="input-group">
                                 <input type="text" name="location" id="location" class="form-control" <?php if(isset($error) && !empty($error) && !empty($udata)) echo 'value="'.$udata['location'].'"' ; ?>>
                                 <span class="input-group-btn">
-                                    <button type="button" class="btn btn-primary" onclick="codeAddress()"><i class="fa fa-map-marker"></i>geocode</button>
+                                    <button type="button" class="btn btn-primary" onclick="codeAddress()"><i class="fa fa-map-marker"></i> geocode</button>
                                 </span>
                             </div>
 
