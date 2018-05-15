@@ -157,7 +157,7 @@ class PartyController extends Controller
 
               $hours = $dtDiff->h;
 
-              $group = Group::where('idgroups', $group)->first();
+              // $group = Group::where('idgroups', $group)->first();
 
               // dd($group);
 
