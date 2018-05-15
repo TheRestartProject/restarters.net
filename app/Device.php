@@ -68,6 +68,10 @@ class Device extends Model
 
         $sql .= ' ORDER BY `sorter` DESC';
 
+        if (array_key_exists('event_date', $params)) {
+          unset($params['event_date']);
+        }
+
         if ($params != null) {
           return DB::select(DB::raw($sql), $params);
         } else {

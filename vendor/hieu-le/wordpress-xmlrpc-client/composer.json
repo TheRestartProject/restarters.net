@@ -1,0 +1,31 @@
+{
+	"name": "hieu-le/wordpress-xmlrpc-client",
+	"description": "A PHP client for Wordpress websites that closely implement the XML-RPC WordPress API with full test suite built in",
+	"keywords": ["wordpress", "xmlrpc", "client", "remote", "api"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Hieu Le",
+			"email": "letrunghieu.cse09@gmail.com",
+			"homepage": "http://www.hieule.info"
+		}
+	],
+	"require": {
+		"php": ">=5.3.0",
+		"ext-xmlrpc": "*"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "*",
+		"symfony/yaml": "2.*",
+		"php-vcr/php-vcr": "^1.0",
+		"php-vcr/phpunit-testlistener-vcr": "*",
+		"illuminate/support": "~4.0",
+		"codeclimate/php-test-reporter": "dev-master"
+	},
+	"autoload": {
+		"psr-4": {
+			"HieuLe\\WordpressXmlrpcClient\\": "src/"
+		}
+	},
+	"minimum-stability": "stable"
+}

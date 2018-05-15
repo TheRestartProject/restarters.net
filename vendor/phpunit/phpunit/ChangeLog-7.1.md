@@ -2,6 +2,12 @@
 
 All notable changes of the PHPUnit 7.1 release series are documented in this file using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [7.1.5] - 2018-04-29
+
+### Fixed
+
+* Fixed [#3105](https://github.com/sebastianbergmann/phpunit/pull/3105): Name is prettified inconsistently when snake_case notation is used
+
 ## [7.1.4] - 2018-04-18
 
 ### Fixed
@@ -40,6 +46,7 @@ All notable changes of the PHPUnit 7.1 release series are documented in this fil
 * `PHPUnit\Framework\Assert` is no longer searched for test methods
 * `ReflectionMethod::invokeArgs()` is no longer used to invoke test methods
 
+[7.1.5]: https://github.com/sebastianbergmann/phpunit/compare/7.1.4...7.1.5
 [7.1.4]: https://github.com/sebastianbergmann/phpunit/compare/7.1.3...7.1.4
 [7.1.3]: https://github.com/sebastianbergmann/phpunit/compare/7.1.2...7.1.3
 [7.1.2]: https://github.com/sebastianbergmann/phpunit/compare/7.1.1...7.1.2

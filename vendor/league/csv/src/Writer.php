@@ -4,7 +4,7 @@
 *
 * @license http://opensource.org/licenses/MIT
 * @link https://github.com/thephpleague/csv/
-* @version 9.1.3
+* @version 9.1.4
 * @package League.csv
 *
 * For the full copyright and license information, please view the LICENSE
@@ -129,7 +129,7 @@ class Writer extends AbstractCsv
         $record = array_reduce($this->formatters, [$this, 'formatRecord'], $record);
         $this->validateRecord($record);
         $bytes = $this->document->fputcsv($record, $this->delimiter, $this->enclosure, $this->escape);
-        if (false !== $bytes && null !== $bytes) {
+        if ('' !== (string) $bytes) {
             return $bytes + $this->consolidate();
         }
 
@@ -265,7 +265,7 @@ class Writer extends AbstractCsv
             throw new TypeError(sprintf(__METHOD__.'() expects 1 Argument to be null or an integer %s given', gettype($threshold)));
         }
 
-        if (null !== $threshold && 1 >= $threshold) {
+        if (null !== $threshold && 1 > $threshold) {
             throw new Exception(__METHOD__.'() expects 1 Argument to be null or a valid integer greater or equal to 1');
         }
 

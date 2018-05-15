@@ -52,23 +52,13 @@ class DeviceController extends Controller
   //     }
   // }
 
-  public function index(){
-
-      // $this->set('title', 'Devices');
-      // $this->set('css', array('/components/jquery.bootgrid/dist/jquery.bootgrid.min.css'));
-      // $this->set('js', array('head' => array(
-      //   '/components/jquery.bootgrid/dist/jquery.bootgrid.js',
-      //   '/components/jquery.bootgrid/dist/jquery.bootgrid.fa.js',
-      //   '/dist/js/device_list.js'
-      // )));
+  public function index($search = null){
 
       $Category   = new Category;
       $Group      = new Group;
       $Device     = new Device;
 
       $categories = $Category->listed();
-      // $this->set('categories', $categories);
-      // $this->set('groups', $Group->findAll());
 
       if(isset($_GET['fltr']) && !empty($_GET['fltr'])){
 

@@ -219,7 +219,7 @@ class PartyController extends Controller
 
                       /** Start WP XML-RPC **/
                       $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-                      $wpClient->setCredentials(WP_XMLRPC_ENDPOINT, WP_XMLRPC_USER, WP_XMLRPC_PSWD);
+                      $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
 
                       $content = array(
@@ -332,7 +332,7 @@ class PartyController extends Controller
           );
           echo "Connecting ... ";
           $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-          $wpClient->setCredentials(WP_XMLRPC_ENDPOINT, WP_XMLRPC_USER, WP_XMLRPC_PSWD);
+          $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
 
           $content = array(
@@ -646,7 +646,7 @@ class PartyController extends Controller
 
                   /** Start WP XML-RPC **/
                   $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-                  $wpClient->setCredentials(WP_XMLRPC_ENDPOINT, WP_XMLRPC_USER, WP_XMLRPC_PSWD);
+                  $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
 
 
@@ -782,7 +782,7 @@ class PartyController extends Controller
                   // delete from WordPress
                   /** Start WP XML-RPC **/
                   $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-                  $wpClient->setCredentials(WP_XMLRPC_ENDPOINT, WP_XMLRPC_USER, WP_XMLRPC_PSWD);
+                  $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
                   $deletion = $wpClient->deletePost($wpId);
                   if(!$wpId){
