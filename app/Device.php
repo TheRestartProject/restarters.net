@@ -68,7 +68,7 @@ class Device extends Model
 
         $sql .= ' ORDER BY `sorter` DESC';
 
-        if (array_key_exists('event_date', $params)) {
+        if (!empty($params) && array_key_exists('event_date', $params)) {
           unset($params['event_date']);
         }
 
