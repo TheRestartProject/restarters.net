@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
 
   //Device Controller
   Route::get('/device', 'DeviceController@index');
-  Route::get('/device/index{?search}', 'DeviceController@index');
+  Route::get('/device/index{search}', 'DeviceController@index');
   Route::get('/device/edit/{id}', 'DeviceController@edit');
   Route::post('/device/edit/{id}', 'DeviceController@edit');
   Route::get('/device/create', 'DeviceController@create');
