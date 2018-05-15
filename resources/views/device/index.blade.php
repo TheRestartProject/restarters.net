@@ -14,12 +14,12 @@
 
         </div>
         <div class="col-md-11">
-          <form action="/device/index" method="get">
+          <form action="/device/search/" method="get">
             <input type="hidden" name="fltr" value="<?php echo bin2hex(openssl_random_pseudo_bytes(8)); ?>">
             <div class="row">
               <div class="col-md-3">
                 <div class="form-group">
-                  <select id="categories" name="categories[]" class="selectpicker form-control" multiple data-live-search="true" title="Choose categories...">
+                  <select id="categories" name="categories[]" class="form-control" multiple data-live-search="true" title="Choose categories..."> <!-- REMOVED selectpicker -->
                     @if(isset($categories))
                       @foreach($categories as $cluster)
                       <optgroup label="<?php echo $cluster->name; ?>">
