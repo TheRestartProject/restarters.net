@@ -12,6 +12,7 @@ use App\Party;
 
 use Auth;
 use FixometerHelper;
+use FixometerFile;
 
 class DeviceController extends Controller
 {
@@ -159,10 +160,10 @@ class DeviceController extends Controller
 
 
                   /** let's create the image attachment! **/
-                  // if(isset($_FILES) && !empty($_FILES)){
-                  //     $file = new File;
-                  //     $file->upload('file', 'image', $id, TBL_EVENTS);
-                  // }
+                  if(isset($_FILES) && !empty($_FILES)){
+                      $file = new FixometerFile;
+                      $file->upload('file', 'image', $id, TBL_EVENTS);
+                  }
 
               }
 

@@ -10,6 +10,7 @@ use App\Device;
 
 use Auth;
 use FixometerHelper;
+use FixometerFile;
 
 class GroupController extends Controller
 {
@@ -117,10 +118,10 @@ class GroupController extends Controller
 
                       $response['success'] = 'Group created correctly.';
 
-                      // if(isset($_FILES) && !empty($_FILES)){
-                      //     $file = new File;
-                      //     $group_avatar = $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true);
-                      // }
+                      if(isset($_FILES) && !empty($_FILES)){
+                          $file = new File;
+                          $group_avatar = $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true);
+                      }
 
                       /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                       // $Host = $Group->findHost($idGroup);
@@ -291,25 +292,25 @@ class GroupController extends Controller
 
                   // dbga($_FILES);
 
-                  // if(isset($_FILES['image']) && !empty($_FILES['image']) && $_FILES['image']['error'] != 4){
-                  //    // echo "uploading image ... ";
-                  //     $existing_image = $Group->hasImage($id, true);
-                  //     if(count($existing_image) > 0){
-                  //         $Group->removeImage($id, $existing_image[0]);
-                  //     }
-                  //     $file = new File;
-                  //     $group_avatar = $file->upload('image', 'image', $id, env('TBL_GROUPS'), false, true);
-                  //     $group_avatar = env('UPLOADS_URL') . 'mid_' . $group_avatar ;
-                  // }
-                  // else {
-                  //     $existing_image = $Group->hasImage($id, true);
-                  //     if( count($existing_image) > 0 ) {
-                  //         $group_avatar = env('UPLOADS_URL') . 'mid_' . $existing_image[0]->path;
-                  //     }
-                  //     else {
-                  //         $group_avatar = 'null';
-                  //     }
-                  // }
+                  if(isset($_FILES['image']) && !empty($_FILES['image']) && $_FILES['image']['error'] != 4){
+                     // echo "uploading image ... ";
+                      $existing_image = $Group->hasImage($id, true);
+                      if(count($existing_image) > 0){
+                          $Group->removeImage($id, $existing_image[0]);
+                      }
+                      $file = new FixometerFile;
+                      $group_avatar = $file->upload('image', 'image', $id, env('TBL_GROUPS'), false, true);
+                      $group_avatar = env('UPLOADS_URL') . 'mid_' . $group_avatar ;
+                  }
+                  else {
+                      $existing_image = $Group->hasImage($id, true);
+                      if( count($existing_image) > 0 ) {
+                          $group_avatar = env('UPLOADS_URL') . 'mid_' . $existing_image[0]->path;
+                      }
+                      else {
+                          $group_avatar = 'null';
+                      }
+                  }
 
                    /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                   // $Host = $Group->findHost($id);

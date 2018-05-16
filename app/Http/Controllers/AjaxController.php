@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 use FixometerHelper;
+use FixometerFile;
 use Auth;
 
 class AjaxController extends Controller
@@ -111,7 +112,7 @@ class AjaxController extends Controller
       if(isset($_POST['id']) && isset($_POST['file'])) {
         $id = filter_var($_POST['id'], FILTER_SANITIZE_NUMBER_INT);
         $filename = filter_var($_POST['file'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $File = new File;
+        $File = new FixometerFile;
         $File->deleteImage($id, $filename);
         echo true;
       }
