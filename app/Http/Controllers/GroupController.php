@@ -119,7 +119,7 @@ class GroupController extends Controller
                       $response['success'] = 'Group created correctly.';
 
                       if(isset($_FILES) && !empty($_FILES)){
-                          $file = new File;
+                          $file = new FixometerFile;
                           $group_avatar = $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true);
                       }
 
