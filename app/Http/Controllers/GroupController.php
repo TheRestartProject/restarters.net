@@ -294,7 +294,7 @@ class GroupController extends Controller
 
                   if(isset($_FILES['image']) && !empty($_FILES['image']) && $_FILES['image']['error'] != 4){
                      // echo "uploading image ... ";
-                      $existing_image = $Group->hasImage($id, true);
+                      $existing_image = FixometerHelper::hasImage($id, 'groups', true);
                       if(count($existing_image) > 0){
                           $Group->removeImage($id, $existing_image[0]);
                       }
@@ -303,7 +303,7 @@ class GroupController extends Controller
                       $group_avatar = env('UPLOADS_URL') . 'mid_' . $group_avatar ;
                   }
                   else {
-                      $existing_image = $Group->hasImage($id, true);
+                      $existing_image = FixometerHelper::hasImage($id, 'groups', true);
                       if( count($existing_image) > 0 ) {
                           $group_avatar = env('UPLOADS_URL') . 'mid_' . $existing_image[0]->path;
                       }
