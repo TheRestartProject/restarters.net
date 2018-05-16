@@ -617,7 +617,7 @@ class PartyController extends Controller
               }
 
 
-              if(env('APP_ENV') != 'development' || env('APP_ENV') != 'local') {
+              if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
                   /** WP Sync **/
                   $party = $Party->findThis($idparty, true);
 
