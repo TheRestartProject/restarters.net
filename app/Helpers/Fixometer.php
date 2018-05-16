@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App;
 use Auth;
+use DB;
 
 class FixometerHelper {
 
