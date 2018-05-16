@@ -205,9 +205,9 @@ class FixometerFile extends Model {
           $data['height']   = $size[1];
           $data['alt_text'] = $title;
 
-          $this->table = 'images';
+          $Images = new Images;
 
-          $image = $this->create($data);
+          $image = $Images->create($data);
 
           if(is_numeric($image)  && !is_null($object_id)){
               $xref = new Xref('object', $image, env('TBL_IMAGES'), $object_id, env('TBL_DEVICES'));

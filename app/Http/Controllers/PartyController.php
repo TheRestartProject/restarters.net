@@ -188,10 +188,10 @@ class PartyController extends Controller
 
 
                   /** let's create the image attachment! **/
-                  // if(isset($_FILES) && !empty($_FILES)){
-                  //     $file = new File;
-                  //     $file->upload('file', 'image', $idParty, env('TBL_EVENTS'));
-                  // }
+                  if(isset($_FILES) && !empty($_FILES)){
+                      $file = new FixometerFile;
+                      $file->upload('file', 'image', $idParty, env('TBL_EVENTS'));
+                  }
 
                   if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
                       /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
@@ -566,7 +566,7 @@ class PartyController extends Controller
                   // Rearrange files to more friendly Array
                   if(isset($_FILES) && !empty($_FILES)){
                     $files = reflow($_FILES['device']);
-                    $File = new File;
+                    $File = new FixometerFile;
                   }
                   //dbga($files);
                   foreach ($devices as $i => $device){
