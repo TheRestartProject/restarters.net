@@ -85,7 +85,7 @@ Route::middleware('auth')->group(function () {
 
   //Role Controller
   Route::get('/role', 'RoleController@index');
-  Route::get('/role/edit/{id}', 'RoleController@edit');
+  Route::post('/role/edit/{id}', 'RoleController@edit');
 
   //Search Controller
   Route::get('/search', 'SearchController@index');
