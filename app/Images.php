@@ -22,13 +22,6 @@ class Images extends Model
      */
     protected $hidden = [];
 
-    //Table Relations
-
-
-    // Setters
-
-
-    //Getters
 
 
 }
