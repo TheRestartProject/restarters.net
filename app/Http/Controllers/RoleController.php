@@ -50,7 +50,7 @@ class RoleController extends Controller
 
     public function edit($id){
 
-        $user = User::find(Auth::id());
+        $user = Auth::user();
 
         if(FixometerHelper::hasRole($user, 'Administrator')){
 
@@ -80,10 +80,6 @@ class RoleController extends Controller
                 $activePerms[] = $p->permission;
             }
 
-            // $this->set('formId', $role->idroles);
-            // $this->set('permissions', $role->permissions());
-            // $this->set('activePermissions', $activePerms);
-
             if (!isset($response)) {
               $response = null;
             }
@@ -97,6 +93,7 @@ class RoleController extends Controller
             ]);
 
         }
+
     }
 
     // public function test() {

@@ -8,10 +8,11 @@
             <h1><?php echo $title; ?></h1>
 
             @if(isset($response))
-              @php( printResponse($response) )
+              @php( FixometerHelper::printResponse($response) )
             @endif
 
             <form class="" method="post" action="/role/edit/<?php echo $formId; ?>">
+              @csrf
                 <input name="formId" value="<?php echo env('APP_NAME') . '_' . $formId; ?>" type="hidden">
                 <!-- Checkbox List of Permissions -->
                 @foreach($permissions as $p)
