@@ -19,6 +19,8 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         '4a1f389d6ce373bda9e57857d3b61c84' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/helpers.php',
         'f18cc91337d49233e5754e93f3ed9ec3' => __DIR__ . '/..' . '/laravelcollective/html/src/helpers.php',
         '9e4824c5afbdc1482b6025ce3d4dfde8' => __DIR__ . '/..' . '/league/csv/src/functions_include.php',
+        '1f4a38abb7d261d45606158c65438f8c' => __DIR__ . '/../..' . '/app/Helpers/Fixometer.php',
+        '07069d856aa8ce08caf71afac534cd76' => __DIR__ . '/../..' . '/app/Helpers/FixometerFile.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -405,6 +407,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Statistics' => __DIR__ . '/../..' . '/app/Statistics.php',
         'App\\User' => __DIR__ . '/../..' . '/app/User.php',
         'App\\UserGroups' => __DIR__ . '/../..' . '/app/UserGroups.php',
+        'App\\Xref' => __DIR__ . '/../..' . '/app/Xref.php',
         'Barryvdh\\Debugbar\\Console\\ClearCommand' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/Console/ClearCommand.php',
         'Barryvdh\\Debugbar\\Controllers\\AssetController' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/Controllers/AssetController.php',
         'Barryvdh\\Debugbar\\Controllers\\BaseController' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/Controllers/BaseController.php',

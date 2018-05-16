@@ -12,6 +12,7 @@ use App\UserGroups;
 use App\Session;
 
 use FixometerHelper;
+use FixometerFile;
 use Auth;
 
 class UserController extends Controller
@@ -532,10 +533,10 @@ class UserController extends Controller
                         $Session = new Session;
                         $Session->createSession($idUser);
 
-                        // if(isset($_FILES) && !empty($_FILES)){
-                        //     $file = new File;
-                        //     $file->upload('profile', 'image', $idUser, TBL_USERS, false, true);
-                        // }
+                        if(isset($_FILES) && !empty($_FILES)){
+                            $file = new FixometerFile;
+                            $file->upload('profile', 'image', $idUser, env('TBL_USERS'), false, true);
+                        }
 
                     }
                     if($idUser){
@@ -662,10 +663,10 @@ class UserController extends Controller
 
 
 
-                    // if(isset($_FILES) && !empty($_FILES)){
-                    //     $file = new File;
-                    //     $file->upload('profile', 'image', $id, env('TBL_USERS'), false, true);
-                    // }
+                    if(isset($_FILES) && !empty($_FILES)){
+                        $file = new FixometerFile;
+                        $file->upload('profile', 'image', $id, env('TBL_USERS'), false, true);
+                    }
 
                     if(!$u) {
                         $response['danger'] = 'Something went wrong. Please check the data and try again.';

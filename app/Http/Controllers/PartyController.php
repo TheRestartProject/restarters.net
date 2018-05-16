@@ -11,7 +11,7 @@ use App\Device;
 
 use FixometerHelper;
 use Auth;
-use File;
+use FixometerFile;
 use DateTime;
 
 class PartyController extends Controller
@@ -120,7 +120,7 @@ class PartyController extends Controller
           $location   =       $_POST['location'];
           $latitude   =       $_POST['latitude'];
           $longitude  =       $_POST['longitude'];
-          $group      =       $_POST['group'];
+          $group      =       intval($_POST['group']);
 
 
           // saving this for wordpress
@@ -157,10 +157,6 @@ class PartyController extends Controller
 
               $hours = $dtDiff->h;
 
-              // $group = Group::where('idgroups', $group)->first();
-
-              // dd($group);
-
               // No errors. We can proceed and create the Party.
               $data = array(
                               'event_date'    => $event_date,
@@ -174,9 +170,10 @@ class PartyController extends Controller
                               'longitude'     => $longitude,
                               'group'         => $group,
                               'hours'         => $hours,
-                              'volunteers'    => $volunteers
-                              );
-              $idParty = $Party->create($data)->id;
+                              'volunteers'    => $volunteers,
+                              'created_at'    => date('Y-m-d H:i:s')
+                            );
+              $idParty = $Party->insertGetId($data);
 
 
 
@@ -191,12 +188,12 @@ class PartyController extends Controller
 
 
                   /** let's create the image attachment! **/
-                  if(isset($_FILES) && !empty($_FILES)){
-                      $file = new File;
-                      $file->upload('file', 'image', $idParty, env('TBL_EVENTS'));
-                  }
+                  // if(isset($_FILES) && !empty($_FILES)){
+                  //     $file = new File;
+                  //     $file->upload('file', 'image', $idParty, env('TBL_EVENTS'));
+                  // }
 
-                  if(env('APP_ENV') != 'development' || env('APP_ENV') != 'local') {
+                  if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
                       /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                       $Host = $Groups->findHost($group);
 
@@ -232,12 +229,12 @@ class PartyController extends Controller
                       $Party->update(array('wordpress_post_id' => $wpid), $idParty);
                   }
 
-                  if(FixometerHelper::hasRole($this->user, 'Host')){
+                  if(FixometerHelper::hasRole($user, 'Host')){
 
                       $this->sendCreationNotificationEmail($venue, $location, $event_date, $start, $end, $group);
                       header('Location: /host?action=pc&code=200');
 
-                  } else if(FixometerHelper::hasRole($this->user, 'Administrator')){
+                  } else if(FixometerHelper::hasRole($user, 'Administrator')){
                     header('Location: /admin?action=pc&code=200');
                   }
                }
@@ -359,7 +356,7 @@ class PartyController extends Controller
       // $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
       $Groups = new Group;
-      $File = new File;
+      $File = new FixometerFile;
       $Party = new Party;
 
       if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
@@ -464,15 +461,15 @@ class PartyController extends Controller
 
 
               /** let's create the image attachment! **/
-              // if(isset($_FILES) && !empty($_FILES)){
-              //     if(is_array($_FILES['file']['name'])) {
-              //         $files = rearrange($_FILES['file']);
-              //         foreach($files as $upload){
-              //             $File->upload($upload, 'image', $id, env('TBL_EVENTS'));
-              //         }
-              //     }
-              //     else { }
-              // }
+              if(isset($_FILES) && !empty($_FILES)){
+                  if(is_array($_FILES['file']['name'])) {
+                      $files = FixometerHelper::rearrange($_FILES['file']);
+                      foreach($files as $upload){
+                          $File->upload($upload, 'image', $id, env('TBL_EVENTS'));
+                      }
+                  }
+                  else { }
+              }
           }
           if(FixometerHelper::hasRole($user, 'Host')){
               header('Location: /host?action=pe&code=200');
@@ -502,11 +499,11 @@ class PartyController extends Controller
           ]);
       }
 
-      // $images = $File->findImages(env('TBL_EVENTS'), $id);//NB: File facade can't find findImages may need to add
-      $images = null;
+      $images = $File->findImages(env('TBL_EVENTS'), $id);//NB: File facade can't find findImages may need to add
 
-      // $this->set('gmaps', true);
-      // $this->set('js', array( 'head' => array( '/ext/geocoder.js')));
+      if (!isset($images)) {
+        $images = null;
+      }
 
       $party = $Party->findThis($id)[0];
       // $this->set('images', $images);
@@ -871,7 +868,7 @@ class PartyController extends Controller
       else {
           $id = $_GET['id'];
           $path = $_GET['path'];
-          $Image = new File;
+          $Image = new FixometerFile;
 
           $Image->deleteImage($id, $path);
 

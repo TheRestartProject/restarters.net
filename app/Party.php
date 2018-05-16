@@ -16,7 +16,7 @@ class Party extends Model
      *
      * @var array
      */
-    protected $fillable = ['devices', 'co2', 'ewaste', 'fixed_devices', 'repairable_devices', 'dead_devices'];
+    protected $fillable = ['devices', 'co2', 'ewaste', 'fixed_devices', 'repairable_devices', 'dead_devices', 'created_at', 'updated_at'];
 
     /**
      * The attributes that should be hidden for arrays.

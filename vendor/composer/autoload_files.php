@@ -18,4 +18,6 @@ return array(
     '4a1f389d6ce373bda9e57857d3b61c84' => $vendorDir . '/barryvdh/laravel-debugbar/src/helpers.php',
     'f18cc91337d49233e5754e93f3ed9ec3' => $vendorDir . '/laravelcollective/html/src/helpers.php',
     '9e4824c5afbdc1482b6025ce3d4dfde8' => $vendorDir . '/league/csv/src/functions_include.php',
+    '1f4a38abb7d261d45606158c65438f8c' => $baseDir . '/app/Helpers/Fixometer.php',
+    '07069d856aa8ce08caf71afac534cd76' => $baseDir . '/app/Helpers/FixometerFile.php',
 );

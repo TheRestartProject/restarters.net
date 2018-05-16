@@ -149,6 +149,20 @@ class FixometerHelper {
       }
   }
 
+  /**
+   * Rearranges an array
+   * used to "reflow" the $_FILES array
+   * with multiple entries
+   * */
+  public static function rearrange($arr){
+      foreach($arr as $key => $all){
+          foreach($all as $i => $val){
+              $new[$i][$key] = $val;
+          }
+      }
+      return $new;
+  }
+
 
 }
 

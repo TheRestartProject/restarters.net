@@ -23,6 +23,10 @@
         "phpunit/phpunit": "^7.0"
     },
     "autoload": {
+        "files": [
+            "app/Helpers/Fixometer.php",
+            "app/Helpers/FixometerFile.php"
+        ],
         "classmap": [
             "database/seeds",
             "database/factories"

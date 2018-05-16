@@ -81,7 +81,7 @@ Route::middleware('auth')->group(function () {
   Route::get('/party/manage/{id}', 'PartyController@manage');
   Route::get('/party/edit/{id}', 'PartyController@edit');
   Route::post('/party/edit/{id}', 'PartyController@edit');
-
+  Route::get('/party/deleteimage', 'PartyController@deleteimage');
 
   //Role Controller
   Route::get('/role', 'RoleController@index');
