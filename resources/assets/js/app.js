@@ -8,29 +8,30 @@
 require('./jquery.min');
 require('./bootstrap.min');
 require('./bootstrap');
-require('./main.js');
-require('./misc/geocoder.js');
-require('./misc/markers.js');
 
 // Plugins
 require('../../../node_modules/moment/min/locales.min.js');
-require('../../../node_modules/bootstrap-select/dist/js/bootstrap-select.min.js');
 require('../../../node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js');
 require('../../../node_modules/summernote/dist/summernote.js');
 require('../../../node_modules/summernote-cleaner/summernote-cleaner.js');
 require('../../../node_modules/bootstrap-fileinput/js/fileinput.js');
 require('../../../node_modules/chart.js/dist/Chart.min.js');
+require('../../../node_modules/bootstrap-select/dist/js/bootstrap-select.min.js');
 
-window.Vue = require('vue');
+require('./main.js');
+// require('./misc/geocoder.js');
+// require('./misc/markers.js');
 
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
+// window.Vue = require('vue');
 
-Vue.component('example-component', require('./components/ExampleComponent.vue'));
+// /**
+//  * Next, we will create a fresh Vue application instance and attach it to
+//  * the page. Then, you may begin adding components to this application
+//  * or customize the JavaScript scaffolding to fit your unique needs.
+//  */
 
-const app = new Vue({
-    el: '#app'
-});
+// Vue.component('example-component', require('./components/ExampleComponent.vue'));
+
+// const app = new Vue({
+//     el: '#app'
+// });

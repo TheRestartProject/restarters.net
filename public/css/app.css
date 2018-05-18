@@ -5,7 +5,7 @@
 /** Colors **/
 
 /*!
- * Bootstrap v4.1.0 (https://getbootstrap.com/)
+ * Bootstrap v4.1.1 (https://getbootstrap.com/)
  * Copyright 2011-2018 The Bootstrap Authors
  * Copyright 2011-2018 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
@@ -64,7 +64,6 @@ html {
 
 article,
 aside,
-dialog,
 figcaption,
 figure,
 footer,
@@ -215,7 +214,7 @@ pre,
 code,
 kbd,
 samp {
-  font-family: monospace, monospace;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 1em;
 }
 
@@ -545,13 +544,6 @@ mark,
 .figure-caption {
   font-size: 90%;
   color: #6c757d;
-}
-
-code,
-kbd,
-pre,
-samp {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 code {
@@ -2520,6 +2512,13 @@ select.form-control-lg:not([size]):not([multiple]),
   display: block;
 }
 
+.was-validated .form-control-file:valid ~ .valid-feedback,
+.was-validated .form-control-file:valid ~ .valid-tooltip,
+.form-control-file.is-valid ~ .valid-feedback,
+.form-control-file.is-valid ~ .valid-tooltip {
+  display: block;
+}
+
 .was-validated .form-check-input:valid ~ .form-check-label,
 .form-check-input.is-valid ~ .form-check-label {
   color: #28a745;
@@ -2634,6 +2633,13 @@ select.form-control-lg:not([size]):not([multiple]),
 .custom-select:invalid ~ .invalid-tooltip,
 .custom-select.is-invalid ~ .invalid-feedback,
 .custom-select.is-invalid ~ .invalid-tooltip {
+  display: block;
+}
+
+.was-validated .form-control-file:invalid ~ .invalid-feedback,
+.was-validated .form-control-file:invalid ~ .invalid-tooltip,
+.form-control-file.is-invalid ~ .invalid-feedback,
+.form-control-file.is-invalid ~ .invalid-tooltip {
   display: block;
 }
 
@@ -4021,8 +4027,7 @@ input[type="button"].btn-block {
   border-bottom-right-radius: 0;
 }
 
-.input-group > .custom-file:not(:first-child) .custom-file-label,
-.input-group > .custom-file:not(:first-child) .custom-file-label::after {
+.input-group > .custom-file:not(:first-child) .custom-file-label {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
@@ -4148,13 +4153,14 @@ input[type="button"].btn-block {
 }
 
 .custom-control-label {
+  position: relative;
   margin-bottom: 0;
 }
 
 .custom-control-label::before {
   position: absolute;
   top: 0.3rem;
-  left: 0;
+  left: -1.5rem;
   display: block;
   width: 1rem;
   height: 1rem;
@@ -4170,7 +4176,7 @@ input[type="button"].btn-block {
 .custom-control-label::after {
   position: absolute;
   top: 0.3rem;
-  left: 0;
+  left: -1.5rem;
   display: block;
   width: 1rem;
   height: 1rem;
@@ -4336,7 +4342,7 @@ input[type="button"].btn-block {
   bottom: 0;
   z-index: 3;
   display: block;
-  height: calc(calc(2.19rem + 2px) - 1px * 2);
+  height: 2.19rem;
   padding: 0.375rem 0.75rem;
   line-height: 1.6;
   color: #495057;
@@ -6794,6 +6800,7 @@ button.close {
   margin-right: 3px;
   margin-left: 3px;
   text-indent: -999px;
+  cursor: pointer;
   background-color: rgba(255, 255, 255, 0.5);
 }
 
@@ -10393,6 +10400,22 @@ a.text-dark:focus {
   .table-bordered td {
     border: 1px solid #dee2e6 !important;
   }
+
+  .table-dark {
+    color: inherit;
+  }
+
+  .table-dark th,
+  .table-dark td,
+  .table-dark thead th,
+  .table-dark tbody + tbody {
+    border-color: #dee2e6;
+  }
+
+  .table .thead-dark th {
+    color: inherit;
+    border-color: #dee2e6;
+  }
 }
 
 /*!
@@ -12874,6 +12897,7 @@ body {
   margin-bottom: -190px;
   min-height: 100%;
   height: 100%;
+  background-color: #0394A6;
 }
 
 h1,
@@ -13539,6 +13563,89 @@ div.group-option {
   border-radius: 20px;
   -moz-border-radius: 20px;
   -webkit-border-radius: 20px;
+}
+
+.navbar-laravel {
+  background-color: #F1F6F6;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  padding: 0;
+}
+
+.navbar-laravel .container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: row wrap;
+          flex-flow: row wrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+@media (min-width: 576px) {
+  .navbar-laravel .container {
+    max-width: 100%;
+    padding: 0;
+  }
+}
+
+.navbar-laravel .navbar-brand {
+  margin: auto 0;
+  padding: 10px 20px 10px;
+  border: 1px solid #D9D9D9;
+  border-top: 0;
+  border-left: 0;
+}
+
+.navbar-laravel .navbar-brand svg {
+  display: block;
+}
+
+.navbar-laravel .navbar-nav {
+  font-size: 16px;
+}
+
+.navbar-laravel .navbar-nav .nav-link {
+  color: #000;
+  padding: 16px 15px;
+  border: 1px solid #D9D9D9;
+  border-top: 0;
+  border-right: 0;
+}
+
+.navbar-laravel .navbar-nav .nav-link:hover,
+.navbar-laravel .navbar-nav .nav-link:focus {
+  background-color: #fff;
+  text-decoration: none;
+}
+
+.navbar-laravel .navbar-nav .dropdown-menu {
+  border-radius: 0;
+  background-color: #F1F6F6;
+  border: 0;
+  margin: 0;
+  right: 0;
+  left: auto;
+  border-top: 1px solid #D9D9D9;
+  width: 230px;
+}
+
+.navbar-laravel .navbar-nav .dropdown-item {
+  font-size: 17px;
+}
+
+.navbar-laravel .navbar-nav #navbarDropdown {
+  text-decoration: underline;
+  width: 230px;
+}
+
+.navbar-laravel .navbar-nav #navbarDropdown:hover,
+.navbar-laravel .navbar-nav #navbarDropdown:focus {
+  background-color: #fff;
+  text-decoration: none;
 }
 
 /** form specific less **/
@@ -14859,11 +14966,5 @@ time {
 #hangovers table td:not(:first-child) .aggregate {
   font-size: 10px;
   color: #727d83;
-}
-
-.navbar-laravel {
-  background-color: #fff;
-  -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 

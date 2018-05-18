@@ -26,3 +26,74 @@
     }
     
 }
+
+.navbar-laravel {
+    background-color: #F1F6F6;
+    box-shadow: none;
+    padding: 0;
+
+    .container {
+        display: flex;
+        flex-flow:row wrap;
+        align-items: center;
+        @include media-breakpoint-up(sm) {
+            max-width:100%;
+            padding: 0;
+        }
+    }
+
+    .navbar-brand {
+        margin:auto 0;
+        padding: 10px 20px 10px;
+        border:1px solid #D9D9D9;
+        border-top:0;
+        border-left:0;
+
+        svg {
+            display: block;
+        }
+    }
+
+    .navbar-nav {
+        font-size: 16px;
+
+        .nav-link {
+            color: #000;
+            padding: 16px 15px;
+            border:1px solid #D9D9D9;
+            border-top:0;
+            border-right:0;
+
+            &:hover, &:focus {
+                background-color: #fff;
+                text-decoration: none;
+            }
+        }
+
+        .dropdown-menu {
+            border-radius: 0;
+            background-color: #F1F6F6;
+            border: 0;
+            margin: 0;
+            right: 0;
+            left: auto;
+            border-top:1px solid #D9D9D9;
+            width: 230px;
+        }
+
+        .dropdown-item {
+            font-size: 17px;
+        }
+
+        #navbarDropdown {
+            text-decoration: underline;
+            width: 230px;
+
+            &:hover, &:focus {
+                background-color: #fff;
+                text-decoration: none;
+            }
+
+        }
+    }
+}
