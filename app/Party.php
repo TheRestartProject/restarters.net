@@ -371,7 +371,7 @@ class Party extends Model
                     `e`.`longitude`
                 FROM `' . $this->table . '` AS `e`
                 ORDER BY `e`.`event_date` DESC
-                LIMIT :limit'), array('limit', $limit));
+                LIMIT :limit'), array('limit' => $limit));
     }
 
     public function attendees(){//Tested

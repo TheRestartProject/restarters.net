@@ -381,10 +381,10 @@
 
             <section class="row" id="impact-dataviz">
                 <div class="col-md-12 text-center texter">
-                    <span class="datalabel">Total waste prevented: </span><span class="blue">  <?php echo 0;//number_format(round($wasteTotal), 0, '.', ','); ?> kg </span>
+                    <span class="datalabel">Total waste prevented: </span><span class="blue">  <?php echo number_format(round($wasteTotal), 0, '.', ','); ?> kg </span>
                 </div>
                 <div class="col-md-12 text-center texter">
-                    <span class="datalabel">Total CO<sub>2</sub> emission prevented: </span><span class="blue"><?php echo 0;//number_format(round($co2Total), 0, '.', ','); ?> kg</span>
+                    <span class="datalabel">Total CO<sub>2</sub> emission prevented: </span><span class="blue"><?php echo number_format(round($co2Total), 0, '.', ','); ?> kg</span>
                 </div>
                 <div class="col-md-12">
                     <?php

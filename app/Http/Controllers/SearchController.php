@@ -59,6 +59,7 @@ class SearchController extends Controller
       $Groups = new Group;
       $Parties = new Party;
       $Device = new Device;
+      $Search = new Search;
       // $this->set('title', 'Filter Stats');
 
       $user = User::find(Auth::id());
@@ -141,6 +142,7 @@ class SearchController extends Controller
           $hours_volunteered = 0;
           $totalCO2 = 0;
           $totalWeight = 0;
+          $need_attention = 0;
         //  dbga($PartyList[12]->devices);
           foreach($PartyList as $i => $party){
               if($party->device_count == 0){
@@ -207,9 +209,9 @@ class SearchController extends Controller
           // most/least stats for clusters
           $mostleast = array();
           for($i = 1; $i <= 4; $i++){
-              $mostleast[$i]['most_seen'] = $this->Search->findMostSeen($partyIds,null, $i);
-              $mostleast[$i]['most_repaired'] = $this->Search->findMostSeen($partyIds,1, $i);
-              $mostleast[$i]['least_repaired'] = $this->Search->findMostSeen($partyIds,3, $i);
+              $mostleast[$i]['most_seen'] = $Search->findMostSeen($partyIds,null, $i);
+              $mostleast[$i]['most_repaired'] = $Search->findMostSeen($partyIds,1, $i);
+              $mostleast[$i]['least_repaired'] = $Search->findMostSeen($partyIds,3, $i);
 
           }
 

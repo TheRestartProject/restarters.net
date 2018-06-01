@@ -54,7 +54,7 @@
                                 <div class="form-group <?php if(isset($error) && isset($error['role']) && !empty($error['role'])) { echo "has-error"; } ?>">
 
                                     <label for="role">User Role:</label>
-                                    <select id="role" name="role"  class="form-control"> <!-- REMOVED selectpicker from class options -->
+                                    <select id="role" name="role"  class="form-control selectpicker"> 
                                         <option></option>
                                         @foreach($roles as $role)
                                         <option value="<?php echo $role->id; ?>" <?php echo ($role->id == $data->role ? 'selected' : ''); ?>><?php echo $role->role; ?></option>

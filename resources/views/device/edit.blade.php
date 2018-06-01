@@ -24,7 +24,7 @@
                                 <div class="form-group <?php if(isset($error) && isset($error['event']) && !empty($error['event'])) { echo "has-error"; } ?>">
 
                                     <label for="event">Restart Party:</label>
-                                    <select id="event" name="event"  class="form-control" data-live-search="true"><!-- REMOVED selectpicker -->
+                                    <select id="event" name="event"  class="form-control selectpicker" data-live-search="true">
                                         <option></option>
                                         @if(isset($events))
                                           <?php foreach($events as $event){ ?>
@@ -40,7 +40,7 @@
                                 <div class="form-group <?php if(isset($error) && isset($error['category']) && !empty($error['category'])) { echo "has-error"; } ?>">
 
                                     <label for="category">Category:</label>
-                                    <select id="category" name="category"  class="form-control" data-live-search="true"><!-- REMOVED selectpicker -->
+                                    <select id="category" name="category"  class="form-control selectpicker" data-live-search="true">
                                         <option></option>
                                         @if(isset($categories))
                                           <?php foreach($categories as $category){ ?>

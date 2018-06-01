@@ -20,81 +20,89 @@
     </div>
     @endif
 
-    <section class="row profile">
+    <!-- <section class="row profile"> -->
 
         <form action="/search" class="" method="get" id="filter-search">
+          @csrf
           <input type="hidden" name="fltr" value="<?php echo bin2hex(openssl_random_pseudo_bytes(8)); ?>">
 
-          <div class="col-md-2">
-            <h2>Search</h2>
-          </div>
-
-          <div class="col-md-5">
-            <div class="form-group">
-              <select id="search-groups" name="groups[]" class="search-groups-class selectpicker form-control" data-live-search="true" multiple title="Choose groups...">
-                @foreach($groups as $group)
-                <option value="<?php echo $group->id; ?>"
-                <?php
-                if(isset($_GET['groups']) && !empty($_GET['groups'])){
-                  foreach($_GET['groups'] as $g){
-                    if ($g == $group->id) { echo " selected "; }
-                  }
-                }
-                ?>
-                ><?php echo trim($group->name); ?></option>
-                @endforeach
-              </select>
+          <div class="row">
+            <div class="col-md-2">
+              <h2>Search</h2>
             </div>
-            <div class="form-group">
-              <label for="parties" class="sr-only">Parties</label>
-              <select class="selectpicker form-control" id="search-parties" name="parties[]" title="Select parties..." data-live-search="true" multiple title="Choose parties...">
-                @foreach($sorted_parties as $groupname => $groupparties)
-                <optgroup label="<?php echo trim($groupname); ?>">
-                  <?php foreach($groupparties as $party) { ?>
-                  <option value="<?php echo $party->id; ?>" data-subtext="<?php echo strftime('%d/%m/%Y', $party->event_timestamp); ?>"
-                    <?php
-                    if(isset($_GET['parties']) && !empty($_GET['parties'])){
-                      foreach($_GET['parties'] as $p){
-                        if ($p == $party->id) { echo " selected "; }
-                      }
+            <div class="col-md-4">
+              <div class="form-group">
+                <select id="search-groups" name="groups[]" class="search-groups-class selectpicker form-control" data-live-search="true" multiple title="Choose groups...">
+                  @foreach($groups as $group)
+                  <option value="<?php echo $group->id; ?>"
+                  <?php
+                  if(isset($_GET['groups']) && !empty($_GET['groups'])){
+                    foreach($_GET['groups'] as $g){
+                      if ($g == $group->id) { echo " selected "; }
                     }
-                    ?>
-                  ><?php echo $party->venue; ?></option>
-                  <?php } ?>
-                </optgroup>
-                @endforeach
-              </select>
+                  }
+                  ?>
+                  ><?php echo trim($group->name); ?></option>
+                  @endforeach
+                </select>
+              </div>
             </div>
-          </div>
-
-          <div class="col-md-3">
-            <div class="form-group">
-              <label for="from-date" class="sr-only">From date</label>
-
-              <div class="input-group date">
-                <input type="text" class="form-control" id="search-from-date" name="from-date" placeholder="From date..." <?php if(isset($_GET['from-date']) && !empty($_GET['from-date'])){ echo ' value="' . $_GET['from-date'] . '"'; } ?> >
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="parties" class="sr-only">Parties</label>
+                <select class="selectpicker form-control" id="search-parties" name="parties[]" title="Select parties..." data-live-search="true" multiple title="Choose parties...">
+                  @foreach($sorted_parties as $groupname => $groupparties)
+                  <optgroup label="<?php echo trim($groupname); ?>">
+                    <?php foreach($groupparties as $party) { ?>
+                    <option value="<?php echo $party->id; ?>" data-subtext="<?php echo strftime('%d/%m/%Y', $party->event_timestamp); ?>"
+                      <?php
+                      if(isset($_GET['parties']) && !empty($_GET['parties'])){
+                        foreach($_GET['parties'] as $p){
+                          if ($p == $party->id) { echo " selected "; }
+                        }
+                      }
+                      ?>
+                    ><?php echo $party->venue; ?></option>
+                    <?php } ?>
+                  </optgroup>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>
+                <a href="/search" class="btn btn-default"><i class="fa fa-refresh"></i> Reset</a>
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="from-date" class="sr-only">To date</label>
-              <div class="input-group date">
-                <input type="text" class="form-control" id="search-to-date" name="to-date" placeholder="To date..." <?php if(isset($_GET['to-date']) && !empty($_GET['to-date'])){ echo ' value="' . $_GET['to-date'] . '"'; } ?>>
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <br>
+
+            <div class="col-md-4 offset-md-2">
+              <div class="form-group">
+                <label for="from-date" class="sr-only">From date</label>
+
+                <div class="input-group date">
+                  <input type="text" class="form-control" id="search-from-date" name="from-date" placeholder="From date..." <?php if(isset($_GET['from-date']) && !empty($_GET['from-date'])){ echo ' value="' . $_GET['from-date'] . '"'; } ?> >
+                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="from-date" class="sr-only">To date</label>
+                <div class="input-group date">
+                  <input type="text" class="form-control" id="search-to-date" name="to-date" placeholder="To date..." <?php if(isset($_GET['to-date']) && !empty($_GET['to-date'])){ echo ' value="' . $_GET['to-date'] . '"'; } ?>>
+                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="col-md-2">
-            <div class="form-group">
-              <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>
-              <a href="/search" class="btn btn-default"><i class="fa fa-refresh"></i> Reset</a>
-            </div>
-          </div>
         </form>
 
-    </section>
+    <!-- </section> -->
 
 
     @if(isset($PartyList))
@@ -226,7 +234,7 @@
 
                             <div class="short-body">
                                 <span class="location"><?php echo $party->venue; ?></span>
-                                <time datetime="<?php echo dbDate($party->event_date); ?>"><?php echo substr($party->start, 0, -3); ?></time>
+                                <time datetime="<?php echo $party->event_date; ?>"><?php echo substr($party->start, 0, -3); ?></time>
 
                             </div>
                         </div>
@@ -259,7 +267,7 @@
 
                             <div class="short-body">
                                 <span class="location"><?php echo $party->venue; ?></span>
-                                <time datetime="<?php echo dbDate($party->event_date); ?>"><?php echo  substr($party->start, 0, -3); ?></time>
+                                <time datetime="<?php echo $party->event_date; ?>"><?php echo  substr($party->start, 0, -3); ?></time>
 
                             </div>
                         </div>
@@ -346,9 +354,21 @@
                       <h2><span class="title-text">Most Repaired Devices</span></h2>
 
                       <div class="row">
-                          <div class="col-md-4"><div class="topper  text-center"><?php echo $top[0]->name . ' [' . $top[0]->counter . ']'; ?></div></div>
-                          <div class="col-md-4"><div class="topper  text-center"><?php echo $top[1]->name . ' [' . $top[1]->counter . ']'; ?></div></div>
-                          <div class="col-md-4"><div class="topper  text-center"><?php echo $top[2]->name . ' [' . $top[2]->counter . ']'; ?></div></div>
+                          @if (isset($top[0]))
+                            <div class="col-md-4"><div class="topper  text-center"><?php echo $top[0]->name . ' [' . $top[0]->counter . ']'; ?></div></div>
+                          @else
+                            <div class="col-md-4"><div class="topper  text-center">N/A [0]</div></div>
+                          @endif
+                          @if (isset($top[1]))
+                            <div class="col-md-4"><div class="topper  text-center"><?php echo $top[1]->name . ' [' . $top[1]->counter . ']'; ?></div></div>
+                          @else
+                            <div class="col-md-4"><div class="topper  text-center">N/A [0]</div></div>
+                          @endif
+                          @if (isset($top[2]))
+                            <div class="col-md-4"><div class="topper  text-center"><?php echo $top[2]->name . ' [' . $top[2]->counter . ']'; ?></div></div>
+                          @else
+                            <div class="col-md-4"><div class="topper  text-center">N/A [0]</div></div>
+                          @endif
                       </div>
                   </div>
 
@@ -507,15 +527,25 @@
                       </div>
                       <div class="col-md-4">
                           <div class="col3">
-                              <span class="largetext fixed"><?php echo $clusters['all'][1][0]->counter; ?></span>
+                              @if (isset($clusters['all'][1][0]))
+                                <span class="largetext fixed"><?php echo $clusters['all'][1][0]->counter; ?></span>
+                              @else
+                                <span class="largetext fixed">0</span>
+                              @endif
                           </div>
                           <div class="col3">
-
-                              <span class="largetext repairable"><?php echo $clusters['all'][1][1]->counter; ?></span>
+                              @if (isset($clusters['all'][1][1]))
+                                <span class="largetext repairable"><?php echo $clusters['all'][1][1]->counter; ?></span>
+                              @else
+                                <span class="largetext repairable">0</span>
+                              @endif
                           </div>
                           <div class="col3">
-
-                              <span class="largetext dead"><?php echo $clusters['all'][1][2]->counter; ?></span>
+                              @if (isset($clusters['all'][1][2]))
+                                <span class="largetext dead"><?php echo $clusters['all'][1][2]->counter; ?></span>
+                              @else
+                                <span class="largetext dead">0</span>
+                              @endif
                           </div>
                       </div>
                       <div class="col-md-6">
@@ -532,18 +562,33 @@
                                   <tbody>
                                       <tr>
                                           <td class="table-label">Most seen:</td>
-                                          <td class="table-data"><?php echo $mostleast[1]['most_seen'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[1]['most_seen'][0]->counter; ?></td>
+                                          @if (isset($mostleast[1]['most_seen'][0]))
+                                            <td class="table-data"><?php echo $mostleast[1]['most_seen'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[1]['most_seen'][0]->counter; ?></td>
+                                          @else
+                                            <td class="table-data">N/A</td>
+                                            <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                       <tr>
                                           <td class="table-label">Most repaired:</td>
-                                          <td class="table-data"><?php echo $mostleast[1]['most_repaired'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[1]['most_repaired'][0]->counter; ?></td>
+                                          @if (isset($mostleast[1]['most_repaired'][0]))
+                                            <td class="table-data"><?php echo $mostleast[1]['most_repaired'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[1]['most_repaired'][0]->counter; ?></td>
+                                          @else
+                                          <td class="table-data">N/A</td>
+                                          <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                       <tr>
                                           <td class="table-label">Least repaired:</td>
-                                          <td class="table-data"><?php echo $mostleast[1]['least_repaired'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[1]['least_repaired'][0]->counter; ?></td>
+                                          @if (isset($mostleast[1]['least_repaired'][0]))
+                                            <td class="table-data"><?php echo $mostleast[1]['least_repaired'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[1]['least_repaired'][0]->counter; ?></td>
+                                          @else
+                                            <td class="table-data">N/A</td>
+                                            <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                   </tbody>
                               </table>
@@ -561,16 +606,25 @@
                       </div>
                       <div class="col-md-4">
                           <div class="col3">
-
-                              <span class="largetext fixed"><?php echo $clusters['all'][2][0]->counter; ?></span>
+                              @if (isset($clusters['all'][2][0]))
+                                <span class="largetext fixed"><?php echo $clusters['all'][2][0]->counter; ?></span>
+                              @else
+                                <span class="largetext fixed">0</span>
+                              @endif
                           </div>
                           <div class="col3">
-
-                              <span class="largetext repairable"><?php echo $clusters['all'][2][1]->counter; ?></span>
+                              @if (isset($clusters['all'][2][1]))
+                                <span class="largetext repairable"><?php echo $clusters['all'][2][1]->counter; ?></span>
+                              @else
+                                <span class="largetext repairable">0</span>
+                              @endif
                           </div>
                           <div class="col3">
-
-                              <span class="largetext dead"><?php echo $clusters['all'][2][2]->counter; ?></span>
+                              @if (isset($clusters['all'][2][2]))
+                                <span class="largetext dead"><?php echo $clusters['all'][2][2]->counter; ?></span>
+                              @else
+                                <span class="largetext dead">0</span>
+                              @endif
                           </div>
                       </div>
                       <div class="col-md-6">
@@ -586,18 +640,33 @@
                                   <tbody>
                                       <tr>
                                           <td class="table-label">Most seen:</td>
-                                          <td class="table-data"><?php echo $mostleast[2]['most_seen'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[2]['most_seen'][0]->counter; ?></td>
+                                          @if (isset($mostleast[2]['most_seen'][0]))
+                                            <td class="table-data"><?php echo $mostleast[2]['most_seen'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[2]['most_seen'][0]->counter; ?></td>
+                                          @else
+                                            <td class="table-data">N/A</td>
+                                            <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                       <tr>
                                           <td class="table-label">Most repaired:</td>
-                                          <td class="table-data"><?php echo $mostleast[2]['most_repaired'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[2]['most_repaired'][0]->counter; ?></td>
+                                          @if (isset($mostleast[2]['most_repaired'][0]))
+                                            <td class="table-data"><?php echo $mostleast[2]['most_repaired'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[2]['most_repaired'][0]->counter; ?></td>
+                                          @else
+                                            <td class="table-data">N/A</td>
+                                            <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                       <tr>
                                           <td class="table-label">Least repaired:</td>
-                                          <td class="table-data"><?php echo $mostleast[2]['least_repaired'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[2]['least_repaired'][0]->counter; ?></td>
+                                          @if (isset($mostleast[2]['least_repaired'][0]))
+                                            <td class="table-data"><?php echo $mostleast[2]['least_repaired'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[2]['least_repaired'][0]->counter; ?></td>
+                                          @else
+                                            <td class="table-data">N/A</td>
+                                            <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                   </tbody>
                               </table>
@@ -614,16 +683,25 @@
                       </div>
                       <div class="col-md-4">
                           <div class="col3">
-
+                            @if (isset($clusters['all'][3][0]))
                               <span class="largetext fixed"><?php echo $clusters['all'][3][0]->counter; ?></span>
+                            @else
+                              <span class="largetext fixed">0</span>
+                            @endif
                           </div>
                           <div class="col3">
-
+                            @if (isset($clusters['all'][3][1]))
                               <span class="largetext repairable"><?php echo $clusters['all'][3][1]->counter; ?></span>
+                            @else
+                              <span class="largetext repairable">0</span>
+                            @endif
                           </div>
                           <div class="col3">
-
+                            @if (isset($clusters['all'][3][2]))
                               <span class="largetext dead"><?php echo $clusters['all'][3][2]->counter; ?></span>
+                            @else
+                              <span class="largetext dead">0</span>
+                            @endif
                           </div>
                       </div>
                       <div class="col-md-6">
@@ -639,18 +717,33 @@
                                   <tbody>
                                       <tr>
                                           <td class="table-label">Most seen:</td>
-                                          <td class="table-data"><?php echo $mostleast[3]['most_seen'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[3]['most_seen'][0]->counter; ?></td>
+                                          @if (isset($mostleast[3]['most_seen'][0]))
+                                            <td class="table-data"><?php echo $mostleast[3]['most_seen'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[3]['most_seen'][0]->counter; ?></td>
+                                          @else
+                                            <td class="table-data">N/A</td>
+                                            <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                       <tr>
                                           <td class="table-label">Most repaired:</td>
-                                          <td class="table-data"><?php echo $mostleast[3]['most_repaired'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[3]['most_repaired'][0]->counter; ?></td>
+                                          @if (isset($mostleast[3]['most_repaired'][0]))
+                                            <td class="table-data"><?php echo $mostleast[3]['most_repaired'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[3]['most_repaired'][0]->counter; ?></td>
+                                          @else
+                                            <td class="table-data">N/A</td>
+                                            <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                       <tr>
                                           <td class="table-label">Least repaired:</td>
-                                          <td class="table-data"><?php echo $mostleast[3]['least_repaired'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[3]['least_repaired'][0]->counter; ?></td>
+                                          @if (isset($mostleast[3]['least_repaired'][0]))
+                                            <td class="table-data"><?php echo $mostleast[3]['least_repaired'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[3]['least_repaired'][0]->counter; ?></td>
+                                          @else
+                                            <td class="table-data">N/A</td>
+                                            <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                   </tbody>
                               </table>
@@ -665,16 +758,25 @@
                       </div>
                       <div class="col-md-4">
                           <div class="col3">
-
+                            @if (isset($clusters['all'][4][0]))
                               <span class="largetext fixed"><?php echo $clusters['all'][4][0]->counter; ?></span>
+                            @else
+                              <span class="largetext fixed">0</span>
+                            @endif
                           </div>
                           <div class="col3">
-
+                            @if (isset($clusters['all'][4][1]))
                               <span class="largetext repairable"><?php echo $clusters['all'][4][1]->counter; ?></span>
+                            @else
+                              <span class="largetext repairable">0</span>
+                            @endif
                           </div>
                           <div class="col3">
-
+                            @if (isset($clusters['all'][4][2]))
                               <span class="largetext dead"><?php echo $clusters['all'][4][2]->counter; ?></span>
+                            @else
+                              <span class="largetext dead">0</span>
+                            @endif
                           </div>
                       </div>
                       <div class="col-md-6">
@@ -691,18 +793,33 @@
                                   <tbody>
                                       <tr>
                                           <td class="table-label">Most seen:</td>
-                                          <td class="table-data"><?php echo $mostleast[4]['most_seen'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[4]['most_seen'][0]->counter; ?></td>
+                                          @if (isset($mostleast[4]['most_seen'][0]))
+                                            <td class="table-data"><?php echo $mostleast[4]['most_seen'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[4]['most_seen'][0]->counter; ?></td>
+                                          @else
+                                            <td class="table-data">N/A</td>
+                                            <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                       <tr>
                                           <td class="table-label">Most repaired:</td>
-                                          <td class="table-data"><?php echo $mostleast[4]['most_repaired'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[4]['most_repaired'][0]->counter; ?></td>
+                                          @if (isset($mostleast[4]['most_repaired'][0]))
+                                            <td class="table-data"><?php echo $mostleast[4]['most_repaired'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[4]['most_repaired'][0]->counter; ?></td>
+                                          @else
+                                            <td class="table-data">N/A</td>
+                                            <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                       <tr>
                                           <td class="table-label">Least repaired:</td>
-                                          <td class="table-data"><?php echo $mostleast[4]['least_repaired'][0]->name; ?></td>
-                                          <td class="table-count"><?php echo $mostleast[4]['least_repaired'][0]->counter; ?></td>
+                                          @if (isset($mostleast[4]['least_repaired'][0]))
+                                            <td class="table-data"><?php echo $mostleast[4]['least_repaired'][0]->name; ?></td>
+                                            <td class="table-count"><?php echo $mostleast[4]['least_repaired'][0]->counter; ?></td>
+                                          @else
+                                            <td class="table-data">N/A</td>
+                                            <td class="table-count">0</td>
+                                          @endif
                                       </tr>
                                   </tbody>
                               </table>
@@ -724,47 +841,57 @@
                   <div class="col-md-12 <?php echo($c == 1 ? 'show' : 'hide'); ?> bargroup" id="<?php echo $key; ?>">
 
                       <div class="row">
+                        @for ($i = 1; $i <= 2; $i++)
                           <div class="col-md-2">
-                              <span class="cluster big cluster-1"></span>
+                              <span class="cluster big cluster-<?php echo $i ?>"></span>
                           </div>
                           <div class="col-md-4">
-                              <div class="barpiece fixed" style="width :<?php echo round((($cluster[1][0]->counter / $cluster[1]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo ($cluster[1]['total'] > 0 ? round((($cluster[1][0]->counter / $cluster[1]['total']) * 100) , 2) : '0' ); ?>%</div>
-                              <div class="barpiece repairable" style="width :<?php echo round((($cluster[1][1]->counter / $cluster[1]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo ($cluster[1]['total'] > 0 ? round((($cluster[1][1]->counter / $cluster[1]['total']) * 100) , 2) : '0'  ); ?>%</div>
-                              <div class="barpiece end-of-life" style="width :<?php echo round((($cluster[1][2]->counter / $cluster[1]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo ($cluster[1]['total'] > 0 ? round((($cluster[1][2]->counter / $cluster[1]['total']) * 100) , 2) : '0' ) ; ?>%</div>
-                          </div>
+                              @if (array_key_exists(0, $cluster[$i]))
+                                <div class="barpiece fixed" style="width :<?php echo round((($cluster[1][0]->counter / $cluster[1]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo ($cluster[1]['total'] > 0 ? round((($cluster[1][0]->counter / $cluster[1]['total']) * 100) , 2) : '0' ); ?>%</div>
+                              @else
+                                <div class="barpiece fixed" style="width :0%">&nbsp;</div><div class="barpiece-label fixed">0%</div>
+                              @endif
 
+                              @if (array_key_exists(1, $cluster[$i]))
+                                <div class="barpiece repairable" style="width :<?php echo round((($cluster[1][1]->counter / $cluster[1]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo ($cluster[1]['total'] > 0 ? round((($cluster[1][1]->counter / $cluster[1]['total']) * 100) , 2) : '0'  ); ?>%</div>
+                              @else
+                                <div class="barpiece repairable" style="width :0%">&nbsp;</div><div class="barpiece-label repairable">0%</div>
+                              @endif
 
-                          <div class="col-md-2">
-                              <span class="cluster big cluster-2"></span>
+                              @if (array_key_exists(2, $cluster[$i]))
+                                <div class="barpiece end-of-life" style="width :<?php echo round((($cluster[1][2]->counter / $cluster[1]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo ($cluster[1]['total'] > 0 ? round((($cluster[1][2]->counter / $cluster[1]['total']) * 100) , 2) : '0' ) ; ?>%</div>
+                              @else
+                                <div class="barpiece end-of-life" style="width :0%">&nbsp;</div><div class="barpiece-label dead">0%</div>
+                              @endif
                           </div>
-                          <div class="col-md-4">
-                              <div class="barpiece fixed" style="width :<?php echo round((($cluster[2][0]->counter / $cluster[2]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo ($cluster[2]['total'] > 0 ? round((($cluster[2][0]->counter / $cluster[2]['total']) * 100) , 2) : '0' );  ?>%</div>
-                              <div class="barpiece repairable" style="width :<?php echo round((($cluster[2][1]->counter / $cluster[2]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo ($cluster[2]['total'] > 0 ? round((($cluster[2][1]->counter / $cluster[2]['total']) * 100) , 2) : '0' );  ?>%</div>
-                              <div class="barpiece end-of-life" style="width :<?php echo round((($cluster[2][2]->counter / $cluster[2]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo ($cluster[2]['total'] > 0 ? round((($cluster[2][2]->counter / $cluster[2]['total']) * 100) , 2) : '0' );  ?>%</div>
-                          </div>
-
+                          @endfor
                       </div>
 
                       <div class="row">
+                        @for ($i = 3; $i <= 4; $i++)
                           <div class="col-md-2">
-                              <span class="cluster big cluster-3"></span>
+                              <span class="cluster big cluster-<?php echo $i ?>"></span>
                           </div>
                           <div class="col-md-4">
-                              <div class="barpiece fixed" style="width :<?php echo round((($cluster[3][0]->counter / $cluster[3]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo ($cluster[3]['total'] > 0 ? round((($cluster[3][0]->counter / $cluster[3]['total']) * 100) , 2) : '0' );  ?>%</div>
-                              <div class="barpiece repairable" style="width :<?php echo round((($cluster[3][1]->counter / $cluster[3]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo ($cluster[3]['total'] > 0 ? round((($cluster[3][1]->counter / $cluster[3]['total']) * 100) , 2) : '0' );  ?>%</div>
-                              <div class="barpiece end-of-life" style="width :<?php echo round((($cluster[3][2]->counter / $cluster[3]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo ($cluster[3]['total'] > 0 ? round((($cluster[3][2]->counter / $cluster[3]['total']) * 100) , 2) : '0' );  ?>%</div>
-                          </div>
+                              @if (array_key_exists(0, $cluster[$i]))
+                                <div class="barpiece fixed" style="width :<?php echo round((($cluster[3][0]->counter / $cluster[3]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo ($cluster[3]['total'] > 0 ? round((($cluster[3][0]->counter / $cluster[3]['total']) * 100) , 2) : '0' );  ?>%</div>
+                              @else
+                                <div class="barpiece fixed" style="width :0%">&nbsp;</div><div class="barpiece-label fixed">0%</div>
+                              @endif
 
-                          <div class="col-md-2">
-                              <span class="cluster big cluster-4"></span>
-                          </div>
-                          <div class="col-md-4">
-                              <div class="barpiece fixed" style="width :<?php echo round((($cluster[4][0]->counter / $cluster[4]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label fixed"><?php echo ($cluster[4]['total'] > 0 ? round((($cluster[4][0]->counter / $cluster[4]['total']) * 100) , 2) : '0' );  ?>%</div>
-                              <div class="barpiece repairable" style="width :<?php echo round((($cluster[4][1]->counter / $cluster[4]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo ($cluster[4]['total'] > 0 ? round((($cluster[4][1]->counter / $cluster[4]['total']) * 100) , 2) : '0' );  ?>%</div>
-                              <div class="barpiece end-of-life" style="width :<?php echo round((($cluster[4][2]->counter / $cluster[4]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo ($cluster[4]['total'] > 0 ? round((($cluster[4][2]->counter / $cluster[4]['total']) * 100) , 2) : '0' ); ?>%</div>
-                          </div>
+                              @if (array_key_exists(1, $cluster[$i]))
+                                <div class="barpiece repairable" style="width :<?php echo round((($cluster[3][1]->counter / $cluster[3]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label repairable"><?php echo ($cluster[3]['total'] > 0 ? round((($cluster[3][1]->counter / $cluster[3]['total']) * 100) , 2) : '0' );  ?>%</div>
+                              @else
+                                <div class="barpiece repairable" style="width :0%">&nbsp;</div><div class="barpiece-label repairable">0%</div>
+                              @endif
 
-
+                              @if (array_key_exists(2, $cluster[$i]))
+                                <div class="barpiece end-of-life" style="width :<?php echo round((($cluster[3][2]->counter / $cluster[3]['total']) * 100) , 4); ?>%">&nbsp;</div><div class="barpiece-label dead"><?php echo ($cluster[3]['total'] > 0 ? round((($cluster[3][2]->counter / $cluster[3]['total']) * 100) , 2) : '0' );  ?>%</div>
+                              @else
+                                <div class="barpiece end-of-life" style="width :0%">&nbsp;</div><div class="barpiece-label dead">0%</div>
+                              @endif
+                          </div>
+                          @endfor
                       </div>
 
 

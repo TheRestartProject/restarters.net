@@ -110,7 +110,7 @@ class User extends Authenticatable
         $Users = DB::select(DB::raw('SELECT users.id AS id, users.name, users.email, roles.role, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at FROM users
                 INNER JOIN roles ON roles.idroles = users.role
                 INNER JOIN sessions ON sessions.user = users.id
-                ORDER BY users.role ASC'));
+                ORDER BY users.id ASC'));
 
         if(is_array($Users)){
 

@@ -160,7 +160,7 @@
                                 <div class="form-group <?php if(isset($error) && isset($error['group']) && !empty($error['group'])) { echo "has-error"; } ?>">
                                     <label for="group">Group: </label>
                                     <i class="fa fa-question-circle" data-toggle="popover" title="Group hosting the party" data-content="This is the Restart group that is hosting the party."></i>
-                                    <select id="group" name="group"  class="form-control users_group"><!-- REMOVED selectpicker as it is making group not appear -->
+                                    <select id="group" name="group"  class="form-control users_group selectpicker">
                                         <option></option>
                                         @foreach($group_list as $group)
                                         <option value="<?php echo $group->id; ?>"><?php echo $group->name; ?></option>

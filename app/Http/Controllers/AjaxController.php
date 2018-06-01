@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use App\User;
 
 use FixometerHelper;
 use FixometerFile;
@@ -16,26 +17,20 @@ class AjaxController extends Controller
 
 
   public function restarters_in_group(){
-      $Auth = new Auth($url);
-      if(!$Auth->isLoggedIn()){
-          header('Location: /user/login');
-      }
-      else {
 
-          $user = $Auth->getProfile();
-          $this->user = $user;
-          $this->set('user', $user);
-          $this->set('header', true);
+        $user = Auth::user();
+        // $this->user = $user;
+        // $this->set('user', $user);
+        // $this->set('header', true);
 
-          if(isset($_GET['group']) && is_numeric($_GET['group'])) {
-              $group = (integer)$_GET['group'];
+        if(isset($_GET['group']) && is_numeric($_GET['group'])) {
+            $group = (integer)$_GET['group'];
 
-              $Users = new User;
-              $restarters = $Users->inGroup($group);
+            $Users = new User;
+            $restarters = $Users->inGroup($group);
 
-              echo json_encode($restarters);
-          }
-      }
+            echo json_encode($restarters);
+        }
   }
 
   public function restarters(){

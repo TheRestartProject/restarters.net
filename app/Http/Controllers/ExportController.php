@@ -8,6 +8,7 @@ use App\Party;
 use App\Search;
 
 use Auth;
+use Response;
 
 class ExportController extends Controller
 {
@@ -67,24 +68,55 @@ class ExportController extends Controller
             $data[$i]->group_name = (empty($d->group_name) ? 'Unknown' : $d->group_name);
 
         }
-        $header = array(
-                    array(
-                        'Category',
-                        'Brand',
-                        'Model',
-                        'Comments',
-                        'Repair Status',
-                        'Spare parts (needed/used)',
-                        'Restart Party Location',
-                        'Restart Group',
-                        'Restart Party Date'
-                        )
-                    );
-        $data = array_merge($header, $data);
 
-        return view('export.devices', [
-          'data' => $data,
-        ]);
+        /** lets format the array **/
+        $columns = array(
+              "Category",
+              "Brand",
+              "Model",
+              "Comments",
+              "Repair Status",
+              "Spare parts (needed/used)",
+              "Restart Party Location",
+              "Restart Group",
+              "Restart Party Date",
+        );
+
+        $filename = 'devices.csv';
+
+        $file = fopen($filename, 'w+');
+        fputcsv($file, $columns);
+
+        foreach($data as $d) {
+            $d = array_filter((array) $d, 'utf8_encode');
+            fputcsv($file, $d);
+        }
+        fclose($file);
+
+        $headers = array(
+          'Content-Type' => 'text/csv',
+        );
+
+        return Response::download($filename, 'devices.csv', $headers);
+
+        // $header = array(
+        //             array(
+        //                 'Category',
+        //                 'Brand',
+        //                 'Model',
+        //                 'Comments',
+        //                 'Repair Status',
+        //                 'Spare parts (needed/used)',
+        //                 'Restart Party Location',
+        //                 'Restart Group',
+        //                 'Restart Party Date'
+        //                 )
+        //             );
+        // $data = array_merge($header, $data);
+        //
+        // return view('export.devices', [
+        //   'data' => $data,
+        // ]);
     }
 
 
@@ -200,16 +232,36 @@ class ExportController extends Controller
         }
 
         /** lets format the array **/
-        $headers = array(
-          array(
+        $columns = array(
               "Date","Venue","Group","Participants","Volunteers","CO2 (kg)","Weight (kg)","Fixed","Repairable","Dead","Hours Volunteered"
-          )
         );
-        $data = array_merge($headers, $PartyArray);
 
-        return view('export.parties', [
-          'data' => $data,
-        ]);
+        $filename = 'parties.csv';
+
+        $file = fopen($filename, 'w+');
+        fputcsv($file, $columns);
+
+        foreach($PartyArray as $d) {
+            $d = array_filter((array) $d, 'utf8_encode');
+            fputcsv($file, $d);
+        }
+        fclose($file);
+
+        $headers = array(
+          'Content-Type' => 'text/csv',
+        );
+
+        return Response::download($filename, $filename, $headers);
+
+        /** lets format the array **/
+        // $headers = array(
+        //       "Date","Venue","Group","Participants","Volunteers","CO2 (kg)","Weight (kg)","Fixed","Repairable","Dead","Hours Volunteered"
+        // );
+        // $data = array_merge($columns, $PartyArray);
+
+        // return view('export.parties', [
+        //   'data' => $data,
+        // ]);
     }
     $data = array('No data to return');
 

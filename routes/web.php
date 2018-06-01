@@ -11,9 +11,15 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+Route::get('/user/reset', 'UserController@reset');
+Route::post('/user/reset', 'UserController@reset');
+Route::get('/user/recover', 'UserController@recover');
+Route::post('/user/recover', 'UserController@recover');
+
 
 Route::get('/user/forbidden', function () {
     return view('user.forbidden', [
@@ -23,9 +29,10 @@ Route::get('/user/forbidden', function () {
 
 Auth::routes();
 
+
 Route::middleware('auth')->group(function () {
 
-  Route::get('/home', 'HomeController@index')->name('home');
+  Route::get('/', 'HomeController@index')->name('home');
 
   // Route::get('/', 'UserController@index');
 
@@ -58,6 +65,7 @@ Route::middleware('auth')->group(function () {
   Route::post('/device/edit/{id}', 'DeviceController@edit');
   Route::get('/device/create', 'DeviceController@create');
   Route::post('/device/create', 'DeviceController@create');
+  Route::get('/device/delete/{id}', 'DeviceController@delete');
 
   //Group Controller
   Route::get('/group', 'GroupController@index');
@@ -79,6 +87,7 @@ Route::middleware('auth')->group(function () {
   Route::get('/party/create', 'PartyController@create');
   Route::post('/party/create', 'PartyController@create');
   Route::get('/party/manage/{id}', 'PartyController@manage');
+  Route::post('/party/manage/{id}', 'PartyController@manage');
   Route::get('/party/edit/{id}', 'PartyController@edit');
   Route::post('/party/edit/{id}', 'PartyController@edit');
   Route::get('/party/deleteimage', 'PartyController@deleteimage');
@@ -90,6 +99,9 @@ Route::middleware('auth')->group(function () {
 
   //Search Controller
   Route::get('/search', 'SearchController@index');
+
+  //AJAX Controller
+  Route::get('/ajax/restarters_in_group', 'AjaxController@restarters_in_group');
 
   //Export Controller
   Route::get('/export/devices', 'ExportController@devices');

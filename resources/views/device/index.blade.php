@@ -19,7 +19,7 @@
             <div class="row">
               <div class="col-md-3">
                 <div class="form-group">
-                  <select id="categories" name="categories[]" class="form-control" multiple data-live-search="true" title="Choose categories..."> <!-- REMOVED selectpicker -->
+                  <select id="categories" name="categories" class="form-control selectpicker" multiple data-live-search="true" title="Choose categories...">
                     @if(isset($categories))
                       @foreach($categories as $cluster)
                       <optgroup label="<?php echo $cluster->name; ?>">
@@ -27,9 +27,9 @@
                         <option value="<?php echo $c->idcategories; ?>"
                           <?php
                           if(isset($_GET['categories']) && !empty($_GET['categories'])){
-                            foreach($_GET['categories'] as $cat){
-                              if ($cat == $c->idcategories) { echo " selected "; }
-                            }
+                            // foreach($_GET['categories'] as $cat){
+                              if ($_GET['categories']/*$cat*/ == $c->idcategories) { echo " selected "; }
+                            // }
                           }
                           ?>
                         >
@@ -46,15 +46,15 @@
               </div>
               <div class="col-md-3">
                 <div class="form-group">
-                  <select id="groups" name="groups[]" class="selectpicker form-control" multiple data-live-search="true" title="Choose groups...">
+                  <select id="groups" name="groups" class="form-control selectpicker" multiple data-live-search="true" title="Choose groups..."> 
                     @if(isset($groups))
                       @foreach($groups as $g)
                         <option value="<?php echo $g->id; ?>"
                           <?php
                           if(isset($_GET['groups']) && !empty($_GET['groups'])){
-                            foreach($_GET['groups'] as $grp){
-                              if ($grp == $g->id) { echo " selected "; }
-                            }
+                            // foreach($_GET['groups'] as $grp){
+                              if ($_GET['groups']/*$grp*/ == $g->id) { echo " selected "; }
+                            // }
                           }
                           ?>
                         >
@@ -108,7 +108,7 @@
               </div>
 
               <div class="col-md-1">
-                <a href="/device/index" class="btn btn-default btn-block"><i class="fa fa-refresh"></i> Reset</a>
+                <a href="/device" class="btn btn-default btn-block"><i class="fa fa-refresh"></i> Reset</a>
               </div>
             </div>
           </form>

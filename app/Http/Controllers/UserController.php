@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Role;
 use App\Group;
+use App\Device;
+use App\Party;
 use App\UserGroups;
 use App\Session;
 
@@ -22,10 +24,10 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth');
+    // }
 
     /**
      * Show the application dashboard.
@@ -234,43 +236,44 @@ class UserController extends Controller
      //To display Stats
       $Device = new Device;
       $Party = new Party;
+      $User = new User;
 
       $weights= $Device->getWeights();
       $devices= $Device->statusCount();
 
-      $this->set('weights', $weights);
-      $this->set('devices', $devices);
-
-      $this->set('nextparties', $Party->findNextParties());
-      $this->set('allparties', $Party->findAll());
+      // $this->set('weights', $weights);
+      // $this->set('devices', $devices);
+      //
+      // $this->set('nextparties', $Party->findNextParties());
+      // $this->set('allparties', $Party->findAll());
 
       $co2_years = $Device->countCO2ByYear();
-      $this->set('year_data', $co2_years);
+      // $this->set('year_data', $co2_years);
       $stats = array();
       foreach($co2_years as $year){
           $stats[$year->year] = $year->co2;
       }
-      $this->set('bar_chart_stats', array_reverse($stats, true));
+      // $this->set('bar_chart_stats', array_reverse($stats, true));
 
       $waste_years = $Device->countWasteByYear();
-      $this->set('waste_year_data', $waste_years);
+      // $this->set('waste_year_data', $waste_years);
       $wstats = array();
       foreach($waste_years as $year){
           $wstats[$year->year] = $year->waste;
       }
-      $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
+      // $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
 
       //Account recovery
-      $this->set('title', 'Account recovery');
+      // $this->set('title', 'Account recovery');
 
       if(strtoupper($_SERVER['REQUEST_METHOD']) == 'POST' && isset($_POST['email']) && !empty($_POST['email'])){
         $email = $_POST['email'];
         if(empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)){
             $response['danger'] = 'Please input a <strong>valid</strong> email.';
         } else {
-          $user = $this->User->find(array('email' => $email));
+          $user = $User->where('email', $email)->first();
           if(!empty($user)){
-            $id = $user[0]->idusers;
+            $id = $user->id;
             $data = array();
             // generate recovery code
             $bytes = 32;
@@ -279,24 +282,27 @@ class UserController extends Controller
             $data['recovery_expires'] = strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60));
 
             // update record
-            $this->User->update($data, $id);
+            $user->update([
+                'recovery' => substr( bin2hex(openssl_random_pseudo_bytes($bytes)), 0, 24 ),
+                'recovery_expires' => strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60)),
+            ]);
 
             // send email to User
             $message = "<p>Hi,</p>" .
-                     "<p>You've requested to recover your password for the " . APPNAME . ".</p>" .
+                     "<p>You've requested to recover your password for the " . env('APP_NAME') . ".</p>" .
                      "<hr/>" .
-                     "<p>Please click on this link to recover your password: <a href=\"" . BASE_URL . "/user/reset/?recovery=" . $data['recovery'] . "\">" . BASE_URL . "/user/reset/?recovery=" . $data['recovery'] . "</a>.</p>" .
+                     "<p>Please click on this link to recover your password: <a href=\"" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "\">" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "</a>.</p>" .
                      "<p>If the link doesn't work, please copy and paste it in the address bar of your browser.</p>" .
                      "<p>The link will be active for the next 24 hours.</p>" .
                      "<hr/>" .
-                     "<p>If you have any issues, or if you did <strong>not</strong> ask to recover your password, please contact <a href='mailto:" . SUPPORT_CONTACT_EMAIL . "'>" . SUPPORT_CONTACT_EMAIL . "</a>.</p>" .
-            "<p>Thanks for using the " . APPNAME . "!</p>" .
+                     "<p>If you have any issues, or if you did <strong>not</strong> ask to recover your password, please contact <a href='mailto:" . env('SUPPORT_CONTACT_EMAIL') . "'>" . env('SUPPORT_CONTACT_EMAIL') . "</a>.</p>" .
+            "<p>Thanks for using the " . env('APP_NAME') . "!</p>" .
             "<p><em>The Restart Project</em></p>";
-            $subject = APPNAME . ": Password recovery";
-            $headers = "From: " . APPEMAIL . "\r\n";
+            $subject = env('APP_NAME') . ": Password recovery";
+            $headers = "From: " . env('APP_EMAIL') . "\r\n";
             $headers .= "MIME-Version: 1.0\r\n";
             $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-            $headers .= "Bcc: " . SUPPORT_CONTACT_EMAIL . "\r\n";
+            $headers .= "Bcc: " . env('SUPPORT_CONTACT_EMAIL') . "\r\n";
 
             $sender = mail($email, $subject, $message, $headers);
 
@@ -312,7 +318,7 @@ class UserController extends Controller
           }
 
         }
-        $this->set('response', $response);
+        // $this->set('response', $response);
 
         return view('user.recover', [
           'weights' => $weights,
@@ -328,6 +334,19 @@ class UserController extends Controller
         ]);
 
       }
+
+      return view('user.recover', [
+        'weights' => $weights,
+        'devices' => $devices,
+        'nextparties' => $Party->findNextParties(),
+        'allparties' => $Party->findAll(),
+        'year_data' => $co2_years,
+        'bar_chart_stats' => array_reverse($stats, true),
+        'waste_year_data' => $waste_years,
+        'waste_bar_chart_stats' => array_reverse($wstats, true),
+        'title' => 'Account recovery',
+      ]);
+
     }
 
     public function reset(){
@@ -335,47 +354,48 @@ class UserController extends Controller
            //To display Stats
             $Device = new Device;
             $Party = new Party;
+            $User = new User;
 
             $weights= $Device->getWeights();
             $devices= $Device->statusCount();
 
-            $this->set('weights', $weights);
-            $this->set('devices', $devices);
-
-            $this->set('nextparties', $Party->findNextParties());
-            $this->set('allparties', $Party->findAll());
+            // $this->set('weights', $weights);
+            // $this->set('devices', $devices);
+            //
+            // $this->set('nextparties', $Party->findNextParties());
+            // $this->set('allparties', $Party->findAll());
 
             $co2_years = $Device->countCO2ByYear();
-            $this->set('year_data', $co2_years);
+            // $this->set('year_data', $co2_years);
             $stats = array();
             foreach($co2_years as $year){
                 $stats[$year->year] = $year->co2;
             }
-            $this->set('bar_chart_stats', array_reverse($stats, true));
+            // $this->set('bar_chart_stats', array_reverse($stats, true));
 
             $waste_years = $Device->countWasteByYear();
-            $this->set('waste_year_data', $waste_years);
+            // $this->set('waste_year_data', $waste_years);
             $wstats = array();
             foreach($waste_years as $year){
                 $wstats[$year->year] = $year->waste;
             }
-            $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
+            // $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
 
       //account recovery
-      $this->set('title', 'Account recovery');
+      // $this->set('title', 'Account recovery');
 
       if( !isset($_GET['recovery']) || empty($_GET['recovery']) ){
         $valid_code = false;
       } else {
         $recovery = filter_var($_GET['recovery'], FILTER_SANITIZE_STRING);
-        $user = $this->User->find(array('recovery' => $recovery));
+        $user = $User->find(array('recovery' => $recovery));
 
         if( strtotime($user[0]->recovery_expires) > time() ) {
           $valid_code = true;
-          $this->set('recovery', $recovery);
+          // $this->set('recovery', $recovery);
         }
       }
-      $this->set('valid_code', $valid_code);
+      // $this->set('valid_code', $valid_code);
 
       if(strtoupper($_SERVER['REQUEST_METHOD']) == 'POST' && isset($_POST['password']) && !empty($_POST['password']) && isset($_POST['confirm_password']) && !empty($_POST['confirm_password'])){
         $recovery = $_POST['recovery'];
@@ -389,12 +409,12 @@ class UserController extends Controller
         }
 
         else {
-          $user = $this->User->find(array('recovery' => $recovery));
+          $user = $User->find(array('recovery' => $recovery));
           if(!empty($user)){
             $data = array(
               'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY'))))
             );
-            $update = $this->User->update($data, $user[0]->idusers);
+            $update = $user->update($user[0]->idusers, $data);
             if($update){
               header('Location: /user/login?reset=ok');
             }
@@ -407,9 +427,17 @@ class UserController extends Controller
           }
         }
       }
-      $this->set('response', $response);
+      // $this->set('response', $response);
 
-      return view('users.reset', [
+      if (!isset($recovery)) {
+        $recovery = null;
+      }
+
+      if (!isset($response)) {
+        $response = null;
+      }
+
+      return view('user.reset', [
         'weights' => $weights,
         'devices' => $devices,
         'nextparties' => $Party->findNextParties(),
@@ -622,8 +650,9 @@ class UserController extends Controller
                 $data = $_POST;
                 $id = $_POST['id'];
 
-                $sent_groups = $data['groups'];
-
+                if (!FixometerHelper::hasRole($User->find($id), 'Administrator')) {
+                  $sent_groups = $data['groups'];
+                }
 
                 $error = false;
                 // check for email in use
@@ -659,8 +688,9 @@ class UserController extends Controller
                     // setcookie(env('LANGUAGE_COOKIE'), $data['language'], $time, '/', $_SERVER['HTTP_HOST']);
 
                     $ug = new UserGroups;
-                    $ug->createUsersGroups($id, $sent_groups);
-
+                    if(isset($sent_groups)) {
+                      $ug->createUsersGroups($id, $sent_groups);
+                    }
 
 
                     if(isset($_FILES) && !empty($_FILES)){

@@ -97,8 +97,8 @@ class DeviceController extends Controller
           'model'       => filter_var($_GET['model'], FILTER_SANITIZE_STRING),
           'problem'     => filter_var($_GET['free-text'], FILTER_SANITIZE_STRING),
 
-          'category'    => isset($_GET['categories']) ? implode(', ', filter_var_array($_GET['categories'], FILTER_SANITIZE_NUMBER_INT)) : null,
-          'group'       => isset($_GET['groups']) ? implode(', ', filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT)) : null,
+          'category'    => isset($_GET['categories']) ? filter_var($_GET['categories'], FILTER_SANITIZE_STRING) : null,//isset($_GET['categories']) ? implode(', ', filter_var_array($_GET['categories'], FILTER_SANITIZE_NUMBER_INT)) : null,
+          'group'       => isset($_GET['groups']) ? filter_var($_GET['groups'], FILTER_SANITIZE_STRING) : null,//isset($_GET['groups']) ? implode(', ', filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT)) : null,
 
           'event_date'  => array($fromTimeStamp,  $toTimeStamp)
 
@@ -332,26 +332,22 @@ class DeviceController extends Controller
 
 
   public function delete($id){
-      if(FixometerHelper::hasRole($this->user, 'Administrator') || (FixometerHelper::hasRole($this->user, 'Host')) ){
+      $Device = new Device;
+      $user = Auth::user();
+
+      if(FixometerHelper::hasRole($user, 'Administrator') || (FixometerHelper::hasRole($user, 'Host')) ){
           // get device party
-          $curr = $this->Device->findOne($id);
+          $curr = $Device->findOne($id);
           $party = $curr->event;
           // echo $party; //die();
 
-          $r = $this->Device->delete($id);
-          if(!$r){
-              $response = 'd:err';
-          }
-          else {
-              $response = 'd:ok';
-          }
+          $r = $Device->delete($id);
 
-          header('Location: /party/manage/' . $party . '/' . $response);
-
+          return redirect('/party/manage/'.$party);
 
       }
       else {
-          header('Location: /user/forbidden');
+          return redirect('/party/manage/'.$party);
       }
   }
 

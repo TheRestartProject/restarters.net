@@ -417,4 +417,15 @@ class Device extends Model
         return $this->where('iddevices', $id)->first();
     }
 
+    public function howMany($params = null){
+        if(empty($params)){
+            return count(self::all());
+        }
+        else {
+            return count(self::where($params));
+
+        }
+
+    }
+
 }
