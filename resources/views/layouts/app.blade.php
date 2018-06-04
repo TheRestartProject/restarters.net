@@ -74,6 +74,22 @@
                               </a>
                             </div>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a id="deviceDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                Admin <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="deviceDropdown">
+                              <a class="dropdown-item" href="/skills">
+                                  {{ __('Skills') }}
+                              </a>
+                              <a class="dropdown-item" href="/tags">
+                                  {{ __('Group Tags') }}
+                              </a>
+                              <a class="dropdown-item" href="/brands">
+                                  {{ __('Brands') }}
+                              </a>
+                            </div>
+                        </li>
                       @endif
                     </ul>
 
