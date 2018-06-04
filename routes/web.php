@@ -97,6 +97,30 @@ Route::middleware('auth')->group(function () {
   Route::get('/role/edit/{id}', 'RoleController@edit');
   Route::post('/role/edit/{id}', 'RoleController@edit');
 
+  //Brand Controller
+  Route::get('/brands', 'BrandsController@index');
+  Route::get('/brands/create', 'BrandsController@getCreateBrand');
+  Route::post('/brands/create', 'BrandsController@postCreateBrand');
+  Route::get('/brands/edit/{id}', 'BrandsController@getEditBrand');
+  Route::post('/brands/edit/{id}', 'BrandsController@postEditBrand');
+  Route::get('/brands/delete/{id}', 'BrandsController@getDeleteBrand');
+
+  //Skills Controller
+  Route::get('/skills', 'SkillsController@index');
+  Route::get('/skills/create', 'SkillsController@getCreateSkill');
+  Route::post('/skills/create', 'SkillsController@postCreateSkill');
+  Route::get('/skills/edit/{id}', 'SkillsController@getEditSkill');
+  Route::post('/skills/edit/{id}', 'SkillsController@postEditSkill');
+  Route::get('/skills/delete/{id}', 'SkillsController@getDeleteSkill');
+
+  //GroupTags Controller
+  Route::get('/tags', 'GroupTagsController@index');
+  Route::get('/tags/create', 'GroupTagsController@getCreateTag');
+  Route::post('/tags/create', 'GroupTagsController@postCreateTag');
+  Route::get('/tags/edit/{id}', 'GroupTagsController@getEditTag');
+  Route::post('/tags/edit/{id}', 'GroupTagsController@postEditTag');
+  Route::get('/tags/delete/{id}', 'GroupTagsController@getDeleteTag');
+
   //Search Controller
   Route::get('/search', 'SearchController@index');
 

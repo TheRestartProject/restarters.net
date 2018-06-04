@@ -12,6 +12,11 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
+    @if(isset($gmaps) && $gmaps == true)
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE&v=3.exp&signed_in=true"></script>
+    @endif
+    <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE&callback=initMap"
+    type="text/javascript"></script> -->
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
