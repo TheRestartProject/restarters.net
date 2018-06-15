@@ -13,6 +13,23 @@ use App\Party;
 use App\UserGroups;
 use App\Session;
 
+// use Illuminate\Support\Facades\Notifications;
+use Notification;
+use App\Notifications\ResetPassword;
+use App\Notifications\JoinGroup;
+use App\Notifications\JoinEvent;
+use App\Notifications\EventDevices;
+use App\Notifications\EventRepairs;
+use App\Notifications\NewRegister;
+use App\Notifications\RSVPEvent;
+use App\Notifications\NewGroupMember;
+use App\Notifications\ModerationEvent;
+use App\Notifications\EventConfirmed;
+use App\Notifications\ModerationGroup;
+use App\Notifications\GroupConfirmed;
+use App\Notifications\ReviewNotes;
+use App\Notifications\AccountCreated;
+
 use FixometerHelper;
 use FixometerFile;
 use Auth;
@@ -97,6 +114,17 @@ class UserController extends Controller
 
       return redirect()->back()->with('success', 'Profile updated');
 
+    }
+
+    public function emailExample() {
+      // User::find(1)->notify(new ResetPassword);
+      $arr = array('Kyle', 'The Mighty Restarters');
+      // Single user
+      // User::find(1)->notify(new JoinGroup($arr));
+
+      // Multiple users
+      $users = User::find(1);
+      Notification::send($users, new JoinEvent($arr));
     }
 
     // public function test() {
