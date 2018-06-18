@@ -1,0 +1,12 @@
+.truncate {
+    overflow: hidden;
+    max-height: 9000px;
+    transition: all ease-in-out 0.5s;
+    position: relative;
+    z-index: 1;
+
+    .truncated & {
+        max-height: 100px;
+    }
+
+}

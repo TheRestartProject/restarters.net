@@ -9,9 +9,9 @@
     @if($valid_code == false)
     <p class="login-text text-center">The recovery code you're using is invalid. Please proceed to request a new recovery link <a href="/user/recover">here</a>.</p>
     @else
-      <?php if(isset($response)) :
-        FixometerHelper::printResponse($response);
-      endif ?>
+      @if(isset($response))
+        @php( FixometerHelper::printResponse($response) )
+      @endif
     <div class="shader"></div>
     <h2><span class="title-text">Reset your password</span></h2>
 

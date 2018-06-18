@@ -2007,6 +2007,57 @@
         ]
     },
     {
+        "name": "msurguy/honeypot",
+        "version": "1.0.3",
+        "version_normalized": "1.0.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/msurguy/Honeypot.git",
+            "reference": "861deefc8a4cc13b9a73820aba92db21c32a7159"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/msurguy/Honeypot/zipball/861deefc8a4cc13b9a73820aba92db21c32a7159",
+            "reference": "861deefc8a4cc13b9a73820aba92db21c32a7159",
+            "shasum": ""
+        },
+        "require": {
+            "illuminate/config": "4.*|5.*",
+            "illuminate/support": "4.*|5.*",
+            "illuminate/translation": "4.*|5.*",
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "mockery/mockery": "0.9.*",
+            "phpunit/phpunit": "4.0.*"
+        },
+        "time": "2017-01-17T19:43:23+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Msurguy\\Honeypot\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Maksim Surguy",
+                "email": "m.surguy@gmail.com"
+            }
+        ],
+        "description": "Honeypot spam prevention",
+        "keywords": [
+            "Forms",
+            "Honeypot",
+            "laravel",
+            "spam"
+        ]
+    },
+    {
         "name": "myclabs/deep-copy",
         "version": "1.8.0",
         "version_normalized": "1.8.0.0",

@@ -1,0 +1,21 @@
+.pagination {
+    margin:30px 0 0 0;
+    font-family: $font-family-second;
+    font-size: 15px;
+
+    a, .page-link {
+        color: #000;
+        border: 0;
+        text-decoration: underline;
+        border-radius: 0;
+    }
+
+    .active a.page-link  {
+        border: 0;
+        background-color: $brand;
+        text-decoration: none;
+        color: #FFF;
+        border-radius: 3px;
+        border-bottom: 2px solid #155E67;
+    }
+}

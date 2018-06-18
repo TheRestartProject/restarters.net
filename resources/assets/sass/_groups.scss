@@ -1,0 +1,79 @@
+.groups {
+    background-color: #fff;
+    padding: 70px 0;
+
+    .breadcrumb {
+        margin: auto;
+    }
+
+    .pagination {
+        margin-top: 0;
+    }
+
+    h2 {
+        font-size: 26px;
+        margin: 0 0 20px 0;
+    }
+
+    aside.edit-panel {
+        padding: 15px;
+        margin: 0 0 15px 0;
+        @extend .clear;
+
+        legend {
+            color: $brand;
+            font-size: 20px;
+        }
+    }
+}
+
+.modal-intro {
+    background-color: RGBA(3, 148, 166, 0.5);
+    overflow: hidden;
+    border-radius: 3px;
+    .modal-dialog {
+        @include media-breakpoint-up(lg) {
+            max-width: 445px;
+        }
+    }
+
+    .modal-content {
+        border-radius: 3px;
+    }
+
+    img {
+        border-radius: 3px;
+        display: block;
+    }
+
+    .modal-body {
+        padding: 30px;
+        text-align: center;
+    }
+
+    .close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        z-index: 10;
+        font-weight: normal;
+        font-size: 70px;
+        line-height: 40px;
+        opacity: 1;
+        color: #FFF;
+    }
+
+    h5 {
+        font-size: 20px;
+        margin: 0 0 20px 0;
+    }
+
+    p {
+        margin: 0 0 20px;
+    }
+
+    .btn {
+        width: 200px;
+        margin: 0 auto 20px auto;
+    }
+}

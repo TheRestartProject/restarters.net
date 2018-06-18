@@ -19,6 +19,8 @@ Route::get('/user/reset', 'UserController@reset');
 Route::post('/user/reset', 'UserController@reset');
 Route::get('/user/recover', 'UserController@recover');
 Route::post('/user/recover', 'UserController@recover');
+Route::get('/user/register', 'UserController@getRegister');
+Route::post('/user/register', 'UserController@postRegister');
 
 
 Route::get('/user/forbidden', function () {
@@ -38,12 +40,20 @@ Route::middleware('auth')->group(function () {
 
   //User Controller
   Route::get('/profile', 'UserController@index')->name('profile');
+  Route::get('/profile/{id}', 'UserController@index');
+  Route::get('/profile/edit/{id}', 'UserController@getProfileEdit')->name('profile');
+  Route::post('profile/edit-info', 'UserController@postProfileInfoEdit');
+  Route::post('profile/edit-password', 'UserController@postProfilePasswordEdit');
+  Route::post('profile/edit-preferences', 'UserController@postProfilePreferencesEdit');
+  Route::post('profile/edit-tags', 'UserController@postProfileTagsEdit');
+  Route::post('profile/edit-photo', 'UserController@postProfilePictureEdit');
   Route::post('/edit-user', 'UserController@postEdit');
   Route::get('/user/create', 'UserController@create');
   Route::post('/user/create', 'UserController@create');
   Route::get('/user/all', 'UserController@all');
   Route::get('/user/edit/{id}', 'UserController@edit');
   Route::post('/user/edit/{id}', 'UserController@edit');
+  Route::post('user/soft-delete', 'UserController@postSoftDeleteUser');
 
   //Test NB: Remove after testing!!
   Route::get('/test', 'PartyController@test');
@@ -57,6 +67,7 @@ Route::middleware('auth')->group(function () {
 
   //Dashboard Controller
   Route::get('/dashboard', 'DashboardController@index');
+  Route::get('/dashboard/host', 'DashboardController@getHostDash');
 
   //Device Controller
   Route::get('/device', 'DeviceController@index');

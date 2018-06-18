@@ -16,7 +16,7 @@
                       @php( FixometerHelper::printResponse($response) )
                     @endif
 
-                    <form action="/device/edit/<?php echo $formdata->iddevices; ?>" method="post">
+                    <form action="/device/edit/<?php echo $formdata->iddevices; ?>" method="post" enctype="multipart/form-data">
                       @csrf
                         <div class="row">
                             <div class="col-md-6">
@@ -124,9 +124,13 @@
                                     <label for="problem">Problem:</label>
                                     <textarea class="form-control rte" rows="6" name="problem" id="problem"><?php echo $formdata->problem; ?></textarea>
                                 </div>
+                            </div>
 
-
-
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label for="profilePhoto">Upload Device Photo:</label>
+                                <input type="file" class="form-control" id="devicePhoto" name="devicePhoto">
+                              </div>
                             </div>
 
                             <div class="col-md-12 buttons">

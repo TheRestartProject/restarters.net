@@ -38,7 +38,6 @@ class HomeController extends Controller
         //             '/ext/markers.js'
         // )));
 
-
         $Devices    = new Device;
         $Parties    = new Party;
         $Groups     = new Group;

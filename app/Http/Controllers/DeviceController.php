@@ -162,7 +162,7 @@ class DeviceController extends Controller
                   /** let's create the image attachment! **/
                   if(isset($_FILES) && !empty($_FILES)){
                       $file = new FixometerFile;
-                      $file->upload('file', 'image', $id, TBL_EVENTS);
+                      $file->upload('devicePhoto', 'image', $id, env('TBL_EVENTS'));
                   }
 
               }

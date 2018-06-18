@@ -1,0 +1,17 @@
+.popover-group {
+    bottom: 2px;
+    left: 5px;
+
+    svg {
+        position: relative;
+        z-index: 1;
+        top: 2px;
+        margin-right: 5px;
+    }
+}
+
+.popover-body {
+    font-size: 14px;
+    font-family: $font-family-second;
+    color: #5A5A5A;
+}

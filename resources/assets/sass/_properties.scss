@@ -1,0 +1,48 @@
+.properties {
+    margin: 0 -1px;
+    margin-bottom: 30px;
+    padding: 0;
+    display: flex;
+    flex-flow: row wrap;
+    li {
+        padding: 0 1px;
+        flex: 1 0 50%;
+        list-style: none;
+        font-size: 24px;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 2px;
+        @include media-breakpoint-up(lg) {
+            flex: 1 0 20%;
+        }
+
+
+        > div {
+            background-color: #F9F9F9;
+            border: 1px solid #D9D9D9;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex: 1 0 100%;
+            border-radius:3px;
+            position: relative;
+            z-index: 1;
+        }
+
+        svg {
+            position: absolute;
+            left: 15px;
+            top: 18px;
+            z-index: 1;
+            display: block;
+        }
+
+        h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 400;
+            padding: 0 0 15px 28px;
+            color: $brand;
+        }
+    }
+}

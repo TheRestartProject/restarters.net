@@ -1,0 +1,36 @@
+.slideshow {
+    margin: auto;
+    img {
+        margin: auto;
+        display: block;
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+.slideshow, .modal-slideshow {
+
+    .slick-dots li {
+        width: 15px;
+        height: 15px;
+       
+        button::before {
+            font-size: 12px;
+            color:#81CAD3;
+            opacity: 1;
+        } 
+
+        &.slick-active {
+            button::before {
+                color:#000;
+            } 
+        }
+    }
+  
+}
+
+.modal-slideshow {
+    .slick-dots {
+        bottom: 15px;
+    }
+}

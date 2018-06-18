@@ -11,6 +11,8 @@ use App\Group;
 use App\Device;
 use App\Party;
 use App\UserGroups;
+use App\UsersSkills;
+use App\Skills;
 use App\Session;
 
 use FixometerHelper;
@@ -36,12 +38,18 @@ class UserController extends Controller
      */
     public function index($id = null)
     {
-        $user = User::getProfile(Auth::id());
+        if (is_null($id)) {
+          $id = Auth::id();
+        }
+        $user = User::getProfile($id);
 
         if(FixometerHelper::hasRole($user, 'Administrator')){
-            // header('Location: /admin');
-            return view('user.profile', [
+            $skill_ids = UsersSkills::where('user', $id)->pluck('skill');
+            $skills = Skills::whereIn('id', $skill_ids)->pluck('skill_name')->toArray();
+
+            return view('user.profile-new', [//user.profile
               'user' => $user,
+              'skills' => $skills,
             ]);
             // return view('admin.index', [
             //   'user' => $user,
@@ -55,15 +63,152 @@ class UserController extends Controller
         }
         elseif(FixometerHelper::hasRole($user, 'Host')){
             // header('Location: /host');
-            return view('user.profile', [
+            return view('user.profile-new', [//user.profile
               'user' => $user,
             ]);
         }
         else {
-          return view('user.profile', [
+          return view('user.profile-new', [//user.profile
             'user' => $user,
           ]);
         }
+    }
+
+    public function getProfileEdit($id) {
+
+      $user = User::find($id);
+
+      $user_skills = UsersSkills::where('user', $id)->pluck('skill')->toArray();
+
+      return view('user.profile-edit', [
+        'user' => $user,
+        'skills' => FixometerHelper::allSkills(),
+        'user_skills' => $user_skills,
+      ]);
+    }
+
+    public function postProfileInfoEdit(Request $request) {
+
+      $updateInfo = Auth::user()->update([
+        'email'    => $request->input('email'),
+        'name'     => $request->input('name'),
+        'country'  => $request->input('country'),
+        'location' => $request->input('townCity'),
+        'age'      => $request->input('age'),
+        'gender'   => $request->input('gender'),
+        'biography'=> $request->input('biography'),
+      ]);
+
+      if (!empty($user->location)) {
+
+        $json = file_get_contents("http://maps.google.com/maps/api/geocode/json?address=".urlencode($user->location.',United Kingdom')."&sensor=false");
+        $json = json_decode($json);
+
+        if (is_object($json) && !empty($json->{'results'})) {
+            $user->latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
+            $user->longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+
+            $user->save();
+        }
+
+      }
+
+      return redirect()->back()->with('message', 'User Profile Updated!');
+
+    }
+
+    public function postProfilePasswordEdit(Request $request) {
+
+      $user = Auth::user();
+
+      if ($request->input('new-password') !== $request->input('new-password-repeat')) {
+        return redirect()->back()->with('error', 'New Passwords do not match!');
+      }
+
+      if ($request->input('new-password') == $request->input('new-password-repeat') && Hash::check($request->input('current-password'), $user->password)) {
+
+        $user->setPassword(Hash::make($request->input('new-password')));
+        $user->save();
+
+        $updateInfo = $user->update([
+          'recovery' => substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 ),
+          'recovery_expires' => strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60)),
+        ]);
+
+        return redirect()->back()->with('message', 'User Password Updated!');
+
+      }
+
+      return redirect()->back()->with('error', 'Current Password does not match!');
+
+    }
+
+    public function postSoftDeleteUser() {
+
+      $user = Auth::user();
+
+      $user->delete();
+
+      return redirect()->back()->with('error', 'Account has been soft deleted');
+
+    }
+
+    public function postProfilePreferencesEdit(Request $request) {
+
+      $user = Auth::user();
+
+      if ($request->input('newsletter') !== null && !empty($request->input('newsletter'))) {
+
+        $user->update([
+          'newsletter' => 1,
+        ]);
+
+      }
+
+      if ($request->input('invites') !== null && !empty($request->input('invites'))) {
+
+        $user->update([
+          'invites'    => 1,
+        ]);
+
+      }
+
+      return redirect()->back()->with('message', 'User Preferences Updated!');
+
+    }
+
+    public function postProfileTagsEdit(Request $request) {
+
+      $input_skills = $request->input('tags');
+
+      $exisiting_skills = UsersSkills::where('user', Auth::id())->pluck('skill')->toArray();
+
+      $new_skills = array_diff($input_skills, $exisiting_skills);
+
+      foreach ($new_skills as $new_skill) {
+
+        UsersSkills::create([
+          'skill' => $new_skill,
+          'user' => Auth::id(),
+        ]);
+
+      }
+
+      return redirect()->back()->with('message', 'User Skills Updated!');
+
+    }
+
+    public function postProfilePictureEdit(Request $request) {
+
+      if(isset($_FILES) && !empty($_FILES)){
+          $file = new FixometerFile;
+          $file->upload('profilePhoto', 'image', Auth::id(), env('TBL_USERS'), false, true);
+
+          return redirect()->back()->with('message', 'Profile Picture Updated!');
+      }
+
+      return redirect()->back()->with('error', 'Failed to upload profile picture!');
+
     }
 
     public function postEdit(Request $request) {
@@ -320,7 +465,7 @@ class UserController extends Controller
         }
         // $this->set('response', $response);
 
-        return view('user.recover', [
+        return view('auth.forgot-password', [//user.recover
           'weights' => $weights,
           'devices' => $devices,
           'nextparties' => $Party->findNextParties(),
@@ -335,7 +480,7 @@ class UserController extends Controller
 
       }
 
-      return view('user.recover', [
+      return view('auth.forgot-password', [//user.recover
         'weights' => $weights,
         'devices' => $devices,
         'nextparties' => $Party->findNextParties(),
@@ -388,9 +533,9 @@ class UserController extends Controller
         $valid_code = false;
       } else {
         $recovery = filter_var($_GET['recovery'], FILTER_SANITIZE_STRING);
-        $user = $User->find(array('recovery' => $recovery));
+        $user = $User->where('recovery', '=', $recovery)->first();
 
-        if( strtotime($user[0]->recovery_expires) > time() ) {
+        if( strtotime($user->recovery_expires) > time() ) {
           $valid_code = true;
           // $this->set('recovery', $recovery);
         }
@@ -409,14 +554,14 @@ class UserController extends Controller
         }
 
         else {
-          $user = $User->find(array('recovery' => $recovery));
+          $user = $User->where('recovery', '=', $recovery)->first();
           if(!empty($user)){
             $data = array(
               'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY'))))
             );
-            $update = $user->update($user[0]->idusers, $data);
+            $update = $user->update($data);
             if($update){
-              header('Location: /user/login?reset=ok');
+              return redirect('login?reset=ok');
             }
             else {
               $response['danger'] = "Could not update the password.";
@@ -437,7 +582,13 @@ class UserController extends Controller
         $response = null;
       }
 
-      return view('user.reset', [
+      if (isset($user)) {
+        $email = $user->email;
+      } else {
+        $email = null;
+      }
+
+      return view('auth.reset-password', [//user.reset
         'weights' => $weights,
         'devices' => $devices,
         'nextparties' => $Party->findNextParties(),
@@ -450,6 +601,7 @@ class UserController extends Controller
         'recovery' => $recovery,
         'valid_code' => $valid_code,
         'response' => $response,
+        'email' => $email,
       ]);
     }
 
@@ -870,5 +1022,108 @@ class UserController extends Controller
         setcookie(LANGUAGE_COOKIE, $lang, $time, '/', $_SERVER['HTTP_HOST']);
         header('Location: /user/login');
       }
+    }
+
+    public function getRegister(){
+      $Party = new Party;
+      $Device = new Device;
+
+      $allparties = $Party->ofThisGroup('admin', true, true);
+      $co2Total = $Device->getWeights();
+      $device_count_status = $Device->statusCount();
+
+      return view('auth.register-new', [
+        'skills' => FixometerHelper::allSkills(),
+        'co2Total' => $co2Total[0]->total_footprints,
+        'wasteTotal' => $co2Total[0]->total_weights,
+        'partiesCount' => count($allparties),
+        'device_count_status' => $device_count_status,
+      ]);
+    }
+
+    public function postRegister(Request $request){
+
+      $rules = [
+          'reg_name' => 'required|string|max:255',
+          'email' => 'required|string|email|max:255|unique:users',
+          'reg_age' => 'required',
+          'reg_country' => 'required',
+          'reg_gender' => 'required|string|max:255',
+          'password' => 'required|string|min:6|confirmed',
+          'my_name'   => 'honeypot',
+          'my_time'   => 'required|honeytime:5',
+      ];
+
+      $validator = Validator::make($request->all(), $rules);
+
+      if ($validator->fails()) {
+          return redirect()->back()->withErrors($validator)->withInput();
+      }
+
+      try {
+        $user = User::create([
+            'name' => $request->input('reg_name'),
+            'email' => $request->input('email'),
+            'password' => Hash::make($request->input('password')),
+            'role' => 4,
+            'recovery' => substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 ),
+            'recovery_expires' => strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60)),
+            'country' => $request->input('reg_country'),
+            'location' => $request->input('reg_city'),
+            'gender' => $request->input('reg_gender'),
+            'age' => $request->input('reg_age'),
+        ]);
+      } catch (\Exception $e) {
+        $error['message'] = 'Failed to create user';
+        return redirect()->back()->withErrors('message', 'User already exists');
+      }
+
+      if (!is_null($request->input('newsletter')) && $request->input('newsletter') == 1) {
+        //Subscribe to newsletter
+        $user->newsletter = 1;
+      }
+
+      if (!is_null($request->input('invites')) && $request->input('invites') == 1) {
+        //Subscribe to invites
+        $user->invites = 1;
+      }
+
+      if (!is_null($request->input('consent')) && $request->input('consent') == 1) {
+        //Timestamp consent
+        $user->consent = date('Y-m-d H:i:s');
+      }
+
+      if (!is_null($user->location)) {
+
+        $json = file_get_contents("http://maps.google.com/maps/api/geocode/json?address=".urlencode($user->location.',United Kingdom')."&sensor=false");
+        $json = json_decode($json);
+
+        if (is_object($json) && !empty($json->{'results'})) {
+            $user->latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
+            $user->longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+
+        }
+
+      }
+
+      $user->save();
+
+      $skills = $request->input('skills');
+
+      if (!empty($skills)) {
+
+        foreach($skills as $skill) {
+          UsersSkills::create([
+            'skill' => $skill,
+            'user'  => $user->id,
+          ]);
+        }
+
+      }
+
+      Session::createSession($user->id);
+
+      return redirect('login');
+
     }
 }

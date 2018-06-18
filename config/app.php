@@ -159,6 +159,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Msurguy\Honeypot\HoneypotServiceProvider::class,
 
     ],
 
@@ -209,6 +210,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'FixometerHelper' => App\Helpers\FixometerHelper::class,
+        'Honeypot' => Msurguy\Honeypot\HoneypotFacade::class,
 
     ],
 

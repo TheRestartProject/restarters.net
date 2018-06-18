@@ -1,0 +1,33 @@
+{
+    "name": "msurguy/honeypot",
+    "description": "Honeypot spam prevention",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "spam",
+        "forms",
+        "honeypot"
+    ],
+    "authors": [
+        {
+            "name": "Maksim Surguy",
+            "email": "m.surguy@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.*|5.*",
+        "illuminate/config": "4.*|5.*",
+        "illuminate/translation": "4.*|5.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.0.*",
+        "mockery/mockery": "0.9.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Msurguy\\Honeypot\\": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}

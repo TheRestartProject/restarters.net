@@ -8,23 +8,53 @@
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
 
-// Plugins
-@import '~font-awesome/css/font-awesome.min.css';
-@import '~bootstrap-select/dist/css/bootstrap-select.min';
-@import '~eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min';
-@import '~summernote/dist/summernote';
-@import '~bootstrap-fileinput/css/fileinput.min';
+// Slick
+@import '~slick-carousel/slick/slick';
+@import '~slick-carousel/slick/slick-theme';
 
-@import 'variables';
-@import 'mixins';
-@import 'main';
-@import 'navigation';
-@import 'forms';
-@import 'footer';
-@import 'profile';
-@import 'dashboard';
-@import 'ctrl-box';
-@import 'homepage';
-@import 'host';
-@import 'outbound';
+// Tokenfield
+@import 'tfvariables';
+@import '~tokenfield/lib/scss/mixins';
+@import '~tokenfield/lib/scss/tokenfield';
+// @import '~bootstrap-tokenfield/dist/css/bootstrap-tokenfield.css';
 
+// Summernote
+@import '~summernote/src/less/summernote';
+@import '~summernote/src/less/summernote-bs4';
+@import '~summernote/src/less/elements';
+
+// Select2
+@import '~select2/src/scss/core';
+
+.navbar-laravel {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+@import "accordion";
+@import "alert";
+@import "entry";
+@import "buttons";
+@import "breadcrumb";
+@import "registration";
+@import "navigation";
+@import "notifications";
+@import "dashboard";
+@import "onboarding";
+@import "card";
+@import "features";
+@import "steps";
+@import "slideshow";
+@import "list-group";
+@import "login-page";
+@import "modal";
+@import "edit";
+@import "table";
+@import "groups";
+@import "popover";
+@import "pagination";
+@import "properties";
+@import 'summernote';
+@import 'events';
+@import 'truncate';
+@import "global";

@@ -1,106 +1,150 @@
 @extends('layouts.app')
-
 @section('content')
-<div class="container-fluid" id="dashboard">
-    <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-12">
-            <h1>Welcome, <span class="orange"><?php echo $user->name; ?></span></h2>
-
-        </div>
-
-
-    </div>
-
-    <div class="row">
-        <div class="col-md-5">
-            <div class="party-opt-in dbObject">
-                <h3>Upcoming Parties!</h3>
-                <ul>
-                  @if(isset($upcomingParties))
-                    @foreach($upcomingParties as $e)
-                    <li class="clearfix">
-                        <time><?php echo dateFormatNoTime($e->event_date) . ' - FROM ' . $e->start . ' TO ' . $e->end; ?> </time>
-                        <a class="location" title="<?php echo $e->location; ?>" href="http://maps.google.com/?ie=UTF8&hq=&q=<?php echo $e->location; ?>&ll=<?php echo $e->latitude; ?>,<?php echo $e->longitude; ?>&z=14" target="_blank"><i class="fa fa-map-marker"></i> <?php echo $e->location; ?></a>
-                        <a class="cta" id="restarter-opt-in" data-party="<?php echo $e->idevents; ?>" href="#">OPT-IN!</a>
-                        <div class="map-wrap clearfix" id="party-map-<?php echo $e->idevents; ?>" height="250px" width="100%"></div>
-                    </li>
-                    @endforeach
-                  @endif
-                </ul>
-
+<section class="dashboard">
+  <div class="container-fluid">
+  <div class="row row-compressed">
+    @if (!$has_profile_pic || !$has_skills || !$in_group || !$in_event)
+    <div class="col-lg-3">
+      <aside class="dashboard__aside">
+        <ul class="steps">
+          <li class="step step__active">
+            <h3>Getting started</h3>
+            <p>Welcome to restart, here are a few things to get you started:</p>
+          </li>
+          <li class="step">
+            <div class="row">
+              <div class="col-7 d-flex align-items-center">
+                <h4>Add an avatar</h4>
+              </div>
+              @if ($has_profile_pic)
+                <div class="col-5 d-flex align-items-center justify-content-end">
+                  <svg class="step__tick" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Tick</title><g fill="#78ca6e"><path d="M7.646 16.486l3.823-3.823-7.646-7.646L0 8.84l7.646 7.646z"/><path d="M20.309 3.823L16.486 0 3.823 12.663l3.823 3.823L20.309 3.823z"/></g></svg>
+                </div>
+              @else
+                <div class="col-5 d-flex align-items-center justify-content-end">
+                  <a href="" class="step__link">Upload photo</a>
+                </div>
+              @endif
             </div>
-        </div>
-
-        <div class="col-md-7">
-            <div class="dbObject">
-                <canvas id="devicesYears"></canvas>
-                <?php //dbga($devicesByYear); ?>
-                <script>
-                    var legends = {};
-
-                    var data = {
-                        labels: [ <?php /*echo implode(',', array_keys($devicesByYear[1])); */?>],
-                        datasets: [
-                            {
-                                label: "Fixed!",
-                                fillColor: "rgba(154,205, 50,0.2)",
-                                strokeColor: "rgba(154,205, 50,1)",
-                                pointColor: "rgba(154,205, 50,1)",
-                                pointStrokeColor: "#fff",
-                                pointHighlightFill: "#fff",
-                                pointHighlightStroke: "rgba(154,205, 50,1)",
-                                data: [<?php /*echo implode(', ', $devicesByYear[1]); */?> ]
-                            },
-                            {
-                                label: "Repairable",
-                                fillColor: "rgba(175,238,238,0.2)",
-                                strokeColor: "rgba(175,238,238,1)",
-                                pointColor: "rgba(175,238,238,1)",
-                                pointStrokeColor: "#fff",
-                                pointHighlightFill: "#fff",
-                                pointHighlightStroke: "rgba(175,238,238,1)",
-                                data: [<?php /*echo implode(', ', $devicesByYear[2]); */?> ]
-                            },
-                            {
-                                label: "End Of Life",
-                                fillColor: "rgba(0,0,0,0.2)",
-                                strokeColor: "rgba(0,0,0,1)",
-                                pointColor: "rgba(0,0,0,1)",
-                                pointStrokeColor: "#fff",
-                                pointHighlightFill: "#fff",
-                                pointHighlightStroke: "rgba(0,0,0,1)",
-                                data: [<?php /*echo implode(', ', $devicesByYear[3]); */?> ]
-                            },
-                        ]
-                    };
-
-                    var ctx = document.getElementById("devicesYears").getContext("2d");
-                    var myLineChart = new Chart(ctx).Line(data, {
-                        tooltipTemplate: "<%if (label){%><%=label%>: <%}%><%= value %>",
-                        datasetStrokeWidth : 0.5,
-                        legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
-                    });
-                    //then you just need to generate the legend
-                    legends.devicesYears = myLineChart.generateLegend();
-
-
-
-                </script>
+          </li>
+          <li class="step">
+            <div class="row">
+              <div class="col-7 d-flex align-items-center">
+                <h4>Add your skills</h4>
+              </div>
+              @if ($has_skills)
+                <div class="col-5 d-flex align-items-center justify-content-end">
+                  <svg class="step__tick" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Tick</title><g fill="#78ca6e"><path d="M7.646 16.486l3.823-3.823-7.646-7.646L0 8.84l7.646 7.646z"/><path d="M20.309 3.823L16.486 0 3.823 12.663l3.823 3.823L20.309 3.823z"/></g></svg>
+                </div>
+              @else
+                <div class="col-5 d-flex align-items-center justify-content-end">
+                  <a href="" class="step__link">Add Skills</a>
+                </div>
+              @endif
             </div>
-        </div>
-        <div class="col-md-7"><div class="db-object">A Block Here</div></div>
-    </div>
+          </li>
+          @if (FixometerHelper::hasRole($user, 'Restarter'))
 
-    <div class="row">
-        <div class="col-md-2"><div class="db-object">A Block Here</div></div>
-        <div class="col-md-2"><div class="db-object">A Block Here</div></div>
-        <div class="col-md-8"><div class="db-object">A Block Here</div></div>
-    </div>
+            <li class="step">
+              <div class="row">
+                <div class="col-7 d-flex align-items-center">
+                  <h4>Join a Restart Group</h4>
+                </div>
+                @if ($in_group)
+                  <div class="col-5 d-flex align-items-center justify-content-end">
+                    <svg class="step__tick" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Tick</title><g fill="#78ca6e"><path d="M7.646 16.486l3.823-3.823-7.646-7.646L0 8.84l7.646 7.646z"/><path d="M20.309 3.823L16.486 0 3.823 12.663l3.823 3.823L20.309 3.823z"/></g></svg>
+                  </div>
+                @else
+                  <div class="col-5 d-flex align-items-center justify-content-end">
+                    <a href="" class="step__link">Find a group</a>
+                  </div>
+                @endif
+              </div>
+            </li>
+            <li class="step">
+              <div class="row">
+                <div class="col-7 d-flex align-items-center">
+                  <h4>RSVP a event</h4>
+                </div>
+                @if ($in_event)
+                  <div class="col-5 d-flex align-items-center justify-content-end">
+                    <svg class="step__tick" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Tick</title><g fill="#78ca6e"><path d="M7.646 16.486l3.823-3.823-7.646-7.646L0 8.84l7.646 7.646z"/><path d="M20.309 3.823L16.486 0 3.823 12.663l3.823 3.823L20.309 3.823z"/></g></svg>
+                  </div>
+                @else
+                  <div class="col-5 d-flex align-items-center justify-content-end">
+                    <a href="" class="step__link">Find an event</a>
+                  </div>
+                @endif
+              </div>
+            </li>
 
-    <div class="row">
-        <div class="col-md-4"><div class="db-object">A Block Here</div></div>
-        <div class="col-md-4"><div class="db-object">A Block Here</div></div>
-        <div class="col-md-4"><div class="db-object">A Block Here</div></div>
+          @endif
+
+          @if (FixometerHelper::hasRole($user, 'Host'))
+
+            <li class="step">
+              <div class="row">
+                <div class="col-7 d-flex align-items-center">
+                  <h4>Create a Restart Group</h4>
+                </div>
+                @if ($in_group)
+                  <div class="col-5 d-flex align-items-center justify-content-end">
+                    <svg class="step__tick" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Tick</title><g fill="#78ca6e"><path d="M7.646 16.486l3.823-3.823-7.646-7.646L0 8.84l7.646 7.646z"/><path d="M20.309 3.823L16.486 0 3.823 12.663l3.823 3.823L20.309 3.823z"/></g></svg>
+                  </div>
+                @else
+                  <div class="col-5 d-flex align-items-center justify-content-end">
+                    <a href="" class="step__link">Create a group</a>
+                  </div>
+                @endif
+              </div>
+            </li>
+            <li class="step">
+              <div class="row">
+                <div class="col-7 d-flex align-items-center">
+                  <h4>Create a Restart event</h4>
+                </div>
+                @if ($in_event)
+                  <div class="col-5 d-flex align-items-center justify-content-end">
+                    <svg class="step__tick" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Tick</title><g fill="#78ca6e"><path d="M7.646 16.486l3.823-3.823-7.646-7.646L0 8.84l7.646 7.646z"/><path d="M20.309 3.823L16.486 0 3.823 12.663l3.823 3.823L20.309 3.823z"/></g></svg>
+                  </div>
+                @else
+                  <div class="col-5 d-flex align-items-center justify-content-end">
+                    <a href="" class="step__link">Create an event</a>
+                  </div>
+                @endif
+              </div>
+            </li>
+
+          @endif
+
+        </ul>
+      </aside>
     </div>
-</div>
+    @endif
+    @if (!$has_profile_pic || !$has_skills || !$in_group || !$in_event)
+      <div class="col-lg-9">
+    @else
+      <div class="col-lg-9 offset-lg-3">
+    @endif
+      <div class="row row-compressed">
+        @if (FixometerHelper::hasRole($user, 'Administrator'))
+          @include('dashboard.restarter')
+        @endif
+        @if (FixometerHelper::hasRole($user, 'Host'))
+          @include('dashboard.host')
+        @endif
+        @if (FixometerHelper::hasRole($user, 'Restarter'))
+          @include('dashboard.restarter')
+        @endif
+      </div>
+    </div>
+  </div>
+
+  </div>
+  @if ($onboarding)
+    <script>
+      onboarding();
+    </script>
+  @endif
+<section>
 @endsection

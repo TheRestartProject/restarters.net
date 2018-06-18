@@ -1,0 +1,29 @@
+.breadcrumb {
+    background-color: transparent;
+    padding-left: 0;
+    padding-right: 0;
+    border-radius: 0;
+
+    li {
+        text-transform: uppercase;
+        font-size: 12px;
+        color: #000;
+        
+        a {
+            text-decoration: underline;
+            color: #000;
+        }
+
+        &.active {
+            text-decoration: none;
+            color: #000;
+        }
+
+        &.breadcrumb-item + .breadcrumb-item::before {
+            color: #000;
+            content: "\203A";
+        }
+
+
+    }
+}

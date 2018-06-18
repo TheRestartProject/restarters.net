@@ -20,7 +20,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'location', 'age', 'gender'
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'location', 'age', 'gender', 'country', 'newsletter', 'invites', 'biography', 'consent', 'number_of_logins', 'latitude', 'longitude'
     ];
 
     /**
@@ -74,11 +74,11 @@ class User extends Authenticatable
 
       try {
         return User::where('users.id', '=', $id)
-                ->leftJoin('images', function ($join) {
+                ->leftJoin('images', function ($join) use ($id) {
                   $join->join('xref', 'xref.object', '=', 'images.idimages')
                          ->where('xref.object_type', '=', 5)
                            ->where('xref.reference_type', '=', 1)
-                             ->where('xref.reference', '=', 'users.id')
+                             ->where('xref.reference', '=', $id)
                                ->groupBy('images.path')
                                  ->select('images.*');
                 })->first();

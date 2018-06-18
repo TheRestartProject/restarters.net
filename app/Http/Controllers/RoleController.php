@@ -41,7 +41,7 @@ class RoleController extends Controller
 
             $Role = new Role;
 
-            return view('role.index', [
+            return view('role.all', [//role.index
               'title' => 'Roles',
               'roleList' => $Role->findAll(),
             ]);
@@ -90,6 +90,7 @@ class RoleController extends Controller
               'formId' => $role->idroles,
               'permissions' => $role->permissions(),
               'activePermissions' => $activePerms,
+              'role_name' => $role->role,
             ]);
 
         }

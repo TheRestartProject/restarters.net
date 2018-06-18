@@ -1,0 +1,54 @@
+.entry-panel {
+    margin: 20px auto;
+    max-width: 450px;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    @include media-breakpoint-up(sm) {
+        padding: 50px;
+    }
+
+    h1 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-size: 16px;
+    }
+
+    a {
+        color:#000;
+    }
+
+    &__link {
+        margin-top: auto;
+        margin-bottom: auto;
+        display: block;
+    }
+
+    &__actions {
+        padding-top: 15px;
+    }
+}
+
+.entry-wrapper {
+    padding: 30px 0;
+    @media (min-height:600px) and (min-width:1600px) {
+        padding: 0;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .container > svg {
+        margin: auto;
+        display: block;
+    }
+}

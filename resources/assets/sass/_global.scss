@@ -1,0 +1,149 @@
+html, body {
+  height: 100%;
+  background-color: #DDE4E5;
+  color: #000000;
+  font-family: $font-family-second;
+  & > .container {
+    margin-top: 50px;
+  }
+}
+
+.container {
+  max-width: 1270px;
+}
+
+.block {
+  background-color: #FFFFFF;
+  padding: 40px;
+}
+
+.row-expanded {
+  @include media-breakpoint-up(xl) {
+  margin-left: -35px;
+  margin-right: -35px;
+    > div {
+      
+        padding-left: 35px;
+        padding-right: 35px;
+      }
+  }
+}
+
+.row-compressed {
+  margin-left: -10px;
+  margin-right: -10px;
+  > div {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+.body-plain, .body-plain body {
+  background-color: #fff;
+}
+
+.button-group {
+  padding-top: 15px;
+
+  .btn {
+    min-width: 120px;
+  }
+}
+
+.form-group {
+  &__offset {
+    @include media-breakpoint-up(lg) {
+      padding-right: 210px;
+    }
+  }
+}
+
+.form-control__select {
+  select {
+    border: 0;
+    background-color: transparent;
+    width: 100%;
+  }
+  
+  .select2-container--default .select2-selection--single {
+    border: 0;
+  }
+}
+
+.offset-lg-sidebar {
+  @include media-breakpoint-up(xl) {
+    padding-right: 40px;
+  }
+}
+
+.after-offset {
+  margin-top: -10px;
+  margin-bottom: 15px;
+  display: block;
+}
+
+h1, h2, h3, h4, h5, table th {
+  font-family: $font-family-sans-serif;
+  font-weight: 500;
+}
+
+.photo-list {
+    margin: 15px -2px;
+    padding: 0;
+    display: flex;
+    flex-flow: row wrap;
+
+    li {
+        list-style:none;
+        padding: 0 2px;
+        margin: 0;
+        flex: 1 0 25%;
+
+        a {
+            display: block;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 3px;
+            background:#BEC0C0;
+            border: 2px solid #BEC0C0;
+        }
+    }
+}
+
+.input-group-qty {
+  display: flex;
+  flex-flow: row wrap;
+  border-radius: 3px;
+  border: 2px solid #BEC0C0;
+  width: 100px;
+
+  .form-control {
+    border: 0;
+    font-size: 15px;
+    width: 40px;
+    padding: 0 2px;
+    text-align: center;
+  }
+
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    margin: 0; /* Removes leftover margin */
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+
+  .btn-value {
+    font-size: 15px;
+    padding: 2px;
+    border: 0;
+    flex: 1;
+    background-color: #E6E6E6;
+  }
+}

@@ -53,6 +53,8 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'my_name'   => 'honeypot',
+            'my_time'   => 'required|honeytime:5'
         ]);
     }
 
@@ -64,6 +66,20 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        //Old Laravel
+        // $user = User::create([
+        //     'name' => $data['name'],
+        //     'email' => $data['email'],
+        //     'password' => Hash::make($data['password']),
+        //     'role' => 4,
+        //     'recovery' => substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 ),
+        //     'recovery_expires' => strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60)),
+        // ]);
+        //
+        // Session::createSession($user->id);
+        //
+        // return $user;
+
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],

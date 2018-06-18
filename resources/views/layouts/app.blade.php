@@ -97,8 +97,8 @@
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
                         @guest
-                            <li><a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a></li>
-                            <li><a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a></li>
+                            <li><a class="nav-link" href="{{ route('login') }}">{{ __('auth.login') }}</a></li>
+                            <li><a class="nav-link" href="{{ route('register') }}">{{ __('general.register') }}</a></li>
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -108,17 +108,17 @@
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
                                       <a class="dropdown-item" href="/admin">
-                                          {{ __('Dashboard') }}
+                                          {{ __('general.dashboard') }}
                                       </a>
                                       <hr>
                                     @endif
-                                    <a class="dropdown-item" href="/profile">
-                                        {{ __('Profile') }}
+                                    <a class="dropdown-item" href="/profile/">
+                                        {{ __('general.profile') }}
                                     </a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
+                                        {{ __('general.logout') }}
                                     </a>
 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -136,8 +136,4 @@
             @yield('content')
         </main>
     </div>
-</body>
-
 @include('layouts.footer')
-
-</html>

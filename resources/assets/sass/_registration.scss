@@ -1,0 +1,129 @@
+.registration {
+    padding-top: 130px;
+
+    label sup {
+        color: #FF0000;
+        font-size: 16px;
+        top: auto;
+        left: auto;
+    }
+    
+    header {
+       
+        svg {
+            width: 170px;
+            margin-bottom: 15px;
+        }
+        p {
+            font-size: 24px;
+            padding: 0 15px;
+        }
+    }
+
+    fieldset, .fieldset {
+        margin-bottom: 10px;
+        @extend .clear;
+    }
+
+    .alert {
+        margin: 15px 0;
+        @extend .clear;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    &__offset {
+        @include media-breakpoint-up(lg) {
+            padding-right: 140px;
+        }
+    }
+
+
+    &__offset2 {
+        @include media-breakpoint-up(lg) {
+            padding-right: 60px;
+        }
+    }
+
+    &__prev {
+        border: 0;
+        background-color: transparent;
+        color: #616161;
+        text-decoration: underline;
+        padding: 16px;
+        &:hover {
+            text-decoration: none;
+        }
+    }
+    
+    &__status {
+        position: absolute;
+        right: 35px;
+        top: 40px;
+        z-index: 2;
+        color: #757575;
+        font-size: 14px;
+        margin: 0 0 20px 0;
+        font-family: $font-family-second;
+    }
+
+    &__step {
+        position: relative;
+        z-index: 1;
+        margin: 30px 0;
+        padding: 40px 35px;
+        @extend .clear;
+        border: 1px solid #D9D9D9;
+        background-color: #F9F9F9;
+        display: none;
+        visibility: hidden;
+
+        &--active {
+            display: block;
+            visibility: visible;
+        }
+
+        h3 {
+            font-size: 20px;
+            margin: 0 0 10px 0;
+            color: $brand;
+            padding-right: 100px;
+        }
+
+        legend {
+            font-size: 15px;
+            line-height: 1;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-family: $font-family-second;
+        }
+    }
+
+    .form-control {
+        font-size: 15px;
+        font-family: $font-family-second;
+        border-width: 2px;
+    }
+
+    .form-check {
+        margin-bottom: 10px;
+        font-size: 15px;
+
+        label {
+            font-family: $font-family-second;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        label, input {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        input.checkbox-top {
+            margin-top: 5px;
+        }
+    }
+}

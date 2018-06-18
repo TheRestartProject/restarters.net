@@ -1,0 +1,27 @@
+.alert {
+    border: 0;
+    font-size: 18px;
+    font-family: $font-family-second;
+    padding: 20px;
+    &-primary {
+        background-color: #EC7F00;
+        color:#FFF;
+    }
+    &-delete {
+        border: 0;
+        padding-right: 185px;
+        position: relative;
+        z-index: 1;
+        color: #FFF;
+        background-color: #E15A3B;
+
+        .btn  {
+            position: absolute;
+            top: 50%;
+            margin-top: -23px;
+            right: 20px;
+            z-index: 2;
+            line-height: 1.2;
+        }
+    }
+}

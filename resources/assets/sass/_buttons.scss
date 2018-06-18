@@ -1,0 +1,94 @@
+.btn-primary {
+    background-color: $brand;
+    border: 0;
+    border-bottom: 3px solid #155E67;
+    color: #FFF;
+    font-size: 16px;
+    border-radius: 3px;
+}
+
+.btn-checkbox {
+    width: 100%;
+    font-size: 16px;
+    padding: 16px;
+    margin-bottom: 15px;
+    background-color: #E4E4E4;
+    border-bottom: 3px solid #B6B6B6;
+    color: #000;
+}
+
+[type="checkbox"]:focus + label.btn-checkbox {
+    background-color:  #155E67;
+    color: #fff;
+}
+
+[type="checkbox"]:checked + label.btn-checkbox {
+    background-color: $brand;
+    border: 0;
+    border-bottom: 3px solid #155E67;
+    color: #FFF;
+    font-size: 16px;
+    border-radius: 3px;
+}
+
+.styled-checkbox {
+    @extend .sr-only;
+}
+
+.btn-view {
+    min-width: 128px;
+    margin-bottom: 30px;
+}
+
+.btn-danger {
+    background-color: #BE4E35;
+    color: #FFF;
+    font-size: 18px;
+    border: 0;
+    border-radius: 3px;
+    border-bottom: 3px solid #AA351A;
+    padding: 10px 15px;
+}
+
+.btn-save,
+.button-group .btn.btn-save {
+    margin: auto;
+    min-width: 170px;
+}
+
+.btn-preferences,
+.registration__prev.btn-preferences {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.btn-groups {
+    width: 100%;
+    display: block;
+    margin: 20px 0 10px 0;
+}
+
+.btn-token {
+    background-color: $brand;
+    border-radius: 2px;
+    border: 0;
+    font-size: 10px;
+    padding: 1px 4px;
+    color: #FFF;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+}
+
+.button-group {
+    &__notice {
+        font-size: 15px;
+        display: block;
+        margin: auto 0;
+    }
+    &__r {
+        float: right;
+
+        .btn {
+            margin-bottom: 5px;
+        }
+    }
+}
