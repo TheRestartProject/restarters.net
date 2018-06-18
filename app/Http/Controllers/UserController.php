@@ -60,7 +60,7 @@ class UserController extends Controller
         }
         $user = User::getProfile($id);
 
-        if(FixometerHelper::hasRole($user, 'Administrator')){
+        // if(FixometerHelper::hasRole($user, 'Administrator')){
             $skill_ids = UsersSkills::where('user', $id)->pluck('skill');
             $skills = Skills::whereIn('id', $skill_ids)->pluck('skill_name')->toArray();
 
@@ -77,18 +77,18 @@ class UserController extends Controller
             //   'waste_year_data' => null,
             //   'clusters' => null,
             // ]);
-        }
-        elseif(FixometerHelper::hasRole($user, 'Host')){
+        // }
+        // elseif(FixometerHelper::hasRole($user, 'Host')){
             // header('Location: /host');
-            return view('user.profile-new', [//user.profile
-              'user' => $user,
-            ]);
-        }
-        else {
-          return view('user.profile-new', [//user.profile
-            'user' => $user,
-          ]);
-        }
+            // return view('user.profile-new', [//user.profile
+            //   'user' => $user,
+            // ]);
+        // }
+        // else {
+          // return view('user.profile-new', [//user.profile
+          //   'user' => $user,
+          // ]);
+        // }
     }
 
     public function getProfileEdit($id) {
