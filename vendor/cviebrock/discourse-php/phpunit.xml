@@ -1,0 +1,25 @@
+<phpunit bootstrap="./tests/bootstrap.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         verbose="true"
+         stopOnFailure="false"
+         processIsolation="false"
+         backupGlobals="false"
+         syntaxCheck="true"
+        >
+    <testsuite name="SSOHelper Test Suite">
+        <directory>./tests/SSOHelperTest</directory>
+    </testsuite>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
+
+    <logging>
+        <log type="coverage-text" target="php://stdout"/>
+    </logging>
+</phpunit>

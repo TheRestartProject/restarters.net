@@ -14,11 +14,11 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
+        '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
-        '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
         '4a1f389d6ce373bda9e57857d3b61c84' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/helpers.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'f18cc91337d49233e5754e93f3ed9ec3' => __DIR__ . '/..' . '/laravelcollective/html/src/helpers.php',
@@ -62,6 +62,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
             'Symfony\\Component\\Debug\\' => 24,
             'Symfony\\Component\\CssSelector\\' => 30,
             'Symfony\\Component\\Console\\' => 26,
+            'Spinen\\Discourse\\' => 17,
         ),
         'R' => 
         array (
@@ -126,6 +127,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         ),
         'C' => 
         array (
+            'Cviebrock\\DiscoursePHP\\' => 23,
             'Cron\\' => 5,
             'Collective\\Html\\' => 16,
             'Carbon\\' => 7,
@@ -222,6 +224,10 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'Symfony\\Component\\Console\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/console',
+        ),
+        'Spinen\\Discourse\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/spinen/laravel-discourse-sso/src',
         ),
         'Ramsey\\Uuid\\' => 
         array (
@@ -334,6 +340,10 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'DebugBar\\' => 
         array (
             0 => __DIR__ . '/..' . '/maximebf/debugbar/src/DebugBar',
+        ),
+        'Cviebrock\\DiscoursePHP\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cviebrock/discourse-php/src',
         ),
         'Cron\\' => 
         array (
@@ -458,6 +468,20 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
         'App\\Images' => __DIR__ . '/../..' . '/app/Images.php',
         'App\\Listeners\\LogSuccessfulLogin' => __DIR__ . '/../..' . '/app/Listeners/LogSuccessfulLogin.php',
+        'App\\Notifications\\AccountCreated' => __DIR__ . '/../..' . '/app/Notifications/AccountCreated.php',
+        'App\\Notifications\\EventConfirmed' => __DIR__ . '/../..' . '/app/Notifications/EventConfirmed.php',
+        'App\\Notifications\\EventDevices' => __DIR__ . '/../..' . '/app/Notifications/EventDevices.php',
+        'App\\Notifications\\EventRepairs' => __DIR__ . '/../..' . '/app/Notifications/EventRepairs.php',
+        'App\\Notifications\\GroupConfirmed' => __DIR__ . '/../..' . '/app/Notifications/GroupConfirmed.php',
+        'App\\Notifications\\JoinEvent' => __DIR__ . '/../..' . '/app/Notifications/JoinEvent.php',
+        'App\\Notifications\\JoinGroup' => __DIR__ . '/../..' . '/app/Notifications/JoinGroup.php',
+        'App\\Notifications\\ModerationEvent' => __DIR__ . '/../..' . '/app/Notifications/ModerationEvent.php',
+        'App\\Notifications\\ModerationGroup' => __DIR__ . '/../..' . '/app/Notifications/ModerationGroup.php',
+        'App\\Notifications\\NewGroupMember' => __DIR__ . '/../..' . '/app/Notifications/NewGroupMember.php',
+        'App\\Notifications\\NewRegister' => __DIR__ . '/../..' . '/app/Notifications/NewRegister.php',
+        'App\\Notifications\\RSVPEvent' => __DIR__ . '/../..' . '/app/Notifications/RSVPEvent.php',
+        'App\\Notifications\\ResetPassword' => __DIR__ . '/../..' . '/app/Notifications/ResetPassword.php',
+        'App\\Notifications\\ReviewNotes' => __DIR__ . '/../..' . '/app/Notifications/ReviewNotes.php',
         'App\\Outbound' => __DIR__ . '/../..' . '/app/Outbound.php',
         'App\\Party' => __DIR__ . '/../..' . '/app/Party.php',
         'App\\Permissions' => __DIR__ . '/../..' . '/app/Permissions.php',
@@ -532,6 +556,8 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'Cron\\HoursField' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/HoursField.php',
         'Cron\\MinutesField' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/MinutesField.php',
         'Cron\\MonthField' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/MonthField.php',
+        'Cviebrock\\DiscoursePHP\\Exception\\PayloadException' => __DIR__ . '/..' . '/cviebrock/discourse-php/src/Exception/PayloadException.php',
+        'Cviebrock\\DiscoursePHP\\SSOHelper' => __DIR__ . '/..' . '/cviebrock/discourse-php/src/SSOHelper.php',
         'DatabaseSeeder' => __DIR__ . '/../..' . '/database/seeds/DatabaseSeeder.php',
         'DebugBar\\Bridge\\CacheCacheCollector' => __DIR__ . '/..' . '/maximebf/debugbar/src/DebugBar/Bridge/CacheCacheCollector.php',
         'DebugBar\\Bridge\\DoctrineCollector' => __DIR__ . '/..' . '/maximebf/debugbar/src/DebugBar/Bridge/DoctrineCollector.php',
@@ -3695,6 +3721,8 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'SebastianBergmann\\Timer\\RuntimeException' => __DIR__ . '/..' . '/phpunit/php-timer/src/RuntimeException.php',
         'SebastianBergmann\\Timer\\Timer' => __DIR__ . '/..' . '/phpunit/php-timer/src/Timer.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'Spinen\\Discourse\\Controllers\\SsoController' => __DIR__ . '/..' . '/spinen/laravel-discourse-sso/src/Controllers/SsoController.php',
+        'Spinen\\Discourse\\SsoServiceProvider' => __DIR__ . '/..' . '/spinen/laravel-discourse-sso/src/SsoServiceProvider.php',
         'Symfony\\Component\\Console\\Application' => __DIR__ . '/..' . '/symfony/console/Application.php',
         'Symfony\\Component\\Console\\CommandLoader\\CommandLoaderInterface' => __DIR__ . '/..' . '/symfony/console/CommandLoader/CommandLoaderInterface.php',
         'Symfony\\Component\\Console\\CommandLoader\\ContainerCommandLoader' => __DIR__ . '/..' . '/symfony/console/CommandLoader/ContainerCommandLoader.php',
