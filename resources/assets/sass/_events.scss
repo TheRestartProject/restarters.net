@@ -1,10 +1,11 @@
 .events {
-    background-color: #fff;
     @extend .clear;
     padding: 50px 0;
 
+
+
     header {
-        padding-left: 130px;
+        padding-left: 150px;
         position: relative;
         z-index: 1;
         font-size: 15px;
@@ -36,14 +37,32 @@
             left: 10px;
             top: 0;
             z-index: 1;
-            width: 72px;
+            width: 115px;
             height: auto;
+            border-radius: 50%;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
         }
     }
 
     h2 {
         font-size: 18px;
         margin: 0 0 10px 0;
+
+        sup {
+            font-size: 14px;
+            font-family: $font-family-second;
+            font-weight: 400;
+            left: 5px;
+            top: -3px;
+            a {
+                color: #000;
+                text-decoration: underline;
+
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+        }
     }
 
     .map {
@@ -59,8 +78,60 @@
         padding: 0;
     }
 
+    .nav-tabs {
+        font-size: 16px;
+        .nav-item {
+            margin-right: 3px;
+        }
+        .nav-link {
+            color: #000;
+            background-color: #F9F9F9;
+            border-color: #D9D9D9;
+            border-radius: 3px 3px 0 0;
+            padding: 10px 15px;
+
+            svg {
+                position: relative;
+                z-index: 1;
+                margin-right: 5px;
+            }
+            &.active {
+                border-bottom: 1px #F9F9F9 solid;
+            }
+            &:hover, &:focus {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .tab-content {
+        background-color: #F9F9F9;
+        border-radius: 3px;
+        border-color: #D9D9D9;
+    }
+
+    .tab-panel {
+        border-radius: 3px;
+    }
+
     &__header {
         margin-bottom: 30px;
+
+        &__url {
+            color: $brand;
+            display: block;
+            margin-top: -5px;
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+    }
+
+    &__side__heading {
+        font-size: 14px;
+        font-weight: 700;
+        font-family: $font-family-second;
+        color: #000;
+        margin: 0 0 10px 0;
     }
 
     &__description {
@@ -124,5 +195,16 @@
             padding-right: 30px;
         }
     }
-}
 
+    &-page {
+        header {
+            padding-left: 0;
+
+            h2 {
+                font-size: 26px;
+            }
+        }
+    }
+
+
+}

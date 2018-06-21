@@ -56,9 +56,7 @@
                               <a class="dropdown-item" href="/device">
                                   {{ __('All Devices') }}
                               </a>
-                              <a class="dropdown-item" href="/device/create">
-                                  {{ __('New Device') }}
-                              </a>
+
                             </div>
                         </li>
                         <li class="nav-item dropdown">

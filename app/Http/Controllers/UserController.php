@@ -14,6 +14,7 @@ use App\UserGroups;
 use App\UsersSkills;
 use App\Skills;
 use App\Session;
+use App\Http\Controllers\PartyController;
 
 // use Illuminate\Support\Facades\Notifications;
 use Notification;
@@ -1052,7 +1053,7 @@ class UserController extends Controller
       }
     }
 
-    public function getRegister(){
+    public function getRegister($event_id = null, $invite = null){
       $Party = new Party;
       $Device = new Device;
 
@@ -1060,13 +1061,25 @@ class UserController extends Controller
       $co2Total = $Device->getWeights();
       $device_count_status = $Device->statusCount();
 
-      return view('auth.register-new', [
-        'skills' => FixometerHelper::allSkills(),
-        'co2Total' => $co2Total[0]->total_footprints,
-        'wasteTotal' => $co2Total[0]->total_weights,
-        'partiesCount' => count($allparties),
-        'device_count_status' => $device_count_status,
-      ]);
+      if (is_null($invite) && is_null($event_id)) {
+        return view('auth.register-new', [
+          'skills' => FixometerHelper::allSkills(),
+          'co2Total' => $co2Total[0]->total_footprints,
+          'wasteTotal' => $co2Total[0]->total_weights,
+          'partiesCount' => count($allparties),
+          'device_count_status' => $device_count_status,
+        ]);
+      } else {
+        return view('auth.register-new', [
+          'skills' => FixometerHelper::allSkills(),
+          'co2Total' => $co2Total[0]->total_footprints,
+          'wasteTotal' => $co2Total[0]->total_weights,
+          'partiesCount' => count($allparties),
+          'device_count_status' => $device_count_status,
+          'event_id' => $event_id,
+          'invite' => $invite,
+        ]);
+      }
     }
 
     public function postRegister(Request $request){
@@ -1147,6 +1160,11 @@ class UserController extends Controller
           ]);
         }
 
+      }
+
+      if ($request->input('event') !== null && $request->input('invite') !== null) {
+        $PartyController = new PartyController;
+        $PartyController->confirmInvite($request->input('event'), $request->input('invite'), $user->id);
       }
 
       Session::createSession($user->id);

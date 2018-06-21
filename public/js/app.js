@@ -13275,6 +13275,34 @@ Popper.Defaults = Defaults;
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13376,34 +13404,6 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 module.exports = defaults;
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-module.exports = function(module) {
-	if(!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
 
 /***/ }),
 /* 5 */
@@ -23417,7 +23417,7 @@ return CodeMirror$1;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(14);
-module.exports = __webpack_require__(46);
+module.exports = __webpack_require__(48);
 
 
 /***/ }),
@@ -23434,11 +23434,13 @@ module.exports = __webpack_require__(46);
 __webpack_require__(15);
 __webpack_require__(16);
 __webpack_require__(17);
-//require('./bootstrap-tokenfield/dist/bootstrap-tokenfield.js');
+__webpack_require__(67);
 __webpack_require__(40);
 __webpack_require__(41);
 __webpack_require__(42);
-window.Tokenfield = __webpack_require__(43);
+__webpack_require__(43);
+window.Dropzone = __webpack_require__(44);
+// window.Tokenfield = require("tokenfield");
 
 // window.Vue = require('vue');
 
@@ -23722,20 +23724,87 @@ function numericInputs() {
     });
 }
 
-__webpack_require__(45);
+function removeUser() {
+    jQuery(this).parent().remove();
+    // AJAX remove entry...
+}
 
+function nestedTable() {
+
+    jQuery('.table-row-details').each(function () {
+
+        jQuery(this).on('show.bs.collapse', function () {
+            jQuery(this).prev('tr').addClass('active-row');
+            //jQuery(this).prev('tr').find('.row-button')
+        });
+        jQuery(this).on('hide.bs.collapse', function () {
+            jQuery(this).prev('tr').removeClass('active-row');
+        });
+    });
+}
+
+function loadDropzones() {
+
+    if (jQuery("#dropzoneEl").length > 0) {
+
+        var field1 = jQuery('#dropzoneEl').data('field1');
+        var field2 = jQuery('#dropzoneEl').data('field2');
+
+        var instanceDropzone = new Dropzone("#dropzoneEl", {
+            init: function init() {
+                jQuery(".dz-message").find('span').text(field1);
+                jQuery(".dz-message").append('<small>' + field2 + '</small>');
+            },
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 2,
+            uploadMultiple: true,
+            createImageThumbnails: true,
+            thumbnailWidth: 70,
+            thumbnailHeight: 60,
+            thumbnailMethod: "contain",
+            addRemoveLinks: true,
+            previewsContainer: ".previews"
+        });
+    }
+}
+
+Dropzone.autoDiscover = false;
 onboarding();
-initTokenfields();
+// initTokenfields();
 groupsMap();
 textEditor();
 numericInputs();
 eventsMap();
 truncate();
+nestedTable();
 
 jQuery(function () {
-    jQuery('[data-toggle="popover"]').popover();
+    jQuery('.users-list').find('[data-toggle="popover"]').popover();
+
+    jQuery('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
+        jQuery('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
+    });
+
+    jQuery('.table').find('[data-toggle="popover"]').popover({
+        template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
+        placement: 'top'
+    });
+
+    jQuery('.table').find('[data-toggle="popover"]').on('click', function (e) {
+        jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
+    });
+
     jQuery('.form-control > select').select2();
+    jQuery('.js-remove').on('click', removeUser);
+    jQuery(document).on('click', '[data-toggle="lightbox"]', function (event) {
+        event.preventDefault();
+        jQuery(this).ekkoLightbox();
+    });
+
+    loadDropzones();
 });
+
+__webpack_require__(47);
 
 /***/ }),
 /* 15 */
@@ -26031,7 +26100,7 @@ jQuery(function () {
     return e.$ === w && (e.$ = Kt), t && e.jQuery === w && (e.jQuery = Jt), w;
   }, t || (e.jQuery = e.$ = w), w;
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
 /* 16 */
@@ -44186,7 +44255,7 @@ if (token) {
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(4)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(3)(module)))
 
 /***/ }),
 /* 19 */
@@ -48137,7 +48206,7 @@ module.exports = __webpack_require__(21);
 var utils = __webpack_require__(0);
 var bind = __webpack_require__(7);
 var Axios = __webpack_require__(23);
-var defaults = __webpack_require__(3);
+var defaults = __webpack_require__(4);
 
 /**
  * Create an instance of Axios
@@ -48220,7 +48289,7 @@ function isSlowBuffer (obj) {
 "use strict";
 
 
-var defaults = __webpack_require__(3);
+var defaults = __webpack_require__(4);
 var utils = __webpack_require__(0);
 var InterceptorManager = __webpack_require__(33);
 var dispatchRequest = __webpack_require__(34);
@@ -48949,7 +49018,7 @@ module.exports = InterceptorManager;
 var utils = __webpack_require__(0);
 var transformData = __webpack_require__(35);
 var isCancel = __webpack_require__(10);
-var defaults = __webpack_require__(3);
+var defaults = __webpack_require__(4);
 var isAbsoluteURL = __webpack_require__(36);
 var combineURLs = __webpack_require__(37);
 
@@ -65398,2149 +65467,3549 @@ $$1.summernote = $$1.extend($$1.summernote, {
 
 /***/ }),
 /* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports =
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(1).default;
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _events = __webpack_require__(2);
-
-var _events2 = _interopRequireDefault(_events);
-
-var _ajax = __webpack_require__(3);
-
-var _ajax2 = _interopRequireDefault(_ajax);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Input field with tagging/token/chip capabilities written in raw JavaScript
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * tokenfield 0.9.8 <https://github.com/KaneCohen/tokenfield>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright 2016 Kane Cohen <https://github.com/KaneCohen>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Available under BSD-3-Clause license
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-
-var _tokenfields = {};
-
-var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
-var reHasRegExpChar = RegExp(reRegExpChar.source);
-
-var _factory = document.createElement('div');
-
-var _templates = {
-  containerTokenfield: '<div class="tokenfield tokenfield-mode-tokens">\n      <input class="tokenfield-copy-helper"\n        style="position:fixed;left:-1000000px"\n        tabindex="-1"\n        type="text"\n      />\n      <div class="tokenfield-set">\n        <ul></ul>\n      </div>\n      <input class="tokenfield-input" />\n      <div class="tokenfield-suggest">\n        <ul class="tokenfield-suggest-list"></ul>\n      </div>\n    </div>',
-  containerList: '<div class="tokenfield tokenfield-mode-list">\n      <input class="tokenfield-input" />\n      <div class="tokenfield-suggest">\n        <ul class="tokenfield-suggest-list"></ul>\n      </div>\n      <div class="tokenfield-set">\n        <ul></ul>\n      </div>\n    </div>',
-  suggestItem: '<li class="tokenfield-suggest-item"></li>',
-  setItem: '<li class="tokenfield-set-item">\n      <span class="item-label"></span>\n      <a href="#" class="item-remove" tabindex="-1">\xD7</a>\n      <input class="item-input" type="hidden" />\n    </li>'
-};
-
-function guid() {
-  return ((1 + Math.random()) * 0x10000 | 0).toString(16) + ((1 + Math.random()) * 0x10000 | 0).toString(16);
-}
-
-function includes(arr, item) {
-  return arr.indexOf(item) >= 0;
-}
-
-function getPath(node) {
-  var nodes = [node];
-  while (node.parentNode) {
-    node = node.parentNode;
-    nodes.push(node);
-  }
-  return nodes;
-}
-
-function findElement(input) {
-  if (input.nodeName) {
-    return input;
-  } else if (typeof input === 'string') {
-    return document.querySelector(input);
-  }
-  return null;
-}
-
-function build(html, all) {
-  if (html.nodeName) return html;
-  html = html.replace(/(\t|\n$)/g, '');
-
-  _factory.innerHTML = '';
-  _factory.innerHTML = html;
-  if (all === true) {
-    return _factory.childNodes;
-  } else {
-    return _factory.childNodes[0];
-  }
-}
-
-function toString(value) {
-  if (typeof value == 'string') {
-    return value;
-  }
-  if (value === null) {
-    return '';
-  }
-  var result = value + '';
-  return result === '0' && 1 / value === -Infinity ? '-0' : result;
-}
-
-function keyToChar(e) {
-  return e.key || String.fromCharCode(parseInt(e.keyIdentifier.substr(2), 16));
-}
-
-function escapeRegex(string) {
-  string = toString(string);
-  return string && reHasRegExpChar.test(string) ? string.replace(reRegExpChar, '\\$&') : string;
-}
-
-function makeDefaultsAndOptions() {
-  var _defaults = {
-    focusedItem: null,
-    cache: {},
-    timer: null,
-    xhr: null,
-    suggested: false,
-    suggestedItems: [],
-    setItems: [],
-    events: {},
-    delimiters: {}
-  };
-
-  var _options = {
-    el: null,
-    form: true, // Listens to reset event on the specifiedform. If set to true listens to
-    // immediate parent form. Also accepts selectors or elements.
-    mode: 'tokenfield', // Display mode: tokenfield or list.
-    addItemOnBlur: false, // Add token if input field loses focus.
-    addItemsOnPaste: false, // Add tokens using `delimiters` option below to tokenize given string.
-    setItems: [], // List of set items.
-    items: [], // List of available items to work with.
-    // Example: [{id: 143, value: 'Hello World'}, {id: 144, value: 'Foo Bar'}].
-    newItems: true, // Allow input (on delimiter key) of new items.
-    multiple: true, // Accept multiple items.
-    maxItems: 0, // Set maximum allowed number of items.
-    keys: { // Various action keys.
-      17: 'ctrl',
-      16: 'shift',
-      91: 'meta',
-      8: 'delete', // Backspace
-      27: 'esc',
-      37: 'left',
-      38: 'up',
-      39: 'right',
-      40: 'down',
-      46: 'delete',
-      65: 'select', // A
-      67: 'copy', // C
-      88: 'cut', // X
-      9: 'delimiter', // Tab
-      13: 'delimiter', // Enter
-      108: 'delimiter' // Numpad Enter
-    },
-    matchRegex: '{value}', // Match regex where {value} would be replaced by ecaped user input.
-    matchFlags: 'i', // Flags used in regex matching.
-    matchStart: false, // Set match regex to test from the beginning of the string.
-    matchEnd: false, // Set match regex to test from the end of the string.
-    delimiters: [], // Array of strings which act as delimiters during tokenization.
-    copyProperty: 'name', // Property of the token used for copy event.
-    copyDelimiter: ', ', // Delimiter used to populate clipboard with selected tokens.
-    remote: {
-      type: 'GET', // Ajax request type.
-      url: null, // Full server url.
-      queryParam: 'q', // What param to use when asking server for data.
-      delay: 300, // Dealy between last keydown event and ajax request for data.
-      timestampParam: 't',
-      params: {},
-      headers: {}
-    },
-    placeholder: null, // Hardcoded placeholder text. If not set, will use placeholder from the element itself.
-    inputType: 'text', // HTML attribute for the input element which lets mobile browsers use various input modes.
-    // Accepts text, email, url, and others.
-    minChars: 2, // Number of characters before we start to look for similar items.
-    maxSuggest: 10, // Max items in the suggest box.
-    maxSuggestWindow: 10, // Limit height of the suggest box after given number of items.
-    filterSetItems: true, // Filters already set items from the suggestions list.
-
-    singleInput: false, // Pushes all token values into a single. Accepts: true, 'selector', or an element.
-    // When set to true - would use tokenfield target element as an input to fill.
-    singleInputValue: 'id', // Which property of the item to use when using fillInput.
-    singleInputDelimiter: ', ',
-
-    itemLabel: 'name', // Property to use in order to render item label.
-    itemName: 'items', // If set, for each tag/token there will be added
-    // input field with array property name:
-    // name="items[]".
-
-    newItemName: 'items_new', // Suffix that will be added to the new tag in
-    // case it was not available from the server:
-    // name="items_new[]".
-
-    itemValue: 'id', // Value that will be taken out of the results and inserted into itemAttr.
-    newItemValue: 'name', // Value that will be taken out of the results and inserted into itemAttr.
-    itemData: 'name' // Which property to search for.
-  };
-  return { _defaults: _defaults, _options: _options };
-}
-
-var Tokenfield = function (_EventEmitter) {
-  _inherits(Tokenfield, _EventEmitter);
-
-  function Tokenfield() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, Tokenfield);
-
-    var _this = _possibleConstructorReturn(this, (Tokenfield.__proto__ || Object.getPrototypeOf(Tokenfield)).call(this));
-
-    var _makeDefaultsAndOptio = makeDefaultsAndOptions(),
-        _defaults = _makeDefaultsAndOptio._defaults,
-        _options = _makeDefaultsAndOptio._options;
-
-    _this.id = guid();
-    _this.key = 'key_' + _this.id;
-    _this._vars = _extends({}, _defaults);
-    _this._options = _extends({}, _options, options);
-    _this._options.keys = _extends({}, _options.keys, options.keys);
-    _this._options.remote = _extends({}, _options.remote, options.remote);
-    _this._templates = _extends({}, _templates, options.templates);
-    _this._vars.setItems = _this._prepareData(_this._options.setItems || []);
-    _this._focused = false;
-    _this._input = null;
-    _this._form = false;
-    _this._html = {};
-
-    var o = _this._options;
-
-    // Make a hash map to simplify filtering later.
-    o.delimiters.forEach(function (delimiter) {
-      _this._vars.delimiters[delimiter] = true;
-    });
-
-    var el = findElement(o.el);
-    if (el) {
-      _this.el = el;
-    } else {
-      throw new Error('Selector: DOM Element ' + o.el + ' not found.');
-    }
-
-    if (o.singleInput) {
-      var _el = findElement(o.singleInput);
-      if (_el) {
-        _this._input = _el;
-      } else {
-        _this._input = _this.el;
-      }
-    }
-
-    _this.el.tokenfield = _this;
-
-    if (o.placeholder === null) {
-      o.placeholder = o.el.placeholder || '';
-    }
-
-    if (o.form) {
-      var form = false;
-      if (o.form.nodeName) {
-        form = o.form;
-      } else if (o.form === true) {
-        var node = _this.el;
-        while (node.parentNode) {
-          if (node.nodeName === 'FORM') {
-            form = node;
-            break;
-          }
-          node = node.parentNode;
-        }
-      } else if (typeof form == 'string') {
-        form = document.querySelector(form);
-        if (!form) {
-          throw new Error('Selector: DOM Element ' + o.form + ' not found.');
-        }
-      }
-      _this._form = form;
-    } else {
-      throw new Error('Cannot create tokenfield without DOM Element.');
-    }
-
-    _tokenfields[_this.id] = _this;
-
-    _this._render();
-    return _this;
-  }
-
-  _createClass(Tokenfield, [{
-    key: '_render',
-    value: function _render() {
-      var o = this._options;
-      var html = this._html;
-
-      if (o.mode === 'tokenfield') {
-        html.container = build(this._templates.containerTokenfield);
-      } else {
-        html.container = build(this._templates.containerList);
-      }
-      html.suggest = html.container.querySelector('.tokenfield-suggest');
-      html.suggestList = html.container.querySelector('.tokenfield-suggest-list');
-      html.items = html.container.querySelector('.tokenfield-set > ul');
-      html.input = html.container.querySelector('.tokenfield-input');
-      html.input.setAttribute('type', o.inputType);
-      html.input.placeholder = o.placeholder;
-      html.copyHelper = html.container.querySelector('.tokenfield-copy-helper');
-
-      o.el.style.display = 'none';
-      html.suggest.style.display = 'none';
-      this._renderSizer();
-
-      // Set tokenfield in DOM.
-      html.container.tokenfield = this;
-      o.el.parentElement.insertBefore(html.container, o.el);
-      html.container.insertBefore(o.el, html.container.firstChild);
-
-      this._setEvents();
-      this._renderItems();
-      if (o.mode === 'tokenfield') {
-        this._resizeInput();
-      }
-
-      return this;
-    }
-  }, {
-    key: '_renderSizer',
-    value: function _renderSizer() {
-      var html = this._html;
-      var b = this._getBounds();
-      var style = window.getComputedStyle(html.container);
-      var compensate = parseInt(style.paddingLeft, 10) + parseInt(style.paddingRight, 10);
-
-      var styles = {
-        width: 'auto',
-        height: 'auto',
-        overflow: 'hidden',
-        whiteSpace: 'pre',
-        maxWidth: b.width - compensate + 'px',
-        position: 'fixed',
-        top: -10000 + 'px',
-        left: 10000 + 'px',
-        fontSize: style.fontSize,
-        paddingLeft: style.paddingLeft,
-        paddingRight: style.paddingRight
-      };
-
-      html.sizer = document.createElement('div');
-      html.sizer.id = 'tokenfield-sizer-' + this.id;
-      for (var key in styles) {
-        html.sizer.style[key] = styles[key];
-      }
-      html.container.appendChild(html.sizer);
-    }
-  }, {
-    key: '_refreshInput',
-    value: function _refreshInput() {
-      var empty = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
-      var v = this._vars;
-      var html = this._html;
-
-      if (empty) html.input.value = '';
-
-      if (this._options.mode === 'tokenfield') {
-        this._resizeInput();
-        var placeholder = v.setItems.length ? '' : this._options.placeholder;
-        html.input.setAttribute('placeholder', placeholder);
-      }
-      return this;
-    }
-  }, {
-    key: '_resizeInput',
-    value: function _resizeInput() {
-      var val = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-
-      var html = this._html;
-      var b = this._getBounds();
-      var style = window.getComputedStyle(html.container);
-      var compensate = parseInt(style.paddingRight, 10) + parseInt(style.borderRightWidth, 10);
-
-      var fullCompensate = compensate + parseInt(style.paddingLeft, 10) + parseInt(style.borderLeftWidth, 10);
-
-      html.sizer.innerHTML = val;
-      html.input.style.width = '20px';
-
-      var sb = html.sizer.getBoundingClientRect();
-      var ib = html.input.getBoundingClientRect();
-      var rw = b.width - (ib.left - b.left) - compensate;
-
-      if (sb.width > rw) {
-        html.input.style.width = b.width - fullCompensate + 'px';
-      } else {
-        html.input.style.width = rw + 'px';
-      }
-    }
-  }, {
-    key: '_fetchData',
-    value: function _fetchData(val) {
-      var _this2 = this;
-
-      var v = this._vars;
-      var o = this._options;
-      var r = o.remote;
-      var reqData = _extends({}, o.params);
-
-      for (var key in r.params) {
-        reqData[key] = r.params[key];
-      }
-
-      if (r.limit) {
-        reqData[r.limit] = o.remote.limit;
-      }
-
-      reqData[r.queryParam] = val;
-      reqData[r.timestampParam] = Math.round(new Date().getTime() / 1000);
-
-      v.xhr = (0, _ajax2.default)(reqData, o.remote, function () {
-        if (v.xhr && v.xhr.readyState == 4) {
-          if (v.xhr.status == 200) {
-            var response = JSON.parse(v.xhr.responseText);
-            v.cache[val] = response;
-            var data = _this2._prepareData(_this2.remapData(response));
-            var items = _this2._filterData(val, data);
-            v.suggestedItems = o.filterSetItems ? _this2._filterSetItems(items) : items;
-            _this2.showSuggestions();
-          } else if (v.xhr.status > 0) {
-            throw new Error('Error while loading remote data.');
-          }
-          _this2._abortXhr();
-        }
-      });
-    }
-
-    // Overwriteable method where you can change given data to appropriate format.
-
-  }, {
-    key: 'remapData',
-    value: function remapData(data) {
-      return data;
-    }
-  }, {
-    key: '_prepareData',
-    value: function _prepareData(data) {
-      var _this3 = this;
-
-      return data.map(function (item) {
-        return _extends({}, item, _defineProperty({}, _this3.key, guid()));
-      });
-    }
-  }, {
-    key: '_filterData',
-    value: function _filterData(val, data) {
-      var o = this._options;
-      var regex = o.matchRegex.replace('{value}', escapeRegex(val));
-      if (o.matchStart) {
-        regex = '^' + regex;
-      } else if (o.matchEnd) {
-        regex = regex + '$';
-      }
-      var pattern = new RegExp(regex, o.matchFlags);
-      return data.filter(function (item) {
-        return pattern.test(item[o.itemData]);
-      });
-    }
-  }, {
-    key: '_abortXhr',
-    value: function _abortXhr() {
-      var v = this._vars;
-      if (v.xhr !== null) {
-        v.xhr.abort();
-        v.xhr = null;
-      }
-    }
-  }, {
-    key: '_filterSetItems',
-    value: function _filterSetItems(items) {
-      var key = this._options.itemValue;
-      var v = this._vars;
-      if (!v.setItems.length) return items;
-
-      var setKeys = v.setItems.map(function (item) {
-        return item[key];
-      });
-
-      return items.filter(function (item) {
-        if (setKeys.indexOf(item[key]) === -1) {
-          return true;
-        }
-        return false;
-      });
-    }
-  }, {
-    key: '_setEvents',
-    value: function _setEvents() {
-      var v = this._vars;
-      var html = this._html;
-      v.events.onClick = this._onClick.bind(this);
-      v.events.onMouseDown = this._onMouseDown.bind(this);
-      v.events.onMouseOver = this._onMouseOver.bind(this);
-      v.events.onFocus = this._onFocus.bind(this);
-      v.events.onResize = this._onResize.bind(this);
-      v.events.onReset = this._onReset.bind(this);
-      v.events.onKeyDown = this._onKeyDown.bind(this);
-      v.events.onFocusOut = this._onFocusOut.bind(this);
-
-      html.container.addEventListener('click', v.events.onClick);
-
-      // Attach document event only once.
-      if (Object.keys(_tokenfields).length === 1) {
-        document.addEventListener('mousedown', v.events.onMouseDown);
-        window.addEventListener('resize', v.events.onResize);
-      }
-
-      if (this._form && this._form.nodeName) {
-        this._form.addEventListener('reset', v.events.onReset);
-      }
-
-      html.suggestList.addEventListener('mouseover', v.events.onMouseOver);
-      html.input.addEventListener('focus', v.events.onFocus);
-    }
-  }, {
-    key: '_onMouseOver',
-    value: function _onMouseOver(e) {
-      var target = e.target;
-      if (target.classList.contains('tokenfield-suggest-item')) {
-        var selected = [].slice.call(this._html.suggestList.querySelectorAll('.selected'));
-        selected.forEach(function (item) {
-          if (item !== target) item.classList.remove('selected');
-        });
-        target.classList.add('selected');
-        this._selectItem(target.key, false);
-        this._refreshItemsSelection();
-      }
-    }
-  }, {
-    key: '_onReset',
-    value: function _onReset() {
-      this.setItems(this._options.setItems);
-    }
-  }, {
-    key: '_onFocus',
-    value: function _onFocus(e) {
-      var v = this._vars;
-      var html = this._html;
-      var o = this._options;
-
-      html.input.removeEventListener('keydown', v.events.onKeyDown);
-      html.input.addEventListener('keydown', v.events.onKeyDown);
-      html.input.addEventListener('focusout', v.events.onFocusOut);
-
-      if (o.addItemsOnPaste) {
-        v.events.onPaste = this._onPaste.bind(this);
-        html.input.addEventListener('paste', v.events.onPaste);
-      }
-
-      this._focused = true;
-      this._html.container.classList.add('focused');
-
-      if (html.input.value.trim().length >= o.minChars) {
-        this.showSuggestions();
-      }
-    }
-  }, {
-    key: '_onFocusOut',
-    value: function _onFocusOut(e) {
-      var v = this._vars;
-      var o = this._options;
-      var html = this._html;
-      html.input.removeEventListener('keydown', v.events.onKeyDown);
-      html.input.removeEventListener('focusout', v.events.onFocusOut);
-
-      if (typeof v.events.onPaste !== 'undefined') {
-        html.input.removeEventListener('paste', v.events.onPaste);
-      }
-
-      if (e.relatedTarget && e.relatedTarget === html.copyHelper) {
-        return;
-      }
-
-      var canAddItem = o.multiple && !o.maxItems || !o.multiple && !v.setItems.length || o.multiple && o.maxItems && v.setItems.length < o.maxItems;
-
-      if (this._focused && o.addItemOnBlur && canAddItem && this._newItem(html.input.value)) {
-        this._renderItems()._refreshInput();
-      } else {
-        this._defocusItems()._renderItems();
-      }
-
-      this._focused = false;
-      this._html.container.classList.remove('focused');
-    }
-  }, {
-    key: '_onMouseDown',
-    value: function _onMouseDown(e) {
-      var tokenfield = null;
-      for (var key in _tokenfields) {
-        if (_tokenfields[key]._html.container.contains(e.target)) {
-          tokenfield = _tokenfields[key];
-          break;
-        }
-      }
-
-      if (tokenfield) {
-        for (var _key in _tokenfields) {
-          if (_key !== tokenfield.id) {
-            _tokenfields[_key].hideSuggestions();
-            _tokenfields[_key].blur();
-          }
-        }
-
-        // Prevent input blur.
-        if (e.target !== tokenfield._html.input) {
-          e.preventDefault();
-        }
-      } else {
-        for (var _key2 in _tokenfields) {
-          _tokenfields[_key2].hideSuggestions();
-          _tokenfields[_key2].blur();
-        }
-      }
-    }
-  }, {
-    key: '_onResize',
-    value: function _onResize() {
-      for (var key in _tokenfields) {
-        _tokenfields[key]._resizeInput(_tokenfields[key]._html.input.value);
-      }
-    }
-  }, {
-    key: '_onPaste',
-    value: function _onPaste(e) {
-      var _this4 = this;
-
-      var v = this._vars;
-      var o = this._options;
-      var val = e.clipboardData.getData('text');
-      var tokens = [val];
-
-      // Break input using delimiters option.
-      if (o.delimiters.length) {
-        var search = o.delimiters.join('|');
-        var splitRegex = new RegExp('(' + search + ')', 'ig');
-        tokens = val.split(splitRegex);
-      }
-
-      var items = tokens.map(function (token) {
-        return token.trim();
-      }).filter(function (token) {
-        return token.length > 0 && token.length >= o.minChars && typeof v.delimiters[token] === 'undefined';
-      }).map(function (token) {
-        return _this4._newItem(token);
-      });
-
-      if (items.length) {
-        setTimeout(function () {
-          _this4._renderItems()._refreshInput()._deselectItems().hideSuggestions();
-        }, 1);
-
-        e.preventDefault();
-      }
-    }
-  }, {
-    key: '_onKeyDown',
-    value: function _onKeyDown(e) {
-      var _this5 = this;
-
-      var v = this._vars;
-      var o = this._options;
-      var html = this._html;
-
-      if (o.maxItems && v.setItems.length >= o.maxItems) {
-        e.preventDefault();
-      }
-
-      if (o.mode === 'tokenfield') {
-        setTimeout(function () {
-          _this5._resizeInput(html.input.value);
-        }, 1);
-      }
-
-      var key = keyToChar(e);
-      if (typeof o.keys[e.keyCode] !== 'undefined' || includes(o.delimiters, key)) {
-        if (this._keyAction(e)) return true;
-      } else {
-        this._defocusItems()._refreshItems();
-      }
-
-      clearTimeout(v.timer);
-      this._abortXhr();
-
-      if (!o.maxItems || v.setItems.length < o.maxItems) {
-        setTimeout(function () {
-          _this5._keyInput(e);
-        }, 1);
-      }
-    }
-  }, {
-    key: '_keyAction',
-    value: function _keyAction(e) {
-      var _this6 = this;
-
-      var item = null;
-      var v = this._vars;
-      var key = this.key;
-      var o = this._options;
-      var html = this._html;
-      var keyName = o.keys[e.keyCode];
-      var val = html.input.value.trim();
-      var keyChar = keyToChar(e);
-
-      if (includes(o.delimiters, keyChar) && typeof keyName === 'undefined') {
-        keyName = 'delimiter';
-      }
-
-      var selected = this._getSelectedItems();
-      if (selected.length) {
-        item = selected[0];
-      }
-
-      switch (keyName) {
-        case 'esc':
-          this._deselectItems()._defocusItems()._renderItems().hideSuggestions();
-          break;
-        case 'up':
-          if (this._vars.suggested) {
-            this._selectPrevItem()._refreshItemsSelection();
-            e.preventDefault();
-          }
-          this._defocusItems()._renderItems();
-          break;
-        case 'down':
-          if (this._vars.suggested) {
-            this._selectNextItem()._refreshItemsSelection();
-            e.preventDefault();
-          }
-          this._defocusItems()._renderItems();
-          break;
-        case 'left':
-          if (this.getFocusedItems().length || !html.input.selectionStart && !html.input.selectionEnd) {
-            this._focusPrevItem(e.shiftKey);
-            e.preventDefault();
-          }
-          break;
-        case 'right':
-          if (this.getFocusedItems().length || html.input.selectionStart === val.length) {
-            this._focusNextItem(e.shiftKey);
-            e.preventDefault();
-          }
-          break;
-        case 'delimiter':
-          this._abortXhr();
-          this._defocusItems();
-
-          if (!o.multiple && v.setItems.length >= 1) {
-            return false;
-          }
-
-          val = this.onInput(val);
-          if (item) {
-            this._addItem(item);
-          } else if (val.length) {
-            item = this._newItem(val);
-          }
-
-          if (item) {
-            this._renderItems().focus()._refreshInput()._refreshSuggestions()._deselectItems();
-          }
-          e.preventDefault();
-          break;
-        case 'select':
-          if (!val.length && (e.ctrlKey || e.metaKey)) {
-            this._vars.setItems.forEach(function (item) {
-              item.focused = true;
-            });
-            this._refreshItems();
-          } else {
-            return false;
-          }
-          break;
-        case 'cut':
-          {
-            var focusedItems = this.getFocusedItems();
-            if (focusedItems.length && (e.ctrlKey || e.metaKey)) {
-              this._copy()._delete(e);
-            } else {
-              return false;
-            }
-            break;
-          }
-        case 'copy':
-          {
-            var _focusedItems = this.getFocusedItems();
-            if (_focusedItems.length && (e.ctrlKey || e.metaKey)) {
-              this._copy();
-            } else {
-              return false;
-            }
-            break;
-          }
-        case 'delete':
-          {
-            this._abortXhr();
-            var _focusedItems2 = this.getFocusedItems();
-            if (!html.input.selectionEnd && e.keyCode === 8 || html.input.selectionStart === val.length && e.keyCode === 46 || _focusedItems2.length) {
-              this._delete(e);
-            } else {
-              v.timer = setTimeout(function () {
-                _this6._keyInput(e);
-              }, o.delay);
-            }
-            break;
-          }
-        default:
-          break;
-      }
-
-      return true;
-    }
-  }, {
-    key: '_copy',
-    value: function _copy() {
-      var o = this._options;
-      var html = this._html;
-      var copyString = this.getFocusedItems().map(function (item) {
-        return item[o.copyProperty];
-      }).join(o.copyDelimiter);
-
-      html.copyHelper.value = copyString;
-      html.copyHelper.focus();
-      html.copyHelper.select();
-      document.execCommand('copy');
-      html.copyHelper.value = '';
-      html.input.focus();
-
-      return this;
-    }
-  }, {
-    key: '_delete',
-    value: function _delete(e) {
-      var _this7 = this;
-
-      var v = this._vars;
-      var o = this._options;
-      var key = this.key;
-      var html = this._html;
-      var focusedItems = this.getFocusedItems();
-
-      if (o.mode === 'tokenfield' && v.setItems.length) {
-        if (focusedItems.length) {
-          focusedItems.forEach(function (item) {
-            _this7._removeItem(item[key]);
-          });
-          this._refreshSuggestions()._keyInput(e);
-        } else if (!html.input.selectionStart) {
-          this._focusItem(v.setItems[v.setItems.length - 1][key]);
-        }
-      } else if (focusedItems.length) {
-        focusedItems.forEach(function (item) {
-          _this7._removeItem(item[key]);
-        });
-        this._refreshSuggestions()._keyInput(e);
-      }
-      this._renderItems()._refreshInput(false);
-
-      return this;
-    }
-  }, {
-    key: '_keyInput',
-    value: function _keyInput(e) {
-      var _this8 = this;
-
-      var v = this._vars;
-      var o = this._options;
-      var html = this._html;
-
-      this._defocusItems()._refreshItems();
-
-      var val = this.onInput(html.input.value.trim(), e);
-
-      if (e.type === 'keydown') {
-        this.emit('input', this, val, e);
-      }
-
-      if (val.length < o.minChars) {
-        this.hideSuggestions();
-        return false;
-      }
-
-      if (!o.multiple && v.setItems.length >= 1) {
-        return false;
-      }
-
-      // Check if we have cache with this val.
-      if (typeof v.cache[val] === 'undefined') {
-        // Get new data.
-        if (o.remote.url) {
-          v.timer = setTimeout(function () {
-            _this8._fetchData(val);
-          }, o.delay);
-        } else if (!o.remote.url && o.items.length) {
-          var data = this._prepareData(o.items);
-          var items = this._filterData(val, data);
-          v.suggestedItems = o.filterSetItems ? this._filterSetItems(items) : items;
-          this.showSuggestions();
-        }
-      } else {
-        // Work with cached data.
-        var _data = this._prepareData(this.remapData(v.cache[val]));
-        var _items = this._filterData(val, _data);
-        v.suggestedItems = o.filterSetItems ? this._filterSetItems(_items) : _items;
-        this.showSuggestions();
-      }
-
-      return this;
-    }
-  }, {
-    key: '_onClick',
-    value: function _onClick(e) {
-      var target = e.target;
-
-      if (target.classList.contains('item-remove')) {
-        e.preventDefault();
-
-        this._removeItem(target.key)._defocusItems()._renderItems()._keyInput(e);
-
-        this.focus();
-      } else if (target.classList.contains('tokenfield-suggest-item')) {
-        var item = this._getSuggestedItem(target.key);
-        this._addItem(item)._renderItems()._refreshInput()._refreshSuggestions().focus();
-      } else {
-        var setItem = getPath(target).filter(function (node) {
-          return node.classList && node.classList.contains('tokenfield-set-item');
-        })[0];
-
-        if (setItem) {
-          this._focusItem(setItem.key, e.shiftKey, e.ctrlKey || e.metaKey, true);
-          this._refreshItems();
-        } else {
-          this._keyInput(e);
-        }
-
-        this.focus();
-      }
-    }
-  }, {
-    key: '_selectPrevItem',
-    value: function _selectPrevItem() {
-      var key = this.key;
-      var o = this._options;
-      var items = this._vars.suggestedItems;
-      var index = this._getSelectedItemIndex();
-
-      if (!items.length) {
-        return this;
-      }
-
-      if (index !== null) {
-        if (index === 0) {
-          if (o.newItems) {
-            this._deselectItems();
-          } else {
-            this._selectItem(items[items.length - 1][key]);
-          }
-        } else {
-          this._selectItem(items[index - 1][key]);
-        }
-      } else {
-        this._selectItem(items[items.length - 1][key]);
-      }
-
-      return this;
-    }
-  }, {
-    key: '_selectNextItem',
-    value: function _selectNextItem() {
-      var key = this.key;
-      var o = this._options;
-      var items = this._vars.suggestedItems;
-      var index = this._getSelectedItemIndex();
-
-      if (!items.length) {
-        return this;
-      }
-
-      if (index !== null) {
-        if (index === items.length - 1) {
-          if (o.newItems) {
-            this._deselectItems();
-          } else {
-            this._selectItem(items[0][key]);
-          }
-        } else {
-          this._selectItem(items[index + 1][key]);
-        }
-      } else {
-        this._selectItem(items[0][key]);
-      }
-
-      return this;
-    }
-  }, {
-    key: '_focusPrevItem',
-    value: function _focusPrevItem() {
-      var multiple = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-      var key = this.key;
-      var items = this._vars.setItems;
-      var index = this._getFocusedItemIndex();
-
-      if (!items.length) {
-        return this;
-      }
-
-      if (index !== null) {
-        if (index === 0 && !multiple) {
-          this._defocusItems();
-        } else if (index === 0 && multiple) {
-          var lastFocused = this._getFocusedItemIndex(true);
-          this._defocusItem(items[lastFocused][key]);
-        } else {
-          this._focusItem(items[index - 1][key], multiple, false, true);
-        }
-      } else {
-        this._focusItem(items[items.length - 1][key], false, false, true);
-      }
-      this._refreshItems();
-
-      return this;
-    }
-  }, {
-    key: '_focusNextItem',
-    value: function _focusNextItem() {
-      var multiple = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-      var key = this.key;
-      var items = this._vars.setItems;
-      var index = this._getFocusedItemIndex(true);
-
-      if (!items.length) {
-        return this;
-      }
-
-      if (index !== null) {
-        if (index === items.length - 1 && !multiple) {
-          this._defocusItems();
-        } else if (index === items.length - 1 && multiple) {
-          this._focusItem(items[0][key], multiple);
-        } else {
-          this._focusItem(items[index + 1][key], multiple);
-        }
-      } else {
-        this._focusItem(items[0][key], false);
-      }
-      this._refreshItems();
-
-      return this;
-    }
-  }, {
-    key: '_getSelectedItems',
-    value: function _getSelectedItems() {
-      var key = this.key;
-      var setIds = this._vars.setItems.map(function (item) {
-        return item[key];
-      });
-      return this._vars.suggestedItems.filter(function (v) {
-        return v.selected && setIds.indexOf(v[key]) < 0;
-      });
-    }
-  }, {
-    key: '_selectItem',
-    value: function _selectItem(key) {
-      var _this9 = this;
-
-      var scroll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-      this._vars.suggestedItems.forEach(function (v) {
-        v.selected = v[_this9.key] === key;
-        if (v.selected && scroll) {
-          var height = parseInt(_this9._html.suggest.style.maxHeight, 10);
-          if (height) {
-            var listBounds = _this9._html.suggestList.getBoundingClientRect();
-            var elBounds = v.el.getBoundingClientRect();
-            var top = elBounds.top - listBounds.top;
-            var bottom = top + elBounds.height;
-
-            if (bottom >= height + _this9._html.suggest.scrollTop) {
-              _this9._html.suggest.scrollTop = bottom - height;
-            } else if (top < _this9._html.suggest.scrollTop) {
-              _this9._html.suggest.scrollTop = top;
-            }
-          }
-        }
-      });
-    }
-  }, {
-    key: '_deselectItem',
-    value: function _deselectItem(key) {
-      var _this10 = this;
-
-      this._vars.suggestedItems.every(function (v) {
-        if (v[_this10.key] === key) {
-          v.selected = false;
-          return false;
-        }
-        return true;
-      });
-      return this;
-    }
-  }, {
-    key: '_deselectItems',
-    value: function _deselectItems() {
-      this._vars.suggestedItems.forEach(function (v) {
-        v.selected = false;
-      });
-      return this;
-    }
-  }, {
-    key: '_refreshItemsSelection',
-    value: function _refreshItemsSelection() {
-      this._vars.suggestedItems.forEach(function (v) {
-        if (v.selected && v.el) {
-          v.el.classList.add('selected');
-        } else if (v.el) {
-          v.el.classList.remove('selected');
-        }
-      });
-    }
-  }, {
-    key: '_getSelectedItemIndex',
-    value: function _getSelectedItemIndex() {
-      var index = null;
-      this._vars.suggestedItems.every(function (v, k) {
-        if (v.selected) {
-          index = k;
-          return false;
-        }
-        return true;
-      });
-      return index;
-    }
-  }, {
-    key: '_getFocusedItemIndex',
-    value: function _getFocusedItemIndex() {
-      var last = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-      var index = null;
-      this._vars.setItems.every(function (v, k) {
-        if (v.focused) {
-          index = k;
-          if (!last) {
-            return false;
-          }
-        }
-        return true;
-      });
-      return index;
-    }
-  }, {
-    key: '_getItem',
-    value: function _getItem(val) {
-      var prop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      if (prop === null) prop = this.key;
-      var items = this._filterItems(this._vars.setItems, val, prop);
-      return items.length ? items[0] : null;
-    }
-  }, {
-    key: '_getSuggestedItem',
-    value: function _getSuggestedItem(val) {
-      var prop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      if (prop === null) prop = this.key;
-      var items = this._filterItems(this._vars.suggestedItems, val, prop);
-      return items.length ? items[0] : null;
-    }
-  }, {
-    key: '_getAvailableItem',
-    value: function _getAvailableItem(val) {
-      var prop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      if (prop === null) prop = this.key;
-      var items = this._filterItems(this._options.items, val, prop);
-      return items.length ? items[0] : null;
-    }
-  }, {
-    key: '_filterItems',
-    value: function _filterItems(items, val, prop) {
-      return items.filter(function (v) {
-        if (typeof v[prop] === 'string' && typeof val === 'string') {
-          return v[prop].toLowerCase() == val.toLowerCase();
-        }
-        return v[prop] == val;
-      });
-    }
-  }, {
-    key: '_removeItem',
-    value: function _removeItem(key) {
-      var _this11 = this;
-
-      this._vars.setItems.every(function (item, k) {
-        if (item[_this11.key] === key) {
-          _this11.emit('removeToken', _this11, item);
-          _this11._vars.setItems.splice(k, 1);
-          _this11.emit('removedToken', _this11, item);
-          _this11.emit('change', _this11);
-          return false;
-        }
-        return true;
-      });
-      return this;
-    }
-  }, {
-    key: '_addItem',
-    value: function _addItem(item) {
-      item.focused = false;
-      var o = this._options;
-      // Check if item already exists in a given list.
-      if (item.isNew && !this._getItem(item[o.itemData], o.itemData) || !this._getItem(item[o.itemValue], o.itemValue)) {
-        this.emit('addToken', this, item);
-        if (!this._options.maxItems || this._options.maxItems && this._vars.setItems.length < this._options.maxItems) {
-          item.selected = false;
-          var clonedItem = _extends({}, item);
-          this._vars.setItems.push(clonedItem);
-          this.emit('addedToken', this, clonedItem);
-          this.emit('change', this);
-        }
-      }
-      return this;
-    }
-  }, {
-    key: 'getFocusedItem',
-    value: function getFocusedItem() {
-      var items = this._vars.setItems.filter(function (item) {
-        return item.focused;
-      })[0];
-      if (items.length) return items[0];
-      return null;
-    }
-  }, {
-    key: 'getFocusedItems',
-    value: function getFocusedItems() {
-      return this._vars.setItems.filter(function (item) {
-        return item.focused;
-      });
-    }
-  }, {
-    key: '_focusItem',
-    value: function _focusItem(key) {
-      var shift = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-      var _this12 = this;
-
-      var ctrl = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      var add = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-
-      if (shift) {
-        var first = null;
-        var last = null;
-        var target = null;
-        var length = this._vars.setItems.length;
-        this._vars.setItems.forEach(function (item, k) {
-          if (item[_this12.key] === key) {
-            target = k;
-          }
-          if (first === null && item.focused) {
-            first = k;
-          }
-          if (item.focused) {
-            last = k;
-          }
-        });
-
-        if ((target === 0 || target === length - 1) && first === null && last === null) {
-          return;
-        } else if (first === null && last === null) {
-          this._vars.setItems[target].focused = true;
-        } else if (target === 0 && last === length - 1 && !add) {
-          this._vars.setItems[first].focused = false;
-        } else {
-          first = Math.min(target, first);
-          last = Math.max(target, last);
-          this._vars.setItems.forEach(function (item, k) {
-            item.focused = target === k || k >= first && k <= last;
-          });
-        }
-      } else {
-        this._vars.setItems.forEach(function (item) {
-          if (ctrl) {
-            item.focused = item[_this12.key] === key ? !item.focused : item.focused;
-          } else {
-            item.focused = item[_this12.key] === key;
-          }
-        });
-      }
-      return this;
-    }
-  }, {
-    key: '_defocusItem',
-    value: function _defocusItem(key) {
-      var _this13 = this;
-
-      return this._vars.setItems.filter(function (item) {
-        if (item[_this13.key] === key) {
-          item.focused = false;
-        }
-      });
-    }
-  }, {
-    key: '_defocusItems',
-    value: function _defocusItems() {
-      this._vars.setItems.forEach(function (item) {
-        item.focused = false;
-      });
-      return this;
-    }
-  }, {
-    key: '_newItem',
-    value: function _newItem(value) {
-      if (typeof value === 'string' && !value.length) return null;
-
-      var o = this._options;
-      var item = this._getItem(value, o.itemData) || this._getSuggestedItem(value, o.itemData) || this._getAvailableItem(value, o.itemData);
-
-      if (!item && o.newItems) {
-        var _item;
-
-        item = (_item = {
-          isNew: true
-        }, _defineProperty(_item, this.key, guid()), _defineProperty(_item, o.itemData, value), _item);
-        this.emit('newToken', this, item);
-      }
-
-      if (item) {
-        this._addItem(item);
-        return item;
-      }
-
-      return null;
-    }
-
-    // Wrapper for build function in case some of the functions are overwritten.
-
-  }, {
-    key: '_buildEl',
-    value: function _buildEl(html) {
-      return build(html);
-    }
-  }, {
-    key: '_getBounds',
-    value: function _getBounds() {
-      return this._html.container.getBoundingClientRect();
-    }
-  }, {
-    key: '_renderItems',
-    value: function _renderItems() {
-      var _this14 = this;
-
-      var v = this._vars;
-      var o = this._options;
-      var html = this._html;
-
-      html.items.innerHTML = '';
-      v.setItems.forEach(function (item) {
-        var itemEl = _this14._renderItem(item);
-        html.items.appendChild(itemEl);
-        item.el = itemEl;
-        if (item.focused) {
-          item.el.classList.add('focused');
-        } else {
-          item.el.classList.remove('focused');
-        }
-      });
-
-      if (v.setItems.length > 1 && o.mode === 'tokenfield') {
-        html.input.setAttribute('placeholder', '');
-      }
-
-      if (this._input) {
-        this._input.value = v.setItems.map(function (item) {
-          return item[o.singleInputValue];
-        }).join(o.singleInputDelimiter);
-      }
-
-      return this;
-    }
-  }, {
-    key: '_refreshItems',
-    value: function _refreshItems() {
-      var v = this._vars;
-
-      v.setItems.forEach(function (item) {
-        if (item.el) {
-          if (item.focused) {
-            item.el.classList.add('focused');
-          } else {
-            item.el.classList.remove('focused');
-          }
-        }
-      });
-    }
-  }, {
-    key: '_renderItem',
-    value: function _renderItem(item) {
-      var o = this._options;
-
-      var itemHtml = this.renderSetItemHtml(item);
-      var label = itemHtml.querySelector('.item-label');
-      var input = itemHtml.querySelector('.item-input');
-      var remove = itemHtml.querySelector('.item-remove');
-
-      itemHtml.key = item[this.key];
-      remove.key = item[this.key];
-      input.setAttribute('name', (item.isNew ? o.newItemName : o.itemName) + '[]');
-
-      input.value = item[item.isNew ? o.newItemValue : o.itemValue] || null;
-      label.textContent = this.renderSetItemLabel(item);
-      if (item.focused) {
-        itemHtml.classList.add('focused');
-      }
-
-      return itemHtml;
-    }
-  }, {
-    key: 'onInput',
-    value: function onInput(value, e) {
-      return value;
-    }
-  }, {
-    key: 'renderSetItemHtml',
-    value: function renderSetItemHtml() {
-      return this._buildEl(this._templates.setItem);
-    }
-  }, {
-    key: 'renderSetItemLabel',
-    value: function renderSetItemLabel(item) {
-      return item[this._options.itemLabel];
-    }
-  }, {
-    key: 'renderSuggestions',
-    value: function renderSuggestions(items) {
-      var _this15 = this;
-
-      var v = this._vars;
-      var o = this._options;
-      var html = this._html;
-      var index = this._getSelectedItemIndex();
-
-      if (!items.length) {
-        return this;
-      }
-
-      if (o.maxSuggestWindow === 0) {
-        html.suggest.style.maxHeight = null;
-      }
-
-      if (!v.suggestedItems.length) {
-        return this;
-      }
-
-      if (!o.newItems && index === null) {
-        items[0].selected = true;
-      }
-
-      var maxHeight = 0;
-
-      items.every(function (item, k) {
-        if (k >= o.maxSuggest) return false;
-        var child = html.suggestList.childNodes[k];
-        var el = item.el = _this15.renderSuggestedItem(item);
-
-        if (child) {
-          if (child.itemValue === item[o.itemValue]) {
-            child.key = item[_this15.key];
-            item.el = child;
-          } else {
-            html.suggestList.replaceChild(el, child);
-          }
-        } else if (!child) {
-          html.suggestList.appendChild(el);
-        }
-
-        if (o.maxSuggestWindow > 0 && k < o.maxSuggestWindow) {
-          maxHeight += html.suggestList.childNodes[k].getBoundingClientRect().height;
-        }
-
-        if (o.maxSuggestWindow > 0 && k === o.maxSuggestWindow) {
-          html.suggest.style.maxHeight = maxHeight + 'px';
-        }
-
-        return true;
-      });
-
-      var overflow = html.suggestList.childElementCount - items.length;
-      if (overflow > 0) {
-        for (var i = overflow - 1; i >= 0; i--) {
-          html.suggestList.removeChild(html.suggestList.childNodes[items.length + i]);
-        }
-      }
-
-      return this;
-    }
-  }, {
-    key: 'renderSuggestedItem',
-    value: function renderSuggestedItem(item) {
-      var o = this._options;
-      var el = this._buildEl(this._templates.suggestItem);
-      el.key = item[this.key];
-      el.itemValue = item[o.itemValue];
-      el.innerHTML = item[o.itemData];
-      el.setAttribute('title', item[o.itemData]);
-      if (item.selected) {
-        el.classList.add('selected');
-      }
-      if (!o.filterSetItems) {
-        var setItem = this._getItem(item[o.itemValue], o.itemValue) || this._getItem(item[o.itemData], o.itemData);
-
-        if (setItem) {
-          el.classList.add('set');
-        }
-      }
-      return el;
-    }
-  }, {
-    key: 'showSuggestions',
-    value: function showSuggestions() {
-      if (this._vars.suggestedItems.length) {
-        this.emit('showSuggestions', this);
-        if (!this._options.maxItems || this._options.maxItems && this._vars.setItems.length < this._options.maxItems) {
-          this._html.suggest.style.display = 'block';
-          this._vars.suggested = true;
-          this.renderSuggestions(this._vars.suggestedItems);
-        }
-        this.emit('shownSuggestions', this);
-      } else {
-        this.hideSuggestions();
-      }
-      return this;
-    }
-  }, {
-    key: '_refreshSuggestions',
-    value: function _refreshSuggestions() {
-      var v = this._vars;
-      var o = this._options;
-
-      if (this._html.input.value.length < o.minChars) {
-        this.hideSuggestions();
-        return this;
-      }
-
-      var data = this._prepareData(o.items);
-      var items = this._filterData(this._html.input.value, data);
-      v.suggestedItems = o.filterSetItems ? this._filterSetItems(items) : items;
-
-      if (v.suggestedItems.length) {
-        if (!o.maxItems || o.maxItems && v.setItems.length < o.maxItems) {
-          this.renderSuggestions(v.suggestedItems);
-        } else {
-          this.hideSuggestions();
-        }
-      } else {
-        this.hideSuggestions();
-      }
-
-      return this;
-    }
-  }, {
-    key: 'hideSuggestions',
-    value: function hideSuggestions() {
-      this.emit('hideSuggestions', this);
-      this._vars.suggested = false;
-      this._html.suggest.style.display = 'none';
-      this._html.suggestList.innerHTML = '';
-      this.emit('hiddenSuggestions', this);
-      return this;
-    }
-  }, {
-    key: 'getItems',
-    value: function getItems() {
-      return this._vars.setItems.map(function (item) {
-        return _extends({}, item);
-      });
-    }
-  }, {
-    key: 'setItems',
-    value: function setItems() {
-      var items = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
-      if (!Array.isArray(items)) {
-        items = [items];
-      }
-      this._vars.setItems = this._prepareData(items || []);
-      this._renderItems()._refreshInput().hideSuggestions();
-      this.emit('change', this);
-      return this;
-    }
-  }, {
-    key: 'addItems',
-    value: function addItems() {
-      var items = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
-      var key = this._options.itemValue;
-      if (!Array.isArray(items)) {
-        items = [items];
-      }
-      var idsHash = {};
-      this.getItems().forEach(function (item) {
-        idsHash[item[key]] = true;
-      });
-      items = items.filter(function (item) {
-        return idsHash[item[key]] !== true;
-      });
-      if (!items.length) {
-        return this;
-      }
-
-      var preparedItems = this._prepareData(items);
-      this._vars.setItems = this._vars.setItems.concat(preparedItems);
-      this._renderItems()._refreshInput().hideSuggestions();
-      this.emit('change', this);
-      return this;
-    }
-  }, {
-    key: 'removeItem',
-    value: function removeItem(value) {
-      var o = this._options;
-      if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && (value[o.itemValue] || value[o.newItemValue])) {
-        value = value[o.itemValue] || value[o.newItemValue];
-      }
-
-      var item = this._getItem(value, o.itemValue) || this._getItem(value, o.newItemValue);
-
-      if (!item) {
-        return this;
-      }
-
-      this._removeItem(item[this.key])._renderItems();
-
-      return this;
-    }
-  }, {
-    key: 'emptyItems',
-    value: function emptyItems() {
-      this._vars.setItems = [];
-      this._renderItems()._refreshInput().hideSuggestions();
-      this.emit('change', this);
-      return this;
-    }
-  }, {
-    key: 'getSuggestedItems',
-    value: function getSuggestedItems() {
-      return this._vars.suggestedItems.map(function (item) {
-        return _extends({}, item);
-      });
-    }
-  }, {
-    key: 'focus',
-    value: function focus() {
-      this._html.container.classList.add('focused');
-      if (!this._focused) this._html.input.focus();
-      return this;
-    }
-  }, {
-    key: 'blur',
-    value: function blur() {
-      this._html.container.classList.remove('focused');
-      if (this._focused) this._html.input.blur();
-      return this;
-    }
-  }, {
-    key: 'remove',
-    value: function remove() {
-      var html = this._html;
-
-      html.container.parentElement.insertBefore(this.el, html.container);
-      html.container.remove();
-      this.el.style.display = 'block';
-
-      if (Object.keys(_tokenfields).length === 1) {
-        document.removeEventListener('mousedown', this._vars.events.onMouseDown);
-        window.removeEventListener('resize', this._vars.events.onResize);
-      }
-
-      if (this._form && this._form.nodeName) {
-        this._form.removeEventListener('reset', this._vars.events.onReset);
-      }
-
-      delete _tokenfields[this.id];
-      delete this.el.tokenfield;
-    }
-  }]);
-
-  return Tokenfield;
-}(_events2.default);
-
-exports.default = Tokenfield;
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports) {
 
-module.exports = __webpack_require__(44);
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = ajax;
-/**
- * Simple AJAX handling module.
- * tokenfield 0.9.8 <https://github.com/KaneCohen/tokenfield>
- * Copyright 2016 Kane Cohen <https://github.com/KaneCohen>
- * Available under BSD-3-Clause license
- */
-function ajax(params) {
-  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-
-  var xhr = new XMLHttpRequest();
-  var url = options.url;
-  var paramsArr = [];
-  for (var key in params) {
-    paramsArr.push(key + '=' + params[key]);
-  }
-
-  var paramsString = paramsArr.join('&');
-
-  if (options.type.toLowerCase() === 'get') {
-    url += '?' + paramsString;
-  }
-
-  xhr.open(options.type, url, true);
-
-  for (var header in options.headers) {
-    var value = options.headers[header];
-    if (typeof value === 'function') {
-      value = value(params, options);
-    }
-    xhr.setRequestHeader(header, value);
-  }
-
-  if (callback) {
-    xhr.onreadystatechange = callback;
-  }
-
-  xhr.send(params);
-
-  return xhr;
-}
-
-/***/ })
-/******/ ]);
++function(a){"use strict";function b(a,b){if(!(a instanceof b))throw new TypeError("Cannot call a class as a function")}var c=function(){function a(a,b){for(var c=0;c<b.length;c++){var d=b[c];d.enumerable=d.enumerable||!1,d.configurable=!0,"value"in d&&(d.writable=!0),Object.defineProperty(a,d.key,d)}}return function(b,c,d){return c&&a(b.prototype,c),d&&a(b,d),b}}();(function(a){var d="ekkoLightbox",e=a.fn[d],f={title:"",footer:"",maxWidth:9999,maxHeight:9999,showArrows:!0,wrapping:!0,type:null,alwaysShowClose:!1,loadingMessage:'<div class="ekko-lightbox-loader"><div><div></div><div></div></div></div>',leftArrow:"<span>&#10094;</span>",rightArrow:"<span>&#10095;</span>",strings:{close:"Close",fail:"Failed to load image:",type:"Could not detect remote target type. Force the type using data-type"},doc:document,onShow:function(){},onShown:function(){},onHide:function(){},onHidden:function(){},onNavigate:function(){},onContentLoaded:function(){}},g=function(){function d(c,e){var g=this;b(this,d),this._config=a.extend({},f,e),this._$modalArrows=null,this._galleryIndex=0,this._galleryName=null,this._padding=null,this._border=null,this._titleIsShown=!1,this._footerIsShown=!1,this._wantedWidth=0,this._wantedHeight=0,this._touchstartX=0,this._touchendX=0,this._modalId="ekkoLightbox-"+Math.floor(1e3*Math.random()+1),this._$element=c instanceof jQuery?c:a(c),this._isBootstrap3=3==a.fn.modal.Constructor.VERSION[0];var h='<h4 class="modal-title">'+(this._config.title||"&nbsp;")+"</h4>",i='<button type="button" class="close" data-dismiss="modal" aria-label="'+this._config.strings.close+'"><span aria-hidden="true">&times;</span></button>',j='<div class="modal-header'+(this._config.title||this._config.alwaysShowClose?"":" hide")+'">'+(this._isBootstrap3?i+h:h+i)+"</div>",k='<div class="modal-footer'+(this._config.footer?"":" hide")+'">'+(this._config.footer||"&nbsp;")+"</div>",l='<div class="modal-body"><div class="ekko-lightbox-container"><div class="ekko-lightbox-item fade in show"></div><div class="ekko-lightbox-item fade"></div></div></div>',m='<div class="modal-dialog" role="document"><div class="modal-content">'+j+l+k+"</div></div>";a(this._config.doc.body).append('<div id="'+this._modalId+'" class="ekko-lightbox modal fade" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">'+m+"</div>"),this._$modal=a("#"+this._modalId,this._config.doc),this._$modalDialog=this._$modal.find(".modal-dialog").first(),this._$modalContent=this._$modal.find(".modal-content").first(),this._$modalBody=this._$modal.find(".modal-body").first(),this._$modalHeader=this._$modal.find(".modal-header").first(),this._$modalFooter=this._$modal.find(".modal-footer").first(),this._$lightboxContainer=this._$modalBody.find(".ekko-lightbox-container").first(),this._$lightboxBodyOne=this._$lightboxContainer.find("> div:first-child").first(),this._$lightboxBodyTwo=this._$lightboxContainer.find("> div:last-child").first(),this._border=this._calculateBorders(),this._padding=this._calculatePadding(),this._galleryName=this._$element.data("gallery"),this._galleryName&&(this._$galleryItems=a(document.body).find('*[data-gallery="'+this._galleryName+'"]'),this._galleryIndex=this._$galleryItems.index(this._$element),a(document).on("keydown.ekkoLightbox",this._navigationalBinder.bind(this)),this._config.showArrows&&this._$galleryItems.length>1&&(this._$lightboxContainer.append('<div class="ekko-lightbox-nav-overlay"><a href="#">'+this._config.leftArrow+'</a><a href="#">'+this._config.rightArrow+"</a></div>"),this._$modalArrows=this._$lightboxContainer.find("div.ekko-lightbox-nav-overlay").first(),this._$lightboxContainer.on("click","a:first-child",function(a){return a.preventDefault(),g.navigateLeft()}),this._$lightboxContainer.on("click","a:last-child",function(a){return a.preventDefault(),g.navigateRight()}),this.updateNavigation())),this._$modal.on("show.bs.modal",this._config.onShow.bind(this)).on("shown.bs.modal",function(){return g._toggleLoading(!0),g._handle(),g._config.onShown.call(g)}).on("hide.bs.modal",this._config.onHide.bind(this)).on("hidden.bs.modal",function(){return g._galleryName&&(a(document).off("keydown.ekkoLightbox"),a(window).off("resize.ekkoLightbox")),g._$modal.remove(),g._config.onHidden.call(g)}).modal(this._config),a(window).on("resize.ekkoLightbox",function(){g._resize(g._wantedWidth,g._wantedHeight)}),this._$lightboxContainer.on("touchstart",function(){g._touchstartX=event.changedTouches[0].screenX}).on("touchend",function(){g._touchendX=event.changedTouches[0].screenX,g._swipeGesure()})}return c(d,null,[{key:"Default",get:function(){return f}}]),c(d,[{key:"element",value:function(){return this._$element}},{key:"modal",value:function(){return this._$modal}},{key:"navigateTo",value:function(b){return b<0||b>this._$galleryItems.length-1?this:(this._galleryIndex=b,this.updateNavigation(),this._$element=a(this._$galleryItems.get(this._galleryIndex)),void this._handle())}},{key:"navigateLeft",value:function(){if(this._$galleryItems&&1!==this._$galleryItems.length){if(0===this._galleryIndex){if(!this._config.wrapping)return;this._galleryIndex=this._$galleryItems.length-1}else this._galleryIndex--;return this._config.onNavigate.call(this,"left",this._galleryIndex),this.navigateTo(this._galleryIndex)}}},{key:"navigateRight",value:function(){if(this._$galleryItems&&1!==this._$galleryItems.length){if(this._galleryIndex===this._$galleryItems.length-1){if(!this._config.wrapping)return;this._galleryIndex=0}else this._galleryIndex++;return this._config.onNavigate.call(this,"right",this._galleryIndex),this.navigateTo(this._galleryIndex)}}},{key:"updateNavigation",value:function(){if(!this._config.wrapping){var a=this._$lightboxContainer.find("div.ekko-lightbox-nav-overlay");0===this._galleryIndex?a.find("a:first-child").addClass("disabled"):a.find("a:first-child").removeClass("disabled"),this._galleryIndex===this._$galleryItems.length-1?a.find("a:last-child").addClass("disabled"):a.find("a:last-child").removeClass("disabled")}}},{key:"close",value:function(){return this._$modal.modal("hide")}},{key:"_navigationalBinder",value:function(a){return a=a||window.event,39===a.keyCode?this.navigateRight():37===a.keyCode?this.navigateLeft():void 0}},{key:"_detectRemoteType",value:function(a,b){return b=b||!1,!b&&this._isImage(a)&&(b="image"),!b&&this._getYoutubeId(a)&&(b="youtube"),!b&&this._getVimeoId(a)&&(b="vimeo"),!b&&this._getInstagramId(a)&&(b="instagram"),(!b||["image","youtube","vimeo","instagram","video","url"].indexOf(b)<0)&&(b="url"),b}},{key:"_isImage",value:function(a){return a&&a.match(/(^data:image\/.*,)|(\.(jp(e|g|eg)|gif|png|bmp|webp|svg)((\?|#).*)?$)/i)}},{key:"_containerToUse",value:function(){var a=this,b=this._$lightboxBodyTwo,c=this._$lightboxBodyOne;return this._$lightboxBodyTwo.hasClass("in")&&(b=this._$lightboxBodyOne,c=this._$lightboxBodyTwo),c.removeClass("in show"),setTimeout(function(){a._$lightboxBodyTwo.hasClass("in")||a._$lightboxBodyTwo.empty(),a._$lightboxBodyOne.hasClass("in")||a._$lightboxBodyOne.empty()},500),b.addClass("in show"),b}},{key:"_handle",value:function(){var a=this._containerToUse();this._updateTitleAndFooter();var b=this._$element.attr("data-remote")||this._$element.attr("href"),c=this._detectRemoteType(b,this._$element.attr("data-type")||!1);if(["image","youtube","vimeo","instagram","video","url"].indexOf(c)<0)return this._error(this._config.strings.type);switch(c){case"image":this._preloadImage(b,a),this._preloadImageByIndex(this._galleryIndex,3);break;case"youtube":this._showYoutubeVideo(b,a);break;case"vimeo":this._showVimeoVideo(this._getVimeoId(b),a);break;case"instagram":this._showInstagramVideo(this._getInstagramId(b),a);break;case"video":this._showHtml5Video(b,a);break;default:this._loadRemoteContent(b,a)}return this}},{key:"_getYoutubeId",value:function(a){if(!a)return!1;var b=a.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);return!(!b||11!==b[2].length)&&b[2]}},{key:"_getVimeoId",value:function(a){return!!(a&&a.indexOf("vimeo")>0)&&a}},{key:"_getInstagramId",value:function(a){return!!(a&&a.indexOf("instagram")>0)&&a}},{key:"_toggleLoading",value:function(b){return b=b||!1,b?(this._$modalDialog.css("display","none"),this._$modal.removeClass("in show"),a(".modal-backdrop").append(this._config.loadingMessage)):(this._$modalDialog.css("display","block"),this._$modal.addClass("in show"),a(".modal-backdrop").find(".ekko-lightbox-loader").remove()),this}},{key:"_calculateBorders",value:function(){return{top:this._totalCssByAttribute("border-top-width"),right:this._totalCssByAttribute("border-right-width"),bottom:this._totalCssByAttribute("border-bottom-width"),left:this._totalCssByAttribute("border-left-width")}}},{key:"_calculatePadding",value:function(){return{top:this._totalCssByAttribute("padding-top"),right:this._totalCssByAttribute("padding-right"),bottom:this._totalCssByAttribute("padding-bottom"),left:this._totalCssByAttribute("padding-left")}}},{key:"_totalCssByAttribute",value:function(a){return parseInt(this._$modalDialog.css(a),10)+parseInt(this._$modalContent.css(a),10)+parseInt(this._$modalBody.css(a),10)}},{key:"_updateTitleAndFooter",value:function(){var a=this._$element.data("title")||"",b=this._$element.data("footer")||"";return this._titleIsShown=!1,a||this._config.alwaysShowClose?(this._titleIsShown=!0,this._$modalHeader.css("display","").find(".modal-title").html(a||"&nbsp;")):this._$modalHeader.css("display","none"),this._footerIsShown=!1,b?(this._footerIsShown=!0,this._$modalFooter.css("display","").html(b)):this._$modalFooter.css("display","none"),this}},{key:"_showYoutubeVideo",value:function(a,b){var c=this._getYoutubeId(a),d=a.indexOf("&")>0?a.substr(a.indexOf("&")):"",e=this._$element.data("width")||560,f=this._$element.data("height")||e/(560/315);return this._showVideoIframe("//www.youtube.com/embed/"+c+"?badge=0&autoplay=1&html5=1"+d,e,f,b)}},{key:"_showVimeoVideo",value:function(a,b){var c=this._$element.data("width")||500,d=this._$element.data("height")||c/(560/315);return this._showVideoIframe(a+"?autoplay=1",c,d,b)}},{key:"_showInstagramVideo",value:function(a,b){var c=this._$element.data("width")||612,d=c+80;return a="/"!==a.substr(-1)?a+"/":a,b.html('<iframe width="'+c+'" height="'+d+'" src="'+a+'embed/" frameborder="0" allowfullscreen></iframe>'),this._resize(c,d),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_showVideoIframe",value:function(a,b,c,d){return c=c||b,d.html('<div class="embed-responsive embed-responsive-16by9"><iframe width="'+b+'" height="'+c+'" src="'+a+'" frameborder="0" allowfullscreen class="embed-responsive-item"></iframe></div>'),this._resize(b,c),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_showHtml5Video",value:function(a,b){var c=this._$element.data("width")||560,d=this._$element.data("height")||c/(560/315);return b.html('<div class="embed-responsive embed-responsive-16by9"><video width="'+c+'" height="'+d+'" src="'+a+'" preload="auto" autoplay controls class="embed-responsive-item"></video></div>'),this._resize(c,d),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_loadRemoteContent",value:function(b,c){var d=this,e=this._$element.data("width")||560,f=this._$element.data("height")||560,g=this._$element.data("disableExternalCheck")||!1;return this._toggleLoading(!1),g||this._isExternal(b)?(c.html('<iframe src="'+b+'" frameborder="0" allowfullscreen></iframe>'),this._config.onContentLoaded.call(this)):c.load(b,a.proxy(function(){return d._$element.trigger("loaded.bs.modal")})),this._$modalArrows&&this._$modalArrows.css("display","none"),this._resize(e,f),this}},{key:"_isExternal",value:function(a){var b=a.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);return"string"==typeof b[1]&&b[1].length>0&&b[1].toLowerCase()!==location.protocol||"string"==typeof b[2]&&b[2].length>0&&b[2].replace(new RegExp(":("+{"http:":80,"https:":443}[location.protocol]+")?$"),"")!==location.host}},{key:"_error",value:function(a){return console.error(a),this._containerToUse().html(a),this._resize(300,300),this}},{key:"_preloadImageByIndex",value:function(b,c){if(this._$galleryItems){var d=a(this._$galleryItems.get(b),!1);if("undefined"!=typeof d){var e=d.attr("data-remote")||d.attr("href");return("image"===d.attr("data-type")||this._isImage(e))&&this._preloadImage(e,!1),c>0?this._preloadImageByIndex(b+1,c-1):void 0}}}},{key:"_preloadImage",value:function(b,c){var d=this;c=c||!1;var e=new Image;return c&&!function(){var f=setTimeout(function(){c.append(d._config.loadingMessage)},200);e.onload=function(){f&&clearTimeout(f),f=null;var b=a("<img />");return b.attr("src",e.src),b.addClass("img-fluid"),b.css("width","100%"),c.html(b),d._$modalArrows&&d._$modalArrows.css("display",""),d._resize(e.width,e.height),d._toggleLoading(!1),d._config.onContentLoaded.call(d)},e.onerror=function(){return d._toggleLoading(!1),d._error(d._config.strings.fail+("  "+b))}}(),e.src=b,e}},{key:"_swipeGesure",value:function(){return this._touchendX<this._touchstartX?this.navigateRight():this._touchendX>this._touchstartX?this.navigateLeft():void 0}},{key:"_resize",value:function(b,c){c=c||b,this._wantedWidth=b,this._wantedHeight=c;var d=b/c,e=this._padding.left+this._padding.right+this._border.left+this._border.right,f=this._config.doc.body.clientWidth>575?20:0,g=this._config.doc.body.clientWidth>575?0:20,h=Math.min(b+e,this._config.doc.body.clientWidth-f,this._config.maxWidth);b+e>h?(c=(h-e-g)/d,b=h):b+=e;var i=0,j=0;this._footerIsShown&&(j=this._$modalFooter.outerHeight(!0)||55),this._titleIsShown&&(i=this._$modalHeader.outerHeight(!0)||67);var k=this._padding.top+this._padding.bottom+this._border.bottom+this._border.top,l=parseFloat(this._$modalDialog.css("margin-top"))+parseFloat(this._$modalDialog.css("margin-bottom")),m=Math.min(c,a(window).height()-k-l-i-j,this._config.maxHeight-k-i-j);c>m&&(b=Math.ceil(m*d)+e),this._$lightboxContainer.css("height",m),this._$modalDialog.css("flex",1).css("maxWidth",b);var n=this._$modal.data("bs.modal");if(n)try{n._handleUpdate()}catch(o){n.handleUpdate()}return this}}],[{key:"_jQueryInterface",value:function(b){var c=this;return b=b||{},this.each(function(){var e=a(c),f=a.extend({},d.Default,e.data(),"object"==typeof b&&b);new d(c,f)})}}]),d}();return a.fn[d]=g._jQueryInterface,a.fn[d].Constructor=g,a.fn[d].noConflict=function(){return a.fn[d]=e,g._jQueryInterface},g})(jQuery)}(jQuery);
+//# sourceMappingURL=ekko-lightbox.min.js.map
 
 /***/ }),
 /* 44 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
+"use strict";
+/* WEBPACK VAR INJECTION */(function(module) {
 
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
+/*
+ *
+ * More info at [www.dropzonejs.com](http://www.dropzonejs.com)
+ *
+ * Copyright (c) 2012, Matias Meno
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
 
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
+// The Emitter class provides the ability to call `.on()` on Dropzone to listen
+// to events.
+// It is strongly based on component's emitter class, and I removed the
+// functionality because of the dependency hell with different frameworks.
+var Emitter = function () {
+  function Emitter() {
+    _classCallCheck(this, Emitter);
+  }
 
-  if (!this._events)
-    this._events = {};
+  _createClass(Emitter, [{
+    key: "on",
 
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      } else {
-        // At least give some kind of context to the user
-        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-        err.context = er;
-        throw err;
+    // Add an event listener for given event
+    value: function on(event, fn) {
+      this._callbacks = this._callbacks || {};
+      // Create namespace for this event
+      if (!this._callbacks[event]) {
+        this._callbacks[event] = [];
       }
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        args = Array.prototype.slice.call(arguments, 1);
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    args = Array.prototype.slice.call(arguments, 1);
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
+      this._callbacks[event].push(fn);
       return this;
+    }
+  }, {
+    key: "emit",
+    value: function emit(event) {
+      this._callbacks = this._callbacks || {};
+      var callbacks = this._callbacks[event];
 
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
+      if (callbacks) {
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        for (var _iterator = callbacks, _isArray = true, _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+          var _ref;
+
+          if (_isArray) {
+            if (_i >= _iterator.length) break;
+            _ref = _iterator[_i++];
+          } else {
+            _i = _iterator.next();
+            if (_i.done) break;
+            _ref = _i.value;
+          }
+
+          var callback = _ref;
+
+          callback.apply(this, args);
+        }
+      }
+
+      return this;
+    }
+
+    // Remove event listener for given event. If fn is not provided, all event
+    // listeners for that event will be removed. If neither is provided, all
+    // event listeners will be removed.
+
+  }, {
+    key: "off",
+    value: function off(event, fn) {
+      if (!this._callbacks || arguments.length === 0) {
+        this._callbacks = {};
+        return this;
+      }
+
+      // specific event
+      var callbacks = this._callbacks[event];
+      if (!callbacks) {
+        return this;
+      }
+
+      // remove all handlers
+      if (arguments.length === 1) {
+        delete this._callbacks[event];
+        return this;
+      }
+
+      // remove specific handler
+      for (var i = 0; i < callbacks.length; i++) {
+        var callback = callbacks[i];
+        if (callback === fn) {
+          callbacks.splice(i, 1);
+          break;
+        }
+      }
+
+      return this;
+    }
+  }]);
+
+  return Emitter;
+}();
+
+var Dropzone = function (_Emitter) {
+  _inherits(Dropzone, _Emitter);
+
+  _createClass(Dropzone, null, [{
+    key: "initClass",
+    value: function initClass() {
+
+      // Exposing the emitter class, mainly for tests
+      this.prototype.Emitter = Emitter;
+
+      /*
+       This is a list of all available events you can register on a dropzone object.
+        You can register an event handler like this:
+        dropzone.on("dragEnter", function() { });
+        */
+      this.prototype.events = ["drop", "dragstart", "dragend", "dragenter", "dragover", "dragleave", "addedfile", "addedfiles", "removedfile", "thumbnail", "error", "errormultiple", "processing", "processingmultiple", "uploadprogress", "totaluploadprogress", "sending", "sendingmultiple", "success", "successmultiple", "canceled", "canceledmultiple", "complete", "completemultiple", "reset", "maxfilesexceeded", "maxfilesreached", "queuecomplete"];
+
+      this.prototype.defaultOptions = {
+        /**
+         * Has to be specified on elements other than form (or when the form
+         * doesn't have an `action` attribute). You can also
+         * provide a function that will be called with `files` and
+         * must return the url (since `v3.12.0`)
+         */
+        url: null,
+
+        /**
+         * Can be changed to `"put"` if necessary. You can also provide a function
+         * that will be called with `files` and must return the method (since `v3.12.0`).
+         */
+        method: "post",
+
+        /**
+         * Will be set on the XHRequest.
+         */
+        withCredentials: false,
+
+        /**
+         * The timeout for the XHR requests in milliseconds (since `v4.4.0`).
+         */
+        timeout: 30000,
+
+        /**
+         * How many file uploads to process in parallel (See the
+         * Enqueuing file uploads* documentation section for more info)
+         */
+        parallelUploads: 2,
+
+        /**
+         * Whether to send multiple files in one request. If
+         * this it set to true, then the fallback file input element will
+         * have the `multiple` attribute as well. This option will
+         * also trigger additional events (like `processingmultiple`). See the events
+         * documentation section for more information.
+         */
+        uploadMultiple: false,
+
+        /**
+         * Whether you want files to be uploaded in chunks to your server. This can't be
+         * used in combination with `uploadMultiple`.
+         *
+         * See [chunksUploaded](#config-chunksUploaded) for the callback to finalise an upload.
+         */
+        chunking: false,
+
+        /**
+         * If `chunking` is enabled, this defines whether **every** file should be chunked,
+         * even if the file size is below chunkSize. This means, that the additional chunk
+         * form data will be submitted and the `chunksUploaded` callback will be invoked.
+         */
+        forceChunking: false,
+
+        /**
+         * If `chunking` is `true`, then this defines the chunk size in bytes.
+         */
+        chunkSize: 2000000,
+
+        /**
+         * If `true`, the individual chunks of a file are being uploaded simultaneously.
+         */
+        parallelChunkUploads: false,
+
+        /**
+         * Whether a chunk should be retried if it fails.
+         */
+        retryChunks: false,
+
+        /**
+         * If `retryChunks` is true, how many times should it be retried.
+         */
+        retryChunksLimit: 3,
+
+        /**
+         * If not `null` defines how many files this Dropzone handles. If it exceeds,
+         * the event `maxfilesexceeded` will be called. The dropzone element gets the
+         * class `dz-max-files-reached` accordingly so you can provide visual feedback.
+         */
+        maxFilesize: 256,
+
+        /**
+         * The name of the file param that gets transferred.
+         * **NOTE**: If you have the option  `uploadMultiple` set to `true`, then
+         * Dropzone will append `[]` to the name.
+         */
+        paramName: "file",
+
+        /**
+         * Whether thumbnails for images should be generated
+         */
+        createImageThumbnails: true,
+
+        /**
+         * In MB. When the filename exceeds this limit, the thumbnail will not be generated.
+         */
+        maxThumbnailFilesize: 10,
+
+        /**
+         * If `null`, the ratio of the image will be used to calculate it.
+         */
+        thumbnailWidth: 120,
+
+        /**
+         * The same as `thumbnailWidth`. If both are null, images will not be resized.
+         */
+        thumbnailHeight: 120,
+
+        /**
+         * How the images should be scaled down in case both, `thumbnailWidth` and `thumbnailHeight` are provided.
+         * Can be either `contain` or `crop`.
+         */
+        thumbnailMethod: 'crop',
+
+        /**
+         * If set, images will be resized to these dimensions before being **uploaded**.
+         * If only one, `resizeWidth` **or** `resizeHeight` is provided, the original aspect
+         * ratio of the file will be preserved.
+         *
+         * The `options.transformFile` function uses these options, so if the `transformFile` function
+         * is overridden, these options don't do anything.
+         */
+        resizeWidth: null,
+
+        /**
+         * See `resizeWidth`.
+         */
+        resizeHeight: null,
+
+        /**
+         * The mime type of the resized image (before it gets uploaded to the server).
+         * If `null` the original mime type will be used. To force jpeg, for example, use `image/jpeg`.
+         * See `resizeWidth` for more information.
+         */
+        resizeMimeType: null,
+
+        /**
+         * The quality of the resized images. See `resizeWidth`.
+         */
+        resizeQuality: 0.8,
+
+        /**
+         * How the images should be scaled down in case both, `resizeWidth` and `resizeHeight` are provided.
+         * Can be either `contain` or `crop`.
+         */
+        resizeMethod: 'contain',
+
+        /**
+         * The base that is used to calculate the filesize. You can change this to
+         * 1024 if you would rather display kibibytes, mebibytes, etc...
+         * 1024 is technically incorrect, because `1024 bytes` are `1 kibibyte` not `1 kilobyte`.
+         * You can change this to `1024` if you don't care about validity.
+         */
+        filesizeBase: 1000,
+
+        /**
+         * Can be used to limit the maximum number of files that will be handled by this Dropzone
+         */
+        maxFiles: null,
+
+        /**
+         * An optional object to send additional headers to the server. Eg:
+         * `{ "My-Awesome-Header": "header value" }`
+         */
+        headers: null,
+
+        /**
+         * If `true`, the dropzone element itself will be clickable, if `false`
+         * nothing will be clickable.
+         *
+         * You can also pass an HTML element, a CSS selector (for multiple elements)
+         * or an array of those. In that case, all of those elements will trigger an
+         * upload when clicked.
+         */
+        clickable: true,
+
+        /**
+         * Whether hidden files in directories should be ignored.
+         */
+        ignoreHiddenFiles: true,
+
+        /**
+         * The default implementation of `accept` checks the file's mime type or
+         * extension against this list. This is a comma separated list of mime
+         * types or file extensions.
+         *
+         * Eg.: `image/*,application/pdf,.psd`
+         *
+         * If the Dropzone is `clickable` this option will also be used as
+         * [`accept`](https://developer.mozilla.org/en-US/docs/HTML/Element/input#attr-accept)
+         * parameter on the hidden file input as well.
+         */
+        acceptedFiles: null,
+
+        /**
+         * **Deprecated!**
+         * Use acceptedFiles instead.
+         */
+        acceptedMimeTypes: null,
+
+        /**
+         * If false, files will be added to the queue but the queue will not be
+         * processed automatically.
+         * This can be useful if you need some additional user input before sending
+         * files (or if you want want all files sent at once).
+         * If you're ready to send the file simply call `myDropzone.processQueue()`.
+         *
+         * See the [enqueuing file uploads](#enqueuing-file-uploads) documentation
+         * section for more information.
+         */
+        autoProcessQueue: true,
+
+        /**
+         * If false, files added to the dropzone will not be queued by default.
+         * You'll have to call `enqueueFile(file)` manually.
+         */
+        autoQueue: true,
+
+        /**
+         * If `true`, this will add a link to every file preview to remove or cancel (if
+         * already uploading) the file. The `dictCancelUpload`, `dictCancelUploadConfirmation`
+         * and `dictRemoveFile` options are used for the wording.
+         */
+        addRemoveLinks: false,
+
+        /**
+         * Defines where to display the file previews – if `null` the
+         * Dropzone element itself is used. Can be a plain `HTMLElement` or a CSS
+         * selector. The element should have the `dropzone-previews` class so
+         * the previews are displayed properly.
+         */
+        previewsContainer: null,
+
+        /**
+         * This is the element the hidden input field (which is used when clicking on the
+         * dropzone to trigger file selection) will be appended to. This might
+         * be important in case you use frameworks to switch the content of your page.
+         */
+        hiddenInputContainer: "body",
+
+        /**
+         * If null, no capture type will be specified
+         * If camera, mobile devices will skip the file selection and choose camera
+         * If microphone, mobile devices will skip the file selection and choose the microphone
+         * If camcorder, mobile devices will skip the file selection and choose the camera in video mode
+         * On apple devices multiple must be set to false.  AcceptedFiles may need to
+         * be set to an appropriate mime type (e.g. "image/*", "audio/*", or "video/*").
+         */
+        capture: null,
+
+        /**
+         * **Deprecated**. Use `renameFile` instead.
+         */
+        renameFilename: null,
+
+        /**
+         * A function that is invoked before the file is uploaded to the server and renames the file.
+         * This function gets the `File` as argument and can use the `file.name`. The actual name of the
+         * file that gets used during the upload can be accessed through `file.upload.filename`.
+         */
+        renameFile: null,
+
+        /**
+         * If `true` the fallback will be forced. This is very useful to test your server
+         * implementations first and make sure that everything works as
+         * expected without dropzone if you experience problems, and to test
+         * how your fallbacks will look.
+         */
+        forceFallback: false,
+
+        /**
+         * The text used before any files are dropped.
+         */
+        dictDefaultMessage: "Drop files here to upload",
+
+        /**
+         * The text that replaces the default message text it the browser is not supported.
+         */
+        dictFallbackMessage: "Your browser does not support drag'n'drop file uploads.",
+
+        /**
+         * The text that will be added before the fallback form.
+         * If you provide a  fallback element yourself, or if this option is `null` this will
+         * be ignored.
+         */
+        dictFallbackText: "Please use the fallback form below to upload your files like in the olden days.",
+
+        /**
+         * If the filesize is too big.
+         * `{{filesize}}` and `{{maxFilesize}}` will be replaced with the respective configuration values.
+         */
+        dictFileTooBig: "File is too big ({{filesize}}MiB). Max filesize: {{maxFilesize}}MiB.",
+
+        /**
+         * If the file doesn't match the file type.
+         */
+        dictInvalidFileType: "You can't upload files of this type.",
+
+        /**
+         * If the server response was invalid.
+         * `{{statusCode}}` will be replaced with the servers status code.
+         */
+        dictResponseError: "Server responded with {{statusCode}} code.",
+
+        /**
+         * If `addRemoveLinks` is true, the text to be used for the cancel upload link.
+         */
+        dictCancelUpload: "Cancel upload",
+
+        /**
+         * The text that is displayed if an upload was manually canceled
+         */
+        dictUploadCanceled: "Upload canceled.",
+
+        /**
+         * If `addRemoveLinks` is true, the text to be used for confirmation when cancelling upload.
+         */
+        dictCancelUploadConfirmation: "Are you sure you want to cancel this upload?",
+
+        /**
+         * If `addRemoveLinks` is true, the text to be used to remove a file.
+         */
+        dictRemoveFile: "Remove file",
+
+        /**
+         * If this is not null, then the user will be prompted before removing a file.
+         */
+        dictRemoveFileConfirmation: null,
+
+        /**
+         * Displayed if `maxFiles` is st and exceeded.
+         * The string `{{maxFiles}}` will be replaced by the configuration value.
+         */
+        dictMaxFilesExceeded: "You can not upload any more files.",
+
+        /**
+         * Allows you to translate the different units. Starting with `tb` for terabytes and going down to
+         * `b` for bytes.
+         */
+        dictFileSizeUnits: { tb: "TB", gb: "GB", mb: "MB", kb: "KB", b: "b" },
+        /**
+         * Called when dropzone initialized
+         * You can add event listeners here
+         */
+        init: function init() {},
+
+
+        /**
+         * Can be an **object** of additional parameters to transfer to the server, **or** a `Function`
+         * that gets invoked with the `files`, `xhr` and, if it's a chunked upload, `chunk` arguments. In case
+         * of a function, this needs to return a map.
+         *
+         * The default implementation does nothing for normal uploads, but adds relevant information for
+         * chunked uploads.
+         *
+         * This is the same as adding hidden input fields in the form element.
+         */
+        params: function params(files, xhr, chunk) {
+          if (chunk) {
+            return {
+              dzuuid: chunk.file.upload.uuid,
+              dzchunkindex: chunk.index,
+              dztotalfilesize: chunk.file.size,
+              dzchunksize: this.options.chunkSize,
+              dztotalchunkcount: chunk.file.upload.totalChunkCount,
+              dzchunkbyteoffset: chunk.index * this.options.chunkSize
+            };
+          }
+        },
+
+
+        /**
+         * A function that gets a [file](https://developer.mozilla.org/en-US/docs/DOM/File)
+         * and a `done` function as parameters.
+         *
+         * If the done function is invoked without arguments, the file is "accepted" and will
+         * be processed. If you pass an error message, the file is rejected, and the error
+         * message will be displayed.
+         * This function will not be called if the file is too big or doesn't match the mime types.
+         */
+        accept: function accept(file, done) {
+          return done();
+        },
+
+
+        /**
+         * The callback that will be invoked when all chunks have been uploaded for a file.
+         * It gets the file for which the chunks have been uploaded as the first parameter,
+         * and the `done` function as second. `done()` needs to be invoked when everything
+         * needed to finish the upload process is done.
+         */
+        chunksUploaded: function chunksUploaded(file, done) {
+          done();
+        },
+
+        /**
+         * Gets called when the browser is not supported.
+         * The default implementation shows the fallback input field and adds
+         * a text.
+         */
+        fallback: function fallback() {
+          // This code should pass in IE7... :(
+          var messageElement = void 0;
+          this.element.className = this.element.className + " dz-browser-not-supported";
+
+          for (var _iterator2 = this.element.getElementsByTagName("div"), _isArray2 = true, _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+            var _ref2;
+
+            if (_isArray2) {
+              if (_i2 >= _iterator2.length) break;
+              _ref2 = _iterator2[_i2++];
+            } else {
+              _i2 = _iterator2.next();
+              if (_i2.done) break;
+              _ref2 = _i2.value;
+            }
+
+            var child = _ref2;
+
+            if (/(^| )dz-message($| )/.test(child.className)) {
+              messageElement = child;
+              child.className = "dz-message"; // Removes the 'dz-default' class
+              break;
+            }
+          }
+          if (!messageElement) {
+            messageElement = Dropzone.createElement("<div class=\"dz-message\"><span></span></div>");
+            this.element.appendChild(messageElement);
+          }
+
+          var span = messageElement.getElementsByTagName("span")[0];
+          if (span) {
+            if (span.textContent != null) {
+              span.textContent = this.options.dictFallbackMessage;
+            } else if (span.innerText != null) {
+              span.innerText = this.options.dictFallbackMessage;
+            }
+          }
+
+          return this.element.appendChild(this.getFallbackForm());
+        },
+
+
+        /**
+         * Gets called to calculate the thumbnail dimensions.
+         *
+         * It gets `file`, `width` and `height` (both may be `null`) as parameters and must return an object containing:
+         *
+         *  - `srcWidth` & `srcHeight` (required)
+         *  - `trgWidth` & `trgHeight` (required)
+         *  - `srcX` & `srcY` (optional, default `0`)
+         *  - `trgX` & `trgY` (optional, default `0`)
+         *
+         * Those values are going to be used by `ctx.drawImage()`.
+         */
+        resize: function resize(file, width, height, resizeMethod) {
+          var info = {
+            srcX: 0,
+            srcY: 0,
+            srcWidth: file.width,
+            srcHeight: file.height
+          };
+
+          var srcRatio = file.width / file.height;
+
+          // Automatically calculate dimensions if not specified
+          if (width == null && height == null) {
+            width = info.srcWidth;
+            height = info.srcHeight;
+          } else if (width == null) {
+            width = height * srcRatio;
+          } else if (height == null) {
+            height = width / srcRatio;
+          }
+
+          // Make sure images aren't upscaled
+          width = Math.min(width, info.srcWidth);
+          height = Math.min(height, info.srcHeight);
+
+          var trgRatio = width / height;
+
+          if (info.srcWidth > width || info.srcHeight > height) {
+            // Image is bigger and needs rescaling
+            if (resizeMethod === 'crop') {
+              if (srcRatio > trgRatio) {
+                info.srcHeight = file.height;
+                info.srcWidth = info.srcHeight * trgRatio;
+              } else {
+                info.srcWidth = file.width;
+                info.srcHeight = info.srcWidth / trgRatio;
+              }
+            } else if (resizeMethod === 'contain') {
+              // Method 'contain'
+              if (srcRatio > trgRatio) {
+                height = width / srcRatio;
+              } else {
+                width = height * srcRatio;
+              }
+            } else {
+              throw new Error("Unknown resizeMethod '" + resizeMethod + "'");
+            }
+          }
+
+          info.srcX = (file.width - info.srcWidth) / 2;
+          info.srcY = (file.height - info.srcHeight) / 2;
+
+          info.trgWidth = width;
+          info.trgHeight = height;
+
+          return info;
+        },
+
+
+        /**
+         * Can be used to transform the file (for example, resize an image if necessary).
+         *
+         * The default implementation uses `resizeWidth` and `resizeHeight` (if provided) and resizes
+         * images according to those dimensions.
+         *
+         * Gets the `file` as the first parameter, and a `done()` function as the second, that needs
+         * to be invoked with the file when the transformation is done.
+         */
+        transformFile: function transformFile(file, done) {
+          if ((this.options.resizeWidth || this.options.resizeHeight) && file.type.match(/image.*/)) {
+            return this.resizeImage(file, this.options.resizeWidth, this.options.resizeHeight, this.options.resizeMethod, done);
+          } else {
+            return done(file);
+          }
+        },
+
+
+        /**
+         * A string that contains the template used for each dropped
+         * file. Change it to fulfill your needs but make sure to properly
+         * provide all elements.
+         *
+         * If you want to use an actual HTML element instead of providing a String
+         * as a config option, you could create a div with the id `tpl`,
+         * put the template inside it and provide the element like this:
+         *
+         *     document
+         *       .querySelector('#tpl')
+         *       .innerHTML
+         *
+         */
+        previewTemplate: "<div class=\"dz-preview dz-file-preview\">\n  <div class=\"dz-image\"><img data-dz-thumbnail /></div>\n  <div class=\"dz-details\">\n    <div class=\"dz-size\"><span data-dz-size></span></div>\n    <div class=\"dz-filename\"><span data-dz-name></span></div>\n  </div>\n  <div class=\"dz-progress\"><span class=\"dz-upload\" data-dz-uploadprogress></span></div>\n  <div class=\"dz-error-message\"><span data-dz-errormessage></span></div>\n  <div class=\"dz-success-mark\">\n    <svg width=\"54px\" height=\"54px\" viewBox=\"0 0 54 54\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:sketch=\"http://www.bohemiancoding.com/sketch/ns\">\n      <title>Check</title>\n      <defs></defs>\n      <g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\" sketch:type=\"MSPage\">\n        <path d=\"M23.5,31.8431458 L17.5852419,25.9283877 C16.0248253,24.3679711 13.4910294,24.366835 11.9289322,25.9289322 C10.3700136,27.4878508 10.3665912,30.0234455 11.9283877,31.5852419 L20.4147581,40.0716123 C20.5133999,40.1702541 20.6159315,40.2626649 20.7218615,40.3488435 C22.2835669,41.8725651 24.794234,41.8626202 26.3461564,40.3106978 L43.3106978,23.3461564 C44.8771021,21.7797521 44.8758057,19.2483887 43.3137085,17.6862915 C41.7547899,16.1273729 39.2176035,16.1255422 37.6538436,17.6893022 L23.5,31.8431458 Z M27,53 C41.3594035,53 53,41.3594035 53,27 C53,12.6405965 41.3594035,1 27,1 C12.6405965,1 1,12.6405965 1,27 C1,41.3594035 12.6405965,53 27,53 Z\" id=\"Oval-2\" stroke-opacity=\"0.198794158\" stroke=\"#747474\" fill-opacity=\"0.816519475\" fill=\"#FFFFFF\" sketch:type=\"MSShapeGroup\"></path>\n      </g>\n    </svg>\n  </div>\n  <div class=\"dz-error-mark\">\n    <svg width=\"54px\" height=\"54px\" viewBox=\"0 0 54 54\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:sketch=\"http://www.bohemiancoding.com/sketch/ns\">\n      <title>Error</title>\n      <defs></defs>\n      <g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\" sketch:type=\"MSPage\">\n        <g id=\"Check-+-Oval-2\" sketch:type=\"MSLayerGroup\" stroke=\"#747474\" stroke-opacity=\"0.198794158\" fill=\"#FFFFFF\" fill-opacity=\"0.816519475\">\n          <path d=\"M32.6568542,29 L38.3106978,23.3461564 C39.8771021,21.7797521 39.8758057,19.2483887 38.3137085,17.6862915 C36.7547899,16.1273729 34.2176035,16.1255422 32.6538436,17.6893022 L27,23.3431458 L21.3461564,17.6893022 C19.7823965,16.1255422 17.2452101,16.1273729 15.6862915,17.6862915 C14.1241943,19.2483887 14.1228979,21.7797521 15.6893022,23.3461564 L21.3431458,29 L15.6893022,34.6538436 C14.1228979,36.2202479 14.1241943,38.7516113 15.6862915,40.3137085 C17.2452101,41.8726271 19.7823965,41.8744578 21.3461564,40.3106978 L27,34.6568542 L32.6538436,40.3106978 C34.2176035,41.8744578 36.7547899,41.8726271 38.3137085,40.3137085 C39.8758057,38.7516113 39.8771021,36.2202479 38.3106978,34.6538436 L32.6568542,29 Z M27,53 C41.3594035,53 53,41.3594035 53,27 C53,12.6405965 41.3594035,1 27,1 C12.6405965,1 1,12.6405965 1,27 C1,41.3594035 12.6405965,53 27,53 Z\" id=\"Oval-2\" sketch:type=\"MSShapeGroup\"></path>\n        </g>\n      </g>\n    </svg>\n  </div>\n</div>",
+
+        // END OPTIONS
+        // (Required by the dropzone documentation parser)
+
+
+        /*
+         Those functions register themselves to the events on init and handle all
+         the user interface specific stuff. Overwriting them won't break the upload
+         but can break the way it's displayed.
+         You can overwrite them if you don't like the default behavior. If you just
+         want to add an additional event handler, register it on the dropzone object
+         and don't overwrite those options.
+         */
+
+        // Those are self explanatory and simply concern the DragnDrop.
+        drop: function drop(e) {
+          return this.element.classList.remove("dz-drag-hover");
+        },
+        dragstart: function dragstart(e) {},
+        dragend: function dragend(e) {
+          return this.element.classList.remove("dz-drag-hover");
+        },
+        dragenter: function dragenter(e) {
+          return this.element.classList.add("dz-drag-hover");
+        },
+        dragover: function dragover(e) {
+          return this.element.classList.add("dz-drag-hover");
+        },
+        dragleave: function dragleave(e) {
+          return this.element.classList.remove("dz-drag-hover");
+        },
+        paste: function paste(e) {},
+
+
+        // Called whenever there are no files left in the dropzone anymore, and the
+        // dropzone should be displayed as if in the initial state.
+        reset: function reset() {
+          return this.element.classList.remove("dz-started");
+        },
+
+
+        // Called when a file is added to the queue
+        // Receives `file`
+        addedfile: function addedfile(file) {
+          var _this2 = this;
+
+          if (this.element === this.previewsContainer) {
+            this.element.classList.add("dz-started");
+          }
+
+          if (this.previewsContainer) {
+            file.previewElement = Dropzone.createElement(this.options.previewTemplate.trim());
+            file.previewTemplate = file.previewElement; // Backwards compatibility
+
+            this.previewsContainer.appendChild(file.previewElement);
+            for (var _iterator3 = file.previewElement.querySelectorAll("[data-dz-name]"), _isArray3 = true, _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+              var _ref3;
+
+              if (_isArray3) {
+                if (_i3 >= _iterator3.length) break;
+                _ref3 = _iterator3[_i3++];
+              } else {
+                _i3 = _iterator3.next();
+                if (_i3.done) break;
+                _ref3 = _i3.value;
+              }
+
+              var node = _ref3;
+
+              node.textContent = file.name;
+            }
+            for (var _iterator4 = file.previewElement.querySelectorAll("[data-dz-size]"), _isArray4 = true, _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+              if (_isArray4) {
+                if (_i4 >= _iterator4.length) break;
+                node = _iterator4[_i4++];
+              } else {
+                _i4 = _iterator4.next();
+                if (_i4.done) break;
+                node = _i4.value;
+              }
+
+              node.innerHTML = this.filesize(file.size);
+            }
+
+            if (this.options.addRemoveLinks) {
+              file._removeLink = Dropzone.createElement("<a class=\"dz-remove\" href=\"javascript:undefined;\" data-dz-remove>" + this.options.dictRemoveFile + "</a>");
+              file.previewElement.appendChild(file._removeLink);
+            }
+
+            var removeFileEvent = function removeFileEvent(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              if (file.status === Dropzone.UPLOADING) {
+                return Dropzone.confirm(_this2.options.dictCancelUploadConfirmation, function () {
+                  return _this2.removeFile(file);
+                });
+              } else {
+                if (_this2.options.dictRemoveFileConfirmation) {
+                  return Dropzone.confirm(_this2.options.dictRemoveFileConfirmation, function () {
+                    return _this2.removeFile(file);
+                  });
+                } else {
+                  return _this2.removeFile(file);
+                }
+              }
+            };
+
+            for (var _iterator5 = file.previewElement.querySelectorAll("[data-dz-remove]"), _isArray5 = true, _i5 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
+              var _ref4;
+
+              if (_isArray5) {
+                if (_i5 >= _iterator5.length) break;
+                _ref4 = _iterator5[_i5++];
+              } else {
+                _i5 = _iterator5.next();
+                if (_i5.done) break;
+                _ref4 = _i5.value;
+              }
+
+              var removeLink = _ref4;
+
+              removeLink.addEventListener("click", removeFileEvent);
+            }
+          }
+        },
+
+
+        // Called whenever a file is removed.
+        removedfile: function removedfile(file) {
+          if (file.previewElement != null && file.previewElement.parentNode != null) {
+            file.previewElement.parentNode.removeChild(file.previewElement);
+          }
+          return this._updateMaxFilesReachedClass();
+        },
+
+
+        // Called when a thumbnail has been generated
+        // Receives `file` and `dataUrl`
+        thumbnail: function thumbnail(file, dataUrl) {
+          if (file.previewElement) {
+            file.previewElement.classList.remove("dz-file-preview");
+            for (var _iterator6 = file.previewElement.querySelectorAll("[data-dz-thumbnail]"), _isArray6 = true, _i6 = 0, _iterator6 = _isArray6 ? _iterator6 : _iterator6[Symbol.iterator]();;) {
+              var _ref5;
+
+              if (_isArray6) {
+                if (_i6 >= _iterator6.length) break;
+                _ref5 = _iterator6[_i6++];
+              } else {
+                _i6 = _iterator6.next();
+                if (_i6.done) break;
+                _ref5 = _i6.value;
+              }
+
+              var thumbnailElement = _ref5;
+
+              thumbnailElement.alt = file.name;
+              thumbnailElement.src = dataUrl;
+            }
+
+            return setTimeout(function () {
+              return file.previewElement.classList.add("dz-image-preview");
+            }, 1);
+          }
+        },
+
+
+        // Called whenever an error occurs
+        // Receives `file` and `message`
+        error: function error(file, message) {
+          if (file.previewElement) {
+            file.previewElement.classList.add("dz-error");
+            if (typeof message !== "String" && message.error) {
+              message = message.error;
+            }
+            for (var _iterator7 = file.previewElement.querySelectorAll("[data-dz-errormessage]"), _isArray7 = true, _i7 = 0, _iterator7 = _isArray7 ? _iterator7 : _iterator7[Symbol.iterator]();;) {
+              var _ref6;
+
+              if (_isArray7) {
+                if (_i7 >= _iterator7.length) break;
+                _ref6 = _iterator7[_i7++];
+              } else {
+                _i7 = _iterator7.next();
+                if (_i7.done) break;
+                _ref6 = _i7.value;
+              }
+
+              var node = _ref6;
+
+              node.textContent = message;
+            }
+          }
+        },
+        errormultiple: function errormultiple() {},
+
+
+        // Called when a file gets processed. Since there is a cue, not all added
+        // files are processed immediately.
+        // Receives `file`
+        processing: function processing(file) {
+          if (file.previewElement) {
+            file.previewElement.classList.add("dz-processing");
+            if (file._removeLink) {
+              return file._removeLink.textContent = this.options.dictCancelUpload;
+            }
+          }
+        },
+        processingmultiple: function processingmultiple() {},
+
+
+        // Called whenever the upload progress gets updated.
+        // Receives `file`, `progress` (percentage 0-100) and `bytesSent`.
+        // To get the total number of bytes of the file, use `file.size`
+        uploadprogress: function uploadprogress(file, progress, bytesSent) {
+          if (file.previewElement) {
+            for (var _iterator8 = file.previewElement.querySelectorAll("[data-dz-uploadprogress]"), _isArray8 = true, _i8 = 0, _iterator8 = _isArray8 ? _iterator8 : _iterator8[Symbol.iterator]();;) {
+              var _ref7;
+
+              if (_isArray8) {
+                if (_i8 >= _iterator8.length) break;
+                _ref7 = _iterator8[_i8++];
+              } else {
+                _i8 = _iterator8.next();
+                if (_i8.done) break;
+                _ref7 = _i8.value;
+              }
+
+              var node = _ref7;
+
+              node.nodeName === 'PROGRESS' ? node.value = progress : node.style.width = progress + "%";
+            }
+          }
+        },
+
+
+        // Called whenever the total upload progress gets updated.
+        // Called with totalUploadProgress (0-100), totalBytes and totalBytesSent
+        totaluploadprogress: function totaluploadprogress() {},
+
+
+        // Called just before the file is sent. Gets the `xhr` object as second
+        // parameter, so you can modify it (for example to add a CSRF token) and a
+        // `formData` object to add additional information.
+        sending: function sending() {},
+        sendingmultiple: function sendingmultiple() {},
+
+
+        // When the complete upload is finished and successful
+        // Receives `file`
+        success: function success(file) {
+          if (file.previewElement) {
+            return file.previewElement.classList.add("dz-success");
+          }
+        },
+        successmultiple: function successmultiple() {},
+
+
+        // When the upload is canceled.
+        canceled: function canceled(file) {
+          return this.emit("error", file, this.options.dictUploadCanceled);
+        },
+        canceledmultiple: function canceledmultiple() {},
+
+
+        // When the upload is finished, either with success or an error.
+        // Receives `file`
+        complete: function complete(file) {
+          if (file._removeLink) {
+            file._removeLink.textContent = this.options.dictRemoveFile;
+          }
+          if (file.previewElement) {
+            return file.previewElement.classList.add("dz-complete");
+          }
+        },
+        completemultiple: function completemultiple() {},
+        maxfilesexceeded: function maxfilesexceeded() {},
+        maxfilesreached: function maxfilesreached() {},
+        queuecomplete: function queuecomplete() {},
+        addedfiles: function addedfiles() {}
+      };
+
+      this.prototype._thumbnailQueue = [];
+      this.prototype._processingThumbnail = false;
+    }
+
+    // global utility
+
+  }, {
+    key: "extend",
+    value: function extend(target) {
+      for (var _len2 = arguments.length, objects = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        objects[_key2 - 1] = arguments[_key2];
+      }
+
+      for (var _iterator9 = objects, _isArray9 = true, _i9 = 0, _iterator9 = _isArray9 ? _iterator9 : _iterator9[Symbol.iterator]();;) {
+        var _ref8;
+
+        if (_isArray9) {
+          if (_i9 >= _iterator9.length) break;
+          _ref8 = _iterator9[_i9++];
+        } else {
+          _i9 = _iterator9.next();
+          if (_i9.done) break;
+          _ref8 = _i9.value;
+        }
+
+        var object = _ref8;
+
+        for (var key in object) {
+          var val = object[key];
+          target[key] = val;
+        }
+      }
+      return target;
+    }
+  }]);
+
+  function Dropzone(el, options) {
+    _classCallCheck(this, Dropzone);
+
+    var _this = _possibleConstructorReturn(this, (Dropzone.__proto__ || Object.getPrototypeOf(Dropzone)).call(this));
+
+    var fallback = void 0,
+        left = void 0;
+    _this.element = el;
+    // For backwards compatibility since the version was in the prototype previously
+    _this.version = Dropzone.version;
+
+    _this.defaultOptions.previewTemplate = _this.defaultOptions.previewTemplate.replace(/\n*/g, "");
+
+    _this.clickableElements = [];
+    _this.listeners = [];
+    _this.files = []; // All files
+
+    if (typeof _this.element === "string") {
+      _this.element = document.querySelector(_this.element);
+    }
+
+    // Not checking if instance of HTMLElement or Element since IE9 is extremely weird.
+    if (!_this.element || _this.element.nodeType == null) {
+      throw new Error("Invalid dropzone element.");
+    }
+
+    if (_this.element.dropzone) {
+      throw new Error("Dropzone already attached.");
+    }
+
+    // Now add this dropzone to the instances.
+    Dropzone.instances.push(_this);
+
+    // Put the dropzone inside the element itself.
+    _this.element.dropzone = _this;
+
+    var elementOptions = (left = Dropzone.optionsForElement(_this.element)) != null ? left : {};
+
+    _this.options = Dropzone.extend({}, _this.defaultOptions, elementOptions, options != null ? options : {});
+
+    // If the browser failed, just call the fallback and leave
+    if (_this.options.forceFallback || !Dropzone.isBrowserSupported()) {
+      var _ret;
+
+      return _ret = _this.options.fallback.call(_this), _possibleConstructorReturn(_this, _ret);
+    }
+
+    // @options.url = @element.getAttribute "action" unless @options.url?
+    if (_this.options.url == null) {
+      _this.options.url = _this.element.getAttribute("action");
+    }
+
+    if (!_this.options.url) {
+      throw new Error("No URL provided.");
+    }
+
+    if (_this.options.acceptedFiles && _this.options.acceptedMimeTypes) {
+      throw new Error("You can't provide both 'acceptedFiles' and 'acceptedMimeTypes'. 'acceptedMimeTypes' is deprecated.");
+    }
+
+    if (_this.options.uploadMultiple && _this.options.chunking) {
+      throw new Error('You cannot set both: uploadMultiple and chunking.');
+    }
+
+    // Backwards compatibility
+    if (_this.options.acceptedMimeTypes) {
+      _this.options.acceptedFiles = _this.options.acceptedMimeTypes;
+      delete _this.options.acceptedMimeTypes;
+    }
+
+    // Backwards compatibility
+    if (_this.options.renameFilename != null) {
+      _this.options.renameFile = function (file) {
+        return _this.options.renameFilename.call(_this, file.name, file);
+      };
+    }
+
+    _this.options.method = _this.options.method.toUpperCase();
+
+    if ((fallback = _this.getExistingFallback()) && fallback.parentNode) {
+      // Remove the fallback
+      fallback.parentNode.removeChild(fallback);
+    }
+
+    // Display previews in the previewsContainer element or the Dropzone element unless explicitly set to false
+    if (_this.options.previewsContainer !== false) {
+      if (_this.options.previewsContainer) {
+        _this.previewsContainer = Dropzone.getElement(_this.options.previewsContainer, "previewsContainer");
+      } else {
+        _this.previewsContainer = _this.element;
+      }
+    }
+
+    if (_this.options.clickable) {
+      if (_this.options.clickable === true) {
+        _this.clickableElements = [_this.element];
+      } else {
+        _this.clickableElements = Dropzone.getElements(_this.options.clickable, "clickable");
+      }
+    }
+
+    _this.init();
+    return _this;
+  }
+
+  // Returns all files that have been accepted
+
+
+  _createClass(Dropzone, [{
+    key: "getAcceptedFiles",
+    value: function getAcceptedFiles() {
+      return this.files.filter(function (file) {
+        return file.accepted;
+      }).map(function (file) {
+        return file;
+      });
+    }
+
+    // Returns all files that have been rejected
+    // Not sure when that's going to be useful, but added for completeness.
+
+  }, {
+    key: "getRejectedFiles",
+    value: function getRejectedFiles() {
+      return this.files.filter(function (file) {
+        return !file.accepted;
+      }).map(function (file) {
+        return file;
+      });
+    }
+  }, {
+    key: "getFilesWithStatus",
+    value: function getFilesWithStatus(status) {
+      return this.files.filter(function (file) {
+        return file.status === status;
+      }).map(function (file) {
+        return file;
+      });
+    }
+
+    // Returns all files that are in the queue
+
+  }, {
+    key: "getQueuedFiles",
+    value: function getQueuedFiles() {
+      return this.getFilesWithStatus(Dropzone.QUEUED);
+    }
+  }, {
+    key: "getUploadingFiles",
+    value: function getUploadingFiles() {
+      return this.getFilesWithStatus(Dropzone.UPLOADING);
+    }
+  }, {
+    key: "getAddedFiles",
+    value: function getAddedFiles() {
+      return this.getFilesWithStatus(Dropzone.ADDED);
+    }
+
+    // Files that are either queued or uploading
+
+  }, {
+    key: "getActiveFiles",
+    value: function getActiveFiles() {
+      return this.files.filter(function (file) {
+        return file.status === Dropzone.UPLOADING || file.status === Dropzone.QUEUED;
+      }).map(function (file) {
+        return file;
+      });
+    }
+
+    // The function that gets called when Dropzone is initialized. You
+    // can (and should) setup event listeners inside this function.
+
+  }, {
+    key: "init",
+    value: function init() {
+      var _this3 = this;
+
+      // In case it isn't set already
+      if (this.element.tagName === "form") {
+        this.element.setAttribute("enctype", "multipart/form-data");
+      }
+
+      if (this.element.classList.contains("dropzone") && !this.element.querySelector(".dz-message")) {
+        this.element.appendChild(Dropzone.createElement("<div class=\"dz-default dz-message\"><span>" + this.options.dictDefaultMessage + "</span></div>"));
+      }
+
+      if (this.clickableElements.length) {
+        var setupHiddenFileInput = function setupHiddenFileInput() {
+          if (_this3.hiddenFileInput) {
+            _this3.hiddenFileInput.parentNode.removeChild(_this3.hiddenFileInput);
+          }
+          _this3.hiddenFileInput = document.createElement("input");
+          _this3.hiddenFileInput.setAttribute("type", "file");
+          if (_this3.options.maxFiles === null || _this3.options.maxFiles > 1) {
+            _this3.hiddenFileInput.setAttribute("multiple", "multiple");
+          }
+          _this3.hiddenFileInput.className = "dz-hidden-input";
+
+          if (_this3.options.acceptedFiles !== null) {
+            _this3.hiddenFileInput.setAttribute("accept", _this3.options.acceptedFiles);
+          }
+          if (_this3.options.capture !== null) {
+            _this3.hiddenFileInput.setAttribute("capture", _this3.options.capture);
+          }
+
+          // Not setting `display="none"` because some browsers don't accept clicks
+          // on elements that aren't displayed.
+          _this3.hiddenFileInput.style.visibility = "hidden";
+          _this3.hiddenFileInput.style.position = "absolute";
+          _this3.hiddenFileInput.style.top = "0";
+          _this3.hiddenFileInput.style.left = "0";
+          _this3.hiddenFileInput.style.height = "0";
+          _this3.hiddenFileInput.style.width = "0";
+          document.querySelector(_this3.options.hiddenInputContainer).appendChild(_this3.hiddenFileInput);
+          return _this3.hiddenFileInput.addEventListener("change", function () {
+            var files = _this3.hiddenFileInput.files;
+
+            if (files.length) {
+              for (var _iterator10 = files, _isArray10 = true, _i10 = 0, _iterator10 = _isArray10 ? _iterator10 : _iterator10[Symbol.iterator]();;) {
+                var _ref9;
+
+                if (_isArray10) {
+                  if (_i10 >= _iterator10.length) break;
+                  _ref9 = _iterator10[_i10++];
+                } else {
+                  _i10 = _iterator10.next();
+                  if (_i10.done) break;
+                  _ref9 = _i10.value;
+                }
+
+                var file = _ref9;
+
+                _this3.addFile(file);
+              }
+            }
+            _this3.emit("addedfiles", files);
+            return setupHiddenFileInput();
+          });
+        };
+        setupHiddenFileInput();
+      }
+
+      this.URL = window.URL !== null ? window.URL : window.webkitURL;
+
+      // Setup all event listeners on the Dropzone object itself.
+      // They're not in @setupEventListeners() because they shouldn't be removed
+      // again when the dropzone gets disabled.
+      for (var _iterator11 = this.events, _isArray11 = true, _i11 = 0, _iterator11 = _isArray11 ? _iterator11 : _iterator11[Symbol.iterator]();;) {
+        var _ref10;
+
+        if (_isArray11) {
+          if (_i11 >= _iterator11.length) break;
+          _ref10 = _iterator11[_i11++];
+        } else {
+          _i11 = _iterator11.next();
+          if (_i11.done) break;
+          _ref10 = _i11.value;
+        }
+
+        var eventName = _ref10;
+
+        this.on(eventName, this.options[eventName]);
+      }
+
+      this.on("uploadprogress", function () {
+        return _this3.updateTotalUploadProgress();
+      });
+
+      this.on("removedfile", function () {
+        return _this3.updateTotalUploadProgress();
+      });
+
+      this.on("canceled", function (file) {
+        return _this3.emit("complete", file);
+      });
+
+      // Emit a `queuecomplete` event if all files finished uploading.
+      this.on("complete", function (file) {
+        if (_this3.getAddedFiles().length === 0 && _this3.getUploadingFiles().length === 0 && _this3.getQueuedFiles().length === 0) {
+          // This needs to be deferred so that `queuecomplete` really triggers after `complete`
+          return setTimeout(function () {
+            return _this3.emit("queuecomplete");
+          }, 0);
+        }
+      });
+
+      var noPropagation = function noPropagation(e) {
+        e.stopPropagation();
+        if (e.preventDefault) {
+          return e.preventDefault();
+        } else {
+          return e.returnValue = false;
+        }
+      };
+
+      // Create the listeners
+      this.listeners = [{
+        element: this.element,
+        events: {
+          "dragstart": function dragstart(e) {
+            return _this3.emit("dragstart", e);
+          },
+          "dragenter": function dragenter(e) {
+            noPropagation(e);
+            return _this3.emit("dragenter", e);
+          },
+          "dragover": function dragover(e) {
+            // Makes it possible to drag files from chrome's download bar
+            // http://stackoverflow.com/questions/19526430/drag-and-drop-file-uploads-from-chrome-downloads-bar
+            // Try is required to prevent bug in Internet Explorer 11 (SCRIPT65535 exception)
+            var efct = void 0;
+            try {
+              efct = e.dataTransfer.effectAllowed;
+            } catch (error) {}
+            e.dataTransfer.dropEffect = 'move' === efct || 'linkMove' === efct ? 'move' : 'copy';
+
+            noPropagation(e);
+            return _this3.emit("dragover", e);
+          },
+          "dragleave": function dragleave(e) {
+            return _this3.emit("dragleave", e);
+          },
+          "drop": function drop(e) {
+            noPropagation(e);
+            return _this3.drop(e);
+          },
+          "dragend": function dragend(e) {
+            return _this3.emit("dragend", e);
+          }
+
+          // This is disabled right now, because the browsers don't implement it properly.
+          // "paste": (e) =>
+          //   noPropagation e
+          //   @paste e
+        } }];
+
+      this.clickableElements.forEach(function (clickableElement) {
+        return _this3.listeners.push({
+          element: clickableElement,
+          events: {
+            "click": function click(evt) {
+              // Only the actual dropzone or the message element should trigger file selection
+              if (clickableElement !== _this3.element || evt.target === _this3.element || Dropzone.elementInside(evt.target, _this3.element.querySelector(".dz-message"))) {
+                _this3.hiddenFileInput.click(); // Forward the click
+              }
+              return true;
+            }
+          }
+        });
+      });
+
+      this.enable();
+
+      return this.options.init.call(this);
+    }
+
+    // Not fully tested yet
+
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      this.disable();
+      this.removeAllFiles(true);
+      if (this.hiddenFileInput != null ? this.hiddenFileInput.parentNode : undefined) {
+        this.hiddenFileInput.parentNode.removeChild(this.hiddenFileInput);
+        this.hiddenFileInput = null;
+      }
+      delete this.element.dropzone;
+      return Dropzone.instances.splice(Dropzone.instances.indexOf(this), 1);
+    }
+  }, {
+    key: "updateTotalUploadProgress",
+    value: function updateTotalUploadProgress() {
+      var totalUploadProgress = void 0;
+      var totalBytesSent = 0;
+      var totalBytes = 0;
+
+      var activeFiles = this.getActiveFiles();
+
+      if (activeFiles.length) {
+        for (var _iterator12 = this.getActiveFiles(), _isArray12 = true, _i12 = 0, _iterator12 = _isArray12 ? _iterator12 : _iterator12[Symbol.iterator]();;) {
+          var _ref11;
+
+          if (_isArray12) {
+            if (_i12 >= _iterator12.length) break;
+            _ref11 = _iterator12[_i12++];
+          } else {
+            _i12 = _iterator12.next();
+            if (_i12.done) break;
+            _ref11 = _i12.value;
+          }
+
+          var file = _ref11;
+
+          totalBytesSent += file.upload.bytesSent;
+          totalBytes += file.upload.total;
+        }
+        totalUploadProgress = 100 * totalBytesSent / totalBytes;
+      } else {
+        totalUploadProgress = 100;
+      }
+
+      return this.emit("totaluploadprogress", totalUploadProgress, totalBytes, totalBytesSent);
+    }
+
+    // @options.paramName can be a function taking one parameter rather than a string.
+    // A parameter name for a file is obtained simply by calling this with an index number.
+
+  }, {
+    key: "_getParamName",
+    value: function _getParamName(n) {
+      if (typeof this.options.paramName === "function") {
+        return this.options.paramName(n);
+      } else {
+        return "" + this.options.paramName + (this.options.uploadMultiple ? "[" + n + "]" : "");
+      }
+    }
+
+    // If @options.renameFile is a function,
+    // the function will be used to rename the file.name before appending it to the formData
+
+  }, {
+    key: "_renameFile",
+    value: function _renameFile(file) {
+      if (typeof this.options.renameFile !== "function") {
+        return file.name;
+      }
+      return this.options.renameFile(file);
+    }
+
+    // Returns a form that can be used as fallback if the browser does not support DragnDrop
+    //
+    // If the dropzone is already a form, only the input field and button are returned. Otherwise a complete form element is provided.
+    // This code has to pass in IE7 :(
+
+  }, {
+    key: "getFallbackForm",
+    value: function getFallbackForm() {
+      var existingFallback = void 0,
+          form = void 0;
+      if (existingFallback = this.getExistingFallback()) {
+        return existingFallback;
+      }
+
+      var fieldsString = "<div class=\"dz-fallback\">";
+      if (this.options.dictFallbackText) {
+        fieldsString += "<p>" + this.options.dictFallbackText + "</p>";
+      }
+      fieldsString += "<input type=\"file\" name=\"" + this._getParamName(0) + "\" " + (this.options.uploadMultiple ? 'multiple="multiple"' : undefined) + " /><input type=\"submit\" value=\"Upload!\"></div>";
+
+      var fields = Dropzone.createElement(fieldsString);
+      if (this.element.tagName !== "FORM") {
+        form = Dropzone.createElement("<form action=\"" + this.options.url + "\" enctype=\"multipart/form-data\" method=\"" + this.options.method + "\"></form>");
+        form.appendChild(fields);
+      } else {
+        // Make sure that the enctype and method attributes are set properly
+        this.element.setAttribute("enctype", "multipart/form-data");
+        this.element.setAttribute("method", this.options.method);
+      }
+      return form != null ? form : fields;
+    }
+
+    // Returns the fallback elements if they exist already
+    //
+    // This code has to pass in IE7 :(
+
+  }, {
+    key: "getExistingFallback",
+    value: function getExistingFallback() {
+      var getFallback = function getFallback(elements) {
+        for (var _iterator13 = elements, _isArray13 = true, _i13 = 0, _iterator13 = _isArray13 ? _iterator13 : _iterator13[Symbol.iterator]();;) {
+          var _ref12;
+
+          if (_isArray13) {
+            if (_i13 >= _iterator13.length) break;
+            _ref12 = _iterator13[_i13++];
+          } else {
+            _i13 = _iterator13.next();
+            if (_i13.done) break;
+            _ref12 = _i13.value;
+          }
+
+          var el = _ref12;
+
+          if (/(^| )fallback($| )/.test(el.className)) {
+            return el;
+          }
+        }
+      };
+
+      var _arr = ["div", "form"];
+      for (var _i14 = 0; _i14 < _arr.length; _i14++) {
+        var tagName = _arr[_i14];
+        var fallback;
+        if (fallback = getFallback(this.element.getElementsByTagName(tagName))) {
+          return fallback;
+        }
+      }
+    }
+
+    // Activates all listeners stored in @listeners
+
+  }, {
+    key: "setupEventListeners",
+    value: function setupEventListeners() {
+      return this.listeners.map(function (elementListeners) {
+        return function () {
+          var result = [];
+          for (var event in elementListeners.events) {
+            var listener = elementListeners.events[event];
+            result.push(elementListeners.element.addEventListener(event, listener, false));
+          }
+          return result;
+        }();
+      });
+    }
+
+    // Deactivates all listeners stored in @listeners
+
+  }, {
+    key: "removeEventListeners",
+    value: function removeEventListeners() {
+      return this.listeners.map(function (elementListeners) {
+        return function () {
+          var result = [];
+          for (var event in elementListeners.events) {
+            var listener = elementListeners.events[event];
+            result.push(elementListeners.element.removeEventListener(event, listener, false));
+          }
+          return result;
+        }();
+      });
+    }
+
+    // Removes all event listeners and cancels all files in the queue or being processed.
+
+  }, {
+    key: "disable",
+    value: function disable() {
+      var _this4 = this;
+
+      this.clickableElements.forEach(function (element) {
+        return element.classList.remove("dz-clickable");
+      });
+      this.removeEventListeners();
+      this.disabled = true;
+
+      return this.files.map(function (file) {
+        return _this4.cancelUpload(file);
+      });
+    }
+  }, {
+    key: "enable",
+    value: function enable() {
+      delete this.disabled;
+      this.clickableElements.forEach(function (element) {
+        return element.classList.add("dz-clickable");
+      });
+      return this.setupEventListeners();
+    }
+
+    // Returns a nicely formatted filesize
+
+  }, {
+    key: "filesize",
+    value: function filesize(size) {
+      var selectedSize = 0;
+      var selectedUnit = "b";
+
+      if (size > 0) {
+        var units = ['tb', 'gb', 'mb', 'kb', 'b'];
+
+        for (var i = 0; i < units.length; i++) {
+          var unit = units[i];
+          var cutoff = Math.pow(this.options.filesizeBase, 4 - i) / 10;
+
+          if (size >= cutoff) {
+            selectedSize = size / Math.pow(this.options.filesizeBase, 4 - i);
+            selectedUnit = unit;
+            break;
+          }
+        }
+
+        selectedSize = Math.round(10 * selectedSize) / 10; // Cutting of digits
+      }
+
+      return "<strong>" + selectedSize + "</strong> " + this.options.dictFileSizeUnits[selectedUnit];
+    }
+
+    // Adds or removes the `dz-max-files-reached` class from the form.
+
+  }, {
+    key: "_updateMaxFilesReachedClass",
+    value: function _updateMaxFilesReachedClass() {
+      if (this.options.maxFiles != null && this.getAcceptedFiles().length >= this.options.maxFiles) {
+        if (this.getAcceptedFiles().length === this.options.maxFiles) {
+          this.emit('maxfilesreached', this.files);
+        }
+        return this.element.classList.add("dz-max-files-reached");
+      } else {
+        return this.element.classList.remove("dz-max-files-reached");
+      }
+    }
+  }, {
+    key: "drop",
+    value: function drop(e) {
+      if (!e.dataTransfer) {
+        return;
+      }
+      this.emit("drop", e);
+
+      // Convert the FileList to an Array
+      // This is necessary for IE11
+      var files = [];
+      for (var i = 0; i < e.dataTransfer.files.length; i++) {
+        files[i] = e.dataTransfer.files[i];
+      }
+
+      this.emit("addedfiles", files);
+
+      // Even if it's a folder, files.length will contain the folders.
+      if (files.length) {
+        var items = e.dataTransfer.items;
+
+        if (items && items.length && items[0].webkitGetAsEntry != null) {
+          // The browser supports dropping of folders, so handle items instead of files
+          this._addFilesFromItems(items);
+        } else {
+          this.handleFiles(files);
+        }
+      }
+    }
+  }, {
+    key: "paste",
+    value: function paste(e) {
+      if (__guard__(e != null ? e.clipboardData : undefined, function (x) {
+        return x.items;
+      }) == null) {
+        return;
+      }
+
+      this.emit("paste", e);
+      var items = e.clipboardData.items;
+
+
+      if (items.length) {
+        return this._addFilesFromItems(items);
+      }
+    }
+  }, {
+    key: "handleFiles",
+    value: function handleFiles(files) {
+      for (var _iterator14 = files, _isArray14 = true, _i15 = 0, _iterator14 = _isArray14 ? _iterator14 : _iterator14[Symbol.iterator]();;) {
+        var _ref13;
+
+        if (_isArray14) {
+          if (_i15 >= _iterator14.length) break;
+          _ref13 = _iterator14[_i15++];
+        } else {
+          _i15 = _iterator14.next();
+          if (_i15.done) break;
+          _ref13 = _i15.value;
+        }
+
+        var file = _ref13;
+
+        this.addFile(file);
+      }
+    }
+
+    // When a folder is dropped (or files are pasted), items must be handled
+    // instead of files.
+
+  }, {
+    key: "_addFilesFromItems",
+    value: function _addFilesFromItems(items) {
+      var _this5 = this;
+
+      return function () {
+        var result = [];
+        for (var _iterator15 = items, _isArray15 = true, _i16 = 0, _iterator15 = _isArray15 ? _iterator15 : _iterator15[Symbol.iterator]();;) {
+          var _ref14;
+
+          if (_isArray15) {
+            if (_i16 >= _iterator15.length) break;
+            _ref14 = _iterator15[_i16++];
+          } else {
+            _i16 = _iterator15.next();
+            if (_i16.done) break;
+            _ref14 = _i16.value;
+          }
+
+          var item = _ref14;
+
+          var entry;
+          if (item.webkitGetAsEntry != null && (entry = item.webkitGetAsEntry())) {
+            if (entry.isFile) {
+              result.push(_this5.addFile(item.getAsFile()));
+            } else if (entry.isDirectory) {
+              // Append all files from that directory to files
+              result.push(_this5._addFilesFromDirectory(entry, entry.name));
+            } else {
+              result.push(undefined);
+            }
+          } else if (item.getAsFile != null) {
+            if (item.kind == null || item.kind === "file") {
+              result.push(_this5.addFile(item.getAsFile()));
+            } else {
+              result.push(undefined);
+            }
+          } else {
+            result.push(undefined);
+          }
+        }
+        return result;
+      }();
+    }
+
+    // Goes through the directory, and adds each file it finds recursively
+
+  }, {
+    key: "_addFilesFromDirectory",
+    value: function _addFilesFromDirectory(directory, path) {
+      var _this6 = this;
+
+      var dirReader = directory.createReader();
+
+      var errorHandler = function errorHandler(error) {
+        return __guardMethod__(console, 'log', function (o) {
+          return o.log(error);
+        });
+      };
+
+      var readEntries = function readEntries() {
+        return dirReader.readEntries(function (entries) {
+          if (entries.length > 0) {
+            for (var _iterator16 = entries, _isArray16 = true, _i17 = 0, _iterator16 = _isArray16 ? _iterator16 : _iterator16[Symbol.iterator]();;) {
+              var _ref15;
+
+              if (_isArray16) {
+                if (_i17 >= _iterator16.length) break;
+                _ref15 = _iterator16[_i17++];
+              } else {
+                _i17 = _iterator16.next();
+                if (_i17.done) break;
+                _ref15 = _i17.value;
+              }
+
+              var entry = _ref15;
+
+              if (entry.isFile) {
+                entry.file(function (file) {
+                  if (_this6.options.ignoreHiddenFiles && file.name.substring(0, 1) === '.') {
+                    return;
+                  }
+                  file.fullPath = path + "/" + file.name;
+                  return _this6.addFile(file);
+                });
+              } else if (entry.isDirectory) {
+                _this6._addFilesFromDirectory(entry, path + "/" + entry.name);
+              }
+            }
+
+            // Recursively call readEntries() again, since browser only handle
+            // the first 100 entries.
+            // See: https://developer.mozilla.org/en-US/docs/Web/API/DirectoryReader#readEntries
+            readEntries();
+          }
+          return null;
+        }, errorHandler);
+      };
+
+      return readEntries();
+    }
+
+    // If `done()` is called without argument the file is accepted
+    // If you call it with an error message, the file is rejected
+    // (This allows for asynchronous validation)
+    //
+    // This function checks the filesize, and if the file.type passes the
+    // `acceptedFiles` check.
+
+  }, {
+    key: "accept",
+    value: function accept(file, done) {
+      if (file.size > this.options.maxFilesize * 1024 * 1024) {
+        return done(this.options.dictFileTooBig.replace("{{filesize}}", Math.round(file.size / 1024 / 10.24) / 100).replace("{{maxFilesize}}", this.options.maxFilesize));
+      } else if (!Dropzone.isValidFile(file, this.options.acceptedFiles)) {
+        return done(this.options.dictInvalidFileType);
+      } else if (this.options.maxFiles != null && this.getAcceptedFiles().length >= this.options.maxFiles) {
+        done(this.options.dictMaxFilesExceeded.replace("{{maxFiles}}", this.options.maxFiles));
+        return this.emit("maxfilesexceeded", file);
+      } else {
+        return this.options.accept.call(this, file, done);
+      }
+    }
+  }, {
+    key: "addFile",
+    value: function addFile(file) {
+      var _this7 = this;
+
+      file.upload = {
+        uuid: Dropzone.uuidv4(),
+        progress: 0,
+        // Setting the total upload size to file.size for the beginning
+        // It's actual different than the size to be transmitted.
+        total: file.size,
+        bytesSent: 0,
+        filename: this._renameFile(file),
+        chunked: this.options.chunking && (this.options.forceChunking || file.size > this.options.chunkSize),
+        totalChunkCount: Math.ceil(file.size / this.options.chunkSize)
+      };
+      this.files.push(file);
+
+      file.status = Dropzone.ADDED;
+
+      this.emit("addedfile", file);
+
+      this._enqueueThumbnail(file);
+
+      return this.accept(file, function (error) {
+        if (error) {
+          file.accepted = false;
+          _this7._errorProcessing([file], error); // Will set the file.status
+        } else {
+          file.accepted = true;
+          if (_this7.options.autoQueue) {
+            _this7.enqueueFile(file);
+          } // Will set .accepted = true
+        }
+        return _this7._updateMaxFilesReachedClass();
+      });
+    }
+
+    // Wrapper for enqueueFile
+
+  }, {
+    key: "enqueueFiles",
+    value: function enqueueFiles(files) {
+      for (var _iterator17 = files, _isArray17 = true, _i18 = 0, _iterator17 = _isArray17 ? _iterator17 : _iterator17[Symbol.iterator]();;) {
+        var _ref16;
+
+        if (_isArray17) {
+          if (_i18 >= _iterator17.length) break;
+          _ref16 = _iterator17[_i18++];
+        } else {
+          _i18 = _iterator17.next();
+          if (_i18.done) break;
+          _ref16 = _i18.value;
+        }
+
+        var file = _ref16;
+
+        this.enqueueFile(file);
+      }
+      return null;
+    }
+  }, {
+    key: "enqueueFile",
+    value: function enqueueFile(file) {
+      var _this8 = this;
+
+      if (file.status === Dropzone.ADDED && file.accepted === true) {
+        file.status = Dropzone.QUEUED;
+        if (this.options.autoProcessQueue) {
+          return setTimeout(function () {
+            return _this8.processQueue();
+          }, 0); // Deferring the call
+        }
+      } else {
+        throw new Error("This file can't be queued because it has already been processed or was rejected.");
+      }
+    }
+  }, {
+    key: "_enqueueThumbnail",
+    value: function _enqueueThumbnail(file) {
+      var _this9 = this;
+
+      if (this.options.createImageThumbnails && file.type.match(/image.*/) && file.size <= this.options.maxThumbnailFilesize * 1024 * 1024) {
+        this._thumbnailQueue.push(file);
+        return setTimeout(function () {
+          return _this9._processThumbnailQueue();
+        }, 0); // Deferring the call
+      }
+    }
+  }, {
+    key: "_processThumbnailQueue",
+    value: function _processThumbnailQueue() {
+      var _this10 = this;
+
+      if (this._processingThumbnail || this._thumbnailQueue.length === 0) {
+        return;
+      }
+
+      this._processingThumbnail = true;
+      var file = this._thumbnailQueue.shift();
+      return this.createThumbnail(file, this.options.thumbnailWidth, this.options.thumbnailHeight, this.options.thumbnailMethod, true, function (dataUrl) {
+        _this10.emit("thumbnail", file, dataUrl);
+        _this10._processingThumbnail = false;
+        return _this10._processThumbnailQueue();
+      });
+    }
+
+    // Can be called by the user to remove a file
+
+  }, {
+    key: "removeFile",
+    value: function removeFile(file) {
+      if (file.status === Dropzone.UPLOADING) {
+        this.cancelUpload(file);
+      }
+      this.files = without(this.files, file);
+
+      this.emit("removedfile", file);
+      if (this.files.length === 0) {
+        return this.emit("reset");
+      }
+    }
+
+    // Removes all files that aren't currently processed from the list
+
+  }, {
+    key: "removeAllFiles",
+    value: function removeAllFiles(cancelIfNecessary) {
+      // Create a copy of files since removeFile() changes the @files array.
+      if (cancelIfNecessary == null) {
+        cancelIfNecessary = false;
+      }
+      for (var _iterator18 = this.files.slice(), _isArray18 = true, _i19 = 0, _iterator18 = _isArray18 ? _iterator18 : _iterator18[Symbol.iterator]();;) {
+        var _ref17;
+
+        if (_isArray18) {
+          if (_i19 >= _iterator18.length) break;
+          _ref17 = _iterator18[_i19++];
+        } else {
+          _i19 = _iterator18.next();
+          if (_i19.done) break;
+          _ref17 = _i19.value;
+        }
+
+        var file = _ref17;
+
+        if (file.status !== Dropzone.UPLOADING || cancelIfNecessary) {
+          this.removeFile(file);
+        }
+      }
+      return null;
+    }
+
+    // Resizes an image before it gets sent to the server. This function is the default behavior of
+    // `options.transformFile` if `resizeWidth` or `resizeHeight` are set. The callback is invoked with
+    // the resized blob.
+
+  }, {
+    key: "resizeImage",
+    value: function resizeImage(file, width, height, resizeMethod, callback) {
+      var _this11 = this;
+
+      return this.createThumbnail(file, width, height, resizeMethod, false, function (dataUrl, canvas) {
+        if (canvas == null) {
+          // The image has not been resized
+          return callback(file);
+        } else {
+          var resizeMimeType = _this11.options.resizeMimeType;
+
+          if (resizeMimeType == null) {
+            resizeMimeType = file.type;
+          }
+          var resizedDataURL = canvas.toDataURL(resizeMimeType, _this11.options.resizeQuality);
+          if (resizeMimeType === 'image/jpeg' || resizeMimeType === 'image/jpg') {
+            // Now add the original EXIF information
+            resizedDataURL = ExifRestore.restore(file.dataURL, resizedDataURL);
+          }
+          return callback(Dropzone.dataURItoBlob(resizedDataURL));
+        }
+      });
+    }
+  }, {
+    key: "createThumbnail",
+    value: function createThumbnail(file, width, height, resizeMethod, fixOrientation, callback) {
+      var _this12 = this;
+
+      var fileReader = new FileReader();
+
+      fileReader.onload = function () {
+
+        file.dataURL = fileReader.result;
+
+        // Don't bother creating a thumbnail for SVG images since they're vector
+        if (file.type === "image/svg+xml") {
+          if (callback != null) {
+            callback(fileReader.result);
+          }
+          return;
+        }
+
+        return _this12.createThumbnailFromUrl(file, width, height, resizeMethod, fixOrientation, callback);
+      };
+
+      return fileReader.readAsDataURL(file);
+    }
+  }, {
+    key: "createThumbnailFromUrl",
+    value: function createThumbnailFromUrl(file, width, height, resizeMethod, fixOrientation, callback, crossOrigin) {
+      var _this13 = this;
+
+      // Not using `new Image` here because of a bug in latest Chrome versions.
+      // See https://github.com/enyo/dropzone/pull/226
+      var img = document.createElement("img");
+
+      if (crossOrigin) {
+        img.crossOrigin = crossOrigin;
+      }
+
+      img.onload = function () {
+        var loadExif = function loadExif(callback) {
+          return callback(1);
+        };
+        if (typeof EXIF !== 'undefined' && EXIF !== null && fixOrientation) {
+          loadExif = function loadExif(callback) {
+            return EXIF.getData(img, function () {
+              return callback(EXIF.getTag(this, 'Orientation'));
+            });
+          };
+        }
+
+        return loadExif(function (orientation) {
+          file.width = img.width;
+          file.height = img.height;
+
+          var resizeInfo = _this13.options.resize.call(_this13, file, width, height, resizeMethod);
+
+          var canvas = document.createElement("canvas");
+          var ctx = canvas.getContext("2d");
+
+          canvas.width = resizeInfo.trgWidth;
+          canvas.height = resizeInfo.trgHeight;
+
+          if (orientation > 4) {
+            canvas.width = resizeInfo.trgHeight;
+            canvas.height = resizeInfo.trgWidth;
+          }
+
+          switch (orientation) {
+            case 2:
+              // horizontal flip
+              ctx.translate(canvas.width, 0);
+              ctx.scale(-1, 1);
+              break;
+            case 3:
+              // 180° rotate left
+              ctx.translate(canvas.width, canvas.height);
+              ctx.rotate(Math.PI);
+              break;
+            case 4:
+              // vertical flip
+              ctx.translate(0, canvas.height);
+              ctx.scale(1, -1);
+              break;
+            case 5:
+              // vertical flip + 90 rotate right
+              ctx.rotate(0.5 * Math.PI);
+              ctx.scale(1, -1);
+              break;
+            case 6:
+              // 90° rotate right
+              ctx.rotate(0.5 * Math.PI);
+              ctx.translate(0, -canvas.height);
+              break;
+            case 7:
+              // horizontal flip + 90 rotate right
+              ctx.rotate(0.5 * Math.PI);
+              ctx.translate(canvas.width, -canvas.height);
+              ctx.scale(-1, 1);
+              break;
+            case 8:
+              // 90° rotate left
+              ctx.rotate(-0.5 * Math.PI);
+              ctx.translate(-canvas.width, 0);
+              break;
+          }
+
+          // This is a bugfix for iOS' scaling bug.
+          drawImageIOSFix(ctx, img, resizeInfo.srcX != null ? resizeInfo.srcX : 0, resizeInfo.srcY != null ? resizeInfo.srcY : 0, resizeInfo.srcWidth, resizeInfo.srcHeight, resizeInfo.trgX != null ? resizeInfo.trgX : 0, resizeInfo.trgY != null ? resizeInfo.trgY : 0, resizeInfo.trgWidth, resizeInfo.trgHeight);
+
+          var thumbnail = canvas.toDataURL("image/png");
+
+          if (callback != null) {
+            return callback(thumbnail, canvas);
+          }
+        });
+      };
+
+      if (callback != null) {
+        img.onerror = callback;
+      }
+
+      return img.src = file.dataURL;
+    }
+
+    // Goes through the queue and processes files if there aren't too many already.
+
+  }, {
+    key: "processQueue",
+    value: function processQueue() {
+      var parallelUploads = this.options.parallelUploads;
+
+      var processingLength = this.getUploadingFiles().length;
+      var i = processingLength;
+
+      // There are already at least as many files uploading than should be
+      if (processingLength >= parallelUploads) {
+        return;
+      }
+
+      var queuedFiles = this.getQueuedFiles();
+
+      if (!(queuedFiles.length > 0)) {
+        return;
+      }
+
+      if (this.options.uploadMultiple) {
+        // The files should be uploaded in one request
+        return this.processFiles(queuedFiles.slice(0, parallelUploads - processingLength));
+      } else {
+        while (i < parallelUploads) {
+          if (!queuedFiles.length) {
+            return;
+          } // Nothing left to process
+          this.processFile(queuedFiles.shift());
+          i++;
+        }
+      }
+    }
+
+    // Wrapper for `processFiles`
+
+  }, {
+    key: "processFile",
+    value: function processFile(file) {
+      return this.processFiles([file]);
+    }
+
+    // Loads the file, then calls finishedLoading()
+
+  }, {
+    key: "processFiles",
+    value: function processFiles(files) {
+      for (var _iterator19 = files, _isArray19 = true, _i20 = 0, _iterator19 = _isArray19 ? _iterator19 : _iterator19[Symbol.iterator]();;) {
+        var _ref18;
+
+        if (_isArray19) {
+          if (_i20 >= _iterator19.length) break;
+          _ref18 = _iterator19[_i20++];
+        } else {
+          _i20 = _iterator19.next();
+          if (_i20.done) break;
+          _ref18 = _i20.value;
+        }
+
+        var file = _ref18;
+
+        file.processing = true; // Backwards compatibility
+        file.status = Dropzone.UPLOADING;
+
+        this.emit("processing", file);
+      }
+
+      if (this.options.uploadMultiple) {
+        this.emit("processingmultiple", files);
+      }
+
+      return this.uploadFiles(files);
+    }
+  }, {
+    key: "_getFilesWithXhr",
+    value: function _getFilesWithXhr(xhr) {
+      var files = void 0;
+      return files = this.files.filter(function (file) {
+        return file.xhr === xhr;
+      }).map(function (file) {
+        return file;
+      });
+    }
+
+    // Cancels the file upload and sets the status to CANCELED
+    // **if** the file is actually being uploaded.
+    // If it's still in the queue, the file is being removed from it and the status
+    // set to CANCELED.
+
+  }, {
+    key: "cancelUpload",
+    value: function cancelUpload(file) {
+      if (file.status === Dropzone.UPLOADING) {
+        var groupedFiles = this._getFilesWithXhr(file.xhr);
+        for (var _iterator20 = groupedFiles, _isArray20 = true, _i21 = 0, _iterator20 = _isArray20 ? _iterator20 : _iterator20[Symbol.iterator]();;) {
+          var _ref19;
+
+          if (_isArray20) {
+            if (_i21 >= _iterator20.length) break;
+            _ref19 = _iterator20[_i21++];
+          } else {
+            _i21 = _iterator20.next();
+            if (_i21.done) break;
+            _ref19 = _i21.value;
+          }
+
+          var groupedFile = _ref19;
+
+          groupedFile.status = Dropzone.CANCELED;
+        }
+        if (typeof file.xhr !== 'undefined') {
+          file.xhr.abort();
+        }
+        for (var _iterator21 = groupedFiles, _isArray21 = true, _i22 = 0, _iterator21 = _isArray21 ? _iterator21 : _iterator21[Symbol.iterator]();;) {
+          var _ref20;
+
+          if (_isArray21) {
+            if (_i22 >= _iterator21.length) break;
+            _ref20 = _iterator21[_i22++];
+          } else {
+            _i22 = _iterator21.next();
+            if (_i22.done) break;
+            _ref20 = _i22.value;
+          }
+
+          var _groupedFile = _ref20;
+
+          this.emit("canceled", _groupedFile);
+        }
+        if (this.options.uploadMultiple) {
+          this.emit("canceledmultiple", groupedFiles);
+        }
+      } else if (file.status === Dropzone.ADDED || file.status === Dropzone.QUEUED) {
+        file.status = Dropzone.CANCELED;
+        this.emit("canceled", file);
+        if (this.options.uploadMultiple) {
+          this.emit("canceledmultiple", [file]);
+        }
+      }
+
+      if (this.options.autoProcessQueue) {
+        return this.processQueue();
+      }
+    }
+  }, {
+    key: "resolveOption",
+    value: function resolveOption(option) {
+      if (typeof option === 'function') {
+        for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+          args[_key3 - 1] = arguments[_key3];
+        }
+
+        return option.apply(this, args);
+      }
+      return option;
+    }
+  }, {
+    key: "uploadFile",
+    value: function uploadFile(file) {
+      return this.uploadFiles([file]);
+    }
+  }, {
+    key: "uploadFiles",
+    value: function uploadFiles(files) {
+      var _this14 = this;
+
+      this._transformFiles(files, function (transformedFiles) {
+        if (files[0].upload.chunked) {
+          // This file should be sent in chunks!
+
+          // If the chunking option is set, we **know** that there can only be **one** file, since
+          // uploadMultiple is not allowed with this option.
+          var file = files[0];
+          var transformedFile = transformedFiles[0];
+          var startedChunkCount = 0;
+
+          file.upload.chunks = [];
+
+          var handleNextChunk = function handleNextChunk() {
+            var chunkIndex = 0;
+
+            // Find the next item in file.upload.chunks that is not defined yet.
+            while (file.upload.chunks[chunkIndex] !== undefined) {
+              chunkIndex++;
+            }
+
+            // This means, that all chunks have already been started.
+            if (chunkIndex >= file.upload.totalChunkCount) return;
+
+            startedChunkCount++;
+
+            var start = chunkIndex * _this14.options.chunkSize;
+            var end = Math.min(start + _this14.options.chunkSize, file.size);
+
+            var dataBlock = {
+              name: _this14._getParamName(0),
+              data: transformedFile.webkitSlice ? transformedFile.webkitSlice(start, end) : transformedFile.slice(start, end),
+              filename: file.upload.filename,
+              chunkIndex: chunkIndex
+            };
+
+            file.upload.chunks[chunkIndex] = {
+              file: file,
+              index: chunkIndex,
+              dataBlock: dataBlock, // In case we want to retry.
+              status: Dropzone.UPLOADING,
+              progress: 0,
+              retries: 0 // The number of times this block has been retried.
+            };
+
+            _this14._uploadData(files, [dataBlock]);
+          };
+
+          file.upload.finishedChunkUpload = function (chunk) {
+            var allFinished = true;
+            chunk.status = Dropzone.SUCCESS;
+
+            // Clear the data from the chunk
+            chunk.dataBlock = null;
+
+            for (var i = 0; i < file.upload.totalChunkCount; i++) {
+              if (file.upload.chunks[i] === undefined) {
+                return handleNextChunk();
+              }
+              if (file.upload.chunks[i].status !== Dropzone.SUCCESS) {
+                allFinished = false;
+              }
+            }
+
+            if (allFinished) {
+              _this14.options.chunksUploaded(file, function () {
+                _this14._finished(files, '', null);
+              });
+            }
+          };
+
+          if (_this14.options.parallelChunkUploads) {
+            for (var i = 0; i < file.upload.totalChunkCount; i++) {
+              handleNextChunk();
+            }
+          } else {
+            handleNextChunk();
+          }
+        } else {
+          var dataBlocks = [];
+          for (var _i23 = 0; _i23 < files.length; _i23++) {
+            dataBlocks[_i23] = {
+              name: _this14._getParamName(_i23),
+              data: transformedFiles[_i23],
+              filename: files[_i23].upload.filename
+            };
+          }
+          _this14._uploadData(files, dataBlocks);
+        }
+      });
+    }
+
+    /// Returns the right chunk for given file and xhr
+
+  }, {
+    key: "_getChunk",
+    value: function _getChunk(file, xhr) {
+      for (var i = 0; i < file.upload.totalChunkCount; i++) {
+        if (file.upload.chunks[i] !== undefined && file.upload.chunks[i].xhr === xhr) {
+          return file.upload.chunks[i];
+        }
+      }
+    }
+
+    // This function actually uploads the file(s) to the server.
+    // If dataBlocks contains the actual data to upload (meaning, that this could either be transformed
+    // files, or individual chunks for chunked upload).
+
+  }, {
+    key: "_uploadData",
+    value: function _uploadData(files, dataBlocks) {
+      var _this15 = this;
+
+      var xhr = new XMLHttpRequest();
+
+      // Put the xhr object in the file objects to be able to reference it later.
+      for (var _iterator22 = files, _isArray22 = true, _i24 = 0, _iterator22 = _isArray22 ? _iterator22 : _iterator22[Symbol.iterator]();;) {
+        var _ref21;
+
+        if (_isArray22) {
+          if (_i24 >= _iterator22.length) break;
+          _ref21 = _iterator22[_i24++];
+        } else {
+          _i24 = _iterator22.next();
+          if (_i24.done) break;
+          _ref21 = _i24.value;
+        }
+
+        var file = _ref21;
+
+        file.xhr = xhr;
+      }
+      if (files[0].upload.chunked) {
+        // Put the xhr object in the right chunk object, so it can be associated later, and found with _getChunk
+        files[0].upload.chunks[dataBlocks[0].chunkIndex].xhr = xhr;
+      }
+
+      var method = this.resolveOption(this.options.method, files);
+      var url = this.resolveOption(this.options.url, files);
+      xhr.open(method, url, true);
+
+      // Setting the timeout after open because of IE11 issue: https://gitlab.com/meno/dropzone/issues/8
+      xhr.timeout = this.resolveOption(this.options.timeout, files);
+
+      // Has to be after `.open()`. See https://github.com/enyo/dropzone/issues/179
+      xhr.withCredentials = !!this.options.withCredentials;
+
+      xhr.onload = function (e) {
+        _this15._finishedUploading(files, xhr, e);
+      };
+
+      xhr.onerror = function () {
+        _this15._handleUploadError(files, xhr);
+      };
+
+      // Some browsers do not have the .upload property
+      var progressObj = xhr.upload != null ? xhr.upload : xhr;
+      progressObj.onprogress = function (e) {
+        return _this15._updateFilesUploadProgress(files, xhr, e);
+      };
+
+      var headers = {
+        "Accept": "application/json",
+        "Cache-Control": "no-cache",
+        "X-Requested-With": "XMLHttpRequest"
+      };
+
+      if (this.options.headers) {
+        Dropzone.extend(headers, this.options.headers);
+      }
+
+      for (var headerName in headers) {
+        var headerValue = headers[headerName];
+        if (headerValue) {
+          xhr.setRequestHeader(headerName, headerValue);
+        }
+      }
+
+      var formData = new FormData();
+
+      // Adding all @options parameters
+      if (this.options.params) {
+        var additionalParams = this.options.params;
+        if (typeof additionalParams === 'function') {
+          additionalParams = additionalParams.call(this, files, xhr, files[0].upload.chunked ? this._getChunk(files[0], xhr) : null);
+        }
+
+        for (var key in additionalParams) {
+          var value = additionalParams[key];
+          formData.append(key, value);
+        }
+      }
+
+      // Let the user add additional data if necessary
+      for (var _iterator23 = files, _isArray23 = true, _i25 = 0, _iterator23 = _isArray23 ? _iterator23 : _iterator23[Symbol.iterator]();;) {
+        var _ref22;
+
+        if (_isArray23) {
+          if (_i25 >= _iterator23.length) break;
+          _ref22 = _iterator23[_i25++];
+        } else {
+          _i25 = _iterator23.next();
+          if (_i25.done) break;
+          _ref22 = _i25.value;
+        }
+
+        var _file = _ref22;
+
+        this.emit("sending", _file, xhr, formData);
+      }
+      if (this.options.uploadMultiple) {
+        this.emit("sendingmultiple", files, xhr, formData);
+      }
+
+      this._addFormElementData(formData);
+
+      // Finally add the files
+      // Has to be last because some servers (eg: S3) expect the file to be the last parameter
+      for (var i = 0; i < dataBlocks.length; i++) {
+        var dataBlock = dataBlocks[i];
+        formData.append(dataBlock.name, dataBlock.data, dataBlock.filename);
+      }
+
+      this.submitRequest(xhr, formData, files);
+    }
+
+    // Transforms all files with this.options.transformFile and invokes done with the transformed files when done.
+
+  }, {
+    key: "_transformFiles",
+    value: function _transformFiles(files, done) {
+      var _this16 = this;
+
+      var transformedFiles = [];
+      // Clumsy way of handling asynchronous calls, until I get to add a proper Future library.
+      var doneCounter = 0;
+
+      var _loop = function _loop(i) {
+        _this16.options.transformFile.call(_this16, files[i], function (transformedFile) {
+          transformedFiles[i] = transformedFile;
+          if (++doneCounter === files.length) {
+            done(transformedFiles);
+          }
+        });
+      };
+
+      for (var i = 0; i < files.length; i++) {
+        _loop(i);
+      }
+    }
+
+    // Takes care of adding other input elements of the form to the AJAX request
+
+  }, {
+    key: "_addFormElementData",
+    value: function _addFormElementData(formData) {
+      // Take care of other input elements
+      if (this.element.tagName === "FORM") {
+        for (var _iterator24 = this.element.querySelectorAll("input, textarea, select, button"), _isArray24 = true, _i26 = 0, _iterator24 = _isArray24 ? _iterator24 : _iterator24[Symbol.iterator]();;) {
+          var _ref23;
+
+          if (_isArray24) {
+            if (_i26 >= _iterator24.length) break;
+            _ref23 = _iterator24[_i26++];
+          } else {
+            _i26 = _iterator24.next();
+            if (_i26.done) break;
+            _ref23 = _i26.value;
+          }
+
+          var input = _ref23;
+
+          var inputName = input.getAttribute("name");
+          var inputType = input.getAttribute("type");
+          if (inputType) inputType = inputType.toLowerCase();
+
+          // If the input doesn't have a name, we can't use it.
+          if (typeof inputName === 'undefined' || inputName === null) continue;
+
+          if (input.tagName === "SELECT" && input.hasAttribute("multiple")) {
+            // Possibly multiple values
+            for (var _iterator25 = input.options, _isArray25 = true, _i27 = 0, _iterator25 = _isArray25 ? _iterator25 : _iterator25[Symbol.iterator]();;) {
+              var _ref24;
+
+              if (_isArray25) {
+                if (_i27 >= _iterator25.length) break;
+                _ref24 = _iterator25[_i27++];
+              } else {
+                _i27 = _iterator25.next();
+                if (_i27.done) break;
+                _ref24 = _i27.value;
+              }
+
+              var option = _ref24;
+
+              if (option.selected) {
+                formData.append(inputName, option.value);
+              }
+            }
+          } else if (!inputType || inputType !== "checkbox" && inputType !== "radio" || input.checked) {
+            formData.append(inputName, input.value);
+          }
+        }
+      }
+    }
+
+    // Invoked when there is new progress information about given files.
+    // If e is not provided, it is assumed that the upload is finished.
+
+  }, {
+    key: "_updateFilesUploadProgress",
+    value: function _updateFilesUploadProgress(files, xhr, e) {
+      var progress = void 0;
+      if (typeof e !== 'undefined') {
+        progress = 100 * e.loaded / e.total;
+
+        if (files[0].upload.chunked) {
+          var file = files[0];
+          // Since this is a chunked upload, we need to update the appropriate chunk progress.
+          var chunk = this._getChunk(file, xhr);
+          chunk.progress = progress;
+          chunk.total = e.total;
+          chunk.bytesSent = e.loaded;
+          var fileProgress = 0,
+              fileTotal = void 0,
+              fileBytesSent = void 0;
+          file.upload.progress = 0;
+          file.upload.total = 0;
+          file.upload.bytesSent = 0;
+          for (var i = 0; i < file.upload.totalChunkCount; i++) {
+            if (file.upload.chunks[i] !== undefined && file.upload.chunks[i].progress !== undefined) {
+              file.upload.progress += file.upload.chunks[i].progress;
+              file.upload.total += file.upload.chunks[i].total;
+              file.upload.bytesSent += file.upload.chunks[i].bytesSent;
+            }
+          }
+          file.upload.progress = file.upload.progress / file.upload.totalChunkCount;
+        } else {
+          for (var _iterator26 = files, _isArray26 = true, _i28 = 0, _iterator26 = _isArray26 ? _iterator26 : _iterator26[Symbol.iterator]();;) {
+            var _ref25;
+
+            if (_isArray26) {
+              if (_i28 >= _iterator26.length) break;
+              _ref25 = _iterator26[_i28++];
+            } else {
+              _i28 = _iterator26.next();
+              if (_i28.done) break;
+              _ref25 = _i28.value;
+            }
+
+            var _file2 = _ref25;
+
+            _file2.upload.progress = progress;
+            _file2.upload.total = e.total;
+            _file2.upload.bytesSent = e.loaded;
+          }
+        }
+        for (var _iterator27 = files, _isArray27 = true, _i29 = 0, _iterator27 = _isArray27 ? _iterator27 : _iterator27[Symbol.iterator]();;) {
+          var _ref26;
+
+          if (_isArray27) {
+            if (_i29 >= _iterator27.length) break;
+            _ref26 = _iterator27[_i29++];
+          } else {
+            _i29 = _iterator27.next();
+            if (_i29.done) break;
+            _ref26 = _i29.value;
+          }
+
+          var _file3 = _ref26;
+
+          this.emit("uploadprogress", _file3, _file3.upload.progress, _file3.upload.bytesSent);
+        }
+      } else {
+        // Called when the file finished uploading
+
+        var allFilesFinished = true;
+
+        progress = 100;
+
+        for (var _iterator28 = files, _isArray28 = true, _i30 = 0, _iterator28 = _isArray28 ? _iterator28 : _iterator28[Symbol.iterator]();;) {
+          var _ref27;
+
+          if (_isArray28) {
+            if (_i30 >= _iterator28.length) break;
+            _ref27 = _iterator28[_i30++];
+          } else {
+            _i30 = _iterator28.next();
+            if (_i30.done) break;
+            _ref27 = _i30.value;
+          }
+
+          var _file4 = _ref27;
+
+          if (_file4.upload.progress !== 100 || _file4.upload.bytesSent !== _file4.upload.total) {
+            allFilesFinished = false;
+          }
+          _file4.upload.progress = progress;
+          _file4.upload.bytesSent = _file4.upload.total;
+        }
+
+        // Nothing to do, all files already at 100%
+        if (allFilesFinished) {
+          return;
+        }
+
+        for (var _iterator29 = files, _isArray29 = true, _i31 = 0, _iterator29 = _isArray29 ? _iterator29 : _iterator29[Symbol.iterator]();;) {
+          var _ref28;
+
+          if (_isArray29) {
+            if (_i31 >= _iterator29.length) break;
+            _ref28 = _iterator29[_i31++];
+          } else {
+            _i31 = _iterator29.next();
+            if (_i31.done) break;
+            _ref28 = _i31.value;
+          }
+
+          var _file5 = _ref28;
+
+          this.emit("uploadprogress", _file5, progress, _file5.upload.bytesSent);
+        }
+      }
+    }
+  }, {
+    key: "_finishedUploading",
+    value: function _finishedUploading(files, xhr, e) {
+      var response = void 0;
+
+      if (files[0].status === Dropzone.CANCELED) {
+        return;
+      }
+
+      if (xhr.readyState !== 4) {
+        return;
+      }
+
+      if (xhr.responseType !== 'arraybuffer' && xhr.responseType !== 'blob') {
+        response = xhr.responseText;
+
+        if (xhr.getResponseHeader("content-type") && ~xhr.getResponseHeader("content-type").indexOf("application/json")) {
+          try {
+            response = JSON.parse(response);
+          } catch (error) {
+            e = error;
+            response = "Invalid JSON response from server.";
+          }
+        }
+      }
+
+      this._updateFilesUploadProgress(files);
+
+      if (!(200 <= xhr.status && xhr.status < 300)) {
+        this._handleUploadError(files, xhr, response);
+      } else {
+        if (files[0].upload.chunked) {
+          files[0].upload.finishedChunkUpload(this._getChunk(files[0], xhr));
+        } else {
+          this._finished(files, response, e);
+        }
+      }
+    }
+  }, {
+    key: "_handleUploadError",
+    value: function _handleUploadError(files, xhr, response) {
+      if (files[0].status === Dropzone.CANCELED) {
+        return;
+      }
+
+      if (files[0].upload.chunked && this.options.retryChunks) {
+        var chunk = this._getChunk(files[0], xhr);
+        if (chunk.retries++ < this.options.retryChunksLimit) {
+          this._uploadData(files, [chunk.dataBlock]);
+          return;
+        } else {
+          console.warn('Retried this chunk too often. Giving up.');
+        }
+      }
+
+      for (var _iterator30 = files, _isArray30 = true, _i32 = 0, _iterator30 = _isArray30 ? _iterator30 : _iterator30[Symbol.iterator]();;) {
+        var _ref29;
+
+        if (_isArray30) {
+          if (_i32 >= _iterator30.length) break;
+          _ref29 = _iterator30[_i32++];
+        } else {
+          _i32 = _iterator30.next();
+          if (_i32.done) break;
+          _ref29 = _i32.value;
+        }
+
+        var file = _ref29;
+
+        this._errorProcessing(files, response || this.options.dictResponseError.replace("{{statusCode}}", xhr.status), xhr);
+      }
+    }
+  }, {
+    key: "submitRequest",
+    value: function submitRequest(xhr, formData, files) {
+      xhr.send(formData);
+    }
+
+    // Called internally when processing is finished.
+    // Individual callbacks have to be called in the appropriate sections.
+
+  }, {
+    key: "_finished",
+    value: function _finished(files, responseText, e) {
+      for (var _iterator31 = files, _isArray31 = true, _i33 = 0, _iterator31 = _isArray31 ? _iterator31 : _iterator31[Symbol.iterator]();;) {
+        var _ref30;
+
+        if (_isArray31) {
+          if (_i33 >= _iterator31.length) break;
+          _ref30 = _iterator31[_i33++];
+        } else {
+          _i33 = _iterator31.next();
+          if (_i33.done) break;
+          _ref30 = _i33.value;
+        }
+
+        var file = _ref30;
+
+        file.status = Dropzone.SUCCESS;
+        this.emit("success", file, responseText, e);
+        this.emit("complete", file);
+      }
+      if (this.options.uploadMultiple) {
+        this.emit("successmultiple", files, responseText, e);
+        this.emit("completemultiple", files);
+      }
+
+      if (this.options.autoProcessQueue) {
+        return this.processQueue();
+      }
+    }
+
+    // Called internally when processing is finished.
+    // Individual callbacks have to be called in the appropriate sections.
+
+  }, {
+    key: "_errorProcessing",
+    value: function _errorProcessing(files, message, xhr) {
+      for (var _iterator32 = files, _isArray32 = true, _i34 = 0, _iterator32 = _isArray32 ? _iterator32 : _iterator32[Symbol.iterator]();;) {
+        var _ref31;
+
+        if (_isArray32) {
+          if (_i34 >= _iterator32.length) break;
+          _ref31 = _iterator32[_i34++];
+        } else {
+          _i34 = _iterator32.next();
+          if (_i34.done) break;
+          _ref31 = _i34.value;
+        }
+
+        var file = _ref31;
+
+        file.status = Dropzone.ERROR;
+        this.emit("error", file, message, xhr);
+        this.emit("complete", file);
+      }
+      if (this.options.uploadMultiple) {
+        this.emit("errormultiple", files, message, xhr);
+        this.emit("completemultiple", files);
+      }
+
+      if (this.options.autoProcessQueue) {
+        return this.processQueue();
+      }
+    }
+  }], [{
+    key: "uuidv4",
+    value: function uuidv4() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0,
+            v = c === 'x' ? r : r & 0x3 | 0x8;
+        return v.toString(16);
+      });
+    }
+  }]);
+
+  return Dropzone;
+}(Emitter);
+
+Dropzone.initClass();
+
+Dropzone.version = "5.4.0";
+
+// This is a map of options for your different dropzones. Add configurations
+// to this object for your different dropzone elemens.
+//
+// Example:
+//
+//     Dropzone.options.myDropzoneElementId = { maxFilesize: 1 };
+//
+// To disable autoDiscover for a specific element, you can set `false` as an option:
+//
+//     Dropzone.options.myDisabledElementId = false;
+//
+// And in html:
+//
+//     <form action="/upload" id="my-dropzone-element-id" class="dropzone"></form>
+Dropzone.options = {};
+
+// Returns the options for an element or undefined if none available.
+Dropzone.optionsForElement = function (element) {
+  // Get the `Dropzone.options.elementId` for this element if it exists
+  if (element.getAttribute("id")) {
+    return Dropzone.options[camelize(element.getAttribute("id"))];
+  } else {
+    return undefined;
+  }
+};
+
+// Holds a list of all dropzone instances
+Dropzone.instances = [];
+
+// Returns the dropzone for given element if any
+Dropzone.forElement = function (element) {
+  if (typeof element === "string") {
+    element = document.querySelector(element);
+  }
+  if ((element != null ? element.dropzone : undefined) == null) {
+    throw new Error("No Dropzone found for given element. This is probably because you're trying to access it before Dropzone had the time to initialize. Use the `init` option to setup any additional observers on your Dropzone.");
+  }
+  return element.dropzone;
+};
+
+// Set to false if you don't want Dropzone to automatically find and attach to .dropzone elements.
+Dropzone.autoDiscover = true;
+
+// Looks for all .dropzone elements and creates a dropzone for them
+Dropzone.discover = function () {
+  var dropzones = void 0;
+  if (document.querySelectorAll) {
+    dropzones = document.querySelectorAll(".dropzone");
+  } else {
+    dropzones = [];
+    // IE :(
+    var checkElements = function checkElements(elements) {
+      return function () {
+        var result = [];
+        for (var _iterator33 = elements, _isArray33 = true, _i35 = 0, _iterator33 = _isArray33 ? _iterator33 : _iterator33[Symbol.iterator]();;) {
+          var _ref32;
+
+          if (_isArray33) {
+            if (_i35 >= _iterator33.length) break;
+            _ref32 = _iterator33[_i35++];
+          } else {
+            _i35 = _iterator33.next();
+            if (_i35.done) break;
+            _ref32 = _i35.value;
+          }
+
+          var el = _ref32;
+
+          if (/(^| )dropzone($| )/.test(el.className)) {
+            result.push(dropzones.push(el));
+          } else {
+            result.push(undefined);
+          }
+        }
+        return result;
+      }();
+    };
+    checkElements(document.getElementsByTagName("div"));
+    checkElements(document.getElementsByTagName("form"));
+  }
+
+  return function () {
+    var result = [];
+    for (var _iterator34 = dropzones, _isArray34 = true, _i36 = 0, _iterator34 = _isArray34 ? _iterator34 : _iterator34[Symbol.iterator]();;) {
+      var _ref33;
+
+      if (_isArray34) {
+        if (_i36 >= _iterator34.length) break;
+        _ref33 = _iterator34[_i36++];
+      } else {
+        _i36 = _iterator34.next();
+        if (_i36.done) break;
+        _ref33 = _i36.value;
+      }
+
+      var dropzone = _ref33;
+
+      // Create a dropzone unless auto discover has been disabled for specific element
+      if (Dropzone.optionsForElement(dropzone) !== false) {
+        result.push(new Dropzone(dropzone));
+      } else {
+        result.push(undefined);
+      }
+    }
+    return result;
+  }();
+};
+
+// Since the whole Drag'n'Drop API is pretty new, some browsers implement it,
+// but not correctly.
+// So I created a blacklist of userAgents. Yes, yes. Browser sniffing, I know.
+// But what to do when browsers *theoretically* support an API, but crash
+// when using it.
+//
+// This is a list of regular expressions tested against navigator.userAgent
+//
+// ** It should only be used on browser that *do* support the API, but
+// incorrectly **
+//
+Dropzone.blacklistedBrowsers = [
+// The mac os and windows phone version of opera 12 seems to have a problem with the File drag'n'drop API.
+/opera.*(Macintosh|Windows Phone).*version\/12/i];
+
+// Checks if the browser is supported
+Dropzone.isBrowserSupported = function () {
+  var capableBrowser = true;
+
+  if (window.File && window.FileReader && window.FileList && window.Blob && window.FormData && document.querySelector) {
+    if (!("classList" in document.createElement("a"))) {
+      capableBrowser = false;
     } else {
-      list.splice(position, 1);
+      // The browser supports the API, but may be blacklisted.
+      for (var _iterator35 = Dropzone.blacklistedBrowsers, _isArray35 = true, _i37 = 0, _iterator35 = _isArray35 ? _iterator35 : _iterator35[Symbol.iterator]();;) {
+        var _ref34;
+
+        if (_isArray35) {
+          if (_i37 >= _iterator35.length) break;
+          _ref34 = _iterator35[_i37++];
+        } else {
+          _i37 = _iterator35.next();
+          if (_i37.done) break;
+          _ref34 = _i37.value;
+        }
+
+        var regex = _ref34;
+
+        if (regex.test(navigator.userAgent)) {
+          capableBrowser = false;
+          continue;
+        }
+      }
+    }
+  } else {
+    capableBrowser = false;
+  }
+
+  return capableBrowser;
+};
+
+Dropzone.dataURItoBlob = function (dataURI) {
+  // convert base64 to raw binary data held in a string
+  // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+  var byteString = atob(dataURI.split(',')[1]);
+
+  // separate out the mime component
+  var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+  // write the bytes of the string to an ArrayBuffer
+  var ab = new ArrayBuffer(byteString.length);
+  var ia = new Uint8Array(ab);
+  for (var i = 0, end = byteString.length, asc = 0 <= end; asc ? i <= end : i >= end; asc ? i++ : i--) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+
+  // write the ArrayBuffer to a blob
+  return new Blob([ab], { type: mimeString });
+};
+
+// Returns an array without the rejected item
+var without = function without(list, rejectedItem) {
+  return list.filter(function (item) {
+    return item !== rejectedItem;
+  }).map(function (item) {
+    return item;
+  });
+};
+
+// abc-def_ghi -> abcDefGhi
+var camelize = function camelize(str) {
+  return str.replace(/[\-_](\w)/g, function (match) {
+    return match.charAt(1).toUpperCase();
+  });
+};
+
+// Creates an element from string
+Dropzone.createElement = function (string) {
+  var div = document.createElement("div");
+  div.innerHTML = string;
+  return div.childNodes[0];
+};
+
+// Tests if given element is inside (or simply is) the container
+Dropzone.elementInside = function (element, container) {
+  if (element === container) {
+    return true;
+  } // Coffeescript doesn't support do/while loops
+  while (element = element.parentNode) {
+    if (element === container) {
+      return true;
+    }
+  }
+  return false;
+};
+
+Dropzone.getElement = function (el, name) {
+  var element = void 0;
+  if (typeof el === "string") {
+    element = document.querySelector(el);
+  } else if (el.nodeType != null) {
+    element = el;
+  }
+  if (element == null) {
+    throw new Error("Invalid `" + name + "` option provided. Please provide a CSS selector or a plain HTML element.");
+  }
+  return element;
+};
+
+Dropzone.getElements = function (els, name) {
+  var el = void 0,
+      elements = void 0;
+  if (els instanceof Array) {
+    elements = [];
+    try {
+      for (var _iterator36 = els, _isArray36 = true, _i38 = 0, _iterator36 = _isArray36 ? _iterator36 : _iterator36[Symbol.iterator]();;) {
+        if (_isArray36) {
+          if (_i38 >= _iterator36.length) break;
+          el = _iterator36[_i38++];
+        } else {
+          _i38 = _iterator36.next();
+          if (_i38.done) break;
+          el = _i38.value;
+        }
+
+        elements.push(this.getElement(el, name));
+      }
+    } catch (e) {
+      elements = null;
+    }
+  } else if (typeof els === "string") {
+    elements = [];
+    for (var _iterator37 = document.querySelectorAll(els), _isArray37 = true, _i39 = 0, _iterator37 = _isArray37 ? _iterator37 : _iterator37[Symbol.iterator]();;) {
+      if (_isArray37) {
+        if (_i39 >= _iterator37.length) break;
+        el = _iterator37[_i39++];
+      } else {
+        _i39 = _iterator37.next();
+        if (_i39.done) break;
+        el = _i39.value;
+      }
+
+      elements.push(el);
+    }
+  } else if (els.nodeType != null) {
+    elements = [els];
+  }
+
+  if (elements == null || !elements.length) {
+    throw new Error("Invalid `" + name + "` option provided. Please provide a CSS selector, a plain HTML element or a list of those.");
+  }
+
+  return elements;
+};
+
+// Asks the user the question and calls accepted or rejected accordingly
+//
+// The default implementation just uses `window.confirm` and then calls the
+// appropriate callback.
+Dropzone.confirm = function (question, accepted, rejected) {
+  if (window.confirm(question)) {
+    return accepted();
+  } else if (rejected != null) {
+    return rejected();
+  }
+};
+
+// Validates the mime type like this:
+//
+// https://developer.mozilla.org/en-US/docs/HTML/Element/input#attr-accept
+Dropzone.isValidFile = function (file, acceptedFiles) {
+  if (!acceptedFiles) {
+    return true;
+  } // If there are no accepted mime types, it's OK
+  acceptedFiles = acceptedFiles.split(",");
+
+  var mimeType = file.type;
+  var baseMimeType = mimeType.replace(/\/.*$/, "");
+
+  for (var _iterator38 = acceptedFiles, _isArray38 = true, _i40 = 0, _iterator38 = _isArray38 ? _iterator38 : _iterator38[Symbol.iterator]();;) {
+    var _ref35;
+
+    if (_isArray38) {
+      if (_i40 >= _iterator38.length) break;
+      _ref35 = _iterator38[_i40++];
+    } else {
+      _i40 = _iterator38.next();
+      if (_i40.done) break;
+      _ref35 = _i40.value;
     }
 
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
+    var validType = _ref35;
 
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
+    validType = validType.trim();
+    if (validType.charAt(0) === ".") {
+      if (file.name.toLowerCase().indexOf(validType.toLowerCase(), file.name.length - validType.length) !== -1) {
+        return true;
+      }
+    } else if (/\/\*$/.test(validType)) {
+      // This is something like a image/* mime type
+      if (baseMimeType === validType.replace(/\/.*$/, "")) {
+        return true;
+      }
+    } else {
+      if (mimeType === validType) {
+        return true;
+      }
     }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
   }
 
-  listeners = this._events[type];
+  return false;
+};
 
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else if (listeners) {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
+// Augment jQuery
+if (typeof jQuery !== 'undefined' && jQuery !== null) {
+  jQuery.fn.dropzone = function (options) {
+    return this.each(function () {
+      return new Dropzone(this, options);
+    });
+  };
+}
+
+if (typeof module !== 'undefined' && module !== null) {
+  module.exports = Dropzone;
+} else {
+  window.Dropzone = Dropzone;
+}
+
+// Dropzone file status codes
+Dropzone.ADDED = "added";
+
+Dropzone.QUEUED = "queued";
+// For backwards compatibility. Now, if a file is accepted, it's either queued
+// or uploading.
+Dropzone.ACCEPTED = Dropzone.QUEUED;
+
+Dropzone.UPLOADING = "uploading";
+Dropzone.PROCESSING = Dropzone.UPLOADING; // alias
+
+Dropzone.CANCELED = "canceled";
+Dropzone.ERROR = "error";
+Dropzone.SUCCESS = "success";
+
+/*
+
+ Bugfix for iOS 6 and 7
+ Source: http://stackoverflow.com/questions/11929099/html5-canvas-drawimage-ratio-bug-ios
+ based on the work of https://github.com/stomita/ios-imagefile-megapixel
+
+ */
+
+// Detecting vertical squash in loaded image.
+// Fixes a bug which squash image vertically while drawing into canvas for some images.
+// This is a bug in iOS6 devices. This function from https://github.com/stomita/ios-imagefile-megapixel
+var detectVerticalSquash = function detectVerticalSquash(img) {
+  var iw = img.naturalWidth;
+  var ih = img.naturalHeight;
+  var canvas = document.createElement("canvas");
+  canvas.width = 1;
+  canvas.height = ih;
+  var ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0);
+
+  var _ctx$getImageData = ctx.getImageData(1, 0, 1, ih),
+      data = _ctx$getImageData.data;
+
+  // search image edge pixel position in case it is squashed vertically.
+
+
+  var sy = 0;
+  var ey = ih;
+  var py = ih;
+  while (py > sy) {
+    var alpha = data[(py - 1) * 4 + 3];
+
+    if (alpha === 0) {
+      ey = py;
+    } else {
+      sy = py;
+    }
+
+    py = ey + sy >> 1;
   }
-  delete this._events[type];
+  var ratio = py / ih;
 
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.prototype.listenerCount = function(type) {
-  if (this._events) {
-    var evlistener = this._events[type];
-
-    if (isFunction(evlistener))
-      return 1;
-    else if (evlistener)
-      return evlistener.length;
+  if (ratio === 0) {
+    return 1;
+  } else {
+    return ratio;
   }
-  return 0;
 };
 
-EventEmitter.listenerCount = function(emitter, type) {
-  return emitter.listenerCount(type);
+// A replacement for context.drawImage
+// (args are for source and destination).
+var drawImageIOSFix = function drawImageIOSFix(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
+  var vertSquashRatio = detectVerticalSquash(img);
+  return ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh / vertSquashRatio);
 };
 
-function isFunction(arg) {
-  return typeof arg === 'function';
+// Based on MinifyJpeg
+// Source: http://www.perry.cz/files/ExifRestorer.js
+// http://elicon.blog57.fc2.com/blog-entry-206.html
+
+var ExifRestore = function () {
+  function ExifRestore() {
+    _classCallCheck(this, ExifRestore);
+  }
+
+  _createClass(ExifRestore, null, [{
+    key: "initClass",
+    value: function initClass() {
+      this.KEY_STR = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    }
+  }, {
+    key: "encode64",
+    value: function encode64(input) {
+      var output = '';
+      var chr1 = undefined;
+      var chr2 = undefined;
+      var chr3 = '';
+      var enc1 = undefined;
+      var enc2 = undefined;
+      var enc3 = undefined;
+      var enc4 = '';
+      var i = 0;
+      while (true) {
+        chr1 = input[i++];
+        chr2 = input[i++];
+        chr3 = input[i++];
+        enc1 = chr1 >> 2;
+        enc2 = (chr1 & 3) << 4 | chr2 >> 4;
+        enc3 = (chr2 & 15) << 2 | chr3 >> 6;
+        enc4 = chr3 & 63;
+        if (isNaN(chr2)) {
+          enc3 = enc4 = 64;
+        } else if (isNaN(chr3)) {
+          enc4 = 64;
+        }
+        output = output + this.KEY_STR.charAt(enc1) + this.KEY_STR.charAt(enc2) + this.KEY_STR.charAt(enc3) + this.KEY_STR.charAt(enc4);
+        chr1 = chr2 = chr3 = '';
+        enc1 = enc2 = enc3 = enc4 = '';
+        if (!(i < input.length)) {
+          break;
+        }
+      }
+      return output;
+    }
+  }, {
+    key: "restore",
+    value: function restore(origFileBase64, resizedFileBase64) {
+      if (!origFileBase64.match('data:image/jpeg;base64,')) {
+        return resizedFileBase64;
+      }
+      var rawImage = this.decode64(origFileBase64.replace('data:image/jpeg;base64,', ''));
+      var segments = this.slice2Segments(rawImage);
+      var image = this.exifManipulation(resizedFileBase64, segments);
+      return "data:image/jpeg;base64," + this.encode64(image);
+    }
+  }, {
+    key: "exifManipulation",
+    value: function exifManipulation(resizedFileBase64, segments) {
+      var exifArray = this.getExifArray(segments);
+      var newImageArray = this.insertExif(resizedFileBase64, exifArray);
+      var aBuffer = new Uint8Array(newImageArray);
+      return aBuffer;
+    }
+  }, {
+    key: "getExifArray",
+    value: function getExifArray(segments) {
+      var seg = undefined;
+      var x = 0;
+      while (x < segments.length) {
+        seg = segments[x];
+        if (seg[0] === 255 & seg[1] === 225) {
+          return seg;
+        }
+        x++;
+      }
+      return [];
+    }
+  }, {
+    key: "insertExif",
+    value: function insertExif(resizedFileBase64, exifArray) {
+      var imageData = resizedFileBase64.replace('data:image/jpeg;base64,', '');
+      var buf = this.decode64(imageData);
+      var separatePoint = buf.indexOf(255, 3);
+      var mae = buf.slice(0, separatePoint);
+      var ato = buf.slice(separatePoint);
+      var array = mae;
+      array = array.concat(exifArray);
+      array = array.concat(ato);
+      return array;
+    }
+  }, {
+    key: "slice2Segments",
+    value: function slice2Segments(rawImageArray) {
+      var head = 0;
+      var segments = [];
+      while (true) {
+        var length;
+        if (rawImageArray[head] === 255 & rawImageArray[head + 1] === 218) {
+          break;
+        }
+        if (rawImageArray[head] === 255 & rawImageArray[head + 1] === 216) {
+          head += 2;
+        } else {
+          length = rawImageArray[head + 2] * 256 + rawImageArray[head + 3];
+          var endPoint = head + length + 2;
+          var seg = rawImageArray.slice(head, endPoint);
+          segments.push(seg);
+          head = endPoint;
+        }
+        if (head > rawImageArray.length) {
+          break;
+        }
+      }
+      return segments;
+    }
+  }, {
+    key: "decode64",
+    value: function decode64(input) {
+      var output = '';
+      var chr1 = undefined;
+      var chr2 = undefined;
+      var chr3 = '';
+      var enc1 = undefined;
+      var enc2 = undefined;
+      var enc3 = undefined;
+      var enc4 = '';
+      var i = 0;
+      var buf = [];
+      // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
+      var base64test = /[^A-Za-z0-9\+\/\=]/g;
+      if (base64test.exec(input)) {
+        console.warn('There were invalid base64 characters in the input text.\nValid base64 characters are A-Z, a-z, 0-9, \'+\', \'/\',and \'=\'\nExpect errors in decoding.');
+      }
+      input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '');
+      while (true) {
+        enc1 = this.KEY_STR.indexOf(input.charAt(i++));
+        enc2 = this.KEY_STR.indexOf(input.charAt(i++));
+        enc3 = this.KEY_STR.indexOf(input.charAt(i++));
+        enc4 = this.KEY_STR.indexOf(input.charAt(i++));
+        chr1 = enc1 << 2 | enc2 >> 4;
+        chr2 = (enc2 & 15) << 4 | enc3 >> 2;
+        chr3 = (enc3 & 3) << 6 | enc4;
+        buf.push(chr1);
+        if (enc3 !== 64) {
+          buf.push(chr2);
+        }
+        if (enc4 !== 64) {
+          buf.push(chr3);
+        }
+        chr1 = chr2 = chr3 = '';
+        enc1 = enc2 = enc3 = enc4 = '';
+        if (!(i < input.length)) {
+          break;
+        }
+      }
+      return buf;
+    }
+  }]);
+
+  return ExifRestore;
+}();
+
+ExifRestore.initClass();
+
+/*
+ * contentloaded.js
+ *
+ * Author: Diego Perini (diego.perini at gmail.com)
+ * Summary: cross-browser wrapper for DOMContentLoaded
+ * Updated: 20101020
+ * License: MIT
+ * Version: 1.2
+ *
+ * URL:
+ * http://javascript.nwbox.com/ContentLoaded/
+ * http://javascript.nwbox.com/ContentLoaded/MIT-LICENSE
+ */
+
+// @win window reference
+// @fn function reference
+var contentLoaded = function contentLoaded(win, fn) {
+  var done = false;
+  var top = true;
+  var doc = win.document;
+  var root = doc.documentElement;
+  var add = doc.addEventListener ? "addEventListener" : "attachEvent";
+  var rem = doc.addEventListener ? "removeEventListener" : "detachEvent";
+  var pre = doc.addEventListener ? "" : "on";
+  var init = function init(e) {
+    if (e.type === "readystatechange" && doc.readyState !== "complete") {
+      return;
+    }
+    (e.type === "load" ? win : doc)[rem](pre + e.type, init, false);
+    if (!done && (done = true)) {
+      return fn.call(win, e.type || e);
+    }
+  };
+
+  var poll = function poll() {
+    try {
+      root.doScroll("left");
+    } catch (e) {
+      setTimeout(poll, 50);
+      return;
+    }
+    return init("poll");
+  };
+
+  if (doc.readyState !== "complete") {
+    if (doc.createEventObject && root.doScroll) {
+      try {
+        top = !win.frameElement;
+      } catch (error) {}
+      if (top) {
+        poll();
+      }
+    }
+    doc[add](pre + "DOMContentLoaded", init, false);
+    doc[add](pre + "readystatechange", init, false);
+    return win[add](pre + "load", init, false);
+  }
+};
+
+// As a single function to be able to write tests.
+Dropzone._autoDiscoverFunction = function () {
+  if (Dropzone.autoDiscover) {
+    return Dropzone.discover();
+  }
+};
+contentLoaded(window, Dropzone._autoDiscoverFunction);
+
+function __guard__(value, transform) {
+  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined;
+}
+function __guardMethod__(obj, methodName, transform) {
+  if (typeof obj !== 'undefined' && obj !== null && typeof obj[methodName] === 'function') {
+    return transform(obj, methodName);
+  } else {
+    return undefined;
+  }
 }
 
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
-/* 45 */
+/* 45 */,
+/* 46 */,
+/* 47 */
 /***/ (function(module, exports) {
 
 $('#register-form-submit').on('click', function (e) {
@@ -67605,11 +69074,341 @@ $(".select2-tags").select2({
   tags: true
 });
 
+$(document).ready(function () {
+  $('.tokenfield-make').tokenfield();
+
+  $("#invites_to_volunteers").on("click", function () {
+    if (this.checked) {
+      var event_id = $('#event_id').val();
+
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        },
+        type: 'post',
+        url: '/party/get-group-emails',
+        data: { event_id: event_id },
+        success: function success(data) {
+          var current_items = $('#manual_invite_box').tokenfield('getTokens');
+          var new_items = $.parseJSON(data);
+
+          var pop_arr = [];
+
+          current_items.forEach(function (current_item) {
+            pop_arr.push(current_item.value);
+          });
+
+          new_items.forEach(function (new_item) {
+            pop_arr.push(new_item);
+          });
+
+          // var populate_arr = new_items.filter(function(obj) { return current_items.indexOf(obj) == -1; });
+          // var populate_arr = pop_arr + new_items;
+
+          // console.log($('#manual_invite_box').tokenfield('getTokens'));
+
+          $('#manual_invite_box').tokenfield('setTokens', pop_arr);
+
+          // // console.log("current: "+current_items);
+          // // console.log("new: "+new_items);
+          // // console.log("pop: "+populate_arr);
+          //
+          // // console.log(populate_arr.toString() + ","+ current_items.toString());
+          // var pop_str = "";
+          //
+          // current_items.forEach(function(email) {
+          //   pop_str += '"'+email+'",\n';
+          // });
+          //
+          // populate_arr.forEach(function(email) {
+          //   pop_str += '"'+email+'",\n';
+          // });
+          //
+          // var final_output = pop_str.substring(0, pop_str.length - 2);
+          //
+          // console.log(final_output);
+          //
+          // // $("#prepopulate").val('{ "items_new" : [' + final_output + ']\n}');
+          //
+          // var tokens = $("#manual_invite_box").tokenfield('getTokens');
+          //
+          // console.log($('#test').tokenfield('getTokens'));
+          //
+          // console.log(tokens);
+          //
+          // // $('#manual_invite_box').tokenfield('setTokens', 'blue,red,white');
+        },
+        error: function error(_error) {
+          console.log('fail');
+        }
+      });
+    }
+  });
+});
+
+$('#manual_invite_box').on('tokenfield:createtoken', function (event) {
+  var existingTokens = $(this).tokenfield('getTokens');
+  $.each(existingTokens, function (index, token) {
+    if (token.value === event.attrs.value) event.preventDefault();
+  });
+});
+
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 49 */,
+/* 50 */,
+/* 51 */,
+/* 52 */,
+/* 53 */,
+/* 54 */,
+/* 55 */,
+/* 56 */,
+/* 57 */,
+/* 58 */,
+/* 59 */,
+/* 60 */,
+/* 61 */,
+/* 62 */,
+/* 63 */,
+/* 64 */,
+/* 65 */,
+/* 66 */,
+/* 67 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/*!
+ * bootstrap-tokenfield 0.12.0
+ * https://github.com/sliptree/bootstrap-tokenfield
+ * Copyright 2013-2014 Sliptree and other contributors; Licensed MIT
+ */
+
+!function (a) {
+   true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (a),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : "object" == (typeof exports === "undefined" ? "undefined" : _typeof(exports)) ? module.exports = global.window && global.window.$ ? a(global.window.$) : function (b) {
+    if (!b.$ && !b.fn) throw new Error("Tokenfield requires a window object with jQuery or a jQuery instance");return a(b.$ || b);
+  } : a(jQuery);
+}(function (a, b) {
+  "use strict";
+  var c = function c(_c, d) {
+    var e = this;this.$element = a(_c), this.textDirection = this.$element.css("direction"), this.options = a.extend(!0, {}, a.fn.tokenfield.defaults, { tokens: this.$element.val() }, this.$element.data(), d), this._delimiters = "string" == typeof this.options.delimiter ? [this.options.delimiter] : this.options.delimiter, this._triggerKeys = a.map(this._delimiters, function (a) {
+      return a.charCodeAt(0);
+    }), this._firstDelimiter = this._delimiters[0];var f = a.inArray(" ", this._delimiters),
+        g = a.inArray("-", this._delimiters);f >= 0 && (this._delimiters[f] = "\\s"), g >= 0 && (delete this._delimiters[g], this._delimiters.unshift("-"));var h = ["\\", "$", "[", "{", "^", ".", "|", "?", "*", "+", "(", ")"];a.each(this._delimiters, function (b, c) {
+      var d = a.inArray(c, h);d >= 0 && (e._delimiters[b] = "\\" + c);
+    });var i,
+        j = b && "function" == typeof b.getMatchedCSSRules ? b.getMatchedCSSRules(_c) : null,
+        k = _c.style.width,
+        l = this.$element.width();j && a.each(j, function (a, b) {
+      b.style.width && (i = b.style.width);
+    });var m = "rtl" === a("body").css("direction") ? "right" : "left",
+        n = { position: this.$element.css("position") };n[m] = this.$element.css(m), this.$element.data("original-styles", n).data("original-tabindex", this.$element.prop("tabindex")).css("position", "absolute").css(m, "-10000px").prop("tabindex", -1), this.$wrapper = a('<div class="tokenfield form-control" />'), this.$element.hasClass("input-lg") && this.$wrapper.addClass("input-lg"), this.$element.hasClass("input-sm") && this.$wrapper.addClass("input-sm"), "rtl" === this.textDirection && this.$wrapper.addClass("rtl");var o = this.$element.prop("id") || new Date().getTime() + "" + Math.floor(100 * (1 + Math.random()));this.$input = a('<input type="text" class="token-input" autocomplete="off" />').appendTo(this.$wrapper).prop("placeholder", this.$element.prop("placeholder")).prop("id", o + "-tokenfield").prop("tabindex", this.$element.data("original-tabindex"));var p = a('label[for="' + this.$element.prop("id") + '"]');if (p.length && p.prop("for", this.$input.prop("id")), this.$copyHelper = a('<input type="text" />').css("position", "absolute").css(m, "-10000px").prop("tabindex", -1).prependTo(this.$wrapper), k ? this.$wrapper.css("width", k) : i ? this.$wrapper.css("width", i) : this.$element.parents(".form-inline").length && this.$wrapper.width(l), (this.$element.prop("disabled") || this.$element.parents("fieldset[disabled]").length) && this.disable(), this.$element.prop("readonly") && this.readonly(), this.$mirror = a('<span style="position:absolute; top:-999px; left:0; white-space:pre;"/>'), this.$input.css("min-width", this.options.minWidth + "px"), a.each(["fontFamily", "fontSize", "fontWeight", "fontStyle", "letterSpacing", "textTransform", "wordSpacing", "textIndent"], function (a, b) {
+      e.$mirror[0].style[b] = e.$input.css(b);
+    }), this.$mirror.appendTo("body"), this.$wrapper.insertBefore(this.$element), this.$element.prependTo(this.$wrapper), this.update(), this.setTokens(this.options.tokens, !1, !1), this.listen(), !a.isEmptyObject(this.options.autocomplete)) {
+      var q = "rtl" === this.textDirection ? "right" : "left",
+          r = a.extend({ minLength: this.options.showAutocompleteOnFocus ? 0 : null, position: { my: q + " top", at: q + " bottom", of: this.$wrapper } }, this.options.autocomplete);this.$input.autocomplete(r);
+    }if (!a.isEmptyObject(this.options.typeahead)) {
+      var s = this.options.typeahead,
+          t = { minLength: this.options.showAutocompleteOnFocus ? 0 : null },
+          u = a.isArray(s) ? s : [s, s];u[0] = a.extend({}, t, u[0]), this.$input.typeahead.apply(this.$input, u), this.typeahead = !0;
+    }this.$element.trigger("tokenfield:initialize");
+  };c.prototype = { constructor: c, createToken: function createToken(b, c) {
+      var d = this;if ("string" == typeof b && (b = { value: b, label: b }), "undefined" == typeof c && (c = !0), b.value = a.trim(b.value), b.label = b.label && b.label.length ? a.trim(b.label) : b.value, !(!b.value.length || !b.label.length || b.label.length <= this.options.minLength || this.options.limit && this.getTokens().length >= this.options.limit)) {
+        var e = a.Event("tokenfield:createtoken", { attrs: b });if (this.$element.trigger(e), e.attrs && !e.isDefaultPrevented()) {
+          var f = a('<div class="token" />').attr("data-value", b.value).append('<span class="token-label" />').append('<a href="#" class="close" tabindex="-1">&times;</a>');this.$input.hasClass("tt-input") ? this.$input.parent().before(f) : this.$input.before(f), this.$input.css("width", this.options.minWidth + "px");var g = f.find(".token-label"),
+              h = f.find(".close");return this.maxTokenWidth || (this.maxTokenWidth = this.$wrapper.width() - h.outerWidth() - parseInt(h.css("margin-left"), 10) - parseInt(h.css("margin-right"), 10) - parseInt(f.css("border-left-width"), 10) - parseInt(f.css("border-right-width"), 10) - parseInt(f.css("padding-left"), 10) - parseInt(f.css("padding-right"), 10), parseInt(g.css("border-left-width"), 10) - parseInt(g.css("border-right-width"), 10) - parseInt(g.css("padding-left"), 10) - parseInt(g.css("padding-right"), 10), parseInt(g.css("margin-left"), 10) - parseInt(g.css("margin-right"), 10)), g.text(b.label).css("max-width", this.maxTokenWidth), f.on("mousedown", function () {
+            return d._disabled || d._readonly ? !1 : (d.preventDeactivation = !0, void 0);
+          }).on("click", function (a) {
+            return d._disabled || d._readonly ? !1 : (d.preventDeactivation = !1, a.ctrlKey || a.metaKey ? (a.preventDefault(), d.toggle(f)) : (d.activate(f, a.shiftKey, a.shiftKey), void 0));
+          }).on("dblclick", function () {
+            return d._disabled || d._readonly || !d.options.allowEditing ? !1 : (d.edit(f), void 0);
+          }), h.on("click", a.proxy(this.remove, this)), this.$element.trigger(a.Event("tokenfield:createdtoken", { attrs: b, relatedTarget: f.get(0) })), c && this.$element.val(this.getTokensList()).trigger(a.Event("change", { initiator: "tokenfield" })), this.update(), this.$element.get(0);
+        }
+      }
+    }, setTokens: function setTokens(b, c, d) {
+      if (b) {
+        c || this.$wrapper.find(".token").remove(), "undefined" == typeof d && (d = !0), "string" == typeof b && (b = this._delimiters.length ? b.split(new RegExp("[" + this._delimiters.join("") + "]")) : [b]);var e = this;return a.each(b, function (a, b) {
+          e.createToken(b, d);
+        }), this.$element.get(0);
+      }
+    }, getTokenData: function getTokenData(b) {
+      var c = b.map(function () {
+        var b = a(this);return { value: b.attr("data-value"), label: b.find(".token-label").text() };
+      }).get();return 1 == c.length && (c = c[0]), c;
+    }, getTokens: function getTokens(b) {
+      var c = this,
+          d = [],
+          e = b ? ".active" : "";return this.$wrapper.find(".token" + e).each(function () {
+        d.push(c.getTokenData(a(this)));
+      }), d;
+    }, getTokensList: function getTokensList(b, c, d) {
+      b = b || this._firstDelimiter, c = "undefined" != typeof c && null !== c ? c : this.options.beautify;var e = b + (c && " " !== b ? " " : "");return a.map(this.getTokens(d), function (a) {
+        return a.value;
+      }).join(e);
+    }, getInput: function getInput() {
+      return this.$input.val();
+    }, listen: function listen() {
+      var c = this;this.$element.on("change", a.proxy(this.change, this)), this.$wrapper.on("mousedown", a.proxy(this.focusInput, this)), this.$input.on("focus", a.proxy(this.focus, this)).on("blur", a.proxy(this.blur, this)).on("paste", a.proxy(this.paste, this)).on("keydown", a.proxy(this.keydown, this)).on("keypress", a.proxy(this.keypress, this)).on("keyup", a.proxy(this.keyup, this)), this.$copyHelper.on("focus", a.proxy(this.focus, this)).on("blur", a.proxy(this.blur, this)).on("keydown", a.proxy(this.keydown, this)).on("keyup", a.proxy(this.keyup, this)), this.$input.on("keypress", a.proxy(this.update, this)).on("keyup", a.proxy(this.update, this)), this.$input.on("autocompletecreate", function () {
+        var b = a(this).data("ui-autocomplete").menu.element,
+            d = c.$wrapper.outerWidth() - parseInt(b.css("border-left-width"), 10) - parseInt(b.css("border-right-width"), 10);b.css("min-width", d + "px");
+      }).on("autocompleteselect", function (a, b) {
+        return c.createToken(b.item) && (c.$input.val(""), c.$input.data("edit") && c.unedit(!0)), !1;
+      }).on("typeahead:selected typeahead:autocompleted", function (a, b) {
+        c.createToken(b) && (c.$input.typeahead("val", ""), c.$input.data("edit") && c.unedit(!0));
+      }), a(b).on("resize", a.proxy(this.update, this));
+    }, keydown: function keydown(b) {
+      function c(a) {
+        if (e.$input.is(document.activeElement)) {
+          if (e.$input.val().length > 0) return;a += "All";var c = e.$input.hasClass("tt-input") ? e.$input.parent()[a](".token:first") : e.$input[a](".token:first");if (!c.length) return;e.preventInputFocus = !0, e.preventDeactivation = !0, e.activate(c), b.preventDefault();
+        } else e[a](b.shiftKey), b.preventDefault();
+      }function d(c) {
+        if (b.shiftKey) {
+          if (e.$input.is(document.activeElement)) {
+            if (e.$input.val().length > 0) return;var d = e.$input.hasClass("tt-input") ? e.$input.parent()[c + "All"](".token:first") : e.$input[c + "All"](".token:first");if (!d.length) return;e.activate(d);
+          }var f = "prev" === c ? "next" : "prev",
+              g = "prev" === c ? "first" : "last";e.firstActiveToken[f + "All"](".token").each(function () {
+            e.deactivate(a(this));
+          }), e.activate(e.$wrapper.find(".token:" + g), !0, !0), b.preventDefault();
+        }
+      }if (this.focused) {
+        var e = this;switch (b.keyCode) {case 8:
+            if (!this.$input.is(document.activeElement)) break;this.lastInputValue = this.$input.val();break;case 37:
+            c("rtl" === this.textDirection ? "next" : "prev");break;case 38:
+            d("prev");break;case 39:
+            c("rtl" === this.textDirection ? "prev" : "next");break;case 40:
+            d("next");break;case 65:
+            if (this.$input.val().length > 0 || !b.ctrlKey && !b.metaKey) break;this.activateAll(), b.preventDefault();break;case 9:case 13:
+            if (this.$input.data("ui-autocomplete") && this.$input.data("ui-autocomplete").menu.element.find("li:has(a.ui-state-focus)").length) break;if (this.$input.hasClass("tt-input") && this.$wrapper.find(".tt-cursor").length) break;if (this.$input.hasClass("tt-input") && this.$wrapper.find(".tt-hint").val().length) break;if (this.$input.is(document.activeElement) && this.$input.val().length || this.$input.data("edit")) return this.createTokensFromInput(b, this.$input.data("edit"));if (13 === b.keyCode) {
+              if (!this.$copyHelper.is(document.activeElement) || 1 !== this.$wrapper.find(".token.active").length) break;if (!e.options.allowEditing) break;this.edit(this.$wrapper.find(".token.active"));
+            }}this.lastKeyDown = b.keyCode;
+      }
+    }, keypress: function keypress(b) {
+      return this.lastKeyPressCode = b.keyCode, this.lastKeyPressCharCode = b.charCode, -1 !== a.inArray(b.charCode, this._triggerKeys) && this.$input.is(document.activeElement) ? (this.$input.val() && this.createTokensFromInput(b), !1) : void 0;
+    }, keyup: function keyup(a) {
+      if (this.preventInputFocus = !1, this.focused) {
+        switch (a.keyCode) {case 8:
+            if (this.$input.is(document.activeElement)) {
+              if (this.$input.val().length || this.lastInputValue.length && 8 === this.lastKeyDown) break;this.preventDeactivation = !0;var b = this.$input.hasClass("tt-input") ? this.$input.parent().prevAll(".token:first") : this.$input.prevAll(".token:first");if (!b.length) break;this.activate(b);
+            } else this.remove(a);break;case 46:
+            this.remove(a, "next");}this.lastKeyUp = a.keyCode;
+      }
+    }, focus: function focus() {
+      this.focused = !0, this.$wrapper.addClass("focus"), this.$input.is(document.activeElement) && (this.$wrapper.find(".active").removeClass("active"), this.$firstActiveToken = null, this.options.showAutocompleteOnFocus && this.search());
+    }, blur: function blur(a) {
+      this.focused = !1, this.$wrapper.removeClass("focus"), this.preventDeactivation || this.$element.is(document.activeElement) || (this.$wrapper.find(".active").removeClass("active"), this.$firstActiveToken = null), !this.preventCreateTokens && (this.$input.data("edit") && !this.$input.is(document.activeElement) || this.options.createTokensOnBlur) && this.createTokensFromInput(a), this.preventDeactivation = !1, this.preventCreateTokens = !1;
+    }, paste: function paste(a) {
+      var b = this;setTimeout(function () {
+        b.createTokensFromInput(a);
+      }, 1);
+    }, change: function change(a) {
+      "tokenfield" !== a.initiator && this.setTokens(this.$element.val());
+    }, createTokensFromInput: function createTokensFromInput(a, b) {
+      if (!(this.$input.val().length < this.options.minLength)) {
+        var c = this.getTokensList();return this.setTokens(this.$input.val(), !0), c == this.getTokensList() && this.$input.val().length ? !1 : (this.$input.hasClass("tt-input") ? this.$input.typeahead("val", "") : this.$input.val(""), this.$input.data("edit") && this.unedit(b), !1);
+      }
+    }, next: function next(a) {
+      if (a) {
+        var b = this.$wrapper.find(".active:first"),
+            c = b && this.$firstActiveToken ? b.index() < this.$firstActiveToken.index() : !1;if (c) return this.deactivate(b);
+      }var d = this.$wrapper.find(".active:last"),
+          e = d.nextAll(".token:first");return e.length ? (this.activate(e, a), void 0) : (this.$input.focus(), void 0);
+    }, prev: function prev(a) {
+      if (a) {
+        var b = this.$wrapper.find(".active:last"),
+            c = b && this.$firstActiveToken ? b.index() > this.$firstActiveToken.index() : !1;if (c) return this.deactivate(b);
+      }var d = this.$wrapper.find(".active:first"),
+          e = d.prevAll(".token:first");return e.length || (e = this.$wrapper.find(".token:first")), e.length || a ? (this.activate(e, a), void 0) : (this.$input.focus(), void 0);
+    }, activate: function activate(b, c, d, e) {
+      if (b) {
+        if ("undefined" == typeof e) var e = !0;if (d) var c = !0;if (this.$copyHelper.focus(), c || (this.$wrapper.find(".active").removeClass("active"), e ? this.$firstActiveToken = b : delete this.$firstActiveToken), d && this.$firstActiveToken) {
+          var f = this.$firstActiveToken.index() - 2,
+              g = b.index() - 2,
+              h = this;this.$wrapper.find(".token").slice(Math.min(f, g) + 1, Math.max(f, g)).each(function () {
+            h.activate(a(this), !0);
+          });
+        }b.addClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select();
+      }
+    }, activateAll: function activateAll() {
+      var b = this;this.$wrapper.find(".token").each(function (c) {
+        b.activate(a(this), 0 !== c, !1, !1);
+      });
+    }, deactivate: function deactivate(a) {
+      a && (a.removeClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select());
+    }, toggle: function toggle(a) {
+      a && (a.toggleClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select());
+    }, edit: function edit(b) {
+      if (b) {
+        var c = { value: b.data("value"), label: b.find(".token-label").text() },
+            d = { attrs: c, relatedTarget: b.get(0) },
+            e = a.Event("tokenfield:edittoken", d);if (this.$element.trigger(e), !e.isDefaultPrevented()) {
+          b.find(".token-label").text(c.value);var f = b.outerWidth(),
+              g = this.$input.hasClass("tt-input") ? this.$input.parent() : this.$input;b.replaceWith(g), this.preventCreateTokens = !0, this.$input.val(c.value).select().data("edit", !0).width(f), this.update(), this.$element.trigger(a.Event("tokenfield:editedtoken", d));
+        }
+      }
+    }, unedit: function unedit(a) {
+      var b = this.$input.hasClass("tt-input") ? this.$input.parent() : this.$input;if (b.appendTo(this.$wrapper), this.$input.data("edit", !1), this.$mirror.text(""), this.update(), a) {
+        var c = this;setTimeout(function () {
+          c.$input.focus();
+        }, 1);
+      }
+    }, remove: function remove(b, c) {
+      if (!(this.$input.is(document.activeElement) || this._disabled || this._readonly)) {
+        var d = "click" === b.type ? a(b.target).closest(".token") : this.$wrapper.find(".token.active");if ("click" !== b.type) {
+          if (!c) var c = "prev";if (this[c](), "prev" === c) var e = 0 === d.first().prevAll(".token:first").length;
+        }var f = { attrs: this.getTokenData(d), relatedTarget: d.get(0) },
+            g = a.Event("tokenfield:removetoken", f);if (this.$element.trigger(g), !g.isDefaultPrevented()) {
+          var h = a.Event("tokenfield:removedtoken", f),
+              i = a.Event("change", { initiator: "tokenfield" });d.remove(), this.$element.val(this.getTokensList()).trigger(h).trigger(i), (!this.$wrapper.find(".token").length || "click" === b.type || e) && this.$input.focus(), this.$input.css("width", this.options.minWidth + "px"), this.update(), b.preventDefault(), b.stopPropagation();
+        }
+      }
+    }, update: function update() {
+      var a = this.$input.val(),
+          b = parseInt(this.$input.css("padding-left"), 10),
+          c = parseInt(this.$input.css("padding-right"), 10),
+          d = b + c;if (this.$input.data("edit")) {
+        if (a || (a = this.$input.prop("placeholder")), a === this.$mirror.text()) return;this.$mirror.text(a);var e = this.$mirror.width() + 10;if (e > this.$wrapper.width()) return this.$input.width(this.$wrapper.width());this.$input.width(e);
+      } else {
+        if (this.$input.css("width", this.options.minWidth + "px"), "rtl" === this.textDirection) return this.$input.width(this.$input.offset().left + this.$input.outerWidth() - this.$wrapper.offset().left - parseInt(this.$wrapper.css("padding-left"), 10) - d - 1);this.$input.width(this.$wrapper.offset().left + this.$wrapper.width() + parseInt(this.$wrapper.css("padding-left"), 10) - this.$input.offset().left - d);
+      }
+    }, focusInput: function focusInput(b) {
+      if (!(a(b.target).closest(".token").length || a(b.target).closest(".token-input").length || a(b.target).closest(".tt-dropdown-menu").length)) {
+        var c = this;setTimeout(function () {
+          c.$input.focus();
+        }, 0);
+      }
+    }, search: function search() {
+      this.$input.data("ui-autocomplete") && this.$input.autocomplete("search");
+    }, disable: function disable() {
+      this.setProperty("disabled", !0);
+    }, enable: function enable() {
+      this.setProperty("disabled", !1);
+    }, readonly: function readonly() {
+      this.setProperty("readonly", !0);
+    }, writeable: function writeable() {
+      this.setProperty("readonly", !1);
+    }, setProperty: function setProperty(a, b) {
+      this["_" + a] = b, this.$input.prop(a, b), this.$element.prop(a, b), this.$wrapper[b ? "addClass" : "removeClass"](a);
+    }, destroy: function destroy() {
+      this.$element.val(this.getTokensList()), this.$element.css(this.$element.data("original-styles")), this.$element.prop("tabindex", this.$element.data("original-tabindex"));var b = a('label[for="' + this.$input.prop("id") + '"]');b.length && b.prop("for", this.$element.prop("id")), this.$element.insertBefore(this.$wrapper), this.$element.removeData("original-styles").removeData("original-tabindex").removeData("bs.tokenfield"), this.$wrapper.remove();var c = this.$element;return delete this, c;
+    } };var d = a.fn.tokenfield;return a.fn.tokenfield = function (b, d) {
+    var e,
+        f = [];Array.prototype.push.apply(f, arguments);var g = this.each(function () {
+      var g = a(this),
+          h = g.data("bs.tokenfield"),
+          i = "object" == (typeof b === "undefined" ? "undefined" : _typeof(b)) && b;"string" == typeof b && h && h[b] ? (f.shift(), e = h[b].apply(h, f)) : h || "string" == typeof b || d || g.data("bs.tokenfield", h = new c(this, i));
+    });return "undefined" != typeof e ? e : g;
+  }, a.fn.tokenfield.defaults = { minWidth: 60, minLength: 0, allowEditing: !0, limit: 0, autocomplete: {}, typeahead: {}, showAutocompleteOnFocus: !1, createTokensOnBlur: !1, delimiter: ",", beautify: !0 }, a.fn.tokenfield.Constructor = c, a.fn.tokenfield.noConflict = function () {
+    return a.fn.tokenfield = d, this;
+  }, c;
+});
 
 /***/ })
 /******/ ]);

@@ -1,0 +1,25 @@
+.badge {
+    &-primary {
+        background-color: $brand;
+        border-radius: 3px;
+        margin-left: 8px;
+        font-weight: 400;
+    }
+    &-success, &-danger, &-warning {
+        font-size: 11px;
+        font-weight: 400;
+        padding: 4px 1px;
+        color: #FFF;
+    }
+    &-success {
+        background-color: #7BC743;
+    }
+    &-danger {
+        background-color: #F05D4C;
+    }
+    &-warning {
+        background-color: #F9A33F;
+    }
+
+
+}

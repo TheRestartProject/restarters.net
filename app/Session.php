@@ -30,7 +30,7 @@ class Session extends Model
 
   // Setters
   public static function createSession($user){
-     $session = 'noToken'.md5(substr(time(), -8));
+     $session = '$1'.md5(substr(time(), -8));
      $created_at = date('Y-m-d H:i:s', time() );
 
      try {

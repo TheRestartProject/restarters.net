@@ -11,6 +11,8 @@ class Party extends Model
 {
 
     protected $table = 'events';
+
+    protected $primaryKey = 'idevents';
     /**
      * The attributes that are mass assignable.
      *

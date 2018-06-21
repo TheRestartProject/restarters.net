@@ -8,11 +8,13 @@
 require('./jquery.min');
 require('./bootstrap.min');
 require('./bootstrap');
-//require('./bootstrap-tokenfield/dist/bootstrap-tokenfield.js');
+require('./bootstrap-tokenfield.min.js');
 require('select2');
 require('slick-carousel');
 require('summernote');
-window.Tokenfield = require("tokenfield");
+require('ekko-lightbox');
+window.Dropzone = require('dropzone');
+// window.Tokenfield = require("tokenfield");
 
 // window.Vue = require('vue');
 
@@ -323,17 +325,88 @@ function numericInputs() {
     });
 }
 
-require('./app_additional');
+function removeUser() {
+    jQuery(this).parent().remove();
+    // AJAX remove entry...
+}
 
+function nestedTable() {
+
+    jQuery('.table-row-details').each(function(){
+
+        jQuery(this).on('show.bs.collapse', function () {
+            jQuery(this).prev('tr').addClass('active-row');
+            //jQuery(this).prev('tr').find('.row-button')
+        })
+        jQuery(this).on('hide.bs.collapse', function () {
+            jQuery(this).prev('tr').removeClass('active-row');
+        })
+
+    });
+
+
+}
+
+function loadDropzones() {
+
+    if (jQuery("#dropzoneEl").length > 0 ) {
+
+        var field1 = jQuery('#dropzoneEl').data('field1');
+        var field2 = jQuery('#dropzoneEl').data('field2');
+
+        var instanceDropzone = new Dropzone("#dropzoneEl", {
+            init: function () {
+                jQuery(".dz-message").find('span').text(field1);
+                jQuery(".dz-message").append('<small>'+field2+'</small>');
+            },
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 2,
+            uploadMultiple: true,
+            createImageThumbnails: true,
+            thumbnailWidth: 70,
+            thumbnailHeight: 60,
+            thumbnailMethod: "contain",
+            addRemoveLinks: true,
+            previewsContainer: ".previews"
+        });
+
+    }
+}
+
+Dropzone.autoDiscover = false;
 onboarding();
-initTokenfields();
+// initTokenfields();
 groupsMap();
 textEditor();
 numericInputs();
 eventsMap();
 truncate();
+nestedTable();
 
 jQuery(function () {
-    jQuery('[data-toggle="popover"]').popover();
+    jQuery('.users-list').find('[data-toggle="popover"]').popover();
+
+    jQuery('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
+        jQuery('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
+    });
+
+    jQuery('.table').find('[data-toggle="popover"]').popover({
+        template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
+        placement:'top'
+    })
+
+    jQuery('.table').find('[data-toggle="popover"]').on('click', function (e) {
+        jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
+    });
+
     jQuery('.form-control > select').select2();
+    jQuery('.js-remove').on('click', removeUser);
+    jQuery(document).on('click', '[data-toggle="lightbox"]', function (event) {
+        event.preventDefault();
+        jQuery(this).ekkoLightbox();
+    });
+
+    loadDropzones();
 })
+
+require('./app_additional');

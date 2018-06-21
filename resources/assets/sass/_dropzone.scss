@@ -1,0 +1,85 @@
+.dropzone.dz-clickable {
+  border-style: dashed;
+  border-color: #BEC0C0;
+  border-radius: 3px;
+  background-color: #F8F8F8;
+
+  .dz-message {
+    font-size: 16px;
+    color: #000;
+    font-family: $font-family-sans-serif;
+    background-repeat: no-repeat;
+    background-position: 50% 0;
+    background-image: url('../images/camera-upload.svg');
+    padding-top: 22px;
+
+    small {
+        font-family: $font-family-second;
+        font-size: 13px;
+        display: block;
+        padding-top: 15px;
+        text-align: center;
+        color: #5A5A5A;
+    }
+  }
+
+}
+
+.previews {
+    margin: 20px -5px;
+    padding: 0;
+    display: flex;
+    flex-flow: row wrap;
+
+    img {
+        width: 100% !important;
+        height: auto !important;
+        display: block !important;
+        border-radius: 3px;
+        background:#BEC0C0;
+        border: 2px solid #BEC0C0;
+        margin: auto;
+    }
+
+    > div {
+        padding: 0 5px;
+        margin: 0;
+        flex: 1 0 20%;
+        max-width: 20%;
+        min-width: 20%;
+        flex-direction: column;
+    }
+
+    .dz-preview,
+    .dz-image {
+        position: relative;
+        z-index: 1;
+    }
+
+    .dz-image {
+        margin-bottom: 5px;
+    }
+
+    .dz-success-mark,
+    .dz-error-mark,
+    .dz-error-message,
+    .dz-filename,
+    .dz-size {
+        display: none;
+    }
+
+    .dz-remove {
+        text-indent: -9999px;
+        background-image: url('../images/remove.svg');
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        width: 19px;
+        height: 19px;
+        display: block;
+        text-decoration: none;
+        position: absolute;
+        right: -7px;
+        top: -7px;
+        z-index: 2;
+    }
+}

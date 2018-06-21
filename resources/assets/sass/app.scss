@@ -14,14 +14,20 @@
 
 // Tokenfield
 @import 'tfvariables';
-@import '~tokenfield/lib/scss/mixins';
-@import '~tokenfield/lib/scss/tokenfield';
-// @import '~bootstrap-tokenfield/dist/css/bootstrap-tokenfield.css';
+// @import '~tokenfield/lib/scss/mixins';
+// @import '~tokenfield/lib/scss/tokenfield';
+@import '~bootstrap-tokenfield/dist/css/bootstrap-tokenfield.css';
 
 // Summernote
-@import '~summernote/src/less/summernote';
-@import '~summernote/src/less/summernote-bs4';
-@import '~summernote/src/less/elements';
+// @import '~summernote/src/less/summernote';
+// @import '~summernote/src/less/summernote-bs4';
+// @import '~summernote/src/less/elements';
+@import '~summernote/dist/summernote';
+@import '~summernote/dist/summernote-bs4';
+
+// Dropzone
+@import '~dropzone/dist/basic';
+@import '~dropzone/dist/dropzone';
 
 // Select2
 @import '~select2/src/scss/core';
@@ -35,7 +41,9 @@
 @import "alert";
 @import "entry";
 @import "buttons";
+@import "badge";
 @import "breadcrumb";
+@import "dropzone";
 @import "registration";
 @import "navigation";
 @import "notifications";
@@ -56,5 +64,8 @@
 @import "properties";
 @import 'summernote';
 @import 'events';
+@import "user-list";
+@import "mini-stats";
+@import "stat";
 @import 'truncate';
 @import "global";

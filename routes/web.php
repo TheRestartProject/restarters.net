@@ -20,6 +20,7 @@ Route::post('/user/reset', 'UserController@reset');
 Route::get('/user/recover', 'UserController@recover');
 Route::post('/user/recover', 'UserController@recover');
 Route::get('/user/register', 'UserController@getRegister');
+Route::get('/user/register/{invite}', 'UserController@getRegister');
 Route::post('/user/register', 'UserController@postRegister');
 
 
@@ -74,8 +75,8 @@ Route::middleware('auth')->group(function () {
   Route::get('/device/search', 'DeviceController@index');
   Route::get('/device/edit/{id}', 'DeviceController@edit');
   Route::post('/device/edit/{id}', 'DeviceController@edit');
-  Route::get('/device/create', 'DeviceController@create');
-  Route::post('/device/create', 'DeviceController@create');
+  // Route::get('/device/create', 'DeviceController@create');
+  // Route::post('/device/create', 'DeviceController@create');
   Route::get('/device/delete/{id}', 'DeviceController@delete');
 
   //Group Controller
@@ -102,6 +103,10 @@ Route::middleware('auth')->group(function () {
   Route::get('/party/edit/{id}', 'PartyController@edit');
   Route::post('/party/edit/{id}', 'PartyController@edit');
   Route::get('/party/deleteimage', 'PartyController@deleteimage');
+  Route::post('/party/invite', 'PartyController@postSendInvite');
+  Route::get('/accept-invite/party-{id}/{hash}', 'PartyController@confirmInvite');
+  Route::get('/party/view/{id}', 'PartyController@view');
+  Route::post('/party/get-group-emails', 'PartyController@getGroupEmails');
 
   //Role Controller
   Route::get('/role', 'RoleController@index');

@@ -1,0 +1,30 @@
+.mini-stats {
+    margin: 0 -2px 15px -2px;
+    padding: 0;
+    display: flex;
+    flex-flow: row wrap;
+
+    li {
+        list-style: none;
+        padding: 0;
+        flex: 1 0 33.333%;
+        min-width: 33.333%;
+        max-width: 33.333%;
+        padding-left: 2px;
+        padding-right: 2px;
+        font-size: 22px;
+        white-space: nowrap;
+
+        sup {
+            color: #EC7F00;
+            font-size: 12px;
+            font-weight: 700;
+            left: -4px;
+            top: -8px;
+        }
+
+        svg {
+            display: inline;
+        }
+    }
+}

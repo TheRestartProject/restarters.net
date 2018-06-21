@@ -1,3 +1,13 @@
+.btn {
+    font-family: $font-family-sans-serif;
+    &.disabled {
+      color: #666B6C;
+      background-color: #D3D9DC;
+      border-color: #B0BBC0;
+      opacity: 1;
+    }
+}
+
 .btn-primary {
     background-color: $brand;
     border: 0;
@@ -56,6 +66,14 @@
     min-width: 170px;
 }
 
+.btn-save2 {
+    max-width: 65px !important;
+    min-width: 65px !important;
+    padding-left: 1px;
+    padding-right: 1px;
+    margin: auto 0;
+}
+
 .btn-preferences,
 .registration__prev.btn-preferences {
     padding-left: 0;
@@ -78,6 +96,27 @@
     font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
 }
 
+.btn-skills,
+.btn-title {
+    background-color:transparent;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+}
+
+.btn-title {
+    @extend h1;
+    text-decoration: none;
+
+    &:focus, &:hover, &[aria-expanded="true"] {
+        text-decoration: underline;
+    }
+}
+
+.btn-add {
+    padding: 4px 10px;
+}
+
 .button-group {
     &__notice {
         font-size: 15px;
@@ -89,6 +128,61 @@
 
         .btn {
             margin-bottom: 5px;
+        }
+    }
+
+    .dropdown {
+        display: inline;
+        border: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .dropdown-menu {
+        padding: 5px 0;
+        min-width: 100%;
+        top: -1px !important;
+        background-color: $brand;
+        border-bottom: 3px solid #155E67;
+    }
+
+    .dropdown-item {
+        padding: 5px 10px;
+        background-color: $brand;
+        color: #FFF;
+        font-family: $font-family-sans-serif;
+        font-size: 16px;
+
+        &:hover, &:focus {
+            background-color:$focus1;
+        }
+    }
+}
+
+.dropdown-menu__titles {
+    border: 0;
+    border-radius: 0;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
+    padding: 5px 0;
+
+    a {
+        font-size: 15px;
+        padding: 2px 15px;
+        display: flex;
+        flex: 1 0 100%;
+        align-content: center;
+        flex-direction: row;
+
+        img, svg, span {
+            margin: auto 0;
+        }
+
+        img.dropdown-item-icon {
+            width: 26px;
+            height: auto;
+            margin-right: 10px;
+            border-radius: 50%;
+            box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
         }
     }
 }

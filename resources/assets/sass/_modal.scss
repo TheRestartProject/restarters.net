@@ -1,0 +1,60 @@
+.modal {
+    button[type=submit] {
+      margin-top: 9px;
+    }
+}
+
+.modal-header {
+  h5 {
+    font-size: 20px;
+    margin-bottom: 0;
+  }
+  .close {
+    margin: -1.3rem -1.5rem -1rem auto;
+  }
+  border: 0 none;
+  padding-bottom: 0;
+}
+
+.modal-content {
+  padding: 30px 35px 40px;
+}
+
+.form-control {
+  border: 2px solid #BEC0C0;
+  &:focus{
+    border-color: $brand;
+  }
+}
+
+.form-group {
+  label {
+    font-family: $font-family-sans-serif;
+    font-size: 17px;
+  } 
+}
+
+.after-offset {
+  color: #5A5A5A;
+  font-size: 90%;
+}
+
+.btn-primary {
+    font-size: 16px;
+    border-radius: 3px;
+    font-family: $font-family-sans-serif;
+    padding: 8px 25px 9px 25px;
+    border-radius: 5px;
+}
+
+.modal__invite {
+    textarea {
+      min-height: 140px;
+    }
+}
+
+.modal__description {
+    p:last-child {
+      margin-bottom: 0;
+    }
+}

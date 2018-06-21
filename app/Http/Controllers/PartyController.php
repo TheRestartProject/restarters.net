@@ -8,6 +8,12 @@ use App\Group;
 use App\User;
 use App\Category;
 use App\Device;
+use App\EventsUsers;
+use App\Session;
+use App\UserGroups;
+
+use Notification;
+use App\Notifications\JoinEvent;
 
 use FixometerHelper;
 use Auth;
@@ -358,6 +364,11 @@ class PartyController extends Controller
       $Groups = new Group;
       $File = new FixometerFile;
       $Party = new Party;
+      $Device = new Device;
+
+      $allparties = $Party->ofThisGroup('admin', true, true);
+      $co2Total = $Device->getWeights();
+      $device_count_status = $Device->statusCount();
 
       if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
           $id = $_POST['id'];
@@ -496,6 +507,10 @@ class PartyController extends Controller
             'remotePost' => $remotePost,
             'grouplist' => $Groups->findList(),
             'user' => Auth::user(),
+            'co2Total' => $co2Total[0]->total_footprints,
+            'wasteTotal' => $co2Total[0]->total_weights,
+            'partiesCount' => count($allparties),
+            'device_count_status' => $device_count_status,
           ]);
       }
 
@@ -527,6 +542,68 @@ class PartyController extends Controller
         'remotePost' => $remotePost,
         'grouplist' => $Groups->findList(),
         'user' => Auth::user(),
+        'co2Total' => $co2Total[0]->total_footprints,
+        'wasteTotal' => $co2Total[0]->total_weights,
+        'partiesCount' => count($allparties),
+        'device_count_status' => $device_count_status,
+      ]);
+  }
+
+  public function view($id) {
+      $user = Auth::user();
+
+      $Groups = new Group;
+      $File = new FixometerFile;
+      $Party = new Party;
+      $Device = new Device;
+
+      $allparties = $Party->ofThisGroup('admin', true, true);
+      $co2Total = $Device->getWeights();
+      $device_count_status = $Device->statusCount();
+
+      $images = $File->findImages(env('TBL_EVENTS'), $id);
+
+      if (!isset($images)) {
+        $images = null;
+      }
+
+      $party = $Party->findThis($id)[0];
+
+      $attended_ids = EventsUsers::where('event', $id)->where('status', '=', 2)->pluck('user')->toArray();
+      if (!empty($attended_ids)) {
+        foreach ($attended_ids as $attended_id) {
+          $attended[] = User::getProfile($attended_id);
+          $attended_roles[$attended_id] = EventsUsers::where('user', $attended_id)->where('event', $id)->first()->role;
+        }
+      } else {
+        $attended = [];
+        $attended_roles = [];
+      }
+
+      $invited_ids = EventsUsers::where('event', $id)->where('status', '!=', 2)->pluck('user')->toArray();
+      if (!empty($invited_ids)) {
+        foreach ($invited_ids as $invited_id) {
+          $invited[] = User::getProfile($invited_id);
+          $invited_roles[$invited_id] = EventsUsers::where('user', $invited_id)->where('event', $id)->first()->role;
+        }
+      } else {
+        $invited = [];
+        $invited_roles = [];
+      }
+
+      return view('events.view', [
+        'gmaps' => true,
+        'images' => $images,
+        'formdata' => $party,
+        'user' => $user,
+        'co2Total' => $co2Total[0]->total_footprints,
+        'wasteTotal' => $co2Total[0]->total_weights,
+        'partiesCount' => count($allparties),
+        'device_count_status' => $device_count_status,
+        'attended' => $attended,
+        'attended_roles' => $attended_roles,
+        'invited'  => $invited,
+        'invited_roles' => $invited_roles,
       ]);
   }
 
@@ -880,6 +957,116 @@ class PartyController extends Controller
       }
   }
 
+  public function getGroupEmails(Request $request){
+    $event_id = $request->input('event_id');
+
+    $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)->pluck('user')->toArray();
+    $group_users = User::whereIn('id', $group_user_ids)->pluck('email')->toArray();
+
+    return json_encode($group_users);
+  }
+
+  public function postSendInvite(Request $request) {
+
+    $from_id = $request->input('from_id');
+    $group_name = $request->input('group_name');
+    $event_id = $request->input('event_id');
+    $invite_group = $request->input('invite_group');
+    $emails = explode(',', str_replace(' ', '', $request->input('manual_invite_box')));
+    $message = $request->input('message_to_restarters');
+
+    if (empty($emails)) {
+      $users = User::whereIn('email', $emails)->get();
+      // if (isset($invite_group) && $invite_group == 1) {
+      //   $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)->pluck('user')->toArray();
+      //   $group_users = User::whereIn('id', $group_user_ids)->get();
+      //
+      //   $users = $users->merge($group_users);
+      // }
+      $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
+      $from = User::find($from_id);
+
+      foreach ($users as $user) {
+        $user_event = EventsUsers::where('user', $user->id)->where('event', $event_id)->first();
+        if (is_null($user_event) || $user_event->status != "1") {
+          $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
+          $url = url('/').'/accept-invite/party-'.$event_id.'/'.$hash;
+
+          if (!is_null($user_event)) {
+            $user_event->update([
+              'status' => $hash,
+            ]);
+          } else {
+            EventsUsers::create([
+              'user' => $user->id,
+              'event' => $event_id,
+              'status' => $hash,
+            ]);
+          }
+
+          $arr = array(
+            'name' => $from->name,
+            'group' => $group_name,
+            'url' => $url,
+            'message' => $message,
+          );
+          Notification::send($user, new JoinEvent($arr));
+        } else {
+          $not_sent[] = $user->email;
+        }
+      }
+
+      if (!empty($non_users)) {
+        foreach ($non_users as $non_user) {
+          $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
+          $url = url('/').'/user/register/party-'.$event_id.'/'.$hash;
+
+          EventsUsers::create([
+            'user' => $user->id,
+            'event' => $event_id,
+            'status' => $hash,
+          ]);
+
+          $invite = JoinEvent::create(array(
+            'name' => $from->name,
+            'group' => $group_name,
+            'url' => $url,
+            'message' => $message,
+          ));
+          $invite->notify();
+          // Notification::send($user, new JoinEvent($arr));
+        }
+      }
+
+      if (!isset($not_sent)) {
+        return redirect()->back()->with('success', 'Invites Sent!');
+      } else {
+        return redirect()->back()->with('warning', 'Invites Sent - apart from these ('.implode(',', $not_sent).') who were already part of the event');
+      }
+    } else {
+      return redirect()->back()->with('warning', 'You have not entered any emails!');
+    }
+
+  }
+
+  public function confirmInvite($event_id, $hash, $register_id = null) {
+
+    try {
+      $user_event = EventsUsers::where('status', $hash)->where('event', $event_id)->first();
+      $user_event->status = 1;
+
+      if (is_null($register_id)) {
+        $user_event->save();
+        return redirect('/party/view/'.$user_event->event)->with('success', 'Excellent! You are joining us for this party');
+      } else {
+        $user_event->user = $register_id;
+        $user_event->save();
+      }
+    } catch (\Exception $e) {
+      return false;
+    }
+
+  }
 
     public function test() {
       $g = new Party;

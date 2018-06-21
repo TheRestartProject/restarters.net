@@ -2,7 +2,7 @@
     background-color: #F9F9F9;
     border: 1px solid #D9D9D9;
     border-radius: 3px;
-    padding: 50px 45px;
+    padding: 50px 45px 40px;
     margin: 0 0 30px 0;
 
     .d-flex & {
@@ -17,7 +17,7 @@
 
     p {
         font-size: 15px;
-        line-height: 1;
+        line-height: 19px;
     }
 
     .form-control, .tokenfield {
@@ -130,4 +130,3 @@
 .col-bottom {
     margin-bottom: 30px;
 }
-

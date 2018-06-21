@@ -24,4 +24,28 @@
             line-height: 1.2;
         }
     }
+
+    &-attendance {
+        border: 0;
+        padding-right: 300px;
+        position: relative;
+        z-index: 1;
+        color: #FFF;
+        background-color: #4AC54B;
+        margin-bottom: 40px;
+
+        .btn  {
+            position: absolute;
+            font-family: $font-family-sans-serif;
+            top: 50%;
+            margin-top: -23px;
+            right: 20px;
+            z-index: 2;
+            padding: 12px 15px;
+            line-height: 1.2;
+            background-color: #3BA43D;
+            border-bottom:3px solid #206821;
+            color: #FFF;
+        }
+    }
 }

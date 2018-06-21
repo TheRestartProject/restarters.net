@@ -1,5 +1,4 @@
 .features {
-    background-color: #fff;
     padding: 10px 0;
     height: 100%;
 
@@ -19,7 +18,7 @@
         text-align: center;
 
         @extend .clear;
-        
+
         p {
             font-size: 18px;
         }
@@ -45,3 +44,8 @@
 
 }
 
+.featured-slide__heading {
+    font-size: 18px;
+    text-align: center;
+    margin: 15px auto;
+}

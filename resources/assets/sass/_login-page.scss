@@ -1,9 +1,12 @@
 .login-page {
-    background-color: #fff;
     height: 100vh;
     @extend .clear;
 
     header {
+        margin-top: 20px;
+        svg {
+          margin-bottom: 15px;
+        }
         p {
             padding: 0 15px;
             font-size: 24px;
@@ -14,12 +17,15 @@
             }
         }
     }
-
     .entry-wrapper {
         margin: auto;
         @include media-breakpoint-up(xl) {
             width: 960px;
         }
+    }
+    legend {
+        font-family: $font-family-sans-serif;
+        font-size: 20px;
     }
 }
 

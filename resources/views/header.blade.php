@@ -50,7 +50,7 @@
                                 </a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="device-management-dropdown">
                                         <li role="presentation"><a role="menuitem" tabindex="-1" href="/device"> All Devices</a></li>
-                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/device/create">New Device</a></li>
+                                        <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="/device/create">New Device</a></li> -->
 
                                     </ul>
                             </li>

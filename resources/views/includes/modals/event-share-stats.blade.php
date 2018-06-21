@@ -1,0 +1,74 @@
+<!-- Modal -->
+<div class="modal fade" id="event-share-stats" tabindex="-1" role="dialog" aria-labelledby="eventShareStatsLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <h5 id="eventShareStatsLabel">@lang('events.share_stats_header')</h5>
+        @include('fixometer/partials/cross')
+
+      </div>
+
+      <div class="modal-body">
+
+        <p>@lang('events.share_stats_message', ['date' => '7th May', 'event_name' => 'The Old Chapel', 'number_devices' => 100])</p>
+
+        <div id="accordionEvent" class="accordion__share mt-4">
+
+          <div class="card">
+            <div class="card-header p-0" id="headingEventHeadline">
+              <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseEventHeadline" aria-expanded="false" aria-controls="collapseEventHeadline">
+                @lang('events.headline_stats_dropdown')
+                @include('fixometer/partials/caret')
+              </button>
+            </div>
+            <div id="collapseEventHeadline" class="collapse" aria-labelledby="headingEventHeadline" data-parent="#accordionEvent">
+              <div class="card-body">
+
+                  <div class="form-group">
+                      <label for="event_headline_stats_embed">@lang('events.embed_code_header'):</label>
+                      <input type="text" class="form-control field" id="event_headline_stats_embed" value='<iframe src="https://community.therestartproject.org/group/stats/1" frameborder="0" width="100%" height="115"></iframe>'>
+                  </div>
+                  <small class="after-offset">@lang('events.headline_stats_message')</small>
+
+                  <iframe src="https://community.therestartproject.org/group/stats/1" frameborder="0" width="100%" height="115" class="form-control"></iframe>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header p-0" id="headingEventCO2">
+              <button class="btn btn-link" data-toggle="collapse" data-target="#collapseEventCO2" aria-expanded="true" aria-controls="collapseEventCO2">
+                @lang('events.co2_equivalence_visualisation_dropdown')
+                @include('fixometer/partials/caret')
+              </button>
+            </div>
+
+            <div id="collapseEventCO2" class="collapse show" aria-labelledby="headingEventCO2" data-parent="#accordionEvent">
+              <div class="card-body">
+
+                  <div class="form-group">
+                      <label for="event_co2_stats_embed">@lang('events.embed_code_header'):</label>
+                      <input type="text" class="form-control field" id="event_co2_stats_embed" value='<iframe src="https://community.therestartproject.org/outbound/info/group/1" frameborder="0" width="700" height="850"></iframe>'>
+                  </div>
+                  <small class="after-offset">@lang('events.infographic_message')</small>
+
+                  <div class="embed-responsive embed-responsive-21by9">
+                    <iframe src="https://community.therestartproject.org/outbound/info/group/1" frameborder="0" width="700" height="850" class="form-control embed-responsive-item"></iframe>
+                  </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </div>
+  </div>
+</div>

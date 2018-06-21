@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-12">
             <h1><?php echo $title; ?></h1>
-            <a class="btn btn-default btn-sm" href="/device/create"><i class="fa fa-plus"></i>New Device</a>
+            <!-- <a class="btn btn-default btn-sm" href="/device/create"><i class="fa fa-plus"></i>New Device</a> -->
             <a href="/export/devices" class="btn btn-default btn-sm"><i class="fa fa-download"></i>All Device Data</a>
             <hr />
         </div>
@@ -46,7 +46,7 @@
               </div>
               <div class="col-md-3">
                 <div class="form-group">
-                  <select id="groups" name="groups" class="form-control selectpicker" multiple data-live-search="true" title="Choose groups..."> 
+                  <select id="groups" name="groups" class="form-control selectpicker" multiple data-live-search="true" title="Choose groups...">
                     @if(isset($groups))
                       @foreach($groups as $g)
                         <option value="<?php echo $g->id; ?>"

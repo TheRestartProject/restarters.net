@@ -21,6 +21,11 @@
 
         {!! Honeypot::generate('my_name', 'my_time') !!}
 
+        @if(isset($event_id) && isset($invite))
+          <input name="event" type="hidden" value="{{ $event_id }}">
+          <input name="invite" type="hidden" value="{{ $invite }}">
+        @endif
+
         <aside class="registration__step registration__step--active" id="step-1" aria-labelledby="step-1-form-label">
             <h3> @lang('registration.reg-step-1-heading')</h3>
             <p class="registration__status">@lang('registration.step-1')</p>

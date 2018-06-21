@@ -16,6 +16,10 @@
             flex: 1 0 20%;
         }
 
+        &.properties__item__full {
+            flex: 1 0 100% !important;
+        }
+
 
         > div {
             background-color: #F9F9F9;
@@ -43,6 +47,24 @@
             font-weight: 400;
             padding: 0 0 15px 28px;
             color: $brand;
+            flex: 1;
+        }
+    }
+
+    &__small {
+        flex: 1 0 50%;
+        li {
+            @include media-breakpoint-up(lg) {
+                flex: 1 0 50%;
+            }
+        }
+    }
+
+    &__repair-count {
+        font-size: 14px;
+
+        > div {
+            padding-bottom:10px;
         }
     }
 }

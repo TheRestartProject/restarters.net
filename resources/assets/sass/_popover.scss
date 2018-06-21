@@ -15,3 +15,23 @@
     font-family: $font-family-second;
     color: #5A5A5A;
 }
+
+.popover__table {
+    border-color: $brand;
+    border: 0;
+    
+    .popover-body {
+        font-size: 13px;
+        background-color: $brand;
+        border-radius: 3px;
+        color: #FFF;
+        padding: 5px 10px;
+    }
+
+    .arrow::after,
+    .arrow::before {
+        border-bottom-color: $brand;
+        border-top-color: $brand;
+    }
+
+}

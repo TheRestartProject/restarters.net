@@ -16,7 +16,7 @@
     &__login {
         background-color: #F9F9F9;
         border: 1px solid #E9E9E9;
-        padding: 30px 35px;
+        padding: 40px 35px 50px 35px;
         display: flex;
         flex: 1 0 auto;
         margin-top: 10px;
@@ -28,6 +28,10 @@
 
         a {
             color: #000;
+            text-decoration: underline;
+            &:hover{
+              text-decoration: none;
+            }
         }
 
     }
@@ -35,13 +39,13 @@
     &__content {
         background-color: $brand;
         color: #FFF;
-        padding: 30px 35px;
+        padding: 40px 35px;
         display: flex;
         flex: 1 0 auto;
 
         h3 {
             font-size: 23px;
-            margin: 15px 0 15px;
+            margin: 0 0 15px;
         }
 
         p {
@@ -53,7 +57,7 @@
             margin:0 0 0 0;
 
             li {
-                margin: 10px;
+                margin: 6px 10px 6px 17px;
             }
         }
 
