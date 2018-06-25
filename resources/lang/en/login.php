@@ -2,7 +2,7 @@
 
 return [
 
-    'whatis' => 'What is restart?',
+    'whatis' => 'What is restart? Test',
     'whatis_content' => '<p>Benefits of the system should be written here. I recommend a short paragraph and include bullet points for summarising benefits:</p><ul>
                                 <li>Ipsum venenatis</li>
                                 <li>A pharetra lectus viverra a</li>
