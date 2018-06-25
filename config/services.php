@@ -70,7 +70,7 @@ return [
             'avatar_force_update' => false,
 
             // Content of the user's bio
-            'bio' => 'biography', 
+            'bio' => 'biography',
 
             // Verified email address (see "require_activation" if not verified)
             'email' => 'email',
