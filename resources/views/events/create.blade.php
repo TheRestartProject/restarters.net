@@ -7,9 +7,9 @@
         <div class="d-flex justify-content-between align-content-center">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="">FIXOMETER</a></li>
-                <li class="breadcrumb-item"><a href="">@lang('events.event')</a></li>
-                <li class="breadcrumb-item active" aria-current="page">@lang('events.edit_event')</li>
+                <li class="breadcrumb-item"><a href="/">FIXOMETER</a></li>
+                <li class="breadcrumb-item"><a href="/party">@lang('events.event')</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@lang('events.add_event')</li>
             </ol>
           </nav>
 
@@ -24,15 +24,13 @@
         @endif
 
         <div class="edit-panel">
-          <form action="/party/edit/<?php echo $formdata->id; ?>" method="post" id="party-edit" enctype="multipart/form-data">
+        <form action="/party/create" method="post" enctype="multipart/form-data">
             @csrf
-            <input type="hidden" name="id" value="<?php echo $formdata->id; ?>" >
-
           <div class="row">
             <div class="col-lg-6">
               <div class="form-group__offset">
-              <h4>@lang('events.edit_event')</h4>
-              <p>@lang('events.edit_event_content')</p>
+              <h4>@lang('events.add_an_event')</h4>
+              <p>@lang('events.add_event_content')</p>
               </div>
             </div>
           </div>
@@ -41,10 +39,8 @@
             <div class="col-lg-6">
               <div class="form-group form-group__offset">
                   <label for="event_name">@lang('events.field_event_name'):</label>
-                  <input type="text" class="form-control field" id="event_name" name="venue" value="{{ $formdata->venue }}">
+                  <input type="text" class="form-control field" id="event_name" name="venue">
               </div>
-
-              <input type="hidden" name="group" id="group" value="<?php echo $formdata->group; ?>">
 
               <div class="form-group form-group__offset">
                   <label for="event_group">@lang('events.field_event_group'):</label>
@@ -52,7 +48,7 @@
                     <select name="group" id="event_group" class="field field select2">
                       <option></option>
                       @foreach($group_list as $group)
-                      <option value="<?php echo $group->id; ?>" <?php echo($group->id == $formdata->group ? 'selected' : ''); ?>><?php echo $group->name; ?></option>
+                      <option value="<?php echo $group->id; ?>"><?php echo $group->name; ?></option>
                       @endforeach
                     </select>
                   </div>
@@ -60,11 +56,11 @@
 
               <div class="form-group">
                 <label for="event_desc">@lang('events.field_event_desc'):</label>
-                <!-- <div id="textarea-1" class="rte"></div> -->
-                <!-- <noscript>
-                  <textarea name="free_text" id="grp_desc">{!! $formdata->free_text !!}</textarea>
+                <!-- <div id="textarea-1" class="rte"></div>
+                <noscript>
+                  <textarea name="grp_desc" id="grp_desc"></textarea>
                 </noscript> -->
-                <div class="rte" name="description" id="description">{!! $formdata->free_text !!}</div>
+                <div class="rte" name="description" id="description"></div>
               </div>
 
               <input type="hidden" name="free_text" id="free_text" value="">
@@ -74,7 +70,7 @@
                 <div class="row">
                   <div class="col-7">
                     <label for="event_date">@lang('events.field_event_date'):</label>
-                    <input type="date" id="event_date" name="event_date" class="form-control field" value="<?php echo date('Y-m-d', $formdata->event_date); ?>">
+                    <input type="date" id="event_date" name="event_date" class="form-control field">
                   </div>
                 </div>
               </div>
@@ -86,11 +82,11 @@
                     <div class="row row-compressed">
 
                       <div class="col-6">
-                      <input type="text" id="field_event_time" name="start" class="form-control field" value="{{ $formdata->start }}">
+                      <input type="text" id="field_event_time" name="start" class="form-control field">
                       </div>
                       <div class="col-6">
                       <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
-                      <input type="text" id="field_event_time_2" name="end" class="form-control field" value="{{ $formdata->end }}">
+                      <input type="text" id="field_event_time_2" name="end" class="form-control field">
                       </div>
                       </div>
 
@@ -102,7 +98,7 @@
                           <div class="col-7">
                             <div class="form-group">
                               <label for="autocomplete">@lang('events.field_event_venue'):</label>
-                              <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ $formdata->location }}"/>
+                              <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock"  />
 
                               <small id="locationHelpBlock" class="form-text text-muted">
                                 @lang('events.field_venue_helper')
@@ -149,9 +145,9 @@
 
                     <label for="file">@lang('events.field_add_image'):</label>
 
-                    <!-- <form id="dropzoneEl" class="dropzone" action="/party/add-image/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')"> -->
+                    <!-- <form id="dropzoneEl" class="dropzone" action="/" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')"> -->
                         <div class="fallback">
-                            <input id="file" name="file[]" type="file" multiple />
+                            <input id="file" name="file" type="file" multiple />
                         </div>
                     <!-- </form> -->
 
@@ -169,11 +165,11 @@
                   <span class="button-group__notice">@lang('events.before_submit_text')</span>
               </div>
               <div class="col-lg-2 d-flex align-items-center justify-content-end">
-                  <input type="submit" class="btn btn-primary btn-create" id="create-event" value="@lang('events.save_event')">
+                  <input type="submit" class="btn btn-primary btn-create" id="create-event" value="@lang('events.create_event')">
               </div>
           </div>
 
-          </form>
+        </form>
         </div>
 
       </div>

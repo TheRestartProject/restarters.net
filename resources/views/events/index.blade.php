@@ -93,7 +93,7 @@
                       @foreach ($upcoming as $event)
                         <tr>
                             <td class="table-cell-icon"><img src="{{ asset('/images/placeholder.png') }}" alt="Placeholder"></td>
-                            <td class="cell-name"><a href=""><?php echo (!empty($event->venue) ? $event->venue  : $event->location); ?></a></td>
+                            <td class="cell-name"><a href="party/view/{{ $event->id }}"><?php echo (!empty($event->venue) ? $event->venue  : $event->location); ?></a></td>
                             <td class="cell-date">{{ date('d/m/Y', $event->event_timestamp) }}</td>
                             <td class="cell-date">{{ $event->start }}-{{ $event->end }}</td>
                             <td class="cell-locations">{{ $event->location }}</td>
@@ -136,7 +136,7 @@
                       @foreach($past as $event)
                         <tr>
                             <td class="table-cell-icon"><img src="{{ asset('/images/placeholder.png') }}" alt="Placeholder"></td>
-                            <td class="cell-name"><a href=""><?php echo (!empty($event->venue) ? $event->venue  : $event->location); ?></a></td>
+                            <td class="cell-name"><a href="party/view/{{ $event->id }}"><?php echo (!empty($event->venue) ? $event->venue  : $event->location); ?></a></td>
                             <td class="cell-date">{{ date('d/m/Y', $event->event_timestamp) }}</td>
                             <td class="cell-date">{{ $event->start }}-{{ $event->end }}</td>
                             <td class="cell-locations">{{ $event->location }}</td>

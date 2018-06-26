@@ -127,24 +127,39 @@ class PartyController extends Controller
           $error = array();
 
           // Add SuperHero Restarter!
-          $_POST['users'][] = 29;
-          if(empty($_POST['volunteers'])) {
-              $volunteers = count($_POST['users']);
-          }
-          else {
-              $volunteers = $_POST['volunteers'];
+          // $_POST['users'][] = 29;
+          // if(empty($_POST['volunteers'])) {
+          //     $volunteers = count($_POST['users']);
+          // }
+          // else {
+          //     $volunteers = $_POST['volunteers'];
+          // }
+
+          if (!empty($_POST['location'])) {
+
+            $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($_POST['location'].',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
+            $json = json_decode($json);
+
+            if (is_object($json) && !empty($json->{'results'})) {
+                $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
+                $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
+            }
+
+          } else {
+            $latitude = null;
+            $longitude = null;
           }
 
           // We got data! Elaborate.
           $event_date =       $_POST['event_date'];
           $start      =       $_POST['start'];
           $end        =       $_POST['end'];
-          $pax        =       $_POST['pax'];
+          // $pax        =       $_POST['pax'];
           $free_text  =       $_POST['free_text'];
           $venue      =       $_POST['venue'];
           $location   =       $_POST['location'];
-          $latitude   =       $_POST['latitude'];
-          $longitude  =       $_POST['longitude'];
+          // $latitude   =       $latitude;
+          // $longitude  =       $longitude;
           $group      =       intval($_POST['group']);
 
 
@@ -160,16 +175,16 @@ class PartyController extends Controller
           if(!FixometerHelper::verify($start)){
               $error['name'] = 'We must have a starting date and time.';
           }
-          if(!empty($latitude) || !empty($longitude)) {
-              // check that these values are floats.
-              $check_lat = filter_var($latitude, FILTER_VALIDATE_FLOAT);
-              $check_lon = filter_var($longitude, FILTER_VALIDATE_FLOAT);
-
-              if(!$check_lat || !$check_lon){
-                  $error['location'] = 'Coordinates must be in the correct format.';
-              }
-
-          }
+          // if(!empty($latitude) || !empty($longitude)) {
+          //     // check that these values are floats.
+          //     $check_lat = filter_var($latitude, FILTER_VALIDATE_FLOAT);
+          //     $check_lon = filter_var($longitude, FILTER_VALIDATE_FLOAT);
+          //
+          //     if(!$check_lat || !$check_lon){
+          //         $error['location'] = 'Coordinates must be in the correct format.';
+          //     }
+          //
+          // }
 
 
           if(empty($error)) {
@@ -187,7 +202,7 @@ class PartyController extends Controller
                               'event_date'    => $event_date,
                               'start'         => $start,
                               'end'           => $end,
-                              'pax'           => $pax,
+                              // 'pax'           => $pax,
                               'free_text'     => $free_text,
                               'venue'         => $venue,
                               'location'      => $location,
@@ -195,7 +210,7 @@ class PartyController extends Controller
                               'longitude'     => $longitude,
                               'group'         => $group,
                               'hours'         => $hours,
-                              'volunteers'    => $volunteers,
+                              // 'volunteers'    => $volunteers,
                               'created_at'    => date('Y-m-d H:i:s')
                             );
               $idParty = $Party->insertGetId($data);
@@ -256,11 +271,11 @@ class PartyController extends Controller
 
                   if(FixometerHelper::hasRole($user, 'Host')){
 
-                      $this->sendCreationNotificationEmail($venue, $location, $event_date, $start, $end, $group);
-                      header('Location: /host?action=pc&code=200');
+                      // $this->sendCreationNotificationEmail($venue, $location, $event_date, $start, $end, $group);
+                      // header('Location: /host?action=pc&code=200');
 
                   } else if(FixometerHelper::hasRole($user, 'Administrator')){
-                    header('Location: /admin?action=pc&code=200');
+                    // header('Location: /admin?action=pc&code=200');
                   }
                }
               else {
@@ -287,7 +302,7 @@ class PartyController extends Controller
             $udata = $_POST;
           }
 
-          return view('party.create', [
+          return view('events.create', [ //party.create
             'title' => 'New Party',
             'grouplist' => $Groups->findList(),
             'gmaps' => true,
@@ -299,7 +314,7 @@ class PartyController extends Controller
           ]);
       }
 
-      return view('party.create', [
+      return view('events.create', [ //party.create
         'title' => 'New Party',
         'grouplist' => $Groups->findList(),
         'gmaps' => true,
