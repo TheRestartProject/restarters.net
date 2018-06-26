@@ -73,11 +73,14 @@ Route::middleware('auth')->group(function () {
   //Device Controller
   Route::get('/device', 'DeviceController@index');
   Route::get('/device/search', 'DeviceController@index');
-  Route::get('/device/edit/{id}', 'DeviceController@edit');
-  Route::post('/device/edit/{id}', 'DeviceController@edit');
+  // Route::get('/device/edit/{id}', 'DeviceController@edit');
+  // Route::post('/device/edit/{id}', 'DeviceController@edit');
+  Route::post('/device/edit/{id}', 'DeviceController@ajaxEdit');
   // Route::get('/device/create', 'DeviceController@create');
   // Route::post('/device/create', 'DeviceController@create');
+  Route::post('/device/create', 'DeviceController@ajaxCreate');
   Route::get('/device/delete/{id}', 'DeviceController@delete');
+  Route::post('/device/image-upload/{id}', 'DeviceController@imageUpload');
 
   //Group Controller
   Route::get('/group', 'GroupController@index');
@@ -107,6 +110,7 @@ Route::middleware('auth')->group(function () {
   Route::get('/accept-invite/party-{id}/{hash}', 'PartyController@confirmInvite');
   Route::get('/party/view/{id}', 'PartyController@view');
   Route::post('/party/get-group-emails', 'PartyController@getGroupEmails');
+  Route::post('/party/update-quantity', 'PartyController@updateQuantity');
 
   //Role Controller
   Route::get('/role', 'RoleController@index');

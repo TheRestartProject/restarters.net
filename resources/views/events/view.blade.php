@@ -7,7 +7,7 @@
           <div class="col-lg-7 d-flex flex-column">
 
             <header>
-                <h1>{{ $formdata->free_text }}</h1>
+                <h1>{{ $formdata->venue }}</h1>
                 <p>Hosted by <a href="">{{ $formdata->group_name }}</a>, {{ $formdata->location }}</p>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
@@ -48,23 +48,27 @@
 
                     <h2>Event details</h2>
                     <div class="card events-card">
-                        <div id="event-map" class="map" data-latitude="51.4985812" data-longitude="-0.0778824" data-zoom="14"></div>
+                        <div id="event-map" class="map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
 
                         <div class="events-card__details">
 
                             <div class="row flex-row d-flex">
 
                                 <div class="col-4 d-flex flex-column"><strong>Date: </strong></div>
-                                <div class="col-8 d-flex flex-column">Mon 7th May 2018</div>
+                                <div class="col-8 d-flex flex-column">{{ date('D jS M Y', $formdata->event_date) }}</div>
 
                                 <div class="col-4 d-flex flex-column"><strong>Time: </strong></div>
-                                <div class="col-8 d-flex flex-column">13:00pm - 18:30pm</div>
+                                <div class="col-8 d-flex flex-column">{{ date('H:ia', $formdata->event_timestamp) }} - {{ date('H:ia', $formdata->event_end_timestamp) }}</div>
 
                                 <div class="col-4 d-flex flex-column"><strong>Address: </strong></div>
-                                <div class="col-8 d-flex flex-column"><address>The Old Chapel<br>33 Church Street<br>Coggeshall, Colchester<br>Essex, CO6 1TX</address></div>
+                                <div class="col-8 d-flex flex-column"><address>{{ $formdata->location }}</address></div>
 
                                 <div class="col-4 d-flex flex-column"><strong>Host: </strong></div>
-                                <div class="col-8 d-flex flex-column">Dean Appleton-Claydon</div>
+                                @if(!empty($host))
+                                  <div class="col-8 d-flex flex-column">{{ $host->name }}</div>
+                                @else
+                                  <div class="col-8 d-flex flex-column">None</div>
+                                @endif
 
                                 <div class="col-4 col-label d-flex flex-column"><strong>Participants:</strong></div>
                                 <div class="col-8 d-flex flex-column">
@@ -72,9 +76,9 @@
                                     <div>
 
                                     <div class="input-group-qty">
-                                        <label for="qty" class="sr-only">Quantity:</label>
+                                        <label for="participants_qty" class="sr-only">Quantity:</label>
                                         <button class="increase btn-value">+</button>
-                                        <input name="qty" id="qty" maxlength="3" value="1" title="Qty" class="input-text form-control qty" type="number">
+                                        <input name="participants_qty" id="participants_qty" maxlength="3" value="{{ $formdata->volunteers }}" title="Qty" class="input-text form-control qty" type="number">
                                         <button class="decrease btn-value">–</button>
                                     </div>
 
@@ -141,9 +145,7 @@
                 <h2 id="description">Description</h2>
                 <div class="events__description">
                     <div class="truncate">
-                    <p>Nulla vitae elit libero, a pharetra augue. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam porta sem malesuada magna mollis euismod. Vestibulum id ligula porta felis euismod semper. Etiam porta sem malesuada magna mollis euismod. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</p>
-                    <p>Nulla vitae elit libero, a pharetra augue. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam porta sem malesuada magna mollis euismod. Vestibulum id ligula porta felis euismod semper. Etiam porta sem malesuada magna mollis euismod. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</p>
-                    <p>Nulla vitae elit libero, a pharetra augue. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam porta sem malesuada magna mollis euismod. Vestibulum id ligula porta felis euismod semper. Etiam porta sem malesuada magna mollis euismod. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</p>
+                      {!! $formdata->free_text !!}
                     </div>
                     <button class="expand truncate__button"><span>Read more</span></button>
                 </div>
@@ -215,8 +217,7 @@
 
             </div>
             <div class="col-lg-12">
-                <h2><svg width="20" height="18" viewBox="0 0 15 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="position:relative;z-index:1;top:2px;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M13.528,13.426l-12.056,0c-0.812,0 -1.472,-0.66 -1.472,-1.472l0,-7.933c0,-0.812 0.66,-1.472 1.472,-1.472l4.686,0l-1.426,-2.035c-0.059,-0.086 -0.039,-0.203 0.047,-0.263l0.309,-0.217c0.086,-0.06 0.204,-0.039 0.263,0.047l1.729,2.468l0.925,0l1.728,-2.468c0.06,-0.086 0.178,-0.107 0.263,-0.047l0.31,0.217c0.085,0.06 0.106,0.177 0.046,0.263l-1.425,2.035l4.601,0c0.812,0 1.472,0.66 1.472,1.472l0,7.933c0,0.812 -0.66,1.472 -1.472,1.472Zm-4.012,-9.499l-7.043,0c-0.607,0 -1.099,0.492 -1.099,1.099l0,5.923c0,0.607 0.492,1.099 1.099,1.099l7.043,0c0.606,0 1.099,-0.492 1.099,-1.099l0,-5.923c0,-0.607 -0.493,-1.099 -1.099,-1.099Zm3.439,3.248c0.448,0 0.812,0.364 0.812,0.812c0,0.449 -0.364,0.813 -0.812,0.813c-0.448,0 -0.812,-0.364 -0.812,-0.813c0,-0.448 0.364,-0.812 0.812,-0.812Zm0,-2.819c0.448,0 0.812,0.364 0.812,0.812c0,0.449 -0.364,0.813 -0.812,0.813c-0.448,0 -0.812,-0.364 -0.812,-0.813c0,-0.448 0.364,-0.812 0.812,-0.812Z" style="fill:#0394a6;"/></svg> Devices <span class="badge badge-pill badge-primary">9</span></h2>
-
+                <h2><svg width="20" height="18" viewBox="0 0 15 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="position:relative;z-index:1;top:2px;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M13.528,13.426l-12.056,0c-0.812,0 -1.472,-0.66 -1.472,-1.472l0,-7.933c0,-0.812 0.66,-1.472 1.472,-1.472l4.686,0l-1.426,-2.035c-0.059,-0.086 -0.039,-0.203 0.047,-0.263l0.309,-0.217c0.086,-0.06 0.204,-0.039 0.263,0.047l1.729,2.468l0.925,0l1.728,-2.468c0.06,-0.086 0.178,-0.107 0.263,-0.047l0.31,0.217c0.085,0.06 0.106,0.177 0.046,0.263l-1.425,2.035l4.601,0c0.812,0 1.472,0.66 1.472,1.472l0,7.933c0,0.812 -0.66,1.472 -1.472,1.472Zm-4.012,-9.499l-7.043,0c-0.607,0 -1.099,0.492 -1.099,1.099l0,5.923c0,0.607 0.492,1.099 1.099,1.099l7.043,0c0.606,0 1.099,-0.492 1.099,-1.099l0,-5.923c0,-0.607 -0.493,-1.099 -1.099,-1.099Zm3.439,3.248c0.448,0 0.812,0.364 0.812,0.812c0,0.449 -0.364,0.813 -0.812,0.813c-0.448,0 -0.812,-0.364 -0.812,-0.813c0,-0.448 0.364,-0.812 0.812,-0.812Zm0,-2.819c0.448,0 0.812,0.364 0.812,0.812c0,0.449 -0.364,0.813 -0.812,0.813c-0.448,0 -0.812,-0.364 -0.812,-0.813c0,-0.448 0.364,-0.812 0.812,-0.812Z" style="fill:#0394a6;"/></svg> Devices <span class="badge badge-pill badge-primary">{{ count($formdata->devices) }}</span></h2>
                 <div class="table-responsive">
                     <table class="table table-repair" role="table">
                         <thead>
@@ -235,20 +236,206 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><a class="collapsed row-button" data-toggle="collapse" href="#row-1" role="button" aria-expanded="false" aria-controls="row-1">Edit <span class="arrow">▴</span></a></td>
-                                <td class="text-center"><a href="#">12</a></td>
-                                <td>Flat screen 26-30"</td>
-                                <td>Toshiba</td>
-                                <td>RC1900</td>
-                                <td>3 years</td>
-                                <td>Hair straightener - No power</td>
-                                <td><span class="badge badge-success">Fixed</span></td>
-                                <td>More time</td>
-                                <td class="text-center"><svg class="table-tick" width="21" height="17" viewBox="0 0 16 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;position:relative;z-index:1"><g><path d="M5.866,12.648l2.932,-2.933l-5.865,-5.866l-2.933,2.933l5.866,5.866Z" style="fill:#0394a6;"/><path d="M15.581,2.933l-2.933,-2.933l-9.715,9.715l2.933,2.933l9.715,-9.715Z" style="fill:#0394a6;"/></g></svg></td>
-                                <td><a class="collapsed row-button" data-toggle="collapse"  href="#row-1" role="button" aria-expanded="false" aria-controls="row-1"><svg width="15" height="15" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><g opacity="0.5"><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></g></svg></a></td>
-                            </tr>
-                            <tr class="collapse table-row-details" id="row-1">
+                            @php( $i = 1)
+                            @foreach($formdata->devices as $device)
+                              <tr>
+                                  <td><a class="collapsed row-button" data-toggle="collapse" href="#row-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="row-1">Edit <span class="arrow">▴</span></a></td>
+                                  <td class="text-center"><a href="#">{{ $device->iddevices }}</a></td>
+                                  <td>{{ $device->name }}</td>
+                                  <td>{{ $device->brand }}</td>
+                                  <td>{{ $device->model }}</td>
+                                  <td>{{ $device->age }}</td>
+                                  <td>{!! $device->problem !!}</td>
+                                  @if ( $device->repair_status == 1 )
+                                    <td><span class="badge badge-success">Fixed</span></td>
+                                  @elseif ( $device->repair_status == 2 )
+                                    <td><span class="badge badge-warning">Repairable</span></td>
+                                  @else
+                                    <td><span class="badge badge-danger">End</span></td>
+                                  @endif
+                                  @if ($device->more_time_needed == 1)
+                                    <td>More time needed</td>
+                                  @elseif ($device->professional_help == 1)
+                                    <td>Professional help</td>
+                                  @elseif ($device->do_it_yourself == 1)
+                                    <td>Do it yourself</td>
+                                  @else
+                                    <td>N/A</td>
+                                  @endif
+                                  @if ($device->spare_parts == 1)
+                                    <td class="text-center"><svg class="table-tick" width="21" height="17" viewBox="0 0 16 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;position:relative;z-index:1"><g><path d="M5.866,12.648l2.932,-2.933l-5.865,-5.866l-2.933,2.933l5.866,5.866Z" style="fill:#0394a6;"/><path d="M15.581,2.933l-2.933,-2.933l-9.715,9.715l2.933,2.933l9.715,-9.715Z" style="fill:#0394a6;"/></g></svg></td>
+                                  @else
+                                    <td class="text-center"><svg width="15" height="15" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><g opacity="0.5"><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></g></svg></td>
+                                  @endif
+                                  <td><a class="collapsed row-button" data-toggle="collapse"  href="#row-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="row-1"><svg width="15" height="15" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><g opacity="0.5"><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></g></svg></a></td>
+                              </tr>
+                              <tr class="collapse table-row-details" id="row-{{ $device->iddevices }}">
+                                  <td colspan="11">
+                                      <form id="data-{{ $device->iddevices }}" class="edit-device" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
+                                      <table class="table">
+                                          <tbody>
+                                              <tr>
+                                                  <td>
+                                                      <label for="status-{{ $device->iddevices }}">Status:</label>
+                                                      <div class="form-control form-control__select">
+                                                          <select class="checkStatus" name="status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}">
+                                                            @if ( $device->repair_status == 1 )
+                                                              <option value="1" selected>Fixed</option>
+                                                              <option value="2">Repairable</option>
+                                                              <option value="3">End of Life</option>
+                                                            @elseif ( $device->repair_status == 2 )
+                                                              <option value="1">Fixed</option>
+                                                              <option value="2" selected>Repairable</option>
+                                                              <option value="3">End of Life</option>
+                                                            @else
+                                                              <option value="1">Fixed</option>
+                                                              <option value="2">Repairable</option>
+                                                              <option value="3" selected>End of Life</option>
+                                                            @endif
+                                                          </select>
+                                                      </div>
+                                                  </td>
+                                                  <td>
+                                                      <label for="repair-info-{{ $device->iddevices }}" class="sr-only">Repairable: more information</label>
+                                                      <div class="form-control form-control__select">
+                                                          <select name="repair-info" id="repair-info-{{ $device->iddevices }}" disabled>
+                                                            <option value="0">Repair Details</option>
+                                                            @if ( $device->more_time_needed == 1 )
+                                                              <option value="1" selected>More time needed</option>
+                                                              <option value="2">Professional help</option>
+                                                              <option value="3">Do it yourself</option>
+                                                            @elseif ( $device->professional_help == 1 )
+                                                              <option value="1">More time needed</option>
+                                                              <option value="2" selected>Professional help</option>
+                                                              <option value="3">Do it yourself</option>
+                                                            @elseif ( $device->do_it_yourself == 1 )
+                                                              <option value="1" >More time needed</option>
+                                                              <option value="2">Professional help</option>
+                                                              <option value="3" selected>Do it yourself</option>
+                                                            @else
+                                                              <option value="1">More time needed</option>
+                                                              <option value="2">Professional help</option>
+                                                              <option value="3">Do it yourself</option>
+                                                            @endif
+                                                          </select>
+                                                      </div>
+                                                  </td>
+                                                  <td>
+                                                      <label for="spare_parts">Spare parts:</label>
+                                                      <div class="form-control form-control__select">
+                                                          <select name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
+                                                            @if ($device->spare_parts == 1)
+                                                              <option value="1" selected>Yes</option>
+                                                              <option value="2">No</option>
+                                                            @else
+                                                              <option value="1">Yes</option>
+                                                              <option value="2" selected>No</option>
+                                                            @endif
+                                                          </select>
+                                                      </div>
+                                                  </td>
+                                                  <td>
+                                                      <label for="category">Category:</label>
+                                                      <div class="form-control form-control__select">
+                                                          <select name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}">
+                                                              @foreach($categories as $category)
+                                                                @if ($device->category == $category->idcategories)
+                                                                  <option value="{{ $category->idcategories }}" selected>{{ $category->name }}</option>
+                                                                @else
+                                                                  <option value="{{ $category->idcategories }}">{{ $category->name }}</option>
+                                                                @endif
+                                                              @endforeach
+                                                          </select>
+                                                      </div>
+                                                  </td>
+                                                  <td>
+                                                      <label for="nested-5">Brand:</label>
+                                                      <div class="form-control form-control__select">
+                                                          <select name="brand-{{ $device->iddevices }}" id="brand-{{ $device->iddevices }}">
+                                                              @foreach($brands as $brand)
+                                                                @if ($device->brand == $brand->brand_name)
+                                                                  <option value="{{ $brand->id }}" selected>{{ $brand->brand_name }}</option>
+                                                                @else
+                                                                  <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                                                @endif
+                                                              @endforeach
+                                                          </select>
+                                                      </div>
+                                                  </td>
+                                                  <td>
+                                                      <label for="nested-6">Model:</label>
+                                                      <div class="form-group">
+                                                          <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}">
+                                                      </div>
+                                                  </td>
+                                                  <td>
+                                                      <label for="nested-7">Age:</label>
+                                                      <div class="form-group">
+                                                          <input type="text" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" value="{{ $device->age }}">
+                                                      </div>
+                                                  </td>
+                                              </tr>
+                                              <tr class="table-row-more">
+                                                  <td colspan="5">
+                                                      <label for="description">Description of problem/solution:</label>
+                                                      <div class="rte" id="problem-{{ $device->iddevices }}">{!! $device->problem !!}</div>
+                                                  </td>
+                                                  <td colspan="2" class="table-cell-upload-td">
+                                                      <div class="table-cell-upload">
+                                                          <div class="form-group">
+                                                              <label for="file">Add image:</label>
+
+                                                              <form id="dropzoneEl" class="dropzone" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1="Add device images here" data-field2="Choose compelling images that show off your work">
+                                                                  <div class="fallback" >
+                                                                      <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />
+                                                                  </div>
+                                                              </form>
+
+                                                              <div class="previews"></div>
+
+                                                          </div>
+
+                                                          <div class="row">
+                                                              <div class="col-9 d-flex align-content-center flex-column">
+                                                                  <div class="form-check d-flex align-items-center justify-content-start">
+                                                                      <input class="form-check-input" type="checkbox" name="wiki-{{ $device->iddevices }}" id="wiki-{{ $device->iddevices }}" value="1">
+                                                                      <label class="form-check-label" for="opt">Solution is suitable for the Restart Wiki</label>
+                                                                  </div>
+                                                              </div>
+                                                              <div class="col-3 d-flex justify-content-end flex-column"><div class="d-flex justify-content-end">
+                                                                  <button type="submit" class="btn btn-primary btn-save2">Save</button></div>
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                  </td>
+                                              </tr>
+                                          </tbody>
+                                      </table>
+                                      </form>
+                                  </td>
+                              </tr>
+                              <?php
+                                // $i++;
+                                if($i == 6){
+                                  break;
+                                }
+                              ?>
+                            @endforeach
+                            <!--
+                              <tr>
+                                  <td><a class="collapsed row-button" data-toggle="collapse" href="#row-1" role="button" aria-expanded="false" aria-controls="row-1">Edit <span class="arrow">▴</span></a></td>
+                                  <td class="text-center"><a href="#">12</a></td>
+                                  <td>Flat screen 26-30"</td>
+                                  <td>Toshiba</td>
+                                  <td>RC1900</td>
+                                  <td>3 years</td>
+                                  <td>Hair straightener - No power</td>
+                                  <td><span class="badge badge-success">Fixed</span></td>
+                                  <td>More time</td>
+                                  <td class="text-center"><svg class="table-tick" width="21" height="17" viewBox="0 0 16 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;position:relative;z-index:1"><g><path d="M5.866,12.648l2.932,-2.933l-5.865,-5.866l-2.933,2.933l5.866,5.866Z" style="fill:#0394a6;"/><path d="M15.581,2.933l-2.933,-2.933l-9.715,9.715l2.933,2.933l9.715,-9.715Z" style="fill:#0394a6;"/></g></svg></td>
+                                  <td><a class="collapsed row-button" data-toggle="collapse"  href="#row-1" role="button" aria-expanded="false" aria-controls="row-1"><svg width="15" height="15" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><g opacity="0.5"><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></g></svg></a></td>
+                              </tr>
+                              <tr class="collapse table-row-details" id="row-1">
                                 <td colspan="11">
                                     <table class="table">
                                         <tbody>
@@ -351,8 +538,8 @@
                                         </tbody>
                                     </table>
                                 </td>
-                            </tr>
-                            <tr>
+                            </tr> -->
+                            <!-- <tr>
                                 <td><a class="collapsed row-button" data-toggle="collapse" href="#row-2" role="button" aria-expanded="false" aria-controls="row-2">Edit <span class="arrow">▴</span></a></td>
                                 <td class="text-center"><a href="#">12</a></td>
                                 <td>Flat screen 26-30"</td>
@@ -369,8 +556,8 @@
                                 <td colspan="11">
                                     row 2
                                 </td>
-                            </tr>
-                            <tr>
+                            </tr> -->
+                            <!-- <tr>
                                 <td><a class="collapsed row-button" data-toggle="collapse" href="#row-3" role="button" aria-expanded="false" aria-controls="row-3">Edit <span class="arrow">▴</span></a></td>
                                 <td class="text-center"><a href="#">12</a></td>
                                 <td>Flat screen 26-30"</td>
@@ -387,86 +574,86 @@
                                 <td colspan="11">
                                     row 3
                                 </td>
-                            </tr>
+                            </tr> -->
                         </tbody>
                     </table>
                 </div>
                 <div class="table-responsive">
-
+                    <form id="add-device">
                     <table class="table table-add" role="table">
                         <tbody>
                             <tr>
                                 <th width="100">Add device</th>
                                   <td>
                                     <div class="form-control form-control__select">
-                                        <select name="" id="">
-                                            <option value="">Select</option>
-                                            <option value="">Options</option>
-                                            <option value="">Options</option>
+                                        <select name="repair_status" id="repair_status">
+                                            <option value="0">Status</option>
+                                            <option value="1">Fixed</option>
+                                            <option value="2">Repairable</option>
+                                            <option value="3">End of Life</option>
                                         </select>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="form-control form-control__select">
-                                        <select name="" id="" disabled>
-                                            <option value="">Select</option>
-                                            <option value="">Options</option>
-                                            <option value="">Options</option>
+                                        <select name="repair_details" id="repair_details" disabled>
+                                            <option value="0">Repair Details</option>
+                                            <option value="1">More time needed</option>
+                                            <option value="2">Professional help</option>
+                                            <option value="3">Do it yourself</option>
                                         </select>
                                     </div>
                                 </td>
                                 <td>
                                 <td>
                                     <div class="form-control form-control__select">
-                                        <select name="" id="" disabled>
-                                            <option value="">Select</option>
-                                            <option value="">Options</option>
-                                            <option value="">Options</option>
+                                        <select name="spare_parts" id="spare_parts">
+                                            <option value="0">Spare Parts Needed?</option>
+                                            <option value="1">Yes</option>
+                                            <option value="2">No</option>
                                         </select>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="form-control form-control__select">
-                                        <select name="" id="">
-                                            <option value="">--- Category ---</option>
-                                            <option value="">Options</option>
-                                            <option value="">Options</option>
+                                        <select name="category" id="category">
+                                            <option value="0">--- Category ---</option>
+                                            @foreach($categories as $category)
+                                              <option value="{{ $category->idcategories }}">{{ $category->name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="form-control form-control__select">
-                                        <select name="" id="">
-                                            <option value="">--- Brand ---</option>
-                                            <option value="">Options</option>
-                                            <option value="">Options</option>
+                                        <select name="brand" id="brand">
+                                            <option value="0">--- Brand ---</option>
+                                            @foreach($brands as $brand)
+                                              <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="form-group">
-                                        <input type="text" class="form-control field" id="" name="">
+                                        <input type="text" class="form-control field" id="model" name="model" placeholder="Model" required>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="form-group">
-                                        <input type="text" class="form-control field" id="" name="">
+                                        <input type="text" class="form-control field" id="age" name="age" placeholder="Age" required>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="form-group">
-                                        <input type="text" class="form-control field" id="" name="">
+                                        <input type="text" class="form-control field" id="problem" name="problem" placeholder="Problem" required>
                                     </div>
                                 </td>
-                                <td>
-                                    <div class="form-group">
-                                        <input type="number" class="form-control field" id="" name="">
-                                    </div>
-                                </td>
-                                <td><button class="btn btn-primary btn-add">Add</button></td>
+                                <td><input type="submit" class="btn btn-primary btn-add" id="submit-new-device" value="Add"></td>
                             </tr>
                         </tbody>
                     </table>
+                    </form>
 
                 </div>
             </div>

@@ -18,7 +18,7 @@ class Party extends Model
      *
      * @var array
      */
-    protected $fillable = ['devices', 'co2', 'ewaste', 'fixed_devices', 'repairable_devices', 'dead_devices', 'created_at', 'updated_at'];
+    protected $fillable = ['devices', 'volunteers', 'co2', 'ewaste', 'fixed_devices', 'repairable_devices', 'dead_devices', 'created_at', 'updated_at'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -45,6 +45,7 @@ class Party extends Model
                     `e`.`latitude`,
                     `e`.`longitude`,
                     `e`.`pax`,
+                    `e`.`volunteers`,
                     `e`.`free_text`,
                     `e`.`hours`,
                     `g`.`name` AS `group_name`,

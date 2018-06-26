@@ -7,6 +7,7 @@ use App\Party;
 use App\Group;
 use App\User;
 use App\Category;
+use App\Brands;
 use App\Device;
 use App\EventsUsers;
 use App\Session;
@@ -75,10 +76,28 @@ class PartyController extends Controller
       $Party = new Party;
       $user = User::find(Auth::id());
 
-      return view('party.index', [
+      $past = [];
+      $upcoming = [];
+      $today = new DateTime("today");
+
+      foreach ($Party->findAll() as $party) {
+        $p_date = new DateTime("@$party->event_timestamp");
+        if ($p_date > $today) {
+          //upcoming
+          $upcoming[] = $party;
+        } elseif ($p_date < $today) {
+          //past
+          $past[] = $party;
+        }
+        // dd($today->diff($p_date));
+      }
+
+      return view('events.index', [ //party.index
         'title' => 'Parties',
         'list' => $Party->findAll(),
         'user' => $user,
+        'upcoming' => $upcoming,
+        'past' => $past,
       ]);
   }
 
@@ -351,7 +370,7 @@ class PartyController extends Controller
       */
   }
 
-  public function edit($id) {
+  public function edit($id, Request $request) {
       $user = Auth::user();
 
       if (!FixometerHelper::userHasEditPartyPermission($id, $user->id)) {
@@ -379,10 +398,10 @@ class PartyController extends Controller
           unset($data['id']);
 
           // Add SuperHero Restarter!
-          $_POST['users'][] = 29;
-          if(empty($data['volunteers'])) {
-              $data['volunteers'] = count($_POST['users']);
-          }
+          // $_POST['users'][] = 29;
+          // if(empty($data['volunteers'])) {
+          //     $data['volunteers'] = count($_POST['users']);
+          // }
 
           // saving this for WP
           $wp_date = $data['event_date'];
@@ -391,18 +410,33 @@ class PartyController extends Controller
           $data['event_date'] = FixometerHelper::dbDateNoTime($data['event_date']);
           $timestamp = strtotime($data['event_date']);
 
+          if (!empty($data['location'])) {
+
+            $json = file_get_contents("http://maps.google.com/maps/api/geocode/json?address=".urlencode($data['location'].',United Kingdom')."&sensor=false");
+            $json = json_decode($json);
+
+            if (is_object($json)) {
+                $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
+                $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
+            }
+
+          } else {
+            $latitude = null;
+            $longitude = null;
+          }
+
           $update = array(
                           'event_date'  => $data['event_date'],
                           'start'       => $data['start'],
                           'end'         => $data['end'],
                           'free_text'   => $data['free_text'],
-                          'pax'         => $data['pax'],
-                          'volunteers'  => $data['volunteers'],
+                          // 'pax'         => $data['pax'],
+                          // 'volunteers'  => $data['volunteers'],
                           'group'       => $data['group'],
                           'venue'       => $data['venue'],
                           'location'    => $data['location'],
-                          'latitude'    => $data['latitude'],
-                          'longitude'   => $data['longitude'],
+                          'latitude'    => $latitude,
+                          'longitude'   => $longitude,
                           );
 
           $u = $Party->where('idevents', $id)->update($update);
@@ -497,7 +531,7 @@ class PartyController extends Controller
 
           $party = $Party->findThis($id)[0];
 
-          return view('party.edit', [
+          return view('events.edit', [ //party.edit
             'response' => $response,
             'gmaps' => true,
             'images' => $images,
@@ -533,7 +567,7 @@ class PartyController extends Controller
       //
       // $this->set('grouplist', $Groups->findList());
 
-      return view('party.edit', [
+      return view('events.edit', [ //party.edit
         'gmaps' => true,
         'images' => $images,
         'title' => 'Edit Party',
@@ -558,8 +592,7 @@ class PartyController extends Controller
       $Device = new Device;
 
       $allparties = $Party->ofThisGroup('admin', true, true);
-      $co2Total = $Device->getWeights();
-      $device_count_status = $Device->statusCount();
+      $co2Total = $Device->getPartyWeights($id);
 
       $images = $File->findImages(env('TBL_EVENTS'), $id);
 
@@ -567,7 +600,7 @@ class PartyController extends Controller
         $images = null;
       }
 
-      $party = $Party->findThis($id)[0];
+      $party = $Party->findThis($id, true)[0];
 
       $attended_ids = EventsUsers::where('event', $id)->where('status', '=', 2)->pluck('user')->toArray();
       if (!empty($attended_ids)) {
@@ -591,6 +624,19 @@ class PartyController extends Controller
         $invited_roles = [];
       }
 
+      try {
+        $host = User::find(EventsUsers::where('event', $id)->where('role', '=', 3)->first()->user);
+      } catch (\Exception $e) {
+        $host = null;
+      }
+
+      $brands = Brands::all();
+      $categories = Category::all();
+
+      $device_count_status = $Device->statusCount($party->group);
+
+      // dd($party);
+
       return view('events.view', [
         'gmaps' => true,
         'images' => $images,
@@ -604,7 +650,11 @@ class PartyController extends Controller
         'attended_roles' => $attended_roles,
         'invited'  => $invited,
         'invited_roles' => $invited_roles,
+        'host' => $host,
+        'brands' => $brands,
+        'categories' => $categories,
       ]);
+
   }
 
 
@@ -964,6 +1014,17 @@ class PartyController extends Controller
     $group_users = User::whereIn('id', $group_user_ids)->pluck('email')->toArray();
 
     return json_encode($group_users);
+  }
+
+  public function updateQuantity(Request $request) {
+    $event_id = $request->input('event_id');
+    $quantity = $request->input('quantity');
+
+    Party::find($event_id)->update([
+      'volunteers' => $quantity,
+    ]);
+
+    return "true";
   }
 
   public function postSendInvite(Request $request) {

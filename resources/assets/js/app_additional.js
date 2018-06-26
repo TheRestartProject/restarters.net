@@ -142,3 +142,119 @@ $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
             event.preventDefault();
     });
 });
+
+$('#participants_qty').on('change', function() {
+  updateParticipants();
+});
+
+$( document ).ready(function() {
+  $('#repair_status').on('change', function() {
+    if ($(this).val() == 2) {
+      $('#repair_details').prop('disabled', false);
+    } else {
+      $('#repair_details').prop('disabled', true);
+    }
+  });
+
+  $('.checkStatus').on('change', function() {
+    var device_id = $(this).data('device');
+
+    if ($(this).val() == 2) {
+      $('#repair-info-'+device_id).prop('disabled', false);
+    } else {
+      $('#repair-info-'+device_id).prop('disabled', true);
+    }
+  });
+
+  $('#add-device').on('submit', function(e) {
+    e.preventDefault();
+    // var form_fields = JSON.stringify($(this).serialize());
+    // console.log(form_fields);
+
+    var form_array = {
+      repair_status:$('#repair_status').val(),
+      repair_details:$('#repair_details').val(),
+      spare_parts:$('#spare_parts').val(),
+      category:$('#category').val(),
+      brand:$('#brand').val(),
+      model:$('#model').val(),
+      age:$('#age').val(),
+      problem:$('#problem').val(),
+    };
+
+    var event_id = event_id = $('#event_id').val();
+    // form_array['repair_status'] = $('#repair_status').val();
+    // form_array['repair_details'] = $('#repair_details').val();
+    // form_array['spare_parts'] = $('#spare_parts').val();
+    // form_array['category'] = $('#category').val();
+    // form_array['brand'] = $('#brand').val();
+    // form_array['model'] = $('#model').val();
+    // form_array['age'] = $('#age').val();
+    // form_array['problem'] = $('#problem').val();
+    // console.log(form_array.toString());
+
+    $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $("input[name='_token']").val()
+      },
+      type: 'post',
+      url: '/device/create',
+      data: { form_array : form_array, event_id : event_id },
+      success: function(data) {
+        if (data.error) {
+          alert(data.error);
+        }
+      },
+      error: function(error) {
+
+      }
+    });
+
+  });
+
+  $('.edit-device').on('submit', function(e) {
+    e.preventDefault();
+    var device_id = $(this).data('device');
+
+    // $form = $('form#data-'+device_id);
+    // console.log($form[0]);
+    // var form_fields = new FormData($form[0]);
+
+    var form_array = {
+      repair_status:$('#status-'+device_id).val(),
+      repair_details:$('#repair-info-'+device_id).val(),
+      spare_parts:$('#spare-parts-'+device_id).val(),
+      category:$('#category-'+device_id).val(),
+      brand:$('#brand-'+device_id).val(),
+      model:$('#model-'+device_id).val(),
+      age:$('#age-'+device_id).val(),
+      problem:$('#problem-'+device_id).summernote('code'),
+      // files:$('#file-'+device_id).val(),
+      wiki:$('#wiki-'+device_id).checked,
+    };
+
+    var event_id = event_id = $('#event_id').val();
+
+    $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $("input[name='_token']").val()
+      },
+      type: 'post',
+      url: '/device/edit/'+device_id,
+      data: { form_array : form_array, event_id : event_id },
+      success: function(data) {
+        if (data.error) {
+          alert(data.error);
+        }
+      },
+      error: function(error) {
+
+      }
+    });
+
+  });
+
+  $('#description').on('summernote.change', function(e) {
+    $('#free_text').val($('#description').summernote('code'));
+  });
+});

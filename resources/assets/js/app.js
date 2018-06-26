@@ -299,6 +299,26 @@ function textEditor() {
 
 }
 
+function updateParticipants() {
+  var quantity = $('#participants_qty').val();
+  var event_id = $('#event_id').val();
+
+  $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $("input[name='_token']").val()
+      },
+      type: 'post',
+      url: '/party/update-quantity',
+      data: {quantity : quantity, event_id : event_id},
+      success: function(data) {
+        console.log('quantity updated');
+      },
+      error: function(error) {
+        console.log('fail');
+      }
+  });
+}
+
 function numericInputs() {
 
     jQuery('.decrease').on('click', function (e) {
@@ -311,6 +331,8 @@ function numericInputs() {
             jQuery(this).parent().find('input[type="number"]').val(value - 1);
         }
 
+        updateParticipants();
+
     });
 
 
@@ -321,6 +343,8 @@ function numericInputs() {
         var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
 
         jQuery(this).parent().find('input[type="number"]').val(value + 1);
+
+        updateParticipants();
 
     });
 }
