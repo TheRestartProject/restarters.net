@@ -1,4 +1,3 @@
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -202,9 +201,116 @@ function initTokenfields() {
 
 }
 
-function groupsMap() {
-    if ( jQuery('#map-plug').length > 0 ) {
+var placeSearch, autocomplete;
+var componentForm = {
+    street_number: 'short_name',
+    route: 'long_name',
+    locality: 'long_name',
+    administrative_area_level_1: 'short_name',
+    country: 'long_name',
+    postal_code: 'short_name'
+};
 
+function initAutocomplete() {
+    // Create the autocomplete object, restricting the search to geographical
+    // location types.
+    autocomplete = new google.maps.places.Autocomplete(
+            /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
+        { types: ['geocode'] });
+
+    // When the user selects an address from the dropdown, populate the address
+    // fields in the form.
+    autocomplete.addListener('place_changed', fillInAddress);
+}
+
+function fillInAddress() {
+    // Get the place details from the autocomplete object.
+    var place = autocomplete.getPlace();
+
+    for (var component in componentForm) {
+        document.getElementById(component).value = '';
+        document.getElementById(component).disabled = false;
+    }
+
+    // Get each component of the address from the place details
+    // and fill the corresponding field on the form.
+    for (var i = 0; i < place.address_components.length; i++) {
+        var addressType = place.address_components[i].types[0];
+        if (componentForm[addressType]) {
+            var val = place.address_components[i][componentForm[addressType]];
+            document.getElementById(addressType).value = val;
+        }
+    }
+
+    // Initialise map
+    var map = new google.maps.Map(document.getElementById('map-plugin'), {
+        center: { lat: -33.8688, lng: 151.2195 },
+        zoom: 13,
+        disableDefaultUI: true
+    });
+
+    // Bind the map's bounds (viewport) property to the autocomplete object,
+    // so that the autocomplete requests use the current map bounds for the
+    // bounds option in the request.
+    autocomplete.bindTo('bounds', map);
+
+    var marker = new google.maps.Marker({
+        map: map,
+        anchorPoint: new google.maps.Point(0, -29)
+    });
+
+    marker.setVisible(false);
+
+    if (!place.geometry) {
+        // User entered the name of a Place that was not suggested and
+        // pressed the Enter key, or the Place Details request failed.
+        window.alert("No details available for input: '" + place.name + "'");
+        return;
+    }
+
+    if (place.geometry.viewport) {
+        map.fitBounds(place.geometry.viewport);
+    } else {
+        map.setCenter(place.geometry.location);
+        map.setZoom(17);
+    }
+    marker.setPosition(place.geometry.location);
+    marker.setVisible(true);
+
+    var address = '';
+    if (place.address_components) {
+        address = [
+            (place.address_components[0] && place.address_components[0].short_name || ''),
+            (place.address_components[1] && place.address_components[1].short_name || ''),
+            (place.address_components[2] && place.address_components[2].short_name || '')
+        ].join(' ');
+    }
+
+
+}
+
+function geolocate() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var geolocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+            var circle = new google.maps.Circle({
+                center: geolocation,
+                radius: position.coords.accuracy
+            });
+            autocomplete.setBounds(circle.getBounds());
+        });
+    }
+}
+
+function groupsMap() {
+    if (jQuery('.field-geolocate').length > 0 ) {
+
+        initAutocomplete();
+
+        jQuery('.field-geolocate').on('focus',geolocate);
         // var map, places, infoWindow;
         // var markers = [];
         // var autocomplete;
@@ -250,7 +356,7 @@ function eventsMap() {
 
     const mapObject = document.querySelector('#event-map');
 
-    if (jQuery('#event-map').length > 0) {
+    if (jQuery('#event-map').length > 0 ) {
 
         let map;
         let latitude = parseFloat(mapObject.dataset.latitude);
@@ -381,7 +487,7 @@ function loadDropzones() {
         var instanceDropzone = new Dropzone("#dropzoneEl", {
             init: function () {
                 jQuery(".dz-message").find('span').text(field1);
-                jQuery(".dz-message").append('<small>'+field2+'</small>');
+                jQuery(".dz-message").append('<small>' + field2 + '</small>');
             },
             paramName: "file", // The name that will be used to transfer the file
             maxFilesize: 2,
@@ -395,12 +501,43 @@ function loadDropzones() {
         });
 
     }
+
+    if (jQuery("#dropzoneSingleEl").length > 0) {
+
+        var field1 = jQuery('#dropzoneSingleEl').data('field1');
+        var field2 = jQuery('#dropzoneSingleEl').data('field2');
+
+        var instanceDropzone = new Dropzone("#dropzoneSingleEl", {
+            init: function () {
+                jQuery(".dz-message").find('span').text(field1);
+                jQuery(".dz-message").append('<small>'+field2+'</small>');
+            },
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 4,
+            maxFiles: 1,
+            uploadMultiple: false,
+            createImageThumbnails: true,
+            addRemoveLinks: true
+        });
+
+    }
+}
+
+function resetForm (e) {
+    e.preventDefault();
+    var attr = jQuery(this).data('form');
+    var form = jQuery('#' + attr);
+    form[0].reset();
+
+    if (form.find('#tags').length > 0 ) {
+        form.find('#tags').val('').trigger('change');
+    }
+
 }
 
 Dropzone.autoDiscover = false;
 onboarding();
-// initTokenfields();
-groupsMap();
+initTokenfields();
 textEditor();
 numericInputs();
 eventsMap();
@@ -408,29 +545,57 @@ truncate();
 nestedTable();
 
 jQuery(function () {
+
+
+    // jQuery('.dropdown-menu').on('hidden.bs.collapse', function () {
+    //     console.log('eve');
+    // });
+
     jQuery('.users-list').find('[data-toggle="popover"]').popover();
 
     jQuery('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
         jQuery('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
     });
 
-    jQuery('.table').find('[data-toggle="popover"]').popover({
+    jQuery('.table:not(.table-devices)').find('[data-toggle="popover"]').popover({
         template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
         placement:'top'
     })
+
+    jQuery('.table-devices').find('[data-toggle="popover"]').popover();
 
     jQuery('.table').find('[data-toggle="popover"]').on('click', function (e) {
         jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
     });
 
-    jQuery('.form-control > select').select2();
+    jQuery('.select2').select2();
+    jQuery('.table-row-details').find('select').select2();
+    jQuery('.select2-tags').select2({tags: true});
+
+    jQuery('.toggle-manual-invite').on('change', function (e) {
+        $value = jQuery(this).val();
+        $toggle = jQuery('.show-hide-manual-invite');
+        if( $value === 'not-registered' ){
+          $toggle.show();
+          $('#full_name').focus();
+        } else {
+          $toggle.hide();
+        }
+    });
+
     jQuery('.js-remove').on('click', removeUser);
     jQuery(document).on('click', '[data-toggle="lightbox"]', function (event) {
         event.preventDefault();
         jQuery(this).ekkoLightbox();
     });
 
+    jQuery('.reset').on('click', resetForm);
+
     loadDropzones();
 })
+
+jQuery(document).ready(function () {
+    groupsMap();
+});
 
 require('./app_additional');

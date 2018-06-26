@@ -12,7 +12,7 @@
             </ol>
           </nav>
           <div class="btn-group">
-            <a href="" class="btn btn-primary btn-save">@lang('events.create_new_event')</a>
+            <a href="/party/create" class="btn btn-primary btn-save">@lang('events.create_new_event')</a>
           </div>
         </div>
       </div>

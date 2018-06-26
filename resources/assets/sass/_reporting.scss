@@ -1,0 +1,42 @@
+.reporting {
+    h2 {
+        color: $brand;
+        font-size: 18px;
+
+        sup {
+            color: #000;
+            font-family: $font-family-second;
+            font-size: 14px;
+            font-weight: 400;
+            left: 5px;
+            top: -3px;
+            a {
+                color: #000;
+                text-decoration: underline;
+
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+    
+    legend {
+        color: $brand;
+        font-size: 20px;
+        font-family: $font-family-sans-serif;
+    }
+
+    padding: 70px 0;
+
+    .breadcrumb {
+        margin: auto;
+    }
+
+    .pagination {
+        margin-top: 0;
+    }
+
+
+}
+

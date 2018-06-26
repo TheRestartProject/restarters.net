@@ -105,6 +105,11 @@
                 label {
                     font-family: $font-family-sans-serif;
                     font-size: 16px;
+
+                    &.form-check-label {
+                        font-size: 15px;
+                        font-family: $font-family-second;
+                    }
                 }
 
                 .form-check {
@@ -212,6 +217,24 @@
 
     }
 
+    &-devices {
+        .badge {
+            width: 60px;
+            margin: auto;
+            display: block;
+        }
+        svg, button, a {
+            margin: auto 0;
+            display: block;
+        }
+        a {
+            text-decoration: underline;
+        }
+        td {
+            vertical-align: middle;
+        }
+    }
+
     &-events {
         th, td {
             padding-left: 15px;
@@ -236,6 +259,9 @@
             width: 115px;
         }
 
+        td.cell-name {
+            border-left: 0;
+        }
 
         td {
             padding-top: 10px;

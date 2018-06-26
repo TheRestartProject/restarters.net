@@ -37,13 +37,13 @@
           <tbody>
             <tr>
               <td class="table-cell-icon"><img src="{{{ url('images/placeholder.png') }}}" class="rounded" alt="Placeholder"></td>
-              <td><a href="">Dean Appleton-Claydon</a> <span class="badge badge-primary">Host</span></td>
+              <td><a href="{{{ prefix_route('profile') }}}">Dean Appleton-Claydon</a> <span class="badge badge-primary">Host</span></td>
               <td>
                 Communication<br>
                 Communication
               </td>
               @if( !isset($confirmed) )
-                <td align="right"><a href="">@lang('events.remove_volunteer_link')</a></td>
+                <td align="right"><a href="#alert">@lang('events.remove_volunteer_link')</a></td>
               @endif
             </tr>
           </tbody>

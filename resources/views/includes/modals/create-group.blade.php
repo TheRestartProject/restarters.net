@@ -14,7 +14,7 @@
           <h5 id="groupLabel">@lang('groups.groups_modal_title')</h5>
           <p>@lang('groups.groups_modal_content')</p>
 
-          <a href="/groups/create" class="btn btn-primary">@lang('groups.groups_modal-button')</a>
+          <a href="{{{ prefix_route('create-group') }}}" class="btn btn-primary">@lang('groups.groups_modal-button')</a>
 
         </div>
 

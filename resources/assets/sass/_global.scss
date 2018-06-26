@@ -60,9 +60,9 @@ html, body {
 .button-group {
   padding-top: 15px;
 
-  .btn {
-    min-width: 120px;
-  }
+  // .btn {
+  //   min-width: 120px;
+  // }
 }
 
 .form-group {
@@ -86,6 +86,7 @@ label.form-check-label {
     font-family: $font-family-second;
     font-size: 15px;
 }
+
 
 .form-control__select {
 
@@ -114,6 +115,37 @@ label.form-check-label {
     top: 4px !important;
   }
 
+  .select2-selection--multiple{
+    margin-top: 0;
+    margin-bottom: 0;
+    border: 0 none !important;
+
+    .select2-selection__choice{
+
+      background-color: $brand;
+      color: #FFF;
+      font-size: 14px;
+      padding: 5px 12px 5px 10px;
+      border: 0 none;
+      border-bottom: 3px solid #155E67;
+      line-height: 24px;
+
+      .select2-selection__choice__remove {
+        float: left;
+        color: #FFF;
+        font-size: 19px;
+        font-weight: 400;
+        margin: 0 9px 0px 0;
+      }
+
+    }
+
+  }
+
+}
+
+.form-control__nolabel {
+  margin-top: 33px;
 }
 
 .offset-lg-sidebar {
@@ -196,4 +228,88 @@ h1, h2, h3, h4, h5, table th {
 
 .ekko-lightbox {
   background-color: RGBA(3, 148, 166, 0.5);
+}
+
+.text-muted {
+  font-size: 13px;
+  color: #5A5A5A;
+}
+
+.skills-list {
+
+  li {
+    margin-bottom: 10px;
+    svg {
+      margin-right: 3px;
+      position: relative;
+      top: 3px;
+      z-index: 1;
+
+      path {
+        fill: $brand;
+      }
+    }
+  }
+
+}
+
+.field-form-input {
+  width: 215px;
+  position: relative;
+  z-index: 1;
+  padding: 0;
+  border-radius: 3px;
+  margin: auto 10px;
+  
+  button {
+    left: 0;
+    top: 0;
+    height: 100%;
+    background-color: #E6E6E6;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    width: 40px;
+    border-radius: 0;
+    position: absolute;
+    border:0;
+    z-index: 2;
+    
+    &:focus {
+        background-color: #00B0C6;
+
+        svg path { fill : #fff }
+    }
+
+    &:hover {
+        background-color: #00B0C6;
+        border-color: #00B0C6;
+        text-decoration: underline;
+
+        svg path { fill : #fff }
+    }
+
+    svg {
+      margin: auto;
+    }
+  }
+
+  input {
+    width: 100%;
+    padding: 8px 5px 8px 50px;
+    border: 0;
+    font-size: 15px;
+  }
+}
+
+.textarea-large {
+  height: 380px;
+}
+
+.table-heading {
+  font-size: 18px;
+  line-height: 1;
+  margin:30px 0;
+  text-align: center;
+  color: $brand;
 }

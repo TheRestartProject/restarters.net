@@ -24,6 +24,31 @@
             font-size: 20px;
         }
     }
+
+    &-tags-label {
+        svg {
+            margin: auto;
+            position: relative;
+            z-index: 1;
+            top: 4px;
+            margin-right: 2px;
+        }
+
+        button, a {
+            font-family: $font-family-second;
+            font-size: 13px;
+            font-weight: normal;
+            color: $brand;
+            text-decoration: underline;
+            border:0;
+            background-color: transparent;
+            padding: 0;
+
+            &:hover, &:focus {
+                text-decoration: none;
+            }
+        }
+    }
 }
 
 .modal-intro {
@@ -75,6 +100,8 @@
         width: 200px;
         margin: 0 auto 20px auto;
     }
+
+
 }
 
 .group-view {

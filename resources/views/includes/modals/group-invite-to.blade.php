@@ -13,20 +13,26 @@
 
       <div class="modal-body">
 
-        <p>@lang('groups.invite_group_name_message')</p>
+        <form action="{{{ prefix_route('view-group') }}}">
 
-        <div class="form-group">
-            <label for="invite_to_group_email_address">@lang('groups.email_addresses_field'):</label>
-            <input type="text" class="form-control field select2" id="invite_to_group_email_address" name="invite_to_group_email_address">
+          <input type="hidden" name="message" value="invite">
+
+          <p>@lang('groups.invite_group_name_message')</p>
+
+          <div class="form-group">
+              <label for="invite_to_group_email_address">@lang('groups.email_addresses_field'):</label>
+              <input type="email" class="form-control field" id="invite_to_group_email_address" name="invite_to_group_email_address">
+          </div>
+          <small class="after-offset">@lang('groups.type_email_addresses_message')</small>
+
+          <div class="form-group">
+              <label for="invite_to_group_message">@lang('groups.message_header'):</label>
+              <textarea name="invite_to_group_message" id="invite_to_group_message" class="form-control field">@lang('groups.message_example_text')</textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary float-right">@lang('groups.send_invite_button')</button>
+
         </div>
-        <small class="after-offset">@lang('groups.type_email_addresses_message')</small>
-
-        <div class="form-group">
-            <label for="invite_to_group_message">@lang('groups.message_header'):</label>
-            <textarea name="invite_to_group_message" id="invite_to_group_message" class="form-control field">@lang('groups.message_example_text')</textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary float-right">@lang('groups.send_invite_button')</button>
 
       </div>
 

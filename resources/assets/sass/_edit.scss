@@ -5,6 +5,16 @@
     padding: 50px 45px 40px;
     margin: 0 0 30px 0;
 
+    &__side {
+        padding: 20px;
+        margin-bottom: 5px;
+    }
+
+    &__device {
+        padding: 60px;
+        margin: 10px auto;
+    }
+
     .d-flex & {
         margin-bottom: 0;
         flex: 1;
@@ -13,6 +23,11 @@
     h4 {
         font-size: 20px;
         margin: 0 0 20px 0;
+    }
+
+    h6 {
+        font-size: 16px;
+        font-family: $font-family-sans-serif;
     }
 
     p {
@@ -95,14 +110,14 @@
         }
     }
 
-    .btn {
-        min-width: 125px;
-        margin-top: 10px;
-    }
+    // .btn {
+    //     min-width: 125px;
+    //     margin-top: 10px;
+    // }
 
     .btn-create {
         margin: auto 0;
-        min-width: 130px;
+        //min-width: 130px;
     }
 
     .form-row {
@@ -117,6 +132,24 @@
                 padding-right: 60px;
             }
         }
+    }
+
+    &__reset {
+        text-align: right;
+        display: block;
+        margin: 0 0 10px 0;
+        font-size: 14px;
+        text-decoration: underline;
+        color: #000;
+        background-color: transparent;
+        border:0;
+        padding: 0;
+        width: 100%;
+
+        &:hover {
+            text-decoration: none;
+        }
+
     }
 
 }

@@ -149,11 +149,11 @@
 
                     <label for="file">@lang('events.field_add_image'):</label>
 
-                    <!-- <form id="dropzoneEl" class="dropzone" action="/" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')"> -->
+                    <form id="dropzoneEl" class="dropzone" action="/party/add-image/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')">
                         <div class="fallback">
                             <input id="file" name="file[]" type="file" multiple />
                         </div>
-                    <!-- </form> -->
+                    </form>
 
 
 

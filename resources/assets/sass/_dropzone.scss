@@ -25,6 +25,33 @@
 
 }
 
+.dz-started {
+  .dz-preview {
+    margin: auto;
+    display: block;
+    position: static;
+    .dz-remove {
+        position: absolute;
+        top: -33px;
+        left: 80px;
+        font-size: 13px;
+        z-index: 2;
+        font-weight: 600;
+        color: $brand;
+        text-decoration: underline;
+
+        &:hover {
+            text-decoration: none;
+        }
+
+        &:before {
+            content:"╳";
+            position: relative;
+        }
+    }
+  }
+}
+
 .previews {
     margin: 20px -5px;
     padding: 0;
@@ -56,18 +83,6 @@
         z-index: 1;
     }
 
-    .dz-image {
-        margin-bottom: 5px;
-    }
-
-    .dz-success-mark,
-    .dz-error-mark,
-    .dz-error-message,
-    .dz-filename,
-    .dz-size {
-        display: none;
-    }
-
     .dz-remove {
         text-indent: -9999px;
         background-image: url('../images/remove.svg');
@@ -82,4 +97,26 @@
         top: -7px;
         z-index: 2;
     }
+
+    .dz-image {
+        margin-bottom: 5px;
+    }
 }
+
+.previews, .dz-preview {
+    .dz-success-mark,
+    .dz-error-mark,
+    .dz-error-message,
+    .dz-filename,
+    .dz-size {
+        display: none;
+    }
+
+}
+
+.dropzone.dz-clickable.dz-started {
+    background-color: #FFF;
+    min-height: 0;
+    padding: 30px;
+}
+

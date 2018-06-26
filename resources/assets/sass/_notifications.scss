@@ -3,12 +3,12 @@
     position: fixed;
     right: 0;
     top: 0;
-    padding-top: 68px;
+    padding-top: 62px;
     width: 350px;
     height: 100%;
     height: 100vh;
     z-index: 1;
-    box-shadow:2px 5px 5px rgba(0, 0, 0, 0.17);
+    box-shadow:-2px 5px 5px rgba(0, 0, 0, 0.17);
 
     &__scroll {
         overflow-y: auto;

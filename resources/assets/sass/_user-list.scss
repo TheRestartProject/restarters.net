@@ -88,6 +88,14 @@
         h3 {
             font-size: 15px;
             margin: 0 5px 0 0;
+
+            a {
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
         }
 
         p {

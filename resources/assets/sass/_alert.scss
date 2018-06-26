@@ -3,27 +3,6 @@
     font-size: 18px;
     font-family: $font-family-second;
     padding: 20px;
-    &-primary {
-        background-color: #EC7F00;
-        color:#FFF;
-    }
-    &-delete {
-        border: 0;
-        padding-right: 185px;
-        position: relative;
-        z-index: 1;
-        color: #FFF;
-        background-color: #E15A3B;
-
-        .btn  {
-            position: absolute;
-            top: 50%;
-            margin-top: -23px;
-            right: 20px;
-            z-index: 2;
-            line-height: 1.2;
-        }
-    }
 
     &-attendance {
         border: 0;
@@ -41,11 +20,65 @@
             margin-top: -23px;
             right: 20px;
             z-index: 2;
-            padding: 12px 15px;
+            //padding: 12px 15px;
             line-height: 1.2;
             background-color: #3BA43D;
-            border-bottom:3px solid #206821;
+            border:1px solid #206821;
+            border-bottom-width:3px;
             color: #FFF;
         }
     }
+
+    &-danger, &-primary, &-warning, &-success, &-delete {
+        border: 0;
+        padding-right: 185px;
+        position: relative;
+        z-index: 1;
+        color: #FFF;
+        margin-bottom: 15px;
+        min-height: 65px;
+
+        .btn {
+            font-family: $font-family-sans-serif;
+            top: 50%;
+            margin-top: -20px;
+            right: 20px;
+            z-index: 2;
+            padding: 7px 15px;
+            line-height: 1.2;
+            color: #FFF;
+            background-color: rgba($color: #000000, $alpha: 0.5);
+            border:1px solid rgba($color: #000000, $alpha: 0.7);
+            border-bottom-width:3px;
+            max-width: 165px;
+            font-size: 18px;
+            position: absolute;
+
+            &:hover {
+                background-color: rgba($color: #000000, $alpha: 0);
+            }
+
+            &:focus {
+                text-decoration: underline;
+                background-color: rgba($color: #000000, $alpha: 0);
+            }
+        }
+    }
+
+    &-success {
+        background-color: #4AC54B;
+    }
+    
+    &-danger {
+        background-color: #D23714;
+    }
+
+    &-primary {
+        background-color: $brand;
+    }
+
+    &-warning, &-delete {
+        background-color:#DE7600;
+    }
+
 }

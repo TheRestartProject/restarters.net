@@ -1,8 +1,4 @@
 
-// Fonts
-@import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
-
-// Variables
 @import "variables";
 
 // Bootstrap
@@ -14,9 +10,9 @@
 
 // Tokenfield
 @import 'tfvariables';
-// @import '~tokenfield/lib/scss/mixins';
-// @import '~tokenfield/lib/scss/tokenfield';
-@import '~bootstrap-tokenfield/dist/css/bootstrap-tokenfield.css';
+@import '~tokenfield/lib/scss/mixins';
+@import '~tokenfield/lib/scss/tokenfield';
+// @import '~bootstrap-tokenfield/dist/css/bootstrap-tokenfield.css';
 
 // Summernote
 // @import '~summernote/src/less/summernote';
@@ -38,12 +34,14 @@
 }
 
 @import "accordion";
+@import "admin";
 @import "alert";
 @import "entry";
 @import "buttons";
 @import "badge";
 @import "breadcrumb";
 @import "dropzone";
+@import "devices";
 @import "registration";
 @import "navigation";
 @import "notifications";
@@ -64,6 +62,8 @@
 @import "properties";
 @import 'summernote';
 @import 'events';
+@import 'reporting';
+@import 'user';
 @import "user-list";
 @import "mini-stats";
 @import "stat";

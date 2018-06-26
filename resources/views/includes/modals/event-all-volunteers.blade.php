@@ -30,7 +30,7 @@
           <tbody>
             <tr>
               <td class="table-cell-icon"><img src="{{{ url('images/placeholder.png') }}}" class="rounded" alt="Placeholder"></td>
-              <td><a href="">Dean Appleton-Claydon</a></td>
+              <td><a href="{{{ prefix_route('profile') }}}">Dean Appleton-Claydon</a></td>
               <td>
                 Communication<br>
                 Communication

@@ -1,4 +1,5 @@
 .badge {
+    font-family: $font-family-sans-serif;
     &-primary {
         background-color: $brand;
         border-radius: 3px;
@@ -19,6 +20,21 @@
     }
     &-warning {
         background-color: #F9A33F;
+    }
+    &-very-poor {
+        background-color: #AD2C1C;
+    }
+    &-poor {
+        background-color: #FF1B00;
+    }
+    &-fair {
+        background-color: #FFBA00;
+    }
+    &-good {
+        background-color: #43B136;
+    }
+    &-very-good {
+        background-color: #26781C;
     }
 
 

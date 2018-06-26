@@ -5,6 +5,23 @@
     .note-btn {
         border: 1px solid #ced4da;
     }
+
+    .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 12px;
+        line-height: 1;
+        border-bottom: 1px solid #ced4da;
+        background-color: #fff;
+
+        &:hover, &:focus {
+            background-color: #ced4da;
+        }
+    }
+
+    .note-editable {
+        font-size: 15px;
+        padding: 20px 15px !important;
+    }
     
     .panel-heading.note-toolbar {
         background-color: #F5F5F5;

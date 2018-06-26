@@ -7,7 +7,22 @@
         color: #000;
         border: 0;
         text-decoration: underline;
-        border-radius: 0;
+        border-width: 2px;
+        border-radius: 3px;
+        padding: 0.5rem 0.75rem;
+
+        &:focus {
+            background-color: #00B0C6;
+            color: #FFF;
+        }
+
+        &:hover {
+            background-color: #00B0C6;
+            border-color: #00B0C6;
+            text-decoration: underline;
+            color: #FFF;
+        }
+
     }
 
     .active a.page-link  {
@@ -17,5 +32,16 @@
         color: #FFF;
         border-radius: 3px;
         border-bottom: 2px solid #155E67;
+
+        &:focus {
+            background-color: #00B0C6;
+        }
+
+        &:hover {
+            background-color: #00B0C6;
+            border-color: #00B0C6;
+            text-decoration: underline;
+        }
+
     }
 }

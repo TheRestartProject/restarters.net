@@ -41,9 +41,7 @@
         <script src="/components/jquery/dist/jquery.min.js"></script>
         <script src="/components/moment/min/moment.min.js"></script>
         <script src="/components/bootstrap/dist/js/bootstrap.min.js"></script>
-        @if(isset($gmaps) && $gmaps == true)
-        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
-        @endif
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE&signed_in=true"></script>
         @if(isset($js) && isset($js['head']) && !empty($js['head']))
             @foreach($js['head'] as $script){
         <script src="<?php echo $script; ?>"></script>

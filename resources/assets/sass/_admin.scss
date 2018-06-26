@@ -1,0 +1,28 @@
+.admin {
+
+    padding: 70px 0;
+
+    .breadcrumb {
+        margin: auto;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    td {
+        .badge {
+            padding: 5px;
+            min-width: 75px;
+            color: #FFF;
+            font-weight: normal;
+            font-size: 12px;
+            font-family: $font-family-second;
+            text-align: center;
+            display: inline-block;
+            margin: auto;
+        }
+    }
+
+
+}

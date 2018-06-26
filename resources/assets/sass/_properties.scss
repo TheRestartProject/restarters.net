@@ -67,4 +67,12 @@
             padding-bottom:10px;
         }
     }
+
+    &__iconless {
+        li {
+            h3 {
+                padding-left: 0;
+            }
+        }
+    }
 }

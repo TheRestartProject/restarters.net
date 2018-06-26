@@ -39,13 +39,13 @@
   font-size: 90%;
 }
 
-.btn-primary {
-    font-size: 16px;
-    border-radius: 3px;
-    font-family: $font-family-sans-serif;
-    padding: 8px 25px 9px 25px;
-    border-radius: 5px;
-}
+// .btn-primary {
+//     font-size: 16px;
+//     border-radius: 3px;
+//     font-family: $font-family-sans-serif;
+//     padding: 8px 25px 9px 25px;
+//     border-radius: 5px;
+// }
 
 .modal__invite {
     textarea {
@@ -57,4 +57,53 @@
     p:last-child {
       margin-bottom: 0;
     }
+}
+
+.modal-form {
+  legend {
+    margin: 0 0 30px 0;
+    font-size: 20px;
+    font-family: $font-family-sans-serif;
+  }
+  .modal-dialog {
+    max-width: 445px;
+  }
+  .close {
+    color: #000 !important;
+    font-size: 40px !important;
+  }
+  .btn-primary {
+    margin: auto 0 !important;
+  }
+  .button-group {
+    padding-top: 0;
+    padding-bottom: 20px;
+  }
+}
+
+.modal-brand {
+  .modal-content {
+    padding: 40px 55px;
+  }
+  .close {
+    right: 35px !important;  
+    top: 20px !important;  
+  }
+}
+
+.modal-reporting.modal-intro {
+  .modal-dialog {
+    max-width: 768px !important;
+  }
+
+  .modal-body {
+    text-align: left;
+    padding: 0;
+  }
+
+  .modal-content {
+    padding: 50px;
+    border: 0;
+  border-radius: 5px;
+  }
 }
