@@ -7,13 +7,13 @@
       <div class="modal-header">
 
         <h5 id="eventShareStatsLabel">@lang('events.share_stats_header')</h5>
-        @include('fixometer/partials/cross')
+        @include('partials.cross')
 
       </div>
 
       <div class="modal-body">
 
-        <p>@lang('events.share_stats_message', ['date' => '7th May', 'event_name' => 'The Old Chapel', 'number_devices' => 100])</p>
+        <p>@lang('events.share_stats_message', ['date' => $formdata->event_date, 'event_name' => $formdata->venue, 'number_devices' => count($formdata->devices)])</p>
 
         <div id="accordionEvent" class="accordion__share mt-4">
 
@@ -21,7 +21,7 @@
             <div class="card-header p-0" id="headingEventHeadline">
               <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseEventHeadline" aria-expanded="false" aria-controls="collapseEventHeadline">
                 @lang('events.headline_stats_dropdown')
-                @include('fixometer/partials/caret')
+                @include('partials.caret')
               </button>
             </div>
             <div id="collapseEventHeadline" class="collapse" aria-labelledby="headingEventHeadline" data-parent="#accordionEvent">
@@ -43,7 +43,7 @@
             <div class="card-header p-0" id="headingEventCO2">
               <button class="btn btn-link" data-toggle="collapse" data-target="#collapseEventCO2" aria-expanded="true" aria-controls="collapseEventCO2">
                 @lang('events.co2_equivalence_visualisation_dropdown')
-                @include('fixometer/partials/caret')
+                @include('partials.caret')
               </button>
             </div>
 

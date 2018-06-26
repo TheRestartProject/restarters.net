@@ -108,6 +108,9 @@
                                 @lang('events.field_venue_helper')
                               </small>
 
+                              <input type="hidden" id="latitude" name="latitude">
+                              <input type="hidden" id="longitude" name="longitude">
+
                             </div>
                             <div class="form-group">
                               <label for="street_number">@lang('events.field_event_street_address'):</label>
@@ -149,11 +152,11 @@
 
                     <label for="file">@lang('events.field_add_image'):</label>
 
-                    <form id="dropzoneEl" class="dropzone" action="/party/add-image/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')">
+                    <!-- <form id="dropzoneEl" class="dropzone" action="/party/add-image/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')"> -->
                         <div class="fallback">
                             <input id="file" name="file[]" type="file" multiple />
                         </div>
-                    </form>
+                    <!-- </form> -->
 
 
 
@@ -169,7 +172,7 @@
                   <span class="button-group__notice">@lang('events.before_submit_text')</span>
               </div>
               <div class="col-lg-2 d-flex align-items-center justify-content-end">
-                  <input type="submit" class="btn btn-primary btn-create" id="create-event" value="@lang('events.create_event')">
+                  <input type="submit" class="btn btn-primary btn-create" id="create-event" value="@lang('events.save_event')">
               </div>
           </div>
 

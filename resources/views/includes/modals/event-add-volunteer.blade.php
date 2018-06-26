@@ -7,7 +7,7 @@
       <div class="modal-header">
 
         <h5 id="addVolunteerEventLabel">@lang('events.add_volunteer_modal_heading')</h5>
-        @include('fixometer/partials/cross')
+        @include('partials.cross')
 
       </div>
 

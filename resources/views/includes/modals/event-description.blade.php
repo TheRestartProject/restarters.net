@@ -6,14 +6,14 @@
 
       <div class="modal-header">
 
-        <h5 id="eventDescriptionLabel">@lang('events.about_event_name_header', ['event' => 'Bank holiday restart @ The Old Chapel'])</h5>
-        @include('fixometer/partials/cross')
+        <h5 id="eventDescriptionLabel">@lang('events.about_event_name_header', ['event' => $formdata->venue])</h5>
+        @include('partials.cross')
 
       </div>
 
       <div class="modal-body">
 
-        <p>Aenean lacinia bibendum nulla sed consectetur. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Aenean lacinia bibendum nulla sed consectetur. Sed posuere consectetur est at lobortis. Nulla vitae elit libero, a pharetra augue. Donec ullamcorper nulla non metus auctor fringilla. Etiam porta sem malesuada magna mollis euismod.</p>
+        {!! $formdata->free_text !!}
 
       </div>
 

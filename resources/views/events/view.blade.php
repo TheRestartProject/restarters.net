@@ -23,8 +23,8 @@
           <div class="col-lg-5">
 
             <div class="button-group button-group__r">
-                <a href="{{ url('/') }}/events/edit" class="btn btn-primary">Edit event</a>
-                <a href="{{ url('/') }}/events/edit" class="btn btn-primary">Event stats embed</a>
+                <a href="{{ url('/') }}/party/edit/{{ $formdata->id }}" class="btn btn-primary">Edit event</a>
+                <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Event stats embed</a>
             </div>
 
           </div>
@@ -147,7 +147,7 @@
                     <div class="truncate">
                       {!! $formdata->free_text !!}
                     </div>
-                    <button class="expand truncate__button"><span>Read more</span></button>
+                    <button data-toggle="modal" data-target="#event-description"><span>Read more</span></button>
                 </div>
                 <h2 id="attendance">Attendance</h2>
                 <ul class="nav nav-tabs" id="events-attendance" role="tablist">
@@ -662,5 +662,10 @@
 </section>
 
 @include('includes.modals.event-invite-to')
+@include('includes.modals.event-description')
+@include('includes.modals.event-share-stats')
+@include('includes.modals.event-all-volunteers')
+@include('includes.modals.event-all-attended')
+@include('includes.modals.event-add-volunteer')
 
 @endsection

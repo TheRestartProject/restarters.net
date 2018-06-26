@@ -11,7 +11,7 @@
         @else
           <h5 id="eventAllVolunteersLabel">@lang('events.all_restarters_attended_modal_heading')</h5>
         @endif
-        @include('fixometer/partials/cross')
+        @include('partials.cross')
 
       </div>
 
@@ -37,7 +37,7 @@
           <tbody>
             <tr>
               <td class="table-cell-icon"><img src="{{{ url('images/placeholder.png') }}}" class="rounded" alt="Placeholder"></td>
-              <td><a href="{{{ prefix_route('profile') }}}">Dean Appleton-Claydon</a> <span class="badge badge-primary">Host</span></td>
+              <td><a href="">Dean Appleton-Claydon</a> <span class="badge badge-primary">Host</span></td>
               <td>
                 Communication<br>
                 Communication
