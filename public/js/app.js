@@ -20304,6 +20304,8 @@ function registerGlobalHandlers() {
 // Called when the window resizes
 function onResize(cm) {
   var d = cm.display;
+  if (d.lastWrapHeight == d.wrapper.clientHeight && d.lastWrapWidth == d.wrapper.clientWidth)
+    { return }
   // Might be a text scaling operation, clear size caches.
   d.cachedCharWidth = d.cachedTextHeight = d.cachedPaddingH = null;
   d.scrollbarsClipped = false;
@@ -23403,7 +23405,7 @@ CodeMirror$1.fromTextArea = fromTextArea;
 
 addLegacyProps(CodeMirror$1);
 
-CodeMirror$1.version = "5.39.0";
+CodeMirror$1.version = "5.38.0";
 
 return CodeMirror$1;
 
@@ -23415,7 +23417,7 @@ return CodeMirror$1;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(14);
-module.exports = __webpack_require__(47);
+module.exports = __webpack_require__(48);
 
 
 /***/ }),
@@ -23429,13 +23431,13 @@ module.exports = __webpack_require__(47);
  */
 
 __webpack_require__(17);
+__webpack_require__(67);
 __webpack_require__(40);
 __webpack_require__(41);
 __webpack_require__(42);
 __webpack_require__(43);
-__webpack_require__(44);
-window.Dropzone = __webpack_require__(45);
-window.Tokenfield = __webpack_require__(66);
+window.Dropzone = __webpack_require__(44);
+window.Tokenfield = __webpack_require__(45);
 
 if (jQuery('.slideshow').length > 0) {
     jQuery('.slideshow').slick({
@@ -23964,7 +23966,7 @@ jQuery(document).ready(function () {
     groupsMap();
 });
 
-__webpack_require__(46);
+__webpack_require__(47);
 
 /***/ }),
 /* 15 */,
@@ -46157,239 +46159,6 @@ module.exports = function spread(callback) {
 /* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-/*!
- * bootstrap-tokenfield 0.12.0
- * https://github.com/sliptree/bootstrap-tokenfield
- * Copyright 2013-2014 Sliptree and other contributors; Licensed MIT
- */
-
-!function (a) {
-   true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (a),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : "object" == (typeof exports === "undefined" ? "undefined" : _typeof(exports)) ? module.exports = global.window && global.window.$ ? a(global.window.$) : function (b) {
-    if (!b.$ && !b.fn) throw new Error("Tokenfield requires a window object with jQuery or a jQuery instance");return a(b.$ || b);
-  } : a(jQuery);
-}(function (a, b) {
-  "use strict";
-  var c = function c(_c, d) {
-    var e = this;this.$element = a(_c), this.textDirection = this.$element.css("direction"), this.options = a.extend(!0, {}, a.fn.tokenfield.defaults, { tokens: this.$element.val() }, this.$element.data(), d), this._delimiters = "string" == typeof this.options.delimiter ? [this.options.delimiter] : this.options.delimiter, this._triggerKeys = a.map(this._delimiters, function (a) {
-      return a.charCodeAt(0);
-    }), this._firstDelimiter = this._delimiters[0];var f = a.inArray(" ", this._delimiters),
-        g = a.inArray("-", this._delimiters);f >= 0 && (this._delimiters[f] = "\\s"), g >= 0 && (delete this._delimiters[g], this._delimiters.unshift("-"));var h = ["\\", "$", "[", "{", "^", ".", "|", "?", "*", "+", "(", ")"];a.each(this._delimiters, function (b, c) {
-      var d = a.inArray(c, h);d >= 0 && (e._delimiters[b] = "\\" + c);
-    });var i,
-        j = b && "function" == typeof b.getMatchedCSSRules ? b.getMatchedCSSRules(_c) : null,
-        k = _c.style.width,
-        l = this.$element.width();j && a.each(j, function (a, b) {
-      b.style.width && (i = b.style.width);
-    });var m = "rtl" === a("body").css("direction") ? "right" : "left",
-        n = { position: this.$element.css("position") };n[m] = this.$element.css(m), this.$element.data("original-styles", n).data("original-tabindex", this.$element.prop("tabindex")).css("position", "absolute").css(m, "-10000px").prop("tabindex", -1), this.$wrapper = a('<div class="tokenfield form-control" />'), this.$element.hasClass("input-lg") && this.$wrapper.addClass("input-lg"), this.$element.hasClass("input-sm") && this.$wrapper.addClass("input-sm"), "rtl" === this.textDirection && this.$wrapper.addClass("rtl");var o = this.$element.prop("id") || new Date().getTime() + "" + Math.floor(100 * (1 + Math.random()));this.$input = a('<input type="text" class="token-input" autocomplete="off" />').appendTo(this.$wrapper).prop("placeholder", this.$element.prop("placeholder")).prop("id", o + "-tokenfield").prop("tabindex", this.$element.data("original-tabindex"));var p = a('label[for="' + this.$element.prop("id") + '"]');if (p.length && p.prop("for", this.$input.prop("id")), this.$copyHelper = a('<input type="text" />').css("position", "absolute").css(m, "-10000px").prop("tabindex", -1).prependTo(this.$wrapper), k ? this.$wrapper.css("width", k) : i ? this.$wrapper.css("width", i) : this.$element.parents(".form-inline").length && this.$wrapper.width(l), (this.$element.prop("disabled") || this.$element.parents("fieldset[disabled]").length) && this.disable(), this.$element.prop("readonly") && this.readonly(), this.$mirror = a('<span style="position:absolute; top:-999px; left:0; white-space:pre;"/>'), this.$input.css("min-width", this.options.minWidth + "px"), a.each(["fontFamily", "fontSize", "fontWeight", "fontStyle", "letterSpacing", "textTransform", "wordSpacing", "textIndent"], function (a, b) {
-      e.$mirror[0].style[b] = e.$input.css(b);
-    }), this.$mirror.appendTo("body"), this.$wrapper.insertBefore(this.$element), this.$element.prependTo(this.$wrapper), this.update(), this.setTokens(this.options.tokens, !1, !1), this.listen(), !a.isEmptyObject(this.options.autocomplete)) {
-      var q = "rtl" === this.textDirection ? "right" : "left",
-          r = a.extend({ minLength: this.options.showAutocompleteOnFocus ? 0 : null, position: { my: q + " top", at: q + " bottom", of: this.$wrapper } }, this.options.autocomplete);this.$input.autocomplete(r);
-    }if (!a.isEmptyObject(this.options.typeahead)) {
-      var s = this.options.typeahead,
-          t = { minLength: this.options.showAutocompleteOnFocus ? 0 : null },
-          u = a.isArray(s) ? s : [s, s];u[0] = a.extend({}, t, u[0]), this.$input.typeahead.apply(this.$input, u), this.typeahead = !0;
-    }this.$element.trigger("tokenfield:initialize");
-  };c.prototype = { constructor: c, createToken: function createToken(b, c) {
-      var d = this;if ("string" == typeof b && (b = { value: b, label: b }), "undefined" == typeof c && (c = !0), b.value = a.trim(b.value), b.label = b.label && b.label.length ? a.trim(b.label) : b.value, !(!b.value.length || !b.label.length || b.label.length <= this.options.minLength || this.options.limit && this.getTokens().length >= this.options.limit)) {
-        var e = a.Event("tokenfield:createtoken", { attrs: b });if (this.$element.trigger(e), e.attrs && !e.isDefaultPrevented()) {
-          var f = a('<div class="token" />').attr("data-value", b.value).append('<span class="token-label" />').append('<a href="#" class="close" tabindex="-1">&times;</a>');this.$input.hasClass("tt-input") ? this.$input.parent().before(f) : this.$input.before(f), this.$input.css("width", this.options.minWidth + "px");var g = f.find(".token-label"),
-              h = f.find(".close");return this.maxTokenWidth || (this.maxTokenWidth = this.$wrapper.width() - h.outerWidth() - parseInt(h.css("margin-left"), 10) - parseInt(h.css("margin-right"), 10) - parseInt(f.css("border-left-width"), 10) - parseInt(f.css("border-right-width"), 10) - parseInt(f.css("padding-left"), 10) - parseInt(f.css("padding-right"), 10), parseInt(g.css("border-left-width"), 10) - parseInt(g.css("border-right-width"), 10) - parseInt(g.css("padding-left"), 10) - parseInt(g.css("padding-right"), 10), parseInt(g.css("margin-left"), 10) - parseInt(g.css("margin-right"), 10)), g.text(b.label).css("max-width", this.maxTokenWidth), f.on("mousedown", function () {
-            return d._disabled || d._readonly ? !1 : (d.preventDeactivation = !0, void 0);
-          }).on("click", function (a) {
-            return d._disabled || d._readonly ? !1 : (d.preventDeactivation = !1, a.ctrlKey || a.metaKey ? (a.preventDefault(), d.toggle(f)) : (d.activate(f, a.shiftKey, a.shiftKey), void 0));
-          }).on("dblclick", function () {
-            return d._disabled || d._readonly || !d.options.allowEditing ? !1 : (d.edit(f), void 0);
-          }), h.on("click", a.proxy(this.remove, this)), this.$element.trigger(a.Event("tokenfield:createdtoken", { attrs: b, relatedTarget: f.get(0) })), c && this.$element.val(this.getTokensList()).trigger(a.Event("change", { initiator: "tokenfield" })), this.update(), this.$element.get(0);
-        }
-      }
-    }, setTokens: function setTokens(b, c, d) {
-      if (b) {
-        c || this.$wrapper.find(".token").remove(), "undefined" == typeof d && (d = !0), "string" == typeof b && (b = this._delimiters.length ? b.split(new RegExp("[" + this._delimiters.join("") + "]")) : [b]);var e = this;return a.each(b, function (a, b) {
-          e.createToken(b, d);
-        }), this.$element.get(0);
-      }
-    }, getTokenData: function getTokenData(b) {
-      var c = b.map(function () {
-        var b = a(this);return { value: b.attr("data-value"), label: b.find(".token-label").text() };
-      }).get();return 1 == c.length && (c = c[0]), c;
-    }, getTokens: function getTokens(b) {
-      var c = this,
-          d = [],
-          e = b ? ".active" : "";return this.$wrapper.find(".token" + e).each(function () {
-        d.push(c.getTokenData(a(this)));
-      }), d;
-    }, getTokensList: function getTokensList(b, c, d) {
-      b = b || this._firstDelimiter, c = "undefined" != typeof c && null !== c ? c : this.options.beautify;var e = b + (c && " " !== b ? " " : "");return a.map(this.getTokens(d), function (a) {
-        return a.value;
-      }).join(e);
-    }, getInput: function getInput() {
-      return this.$input.val();
-    }, listen: function listen() {
-      var c = this;this.$element.on("change", a.proxy(this.change, this)), this.$wrapper.on("mousedown", a.proxy(this.focusInput, this)), this.$input.on("focus", a.proxy(this.focus, this)).on("blur", a.proxy(this.blur, this)).on("paste", a.proxy(this.paste, this)).on("keydown", a.proxy(this.keydown, this)).on("keypress", a.proxy(this.keypress, this)).on("keyup", a.proxy(this.keyup, this)), this.$copyHelper.on("focus", a.proxy(this.focus, this)).on("blur", a.proxy(this.blur, this)).on("keydown", a.proxy(this.keydown, this)).on("keyup", a.proxy(this.keyup, this)), this.$input.on("keypress", a.proxy(this.update, this)).on("keyup", a.proxy(this.update, this)), this.$input.on("autocompletecreate", function () {
-        var b = a(this).data("ui-autocomplete").menu.element,
-            d = c.$wrapper.outerWidth() - parseInt(b.css("border-left-width"), 10) - parseInt(b.css("border-right-width"), 10);b.css("min-width", d + "px");
-      }).on("autocompleteselect", function (a, b) {
-        return c.createToken(b.item) && (c.$input.val(""), c.$input.data("edit") && c.unedit(!0)), !1;
-      }).on("typeahead:selected typeahead:autocompleted", function (a, b) {
-        c.createToken(b) && (c.$input.typeahead("val", ""), c.$input.data("edit") && c.unedit(!0));
-      }), a(b).on("resize", a.proxy(this.update, this));
-    }, keydown: function keydown(b) {
-      function c(a) {
-        if (e.$input.is(document.activeElement)) {
-          if (e.$input.val().length > 0) return;a += "All";var c = e.$input.hasClass("tt-input") ? e.$input.parent()[a](".token:first") : e.$input[a](".token:first");if (!c.length) return;e.preventInputFocus = !0, e.preventDeactivation = !0, e.activate(c), b.preventDefault();
-        } else e[a](b.shiftKey), b.preventDefault();
-      }function d(c) {
-        if (b.shiftKey) {
-          if (e.$input.is(document.activeElement)) {
-            if (e.$input.val().length > 0) return;var d = e.$input.hasClass("tt-input") ? e.$input.parent()[c + "All"](".token:first") : e.$input[c + "All"](".token:first");if (!d.length) return;e.activate(d);
-          }var f = "prev" === c ? "next" : "prev",
-              g = "prev" === c ? "first" : "last";e.firstActiveToken[f + "All"](".token").each(function () {
-            e.deactivate(a(this));
-          }), e.activate(e.$wrapper.find(".token:" + g), !0, !0), b.preventDefault();
-        }
-      }if (this.focused) {
-        var e = this;switch (b.keyCode) {case 8:
-            if (!this.$input.is(document.activeElement)) break;this.lastInputValue = this.$input.val();break;case 37:
-            c("rtl" === this.textDirection ? "next" : "prev");break;case 38:
-            d("prev");break;case 39:
-            c("rtl" === this.textDirection ? "prev" : "next");break;case 40:
-            d("next");break;case 65:
-            if (this.$input.val().length > 0 || !b.ctrlKey && !b.metaKey) break;this.activateAll(), b.preventDefault();break;case 9:case 13:
-            if (this.$input.data("ui-autocomplete") && this.$input.data("ui-autocomplete").menu.element.find("li:has(a.ui-state-focus)").length) break;if (this.$input.hasClass("tt-input") && this.$wrapper.find(".tt-cursor").length) break;if (this.$input.hasClass("tt-input") && this.$wrapper.find(".tt-hint").val().length) break;if (this.$input.is(document.activeElement) && this.$input.val().length || this.$input.data("edit")) return this.createTokensFromInput(b, this.$input.data("edit"));if (13 === b.keyCode) {
-              if (!this.$copyHelper.is(document.activeElement) || 1 !== this.$wrapper.find(".token.active").length) break;if (!e.options.allowEditing) break;this.edit(this.$wrapper.find(".token.active"));
-            }}this.lastKeyDown = b.keyCode;
-      }
-    }, keypress: function keypress(b) {
-      return this.lastKeyPressCode = b.keyCode, this.lastKeyPressCharCode = b.charCode, -1 !== a.inArray(b.charCode, this._triggerKeys) && this.$input.is(document.activeElement) ? (this.$input.val() && this.createTokensFromInput(b), !1) : void 0;
-    }, keyup: function keyup(a) {
-      if (this.preventInputFocus = !1, this.focused) {
-        switch (a.keyCode) {case 8:
-            if (this.$input.is(document.activeElement)) {
-              if (this.$input.val().length || this.lastInputValue.length && 8 === this.lastKeyDown) break;this.preventDeactivation = !0;var b = this.$input.hasClass("tt-input") ? this.$input.parent().prevAll(".token:first") : this.$input.prevAll(".token:first");if (!b.length) break;this.activate(b);
-            } else this.remove(a);break;case 46:
-            this.remove(a, "next");}this.lastKeyUp = a.keyCode;
-      }
-    }, focus: function focus() {
-      this.focused = !0, this.$wrapper.addClass("focus"), this.$input.is(document.activeElement) && (this.$wrapper.find(".active").removeClass("active"), this.$firstActiveToken = null, this.options.showAutocompleteOnFocus && this.search());
-    }, blur: function blur(a) {
-      this.focused = !1, this.$wrapper.removeClass("focus"), this.preventDeactivation || this.$element.is(document.activeElement) || (this.$wrapper.find(".active").removeClass("active"), this.$firstActiveToken = null), !this.preventCreateTokens && (this.$input.data("edit") && !this.$input.is(document.activeElement) || this.options.createTokensOnBlur) && this.createTokensFromInput(a), this.preventDeactivation = !1, this.preventCreateTokens = !1;
-    }, paste: function paste(a) {
-      var b = this;setTimeout(function () {
-        b.createTokensFromInput(a);
-      }, 1);
-    }, change: function change(a) {
-      "tokenfield" !== a.initiator && this.setTokens(this.$element.val());
-    }, createTokensFromInput: function createTokensFromInput(a, b) {
-      if (!(this.$input.val().length < this.options.minLength)) {
-        var c = this.getTokensList();return this.setTokens(this.$input.val(), !0), c == this.getTokensList() && this.$input.val().length ? !1 : (this.$input.hasClass("tt-input") ? this.$input.typeahead("val", "") : this.$input.val(""), this.$input.data("edit") && this.unedit(b), !1);
-      }
-    }, next: function next(a) {
-      if (a) {
-        var b = this.$wrapper.find(".active:first"),
-            c = b && this.$firstActiveToken ? b.index() < this.$firstActiveToken.index() : !1;if (c) return this.deactivate(b);
-      }var d = this.$wrapper.find(".active:last"),
-          e = d.nextAll(".token:first");return e.length ? (this.activate(e, a), void 0) : (this.$input.focus(), void 0);
-    }, prev: function prev(a) {
-      if (a) {
-        var b = this.$wrapper.find(".active:last"),
-            c = b && this.$firstActiveToken ? b.index() > this.$firstActiveToken.index() : !1;if (c) return this.deactivate(b);
-      }var d = this.$wrapper.find(".active:first"),
-          e = d.prevAll(".token:first");return e.length || (e = this.$wrapper.find(".token:first")), e.length || a ? (this.activate(e, a), void 0) : (this.$input.focus(), void 0);
-    }, activate: function activate(b, c, d, e) {
-      if (b) {
-        if ("undefined" == typeof e) var e = !0;if (d) var c = !0;if (this.$copyHelper.focus(), c || (this.$wrapper.find(".active").removeClass("active"), e ? this.$firstActiveToken = b : delete this.$firstActiveToken), d && this.$firstActiveToken) {
-          var f = this.$firstActiveToken.index() - 2,
-              g = b.index() - 2,
-              h = this;this.$wrapper.find(".token").slice(Math.min(f, g) + 1, Math.max(f, g)).each(function () {
-            h.activate(a(this), !0);
-          });
-        }b.addClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select();
-      }
-    }, activateAll: function activateAll() {
-      var b = this;this.$wrapper.find(".token").each(function (c) {
-        b.activate(a(this), 0 !== c, !1, !1);
-      });
-    }, deactivate: function deactivate(a) {
-      a && (a.removeClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select());
-    }, toggle: function toggle(a) {
-      a && (a.toggleClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select());
-    }, edit: function edit(b) {
-      if (b) {
-        var c = { value: b.data("value"), label: b.find(".token-label").text() },
-            d = { attrs: c, relatedTarget: b.get(0) },
-            e = a.Event("tokenfield:edittoken", d);if (this.$element.trigger(e), !e.isDefaultPrevented()) {
-          b.find(".token-label").text(c.value);var f = b.outerWidth(),
-              g = this.$input.hasClass("tt-input") ? this.$input.parent() : this.$input;b.replaceWith(g), this.preventCreateTokens = !0, this.$input.val(c.value).select().data("edit", !0).width(f), this.update(), this.$element.trigger(a.Event("tokenfield:editedtoken", d));
-        }
-      }
-    }, unedit: function unedit(a) {
-      var b = this.$input.hasClass("tt-input") ? this.$input.parent() : this.$input;if (b.appendTo(this.$wrapper), this.$input.data("edit", !1), this.$mirror.text(""), this.update(), a) {
-        var c = this;setTimeout(function () {
-          c.$input.focus();
-        }, 1);
-      }
-    }, remove: function remove(b, c) {
-      if (!(this.$input.is(document.activeElement) || this._disabled || this._readonly)) {
-        var d = "click" === b.type ? a(b.target).closest(".token") : this.$wrapper.find(".token.active");if ("click" !== b.type) {
-          if (!c) var c = "prev";if (this[c](), "prev" === c) var e = 0 === d.first().prevAll(".token:first").length;
-        }var f = { attrs: this.getTokenData(d), relatedTarget: d.get(0) },
-            g = a.Event("tokenfield:removetoken", f);if (this.$element.trigger(g), !g.isDefaultPrevented()) {
-          var h = a.Event("tokenfield:removedtoken", f),
-              i = a.Event("change", { initiator: "tokenfield" });d.remove(), this.$element.val(this.getTokensList()).trigger(h).trigger(i), (!this.$wrapper.find(".token").length || "click" === b.type || e) && this.$input.focus(), this.$input.css("width", this.options.minWidth + "px"), this.update(), b.preventDefault(), b.stopPropagation();
-        }
-      }
-    }, update: function update() {
-      var a = this.$input.val(),
-          b = parseInt(this.$input.css("padding-left"), 10),
-          c = parseInt(this.$input.css("padding-right"), 10),
-          d = b + c;if (this.$input.data("edit")) {
-        if (a || (a = this.$input.prop("placeholder")), a === this.$mirror.text()) return;this.$mirror.text(a);var e = this.$mirror.width() + 10;if (e > this.$wrapper.width()) return this.$input.width(this.$wrapper.width());this.$input.width(e);
-      } else {
-        if (this.$input.css("width", this.options.minWidth + "px"), "rtl" === this.textDirection) return this.$input.width(this.$input.offset().left + this.$input.outerWidth() - this.$wrapper.offset().left - parseInt(this.$wrapper.css("padding-left"), 10) - d - 1);this.$input.width(this.$wrapper.offset().left + this.$wrapper.width() + parseInt(this.$wrapper.css("padding-left"), 10) - this.$input.offset().left - d);
-      }
-    }, focusInput: function focusInput(b) {
-      if (!(a(b.target).closest(".token").length || a(b.target).closest(".token-input").length || a(b.target).closest(".tt-dropdown-menu").length)) {
-        var c = this;setTimeout(function () {
-          c.$input.focus();
-        }, 0);
-      }
-    }, search: function search() {
-      this.$input.data("ui-autocomplete") && this.$input.autocomplete("search");
-    }, disable: function disable() {
-      this.setProperty("disabled", !0);
-    }, enable: function enable() {
-      this.setProperty("disabled", !1);
-    }, readonly: function readonly() {
-      this.setProperty("readonly", !0);
-    }, writeable: function writeable() {
-      this.setProperty("readonly", !1);
-    }, setProperty: function setProperty(a, b) {
-      this["_" + a] = b, this.$input.prop(a, b), this.$element.prop(a, b), this.$wrapper[b ? "addClass" : "removeClass"](a);
-    }, destroy: function destroy() {
-      this.$element.val(this.getTokensList()), this.$element.css(this.$element.data("original-styles")), this.$element.prop("tabindex", this.$element.data("original-tabindex"));var b = a('label[for="' + this.$input.prop("id") + '"]');b.length && b.prop("for", this.$element.prop("id")), this.$element.insertBefore(this.$wrapper), this.$element.removeData("original-styles").removeData("original-tabindex").removeData("bs.tokenfield"), this.$wrapper.remove();var c = this.$element;return delete this, c;
-    } };var d = a.fn.tokenfield;return a.fn.tokenfield = function (b, d) {
-    var e,
-        f = [];Array.prototype.push.apply(f, arguments);var g = this.each(function () {
-      var g = a(this),
-          h = g.data("bs.tokenfield"),
-          i = "object" == (typeof b === "undefined" ? "undefined" : _typeof(b)) && b;"string" == typeof b && h && h[b] ? (f.shift(), e = h[b].apply(h, f)) : h || "string" == typeof b || d || g.data("bs.tokenfield", h = new c(this, i));
-    });return "undefined" != typeof e ? e : g;
-  }, a.fn.tokenfield.defaults = { minWidth: 60, minLength: 0, allowEditing: !0, limit: 0, autocomplete: {}, typeahead: {}, showAutocompleteOnFocus: !1, createTokensOnBlur: !1, delimiter: ",", beautify: !0 }, a.fn.tokenfield.Constructor = c, a.fn.tokenfield.noConflict = function () {
-    return a.fn.tokenfield = d, this;
-  }, c;
-});
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;/*!
  * Select2 4.0.6-rc.1
  * https://select2.github.io
@@ -52243,7 +52012,7 @@ S2.define('jquery.select2',[
 
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -55263,7 +55032,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -62584,14 +62353,14 @@ $$1.summernote = $$1.extend($$1.summernote, {
 
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports) {
 
 +function(a){"use strict";function b(a,b){if(!(a instanceof b))throw new TypeError("Cannot call a class as a function")}var c=function(){function a(a,b){for(var c=0;c<b.length;c++){var d=b[c];d.enumerable=d.enumerable||!1,d.configurable=!0,"value"in d&&(d.writable=!0),Object.defineProperty(a,d.key,d)}}return function(b,c,d){return c&&a(b.prototype,c),d&&a(b,d),b}}();(function(a){var d="ekkoLightbox",e=a.fn[d],f={title:"",footer:"",maxWidth:9999,maxHeight:9999,showArrows:!0,wrapping:!0,type:null,alwaysShowClose:!1,loadingMessage:'<div class="ekko-lightbox-loader"><div><div></div><div></div></div></div>',leftArrow:"<span>&#10094;</span>",rightArrow:"<span>&#10095;</span>",strings:{close:"Close",fail:"Failed to load image:",type:"Could not detect remote target type. Force the type using data-type"},doc:document,onShow:function(){},onShown:function(){},onHide:function(){},onHidden:function(){},onNavigate:function(){},onContentLoaded:function(){}},g=function(){function d(c,e){var g=this;b(this,d),this._config=a.extend({},f,e),this._$modalArrows=null,this._galleryIndex=0,this._galleryName=null,this._padding=null,this._border=null,this._titleIsShown=!1,this._footerIsShown=!1,this._wantedWidth=0,this._wantedHeight=0,this._touchstartX=0,this._touchendX=0,this._modalId="ekkoLightbox-"+Math.floor(1e3*Math.random()+1),this._$element=c instanceof jQuery?c:a(c),this._isBootstrap3=3==a.fn.modal.Constructor.VERSION[0];var h='<h4 class="modal-title">'+(this._config.title||"&nbsp;")+"</h4>",i='<button type="button" class="close" data-dismiss="modal" aria-label="'+this._config.strings.close+'"><span aria-hidden="true">&times;</span></button>',j='<div class="modal-header'+(this._config.title||this._config.alwaysShowClose?"":" hide")+'">'+(this._isBootstrap3?i+h:h+i)+"</div>",k='<div class="modal-footer'+(this._config.footer?"":" hide")+'">'+(this._config.footer||"&nbsp;")+"</div>",l='<div class="modal-body"><div class="ekko-lightbox-container"><div class="ekko-lightbox-item fade in show"></div><div class="ekko-lightbox-item fade"></div></div></div>',m='<div class="modal-dialog" role="document"><div class="modal-content">'+j+l+k+"</div></div>";a(this._config.doc.body).append('<div id="'+this._modalId+'" class="ekko-lightbox modal fade" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">'+m+"</div>"),this._$modal=a("#"+this._modalId,this._config.doc),this._$modalDialog=this._$modal.find(".modal-dialog").first(),this._$modalContent=this._$modal.find(".modal-content").first(),this._$modalBody=this._$modal.find(".modal-body").first(),this._$modalHeader=this._$modal.find(".modal-header").first(),this._$modalFooter=this._$modal.find(".modal-footer").first(),this._$lightboxContainer=this._$modalBody.find(".ekko-lightbox-container").first(),this._$lightboxBodyOne=this._$lightboxContainer.find("> div:first-child").first(),this._$lightboxBodyTwo=this._$lightboxContainer.find("> div:last-child").first(),this._border=this._calculateBorders(),this._padding=this._calculatePadding(),this._galleryName=this._$element.data("gallery"),this._galleryName&&(this._$galleryItems=a(document.body).find('*[data-gallery="'+this._galleryName+'"]'),this._galleryIndex=this._$galleryItems.index(this._$element),a(document).on("keydown.ekkoLightbox",this._navigationalBinder.bind(this)),this._config.showArrows&&this._$galleryItems.length>1&&(this._$lightboxContainer.append('<div class="ekko-lightbox-nav-overlay"><a href="#">'+this._config.leftArrow+'</a><a href="#">'+this._config.rightArrow+"</a></div>"),this._$modalArrows=this._$lightboxContainer.find("div.ekko-lightbox-nav-overlay").first(),this._$lightboxContainer.on("click","a:first-child",function(a){return a.preventDefault(),g.navigateLeft()}),this._$lightboxContainer.on("click","a:last-child",function(a){return a.preventDefault(),g.navigateRight()}),this.updateNavigation())),this._$modal.on("show.bs.modal",this._config.onShow.bind(this)).on("shown.bs.modal",function(){return g._toggleLoading(!0),g._handle(),g._config.onShown.call(g)}).on("hide.bs.modal",this._config.onHide.bind(this)).on("hidden.bs.modal",function(){return g._galleryName&&(a(document).off("keydown.ekkoLightbox"),a(window).off("resize.ekkoLightbox")),g._$modal.remove(),g._config.onHidden.call(g)}).modal(this._config),a(window).on("resize.ekkoLightbox",function(){g._resize(g._wantedWidth,g._wantedHeight)}),this._$lightboxContainer.on("touchstart",function(){g._touchstartX=event.changedTouches[0].screenX}).on("touchend",function(){g._touchendX=event.changedTouches[0].screenX,g._swipeGesure()})}return c(d,null,[{key:"Default",get:function(){return f}}]),c(d,[{key:"element",value:function(){return this._$element}},{key:"modal",value:function(){return this._$modal}},{key:"navigateTo",value:function(b){return b<0||b>this._$galleryItems.length-1?this:(this._galleryIndex=b,this.updateNavigation(),this._$element=a(this._$galleryItems.get(this._galleryIndex)),void this._handle())}},{key:"navigateLeft",value:function(){if(this._$galleryItems&&1!==this._$galleryItems.length){if(0===this._galleryIndex){if(!this._config.wrapping)return;this._galleryIndex=this._$galleryItems.length-1}else this._galleryIndex--;return this._config.onNavigate.call(this,"left",this._galleryIndex),this.navigateTo(this._galleryIndex)}}},{key:"navigateRight",value:function(){if(this._$galleryItems&&1!==this._$galleryItems.length){if(this._galleryIndex===this._$galleryItems.length-1){if(!this._config.wrapping)return;this._galleryIndex=0}else this._galleryIndex++;return this._config.onNavigate.call(this,"right",this._galleryIndex),this.navigateTo(this._galleryIndex)}}},{key:"updateNavigation",value:function(){if(!this._config.wrapping){var a=this._$lightboxContainer.find("div.ekko-lightbox-nav-overlay");0===this._galleryIndex?a.find("a:first-child").addClass("disabled"):a.find("a:first-child").removeClass("disabled"),this._galleryIndex===this._$galleryItems.length-1?a.find("a:last-child").addClass("disabled"):a.find("a:last-child").removeClass("disabled")}}},{key:"close",value:function(){return this._$modal.modal("hide")}},{key:"_navigationalBinder",value:function(a){return a=a||window.event,39===a.keyCode?this.navigateRight():37===a.keyCode?this.navigateLeft():void 0}},{key:"_detectRemoteType",value:function(a,b){return b=b||!1,!b&&this._isImage(a)&&(b="image"),!b&&this._getYoutubeId(a)&&(b="youtube"),!b&&this._getVimeoId(a)&&(b="vimeo"),!b&&this._getInstagramId(a)&&(b="instagram"),(!b||["image","youtube","vimeo","instagram","video","url"].indexOf(b)<0)&&(b="url"),b}},{key:"_isImage",value:function(a){return a&&a.match(/(^data:image\/.*,)|(\.(jp(e|g|eg)|gif|png|bmp|webp|svg)((\?|#).*)?$)/i)}},{key:"_containerToUse",value:function(){var a=this,b=this._$lightboxBodyTwo,c=this._$lightboxBodyOne;return this._$lightboxBodyTwo.hasClass("in")&&(b=this._$lightboxBodyOne,c=this._$lightboxBodyTwo),c.removeClass("in show"),setTimeout(function(){a._$lightboxBodyTwo.hasClass("in")||a._$lightboxBodyTwo.empty(),a._$lightboxBodyOne.hasClass("in")||a._$lightboxBodyOne.empty()},500),b.addClass("in show"),b}},{key:"_handle",value:function(){var a=this._containerToUse();this._updateTitleAndFooter();var b=this._$element.attr("data-remote")||this._$element.attr("href"),c=this._detectRemoteType(b,this._$element.attr("data-type")||!1);if(["image","youtube","vimeo","instagram","video","url"].indexOf(c)<0)return this._error(this._config.strings.type);switch(c){case"image":this._preloadImage(b,a),this._preloadImageByIndex(this._galleryIndex,3);break;case"youtube":this._showYoutubeVideo(b,a);break;case"vimeo":this._showVimeoVideo(this._getVimeoId(b),a);break;case"instagram":this._showInstagramVideo(this._getInstagramId(b),a);break;case"video":this._showHtml5Video(b,a);break;default:this._loadRemoteContent(b,a)}return this}},{key:"_getYoutubeId",value:function(a){if(!a)return!1;var b=a.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);return!(!b||11!==b[2].length)&&b[2]}},{key:"_getVimeoId",value:function(a){return!!(a&&a.indexOf("vimeo")>0)&&a}},{key:"_getInstagramId",value:function(a){return!!(a&&a.indexOf("instagram")>0)&&a}},{key:"_toggleLoading",value:function(b){return b=b||!1,b?(this._$modalDialog.css("display","none"),this._$modal.removeClass("in show"),a(".modal-backdrop").append(this._config.loadingMessage)):(this._$modalDialog.css("display","block"),this._$modal.addClass("in show"),a(".modal-backdrop").find(".ekko-lightbox-loader").remove()),this}},{key:"_calculateBorders",value:function(){return{top:this._totalCssByAttribute("border-top-width"),right:this._totalCssByAttribute("border-right-width"),bottom:this._totalCssByAttribute("border-bottom-width"),left:this._totalCssByAttribute("border-left-width")}}},{key:"_calculatePadding",value:function(){return{top:this._totalCssByAttribute("padding-top"),right:this._totalCssByAttribute("padding-right"),bottom:this._totalCssByAttribute("padding-bottom"),left:this._totalCssByAttribute("padding-left")}}},{key:"_totalCssByAttribute",value:function(a){return parseInt(this._$modalDialog.css(a),10)+parseInt(this._$modalContent.css(a),10)+parseInt(this._$modalBody.css(a),10)}},{key:"_updateTitleAndFooter",value:function(){var a=this._$element.data("title")||"",b=this._$element.data("footer")||"";return this._titleIsShown=!1,a||this._config.alwaysShowClose?(this._titleIsShown=!0,this._$modalHeader.css("display","").find(".modal-title").html(a||"&nbsp;")):this._$modalHeader.css("display","none"),this._footerIsShown=!1,b?(this._footerIsShown=!0,this._$modalFooter.css("display","").html(b)):this._$modalFooter.css("display","none"),this}},{key:"_showYoutubeVideo",value:function(a,b){var c=this._getYoutubeId(a),d=a.indexOf("&")>0?a.substr(a.indexOf("&")):"",e=this._$element.data("width")||560,f=this._$element.data("height")||e/(560/315);return this._showVideoIframe("//www.youtube.com/embed/"+c+"?badge=0&autoplay=1&html5=1"+d,e,f,b)}},{key:"_showVimeoVideo",value:function(a,b){var c=this._$element.data("width")||500,d=this._$element.data("height")||c/(560/315);return this._showVideoIframe(a+"?autoplay=1",c,d,b)}},{key:"_showInstagramVideo",value:function(a,b){var c=this._$element.data("width")||612,d=c+80;return a="/"!==a.substr(-1)?a+"/":a,b.html('<iframe width="'+c+'" height="'+d+'" src="'+a+'embed/" frameborder="0" allowfullscreen></iframe>'),this._resize(c,d),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_showVideoIframe",value:function(a,b,c,d){return c=c||b,d.html('<div class="embed-responsive embed-responsive-16by9"><iframe width="'+b+'" height="'+c+'" src="'+a+'" frameborder="0" allowfullscreen class="embed-responsive-item"></iframe></div>'),this._resize(b,c),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_showHtml5Video",value:function(a,b){var c=this._$element.data("width")||560,d=this._$element.data("height")||c/(560/315);return b.html('<div class="embed-responsive embed-responsive-16by9"><video width="'+c+'" height="'+d+'" src="'+a+'" preload="auto" autoplay controls class="embed-responsive-item"></video></div>'),this._resize(c,d),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_loadRemoteContent",value:function(b,c){var d=this,e=this._$element.data("width")||560,f=this._$element.data("height")||560,g=this._$element.data("disableExternalCheck")||!1;return this._toggleLoading(!1),g||this._isExternal(b)?(c.html('<iframe src="'+b+'" frameborder="0" allowfullscreen></iframe>'),this._config.onContentLoaded.call(this)):c.load(b,a.proxy(function(){return d._$element.trigger("loaded.bs.modal")})),this._$modalArrows&&this._$modalArrows.css("display","none"),this._resize(e,f),this}},{key:"_isExternal",value:function(a){var b=a.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);return"string"==typeof b[1]&&b[1].length>0&&b[1].toLowerCase()!==location.protocol||"string"==typeof b[2]&&b[2].length>0&&b[2].replace(new RegExp(":("+{"http:":80,"https:":443}[location.protocol]+")?$"),"")!==location.host}},{key:"_error",value:function(a){return console.error(a),this._containerToUse().html(a),this._resize(300,300),this}},{key:"_preloadImageByIndex",value:function(b,c){if(this._$galleryItems){var d=a(this._$galleryItems.get(b),!1);if("undefined"!=typeof d){var e=d.attr("data-remote")||d.attr("href");return("image"===d.attr("data-type")||this._isImage(e))&&this._preloadImage(e,!1),c>0?this._preloadImageByIndex(b+1,c-1):void 0}}}},{key:"_preloadImage",value:function(b,c){var d=this;c=c||!1;var e=new Image;return c&&!function(){var f=setTimeout(function(){c.append(d._config.loadingMessage)},200);e.onload=function(){f&&clearTimeout(f),f=null;var b=a("<img />");return b.attr("src",e.src),b.addClass("img-fluid"),b.css("width","100%"),c.html(b),d._$modalArrows&&d._$modalArrows.css("display",""),d._resize(e.width,e.height),d._toggleLoading(!1),d._config.onContentLoaded.call(d)},e.onerror=function(){return d._toggleLoading(!1),d._error(d._config.strings.fail+("  "+b))}}(),e.src=b,e}},{key:"_swipeGesure",value:function(){return this._touchendX<this._touchstartX?this.navigateRight():this._touchendX>this._touchstartX?this.navigateLeft():void 0}},{key:"_resize",value:function(b,c){c=c||b,this._wantedWidth=b,this._wantedHeight=c;var d=b/c,e=this._padding.left+this._padding.right+this._border.left+this._border.right,f=this._config.doc.body.clientWidth>575?20:0,g=this._config.doc.body.clientWidth>575?0:20,h=Math.min(b+e,this._config.doc.body.clientWidth-f,this._config.maxWidth);b+e>h?(c=(h-e-g)/d,b=h):b+=e;var i=0,j=0;this._footerIsShown&&(j=this._$modalFooter.outerHeight(!0)||55),this._titleIsShown&&(i=this._$modalHeader.outerHeight(!0)||67);var k=this._padding.top+this._padding.bottom+this._border.bottom+this._border.top,l=parseFloat(this._$modalDialog.css("margin-top"))+parseFloat(this._$modalDialog.css("margin-bottom")),m=Math.min(c,a(window).height()-k-l-i-j,this._config.maxHeight-k-i-j);c>m&&(b=Math.ceil(m*d)+e),this._$lightboxContainer.css("height",m),this._$modalDialog.css("flex",1).css("maxWidth",b);var n=this._$modal.data("bs.modal");if(n)try{n._handleUpdate()}catch(o){n.handleUpdate()}return this}}],[{key:"_jQueryInterface",value:function(b){var c=this;return b=b||{},this.each(function(){var e=a(c),f=a.extend({},d.Default,e.data(),"object"==typeof b&&b);new d(c,f)})}}]),d}();return a.fn[d]=g._jQueryInterface,a.fn[d].Constructor=g,a.fn[d].noConflict=function(){return a.fn[d]=e,g._jQueryInterface},g})(jQuery)}(jQuery);
 //# sourceMappingURL=ekko-lightbox.min.js.map
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66125,286 +65894,7 @@ function __guardMethod__(obj, methodName, transform) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
-/* 46 */
-/***/ (function(module, exports) {
-
-$('#register-form-submit').on('click', function (e) {
-  e.preventDefault();
-
-  if ($('#consent')["0"].checked && $('#consent2')["0"].checked) {
-    $('#register-form').submit();
-  } else {
-    alert('You must consent to the use of your data in order to register');
-  }
-});
-
-// $('#step-4-form').submit(function(e) {
-//   e.preventDefault();
-//
-//   if ($('#consent1')["0"].checked && $('#consent2')["0"].checked) {
-//
-//     var step1 = $('#step-1-form').serialize();
-//     var step2 = $('#step-2-form').serialize();
-//     var step3 = $('#step-3-form').serialize();
-//
-//     $.ajax({
-//         headers: {
-//           'X-CSRF-TOKEN': $("input[name='_token']").val()
-//         },
-//         type: 'post',
-//         url: '/user/register',
-//         data: {step1 : step1, step2 : step2, step3 : step3},
-//         success: function(data) {
-//           if (data) {
-//             window.location.replace(window.location.origin+"/login");
-//           }
-//         },
-//         error: function(error) {
-//           alert(error.message);
-//         }
-//     });
-//
-//   } else {
-//     alert('You must consent to the use of your data in order to register');
-//   }
-//
-// });
-
-$('#delete-form-submit').on('click', function (e) {
-  e.preventDefault();
-
-  if (confirm('You are about to delete your account! Are you sure you wish to continue?')) {
-    $('#delete-form').submit();
-  }
-});
-
-$('#reg_email').on('change', function () {
-  $('#email-update').text($(this).val());
-});
-
-$(".select2-dropdown").select2({
-  placeholder: 'Select an country'
-});
-
-$(".select2-tags").select2({
-  tags: true
-});
-
-$(document).ready(function () {
-  $('.tokenfield-make').tokenfield();
-
-  $("#invites_to_volunteers").on("click", function () {
-    if (this.checked) {
-      var event_id = $('#event_id').val();
-
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
-        },
-        type: 'post',
-        url: '/party/get-group-emails',
-        data: { event_id: event_id },
-        success: function success(data) {
-          var current_items = $('#manual_invite_box').tokenfield('getTokens');
-          var new_items = $.parseJSON(data);
-
-          var pop_arr = [];
-
-          current_items.forEach(function (current_item) {
-            pop_arr.push(current_item.value);
-          });
-
-          new_items.forEach(function (new_item) {
-            pop_arr.push(new_item);
-          });
-
-          // var populate_arr = new_items.filter(function(obj) { return current_items.indexOf(obj) == -1; });
-          // var populate_arr = pop_arr + new_items;
-
-          // console.log($('#manual_invite_box').tokenfield('getTokens'));
-
-          $('#manual_invite_box').tokenfield('setTokens', pop_arr);
-
-          // // console.log("current: "+current_items);
-          // // console.log("new: "+new_items);
-          // // console.log("pop: "+populate_arr);
-          //
-          // // console.log(populate_arr.toString() + ","+ current_items.toString());
-          // var pop_str = "";
-          //
-          // current_items.forEach(function(email) {
-          //   pop_str += '"'+email+'",\n';
-          // });
-          //
-          // populate_arr.forEach(function(email) {
-          //   pop_str += '"'+email+'",\n';
-          // });
-          //
-          // var final_output = pop_str.substring(0, pop_str.length - 2);
-          //
-          // console.log(final_output);
-          //
-          // // $("#prepopulate").val('{ "items_new" : [' + final_output + ']\n}');
-          //
-          // var tokens = $("#manual_invite_box").tokenfield('getTokens');
-          //
-          // console.log($('#test').tokenfield('getTokens'));
-          //
-          // console.log(tokens);
-          //
-          // // $('#manual_invite_box').tokenfield('setTokens', 'blue,red,white');
-        },
-        error: function error(_error) {
-          console.log('fail');
-        }
-      });
-    }
-  });
-});
-
-$('#manual_invite_box').on('tokenfield:createtoken', function (event) {
-  var existingTokens = $(this).tokenfield('getTokens');
-  $.each(existingTokens, function (index, token) {
-    if (token.value === event.attrs.value) event.preventDefault();
-  });
-});
-
-$('#participants_qty').on('change', function () {
-  updateParticipants();
-});
-
-$(document).ready(function () {
-  $('#repair_status').on('change', function () {
-    if ($(this).val() == 2) {
-      $('#repair_details').prop('disabled', false);
-    } else {
-      $('#repair_details').prop('disabled', true);
-    }
-  });
-
-  $('.checkStatus').on('change', function () {
-    var device_id = $(this).data('device');
-
-    if ($(this).val() == 2) {
-      $('#repair-info-' + device_id).prop('disabled', false);
-    } else {
-      $('#repair-info-' + device_id).prop('disabled', true);
-    }
-  });
-
-  $('#add-device').on('submit', function (e) {
-    e.preventDefault();
-    // var form_fields = JSON.stringify($(this).serialize());
-    // console.log(form_fields);
-
-    var form_array = {
-      repair_status: $('#repair_status').val(),
-      repair_details: $('#repair_details').val(),
-      spare_parts: $('#spare_parts').val(),
-      category: $('#category').val(),
-      brand: $('#brand').val(),
-      model: $('#model').val(),
-      age: $('#age').val(),
-      problem: $('#problem').val()
-    };
-
-    var event_id = event_id = $('#event_id').val();
-    // form_array['repair_status'] = $('#repair_status').val();
-    // form_array['repair_details'] = $('#repair_details').val();
-    // form_array['spare_parts'] = $('#spare_parts').val();
-    // form_array['category'] = $('#category').val();
-    // form_array['brand'] = $('#brand').val();
-    // form_array['model'] = $('#model').val();
-    // form_array['age'] = $('#age').val();
-    // form_array['problem'] = $('#problem').val();
-    // console.log(form_array.toString());
-
-    $.ajax({
-      headers: {
-        'X-CSRF-TOKEN': $("input[name='_token']").val()
-      },
-      type: 'post',
-      url: '/device/create',
-      data: { form_array: form_array, event_id: event_id },
-      success: function success(data) {
-        if (data.error) {
-          alert(data.error);
-        }
-      },
-      error: function error(_error2) {}
-    });
-  });
-
-  $('.edit-device').on('submit', function (e) {
-    e.preventDefault();
-    var device_id = $(this).data('device');
-
-    // $form = $('form#data-'+device_id);
-    // console.log($form[0]);
-    // var form_fields = new FormData($form[0]);
-
-    var form_array = {
-      repair_status: $('#status-' + device_id).val(),
-      repair_details: $('#repair-info-' + device_id).val(),
-      spare_parts: $('#spare-parts-' + device_id).val(),
-      category: $('#category-' + device_id).val(),
-      brand: $('#brand-' + device_id).val(),
-      model: $('#model-' + device_id).val(),
-      age: $('#age-' + device_id).val(),
-      problem: $('#problem-' + device_id).summernote('code'),
-      // files:$('#file-'+device_id).val(),
-      wiki: $('#wiki-' + device_id).checked
-    };
-
-    var event_id = event_id = $('#event_id').val();
-
-    $.ajax({
-      headers: {
-        'X-CSRF-TOKEN': $("input[name='_token']").val()
-      },
-      type: 'post',
-      url: '/device/edit/' + device_id,
-      data: { form_array: form_array, event_id: event_id },
-      success: function success(data) {
-        if (data.error) {
-          alert(data.error);
-        }
-      },
-      error: function error(_error3) {}
-    });
-  });
-
-  $('#description').on('summernote.change', function (e) {
-    $('#free_text').val($('#description').summernote('code'));
-  });
-});
-
-/***/ }),
-/* 47 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 48 */,
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */,
-/* 58 */,
-/* 59 */,
-/* 60 */,
-/* 61 */,
-/* 62 */,
-/* 63 */,
-/* 64 */,
-/* 65 */,
-/* 66 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports =
@@ -68180,7 +67670,7 @@ exports.default = Tokenfield;
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = __webpack_require__(67);
+module.exports = __webpack_require__(46);
 
 /***/ }),
 /* 3 */
@@ -68239,7 +67729,7 @@ function ajax(params) {
 /******/ ]);
 
 /***/ }),
-/* 67 */
+/* 46 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -68545,6 +68035,539 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports) {
+
+$('#register-form-submit').on('click', function (e) {
+  e.preventDefault();
+
+  if ($('#consent')["0"].checked && $('#consent2')["0"].checked) {
+    $('#register-form').submit();
+  } else {
+    alert('You must consent to the use of your data in order to register');
+  }
+});
+
+// $('#step-4-form').submit(function(e) {
+//   e.preventDefault();
+//
+//   if ($('#consent1')["0"].checked && $('#consent2')["0"].checked) {
+//
+//     var step1 = $('#step-1-form').serialize();
+//     var step2 = $('#step-2-form').serialize();
+//     var step3 = $('#step-3-form').serialize();
+//
+//     $.ajax({
+//         headers: {
+//           'X-CSRF-TOKEN': $("input[name='_token']").val()
+//         },
+//         type: 'post',
+//         url: '/user/register',
+//         data: {step1 : step1, step2 : step2, step3 : step3},
+//         success: function(data) {
+//           if (data) {
+//             window.location.replace(window.location.origin+"/login");
+//           }
+//         },
+//         error: function(error) {
+//           alert(error.message);
+//         }
+//     });
+//
+//   } else {
+//     alert('You must consent to the use of your data in order to register');
+//   }
+//
+// });
+
+$('#delete-form-submit').on('click', function (e) {
+  e.preventDefault();
+
+  if (confirm('You are about to delete your account! Are you sure you wish to continue?')) {
+    $('#delete-form').submit();
+  }
+});
+
+$('#reg_email').on('change', function () {
+  $('#email-update').text($(this).val());
+});
+
+$(".select2-dropdown").select2({
+  placeholder: 'Select an country'
+});
+
+$(".select2-tags").select2({
+  tags: true
+});
+
+$(document).ready(function () {
+  $('.tokenfield-make').tokenfield();
+
+  $("#invites_to_volunteers").on("click", function () {
+    if (this.checked) {
+      var event_id = $('#event_id').val();
+
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        },
+        type: 'post',
+        url: '/party/get-group-emails',
+        data: { event_id: event_id },
+        success: function success(data) {
+          var current_items = $('#manual_invite_box').tokenfield('getTokens');
+          var new_items = $.parseJSON(data);
+
+          var pop_arr = [];
+
+          current_items.forEach(function (current_item) {
+            pop_arr.push(current_item.value);
+          });
+
+          new_items.forEach(function (new_item) {
+            pop_arr.push(new_item);
+          });
+
+          // var populate_arr = new_items.filter(function(obj) { return current_items.indexOf(obj) == -1; });
+          // var populate_arr = pop_arr + new_items;
+
+          // console.log($('#manual_invite_box').tokenfield('getTokens'));
+
+          $('#manual_invite_box').tokenfield('setTokens', pop_arr);
+
+          // // console.log("current: "+current_items);
+          // // console.log("new: "+new_items);
+          // // console.log("pop: "+populate_arr);
+          //
+          // // console.log(populate_arr.toString() + ","+ current_items.toString());
+          // var pop_str = "";
+          //
+          // current_items.forEach(function(email) {
+          //   pop_str += '"'+email+'",\n';
+          // });
+          //
+          // populate_arr.forEach(function(email) {
+          //   pop_str += '"'+email+'",\n';
+          // });
+          //
+          // var final_output = pop_str.substring(0, pop_str.length - 2);
+          //
+          // console.log(final_output);
+          //
+          // // $("#prepopulate").val('{ "items_new" : [' + final_output + ']\n}');
+          //
+          // var tokens = $("#manual_invite_box").tokenfield('getTokens');
+          //
+          // console.log($('#test').tokenfield('getTokens'));
+          //
+          // console.log(tokens);
+          //
+          // // $('#manual_invite_box').tokenfield('setTokens', 'blue,red,white');
+        },
+        error: function error(_error) {
+          console.log('fail');
+        }
+      });
+    }
+  });
+});
+
+$('#manual_invite_box').on('tokenfield:createtoken', function (event) {
+  var existingTokens = $(this).tokenfield('getTokens');
+  $.each(existingTokens, function (index, token) {
+    if (token.value === event.attrs.value) event.preventDefault();
+  });
+});
+
+function updateParticipants() {
+  var quantity = $('#participants_qty').val();
+  var event_id = $('#event_id').val();
+
+  $.ajax({
+    headers: {
+      'X-CSRF-TOKEN': $("input[name='_token']").val()
+    },
+    type: 'post',
+    url: '/party/update-quantity',
+    data: { quantity: quantity, event_id: event_id },
+    success: function success(data) {
+      console.log('quantity updated');
+    },
+    error: function error(_error2) {
+      console.log('fail');
+    }
+  });
+}
+
+$(document).ready(function () {
+
+  $('#participants_qty').on('change', function () {
+    updateParticipants();
+  });
+
+  $('#repair_status').on('change', function () {
+    if ($(this).val() == 2) {
+      $('#repair_details').prop('disabled', false);
+    } else {
+      $('#repair_details').prop('disabled', true);
+    }
+  });
+
+  $('.checkStatus').on('change', function () {
+    var device_id = $(this).data('device');
+
+    if ($(this).val() == 2) {
+      $('#repair-info-' + device_id).prop('disabled', false);
+    } else {
+      $('#repair-info-' + device_id).prop('disabled', true);
+    }
+  });
+
+  $('#add-device').on('submit', function (e) {
+    e.preventDefault();
+    // var form_fields = JSON.stringify($(this).serialize());
+    // console.log(form_fields);
+
+    var form_array = {
+      repair_status: $('#repair_status').val(),
+      repair_details: $('#repair_details').val(),
+      spare_parts: $('#spare_parts').val(),
+      category: $('#category').val(),
+      brand: $('#brand').val(),
+      model: $('#model').val(),
+      age: $('#age').val(),
+      problem: $('#problem').val()
+    };
+
+    var event_id = event_id = $('#event_id').val();
+    // form_array['repair_status'] = $('#repair_status').val();
+    // form_array['repair_details'] = $('#repair_details').val();
+    // form_array['spare_parts'] = $('#spare_parts').val();
+    // form_array['category'] = $('#category').val();
+    // form_array['brand'] = $('#brand').val();
+    // form_array['model'] = $('#model').val();
+    // form_array['age'] = $('#age').val();
+    // form_array['problem'] = $('#problem').val();
+    // console.log(form_array.toString());
+
+    $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $("input[name='_token']").val()
+      },
+      type: 'post',
+      url: '/device/create',
+      data: { form_array: form_array, event_id: event_id },
+      success: function success(data) {
+        if (data.error) {
+          alert(data.error);
+        }
+      },
+      error: function error(_error3) {}
+    });
+  });
+
+  $('.edit-device').on('submit', function (e) {
+    e.preventDefault();
+    var device_id = $(this).data('device');
+
+    // $form = $('form#data-'+device_id);
+    // console.log($form[0]);
+    // var form_fields = new FormData($form[0]);
+
+    var form_array = {
+      repair_status: $('#status-' + device_id).val(),
+      repair_details: $('#repair-info-' + device_id).val(),
+      spare_parts: $('#spare-parts-' + device_id).val(),
+      category: $('#category-' + device_id).val(),
+      brand: $('#brand-' + device_id).val(),
+      model: $('#model-' + device_id).val(),
+      age: $('#age-' + device_id).val(),
+      problem: $('#problem-' + device_id).summernote('code'),
+      // files:$('#file-'+device_id).val(),
+      wiki: $('#wiki-' + device_id).checked
+    };
+
+    var event_id = event_id = $('#event_id').val();
+
+    $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $("input[name='_token']").val()
+      },
+      type: 'post',
+      url: '/device/edit/' + device_id,
+      data: { form_array: form_array, event_id: event_id },
+      success: function success(data) {
+        if (data.error) {
+          alert(data.error);
+        }
+      },
+      error: function error(_error4) {}
+    });
+  });
+
+  $('#description').on('summernote.change', function (e) {
+    $('#free_text').val($('#description').summernote('code'));
+  });
+});
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 49 */,
+/* 50 */,
+/* 51 */,
+/* 52 */,
+/* 53 */,
+/* 54 */,
+/* 55 */,
+/* 56 */,
+/* 57 */,
+/* 58 */,
+/* 59 */,
+/* 60 */,
+/* 61 */,
+/* 62 */,
+/* 63 */,
+/* 64 */,
+/* 65 */,
+/* 66 */,
+/* 67 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/*!
+ * bootstrap-tokenfield 0.12.0
+ * https://github.com/sliptree/bootstrap-tokenfield
+ * Copyright 2013-2014 Sliptree and other contributors; Licensed MIT
+ */
+
+!function (a) {
+   true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (a),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : "object" == (typeof exports === "undefined" ? "undefined" : _typeof(exports)) ? module.exports = global.window && global.window.$ ? a(global.window.$) : function (b) {
+    if (!b.$ && !b.fn) throw new Error("Tokenfield requires a window object with jQuery or a jQuery instance");return a(b.$ || b);
+  } : a(jQuery);
+}(function (a, b) {
+  "use strict";
+  var c = function c(_c, d) {
+    var e = this;this.$element = a(_c), this.textDirection = this.$element.css("direction"), this.options = a.extend(!0, {}, a.fn.tokenfield.defaults, { tokens: this.$element.val() }, this.$element.data(), d), this._delimiters = "string" == typeof this.options.delimiter ? [this.options.delimiter] : this.options.delimiter, this._triggerKeys = a.map(this._delimiters, function (a) {
+      return a.charCodeAt(0);
+    }), this._firstDelimiter = this._delimiters[0];var f = a.inArray(" ", this._delimiters),
+        g = a.inArray("-", this._delimiters);f >= 0 && (this._delimiters[f] = "\\s"), g >= 0 && (delete this._delimiters[g], this._delimiters.unshift("-"));var h = ["\\", "$", "[", "{", "^", ".", "|", "?", "*", "+", "(", ")"];a.each(this._delimiters, function (b, c) {
+      var d = a.inArray(c, h);d >= 0 && (e._delimiters[b] = "\\" + c);
+    });var i,
+        j = b && "function" == typeof b.getMatchedCSSRules ? b.getMatchedCSSRules(_c) : null,
+        k = _c.style.width,
+        l = this.$element.width();j && a.each(j, function (a, b) {
+      b.style.width && (i = b.style.width);
+    });var m = "rtl" === a("body").css("direction") ? "right" : "left",
+        n = { position: this.$element.css("position") };n[m] = this.$element.css(m), this.$element.data("original-styles", n).data("original-tabindex", this.$element.prop("tabindex")).css("position", "absolute").css(m, "-10000px").prop("tabindex", -1), this.$wrapper = a('<div class="tokenfield form-control" />'), this.$element.hasClass("input-lg") && this.$wrapper.addClass("input-lg"), this.$element.hasClass("input-sm") && this.$wrapper.addClass("input-sm"), "rtl" === this.textDirection && this.$wrapper.addClass("rtl");var o = this.$element.prop("id") || new Date().getTime() + "" + Math.floor(100 * (1 + Math.random()));this.$input = a('<input type="text" class="token-input" autocomplete="off" />').appendTo(this.$wrapper).prop("placeholder", this.$element.prop("placeholder")).prop("id", o + "-tokenfield").prop("tabindex", this.$element.data("original-tabindex"));var p = a('label[for="' + this.$element.prop("id") + '"]');if (p.length && p.prop("for", this.$input.prop("id")), this.$copyHelper = a('<input type="text" />').css("position", "absolute").css(m, "-10000px").prop("tabindex", -1).prependTo(this.$wrapper), k ? this.$wrapper.css("width", k) : i ? this.$wrapper.css("width", i) : this.$element.parents(".form-inline").length && this.$wrapper.width(l), (this.$element.prop("disabled") || this.$element.parents("fieldset[disabled]").length) && this.disable(), this.$element.prop("readonly") && this.readonly(), this.$mirror = a('<span style="position:absolute; top:-999px; left:0; white-space:pre;"/>'), this.$input.css("min-width", this.options.minWidth + "px"), a.each(["fontFamily", "fontSize", "fontWeight", "fontStyle", "letterSpacing", "textTransform", "wordSpacing", "textIndent"], function (a, b) {
+      e.$mirror[0].style[b] = e.$input.css(b);
+    }), this.$mirror.appendTo("body"), this.$wrapper.insertBefore(this.$element), this.$element.prependTo(this.$wrapper), this.update(), this.setTokens(this.options.tokens, !1, !1), this.listen(), !a.isEmptyObject(this.options.autocomplete)) {
+      var q = "rtl" === this.textDirection ? "right" : "left",
+          r = a.extend({ minLength: this.options.showAutocompleteOnFocus ? 0 : null, position: { my: q + " top", at: q + " bottom", of: this.$wrapper } }, this.options.autocomplete);this.$input.autocomplete(r);
+    }if (!a.isEmptyObject(this.options.typeahead)) {
+      var s = this.options.typeahead,
+          t = { minLength: this.options.showAutocompleteOnFocus ? 0 : null },
+          u = a.isArray(s) ? s : [s, s];u[0] = a.extend({}, t, u[0]), this.$input.typeahead.apply(this.$input, u), this.typeahead = !0;
+    }this.$element.trigger("tokenfield:initialize");
+  };c.prototype = { constructor: c, createToken: function createToken(b, c) {
+      var d = this;if ("string" == typeof b && (b = { value: b, label: b }), "undefined" == typeof c && (c = !0), b.value = a.trim(b.value), b.label = b.label && b.label.length ? a.trim(b.label) : b.value, !(!b.value.length || !b.label.length || b.label.length <= this.options.minLength || this.options.limit && this.getTokens().length >= this.options.limit)) {
+        var e = a.Event("tokenfield:createtoken", { attrs: b });if (this.$element.trigger(e), e.attrs && !e.isDefaultPrevented()) {
+          var f = a('<div class="token" />').attr("data-value", b.value).append('<span class="token-label" />').append('<a href="#" class="close" tabindex="-1">&times;</a>');this.$input.hasClass("tt-input") ? this.$input.parent().before(f) : this.$input.before(f), this.$input.css("width", this.options.minWidth + "px");var g = f.find(".token-label"),
+              h = f.find(".close");return this.maxTokenWidth || (this.maxTokenWidth = this.$wrapper.width() - h.outerWidth() - parseInt(h.css("margin-left"), 10) - parseInt(h.css("margin-right"), 10) - parseInt(f.css("border-left-width"), 10) - parseInt(f.css("border-right-width"), 10) - parseInt(f.css("padding-left"), 10) - parseInt(f.css("padding-right"), 10), parseInt(g.css("border-left-width"), 10) - parseInt(g.css("border-right-width"), 10) - parseInt(g.css("padding-left"), 10) - parseInt(g.css("padding-right"), 10), parseInt(g.css("margin-left"), 10) - parseInt(g.css("margin-right"), 10)), g.text(b.label).css("max-width", this.maxTokenWidth), f.on("mousedown", function () {
+            return d._disabled || d._readonly ? !1 : (d.preventDeactivation = !0, void 0);
+          }).on("click", function (a) {
+            return d._disabled || d._readonly ? !1 : (d.preventDeactivation = !1, a.ctrlKey || a.metaKey ? (a.preventDefault(), d.toggle(f)) : (d.activate(f, a.shiftKey, a.shiftKey), void 0));
+          }).on("dblclick", function () {
+            return d._disabled || d._readonly || !d.options.allowEditing ? !1 : (d.edit(f), void 0);
+          }), h.on("click", a.proxy(this.remove, this)), this.$element.trigger(a.Event("tokenfield:createdtoken", { attrs: b, relatedTarget: f.get(0) })), c && this.$element.val(this.getTokensList()).trigger(a.Event("change", { initiator: "tokenfield" })), this.update(), this.$element.get(0);
+        }
+      }
+    }, setTokens: function setTokens(b, c, d) {
+      if (b) {
+        c || this.$wrapper.find(".token").remove(), "undefined" == typeof d && (d = !0), "string" == typeof b && (b = this._delimiters.length ? b.split(new RegExp("[" + this._delimiters.join("") + "]")) : [b]);var e = this;return a.each(b, function (a, b) {
+          e.createToken(b, d);
+        }), this.$element.get(0);
+      }
+    }, getTokenData: function getTokenData(b) {
+      var c = b.map(function () {
+        var b = a(this);return { value: b.attr("data-value"), label: b.find(".token-label").text() };
+      }).get();return 1 == c.length && (c = c[0]), c;
+    }, getTokens: function getTokens(b) {
+      var c = this,
+          d = [],
+          e = b ? ".active" : "";return this.$wrapper.find(".token" + e).each(function () {
+        d.push(c.getTokenData(a(this)));
+      }), d;
+    }, getTokensList: function getTokensList(b, c, d) {
+      b = b || this._firstDelimiter, c = "undefined" != typeof c && null !== c ? c : this.options.beautify;var e = b + (c && " " !== b ? " " : "");return a.map(this.getTokens(d), function (a) {
+        return a.value;
+      }).join(e);
+    }, getInput: function getInput() {
+      return this.$input.val();
+    }, listen: function listen() {
+      var c = this;this.$element.on("change", a.proxy(this.change, this)), this.$wrapper.on("mousedown", a.proxy(this.focusInput, this)), this.$input.on("focus", a.proxy(this.focus, this)).on("blur", a.proxy(this.blur, this)).on("paste", a.proxy(this.paste, this)).on("keydown", a.proxy(this.keydown, this)).on("keypress", a.proxy(this.keypress, this)).on("keyup", a.proxy(this.keyup, this)), this.$copyHelper.on("focus", a.proxy(this.focus, this)).on("blur", a.proxy(this.blur, this)).on("keydown", a.proxy(this.keydown, this)).on("keyup", a.proxy(this.keyup, this)), this.$input.on("keypress", a.proxy(this.update, this)).on("keyup", a.proxy(this.update, this)), this.$input.on("autocompletecreate", function () {
+        var b = a(this).data("ui-autocomplete").menu.element,
+            d = c.$wrapper.outerWidth() - parseInt(b.css("border-left-width"), 10) - parseInt(b.css("border-right-width"), 10);b.css("min-width", d + "px");
+      }).on("autocompleteselect", function (a, b) {
+        return c.createToken(b.item) && (c.$input.val(""), c.$input.data("edit") && c.unedit(!0)), !1;
+      }).on("typeahead:selected typeahead:autocompleted", function (a, b) {
+        c.createToken(b) && (c.$input.typeahead("val", ""), c.$input.data("edit") && c.unedit(!0));
+      }), a(b).on("resize", a.proxy(this.update, this));
+    }, keydown: function keydown(b) {
+      function c(a) {
+        if (e.$input.is(document.activeElement)) {
+          if (e.$input.val().length > 0) return;a += "All";var c = e.$input.hasClass("tt-input") ? e.$input.parent()[a](".token:first") : e.$input[a](".token:first");if (!c.length) return;e.preventInputFocus = !0, e.preventDeactivation = !0, e.activate(c), b.preventDefault();
+        } else e[a](b.shiftKey), b.preventDefault();
+      }function d(c) {
+        if (b.shiftKey) {
+          if (e.$input.is(document.activeElement)) {
+            if (e.$input.val().length > 0) return;var d = e.$input.hasClass("tt-input") ? e.$input.parent()[c + "All"](".token:first") : e.$input[c + "All"](".token:first");if (!d.length) return;e.activate(d);
+          }var f = "prev" === c ? "next" : "prev",
+              g = "prev" === c ? "first" : "last";e.firstActiveToken[f + "All"](".token").each(function () {
+            e.deactivate(a(this));
+          }), e.activate(e.$wrapper.find(".token:" + g), !0, !0), b.preventDefault();
+        }
+      }if (this.focused) {
+        var e = this;switch (b.keyCode) {case 8:
+            if (!this.$input.is(document.activeElement)) break;this.lastInputValue = this.$input.val();break;case 37:
+            c("rtl" === this.textDirection ? "next" : "prev");break;case 38:
+            d("prev");break;case 39:
+            c("rtl" === this.textDirection ? "prev" : "next");break;case 40:
+            d("next");break;case 65:
+            if (this.$input.val().length > 0 || !b.ctrlKey && !b.metaKey) break;this.activateAll(), b.preventDefault();break;case 9:case 13:
+            if (this.$input.data("ui-autocomplete") && this.$input.data("ui-autocomplete").menu.element.find("li:has(a.ui-state-focus)").length) break;if (this.$input.hasClass("tt-input") && this.$wrapper.find(".tt-cursor").length) break;if (this.$input.hasClass("tt-input") && this.$wrapper.find(".tt-hint").val().length) break;if (this.$input.is(document.activeElement) && this.$input.val().length || this.$input.data("edit")) return this.createTokensFromInput(b, this.$input.data("edit"));if (13 === b.keyCode) {
+              if (!this.$copyHelper.is(document.activeElement) || 1 !== this.$wrapper.find(".token.active").length) break;if (!e.options.allowEditing) break;this.edit(this.$wrapper.find(".token.active"));
+            }}this.lastKeyDown = b.keyCode;
+      }
+    }, keypress: function keypress(b) {
+      return this.lastKeyPressCode = b.keyCode, this.lastKeyPressCharCode = b.charCode, -1 !== a.inArray(b.charCode, this._triggerKeys) && this.$input.is(document.activeElement) ? (this.$input.val() && this.createTokensFromInput(b), !1) : void 0;
+    }, keyup: function keyup(a) {
+      if (this.preventInputFocus = !1, this.focused) {
+        switch (a.keyCode) {case 8:
+            if (this.$input.is(document.activeElement)) {
+              if (this.$input.val().length || this.lastInputValue.length && 8 === this.lastKeyDown) break;this.preventDeactivation = !0;var b = this.$input.hasClass("tt-input") ? this.$input.parent().prevAll(".token:first") : this.$input.prevAll(".token:first");if (!b.length) break;this.activate(b);
+            } else this.remove(a);break;case 46:
+            this.remove(a, "next");}this.lastKeyUp = a.keyCode;
+      }
+    }, focus: function focus() {
+      this.focused = !0, this.$wrapper.addClass("focus"), this.$input.is(document.activeElement) && (this.$wrapper.find(".active").removeClass("active"), this.$firstActiveToken = null, this.options.showAutocompleteOnFocus && this.search());
+    }, blur: function blur(a) {
+      this.focused = !1, this.$wrapper.removeClass("focus"), this.preventDeactivation || this.$element.is(document.activeElement) || (this.$wrapper.find(".active").removeClass("active"), this.$firstActiveToken = null), !this.preventCreateTokens && (this.$input.data("edit") && !this.$input.is(document.activeElement) || this.options.createTokensOnBlur) && this.createTokensFromInput(a), this.preventDeactivation = !1, this.preventCreateTokens = !1;
+    }, paste: function paste(a) {
+      var b = this;setTimeout(function () {
+        b.createTokensFromInput(a);
+      }, 1);
+    }, change: function change(a) {
+      "tokenfield" !== a.initiator && this.setTokens(this.$element.val());
+    }, createTokensFromInput: function createTokensFromInput(a, b) {
+      if (!(this.$input.val().length < this.options.minLength)) {
+        var c = this.getTokensList();return this.setTokens(this.$input.val(), !0), c == this.getTokensList() && this.$input.val().length ? !1 : (this.$input.hasClass("tt-input") ? this.$input.typeahead("val", "") : this.$input.val(""), this.$input.data("edit") && this.unedit(b), !1);
+      }
+    }, next: function next(a) {
+      if (a) {
+        var b = this.$wrapper.find(".active:first"),
+            c = b && this.$firstActiveToken ? b.index() < this.$firstActiveToken.index() : !1;if (c) return this.deactivate(b);
+      }var d = this.$wrapper.find(".active:last"),
+          e = d.nextAll(".token:first");return e.length ? (this.activate(e, a), void 0) : (this.$input.focus(), void 0);
+    }, prev: function prev(a) {
+      if (a) {
+        var b = this.$wrapper.find(".active:last"),
+            c = b && this.$firstActiveToken ? b.index() > this.$firstActiveToken.index() : !1;if (c) return this.deactivate(b);
+      }var d = this.$wrapper.find(".active:first"),
+          e = d.prevAll(".token:first");return e.length || (e = this.$wrapper.find(".token:first")), e.length || a ? (this.activate(e, a), void 0) : (this.$input.focus(), void 0);
+    }, activate: function activate(b, c, d, e) {
+      if (b) {
+        if ("undefined" == typeof e) var e = !0;if (d) var c = !0;if (this.$copyHelper.focus(), c || (this.$wrapper.find(".active").removeClass("active"), e ? this.$firstActiveToken = b : delete this.$firstActiveToken), d && this.$firstActiveToken) {
+          var f = this.$firstActiveToken.index() - 2,
+              g = b.index() - 2,
+              h = this;this.$wrapper.find(".token").slice(Math.min(f, g) + 1, Math.max(f, g)).each(function () {
+            h.activate(a(this), !0);
+          });
+        }b.addClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select();
+      }
+    }, activateAll: function activateAll() {
+      var b = this;this.$wrapper.find(".token").each(function (c) {
+        b.activate(a(this), 0 !== c, !1, !1);
+      });
+    }, deactivate: function deactivate(a) {
+      a && (a.removeClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select());
+    }, toggle: function toggle(a) {
+      a && (a.toggleClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select());
+    }, edit: function edit(b) {
+      if (b) {
+        var c = { value: b.data("value"), label: b.find(".token-label").text() },
+            d = { attrs: c, relatedTarget: b.get(0) },
+            e = a.Event("tokenfield:edittoken", d);if (this.$element.trigger(e), !e.isDefaultPrevented()) {
+          b.find(".token-label").text(c.value);var f = b.outerWidth(),
+              g = this.$input.hasClass("tt-input") ? this.$input.parent() : this.$input;b.replaceWith(g), this.preventCreateTokens = !0, this.$input.val(c.value).select().data("edit", !0).width(f), this.update(), this.$element.trigger(a.Event("tokenfield:editedtoken", d));
+        }
+      }
+    }, unedit: function unedit(a) {
+      var b = this.$input.hasClass("tt-input") ? this.$input.parent() : this.$input;if (b.appendTo(this.$wrapper), this.$input.data("edit", !1), this.$mirror.text(""), this.update(), a) {
+        var c = this;setTimeout(function () {
+          c.$input.focus();
+        }, 1);
+      }
+    }, remove: function remove(b, c) {
+      if (!(this.$input.is(document.activeElement) || this._disabled || this._readonly)) {
+        var d = "click" === b.type ? a(b.target).closest(".token") : this.$wrapper.find(".token.active");if ("click" !== b.type) {
+          if (!c) var c = "prev";if (this[c](), "prev" === c) var e = 0 === d.first().prevAll(".token:first").length;
+        }var f = { attrs: this.getTokenData(d), relatedTarget: d.get(0) },
+            g = a.Event("tokenfield:removetoken", f);if (this.$element.trigger(g), !g.isDefaultPrevented()) {
+          var h = a.Event("tokenfield:removedtoken", f),
+              i = a.Event("change", { initiator: "tokenfield" });d.remove(), this.$element.val(this.getTokensList()).trigger(h).trigger(i), (!this.$wrapper.find(".token").length || "click" === b.type || e) && this.$input.focus(), this.$input.css("width", this.options.minWidth + "px"), this.update(), b.preventDefault(), b.stopPropagation();
+        }
+      }
+    }, update: function update() {
+      var a = this.$input.val(),
+          b = parseInt(this.$input.css("padding-left"), 10),
+          c = parseInt(this.$input.css("padding-right"), 10),
+          d = b + c;if (this.$input.data("edit")) {
+        if (a || (a = this.$input.prop("placeholder")), a === this.$mirror.text()) return;this.$mirror.text(a);var e = this.$mirror.width() + 10;if (e > this.$wrapper.width()) return this.$input.width(this.$wrapper.width());this.$input.width(e);
+      } else {
+        if (this.$input.css("width", this.options.minWidth + "px"), "rtl" === this.textDirection) return this.$input.width(this.$input.offset().left + this.$input.outerWidth() - this.$wrapper.offset().left - parseInt(this.$wrapper.css("padding-left"), 10) - d - 1);this.$input.width(this.$wrapper.offset().left + this.$wrapper.width() + parseInt(this.$wrapper.css("padding-left"), 10) - this.$input.offset().left - d);
+      }
+    }, focusInput: function focusInput(b) {
+      if (!(a(b.target).closest(".token").length || a(b.target).closest(".token-input").length || a(b.target).closest(".tt-dropdown-menu").length)) {
+        var c = this;setTimeout(function () {
+          c.$input.focus();
+        }, 0);
+      }
+    }, search: function search() {
+      this.$input.data("ui-autocomplete") && this.$input.autocomplete("search");
+    }, disable: function disable() {
+      this.setProperty("disabled", !0);
+    }, enable: function enable() {
+      this.setProperty("disabled", !1);
+    }, readonly: function readonly() {
+      this.setProperty("readonly", !0);
+    }, writeable: function writeable() {
+      this.setProperty("readonly", !1);
+    }, setProperty: function setProperty(a, b) {
+      this["_" + a] = b, this.$input.prop(a, b), this.$element.prop(a, b), this.$wrapper[b ? "addClass" : "removeClass"](a);
+    }, destroy: function destroy() {
+      this.$element.val(this.getTokensList()), this.$element.css(this.$element.data("original-styles")), this.$element.prop("tabindex", this.$element.data("original-tabindex"));var b = a('label[for="' + this.$input.prop("id") + '"]');b.length && b.prop("for", this.$element.prop("id")), this.$element.insertBefore(this.$wrapper), this.$element.removeData("original-styles").removeData("original-tabindex").removeData("bs.tokenfield"), this.$wrapper.remove();var c = this.$element;return delete this, c;
+    } };var d = a.fn.tokenfield;return a.fn.tokenfield = function (b, d) {
+    var e,
+        f = [];Array.prototype.push.apply(f, arguments);var g = this.each(function () {
+      var g = a(this),
+          h = g.data("bs.tokenfield"),
+          i = "object" == (typeof b === "undefined" ? "undefined" : _typeof(b)) && b;"string" == typeof b && h && h[b] ? (f.shift(), e = h[b].apply(h, f)) : h || "string" == typeof b || d || g.data("bs.tokenfield", h = new c(this, i));
+    });return "undefined" != typeof e ? e : g;
+  }, a.fn.tokenfield.defaults = { minWidth: 60, minLength: 0, allowEditing: !0, limit: 0, autocomplete: {}, typeahead: {}, showAutocompleteOnFocus: !1, createTokensOnBlur: !1, delimiter: ",", beautify: !0 }, a.fn.tokenfield.Constructor = c, a.fn.tokenfield.noConflict = function () {
+    return a.fn.tokenfield = d, this;
+  }, c;
+});
 
 /***/ })
 /******/ ]);

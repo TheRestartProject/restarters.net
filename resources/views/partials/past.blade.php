@@ -20,7 +20,7 @@
                 @if (!empty($past_events))
                   @foreach($past_events as $past_event)
                     <tr>
-                        <td>{{ $past_event->name }}</td>
+                        <td>{{ $past_event->venue }}</td>
                         <td>{{ $past_event->event_date }}</td>
                         <td><a href="">30 devices need attention</a></td>
                     </tr>

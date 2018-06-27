@@ -143,11 +143,32 @@ $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
     });
 });
 
-$('#participants_qty').on('change', function() {
-  updateParticipants();
-});
+function updateParticipants() {
+  var quantity = $('#participants_qty').val();
+  var event_id = $('#event_id').val();
+
+  $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $("input[name='_token']").val()
+      },
+      type: 'post',
+      url: '/party/update-quantity',
+      data: {quantity : quantity, event_id : event_id},
+      success: function(data) {
+        console.log('quantity updated');
+      },
+      error: function(error) {
+        console.log('fail');
+      }
+  });
+}
 
 $( document ).ready(function() {
+
+  $('#participants_qty').on('change', function() {
+    updateParticipants();
+  });
+
   $('#repair_status').on('change', function() {
     if ($(this).val() == 2) {
       $('#repair_details').prop('disabled', false);

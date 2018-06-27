@@ -163,7 +163,7 @@ class Device extends Model
     public function statusCount($g = null, $year = null){
         $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
                 FROM `'. $this->table .'` AS `d`';
-        if( (!is_null($g) && is_numeric($g)) || (!is_null($year) && is_numeric($year))){
+        if( (!is_null($g) && is_numeric($g)) || (!is_null($year) && is_numeric($year)) ){
             $sql .= ' INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event` ';
         }
 
@@ -182,7 +182,6 @@ class Device extends Model
           $sql .= ', `event`';
         }
 
-
         if(!is_null($g) && is_numeric($g) && is_null($year)){
             return DB::select(DB::raw($sql), array('g' => $g));
         } elseif(!is_null($year) && is_numeric($year) && is_null($g)){
@@ -192,6 +191,23 @@ class Device extends Model
         } else {
             return DB::select(DB::raw($sql));
         }
+
+    }
+
+    public function partyStatusCount($event){
+        $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
+                FROM `'. $this->table .'` AS `d`';
+
+        $sql .= ' WHERE `repair_status` > 0 ';
+
+        $sql .= ' GROUP BY `status`';
+
+        if(!is_null($event) && is_numeric($event)){
+            $sql .= ' AND `event` = :event ';
+        }
+
+
+        return DB::select(DB::raw($sql), array('event' => $event));
 
     }
 

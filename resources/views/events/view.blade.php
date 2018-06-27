@@ -78,7 +78,7 @@
                                     <div class="input-group-qty">
                                         <label for="participants_qty" class="sr-only">Quantity:</label>
                                         <button class="increase btn-value">+</button>
-                                        <input name="participants_qty" id="participants_qty" maxlength="3" value="{{ $formdata->volunteers }}" title="Qty" class="input-text form-control qty" type="number">
+                                        <input name="participants_qty" id="participants_qty" maxlength="3" value="{{ $formdata->pax }}" title="Qty" class="input-text form-control qty" type="number">
                                         <button class="decrease btn-value">–</button>
                                     </div>
 
@@ -144,9 +144,7 @@
                 </ul>
                 <h2 id="description">Description</h2>
                 <div class="events__description">
-                    <div class="truncate">
-                      {!! $formdata->free_text !!}
-                    </div>
+                    {{ substr(strip_tags($formdata->free_text), 0, 200) }}
                     <button data-toggle="modal" data-target="#event-description"><span>Read more</span></button>
                 </div>
                 <h2 id="attendance">Attendance</h2>

@@ -154,7 +154,7 @@ class PartyController extends Controller
           $event_date =       $_POST['event_date'];
           $start      =       $_POST['start'];
           $end        =       $_POST['end'];
-          // $pax        =       $_POST['pax'];
+          $pax        =       0;
           $free_text  =       $_POST['free_text'];
           $venue      =       $_POST['venue'];
           $location   =       $_POST['location'];
@@ -202,7 +202,7 @@ class PartyController extends Controller
                               'event_date'    => $event_date,
                               'start'         => $start,
                               'end'           => $end,
-                              // 'pax'           => $pax,
+                              'pax'           => $pax,
                               'free_text'     => $free_text,
                               'venue'         => $venue,
                               'location'      => $location,
@@ -226,6 +226,12 @@ class PartyController extends Controller
                       $Party->createUserList($idParty, $users);
                   }
 
+                  EventsUsers::create([
+                    'event' => $idParty,
+                    'user' => $user->id,
+                    'status' => 2,
+                    'role' => 3,
+                  ]);
 
                   /** let's create the image attachment! **/
                   if(isset($_FILES) && !empty($_FILES)){
@@ -302,17 +308,26 @@ class PartyController extends Controller
             $udata = $_POST;
           }
 
-          return view('events.create', [ //party.create
-            'title' => 'New Party',
-            'grouplist' => $Groups->findList(),
-            'gmaps' => true,
-            'group_list' => $Groups->findAll(),
-            'response' => $response,
-            'error' => $error,
-            'udata' => $_POST,
-            'user' => $user,
-          ]);
+          if(is_numeric($idParty)){
+            return redirect('/party/edit/'.$idParty)->with('response', $response);
+          } else {
+            $host_ids = EventsUsers::where('user', $user->id)->where('role', 3)->pluck('event')->toArray();
+
+            return view('events.create', [ //party.create
+              'title' => 'New Party',
+              'grouplist' => $Groups->findList(),
+              'gmaps' => true,
+              'group_list' => $Groups->findAll(),
+              'response' => $response,
+              'error' => $error,
+              'udata' => $_POST,
+              'user' => $user,
+              'host_ids' => $host_ids,
+            ]);
+          }
       }
+
+      $host_ids = EventsUsers::where('user', $user->id)->where('role', 3)->pluck('event')->toArray();
 
       return view('events.create', [ //party.create
         'title' => 'New Party',
@@ -320,6 +335,7 @@ class PartyController extends Controller
         'gmaps' => true,
         'group_list' => $Groups->findAll(),
         'user' => $user,
+        'host_ids' => $host_ids,
       ]);
 
   }
@@ -546,6 +562,8 @@ class PartyController extends Controller
 
           $party = $Party->findThis($id)[0];
 
+          $host_ids = EventsUsers::where('user', $user->id)->where('role', 3)->pluck('event')->toArray();
+
           return view('events.edit', [ //party.edit
             'response' => $response,
             'gmaps' => true,
@@ -560,6 +578,7 @@ class PartyController extends Controller
             'wasteTotal' => $co2Total[0]->total_weights,
             'partiesCount' => count($allparties),
             'device_count_status' => $device_count_status,
+            'host_ids' => $host_ids,
           ]);
       }
 
@@ -582,6 +601,8 @@ class PartyController extends Controller
       //
       // $this->set('grouplist', $Groups->findList());
 
+      $host_ids = EventsUsers::where('user', $user->id)->where('role', 3)->pluck('event')->toArray();
+
       return view('events.edit', [ //party.edit
         'gmaps' => true,
         'images' => $images,
@@ -595,6 +616,7 @@ class PartyController extends Controller
         'wasteTotal' => $co2Total[0]->total_weights,
         'partiesCount' => count($allparties),
         'device_count_status' => $device_count_status,
+        'host_ids' => $host_ids,
       ]);
   }
 
@@ -648,7 +670,8 @@ class PartyController extends Controller
       $brands = Brands::all();
       $categories = Category::all();
 
-      $device_count_status = $Device->statusCount($party->group);
+      // $device_count_status = $Device->statusCount($party->group);
+      $device_count_status = $Device->partyStatusCount($id);
 
       // dd($party);
 
@@ -1036,7 +1059,7 @@ class PartyController extends Controller
     $quantity = $request->input('quantity');
 
     Party::find($event_id)->update([
-      'volunteers' => $quantity,
+      'pax' => $quantity,
     ]);
 
     return "true";

@@ -15,7 +15,7 @@
               @if (!empty($closest_events))
                 @foreach($closest_events as $closest_event)
                   <tr>
-                      <td>{!! $closest_event->free_text !!}</td>
+                      <td>{{ $closest_event->venue }}</td>
                       <td>{{ $closest_event->event_date }}</td>
                       <td><a href="">30 devices need attention</a></td>
                   </tr>

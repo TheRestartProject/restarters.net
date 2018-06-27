@@ -42,17 +42,35 @@
                   <input type="text" class="form-control field" id="event_name" name="venue">
               </div>
 
+              @if (FixometerHelper::hasRole($user, 'Adminstrator') ||  count($host_ids) > 1)
               <div class="form-group form-group__offset">
                   <label for="event_group">@lang('events.field_event_group'):</label>
                   <div class="form-control form-control__select">
                     <select name="group" id="event_group" class="field field select2">
                       <option></option>
-                      @foreach($group_list as $group)
-                      <option value="<?php echo $group->id; ?>"><?php echo $group->name; ?></option>
-                      @endforeach
+                      @if (FixometerHelper::hasRole($user, 'Adminstrator'))
+                        @foreach($group_list as $group)
+                        <option value="<?php echo $group->id; ?>"><?php echo $group->name; ?></option>
+                        @endforeach
+                      @else
+                        @foreach($group_list as $group)
+                          @if (in_array($group->id, $host_ids))
+                            <option value="<?php echo $group->id; ?>"><?php echo $group->name; ?></option>
+                          @endif
+                        @endforeach
+                      @endif
                     </select>
                   </div>
               </div>
+              @else
+                @if (!empty($host_ids))
+                  @foreach($group_list as $group)
+                    @if( $group->id == $host_ids[0] )
+                      <input type="hidden" name="group" id="event_group" value="{{ $group->id }}">
+                    @endif
+                  @endforeach
+                @endif
+              @endif
 
               <div class="form-group">
                 <label for="event_desc">@lang('events.field_event_desc'):</label>
