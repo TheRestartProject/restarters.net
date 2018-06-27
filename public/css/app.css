@@ -92,7 +92,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   -ms-overflow-style: scrollbar;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 @-ms-viewport {
@@ -13933,7 +13933,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .alert-warning .btn:hover,
 .alert-success .btn:hover,
 .alert-delete .btn:hover {
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .alert-danger .btn:focus,
@@ -13942,7 +13942,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .alert-success .btn:focus,
 .alert-delete .btn:focus {
   text-decoration: underline;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .alert-success {
@@ -14923,9 +14923,9 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   left: auto;
   width: 260px;
   padding: 0;
-  margin: 4px 0 0 0;
-  -webkit-box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.17);
-          box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.17);
+  margin: 3px 0 0 0;
+  -webkit-box-shadow: -2px 0 5px rgba(0, 0, 0, 0.17);
+          box-shadow: -2px 0 5px rgba(0, 0, 0, 0.17);
 }
 
 .navbar-laravel .navbar-nav .dropdown-item {
@@ -15307,7 +15307,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .onboarding button.slick-disabled {
-  display: none;
+  display: none !important;
 }
 
 .card {

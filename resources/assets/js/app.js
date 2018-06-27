@@ -4,30 +4,14 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require('./jquery.min');
-require('./bootstrap.min');
 require('./bootstrap');
-require('./bootstrap-tokenfield.min.js');
+require('./bootstrap-tokenfield.min');
 require('select2');
 require('slick-carousel');
 require('summernote');
 require('ekko-lightbox');
 window.Dropzone = require('dropzone');
-// window.Tokenfield = require("tokenfield");
-
-// window.Vue = require('vue');
-
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
-
-// Vue.component('example-component', require('./components/ExampleComponent.vue'));
-//
-// const app = new Vue({
-//     el: '#app'
-// });
+window.Tokenfield = require("tokenfield");
 
 if ( jQuery('.slideshow').length > 0 ) {
     jQuery('.slideshow').slick({
@@ -126,7 +110,7 @@ jQuery('.btn-next').on('click',formProcess);
 jQuery('.registration__prev').on('click', formProcessPrev);
 
 function onboarding() {
-    if ( jQuery('.onboarding').length > 0 ) {
+    if ( jQuery('body.onboarding').length > 0 ) { 
 
         jQuery('#onboarding').modal('show');
 

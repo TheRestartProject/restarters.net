@@ -23,7 +23,6 @@ Route::get('/user/register', 'UserController@getRegister');
 Route::get('/user/register/{invite}', 'UserController@getRegister');
 Route::post('/user/register', 'UserController@postRegister');
 
-
 Route::get('/user/forbidden', function () {
     return view('user.forbidden', [
       'title' => 'Oops'
@@ -31,9 +30,9 @@ Route::get('/user/forbidden', function () {
 });
 
 Auth::routes();
+Route::get('/logout', 'UserController@logout');
 
-
-Route::middleware('auth')->group(function () {
+Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
   Route::get('/', 'HomeController@index')->name('home');
 
@@ -42,7 +41,7 @@ Route::middleware('auth')->group(function () {
   //User Controller
   Route::get('/profile', 'UserController@index')->name('profile');
   Route::get('/profile/{id}', 'UserController@index');
-  Route::get('/profile/edit/{id}', 'UserController@getProfileEdit')->name('profile');
+  Route::get('/profile/edit/{id}', 'UserController@getProfileEdit');
   Route::post('profile/edit-info', 'UserController@postProfileInfoEdit');
   Route::post('profile/edit-password', 'UserController@postProfilePasswordEdit');
   Route::post('profile/edit-preferences', 'UserController@postProfilePreferencesEdit');
@@ -67,11 +66,11 @@ Route::middleware('auth')->group(function () {
   Route::get('/category', 'CategoryController@index');
 
   //Dashboard Controller
-  Route::get('/dashboard', 'DashboardController@index');
+  Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
   Route::get('/dashboard/host', 'DashboardController@getHostDash');
 
   //Device Controller
-  Route::get('/device', 'DeviceController@index');
+  Route::get('/device', 'DeviceController@index')->name('devices');
   Route::get('/device/search', 'DeviceController@index');
   // Route::get('/device/edit/{id}', 'DeviceController@edit');
   // Route::post('/device/edit/{id}', 'DeviceController@edit');
@@ -83,7 +82,7 @@ Route::middleware('auth')->group(function () {
   Route::post('/device/image-upload/{id}', 'DeviceController@imageUpload');
 
   //Group Controller
-  Route::get('/group', 'GroupController@index');
+  Route::get('/group', 'GroupController@index')->name('groups');
   Route::get('/group/create', 'GroupController@create');
   Route::post('/group/create', 'GroupController@create');
   Route::get('/group/edit/{id}', 'GroupController@edit');
@@ -98,7 +97,7 @@ Route::middleware('auth')->group(function () {
   Route::get('/outbound', 'OutboundController@index');
 
   //Party Controller
-  Route::get('/party', 'PartyController@index');
+  Route::get('/party', 'PartyController@index')->name('events');
   Route::get('/party/create', 'PartyController@create');
   Route::post('/party/create', 'PartyController@create');
   Route::get('/party/manage/{id}', 'PartyController@manage');

@@ -1,10 +1,11 @@
 <div class="row row-expanded">
     <div class="col-lg-6">
         <header>
-        @include('includes.logo-large')
-        <div class="row">
-            <p>@lang('login.lead')</p>
-        </div>
+          <a href="/">
+            @include('includes.logo-large')
+          </a>
+          <br>
+          <h4>@lang('login.lead')</h4>
         </header>
     </div>
     <div class="col-lg-6">
@@ -14,7 +15,7 @@
                 <strong>{{ $device_count_status[0]->counter }}</strong>
             </div>
             <div class="col">
-                <h3>@lang('login.stat_2')</h3>
+                <h3 style="width: 115px;">@lang('login.stat_2')</h3>
                 <strong>{{ number_format(round($co2Total), 0, '.', ',') }} kg</strong>
             </div>
             <div class="col">

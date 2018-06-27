@@ -2,12 +2,16 @@
 
     <div class="dashboard__block__content dashboard__block__content--table">
         <h4>Your past events</h4>
-        <p>Donec id elit non mi porta gravida at eget mets. Vestibulum id ligula porta felis euismod semper.</p>
+        @if ( FixometerHelper::hasRole(Auth::user(), 'Restarter') )
+          <p>These are events you RSVP'ed to, or where a host logged your participation.</p>
+        @else
+          <p>Here's a list of past events you have helped organise, all important contributions to your community and the environment. </p>
+        @endif
         <div class="table-responsive">
         <table role="table" class="table table-striped">
             <thead>
                 <tr>
-                    <th scope="col">Group</th>
+                    <th scope="col">@lang('events.event_name')</th>
                     <th scope="col">Date</th>
                     <th scope="col">Status</th>
                 </tr>
@@ -30,7 +34,7 @@
         </table>
         </div>
         <div class="dashboard__links d-flex flex-row justify-content-end">
-            <a href="{{ url('/') }}/devices">See all devices</a>
+            <a href="{{ url('/devices') }}">See all devices</a>
         </div>
     </div>
 </section>

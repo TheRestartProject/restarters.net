@@ -17,8 +17,6 @@
 
                         <legend>@lang('login.login_title')</legend>
 
-                        <p>@lang('login.login_text')</p>
-
                         <div class="form-group">
                             <label for="fp_email">@lang('auth.email_address'):</label>
                             <input type="email" name="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" id="fp_email" value="{{ old('email') }}" required autofocus>

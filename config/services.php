@@ -96,7 +96,7 @@ return [
 
             // username on Discourse if the user is new or
             // if SiteSetting.sso_overrides_username is set
-            'username' => 'email',
+            'username' => 'name',
         ],
     ],
 

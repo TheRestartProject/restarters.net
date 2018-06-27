@@ -1007,9 +1007,10 @@ class UserController extends Controller
     }
 
     public function logout() {
-        unset($_SESSION[env('APP_NAME')][env('APP_KEY')]);//Was $_SESSION[APPNAME][SESSIONKEY]
-        session_destroy();
-        header('Location: /user/login');
+
+        Auth::logout();
+        return redirect('/login');
+
     }
 
     public function delete(){
@@ -1129,11 +1130,19 @@ class UserController extends Controller
         $user->invites = 1;
       }
 
-      if (!is_null($request->input('consent')) && $request->input('consent') == 1) {
-        //Timestamp consent
-        $user->consent = date('Y-m-d H:i:s');
-      }
+      // Let's set a timestamp to get consent
+      $timestamp = date('Y-m-d H:i:s');
 
+      if (!is_null($request->input('consent_gdpr')) && $request->input('consent_gdpr') == 1)
+        $user->consent_gdpr = $timestamp;
+
+      if (!is_null($request->input('consent_past_data')) && $request->input('consent_past_data') == 1)
+        $user->consent_past_data = $timestamp;
+
+      if (!is_null($request->input('consent_future_data')) && $request->input('consent_future_data') == 1)
+        $user->consent_future_data = $timestamp;
+
+      // Now determine lat and long values from location field (if provided)
       if (!is_null($user->location)) {
 
         $json = file_get_contents("http://maps.google.com/maps/api/geocode/json?address=".urlencode($user->location.',United Kingdom')."&sensor=false");

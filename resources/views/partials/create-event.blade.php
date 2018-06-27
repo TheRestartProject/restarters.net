@@ -1,10 +1,10 @@
 <section class="dashboard__block">
-    <img src="http://via.placeholder.com/480x200" alt="">
+    <img src="/images/dashboard/dashboard__create_an_event.png" alt="">
     <div class="dashboard__block__content">
-        <h4>Create a new event</h4>
-        <p>Donec id elit non mi porta gravida at eget mets. Vestibulum id ligula porta felis euismod semper.</p>
+      <h4>Create a new event</h4>
+      <p>Create an event here to publicise it to our network, and to invite volunteers. Afterwards, you can log repairs and discover its impact.</p>
         <div class="dashboard__links d-flex flex-row justify-content-end">
             <a href="{{ url('/') }}/event/create">Create an event</a>
-        </div>  
+        </div>
     </div>
 </section>

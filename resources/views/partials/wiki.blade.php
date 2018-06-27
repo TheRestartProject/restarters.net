@@ -1,10 +1,10 @@
 <section class="dashboard__block">
-    <img src="http://via.placeholder.com/480x200" alt="">
+    <img src="/images/dashboard/dashboard__wiki.png" alt="">
     <div class="dashboard__block__content">
         <h4>Wiki</h4>
-        <p>Donec id elit non mi porta gravida at eget mets. Vestibulum id ligula porta felis euismod semper.</p>
+        <p>For anyone with a curiosity about how things work and how to fix them. We concentrate on basic and widely applicable principles, not specific repairs. Consult or contribute</p>
         <div class="dashboard__links d-flex flex-row justify-content-end">
-            <a href="{{ url('/') }}/wiki">View the Wiki</a>
-        </div>  
+            <a href="https://wiki.restarters.net" target="_blank" rel="noopener noreferrer">View the Wiki</a>
+        </div>
     </div>
 </section>

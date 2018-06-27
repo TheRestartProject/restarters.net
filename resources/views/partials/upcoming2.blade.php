@@ -1,14 +1,14 @@
 <section class="dashboard__block">
     <div class="dashboard__block__content dashboard__block__content--table">
-        <h4>Upcoming events</h4>
-        <p>Donec id elit non mi porta gravida at eget mets. Vestibulum id ligula porta felis euismod semper.</p>
+      <h4>Upcoming events</h4>
+      <p>If possible, the best way to get involved is to go to an event, see how it works, and participate</p>
         <div class="table-responsive">
         <table role="table" class="table table-striped">
             <thead>
                 <tr>
-                    <th scope="col">Group</th>
-                    <th scope="col">Date/time</th>
-                    <th scope="col">Location</th>
+                    <th scope="col">@lang('events.event_name')</th>
+                    <th scope="col" class="cell-date">@lang('events.event_datetime')</th>
+                    <th scope="col" class="cell-locations">@lang('events.event_location')</th>
                 </tr>
             </thead>
             <tbody>
@@ -29,7 +29,7 @@
         </table>
         </div>
         <div class="dashboard__links d-flex flex-row justify-content-end">
-            <a href="{{ url('/') }}/events">See all events</a>
+            <a href="{{ url('/events') }}">See all events</a>
         </div>
     </div>
 </section>

@@ -20,7 +20,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'location', 'age', 'gender', 'country', 'newsletter', 'invites', 'biography', 'consent', 'number_of_logins', 'latitude', 'longitude'
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'location', 'age', 'gender', 'country', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude'
     ];
 
     /**
@@ -160,6 +160,27 @@ class User extends Authenticatable
 
         $r = DB::select(DB::raw('SELECT COUNT(id) AS emails FROM ' . $this->table . ' WHERE email = :email'), array('email' => $email));
         return ($r[0]->emails > 0) ? false : true;
+
+    }
+
+    /*
+    *
+    * This allows us to check whether consent has been provided - couples with custom middleware
+    *
+    */
+    public function hasUserGivenConsent(){
+
+      if( is_null($this->consent_future_data) )
+        return false;
+
+      //Past data is only required for users who created their account prior to the Laravel app launch
+      if( is_null($this->consent_past_data) && strtotime($this->created_at) <= strtotime( date('2018-07-01') ) )
+        return false;
+
+      if( is_null($this->consent_gdpr) )
+        return false;
+
+      return true;
 
     }
 

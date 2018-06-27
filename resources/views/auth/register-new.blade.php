@@ -77,7 +77,7 @@
                                 <div class="form-group">
                                     <label for="reg_age">@lang('registration.age'):<sup>*</sup></label>
                                     <div class="form-control form-control__select">
-                                        <select id="reg_age" name="reg_age" required aria-required="true" class="field">
+                                        <select id="reg_age" name="reg_age" required aria-required="true" class="field select2">
                                             @foreach(FixometerHelper::allAges() as $age)
                                               <option value="{{ $age }}">{{ $age }}</option>
                                             @endforeach
@@ -90,7 +90,7 @@
                                 <div class="form-group">
                                     <label for="reg_country">@lang('registration.country'):<sup>*</sup></label>
                                     <div class="form-control form-control__select">
-                                        <select id="reg_country" name="reg_country" required aria-required="true" class="field">
+                                        <select id="reg_country" name="reg_country" required aria-required="true" class="field select2">
                                             <option value=""></option>
                                             @foreach (FixometerHelper::getAllCountries() as $key => $value)
                                               <option value="{{ $key }}">{{ $value }}</option>

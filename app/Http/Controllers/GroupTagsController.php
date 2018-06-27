@@ -11,15 +11,23 @@ class GroupTagsController extends Controller
 {
 
   public function index() {
+
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
+
     $all_tags = GroupTags::all();
 
     return view('tags.index', [
       'title' => 'Group Tags',
       'tags' => $all_tags
     ]);
+
   }
 
   public function getCreateTag() {
+
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
 
     return view('tags.create', [
       'title' => 'Add Group Tag',
@@ -28,6 +36,9 @@ class GroupTagsController extends Controller
   }
 
   public function postCreateTag(Request $request) {
+
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
 
     $name = $request->input('tag-name');
     $description = $request->input('tag-description');
@@ -43,6 +54,9 @@ class GroupTagsController extends Controller
 
   public function getEditTag($id) {
 
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
+
     $tag = GroupTags::find($id);
 
     return view('tags.edit', [
@@ -53,6 +67,9 @@ class GroupTagsController extends Controller
   }
 
   public function postEditTag($id, Request $request) {
+
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
 
     $name = $request->input('tag-name');
     $description = $request->input('tag-description');
@@ -67,6 +84,9 @@ class GroupTagsController extends Controller
   }
 
   public function getDeleteTag($id) {
+
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
 
     GroupTags::find($id)->delete();
 

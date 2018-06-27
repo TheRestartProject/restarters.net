@@ -4,27 +4,27 @@
     height: 100%;
     padding: 0px;
     margin: 0px;
-    
+
     li {
         display: inline-block;
         margin: 0px;
         padding: 1em 2em;
-        
+
         a {
             color: $blue;
-            
+
         }
     }
 }
 .profile-picture {
     border: none;
     background: none;
-    img { 
+    img {
         border-radius: 20px;
         -moz-border-radius: 20px;
         -webkit-border-radius: 20px;
     }
-    
+
 }
 
 .user-name {
@@ -126,7 +126,7 @@
         border:1px solid #D9D9D9;
         border-top:0;
         border-left:0;
-        border-bottom:0; 
+        border-bottom:0;
 
         svg {
             display: block;
@@ -157,7 +157,7 @@
             color: #000;
             position: relative;
             z-index: 1;
-            font-family: $font-family-sans-serif; 
+            font-family: $font-family-sans-serif;
             @include media-breakpoint-up(sm) {
                 padding: 11px 15px;
                 border:1px solid #D9D9D9;
@@ -222,8 +222,8 @@
             // border:1px solid #D9D9D9;
             // border-top:0;
             padding:0;
-            margin: 4px 0 0 0;
-            box-shadow:-2px 5px 5px rgba(0, 0, 0, 0.17);
+            margin: 3px 0 0 0;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.17);
         }
 
         .dropdown-item {
@@ -268,7 +268,7 @@
     > ul {
         margin: 0;
         padding: 0;
-        
+
         > li {
             text-transform: uppercase;
             list-style: none;
@@ -277,7 +277,7 @@
             padding-bottom: 10px;
             padding: 15px 20px 15px 20px;
             border-bottom:1px solid #D9D9D9;
-            
+
 
             svg {
                 display: inline-block;

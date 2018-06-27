@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Skills;
+use FixometerHelper;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -11,6 +12,10 @@ class SkillsController extends Controller
 {
 
   public function index() {
+
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
+
     $all_skills = Skills::all();
 
     return view('skills.index', [
@@ -21,6 +26,9 @@ class SkillsController extends Controller
 
   public function getCreateSkill() {
 
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
+
     return view('skills.create', [
       'title' => 'Add Skill',
     ]);
@@ -28,6 +36,9 @@ class SkillsController extends Controller
   }
 
   public function postCreateSkill(Request $request) {
+
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
 
     $name = $request->input('skill-name');
     $description = $request->input('skill-description');
@@ -43,6 +54,9 @@ class SkillsController extends Controller
 
   public function getEditSkill($id) {
 
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
+
     $skill = Skills::find($id);
 
     return view('skills.edit', [
@@ -53,6 +67,9 @@ class SkillsController extends Controller
   }
 
   public function postEditSkill($id, Request $request) {
+
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
 
     $name = $request->input('skill-name');
     $description = $request->input('skill-description');
@@ -67,6 +84,9 @@ class SkillsController extends Controller
   }
 
   public function getDeleteSkill($id) {
+
+    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      return redirect('/user/forbidden');
 
     Skills::find($id)->delete();
 

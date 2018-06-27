@@ -141,10 +141,5 @@
   </div>
 
   </div>
-  @if ($onboarding)
-    <script>
-      onboarding();
-    </script>
-  @endif
 <section>
 @endsection

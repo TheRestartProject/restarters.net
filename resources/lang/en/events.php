@@ -53,7 +53,6 @@ return [
     'create_new_event' => 'Create new event',
     'create_event' => 'Create event',
     'edit_event' => 'Edit event',
-    'save_event' => 'Save event',
     'edit_event_content' => 'Go ahead and change or improve your event information.',
     'events_title_admin' => 'Events to moderate (admin only)',
     'past_events' => 'Past events',

@@ -2,20 +2,19 @@
 
 return [
 
-    'whatis' => 'What is restart?',
-    'whatis_content' => '<p>Benefits of the system should be written here. I recommend a short paragraph and include bullet points for summarising benefits:</p><ul>
-                                <li>Ipsum venenatis</li>
-                                <li>A pharetra lectus viverra a</li>
-                                <li>Maecenas magnis dolor quam</li>
-                                <li>Adipiscing elementum vestibulum</li>
-                                <li>Condimentum arcu neque.</li>
+    'whatis' => 'What is restarters.net?',
+    'whatis_content' => '<p>This is place to grow the community electronics repair movement. The world needs more fixing and more fixing skills to be shared. Join in if you would like to</p><ul>
+                                <li>Learn electronics repair with others</li>
+                                <li>Share your repair skills with others</li>
+                                <li>Organise electronics repair events</li>
+                                <li>View and share the impact of repair events</li>
+                                <li>Document and bring down the barriers to repair</li>
                             </ul>',
     'more' => 'Find out more',
-    'stat_1' => 'Devices restarted',
+    'stat_1' => 'Devices<br>fixed',
     'stat_2' => 'CO<sub>2</sub> emissions prevented',
     'stat_3' => 'Waste<br>prevented',
-    'stat_4' => 'Parties<br>held',
-    'lead' => 'Welcome to our Restarter community space',
+    'stat_4' => 'Events<br>held',
+    'lead' => 'Welcome to our Restarter community',
     'login_title' => 'Sign in',
-    'login_text' => 'Donec id elit non mi porta gravida at eget metus. Vestibulum id ligula porta'
 ];

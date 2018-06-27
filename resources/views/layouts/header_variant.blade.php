@@ -67,7 +67,11 @@
             }
         </style>
     </head>
-    <body>
+    @if ( isset($onboarding) && $onboarding )
+      <body class="onboarding">
+    @else
+      <body>
+    @endif
 
    <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
             <div class="container">

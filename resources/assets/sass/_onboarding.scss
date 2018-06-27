@@ -1,5 +1,5 @@
 .onboarding {
-    .modal { 
+    .modal {
         background-color: RGBA(3, 148, 166, 0.5);
 
         .close {
@@ -102,6 +102,6 @@
     }
 
     button.slick-disabled {
-        display: none;
+        display: none !important;
     }
 }
