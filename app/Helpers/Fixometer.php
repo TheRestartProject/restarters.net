@@ -601,4 +601,20 @@ class FixometerHelper {
 
   }
 
+  public static function getLatLongFromCityCountry($town_city, $country) {
+
+    $return = array();
+
+    $json = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=".urlencode($town_city.','.$country)."&sensor=false&key=".env('GOOGLE_API_CONSOLE_KEY'));
+    $json = json_decode($json);
+
+    if (is_object($json) && !empty($json->{'results'})) {
+        $return[] = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
+        $return[] = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+    }
+
+    return $return;
+
+  }
+
 }

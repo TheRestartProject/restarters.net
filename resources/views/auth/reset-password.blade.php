@@ -6,11 +6,13 @@
             @include('includes.logo-large')
 
             @if($valid_code == false)
-            <br>
-            <p class="login-text text-center">The recovery code you're using is invalid. Please proceed to request a new recovery link <a href="/user/recover">here</a>.</p>
+              <div class="entry-panel card card__login col-12 mt-5 text-left">
+                <h1>@lang('auth.reset_password')</h1>
+                <p class="login-text">The recovery code you're using is invalid. Please proceed to request a new recovery link <a href="/user/recover">here</a>.</p>
+              </div>
             @else
 
-            <div class="entry-panel">
+            <div class="entry-panel card card__login col-12 mt-5 text-left">
 
                 @if(isset($response))
                   @php( FixometerHelper::printResponse($response) )
@@ -38,11 +40,8 @@
                     </div>
 
                     <div class="row entry-panel__actions">
-                        <div class="col-6 align-content-center d-flex">
-
-                        </div>
-                        <div class="col-6 align-content-center justify-content-end d-flex">
-                            <button type="submit" name="submit" id="submit" class="form-control btn btn-primary login-button">@lang('auth.change_password')</button>
+                        <div class="col-12 justify-content-end d-flex">
+                            <button type="submit" name="submit" id="submit" class="btn btn-primary">@lang('auth.change_password')</button>
                         </div>
                     </div>
 

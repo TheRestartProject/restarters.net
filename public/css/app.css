@@ -15415,6 +15415,11 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   border: 2px solid #BEC0C0;
 }
 
+.card .form-control:disabled,
+.card .form-control[readonly] {
+  background-color: #e9ecef;
+}
+
 .features {
   padding: 10px 0;
   height: 100%;

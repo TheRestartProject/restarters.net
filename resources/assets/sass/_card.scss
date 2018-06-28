@@ -90,5 +90,8 @@
         font-size: 15px;
         background-color: #FFFFFF;
         border:2px solid #BEC0C0;
+        &:disabled, &[readonly]{
+          background-color: #e9ecef;
+        }
     }
 }

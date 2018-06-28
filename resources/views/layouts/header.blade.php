@@ -57,7 +57,7 @@
                                   @if ( !isset( Auth::user()->path ) || is_null( Auth::user()->path ) )
                                     <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{ Auth::user()->name }} Profile Picture" class="avatar">
                                   @else
-                                    <img src="/uploads/thumbnail_/{{ Auth::user()->path }}" alt="{{ Auth::user()->name }} Profile Picture" class="avatar">
+                                    <img src="/uploads/thumbnail_{{ Auth::user()->path }}" alt="{{ Auth::user()->name }} Profile Picture" class="avatar">
                                   @endif
                                    <span class="user-name">{{ Auth::user()->name }}</span> <span class="caret"></span>
                                 </a>
@@ -90,8 +90,8 @@
                                               <svg width="15" height="13" viewBox="0 0 12 10" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><g fill="#0394a6"><path d="M11.25 6.245H.002v2.25s-.038.75.208 1.066c.242.311.997.269.997.269l8.953-.011s.565.039.843-.26c.259-.278.247-.929.247-.929V6.245zm0-.625H6.887V4.618H4.365V5.62H.002V1.946s.008-.267.105-.386c.098-.12.335-.14.335-.14l10.29-.004s.237-.027.385.1c.133.114.133.43.133.43V5.62z"/><path d="M7.592 0v1.946H3.66V0h3.932zm-.705.666H4.365v.75h2.522v-.75z"/></g></svg> @lang('general.general')
                                             @endif
                                             <ul>
-                                                <li><a href="{{{ route('profile') }}}">@lang('general.profile')</a></li>
-                                                <li><a href="#todo">@lang('auth.change_password')</a></li>
+                                                <li><a href="/profile/edit/{{{ Auth::user()->id }}}">@lang('general.profile')</a></li>
+                                                <li><a href="/profile/edit/{{{ Auth::user()->id }}}#change-password">@lang('auth.change_password')</a></li>
                                                 <li><a href="/logout">@lang('general.logout')</a></li>
                                             </ul>
                                         </li>

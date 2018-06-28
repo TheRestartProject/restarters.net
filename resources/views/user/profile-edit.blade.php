@@ -1,4 +1,4 @@
-@extends('layouts.profile')
+@extends('layouts.app')
 @section('content')
   <div class="container">
     <div class="row">
@@ -69,19 +69,23 @@
                     <label for="name">Name:</label>
                     <input type="text" class="form-control" id="name" name="name" value="{{ $user->name }}">
                   </div>
-                  <div class="form-group col-lg-4">
-                    <label for="name">Country:</label>
-                    <select id="country" name="country" class="form-control select2-dropdown">
-                      @foreach (FixometerHelper::getAllCountries() as $key => $value)
-                        <option value=""></option>
-                        @if ($user->country == $key)
-                          <option value="{{ $key }}" selected>{{ $value }}</option>
-                        @else
-                          <option value="{{ $key }}">{{ $value }}</option>
-                        @endif
-                      @endforeach
-                    </select>
-                  </div>
+
+                  <div class="form-group col-lg-6">
+                        <label for="country">@lang('registration.country'):<sup>*</sup></label>
+                        <div class="form-control form-control__select">
+                            <select id="country" name="country" required aria-required="true" class="field select2">
+                                <option value=""></option>
+                                @foreach (FixometerHelper::getAllCountries() as $key => $value)
+                                  @if ($user->country == $key)
+                                    <option value="{{ $key }}" selected>{{ $value }}</option>
+                                  @else
+                                    <option value="{{ $key }}">{{ $value }}</option>
+                                  @endif
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="invalid-feedback">@lang('registration.country_validation')</div>
+                    </div>
                 </div>
                 <div class="form-row">
                   <div class="form-group col-lg-6">
@@ -94,19 +98,26 @@
                   </div>
                 </div>
                 <div class="form-row">
+
                   <div class="form-group col-lg-6">
-                    <label for="age">Age:</label>
-                    {{ Form::select('age', FixometerHelper::allAges(), $user->age, ['class' => 'form-control select2-dropdown']) }}
+                      <label for="age">Age:</label>
+                      <div class="form-control form-control__select">
+                          <select id="age" name="age" required aria-required="true" class="field select2">
+                              @foreach(FixometerHelper::allAges() as $age)
+                                @if ( $user->age == $age )
+                                  <option value="{{ $age }}" selected>{{ $age }}</option>
+                                @else
+                                  <option value="{{ $age }}">{{ $age }}</option>
+                                @endif
+                              @endforeach
+                          </select>
+                      </div>
+                      <div class="invalid-feedback">@lang('registration.age_validation')</div>
                   </div>
+
                   <div class="form-group col-lg-6">
                     <label for="gender">Gender:</label>
-                    <div class="form-control form-control__select">
-                    <select id="gender" name="gender">
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
-                    </div>
+                    <input id="gender" class="form-control" name="gender" value="{{ $user->gender }}">
                   </div>
                 </div>
                 <div class="form-row">
@@ -138,18 +149,24 @@
 
                     @csrf
 
-                    <label for="tags[]">@lang('general.your_repair_skills'):</label>
-                    <!-- <div id="tokenfield" class="tokenfield form-control"></div> -->
-                    <select id="tags" name="tags[]" class="form-control select2-tags" multiple="multiple">
-                        @foreach ($skills as $skill)
-                          @if (in_array($skill->id, $user_skills))
-                            <option value="{{ $skill->id }}" selected>{{ $skill->skill_name }}</option>
-                          @else
-                            <option value="{{ $skill->id }}">{{ $skill->skill_name }}</option>
-                          @endif
-                        @endforeach
-                    </select>
-                    <input type="hidden" id="prepopulate" value="">
+                    <div class="form-group">
+                      <label for="tags[]">@lang('general.your_repair_skills'):</label>
+                      <div class="form-control form-control__select">
+                        <select id="tags" name="tags[]" class="select2-tags" multiple>
+                            @foreach( FixometerHelper::skillCategories() as $key => $skill_category )
+                              <optgroup label="{{{ $skill_category }}}">
+                                @foreach ($skills[$key] as $skill)
+                                  @if ( !empty($user_skills) && in_array($skill->id, $user_skills))
+                                    <option value="{{ $skill->id }}" selected>{{ $skill->skill_name }}</option>
+                                  @else
+                                    <option value="{{ $skill->id }}">{{ $skill->skill_name }}</option>
+                                  @endif
+                                @endforeach
+                              </optgroup>
+                            @endforeach
+                        </select>
+                      </div>
+                    </div>
 
                     <div class="form-row">
                       <div class="form-group col-lg-12">
@@ -265,13 +282,21 @@
                   @csrf
                   <fieldset class="email-options">
                       <div class="form-check d-flex align-items-center justify-content-start">
-                          <input class="checkbox-top form-check-input" type="checkbox" name="newsletter" id="newsletter" value="1">
+                          @if( $user->newsletter == 1 )
+                            <input class="checkbox-top form-check-input" type="checkbox" name="newsletter" id="newsletter" value="1" checked>
+                          @else
+                            <input class="checkbox-top form-check-input" type="checkbox" name="newsletter" id="newsletter" value="1">
+                          @endif
                           <label class="form-check-label" for="newsletter">
                           @lang('general.email_alerts_pref1')
                       </label>
                       </div>
                       <div class="form-check d-flex align-items-center justify-content-start">
-                          <input class="checkbox-top form-check-input" type="checkbox" name="invites" id="invites" value="1">
+                          @if( $user->invites == 1 )
+                            <input class="checkbox-top form-check-input" type="checkbox" name="invites" id="invites" value="1" checked>
+                          @else
+                            <input class="checkbox-top form-check-input" type="checkbox" name="invites" id="invites" value="1">
+                          @endif
                           <label class="form-check-label" for="invites">
                           @lang('general.email_alerts_pref2')
                       </label>
@@ -280,7 +305,7 @@
 
                   <div class="button-group row">
                       <div class="col-xl-9 d-flex align-items-center justify-content-start">
-                          <a class="registration__prev btn-preferences" href="/set-preferences">@lang('auth.set_preferences')</a>
+                          <a class="btn-preferences" href="{{ env('PLATFORM_COMMUNITY_URL') }}/u/{{ Auth::user()->username }}/preferences/emails">@lang('auth.set_preferences')</a>
                       </div>
                       <div class="col-xl-3 d-flex align-items-center justify-content-end">
                           <button class="btn btn-primary btn-save">@lang('auth.save_preferences')</button>

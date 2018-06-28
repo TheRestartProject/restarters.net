@@ -19,19 +19,19 @@ use App\Http\Controllers\PartyController;
 // use Illuminate\Support\Facades\Notifications;
 use Notification;
 use App\Notifications\ResetPassword;
-use App\Notifications\JoinGroup;
-use App\Notifications\JoinEvent;
-use App\Notifications\EventDevices;
-use App\Notifications\EventRepairs;
-use App\Notifications\NewRegister;
-use App\Notifications\RSVPEvent;
-use App\Notifications\NewGroupMember;
-use App\Notifications\ModerationEvent;
-use App\Notifications\EventConfirmed;
-use App\Notifications\ModerationGroup;
-use App\Notifications\GroupConfirmed;
-use App\Notifications\ReviewNotes;
-use App\Notifications\AccountCreated;
+// use App\Notifications\JoinGroup;
+// use App\Notifications\JoinEvent;
+// use App\Notifications\EventDevices;
+// use App\Notifications\EventRepairs;
+// use App\Notifications\NewRegister;
+// use App\Notifications\RSVPEvent;
+// use App\Notifications\NewGroupMember;
+// use App\Notifications\ModerationEvent;
+// use App\Notifications\EventConfirmed;
+// use App\Notifications\ModerationGroup;
+// use App\Notifications\GroupConfirmed;
+// use App\Notifications\ReviewNotes;
+// use App\Notifications\AccountCreated;
 
 use FixometerHelper;
 use FixometerFile;
@@ -92,9 +92,13 @@ class UserController extends Controller
         // }
     }
 
-    public function getProfileEdit($id) {
+    public function getProfileEdit($id = null) {
 
-      $user = User::find($id);
+      if( is_null($id) || !FixometerHelper::hasRole(Auth::user(), 'Administrator') ){
+          $user = User::find(Auth::user()->id);
+      } else {
+          $user = User::find($id);
+      }
 
       $user_skills = UsersSkills::where('user', $id)->pluck('skill')->toArray();
 
@@ -107,7 +111,21 @@ class UserController extends Controller
 
     public function postProfileInfoEdit(Request $request) {
 
-      $updateInfo = Auth::user()->update([
+      $rules = [
+          'name'            => 'required|string|max:255',
+          'email'           => 'required|string|email|max:255',
+          'age'             => 'required',
+          'country'         => 'required',
+          'gender'          => 'required|string|max:255',
+      ];
+
+      $validator = Validator::make($request->all(), $rules);
+
+      if ($validator->fails()) {
+          return redirect()->back()->withErrors($validator)->withInput();
+      }
+
+      $user = User::find(Auth::user()->id)->update([
         'email'    => $request->input('email'),
         'name'     => $request->input('name'),
         'country'  => $request->input('country'),
@@ -117,19 +135,31 @@ class UserController extends Controller
         'biography'=> $request->input('biography'),
       ]);
 
+      $user = User::find(Auth::user()->id);
+
       if (!empty($user->location)) {
 
-        $json = file_get_contents("http://maps.google.com/maps/api/geocode/json?address=".urlencode($user->location.','.$user->country)."&sensor=false");
-        $json = json_decode($json);
+        $lat_long = FixometerHelper::getLatLongFromCityCountry($user->location, $user->country);
+        if ( !empty($lat_long) ) {
 
-        if (is_object($json) && !empty($json->{'results'})) {
-            $user->latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
-            $user->longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+            $user->latitude = $lat_long[0];
+            $user->longitude = $lat_long[1];
 
-            $user->save();
+        } else {
+
+          $user->latitude = NULL;
+          $user->longitude = NULL;
+
         }
 
+      } else {
+
+        $user->latitude = NULL;
+        $user->longitude = NULL;
+
       }
+
+      $user->save();
 
       return redirect()->back()->with('message', 'User Profile Updated!');
 
@@ -137,7 +167,7 @@ class UserController extends Controller
 
     public function postProfilePasswordEdit(Request $request) {
 
-      $user = Auth::user();
+      $user = User::find(Auth::user()->id);
 
       if ($request->input('new-password') !== $request->input('new-password-repeat')) {
         return redirect()->back()->with('error', 'New Passwords do not match!');
@@ -163,8 +193,7 @@ class UserController extends Controller
 
     public function postSoftDeleteUser() {
 
-      $user = Auth::user();
-
+      $user = User::find(Auth::user()->id);
       $user->delete();
 
       return redirect()->back()->with('error', 'Account has been soft deleted');
@@ -173,23 +202,21 @@ class UserController extends Controller
 
     public function postProfilePreferencesEdit(Request $request) {
 
-      $user = Auth::user();
+      $user = User::find(Auth::user()->id);
 
-      if ($request->input('newsletter') !== null && !empty($request->input('newsletter'))) {
+      if ( $request->input('newsletter') !== null ):
+        $user->newsletter = 1;
+      else:
+        $user->newsletter = 0;
+      endif;
 
-        $user->update([
-          'newsletter' => 1,
-        ]);
+      if ( $request->input('invites') !== null ):
+        $user->invites = 1;
+      else:
+        $user->invites = 0;
+      endif;
 
-      }
-
-      if ($request->input('invites') !== null && !empty($request->input('invites'))) {
-
-        $user->update([
-          'invites'    => 1,
-        ]);
-
-      }
+      $user->save();
 
       return redirect()->back()->with('message', 'User Preferences Updated!');
 
@@ -262,149 +289,6 @@ class UserController extends Controller
 
     }
 
-    public function emailExample() {
-      // User::find(1)->notify(new ResetPassword);
-      $arr = array('Kyle', 'The Mighty Restarters');
-      // Single user
-      // User::find(1)->notify(new JoinGroup($arr));
-
-      // Multiple users
-      $users = User::find(1);
-      Notification::send($users, new JoinEvent($arr));
-    }
-
-    // public function test() {
-    //   $u = new User;
-    //   dd($u->checkEmail('will@wecreatedigital.co.uk'));
-    // }
-
-    // public function login(){
-    //
-    //     $Auth = new Auth($url);
-    //     if($Auth->isLoggedIn()){
-    //
-    //         $user = $Auth->getProfile();
-    //
-    //         if(hasRole($user, 'Administrator')){
-    //             header('Location: /admin');
-    //         }
-    //         elseif(hasRole($user, 'Host')){
-    //             header('Location: /host');
-    //         }
-    //         else {
-    //             header('Location: /user/forbidden');
-    //         }
-    //
-    //     }
-    //     else {
-    //
-    //         $this->set('title', 'Login');
-    //         $this->set('charts', true);
-    //
-    //         // set up stuff for engagin login page
-    //         $Device = new Device;
-    //         $Party = new Party;
-    //
-    //         $weights= $Device->getWeights();
-    //         $devices= $Device->statusCount();
-    //
-    //         $this->set('weights', $weights);
-    //         $this->set('devices', $devices);
-    //
-    //         $this->set('nextparties', $Party->findNextParties());
-    //         $this->set('allparties', $Party->findAll());
-    //
-    //         $co2_years = $Device->countCO2ByYear();
-    //         $this->set('year_data', $co2_years);
-    //         $stats = array();
-    //         foreach($co2_years as $year){
-    //             $stats[$year->year] = $year->co2;
-    //         }
-    //         $this->set('bar_chart_stats', array_reverse($stats, true));
-    //
-    //         $waste_years = $Device->countWasteByYear();
-    //         $this->set('waste_year_data', $waste_years);
-    //         $wstats = array();
-    //         foreach($waste_years as $year){
-    //             $wstats[$year->year] = $year->waste;
-    //         }
-    //         $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
-    //
-    //         if($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET)){
-    //             $reset_result = $_GET['reset'];
-    //
-    //             if (!empty($reset_result) && $reset_result == 'ok') {
-    //                 $response['success'] = '<strong>Password reset successfully</strong>. You can now login with your new password.';
-    //
-    //                 $this->set('response', $response);
-    //             }
-    //         }
-    //
-    //         if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
-    //
-    //             $response = array();
-    //
-    //             $uput_email = $_POST['email'];
-    //             $uput_password = $_POST['password'];
-    //
-    //             if(empty($uput_email) || !filter_var($uput_email, FILTER_VALIDATE_EMAIL)){
-    //                 $response['danger'] = '<strong>Invalid/Empty email</strong>. Please input a valid email address.';
-    //             }
-    //             if(empty($uput_password)){
-    //                 $response['danger'] = '<strong>Empty Password</strong>. Please input a password.';
-    //             }
-    //
-    //             if(!isset($response['danger'])){
-    //                 // No errors, we can proceed and see if we can auth this guy here.
-    //
-    //                 $user = $this->User->find(array(
-    //                                                 'email' => $uput_email,
-    //                                                 'password' => crypt($uput_password, '$1$' . SECRET)
-    //                                             )
-    //                                         );
-    //
-    //                 if(!empty($user)){
-    //                     $Auth = new Auth;
-    //                     if(!$Auth->isLoggedIn()){
-    //
-    //                         $pass = $Auth->authorize($user[0]->idusers);
-    //
-    //                     }
-    //                     else {
-    //                         $pass = true;
-    //                     }
-    //
-    //                     if($pass == true){
-    //                       // fetch lang preference
-    //                       $lang = (isset($_COOKIE[LANGUAGE_COOKIE]) ? $_COOKIE[LANGUAGE_COOKIE] : 'en');
-    //                       $this->User->update(array( 'language' => $lang ), $user[0]->idusers);
-    //
-    //                         if(hasRole($user[0], 'Administrator')){
-    //                             header('Location: /admin');
-    //                         }
-    //                         elseif(hasRole($user[0], 'Host')){
-    //                             header('Location: /host');
-    //                         }
-    //                         else {
-    //                             header('Location: /user/forbidden');
-    //                         }
-    //
-    //                     }
-    //                 }
-    //                 else {
-    //                     $response['danger'] = 'No user account was found for the email and password provided. Please check your details and try again.';
-    //                     $this->set('response', $response);
-    //                     //header('Location: /user/login');
-    //                 }
-    //             }
-    //             else {
-    //                 $this->set('response', $response);
-    //             }
-    //
-    //         }
-    //     }
-    // }
-    //
     public function recover(){
 
      //To display Stats
@@ -573,9 +457,11 @@ class UserController extends Controller
         $recovery = filter_var($_GET['recovery'], FILTER_SANITIZE_STRING);
         $user = $User->where('recovery', '=', $recovery)->first();
 
-        if( strtotime($user->recovery_expires) > time() ) {
+        if( is_object($user) && strtotime($user->recovery_expires) > time() ) {
           $valid_code = true;
           // $this->set('recovery', $recovery);
+        } else {
+          $valid_code = false;
         }
       }
       // $this->set('valid_code', $valid_code);
@@ -1193,13 +1079,10 @@ class UserController extends Controller
       // Now determine lat and long values from location field (if provided)
       if ( !is_null( $request->input('reg_city') ) ) {
 
-        $json = file_get_contents("http://maps.google.com/maps/api/geocode/json?address=".urlencode($request->input('reg_city').','.$request->input('reg_country') )."&sensor=false");
-        $json = json_decode($json);
-
-        if (is_object($json) && !empty($json->{'results'})) {
-            $user->latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
-            $user->longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
-
+        $lat_long = FixometerHelper::getLatLongFromCityCountry($request->input('reg_city'), $request->input('reg_country'));
+        if ( !empty($lat_long) ) {
+            $user->latitude = $lat_long[0];
+            $user->longitude = $lat_long[1];
         }
 
       }

@@ -41,7 +41,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   //User Controller
   Route::get('/profile', 'UserController@index')->name('profile');
   Route::get('/profile/{id}', 'UserController@index');
-  Route::get('/profile/edit/{id}', 'UserController@getProfileEdit');
+  Route::get('/profile/edit/{id?}', 'UserController@getProfileEdit');
   Route::post('profile/edit-info', 'UserController@postProfileInfoEdit');
   Route::post('profile/edit-password', 'UserController@postProfilePasswordEdit');
   Route::post('profile/edit-preferences', 'UserController@postProfilePreferencesEdit');
