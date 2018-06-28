@@ -73,31 +73,72 @@ class PartyController extends Controller
       // $this->set('title', 'Parties');
       // $this->set('list', $this->Party->findAll());
 
-      $Party = new Party;
-      $user = User::find(Auth::id());
+      // $Party = new Party;
+      // $user = User::find(Auth::id());
+      //
+      // $past = [];
+      // $upcoming = [];
+      // $moderate = [];
+      //
+      // $today = new DateTime("today");
+      //
+      // foreach ($Party->findAll() as $party) {
+      //
+      //   $p_date = new DateTime("@$party->event_timestamp");
+      //
+      //   if( is_null($party->wordpress_post_id) ) { //To moderate
+      //
+      //     $moderate[] = $party;
+      //
+      //   } elseif ($p_date > $today) { //upcoming
+      //
+      //     $upcoming[] = $party;
+      //
+      //   } elseif ($p_date < $today) { //past
+      //
+      //     $past[] = $party;
+      //
+      //   }
+      //
+      //   // dd($today->diff($p_date));
+      //
+      // }
 
-      $past = [];
-      $upcoming = [];
-      $today = new DateTime("today");
+      $upcoming = Party::whereNotNull('wordpress_post_id')
+                    ->whereDate('event_date', '>=', date('Y-m-d'))
+                      ->get();
 
-      foreach ($Party->findAll() as $party) {
-        $p_date = new DateTime("@$party->event_timestamp");
-        if ($p_date > $today) {
-          //upcoming
-          $upcoming[] = $party;
-        } elseif ($p_date < $today) {
-          //past
-          $past[] = $party;
-        }
-        // dd($today->diff($p_date));
+      $past = Party::whereNotNull('wordpress_post_id')
+                    ->whereDate('event_date', '<', date('Y-m-d'))
+                      ->get();
+
+      if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') ){
+
+        $moderate = Party::whereNull('wordpress_post_id')
+                      ->whereDate('event_date', '>=', date('Y-m-d'))
+                        ->get();
+
+      } elseif( !FixometerHelper::hasRole(Auth::user(), 'Host') ){
+
+        $moderate = Party::whereNull('wordpress_post_id')
+                      //->where('user_id', Auth::user()->id)
+                        ->whereDate('event_date', '>=', date('Y-m-d'))
+                          ->get();
+
+      } else {
+
+        $moderate = null;
+
       }
 
+
       return view('events.index', [ //party.index
-        'title' => 'Parties',
-        'list' => $Party->findAll(),
-        'user' => $user,
-        'upcoming' => $upcoming,
-        'past' => $past,
+        'title'     => 'Events',
+        //'list'      => $Party->findAll(),
+        //'user'      => $user,
+        'upcoming'  => $upcoming,
+        'past'      => $past,
+        'moderate'  => $moderate,
       ]);
   }
 
@@ -105,9 +146,8 @@ class PartyController extends Controller
   {
       $user = Auth::user();
 
-      // if (!FixometerHelper::hasRole($user, 'Administrator') || !FixometerHelper::hasRole($user, 'Host')) {
-      //     header('Location: /user/forbidden');
-      // }
+      if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') || !FixometerHelper::hasRole(Auth::user(), 'Host') )
+        return redirect('/user/forbidden');
 
       $Groups = new Group;
       $Party = new Party;
@@ -476,7 +516,7 @@ class PartyController extends Controller
               $response['danger'] = 'Something went wrong. Please check the data and try again.';
           }
           else {
-              $response['success'] = 'Party updated!';
+              $response['success'] = 'Event details updated <a href="/party/view/'.$id.'" class="btn btn-success">View event</a>';
 
               if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
                   /** Prepare Custom Fields for WP XML-RPC - get all needed data **/

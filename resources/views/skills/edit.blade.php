@@ -17,6 +17,19 @@
             <input type="text" name="skill-name" id="skill-name" class="form-control" value="{{ $skill->skill_name }}">
         </div>
         <div class="form-group">
+            <label for="category">Category:</label>
+            <select id="category" name="category" class="form-control" data-live-search="true">
+                <option></option>
+                @foreach( FixometerHelper::skillCategories() as $key => $category )
+                  @if( $skill->category == $key )
+                    <option selected value="{{{ $key }}}">{{{ $category }}}</option>
+                  @else
+                    <option value="{{{ $key }}}">{{{ $category }}}</option>
+                  @endif
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group">
             <label for="skill-description">Description:</label>
             <textarea class="form-control rte" rows="6" name="skill-description" id="skill-description">{{ $skill->description }}</textarea>
         </div>

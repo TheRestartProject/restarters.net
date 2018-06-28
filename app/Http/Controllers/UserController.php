@@ -119,7 +119,7 @@ class UserController extends Controller
 
       if (!empty($user->location)) {
 
-        $json = file_get_contents("http://maps.google.com/maps/api/geocode/json?address=".urlencode($user->location.',United Kingdom')."&sensor=false");
+        $json = file_get_contents("http://maps.google.com/maps/api/geocode/json?address=".urlencode($user->location.','.$user->country)."&sensor=false");
         $json = json_decode($json);
 
         if (is_object($json) && !empty($json->{'results'})) {
@@ -445,47 +445,56 @@ class UserController extends Controller
         if(empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)){
             $response['danger'] = 'Please input a <strong>valid</strong> email.';
         } else {
+
           $user = $User->where('email', $email)->first();
+
           if(!empty($user)){
+
             $id = $user->id;
             $data = array();
+
             // generate recovery code
             $bytes = 32;
             $data['recovery'] = substr( bin2hex(openssl_random_pseudo_bytes($bytes)), 0, 24 );
+
             // add date timestamp
             $data['recovery_expires'] = strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60));
 
             // update record
             $user->update([
-                'recovery' => substr( bin2hex(openssl_random_pseudo_bytes($bytes)), 0, 24 ),
-                'recovery_expires' => strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60)),
+                'recovery' => $data['recovery'],
+                'recovery_expires' => $data['recovery_expires'],
             ]);
 
             // send email to User
-            $message = "<p>Hi,</p>" .
-                     "<p>You've requested to recover your password for the " . env('APP_NAME') . ".</p>" .
-                     "<hr/>" .
-                     "<p>Please click on this link to recover your password: <a href=\"" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "\">" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "</a>.</p>" .
-                     "<p>If the link doesn't work, please copy and paste it in the address bar of your browser.</p>" .
-                     "<p>The link will be active for the next 24 hours.</p>" .
-                     "<hr/>" .
-                     "<p>If you have any issues, or if you did <strong>not</strong> ask to recover your password, please contact <a href='mailto:" . env('SUPPORT_CONTACT_EMAIL') . "'>" . env('SUPPORT_CONTACT_EMAIL') . "</a>.</p>" .
-            "<p>Thanks for using the " . env('APP_NAME') . "!</p>" .
-            "<p><em>The Restart Project</em></p>";
-            $subject = env('APP_NAME') . ": Password recovery";
-            $headers = "From: " . env('APP_EMAIL') . "\r\n";
-            $headers .= "MIME-Version: 1.0\r\n";
-            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-            $headers .= "Bcc: " . env('SUPPORT_CONTACT_EMAIL') . "\r\n";
+            // $message = "<p>Hi,</p>" .
+            //          "<p>You've requested to recover your password for the " . env('APP_NAME') . ".</p>" .
+            //          "<hr/>" .
+            //          "<p>Please click on this link to recover your password: <a href=\"" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "\">" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "</a>.</p>" .
+            //          "<p>If the link doesn't work, please copy and paste it in the address bar of your browser.</p>" .
+            //          "<p>The link will be active for the next 24 hours.</p>" .
+            //          "<hr/>" .
+            //          "<p>If you have any issues, or if you did <strong>not</strong> ask to recover your password, please contact <a href='mailto:" . env('SUPPORT_CONTACT_EMAIL') . "'>" . env('SUPPORT_CONTACT_EMAIL') . "</a>.</p>" .
+            // "<p>Thanks for using the " . env('APP_NAME') . "!</p>" .
+            // "<p><em>The Restart Project</em></p>";
+            // $subject = env('APP_NAME') . ": Password recovery";
+            // $headers = "From: " . env('APP_EMAIL') . "\r\n";
+            // $headers .= "MIME-Version: 1.0\r\n";
+            // $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+            // $headers .= "Bcc: " . env('SUPPORT_CONTACT_EMAIL') . "\r\n";
+            //
+            // $sender = mail($email, $subject, $message, $headers);
 
-            $sender = mail($email, $subject, $message, $headers);
+            User::find($id)->notify(new ResetPassword([
+                'url' => env('APP_URL') . "/user/reset/?recovery=" . $data['recovery']
+            ]));
 
-            if(!$sender){
-                $response['danger'] = 'Could not send email with reset instructions.';
-            }
-            else {
-                $response['success'] = 'Email Sent! Please check your inbox and follow instructions.  <strong>Please allow up to 10 minutes for your email to arrive, and please check your spam folder.</strong>';
-            }
+            // if(!$sender){
+            //     $response['danger'] = 'Could not send email with reset instructions.';
+            // }
+            // else {
+                $response['success'] = 'Email Sent! Please check your inbox and follow instructions';
+            //}
 
           } else {
             $response['danger'] = 'This email is not in our database.';
@@ -1085,16 +1094,35 @@ class UserController extends Controller
 
     public function postRegister(Request $request){
 
-      $rules = [
-          'reg_name' => 'required|string|max:255',
-          'email' => 'required|string|email|max:255|unique:users',
-          'reg_age' => 'required',
-          'reg_country' => 'required',
-          'reg_gender' => 'required|string|max:255',
-          'password' => 'required|string|min:6|confirmed',
-          'my_name'   => 'honeypot',
-          'my_time'   => 'required|honeytime:5',
-      ];
+      if( Auth::check() ){ //Existing users don't need all the same rules
+
+        $rules = [
+            'reg_age'             => 'required',
+            'reg_country'         => 'required',
+            'reg_gender'          => 'required|string|max:255',
+            'my_name'             => 'honeypot',
+            'my_time'             => 'required|honeytime:5',
+            'consent_gdpr'        => 'required',
+            'consent_past_data'   => 'required',
+            'consent_future_data' => 'required',
+        ];
+
+      } else {
+
+        $rules = [
+            'reg_name'            => 'required|string|max:255',
+            'email'               => 'required|string|email|max:255|unique:users',
+            'reg_age'             => 'required',
+            'reg_country'         => 'required',
+            'reg_gender'          => 'required|string|max:255',
+            'password'            => 'required|string|min:6|confirmed',
+            'my_name'             => 'honeypot',
+            'my_time'             => 'required|honeytime:5',
+            'consent_gdpr'        => 'required',
+            'consent_future_data' => 'required',
+        ];
+
+      }
 
       $validator = Validator::make($request->all(), $rules);
 
@@ -1102,12 +1130,36 @@ class UserController extends Controller
           return redirect()->back()->withErrors($validator)->withInput();
       }
 
-      try {
+      $skills = $request->input('skills');
+      $timestamp = date('Y-m-d H:i:s');
+
+      // try {
+
+      if( Auth::check() ){ //Existing users are to update
+
+        $user_id = Auth::user()->id;
+
+        $user = User::find( Auth::user()->id );
+        $user->country = $request->input('reg_country');
+        $user->location = $request->input('reg_city');
+        $user->gender = $request->input('reg_gender');
+        $user->age = $request->input('reg_age');
+        $user->consent_past_data = $timestamp;
+
+      } else {
+
+        $has_host_skills = Skills::where('category', 1)->whereIn('id', $skills)->count();
+        if( $has_host_skills > 0 ){
+          $role = 3;
+        } else {
+          $role = 4;
+        }
+
         $user = User::create([
             'name' => $request->input('reg_name'),
             'email' => $request->input('email'),
             'password' => Hash::make($request->input('password')),
-            'role' => 4,
+            'role' => $role,
             'recovery' => substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 ),
             'recovery_expires' => strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60)),
             'country' => $request->input('reg_country'),
@@ -1115,37 +1167,33 @@ class UserController extends Controller
             'gender' => $request->input('reg_gender'),
             'age' => $request->input('reg_age'),
         ]);
-      } catch (\Exception $e) {
-        $error['message'] = 'Failed to create user';
-        return redirect()->back()->withErrors('message', 'User already exists');
+
       }
 
-      if (!is_null($request->input('newsletter')) && $request->input('newsletter') == 1) {
-        //Subscribe to newsletter
+      //Create username for Discourse
+      $name = explode(' ', $user->name);
+      $offset = strlen($user->id) + 1;
+      $user->username = substr( strtolower( preg_replace( '/[^a-zA-Z0-9]+/', '', $name[0] ) ), 0, 20 - $offset ) . '-' . $user->id;
+
+      //Save timestamps
+      $user->consent_gdpr = $timestamp;
+      $user->consent_future_data = $timestamp;
+
+      // // } catch (\Exception $e) {
+      //   $error['message'] = 'Failed to create user';
+      //   return redirect()->back()->withErrors('message', 'User already exists');
+      // }
+
+      if (!is_null($request->input('newsletter')) && $request->input('newsletter') == 1) //Subscribe to newsletter
         $user->newsletter = 1;
-      }
 
-      if (!is_null($request->input('invites')) && $request->input('invites') == 1) {
-        //Subscribe to invites
+      if (!is_null($request->input('invites')) && $request->input('invites') == 1) //Subscribe to invites
         $user->invites = 1;
-      }
-
-      // Let's set a timestamp to get consent
-      $timestamp = date('Y-m-d H:i:s');
-
-      if (!is_null($request->input('consent_gdpr')) && $request->input('consent_gdpr') == 1)
-        $user->consent_gdpr = $timestamp;
-
-      if (!is_null($request->input('consent_past_data')) && $request->input('consent_past_data') == 1)
-        $user->consent_past_data = $timestamp;
-
-      if (!is_null($request->input('consent_future_data')) && $request->input('consent_future_data') == 1)
-        $user->consent_future_data = $timestamp;
 
       // Now determine lat and long values from location field (if provided)
-      if (!is_null($user->location)) {
+      if ( !is_null( $request->input('reg_city') ) ) {
 
-        $json = file_get_contents("http://maps.google.com/maps/api/geocode/json?address=".urlencode($user->location.',United Kingdom')."&sensor=false");
+        $json = file_get_contents("http://maps.google.com/maps/api/geocode/json?address=".urlencode($request->input('reg_city').','.$request->input('reg_country') )."&sensor=false");
         $json = json_decode($json);
 
         if (is_object($json) && !empty($json->{'results'})) {
@@ -1157,8 +1205,6 @@ class UserController extends Controller
       }
 
       $user->save();
-
-      $skills = $request->input('skills');
 
       if (!empty($skills)) {
 
@@ -1178,7 +1224,13 @@ class UserController extends Controller
 
       Session::createSession($user->id);
 
-      return redirect('login');
+      if( Auth::check() ) //Existing users are to update
+        return redirect('dashboard');
+
+      $credentials = $request->only('email', 'password');
+      if (Auth::attempt($credentials))
+          return redirect()->intended('dashboard');
+
 
     }
 }

@@ -50,20 +50,20 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::post('/edit-user', 'UserController@postEdit');
   Route::get('/user/create', 'UserController@create');
   Route::post('/user/create', 'UserController@create');
-  Route::get('/user/all', 'UserController@all');
+  Route::get('/user/all', 'UserController@all')->name('users');
   Route::get('/user/edit/{id}', 'UserController@edit');
   Route::post('/user/edit/{id}', 'UserController@edit');
   Route::post('user/soft-delete', 'UserController@postSoftDeleteUser');
 
   //Test NB: Remove after testing!!
-  Route::get('/test', 'PartyController@test');
+  //Route::get('/test', 'PartyController@test');
 
   //Admin Controller
   Route::get('/admin', 'AdminController@index');
   Route::get('/admin/stats', 'AdminController@stats');
 
   //Category Controller
-  Route::get('/category', 'CategoryController@index');
+  Route::get('/category', 'CategoryController@index')->name('category');
 
   //Dashboard Controller
   Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
@@ -112,12 +112,12 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::post('/party/update-quantity', 'PartyController@updateQuantity');
 
   //Role Controller
-  Route::get('/role', 'RoleController@index');
+  Route::get('/role', 'RoleController@index')->name('roles');
   Route::get('/role/edit/{id}', 'RoleController@edit');
   Route::post('/role/edit/{id}', 'RoleController@edit');
 
   //Brand Controller
-  Route::get('/brands', 'BrandsController@index');
+  Route::get('/brands', 'BrandsController@index')->name('brands');
   Route::get('/brands/create', 'BrandsController@getCreateBrand');
   Route::post('/brands/create', 'BrandsController@postCreateBrand');
   Route::get('/brands/edit/{id}', 'BrandsController@getEditBrand');
@@ -125,7 +125,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::get('/brands/delete/{id}', 'BrandsController@getDeleteBrand');
 
   //Skills Controller
-  Route::get('/skills', 'SkillsController@index');
+  Route::get('/skills', 'SkillsController@index')->name('skills');
   Route::get('/skills/create', 'SkillsController@getCreateSkill');
   Route::post('/skills/create', 'SkillsController@postCreateSkill');
   Route::get('/skills/edit/{id}', 'SkillsController@getEditSkill');
@@ -133,7 +133,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::get('/skills/delete/{id}', 'SkillsController@getDeleteSkill');
 
   //GroupTags Controller
-  Route::get('/tags', 'GroupTagsController@index');
+  Route::get('/tags', 'GroupTagsController@index')->name('tags');
   Route::get('/tags/create', 'GroupTagsController@getCreateTag');
   Route::post('/tags/create', 'GroupTagsController@postCreateTag');
   Route::get('/tags/edit/{id}', 'GroupTagsController@getEditTag');

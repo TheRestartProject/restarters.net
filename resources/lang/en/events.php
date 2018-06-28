@@ -96,6 +96,7 @@ return [
     'field_add_image' => 'Add image',
 
     'before_submit_text' => 'Event will not display on therestartproject.org until approved by a moderator',
+    'save_event' => 'Save Event',
 
     'reporting' => 'Reporting',
     'events-filter' => 'Events filter',

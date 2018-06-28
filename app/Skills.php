@@ -15,7 +15,7 @@ class Skills extends Model
      *
      * @var array
      */
-    protected $fillable = ['skill_name', 'description'];
+    protected $fillable = ['skill_name', 'category', 'description'];
 
     /**
      * The attributes that should be hidden for arrays.

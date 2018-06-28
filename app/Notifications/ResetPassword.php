@@ -16,9 +16,9 @@ class ResetPassword extends Notification
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($arr)
     {
-        //
+        $this->arr = $arr;
     }
 
     /**
@@ -46,7 +46,7 @@ class ResetPassword extends Notification
                     ->subject('Reset password')
                     ->greeting('Hello!')
                     ->line('You are receiving this email because we received a password reset request for your account.')
-                    ->action('Reset password', url('/'))
+                    ->action('Reset password', $this->arr['url'])
                     ->line('If you did not request a password reset, no further action is required.');
     }
 

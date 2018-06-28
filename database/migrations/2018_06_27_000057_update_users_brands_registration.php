@@ -1,5 +1,6 @@
 <?php
 
+use App\Skills;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -14,15 +15,29 @@ class UpdateUsersBrandsRegistration extends Migration
     public function up()
     {
       Schema::table('users', function (Blueprint $table) {
-          $table->timestamp('consent_past_data')->after('consent')->nullable();
-          $table->timestamp('consent_gdpr')->after('consent_past_data')->nullable();
-          $table->renameColumn('consent', 'consent_future_data');
+          $table->timestamp('consent_past_data')->nullable();
+          $table->timestamp('consent_gdpr')->nullable();
+          $table->timestamp('consent_future_data')->nullable();
+          $table->dropColumn('consent');
           $table->string('username', 20);
+          $table->dropColumn('lat');
+          $table->dropColumn('lon');
+          $table->decimal('latitude', 10, 8)->change();
+          $table->decimal('longitude', 10, 8)->change();
       });
 
-      Schema::table('brands', function (Blueprint $table) {
-          $table->integer('category')->nullable();
+      Schema::table('skills', function (Blueprint $table) {
+          $table->integer('category')->after('skill_name')->nullable();
       });
+
+      $a = [1, 2];
+      $skills = Skills::all();
+      foreach( $skills as $skill ){
+        Skills::find($skill->id)->update([
+          'category' => $a[mt_rand(0, count($a) - 1)]
+        ]);
+      }
+
     }
 
     /**
@@ -35,12 +50,26 @@ class UpdateUsersBrandsRegistration extends Migration
       Schema::table('users', function (Blueprint $table) {
           $table->dropColumn('consent_gdpr');
           $table->dropColumn('consent_past_data');
-          $table->renameColumn('consent_future_data', 'consent');
+          $table->dropColumn('consent_future_data');
+          $table->timestamp('consent')->nullable();
           $table->dropColumn('username');
+          $table->integer('lat')->nullable();
+          $table->integer('lon')->nullable();
+          $table->integer('latitude')->change();
+          $table->integer('longitude')->change();
       });
 
-      Schema::table('brands', function (Blueprint $table) {
+      if ( Schema::hasColumn('brands', 'category') ) {
+        Schema::table('brands', function (Blueprint $table){
           $table->dropColumn('category');
-      });
+        });
+      }
+
+      if ( Schema::hasColumn('skills', 'category') ) {
+        Schema::table('skills', function (Blueprint $table) {
+            $table->dropColumn('category');
+        });
+      }
+
     }
 }

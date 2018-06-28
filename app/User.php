@@ -174,7 +174,7 @@ class User extends Authenticatable
         return false;
 
       //Past data is only required for users who created their account prior to the Laravel app launch
-      if( is_null($this->consent_past_data) && strtotime($this->created_at) <= strtotime( date('2018-07-01') ) )
+      if( is_null($this->consent_past_data) && strtotime($this->created_at) <= strtotime( date('2018-06-26') ) )
         return false;
 
       if( is_null($this->consent_gdpr) )

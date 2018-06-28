@@ -40,12 +40,10 @@ class SkillsController extends Controller
     if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
       return redirect('/user/forbidden');
 
-    $name = $request->input('skill-name');
-    $description = $request->input('skill-description');
-
     $skill = Skills::create([
-      'skill_name'  => $name,
-      'description' => $description
+      'skill_name'  => $request->input('skill-name'),
+      'category'    => $request->input('category'),
+      'description' => $request->input('skill-description')
     ]);
 
     return Redirect::to('skills/edit/'.$skill->id);
@@ -71,12 +69,10 @@ class SkillsController extends Controller
     if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
       return redirect('/user/forbidden');
 
-    $name = $request->input('skill-name');
-    $description = $request->input('skill-description');
-
     Skills::find($id)->update([
-      'skill_name'    => $name,
-      'description' => $description
+      'skill_name'  => $request->input('skill-name'),
+      'category'  => $request->input('category'),
+      'description' => $request->input('skill-description')
     ]);
 
     return Redirect::back()->with('message', 'Skill updated!');

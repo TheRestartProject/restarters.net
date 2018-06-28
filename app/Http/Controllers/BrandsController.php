@@ -41,10 +41,8 @@ class BrandsController extends Controller
     if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
       return redirect('/user/forbidden');
 
-    $name = $request->input('brand-name');
-
     $brand = Brands::create([
-      'brand_name'    => $name,
+      'brand_name' => $request->input('brand-name')
     ]);
 
     return Redirect::to('brands/edit/'.$brand->id);
@@ -70,10 +68,8 @@ class BrandsController extends Controller
     if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
       return redirect('/user/forbidden');
 
-    $name = $request->input('brand-name');
-
     Brands::find($id)->update([
-      'brand_name'    => $name,
+      'brand_name' => $request->input('brand-name')
     ]);
 
     return Redirect::back()->with('message', 'Brand updated!');

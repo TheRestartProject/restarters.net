@@ -144,8 +144,10 @@
                 </ul>
                 <h2 id="description">Description</h2>
                 <div class="events__description">
-                    {{ substr(strip_tags($formdata->free_text), 0, 200) }}
-                    <button data-toggle="modal" data-target="#event-description"><span>Read more</span></button>
+                    {{ str_limit(strip_tags($formdata->free_text), 440, '...') }}
+                    @if( strlen($formdata->free_text) > 440 )
+                      <button data-toggle="modal" data-target="#event-description"><span>Read more</span></button>
+                    @endif
                 </div>
                 <h2 id="attendance">Attendance</h2>
                 <ul class="nav nav-tabs" id="events-attendance" role="tablist">

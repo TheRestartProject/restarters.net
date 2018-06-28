@@ -1,7 +1,7 @@
 $('#register-form-submit').on('click', function(e) {
   e.preventDefault();
 
-  if ($('#consent')["0"].checked && $('#consent2')["0"].checked) {
+  if ( $('#consent_gdpr')["0"].checked && $('#consent_future_data')["0"].checked ) {
     $('#register-form').submit();
   } else {
     alert('You must consent to the use of your data in order to register');

@@ -17,7 +17,6 @@
                 @endif
 
                 <h1>@lang('auth.reset_password')</h1>
-                <p>@lang('auth.reset_password_text')</p>
 
                 <form class="" method="post" action="/user/reset?recovery=<?php echo $recovery; ?>">
                     @csrf

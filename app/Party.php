@@ -48,6 +48,7 @@ class Party extends Model
                     `e`.`volunteers`,
                     `e`.`free_text`,
                     `e`.`hours`,
+                    `e`.`wordpress_post_id`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
                 FROM `events` AS `e`
@@ -379,6 +380,30 @@ class Party extends Model
 
     public function attendees(){//Tested
         return DB::select(DB::raw('SELECT SUM(pax) AS pax FROM ' . $this->table));
+    }
+
+    public function getEventDate() {
+
+        return date('d/m/Y', strtotime($this->event_date));
+
+    }
+
+    public function getEventStart() {
+
+        return date('H:i', strtotime($this->start));
+
+    }
+
+    public function getEventEnd() {
+
+        return date('H:i', strtotime($this->end));
+
+    }
+
+    public function getEventStartEnd() {
+
+        return $this->getEventStart() . '-' . $this->getEventEnd();
+
     }
 
 }

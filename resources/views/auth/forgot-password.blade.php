@@ -5,7 +5,7 @@
 
             @include('includes.logo-large')
 
-            <div class="entry-panel">
+            <div class="entry-panel card card__login col-12 mt-5 text-left">
 
                 @if(isset($response))
                   @php( FixometerHelper::printResponse($response) )

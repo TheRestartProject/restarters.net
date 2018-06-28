@@ -466,6 +466,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Http\\Middleware\\TrimStrings' => __DIR__ . '/../..' . '/app/Http/Middleware/TrimStrings.php',
         'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
+        'App\\Http\\Middleware\\VerifyUserConsent' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyUserConsent.php',
         'App\\Images' => __DIR__ . '/../..' . '/app/Images.php',
         'App\\Listeners\\LogSuccessfulLogin' => __DIR__ . '/../..' . '/app/Listeners/LogSuccessfulLogin.php',
         'App\\Notifications\\AccountCreated' => __DIR__ . '/../..' . '/app/Notifications/AccountCreated.php',

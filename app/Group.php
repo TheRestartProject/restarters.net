@@ -47,7 +47,7 @@ class Group extends Model
                 LEFT JOIN `users_groups` AS `ug` ON `g`.`idgroups` = `ug`.`group`
                 LEFT JOIN `users` AS `u` ON `ug`.`user` = `u`.`id`
                 GROUP BY `g`.`idgroups`
-                ORDER BY `g`.`idgroups` ASC'));
+                ORDER BY `g`.`name` ASC'));
       } catch (\Illuminate\Database\QueryException $e) {
           dd($e);
       }

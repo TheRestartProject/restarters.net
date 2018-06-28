@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 13);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -70,8 +70,8 @@
 "use strict";
 
 
-var bind = __webpack_require__(7);
-var isBuffer = __webpack_require__(22);
+var bind = __webpack_require__(6);
+var isBuffer = __webpack_require__(19);
 
 /*global toString:true*/
 
@@ -10746,6 +10746,165 @@ return jQuery;
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var utils = __webpack_require__(0);
+var normalizeHeaderName = __webpack_require__(22);
+
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = __webpack_require__(7);
+  } else if (typeof process !== 'undefined') {
+    // For node use HTTP adapter
+    adapter = __webpack_require__(7);
+  }
+  return adapter;
+}
+
+var defaults = {
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Content-Type');
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data)) {
+      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    /*eslint no-param-reassign:0*/
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) { /* Ignore */ }
+    }
+    return data;
+  }],
+
+  /**
+   * A timeout in milliseconds to abort a request. If set to 0 (default) a
+   * timeout is not created.
+   */
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  }
+};
+
+defaults.headers = {
+  common: {
+    'Accept': 'application/json, text/plain, */*'
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+module.exports = defaults;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13271,178 +13430,10 @@ Popper.Defaults = Defaults;
 /* harmony default export */ __webpack_exports__["default"] = (Popper);
 //# sourceMappingURL=popper.js.map
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(6)))
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-module.exports = function(module) {
-	if(!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {
-
-var utils = __webpack_require__(0);
-var normalizeHeaderName = __webpack_require__(25);
-
-var DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
-
-function setContentTypeIfUnset(headers, value) {
-  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-    headers['Content-Type'] = value;
-  }
-}
-
-function getDefaultAdapter() {
-  var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = __webpack_require__(8);
-  } else if (typeof process !== 'undefined') {
-    // For node use HTTP adapter
-    adapter = __webpack_require__(8);
-  }
-  return adapter;
-}
-
-var defaults = {
-  adapter: getDefaultAdapter(),
-
-  transformRequest: [function transformRequest(data, headers) {
-    normalizeHeaderName(headers, 'Content-Type');
-    if (utils.isFormData(data) ||
-      utils.isArrayBuffer(data) ||
-      utils.isBuffer(data) ||
-      utils.isStream(data) ||
-      utils.isFile(data) ||
-      utils.isBlob(data)
-    ) {
-      return data;
-    }
-    if (utils.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils.isURLSearchParams(data)) {
-      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-      return data.toString();
-    }
-    if (utils.isObject(data)) {
-      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-      return JSON.stringify(data);
-    }
-    return data;
-  }],
-
-  transformResponse: [function transformResponse(data) {
-    /*eslint no-param-reassign:0*/
-    if (typeof data === 'string') {
-      try {
-        data = JSON.parse(data);
-      } catch (e) { /* Ignore */ }
-    }
-    return data;
-  }],
-
-  /**
-   * A timeout in milliseconds to abort a request. If set to 0 (default) a
-   * timeout is not created.
-   */
-  timeout: 0,
-
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-
-  maxContentLength: -1,
-
-  validateStatus: function validateStatus(status) {
-    return status >= 200 && status < 300;
-  }
-};
-
-defaults.headers = {
-  common: {
-    'Accept': 'application/json, text/plain, */*'
-  }
-};
-
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-  defaults.headers[method] = {};
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-});
-
-module.exports = defaults;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
-module.exports = __webpack_amd_options__;
-
-/* WEBPACK VAR INJECTION */}.call(exports, {}))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3)))
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13460,19 +13451,19 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var settle = __webpack_require__(26);
-var buildURL = __webpack_require__(28);
-var parseHeaders = __webpack_require__(29);
-var isURLSameOrigin = __webpack_require__(30);
-var createError = __webpack_require__(9);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(31);
+var settle = __webpack_require__(23);
+var buildURL = __webpack_require__(25);
+var parseHeaders = __webpack_require__(26);
+var isURLSameOrigin = __webpack_require__(27);
+var createError = __webpack_require__(8);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(28);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -13569,7 +13560,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(32);
+      var cookies = __webpack_require__(29);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -13647,13 +13638,13 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var enhanceError = __webpack_require__(27);
+var enhanceError = __webpack_require__(24);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -13672,7 +13663,7 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13684,7 +13675,7 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13710,7 +13701,7 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
@@ -20304,8 +20295,6 @@ function registerGlobalHandlers() {
 // Called when the window resizes
 function onResize(cm) {
   var d = cm.display;
-  if (d.lastWrapHeight == d.wrapper.clientHeight && d.lastWrapWidth == d.wrapper.clientWidth)
-    { return }
   // Might be a text scaling operation, clear size caches.
   d.cachedCharWidth = d.cachedTextHeight = d.cachedPaddingH = null;
   d.scrollbarsClipped = false;
@@ -23405,7 +23394,7 @@ CodeMirror$1.fromTextArea = fromTextArea;
 
 addLegacyProps(CodeMirror$1);
 
-CodeMirror$1.version = "5.38.0";
+CodeMirror$1.version = "5.39.0";
 
 return CodeMirror$1;
 
@@ -23413,15 +23402,15 @@ return CodeMirror$1;
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(14);
-module.exports = __webpack_require__(48);
+__webpack_require__(13);
+module.exports = __webpack_require__(47);
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -23430,14 +23419,14 @@ module.exports = __webpack_require__(48);
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-__webpack_require__(17);
-__webpack_require__(67);
+__webpack_require__(14);
+__webpack_require__(37);
+__webpack_require__(38);
+__webpack_require__(39);
 __webpack_require__(40);
-__webpack_require__(41);
 __webpack_require__(42);
-__webpack_require__(43);
-window.Dropzone = __webpack_require__(44);
-window.Tokenfield = __webpack_require__(45);
+window.Dropzone = __webpack_require__(43);
+window.Tokenfield = __webpack_require__(44);
 
 if (jQuery('.slideshow').length > 0) {
     jQuery('.slideshow').slick({
@@ -23966,17 +23955,15 @@ jQuery(document).ready(function () {
     groupsMap();
 });
 
-__webpack_require__(47);
+__webpack_require__(46);
 
 /***/ }),
-/* 15 */,
-/* 16 */,
-/* 17 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-window._ = __webpack_require__(18);
-window.Popper = __webpack_require__(2).default;
+window._ = __webpack_require__(15);
+window.Popper = __webpack_require__(5).default;
 
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
@@ -23987,7 +23974,7 @@ window.Popper = __webpack_require__(2).default;
 try {
   window.$ = window.jQuery = __webpack_require__(1);
 
-  __webpack_require__(19);
+  __webpack_require__(16);
 } catch (e) {}
 
 /**
@@ -23996,7 +23983,7 @@ try {
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
 
-window.axios = __webpack_require__(20);
+window.axios = __webpack_require__(17);
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
@@ -24032,7 +24019,7 @@ if (token) {
 // });
 
 /***/ }),
-/* 18 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -41142,10 +41129,10 @@ if (token) {
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(3)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(4)(module)))
 
 /***/ }),
-/* 19 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -41154,7 +41141,7 @@ if (token) {
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
   */
 (function (global, factory) {
-   true ? factory(exports, __webpack_require__(1), __webpack_require__(2)) :
+   true ? factory(exports, __webpack_require__(1), __webpack_require__(5)) :
   typeof define === 'function' && define.amd ? define(['exports', 'jquery', 'popper.js'], factory) :
   (factory((global.bootstrap = {}),global.jQuery,global.Popper));
 }(this, (function (exports,$,Popper) { 'use strict';
@@ -45078,22 +45065,22 @@ if (token) {
 
 
 /***/ }),
-/* 20 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(21);
+module.exports = __webpack_require__(18);
 
 /***/ }),
-/* 21 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var bind = __webpack_require__(7);
-var Axios = __webpack_require__(23);
-var defaults = __webpack_require__(4);
+var bind = __webpack_require__(6);
+var Axios = __webpack_require__(20);
+var defaults = __webpack_require__(2);
 
 /**
  * Create an instance of Axios
@@ -45126,15 +45113,15 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(11);
-axios.CancelToken = __webpack_require__(38);
-axios.isCancel = __webpack_require__(10);
+axios.Cancel = __webpack_require__(10);
+axios.CancelToken = __webpack_require__(35);
+axios.isCancel = __webpack_require__(9);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(39);
+axios.spread = __webpack_require__(36);
 
 module.exports = axios;
 
@@ -45143,7 +45130,7 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 22 */
+/* 19 */
 /***/ (function(module, exports) {
 
 /*!
@@ -45170,16 +45157,16 @@ function isSlowBuffer (obj) {
 
 
 /***/ }),
-/* 23 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var defaults = __webpack_require__(4);
+var defaults = __webpack_require__(2);
 var utils = __webpack_require__(0);
-var InterceptorManager = __webpack_require__(33);
-var dispatchRequest = __webpack_require__(34);
+var InterceptorManager = __webpack_require__(30);
+var dispatchRequest = __webpack_require__(31);
 
 /**
  * Create a new instance of Axios
@@ -45256,7 +45243,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 24 */
+/* 21 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -45446,7 +45433,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 25 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45465,13 +45452,13 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 26 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var createError = __webpack_require__(9);
+var createError = __webpack_require__(8);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -45498,7 +45485,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 27 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45526,7 +45513,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
 
 
 /***/ }),
-/* 28 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45599,7 +45586,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 29 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45659,7 +45646,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 30 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45734,7 +45721,7 @@ module.exports = (
 
 
 /***/ }),
-/* 31 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45777,7 +45764,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 32 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45837,7 +45824,7 @@ module.exports = (
 
 
 /***/ }),
-/* 33 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45896,18 +45883,18 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 34 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var transformData = __webpack_require__(35);
-var isCancel = __webpack_require__(10);
-var defaults = __webpack_require__(4);
-var isAbsoluteURL = __webpack_require__(36);
-var combineURLs = __webpack_require__(37);
+var transformData = __webpack_require__(32);
+var isCancel = __webpack_require__(9);
+var defaults = __webpack_require__(2);
+var isAbsoluteURL = __webpack_require__(33);
+var combineURLs = __webpack_require__(34);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -45989,7 +45976,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 35 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46016,7 +46003,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 36 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46037,7 +46024,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 37 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46058,13 +46045,13 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 38 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Cancel = __webpack_require__(11);
+var Cancel = __webpack_require__(10);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -46122,7 +46109,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 39 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46156,7 +46143,240 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 40 */
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/*!
+ * bootstrap-tokenfield 0.12.0
+ * https://github.com/sliptree/bootstrap-tokenfield
+ * Copyright 2013-2014 Sliptree and other contributors; Licensed MIT
+ */
+
+!function (a) {
+   true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (a),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : "object" == (typeof exports === "undefined" ? "undefined" : _typeof(exports)) ? module.exports = global.window && global.window.$ ? a(global.window.$) : function (b) {
+    if (!b.$ && !b.fn) throw new Error("Tokenfield requires a window object with jQuery or a jQuery instance");return a(b.$ || b);
+  } : a(jQuery);
+}(function (a, b) {
+  "use strict";
+  var c = function c(_c, d) {
+    var e = this;this.$element = a(_c), this.textDirection = this.$element.css("direction"), this.options = a.extend(!0, {}, a.fn.tokenfield.defaults, { tokens: this.$element.val() }, this.$element.data(), d), this._delimiters = "string" == typeof this.options.delimiter ? [this.options.delimiter] : this.options.delimiter, this._triggerKeys = a.map(this._delimiters, function (a) {
+      return a.charCodeAt(0);
+    }), this._firstDelimiter = this._delimiters[0];var f = a.inArray(" ", this._delimiters),
+        g = a.inArray("-", this._delimiters);f >= 0 && (this._delimiters[f] = "\\s"), g >= 0 && (delete this._delimiters[g], this._delimiters.unshift("-"));var h = ["\\", "$", "[", "{", "^", ".", "|", "?", "*", "+", "(", ")"];a.each(this._delimiters, function (b, c) {
+      var d = a.inArray(c, h);d >= 0 && (e._delimiters[b] = "\\" + c);
+    });var i,
+        j = b && "function" == typeof b.getMatchedCSSRules ? b.getMatchedCSSRules(_c) : null,
+        k = _c.style.width,
+        l = this.$element.width();j && a.each(j, function (a, b) {
+      b.style.width && (i = b.style.width);
+    });var m = "rtl" === a("body").css("direction") ? "right" : "left",
+        n = { position: this.$element.css("position") };n[m] = this.$element.css(m), this.$element.data("original-styles", n).data("original-tabindex", this.$element.prop("tabindex")).css("position", "absolute").css(m, "-10000px").prop("tabindex", -1), this.$wrapper = a('<div class="tokenfield form-control" />'), this.$element.hasClass("input-lg") && this.$wrapper.addClass("input-lg"), this.$element.hasClass("input-sm") && this.$wrapper.addClass("input-sm"), "rtl" === this.textDirection && this.$wrapper.addClass("rtl");var o = this.$element.prop("id") || new Date().getTime() + "" + Math.floor(100 * (1 + Math.random()));this.$input = a('<input type="text" class="token-input" autocomplete="off" />').appendTo(this.$wrapper).prop("placeholder", this.$element.prop("placeholder")).prop("id", o + "-tokenfield").prop("tabindex", this.$element.data("original-tabindex"));var p = a('label[for="' + this.$element.prop("id") + '"]');if (p.length && p.prop("for", this.$input.prop("id")), this.$copyHelper = a('<input type="text" />').css("position", "absolute").css(m, "-10000px").prop("tabindex", -1).prependTo(this.$wrapper), k ? this.$wrapper.css("width", k) : i ? this.$wrapper.css("width", i) : this.$element.parents(".form-inline").length && this.$wrapper.width(l), (this.$element.prop("disabled") || this.$element.parents("fieldset[disabled]").length) && this.disable(), this.$element.prop("readonly") && this.readonly(), this.$mirror = a('<span style="position:absolute; top:-999px; left:0; white-space:pre;"/>'), this.$input.css("min-width", this.options.minWidth + "px"), a.each(["fontFamily", "fontSize", "fontWeight", "fontStyle", "letterSpacing", "textTransform", "wordSpacing", "textIndent"], function (a, b) {
+      e.$mirror[0].style[b] = e.$input.css(b);
+    }), this.$mirror.appendTo("body"), this.$wrapper.insertBefore(this.$element), this.$element.prependTo(this.$wrapper), this.update(), this.setTokens(this.options.tokens, !1, !1), this.listen(), !a.isEmptyObject(this.options.autocomplete)) {
+      var q = "rtl" === this.textDirection ? "right" : "left",
+          r = a.extend({ minLength: this.options.showAutocompleteOnFocus ? 0 : null, position: { my: q + " top", at: q + " bottom", of: this.$wrapper } }, this.options.autocomplete);this.$input.autocomplete(r);
+    }if (!a.isEmptyObject(this.options.typeahead)) {
+      var s = this.options.typeahead,
+          t = { minLength: this.options.showAutocompleteOnFocus ? 0 : null },
+          u = a.isArray(s) ? s : [s, s];u[0] = a.extend({}, t, u[0]), this.$input.typeahead.apply(this.$input, u), this.typeahead = !0;
+    }this.$element.trigger("tokenfield:initialize");
+  };c.prototype = { constructor: c, createToken: function createToken(b, c) {
+      var d = this;if ("string" == typeof b && (b = { value: b, label: b }), "undefined" == typeof c && (c = !0), b.value = a.trim(b.value), b.label = b.label && b.label.length ? a.trim(b.label) : b.value, !(!b.value.length || !b.label.length || b.label.length <= this.options.minLength || this.options.limit && this.getTokens().length >= this.options.limit)) {
+        var e = a.Event("tokenfield:createtoken", { attrs: b });if (this.$element.trigger(e), e.attrs && !e.isDefaultPrevented()) {
+          var f = a('<div class="token" />').attr("data-value", b.value).append('<span class="token-label" />').append('<a href="#" class="close" tabindex="-1">&times;</a>');this.$input.hasClass("tt-input") ? this.$input.parent().before(f) : this.$input.before(f), this.$input.css("width", this.options.minWidth + "px");var g = f.find(".token-label"),
+              h = f.find(".close");return this.maxTokenWidth || (this.maxTokenWidth = this.$wrapper.width() - h.outerWidth() - parseInt(h.css("margin-left"), 10) - parseInt(h.css("margin-right"), 10) - parseInt(f.css("border-left-width"), 10) - parseInt(f.css("border-right-width"), 10) - parseInt(f.css("padding-left"), 10) - parseInt(f.css("padding-right"), 10), parseInt(g.css("border-left-width"), 10) - parseInt(g.css("border-right-width"), 10) - parseInt(g.css("padding-left"), 10) - parseInt(g.css("padding-right"), 10), parseInt(g.css("margin-left"), 10) - parseInt(g.css("margin-right"), 10)), g.text(b.label).css("max-width", this.maxTokenWidth), f.on("mousedown", function () {
+            return d._disabled || d._readonly ? !1 : (d.preventDeactivation = !0, void 0);
+          }).on("click", function (a) {
+            return d._disabled || d._readonly ? !1 : (d.preventDeactivation = !1, a.ctrlKey || a.metaKey ? (a.preventDefault(), d.toggle(f)) : (d.activate(f, a.shiftKey, a.shiftKey), void 0));
+          }).on("dblclick", function () {
+            return d._disabled || d._readonly || !d.options.allowEditing ? !1 : (d.edit(f), void 0);
+          }), h.on("click", a.proxy(this.remove, this)), this.$element.trigger(a.Event("tokenfield:createdtoken", { attrs: b, relatedTarget: f.get(0) })), c && this.$element.val(this.getTokensList()).trigger(a.Event("change", { initiator: "tokenfield" })), this.update(), this.$element.get(0);
+        }
+      }
+    }, setTokens: function setTokens(b, c, d) {
+      if (b) {
+        c || this.$wrapper.find(".token").remove(), "undefined" == typeof d && (d = !0), "string" == typeof b && (b = this._delimiters.length ? b.split(new RegExp("[" + this._delimiters.join("") + "]")) : [b]);var e = this;return a.each(b, function (a, b) {
+          e.createToken(b, d);
+        }), this.$element.get(0);
+      }
+    }, getTokenData: function getTokenData(b) {
+      var c = b.map(function () {
+        var b = a(this);return { value: b.attr("data-value"), label: b.find(".token-label").text() };
+      }).get();return 1 == c.length && (c = c[0]), c;
+    }, getTokens: function getTokens(b) {
+      var c = this,
+          d = [],
+          e = b ? ".active" : "";return this.$wrapper.find(".token" + e).each(function () {
+        d.push(c.getTokenData(a(this)));
+      }), d;
+    }, getTokensList: function getTokensList(b, c, d) {
+      b = b || this._firstDelimiter, c = "undefined" != typeof c && null !== c ? c : this.options.beautify;var e = b + (c && " " !== b ? " " : "");return a.map(this.getTokens(d), function (a) {
+        return a.value;
+      }).join(e);
+    }, getInput: function getInput() {
+      return this.$input.val();
+    }, listen: function listen() {
+      var c = this;this.$element.on("change", a.proxy(this.change, this)), this.$wrapper.on("mousedown", a.proxy(this.focusInput, this)), this.$input.on("focus", a.proxy(this.focus, this)).on("blur", a.proxy(this.blur, this)).on("paste", a.proxy(this.paste, this)).on("keydown", a.proxy(this.keydown, this)).on("keypress", a.proxy(this.keypress, this)).on("keyup", a.proxy(this.keyup, this)), this.$copyHelper.on("focus", a.proxy(this.focus, this)).on("blur", a.proxy(this.blur, this)).on("keydown", a.proxy(this.keydown, this)).on("keyup", a.proxy(this.keyup, this)), this.$input.on("keypress", a.proxy(this.update, this)).on("keyup", a.proxy(this.update, this)), this.$input.on("autocompletecreate", function () {
+        var b = a(this).data("ui-autocomplete").menu.element,
+            d = c.$wrapper.outerWidth() - parseInt(b.css("border-left-width"), 10) - parseInt(b.css("border-right-width"), 10);b.css("min-width", d + "px");
+      }).on("autocompleteselect", function (a, b) {
+        return c.createToken(b.item) && (c.$input.val(""), c.$input.data("edit") && c.unedit(!0)), !1;
+      }).on("typeahead:selected typeahead:autocompleted", function (a, b) {
+        c.createToken(b) && (c.$input.typeahead("val", ""), c.$input.data("edit") && c.unedit(!0));
+      }), a(b).on("resize", a.proxy(this.update, this));
+    }, keydown: function keydown(b) {
+      function c(a) {
+        if (e.$input.is(document.activeElement)) {
+          if (e.$input.val().length > 0) return;a += "All";var c = e.$input.hasClass("tt-input") ? e.$input.parent()[a](".token:first") : e.$input[a](".token:first");if (!c.length) return;e.preventInputFocus = !0, e.preventDeactivation = !0, e.activate(c), b.preventDefault();
+        } else e[a](b.shiftKey), b.preventDefault();
+      }function d(c) {
+        if (b.shiftKey) {
+          if (e.$input.is(document.activeElement)) {
+            if (e.$input.val().length > 0) return;var d = e.$input.hasClass("tt-input") ? e.$input.parent()[c + "All"](".token:first") : e.$input[c + "All"](".token:first");if (!d.length) return;e.activate(d);
+          }var f = "prev" === c ? "next" : "prev",
+              g = "prev" === c ? "first" : "last";e.firstActiveToken[f + "All"](".token").each(function () {
+            e.deactivate(a(this));
+          }), e.activate(e.$wrapper.find(".token:" + g), !0, !0), b.preventDefault();
+        }
+      }if (this.focused) {
+        var e = this;switch (b.keyCode) {case 8:
+            if (!this.$input.is(document.activeElement)) break;this.lastInputValue = this.$input.val();break;case 37:
+            c("rtl" === this.textDirection ? "next" : "prev");break;case 38:
+            d("prev");break;case 39:
+            c("rtl" === this.textDirection ? "prev" : "next");break;case 40:
+            d("next");break;case 65:
+            if (this.$input.val().length > 0 || !b.ctrlKey && !b.metaKey) break;this.activateAll(), b.preventDefault();break;case 9:case 13:
+            if (this.$input.data("ui-autocomplete") && this.$input.data("ui-autocomplete").menu.element.find("li:has(a.ui-state-focus)").length) break;if (this.$input.hasClass("tt-input") && this.$wrapper.find(".tt-cursor").length) break;if (this.$input.hasClass("tt-input") && this.$wrapper.find(".tt-hint").val().length) break;if (this.$input.is(document.activeElement) && this.$input.val().length || this.$input.data("edit")) return this.createTokensFromInput(b, this.$input.data("edit"));if (13 === b.keyCode) {
+              if (!this.$copyHelper.is(document.activeElement) || 1 !== this.$wrapper.find(".token.active").length) break;if (!e.options.allowEditing) break;this.edit(this.$wrapper.find(".token.active"));
+            }}this.lastKeyDown = b.keyCode;
+      }
+    }, keypress: function keypress(b) {
+      return this.lastKeyPressCode = b.keyCode, this.lastKeyPressCharCode = b.charCode, -1 !== a.inArray(b.charCode, this._triggerKeys) && this.$input.is(document.activeElement) ? (this.$input.val() && this.createTokensFromInput(b), !1) : void 0;
+    }, keyup: function keyup(a) {
+      if (this.preventInputFocus = !1, this.focused) {
+        switch (a.keyCode) {case 8:
+            if (this.$input.is(document.activeElement)) {
+              if (this.$input.val().length || this.lastInputValue.length && 8 === this.lastKeyDown) break;this.preventDeactivation = !0;var b = this.$input.hasClass("tt-input") ? this.$input.parent().prevAll(".token:first") : this.$input.prevAll(".token:first");if (!b.length) break;this.activate(b);
+            } else this.remove(a);break;case 46:
+            this.remove(a, "next");}this.lastKeyUp = a.keyCode;
+      }
+    }, focus: function focus() {
+      this.focused = !0, this.$wrapper.addClass("focus"), this.$input.is(document.activeElement) && (this.$wrapper.find(".active").removeClass("active"), this.$firstActiveToken = null, this.options.showAutocompleteOnFocus && this.search());
+    }, blur: function blur(a) {
+      this.focused = !1, this.$wrapper.removeClass("focus"), this.preventDeactivation || this.$element.is(document.activeElement) || (this.$wrapper.find(".active").removeClass("active"), this.$firstActiveToken = null), !this.preventCreateTokens && (this.$input.data("edit") && !this.$input.is(document.activeElement) || this.options.createTokensOnBlur) && this.createTokensFromInput(a), this.preventDeactivation = !1, this.preventCreateTokens = !1;
+    }, paste: function paste(a) {
+      var b = this;setTimeout(function () {
+        b.createTokensFromInput(a);
+      }, 1);
+    }, change: function change(a) {
+      "tokenfield" !== a.initiator && this.setTokens(this.$element.val());
+    }, createTokensFromInput: function createTokensFromInput(a, b) {
+      if (!(this.$input.val().length < this.options.minLength)) {
+        var c = this.getTokensList();return this.setTokens(this.$input.val(), !0), c == this.getTokensList() && this.$input.val().length ? !1 : (this.$input.hasClass("tt-input") ? this.$input.typeahead("val", "") : this.$input.val(""), this.$input.data("edit") && this.unedit(b), !1);
+      }
+    }, next: function next(a) {
+      if (a) {
+        var b = this.$wrapper.find(".active:first"),
+            c = b && this.$firstActiveToken ? b.index() < this.$firstActiveToken.index() : !1;if (c) return this.deactivate(b);
+      }var d = this.$wrapper.find(".active:last"),
+          e = d.nextAll(".token:first");return e.length ? (this.activate(e, a), void 0) : (this.$input.focus(), void 0);
+    }, prev: function prev(a) {
+      if (a) {
+        var b = this.$wrapper.find(".active:last"),
+            c = b && this.$firstActiveToken ? b.index() > this.$firstActiveToken.index() : !1;if (c) return this.deactivate(b);
+      }var d = this.$wrapper.find(".active:first"),
+          e = d.prevAll(".token:first");return e.length || (e = this.$wrapper.find(".token:first")), e.length || a ? (this.activate(e, a), void 0) : (this.$input.focus(), void 0);
+    }, activate: function activate(b, c, d, e) {
+      if (b) {
+        if ("undefined" == typeof e) var e = !0;if (d) var c = !0;if (this.$copyHelper.focus(), c || (this.$wrapper.find(".active").removeClass("active"), e ? this.$firstActiveToken = b : delete this.$firstActiveToken), d && this.$firstActiveToken) {
+          var f = this.$firstActiveToken.index() - 2,
+              g = b.index() - 2,
+              h = this;this.$wrapper.find(".token").slice(Math.min(f, g) + 1, Math.max(f, g)).each(function () {
+            h.activate(a(this), !0);
+          });
+        }b.addClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select();
+      }
+    }, activateAll: function activateAll() {
+      var b = this;this.$wrapper.find(".token").each(function (c) {
+        b.activate(a(this), 0 !== c, !1, !1);
+      });
+    }, deactivate: function deactivate(a) {
+      a && (a.removeClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select());
+    }, toggle: function toggle(a) {
+      a && (a.toggleClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select());
+    }, edit: function edit(b) {
+      if (b) {
+        var c = { value: b.data("value"), label: b.find(".token-label").text() },
+            d = { attrs: c, relatedTarget: b.get(0) },
+            e = a.Event("tokenfield:edittoken", d);if (this.$element.trigger(e), !e.isDefaultPrevented()) {
+          b.find(".token-label").text(c.value);var f = b.outerWidth(),
+              g = this.$input.hasClass("tt-input") ? this.$input.parent() : this.$input;b.replaceWith(g), this.preventCreateTokens = !0, this.$input.val(c.value).select().data("edit", !0).width(f), this.update(), this.$element.trigger(a.Event("tokenfield:editedtoken", d));
+        }
+      }
+    }, unedit: function unedit(a) {
+      var b = this.$input.hasClass("tt-input") ? this.$input.parent() : this.$input;if (b.appendTo(this.$wrapper), this.$input.data("edit", !1), this.$mirror.text(""), this.update(), a) {
+        var c = this;setTimeout(function () {
+          c.$input.focus();
+        }, 1);
+      }
+    }, remove: function remove(b, c) {
+      if (!(this.$input.is(document.activeElement) || this._disabled || this._readonly)) {
+        var d = "click" === b.type ? a(b.target).closest(".token") : this.$wrapper.find(".token.active");if ("click" !== b.type) {
+          if (!c) var c = "prev";if (this[c](), "prev" === c) var e = 0 === d.first().prevAll(".token:first").length;
+        }var f = { attrs: this.getTokenData(d), relatedTarget: d.get(0) },
+            g = a.Event("tokenfield:removetoken", f);if (this.$element.trigger(g), !g.isDefaultPrevented()) {
+          var h = a.Event("tokenfield:removedtoken", f),
+              i = a.Event("change", { initiator: "tokenfield" });d.remove(), this.$element.val(this.getTokensList()).trigger(h).trigger(i), (!this.$wrapper.find(".token").length || "click" === b.type || e) && this.$input.focus(), this.$input.css("width", this.options.minWidth + "px"), this.update(), b.preventDefault(), b.stopPropagation();
+        }
+      }
+    }, update: function update() {
+      var a = this.$input.val(),
+          b = parseInt(this.$input.css("padding-left"), 10),
+          c = parseInt(this.$input.css("padding-right"), 10),
+          d = b + c;if (this.$input.data("edit")) {
+        if (a || (a = this.$input.prop("placeholder")), a === this.$mirror.text()) return;this.$mirror.text(a);var e = this.$mirror.width() + 10;if (e > this.$wrapper.width()) return this.$input.width(this.$wrapper.width());this.$input.width(e);
+      } else {
+        if (this.$input.css("width", this.options.minWidth + "px"), "rtl" === this.textDirection) return this.$input.width(this.$input.offset().left + this.$input.outerWidth() - this.$wrapper.offset().left - parseInt(this.$wrapper.css("padding-left"), 10) - d - 1);this.$input.width(this.$wrapper.offset().left + this.$wrapper.width() + parseInt(this.$wrapper.css("padding-left"), 10) - this.$input.offset().left - d);
+      }
+    }, focusInput: function focusInput(b) {
+      if (!(a(b.target).closest(".token").length || a(b.target).closest(".token-input").length || a(b.target).closest(".tt-dropdown-menu").length)) {
+        var c = this;setTimeout(function () {
+          c.$input.focus();
+        }, 0);
+      }
+    }, search: function search() {
+      this.$input.data("ui-autocomplete") && this.$input.autocomplete("search");
+    }, disable: function disable() {
+      this.setProperty("disabled", !0);
+    }, enable: function enable() {
+      this.setProperty("disabled", !1);
+    }, readonly: function readonly() {
+      this.setProperty("readonly", !0);
+    }, writeable: function writeable() {
+      this.setProperty("readonly", !1);
+    }, setProperty: function setProperty(a, b) {
+      this["_" + a] = b, this.$input.prop(a, b), this.$element.prop(a, b), this.$wrapper[b ? "addClass" : "removeClass"](a);
+    }, destroy: function destroy() {
+      this.$element.val(this.getTokensList()), this.$element.css(this.$element.data("original-styles")), this.$element.prop("tabindex", this.$element.data("original-tabindex"));var b = a('label[for="' + this.$input.prop("id") + '"]');b.length && b.prop("for", this.$element.prop("id")), this.$element.insertBefore(this.$wrapper), this.$element.removeData("original-styles").removeData("original-tabindex").removeData("bs.tokenfield"), this.$wrapper.remove();var c = this.$element;return delete this, c;
+    } };var d = a.fn.tokenfield;return a.fn.tokenfield = function (b, d) {
+    var e,
+        f = [];Array.prototype.push.apply(f, arguments);var g = this.each(function () {
+      var g = a(this),
+          h = g.data("bs.tokenfield"),
+          i = "object" == (typeof b === "undefined" ? "undefined" : _typeof(b)) && b;"string" == typeof b && h && h[b] ? (f.shift(), e = h[b].apply(h, f)) : h || "string" == typeof b || d || g.data("bs.tokenfield", h = new c(this, i));
+    });return "undefined" != typeof e ? e : g;
+  }, a.fn.tokenfield.defaults = { minWidth: 60, minLength: 0, allowEditing: !0, limit: 0, autocomplete: {}, typeahead: {}, showAutocompleteOnFocus: !1, createTokensOnBlur: !1, delimiter: ",", beautify: !0 }, a.fn.tokenfield.Constructor = c, a.fn.tokenfield.noConflict = function () {
+    return a.fn.tokenfield = d, this;
+  }, c;
+});
+
+/***/ }),
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;/*!
@@ -52012,7 +52232,7 @@ S2.define('jquery.select2',[
 
 
 /***/ }),
-/* 41 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -55032,7 +55252,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 42 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -55658,7 +55878,7 @@ var lists = {
     unique: unique
 };
 
-var isSupportAmd = "function" === 'function' && __webpack_require__(5); // eslint-disable-line
+var isSupportAmd = "function" === 'function' && __webpack_require__(41); // eslint-disable-line
 /**
  * returns whether font is installed or not.
  *
@@ -55699,7 +55919,7 @@ if (!hasCodeMirror && isSupportAmd) {
         try {
             // If CodeMirror can't be resolved, `require.resolve` will throw an
             // exception and `hasCodeMirror` won't be set to `true`.
-            /*require.resolve*/(12);
+            /*require.resolve*/(11);
             hasCodeMirror = true;
         }
         catch (e) {
@@ -59644,7 +59864,7 @@ var Dropzone = /** @class */ (function () {
 var CodeMirror;
 if (env.hasCodeMirror) {
     if (env.isSupportAmd) {
-        new Promise(function(resolve) { resolve(); }).then(function() { var __WEBPACK_AMD_REQUIRE_ARRAY__ = [__webpack_require__(12)]; ((function (cm) {
+        new Promise(function(resolve) { resolve(); }).then(function() { var __WEBPACK_AMD_REQUIRE_ARRAY__ = [__webpack_require__(11)]; ((function (cm) {
             CodeMirror = cm;
         }).apply(null, __WEBPACK_AMD_REQUIRE_ARRAY__));}).catch(__webpack_require__.oe);
     }
@@ -62353,14 +62573,23 @@ $$1.summernote = $$1.extend($$1.summernote, {
 
 
 /***/ }),
-/* 43 */
+/* 41 */
+/***/ (function(module, exports) {
+
+/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
+module.exports = __webpack_amd_options__;
+
+/* WEBPACK VAR INJECTION */}.call(exports, {}))
+
+/***/ }),
+/* 42 */
 /***/ (function(module, exports) {
 
 +function(a){"use strict";function b(a,b){if(!(a instanceof b))throw new TypeError("Cannot call a class as a function")}var c=function(){function a(a,b){for(var c=0;c<b.length;c++){var d=b[c];d.enumerable=d.enumerable||!1,d.configurable=!0,"value"in d&&(d.writable=!0),Object.defineProperty(a,d.key,d)}}return function(b,c,d){return c&&a(b.prototype,c),d&&a(b,d),b}}();(function(a){var d="ekkoLightbox",e=a.fn[d],f={title:"",footer:"",maxWidth:9999,maxHeight:9999,showArrows:!0,wrapping:!0,type:null,alwaysShowClose:!1,loadingMessage:'<div class="ekko-lightbox-loader"><div><div></div><div></div></div></div>',leftArrow:"<span>&#10094;</span>",rightArrow:"<span>&#10095;</span>",strings:{close:"Close",fail:"Failed to load image:",type:"Could not detect remote target type. Force the type using data-type"},doc:document,onShow:function(){},onShown:function(){},onHide:function(){},onHidden:function(){},onNavigate:function(){},onContentLoaded:function(){}},g=function(){function d(c,e){var g=this;b(this,d),this._config=a.extend({},f,e),this._$modalArrows=null,this._galleryIndex=0,this._galleryName=null,this._padding=null,this._border=null,this._titleIsShown=!1,this._footerIsShown=!1,this._wantedWidth=0,this._wantedHeight=0,this._touchstartX=0,this._touchendX=0,this._modalId="ekkoLightbox-"+Math.floor(1e3*Math.random()+1),this._$element=c instanceof jQuery?c:a(c),this._isBootstrap3=3==a.fn.modal.Constructor.VERSION[0];var h='<h4 class="modal-title">'+(this._config.title||"&nbsp;")+"</h4>",i='<button type="button" class="close" data-dismiss="modal" aria-label="'+this._config.strings.close+'"><span aria-hidden="true">&times;</span></button>',j='<div class="modal-header'+(this._config.title||this._config.alwaysShowClose?"":" hide")+'">'+(this._isBootstrap3?i+h:h+i)+"</div>",k='<div class="modal-footer'+(this._config.footer?"":" hide")+'">'+(this._config.footer||"&nbsp;")+"</div>",l='<div class="modal-body"><div class="ekko-lightbox-container"><div class="ekko-lightbox-item fade in show"></div><div class="ekko-lightbox-item fade"></div></div></div>',m='<div class="modal-dialog" role="document"><div class="modal-content">'+j+l+k+"</div></div>";a(this._config.doc.body).append('<div id="'+this._modalId+'" class="ekko-lightbox modal fade" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">'+m+"</div>"),this._$modal=a("#"+this._modalId,this._config.doc),this._$modalDialog=this._$modal.find(".modal-dialog").first(),this._$modalContent=this._$modal.find(".modal-content").first(),this._$modalBody=this._$modal.find(".modal-body").first(),this._$modalHeader=this._$modal.find(".modal-header").first(),this._$modalFooter=this._$modal.find(".modal-footer").first(),this._$lightboxContainer=this._$modalBody.find(".ekko-lightbox-container").first(),this._$lightboxBodyOne=this._$lightboxContainer.find("> div:first-child").first(),this._$lightboxBodyTwo=this._$lightboxContainer.find("> div:last-child").first(),this._border=this._calculateBorders(),this._padding=this._calculatePadding(),this._galleryName=this._$element.data("gallery"),this._galleryName&&(this._$galleryItems=a(document.body).find('*[data-gallery="'+this._galleryName+'"]'),this._galleryIndex=this._$galleryItems.index(this._$element),a(document).on("keydown.ekkoLightbox",this._navigationalBinder.bind(this)),this._config.showArrows&&this._$galleryItems.length>1&&(this._$lightboxContainer.append('<div class="ekko-lightbox-nav-overlay"><a href="#">'+this._config.leftArrow+'</a><a href="#">'+this._config.rightArrow+"</a></div>"),this._$modalArrows=this._$lightboxContainer.find("div.ekko-lightbox-nav-overlay").first(),this._$lightboxContainer.on("click","a:first-child",function(a){return a.preventDefault(),g.navigateLeft()}),this._$lightboxContainer.on("click","a:last-child",function(a){return a.preventDefault(),g.navigateRight()}),this.updateNavigation())),this._$modal.on("show.bs.modal",this._config.onShow.bind(this)).on("shown.bs.modal",function(){return g._toggleLoading(!0),g._handle(),g._config.onShown.call(g)}).on("hide.bs.modal",this._config.onHide.bind(this)).on("hidden.bs.modal",function(){return g._galleryName&&(a(document).off("keydown.ekkoLightbox"),a(window).off("resize.ekkoLightbox")),g._$modal.remove(),g._config.onHidden.call(g)}).modal(this._config),a(window).on("resize.ekkoLightbox",function(){g._resize(g._wantedWidth,g._wantedHeight)}),this._$lightboxContainer.on("touchstart",function(){g._touchstartX=event.changedTouches[0].screenX}).on("touchend",function(){g._touchendX=event.changedTouches[0].screenX,g._swipeGesure()})}return c(d,null,[{key:"Default",get:function(){return f}}]),c(d,[{key:"element",value:function(){return this._$element}},{key:"modal",value:function(){return this._$modal}},{key:"navigateTo",value:function(b){return b<0||b>this._$galleryItems.length-1?this:(this._galleryIndex=b,this.updateNavigation(),this._$element=a(this._$galleryItems.get(this._galleryIndex)),void this._handle())}},{key:"navigateLeft",value:function(){if(this._$galleryItems&&1!==this._$galleryItems.length){if(0===this._galleryIndex){if(!this._config.wrapping)return;this._galleryIndex=this._$galleryItems.length-1}else this._galleryIndex--;return this._config.onNavigate.call(this,"left",this._galleryIndex),this.navigateTo(this._galleryIndex)}}},{key:"navigateRight",value:function(){if(this._$galleryItems&&1!==this._$galleryItems.length){if(this._galleryIndex===this._$galleryItems.length-1){if(!this._config.wrapping)return;this._galleryIndex=0}else this._galleryIndex++;return this._config.onNavigate.call(this,"right",this._galleryIndex),this.navigateTo(this._galleryIndex)}}},{key:"updateNavigation",value:function(){if(!this._config.wrapping){var a=this._$lightboxContainer.find("div.ekko-lightbox-nav-overlay");0===this._galleryIndex?a.find("a:first-child").addClass("disabled"):a.find("a:first-child").removeClass("disabled"),this._galleryIndex===this._$galleryItems.length-1?a.find("a:last-child").addClass("disabled"):a.find("a:last-child").removeClass("disabled")}}},{key:"close",value:function(){return this._$modal.modal("hide")}},{key:"_navigationalBinder",value:function(a){return a=a||window.event,39===a.keyCode?this.navigateRight():37===a.keyCode?this.navigateLeft():void 0}},{key:"_detectRemoteType",value:function(a,b){return b=b||!1,!b&&this._isImage(a)&&(b="image"),!b&&this._getYoutubeId(a)&&(b="youtube"),!b&&this._getVimeoId(a)&&(b="vimeo"),!b&&this._getInstagramId(a)&&(b="instagram"),(!b||["image","youtube","vimeo","instagram","video","url"].indexOf(b)<0)&&(b="url"),b}},{key:"_isImage",value:function(a){return a&&a.match(/(^data:image\/.*,)|(\.(jp(e|g|eg)|gif|png|bmp|webp|svg)((\?|#).*)?$)/i)}},{key:"_containerToUse",value:function(){var a=this,b=this._$lightboxBodyTwo,c=this._$lightboxBodyOne;return this._$lightboxBodyTwo.hasClass("in")&&(b=this._$lightboxBodyOne,c=this._$lightboxBodyTwo),c.removeClass("in show"),setTimeout(function(){a._$lightboxBodyTwo.hasClass("in")||a._$lightboxBodyTwo.empty(),a._$lightboxBodyOne.hasClass("in")||a._$lightboxBodyOne.empty()},500),b.addClass("in show"),b}},{key:"_handle",value:function(){var a=this._containerToUse();this._updateTitleAndFooter();var b=this._$element.attr("data-remote")||this._$element.attr("href"),c=this._detectRemoteType(b,this._$element.attr("data-type")||!1);if(["image","youtube","vimeo","instagram","video","url"].indexOf(c)<0)return this._error(this._config.strings.type);switch(c){case"image":this._preloadImage(b,a),this._preloadImageByIndex(this._galleryIndex,3);break;case"youtube":this._showYoutubeVideo(b,a);break;case"vimeo":this._showVimeoVideo(this._getVimeoId(b),a);break;case"instagram":this._showInstagramVideo(this._getInstagramId(b),a);break;case"video":this._showHtml5Video(b,a);break;default:this._loadRemoteContent(b,a)}return this}},{key:"_getYoutubeId",value:function(a){if(!a)return!1;var b=a.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);return!(!b||11!==b[2].length)&&b[2]}},{key:"_getVimeoId",value:function(a){return!!(a&&a.indexOf("vimeo")>0)&&a}},{key:"_getInstagramId",value:function(a){return!!(a&&a.indexOf("instagram")>0)&&a}},{key:"_toggleLoading",value:function(b){return b=b||!1,b?(this._$modalDialog.css("display","none"),this._$modal.removeClass("in show"),a(".modal-backdrop").append(this._config.loadingMessage)):(this._$modalDialog.css("display","block"),this._$modal.addClass("in show"),a(".modal-backdrop").find(".ekko-lightbox-loader").remove()),this}},{key:"_calculateBorders",value:function(){return{top:this._totalCssByAttribute("border-top-width"),right:this._totalCssByAttribute("border-right-width"),bottom:this._totalCssByAttribute("border-bottom-width"),left:this._totalCssByAttribute("border-left-width")}}},{key:"_calculatePadding",value:function(){return{top:this._totalCssByAttribute("padding-top"),right:this._totalCssByAttribute("padding-right"),bottom:this._totalCssByAttribute("padding-bottom"),left:this._totalCssByAttribute("padding-left")}}},{key:"_totalCssByAttribute",value:function(a){return parseInt(this._$modalDialog.css(a),10)+parseInt(this._$modalContent.css(a),10)+parseInt(this._$modalBody.css(a),10)}},{key:"_updateTitleAndFooter",value:function(){var a=this._$element.data("title")||"",b=this._$element.data("footer")||"";return this._titleIsShown=!1,a||this._config.alwaysShowClose?(this._titleIsShown=!0,this._$modalHeader.css("display","").find(".modal-title").html(a||"&nbsp;")):this._$modalHeader.css("display","none"),this._footerIsShown=!1,b?(this._footerIsShown=!0,this._$modalFooter.css("display","").html(b)):this._$modalFooter.css("display","none"),this}},{key:"_showYoutubeVideo",value:function(a,b){var c=this._getYoutubeId(a),d=a.indexOf("&")>0?a.substr(a.indexOf("&")):"",e=this._$element.data("width")||560,f=this._$element.data("height")||e/(560/315);return this._showVideoIframe("//www.youtube.com/embed/"+c+"?badge=0&autoplay=1&html5=1"+d,e,f,b)}},{key:"_showVimeoVideo",value:function(a,b){var c=this._$element.data("width")||500,d=this._$element.data("height")||c/(560/315);return this._showVideoIframe(a+"?autoplay=1",c,d,b)}},{key:"_showInstagramVideo",value:function(a,b){var c=this._$element.data("width")||612,d=c+80;return a="/"!==a.substr(-1)?a+"/":a,b.html('<iframe width="'+c+'" height="'+d+'" src="'+a+'embed/" frameborder="0" allowfullscreen></iframe>'),this._resize(c,d),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_showVideoIframe",value:function(a,b,c,d){return c=c||b,d.html('<div class="embed-responsive embed-responsive-16by9"><iframe width="'+b+'" height="'+c+'" src="'+a+'" frameborder="0" allowfullscreen class="embed-responsive-item"></iframe></div>'),this._resize(b,c),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_showHtml5Video",value:function(a,b){var c=this._$element.data("width")||560,d=this._$element.data("height")||c/(560/315);return b.html('<div class="embed-responsive embed-responsive-16by9"><video width="'+c+'" height="'+d+'" src="'+a+'" preload="auto" autoplay controls class="embed-responsive-item"></video></div>'),this._resize(c,d),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_loadRemoteContent",value:function(b,c){var d=this,e=this._$element.data("width")||560,f=this._$element.data("height")||560,g=this._$element.data("disableExternalCheck")||!1;return this._toggleLoading(!1),g||this._isExternal(b)?(c.html('<iframe src="'+b+'" frameborder="0" allowfullscreen></iframe>'),this._config.onContentLoaded.call(this)):c.load(b,a.proxy(function(){return d._$element.trigger("loaded.bs.modal")})),this._$modalArrows&&this._$modalArrows.css("display","none"),this._resize(e,f),this}},{key:"_isExternal",value:function(a){var b=a.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);return"string"==typeof b[1]&&b[1].length>0&&b[1].toLowerCase()!==location.protocol||"string"==typeof b[2]&&b[2].length>0&&b[2].replace(new RegExp(":("+{"http:":80,"https:":443}[location.protocol]+")?$"),"")!==location.host}},{key:"_error",value:function(a){return console.error(a),this._containerToUse().html(a),this._resize(300,300),this}},{key:"_preloadImageByIndex",value:function(b,c){if(this._$galleryItems){var d=a(this._$galleryItems.get(b),!1);if("undefined"!=typeof d){var e=d.attr("data-remote")||d.attr("href");return("image"===d.attr("data-type")||this._isImage(e))&&this._preloadImage(e,!1),c>0?this._preloadImageByIndex(b+1,c-1):void 0}}}},{key:"_preloadImage",value:function(b,c){var d=this;c=c||!1;var e=new Image;return c&&!function(){var f=setTimeout(function(){c.append(d._config.loadingMessage)},200);e.onload=function(){f&&clearTimeout(f),f=null;var b=a("<img />");return b.attr("src",e.src),b.addClass("img-fluid"),b.css("width","100%"),c.html(b),d._$modalArrows&&d._$modalArrows.css("display",""),d._resize(e.width,e.height),d._toggleLoading(!1),d._config.onContentLoaded.call(d)},e.onerror=function(){return d._toggleLoading(!1),d._error(d._config.strings.fail+("  "+b))}}(),e.src=b,e}},{key:"_swipeGesure",value:function(){return this._touchendX<this._touchstartX?this.navigateRight():this._touchendX>this._touchstartX?this.navigateLeft():void 0}},{key:"_resize",value:function(b,c){c=c||b,this._wantedWidth=b,this._wantedHeight=c;var d=b/c,e=this._padding.left+this._padding.right+this._border.left+this._border.right,f=this._config.doc.body.clientWidth>575?20:0,g=this._config.doc.body.clientWidth>575?0:20,h=Math.min(b+e,this._config.doc.body.clientWidth-f,this._config.maxWidth);b+e>h?(c=(h-e-g)/d,b=h):b+=e;var i=0,j=0;this._footerIsShown&&(j=this._$modalFooter.outerHeight(!0)||55),this._titleIsShown&&(i=this._$modalHeader.outerHeight(!0)||67);var k=this._padding.top+this._padding.bottom+this._border.bottom+this._border.top,l=parseFloat(this._$modalDialog.css("margin-top"))+parseFloat(this._$modalDialog.css("margin-bottom")),m=Math.min(c,a(window).height()-k-l-i-j,this._config.maxHeight-k-i-j);c>m&&(b=Math.ceil(m*d)+e),this._$lightboxContainer.css("height",m),this._$modalDialog.css("flex",1).css("maxWidth",b);var n=this._$modal.data("bs.modal");if(n)try{n._handleUpdate()}catch(o){n.handleUpdate()}return this}}],[{key:"_jQueryInterface",value:function(b){var c=this;return b=b||{},this.each(function(){var e=a(c),f=a.extend({},d.Default,e.data(),"object"==typeof b&&b);new d(c,f)})}}]),d}();return a.fn[d]=g._jQueryInterface,a.fn[d].Constructor=g,a.fn[d].noConflict=function(){return a.fn[d]=e,g._jQueryInterface},g})(jQuery)}(jQuery);
 //# sourceMappingURL=ekko-lightbox.min.js.map
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65891,10 +66120,10 @@ function __guardMethod__(obj, methodName, transform) {
   }
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports =
@@ -67670,7 +67899,7 @@ exports.default = Tokenfield;
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = __webpack_require__(46);
+module.exports = __webpack_require__(45);
 
 /***/ }),
 /* 3 */
@@ -67729,7 +67958,7 @@ function ajax(params) {
 /******/ ]);
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -68037,13 +68266,13 @@ function isUndefined(arg) {
 
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, exports) {
 
 $('#register-form-submit').on('click', function (e) {
   e.preventDefault();
 
-  if ($('#consent')["0"].checked && $('#consent2')["0"].checked) {
+  if ($('#consent_gdpr')["0"].checked && $('#consent_future_data')["0"].checked) {
     $('#register-form').submit();
   } else {
     alert('You must consent to the use of your data in order to register');
@@ -68313,261 +68542,10 @@ $(document).ready(function () {
 });
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */,
-/* 58 */,
-/* 59 */,
-/* 60 */,
-/* 61 */,
-/* 62 */,
-/* 63 */,
-/* 64 */,
-/* 65 */,
-/* 66 */,
-/* 67 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-/*!
- * bootstrap-tokenfield 0.12.0
- * https://github.com/sliptree/bootstrap-tokenfield
- * Copyright 2013-2014 Sliptree and other contributors; Licensed MIT
- */
-
-!function (a) {
-   true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (a),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : "object" == (typeof exports === "undefined" ? "undefined" : _typeof(exports)) ? module.exports = global.window && global.window.$ ? a(global.window.$) : function (b) {
-    if (!b.$ && !b.fn) throw new Error("Tokenfield requires a window object with jQuery or a jQuery instance");return a(b.$ || b);
-  } : a(jQuery);
-}(function (a, b) {
-  "use strict";
-  var c = function c(_c, d) {
-    var e = this;this.$element = a(_c), this.textDirection = this.$element.css("direction"), this.options = a.extend(!0, {}, a.fn.tokenfield.defaults, { tokens: this.$element.val() }, this.$element.data(), d), this._delimiters = "string" == typeof this.options.delimiter ? [this.options.delimiter] : this.options.delimiter, this._triggerKeys = a.map(this._delimiters, function (a) {
-      return a.charCodeAt(0);
-    }), this._firstDelimiter = this._delimiters[0];var f = a.inArray(" ", this._delimiters),
-        g = a.inArray("-", this._delimiters);f >= 0 && (this._delimiters[f] = "\\s"), g >= 0 && (delete this._delimiters[g], this._delimiters.unshift("-"));var h = ["\\", "$", "[", "{", "^", ".", "|", "?", "*", "+", "(", ")"];a.each(this._delimiters, function (b, c) {
-      var d = a.inArray(c, h);d >= 0 && (e._delimiters[b] = "\\" + c);
-    });var i,
-        j = b && "function" == typeof b.getMatchedCSSRules ? b.getMatchedCSSRules(_c) : null,
-        k = _c.style.width,
-        l = this.$element.width();j && a.each(j, function (a, b) {
-      b.style.width && (i = b.style.width);
-    });var m = "rtl" === a("body").css("direction") ? "right" : "left",
-        n = { position: this.$element.css("position") };n[m] = this.$element.css(m), this.$element.data("original-styles", n).data("original-tabindex", this.$element.prop("tabindex")).css("position", "absolute").css(m, "-10000px").prop("tabindex", -1), this.$wrapper = a('<div class="tokenfield form-control" />'), this.$element.hasClass("input-lg") && this.$wrapper.addClass("input-lg"), this.$element.hasClass("input-sm") && this.$wrapper.addClass("input-sm"), "rtl" === this.textDirection && this.$wrapper.addClass("rtl");var o = this.$element.prop("id") || new Date().getTime() + "" + Math.floor(100 * (1 + Math.random()));this.$input = a('<input type="text" class="token-input" autocomplete="off" />').appendTo(this.$wrapper).prop("placeholder", this.$element.prop("placeholder")).prop("id", o + "-tokenfield").prop("tabindex", this.$element.data("original-tabindex"));var p = a('label[for="' + this.$element.prop("id") + '"]');if (p.length && p.prop("for", this.$input.prop("id")), this.$copyHelper = a('<input type="text" />').css("position", "absolute").css(m, "-10000px").prop("tabindex", -1).prependTo(this.$wrapper), k ? this.$wrapper.css("width", k) : i ? this.$wrapper.css("width", i) : this.$element.parents(".form-inline").length && this.$wrapper.width(l), (this.$element.prop("disabled") || this.$element.parents("fieldset[disabled]").length) && this.disable(), this.$element.prop("readonly") && this.readonly(), this.$mirror = a('<span style="position:absolute; top:-999px; left:0; white-space:pre;"/>'), this.$input.css("min-width", this.options.minWidth + "px"), a.each(["fontFamily", "fontSize", "fontWeight", "fontStyle", "letterSpacing", "textTransform", "wordSpacing", "textIndent"], function (a, b) {
-      e.$mirror[0].style[b] = e.$input.css(b);
-    }), this.$mirror.appendTo("body"), this.$wrapper.insertBefore(this.$element), this.$element.prependTo(this.$wrapper), this.update(), this.setTokens(this.options.tokens, !1, !1), this.listen(), !a.isEmptyObject(this.options.autocomplete)) {
-      var q = "rtl" === this.textDirection ? "right" : "left",
-          r = a.extend({ minLength: this.options.showAutocompleteOnFocus ? 0 : null, position: { my: q + " top", at: q + " bottom", of: this.$wrapper } }, this.options.autocomplete);this.$input.autocomplete(r);
-    }if (!a.isEmptyObject(this.options.typeahead)) {
-      var s = this.options.typeahead,
-          t = { minLength: this.options.showAutocompleteOnFocus ? 0 : null },
-          u = a.isArray(s) ? s : [s, s];u[0] = a.extend({}, t, u[0]), this.$input.typeahead.apply(this.$input, u), this.typeahead = !0;
-    }this.$element.trigger("tokenfield:initialize");
-  };c.prototype = { constructor: c, createToken: function createToken(b, c) {
-      var d = this;if ("string" == typeof b && (b = { value: b, label: b }), "undefined" == typeof c && (c = !0), b.value = a.trim(b.value), b.label = b.label && b.label.length ? a.trim(b.label) : b.value, !(!b.value.length || !b.label.length || b.label.length <= this.options.minLength || this.options.limit && this.getTokens().length >= this.options.limit)) {
-        var e = a.Event("tokenfield:createtoken", { attrs: b });if (this.$element.trigger(e), e.attrs && !e.isDefaultPrevented()) {
-          var f = a('<div class="token" />').attr("data-value", b.value).append('<span class="token-label" />').append('<a href="#" class="close" tabindex="-1">&times;</a>');this.$input.hasClass("tt-input") ? this.$input.parent().before(f) : this.$input.before(f), this.$input.css("width", this.options.minWidth + "px");var g = f.find(".token-label"),
-              h = f.find(".close");return this.maxTokenWidth || (this.maxTokenWidth = this.$wrapper.width() - h.outerWidth() - parseInt(h.css("margin-left"), 10) - parseInt(h.css("margin-right"), 10) - parseInt(f.css("border-left-width"), 10) - parseInt(f.css("border-right-width"), 10) - parseInt(f.css("padding-left"), 10) - parseInt(f.css("padding-right"), 10), parseInt(g.css("border-left-width"), 10) - parseInt(g.css("border-right-width"), 10) - parseInt(g.css("padding-left"), 10) - parseInt(g.css("padding-right"), 10), parseInt(g.css("margin-left"), 10) - parseInt(g.css("margin-right"), 10)), g.text(b.label).css("max-width", this.maxTokenWidth), f.on("mousedown", function () {
-            return d._disabled || d._readonly ? !1 : (d.preventDeactivation = !0, void 0);
-          }).on("click", function (a) {
-            return d._disabled || d._readonly ? !1 : (d.preventDeactivation = !1, a.ctrlKey || a.metaKey ? (a.preventDefault(), d.toggle(f)) : (d.activate(f, a.shiftKey, a.shiftKey), void 0));
-          }).on("dblclick", function () {
-            return d._disabled || d._readonly || !d.options.allowEditing ? !1 : (d.edit(f), void 0);
-          }), h.on("click", a.proxy(this.remove, this)), this.$element.trigger(a.Event("tokenfield:createdtoken", { attrs: b, relatedTarget: f.get(0) })), c && this.$element.val(this.getTokensList()).trigger(a.Event("change", { initiator: "tokenfield" })), this.update(), this.$element.get(0);
-        }
-      }
-    }, setTokens: function setTokens(b, c, d) {
-      if (b) {
-        c || this.$wrapper.find(".token").remove(), "undefined" == typeof d && (d = !0), "string" == typeof b && (b = this._delimiters.length ? b.split(new RegExp("[" + this._delimiters.join("") + "]")) : [b]);var e = this;return a.each(b, function (a, b) {
-          e.createToken(b, d);
-        }), this.$element.get(0);
-      }
-    }, getTokenData: function getTokenData(b) {
-      var c = b.map(function () {
-        var b = a(this);return { value: b.attr("data-value"), label: b.find(".token-label").text() };
-      }).get();return 1 == c.length && (c = c[0]), c;
-    }, getTokens: function getTokens(b) {
-      var c = this,
-          d = [],
-          e = b ? ".active" : "";return this.$wrapper.find(".token" + e).each(function () {
-        d.push(c.getTokenData(a(this)));
-      }), d;
-    }, getTokensList: function getTokensList(b, c, d) {
-      b = b || this._firstDelimiter, c = "undefined" != typeof c && null !== c ? c : this.options.beautify;var e = b + (c && " " !== b ? " " : "");return a.map(this.getTokens(d), function (a) {
-        return a.value;
-      }).join(e);
-    }, getInput: function getInput() {
-      return this.$input.val();
-    }, listen: function listen() {
-      var c = this;this.$element.on("change", a.proxy(this.change, this)), this.$wrapper.on("mousedown", a.proxy(this.focusInput, this)), this.$input.on("focus", a.proxy(this.focus, this)).on("blur", a.proxy(this.blur, this)).on("paste", a.proxy(this.paste, this)).on("keydown", a.proxy(this.keydown, this)).on("keypress", a.proxy(this.keypress, this)).on("keyup", a.proxy(this.keyup, this)), this.$copyHelper.on("focus", a.proxy(this.focus, this)).on("blur", a.proxy(this.blur, this)).on("keydown", a.proxy(this.keydown, this)).on("keyup", a.proxy(this.keyup, this)), this.$input.on("keypress", a.proxy(this.update, this)).on("keyup", a.proxy(this.update, this)), this.$input.on("autocompletecreate", function () {
-        var b = a(this).data("ui-autocomplete").menu.element,
-            d = c.$wrapper.outerWidth() - parseInt(b.css("border-left-width"), 10) - parseInt(b.css("border-right-width"), 10);b.css("min-width", d + "px");
-      }).on("autocompleteselect", function (a, b) {
-        return c.createToken(b.item) && (c.$input.val(""), c.$input.data("edit") && c.unedit(!0)), !1;
-      }).on("typeahead:selected typeahead:autocompleted", function (a, b) {
-        c.createToken(b) && (c.$input.typeahead("val", ""), c.$input.data("edit") && c.unedit(!0));
-      }), a(b).on("resize", a.proxy(this.update, this));
-    }, keydown: function keydown(b) {
-      function c(a) {
-        if (e.$input.is(document.activeElement)) {
-          if (e.$input.val().length > 0) return;a += "All";var c = e.$input.hasClass("tt-input") ? e.$input.parent()[a](".token:first") : e.$input[a](".token:first");if (!c.length) return;e.preventInputFocus = !0, e.preventDeactivation = !0, e.activate(c), b.preventDefault();
-        } else e[a](b.shiftKey), b.preventDefault();
-      }function d(c) {
-        if (b.shiftKey) {
-          if (e.$input.is(document.activeElement)) {
-            if (e.$input.val().length > 0) return;var d = e.$input.hasClass("tt-input") ? e.$input.parent()[c + "All"](".token:first") : e.$input[c + "All"](".token:first");if (!d.length) return;e.activate(d);
-          }var f = "prev" === c ? "next" : "prev",
-              g = "prev" === c ? "first" : "last";e.firstActiveToken[f + "All"](".token").each(function () {
-            e.deactivate(a(this));
-          }), e.activate(e.$wrapper.find(".token:" + g), !0, !0), b.preventDefault();
-        }
-      }if (this.focused) {
-        var e = this;switch (b.keyCode) {case 8:
-            if (!this.$input.is(document.activeElement)) break;this.lastInputValue = this.$input.val();break;case 37:
-            c("rtl" === this.textDirection ? "next" : "prev");break;case 38:
-            d("prev");break;case 39:
-            c("rtl" === this.textDirection ? "prev" : "next");break;case 40:
-            d("next");break;case 65:
-            if (this.$input.val().length > 0 || !b.ctrlKey && !b.metaKey) break;this.activateAll(), b.preventDefault();break;case 9:case 13:
-            if (this.$input.data("ui-autocomplete") && this.$input.data("ui-autocomplete").menu.element.find("li:has(a.ui-state-focus)").length) break;if (this.$input.hasClass("tt-input") && this.$wrapper.find(".tt-cursor").length) break;if (this.$input.hasClass("tt-input") && this.$wrapper.find(".tt-hint").val().length) break;if (this.$input.is(document.activeElement) && this.$input.val().length || this.$input.data("edit")) return this.createTokensFromInput(b, this.$input.data("edit"));if (13 === b.keyCode) {
-              if (!this.$copyHelper.is(document.activeElement) || 1 !== this.$wrapper.find(".token.active").length) break;if (!e.options.allowEditing) break;this.edit(this.$wrapper.find(".token.active"));
-            }}this.lastKeyDown = b.keyCode;
-      }
-    }, keypress: function keypress(b) {
-      return this.lastKeyPressCode = b.keyCode, this.lastKeyPressCharCode = b.charCode, -1 !== a.inArray(b.charCode, this._triggerKeys) && this.$input.is(document.activeElement) ? (this.$input.val() && this.createTokensFromInput(b), !1) : void 0;
-    }, keyup: function keyup(a) {
-      if (this.preventInputFocus = !1, this.focused) {
-        switch (a.keyCode) {case 8:
-            if (this.$input.is(document.activeElement)) {
-              if (this.$input.val().length || this.lastInputValue.length && 8 === this.lastKeyDown) break;this.preventDeactivation = !0;var b = this.$input.hasClass("tt-input") ? this.$input.parent().prevAll(".token:first") : this.$input.prevAll(".token:first");if (!b.length) break;this.activate(b);
-            } else this.remove(a);break;case 46:
-            this.remove(a, "next");}this.lastKeyUp = a.keyCode;
-      }
-    }, focus: function focus() {
-      this.focused = !0, this.$wrapper.addClass("focus"), this.$input.is(document.activeElement) && (this.$wrapper.find(".active").removeClass("active"), this.$firstActiveToken = null, this.options.showAutocompleteOnFocus && this.search());
-    }, blur: function blur(a) {
-      this.focused = !1, this.$wrapper.removeClass("focus"), this.preventDeactivation || this.$element.is(document.activeElement) || (this.$wrapper.find(".active").removeClass("active"), this.$firstActiveToken = null), !this.preventCreateTokens && (this.$input.data("edit") && !this.$input.is(document.activeElement) || this.options.createTokensOnBlur) && this.createTokensFromInput(a), this.preventDeactivation = !1, this.preventCreateTokens = !1;
-    }, paste: function paste(a) {
-      var b = this;setTimeout(function () {
-        b.createTokensFromInput(a);
-      }, 1);
-    }, change: function change(a) {
-      "tokenfield" !== a.initiator && this.setTokens(this.$element.val());
-    }, createTokensFromInput: function createTokensFromInput(a, b) {
-      if (!(this.$input.val().length < this.options.minLength)) {
-        var c = this.getTokensList();return this.setTokens(this.$input.val(), !0), c == this.getTokensList() && this.$input.val().length ? !1 : (this.$input.hasClass("tt-input") ? this.$input.typeahead("val", "") : this.$input.val(""), this.$input.data("edit") && this.unedit(b), !1);
-      }
-    }, next: function next(a) {
-      if (a) {
-        var b = this.$wrapper.find(".active:first"),
-            c = b && this.$firstActiveToken ? b.index() < this.$firstActiveToken.index() : !1;if (c) return this.deactivate(b);
-      }var d = this.$wrapper.find(".active:last"),
-          e = d.nextAll(".token:first");return e.length ? (this.activate(e, a), void 0) : (this.$input.focus(), void 0);
-    }, prev: function prev(a) {
-      if (a) {
-        var b = this.$wrapper.find(".active:last"),
-            c = b && this.$firstActiveToken ? b.index() > this.$firstActiveToken.index() : !1;if (c) return this.deactivate(b);
-      }var d = this.$wrapper.find(".active:first"),
-          e = d.prevAll(".token:first");return e.length || (e = this.$wrapper.find(".token:first")), e.length || a ? (this.activate(e, a), void 0) : (this.$input.focus(), void 0);
-    }, activate: function activate(b, c, d, e) {
-      if (b) {
-        if ("undefined" == typeof e) var e = !0;if (d) var c = !0;if (this.$copyHelper.focus(), c || (this.$wrapper.find(".active").removeClass("active"), e ? this.$firstActiveToken = b : delete this.$firstActiveToken), d && this.$firstActiveToken) {
-          var f = this.$firstActiveToken.index() - 2,
-              g = b.index() - 2,
-              h = this;this.$wrapper.find(".token").slice(Math.min(f, g) + 1, Math.max(f, g)).each(function () {
-            h.activate(a(this), !0);
-          });
-        }b.addClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select();
-      }
-    }, activateAll: function activateAll() {
-      var b = this;this.$wrapper.find(".token").each(function (c) {
-        b.activate(a(this), 0 !== c, !1, !1);
-      });
-    }, deactivate: function deactivate(a) {
-      a && (a.removeClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select());
-    }, toggle: function toggle(a) {
-      a && (a.toggleClass("active"), this.$copyHelper.val(this.getTokensList(null, null, !0)).select());
-    }, edit: function edit(b) {
-      if (b) {
-        var c = { value: b.data("value"), label: b.find(".token-label").text() },
-            d = { attrs: c, relatedTarget: b.get(0) },
-            e = a.Event("tokenfield:edittoken", d);if (this.$element.trigger(e), !e.isDefaultPrevented()) {
-          b.find(".token-label").text(c.value);var f = b.outerWidth(),
-              g = this.$input.hasClass("tt-input") ? this.$input.parent() : this.$input;b.replaceWith(g), this.preventCreateTokens = !0, this.$input.val(c.value).select().data("edit", !0).width(f), this.update(), this.$element.trigger(a.Event("tokenfield:editedtoken", d));
-        }
-      }
-    }, unedit: function unedit(a) {
-      var b = this.$input.hasClass("tt-input") ? this.$input.parent() : this.$input;if (b.appendTo(this.$wrapper), this.$input.data("edit", !1), this.$mirror.text(""), this.update(), a) {
-        var c = this;setTimeout(function () {
-          c.$input.focus();
-        }, 1);
-      }
-    }, remove: function remove(b, c) {
-      if (!(this.$input.is(document.activeElement) || this._disabled || this._readonly)) {
-        var d = "click" === b.type ? a(b.target).closest(".token") : this.$wrapper.find(".token.active");if ("click" !== b.type) {
-          if (!c) var c = "prev";if (this[c](), "prev" === c) var e = 0 === d.first().prevAll(".token:first").length;
-        }var f = { attrs: this.getTokenData(d), relatedTarget: d.get(0) },
-            g = a.Event("tokenfield:removetoken", f);if (this.$element.trigger(g), !g.isDefaultPrevented()) {
-          var h = a.Event("tokenfield:removedtoken", f),
-              i = a.Event("change", { initiator: "tokenfield" });d.remove(), this.$element.val(this.getTokensList()).trigger(h).trigger(i), (!this.$wrapper.find(".token").length || "click" === b.type || e) && this.$input.focus(), this.$input.css("width", this.options.minWidth + "px"), this.update(), b.preventDefault(), b.stopPropagation();
-        }
-      }
-    }, update: function update() {
-      var a = this.$input.val(),
-          b = parseInt(this.$input.css("padding-left"), 10),
-          c = parseInt(this.$input.css("padding-right"), 10),
-          d = b + c;if (this.$input.data("edit")) {
-        if (a || (a = this.$input.prop("placeholder")), a === this.$mirror.text()) return;this.$mirror.text(a);var e = this.$mirror.width() + 10;if (e > this.$wrapper.width()) return this.$input.width(this.$wrapper.width());this.$input.width(e);
-      } else {
-        if (this.$input.css("width", this.options.minWidth + "px"), "rtl" === this.textDirection) return this.$input.width(this.$input.offset().left + this.$input.outerWidth() - this.$wrapper.offset().left - parseInt(this.$wrapper.css("padding-left"), 10) - d - 1);this.$input.width(this.$wrapper.offset().left + this.$wrapper.width() + parseInt(this.$wrapper.css("padding-left"), 10) - this.$input.offset().left - d);
-      }
-    }, focusInput: function focusInput(b) {
-      if (!(a(b.target).closest(".token").length || a(b.target).closest(".token-input").length || a(b.target).closest(".tt-dropdown-menu").length)) {
-        var c = this;setTimeout(function () {
-          c.$input.focus();
-        }, 0);
-      }
-    }, search: function search() {
-      this.$input.data("ui-autocomplete") && this.$input.autocomplete("search");
-    }, disable: function disable() {
-      this.setProperty("disabled", !0);
-    }, enable: function enable() {
-      this.setProperty("disabled", !1);
-    }, readonly: function readonly() {
-      this.setProperty("readonly", !0);
-    }, writeable: function writeable() {
-      this.setProperty("readonly", !1);
-    }, setProperty: function setProperty(a, b) {
-      this["_" + a] = b, this.$input.prop(a, b), this.$element.prop(a, b), this.$wrapper[b ? "addClass" : "removeClass"](a);
-    }, destroy: function destroy() {
-      this.$element.val(this.getTokensList()), this.$element.css(this.$element.data("original-styles")), this.$element.prop("tabindex", this.$element.data("original-tabindex"));var b = a('label[for="' + this.$input.prop("id") + '"]');b.length && b.prop("for", this.$element.prop("id")), this.$element.insertBefore(this.$wrapper), this.$element.removeData("original-styles").removeData("original-tabindex").removeData("bs.tokenfield"), this.$wrapper.remove();var c = this.$element;return delete this, c;
-    } };var d = a.fn.tokenfield;return a.fn.tokenfield = function (b, d) {
-    var e,
-        f = [];Array.prototype.push.apply(f, arguments);var g = this.each(function () {
-      var g = a(this),
-          h = g.data("bs.tokenfield"),
-          i = "object" == (typeof b === "undefined" ? "undefined" : _typeof(b)) && b;"string" == typeof b && h && h[b] ? (f.shift(), e = h[b].apply(h, f)) : h || "string" == typeof b || d || g.data("bs.tokenfield", h = new c(this, i));
-    });return "undefined" != typeof e ? e : g;
-  }, a.fn.tokenfield.defaults = { minWidth: 60, minLength: 0, allowEditing: !0, limit: 0, autocomplete: {}, typeahead: {}, showAutocompleteOnFocus: !1, createTokensOnBlur: !1, delimiter: ",", beautify: !0 }, a.fn.tokenfield.Constructor = c, a.fn.tokenfield.noConflict = function () {
-    return a.fn.tokenfield = d, this;
-  }, c;
-});
 
 /***/ })
 /******/ ]);

@@ -41,12 +41,6 @@ class FixometerHelper {
 
   }
 
-  public static function allSkills() {
-
-    return Skills::all();
-
-  }
-
   /** checks if user has a role **/
   public static function hasRole($user, $role){
 
@@ -589,7 +583,22 @@ class FixometerHelper {
 
   }
 
+  public static function skillCategories() {
+
+    return [
+      '1' => 'Organising Skills',
+      '2' => 'Technical Skills',
+    ];
+
+  }
+
+  public static function allSkills() {
+
+    $return[1] = Skills::where('category', 1)->get();
+    $return[2] = Skills::where('category', 2)->get();
+
+    return $return;
+
+  }
 
 }
-
-?>
