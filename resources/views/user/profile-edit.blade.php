@@ -6,7 +6,7 @@
         <div class="d-flex justify-content-between">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="{{ url('/') }}">FIXOMETER</a></li>
+              <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
               <li class="breadcrumb-item active" aria-current="page">@lang('profile.edit_profile')</li>
             </ol>
           </nav>

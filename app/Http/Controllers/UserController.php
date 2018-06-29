@@ -13,7 +13,7 @@ use App\Party;
 use App\UserGroups;
 use App\UsersSkills;
 use App\Skills;
-use App\Session;
+//use App\Session;
 use App\Http\Controllers\PartyController;
 
 // use Illuminate\Support\Facades\Notifications;
@@ -634,8 +634,8 @@ class UserController extends Controller
                             $Usersgroups->createUsersGroups($idUser, $groups);
                         }
 
-                        $Session = new Session;
-                        $Session->createSession($idUser);
+                        //$Session = new Session;
+                        //$Session->createSession($idUser);
 
                         if(isset($_FILES) && !empty($_FILES)){
                             $file = new FixometerFile;
@@ -926,8 +926,8 @@ class UserController extends Controller
                     $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
 
                     // Delete Session
-                    $session = new Session;
-                    $session->destroySession($id);
+                    //$session = new Session;
+                    //$session->destroySession($id);
 
                     if($this->User->delete($id)) {
                         header('Location: /user/all?msg=ok');
@@ -1105,7 +1105,7 @@ class UserController extends Controller
         $PartyController->confirmInvite($request->input('event'), $request->input('invite'), $user->id);
       }
 
-      Session::createSession($user->id);
+      //Session::createSession($user->id);
 
       if( Auth::check() ) //Existing users are to update
         return redirect('dashboard');

@@ -104,41 +104,31 @@ class PartyController extends Controller
       //
       // }
 
-      $upcoming = Party::whereNotNull('wordpress_post_id')
-                    ->whereDate('event_date', '>=', date('Y-m-d'))
-                      ->get();
+      $moderate_events = null;
 
-      $past = Party::whereNotNull('wordpress_post_id')
-                    ->whereDate('event_date', '<', date('Y-m-d'))
-                      ->get();
+      if( FixometerHelper::hasRole(Auth::user(), 'Administrator') ) {
 
-      if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') ){
-
-        $moderate = Party::whereNull('wordpress_post_id')
+        $moderate_events = Party::whereNull('wordpress_post_id')
                       ->whereDate('event_date', '>=', date('Y-m-d'))
                         ->get();
 
-      } elseif( !FixometerHelper::hasRole(Auth::user(), 'Host') ){
-
-        $moderate = Party::whereNull('wordpress_post_id')
-                      //->where('user_id', Auth::user()->id)
-                        ->whereDate('event_date', '>=', date('Y-m-d'))
-                          ->get();
-
-      } else {
-
-        $moderate = null;
-
       }
 
+      $upcoming_events = Party::whereNotNull('wordpress_post_id')
+                    ->whereDate('event_date', '>=', date('Y-m-d'))
+                      ->get();
+
+      $past_events = Party::whereNotNull('wordpress_post_id')
+                    ->whereDate('event_date', '<', date('Y-m-d'))
+                      ->paginate(env('PAGINATE'));
 
       return view('events.index', [ //party.index
         'title'     => 'Events',
         //'list'      => $Party->findAll(),
         //'user'      => $user,
-        'upcoming'  => $upcoming,
-        'past'      => $past,
-        'moderate'  => $moderate,
+        'upcoming_events'  => $upcoming_events,
+        'past_events'      => $past_events,
+        'moderate_events'  => $moderate_events,
       ]);
   }
 

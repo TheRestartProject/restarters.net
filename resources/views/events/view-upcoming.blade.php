@@ -16,7 +16,7 @@
                 <p>Hosted by <a href="">The Mighty Restarters</a>, East of England, United Kingdom</p>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">FIXOMETER</a></li>
+                        <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/') }}/groups">@lang('groups.groups')</a></li>
                         <li class="breadcrumb-item active" aria-current="page">The Mighty Restarters</li>
                     </ol>

@@ -5,7 +5,7 @@
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url('/') }}">FIXOMETER</a></li>
+            <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
             <li class="breadcrumb-item"><a href="{{ url('/role') }}">ROLES</a></li>
             <li class="breadcrumb-item active" aria-current="page">EDIT ROLE</li>
           </ol>

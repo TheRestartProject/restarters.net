@@ -406,4 +406,41 @@ class Party extends Model
 
     }
 
+    public function isUpcoming() {
+
+        $date_now     = new \DateTime();
+        $event_start  = new \DateTime($this->event_date.' '.$this->start);
+
+        if ( $date_now < $event_start )
+          return true;
+        else
+          return false;
+
+    }
+
+    public function isInProgress() {
+
+        $date_now     = new \DateTime();
+        $event_start  = new \DateTime($this->event_date.' '.$this->start);
+        $event_end    = new \DateTime($this->event_date.' '.$this->end);
+
+        if ( $event_start >= $date_now && $event_end <= $date_now )
+          return true;
+        else
+          return false;
+
+    }
+
+    public function hasFinished() {
+
+        $date_now     = new \DateTime();
+        $event_end    = new \DateTime($this->event_date.' '.$this->end);
+
+        if ( $date_now > $event_end )
+          return true;
+        else
+          return false;
+
+    }
+
 }

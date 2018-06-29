@@ -107,10 +107,9 @@ class User extends Authenticatable
 
     public function getUserList() {//Tested!
 
-        $Users = DB::select(DB::raw('SELECT users.id AS id, users.name, users.email, roles.role, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at FROM users
+        $Users = DB::select(DB::raw('SELECT users.id AS id, users.name, users.email, roles.role FROM users
                 INNER JOIN roles ON roles.idroles = users.role
-                INNER JOIN sessions ON sessions.user = users.id
-                ORDER BY users.id ASC'));
+                ORDER BY users.id ASC')); //INNER JOIN sessions ON sessions.user = users.id, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at
 
         if(is_array($Users)){
 

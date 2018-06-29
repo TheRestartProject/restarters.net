@@ -6,7 +6,7 @@
         <div class="d-flex justify-content-between">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="{{ url('/') }}">FIXOMETER</a></li>
+              <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
               <li class="breadcrumb-item active" aria-current="page">USERS</li>
             </ol>
           </nav>
@@ -108,7 +108,7 @@
                   <td><?php echo $u->role; ?></td>
                   <td><?php echo 'London';//echo $u->location; ?></td>
                   <td><?php echo 'Group';//echo $u->groups; ?></td>
-                  <td data-value="<?php echo $u->modified_at; ?>" ><?php echo FixometerHelper::dateFormat($u->modified_at); ?></td>
+                  <td data-value="<?php //echo $u->modified_at; ?>" ><?php //echo FixometerHelper::dateFormat($u->modified_at); ?></td>
               </tr>
               @endforeach
             </tbody>
