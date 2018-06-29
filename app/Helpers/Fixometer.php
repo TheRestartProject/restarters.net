@@ -83,7 +83,7 @@ class FixometerHelper {
         return true;
       } else {
         if (FixometerHelper::hasRole(Auth::user(), 'Host')) {
-          if (empty(DB::table('event_users')->where('event', $partyId)->where('user', $userId)->first())) {
+          if (empty(DB::table('events_users')->where('event', $partyId)->where('user', $userId)->first())) {
             return false;
           } else {
             return true;

@@ -54,7 +54,7 @@ return [
     'create_event' => 'Create event',
     'edit_event' => 'Edit event',
     'edit_event_content' => 'Go ahead and change or improve your event information.',
-    'events_title_admin' => 'Events to moderate (admin only)',
+    'events_title_admin' => 'Events to moderate',
     'past_events' => 'Past events',
     'upcoming_events' => 'Upcoming events',
 

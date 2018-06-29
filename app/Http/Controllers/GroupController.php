@@ -260,7 +260,7 @@ class GroupController extends Controller
       $user = Auth::user();
       $Group = new Group;
 
-      if(FixometerHelper::hasRole($user, 'Administrator') || hasRole($user, 'Host')){
+      if( FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host') ){
 
           if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
 

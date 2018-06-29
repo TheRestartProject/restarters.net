@@ -110,7 +110,7 @@ jQuery('.btn-next').on('click',formProcess);
 jQuery('.registration__prev').on('click', formProcessPrev);
 
 function onboarding() {
-    if ( jQuery('body.onboarding').length > 0 ) { 
+    if ( jQuery('body.onboarding').length > 0 ) {
 
         jQuery('#onboarding').modal('show');
 
@@ -464,23 +464,52 @@ function loadDropzones() {
 
     if (jQuery("#dropzoneEl").length > 0 ) {
 
-        var field1 = jQuery('#dropzoneEl').data('field1');
-        var field2 = jQuery('#dropzoneEl').data('field2');
+        var field1 = jQuery('.dropzone').data('field1');
+        var field2 = jQuery('.dropzone').data('field2');
 
         var instanceDropzone = new Dropzone("#dropzoneEl", {
-            init: function () {
-                jQuery(".dz-message").find('span').text(field1);
-                jQuery(".dz-message").append('<small>' + field2 + '</small>');
-            },
+            autoProcessQueue: false,
             paramName: "file", // The name that will be used to transfer the file
             maxFilesize: 2,
+            parallelUploads: 100,
             uploadMultiple: true,
             createImageThumbnails: true,
             thumbnailWidth: 70,
             thumbnailHeight: 60,
             thumbnailMethod: "contain",
             addRemoveLinks: true,
-            previewsContainer: ".previews"
+            previewsContainer: ".previews",
+            init: function () {
+
+                jQuery(".dropzone .dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
+
+                var myDropzone = this;
+
+                // First change the button to actually tell Dropzone to process the queue.
+                this.element.querySelector("input[type=submit]").addEventListener("click", function(e) {
+                  // Make sure that the form isn't actually being sent.
+                  e.preventDefault();
+                  e.stopPropagation();
+                  myDropzone.processQueue();
+                });
+
+                // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead
+                // of the sending event because uploadMultiple is set to true.
+                this.on("sendingmultiple", function() {
+                  // Gets triggered when the form is actually being sent.
+                  // Hide the success button or the complete form.
+                });
+                this.on("successmultiple", function(files, response) {
+                  // Gets triggered when the files have successfully been sent.
+                  // Redirect user or notify of success.
+                  
+                });
+                this.on("errormultiple", function(files, response) {
+                  // Gets triggered when there was an error sending the files.
+                  // Maybe show form again, and notify user of error
+                });
+
+            }
         });
 
     }

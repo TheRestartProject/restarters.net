@@ -110,17 +110,27 @@ class PartyController extends Controller
 
         $moderate_events = Party::whereNull('wordpress_post_id')
                       ->whereDate('event_date', '>=', date('Y-m-d'))
+                      ->orderBy('event_date', 'ASC')
                         ->get();
 
       }
 
-      $upcoming_events = Party::whereNotNull('wordpress_post_id')
-                    ->whereDate('event_date', '>=', date('Y-m-d'))
-                      ->get();
+      $upcoming_events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+                    ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+                      ->whereDate('event_date', '>=', date('Y-m-d'))
+                        ->where('users_groups.user', Auth::user()->id)
+                          ->select('events.*')
+                            ->orderBy('wordpress_post_id', 'ASC')
+                              ->orderBy('event_date', 'ASC')
+                                ->take(5)
+                                  ->get();
 
       $past_events = Party::whereNotNull('wordpress_post_id')
                     ->whereDate('event_date', '<', date('Y-m-d'))
+                    ->orderBy('event_date', 'DESC')
                       ->paginate(env('PAGINATE'));
+
+      $user_groups = UserGroups::where('user', Auth::user()->id)->count();
 
       return view('events.index', [ //party.index
         'title'     => 'Events',
@@ -129,6 +139,7 @@ class PartyController extends Controller
         'upcoming_events'  => $upcoming_events,
         'past_events'      => $past_events,
         'moderate_events'  => $moderate_events,
+        'user_groups'      => $user_groups,
       ]);
   }
 
@@ -136,7 +147,7 @@ class PartyController extends Controller
   {
       $user = Auth::user();
 
-      if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') || !FixometerHelper::hasRole(Auth::user(), 'Host') )
+      if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') && !FixometerHelper::hasRole(Auth::user(), 'Host') )
         return redirect('/user/forbidden');
 
       $Groups = new Group;
@@ -154,6 +165,7 @@ class PartyController extends Controller
       // $this->set('group_list', $Groups->findAll());
 
       if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
+
           $error = array();
 
           // Add SuperHero Restarter!
@@ -339,9 +351,10 @@ class PartyController extends Controller
           }
 
           if(is_numeric($idParty)){
+
             return redirect('/party/edit/'.$idParty)->with('response', $response);
+
           } else {
-            $host_ids = EventsUsers::where('user', $user->id)->where('role', 3)->pluck('event')->toArray();
 
             return view('events.create', [ //party.create
               'title' => 'New Party',
@@ -352,12 +365,14 @@ class PartyController extends Controller
               'error' => $error,
               'udata' => $_POST,
               'user' => $user,
-              'host_ids' => $host_ids,
+              'user_groups' => $user_groups,
+              //'host_ids' => $host_ids,
             ]);
           }
       }
 
-      $host_ids = EventsUsers::where('user', $user->id)->where('role', 3)->pluck('event')->toArray();
+      $user_groups = UserGroups::where('user', Auth::user()->id)->pluck('group')->toArray();
+      //$host_ids = EventsUsers::where('user', $user->id)->where('role', 3)->pluck('event')->toArray();
 
       return view('events.create', [ //party.create
         'title' => 'New Party',
@@ -365,7 +380,8 @@ class PartyController extends Controller
         'gmaps' => true,
         'group_list' => $Groups->findAll(),
         'user' => $user,
-        'host_ids' => $host_ids,
+        'user_groups' => $user_groups,
+        //'host_ids' => $host_ids,
       ]);
 
   }
@@ -487,18 +503,18 @@ class PartyController extends Controller
           }
 
           $update = array(
-                          'event_date'  => $data['event_date'],
-                          'start'       => $data['start'],
-                          'end'         => $data['end'],
-                          'free_text'   => $data['free_text'],
-                          // 'pax'         => $data['pax'],
-                          // 'volunteers'  => $data['volunteers'],
-                          'group'       => $data['group'],
-                          'venue'       => $data['venue'],
-                          'location'    => $data['location'],
-                          'latitude'    => $latitude,
-                          'longitude'   => $longitude,
-                          );
+            'event_date'  => $data['event_date'],
+            'start'       => $data['start'],
+            'end'         => $data['end'],
+            'free_text'   => $data['free_text'],
+            // 'pax'         => $data['pax'],
+            // 'volunteers'  => $data['volunteers'],
+            'group'       => $data['group'],
+            'venue'       => $data['venue'],
+            'location'    => $data['location'],
+            'latitude'    => $latitude,
+            'longitude'   => $longitude,
+          );
 
           $u = $Party->where('idevents', $id)->update($update);
 
@@ -508,7 +524,11 @@ class PartyController extends Controller
           else {
               $response['success'] = 'Event details updated <a href="/party/view/'.$id.'" class="btn btn-success">View event</a>';
 
-              if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
+              if( ( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) { //For testing purposes
+
+                $Party->where('idevents', $id)->update(['wordpress_post_id' => 99999]);
+
+              } elseif( ( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) {
                   /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                   $theParty = $Party->findThis($id);
                   $Host = $Groups->findHost($data['group']);
@@ -708,6 +728,7 @@ class PartyController extends Controller
       return view('events.view', [
         'gmaps' => true,
         'images' => $images,
+        'event' => $Party,
         'formdata' => $party,
         'user' => $user,
         'co2Total' => $co2Total[0]->total_footprints,

@@ -97,7 +97,8 @@ class Party extends Model
                     `e`.`hours`,
                     `e`.`free_text`,
                     `e`.`wordpress_post_id`,
-                    `g`.`name` AS `group_name`
+                    `g`.`name` AS `group_name`,
+                    `g`.`idgroups` AS `group_id`
 
                 FROM `events` AS `e`
                 INNER JOIN `groups` AS `g`

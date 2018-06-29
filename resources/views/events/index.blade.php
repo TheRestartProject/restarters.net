@@ -12,7 +12,11 @@
             </ol>
           </nav>
           <div class="btn-group">
-            <a href="/party/create" class="btn btn-primary btn-save">@lang('events.create_new_event')</a>
+            @if( $user_groups > 0 )
+              <a href="/party/create" class="btn btn-primary btn-save">@lang('events.create_new_event')</a>
+            @else
+              <a disabled title="Please create an group first" class="btn btn-primary btn-save disabled">@lang('events.create_new_event')</a>
+            @endif
           </div>
         </div>
       </div>
@@ -52,7 +56,7 @@
 
           <table class="table table-events table-striped" role="table">
 
-            @include('partials.tables.head-events', ['invite' => true])
+            @include('partials.tables.head-events')
 
             <tbody>
                 @foreach ($upcoming_events as $event)
@@ -70,7 +74,7 @@
 
           <table class="table table-events table-striped" role="table">
 
-              @include('partials.tables.head-events')
+              @include('partials.tables.head-events', ['hide_invite' => true])
 
               <tbody>
                   @foreach($past_events as $event)
@@ -83,12 +87,7 @@
 
         <div class="d-flex justify-content-center">
           <nav aria-label="Page navigation example">
-            <ul class="pagination">
-              {!! $past_events->links() !!}
-              <li class="page-item active"><a class="page-link" href="#">1</a></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-            </ul>
+            {!! $past_events->links() !!}
           </nav>
         </div>
 

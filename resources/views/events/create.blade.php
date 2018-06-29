@@ -19,18 +19,21 @@
 
     <div class="row justify-content-center">
       <div class="col-lg-12">
+
         @if(isset($response))
           @php( FixometerHelper::printResponse($response) )
         @endif
 
         <div class="edit-panel">
-        <form action="/party/create" method="post" enctype="multipart/form-data">
-            @csrf
+          <form action="/party/create" method="post" enctype="multipart/form-data"> <!-- id="dropzoneEl" -->
+
+          @csrf
+
           <div class="row">
             <div class="col-lg-6">
               <div class="form-group__offset">
-              <h4>@lang('events.add_an_event')</h4>
-              <p>@lang('events.add_event_content')</p>
+                <h4>@lang('events.add_an_event')</h4>
+                <p>@lang('events.add_event_content')</p>
               </div>
             </div>
           </div>
@@ -39,45 +42,29 @@
             <div class="col-lg-6">
               <div class="form-group form-group__offset">
                   <label for="event_name">@lang('events.field_event_name'):</label>
-                  <input type="text" class="form-control field" id="event_name" name="venue">
+                  <input type="text" class="form-control field" id="event_name" name="venue" required>
               </div>
 
-              @if (FixometerHelper::hasRole($user, 'Administrator') ||  count($host_ids) > 1)
+              @if ( ( FixometerHelper::hasRole($user, 'Host') && count($user_groups) > 1 ) || FixometerHelper::hasRole($user, 'Administrator') )
               <div class="form-group form-group__offset">
                   <label for="event_group">@lang('events.field_event_group'):</label>
                   <div class="form-control form-control__select">
-                    <select name="group" id="event_group" class="field field select2">
+                    <select name="group" id="event_group" class="field field select2" required>
                       <option></option>
-                      @if (FixometerHelper::hasRole($user, 'Administrator'))
-                        @foreach($group_list as $group)
-                        <option value="<?php echo $group->id; ?>"><?php echo $group->name; ?></option>
-                        @endforeach
-                      @else
-                        @foreach($group_list as $group)
-                          @if (in_array($group->id, $host_ids))
-                            <option value="<?php echo $group->id; ?>"><?php echo $group->name; ?></option>
-                          @endif
-                        @endforeach
-                      @endif
+                      @foreach($group_list as $group)
+                        @if( FixometerHelper::hasRole($user, 'Administrator') || in_array($group->id, $user_groups) )
+                          <option value="<?php echo $group->id; ?>"><?php echo $group->name; ?></option>
+                        @endif
+                      @endforeach
                     </select>
                   </div>
               </div>
               @else
-                @if (!empty($host_ids))
-                  @foreach($group_list as $group)
-                    @if( $group->id == $host_ids[0] )
-                      <input type="hidden" name="group" id="event_group" value="{{ $group->id }}">
-                    @endif
-                  @endforeach
-                @endif
+                <input type="hidden" name="group" value="{{ $user_groups[0] }}">
               @endif
 
               <div class="form-group">
                 <label for="event_desc">@lang('events.field_event_desc'):</label>
-                <!-- <div id="textarea-1" class="rte"></div>
-                <noscript>
-                  <textarea name="grp_desc" id="grp_desc"></textarea>
-                </noscript> -->
                 <div class="rte" name="description" id="description"></div>
               </div>
 
@@ -88,24 +75,28 @@
                 <div class="row">
                   <div class="col-7">
                     <label for="event_date">@lang('events.field_event_date'):</label>
-                    <input type="date" id="event_date" name="event_date" class="form-control field">
+                    <input type="date" id="event_date" name="event_date" class="form-control field" required>
                   </div>
                 </div>
               </div>
               <div class="form-group">
                 <div class="row">
                   <div class="col-7">
-                       <div class="form-group">
-                    <label for="field_event_time">@lang('events.field_event_time'):</label>
-                    <div class="row row-compressed">
+                    <div class="form-group">
 
-                      <div class="col-6">
-                      <input type="time" id="field_event_time" name="start" class="form-control field">
-                      </div>
-                      <div class="col-6">
-                      <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
-                      <input type="time" id="field_event_time_2" name="end" class="form-control field">
-                      </div>
+                      <label for="field_event_time">@lang('events.field_event_time'):</label>
+
+                      <div class="row row-compressed">
+
+                        <div class="col-6">
+                          <input type="time" id="field_event_time" name="start" class="form-control field" required>
+                        </div>
+
+                        <div class="col-6">
+                          <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
+                          <input type="time" id="field_event_time_2" name="end" class="form-control field" required>
+                        </div>
+
                       </div>
 
                     </div>
@@ -116,7 +107,7 @@
                           <div class="col-7">
                             <div class="form-group">
                               <label for="autocomplete">@lang('events.field_event_venue'):</label>
-                              <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock"  />
+                              <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" required>
 
                               <small id="locationHelpBlock" class="form-text text-muted">
                                 @lang('events.field_venue_helper')
@@ -145,19 +136,15 @@
                     <div class="previews"></div>
 
                     <label for="file">@lang('events.field_add_image'):</label>
-
-                    <!-- <form id="dropzoneEl" class="dropzone" action="/" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')"> -->
+                    <div class="dropzone" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')">
+                        <div class="dz-default dz-message"></div>
                         <div class="fallback">
-                            <input id="file" name="file" type="file" multiple />
+                            <input id="file" name="file" type="file" multiple>
                         </div>
-                    <!-- </form> -->
-
-
+                    </div>
 
                 </div>
-
               </div>
-
             </div>
           </div>
 
