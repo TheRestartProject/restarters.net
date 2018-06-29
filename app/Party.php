@@ -18,7 +18,7 @@ class Party extends Model
      *
      * @var array
      */
-    protected $fillable = ['devices', 'volunteers', 'co2', 'ewaste', 'fixed_devices', 'repairable_devices', 'dead_devices', 'created_at', 'updated_at'];
+    protected $fillable = ['group', 'event_date', 'start', 'end', 'venue', 'location', 'latitude', 'longitude', 'free_text', 'pax', 'volunteers', 'hours', 'wordpress_post_id', 'created_at', 'updated_at'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -404,6 +404,16 @@ class Party extends Model
     public function getEventStartEnd() {
 
         return $this->getEventStart() . '-' . $this->getEventEnd();
+
+    }
+
+    public function getEventName() {
+
+      if( !empty($this->venue) ) {
+        return $this->venue;
+      } else {
+        return $this->location;
+      }
 
     }
 

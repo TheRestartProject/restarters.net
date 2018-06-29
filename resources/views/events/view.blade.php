@@ -7,7 +7,7 @@
           <div class="col-lg-9 d-flex flex-column">
 
             <header>
-                <h1>{{ $formdata->venue }}</h1>
+                <h1>{{ $event->getEventName() }}</h1>
                 <p>Hosted by <a href="/host/index/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a>, {{ $formdata->location }}</p>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
@@ -105,16 +105,18 @@
                         </div>
 
                     </div>
-                    <h2>Event photos</h2>
-                    <ul class="photo-list">
-                      @foreach($images as $image)
-                        <li>
-                            <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
-                              <img src="/uploads/{{ $image->path }}" alt="placeholder">
-                            </a>
-                        </li>
-                      @endforeach
-                    </ul>
+                    @if( !empty($images) )
+                      <h2>Event photos</h2>
+                      <ul class="photo-list">
+                        @foreach($images as $image)
+                          <li>
+                              <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
+                                <img src="/uploads/{{ $image->path }}" alt="placeholder">
+                              </a>
+                          </li>
+                        @endforeach
+                      </ul>
+                    @endif
 
                 </aside>
             </div>

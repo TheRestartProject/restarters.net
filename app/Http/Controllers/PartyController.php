@@ -728,7 +728,7 @@ class PartyController extends Controller
       return view('events.view', [
         'gmaps' => true,
         'images' => $images,
-        'event' => $Party,
+        'event' => Party::find($id),
         'formdata' => $party,
         'user' => $user,
         'co2Total' => $co2Total[0]->total_footprints,
