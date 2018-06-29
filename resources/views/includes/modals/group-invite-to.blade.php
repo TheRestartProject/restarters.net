@@ -7,13 +7,13 @@
       <div class="modal-header">
 
         <h5 id="inviteToGroupLabel">@lang('groups.invite_group_name_header', ['group' => 'The Mighty Restarters'])</h5>
-        @include('fixometer/partials/cross')
+        @include('partials/cross')
 
       </div>
 
       <div class="modal-body">
 
-        <form action="{{{ prefix_route('view-group') }}}">
+        <form action="#">
 
           <input type="hidden" name="message" value="invite">
 

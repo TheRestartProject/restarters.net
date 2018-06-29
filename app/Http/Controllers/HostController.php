@@ -259,7 +259,7 @@ class HostController extends Controller
         $response = null;
       }
 
-      return view('host.index', [
+      return view('group.view', [ //host.index
         'title' => 'Host Dashboard',
         'showbadges' => true,
         'charts' => false,

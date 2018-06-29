@@ -12,11 +12,8 @@
     </div>
     @endif
 
-
     <!-- Profiles -->
     @if(FixometerHelper::hasRole( $user, 'Administrator' ))
-
-
     <section class="row profiles">
         <div class="col-md-12">
             <h5>Admin Console</h5>
@@ -60,10 +57,9 @@
         </div>
 
     </section>
-
-
-
     @endif
+
+
     @if (FixometerHelper::hasRole($user, 'Host') && count($userGroups) > 0)
       <section class="row profiles">
         <div class="col-md-12">
@@ -76,6 +72,11 @@
         </div>
       </section>
     @endif
+
+
+
+
+
 
     <section class="row profiles" id="group-profile">
         <div class="col-md-3">

@@ -7,7 +7,7 @@
       <div class="modal-header">
 
         <h5 id="groupShareStatsLabel">@lang('groups.share_stats_header')</h5>
-        @include('fixometer/partials/cross')
+        @include('partials/cross')
 
       </div>
 
@@ -21,7 +21,7 @@
             <div class="card-header p-0" id="headingGroupHeadline">
               <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseGroupHeadline" aria-expanded="false" aria-controls="collapseGroupHeadline">
                 @lang('groups.headline_stats_dropdown')
-                @include('fixometer/partials/caret')
+                @include('partials/caret')
               </button>
             </div>
             <div id="collapseGroupHeadline" class="collapse" aria-labelledby="headingGroupHeadline" data-parent="#accordionGroup">
@@ -43,7 +43,7 @@
             <div class="card-header p-0" id="headingGroupCO2">
               <button class="btn btn-link" data-toggle="collapse" data-target="#collapseGroupCO2" aria-expanded="true" aria-controls="collapseGroupCO2">
                 @lang('groups.co2_equivalence_visualisation_dropdown')
-                @include('fixometer/partials/caret')
+                @include('partials/caret')
               </button>
             </div>
 

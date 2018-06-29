@@ -7,7 +7,7 @@
       <div class="modal-header">
 
         <h5 id="groupVolunteersLabel">@lang('groups.all_volunteers_group_name_header', ['group' => 'The Mighty Restarters'])</h5>
-        @include('fixometer/partials/cross')
+        @include('partials/cross')
 
       </div>
 
@@ -30,7 +30,7 @@
           <tbody>
             <tr>
               <td class="table-cell-icon"><img src="{{{ url('images/placeholder.png') }}}" class="rounded" alt="Placeholder"></td>
-              <td><a href="{{{ prefix_route('profile') }}}">Dean Appleton-Claydon</a></td>
+              <td><a href="{{{ route('profile') }}}">Dean Appleton-Claydon</a></td>
               <td>
                 Communication<br>
                 Communication
