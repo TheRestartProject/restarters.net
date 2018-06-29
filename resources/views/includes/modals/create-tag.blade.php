@@ -9,18 +9,19 @@
 
 
 
-        <form action="">
+        <form action="/tags/create" method="POST">
+            @csrf
 
             <legend id="createTagLabel">@lang('admin.tags_modal_title')</legend>
 
             <div class="form-group">
-                <label for="tag_name">@lang('admin.tag-name'):</label>
-                <input require type="text" id="tag_name" class="field form-control">
+                <label for="tag-name">@lang('admin.tag-name'):</label>
+                <input type="text" name="tag-name" id="tag-name" class="field form-control" required>
             </div>
 
             <div class="form-group">
-                <label for="tag_desc">@lang('admin.description_optional'):</label>
-                <textarea name="tag_desc" id="tag_desc" class="form-control field textarea-large"></textarea>
+                <label for="tag-description">@lang('admin.description_optional'):</label>
+                <textarea name="tag-description" id="tag-description" class="form-control field textarea-large"></textarea>
             </div>
 
             <div class="button-group">

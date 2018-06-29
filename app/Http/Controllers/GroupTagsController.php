@@ -50,7 +50,7 @@ class GroupTagsController extends Controller
       'description' => $description
     ]);
 
-    return Redirect::to('tags/edit/'.$tag->id);
+    return Redirect::to('tags/edit/'.$group_tag->id);
 
   }
 
@@ -69,7 +69,7 @@ class GroupTagsController extends Controller
   }
 
   public function postEditTag($id, Request $request) {
-
+    dd($request);
     if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
       return redirect('/user/forbidden');
 

@@ -240,7 +240,7 @@ class Builder
     public function orWhere($column, $operator = null, $value = null)
     {
         list($value, $operator) = $this->query->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->where($column, $operator, $value, 'or');
@@ -321,7 +321,7 @@ class Builder
         $result = $this->find($id, $columns);
 
         if (is_array($id)) {
-            if (count($result) == count(array_unique($id))) {
+            if (count($result) === count(array_unique($id))) {
                 return $result;
             }
         } elseif (! is_null($result)) {
@@ -622,7 +622,7 @@ class Builder
 
         $alias = is_null($alias) ? $column : $alias;
 
-        $lastId = 0;
+        $lastId = null;
 
         do {
             $clone = clone $this;

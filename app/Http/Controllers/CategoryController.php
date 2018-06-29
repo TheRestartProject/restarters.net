@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\User;
 use App\Category;
+use FixometerHelper;
 
-use Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 
 class CategoryController extends Controller
 {
@@ -41,6 +44,18 @@ class CategoryController extends Controller
         'title' => 'Categories',
         'list' => $Category->findAll(),
         'user' => Auth::user(),
+      ]);
+  }
+
+  public function getEditCategory($id) {
+      if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+        return redirect('/user/forbidden');
+
+      $category = Category::find($id);
+
+      return view('category.edit', [
+        'title' => 'Edit Category',
+        'category'   => $category,
       ]);
   }
 }

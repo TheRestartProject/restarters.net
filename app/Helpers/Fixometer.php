@@ -617,4 +617,16 @@ class FixometerHelper {
 
   }
 
+  public static function footprintReliability() {
+
+    return [
+      '1' => 'Very poor',
+      '2' => 'poor',
+      '3' => 'Fair',
+      '4' => 'Good',
+      '5' => 'Very good',
+    ];
+
+  }
+
 }

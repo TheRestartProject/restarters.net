@@ -1,0 +1,86 @@
+@extends('layouts.app')
+@section('content')
+<section class="admin">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="d-flex justify-content-between align-content-center">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
+              <li class="breadcrumb-item"><a href="{{ route('category') }}">@lang('admin.categories')</a></li>
+              <li class="breadcrumb-item active" aria-current="page">@lang('admin.edit-category')</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <div class="edit-panel edit-panel__device">
+         <h2>@lang('admin.edit-category')</h2>
+
+        <div class="row">
+            <div class="col-lg-4">
+                <p>@lang('admin.edit-category-content')</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+
+                <div class="form-group">
+                    <label for="category_name">@lang('admin.category_name'):</label>
+                    <input type="text" id="category_name" class="field form-control" value="{{ $category->name }}">
+                </div>
+                <div class="form-group">
+                    <label for="weight">@lang('admin.weight'):</label>
+                    <input type="number" id="weight" class="field form-control" value="{{ $category->weight }}">
+                </div>
+                <div class="form-group">
+                    <label for="co2_footprint">@lang('admin.co2_footprint'):</label>
+                    <input type="number" id="co2_footprint" class="field form-control" value="{{ $category->footprint }}">
+                </div>
+                <div class="form-group">
+                    <label for="reliability">@lang('admin.reliability'):</label>
+                    <div class="form-control form-control__select">
+                        <select name="reliability" id="reliability" class="field field select2">
+                          @foreach(FixometerHelper::footprintReliability() as $key => $value)
+                            <option value="{{ $key }}" <?php echo ($key == $category->idcategories ? 'selected' : ''); ?>>{{ $value }}</option>
+                          @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="category_cluster">@lang('admin.category_cluster'):</label>
+                    <div class="form-control form-control__select">
+                        <select name="category_cluster" id="category_cluster" class="field field select2">
+                            <option value="">Computers and Home Office</option>
+                        </select>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <div class="offset-lg-1 col-lg-7">
+
+                <div class="form-group">
+                    <label for="categories_desc">@lang('admin.description'):</label>
+                    <textarea name="categories_desc" id="categories_desc" class="form-control field textarea-large"></textarea>
+                </div>
+                <div class="button-group row">
+                    <div class="col-lg-12 d-flex align-items-center justify-content-end">
+                        <button type="submit" class="btn btn-primary btn-create">@lang('admin.save-category')</button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div><!-- /edit-panel -->
+
+
+  </div>
+</section>
+
+@endsection

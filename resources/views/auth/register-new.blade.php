@@ -112,8 +112,8 @@
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label for="reg_gender">@lang('registration.gender'):<sup>*</sup></label>
-                                <input type="text" class="form-control field" id="reg_gender" name="reg_gender" required aria-required="true">
+                                <label for="reg_gender">@lang('registration.gender'):</label>
+                                <input type="text" class="form-control field" id="reg_gender" name="reg_gender">
                                 <div class="invalid-feedback">@lang('registration.gender_validation')</div>
                             </div>
                         </div>

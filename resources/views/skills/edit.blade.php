@@ -1,44 +1,68 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
+<section class="admin">
+  <div class="container">
     <div class="row">
-        <div class="col-md-12">
-            <h1>{{ $title }}</h1>
-            <hr>
+      <div class="col">
+        <div class="d-flex justify-content-between align-content-center">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
+              <li class="breadcrumb-item"><a href="{{ route('skills') }}">@lang('admin.skills')</a></li>
+              <li class="breadcrumb-item active" aria-current="page">@lang('admin.edit-skill')</li>
+            </ol>
+          </nav>
         </div>
+      </div>
     </div>
 
+    <div class="edit-panel edit-panel__device">
+         <h2>@lang('admin.edit-skill')</h2>
 
-    <form action="/skills/edit/{{ $skill->id }}" method="post">
-      @csrf
-        <div class="form-group">
-            <label for="skill-name">Skill:</label>
-            <input type="text" name="skill-name" id="skill-name" class="form-control" value="{{ $skill->skill_name }}">
+        <div class="row">
+            <div class="col-lg-4">
+                <p>@lang('admin.edit-skill-content')</p>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="category">Category:</label>
-            <select id="category" name="category" class="form-control" data-live-search="true">
-                <option></option>
-                @foreach( FixometerHelper::skillCategories() as $key => $category )
-                  @if( $skill->category == $key )
-                    <option selected value="{{{ $key }}}">{{{ $category }}}</option>
-                  @else
-                    <option value="{{{ $key }}}">{{{ $category }}}</option>
-                  @endif
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="skill-description">Description:</label>
-            <textarea class="form-control rte" rows="6" name="skill-description" id="skill-description">{{ $skill->description }}</textarea>
-        </div>
-        <div class="form-group">
-            <button class="btn btn-default" type="reset"><i class="fa fa-refresh"></i> reset</button>
-            <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> save</button>
-        </div>
-    </form>
 
-</div>
+        <form action="/skills/edit/{{ $skill->id }}" method="post">
+          @csrf
+            <div class="form-group">
+                <label for="skill-name">Skill:</label>
+                <input type="text" name="skill-name" id="skill-name" class="form-control" value="{{ $skill->skill_name }}">
+            </div>
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <select id="category" name="category" class="form-control" data-live-search="true">
+                    <option></option>
+                    @foreach( FixometerHelper::skillCategories() as $key => $category )
+                      @if( $skill->category == $key )
+                        <option selected value="{{{ $key }}}">{{{ $category }}}</option>
+                      @else
+                        <option value="{{{ $key }}}">{{{ $category }}}</option>
+                      @endif
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="skill-description">Description:</label>
+                <textarea class="form-control rte" rows="6" name="skill-description" id="skill-description">{{ $skill->description }}</textarea>
+            </div>
 
+            <div class="button-group row">
+                <div class="col-lg-6 d-flex align-items-center justify-content-start">
+                    <button type="submit" class="btn btn-primary btn-danger">@lang('admin.delete-skill')</button>
+                </div>
+                <div class="col-lg-6 d-flex align-items-center justify-content-end">
+                    <button type="submit" class="btn btn-primary btn-create">@lang('admin.save-skill')</button>
+                </div>
+            </div>
+
+        </form>
+
+    </div><!-- /edit-panel -->
+
+  </div>
+</section>
 @endsection
