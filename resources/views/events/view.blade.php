@@ -12,8 +12,8 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}/groups">@lang('groups.groups')</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">The Mighty Restarters</li>
+                        <li class="breadcrumb-item"><a href="/host/index/{{ $formdata->group_id }}">@lang('groups.groups')</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ trim($formdata->group_name) }}</li>
                     </ol>
                 </nav>
                 <img src="{{ asset('/images/placeholder.png') }}" alt="Placeholder" class="event-icon">
