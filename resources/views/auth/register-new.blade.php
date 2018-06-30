@@ -30,7 +30,7 @@
             <h3> @lang('registration.reg-step-1-heading')</h3>
             <p class="registration__status">@lang('registration.step-1')</p>
 
-            <legend id="step-1-form-label">@lang('registration.reg-step-1-1'):</legend>
+            <legend id="step-1-form-label">@lang('registration.reg-step-1-1')</legend>
             @foreach( FixometerHelper::skillCategories() as $key => $skill_category )
               <br>
               <h5>{{{ $skill_category }}}</h5>
@@ -58,7 +58,7 @@
 
                 <div class="error"><span></span></div>
                 <div class="fieldset">
-                    <legend>@lang('registration.reg-step-2-1'):</legend>
+                    <legend>@lang('registration.reg-step-2-1')</legend>
 
                     <div class="row">
                         <div class="col-lg-6">
@@ -94,6 +94,7 @@
                                     </select>
                                 </div>
                                 <div class="invalid-feedback">@lang('registration.age_validation')</div>
+                                <small id="reg_age_help" class="form-text text-muted">@lang('registration.age_help')</small>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -108,6 +109,7 @@
                                     </select>
                                 </div>
                                 <div class="invalid-feedback">@lang('registration.country_validation')</div>
+                                <small id="reg_country_help" class="form-text text-muted">@lang('registration.country_help')</small>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -115,12 +117,14 @@
                                 <label for="reg_gender">@lang('registration.gender'):</label>
                                 <input type="text" class="form-control field" id="reg_gender" name="reg_gender">
                                 <div class="invalid-feedback">@lang('registration.gender_validation')</div>
+                                <small id="reg_gender_help" class="form-text text-muted">@lang('registration.gender_help')</small>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="reg_city">@lang('registration.town-city'):</label>
                                 <input type="text" class="form-control" id="reg_city" name="reg_city" placeholder="@lang('registration.town-city-placeholder')">
+                                <small id="reg_city_help" class="form-text text-muted">@lang('registration.town-city_help')</small>
                             </div>
                         </div>
                     </div>
@@ -129,7 +133,7 @@
 
                 @if( !Auth::check() )
                   <div class="fieldset">
-                      <legend>@lang('registration.reg-step-2-2'):</legend>
+                      <legend>@lang('registration.reg-step-2-2')</legend>
 
                       <div class="row">
                           <div class="col-lg-6">
@@ -170,7 +174,7 @@
 
             <div class="registration__offset">
                 <fieldset>
-                    <legend>@lang('registration.reg-step-3-1a') <span id="email-update">example@mail.com</span> @lang('registration.reg-step-3-1b'):</legend>
+                    <legend>@lang('registration.reg-step-3-1a')</legend>
                     <div class="form-check d-flex align-items-center justify-content-start">
                         <input class="form-check-input" type="checkbox" name="newsletter" id="newsletter" value="1">
                         <label class="form-check-label" for="newsletter">
