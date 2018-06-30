@@ -123,33 +123,36 @@ class GroupController extends Controller
                           $group_avatar = $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true);
                       }
 
-                      /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
-                      // $Host = $Group->findHost($idGroup);
-                      //
-                      // $custom_fields = array(
-                      //                 array('key' => 'group_city',            'value' => $area),
-                      //                 array('key' => 'group_host',            'value' => $Host->hostname),
-                      //                 array('key' => 'group_website',         'value' => $website),
-                      //                 array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' .$Host->path),
-                      //                 array('key' => 'group_hash',            'value' => $idGroup),
-                      //                 array('key' => 'group_avatar_url',      'value' => env('UPLOADS_URL') . 'mid_' . $group_avatar ),
-                      //                 array('key' => 'group_latitude',        'value' => $data['latitude']),
-                      //                 array('key' => 'group_longitude',       'value' => $data['longitude']),
-                      //                 );
+                      if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
+
+                        /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
+                        $Host = $Group->findHost($idGroup);
+
+                        $custom_fields = array(
+                                        array('key' => 'group_city',            'value' => $area),
+                                        array('key' => 'group_host',            'value' => $Host->hostname),
+                                        array('key' => 'group_website',         'value' => $website),
+                                        array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' .$Host->path),
+                                        array('key' => 'group_hash',            'value' => $idGroup),
+                                        array('key' => 'group_avatar_url',      'value' => env('UPLOADS_URL') . 'mid_' . $group_avatar ),
+                                        array('key' => 'group_latitude',        'value' => $data['latitude']),
+                                        array('key' => 'group_longitude',       'value' => $data['longitude']),
+                                        );
 
 
-                      /** Start WP XML-RPC **/
-                      // $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-                      // $wpClient->setCredentials(WP_XMLRPC_ENDPOINT, WP_XMLRPC_USER, WP_XMLRPC_PSWD);
-                      //
-                      // $content = array(
-                      //                 'post_type' => 'group',
-                      //                 'custom_fields' => $custom_fields
-                      //                 );
-                      //
-                      // $wpid = $wpClient->newPost($data['name'], $text, $content);
-                      // $Group->update(array('wordpress_post_id' => $wpid), $idGroup);
+                        /** Start WP XML-RPC **/
+                        $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
+                        $wpClient->setCredentials(WP_XMLRPC_ENDPOINT, WP_XMLRPC_USER, WP_XMLRPC_PSWD);
 
+                        $content = array(
+                                        'post_type' => 'group',
+                                        'custom_fields' => $custom_fields
+                                        );
+
+                        $wpid = $wpClient->newPost($data['name'], $text, $content);
+                        $Group->update(array('wordpress_post_id' => $wpid), $idGroup);
+
+                      }
 
                   }
                   else {
@@ -312,55 +315,59 @@ class GroupController extends Controller
                       }
                   }
 
-                   /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
-                  // $Host = $Group->findHost($id);
-                  //
-                  // $custom_fields = array(
-                  //                     array('key' => 'group_city',            'value' => $data['area']),
-                  //                     array('key' => 'group_host',            'value' => $Host->hostname),
-                  //                     array('key' => 'group_website',         'value' => $data['website']),
-                  //                     array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
-                  //                     array('key' => 'group_hash',            'value' => $id),
-                  //                     array('key' => 'group_avatar_url',      'value' => $group_avatar ),
-                  //                     array('key' => 'group_latitude',        'value' => $data['latitude']),
-                  //                     array('key' => 'group_longitude',       'value' => $data['longitude']),
-                  //                 );
-                  //
-                  //
-                  // /** Start WP XML-RPC **/
-                  // $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-                  // $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+                  if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
 
-                  // $content = array(
-                  //                 'post_type' => 'group',
-                  //                 'post_title' => $data['name'],
-                  //                 'post_content' => $data['free_text'],
-                  //                 'custom_fields' => $custom_fields
-                  //                 );
+                     /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
+                    $Host = $Group->findHost($id);
+
+                    $custom_fields = array(
+                                        array('key' => 'group_city',            'value' => $data['area']),
+                                        array('key' => 'group_host',            'value' => $Host->hostname),
+                                        array('key' => 'group_website',         'value' => $data['website']),
+                                        array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
+                                        array('key' => 'group_hash',            'value' => $id),
+                                        array('key' => 'group_avatar_url',      'value' => $group_avatar ),
+                                        array('key' => 'group_latitude',        'value' => $data['latitude']),
+                                        array('key' => 'group_longitude',       'value' => $data['longitude']),
+                                    );
 
 
-                  // Check for WP existence in DB
-                  // $theGroup = $Group->findOne($id);
-                  // if(!empty($theGroup->wordpress_post_id)){
-                  //
-                  //     // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
-                  //     $thePost = $wpClient->getPost($theGroup->wordpress_post_id);
-                  //
-                  //     foreach( $thePost['custom_fields'] as $i => $field ){
-                  //         foreach( $custom_fields as $k => $set_field){
-                  //             if($field['key'] == $set_field['key']){
-                  //                 $custom_fields[$k]['id'] = $field['id'];
-                  //             }
-                  //         }
-                  //     }
-                  //
-                  //     $content['custom_fields'] = $custom_fields;
-                  //     $wpClient->editPost($theGroup->wordpress_post_id, $content);
-                  // }
-                  // else {
-                  //     $wpid = $wpClient->newPost($data['name'], $data['free_text'], $content);
-                  //     $this->Group->update(array('wordpress_post_id' => $wpid), $id);
-                  // }
+                    /** Start WP XML-RPC **/
+                    $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
+                    $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+
+                    $content = array(
+                                    'post_type' => 'group',
+                                    'post_title' => $data['name'],
+                                    'post_content' => $data['free_text'],
+                                    'custom_fields' => $custom_fields
+                                    );
+
+
+                    Check for WP existence in DB
+                    $theGroup = $Group->findOne($id);
+                    if(!empty($theGroup->wordpress_post_id)){
+
+                        // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
+                        $thePost = $wpClient->getPost($theGroup->wordpress_post_id);
+
+                        foreach( $thePost['custom_fields'] as $i => $field ){
+                            foreach( $custom_fields as $k => $set_field){
+                                if($field['key'] == $set_field['key']){
+                                    $custom_fields[$k]['id'] = $field['id'];
+                                }
+                            }
+                        }
+
+                        $content['custom_fields'] = $custom_fields;
+                        $wpClient->editPost($theGroup->wordpress_post_id, $content);
+                    }
+                    else {
+                        $wpid = $wpClient->newPost($data['name'], $data['free_text'], $content);
+                        $this->Group->update(array('wordpress_post_id' => $wpid), $id);
+                    }
+
+                  }
 
                   if(FixometerHelper::hasRole($user, 'Host')){
                   //    header('Location: /host?action=gu&code=200');
