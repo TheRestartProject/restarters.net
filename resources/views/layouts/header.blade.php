@@ -107,21 +107,22 @@
 
                     <ul>
                         <li>
-                            <svg width="11" height="14" viewBox="0 0 9 11" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M8.55 0H0v10.687l4.253-3.689 4.297 3.689V0z" fill="#0394a6"/></svg> Community tools
+                            <svg width="11" height="14" viewBox="0 0 9 11" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M8.55 0H0v10.687l4.253-3.689 4.297 3.689V0z" fill="#0394a6"/></svg> @lang('general.menu_tools')
                             <ul>
                                 <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                                <li><a href="https://talk.restarters.net" target="_blank" rel="noopener noreferrer">Community</a></li>
-                                <li><a href="http://wiki.restarters.net" target="_blank" rel="noopener noreferrer">Restart Wiki</a></li>
+                                <li><a href="@lang('general.discourse_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_discourse')</a></li>
+                                <li><a href="@lang('general.wiki_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_wiki')</a></li>
                                 <!-- <li><a href="#" target="_blank" rel="noopener noreferrer">The Repair Directory</a></li> -->
                             </ul>
                         </li>
 
                         <li>
-                            <svg width="15" height="15" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M5.625 0a5.627 5.627 0 0 1 5.625 5.625 5.627 5.627 0 0 1-5.625 5.625A5.627 5.627 0 0 1 0 5.625 5.627 5.627 0 0 1 5.625 0zm1.19 9.35l.104-.796c-.111-.131-.301-.249-.57-.352V4.073a9.365 9.365 0 0 0-.838-.031c-.331 0-.69.045-1.076.134l-.104.797c.138.152.328.269.57.352v2.877c-.283.103-.473.221-.57.352l.104.796h2.38zM5.604 3.462c-.572 0-.859-.26-.859-.781s.288-.781.864-.781c.577 0 .865.26.865.781s-.29.781-.87.781z" fill="#0394a6"/></svg> Other
+                            <svg width="15" height="15" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M5.625 0a5.627 5.627 0 0 1 5.625 5.625 5.627 5.627 0 0 1-5.625 5.625A5.627 5.627 0 0 1 0 5.625 5.627 5.627 0 0 1 5.625 0zm1.19 9.35l.104-.796c-.111-.131-.301-.249-.57-.352V4.073a9.365 9.365 0 0 0-.838-.031c-.331 0-.69.045-1.076.134l-.104.797c.138.152.328.269.57.352v2.877c-.283.103-.473.221-.57.352l.104.796h2.38zM5.604 3.462c-.572 0-.859-.26-.859-.781s.288-.781.864-.781c.577 0 .865.26.865.781s-.29.781-.87.781z" fill="#0394a6"/></svg> @lang('general.menu_other')
                             <ul>
-                                <li><a href="https://therestartproject.org/" target="_blank" rel="noopener noreferrer">The Restart Project</a></li>
-                                <li><a href="https://therestartproject.org/contact/" target="_blank" rel="noopener noreferrer">Help</a></li>
-                                <li><a role="button" data-toggle="modal" href="#onboarding" data-target="#onboarding">Welcome</a></li>
+                                <li><a href="@lang('general.help_feedback_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_help_feedback')</a></li>
+                                <li><a href="@lang('general.faq_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_faq')</a></li>
+                                <li><a href="@lang('general.restartproject_url')" target="_blank" rel="noopener noreferrer">@lang('general.therestartproject')</a></li>
+                                <!--<li><a role="button" data-toggle="modal" href="#onboarding" data-target="#onboarding">Welcome</a></li>-->
                             </ul>
                         </li>
 
