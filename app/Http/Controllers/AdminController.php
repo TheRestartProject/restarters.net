@@ -19,7 +19,7 @@ class AdminController extends Controller
   public $TotalEmission;
   public $EmissionRatio;
 
-  // public function __construct($model, $controller, $action){
+  public function __construct(){ //($model, $controller, $action)
   //     parent::__construct($model, $controller, $action);
   //
   //     if (Auth::check()) {
@@ -32,23 +32,23 @@ class AdminController extends Controller
   //         }
   //
   //         else {
-  //             $Device = new Device;
-  //             $weights = $Device->getWeights();
-  //
-  //             $this->TotalWeight = $weights[0]->total_weights;//send to view
-  //             $this->TotalEmission = $weights[0]->total_footprints;//send to view
-  //             if ($this->TotalWeight != 0) {//send to view
-  //               $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
-  //             } else {
-  //               $this->EmissionRatio = $this->TotalEmission;
-  //             }
+              $Device = new Device;
+              $weights = $Device->getWeights();
+
+              $this->TotalWeight = $weights[0]->total_weights;//send to view
+              $this->TotalEmission = $weights[0]->total_footprints;//send to view
+              if ($this->TotalWeight != 0) {//send to view
+                $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
+              } else {
+                $this->EmissionRatio = $this->TotalEmission;
+              }
   //
   //
   //         }
   //     } else {
   //       header('Location: /user/login');
   //     }
-  // }
+  }
 
   public function stats($section = 1, $paragraph_only = false){
       //Object Instances

@@ -78,7 +78,7 @@
 
               <tbody>
                   @foreach($past_events as $event)
-                    @include('partials.tables.row-events', ['invite' => false])
+                    @include('partials.tables.row-events', ['invite' => false, 'EmissionRatio' => $EmissionRatio])
                   @endforeach
               </tbody>
 

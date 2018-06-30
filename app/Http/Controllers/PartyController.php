@@ -21,52 +21,52 @@ use Auth;
 use FixometerFile;
 use DateTime;
 
-class PartyController extends Controller
-{
+class PartyController extends Controller {
 
-  protected $hostParties = array();
-  protected $permissionsChecker;
+  // protected $hostParties = array();
+  // protected $permissionsChecker;
+
   public $TotalWeight;
   public $TotalEmission;
   public $EmissionRatio;
 
-  // public function __construct($model, $controller, $action)
-  // {
-  //     parent::__construct($model, $controller, $action);
-  //
-  //     $Auth = new Auth($url);
-  //     if(!$Auth->isLoggedIn() && $action != 'stats'){
-  //         header('Location: /user/login');
-  //     }
-  //
-  //     $user = $Auth->getProfile();
-  //     $this->user = $user;
-  //     $this->set('user', $user);
-  //     $this->set('header', true);
-  //
-  //     if (hasRole($this->user, 'Host'))
-  //     {
-  //         $Group = new Group;
-  //         $group = $Group->ofThisUser($this->user->id);
-  //         $this->set('usergroup', $group[0]);
-  //         $parties = $this->Party->ofThisGroup($group[0]->idgroups);
-  //
-  //         foreach($parties as $party){
-  //             $this->hostParties[] = $party->idevents;
-  //         }
-  //         $User = new User;
-  //         $this->set('profile', $User->profilePage($this->user->id));
-  //
-  //         $Device = new Device;
-  //         $weights = $Device->getWeights();
-  //
-  //         $this->TotalWeight = $weights[0]->total_weights;
-  //         $this->TotalEmission = $weights[0]->total_footprints;
-  //         $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
-  //     }
-  //
-  //     $this->permissionsChecker = new PermissionsChecker($this->user, $this->hostParties);
-  // }
+  public function __construct(){ //($model, $controller, $action)
+
+      // parent::__construct($model, $controller, $action);
+      //
+      // $Auth = new Auth($url);
+      // if(!$Auth->isLoggedIn() && $action != 'stats'){
+      //     header('Location: /user/login');
+      // }
+      //
+      // $user = $Auth->getProfile();
+      // $this->user = $user;
+      // $this->set('user', $user);
+      // $this->set('header', true);
+      //
+      // if (hasRole($this->user, 'Host'))
+      // {
+      //     $Group = new Group;
+      //     $group = $Group->ofThisUser($this->user->id);
+      //     $this->set('usergroup', $group[0]);
+      //     $parties = $this->Party->ofThisGroup($group[0]->idgroups);
+      //
+      //     foreach($parties as $party){
+      //         $this->hostParties[] = $party->idevents;
+      //     }
+      //     $User = new User;
+      //     $this->set('profile', $User->profilePage($this->user->id));
+
+      $Device = new Device;
+      $weights = $Device->getWeights();
+
+      $this->TotalWeight = $weights[0]->total_weights;
+      $this->TotalEmission = $weights[0]->total_footprints;
+      $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
+      // }
+      //
+      // $this->permissionsChecker = new PermissionsChecker($this->user, $this->hostParties);
+  }
 
   public function index()
   {
@@ -673,7 +673,6 @@ class PartyController extends Controller
   }
 
   public function view($id) {
-      $user = Auth::user();
 
       $Groups = new Group;
       $File = new FixometerFile;
@@ -721,22 +720,15 @@ class PartyController extends Controller
 
       $brands = Brands::all();
       $categories = Category::all();
-
-      // $device_count_status = $Device->statusCount($party->group);
-      $device_count_status = $Device->partyStatusCount($id);
-
-      // dd($party);
+      $event = Party::find($id);
 
       return view('events.view', [
         'gmaps' => true,
         'images' => $images,
-        'event' => Party::find($id),
+        'event' => $event,
+        'stats' => $event->getEventStats($this->EmissionRatio),
         'formdata' => $party,
-        'user' => $user,
-        'co2Total' => $co2Total[0]->total_footprints,
-        'wasteTotal' => $co2Total[0]->total_weights,
         'partiesCount' => count($allparties),
-        'device_count_status' => $device_count_status,
         'attended' => $attended,
         'attended_roles' => $attended_roles,
         'invited'  => $invited,
@@ -933,7 +925,6 @@ class PartyController extends Controller
           $party->fixed_devices = 0;
           $party->repairable_devices = 0;
           $party->dead_devices = 0;
-
 
           if(!empty($party->devices)){
               foreach($party->devices as $device){

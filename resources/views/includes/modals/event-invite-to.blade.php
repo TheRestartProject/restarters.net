@@ -18,7 +18,7 @@
         <form action="/party/invite" method="post">
           @csrf
 
-          <input type="hidden" name="from_id" value="{{ $user->id }}">
+          <input type="hidden" name="from_id" value="{{ Auth::user()->id }}">
           <input type="hidden" name="group_name" value="{{ $formdata->group_name }}">
           <input type="hidden" id="event_id" name="event_id" value="{{ $formdata->id }}">
 

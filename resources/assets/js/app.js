@@ -478,7 +478,7 @@ function loadDropzones() {
             thumbnailHeight: 60,
             thumbnailMethod: "contain",
             addRemoveLinks: true,
-            previewsContainer: ".uploads", 
+            previewsContainer: ".uploads",
             init: function () {
 
                 jQuery(".dropzone .dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');

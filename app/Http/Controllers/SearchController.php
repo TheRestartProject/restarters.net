@@ -11,13 +11,13 @@ use App\Device;
 use Auth;
 use FixometerHelper;
 
-class SearchController extends Controller
-{
-  // public $TotalWeight;
-  // public $TotalEmission;
-  // public $EmissionRatio;
+class SearchController extends Controller {
 
-  // public function __construct($model, $controller, $action){
+  public $TotalWeight;
+  public $TotalEmission;
+  public $EmissionRatio;
+
+  public function __construct(){ //($model, $controller, $action)
   //     parent::__construct($model, $controller, $action);
   //
   //     $Auth = new Auth($url);
@@ -31,20 +31,20 @@ class SearchController extends Controller
   //         $this->set('user', $user);
   //         $this->set('header', true);
   //
-  //         $Device = new Device;
-  //         $weights = $Device->getWeights();
-  //
-  //         $this->TotalWeight = $weights[0]->total_weights;
-  //         $this->TotalEmission = $weights[0]->total_footprints;
-  //         $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
-  //
+          $Device = new Device;
+          $weights = $Device->getWeights();
+
+          $this->TotalWeight = $weights[0]->total_weights;
+          $this->TotalEmission = $weights[0]->total_footprints;
+          $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
+
   //
   //         if(FixometerHelper::hasRole($this->user, 'Host')){
   //             $User = new User;
   //             $this->set('profile', $User->profilePage($this->user->id));
   //         }
   //     }
-  // }
+  }
 
   public function index($response = null){
 

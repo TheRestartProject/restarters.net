@@ -383,6 +383,14 @@ class Party extends Model
         return DB::select(DB::raw('SELECT SUM(pax) AS pax FROM ' . $this->table));
     }
 
+    /**
+    * Laravel specific code
+    */
+
+    public function allDevices(){
+        return $this->hasMany('App\Device', 'event', 'idevents')->join('categories', 'categories.idcategories', '=', 'devices.category');
+    }
+
     public function getEventDate() {
 
         return date('d/m/Y', strtotime($this->event_date));
@@ -451,6 +459,51 @@ class Party extends Model
           return true;
         else
           return false;
+
+    }
+
+    public function getEventStats($emissionRatio) {
+
+      $Device = new Device;
+
+      $co2 = 0;
+      $ewaste = 0;
+      $fixed_devices = 0;
+      $repairable_devices = 0;
+      $dead_devices = 0;
+
+      if( !empty($this->allDevices) ){
+
+        foreach($this->allDevices as $device){
+
+          if( $device->repair_status == env('DEVICE_FIXED') ){
+            $co2     += (!empty((float)$device->estimate) && $device->category==46 ? ((float)$device->estimate * $emissionRatio) : (float)$device->footprint);
+            $ewaste  += (!empty($device->estimate) && $device->category==46 ? $device->estimate : $device->weight);
+          }
+
+          switch($device->repair_status){
+              case 1:
+                  $fixed_devices++;
+                  break;
+              case 2:
+                  $repairable_devices++;
+                  break;
+              case 3:
+                  $dead_devices++;
+                  break;
+          }
+
+        }
+
+        return [
+          'co2'                 => number_format(round($co2 * $Device->displacement), 0, '.' , ','),
+          'ewaste'              => $ewaste,
+          'fixed_devices'       => $fixed_devices,
+          'repairable_devices'  => $repairable_devices,
+          'dead_devices'        => $dead_devices
+        ];
+
+      }
 
     }
 

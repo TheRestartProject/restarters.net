@@ -1,3 +1,4 @@
+@php( $devices = $event->allDevices )
 <tr>
     <td class="table-cell-icon"><img src="{{ asset('/images/placeholder.png') }}" alt="Placeholder"></td>
     <td class="cell-name"><a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a></td>
@@ -13,6 +14,15 @@
     @elseif( $event->isUpcoming() )
       <td class="cell-figure">TBC</td>
       <td class="cell-rsvp" colspan="{{{ $invite === true ? 7 : 6 }}}">This event hasn't started <a href="/party/view/{{ $event->idevents }}">RSVP</a></td>
+    @elseif( !empty($devices) )
+      @php( $stats = $event->getEventStats($EmissionRatio) )
+      <td class="cell-figure">{{ $event->pax }}</td>
+      <td class="cell-figure">{{ $event->volunteers }}</td>
+      <td class="cell-figure">{{{ $stats['ewaste'] }}}kg</td>
+      <td class="cell-figure">{{{ $stats['co2'] }}}</td>
+      <td class="cell-figure">{{{ $stats['fixed_devices'] }}}</td>
+      <td class="cell-figure">{{{ $stats['repairable_devices'] }}}</td>
+      <td class="cell-figure">{{{ $stats['dead_devices'] }}}</td>
     @elseif( $event->isInProgress() )
       <td class="cell-figure">{{ $event->pax }}</td>
       <td class="cell-figure">{{ $event->volunteers }}</td>
