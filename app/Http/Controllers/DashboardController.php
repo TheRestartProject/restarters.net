@@ -9,6 +9,7 @@ use App\UserGroups;
 use App\UsersSkills;
 use App\EventsUsers;
 use App\Helpers\FixometerHelper;
+use App\Device;
 
 use Auth;
 use DB;
@@ -147,6 +148,9 @@ class DashboardController extends Controller
         $onboarding = false;
       }
 
+      $devices_gateway = new Device;
+      $impact_stats = $devices_gateway->getWeights();
+
       return view('dashboard.index', [
         'gmaps' => true,
         'user' => $user,
@@ -163,6 +167,7 @@ class DashboardController extends Controller
         'all_groups' => $all_groups,
         'closest_events' => $closest_events,
         'onboarding' => $onboarding,
+        'impact_stats' => $impact_stats
       ]);
 
       /*
