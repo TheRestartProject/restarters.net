@@ -15,6 +15,8 @@ class UsersAuth extends Migration
     {
       Schema::table('users', function (Blueprint $table) {
           $table->rememberToken();
+          $table->softDeletes();
+          $table->renameColumn('idusers', 'id');
       });
     }
 
@@ -27,6 +29,8 @@ class UsersAuth extends Migration
     {
       Schema::table('users', function (Blueprint $table) {
           $table->dropColumn('remember_token');
+          $table->dropColumn('deleted_at');
+          $table->renameColumn('id', 'idusers');
       });
     }
 }

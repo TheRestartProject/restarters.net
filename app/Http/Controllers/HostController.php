@@ -132,7 +132,7 @@ class HostController extends Controller
 
           foreach($party->devices as $device){
               if($device->repair_status == env('DEVICE_FIXED')){
-                  $party->co2 += (!empty($device->estimate) && $device->category == 46 ? ($device->estimate * $this->EmissionRatio) : $device->footprint);
+                  //$party->co2 += (!empty($device->estimate) && $device->category == 46 ? ($device->estimate * $this->EmissionRatio) : $device->footprint);
 
               }
 

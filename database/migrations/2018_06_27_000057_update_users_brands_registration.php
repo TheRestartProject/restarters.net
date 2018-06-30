@@ -30,13 +30,13 @@ class UpdateUsersBrandsRegistration extends Migration
           $table->integer('category')->after('skill_name')->nullable();
       });
 
-      $a = [1, 2];
-      $skills = Skills::all();
-      foreach( $skills as $skill ){
-        Skills::find($skill->id)->update([
-          'category' => $a[mt_rand(0, count($a) - 1)]
-        ]);
-      }
+      // $a = [1, 2];
+      // $skills = Skills::all();
+      // foreach( $skills as $skill ){
+      //   Skills::find($skill->id)->update([
+      //     'category' => $a[mt_rand(0, count($a) - 1)]
+      //   ]);
+      // }
 
     }
 

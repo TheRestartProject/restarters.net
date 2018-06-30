@@ -344,7 +344,7 @@ class GroupController extends Controller
                                     );
 
 
-                    Check for WP existence in DB
+                    //Check for WP existence in DB
                     $theGroup = $Group->findOne($id);
                     if(!empty($theGroup->wordpress_post_id)){
 
