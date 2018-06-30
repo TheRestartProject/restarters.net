@@ -101,9 +101,39 @@
         margin: 0 auto 20px auto;
     }
 
-
 }
 
 .group-view {
 
+    .events-list-wrap, .events-link-wrap{
+      border-left: 1px #D9D9D9 solid;
+      border-right: 1px #D9D9D9 solid;
+      border-bottom: 1px #D9D9D9 solid;
+    }
+
+    .events-list-wrap {
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+      table {
+        margin-bottom: 0;
+      }
+    }
+
+    .events-link-wrap {
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+      padding-top: 12px;
+      padding-bottom: 13px;
+      a {
+        text-decoration: underline;
+        color: #000;
+        &:hover{
+          text-decoration: none;
+        }
+      }
+    }
+
+    .nav-item {
+        font-family: $font-family-sans-serif;
+    }
 }

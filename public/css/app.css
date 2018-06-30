@@ -16279,6 +16279,42 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   margin: 0 auto 20px auto;
 }
 
+.group-view .events-list-wrap,
+.group-view .events-link-wrap {
+  border-left: 1px #D9D9D9 solid;
+  border-right: 1px #D9D9D9 solid;
+  border-bottom: 1px #D9D9D9 solid;
+}
+
+.group-view .events-list-wrap {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.group-view .events-list-wrap table {
+  margin-bottom: 0;
+}
+
+.group-view .events-link-wrap {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  padding-top: 12px;
+  padding-bottom: 13px;
+}
+
+.group-view .events-link-wrap a {
+  text-decoration: underline;
+  color: #000;
+}
+
+.group-view .events-link-wrap a:hover {
+  text-decoration: none;
+}
+
+.group-view .nav-item {
+  font-family: "Patua One", cursive, sans-serif;
+}
+
 .popover-group {
   bottom: 2px;
   left: 5px;
@@ -16601,6 +16637,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .events .nav-tabs .nav-item {
   margin-right: 3px;
+  font-family: "Patua One", cursive, sans-serif;
 }
 
 .events .nav-tabs .nav-link {
