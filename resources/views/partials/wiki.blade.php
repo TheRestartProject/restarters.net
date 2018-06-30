@@ -1,10 +1,17 @@
 <section class="dashboard__block">
-    <img src="/images/dashboard/dashboard__wiki.png" alt="">
     <div class="dashboard__block__content">
         <h4>Wiki</h4>
-        <p>For anyone with a curiosity about how things work and how to fix them. We concentrate on basic and widely applicable principles, not specific repairs. Consult or contribute</p>
-        <div class="dashboard__links d-flex flex-row justify-content-end">
-            <a href="https://wiki.restarters.net" target="_blank" rel="noopener noreferrer">View the Wiki</a>
+        <p>A random selection of pages from our wiki.</p>
+        <div class="table-responsive">
+            <table role="table" class="table table-striped">
+                <tbody>
+                    @foreach ($wiki_pages as $wiki_page)
+                        <tr>
+                            <td><a href="{{ env('WIKI_URL') }}/{{ $wiki_page->title }}" target="_blank" rel="noopener noreferrer">{{ $wiki_page->title }}</a></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </section>

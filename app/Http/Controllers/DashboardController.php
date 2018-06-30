@@ -141,6 +141,7 @@ class DashboardController extends Controller
       }
 
       $news_feed = FixometerHelper::getRSSFeed();
+      $wiki_pages = FixometerHelper::getRandomWikiPages();
 
       if ($user->number_of_logins == 1) {
         $onboarding = true;
@@ -167,7 +168,8 @@ class DashboardController extends Controller
         'all_groups' => $all_groups,
         'closest_events' => $closest_events,
         'onboarding' => $onboarding,
-        'impact_stats' => $impact_stats
+        'impact_stats' => $impact_stats,
+        'wiki_pages' => $wiki_pages
       ]);
 
       /*

@@ -561,6 +561,19 @@ class FixometerHelper {
 
   }
 
+    public static function getRandomWikiPages()
+    {
+        $api_endpoint = env('WIKI_URL') . '/api.php?action=query&rnnamespace=0&list=random&rnlimit=5&format=json';
+
+        $raw_json = file_get_contents($api_endpoint);
+        $decoded_json = json_decode($raw_json);
+
+        $pages_json = $decoded_json->query->random;
+
+        return $pages_json;
+    }
+
+
   public static function checkDistance($object, $user){
 
     $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=".$object->latitude.",".$object->longitude."&destinations=".$user->latitude.",".$user->longitude;
