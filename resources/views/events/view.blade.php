@@ -24,7 +24,7 @@
 
             <div class="button-group button-group__r">
 
-                @if (FixometerHelper::hasRole($user, 'Host') || FixometerHelper::hasRole($user, 'Administrator'))
+                @if ( ( FixometerHelper::hasRole($user, 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || FixometerHelper::hasRole($user, 'Administrator'))
                   <div class="dropdown">
                       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           Event actions
@@ -35,7 +35,6 @@
                       </div>
                   </div>
                 @else
-                  <a href="{{ url('/') }}/party/edit/{{ $formdata->id }}" class="btn btn-primary">Edit event</a>
                   <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Event stats embed</a>
                 @endif
 

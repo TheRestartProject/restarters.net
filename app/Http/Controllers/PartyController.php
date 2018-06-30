@@ -366,13 +366,11 @@ class PartyController extends Controller
               'udata' => $_POST,
               'user' => $user,
               'user_groups' => $user_groups,
-              //'host_ids' => $host_ids,
             ]);
           }
       }
 
       $user_groups = UserGroups::where('user', Auth::user()->id)->pluck('group')->toArray();
-      //$host_ids = EventsUsers::where('user', $user->id)->where('role', 3)->pluck('event')->toArray();
 
       return view('events.create', [ //party.create
         'title' => 'New Party',
@@ -381,7 +379,6 @@ class PartyController extends Controller
         'group_list' => $Groups->findAll(),
         'user' => $user,
         'user_groups' => $user_groups,
-        //'host_ids' => $host_ids,
       ]);
 
   }
@@ -450,12 +447,8 @@ class PartyController extends Controller
   public function edit($id, Request $request) {
       $user = Auth::user();
 
-      if (!FixometerHelper::userHasEditPartyPermission($id, $user->id)) {
-          header('Location: /user/forbidden');
-      }
-
-      // $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-      // $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+      if (!FixometerHelper::userHasEditPartyPermission($id, $user->id))
+          return redirect('/user/forbidden');
 
       $Groups = new Group;
       $File = new FixometerFile;
@@ -465,6 +458,14 @@ class PartyController extends Controller
       $allparties = $Party->ofThisGroup('admin', true, true);
       $co2Total = $Device->getWeights();
       $device_count_status = $Device->statusCount();
+
+      $user_groups = UserGroups::where('user', Auth::user()->id)->pluck('group')->toArray();
+
+      $images = $File->findImages(env('TBL_EVENTS'), $id);
+
+      if (!isset($images)) {
+        $images = null;
+      }
 
       if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
           $id = $_POST['id'];
@@ -529,6 +530,10 @@ class PartyController extends Controller
                 $Party->where('idevents', $id)->update(['wordpress_post_id' => 99999]);
 
               } elseif( ( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) {
+
+                  $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
+                  $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+
                   /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                   $theParty = $Party->findThis($id);
                   $Host = $Groups->findHost($data['group']);
@@ -612,8 +617,6 @@ class PartyController extends Controller
 
           $party = $Party->findThis($id)[0];
 
-          $host_ids = EventsUsers::where('user', $user->id)->where('role', 3)->pluck('event')->toArray();
-
           return view('events.edit', [ //party.edit
             'response' => $response,
             'gmaps' => true,
@@ -628,7 +631,8 @@ class PartyController extends Controller
             'wasteTotal' => $co2Total[0]->total_weights,
             'partiesCount' => count($allparties),
             'device_count_status' => $device_count_status,
-            'host_ids' => $host_ids,
+            'user_groups' => $user_groups,
+            'images' => $images,
           ]);
       }
 
@@ -651,8 +655,6 @@ class PartyController extends Controller
       //
       // $this->set('grouplist', $Groups->findList());
 
-      $host_ids = EventsUsers::where('user', $user->id)->where('role', 3)->pluck('event')->toArray();
-
       return view('events.edit', [ //party.edit
         'gmaps' => true,
         'images' => $images,
@@ -666,7 +668,7 @@ class PartyController extends Controller
         'wasteTotal' => $co2Total[0]->total_weights,
         'partiesCount' => count($allparties),
         'device_count_status' => $device_count_status,
-        'host_ids' => $host_ids,
+        'user_groups' => $user_groups,
       ]);
   }
 
@@ -752,9 +754,10 @@ class PartyController extends Controller
       $user = User::find(Auth::id());
 
       if( !FixometerHelper::hasRole($user, 'Host') && !FixometerHelper::hasRole($user, 'Administrator')){
-          header('Location: /user/forbidden');
-      }
-      else {
+
+          return redirect('/user/forbidden');
+
+      } else {
 
           // $this->set('js',
           //             array('foot' => array(

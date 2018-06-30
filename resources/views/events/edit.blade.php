@@ -44,34 +44,22 @@
                   <input type="text" class="form-control field" id="event_name" name="venue" value="{{ $formdata->venue }}">
               </div>
 
-              @if ( FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host') )
+              @if ( ( FixometerHelper::hasRole($user, 'Host') && count($user_groups) > 1 ) || FixometerHelper::hasRole($user, 'Administrator') )
               <div class="form-group form-group__offset">
                   <label for="event_group">@lang('events.field_event_group'):</label>
                   <div class="form-control form-control__select">
-                    <select name="group" id="event_group" class="field field select2">
+                    <select name="group" id="event_group" class="field field select2" required>
                       <option></option>
-                      @if (FixometerHelper::hasRole($user, 'Administrator'))
-                        @foreach($group_list as $group)
+                      @foreach($group_list as $group)
+                        @if( FixometerHelper::hasRole($user, 'Administrator') || in_array($group->id, $user_groups) )
                           <option value="<?php echo $group->id; ?>" <?php echo($group->id == $formdata->group ? 'selected' : ''); ?>><?php echo $group->name; ?></option>
-                        @endforeach
-                      @else
-                        @foreach($group_list as $group)
-                          @if (in_array($group->id, $host_ids))
-                            <option value="<?php echo $group->id; ?>" <?php echo($group->id == $formdata->group ? 'selected' : ''); ?>><?php echo $group->name; ?></option>
-                          @endif
-                        @endforeach
-                      @endif
+                        @endif
+                      @endforeach
                     </select>
                   </div>
               </div>
               @else
-                @if (!empty($host_ids))
-                  @foreach($group_list as $group)
-                    @if( $group->id == $host_ids[0] )
-                      <input type="hidden" name="group" id="event_group" value="{{ $group->id }}">
-                    @endif
-                  @endforeach
-                @endif
+                <input type="hidden" name="group" value="{{ $user_groups[0] }}">
               @endif
 
               <div class="form-group">
@@ -137,20 +125,27 @@
                   </div>
                 </div>
 
-
                 <div class="form-group">
 
-                    <div class="previews"></div>
-
-                    <label for="file">@lang('events.field_add_image'):</label>
-
-                    <!-- <form id="dropzoneEl" class="dropzone" action="/party/add-image/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')"> -->
-                        <div class="fallback">
-                            <input id="file" name="file[]" type="file" multiple />
+                  <div class="previews">
+                    @if( !empty($images) )
+                      @foreach($images as $image)
+                        <div class="dz-image">
+                          <img src="/uploads/{{ $image->path }}" alt="placeholder">
+                          <a class="dz-remove">Remove file</a>
                         </div>
-                    <!-- </form> -->
+                      @endforeach
+                    @endif
+                    <div class="uploads"></div>
+                  </div>
 
+                  <label for="file">@lang('events.field_add_image'):</label>
 
+                  <!-- <form id="dropzoneEl" class="dropzone" action="/party/add-image/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')"> -->
+                      <div class="fallback">
+                          <input id="file" name="file[]" type="file" multiple />
+                      </div>
+                  <!-- </form> -->
 
                 </div>
 
