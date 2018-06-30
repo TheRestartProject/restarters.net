@@ -386,28 +386,27 @@
                     <?php
                     /** find size of needed SVGs **/
                     if($sum > 6000) {
-                        $consume_class = 'car';
-                        $consume_image = 'Counters_C2_Driving.svg';
+                        $consume_svg = 'svg-car1';
                         $consume_label = 'Equal to driving';
                         $consume_eql_to = (1 / 0.12) * $weights[0]->total_footprints;
-                        $consume_eql_to = number_format(round($consume_eql_to), 0, '.', ',') . '<small>km</small>';
+                        $consume_legend = number_format(round($consume_eql_to), 0, '.', ',') . ' km';
 
+                        $manufacture_svg = 'svg-car2';
+                        $manufacture_label = 'Like manufacturing';
                         $manufacture_eql_to = round($weights[0]->total_footprints / 6000);
-                        $manufacture_img = 'Icons_04_Assembly_Line.svg';
-                        $manufacture_label = 'or like the manufacture of <span class="dark">' . $manufacture_eql_to . '</span> cars';
-                        $manufacture_legend = ' 6000kg of CO<sub>2</sub>';
+                        $manufacture_legend = $manufacture_eql_to . ' ' . str_plural('car', $manufacture_eql_to);
                     }
                     else {
-                        $consume_class = 'tv';
-                        $consume_image = 'Counters_C1_TV.svg';
+                        $consume_svg = 'svg-tv';
                         $consume_label = 'Like watching TV for';
                         $consume_eql_to = ((1 / 0.024) * $weights[0]->total_footprints ) / 24;
-                        $consume_eql_to = number_format(round($consume_eql_to), 0, '.', ',') . '<small>days</small>';
+                        $consume_eql_to = number_format(round($consume_eql_to), 0, '.', ',');
+                        $consume_legend = $consume_eql_to . ' ' . str_plural('day', $consume_eql_to);
 
+                        $manufacture_svg = 'svg-sofa';
+                        $manufacture_label = 'Like manufacturing';
                         $manufacture_eql_to = round($weights[0]->total_footprints / 100);
-                        $manufacture_img = 'Icons_03_Sofa.svg';
-                        $manufacture_label = 'or like the manufacture of <span class="dark">' . $manufacture_eql_to . '</span> sofas';
-                        $manufacture_legend = ' 100kg of CO<sub>2</sub>';
+                        $manufacture_legend = $manufacture_eql_to . ' ' . str_plural('sofa', $manufacture_eql_to);
                     }
                     ?>
 
@@ -415,16 +414,16 @@
                         <div class="row row-compressed-xs">
                             <div class="col-lg-6 d-flex flex-column">
                                 <div class="stat">
-                                    <h3>Equal to driving</h3>
-                                    @include('partials/svg-car1')
-                                    <p>263,517km</p>
+                                    <h3>{{{ $consume_label }}}</h3>
+                                    @include('partials/'.$consume_svg)
+                                    <p>{{{ $consume_legend }}}</p>
                                 </div>
                             </div>
                             <div class="col-lg-6 d-flex flex-column">
                                 <div class="stat">
-                                    <h3>Like manufacturing</h3>
-                                    @include('partials/svg-car2')
-                                    <p>5 cars</p>
+                                    <h3>{{{ $manufacture_label }}}</h3>
+                                    @include('partials/'.$manufacture_svg)
+                                    <p>{{{ $manufacture_legend }}}</p>
                                 </div>
                             </div>
                         </div>
