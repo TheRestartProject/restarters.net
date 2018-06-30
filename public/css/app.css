@@ -15244,11 +15244,19 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   font-size: 15px;
   line-height: 1.3;
   text-align: center;
+}
+
+.onboarding .modal-content p:last-child {
   margin-bottom: 40px;
 }
 
 .onboarding .modal-content img {
   margin: 0 auto 25px;
+}
+
+.onboarding .modal-content ul {
+  text-align: center;
+  list-style-type: square;
 }
 
 .onboarding .modal-prev,

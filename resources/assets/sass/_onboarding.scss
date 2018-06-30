@@ -45,6 +45,9 @@
             font-size: 15px;
             line-height: 1.3;
             text-align: center;
+        }
+
+        p:last-child {
             margin-bottom: 40px;
         }
 
@@ -52,6 +55,10 @@
           margin: 0 auto 25px;
         }
 
+        ul {
+            text-align: center;
+            list-style-type: square;
+        }
     }
 
     .modal-prev, .modal-next {
