@@ -55,6 +55,7 @@ return array(
     'App\\Http\\Middleware\\VerifyCsrfToken' => $baseDir . '/app/Http/Middleware/VerifyCsrfToken.php',
     'App\\Http\\Middleware\\VerifyUserConsent' => $baseDir . '/app/Http/Middleware/VerifyUserConsent.php',
     'App\\Images' => $baseDir . '/app/Images.php',
+    'App\\Invite' => $baseDir . '/app/Invite.php',
     'App\\Listeners\\LogSuccessfulLogin' => $baseDir . '/app/Listeners/LogSuccessfulLogin.php',
     'App\\Notifications\\AccountCreated' => $baseDir . '/app/Notifications/AccountCreated.php',
     'App\\Notifications\\EventConfirmed' => $baseDir . '/app/Notifications/EventConfirmed.php',

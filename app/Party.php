@@ -27,11 +27,6 @@ class Party extends Model
      */
     protected $hidden = [];
 
-    //Table Relations
-
-
-    // Setters
-
 
     //Getters
     public function findAll() {//Tested
@@ -497,7 +492,7 @@ class Party extends Model
 
         return [
           'co2'                 => number_format(round($co2 * $Device->displacement), 0, '.' , ','),
-          'ewaste'              => $ewaste,
+          'ewaste'              => number_format(round($ewaste), 0, '.' , ','),
           'fixed_devices'       => $fixed_devices,
           'repairable_devices'  => $repairable_devices,
           'dead_devices'        => $dead_devices

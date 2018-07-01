@@ -15,7 +15,7 @@
             </div>
         @endif
 
-        <form id="register-form" action="/user/register" method="post">
+        <form id="register-form" method="post">
 
         @csrf
 

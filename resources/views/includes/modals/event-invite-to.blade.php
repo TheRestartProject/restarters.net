@@ -18,7 +18,6 @@
         <form action="/party/invite" method="post">
           @csrf
 
-          <input type="hidden" name="from_id" value="{{ Auth::user()->id }}">
           <input type="hidden" name="group_name" value="{{ $formdata->group_name }}">
           <input type="hidden" id="event_id" name="event_id" value="{{ $formdata->id }}">
 
@@ -31,10 +30,7 @@
 
           <div id="invite_div" class="form-group">
               <label for="manual_invite_box">@lang('events.manual_invite_box'):</label>
-              <input type="text" class="form-control tokenfield-make" id="manual_invite_box" name="manual_invite_box"/>
-              <!-- <input type="text" class="form-control" id="invite_emails"/> -->
-              <!-- <div id="manual_invite_box" name="manual_invite_box[]" class="tokenfield form-control"></div> -->
-              <!-- <input type="hidden" id="prepopulate" value=""> -->
+              <input type="text" id="manual_invite_box" name="manual_invite_box" class="tokenfield form-control">
           </div>
           <small class="after-offset">@lang('events.type_email_addresses_message')</small>
 

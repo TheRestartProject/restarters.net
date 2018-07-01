@@ -6,11 +6,7 @@
 
       <div class="modal-header">
 
-        @if( isset($confirmed) && $confirmed == true )
-          <h5 id="eventAllVolunteersLabel">All Restarters confirmed</h5>
-        @else
-          <h5 id="eventAllVolunteersLabel">@lang('events.all_restarters_attended_modal_heading')</h5>
-        @endif
+        <h5 id="eventAllVolunteersLabel">All Restarters @if( $event->hasFinished() ) attended @else confirmed @endif</h5>
         @include('partials.cross')
 
       </div>
@@ -29,23 +25,15 @@
               <th></th>
               <th scope="col">@lang('events.table_restarter_column')</th>
               <th scope="col">@lang('events.table_skills_column')</th>
-              @if( !isset($confirmed) )
+              @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator'))
                 <th></th>
               @endif
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="table-cell-icon"><img src="{{{ url('images/placeholder.png') }}}" class="rounded" alt="Placeholder"></td>
-              <td><a href="">Dean Appleton-Claydon</a> <span class="badge badge-primary">Host</span></td>
-              <td>
-                Communication<br>
-                Communication
-              </td>
-              @if( !isset($confirmed) )
-                <td align="right"><a href="#alert">@lang('events.remove_volunteer_link')</a></td>
-              @endif
-            </tr>
+            @foreach ($attended as $volunteer)
+              @include('partials.volunteer-row')
+            @endforeach
           </tbody>
         </table>
 

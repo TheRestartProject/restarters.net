@@ -73,7 +73,7 @@
         font-size: 13px;
         border-bottom: 1px #D9D9D9 solid;
         flex: 1 0 100%;
-        min-height: 90px;
+        min-height: 70px;
         @include media-breakpoint-up(lg) {
             flex: 1 0 33.333%;
             max-width: 33.333%;
@@ -87,7 +87,8 @@
 
         h3 {
             font-size: 15px;
-            margin: 0 5px 0 0;
+            margin: 0 5px 3px 0;
+            font-family: $font-family-second;
 
             a {
                 text-decoration: none;
@@ -103,7 +104,7 @@
             font-size: 13px;
 
             svg {
-                top: 2px;
+                top: 3px;
                 position: relative;
                 z-index: 1;
             }
@@ -114,7 +115,7 @@
             left: 15px;
             top: 50%;
             z-index: 1;
-            width: 36px;           
+            width: 36px;
             height: 36px;
             border-radius: 50%;
             margin-top: -18px;
@@ -160,4 +161,3 @@
     }
 
 }
-

@@ -23569,21 +23569,23 @@ function serialize(tokenfield) {
     return data;
 }
 
-function initTokenfields() {
-    if (document.querySelectorAll('.tokenfield').length > 0) {
-
-        var tokens = document.querySelector('#prepopulate');
-
-        var tf = new Tokenfield({
-            el: document.querySelector('.tokenfield')
-        });
-
-        tf.on('change', function () {
-            var out = JSON.stringify(serialize(tf), null, 2);
-            tokens.value = out;
-        });
-    }
-}
+// function initTokenfields() {
+//     if ( document.querySelectorAll('.tokenfield').length > 0 ) {
+//
+//         var tokens = document.querySelector('#prepopulate');
+//
+//         var tf = new Tokenfield({
+//             el: document.querySelector('.tokenfield')
+//         });
+//
+//         tf.on('change', function () {
+//             var out = JSON.stringify(serialize(tf), null, 2);
+//             tokens.value = out;
+//         });
+//
+//     }
+//
+// }
 
 var placeSearch, autocomplete;
 var componentForm = {
@@ -23923,7 +23925,7 @@ function resetForm(e) {
 
 Dropzone.autoDiscover = false;
 onboarding();
-initTokenfields();
+//initTokenfields();
 textEditor();
 numericInputs();
 eventsMap();
@@ -68360,7 +68362,7 @@ $(".select2-tags").select2({
 });
 
 $(document).ready(function () {
-  $('.tokenfield-make').tokenfield();
+  $('.tokenfield').tokenfield();
 
   $("#invites_to_volunteers").on("click", function () {
     if (this.checked) {

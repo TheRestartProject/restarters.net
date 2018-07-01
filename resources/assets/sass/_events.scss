@@ -12,11 +12,11 @@
 
         h1 {
             font-size: 26px;
-            margin: 0;
+            margin: 10px 0 6px;
         }
 
         p {
-            margin: 0;
+            margin: 0 0 6px;
             a {
                 color: #000;
                 text-decoration: underline;
@@ -40,7 +40,7 @@
             width: 115px;
             height: auto;
             border-radius: 50%;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
     }
 

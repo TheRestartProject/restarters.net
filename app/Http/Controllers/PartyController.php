@@ -12,6 +12,7 @@ use App\Device;
 use App\EventsUsers;
 use App\Session;
 use App\UserGroups;
+use App\Invite;
 
 use Notification;
 use App\Notifications\JoinEvent;
@@ -675,50 +676,24 @@ class PartyController extends Controller {
 
   public function view($id) {
 
-      $Groups = new Group;
       $File = new FixometerFile;
       $Party = new Party;
-      $Device = new Device;
 
-      $allparties = $Party->ofThisGroup('admin', true, true);
-      $co2Total = $Device->getPartyWeights($id);
-
+      //Event details
       $images = $File->findImages(env('TBL_EVENTS'), $id);
-
-      if (!isset($images)) {
-        $images = null;
-      }
-
       $party = $Party->findThis($id, true)[0];
+      $hosts = EventsUsers::where('event', $id)->where('role', '=', 3)->where('status', 1)->get();
 
-      $attended_ids = EventsUsers::where('event', $id)->where('status', '=', 2)->pluck('user')->toArray();
-      if (!empty($attended_ids)) {
-        foreach ($attended_ids as $attended_id) {
-          $attended[] = User::getProfile($attended_id);
-          $attended_roles[$attended_id] = EventsUsers::where('user', $attended_id)->where('event', $id)->first()->role;
-        }
-      } else {
-        $attended = [];
-        $attended_roles = [];
-      }
+      //Info for attendance tabs
+      $attendees = EventsUsers::where('event', $id)->where('status', 1);
+      $attended = clone $attendees->get();
+      $attended_summary = clone $attendees->take(6)->get();
 
-      $invited_ids = EventsUsers::where('event', $id)->where('status', '!=', 2)->pluck('user')->toArray();
-      if (!empty($invited_ids)) {
-        foreach ($invited_ids as $invited_id) {
-          $invited[] = User::getProfile($invited_id);
-          $invited_roles[$invited_id] = EventsUsers::where('user', $invited_id)->where('event', $id)->first()->role;
-        }
-      } else {
-        $invited = [];
-        $invited_roles = [];
-      }
+      $invites = EventsUsers::where('event', $id)->where('status', '!=', 1);
+      $invited = clone $invites->get();
+      $invited_summary = clone $invites->take(6)->get();
 
-      try {
-        $host = User::find(EventsUsers::where('event', $id)->where('role', '=', 3)->first()->user);
-      } catch (\Exception $e) {
-        $host = null;
-      }
-
+      //Useful for add/edit device
       $brands = Brands::all();
       $categories = Category::all();
       $event = Party::find($id);
@@ -729,12 +704,11 @@ class PartyController extends Controller {
         'event' => $event,
         'stats' => $event->getEventStats($this->EmissionRatio),
         'formdata' => $party,
-        'partiesCount' => count($allparties),
+        'attended_summary' => $attended_summary,
         'attended' => $attended,
-        'attended_roles' => $attended_roles,
+        'invited_summary'  => $invited_summary,
         'invited'  => $invited,
-        'invited_roles' => $invited_roles,
-        'host' => $host,
+        'hosts' => $hosts,
         'brands' => $brands,
         'categories' => $categories,
       ]);
@@ -1092,12 +1066,18 @@ class PartyController extends Controller {
   }
 
   public function getGroupEmails(Request $request){
+
     $event_id = $request->input('event_id');
 
-    $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)->pluck('user')->toArray();
+    $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
+              ->where('user', '!=', Auth::user()->id)
+                ->pluck('user')
+                  ->toArray();
+
     $group_users = User::whereIn('id', $group_user_ids)->pluck('email')->toArray();
 
     return json_encode($group_users);
+
   }
 
   public function updateQuantity(Request $request) {
@@ -1113,41 +1093,74 @@ class PartyController extends Controller {
 
   public function postSendInvite(Request $request) {
 
-    $from_id = $request->input('from_id');
+    $from_id = Auth::user()->id;
     $group_name = $request->input('group_name');
     $event_id = $request->input('event_id');
     $invite_group = $request->input('invite_group');
+
     $emails = explode(',', str_replace(' ', '', $request->input('manual_invite_box')));
     $message = $request->input('message_to_restarters');
 
-    if (empty($emails)) {
+    if ( !empty($emails) ) {
+
       $users = User::whereIn('email', $emails)->get();
-      // if (isset($invite_group) && $invite_group == 1) {
-      //   $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)->pluck('user')->toArray();
-      //   $group_users = User::whereIn('id', $group_user_ids)->get();
-      //
-      //   $users = $users->merge($group_users);
-      // }
+
       $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
       $from = User::find($from_id);
 
       foreach ($users as $user) {
-        $user_event = EventsUsers::where('user', $user->id)->where('event', $event_id)->first();
-        if (is_null($user_event) || $user_event->status != "1") {
-          $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
-          $url = url('/').'/accept-invite/party-'.$event_id.'/'.$hash;
 
-          if (!is_null($user_event)) {
-            $user_event->update([
-              'status' => $hash,
-            ]);
+        $user_event = EventsUsers::where('user', $user->id)->where('event', $event_id)->first();
+
+        if (is_null($user_event) || $user_event->status != "1") {
+
+            $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
+            $url = url('/accept-invite/party-'.$event_id.'/'.$hash);
+
+            if (!is_null($user_event)) {
+
+              $user_event->update([
+                'status' => $hash,
+              ]);
+
+            } else {
+
+              EventsUsers::create([
+                'user' => $user->id,
+                'event' => $event_id,
+                'status' => $hash,
+              ]);
+
+            }
+
+            $arr = array(
+              'name' => $from->name,
+              'group' => $group_name,
+              'url' => $url,
+              'message' => $message,
+            );
+            Notification::send($user, new JoinEvent($arr));
+
           } else {
-            EventsUsers::create([
-              'user' => $user->id,
-              'event' => $event_id,
-              'status' => $hash,
-            ]);
+
+            $not_sent[] = $user->email;
+
           }
+
+      }
+
+      if ( !empty($non_users) ) {
+
+        foreach ($non_users as $non_user) {
+
+          $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
+          $url = url('/user/register/'.$hash);
+
+          $invite = Invite::create(array(
+            'event_id' => $event_id,
+            'email' => $non_user,
+            'hash' => $hash,
+          ));
 
           $arr = array(
             'name' => $from->name,
@@ -1155,32 +1168,11 @@ class PartyController extends Controller {
             'url' => $url,
             'message' => $message,
           );
-          Notification::send($user, new JoinEvent($arr));
-        } else {
-          $not_sent[] = $user->email;
+
+          Notification::send($invite, new JoinEvent($arr));
+
         }
-      }
 
-      if (!empty($non_users)) {
-        foreach ($non_users as $non_user) {
-          $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
-          $url = url('/').'/user/register/party-'.$event_id.'/'.$hash;
-
-          EventsUsers::create([
-            'user' => $user->id,
-            'event' => $event_id,
-            'status' => $hash,
-          ]);
-
-          $invite = JoinEvent::create(array(
-            'name' => $from->name,
-            'group' => $group_name,
-            'url' => $url,
-            'message' => $message,
-          ));
-          $invite->notify();
-          // Notification::send($user, new JoinEvent($arr));
-        }
       }
 
       if (!isset($not_sent)) {
@@ -1213,8 +1205,4 @@ class PartyController extends Controller {
 
   }
 
-    public function test() {
-      $g = new Party;
-      dd($g->ofThisUser('1', false, true));
-    }
 }

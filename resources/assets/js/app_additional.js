@@ -63,7 +63,7 @@ $(".select2-tags").select2({
 });
 
 $( document ).ready(function() {
-  $('.tokenfield-make').tokenfield();
+  $('.tokenfield').tokenfield();
 
   $("#invites_to_volunteers").on("click", function(){
     if (this.checked){

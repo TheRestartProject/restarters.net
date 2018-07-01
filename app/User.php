@@ -45,6 +45,11 @@ class User extends Authenticatable
     public function role() {
       return $this->hasOne('App\Role', 'idroles', 'role');
     }
+
+    public function userSkills() {
+      return $this->hasMany('App\UsersSkills', 'user', 'id');
+    }
+
     //
     // public function sessions() {
     //   return $this->hasMany('App\Session', 'user', 'id');

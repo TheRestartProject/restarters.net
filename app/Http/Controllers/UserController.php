@@ -5,14 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use App\User;
-use App\Role;
-use App\Group;
 use App\Device;
+use App\EventsUsers;
+use App\Group;
+use App\Invite;
 use App\Party;
+use App\Role;
+use App\Skills;
+use App\User;
 use App\UserGroups;
 use App\UsersSkills;
-use App\Skills;
 //use App\Session;
 use App\Http\Controllers\PartyController;
 
@@ -949,7 +951,7 @@ class UserController extends Controller
       }
     }
 
-    public function getRegister($event_id = null, $invite = null){
+    public function getRegister($hash = null){
       $Party = new Party;
       $Device = new Device;
 
@@ -957,28 +959,17 @@ class UserController extends Controller
       $co2Total = $Device->getWeights();
       $device_count_status = $Device->statusCount();
 
-      if (is_null($invite) && is_null($event_id)) {
-        return view('auth.register-new', [
-          'skills' => FixometerHelper::allSkills(),
-          'co2Total' => $co2Total[0]->total_footprints,
-          'wasteTotal' => $co2Total[0]->total_weights,
-          'partiesCount' => count($allparties),
-          'device_count_status' => $device_count_status,
-        ]);
-      } else {
-        return view('auth.register-new', [
-          'skills' => FixometerHelper::allSkills(),
-          'co2Total' => $co2Total[0]->total_footprints,
-          'wasteTotal' => $co2Total[0]->total_weights,
-          'partiesCount' => count($allparties),
-          'device_count_status' => $device_count_status,
-          'event_id' => $event_id,
-          'invite' => $invite,
-        ]);
-      }
+      return view('auth.register-new', [
+        'skills' => FixometerHelper::allSkills(),
+        'co2Total' => $co2Total[0]->total_footprints,
+        'wasteTotal' => $co2Total[0]->total_weights,
+        'partiesCount' => count($allparties),
+        'device_count_status' => $device_count_status,
+      ]);
+
     }
 
-    public function postRegister(Request $request){
+    public function postRegister(Request $request, $hash = null){
 
       if( Auth::check() ){ //Existing users don't need all the same rules
 
@@ -1100,9 +1091,18 @@ class UserController extends Controller
 
       }
 
-      if ($request->input('event') !== null && $request->input('invite') !== null) {
-        $PartyController = new PartyController;
-        $PartyController->confirmInvite($request->input('event'), $request->input('invite'), $user->id);
+      if ( !is_null($hash) ) {
+
+        $acceptance = Invite::where('hash', $hash)->first();
+
+        EventsUsers::create([
+          'user' => $user->id,
+          'event' => $acceptance->event_id,
+          'status' => 1,
+        ]);
+
+        $acceptance->delete();
+
       }
 
       //Session::createSession($user->id);

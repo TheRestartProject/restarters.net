@@ -27,12 +27,8 @@ class UsersSkills extends Model
     public $timestamps = false;
 
     //Table Relations
-
-
-    // Setters
-
-
-    //Getters
-
+    public function skillName() {
+      return $this->hasOne('App\Skills', 'id', 'skill');
+    }
 
 }

@@ -28,14 +28,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="table-cell-icon"><img src="{{{ url('images/placeholder.png') }}}" class="rounded" alt="Placeholder"></td>
-              <td><a href="">Dean Appleton-Claydon</a></td>
-              <td>
-                Communication<br>
-                Communication
-              </td>
-            </tr>
+            @foreach ($invited as $volunteer)
+              @include('partials.volunteer-row')
+            @endforeach
           </tbody>
         </table>
 

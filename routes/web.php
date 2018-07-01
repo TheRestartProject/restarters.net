@@ -19,9 +19,8 @@ Route::get('/user/reset', 'UserController@reset');
 Route::post('/user/reset', 'UserController@reset');
 Route::get('/user/recover', 'UserController@recover');
 Route::post('/user/recover', 'UserController@recover');
-Route::get('/user/register', 'UserController@getRegister');
-Route::get('/user/register/{invite}', 'UserController@getRegister');
-Route::post('/user/register', 'UserController@postRegister');
+Route::get('/user/register/{hash?}', 'UserController@getRegister');
+Route::post('/user/register/{hash?}', 'UserController@postRegister');
 
 Route::get('/user/forbidden', function () {
     return view('user.forbidden', [
@@ -43,8 +42,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   // Route::get('/', 'UserController@index');
 
   //User Controller
-  Route::get('/profile', 'UserController@index')->name('profile');
-  Route::get('/profile/{id}', 'UserController@index');
+  Route::get('/profile/{id?}', 'UserController@index')->name('profile');
   Route::get('/profile/edit/{id?}', 'UserController@getProfileEdit');
   Route::post('profile/edit-info', 'UserController@postProfileInfoEdit');
   Route::post('profile/edit-password', 'UserController@postProfilePasswordEdit');

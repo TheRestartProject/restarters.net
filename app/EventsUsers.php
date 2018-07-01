@@ -32,4 +32,9 @@ class EventsUsers extends Model
     public function role() {
       return $this->hasOne('App\Role', 'role', 'role');
     }
+
+    //Table Relations
+    public function eventUser() {
+      return $this->hasOne('App\User', 'id', 'user');
+    }
 }
