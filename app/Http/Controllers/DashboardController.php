@@ -9,6 +9,7 @@ use App\UserGroups;
 use App\UsersSkills;
 use App\EventsUsers;
 use App\Helpers\FixometerHelper;
+use App\Device;
 
 use Auth;
 use DB;
@@ -140,12 +141,16 @@ class DashboardController extends Controller
       }
 
       $news_feed = FixometerHelper::getRSSFeed();
+      $wiki_pages = FixometerHelper::getRandomWikiPages();
 
       if ($user->number_of_logins == 1) {
         $onboarding = true;
       } else {
         $onboarding = false;
       }
+
+      $devices_gateway = new Device;
+      $impact_stats = $devices_gateway->getWeights();
 
       return view('dashboard.index', [
         'gmaps' => true,
@@ -163,6 +168,8 @@ class DashboardController extends Controller
         'all_groups' => $all_groups,
         'closest_events' => $closest_events,
         'onboarding' => $onboarding,
+        'impact_stats' => $impact_stats,
+        'wiki_pages' => $wiki_pages
       ]);
 
       /*

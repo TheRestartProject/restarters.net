@@ -119,6 +119,7 @@
 
         </ul>
       </aside>
+      @include('partials.impact')
     </div>
     @endif
     @if (!$has_profile_pic || !$has_skills || !$in_group || !$in_event)
