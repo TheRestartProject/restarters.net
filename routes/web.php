@@ -32,6 +32,10 @@ Route::get('/user/forbidden', function () {
 Auth::routes();
 Route::get('/logout', 'UserController@logout');
 
+Route::get('/features', function() {
+    return View::make('features.index');
+})->name('features');
+
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
   Route::get('/', 'HomeController@index')->name('home');
