@@ -10,12 +10,12 @@ return [
     |
     */
     'slide1_heading' => 'Welcome!',
-    'slide1_content' => 'Thank you for joining our community space.',
-    'slide2_heading' => 'Get active in community repair',
-    'slide2_content' => 'Through the community space you can chat with other Restarters; host and attend events; join repair groups; share your repair knowledge; and help to bring down the barriers to repair by logging the devices you fix at events.',
+    'slide1_content' => '<p>Thank you for being a part of our community space.</p><p>And <strong>thank you</strong> for being a beta tester!  With your feedback we can help improve the platform for everyone.</p>',
+    'slide2_heading' => 'Your gateway to community repair',
+    'slide2_content' => '<p>In the community space you can:</p> <ul><li>chat with other Restarters</li><li>join repair groups</li><li>share your repair knowledge</li><li>create and RSVP to events</li><li>log the devices you fix at events</li></ul><p><strong>Help bring down the barriers to repair!</strong></p>',
     'slide3_heading' => 'Let\'s get started!',
-    'slide3_content' => 'Your starting point is the community dashboard.  On your dashboard you will find links to your most common activities in the community repair space.  You can also explore other activities via the menus.',
-    'create_a_group' => 'Create a new group',
+    'slide3_content' => '<p>Your starting point is the <strong>community dashboard</strong>.</p><p>Your dashboard gives you at a glance info on the latest happenings in the community, as well as quick access to common actions.</p><p>Have an explore!</p>',
+    'finishing_action' => 'To the dashboard',
     'previous' => 'Previous',
     'next' => 'Next'
 
