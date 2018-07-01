@@ -478,7 +478,7 @@ class Party extends Model
 
           if( $device->repair_status == env('DEVICE_FIXED') ){
             $co2     += (!empty((float)$device->estimate) && $device->category==46 ? ((float)$device->estimate * $emissionRatio) : (float)$device->footprint);
-            $ewaste  += (!empty($device->estimate) && $device->category==46 ? $device->estimate : $device->weight);
+            $ewaste  += (!empty((float)$device->estimate) && $device->category==46 ? (float)$device->estimate : $device->weight);
           }
 
           switch($device->repair_status){

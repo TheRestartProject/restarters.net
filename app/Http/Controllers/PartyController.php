@@ -140,6 +140,7 @@ class PartyController extends Controller {
         'past_events'      => $past_events,
         'moderate_events'  => $moderate_events,
         'user_groups'      => $user_groups,
+        'EmissionRatio'    => $this->EmissionRatio,
       ]);
   }
 
