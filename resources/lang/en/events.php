@@ -33,13 +33,14 @@ return [
     'all_restarters_attended_modal_description' => 'An overview of who attended your event and their skills.',
     'remove_volunteer_link' => 'Remove volunteer',
 
-    'invite_restarters_modal_heading' => 'Invite Restarters',
+    'invite_restarters_modal_heading' => 'Invite Restarters to the event',
     'invite_restarters_modal_description' => 'A repair event is nothing without volunteers. Use this tool to invite them. ',
     'send_invites_to_restarters_tickbox' => 'Send invites to all Restarters affiliated with :group',
     'manual_invite_box' => 'Send invites to',
     'type_email_addresses_message' => 'Type email addresses to manually invite to this event',
     'message_to_restarters' => 'Invitation message',
-    'sample_text_message_to_restarters' => 'We would love you to join us, and help share your repair skills at our upcoming community repair event.',
+    'message_explainer' => 'An email with the event details will be sent to the invitees inviting them to RSVP.  If you would like to, you can include an additional message within the email by filling in the box above.',
+    'sample_text_message_to_restarters' => '<add a custom message here if required>',
     'send_invite_button' => 'Send invite',
 
     'add_volunteer_modal_heading' => 'Add volunteer',
@@ -85,6 +86,7 @@ return [
     'field_venue_helper' => 'I.e. the place where the fixing happens!',
 
     'field_event_name' => 'Name of event',
+    'field_event_name_helper' => 'Please enter a neighbourhood or the name of the venue - please no \'Restart Party\' or \'Repair Cafe\'.',
     'field_event_group' => 'Event group',
     'field_event_desc' => 'Description',
     'field_event_date' => 'Date of event',
@@ -100,7 +102,7 @@ return [
     'field_event_country' => 'Country',
     'field_add_image' => 'Add image',
 
-    'before_submit_text' => 'Event will not display on therestartproject.org until approved by a moderator',
+    'before_submit_text' => 'Once confirmed by our community lead, your event will be made public on The Restart Project homepage.',
     'save_event' => 'Save Event',
 
     'reporting' => 'Reporting',

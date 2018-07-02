@@ -65,7 +65,7 @@ return [
     'therestartproject' => 'The Restart Project',
 
     'help_feedback_url' => 'https://talk.restarters.net/c/site-feedback',
-    'faq_url' => '',
+    'faq_url' => 'https://therestartproject.org/faq',
     'restartproject_url' => 'https://therestartproject.org',
     'discourse_url' => 'https://talk.restarters.net',
     'wiki_url' => 'https://wiki.restarters.net',
