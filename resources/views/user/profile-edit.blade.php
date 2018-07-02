@@ -197,7 +197,13 @@
                       </div>
                     </div>
                     <div class="form-row">
-                      <div class="form-group col-lg-12">
+                      <div class="form-group col-lg-4">
+                        @php ( $path = $user->getProfile($user->id)->path )
+                        @if ( !is_null($path) )
+                          <img width="50" src="{{ asset('/uploads/thumbnail_' . $path) }}" alt="{{{ $user->name }}}'s avatar">
+                        @endif
+                      </div>
+                      <div class="form-group col-lg-8">
                         <div class="d-flex justify-content-end">
                           <button type="submit" class="btn btn-primary">@lang('general.change_photo')</button>
                         </div>
