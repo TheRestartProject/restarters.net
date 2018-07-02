@@ -59,7 +59,11 @@
 
         <section class="table-section" id="events-2">
           <header>
-            <h2>Upcoming {{{ $group->name }}} events</h2>
+            @if( !is_null($group) )
+              <h2>Upcoming {{{ $group->name }}} events</h2>
+            @else
+              <h2>Upcoming events</h2>
+            @endif
           </header>
 
           <table class="table table-events table-striped" role="table">
@@ -93,7 +97,11 @@
 
         <section class="table-section" id="events-3">
           <header>
-            <h2>Past {{{ $group->name }}} events</h2>
+            @if( !is_null($group) )
+              <h2>Past {{{ $group->name }}} events</h2>
+            @else
+              <h2>Past events</h2>
+            @endif
           </header>
 
           <table class="table table-events table-striped" role="table">
