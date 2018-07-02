@@ -7,6 +7,9 @@ use App\User;
 use App\Group;
 use App\Party;
 use App\Device;
+use App\UserGroups;
+use App\GroupTags;
+use App\GrouptagsGroups;
 
 use Auth;
 use FixometerHelper;
@@ -61,7 +64,7 @@ class GroupController extends Controller
       $user = User::find(Auth::id());
 
       // Administrators can add Groups.
-      if(FixometerHelper::hasRole($user, 'Administrator')){
+      if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host')){
           // $this->set('title', 'New Group');
           // $this->set('gmaps', true);
           // $this->set('js',
@@ -76,11 +79,11 @@ class GroupController extends Controller
               // We got data! Elaborate. //NB:: Taken out frequency as it doesn't appear in the post data might be gmaps
               $name       =       $_POST['name'];
               $website    =       $_POST['website'];
-              $area       =       $_POST['area'];
+              // $area       =       $_POST['area'];
               // $freq       =       $_POST['frequency'];
               $location   =       $_POST['location'];
-              $latitude   =       $_POST['latitude'];
-              $longitude  =       $_POST['longitude'];
+              // $latitude   =       $_POST['latitude'];
+              // $longitude  =       $_POST['longitude'];
               $text       =       $_POST['free_text'];
 
 
@@ -89,15 +92,29 @@ class GroupController extends Controller
               if(empty($name)){
                   $error['name'] = 'Please input a name.';
               }
-              if(!empty($latitude) || !empty($longitude)) {
-                  // check that these values are floats.
-                  $check_lat = filter_var($latitude, FILTER_VALIDATE_FLOAT);
-                  $check_lon = filter_var($longitude, FILTER_VALIDATE_FLOAT);
+              // if(!empty($latitude) || !empty($longitude)) {
+              //     // check that these values are floats.
+              //     $check_lat = filter_var($latitude, FILTER_VALIDATE_FLOAT);
+              //     $check_lon = filter_var($longitude, FILTER_VALIDATE_FLOAT);
+              //
+              //     if(!$check_lat || !$check_lon){
+              //         $error['location'] = 'Coordinates must be in the correct format.';
+              //     }
+              //
+              // }
+              if (!empty($location)) {
 
-                  if(!$check_lat || !$check_lon){
-                      $error['location'] = 'Coordinates must be in the correct format.';
-                  }
+                $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($location.',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
+                $json = json_decode($json);
 
+                if (is_object($json) && !empty($json->{'results'})) {
+                    $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
+                    $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
+                }
+
+              } else {
+                $latitude = null;
+                $longitude = null;
               }
 
 
@@ -105,14 +122,14 @@ class GroupController extends Controller
                   // No errors. We can proceed and create the User.
                   $data = array(  'name'          => $name,
                                   'website'       => $website,
-                                  'area'          => $area,
+                                  // 'area'          => $area,
                                   // 'frequency'     => $freq,
                                   'location'      => $location,
                                   'latitude'      => $latitude,
                                   'longitude'     => $longitude,
                                   'free_text'     => $text,
                                   );
-                  $idGroup = $Group->create($data)->id;
+                  $idGroup = $Group->create($data)->idgroups;
 
                   if( is_numeric($idGroup) && $idGroup !== false ){
 
@@ -120,7 +137,7 @@ class GroupController extends Controller
 
                       if(isset($_FILES) && !empty($_FILES)){
                           $file = new FixometerFile;
-                          $group_avatar = $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true);
+                          $group_avatar = $file->upload('file', 'image', $idGroup, env('TBL_GROUPS'), false, true);
                       }
 
                       if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
@@ -183,13 +200,17 @@ class GroupController extends Controller
                 $udata = $_POST;
               }
 
-              return view('group.create', [
-                'title' => 'New Group',
-                'gmaps' => true,
-                'response' => $response,
-                'error' => $error,
-                'udata' => $udata,
-              ]);
+              if( is_numeric($idGroup) && $idGroup !== false ){
+                return redirect('/group/edit/'.$idGroup)->with('response', $response);
+              } else {
+                return view('group.create', [
+                  'title' => 'New Group',
+                  'gmaps' => true,
+                  'response' => $response,
+                  'error' => $error,
+                  'udata' => $udata,
+                ]);
+              }
 
           }
 
@@ -200,7 +221,7 @@ class GroupController extends Controller
 
       }
       else {
-          header('Location: /user/forbidden', true, 403);
+          return redirect('/user/forbidden');
       }
   }
 
@@ -257,32 +278,194 @@ class GroupController extends Controller
 
   }
 
+  public function view($id) {
+
+    $Groups = new Group;
+    $File = new FixometerFile;
+    $Party = new Party;
+    $Device = new Device;
+
+    $user = Auth::user();
+
+    $allparties = $Party->ofThisGroup($id);
+    $weights = $Device->getWeights($id);
+
+    $images = $File->findImages(env('TBL_GROUPS'), $id);
+
+    if (!isset($images)) {
+      $images = null;
+    }
+
+    $group = Group::find($id);
+    $pax = count(UserGroups::where('group', $id)->get());
+    $hours = 0;
+
+    return view('group.view-host', [
+      'gmaps' => true,
+      'images' => $images,
+      'user' => $user,
+      'group' => $group,
+      'grouplist' => $Groups->findList(),
+      'pax' => $pax,
+      'hours' => $hours,
+      'allparties' => $allparties,
+      'weights' => $weights,
+    ]);
+
+  }
+
+  public function postSendInvite(Request $request) {
+
+    $from_id = $request->input('from_id');
+    $group_name = $request->input('group_name');
+    $group_id = $request->input('group_id');
+    $emails = explode(',', str_replace(' ', '', $request->input('manual_invite_box')));
+    $message = $request->input('message_to_restarters');
+
+    if (empty($emails)) {
+      $users = User::whereIn('email', $emails)->get();
+      // if (isset($invite_group) && $invite_group == 1) {
+      //   $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)->pluck('user')->toArray();
+      //   $group_users = User::whereIn('id', $group_user_ids)->get();
+      //
+      //   $users = $users->merge($group_users);
+      // }
+      $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
+      $from = User::find($from_id);
+
+      foreach ($users as $user) {
+        $user_group = UserGroups::where('user', $user->id)->where('group', $group_id)->first();
+        if (is_null($user_group) || $user_group->status != "1") {
+          $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
+          $url = url('/').'/accept-invite/group-'.$group_id.'/'.$hash;
+
+          if (!is_null($user_group)) {
+            $user_group->update([
+              'status' => $hash,
+            ]);
+          } else {
+            UserGroups::create([
+              'user' => $user->id,
+              'group' => $group_id,
+              'status' => $hash,
+            ]);
+          }
+
+          $arr = array(
+            'name' => $from->name,
+            'group' => $group_name,
+            'url' => $url,
+            'message' => $message,
+          );
+          Notification::send($user, new JoinGroup($arr));
+        } else {
+          $not_sent[] = $user->email;
+        }
+      }
+
+      if (!empty($non_users)) {
+        foreach ($non_users as $non_user) {
+          $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
+          $url = url('/').'/user/register/group-'.$group_id.'/'.$hash;
+
+          UserGroups::create([
+            'user' => $user->id,
+            'group' => $group_id,
+            'status' => $hash,
+          ]);
+
+          $invite = JoinGroup::create(array(
+            'name' => $from->name,
+            'group' => $group_name,
+            'url' => $url,
+            'message' => $message,
+          ));
+          $invite->notify();
+          // Notification::send($user, new JoinEvent($arr));
+        }
+      }
+
+      if (!isset($not_sent)) {
+        return redirect()->back()->with('success', 'Invites Sent!');
+      } else {
+        return redirect()->back()->with('warning', 'Invites Sent - apart from these ('.implode(',', $not_sent).') who were already part of the group');
+      }
+    } else {
+      return redirect()->back()->with('warning', 'You have not entered any emails!');
+    }
+
+  }
+
+  public function confirmInvite($group_id, $hash, $register_id = null) {
+
+    try {
+      $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
+      $user_group->status = 1;
+
+      if (is_null($register_id)) {
+        $user_group->save();
+        return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
+      } else {
+        $user_group->user = $register_id;
+        $user_group->save();
+      }
+    } catch (\Exception $e) {
+      return false;
+    }
+
+  }
+
 
   public function edit($id) {
 
       $user = Auth::user();
       $Group = new Group;
+      $File = new FixometerFile;
 
       if( FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host') ){
 
           if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
 
               $data = $_POST;
+              // dd($data);
 
               // remove the extra "files" field that Summernote generates -
               unset($data['files']);
               unset($data['image']);
+
+              if (!empty($data['location'])) {
+
+                $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($data['location'].',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
+                $json = json_decode($json);
+
+                if (is_object($json) && !empty($json->{'results'})) {
+                    $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
+                    $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
+                }
+
+              } else {
+                $latitude = null;
+                $longitude = null;
+              }
 
               $update = array(
                               'name'          => $data['name'],
                               'website'       => $data['website'],
                               'free_text'     => $data['free_text'],
                               'location'      => $data['location'],
-                              'latitude'      => $data['latitude'],
-                              'longitude'     => $data['longitude'],
+                              'latitude'      => $latitude,
+                              'longitude'     => $longitude,
                               );
 
               $u = $Group->where('idgroups', $id)->update($update);
+
+
+              if (!empty($_POST['group_tags'])) {
+
+                $Group->find($id)->group_tags()->sync($_POST['group_tags']);
+
+              }
+
               // echo "Updated---";
               if(!$u) {
 
@@ -388,12 +571,22 @@ class GroupController extends Controller
         $response = null;
       }
 
-      return view('group.edit', [
+      $images = $File->findImages(env('TBL_EVENTS'), $id);
+
+      if (!isset($images)) {
+        $images = null;
+      }
+
+      $tags = GroupTags::all();
+
+      return view('group.edit-group', [
         'response' => $response,
         'gmaps' => true,
-        'title' => 'Edit Group ' . $Group->name,
+        'title' => 'Edit Group ' . $group->name,
         'formdata' => $group,
         'user' => $user,
+        'images' => $images,
+        'tags' => $tags,
       ]);
 
   }

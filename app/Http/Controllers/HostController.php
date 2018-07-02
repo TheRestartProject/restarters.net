@@ -97,7 +97,7 @@ class HostController extends Controller
         $gids[] = $group->idgroups;
       }
 
-      if( isset($groupid) && is_numeric($groupid) && ( FixometerHelper::hasRole($user, 'Administrator') || in_array($groupid, $gids) ) ) { //
+      if( ( isset($groupid) && is_numeric($groupid) ) || in_array($groupid, $gids) ) {
 
           //$group = (object) array_fill_keys( array('idgroups') , $groupid);
           $group = $Group->findOne($groupid);

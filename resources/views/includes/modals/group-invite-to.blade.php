@@ -7,13 +7,36 @@
       <div class="modal-header">
 
         <h5 id="inviteToGroupLabel">@lang('groups.invite_group_name_header', ['group' => 'The Mighty Restarters'])</h5>
-        @include('partials/cross')
+        @include('partials.cross')
 
       </div>
 
       <div class="modal-body">
 
-        <form action="#">
+        <p>@lang('groups.invite_group_name_message')</p>
+
+        <form action="/group/invite" method="post">
+          @csrf
+
+          <input type="hidden" name="from_id" value="{{ Auth::user()->id }}">
+          <input type="hidden" name="group_name" value="{{ $group->name }}">
+          <input type="hidden" id="group_id" name="group_id" value="{{ $group->id }}">
+
+          <div id="invite_div" class="form-group">
+              <label for="manual_invite_box">@lang('groups.email_addresses_field'):</label>
+              <input type="text" class="form-control tokenfield-make" id="manual_invite_box" name="manual_invite_box"/>
+          </div>
+          <small class="after-offset">@lang('groups.type_email_addresses_message')</small>
+
+          <div class="form-group">
+              <label for="message_to_restarters">@lang('groups.message_header'):</label>
+              <textarea name="message_to_restarters" id="message_to_restarters" class="form-control field" placeholder="@lang('groups.message_example_text')"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary float-right">@lang('groups.send_invite_button')</button>
+        </form>
+
+        <!-- <form action="#">
 
           <input type="hidden" name="message" value="invite">
 
@@ -30,7 +53,7 @@
               <textarea name="invite_to_group_message" id="invite_to_group_message" class="form-control field">@lang('groups.message_example_text')</textarea>
           </div>
 
-          <button type="submit" class="btn btn-primary float-right">@lang('groups.send_invite_button')</button>
+          <button type="submit" class="btn btn-primary float-right">@lang('groups.send_invite_button')</button> -->
 
         </div>
 

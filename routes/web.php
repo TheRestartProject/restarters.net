@@ -19,8 +19,9 @@ Route::get('/user/reset', 'UserController@reset');
 Route::post('/user/reset', 'UserController@reset');
 Route::get('/user/recover', 'UserController@recover');
 Route::post('/user/recover', 'UserController@recover');
-Route::get('/user/register/{hash?}', 'UserController@getRegister');
-Route::post('/user/register/{hash?}', 'UserController@postRegister');
+Route::get('/user/register', 'UserController@getRegister');
+Route::get('/user/register/{invite}', 'UserController@getRegister');
+Route::post('/user/register', 'UserController@postRegister');
 
 Route::get('/user/forbidden', function () {
     return view('user.forbidden', [
@@ -42,7 +43,8 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   // Route::get('/', 'UserController@index');
 
   //User Controller
-  Route::get('/profile/{id?}', 'UserController@index')->name('profile');
+  Route::get('/profile', 'UserController@index')->name('profile');
+  Route::get('/profile/{id}', 'UserController@index');
   Route::get('/profile/edit/{id?}', 'UserController@getProfileEdit');
   Route::post('profile/edit-info', 'UserController@postProfileInfoEdit');
   Route::post('profile/edit-password', 'UserController@postProfilePasswordEdit');
@@ -75,7 +77,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   //Device Controller
   Route::get('/device', 'DeviceController@index')->name('devices');
   Route::get('/device/search', 'DeviceController@index');
-  Route::get('/device/edit/{id}', 'DeviceController@edit');
+  // Route::get('/device/edit/{id}', 'DeviceController@edit');
   // Route::post('/device/edit/{id}', 'DeviceController@edit');
   Route::post('/device/edit/{id}', 'DeviceController@ajaxEdit');
   // Route::get('/device/create', 'DeviceController@create');
@@ -90,7 +92,9 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::post('/group/create', 'GroupController@create');
   Route::get('/group/edit/{id}', 'GroupController@edit');
   Route::post('/group/edit/{id}', 'GroupController@edit');
-
+  Route::get('/group/view/{id}', 'GroupController@view');
+  Route::post('/group/invite', 'GroupController@postSendInvite');
+  Route::get('/accept-invite/group-{id}/{hash}', 'GroupController@confirmInvite');
 
   //Host Controller
   Route::get('/host', 'HostController@index');
@@ -109,12 +113,10 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::post('/party/edit/{id}', 'PartyController@edit');
   Route::get('/party/deleteimage', 'PartyController@deleteimage');
   Route::post('/party/invite', 'PartyController@postSendInvite');
-  Route::get('/accept-invite/{id}/{hash}', 'PartyController@confirmInvite');
-  Route::get('/cancel-invite/{id}', 'PartyController@cancelInvite');
+  Route::get('/accept-invite/party-{id}/{hash}', 'PartyController@confirmInvite');
   Route::get('/party/view/{id}', 'PartyController@view');
   Route::post('/party/get-group-emails', 'PartyController@getGroupEmails');
   Route::post('/party/update-quantity', 'PartyController@updateQuantity');
-  Route::post('/party/remove-volunteer', 'PartyController@removeVolunteer');
 
   //Role Controller
   Route::get('/role', 'RoleController@index')->name('roles');

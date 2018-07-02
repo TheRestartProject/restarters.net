@@ -10,6 +10,7 @@ class Group extends Model
 {
 
     protected $table = 'groups';
+    protected $primaryKey = 'idgroups';
     /**
      * The attributes that are mass assignable.
      *
@@ -25,7 +26,9 @@ class Group extends Model
     protected $hidden = [];
 
     //Table Relations
-
+    public function group_tags() {
+      return $this->belongsToMany('App\GroupTags', 'grouptags_groups', 'group', 'group_tag');
+    }
 
     // Setters
 

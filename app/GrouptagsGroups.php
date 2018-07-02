@@ -6,16 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 use DB;
 
-class GroupTags extends Model
+class GrouptagsGroups extends Model
 {
 
-    protected $table = 'group_tags';
+    protected $table = 'grouptags_groups';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['tag_name', 'description'];
+    protected $fillable = ['group_tag', 'group'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -24,15 +25,6 @@ class GroupTags extends Model
      */
     protected $hidden = [];
 
-    //Table Relations
-    public function group_tags() {
-      return $this->belongsToMany('App\GrouptagsGroups');
-    }
-
-    // Setters
-
-
-    //Getters
-
+    public $timestamps = false;
 
 }

@@ -7,7 +7,7 @@
       <div class="modal-header">
 
         <h5 id="groupDescriptionLabel">@lang('groups.about_group_name_header', ['group' => $group->name])</h5>
-        @include('partials/cross')
+        @include('partials.cross')
 
       </div>
 

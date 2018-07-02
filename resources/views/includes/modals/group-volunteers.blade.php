@@ -7,7 +7,7 @@
       <div class="modal-header">
 
         <h5 id="groupVolunteersLabel">@lang('groups.all_volunteers_group_name_header', ['group' => 'The Mighty Restarters'])</h5>
-        @include('partials/cross')
+        @include('partials.cross')
 
       </div>
 
