@@ -3,7 +3,7 @@
 <section class="entry-wrapper align-items-center justify-content-center">
         <div class="container">
 
-            @include('includes.logo-large')
+            @include('includes.logo')
 
             @if($valid_code == false)
               <div class="entry-panel card card__login col-12 mt-5 text-left">

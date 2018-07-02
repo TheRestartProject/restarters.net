@@ -2,7 +2,7 @@
     <div class="col-lg-6">
         <header>
           <a href="/">
-            @include('includes.logo-large')
+            @include('includes.logo')
           </a>
           <br>
           <h4>@lang('login.lead')</h4>

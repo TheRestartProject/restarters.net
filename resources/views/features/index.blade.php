@@ -5,7 +5,7 @@
         <div class="features__link"><a class="" href="/user/register">@lang('general.register')</a> / <a class="" href="{{{ route('login') }}}">@lang('general.login')</a></div>
         <header>
             <a href="{{{ route('login') }}}">
-              @include('includes/logo-large')
+              @include('includes/logo')
             </a>
             <p>@lang('general.introduction_message')</p>
         </header>
