@@ -23384,7 +23384,7 @@ window.Tokenfield = __webpack_require__(!(function webpackMissingModule() { var 
 
 if (jQuery('.slideshow').length > 0) {
     jQuery('.slideshow').slick({
-        dots: true, arrows: false
+        dots: true, arrows: true, infinite: false
     });
 }
 
