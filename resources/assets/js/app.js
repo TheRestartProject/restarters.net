@@ -108,6 +108,17 @@ function formProcessPrev(e) {
 jQuery('.btn-next').on('click',formProcess);
 jQuery('.registration__prev').on('click', formProcessPrev);
 
+function registration() {
+
+    if ( jQuery('section.registration').length > 0 && jQuery('.alert.alert-danger').length > 0 && jQuery('.is-invalid').length > 0 ) {
+
+      jQuery('.registration__step').removeClass('registration__step--active');
+      jQuery('.is-invalid').first().parents('.registration__step').addClass('registration__step--active');
+
+    }
+
+}
+
 function onboarding() {
     if ( jQuery('body.onboarding').length > 0 ) {
 
@@ -577,6 +588,7 @@ function resetForm (e) {
 }
 
 Dropzone.autoDiscover = false;
+registration();
 onboarding();
 //initTokenfields();
 textEditor();
