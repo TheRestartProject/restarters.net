@@ -16,7 +16,12 @@
         case( 5 ):
           $color = '#26781C';
           break;
+
+        default:
+          $reliability = 6;
+          $color = '#FFBA00';
+          break;
     endswitch;
 @endphp
 
-<td><span class="badge indicator-<?php echo $reliability; ?>" style="background-color: {{ $color }}">@lang('admin.reliability-' . $reliability)</span></td>
+<td><span class="badge indicator-{{ $reliability }}" style="background-color: {{ $color }}">@lang('admin.reliability-' . $reliability)</span></td>

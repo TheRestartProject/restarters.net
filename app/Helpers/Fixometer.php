@@ -634,10 +634,22 @@ class FixometerHelper {
 
     return [
       '1' => 'Very poor',
-      '2' => 'poor',
+      '2' => 'Poor',
       '3' => 'Fair',
       '4' => 'Good',
       '5' => 'Very good',
+      '6' => 'N/A'
+    ];
+
+  }
+
+  public static function categoryCluster() {
+
+    return [
+      '1' => 'Computers and Home Office',
+      '2' => 'Computers',
+      '3' => 'Home Office',
+      '4' => 'Test'
     ];
 
   }

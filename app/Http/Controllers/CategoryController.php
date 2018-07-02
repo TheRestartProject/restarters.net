@@ -44,6 +44,7 @@ class CategoryController extends Controller
         'title' => 'Categories',
         'list' => $Category->findAll(),
         'user' => Auth::user(),
+        'categories'  => $Category->listed()
       ]);
   }
 
@@ -53,9 +54,13 @@ class CategoryController extends Controller
 
       $category = Category::find($id);
 
+      $c = new Category;
+      $categories = $c->listed();
+
       return view('category.edit', [
         'title' => 'Edit Category',
         'category'   => $category,
+        'categories'  => $categories
       ]);
   }
 }

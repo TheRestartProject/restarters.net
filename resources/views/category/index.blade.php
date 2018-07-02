@@ -31,6 +31,7 @@
 
                           <th>ID</th>
                           <th>Name</th>
+                          <th>Category Cluster</th>
                           <th>Weight [kg]</th>
                           <th>CO<sub>2</sub> Footprint [kg]</th>
                           <th width="145">Reliability</th>
@@ -44,8 +45,11 @@
                       <tr>
                           <td><a href="/category/edit/{{ $p->idcategories }}"><?php echo $p->idcategories; ?></a></td>
                           <td><?php echo $p->name; ?></td>
-                          <td><?php echo $p->weight; ?></td>
-                          <td><?php echo $p->footprint; ?></td>
+                          @foreach($categories as $cluster)
+                            {!! $cluster->idclusters == $p->cluster ? '<td>'.$cluster->name.'</td>' : '' !!}
+                          @endforeach
+                          <td><?php echo $p->weight ?></td>
+                          <td><?php echo $p->footprint ?></td>
                           @include('partials/footprint-reliability', ['reliability' => $p->footprint_reliability])
                       </tr>
                       @endforeach

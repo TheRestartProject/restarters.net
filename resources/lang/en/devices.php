@@ -54,6 +54,7 @@ return [
         'field_device_images_2' => 'Choose compelling images that show off your work',
 
         'delete_device_content' => 'Delete this device from the Fixometer',
-        'delete_device' => 'Delete device'
+        'delete_device' => 'Delete device',
 
+        'n/a' => 'N/A'
     ];

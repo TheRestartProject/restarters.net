@@ -1,168 +1,221 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
+<section class="devices">
+  <div class="container">
     <div class="row">
-        <div class="col-md-12">
-            <h1><?php echo $title; ?></h1>
-            <!-- <a class="btn btn-default btn-sm" href="/device/create"><i class="fa fa-plus"></i>New Device</a> -->
-            <a href="/export/devices" class="btn btn-default btn-sm"><i class="fa fa-download"></i>All Device Data</a>
-            <hr />
+      <div class="col">
+        <div class="d-flex justify-content-between align-content-center">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
+              <li class="breadcrumb-item active" aria-current="page">@lang('devices.devices')</li>
+            </ol>
+          </nav>
+          <div class="btn-group">
+            <a href="/export/devices" class="btn btn-primary btn-save"><i class="fa fa-download"></i>@lang('devices.export_device_data')</a>
+          </div>
         </div>
-        <div class="col-md-1">
-            <h2>Search</h2>
+      </div>
+    </div>
 
+    <div class="row justify-content-center">
+
+        <div class="col-lg-3">
+            <button class="btn btn-primary btn-groups" type="submit">@lang('devices.search_all_devices')</button>
+
+            <aside class="edit-panel edit-panel__side">
+                <legend>@lang('devices.by_taxonomy')</legend>
+                <div class="form-group">
+                    <label for="items_cat">@lang('devices.category'):</label>
+                    <!-- <div class="form-control form-control__select"> -->
+                        <select id="categories" name="categories" class="form-control select2-tags" multiple title="Choose categories...">
+                            @if(isset($categories))
+                              @foreach($categories as $cluster)
+                                <optgroup label="<?php echo $cluster->name; ?>">
+                                  @foreach($cluster->categories as $c)
+                                    <option value="<?php echo $c->idcategories; ?>"
+                                      <?php
+                                      if(isset($_GET['categories']) && !empty($_GET['categories'])){
+                                        // foreach($_GET['categories'] as $cat){
+                                          if ($_GET['categories']/*$cat*/ == $c->idcategories) { echo " selected "; }
+                                        // }
+                                      }
+                                      ?>
+                                    >
+                                    <?php echo $c->name; ?>
+                                    </option>
+                                  @endforeach
+                                </optgroup>
+                              @endforeach
+                            @endif
+                            <option value="46">Misc</option>
+                        </select>
+                    <!-- </div> -->
+                </div>
+                <div class="form-group">
+                    <label for="items_group">@lang('devices.group'):</label>
+                    <div class="form-control form-control__select">
+                      <select id="groups" name="groups" class="form-control" multiple data-live-search="true" title="Choose groups...">
+                        @if(isset($groups))
+                          @foreach($groups as $g)
+                            <option value="<?php echo $g->id; ?>"
+                              <?php
+                              if(isset($_GET['groups']) && !empty($_GET['groups'])){
+                                // foreach($_GET['groups'] as $grp){
+                                  if ($_GET['groups']/*$grp*/ == $g->id) { echo " selected "; }
+                                // }
+                              }
+                              ?>
+                            >
+                            <?php echo $g->name; ?>
+                            </option>
+                          @endforeach
+                        @endif
+                      </select>
+                    </div>
+                </div>
+
+            </aside>
+
+            <aside class="edit-panel edit-panel__side">
+                <legend>@lang('devices.by_date')</legend>
+                <div class="form-group">
+                    <!-- <div class="input-group date from-date"> -->
+                      <label for="from-date">@lang('devices.from_date'):</label>
+                      <input type="date" class="field form-control" id="search-from-date" name="from-date" <?php if(isset($_GET['from-date']) && !empty($_GET['from-date'])){ echo ' value="' . $_GET['from-date'] . '"'; } ?> >
+                      <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    <!-- </div> -->
+                </div>
+                <div class="form-group">
+                    <!-- <div class="input-group date to-date"> -->
+                      <label for="to-date">@lang('devices.to_date'):</label>
+                      <input type="date" class="field form-control" id="search-to-date" name="to-date" <?php if(isset($_GET['to-date']) && !empty($_GET['to-date'])){ echo ' value="' . $_GET['to-date'] . '"'; } ?> >
+                      <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    <!-- </div> -->
+                </div>
+
+            </aside>
+
+            <aside class="edit-panel edit-panel__side">
+                <legend>@lang('devices.various')</legend>
+                <div class="form-group">
+                    <label for="device_id">@lang('devices.device_id'):</label>
+                    <input type="text" class="form-control field" id="device_id" name="device_id" placeholder="Device Id..."  <?php if(isset($_GET['device_id']) && !empty($_GET['device_id'])){ echo ' value="' . $_GET['device_id'] . '"'; } ?> >
+                </div>
+                <div class="form-group">
+                    <label for="brand">@lang('devices.device_brand'):</label>
+                    <input type="text" class="form-control field" id="brand" name="brand" placeholder="Brand..." <?php if(isset($_GET['brand']) && !empty($_GET['brand'])){ echo ' value="' . $_GET['brand'] . '"'; } ?> >
+                </div>
+                <div class="form-group">
+                    <label for="model">@lang('devices.device_model'):</label>
+                    <input type="text" class="form-control field" id="model" name="model" placeholder="Model..." <?php if(isset($_GET['model']) && !empty($_GET['model'])){ echo ' value="' . $_GET['model'] . '"'; } ?> >
+                </div>
+                <div class="form-group">
+                    <label for="free-text">@lang('devices.search_comments'):</label>
+                    <input type="text" class="form-control field" id="free-text" name="free-text" placeholder="Search in the comment..."  <?php if(isset($_GET['free-text']) && !empty($_GET['free-text'])){ echo ' value="' . $_GET['free-text'] . '"'; } ?> >
+                </div>
+
+            </aside>
         </div>
-        <div class="col-md-11">
-          <form action="/device/search/" method="get">
-            <input type="hidden" name="fltr" value="<?php echo bin2hex(openssl_random_pseudo_bytes(8)); ?>">
+
+        <div class="col-lg-9">
+
+            <br>
+
             <div class="row">
-              <div class="col-md-3">
-                <div class="form-group">
-                  <select id="categories" name="categories" class="form-control selectpicker" multiple data-live-search="true" title="Choose categories...">
-                    @if(isset($categories))
-                      @foreach($categories as $cluster)
-                      <optgroup label="<?php echo $cluster->name; ?>">
-                        @foreach($cluster->categories as $c)
-                        <option value="<?php echo $c->idcategories; ?>"
-                          <?php
-                          if(isset($_GET['categories']) && !empty($_GET['categories'])){
-                            // foreach($_GET['categories'] as $cat){
-                              if ($_GET['categories']/*$cat*/ == $c->idcategories) { echo " selected "; }
-                            // }
-                          }
-                          ?>
-                        >
-                        <?php echo $c->name; ?>
-                        </option>
-                        @endforeach
-                      </optgroup>
-                      @endforeach
-                    @endif
-                    <option value="46">Misc</option>
-                  </select>
+                <div class="col-12">
+
+                    <div class="d-flex flex-row align-content-center justify-content-end">
+
+                        <form action="/device/search" class="search field-form-input form-control" method="get">
+                          <input type="hidden" name="fltr" value="<?php echo bin2hex(openssl_random_pseudo_bytes(8)); ?>">
+                            <label for="search" class="sr-only">Search</label>
+                        <input placeholder="Quick search" id="search" type="search"><button type="submit"><span class="sr-only">Search</span><svg width="15" height="15" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M3.394 3.394a4.801 4.801 0 0 1 6.787 0 4.801 4.801 0 0 1 0 6.787 4.801 4.801 0 0 1-6.787 0 4.801 4.801 0 0 1 0-6.787zm1.094 1.094a3.252 3.252 0 1 1 4.599 4.599 3.252 3.252 0 0 1-4.599-4.599z"/><path d="M8.855 10.218l1.363-1.363 2.622 2.622a.964.964 0 0 1-1.363 1.363l-2.622-2.622z"/></svg></button></form>
+
+
+                        <div class="btn-group btn-group__duo" role="group" aria-label="Filter options">
+
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">10</button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                    <a class="dropdown-item" href="#">Action</a>
+                                    <a class="dropdown-item" href="#">Another action</a>
+                                    <a class="dropdown-item" href="#">Something else here</a>
+                                </div>
+                            </div>
+
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Items</span><svg width="15" height="13" viewBox="0 0 12 10" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M3.163.324A.324.324 0 0 0 2.84 0H.324A.324.324 0 0 0 0 .324v1.909c0 .179.145.324.324.324H2.84a.324.324 0 0 0 .323-.324V.324zm0 3.715a.324.324 0 0 0-.323-.324H.324A.324.324 0 0 0 0 4.039v1.91c0 .178.145.323.324.323H2.84a.323.323 0 0 0 .323-.323v-1.91zm0 3.715a.323.323 0 0 0-.323-.323H.324A.324.324 0 0 0 0 7.754v1.91c0 .179.145.324.324.324H2.84a.324.324 0 0 0 .323-.324v-1.91zM11.25.324A.324.324 0 0 0 10.926 0h-6.37a.323.323 0 0 0-.323.324v1.909c0 .179.144.324.323.324h6.37a.324.324 0 0 0 .324-.324V.324zm0 3.715a.324.324 0 0 0-.324-.324h-6.37a.323.323 0 0 0-.323.324v1.91c0 .178.144.323.323.323h6.37a.324.324 0 0 0 .324-.323v-1.91zm0 3.715a.324.324 0 0 0-.324-.323h-6.37a.323.323 0 0 0-.323.323v1.91c0 .179.144.324.323.324h6.37a.324.324 0 0 0 .324-.324v-1.91z" fill="#fff"/></svg>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                    <a class="dropdown-item" href="#">Action</a>
+                                    <a class="dropdown-item" href="#">Another action</a>
+                                    <a class="dropdown-item" href="#">Something else here</a>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+
+                    <div>
 
                 </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <select id="groups" name="groups" class="form-control selectpicker" multiple data-live-search="true" title="Choose groups...">
-                    @if(isset($groups))
-                      @foreach($groups as $g)
-                        <option value="<?php echo $g->id; ?>"
-                          <?php
-                          if(isset($_GET['groups']) && !empty($_GET['groups'])){
-                            // foreach($_GET['groups'] as $grp){
-                              if ($_GET['groups']/*$grp*/ == $g->id) { echo " selected "; }
-                            // }
-                          }
-                          ?>
-                        >
-                        <?php echo $g->name; ?>
-                        </option>
-                      @endforeach
-                    @endif
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <div class="input-group date from-date">
-                    <input type="text" class="form-control" id="search-from-date" name="from-date" placeholder="From date..." <?php if(isset($_GET['from-date']) && !empty($_GET['from-date'])){ echo ' value="' . $_GET['from-date'] . '"'; } ?> >
-                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <div class="input-group date to-date">
-                    <input type="text" class="form-control" id="search-to-date" name="to-date" placeholder="To date..." <?php if(isset($_GET['to-date']) && !empty($_GET['to-date'])){ echo ' value="' . $_GET['to-date'] . '"'; } ?> >
-                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                  </div>
-                </div>
-              </div>
             </div>
 
-            <div class="row">
+            <br>
 
-              <div class="col-md-3">
-                <div class="form-group">
-                  <input type="text" class="form-control " id="brand" name="brand" placeholder="Brand..." <?php if(isset($_GET['brand']) && !empty($_GET['brand'])){ echo ' value="' . $_GET['brand'] . '"'; } ?> >
-                </div>
-              </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-responsive table-striped bootg table-devices" id="devices-table">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th> <!-- <th scope="col" data-column-id="comment">Comment</th> -->
+                            <th scope="col"></th>
+                            <th scope="col" data-column-id="deviceID"  data-header-css-class="comm-cell" data-identifier="true" data-type="numeric">#</th> <!-- <th scope="col" data-column-id="edit" data-header-css-class="comm-cell" data-formatter="editLink" data-sortable="false">edit</th> -->
+                            <th scope="col" data-column-id="repairstatus" data-header-css-class="mid-cell" data-formatter="statusBox">@lang('devices.state')</th>
+                            <th scope="col" data-column-id="category">@lang('devices.category')</th>
+                            <th scope="col" data-column-id="brand">@lang('devices.brand')</th>
+                            <th scope="col" data-column-id="model">@lang('devices.model')</th>
+                            <th scope="col" data-column-id="location">@lang('devices.eventlocation')</th> <!-- <th scope="col" data-column-id="groupName">Event (Group)</th> -->
+                            <th scope="col" data-column-id="eventDate" data-header-css-class="mid-cell">@lang('devices.repair')</th>
 
-              <div class="col-md-3">
-                <div class="form-group">
-                  <input type="text" class="form-control " id="model" name="model" placeholder="Model..." <?php if(isset($_GET['model']) && !empty($_GET['model'])){ echo ' value="' . $_GET['model'] . '"'; } ?> >
-                </div>
-              </div>
-
-              <div class="col-md-4">
-                <div class="form-group">
-                  <input type="text" class="form-control " id="free-text" name="free-text" placeholder="Search in the comment..."  <?php if(isset($_GET['free-text']) && !empty($_GET['free-text'])){ echo ' value="' . $_GET['free-text'] . '"'; } ?> >
-                </div>
-              </div>
-
-              <div class="col-md-1">
-                <button class="btn btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
-              </div>
-
-              <div class="col-md-1">
-                <a href="/device" class="btn btn-default btn-block"><i class="fa fa-refresh"></i> Reset</a>
-              </div>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(isset($list))
+                            @foreach($list as $device)
+                              <tr>
+                                @include('partials/device-comment-photo', ['comment' => $device->problem ])
+                                <td><a href="/device/edit/<?php echo $device->id; ?>"><?php echo $device->id; ?></a></td>
+                                @include('partials/device-status', ['status' => $device->repair_status])
+                                <td><?php echo $device->category_name; ?></td>
+                                <td><?php echo $device->brand; ?></td>
+                                <td><?php echo $device->model; ?></td>
+                                <td><?php echo $device->group_name . ", " . $device->event_location; ?></td>
+                                <td><?php echo strftime('%Y-%m-%d', $device->event_date); ?></td>
+                              </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
             </div>
-          </form>
-        </div>
 
-        <div class="col-md-12">
+            <br>
 
-            <table class="table table-hover table-responsive table-striped bootg" id="devices-table">
-                <thead>
-                    <tr>
-                        <th data-column-id="deviceID"  data-header-css-class="comm-cell" data-identifier="true" data-type="numeric">#</th>
-                        <th data-column-id="category">Category</th>
-                        <th data-column-id="brand">Brand</th>
-                        <th data-column-id="model">Model</th>
-                        <th data-column-id="comment">Comment</th>
-                        <th data-column-id="groupName">Event (Group)</th>
-                        <th data-column-id="eventDate" data-header-css-class="mid-cell">Event Date</th>
-                        <th data-column-id="location">Location</th>
-                        <th data-column-id="repairstatus" data-header-css-class="mid-cell" data-formatter="statusBox">Repair state</th>
-                        <th data-column-id="edit" data-header-css-class="comm-cell" data-formatter="editLink" data-sortable="false">edit</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                  @if(isset($list))
-                    @foreach($list as $device)
-                    <tr>
-                      <td><?php echo $device->id; ?></td>
-                      <td><?php echo $device->category_name; ?></td>
-                      <td><?php echo $device->brand; ?></td>
-                      <td><?php echo $device->model; ?></td>
-                      <td><?php echo $device->problem; ?></td>
-                      <td><?php echo $device->group_name; ?></td>
-                      <td><?php echo strftime('%Y-%m-%d', $device->event_date); ?></td>
-                      <td><?php echo $device->event_location; ?></td>
-                      <td><?php echo $device->repair_status; ?></td>
-                      <td><a href="/device/edit/<?php echo $device->id; ?>">edit</a></td>
-                    </tr>
-                    @endforeach
-                  @endif
-                </tbody>
-            </table>
+            <div class="d-flex justify-content-center">
+                <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                </ul>
+                </nav>
+            </div>
 
         </div>
     </div>
-</div>
 
-
-<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel" id="deviceEditor">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
+  </div>
+</section>
 @endsection

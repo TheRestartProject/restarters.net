@@ -75,7 +75,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   //Device Controller
   Route::get('/device', 'DeviceController@index')->name('devices');
   Route::get('/device/search', 'DeviceController@index');
-  // Route::get('/device/edit/{id}', 'DeviceController@edit');
+  Route::get('/device/edit/{id}', 'DeviceController@edit');
   // Route::post('/device/edit/{id}', 'DeviceController@edit');
   Route::post('/device/edit/{id}', 'DeviceController@ajaxEdit');
   // Route::get('/device/create', 'DeviceController@create');

@@ -32,6 +32,7 @@ return [
         'reliability-3' => 'Fair',
         'reliability-4' => 'Good',
         'reliability-5' => 'Very good',
+        'reliability-6' => 'N/A',
         'description' => 'Description',
         'description_optional' => 'Description (optional)',
         'save-category' => 'Save category',
