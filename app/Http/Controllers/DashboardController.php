@@ -47,49 +47,34 @@ class DashboardController extends Controller
         $has_profile_pic = false;
       }
 
-      if ($in_event) {
+      //See whether user has any events
+      if ($in_event)
         $event_ids = EventsUsers::where('user', Auth::id())->pluck('event')->toArray();
-      }
 
-      if ($in_group) {
+      //See whether user has any groups
+      if ($in_group)
         $group_ids = UserGroups::where('user', Auth::id())->pluck('group')->toArray();
-      }
 
+      //If users has events, let's see whether they have any past events
       if ($in_event) {
         $past_events = Party::whereIn('idevents', $event_ids)
                                 ->whereDate('event_date', '<', date('Y-m-d'))
                                   ->join('groups', 'events.group', '=', 'idGroups')
-                                    ->select('events.*',
-                                              'groups.name')
+                                    ->select('events.*', 'groups.name')
                                       ->take(3)
                                         ->get();
 
-        if (empty($past_events->toArray())) {
-          $past_events = null;
-        }
+          if (empty($past_events->toArray())) {
+            $past_events = null;
+          }
 
       } else {
         $past_events = null;
       }
 
-      if ($in_event) {
-        $upcoming_events = Party::whereIn('idevents', $event_ids)
-                                ->whereDate('event_date', '>', date('Y-m-d'))
-                                  ->join('groups', 'events.group', '=', 'idGroups')
-                                    ->select('events.*',
-                                              'groups.name')
-                                      ->take(3)
-                                        ->get();
-
-        if (empty($upcoming_events->toArray())) {
-          $upcoming_events = null;
-        }
-
-      } else {
-        $upcoming_events = null;
-      }
-
+      //Host specific queries
       if (FixometerHelper::hasRole($user, 'Host') && $in_group) {
+
         $outdated_groups = Group::whereIn('idgroups', $group_ids)
                                 ->whereDate('updated_at', '<=', date('Y-m-d', strtotime("-3 Months")) )
                                   ->take(3)
@@ -104,6 +89,7 @@ class DashboardController extends Controller
                                     ->whereDate('event_date', '>', date('Y-m-d'))
                                         ->pluck('events.group')
                                           ->toArray();
+
           $non_active_group_ids = array_diff($group_ids, $active_group_ids);
           $inactive_groups = Group::whereIn('idgroups', $non_active_group_ids)
                                         ->take(3)
@@ -119,7 +105,7 @@ class DashboardController extends Controller
         $inactive_groups = null;
       }
 
-      if ($in_group) {
+      if ( $in_group ) {
         $all_groups = Group::whereIn('idgroups', $group_ids)->get();
       }
 
@@ -127,22 +113,28 @@ class DashboardController extends Controller
         $all_groups = null;
       }
 
-      if (!is_null($user->latitude) && !is_null($user->longitude) ) {
+      //Get events nearest (or not) to you
+      if (!is_null($user->latitude) && !is_null($user->longitude) ) { //Should the user have location info
 
-        $closest_events = [];
-
-        $closest_events = Party::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
+        $upcoming_events = Party::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
             ->having("distance", "<=", 50)
-              ->take(3)
-                ->get();
+              ->whereDate('event_date', '>', date('Y-m-d'))
+                ->take(3)
+                  ->get();
 
-      } else {
-        $closest_events = null;
+      } else { //Else show them the latest three
+
+        $upcoming_events = Party::whereDate('event_date', '>=', date('Y-m-d'))
+                                  ->select('events.*')
+                                    ->take(3)
+                                      ->get();
+
       }
 
       $news_feed = FixometerHelper::getRSSFeed();
       $wiki_pages = FixometerHelper::getRandomWikiPages();
 
+      //Show onboarding modals on first login
       if ($user->number_of_logins == 1) {
         $onboarding = true;
       } else {
@@ -166,7 +158,6 @@ class DashboardController extends Controller
         'inactive_groups' => $inactive_groups,
         'news_feed' => $news_feed,
         'all_groups' => $all_groups,
-        'closest_events' => $closest_events,
         'onboarding' => $onboarding,
         'impact_stats' => $impact_stats,
         'wiki_pages' => $wiki_pages

@@ -457,7 +457,6 @@ class PartyController extends Controller {
       $Party = new Party;
       $Device = new Device;
 
-      $allparties = $Party->ofThisGroup('admin', true, true);
       $co2Total = $Device->getWeights();
       $device_count_status = $Device->statusCount();
 
@@ -631,7 +630,6 @@ class PartyController extends Controller {
             'user' => Auth::user(),
             'co2Total' => $co2Total[0]->total_footprints,
             'wasteTotal' => $co2Total[0]->total_weights,
-            'partiesCount' => count($allparties),
             'device_count_status' => $device_count_status,
             'user_groups' => $user_groups,
             'images' => $images,
@@ -668,7 +666,6 @@ class PartyController extends Controller {
         'user' => Auth::user(),
         'co2Total' => $co2Total[0]->total_footprints,
         'wasteTotal' => $co2Total[0]->total_weights,
-        'partiesCount' => count($allparties),
         'device_count_status' => $device_count_status,
         'user_groups' => $user_groups,
       ]);

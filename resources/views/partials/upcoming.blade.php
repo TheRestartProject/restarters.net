@@ -8,17 +8,19 @@
             <thead>
                 <tr>
                     <th scope="col">@lang('events.event_name')</th>
-                    <th scope="col" class="cell-date">@lang('events.event_datetime')</th>
+                    <th scope="col" class="cell-date">@lang('events.event_date')</th>
+                    <th scope="col" class="cell-date">@lang('events.event_time')</th>
                     <th scope="col" class="cell-locations">@lang('events.event_location')</th>
                 </tr>
             </thead>
             <tbody>
-              @if (!empty($closest_events))
-                @foreach($closest_events as $closest_event)
+              @if ( !$upcoming_events->isEmpty() )
+                @foreach($upcoming_events as $event)
                   <tr>
-                      <td>{{ $closest_event->venue }}</td>
-                      <td>{{ $closest_event->event_date }}</td>
-                      <td><a href="">30 devices need attention</a></td>
+                    <td class="cell-name"><a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a></td>
+                    <td class="cell-date">{{ $event->getEventDate() }}</td>
+                    <td class="cell-date">{{ $event->getEventStartEnd() }}</td>
+                    <td class="cell-locations">{{ $event->location }}</td>
                   </tr>
                 @endforeach
               @else
