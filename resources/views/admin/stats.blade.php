@@ -109,7 +109,7 @@
                     <div class="col-md-12 text-center"><div class="lightblue"><?php echo $manufacture_label; ?></div></div>
                     </div>
                     <div class="row">
-                    <?php for($i = 1; $i<= 0;/*$manufacture_eql_to;*/ $i++){ ?>
+                    <?php for($i = 1; $i<= $manufacture_eql_to; $i++){ ?>
                         <div class="col-xs-4 col-sm-4 col-md-3 text-center">
                             <img src="{{ asset('/icons/'.$manufacture_img) }}" class="img-responsive">
                         </div>
