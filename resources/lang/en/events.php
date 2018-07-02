@@ -76,6 +76,7 @@ return [
     'stat-4' => 'End-of-life devices',
     'stat-5' => 'Fixed devices',
     'stat-6' => 'CO2 emissions prevented',
+    'stat-7' => 'Waste prevented',
 
     'add_event' => 'Add event',
     'add_an_event' => 'Add an event',

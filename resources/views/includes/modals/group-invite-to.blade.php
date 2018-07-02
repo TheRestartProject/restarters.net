@@ -20,7 +20,7 @@
 
           <input type="hidden" name="from_id" value="{{ Auth::user()->id }}">
           <input type="hidden" name="group_name" value="{{ $group->name }}">
-          <input type="hidden" id="group_id" name="group_id" value="{{ $group->id }}">
+          <input type="hidden" id="group_id" name="group_id" value="{{ $group->idgroups }}">
 
           <div id="invite_div" class="form-group">
               <label for="manual_invite_box">@lang('groups.email_addresses_field'):</label>

@@ -38,9 +38,15 @@
                 @include('partials.tables.head-events', ['invite' => true])
 
                 <tbody>
-                    @foreach ($moderate_events as $event)
-                      @include('partials.tables.row-events')
-                    @endforeach
+                    @if( !$moderate_events->isEmpty() )
+                      @foreach ($moderate_events as $event)
+                        @include('partials.tables.row-events', ['invite' => true])
+                      @endforeach
+                    @else
+                      <tr>
+                        <td colspan="13" align="center" class="p-3">There are currently no events to moderate</td>
+                      </tr>
+                    @endif
                 </tbody>
 
               </table>
@@ -59,9 +65,15 @@
             @include('partials.tables.head-events')
 
             <tbody>
+              @if( !$upcoming_events->isEmpty() )
                 @foreach ($upcoming_events as $event)
                   @include('partials.tables.row-events', ['invite' => true])
                 @endforeach
+              @else
+                <tr>
+                  <td colspan="13" align="center" class="p-3">There are currently no upcoming events for any of your groups<br><a href="{{{ route('groups') }}}">Find more groups</a></td>
+                </tr>
+              @endif
             </tbody>
 
           </table>

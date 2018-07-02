@@ -71,78 +71,29 @@ class PartyController extends Controller {
 
   public function index()
   {
-      // $this->set('title', 'Parties');
-      // $this->set('list', $this->Party->findAll());
 
-      // $Party = new Party;
-      // $user = User::find(Auth::id());
-      //
-      // $past = [];
-      // $upcoming = [];
-      // $moderate = [];
-      //
-      // $today = new DateTime("today");
-      //
-      // foreach ($Party->findAll() as $party) {
-      //
-      //   $p_date = new DateTime("@$party->event_timestamp");
-      //
-      //   if( is_null($party->wordpress_post_id) ) { //To moderate
-      //
-      //     $moderate[] = $party;
-      //
-      //   } elseif ($p_date > $today) { //upcoming
-      //
-      //     $upcoming[] = $party;
-      //
-      //   } elseif ($p_date < $today) { //past
-      //
-      //     $past[] = $party;
-      //
-      //   }
-      //
-      //   // dd($today->diff($p_date));
-      //
-      // }
-
-      $moderate_events = null;
-
-      if( FixometerHelper::hasRole(Auth::user(), 'Administrator') ) {
-
-        $moderate_events = Party::whereNull('wordpress_post_id')
-                      ->whereDate('event_date', '>=', date('Y-m-d'))
-                      ->orderBy('event_date', 'ASC')
-                        ->get();
-
+      if( FixometerHelper::hasRole(Auth::user(), 'Administrator') ){
+        $moderate_events = Party::RequiresModeration()->get();
+      } else {
+        $moderate_events = null;
       }
 
-      $upcoming_events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
-                    ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-                      ->whereDate('event_date', '>=', date('Y-m-d'))
-                        ->where('users_groups.user', Auth::user()->id)
-                          ->select('events.*')
-                            ->orderBy('wordpress_post_id', 'ASC')
-                              ->orderBy('event_date', 'ASC')
-                                ->take(5)
-                                  ->get();
+      $upcoming_events = Party::upcomingEvents()
+                            ->where('users_groups.user', Auth::user()->id)
+                              ->take(5)
+                                ->get();
 
-      $past_events = Party::whereNotNull('wordpress_post_id')
-                    ->whereDate('event_date', '<', date('Y-m-d'))
-                    ->orderBy('event_date', 'DESC')
-                      ->paginate(env('PAGINATE'));
-
+      $past_events = Party::pastEvents()->paginate(env('PAGINATE'));
       $user_groups = UserGroups::where('user', Auth::user()->id)->count();
 
-      return view('events.index', [ //party.index
-        'title'     => 'Events',
-        //'list'      => $Party->findAll(),
-        //'user'      => $user,
+      return view('events.index', [
         'upcoming_events'  => $upcoming_events,
         'past_events'      => $past_events,
         'moderate_events'  => $moderate_events,
         'user_groups'      => $user_groups,
         'EmissionRatio'    => $this->EmissionRatio,
       ]);
+
   }
 
   public function create()

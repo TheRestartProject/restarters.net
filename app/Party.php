@@ -382,8 +382,37 @@ class Party extends Model
     * Laravel specific code
     */
 
+    public function scopeUpcomingEvents(){
+        return $this->join('groups', 'groups.idgroups', '=', 'events.group')
+                      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+                        ->whereDate('event_date', '>=', date('Y-m-d'))
+                          ->select('events.*')
+                            ->orderBy('wordpress_post_id', 'ASC')
+                              ->orderBy('event_date', 'ASC');
+    }
+
+    public function scopeRequiresModeration(){
+        return $this->whereNull('wordpress_post_id')
+                      ->whereDate('event_date', '>=', date('Y-m-d'))
+                        ->orderBy('event_date', 'ASC');
+    }
+
+    public function scopePastEvents(){
+        return $this->whereNotNull('wordpress_post_id')
+                      ->whereDate('event_date', '<', date('Y-m-d'))
+                        ->orderBy('event_date', 'DESC');
+    }
+
     public function allDevices(){
         return $this->hasMany('App\Device', 'event', 'idevents')->join('categories', 'categories.idcategories', '=', 'devices.category');
+    }
+
+    public function allInvited(){
+        return $this->hasMany('App\EventsUsers', 'event', 'idevents')->where('status', '!=', 1);
+    }
+
+    public function host(){
+        return $this->hasOne('App\Host', 'idgroups', 'group');
     }
 
     public function getEventDate() {

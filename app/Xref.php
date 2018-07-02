@@ -23,30 +23,30 @@ class Xref extends Model {
      * @ object -> can be image, link, or any other shared asset
      * @ reference -> the main App Element that needs the object (user, event, device, group)
      * */
-    public function __construct($index, $object = null, $objectType = null, $reference = null, $referenceType = null){
-
-        parent::__construct();
-
-        $this->obj      = (integer)$object;
-        $this->ref      = (integer)$reference;
-        $this->objType  = (integer)$objectType;
-        $this->refType  = (integer)$referenceType;
-
-        $this->index    = ($index === 'object' || $index === 'reference') ? $index : false;
-        if($this->index === 'object'){
-            $this->search_id = $this->obj;
-            $this->search_type = $this->objType;
-        }
-        elseif($this->index === 'reference'){
-            $this->search_id = $this->ref;
-            $this->search_type = $this->refType;
-
-
-        }
-        else {
-            return new Error(500, 'Invalid Index in Xref search. (xref.class.php, line 32)');
-        }
-    }
+    // public function __construct($index, $object = null, $objectType = null, $reference = null, $referenceType = null){
+    //
+    //     parent::__construct();
+    //
+    //     $this->obj      = (integer)$object;
+    //     $this->ref      = (integer)$reference;
+    //     $this->objType  = (integer)$objectType;
+    //     $this->refType  = (integer)$referenceType;
+    //
+    //     $this->index    = ($index === 'object' || $index === 'reference') ? $index : false;
+    //     if($this->index === 'object'){
+    //         $this->search_id = $this->obj;
+    //         $this->search_type = $this->objType;
+    //     }
+    //     elseif($this->index === 'reference'){
+    //         $this->search_id = $this->ref;
+    //         $this->search_type = $this->refType;
+    //
+    //
+    //     }
+    //     else {
+    //         return new Error(500, 'Invalid Index in Xref search. (xref.class.php, line 32)');
+    //     }
+    // }
 
     /**
      * returns object with cross-references to selected
@@ -121,6 +121,10 @@ class Xref extends Model {
             } catch (\Illuminate\Database\QueryException $e) {
               return false;
             }
+    }
+
+    public function image(){
+        return $this->hasOne('App\Images', 'idimages', 'object');
     }
 
 }
