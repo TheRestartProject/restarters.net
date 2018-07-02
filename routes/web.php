@@ -11,10 +11,6 @@
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
 Route::get('/user/reset', 'UserController@reset');
 Route::post('/user/reset', 'UserController@reset');
 Route::get('/user/recover', 'UserController@recover');
@@ -157,29 +153,29 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::get('/export/devices', 'ExportController@devices');
   Route::get('/export/parties', 'ExportController@parties');
 
-  //iFrames
-  Route::get('/outbound/info/group/{id}', function($id) {
-    return App\Http\Controllers\OutboundController::info('group', $id);
-  });
+});
 
-  Route::get('/group/stats/{id}', function($id) {
-    return App\Http\Controllers\GroupController::stats($id);
-  });
+//iFrames
+Route::get('/outbound/info/group/{id}', function($id) {
+  return App\Http\Controllers\OutboundController::info('group', $id);
+});
 
-  Route::get('/admin/stats/1', function() {
-    return App\Http\Controllers\AdminController::stats();
-  });
+Route::get('/group/stats/{id}', function($id) {
+  return App\Http\Controllers\GroupController::stats($id);
+});
 
-  Route::get('/admin/stats/2', function() {
-    return App\Http\Controllers\AdminController::stats(2);
-  });
+Route::get('/admin/stats/1', function() {
+  return App\Http\Controllers\AdminController::stats();
+});
 
-  Route::get('/party/stats/{id}/wide', function($id) {
-    return App\Http\Controllers\PartyController::stats($id);
-  });
+Route::get('/admin/stats/2', function() {
+  return App\Http\Controllers\AdminController::stats(2);
+});
 
-  Route::get('/outbound/info/party/{id}', function($id) {
-    return App\Http\Controllers\OutboundController::info('party', $id);
-  });
+Route::get('/party/stats/{id}/wide', function($id) {
+  return App\Http\Controllers\PartyController::stats($id);
+});
 
+Route::get('/outbound/info/party/{id}', function($id) {
+  return App\Http\Controllers\OutboundController::info('party', $id);
 });
