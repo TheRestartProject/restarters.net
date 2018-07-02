@@ -23430,7 +23430,7 @@ window.Tokenfield = __webpack_require__(44);
 
 if (jQuery('.slideshow').length > 0) {
     jQuery('.slideshow').slick({
-        dots: true, arrows: false
+        dots: true, arrows: true, infinite: false
     });
 }
 

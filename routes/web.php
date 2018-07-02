@@ -32,7 +32,7 @@ Route::get('/user/forbidden', function () {
 Auth::routes();
 Route::get('/logout', 'UserController@logout');
 
-Route::get('/features', function() {
+Route::get('/about', function() {
     return View::make('features.index');
 })->name('features');
 

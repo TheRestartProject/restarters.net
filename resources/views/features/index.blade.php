@@ -2,7 +2,7 @@
 @yield('content')
 <section class="features">
     <div class="container">
-        <a class="features__link" href="{{{ route('login') }}}">@lang('general.register-signin')</a>
+        <div class="features__link"><a class="" href="/user/register">@lang('general.register')</a> / <a class="" href="{{{ route('login') }}}">@lang('general.login')</a></div>
         <header>
             <a href="{{{ route('login') }}}">
               @include('includes/logo-large')
