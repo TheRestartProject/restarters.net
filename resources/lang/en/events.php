@@ -11,6 +11,10 @@ return [
     */
 
     'about_event_name_header' => 'About :event',
+    'rsvp_message' => 'Excellent! You are joining us at this event',
+    'rsvp_button' => 'Sorry, I can no longer attend',
+    'pending_rsvp_message' => 'You have an invite pending for this event',
+    'pending_rsvp_button' => 'I am attending',
 
     'share_stats_header' => 'Share your stats',
     'share_stats_message' => 'Well done! On the :date at :event_name we were able to repair <strong>:number_devices devices</strong>. Help us spread the message by sharing your environmental impact on your website.',

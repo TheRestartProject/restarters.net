@@ -14,6 +14,20 @@
           </div>
       @endif
 
+      @if( is_object($is_attending) )
+          @if( $is_attending->status == 1 )
+            <div class="alert alert-success">
+                @lang('events.rsvp_message')
+                <a href="/cancel-invite/{{{ $is_attending->event }}}" class="btn btn-success">@lang('events.rsvp_button')</a>
+            </div>
+          @else
+            <div class="alert alert-info">
+                @lang('events.pending_rsvp_message')
+                <a href="/accept-invite/{{{ $is_attending->event }}}/{{{ $is_attending->status }}}" class="btn btn-info">@lang('events.pending_rsvp_button')</a>
+            </div>
+          @endif
+      @endif
+
       <div class="events__header row align-content-top">
           <div class="col-lg-9 d-flex flex-column">
 

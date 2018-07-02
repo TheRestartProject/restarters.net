@@ -679,7 +679,8 @@ class PartyController extends Controller {
       //Event details
       $images = $File->findImages(env('TBL_EVENTS'), $id);
       $party = $Party->findThis($id, true)[0];
-      $hosts = EventsUsers::where('event', $id)->where('role', '=', 3)->where('status', 1)->get();
+      $hosts = EventsUsers::where('event', $id)->where('role', 3)->where('status', 1)->get();
+      $is_attending = EventsUsers::where('event', $id)->where('user', Auth::user()->id)->first();
 
       //Info for attendance tabs
       $attendees = EventsUsers::where('event', $id)->where('status', 1);
@@ -706,6 +707,7 @@ class PartyController extends Controller {
         'invited_summary'  => $invited_summary,
         'invited'  => $invited,
         'hosts' => $hosts,
+        'is_attending' => $is_attending,
         'brands' => $brands,
         'categories' => $categories,
       ]);
@@ -1138,7 +1140,7 @@ class PartyController extends Controller {
         if (is_null($user_event) || $user_event->status != "1") {
 
             $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
-            $url = url('/accept-invite/party-'.$event_id.'/'.$hash);
+            $url = url('/accept-invite/'.$event_id.'/'.$hash);
 
             if (!is_null($user_event)) {
 
@@ -1217,7 +1219,7 @@ class PartyController extends Controller {
 
       if (is_null($register_id)) {
         $user_event->save();
-        return redirect('/party/view/'.$user_event->event)->with('success', 'Excellent! You are joining us for this party');
+        return redirect('/party/view/'.$user_event->event);
       } else {
         $user_event->user = $register_id;
         $user_event->save();
@@ -1225,6 +1227,13 @@ class PartyController extends Controller {
     } catch (\Exception $e) {
       return false;
     }
+
+  }
+
+  public function cancelInvite($event_id) {
+
+      $user_event = EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->delete();
+      return redirect('/party/view/'.$event_id)->with('success', 'You are no longer attending this event');
 
   }
 
