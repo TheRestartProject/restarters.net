@@ -1,7 +1,7 @@
 <section class="dashboard__block">
     <div class="dashboard__block__content">
         <h4>Wiki</h4>
-        <p>A random selection of pages from our wiki.</p>
+        <p>A changing selection of pages from our repair wiki.  Read and contribute advice for community repair!</p>
         <div class="table-responsive">
             <table role="table" class="table table-striped">
                 <tbody>

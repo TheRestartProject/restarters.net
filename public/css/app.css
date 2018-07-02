@@ -92,7 +92,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   -ms-overflow-style: scrollbar;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
 }
 
 @-ms-viewport {
@@ -13933,7 +13933,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .alert-warning .btn:hover,
 .alert-success .btn:hover,
 .alert-delete .btn:hover {
-  background-color: rgba(0, 0, 0, 0);
+  background-color: transparent;
 }
 
 .alert-danger .btn:focus,
@@ -13942,7 +13942,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .alert-success .btn:focus,
 .alert-delete .btn:focus {
   text-decoration: underline;
-  background-color: rgba(0, 0, 0, 0);
+  background-color: transparent;
 }
 
 .alert-success {
@@ -15147,7 +15147,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .dashboard__block__content h4,
 .dashboard__block__content p {
-  padding-right: 115px;
+  /*padding-right: 115px;*/
 }
 
 .dashboard__block__content--table {
@@ -15177,7 +15177,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .dashboard .table {
-  min-width: 400px;
+  /*min-width: 400px;*/
 }
 
 .dashboard .table thead tr th {
