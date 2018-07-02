@@ -31,6 +31,7 @@
           <div class="form-group">
               <label for="message_to_restarters">@lang('groups.message_header'):</label>
               <textarea name="message_to_restarters" id="message_to_restarters" class="form-control field" placeholder="@lang('groups.message_example_text')"></textarea>
+              <small class="form-text text-muted">@lang('groups.message_explainer')</small>
           </div>
 
           <button type="submit" class="btn btn-primary float-right">@lang('groups.send_invite_button')</button>

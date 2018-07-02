@@ -439,7 +439,7 @@
                                                                 <div class="col-9 d-flex align-content-center flex-column">
                                                                     <div class="form-check d-flex align-items-center justify-content-start">
                                                                         <input class="form-check-input" type="checkbox" name="wiki-{{ $device->iddevices }}" id="wiki-{{ $device->iddevices }}" value="1">
-                                                                        <label class="form-check-label" for="opt">Solution is suitable for the Restart Wiki</label>
+                                                                        <label class="form-check-label" for="wiki-{{ $device->iddevices }}">Could the solution comments help Restarters working on a similar device in future?  Or is it a fun case study?</label>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-3 d-flex justify-content-end flex-column"><div class="d-flex justify-content-end">

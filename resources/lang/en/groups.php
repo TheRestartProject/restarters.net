@@ -47,8 +47,9 @@ return [
     'invite_group_name_message' => 'Invite volunteers to affiliate themselves with your group, so that you can invite them more easily to your upcoming events.',
     'email_addresses_field' => 'Email addresses',
     'type_email_addresses_message' => 'Type email addresses to manually invite to this group',
-    'message_header' => 'Message',
-    'message_example_text' => 'We would love you to join us, and help share your repair skills at our community repair events.',
+    'message_header' => 'Invitation message',
+    'message_example_text' => '<add a custom message here if required>',
+    'message_explainer' => 'An email will be sent to the invitees inviting them to join your group.  If you would like to, you can include an additional message within the email by filling in the box above.',
     'send_invite_button' => 'Send invite',
 
     'about_group_name_header' => 'About :group',

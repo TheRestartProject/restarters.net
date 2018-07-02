@@ -4,7 +4,7 @@
 
         <h4>Our Global Environmental Impact</h4>
 
-        <p>The impact of Restarters' fixing.</p>
+        <p>The impact of Restarters' fixing around the world.</p>
 
         <ul class="properties">
             <li>
