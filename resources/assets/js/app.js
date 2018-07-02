@@ -639,5 +639,3 @@ jQuery(function () {
 jQuery(document).ready(function () {
     groupsMap();
 });
-
-require('./app_additional');
