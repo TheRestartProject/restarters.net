@@ -15434,10 +15434,13 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .features__link {
+  float: right;
+}
+
+.features__link a {
   color: #000;
   text-decoration: underline;
   font-weight: 600;
-  float: right;
 }
 
 .features header,
@@ -15473,6 +15476,17 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   font-size: 18px;
   text-align: center;
   margin: 15px auto;
+}
+
+.slideshow .slick-prev:before,
+.slideshow .slick-next:before {
+  color: #f9a33f;
+}
+
+.slideshow img {
+  border: 1px solid #ddd;
+  -webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 0 0 0 rgba(0, 0, 0, 0.12);
+          box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 0 0 0 rgba(0, 0, 0, 0.12);
 }
 
 .steps {
