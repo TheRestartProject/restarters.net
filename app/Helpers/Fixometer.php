@@ -543,7 +543,7 @@ class FixometerHelper {
 
   }
 
-  public static function getRSSFeed(){
+  public static function getRSSFeed($num_posts = 3){
     $xml = new SimpleXMLElement(file_get_contents('https://therestartproject.org/feed/'));
 
     $i = 0;
@@ -552,7 +552,7 @@ class FixometerHelper {
       $news_feed[$i] = $xml_item;
 
       $i += 1;
-      if ($i == 5) {
+      if ($i == $num_posts) {
         break;
       }
     }

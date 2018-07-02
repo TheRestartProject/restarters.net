@@ -1,7 +1,7 @@
 <section class="dashboard__block">
     <div class="dashboard__block__content dashboard__block__content--table">
       <h4>Upcoming events</h4>
-      <p>If possible, the best way to get involved is to go to an event, see how it works, and participate</p>
+      <p>Find and attend events.  If you have entered your town/city in your profile, you will see the events nearest to you.</p>
         <div class="table-responsive">
         <table role="table" class="table table-striped">
             <thead>

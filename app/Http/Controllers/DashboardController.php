@@ -131,7 +131,7 @@ class DashboardController extends Controller
 
       }
 
-      $news_feed = FixometerHelper::getRSSFeed();
+      $news_feed = FixometerHelper::getRSSFeed(3);
       $wiki_pages = FixometerHelper::getRandomWikiPages();
 
       //Show onboarding modals on first login
