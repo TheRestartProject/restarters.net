@@ -994,13 +994,16 @@ class PartyController extends Controller {
   }
 
 
-  public function stats($id, $class = null){
+  public static function stats($id, $class = null){
       $Device = new Device;
+      $Party = new Party;
 
       // $this->set('framed', true);
-      $party = $this->Party->findThis($id, true);
+      $party = $Party->findThis($id, true)[0];
 
-      if($party->device_count == 0){
+      $need_attention = 0;
+
+      if(count($party->devices) == 0){
           $need_attention++;
       }
 
@@ -1010,11 +1013,17 @@ class PartyController extends Controller {
       $party->dead_devices = 0;
       $party->ewaste = 0;
 
+      $weights = $Device->getWeights();
+
+      $TotalWeight = $weights[0]->total_weights;
+      $TotalEmission = $weights[0]->total_footprints;
+      $EmissionRatio = $TotalEmission / $TotalWeight;
+
       foreach($party->devices as $device){
 
-          if($device->repair_status == DEVICE_FIXED){
-              $party->co2 += (!empty($device->estimate) && $device->category == 46 ? ($device->estimate * $this->EmissionRatio) : $device->footprint);
-              $party->ewaste += (!empty($device->estimate) && $device->category == 46  ? $device->estimate : $device->weight);
+          if($device->repair_status == env('DEVICE_FIXED')){
+              $party->co2 += (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $EmissionRatio) : $device->footprint);
+              $party->ewaste += (!empty($device->estimate) && $device->category == 46  ? intval($device->estimate) : $device->weight);
           }
 
           switch($device->repair_status){
@@ -1031,16 +1040,19 @@ class PartyController extends Controller {
       }
 
       $party->co2 = number_format(round($party->co2 * $Device->displacement), 0, '.' , ',');
-      $this->set('party', $party);
+      // $this->set('party', $party);
       if(!is_null($class)) {
-          $this->set('class', 'wide');
+        return view('party.stats', [
+          'framed' => true,
+          'party' => $party,
+          'class' => 'wide',
+        ]);
+      } else {
+        return view('party.stats', [
+          'framed' => true,
+          'party' => $party,
+        ]);
       }
-
-      return view('party.stats', [
-        'framed' => true,
-        'party' => $party,
-        'class' => 'wide',
-      ]);
 
   }
 

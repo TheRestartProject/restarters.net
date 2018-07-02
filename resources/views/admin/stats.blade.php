@@ -1,6 +1,5 @@
-@extends('layouts.app')
+@extends('layouts.header_plain')
 
-@section('content')
     <div class="container" id="public-dataviz-stats">
         <?php if($section == 1){ ?>
         <?php if($paragraph_only == false ) { ?>
@@ -130,4 +129,3 @@
         </section>
         <?php } ?>
     </div>
-@endsection

@@ -607,7 +607,7 @@ class GroupController extends Controller
       }
   }
 
-  public function stats($id, $format = 'row'){
+  public static function stats($id, $format = 'row'){
 
       $Party = new Party;
       $Device = new Device;
@@ -632,28 +632,28 @@ class GroupController extends Controller
           $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
 
           foreach($party->devices as $device){
-              if($device->repair_status == DEVICE_FIXED){
+              if($device->repair_status == env('DEVICE_FIXED')){
               //  echo (!empty($device->estimate) && $device->category == 46 ? ( " Adding ESTIMATED: " . $device->estimate * $EmissionRatio . " - COEFF: " . $EmissionRatio . "<br />") : 'Adding ' . $device->footprint . '<br />');
-                  $partyco2 +=     (!empty($device->estimate) && $device->category == 46 ? ($device->estimate * $EmissionRatio) : $device->footprint);
-                  $waste +=   (!empty($device->estimate) && $device->category == 46 ? $device->estimate : $device->weight);
+                  $partyco2 +=     (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $EmissionRatio) : $device->footprint);
+                  $waste +=   (!empty($device->estimate) && $device->category == 46 ? intval($device->estimate) : $device->weight);
               }
 
           }
-          $partyco2 =  number_format(round($partyco2 * $Device->displacement), 0, '.' , ',');
+          $partyco2 =  intval(number_format(round($partyco2 * $Device->displacement), 0, '.' , ','));
           $co2 += $partyco2;
 
       }
 
       $waste = number_format(round($waste), 0, '.', ',');
 
-      $this->set('pax', $participants);
-      $this->set('hours', $hours_volunteered);
-      $this->set('parties', count($allparties));
-      $this->set('co2', $co2);
-      $this->set('waste', $waste);
-      $this->set('format', $format);
+      // $this->set('pax', $participants);
+      // $this->set('hours', $hours_volunteered);
+      // $this->set('parties', count($allparties));
+      // $this->set('co2', $co2);
+      // $this->set('waste', $waste);
+      // $this->set('format', $format);
 
-      return view('groups.stats', [
+      return view('group.stats', [
         'pax' => $participants,
         'hours' => $hours_volunteered,
         'parties' => count($allparties),

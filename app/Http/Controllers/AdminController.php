@@ -50,7 +50,7 @@ class AdminController extends Controller
   //     }
   }
 
-  public function stats($section = 1, $paragraph_only = false){
+  public static function stats($section = 1, $paragraph_only = false){
       //Object Instances
       $Group = new Group;
       $User = new User;
@@ -92,7 +92,7 @@ class AdminController extends Controller
 
               switch($device->repair_status){
                   case 1:
-                      $party->co2 += (!empty($device->estimate) && $device->category == 46 ? ($device->estimate * $EmissionRatio) : $device->footprint);
+                      $party->co2 += (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $EmissionRatio) : $device->footprint);
                       $party->fixed_devices++;
                       break;
                   case 2:
@@ -182,7 +182,7 @@ class AdminController extends Controller
         'showbadges' => $Device->guesstimates(),
         'need_attention' => $need_attention,
         'user' => $user,
-        'profile' => $user->getProfile($user->id),
+        // 'profile' => $user->getProfile($user->id),
         'upcomingparties' => $Party->findNextParties(),
         'allparties' => $allparties,
         'devices' => $devices,

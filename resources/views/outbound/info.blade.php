@@ -1,11 +1,9 @@
-@extends('layouts.app')
 
-@section('content')
 <div class="container-fluid">
 	<section class="row" id="impact-dataviz">
 		<div class="col-md-12">
 			<div class="di_consume <?php echo $info['consume_class']; ?>">
-				<img src="/assets/icons/<?php echo $info['consume_image']; ?>" class="img-responsive">
+				<img src="{{ asset('/icons/'.$info['consume_image']) }}" class="img-responsive">
 				<div class="text">
 					<div class="blue"><?php echo $info['consume_label']; ?></div>
 					<div class="consume"><?php echo $info['consume_eql_to']; ?></div>
@@ -28,4 +26,3 @@
 		</div>
 	</section>
 </div>
-@endsection

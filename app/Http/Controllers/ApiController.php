@@ -7,7 +7,7 @@ use App\Device;
 
 class ApiController extends Controller
 {
-  public function homepage_data() {
+  public static function homepage_data() {
       $result = array();
 
       $Party = new Party;
