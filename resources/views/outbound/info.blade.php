@@ -1,4 +1,5 @@
-
+@include('layouts.header_plain', ['iframe' => true])
+@yield('content')
 <div class="container-fluid">
 	<section class="row" id="impact-dataviz">
 		<div class="col-md-12">
@@ -26,3 +27,4 @@
 		</div>
 	</section>
 </div>
+@include('layouts.footer')

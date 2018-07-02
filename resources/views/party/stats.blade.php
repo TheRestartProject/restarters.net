@@ -1,3 +1,5 @@
+@include('layouts.header_plain', ['iframe' => true])
+@yield('content')
 <div class="" id="party-headline-stats">
 
     <div class="stat1">
@@ -45,3 +47,4 @@
     </div>
 
 </div>
+@include('layouts.footer')

@@ -1,4 +1,5 @@
-@extends('layouts.header_plain')
+@include('layouts.header_plain', ['iframe' => true])
+@yield('content')
 
     <div class="container" id="public-dataviz-stats">
         <?php if($section == 1){ ?>
@@ -117,7 +118,7 @@
                     <div class="row">
                         <div class="col-md-12 text-center clearfix">
                             <br /><br /><br />
-                            <div class="legend">1 <img src="/assets/icons/<?php echo $manufacture_img; ?>"> = <?php echo $manufacture_legend; ?> <?php _t("(approximately)");?></div>
+                            <div class="legend">1 <img src="/assets/icons/<?php echo $manufacture_img; ?>"> = <?php echo $manufacture_legend; ?> (approximately)</div>
 
                         </div>
                     </div>
@@ -129,3 +130,5 @@
         </section>
         <?php } ?>
     </div>
+
+@include('layouts.footer')

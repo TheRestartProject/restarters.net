@@ -11,7 +11,11 @@
         <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Styles -->
-        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+        @if( isset($iframe) )
+          <link href="{{ asset('css/iframe.css') }}" rel="stylesheet">
+        @else
+          <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+        @endif
 
         @include('includes/gmap')
     </head>
