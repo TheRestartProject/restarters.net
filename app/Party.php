@@ -387,8 +387,9 @@ class Party extends Model
                       ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
                         ->whereDate('event_date', '>=', date('Y-m-d'))
                           ->select('events.*')
-                            ->orderBy('wordpress_post_id', 'ASC')
-                              ->orderBy('event_date', 'ASC');
+                            ->groupBy('idevents')
+                              ->orderBy('wordpress_post_id', 'ASC')
+                                ->orderBy('event_date', 'ASC');
     }
 
     public function scopeRequiresModeration(){

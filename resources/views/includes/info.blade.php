@@ -12,7 +12,7 @@
         <div class="row row-compressed stats">
             <div class="col">
                 <h3>@lang('login.stat_1')</h3>
-                <strong>{{ $device_count_status[0]->counter }}</strong>
+                <strong>{{ number_format($device_count_status[0]->counter, 0, '.', ',') }}</strong>
             </div>
             <div class="col">
                 <h3 style="width: 115px;">@lang('login.stat_2')</h3>
@@ -24,7 +24,7 @@
             </div>
             <div class="col">
                 <h3>@lang('login.stat_4')</h3>
-                <strong>{{ $partiesCount }}</strong>
+                <strong>{{ number_format($partiesCount, 0, '.', ',') }}</strong>
             </div>
         </div>
     </div>

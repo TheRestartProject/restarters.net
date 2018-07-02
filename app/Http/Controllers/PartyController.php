@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Party;
-use App\Group;
-use App\User;
-use App\Category;
 use App\Brands;
+use App\Category;
 use App\Device;
 use App\EventsUsers;
-use App\Session;
-use App\UserGroups;
+use App\Group;
+use App\Host;
 use App\Invite;
+use App\Party;
+use App\Session;
+use App\User;
+use App\UserGroups;
 
 use Notification;
 use App\Notifications\JoinEvent;
@@ -69,7 +70,7 @@ class PartyController extends Controller {
       // $this->permissionsChecker = new PermissionsChecker($this->user, $this->hostParties);
   }
 
-  public function index()
+  public function index($group_id = null)
   {
 
       if( FixometerHelper::hasRole(Auth::user(), 'Administrator') ){
@@ -78,12 +79,33 @@ class PartyController extends Controller {
         $moderate_events = null;
       }
 
-      $upcoming_events = Party::upcomingEvents()
-                            ->where('users_groups.user', Auth::user()->id)
-                              ->take(5)
-                                ->get();
+      //Use this view for showing group only upcoming and past events
+      if( !is_null($group_id) ){
 
-      $past_events = Party::pastEvents()->paginate(env('PAGINATE'));
+        $upcoming_events = Party::upcomingEvents()
+                              ->where('events.group', $group_id)
+                                  ->get();
+
+        $past_events = Party::pastEvents()
+                              ->where('events.group', $group_id)
+                                  ->paginate(env('PAGINATE'));
+
+        $group = Host::find($group_id);
+
+      } else {
+
+        $upcoming_events = Party::upcomingEvents()
+                              ->where('users_groups.user', Auth::user()->id)
+                                ->take(5)
+                                  ->get();
+
+        $past_events = Party::pastEvents()->paginate(env('PAGINATE'));
+
+        $group = null;
+
+      }
+
+      //Looks to see whether user has a group already, if they do, they can create events
       $user_groups = UserGroups::where('user', Auth::user()->id)->count();
 
       return view('events.index', [
@@ -92,6 +114,7 @@ class PartyController extends Controller {
         'moderate_events'  => $moderate_events,
         'user_groups'      => $user_groups,
         'EmissionRatio'    => $this->EmissionRatio,
+        'group'            => $group,
       ]);
 
   }

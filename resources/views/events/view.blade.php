@@ -41,7 +41,12 @@
                         <li class="breadcrumb-item active" aria-current="page">{{ trim($formdata->group_name) }}</li>
                     </ol>
                 </nav>
-                <img src="{{ asset('/images/placeholder.png') }}" alt="Placeholder" class="event-icon">
+                @php( $group_image = $event->host->hostImage )
+                @if( is_object($group_image) )
+                  <img src="{{ asset('/uploads/mid_' . $group_image->image->path) }}" alt="{{{ $event->host->name }}}" class="event-icon">
+                @else
+                  <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}" class="event-icon">
+                @endif
             </header>
 
           </div>

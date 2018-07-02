@@ -1,17 +1,29 @@
 @php( $devices = $event->allDevices )
 <tr>
-    <td class="table-cell-icon">
-      @php( $group_image = $event->host->hostImage )
-      @if( is_object($group_image) )
-        <img src="{{ asset('/uploads/thumbnail_' . $group_image->image->path) }}" alt="{{{ $event->host->name }}}">
-      @else
-        <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}">
-      @endif
-    </td>
+    @if( !isset($group_view) )
+      <td class="table-cell-icon">
+        @php( $group_image = $event->host->hostImage->image )
+        @if( is_object($group_image) )
+          <img src="{{ asset('/uploads/thumbnail_' . $group_image->path) }}" alt="{{{ $event->host->name }}}">
+        @else
+          <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}">
+        @endif
+      </td>
+    @endif
     <td class="cell-name"><a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a></td>
     <td class="cell-date">{{ $event->getEventDate() }}</td>
     <td class="cell-date">{{ $event->getEventStartEnd() }}</td>
-    <td class="cell-locations">{{ $event->location }}</td>
+    @if( !isset($group_view) )
+      <td class="cell-locations">
+        @if( strlen($event->location) > 25 )
+          <span data-toggle="popover" data-content="{{{ $event->location }}}" data-trigger="hover">
+        @endif
+        {{ str_limit($event->location, 25, '...') }}
+        @if( strlen($event->location) > 25 )
+          </span>
+        @endif
+      </td>
+    @endif
     @if( is_null($event->wordpress_post_id) )
       @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') )
         <td class="cell-moderation" colspan="8">Event requires <a href="/party/edit/{{ $event->idevents }}">moderation</a> by an admin</td>

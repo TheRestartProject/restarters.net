@@ -23468,6 +23468,11 @@ function validateForm() {
 
         if (validCount !== jQuery('#step-2').find('input,select').filter('[required]:visible').length) {
             return false;
+        } else if (jQuery('#password').val().length < 6) {
+
+            jQuery('#password').addClass('is-invalid');
+            jQuery('#password-confirm').addClass('is-invalid');
+            return false;
         } else if (jQuery('#password').val() !== jQuery('#password-confirm').val()) {
 
             jQuery('#password').addClass('is-invalid');

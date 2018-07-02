@@ -259,6 +259,19 @@ class HostController extends Controller
         $response = null;
       }
 
+      //Event tabs
+      $upcoming_events = Party::upcomingEvents()
+                            ->where('events.group', $group->idgroups)
+                              ->take(5)
+                                ->get();
+
+      $past_events = Party::pastEvents()
+                            ->where('events.group', $group->idgroups)
+                              ->take(5)
+                                ->get();
+
+
+
       return view('group.view', [ //host.index
         'title' => 'Host Dashboard',
         'showbadges' => true,
@@ -289,6 +302,9 @@ class HostController extends Controller
         'mostleast' => $mostleast,
         'top' => $Device->findMostSeen(1, null, $group->idgroups),
         'user' => $user,
+        'upcoming_events' => $upcoming_events,
+        'past_events' => $past_events,
+        'EmissionRatio' => $Party->EmissionRatio,
       ]);
 
   }

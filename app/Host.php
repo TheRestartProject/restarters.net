@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Host extends Model {
 
     protected $table = 'groups';
+    protected $primaryKey = 'idgroups';
 
     public function hostImage(){
         return $this->hasOne('App\Xref', 'reference', 'idgroups')->where('object_type', 5);
