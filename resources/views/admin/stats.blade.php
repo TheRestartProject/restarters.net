@@ -24,19 +24,19 @@
             <div class="col-md-6 col-md-offset-3  text-center">
 
                 <div class="impact-devices-1">
-                    <img src="/assets/icons/impact_device_1.jpg" class="" width="200">
+                    <img src="{{ asset('/icons/impact_device_1.jpg') }}" class="" width="200">
                     <span class="title"><?php echo (int)$device_count_status[0]->counter;?></span>
                     <span class="legend">were fixed</span>
                 </div>
 
                 <div class="impact-devices-2">
-                    <img src="/assets/icons/impact_device_2.jpg" class="" width="200">
+                    <img src="{{ asset('/icons/impact_device_2.jpg') }}" class="" width="200">
                     <span class="title"><?php echo (int)$device_count_status[1]->counter;?></span>
                     <span class="legend">were still repairable</span>
                 </div>
 
                 <div class="impact-devices-3">
-                    <img src="/assets/icons/impact_device_3.jpg" class="" width="200">
+                    <img src="{{ asset('/icons/impact_device_3.jpg') }}" class="" width="200">
                     <span class="title"><?php echo (int)$device_count_status[2]->counter;?></span>
                     <span class="legend">were dead</span>
                 </div>
@@ -97,7 +97,7 @@
                 ?>
 
                 <div class="di_consume <?php echo $consume_class; ?>">
-                    <img src="/assets/icons/<?php echo $consume_image; ?>" class="img-responsive">
+                    <img src="{{ asset('/icons/'.$consume_image) }}" class="img-responsive">
                     <div class="text">
                         <div class="blue"><?php echo $consume_label; ?></div>
                         <div class="consume"><?php echo $consume_eql_to; ?></div>
@@ -111,14 +111,14 @@
                     <div class="row">
                     <?php for($i = 1; $i<= 0;/*$manufacture_eql_to;*/ $i++){ ?>
                         <div class="col-xs-4 col-sm-4 col-md-3 text-center">
-                            <img src="/assets/icons/<?php echo $manufacture_img; ?>" class="img-responsive">
+                            <img src="{{ asset('/icons/'.$manufacture_img) }}" class="img-responsive">
                         </div>
                     <?php } ?>
                    </div>
                     <div class="row">
                         <div class="col-md-12 text-center clearfix">
                             <br /><br /><br />
-                            <div class="legend">1 <img src="/assets/icons/<?php echo $manufacture_img; ?>"> = <?php echo $manufacture_legend; ?> (approximately)</div>
+                            <div class="legend">1 <img src="{{ asset('/icons/'.$manufacture_img) }}"> = <?php echo $manufacture_legend; ?> (approximately)</div>
 
                         </div>
                     </div>

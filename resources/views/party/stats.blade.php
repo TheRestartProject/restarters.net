@@ -12,7 +12,7 @@
 
     <div class="stat1">
         <span>
-                <img class="" alt="The Restart Project: Logo" src="/assets/images/logo_mini.png">
+                <img class="" alt="The Restart Project: Logo" src="{{ asset('/images/logo_mini.png') }}">
                 <span class="subtext">restarters</span>
             </span>
                 <?php echo $party->volunteers; ?>
