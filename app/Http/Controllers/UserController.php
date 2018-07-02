@@ -2,24 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
+use Auth;
 use App\Device;
 use App\EventsUsers;
 use App\Group;
+use App\Http\Controllers\PartyController;
 use App\Invite;
 use App\Party;
-use App\Role;
-use App\Skills;
-use App\User;
-use App\UserGroups;
-use App\UsersSkills;
-//use App\Session;
-use App\Http\Controllers\PartyController;
-
-// use Illuminate\Support\Facades\Notifications;
-use Notification;
 use App\Notifications\ResetPassword;
 // use App\Notifications\JoinGroup;
 // use App\Notifications\JoinEvent;
@@ -34,10 +23,19 @@ use App\Notifications\ResetPassword;
 // use App\Notifications\GroupConfirmed;
 // use App\Notifications\ReviewNotes;
 // use App\Notifications\AccountCreated;
-
+use App\Role;
+use App\Skills;
+use App\User;
+use App\UserGroups;
+use App\UsersSkills;
+use Cache;
 use FixometerHelper;
 use FixometerFile;
-use Auth;
+use Notification;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+
 
 class UserController extends Controller
 {
@@ -952,19 +950,18 @@ class UserController extends Controller
     }
 
     public function getRegister($hash = null){
-      $Party = new Party;
-      $Device = new Device;
 
-      $allparties = $Party->ofThisGroup('admin', true, true);
-      $co2Total = $Device->getWeights();
-      $device_count_status = $Device->statusCount();
+      if( Auth::check() && Auth::user()->hasUserGivenConsent() )
+        return redirect('dashboard');
+
+      $stats = FixometerHelper::loginRegisterStats();
 
       return view('auth.register-new', [
         'skills' => FixometerHelper::allSkills(),
-        'co2Total' => $co2Total[0]->total_footprints,
-        'wasteTotal' => $co2Total[0]->total_weights,
-        'partiesCount' => count($allparties),
-        'device_count_status' => $device_count_status,
+        'co2Total' => $stats['co2Total'][0]->total_footprints,
+        'wasteTotal' => $stats['co2Total'][0]->total_weights,
+        'partiesCount' => count($stats['allparties']),
+        'device_count_status' => $stats['device_count_status'],
       ]);
 
     }
@@ -974,9 +971,8 @@ class UserController extends Controller
       if( Auth::check() ){ //Existing users don't need all the same rules
 
         $rules = [
-            'reg_age'             => 'required',
-            'reg_country'         => 'required',
-            'reg_gender'          => 'required|string|max:255',
+            'age'                 => 'required',
+            'country'             => 'required',
             'my_name'             => 'honeypot',
             'my_time'             => 'required|honeytime:5',
             'consent_gdpr'        => 'required',
@@ -987,11 +983,10 @@ class UserController extends Controller
       } else {
 
         $rules = [
-            'reg_name'            => 'required|string|max:255',
+            'name'                => 'required|string|max:255',
             'email'               => 'required|string|email|max:255|unique:users',
-            'reg_age'             => 'required',
-            'reg_country'         => 'required',
-            'reg_gender'          => 'required|string|max:255',
+            'age'                 => 'required',
+            'country'             => 'required',
             'password'            => 'required|string|min:6|confirmed',
             'my_name'             => 'honeypot',
             'my_time'             => 'required|honeytime:5',
@@ -1017,10 +1012,10 @@ class UserController extends Controller
         $user_id = Auth::user()->id;
 
         $user = User::find( Auth::user()->id );
-        $user->country = $request->input('reg_country');
-        $user->location = $request->input('reg_city');
-        $user->gender = $request->input('reg_gender');
-        $user->age = $request->input('reg_age');
+        $user->country = $request->input('country');
+        $user->location = $request->input('city');
+        $user->gender = $request->input('gender');
+        $user->age = $request->input('age');
         $user->consent_past_data = $timestamp;
 
       } else {
@@ -1033,16 +1028,16 @@ class UserController extends Controller
         }
 
         $user = User::create([
-            'name' => $request->input('reg_name'),
+            'name' => $request->input('name'),
             'email' => $request->input('email'),
             'password' => Hash::make($request->input('password')),
             'role' => $role,
             'recovery' => substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 ),
             'recovery_expires' => strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60)),
-            'country' => $request->input('reg_country'),
-            'location' => $request->input('reg_city'),
-            'gender' => $request->input('reg_gender'),
-            'age' => $request->input('reg_age'),
+            'country' => $request->input('country'),
+            'location' => $request->input('city'),
+            'gender' => $request->input('gender'),
+            'age' => $request->input('age'),
         ]);
 
       }
@@ -1068,9 +1063,9 @@ class UserController extends Controller
         $user->invites = 1;
 
       // Now determine lat and long values from location field (if provided)
-      if ( !is_null( $request->input('reg_city') ) ) {
+      if ( !is_null( $request->input('city') ) ) {
 
-        $lat_long = FixometerHelper::getLatLongFromCityCountry($request->input('reg_city'), $request->input('reg_country'));
+        $lat_long = FixometerHelper::getLatLongFromCityCountry($request->input('city'), $request->input('country'));
         if ( !empty($lat_long) ) {
             $user->latitude = $lat_long[0];
             $user->longitude = $lat_long[1];

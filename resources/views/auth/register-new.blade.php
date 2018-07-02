@@ -37,7 +37,7 @@
               <div class="row row-compressed">
                   @foreach ($skills[$key] as $skill)
                     <div class="col-sm-6 col-lg-3">
-                        <input type="checkbox" name="skills[]" id="skill-{{ $skill->id }}" class="styled-checkbox" value="{{ $skill->id }}">
+                        <input @if( is_array(old('skills')) && in_array($skill->id, old('skills')) ) checked @endif type="checkbox" name="skills[]" id="skill-{{ $skill->id }}" class="styled-checkbox" value="{{ $skill->id }}">
                         <label for="skill-{{ $skill->id }}" class="btn btn-checkbox"><span>{{ $skill->skill_name }}</span></label>
                     </div>
                   @endforeach
@@ -63,68 +63,68 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label for="reg_name">@lang('general.your_name'):<sup>*</sup></label>
+                                <label for="name">@lang('general.your_name'):<sup>*</sup></label>
                                 @if( Auth::check() )
-                                  <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }} field" id="reg_name" name="reg_name" value="{{{ Auth::user()->name }}}" disabled aria-required="true">
+                                  <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }} field" id="name" name="name" value="{{{ Auth::user()->name }}}" disabled aria-required="true">
                                 @else
-                                  <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }} field" id="reg_name" name="reg_name" required aria-required="true">
+                                  <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }} field" id="name" name="name" value="{{{ old('name') }}}" required aria-required="true">
                                 @endif
                                 <div class="invalid-feedback">@lang('general.your_name_validation')</div>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label for="reg_email">@lang('auth.email_address'):<sup>*</sup></label>
+                                <label for="email">@lang('auth.email_address'):<sup>*</sup></label>
                                 @if( Auth::check() )
-                                  <input type="email" class="form-control field" id="reg_email" name="email" value="{{{ Auth::user()->email }}}" disabled aria-required="true">
+                                  <input type="email" class="form-control field" id="email" name="email" value="{{{ Auth::user()->email }}}" disabled aria-required="true">
                                 @else
-                                  <input type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }} field" id="reg_email" name="email" required aria-required="true">
+                                  <input type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }} field" id="email" name="email" value="{{{ old('email') }}}" required aria-required="true">
                                 @endif
                                 <div class="invalid-feedback">@lang('auth.email_address_validation')</div>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label for="reg_age">@lang('registration.age'):<sup>*</sup></label>
+                                <label for="age">@lang('registration.age'):<sup>*</sup></label>
                                 <div class="form-control form-control__select">
-                                    <select id="reg_age" name="reg_age" required aria-required="true" class="field select2">
+                                    <select id="age" name="age" required aria-required="true" class="field select2">
                                         @foreach(FixometerHelper::allAges() as $age)
-                                          <option value="{{ $age }}">{{ $age }}</option>
+                                          <option @if( old('age') == $age ) selected @endif value="{{ $age }}">{{ $age }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="invalid-feedback">@lang('registration.age_validation')</div>
-                                <small id="reg_age_help" class="form-text text-muted">@lang('registration.age_help')</small>
+                                <small id="age_help" class="form-text text-muted">@lang('registration.age_help')</small>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label for="reg_country">@lang('registration.country'):<sup>*</sup></label>
+                                <label for="country">@lang('registration.country'):<sup>*</sup></label>
                                 <div class="form-control form-control__select">
-                                    <select id="reg_country" name="reg_country" required aria-required="true" class="field select2">
+                                    <select id="country" name="country" required aria-required="true" class="field select2">
                                         <option value=""></option>
-                                        @foreach (FixometerHelper::getAllCountries() as $key => $value)
-                                          <option value="{{ $key }}">{{ $value }}</option>
+                                        @foreach (FixometerHelper::getAllCountries() as $country_code => $country_name)
+                                          <option value="{{ $country_code }}" @if( old('country') == $country_code ) selected @endif>{{ $country_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="invalid-feedback">@lang('registration.country_validation')</div>
-                                <small id="reg_country_help" class="form-text text-muted">@lang('registration.country_help')</small>
+                                <small id="country_help" class="form-text text-muted">@lang('registration.country_help')</small>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label for="reg_gender">@lang('registration.gender'):</label>
-                                <input type="text" class="form-control field" id="reg_gender" name="reg_gender">
+                                <label for="gender">@lang('registration.gender'):</label>
+                                <input type="text" class="form-control field" id="gender" name="gender" value="{{{ old('gender') }}}">
                                 <div class="invalid-feedback">@lang('registration.gender_validation')</div>
-                                <small id="reg_gender_help" class="form-text text-muted">@lang('registration.gender_help')</small>
+                                <small id="gender_help" class="form-text text-muted">@lang('registration.gender_help')</small>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label for="reg_city">@lang('registration.town-city'):</label>
-                                <input type="text" class="form-control" id="reg_city" name="reg_city" placeholder="@lang('registration.town-city-placeholder')">
-                                <small id="reg_city_help" class="form-text text-muted">@lang('registration.town-city_help')</small>
+                                <label for="city">@lang('registration.town-city'):</label>
+                                <input type="text" class="form-control" id="city" name="city" placeholder="@lang('registration.town-city-placeholder')" value="{{{ old('city') }}}">
+                                <small id="city_help" class="form-text text-muted">@lang('registration.town-city_help')</small>
                             </div>
                         </div>
                     </div>
@@ -139,14 +139,14 @@
                           <div class="col-lg-6">
                               <div class="form-group">
                                   <label for="password">@lang('auth.password'):<sup>*</sup></label>
-                                  <input type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }} field" id="password" name="password" required aria-required="true">
+                                  <input type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }} field" id="password" name="password" value="{{{ old('password') }}}" required aria-required="true">
                                   <div class="invalid-feedback">@lang('auth.repeat_password_validation')</div>
                               </div>
                           </div>
                           <div class="col-lg-6">
                               <div class="form-group">
                                   <label for="password-confirm">@lang('auth.repeat_password'):<sup>*</sup></label>
-                                  <input type="password" class="form-control field" id="password-confirm" name="password_confirmation" required aria-required="true">
+                                  <input type="password" class="form-control field" id="password-confirm" name="password_confirmation" value="{{{ old('password_confirmation') }}}" required aria-required="true">
                                   <div class="invalid-feedback">@lang('auth.repeat_password_validation')</div>
                               </div>
                           </div>
@@ -176,13 +176,13 @@
                 <fieldset>
                     <legend>@lang('registration.reg-step-3-1a')</legend>
                     <div class="form-check d-flex align-items-center justify-content-start">
-                        <input class="form-check-input" type="checkbox" name="newsletter" id="newsletter" value="1">
+                        <input class="form-check-input" type="checkbox" name="newsletter" id="newsletter" value="1" @if( old('newsletter') == 1 ) checked @endif>
                         <label class="form-check-label" for="newsletter">
                         @lang('registration.reg-step-3-label1')
                     </label>
                     </div>
                     <div class="form-check d-flex align-items-center justify-content-start">
-                        <input class="form-check-input" type="checkbox" name="invites" id="invites" value="1">
+                        <input class="form-check-input" type="checkbox" name="invites" id="invites" value="1" @if( old('invites') == 1 ) checked @endif>
                         <label class="form-check-label" for="invites">
                         @lang('registration.reg-step-3-label2')
                     </label>
@@ -208,20 +208,20 @@
 
             <fieldset>
                 <div class="form-check d-flex align-items-top justify-content-start">
-                    <input class="checkbox-top form-check-input" type="checkbox" name="consent_gdpr" id="consent_gdpr" value="1">
+                    <input class="checkbox-top form-check-input" type="checkbox" name="consent_gdpr" id="consent_gdpr" value="1" @if( old('consent_gdpr') == 1 ) checked @endif>
                     <label class="form-check-label" for="consent_gdpr">
                       @lang('registration.reg-step-4-label1')
                     </label>
                 </div>
                 <div class="form-check d-flex align-items-top justify-content-start">
-                    <input class="checkbox-top form-check-input" type="checkbox" name="consent_future_data" id="consent_future_data" value="1">
+                    <input class="checkbox-top form-check-input" type="checkbox" name="consent_future_data" id="consent_future_data" value="1" @if( old('consent_future_data') == 1 ) checked @endif>
                     <label class="form-check-label" for="consent_future_data">
                       @lang('registration.reg-step-4-label2')
                     </label>
                 </div>
                 @if( Auth::check() )
                 <div class="form-check d-flex align-items-top justify-content-start">
-                    <input class="checkbox-top form-check-input" type="checkbox" name="consent_past_data" id="consent_past_data" value="1">
+                    <input class="checkbox-top form-check-input" type="checkbox" name="consent_past_data" id="consent_past_data" value="1" @if( old('consent_past_data') == 1 ) checked @endif>
                     <label class="form-check-label" for="consent_past_data">
                       @lang('registration.reg-step-4-label3')
                     </label>

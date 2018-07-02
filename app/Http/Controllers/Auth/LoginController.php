@@ -99,18 +99,14 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        $Party = new Party;
-        $Device = new Device;
 
-        $allparties = $Party->ofThisGroup('admin', true, true);
-        $co2Total = $Device->getWeights();
-        $device_count_status = $Device->statusCount();
+        $stats = FixometerHelper::loginRegisterStats();
 
         return view('auth.login', [
-          'co2Total' => $co2Total[0]->total_footprints,
-          'wasteTotal' => $co2Total[0]->total_weights,
-          'partiesCount' => count($allparties),
-          'device_count_status' => $device_count_status,
+          'co2Total' => $stats['co2Total'][0]->total_footprints,
+          'wasteTotal' => $stats['co2Total'][0]->total_weights,
+          'partiesCount' => count($stats['allparties']),
+          'device_count_status' => $stats['device_count_status'],
         ]);
 
     }

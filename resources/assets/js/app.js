@@ -21,14 +21,14 @@ if ( jQuery('.slideshow').length > 0 ) {
 
 function validateForm() {
 
-    var forms = jQuery('#step-2-form');
+    var form = jQuery('#step-2');
     var validCount = 0;
 
-    var validation = Array.prototype.filter.call(forms, function (form) {
+    var validation = Array.prototype.filter.call(form, function (form) {
 
-        form[0].querySelectorAll('[required]').forEach(element => {
+        form.querySelectorAll('[required]').forEach(element => {
 
-            //console.log(element.checkValidity());
+            console.log(element.checkValidity());
 
             if (element.checkValidity() === false ) {
 
@@ -53,19 +53,19 @@ function validateForm() {
 
         });
 
-        if ( validCount !== jQuery('#step-2-form').find('input,select').filter('[required]:visible').length ) {
+        if ( validCount !== jQuery('#step-2').find('input,select').filter('[required]:visible').length ) {
             return false;
 
-        } else if ( jQuery('#password').val() !== jQuery('#password2').val() ) {
+        } else if ( jQuery('#password').val() !== jQuery('#password-confirm').val() ) {
 
             jQuery('#password').addClass('is-invalid');
-            jQuery('#password2').addClass('is-invalid');
+            jQuery('#password-confirm').addClass('is-invalid');
             return false;
 
         } else {
 
             jQuery('#password').removeClass('is-invalid');
-            jQuery('#password2').removeClass('is-invalid');
+            jQuery('#password-confirm').removeClass('is-invalid');
 
             jQuery('.registration__step').removeClass('registration__step--active');
             jQuery('#step-3').addClass('registration__step--active');
@@ -85,8 +85,7 @@ function formProcess(e) {
 
     jQuery('.btn-next').attr('aria-expanded', 'false');
     jQuery(this).attr('aria-expanded', 'true');
-
-    if ( jQuery('.registration__step--active').find('#step-2-form').length > 0 ) {
+    if ( jQuery('#step-2.registration__step--active').length > 0 ) {
         validateForm();
     } else {
         jQuery('.registration__step').removeClass('registration__step--active');
