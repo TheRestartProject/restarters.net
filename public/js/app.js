@@ -23822,8 +23822,37 @@ function numericInputs() {
 }
 
 function removeUser() {
-    jQuery(this).parent().remove();
-    // AJAX remove entry...
+
+    user_id = jQuery(this).data('remove-volunteer');
+    event_id = jQuery(this).data('event-id');
+    type = jQuery(this).data('type');
+    counter = jQuery('#' + type + '-counter');
+    current_count = parseInt(counter.text());
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $("input[name='_token']").val()
+        },
+        type: 'post',
+        url: '/party/remove-volunteer',
+        data: {
+            user_id: user_id,
+            event_id: event_id
+        },
+        datatype: 'json',
+        success: function success(json) {
+            if (json.success) {
+                jQuery('.volunteer-' + user_id).fadeOut();
+                jQuery('#' + type + '-counter').text();
+                counter.text(current_count - 1);
+            } else {
+                alert('Something has gone wrong');
+            }
+        },
+        error: function error(_error2) {
+            alert('Something has gone wrong');
+        }
+    });
 }
 
 function nestedTable() {

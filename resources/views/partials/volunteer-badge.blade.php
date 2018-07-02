@@ -1,4 +1,4 @@
-<li>
+<li class="volunteer-{{ $volunteer->user }}">
 
     @php( $user = $volunteer->eventUser )
     @php( $user_skills = $user->userSkills )
@@ -20,7 +20,7 @@
     @endif
 
     @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator'))
-      <button class="users-list__remove js-remove">Remove volunteer</button>
+      <button class="users-list__remove js-remove volunteer-{{ $volunteer->user }}" data-remove-volunteer="{{ $volunteer->user }}" data-event-id="{{ $volunteer->event }}" data-type="{{{ $type }}}">Remove volunteer</button>
     @endif
 
     @php( $path = $user->getProfile($user->id)->path )

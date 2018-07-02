@@ -25,11 +25,12 @@
               <th></th>
               <th scope="col">@lang('events.table_restarter_column')</th>
               <th scope="col">@lang('events.table_skills_column')</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             @foreach ($invited as $volunteer)
-              @include('partials.volunteer-row')
+              @include('partials.volunteer-row', ['type' => 'invited'])
             @endforeach
           </tbody>
         </table>

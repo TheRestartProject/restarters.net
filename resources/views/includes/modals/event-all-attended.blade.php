@@ -32,7 +32,7 @@
           </thead>
           <tbody>
             @foreach ($attended as $volunteer)
-              @include('partials.volunteer-row')
+              @include('partials.volunteer-row', ['type' => 'attended'])
             @endforeach
           </tbody>
         </table>

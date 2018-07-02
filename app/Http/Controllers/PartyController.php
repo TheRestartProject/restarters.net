@@ -1088,6 +1088,32 @@ class PartyController extends Controller {
     return "true";
   }
 
+  public function removeVolunteer(Request $request) {
+
+    $user_id = $request->input('user_id');
+    $event_id = $request->input('event_id');
+
+    $return = [
+      'success' => false
+    ];
+
+    if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($event_id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+
+      $delete_user = EventsUsers::where('user', $user_id)->where('event', $event_id)->delete();
+      if( $delete_user == 1 ){
+
+        $return = [
+          'success' => true
+        ];
+
+      }
+
+    }
+
+    return response()->json($return);
+
+  }
+
   public function postSendInvite(Request $request) {
 
     $from_id = Auth::user()->id;
