@@ -2,9 +2,9 @@
 <tr>
     @if( !isset($group_view) )
       <td class="table-cell-icon">
-        @php( $group_image = $event->host->hostImage->image )
-        @if( is_object($group_image) )
-          <img src="{{ asset('/uploads/thumbnail_' . $group_image->path) }}" alt="{{{ $event->host->name }}}">
+        @php( $group_image = $event->host->hostImage )
+        @if( is_object($group_image) && is_object($group_image->image) )
+          <img src="{{ asset('/uploads/thumbnail_' . $group_image->image->path) }}" alt="{{{ $event->host->name }}}">
         @else
           <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}">
         @endif
