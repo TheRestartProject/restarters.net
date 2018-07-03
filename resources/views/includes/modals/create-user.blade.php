@@ -9,23 +9,24 @@
         </button>
       </div>
       <div class="modal-body">
-        <form method="post">
+        <form action="/user/create" method="post">
+          @csrf
           <div class="form-row">
             <div class="form-group col">
               <label for="name">Name:</label>
-              <input type="text" class="form-control" id="inputName" name="inputName">
+              <input type="text" class="form-control" id="inputName" name="name">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group col">
               <label for="email">Email address:</label>
-              <input type="email" class="form-control" id="inputEmail" name="inputEmail">
+              <input type="email" class="form-control" id="inputEmail" name="email">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group col">
               <label for="inputRole">User role:</label>
-              <select class="form-control" id="inputRole" name="inputRole">
+              <select class="form-control" id="inputRole" name="role">
                 <option value="" selected>Choose role</option>
                 @foreach (FixometerHelper::allRoles() as $role)
                   <option value="{{ $role->idroles }}">{{ $role->role }}</option>
@@ -36,15 +37,16 @@
           <div class="form-row">
             <div class="form-group col">
               <label for="inputPassword">Password:</label>
-              <input type="password" class="form-control" id="inputPassword" name="inputPassword">
+              <input type="password" class="form-control" id="inputPassword" name="password">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group col">
               <label for="inputPasswordRepeat">Repeat password:</label>
-              <input type="password" class="form-control" id="inputPasswordRepeat" name="inputPasswordRepeat">
+              <input type="password" class="form-control" id="inputPasswordRepeat" name="passwordRepeat">
             </div>
           </div>
+          <input type="hidden" name="modal" value="1">
           <div class="form-row">
             <div class="form-group col">
               <div class="d-flex justify-content-end">

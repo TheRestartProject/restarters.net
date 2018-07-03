@@ -47,7 +47,6 @@
 
               </div>
           </div>
-        </form>
 
         <div class="button-group row">
             <div class="col-lg-6 d-flex align-items-center justify-content-start">
@@ -57,6 +56,7 @@
                 <button type="submit" class="btn btn-primary btn-create">@lang('admin.save-tag')</button>
             </div>
         </div>
+        </form>
 
     </div><!-- /edit-panel -->
 

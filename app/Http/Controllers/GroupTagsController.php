@@ -69,7 +69,6 @@ class GroupTagsController extends Controller
   }
 
   public function postEditTag($id, Request $request) {
-    dd($request);
     if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
       return redirect('/user/forbidden');
 

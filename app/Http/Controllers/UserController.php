@@ -580,7 +580,9 @@ class UserController extends Controller
                 /*$pwd    =       $_POST['password'];
                 $cpwd   =       $_POST['c_password']; */
                 $role   =       $_POST['role'];
-                $groups  =      $_POST['groups'];
+                if (!isset($_POST['modal'])) {
+                  $groups  =      $_POST['groups'];
+                }
 
                 // dbga($group);
 
@@ -678,16 +680,20 @@ class UserController extends Controller
                   $data = null;
                 }
 
-                return view('user.create', [
-                  'title' => 'New User',
-                  'user' => $user,
-                  'header' => true,
-                  'roles' => $Roles,
-                  'groups' => $Groups,
-                  'response' => $response,
-                  'error' => $error,
-                  'originalData' => $data,
-                ]);
+                if (!isset($_POST['modal'])) {
+                  return view('user.create', [
+                    'title' => 'New User',
+                    'user' => $user,
+                    'header' => true,
+                    'roles' => $Roles,
+                    'groups' => $Groups,
+                    'response' => $response,
+                    'error' => $error,
+                    'originalData' => $data,
+                  ]);
+                } else {
+                  return redirect()->back()->with('response', $response);
+                }
             }
 
             return view('user.create', [
