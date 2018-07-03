@@ -5,7 +5,7 @@
             @include('includes.logo')
           </a>
           <br>
-          <h4>@lang('login.lead')</h4>
+          <!--<h4>@lang('login.lead')</h4>-->
         </header>
     </div>
     <div class="col-lg-6">
