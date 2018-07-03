@@ -19,6 +19,7 @@ return array(
     'App\\Export' => $baseDir . '/app/Export.php',
     'App\\Group' => $baseDir . '/app/Group.php',
     'App\\GroupTags' => $baseDir . '/app/GroupTags.php',
+    'App\\GrouptagsGroups' => $baseDir . '/app/GrouptagsGroups.php',
     'App\\Helpers\\FixometerHelper' => $baseDir . '/app/Helpers/Fixometer.php',
     'App\\Home' => $baseDir . '/app/Home.php',
     'App\\Host' => $baseDir . '/app/Host.php',

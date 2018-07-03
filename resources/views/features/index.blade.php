@@ -2,7 +2,7 @@
 @yield('content')
 <section class="features">
     <div class="container">
-        <div class="features__link"><a class="" href="/user/register">@lang('general.register')</a> / <a class="" href="{{{ route('login') }}}">@lang('general.login')</a></div>
+        <div class="features__link"><a href="{{{ route('registration') }}}">@lang('general.register')</a> / <a href="{{{ route('login') }}}">@lang('general.login')</a></div>
         <header>
             <a href="{{{ route('login') }}}">
               @include('includes/logo')
@@ -19,7 +19,7 @@
             <div><img src="{{ url('/images/slides/6-onboard-barriers-to-repair.png') }}" alt="Bring down the barriers to repair "><h2 class="featured-slide__heading">Bring down the barriers to repair</h2></div>
         </div>
         <div class="features__end">
-            <a href="{{{ route('register') }}}" class="btn btn-primary">@lang('general.signmeup')</a>
+            <a href="{{{ route('registration') }}}" class="btn btn-primary">@lang('general.signmeup')</a>
         </div>
     </div>
 </section>

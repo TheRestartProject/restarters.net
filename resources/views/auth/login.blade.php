@@ -48,7 +48,7 @@
                                         <a class="entry-panel__link" href="/user/recover">@lang('auth.forgot_password')</a>
                                     </div>
                                     <div class="col-12">
-                                        <a class="entry-panel__link" href="/user/register">@lang('auth.create_account')</a>
+                                        <a class="entry-panel__link" href="{{{ route('registration') }}}">@lang('auth.create_account')</a>
                                     </div>
                                 </div>
 

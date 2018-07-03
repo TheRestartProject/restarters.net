@@ -432,6 +432,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Export' => __DIR__ . '/../..' . '/app/Export.php',
         'App\\Group' => __DIR__ . '/../..' . '/app/Group.php',
         'App\\GroupTags' => __DIR__ . '/../..' . '/app/GroupTags.php',
+        'App\\GrouptagsGroups' => __DIR__ . '/../..' . '/app/GrouptagsGroups.php',
         'App\\Helpers\\FixometerHelper' => __DIR__ . '/../..' . '/app/Helpers/Fixometer.php',
         'App\\Home' => __DIR__ . '/../..' . '/app/Home.php',
         'App\\Host' => __DIR__ . '/../..' . '/app/Host.php',

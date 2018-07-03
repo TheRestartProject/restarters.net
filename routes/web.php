@@ -10,14 +10,15 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/user/reset', 'UserController@reset');
-Route::post('/user/reset', 'UserController@reset');
-Route::get('/user/recover', 'UserController@recover');
-Route::post('/user/recover', 'UserController@recover');
-Route::get('/user/register', 'UserController@getRegister');
-Route::get('/user/register/{invite}', 'UserController@getRegister');
-Route::post('/user/register', 'UserController@postRegister');
+Route::prefix('user')->group(function () {
+    Route::get('/', 'HomeController@index');
+    Route::get('reset', 'UserController@reset');
+    Route::post('reset', 'UserController@reset');
+    Route::get('recover', 'UserController@recover');
+    Route::post('recover', 'UserController@recover');
+    Route::get('register/{invite?}', 'UserController@getRegister')->name('registration');
+    Route::post('register', 'UserController@postRegister');
+});
 
 Route::get('/user/forbidden', function () {
     return view('user.forbidden', [
@@ -35,8 +36,6 @@ Route::get('/about', function() {
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
   Route::get('/', 'HomeController@index')->name('home');
-
-  // Route::get('/', 'UserController@index');
 
   //User Controller
   Route::get('/profile', 'UserController@index')->name('profile');
