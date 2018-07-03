@@ -13,7 +13,7 @@
             </ol>
           </nav>
           <div class="btn-group">
-            <a href="/" class="btn btn-primary btn-save">@lang('admin.create-new-category')</a>
+            <!-- <a href="/" class="btn btn-primary btn-save">@lang('admin.create-new-category')</a> -->
           </div>
         </div>
       </div>
@@ -43,8 +43,8 @@
                     @if(isset($list))
                       @foreach($list as $p)
                       <tr>
-                          <td><a href="/category/edit/{{ $p->idcategories }}"><?php echo $p->idcategories; ?></a></td>
-                          <td><?php echo $p->name; ?></td>
+                          <td><?php echo $p->idcategories; ?></td>
+                          <td><a href="/category/edit/{{ $p->idcategories }}"><?php echo $p->name; ?></a></td>
                           @foreach($categories as $cluster)
                             {!! $cluster->idclusters == $p->cluster ? '<td>'.$cluster->name.'</td>' : '' !!}
                           @endforeach
@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-center">
+    <!-- <div class="d-flex justify-content-center">
         <nav aria-label="Page navigation example">
         <ul class="pagination">
             <li class="page-item active"><a class="page-link" href="#">1</a></li>
@@ -69,7 +69,7 @@
             <li class="page-item"><a class="page-link" href="#">3</a></li>
         </ul>
         </nav>
-    </div>
+    </div> -->
 
   </div>
 </section>

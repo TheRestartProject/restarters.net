@@ -63,4 +63,20 @@ class CategoryController extends Controller
         'categories'  => $categories
       ]);
   }
+
+  public function postEditCategory($id) {
+      // if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+      //   return redirect('/user/forbidden');
+      //
+      // $category = Category::find($id);
+      //
+      // $c = new Category;
+      // $categories = $c->listed();
+      //
+      // return view('category.edit', [
+      //   'title' => 'Edit Category',
+      //   'category'   => $category,
+      //   'categories'  => $categories
+      // ]);
+  }
 }

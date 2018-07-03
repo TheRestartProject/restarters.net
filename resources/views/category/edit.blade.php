@@ -21,12 +21,13 @@
 
         <div class="row">
             <div class="col-lg-4">
-                <p>@lang('admin.edit-category-content')</p>
+                <!-- <p>@lang('admin.edit-category-content')</p> -->
             </div>
         </div>
         <div class="row">
             <div class="col-lg-4">
-
+              <form action="/category/edit/{{ $ }}" method="post">
+                @csrf
                 <div class="form-group">
                     <label for="category_name">@lang('admin.category_name'):</label>
                     <input type="text" id="category_name" class="field form-control" value="{{ $category->name }}">
@@ -81,7 +82,7 @@
                         <button type="submit" class="btn btn-primary btn-create">@lang('admin.save-category')</button>
                     </div>
                 </div>
-
+              </form>
 
             </div>
         </div>

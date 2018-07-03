@@ -50,7 +50,7 @@
 
         <div class="button-group row">
             <div class="col-lg-6 d-flex align-items-center justify-content-start">
-                <button type="submit" class="btn btn-primary btn-danger">@lang('admin.delete-tag')</button>
+                <a href="/tags/delete/{{ $tag->id }}" class="btn btn-primary btn-danger">@lang('admin.delete-tag')</a>
             </div>
             <div class="col-lg-6 d-flex align-items-center justify-content-end">
                 <button type="submit" class="btn btn-primary btn-create">@lang('admin.save-tag')</button>
