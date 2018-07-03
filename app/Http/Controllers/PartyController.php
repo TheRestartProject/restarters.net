@@ -123,7 +123,7 @@ class PartyController extends Controller {
   {
       $user = Auth::user();
 
-      if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') && !FixometerHelper::hasRole(Auth::user(), 'Host') )
+      if( FixometerHelper::hasRole(Auth::user(), 'Restarter') )
         return redirect('/user/forbidden');
 
       $Groups = new Group;
