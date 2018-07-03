@@ -25,6 +25,9 @@ class RenameModifiedAt extends Migration
       Schema::table('users', function (Blueprint $table) {
           $table->renameColumn('modified_at', 'updated_at');
       });
+      Schema::table('groups', function (Blueprint $table) {
+          $table->string('website', 100)->nullable();
+      });
     }
 
     /**
@@ -45,6 +48,9 @@ class RenameModifiedAt extends Migration
       });
       Schema::table('users', function (Blueprint $table) {
           $table->renameColumn('updated_at', 'modified_at');
+      });
+      Schema::table('groups', function (Blueprint $table) {
+          $table->dropColumn('website');
       });
     }
 }
