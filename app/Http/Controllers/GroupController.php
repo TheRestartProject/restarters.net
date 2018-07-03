@@ -11,6 +11,9 @@ use App\UserGroups;
 use App\GroupTags;
 use App\GrouptagsGroups;
 
+use Notification;
+use App\Notifications\JoinGroup;
+
 use Auth;
 use FixometerHelper;
 use FixometerFile;
@@ -300,7 +303,9 @@ class GroupController extends Controller
     $pax = count(UserGroups::where('group', $id)->get());
     $hours = 0;
 
-    return view('group.view-host', [
+    $in_group = !empty(UserGroups::where('group', $id)->where('user', $user->id)->first());
+
+    return view('group.view', [
       'gmaps' => true,
       'images' => $images,
       'user' => $user,
@@ -310,19 +315,20 @@ class GroupController extends Controller
       'hours' => $hours,
       'allparties' => $allparties,
       'weights' => $weights,
+      'in_group' => $in_group,
     ]);
 
   }
 
   public function postSendInvite(Request $request) {
 
-    $from_id = $request->input('from_id');
+    $from_id = Auth::id();
     $group_name = $request->input('group_name');
     $group_id = $request->input('group_id');
     $emails = explode(',', str_replace(' ', '', $request->input('manual_invite_box')));
     $message = $request->input('message_to_restarters');
 
-    if (empty($emails)) {
+    if (!empty($emails)) {
       $users = User::whereIn('email', $emails)->get();
       // if (isset($invite_group) && $invite_group == 1) {
       //   $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)->pluck('user')->toArray();
@@ -337,7 +343,7 @@ class GroupController extends Controller
         $user_group = UserGroups::where('user', $user->id)->where('group', $group_id)->first();
         if (is_null($user_group) || $user_group->status != "1") {
           $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
-          $url = url('/').'/accept-invite/group-'.$group_id.'/'.$hash;
+          $url = url('/').'/group/accept-invite/'.$group_id.'/'.$hash;
 
           if (!is_null($user_group)) {
             $user_group->update([
@@ -366,24 +372,24 @@ class GroupController extends Controller
       if (!empty($non_users)) {
         foreach ($non_users as $non_user) {
           $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
-          $url = url('/').'/user/register/group-'.$group_id.'/'.$hash;
+          $url = url('/user/register/'.$hash);
 
-          UserGroups::create([
-            'user' => $user->id,
-            'group' => $group_id,
-            'status' => $hash,
-          ]);
+          $invite = Invite::create(array(
+            'event_id' => $group_id,
+            'email' => $non_user,
+            'hash' => $hash,
+          ));
 
-          $invite = JoinGroup::create(array(
+          $arr = array(
             'name' => $from->name,
             'group' => $group_name,
             'url' => $url,
             'message' => $message,
-          ));
-          $invite->notify();
-          // Notification::send($user, new JoinEvent($arr));
+          );
+          Notification::send($invite, new JoinGroup($arr));
         }
       }
+
 
       if (!isset($not_sent)) {
         return redirect()->back()->with('success', 'Invites Sent!');
@@ -661,6 +667,37 @@ class GroupController extends Controller
         'waste' => $waste,
         'format' => $format,
       ]);
+
+  }
+
+  public function getJoinGroup($group_id) {
+    $user_id = Auth::id();
+
+    $not_in_group = empty(UserGroups::where('group', $group_id)->where('user', $user_id)->first());
+
+    if ($not_in_group) {
+      try {
+        $user_group = UserGroups::create([
+          'user' => $user_id,
+          'group' => $group_id,
+          'status' => 1,
+          'role' => 4,
+        ]);
+
+        $response['success'] = 'Thanks for joining, you are now part of this group!';
+
+        return redirect()->back()->with('response', $response);
+
+      } catch (\Exception $e) {
+        $response['danger'] = 'Failed to join this group';
+
+        return redirect()->back()->with('response', $response);
+      }
+    } else {
+      $response['warning'] = 'You are already part of this group';
+
+      return redirect()->back()->with('response', $response);
+    }
 
   }
 

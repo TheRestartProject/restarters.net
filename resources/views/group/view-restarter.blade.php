@@ -3,66 +3,31 @@
 <section class="events group-view">
   <div class="container-fluid">
 
-      <?php if( isset($_GET['message']) && $_GET['message'] == 'invite' ): ?>
-        <div class="alert alert-info" role="alert">
-          Thank you, your invitation has been sent
-        </div>
-      <?php endif; ?>
-
-      @if(session()->has('response'))
-        @php( FixometerHelper::printResponse(session('response')) )
-      @endif
-
-      @if (\Session::has('success'))
-          <div class="alert alert-success">
-              {!! \Session::get('success') !!}
-          </div>
-      @endif
-      @if (\Session::has('warning'))
-          <div class="alert alert-warning">
-              {!! \Session::get('warning') !!}
-          </div>
-      @endif
-
       <div class="events__header row align-content-top">
           <div class="col-lg-7 d-flex flex-column">
 
             <header>
                 <h1>The Mighty Restarters</h1>
                 <p>Colchester, Essex, United Kingdom</p>
-                <a class="events__header__url" target="_blank" rel="noopener noreferrer" href="https://wecreatedigital.co.uk">https://wecreatedigital.co.uk</a>
+                <a class="events__header__url" rel="noopener noreferrer" target="_blank" href="https://wecreatedigital.co.uk">https://wecreatedigital.co.uk</a>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/">FIXOMETER</a></li>
-                        <li class="breadcrumb-item"><a href="/groups">@lang('groups.groups')</a></li>
+                        <li class="breadcrumb-item"><a href="/group">@lang('groups.groups')</a></li>
                         <li class="breadcrumb-item active" aria-current="page">The Mighty Restarters</li>
                     </ol>
                 </nav>
-                <img src="/images/placeholder.png" alt="Placeholder" class="event-icon">
+                <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="event-icon">
             </header>
 
           </div>
           <div class="col-lg-5">
 
+            <input type="hidden" id="group_id" value="{{ $group->idgroups }}">
+
             <div class="button-group button-group__r">
-                @if (!$in_group)
-                  <a href="/group/join/{{ $group->idgroups }}" class="btn btn-primary" id="join-group">Join group</a>
-                @endif
+                <a href="#alert" class="btn btn-primary" id="join-group">Join group</a>
                 <a href="#" data-toggle="modal" data-target="#group-share-stats" class="btn btn-primary">Group stats embed</a>
-
-                @if (FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host'))
-                  <div class="dropdown">
-                      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Group actions
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                          <a class="dropdown-item" href="/group/edit/{{ $group->idgroups }}">Edit group</a>
-                          <a class="dropdown-item" href="/party/create">Add event</a>
-                          <a class="dropdown-item" data-toggle="modal" data-target="#invite-to-group" href="#">Invite to group</a>
-                      </div>
-                  </div>
-                @endif
-
             </div>
 
           </div>
@@ -71,15 +36,15 @@
         <div class="row">
             <div class="col-lg-3">
 
-                <h2 id="about-grp">About the group <sup>(<a href="/group/edit/{{ $group->id }}">Edit group</a>)</sup></h2>
+                <h2 id="about-grp">About the group <sup>(<a href="/group/edit">Edit group</a>)</sup></h2>
 
                 <div class="events__description">
                     <h3 class="events__side__heading" id="description">Description:</h3>
-                    <p>Nulla vitae elit libero, a pharetra augue. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam porta sem malesuada magna mollis euismod. Vestibulum id ligula porta felis euismod semper. Etiam porta sem malesuada magna mollis euismod. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</p>
+                    <p>Nulla vitae elit libero, a pharetra augue. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam porta sem malesuada magna mollis euismod. Vestibulum id ligula porta felis euismod semper.</p>
                     <button data-toggle="modal" data-target="#group-description"><span>Read more</span></button>
                 </div><!-- /events__description -->
 
-                <h2 id="volunteers">Volunteers <sup>(<a href="#" data-toggle="modal" data-target="#invite-to-group">Invite to group</a>)</sup></h2>
+                <h2 id="volunteers">Volunteers <sup>(<a class="dropdown-item" data-toggle="modal" data-target="#invite-to-group" href="#">Invite to group</a>)</sup></h2>
 
                 <div class="tab">
 
@@ -90,19 +55,19 @@
                                 <h3><a href="/profile">Dean Appleton-Claydon</a></h3>
                                 <p><span class="badge badge-pill badge-primary">Host</span></p>
 
-                                <img src="/images/placeholder.png" alt="Placeholder" class="users-list__icon">
+                                <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="users-list__icon">
                             </li>
                             <li>
                                 <h3><a href="/profile">Dean Appleton-Claydon</a></h3>
                                 <p><svg width="14" height="14" viewBox="0 0 11 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M4.739,0.367c0.081,-0.221 0.284,-0.367 0.511,-0.367c0.227,0 0.43,0.146 0.511,0.367l1.113,3.039l3.107,0.168c0.227,0.013 0.422,0.17 0.492,0.395c0.07,0.225 0,0.473 -0.176,0.622l-2.419,2.046l0.807,3.142c0.059,0.229 -0.024,0.472 -0.207,0.612c-0.183,0.139 -0.43,0.146 -0.62,0.017l-2.608,-1.774l-2.608,1.774c-0.19,0.129 -0.437,0.122 -0.62,-0.017c-0.183,-0.14 -0.266,-0.383 -0.207,-0.612l0.807,-3.142l-2.419,-2.046c-0.176,-0.149 -0.246,-0.397 -0.176,-0.622c0.07,-0.225 0.265,-0.382 0.492,-0.395l3.107,-0.168l1.113,-3.039Z"/></svg> <button type="button" class="btn btn-skills" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Mobile Devices, Audio &amp; Visual, Screens &amp; TVs, Home Appliances">5 skills</button></p>
 
-                                <img src="/images/placeholder.png" alt="Placeholder" class="users-list__icon">
+                                <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="users-list__icon">
                             </li>
                             <li>
                                 <h3><a href="/profile">Dean Appleton-Claydon</a></h3>
                                 <p><svg width="14" height="14" viewBox="0 0 11 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M4.739,0.367c0.081,-0.221 0.284,-0.367 0.511,-0.367c0.227,0 0.43,0.146 0.511,0.367l1.113,3.039l3.107,0.168c0.227,0.013 0.422,0.17 0.492,0.395c0.07,0.225 0,0.473 -0.176,0.622l-2.419,2.046l0.807,3.142c0.059,0.229 -0.024,0.472 -0.207,0.612c-0.183,0.139 -0.43,0.146 -0.62,0.017l-2.608,-1.774l-2.608,1.774c-0.19,0.129 -0.437,0.122 -0.62,-0.017c-0.183,-0.14 -0.266,-0.383 -0.207,-0.612l0.807,-3.142l-2.419,-2.046c-0.176,-0.149 -0.246,-0.397 -0.176,-0.622c0.07,-0.225 0.265,-0.382 0.492,-0.395l3.107,-0.168l1.113,-3.039Z"/></svg> <button type="button" class="btn btn-skills" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Mobile Devices, Audio &amp; Visual, Screens &amp; TVs, Home Appliances">5 skills</button></p>
 
-                                <img src="/images/placeholder.png" alt="Placeholder" class="users-list__icon">
+                                <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="users-list__icon">
                             </li>
 
                         </ul>
@@ -336,7 +301,7 @@
                     </div>
                 </div>
 
-                <h2 id="upcoming-grp">Upcoming events <sup>(<a href="/party/create">Add event</a>)</sup></h2>
+                <h2 id="upcoming-grp">Upcoming events <sup>(<a href="/event/create">Add event</a>)</sup></h2>
                 <div class="table-responsive">
                     <table class="table table-events table-striped" role="table">
                         <thead>
@@ -355,17 +320,17 @@
                         <tbody>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/create">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
                                 <td class="cell-rsvp" colspan="6">This event hasn't started RSVP</td>
                             </tr>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/create">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
-                                <td class="cell-progress" colspan="6">This event is in progress <a href="/party/view#devices">Add a device</a></td>
+                                <td class="cell-progress" colspan="6">This event is in progress <a href="/event/view#devices">Add a device</a></td>
                             </tr>
 
                         </tbody>
@@ -374,14 +339,14 @@
 
                 <br>
 
-                <h2 id="recently-grp">Recently completed events <sup>(<a href="/party/view">See all events</a>)</sup></h2>
+                <h2 id="recently-grp">Recently completed events <sup>(<a href="/event/view">See all events</a>)</sup></h2>
                 <div class="table-responsive">
                     <table class="table table-events table-striped" role="table">
                         <thead>
                             <tr>
-                                <th scope="col">Event Name</th>
-                                <th scope="col" class="cell-date">Date/Time</th>
-                                <th scope="col" class="cell-locations">Location</th>
+                                <th scope="col">@lang('events.event_name')</th>
+                                <th scope="col" class="cell-date">@lang('events.event_datetime')</th>
+                                <th scope="col" class="cell-locations">@lang('events.event_location')</th>
                                 <th scope="col"><svg width="18" height="18" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M8.147,2.06c0.624,0.413 1.062,1.113 1.141,1.925c0.255,0.125 0.537,0.197 0.837,0.197c1.093,0 1.98,-0.936 1.98,-2.091c0,-1.155 -0.887,-2.091 -1.98,-2.091c-1.083,0 -1.962,0.92 -1.978,2.06Zm-1.297,4.282c1.093,0 1.98,-0.937 1.98,-2.092c0,-1.155 -0.887,-2.091 -1.98,-2.091c-1.094,0 -1.981,0.937 -1.981,2.091c0,1.155 0.887,2.092 1.981,2.092Zm0.839,0.142l-1.68,0c-1.397,0 -2.535,1.951 -2.535,3.428l0,2.92l0.006,0.034l0.141,0.047c1.334,0.44 2.493,0.587 3.447,0.587c1.863,0 2.943,-0.561 3.01,-0.597l0.132,-0.071l0.014,0l0,-2.92c0,-1.477 -1.137,-3.428 -2.535,-3.428Zm3.276,-1.937l-1.667,0c-0.018,0.704 -0.303,1.117 -0.753,1.573c1.242,0.391 2.152,2.358 2.152,3.795l0,0.669c1.646,-0.064 2.594,-0.557 2.657,-0.59l0.132,-0.07l0.014,0l0,-2.921c0,-1.477 -1.137,-2.456 -2.535,-2.456Zm-7.59,-0.364c0.388,0 0.748,-0.12 1.053,-0.323c0.097,-0.669 0.437,-1.253 0.921,-1.651c0.002,-0.039 0.006,-0.078 0.006,-0.117c0,-1.155 -0.887,-2.091 -1.98,-2.091c-1.093,0 -1.98,0.936 -1.98,2.091c0,1.154 0.887,2.091 1.98,2.091Zm1.779,1.937c-0.449,-0.454 -0.732,-0.863 -0.753,-1.563c-0.062,-0.005 -0.123,-0.01 -0.186,-0.01l-1.68,0c-1.398,0 -2.535,0.979 -2.535,2.456l0,2.92l0.005,0.034l0.142,0.047c1.07,0.353 2.025,0.515 2.855,0.567l0,-0.656c0,-1.437 0.909,-3.404 2.152,-3.795Z" style="fill:#0394a6;fill-rule:nonzero;"></path></svg></th>
                                 <th scope="col"><svg width="17" height="20" viewBox="0 0 12 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><path d="M9.268,3.161c-0.332,-0.212 -0.776,-0.119 -0.992,0.207c-0.216,0.326 -0.122,0.763 0.21,0.975c1.303,0.834 2.08,2.241 2.08,3.766c0,1.523 -0.777,2.93 -2.078,3.764c-0.001,0.001 -0.001,0.001 -0.002,0.001c-0.741,0.475 -1.601,0.725 -2.486,0.725c-0.885,0 -1.745,-0.25 -2.486,-0.725c-0.001,0 -0.001,0 -0.001,0c-1.302,-0.834 -2.08,-2.241 -2.08,-3.765c0,-1.525 0.778,-2.932 2.081,-3.766c0.332,-0.212 0.426,-0.649 0.21,-0.975c-0.216,-0.326 -0.66,-0.419 -0.992,-0.207c-1.711,1.095 -2.732,2.945 -2.732,4.948c0,2.003 1.021,3.852 2.732,4.947c0,0 0.001,0.001 0.002,0.001c0.973,0.623 2.103,0.952 3.266,0.952c1.164,0 2.294,-0.33 3.268,-0.953c1.711,-1.095 2.732,-2.944 2.732,-4.947c0,-2.003 -1.021,-3.853 -2.732,-4.948" style="fill:#0394a6;fill-rule:nonzero;"></path><path d="M7.59,2.133c0.107,-0.36 -0.047,-1.227 -0.503,-1.758c-0.214,0.301 -0.335,0.688 -0.44,1.022c-0.182,0.066 -0.364,-0.014 -0.581,-0.082c-0.116,-0.037 -0.505,-0.121 -0.584,-0.245c-0.074,-0.116 0.073,-0.249 0.146,-0.388c0.051,-0.094 0.094,-0.231 0.136,-0.337c0.049,-0.126 0.07,-0.247 -0.006,-0.345c-0.462,0.034 -1.144,0.404 -1.394,0.906c-0.067,0.133 -0.101,0.393 -0.089,0.519c0.011,0.104 0.097,0.313 0.161,0.424c0.249,0.426 0.588,0.781 0.766,1.206c0.22,0.525 0.172,0.969 0.182,1.52c0.041,2.214 -0.006,2.923 -0.01,5.109c0,0.189 -0.014,0.415 0.031,0.507c0.26,0.527 1.029,0.579 1.29,-0.001c0.087,-0.191 0.028,-0.571 0.017,-0.843c-0.033,-0.868 -0.056,-1.708 -0.08,-2.526c-0.033,-1.142 -0.06,-0.901 -0.117,-1.97c-0.028,-0.529 -0.023,-1.117 0.275,-1.629c0.141,-0.24 0.657,-0.78 0.8,-1.089" style="fill:#0394a6;fill-rule:nonzero;"></path></g></svg></th>
                                 <th scope="col"><svg width="20" height="12" viewBox="0 0 15 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><circle cx="2.854" cy="6.346" r="2.854" style="fill:#0394a6;"></circle><circle cx="11.721" cy="5.92" r="3.279" style="fill:#0394a6;"></circle><circle cx="7.121" cy="4.6" r="4.6" style="fill:#0394a6;"></circle><rect x="2.854" y="6.346" width="8.867" height="2.854" style="fill:#0394a6;"></rect></g></svg></th>
@@ -393,28 +358,16 @@
                         <tbody>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
                                 <td class="cell-figure">23</td>
                                 <td class="cell-figure">6</td>
-                                <td class="cell-progress" colspan="4">No devices added <a href="/party/view#devices">Add a device</a></td>
+                                <td class="cell-progress" colspan="4">No devices added <a href="/event/view#devices">Add a device</a></td>
                             </tr>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
-                                <td class="cell-date">08/05/2018<br>13:00-18:30</td>
-                                <td class="cell-locations">3Space, Bermondsey, London</td>
-                                <td class="cell-figure">23</td>
-                                <td class="cell-figure">6</td>
-                                <td class="cell-figure">999kg</td>
-                                <td class="cell-figure">6</td>
-                                <td class="cell-figure">23 </td>
-                                <td class="cell-figure">6</td>
-                            </tr>
-
-                            <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
                                 <td class="cell-figure">23</td>
@@ -426,7 +379,7 @@
                             </tr>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
                                 <td class="cell-figure">23</td>
@@ -438,7 +391,19 @@
                             </tr>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td class="cell-date">08/05/2018<br>13:00-18:30</td>
+                                <td class="cell-locations">3Space, Bermondsey, London</td>
+                                <td class="cell-figure">23</td>
+                                <td class="cell-figure">6</td>
+                                <td class="cell-figure">999kg</td>
+                                <td class="cell-figure">6</td>
+                                <td class="cell-figure">23 </td>
+                                <td class="cell-figure">6</td>
+                            </tr>
+
+                            <tr>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
                                 <td class="cell-figure">23</td>

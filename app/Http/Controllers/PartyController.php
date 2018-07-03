@@ -1104,7 +1104,7 @@ class PartyController extends Controller {
 
   public function postSendInvite(Request $request) {
 
-    $from_id = Auth::user()->id;
+    $from_id = Auth::id();
     $group_name = $request->input('group_name');
     $event_id = $request->input('event_id');
     $invite_group = $request->input('invite_group');
@@ -1126,7 +1126,7 @@ class PartyController extends Controller {
         if (is_null($user_event) || $user_event->status != "1") {
 
             $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
-            $url = url('/accept-invite/'.$event_id.'/'.$hash);
+            $url = url('/party/accept-invite/'.$event_id.'/'.$hash);
 
             if (!is_null($user_event)) {
 

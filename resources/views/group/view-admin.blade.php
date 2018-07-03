@@ -3,65 +3,55 @@
 <section class="events group-view">
   <div class="container-fluid">
 
-      <?php if( isset($_GET['message']) && $_GET['message'] == 'invite' ): ?>
-        <div class="alert alert-info" role="alert">
-          Thank you, your invitation has been sent
-        </div>
-      <?php endif; ?>
-
-      @if(session()->has('response'))
-        @php( FixometerHelper::printResponse(session('response')) )
-      @endif
-
-      @if (\Session::has('success'))
-          <div class="alert alert-success">
-              {!! \Session::get('success') !!}
-          </div>
-      @endif
-      @if (\Session::has('warning'))
-          <div class="alert alert-warning">
-              {!! \Session::get('warning') !!}
-          </div>
-      @endif
-
       <div class="events__header row align-content-top">
           <div class="col-lg-7 d-flex flex-column">
 
             <header>
-                <h1>The Mighty Restarters</h1>
+
+                <h1 class="sr-only">The Mighty Restarters</h1>
+                <button class="btn btn-title dropdown-toggle" type="button" id="dropdownTitle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    The Mighty Restarters
+                </button>
+                <div class="dropdown-menu dropdown-menu__titles" aria-labelledby="dropdownTitle">
+                    <a class="dropdown-item" href="#">
+                    <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="dropdown-item-icon">
+                    <span>The Mighty Restarters</span></a>
+                    <a class="dropdown-item" href="#">
+                    <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="dropdown-item-icon">
+                    <span>Brentford Recycling Action Group</span></a>
+                    <a class="dropdown-item" href="#">
+                    <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="dropdown-item-icon">
+                    <span>Restart HQ</span></a>
+                </div>
+
                 <p>Colchester, Essex, United Kingdom</p>
-                <a class="events__header__url" target="_blank" rel="noopener noreferrer" href="https://wecreatedigital.co.uk">https://wecreatedigital.co.uk</a>
+                <a class="events__header__url" href="https://wecreatedigital.co.uk">https://wecreatedigital.co.uk</a>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">FIXOMETER</a></li>
-                        <li class="breadcrumb-item"><a href="/groups">@lang('groups.groups')</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('/') }}">FIXOMETER</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('/') }}/groups">@lang('groups.groups')</a></li>
                         <li class="breadcrumb-item active" aria-current="page">The Mighty Restarters</li>
                     </ol>
                 </nav>
-                <img src="/images/placeholder.png" alt="Placeholder" class="event-icon">
+                <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="event-icon">
             </header>
 
           </div>
           <div class="col-lg-5">
 
             <div class="button-group button-group__r">
-                @if (!$in_group)
-                  <a href="/group/join/{{ $group->idgroups }}" class="btn btn-primary" id="join-group">Join group</a>
-                @endif
                 <a href="#" data-toggle="modal" data-target="#group-share-stats" class="btn btn-primary">Group stats embed</a>
 
-                @if (FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host'))
-                  <div class="dropdown">
-                      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Group actions
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                          <a class="dropdown-item" href="/group/edit/{{ $group->idgroups }}">Edit group</a>
-                          <a class="dropdown-item" href="/party/create">Add event</a>
-                          <a class="dropdown-item" data-toggle="modal" data-target="#invite-to-group" href="#">Invite to group</a>
-                      </div>
-                  </div>
-                @endif
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Group actions
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="/group/edit">Edit group</a>
+                        <a class="dropdown-item" href="/event/create">Add event</a>
+                        <a class="dropdown-item" data-toggle="modal" data-target="#invite-to-group" href="#">Invite to group</a>
+                    </div>
+                </div>
 
             </div>
 
@@ -71,7 +61,7 @@
         <div class="row">
             <div class="col-lg-3">
 
-                <h2 id="about-grp">About the group <sup>(<a href="/group/edit/{{ $group->id }}">Edit group</a>)</sup></h2>
+                <h2 id="about-grp">About the group <sup>(<a href="{{ url('/') }}/edit-group">Edit group</a>)</sup></h2>
 
                 <div class="events__description">
                     <h3 class="events__side__heading" id="description">Description:</h3>
@@ -79,7 +69,7 @@
                     <button data-toggle="modal" data-target="#group-description"><span>Read more</span></button>
                 </div><!-- /events__description -->
 
-                <h2 id="volunteers">Volunteers <sup>(<a href="#" data-toggle="modal" data-target="#invite-to-group">Invite to group</a>)</sup></h2>
+                <h2 id="volunteers">Volunteers <sup>(<a href="{{ url('/') }}/group/invite">Invite to group</a>)</sup></h2>
 
                 <div class="tab">
 
@@ -90,23 +80,23 @@
                                 <h3><a href="/profile">Dean Appleton-Claydon</a></h3>
                                 <p><span class="badge badge-pill badge-primary">Host</span></p>
 
-                                <img src="/images/placeholder.png" alt="Placeholder" class="users-list__icon">
+                                <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="users-list__icon">
                             </li>
                             <li>
                                 <h3><a href="/profile">Dean Appleton-Claydon</a></h3>
                                 <p><svg width="14" height="14" viewBox="0 0 11 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M4.739,0.367c0.081,-0.221 0.284,-0.367 0.511,-0.367c0.227,0 0.43,0.146 0.511,0.367l1.113,3.039l3.107,0.168c0.227,0.013 0.422,0.17 0.492,0.395c0.07,0.225 0,0.473 -0.176,0.622l-2.419,2.046l0.807,3.142c0.059,0.229 -0.024,0.472 -0.207,0.612c-0.183,0.139 -0.43,0.146 -0.62,0.017l-2.608,-1.774l-2.608,1.774c-0.19,0.129 -0.437,0.122 -0.62,-0.017c-0.183,-0.14 -0.266,-0.383 -0.207,-0.612l0.807,-3.142l-2.419,-2.046c-0.176,-0.149 -0.246,-0.397 -0.176,-0.622c0.07,-0.225 0.265,-0.382 0.492,-0.395l3.107,-0.168l1.113,-3.039Z"/></svg> <button type="button" class="btn btn-skills" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Mobile Devices, Audio &amp; Visual, Screens &amp; TVs, Home Appliances">5 skills</button></p>
 
-                                <img src="/images/placeholder.png" alt="Placeholder" class="users-list__icon">
+                                <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="users-list__icon">
                             </li>
                             <li>
                                 <h3><a href="/profile">Dean Appleton-Claydon</a></h3>
                                 <p><svg width="14" height="14" viewBox="0 0 11 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M4.739,0.367c0.081,-0.221 0.284,-0.367 0.511,-0.367c0.227,0 0.43,0.146 0.511,0.367l1.113,3.039l3.107,0.168c0.227,0.013 0.422,0.17 0.492,0.395c0.07,0.225 0,0.473 -0.176,0.622l-2.419,2.046l0.807,3.142c0.059,0.229 -0.024,0.472 -0.207,0.612c-0.183,0.139 -0.43,0.146 -0.62,0.017l-2.608,-1.774l-2.608,1.774c-0.19,0.129 -0.437,0.122 -0.62,-0.017c-0.183,-0.14 -0.266,-0.383 -0.207,-0.612l0.807,-3.142l-2.419,-2.046c-0.176,-0.149 -0.246,-0.397 -0.176,-0.622c0.07,-0.225 0.265,-0.382 0.492,-0.395l3.107,-0.168l1.113,-3.039Z"/></svg> <button type="button" class="btn btn-skills" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Mobile Devices, Audio &amp; Visual, Screens &amp; TVs, Home Appliances">5 skills</button></p>
 
-                                <img src="/images/placeholder.png" alt="Placeholder" class="users-list__icon">
+                                <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="users-list__icon">
                             </li>
 
                         </ul>
-                        <a class="users-list__more" data-toggle="modal" data-target="#group-volunteers" href="#">See all 5 volunteers</a>
+                        <a class="users-list__more" href="{{ url('/') }}/all-volunteers">See all 5 volunteers</a>
                     </div>
 
                 </div>
@@ -336,7 +326,7 @@
                     </div>
                 </div>
 
-                <h2 id="upcoming-grp">Upcoming events <sup>(<a href="/party/create">Add event</a>)</sup></h2>
+                <h2 id="upcoming-grp">Upcoming events <sup>(<a href="{{ url('/') }}/add-event">Add event</a>)</sup></h2>
                 <div class="table-responsive">
                     <table class="table table-events table-striped" role="table">
                         <thead>
@@ -355,17 +345,17 @@
                         <tbody>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
                                 <td class="cell-rsvp" colspan="6">This event hasn't started RSVP</td>
                             </tr>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
-                                <td class="cell-progress" colspan="6">This event is in progress <a href="/party/view#devices">Add a device</a></td>
+                                <td class="cell-progress" colspan="6">This event is in progress <a href="/event/view#devices">Add a device</a></td>
                             </tr>
 
                         </tbody>
@@ -374,7 +364,7 @@
 
                 <br>
 
-                <h2 id="recently-grp">Recently completed events <sup>(<a href="/party/view">See all events</a>)</sup></h2>
+                <h2 id="recently-grp">Recently completed events <sup>(<a href="{{ url('/') }}/add-event">See all events</a>)</sup></h2>
                 <div class="table-responsive">
                     <table class="table table-events table-striped" role="table">
                         <thead>
@@ -393,28 +383,16 @@
                         <tbody>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
                                 <td class="cell-figure">23</td>
                                 <td class="cell-figure">6</td>
-                                <td class="cell-progress" colspan="4">No devices added <a href="/party/view#devices">Add a device</a></td>
+                                <td class="cell-progress" colspan="4">No devices added <a href="/event/view#devices">Add a device</a></td>
                             </tr>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
-                                <td class="cell-date">08/05/2018<br>13:00-18:30</td>
-                                <td class="cell-locations">3Space, Bermondsey, London</td>
-                                <td class="cell-figure">23</td>
-                                <td class="cell-figure">6</td>
-                                <td class="cell-figure">999kg</td>
-                                <td class="cell-figure">6</td>
-                                <td class="cell-figure">23 </td>
-                                <td class="cell-figure">6</td>
-                            </tr>
-
-                            <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
                                 <td class="cell-figure">23</td>
@@ -426,7 +404,7 @@
                             </tr>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
                                 <td class="cell-figure">23</td>
@@ -438,7 +416,19 @@
                             </tr>
 
                             <tr>
-                                <td><a href="/party/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
+                                <td class="cell-date">08/05/2018<br>13:00-18:30</td>
+                                <td class="cell-locations">3Space, Bermondsey, London</td>
+                                <td class="cell-figure">23</td>
+                                <td class="cell-figure">6</td>
+                                <td class="cell-figure">999kg</td>
+                                <td class="cell-figure">6</td>
+                                <td class="cell-figure">23 </td>
+                                <td class="cell-figure">6</td>
+                            </tr>
+
+                            <tr>
+                                <td><a href="/event/view">Bank holiday restart @ The Old Chapel</a></td>
                                 <td class="cell-date">08/05/2018<br>13:00-18:30</td>
                                 <td class="cell-locations">3Space, Bermondsey, London</td>
                                 <td class="cell-figure">23</td>

@@ -89,7 +89,8 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::post('/group/edit/{id}', 'GroupController@edit');
   Route::get('/group/view/{id}', 'GroupController@view');
   Route::post('/group/invite', 'GroupController@postSendInvite');
-  Route::get('/accept-invite/group-{id}/{hash}', 'GroupController@confirmInvite');
+  Route::get('/group/accept-invite/{id}/{hash}', 'GroupController@confirmInvite');
+  Route::get('/group/join/{id}', 'GroupController@getJoinGroup');
 
   //Host Controller
   Route::get('/host', 'HostController@index');
@@ -108,7 +109,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::post('/party/edit/{id}', 'PartyController@edit');
   Route::get('/party/deleteimage', 'PartyController@deleteimage');
   Route::post('/party/invite', 'PartyController@postSendInvite');
-  Route::get('/accept-invite/party-{id}/{hash}', 'PartyController@confirmInvite');
+  Route::get('/party/accept-invite/{id}/{hash}', 'PartyController@confirmInvite');
   Route::get('/party/view/{id}', 'PartyController@view');
   Route::post('/party/get-group-emails', 'PartyController@getGroupEmails');
   Route::post('/party/update-quantity', 'PartyController@updateQuantity');

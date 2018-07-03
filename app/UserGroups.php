@@ -15,7 +15,9 @@ class UserGroups extends Model
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = ['user', 'group', 'status', 'role'];
+
+    protected $primaryKey = 'idusers_groups';
 
     /**
      * The attributes that should be hidden for arrays.
@@ -23,6 +25,8 @@ class UserGroups extends Model
      * @var array
      */
     protected $hidden = [];
+
+    public $timestamps = false;
 
     //Table Relations
 

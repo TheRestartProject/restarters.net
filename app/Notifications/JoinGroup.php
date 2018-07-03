@@ -16,10 +16,10 @@ class JoinGroup extends Notification
      *
      * @return void
      */
-    protected $test;
-    public function __construct(array $test)
+    protected $arr;
+    public function __construct($arr)
     {
-        $this->test = $test;
+        $this->arr = $arr;
     }
 
     /**
@@ -41,15 +41,26 @@ class JoinGroup extends Notification
      */
     public function toMail($notifiable)
     {
-        // $url = '';
-        $name = $this->test[0];
-
-        return (new MailMessage)
-                    ->subject('Group Invitation')
-                    ->greeting('Hello!')
-                    ->line('You have received this email because you have been invited by ' . $name . ' to join the Restart Group \'' . $this->test[1] . '\'.')
-                    ->action('Join group', url('/'))
-                    ->line('If you think this invitation was not intended for you, please discard this email.');
+        if (!is_null($this->arr['message'])) {
+          return (new MailMessage)
+                      ->subject('Group Invitation')
+                      ->greeting('Hello!')
+                      ->line('You have received this email because you have been invited by ' . $this->arr['name'] . ' to join the Restart Group \'' . $this->arr['group'] . '\'.')
+                      ->line('')
+                      ->line($this->arr['name'] . ' attached this message with the invite:')
+                      ->line('')
+                      ->line($this->arr['message'])
+                      ->line('')
+                      ->action('Join group', $this->arr['url'])
+                      ->line('If you think this invitation was not intended for you, please discard this email.');
+        } else {
+          return (new MailMessage)
+                      ->subject('Group Invitation')
+                      ->greeting('Hello!')
+                      ->line('You have received this email because you have been invited by ' . $this->arr['name'] . ' to join the Restart Group \'' . $this->arr['group'] . '\'.')
+                      ->action('Join group', $this->arr['url'])
+                      ->line('If you think this invitation was not intended for you, please discard this email.');
+        }
     }
 
     /**
