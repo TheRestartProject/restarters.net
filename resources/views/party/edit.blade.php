@@ -16,11 +16,9 @@
     <!-- Profiles -->
     @if(FixometerHelper::hasRole( $user, 'Administrator' ))
 
-
     <section class="row profiles">
         <div class="col-md-12">
             <h5>Admin Console</h5>
-
         </div>
         <div class="col-md-6">
             <div class="btn-group btn-group-justified">

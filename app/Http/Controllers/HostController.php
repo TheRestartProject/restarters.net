@@ -270,6 +270,17 @@ class HostController extends Controller
                               ->take(5)
                                 ->get();
 
+      //Checking user for validatity
+      $in_group = !empty(UserGroups::where('group', $id)
+                          ->where('user', $user->id)
+                            ->first());
+
+      $is_host_of_group = !empty(UserGroups::where('group', $id)
+                                  ->where('user', $user->id)
+                                    ->where('role', 3)
+                                      ->first());
+
+      $user_groups = UserGroups::where('user', Auth::user()->id)->count();
 
 
       return view('group.view', [ //host.index
@@ -305,6 +316,9 @@ class HostController extends Controller
         'upcoming_events' => $upcoming_events,
         'past_events' => $past_events,
         'EmissionRatio' => $Party->EmissionRatio,
+        'in_group' => $in_group,
+        'is_host_of_group' => $is_host_of_group,
+        'user_groups' => $user_groups,
       ]);
 
   }

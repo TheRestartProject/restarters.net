@@ -354,22 +354,26 @@ function truncate() {
 
 function eventsMap() {
 
-    const mapObject = document.querySelector('#event-map');
+    const mapObject = document.querySelector('#map-plugin');
 
-    if (jQuery('#event-map').length > 0 ) {
+    if ( jQuery('#map-plugin').length > 0 ) {
 
         let map;
         let latitude = parseFloat(mapObject.dataset.latitude);
         let longitude = parseFloat(mapObject.dataset.longitude);
         let zoom = parseFloat(mapObject.dataset.zoom);
 
-        map = new google.maps.Map(document.getElementById('event-map'), {
-            center: { lat: latitude, lng: longitude },
-            zoom: zoom
-        });
+        if( latitude && longitude ){
 
-        let uluru = { lat: latitude, lng: longitude };
-        let marker = new google.maps.Marker({ position: uluru, map: map });
+            map = new google.maps.Map(document.getElementById('map-plugin'), {
+                center: { lat: latitude, lng: longitude },
+                zoom: zoom
+            });
+
+            let uluru = { lat: latitude, lng: longitude };
+            let marker = new google.maps.Marker({ position: uluru, map: map });
+
+        }
 
     }
 }
@@ -715,10 +719,6 @@ $('#reg_email').on('change', function() {
 
 $(".select2-dropdown").select2({
   placeholder: 'Select an country',
-});
-
-$(".select2-tags").select2({
-  tags: true,
 });
 
 $( document ).ready(function() {

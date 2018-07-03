@@ -121,7 +121,7 @@
                             </div>
                           </div>
                           <div class="col-5">
-                            <div id="event-map" class="map events__map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
+                            <div id="map-plugin" class="map events__map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
                           </div>
                       </div>
 

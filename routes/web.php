@@ -92,10 +92,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::get('/group/accept-invite/{id}/{hash}', 'GroupController@confirmInvite');
   Route::get('/group/join/{id}', 'GroupController@getJoinGroup');
 
-  //Host Controller
-  Route::get('/host', 'HostController@index');
-  Route::get('/host/index/{id}', 'HostController@index');
-
   //Outbound Controller
   Route::get('/outbound', 'OutboundController@index');
 

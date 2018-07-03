@@ -10,6 +10,8 @@ class Xref extends Model {
 
     protected $table = 'xref';
 
+    public $timestamps = false;
+
     protected $obj;
     protected $ref;
     protected $objType;
@@ -18,6 +20,13 @@ class Xref extends Model {
     private $index;
     private $search_id;
     private $search_type;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['object', 'object_type', 'reference', 'reference_type'];
 
     /**
      * @ object -> can be image, link, or any other shared asset

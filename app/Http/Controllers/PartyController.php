@@ -262,8 +262,8 @@ class PartyController extends Controller {
                       $Host = $Groups->findHost($group);
 
                       $custom_fields = array(
-                                      array('key' => 'party_host',            'value' => $Host->hostname),
-                                      array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' .$Host->path),
+                                      // array('key' => 'party_host',            'value' => $Host->hostname),
+                                      // array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' .$Host->path),
                                       array('key' => 'party_grouphash',       'value' => $group),
                                       array('key' => 'party_venue',           'value' => $venue),
                                       array('key' => 'party_location',        'value' => $location),
@@ -513,8 +513,8 @@ class PartyController extends Controller {
                   $theParty = $Party->findThis($id);
                   $Host = $Groups->findHost($data['group']);
                   $custom_fields = array(
-                                  array('key' => 'party_host',            'value' => $Host->hostname),
-                                  array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
+                                  //array('key' => 'party_host',            'value' => $Host->hostname),
+                                  //array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
                                   array('key' => 'party_grouphash',       'value' => $data['group']),
                                   array('key' => 'party_venue',           'value' => $data['venue']),
                                   array('key' => 'party_location',        'value' => $data['location']),
@@ -785,8 +785,8 @@ class PartyController extends Controller {
                   $Host = $Groups->findHost($party->group);
 
                   $custom_fields = array(
-                                      array('key' => 'party_host',            'value' => $Host->hostname),
-                                      array('key' => 'party_hostavatarurl',   'value' => UPLOADS_URL . 'mid_' . $Host->path),
+                                      //array('key' => 'party_host',            'value' => $Host->hostname),
+                                      //array('key' => 'party_hostavatarurl',   'value' => UPLOADS_URL . 'mid_' . $Host->path),
                                       array('key' => 'party_grouphash',       'value' => $party->group),
                                       array('key' => 'party_location',        'value' => $party->location),
                                       array('key' => 'party_time',            'value' => substr($party->start, 0, -3) . ' - ' . substr($party->end, 0, -3)),

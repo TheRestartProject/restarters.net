@@ -51,7 +51,7 @@
                     <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $group->name }}}">
                   @endif
                 </td>
-                <td><a href="/group/view/{{{ $group->id }}}" title="edit group">{{{ $group->name }}}</a></td>
+                <td><a href="/group/view/{{{ $group->idgroups }}}" title="edit group">{{{ $group->name }}}</a></td>
                 <td>{{{ $group->location . ', ' . $group->area }}}</td>
                 <td class="text-center">{{{ $group->allHosts->count() }}}</td>
                 <td class="text-center">{{{ $group->allRestarters->count() }}}</td>

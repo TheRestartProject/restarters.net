@@ -104,8 +104,12 @@ class FixometerFile extends Model {
                     $image = $Images->create($data)->id;
                     //echo "REF: " . $reference. " - REF TYPE: ".$referenceType." - IMAGE: ".$image;
                     if(is_numeric($image) && !is_null($reference) && !is_null($referenceType)){
-                        $xref = new Xref('object', $image, env('TBL_IMAGES'), $reference, $referenceType);
-                        $xref->createXref($clear);
+                        $xref = Xref::create([
+                          'object' => $image,
+                          'object_type' => env('TBL_IMAGES'),
+                          'reference' => $reference,
+                          'reference_type' => $referenceType,
+                        ]);
                     }
                 }
 
