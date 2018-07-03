@@ -1140,6 +1140,7 @@ class PartyController extends Controller {
                 'user' => $user->id,
                 'event' => $event_id,
                 'status' => $hash,
+                'role' => 4,
               ]);
 
             }

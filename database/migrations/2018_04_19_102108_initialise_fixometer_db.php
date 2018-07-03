@@ -13,6 +13,7 @@ class InitialiseFixometerDb extends Migration
      */
     public function up()
     {
+
         //Settings
         // DB::statement('SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";');
         // DB::statement('SET time_zone = "+00:00";');

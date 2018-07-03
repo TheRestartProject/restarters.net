@@ -15,7 +15,7 @@ class AddStatusRoleUserGroups extends Migration
     {
       Schema::table('users_groups', function (Blueprint $table) {
           $table->string('status', 50)->nullable();
-          $table->tinyInteger('role')->default(4);
+          $table->tinyInteger('role')->default(3);
       });
     }
 

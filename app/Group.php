@@ -146,5 +146,16 @@ class Group extends Model
                 ORDER BY `g`.`name` ASC'), array('id' => $id));
     }
 
+    public function groupImage(){
+        return $this->hasOne('App\Xref', 'reference', 'idgroups')->where('object_type', 5);
+    }
+
+    public function allHosts(){
+        return $this->hasMany('App\UserGroups', 'group', 'idgroups')->where('role', 3);
+    }
+
+    public function allRestarters(){
+        return $this->hasMany('App\UserGroups', 'group', 'idgroups')->where('role', 4);
+    }
 
 }

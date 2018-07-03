@@ -42,7 +42,7 @@
                     </ol>
                 </nav>
                 @php( $group_image = $event->host->hostImage )
-                @if( is_object($group_image) )
+                @if( is_object($group_image) && is_object($group_image->image) )
                   <img src="{{ asset('/uploads/mid_' . $group_image->image->path) }}" alt="{{{ $event->host->name }}}" class="event-icon">
                 @else
                   <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}" class="event-icon">

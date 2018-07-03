@@ -15,7 +15,7 @@ class AddStatusRoleUserEvents extends Migration
     {
       Schema::table('events_users', function (Blueprint $table) {
           $table->string('status', 50)->nullable();
-          $table->tinyInteger('role')->default(4);
+          $table->tinyInteger('role')->default(3);
       });
     }
 

@@ -83,7 +83,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
   //Group Controller
   Route::get('/group', 'GroupController@index')->name('groups');
-  Route::get('/group/create', 'GroupController@create');
+  Route::get('/group/create', 'GroupController@create')->name('create-group');
   Route::post('/group/create', 'GroupController@create');
   Route::get('/group/edit/{id}', 'GroupController@edit');
   Route::post('/group/edit/{id}', 'GroupController@edit');

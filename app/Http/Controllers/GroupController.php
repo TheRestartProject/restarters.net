@@ -51,13 +51,16 @@ class GroupController extends Controller
       //     $this->set('response', $response);
       // }
 
-      $Group = new Group;
+      // $Group = new Group;
+
+      $groups = Group::orderBy('name', 'ASC')
+          ->paginate(env('PAGINATE'));
 
       return view('group.index', [
-        'title' => 'Groups',
-        'list' => $Group->findAll(),
-        'response' => $response,
-        'user' => Auth::user(),
+        // 'title' => 'Groups',
+        // 'list' => $Group->findAll(),
+        'groups' => $groups,
+        //'response' => $response,
       ]);
 
   }
@@ -354,6 +357,7 @@ class GroupController extends Controller
               'user' => $user->id,
               'group' => $group_id,
               'status' => $hash,
+              'role' => 4,
             ]);
           }
 
