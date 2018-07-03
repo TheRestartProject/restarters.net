@@ -12,17 +12,21 @@
             <thead>
                 <tr>
                     <th scope="col">@lang('events.event_name')</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Status</th>
+                    <th scope="col" class="cell-date">@lang('events.event_date')</th>
+                    <th scope="col" class="cell-locations">@lang('events.event_location')</th>
                 </tr>
             </thead>
             <tbody>
                 @if (!empty($past_events))
                   @foreach($past_events as $past_event)
                     <tr>
-                        <td>{{ $past_event->venue }}</td>
-                        <td>{{ $past_event->event_date }}</td>
-                        <!-- <td><a href="">30 devices need attention</a></td>-->
+                        <td class="cell-name"><a href="/party/view/{{ $past_event->idevents }}">{{ $past_event->getEventName() }}</a></td>
+                        <td>{{ $past_event->getEventDate() }}</td>
+                        @if( $past_event->allDevices->count() == 0 )
+                          <td><a href="/party/view/{{{ $past_event->eventid }}}#devices"Add a device</a></td>
+                        @else
+                          <td>{{ $past_event->allDevices->count() }} devices found</td>
+                        @endif
                     </tr>
                   @endforeach
                 @else

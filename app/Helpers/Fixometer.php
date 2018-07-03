@@ -27,7 +27,7 @@ class FixometerHelper {
 
     $ages = ['' => ''];
 
-    for ($i=intval(date('Y')); $i > intval(date('Y', strtotime("- 100 years"))); $i--) {
+    for ($i=intval(date('Y')) - 18; $i > intval(date('Y', strtotime("- 100 years"))); $i--) {
       $ages[$i] = $i;
     }
 
