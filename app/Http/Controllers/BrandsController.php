@@ -42,7 +42,7 @@ class BrandsController extends Controller
       return redirect('/user/forbidden');
 
     $brand = Brands::create([
-      'brand_name' => $request->input('brand-name')
+      'brand_name' => $request->input('brand_name')
     ]);
 
     return Redirect::to('brands/edit/'.$brand->id);

@@ -42,9 +42,9 @@ class SkillsController extends Controller
       return redirect('/user/forbidden');
 
     $skill = Skills::create([
-      'skill_name'  => $request->input('skill-name'),
-      'category'    => $request->input('category'),
-      'description' => $request->input('skill-description')
+      'skill_name'  => $request->input('skill_name'),
+      // 'category'    => $request->input('category'),
+      'description' => $request->input('skill_desc')
     ]);
 
     return Redirect::to('skills/edit/'.$skill->id);

@@ -17,6 +17,8 @@ use App\UserGroups;
 
 use Notification;
 use App\Notifications\JoinEvent;
+use App\Notifications\RSVPEvent;
+
 
 use FixometerHelper;
 use Auth;
@@ -1151,7 +1153,7 @@ class PartyController extends Controller {
               'url' => $url,
               'message' => $message,
             );
-            Notification::send($user, new JoinEvent($arr));
+            Notification::send($user, new JoinEvent($arr, $user));
 
           } else {
 
@@ -1206,6 +1208,25 @@ class PartyController extends Controller {
 
       if (is_null($register_id)) {
         $user_event->save();
+        $user = User::find($user_event->user);
+        try {
+          $host = User::find(EventsUsers::where('event', $event_id)->where('role', 3)->first()->user);
+        } catch (\Exception $e) {
+          $host = null;
+        }
+
+        if (!is_null($host)) {
+          //Send Notification to Host
+          $arr = [
+            'user_name' => $user->name,
+            'event_venue' => Party::find($event_id)->venue,
+            'event_url' => url('/event/view/'.$event_id),
+            'preferences' => url('/profile/edit/'.$host->id),
+          ];
+
+          Notification::send($host, new RSVPEvent($arr, $host));
+        }
+
         return redirect('/party/view/'.$user_event->event);
       } else {
         $user_event->user = $register_id;

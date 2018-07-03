@@ -9,13 +9,13 @@
 
 
 
-        <form action="">
-
+        <form action="/brands/create" method="post">
+          @csrf
             <legend id="createbrandLabel">@lang('admin.brand_modal_title')</legend>
 
             <div class="form-group">
                 <label for="brand_name">@lang('admin.brand-name'):</label>
-                <input require type="text" id="brand_name" class="field form-control">
+                <input require type="text" id="brand_name" name="brand_name" class="field form-control">
             </div>
 
             <div class="button-group">

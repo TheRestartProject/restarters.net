@@ -13,6 +13,7 @@ use App\GrouptagsGroups;
 
 use Notification;
 use App\Notifications\JoinGroup;
+use App\Notifications\NewGroupMember;
 
 use Auth;
 use FixometerHelper;
@@ -217,6 +218,23 @@ class GroupController extends Controller
               }
 
               if( is_numeric($idGroup) && $idGroup !== false ){
+                //NB: Dean I believe this is where this should go for sending the group moderation emails
+                // $user = User::find($user_group->user);
+                // try {
+                //   $host = User::find(UserGroups::where('group', $group_id)->where('role', 3)->first()->user);
+                // } catch (\Exception $e) {
+                //   $host = null;
+                // }
+                //
+                // if (!is_null($host)) {
+                //   //Send Notification to Host
+                //   $arr = [
+                //     'group_name' => Group::find($group_id)->name,
+                //     'group_url' => url('/group/view/'.$group_id),
+                //   ];
+                //
+                //   Notification::send($host, new NewGroupMember($arr, $host));
+
                 return redirect('/group/edit/'.$idGroup)->with('response', $response);
               } else {
                 return view('group.create', [
@@ -615,7 +633,7 @@ class GroupController extends Controller
             'url' => $url,
             'message' => $message,
           );
-          Notification::send($user, new JoinGroup($arr));
+          Notification::send($user, new JoinGroup($arr, $user));
         } else {
           $not_sent[] = $user->email;
         }
@@ -662,6 +680,25 @@ class GroupController extends Controller
 
       if (is_null($register_id)) {
         $user_group->save();
+        $user = User::find($user_group->user);
+        try {
+          $host = User::find(UserGroups::where('group', $group_id)->where('role', 3)->first()->user);
+        } catch (\Exception $e) {
+          $host = null;
+        }
+
+        if (!is_null($host)) {
+          //Send Notification to Host
+          $arr = [
+            'user_name' => $user->name,
+            'group_name' => Group::find($group_id)->name,
+            'group_url' => url('/group/view/'.$group_id),
+            'preferences' => url('/profile/edit/'.$host->id),
+          ];
+
+          Notification::send($host, new NewGroupMember($arr, $host));
+        }
+
         return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
       } else {
         $user_group->user = $register_id;

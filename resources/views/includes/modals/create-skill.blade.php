@@ -9,18 +9,18 @@
 
 
 
-        <form action="">
-
+        <form action="/skills/create" method="post">
+          @csrf
             <legend id="createSkillLabel">@lang('admin.skills_modal_title')</legend>
 
             <div class="form-group">
                 <label for="skill_name">@lang('admin.skill_name'):</label>
-                <input require type="text" id="skill_name" class="field form-control">
+                <input require type="text" id="skill_name" name="skill_name" class="field form-control">
             </div>
 
             <div class="form-group">
                 <label for="skill_desc">@lang('admin.description_optional'):</label>
-                <textarea name="skill_desc" id="skill_desc" class="form-control field textarea-large"></textarea>
+                <textarea name="skill_desc" id="skill_desc" name="skill_desc" class="form-control field textarea-large"></textarea>
             </div>
 
             <div class="button-group">

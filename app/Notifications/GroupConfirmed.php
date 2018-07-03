@@ -16,10 +16,13 @@ class GroupConfirmed extends Notification
      *
      * @return void
      */
-    public function __construct($arr)
-    {
-        $this->arr = $arr;
-    }
+     protected $arr;
+     protected $user;
+     public function __construct($arr, $user = null)
+     {
+         $this->arr = $arr;
+         $this->user = $user;
+     }
 
     /**
      * Get the notification's delivery channels.
@@ -40,12 +43,16 @@ class GroupConfirmed extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-                    ->subject('Group Confirmed')
-                    ->greeting('Hello!')
-                    ->line('Your group \'' . $this->arr[0]. '\' has been confirmed by an admin.')
-                    ->action('View repair notes', url('/'))
-                    ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr[1] . '">your preferences</a> on your account.');
+      if ($this->user !== null) {
+        if ($this->user->invites == 1) {
+          return (new MailMessage)
+                      ->subject('Group Confirmed')
+                      ->greeting('Hello!')
+                      ->line('Your group \'' . $this->arr['group_name']. '\' has been confirmed by an admin.')
+                      ->action('View Group', $this->arr['group_url'] )
+                      ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'] . '">your preferences</a> on your account.');
+        }
+      }
     }
 
     /**

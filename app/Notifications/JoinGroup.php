@@ -17,9 +17,11 @@ class JoinGroup extends Notification
      * @return void
      */
     protected $arr;
-    public function __construct($arr)
+    protected $user;
+    public function __construct($arr, $user = null)
     {
         $this->arr = $arr;
+        $this->user = $user;
     }
 
     /**
@@ -41,6 +43,30 @@ class JoinGroup extends Notification
      */
     public function toMail($notifiable)
     {
+      if ($this->user !== null) {
+        if ($this->user->invites == 1) {
+          if (!is_null($this->arr['message'])) {
+            return (new MailMessage)
+                        ->subject('Group Invitation')
+                        ->greeting('Hello!')
+                        ->line('You have received this email because you have been invited by ' . $this->arr['name'] . ' to join the Restart Group \'' . $this->arr['group'] . '\'.')
+                        ->line('')
+                        ->line($this->arr['name'] . ' attached this message with the invite:')
+                        ->line('')
+                        ->line($this->arr['message'])
+                        ->line('')
+                        ->action('Join group', $this->arr['url'])
+                        ->line('If you think this invitation was not intended for you, please discard this email.');
+          } else {
+            return (new MailMessage)
+                        ->subject('Group Invitation')
+                        ->greeting('Hello!')
+                        ->line('You have received this email because you have been invited by ' . $this->arr['name'] . ' to join the Restart Group \'' . $this->arr['group'] . '\'.')
+                        ->action('Join group', $this->arr['url'])
+                        ->line('If you think this invitation was not intended for you, please discard this email.');
+          }
+        }
+      } else {
         if (!is_null($this->arr['message'])) {
           return (new MailMessage)
                       ->subject('Group Invitation')
@@ -61,6 +87,7 @@ class JoinGroup extends Notification
                       ->action('Join group', $this->arr['url'])
                       ->line('If you think this invitation was not intended for you, please discard this email.');
         }
+      }
     }
 
     /**

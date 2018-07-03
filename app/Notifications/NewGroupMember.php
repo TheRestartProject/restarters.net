@@ -16,9 +16,12 @@ class NewGroupMember extends Notification
      *
      * @return void
      */
-    public function __construct($arr)
+    protected $arr;
+    protected $user;
+    public function __construct($arr, $user = null)
     {
         $this->arr = $arr;
+        $this->user = $user;
     }
 
     /**
@@ -40,12 +43,16 @@ class NewGroupMember extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-                    ->subject('New Group Member')
-                    ->greeting('Hello!')
-                    ->line('A new volunteer, ' . $this->arr[0] . ', has joined your group \'' . $this->arr[1] . '\'.')
-                    ->action('Go to group', url('/'))
-                    ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr[2] . '">your preferences</a> on your account.');
+      if ($this->user !== null) {
+        if ($this->user->invites == 1) {
+          return (new MailMessage)
+                      ->subject('New Group Member')
+                      ->greeting('Hello!')
+                      ->line('A new volunteer, ' . $this->arr['user_name'] . ', has joined your group \'' . $this->arr['group_name'] . '\'.')
+                      ->action('Go to group', $this->arr['group_url'])
+                      ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'] . '">your preferences</a> on your account.');
+        }
+      }
     }
 
     /**
