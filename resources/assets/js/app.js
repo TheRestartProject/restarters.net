@@ -635,6 +635,7 @@ jQuery(function () {
     jQuery('.table-row-details').find('select').select2();
     jQuery('.select2-tags').select2({tags: true});
     $(".select2-with-input").select2({
+      minimumInputLength: 2,
       createTag: function (params) {
         return {
           id: params.term,
