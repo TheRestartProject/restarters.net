@@ -525,19 +525,20 @@ class DeviceController extends Controller
       $Device = new Device;
       $user = Auth::user();
 
-      if(FixometerHelper::hasRole($user, 'Administrator') || (FixometerHelper::hasRole($user, 'Host')) ){
-          // get device party
-          $curr = $Device->findOne($id);
-          $party = $curr->event;
+      // get device party
+      $curr = $Device->find($id);
+      $party = $curr->event;
+
+      if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($party, $user->id) ){
           // echo $party; //die();
 
-          $r = $Device->delete($id);
+          $r = $curr->delete();
 
-          return redirect('/party/manage/'.$party);
+          return redirect('/party/view/'.$party)->with('success', 'Device has been deleted!');
 
       }
       else {
-          return redirect('/party/manage/'.$party);
+          return redirect('/party/view/'.$party->with('warning', 'You do not have the right permissions for deleting a device'));
       }
   }
 
