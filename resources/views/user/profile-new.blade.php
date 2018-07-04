@@ -33,16 +33,20 @@
         <div class="block">
           <h4>Biography</h4>
           <p>
-              {{ $user->biography }}
+              @if ($user->biography)
+                  {{ $user->biography }}
+              @else
+                  <em>@lang('profile.no_bio', ['name' => $user->name])</em>
+              @endif
           </p>
         </div>
       </div>
       <div class="col-sm-12 col-md-4">
         <div class="block">
-          <h4>Repair skills</h4>
-          <p>
+          <h4>@lang('profile.skills')</h4>
+          <!-- <p>
             Cras mattis consectetur purus sit amet fermentum. Nulla vitae elit libero, a pharetra augue.
-          </p>
+          </p>-->
           <ul class="nav flex-column">
             @if (isset($skills))
               @foreach ($skills as $skill)
