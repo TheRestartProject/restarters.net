@@ -675,6 +675,7 @@ class GroupController extends Controller
             'event_id' => $group_id,
             'email' => $non_user,
             'hash' => $hash,
+            'type' => 'group',
           ));
 
           $arr = array(

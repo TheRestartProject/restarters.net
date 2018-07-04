@@ -23,7 +23,7 @@
           @else
             <div class="alert alert-info">
                 @lang('events.pending_rsvp_message')
-                <a href="/accept-invite/{{{ $is_attending->event }}}/{{{ $is_attending->status }}}" class="btn btn-info">@lang('events.pending_rsvp_button')</a>
+                <a href="/party/accept-invite/{{{ $is_attending->event }}}/{{{ $is_attending->status }}}" class="btn btn-info">@lang('events.pending_rsvp_button')</a>
             </div>
           @endif
       @endif
@@ -139,7 +139,7 @@
                         @foreach($images as $image)
                           <li>
                               <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
-                                <img src="/uploads/{{ $image->path }}" alt="placeholder">
+                                <img src="/uploads/{{ $image->path }}" alt="placeholder" width="100">
                               </a>
                           </li>
                         @endforeach

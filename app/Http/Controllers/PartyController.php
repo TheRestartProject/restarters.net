@@ -1171,6 +1171,7 @@ class PartyController extends Controller {
             'event_id' => $event_id,
             'email' => $non_user,
             'hash' => $hash,
+            'type' => 'event',
           ));
 
           $arr = array(
