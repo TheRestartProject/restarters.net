@@ -1049,9 +1049,15 @@ class UserController extends Controller
       }
 
       //Create username for Discourse
-      $name = explode(' ', $user->name);
-      $offset = strlen($user->id) + 1;
-      $user->username = substr( strtolower( preg_replace( '/[^a-zA-Z0-9]+/', '', $name[0] ) ), 0, 20 - $offset ) . '-' . $user->id;
+      // Desired username is their first name in all lowercase.  We also have make sure it fits within Discourse 20 char limit.
+      $name_parts = explode(' ', $user->name);
+      $desired_username = substr(strtolower($name_parts[0]), 0, 20);
+      if (!(User::where('username', '=', $desired_username)->exists())) {
+          $user->username = $desired_username;
+      } else { // someone already has the desired username, so we'll append user id to this user's first name (taking 20 char limit into account)
+          $offset = strlen($user->id) + 1;
+          $user->username = substr( strtolower( preg_replace( '/[^a-zA-Z0-9]+/', '', $name_parts[0] ) ), 0, 20 - $offset ) . '-' . $user->id;
+      }
 
       //Save timestamps
       $user->consent_gdpr = $timestamp;
