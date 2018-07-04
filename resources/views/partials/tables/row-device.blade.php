@@ -38,12 +38,16 @@
                   <td>
                     <label for="nested-5">Category:</label>
                     <div class="form-control form-control__select">
-                        <select name="category" class="category select2">
+                        <select name="category" class="select2">
                             <option value="0">-- Category --</option>
                             @foreach( $clusters as $cluster )
                             <optgroup label="{{{ $cluster->name }}}">
                                 @foreach( $cluster->categories as $category )
-                                  <option value="{{{ $category->idcategories }}}">{{{ $category->name }}}</option>
+                                  @if( $device->category == $category->idcategories )
+                                    <option value="{{{ $category->idcategories }}}" selected>{{{ $category->name }}}</option>
+                                  @else
+                                    <option value="{{{ $category->idcategories }}}">{{{ $category->name }}}</option>
+                                  @endif
                                 @endforeach
                             </optgroup>
                             @endforeach
@@ -54,7 +58,7 @@
                     <td>
                         <label for="nested-5">Brand:</label>
                         <div class="form-control form-control__select">
-                            <select name="brand-{{ $device->iddevices }}" id="brand-{{ $device->iddevices }}">
+                            <select name="brand-{{ $device->iddevices }}" class="select2-with-input" id="brand-{{ $device->iddevices }}">
                                 @foreach($brands as $brand)
                                   @if ($device->brand == $brand->brand_name)
                                     <option value="{{ $brand->id }}" selected>{{ $brand->brand_name }}</option>
@@ -68,19 +72,20 @@
                     <td>
                         <label for="nested-6">Model:</label>
                         <div class="form-group">
-                            <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}">
+                            <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}" placeholder="Model" autocomplete="off">
                         </div>
                     </td>
                     <td>
                         <label for="nested-7">Age:</label>
                         <div class="form-group">
-                            <input type="text" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" value="{{ $device->age }}">
+                            <input type="number" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" min="0" value="{{ $device->age }}" placeholder="Age (yrs)" autocomplete="off">
                         </div>
                     </td>
                     <td>
                         <label for="status-{{ $device->iddevices }}">Status:</label>
                         <div class="form-control form-control__select">
-                            <select class="checkStatus" name="status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}">
+                            <select class="checkStatus" name="status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}" placeholder="Description of problem">
+                              <option value="0">-- Status --</option>
                               @if ( $device->repair_status == 1 )
                                 <option value="1" selected>Fixed</option>
                                 <option value="2">Repairable</option>
@@ -98,10 +103,10 @@
                         </div>
                     </td>
                     <td>
-                        <label for="repair-info-{{ $device->iddevices }}">Repair Details</label>
+                        <label for="repair-info-{{ $device->iddevices }}">Repair details:</label>
                         <div class="form-control form-control__select">
                             <select name="repair-info" id="repair-info-{{ $device->iddevices }}" disabled>
-                              <option value="0">Repair Details</option>
+                              <option value="0">-- Repair Details --</option>
                               @if ( $device->more_time_needed == 1 )
                                 <option value="1" selected>More time needed</option>
                                 <option value="2">Professional help</option>
