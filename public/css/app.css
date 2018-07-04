@@ -16006,6 +16006,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .table-row-details td .table {
   background-color: transparent;
+  table-layout: fixed;
 }
 
 .table-row-details td .table label {

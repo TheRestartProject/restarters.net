@@ -103,6 +103,7 @@
 
             .table {
                 background-color: transparent;
+                table-layout: fixed;
 
                 label {
                     font-family: $font-family-sans-serif;

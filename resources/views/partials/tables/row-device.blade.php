@@ -35,6 +35,22 @@
         <table class="table">
             <tbody>
                 <tr>
+                  <td>
+                    <label for="nested-5">Category:</label>
+                    <div class="form-control form-control__select">
+                        <select name="category" class="category select2">
+                            <option value="0">-- Category --</option>
+                            @foreach( $clusters as $cluster )
+                            <optgroup label="{{{ $cluster->name }}}">
+                                @foreach( $cluster->categories as $category )
+                                  <option value="{{{ $category->idcategories }}}">{{{ $category->name }}}</option>
+                                @endforeach
+                            </optgroup>
+                            @endforeach
+                            <option value="46">None of the above</option>
+                        </select>
+                    </div>
+                    </td>
                     <td>
                         <label for="nested-5">Brand:</label>
                         <div class="form-control form-control__select">
@@ -82,7 +98,7 @@
                         </div>
                     </td>
                     <td>
-                        <label for="repair-info-{{ $device->iddevices }}" class="sr-only">Repairable: more information</label>
+                        <label for="repair-info-{{ $device->iddevices }}">Repair Details</label>
                         <div class="form-control form-control__select">
                             <select name="repair-info" id="repair-info-{{ $device->iddevices }}" disabled>
                               <option value="0">Repair Details</option>
@@ -122,13 +138,13 @@
                     </td>
                 </tr>
                 <tr class="table-row-more">
-                    <td colspan="5">
+                    <td colspan="4">
                         <label for="description">Description of problem/solution:</label>
                         <div class="form-group">
-                            <textarea name="problem">{!! $device->problem !!}</textarea>
+                            <textarea class="form-control" rows="6" name="problem">{!! $device->problem !!}</textarea>
                         </div>
                     </td>
-                    <td colspan="2" class="table-cell-upload-td">
+                    <td colspan="3" class="table-cell-upload-td">
                         <div class="table-cell-upload">
                             <div class="form-group">
                                 <label for="file">Add image:</label>

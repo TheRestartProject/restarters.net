@@ -24024,6 +24024,13 @@ jQuery(function () {
         };
     }), _$$select));
 
+    // $(document).on('focus', '.select2.select2-container', function (e) {
+    //   // only open on original attempt - close focus event should not fire open
+    //   if (e.originalEvent && $(this).find(".select2-selection--single").length > 0) {
+    //     $(this).siblings('select').select2('open');
+    //   }
+    // });
+
     jQuery('.repair_status').on('change', function (e) {
         $value = jQuery(this).val();
         $field = jQuery('.repair_details');
@@ -24307,27 +24314,10 @@ $(document).ready(function () {
     });
 
     $('.edit-device').on('submit', function (e) {
+
         e.preventDefault();
+
         var device_id = $(this).data('device');
-
-        // $form = $('form#data-'+device_id);
-        // console.log($form[0]);
-        // var form_fields = new FormData($form[0]);
-
-        var form_array = {
-            repair_status: $('#status-' + device_id).val(),
-            repair_details: $('#repair-info-' + device_id).val(),
-            spare_parts: $('#spare-parts-' + device_id).val(),
-            category: $('#category-' + device_id).val(),
-            brand: $('#brand-' + device_id).val(),
-            model: $('#model-' + device_id).val(),
-            age: $('#age-' + device_id).val(),
-            problem: $('#problem-' + device_id).summernote('code'),
-            // files:$('#file-'+device_id).val(),
-            wiki: $('#wiki-' + device_id).checked
-        };
-
-        var event_id = event_id = $('#event_id').val();
 
         $.ajax({
             headers: {
@@ -24335,7 +24325,19 @@ $(document).ready(function () {
             },
             type: 'post',
             url: '/device/edit/' + device_id,
-            data: { form_array: form_array, event_id: event_id },
+            data: {
+                event_id: $('#event_id').val(),
+                repair_status: $('#status-' + device_id).val(),
+                repair_details: $('#repair-info-' + device_id).val(),
+                spare_parts: $('#spare-parts-' + device_id).val(),
+                category: $('#category-' + device_id).val(),
+                brand: $('#brand-' + device_id).val(),
+                model: $('#model-' + device_id).val(),
+                age: $('#age-' + device_id).val(),
+                problem: $('#problem-' + device_id).val(),
+                // files:$('#file-'+device_id).val(),
+                wiki: $('#wiki-' + device_id).checked
+            },
             success: function success(data) {
                 if (data.error) {
                     alert(data.error);
