@@ -29,7 +29,7 @@
 
             <header>
 
-                @if( FixometerHelper::hasRole( $user, 'Administrator' ) || ( $is_host_of_group && count($user_groups) > 1 ) )
+                @if( FixometerHelper::hasRole( $user, 'Administrator' ) || ( $is_host_of_group && $user_groups > 1 ) )
 
                   <h1 class="sr-only">{{{ $group->name }}}</h1>
                   <button class="btn btn-title dropdown-toggle" type="button" id="dropdownTitle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
