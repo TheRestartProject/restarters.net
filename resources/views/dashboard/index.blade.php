@@ -3,18 +3,18 @@
 <section class="dashboard">
   <div class="container-fluid">
   <div class="row row-compressed">
-    @if (!$has_profile_pic || !$has_skills || !$in_group || !$in_event)
     <div class="col-lg-3">
+      @if (!$has_profile_pic || !$has_skills || !$in_group || !$in_event)
       <aside class="dashboard__aside">
         <ul class="steps">
           <li class="step step__active">
-            <h3>Getting started</h3>
-            <p>Welcome to restart, here are a few things to get you started:</p>
+            <h3>@lang('dashboard.getting_started_header')</h3>
+            <p>@lang('dashboard.getting_started_text')</p>
           </li>
           <li class="step">
             <div class="row">
               <div class="col-7 d-flex align-items-center">
-                <h4>Add an avatar</h4>
+                <h4>@lang('dashboard.add_avatar')</h4>
               </div>
               @if ($has_profile_pic)
                 <div class="col-5 d-flex align-items-center justify-content-end">
@@ -30,7 +30,7 @@
           <li class="step">
             <div class="row">
               <div class="col-7 d-flex align-items-center">
-                <h4>Add your skills</h4>
+                <h4>@lang('dashboard.add_skills')</h4>
               </div>
               @if ($has_skills)
                 <div class="col-5 d-flex align-items-center justify-content-end">
@@ -48,7 +48,7 @@
             <li class="step">
               <div class="row">
                 <div class="col-7 d-flex align-items-center">
-                  <h4>Join a Restart Group</h4>
+                  <h4>@lang('dashboard.join_group')</h4>
                 </div>
                 @if ($in_group)
                   <div class="col-5 d-flex align-items-center justify-content-end">
@@ -64,7 +64,7 @@
             <li class="step">
               <div class="row">
                 <div class="col-7 d-flex align-items-center">
-                  <h4>RSVP a event</h4>
+                  <h4>@lang('dashboard.rsvp_event')</h4>
                 </div>
                 @if ($in_event)
                   <div class="col-5 d-flex align-items-center justify-content-end">
@@ -119,14 +119,10 @@
 
         </ul>
       </aside>
+      @endif
       @include('partials.impact')
     </div>
-    @endif
-    @if (!$has_profile_pic || !$has_skills || !$in_group || !$in_event)
-      <div class="col-lg-9">
-    @else
-      <div class="col-lg-9 offset-lg-3">
-    @endif
+    <div class="col-lg-9">
       <div class="row row-compressed">
         @if (FixometerHelper::hasRole($user, 'Administrator'))
           @include('dashboard.restarter')

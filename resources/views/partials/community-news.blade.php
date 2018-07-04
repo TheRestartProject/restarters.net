@@ -15,7 +15,7 @@
         </table>
         </div>
         <div class="dashboard__links d-flex flex-row justify-content-end">
-            <a href="https://therestartproject.org/community/" target="_blank" rel="noopener noreferrer">See more posts</a>
+            <a href="https://therestartproject.org/blog/" target="_blank" rel="noopener noreferrer">See more posts</a>
         </div>
     </div>
 </section>
