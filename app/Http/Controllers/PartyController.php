@@ -1168,7 +1168,7 @@ class PartyController extends Controller {
           $url = url('/user/register/'.$hash);
 
           $invite = Invite::create(array(
-            'event_id' => $event_id,
+            'record_id' => $event_id,
             'email' => $non_user,
             'hash' => $hash,
             'type' => 'event',

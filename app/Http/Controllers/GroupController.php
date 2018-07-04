@@ -672,7 +672,7 @@ class GroupController extends Controller
           $url = url('/user/register/'.$hash);
 
           $invite = Invite::create(array(
-            'event_id' => $group_id,
+            'record_id' => $group_id,
             'email' => $non_user,
             'hash' => $hash,
             'type' => 'group',
