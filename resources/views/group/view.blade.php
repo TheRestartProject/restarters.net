@@ -113,8 +113,10 @@
               </div>
             @else
               <div class="button-group button-group__r">
-                  @if (!$in_group)
-                    <a href="/group/join/{{ $group->idgroups }}" class="btn btn-primary" id="join-group">Join group</a>
+                  @if ($in_group)
+                    <a class="dropdown-item" data-toggle="modal" data-target="#invite-to-group" href="#">Invite to group</a>
+                  @else
+                    <a href="/group/join/{{ $group->idgroups }}" class="btn btn-primary" id="join-group">@lang('groups.join_group_button')</a>
                   @endif
                   <a class="dropdown-item" href="#" data-toggle="modal" data-target="#group-share-stats">Share group stats</a>
               </div>
@@ -136,34 +138,26 @@
                     @endif
                 </div><!-- /events__description -->
 
-                <h2 id="volunteers">Volunteers <sup>(<a href="{{ url('/') }}/group/invite">Invite to group</a>)</sup></h2>
+
+                @if ($in_group)
+                  <h2 id="volunteers">Volunteers <sup>(<a data-toggle="modal" data-target="#invite-to-group" href="#">Invite to group</a>)</sup></h2>
+                @else
+                  <h2 id="volunteers">Volunteers <sup>(<a href="/group/join/{{ $group->idgroups }}">@lang('groups.join_group_button')</a>)</sup></h2>
+                @endif
 
                 <div class="tab">
 
                     <div class="users-list-wrap users-list__single">
                         <ul class="users-list">
 
-                            <li>
-                                <h3><a href="{{{ route('profile') }}}">Dean Appleton-Claydon</a></h3>
-                                <p><span class="badge badge-pill badge-primary">Host</span></p>
-
-                                <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="users-list__icon">
-                            </li>
-                            <li>
-                                <h3><a href="{{{ route('profile') }}}">Dean Appleton-Claydon</a></h3>
-                                <p><svg width="14" height="14" viewBox="0 0 11 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M4.739,0.367c0.081,-0.221 0.284,-0.367 0.511,-0.367c0.227,0 0.43,0.146 0.511,0.367l1.113,3.039l3.107,0.168c0.227,0.013 0.422,0.17 0.492,0.395c0.07,0.225 0,0.473 -0.176,0.622l-2.419,2.046l0.807,3.142c0.059,0.229 -0.024,0.472 -0.207,0.612c-0.183,0.139 -0.43,0.146 -0.62,0.017l-2.608,-1.774l-2.608,1.774c-0.19,0.129 -0.437,0.122 -0.62,-0.017c-0.183,-0.14 -0.266,-0.383 -0.207,-0.612l0.807,-3.142l-2.419,-2.046c-0.176,-0.149 -0.246,-0.397 -0.176,-0.622c0.07,-0.225 0.265,-0.382 0.492,-0.395l3.107,-0.168l1.113,-3.039Z"/></svg> <button type="button" class="btn btn-skills" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Mobile Devices, Audio &amp; Visual, Screens &amp; TVs, Home Appliances">5 skills</button></p>
-
-                                <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="users-list__icon">
-                            </li>
-                            <li>
-                                <h3><a href="{{{ route('profile') }}}">Dean Appleton-Claydon</a></h3>
-                                <p><svg width="14" height="14" viewBox="0 0 11 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M4.739,0.367c0.081,-0.221 0.284,-0.367 0.511,-0.367c0.227,0 0.43,0.146 0.511,0.367l1.113,3.039l3.107,0.168c0.227,0.013 0.422,0.17 0.492,0.395c0.07,0.225 0,0.473 -0.176,0.622l-2.419,2.046l0.807,3.142c0.059,0.229 -0.024,0.472 -0.207,0.612c-0.183,0.139 -0.43,0.146 -0.62,0.017l-2.608,-1.774l-2.608,1.774c-0.19,0.129 -0.437,0.122 -0.62,-0.017c-0.183,-0.14 -0.266,-0.383 -0.207,-0.612l0.807,-3.142l-2.419,-2.046c-0.176,-0.149 -0.246,-0.397 -0.176,-0.622c0.07,-0.225 0.265,-0.382 0.492,-0.395l3.107,-0.168l1.113,-3.039Z"/></svg> <button type="button" class="btn btn-skills" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Mobile Devices, Audio &amp; Visual, Screens &amp; TVs, Home Appliances">5 skills</button></p>
-
-                                <img src="{{ url('/') }}/images/placeholder.png" alt="Placeholder" class="users-list__icon">
-                            </li>
+                            @foreach( $view_group->allVolunteers->take(3) as $volunteer )
+                              @include('partials.volunteer-badge')
+                            @endforeach
 
                         </ul>
-                        <a class="users-list__more" href="{{ url('/') }}/all-volunteers">See all 5 volunteers</a>
+                        @if( $view_group->allVolunteers->count() > 3 )
+                          <a class="users-list__more" href="#" data-toggle="modal" data-target="#group-volunteers">See all {{{ $view_group->allVolunteers->count() }}} volunteers</a>
+                        @endif
                     </div>
 
                 </div>

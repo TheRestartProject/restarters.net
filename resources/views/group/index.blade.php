@@ -8,8 +8,14 @@
         <div class="d-flex justify-content-between align-content-center">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
-              <li class="breadcrumb-item active" aria-current="page">@lang('groups.groups')</li>
+              @if( !is_null($your_groups) )
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@lang('groups.groups')</li>
+              @else
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('groups') }}">@lang('groups.groups')</a></li>
+                <li class="breadcrumb-item active" aria-current="page">All groups</li>
+              @endif
             </ol>
           </nav>
           <div class="btn-group">
@@ -25,49 +31,94 @@
     <div class="row justify-content-center">
       <div class="col-lg-12">
 
-        <section class="table-section" id="your-groups">
+        @if( !is_null($your_groups) )
+          <section class="table-section" id="your-groups">
 
-          <h2>@lang('groups.groups_title3')</h2>
+            <h2>@lang('groups.groups_title1')</h2>
 
-          <table role="table" class="table table-striped table-hover">
-            <thead>
-              <tr>
-                <th></th>
-                <th scope="col">@lang('groups.groups_name')</th>
-                <th scope="col">@lang('groups.groups_location')</th>
-                <th scope="col" class="text-center">@lang('groups.groups_hosts')</th>
-                <th scope="col" class="text-center">@lang('groups.groups_restarters')</th>
-              </tr>
-            </thead>
-            <tbody>
+            <table role="table" class="table table-striped table-hover">
+              @include('partials.tables.head-groups')
+              <tbody>
+                @if( !$your_groups->isEmpty() )
+                  @foreach ($your_groups as $group)
 
-              @foreach($groups as $group)
-              <tr>
-                <td class="table-cell-icon">
-                  @php( $group_image = $group->groupImage )
-                  @if( is_object($group_image) && is_object($group_image->image) )
-                    <img src="{{ asset('/uploads/thumbnail_' . $group_image->image->path) }}" alt="{{{ $group->name }}}">
-                  @else
-                    <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $group->name }}}">
-                  @endif
-                </td>
-                <td><a href="/group/view/{{{ $group->idgroups }}}" title="edit group">{{{ $group->name }}}</a></td>
-                <td>{{{ $group->location . ', ' . $group->area }}}</td>
-                <td class="text-center">{{{ $group->allHosts->count() }}}</td>
-                <td class="text-center">{{{ $group->allRestarters->count() }}}</td>
-              </tr>
-              @endforeach
+                    @include('partials.tables.row-groups')
 
-            </tbody>
-          </table>
+                  @endforeach
+                @else
+                  <tr>
+                    <td colspan="13" align="center" class="p-3">
+                      You are not associated with any groups, take a look and see if there's one you would like to join
+                      @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host') )
+                        <br><a href="/group/all">See all groups</a>
+                      @endif
+                    </td>
+                  </tr>
+                @endif
+              </tbody>
+            </table>
 
-        </section>
+          </section>
+        @endif
 
-        <div class="d-flex justify-content-center">
-          <nav aria-label="Page navigation example">
-            {!! $groups->links() !!}
-          </nav>
-        </div>
+        @if( !is_null($groups_near_you) )
+          <section class="table-section" id="your-groups">
+
+            <h2>@lang('groups.groups_title2') <sup>(<a href="/group/all">See all groups</a>)</sup></h2>
+
+            <table role="table" class="table table-striped table-hover">
+              @include('partials.tables.head-groups')
+              <tbody>
+                @if( !$groups_near_you->isEmpty() )
+                  @foreach ($groups_near_you as $group)
+
+                    @include('partials.tables.row-groups')
+
+                  @endforeach
+                @else
+                  <tr>
+                    <td colspan="13" align="center" class="p-3">
+                      There are no groups within your area, would you consider starting a group?
+                      <br><a href="/profile/edit/{{{ Auth::user()->id }}}">@lang('groups.create_groups')</a>
+                    </td>
+                  </tr>
+                @endif
+              </tbody>
+            </table>
+
+          </section>
+        @endif
+
+        @if( !is_null($groups) )
+          <section class="table-section" id="your-groups">
+
+            <h2>@lang('groups.groups_title3')</h2>
+
+            <table role="table" class="table table-striped table-hover">
+              @include('partials.tables.head-groups')
+              <tbody>
+                @if( !$groups->isEmpty() )
+                  @foreach ($groups as $group)
+
+                    @include('partials.tables.row-groups')
+
+                  @endforeach
+                @else
+                  <tr>
+                    <td colspan="13" align="center" class="p-3">There are no groups</td>
+                  </tr>
+                @endif
+              </tbody>
+            </table>
+
+          </section>
+
+          <div class="d-flex justify-content-center">
+            <nav aria-label="Page navigation example">
+              {!! $groups->links() !!}
+            </nav>
+          </div>
+        @endif
 
       </div>
     </div>

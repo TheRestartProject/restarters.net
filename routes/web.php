@@ -16,8 +16,8 @@ Route::prefix('user')->group(function () {
     Route::post('reset', 'UserController@reset');
     Route::get('recover', 'UserController@recover');
     Route::post('recover', 'UserController@recover');
-    Route::get('register/{invite?}', 'UserController@getRegister')->name('registration');
-    Route::post('register', 'UserController@postRegister');
+    Route::get('register/{hash?}', 'UserController@getRegister')->name('registration');
+    Route::post('register/{hash?}', 'UserController@postRegister');
 });
 
 Route::get('/user/forbidden', function () {
@@ -82,7 +82,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::post('/device/image-upload/{id}', 'DeviceController@imageUpload');
 
   //Group Controller
-  Route::get('/group', 'GroupController@index')->name('groups');
   Route::get('/group/create', 'GroupController@create')->name('create-group');
   Route::post('/group/create', 'GroupController@create');
   Route::get('/group/edit/{id}', 'GroupController@edit');
@@ -91,6 +90,8 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::post('/group/invite', 'GroupController@postSendInvite');
   Route::get('/group/accept-invite/{id}/{hash}', 'GroupController@confirmInvite');
   Route::get('/group/join/{id}', 'GroupController@getJoinGroup');
+  Route::get('/group/image/delete/{idgroups}/{id}/{path}', 'GroupController@deleteImage');
+  Route::get('/group/{all?}', 'GroupController@index')->name('groups');
 
   //Outbound Controller
   Route::get('/outbound', 'OutboundController@index');

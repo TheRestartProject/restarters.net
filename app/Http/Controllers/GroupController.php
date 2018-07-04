@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\User;
-use App\Group;
-use App\Party;
 use App\Device;
-use App\UserGroups;
+use App\Group;
 use App\GroupTags;
 use App\GrouptagsGroups;
-
-use Notification;
+use App\Party;
+use App\Invite;
+use App\User;
+use App\UserGroups;
+use Auth;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
-
-use Auth;
+use DB;
 use FixometerHelper;
 use FixometerFile;
+use Illuminate\Http\Request;
+use Notification;
+
 
 class GroupController extends Controller
 {
@@ -53,25 +54,50 @@ class GroupController extends Controller
 
   }
 
-  public function index($response = null){
+  public function index($all = false){
 
-      // $this->set('title', 'Groups');
-      // $this->set('list', $this->Group->findAll());
+      if( $all ){
 
-      // if(!is_null($response)){
-      //     $this->set('response', $response);
-      // }
+        //All groups only
+        $your_groups = null;
+        $groups_near_you = null;
+        $groups = Group::orderBy('name', 'ASC')->paginate(env('PAGINATE'));
 
-      // $Group = new Group;
+      } else {
 
-      $groups = Group::orderBy('name', 'ASC')
-          ->paginate(env('PAGINATE'));
+        $groups = null;
+
+        //Get current logged in user
+        $user = Auth::user();
+
+        //Look for groups where user ID exists in pivot table
+        $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+                            ->where('users_groups.user', $user->id)
+                              ->orderBy('name', 'ASC')
+                                ->select('groups.*', 'users_groups.user')
+                                  ->get();
+
+        //Make sure we don't show the same groups in nearest to you
+        $your_groups_uniques = $your_groups->pluck('idgroups')->toArray();
+
+        //Assuming we have valid lat and long values, let's see what is nearest
+        if( !is_null($user->latitude) && !is_null($user->longitude) ){
+          $groups_near_you = Group::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
+                                  ->having("distance", "<=", 150)
+                                    ->whereNotIn('idgroups', $your_groups_uniques)
+                                      ->orderBy('distance', 'ASC')
+                                        ->take(5)
+                                          ->get();
+        } else {
+          $groups_near_you = null;
+        }
+
+      }
 
       return view('group.index', [
-        // 'title' => 'Groups',
-        // 'list' => $Group->findAll(),
+        'your_groups' => $your_groups,
+        'groups_near_you' => $groups_near_you,
         'groups' => $groups,
-        //'response' => $response,
       ]);
 
   }
@@ -80,14 +106,12 @@ class GroupController extends Controller
 
       $user = User::find(Auth::id());
 
-      // Administrators can add Groups.
-      if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host')){
-          // $this->set('title', 'New Group');
-          // $this->set('gmaps', true);
-          // $this->set('js',
-          //             array('head' => array(
-          //                             '/ext/geocoder.js'
-          //             )));
+      // Only administrators can add groups
+      if( FixometerHelper::hasRole($user, 'Restarter') ){
+
+            return redirect('/user/forbidden');
+
+      } else {
 
           if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
               $error = array();
@@ -156,6 +180,14 @@ class GroupController extends Controller
                           $file = new FixometerFile;
                           $group_avatar = $file->upload('file', 'image', $idGroup, env('TBL_GROUPS'), false, true);
                       }
+
+                      //Associate current logged in user as a host
+                      UserGroups::create([
+                        'user' => Auth::user()->id,
+                        'group' => $idGroup,
+                        'status' => 1,
+                        'role' => 3,
+                      ]);
 
                       if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
 
@@ -253,9 +285,6 @@ class GroupController extends Controller
             'gmaps' => true,
           ]);
 
-      }
-      else {
-          return redirect('/user/forbidden');
       }
   }
 
@@ -541,13 +570,10 @@ class GroupController extends Controller
                           ->where('user', $user->id)
                             ->first());
 
-      $is_host_of_group = !empty(UserGroups::where('group', $groupid)
-                                  ->where('user', $user->id)
-                                    ->where('role', 3)
-                                      ->first());
+      $is_host_of_group = FixometerHelper::userHasEditGroupPermission($groupid, $user->id);
 
       $user_groups = UserGroups::where('user', Auth::user()->id)->count();
-
+      $view_group = Group::find($groupid);
 
       return view('group.view', [ //host.index
         'title' => 'Host Dashboard',
@@ -585,6 +611,7 @@ class GroupController extends Controller
         'in_group' => $in_group,
         'is_host_of_group' => $is_host_of_group,
         'user_groups' => $user_groups,
+        'view_group' => $view_group,
       ]);
 
   }
@@ -662,9 +689,9 @@ class GroupController extends Controller
 
 
       if (!isset($not_sent)) {
-        return redirect()->back()->with('success', 'Invites Sent!');
+        return redirect()->back()->with('success', 'Invites sent!');
       } else {
-        return redirect()->back()->with('warning', 'Invites Sent - apart from these ('.implode(',', $not_sent).') who were already part of the group');
+        return redirect()->back()->with('warning', 'Invites sent - apart from these ('.rtrim(implode(', ', $not_sent), ', ').') who have already joined the group or have been sent an invite');
       }
     } else {
       return redirect()->back()->with('warning', 'You have not entered any emails!');
@@ -700,6 +727,7 @@ class GroupController extends Controller
         }
 
         return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
+
       } else {
         $user_group->user = $register_id;
         $user_group->save();
@@ -717,143 +745,144 @@ class GroupController extends Controller
       $Group = new Group;
       $File = new FixometerFile;
 
-      if( FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host') ){
+      $is_host_of_group = FixometerHelper::userHasEditGroupPermission($id, $user->id);
+      if( !FixometerHelper::hasRole($user, 'Administrator') && !$is_host_of_group )
+        return redirect('/user/forbidden');
 
-          if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
+      if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
 
-              $data = $_POST;
-              // dd($data);
+          $data = $_POST;
+          // dd($data);
 
-              // remove the extra "files" field that Summernote generates -
-              unset($data['files']);
-              unset($data['image']);
+          // remove the extra "files" field that Summernote generates -
+          unset($data['files']);
+          unset($data['image']);
 
-              if (!empty($data['location'])) {
+          if (!empty($data['location'])) {
 
-                $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($data['location'].',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
-                $json = json_decode($json);
+            $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($data['location'].',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
+            $json = json_decode($json);
 
-                if (is_object($json) && !empty($json->{'results'})) {
-                    $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
-                    $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
-                }
+            if (is_object($json) && !empty($json->{'results'})) {
+                $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
+                $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
+            }
 
-              } else {
-                $latitude = null;
-                $longitude = null;
-              }
+          } else {
+            $latitude = null;
+            $longitude = null;
+          }
 
-              $update = array(
-                              'name'          => $data['name'],
-                              'website'       => $data['website'],
-                              'free_text'     => $data['free_text'],
-                              'location'      => $data['location'],
-                              'latitude'      => $latitude,
-                              'longitude'     => $longitude,
-                              );
+          $update = array(
+                          'name'          => $data['name'],
+                          'website'       => $data['website'],
+                          'free_text'     => $data['free_text'],
+                          'location'      => $data['location'],
+                          'latitude'      => $latitude,
+                          'longitude'     => $longitude,
+                          );
 
-              $u = $Group->where('idgroups', $id)->update($update);
+          $u = $Group->where('idgroups', $id)->update($update);
 
 
-              if (!empty($_POST['group_tags'])) {
+          if (!empty($_POST['group_tags'])) {
 
-                $Group->find($id)->group_tags()->sync($_POST['group_tags']);
+            $Group->find($id)->group_tags()->sync($_POST['group_tags']);
 
-              }
+          }
 
-              // echo "Updated---";
-              if(!$u) {
+          // echo "Updated---";
+          if(!$u) {
 
-                  $response['danger'] = 'Something went wrong. Please check the data and try again.';
-                  echo $response['danger'];
+              $response['danger'] = 'Something went wrong. Please check the data and try again.';
+              echo $response['danger'];
+          }
+          else {
+             // echo "Here now --- ";
+              $response['success'] = 'Group updated!';
+
+              // dbga($_FILES);
+
+              if(isset($_FILES['image']) && !empty($_FILES['image']) && $_FILES['image']['error'] != 4){
+                 // echo "uploading image ... ";
+                  $existing_image = FixometerHelper::hasImage($id, 'groups', true);
+                  if(count($existing_image) > 0){
+                      $Group->removeImage($id, $existing_image[0]);
+                  }
+                  $file = new FixometerFile;
+                  $group_avatar = $file->upload('image', 'image', $id, env('TBL_GROUPS'), false, true);
+                  $group_avatar = env('UPLOADS_URL') . 'mid_' . $group_avatar ;
               }
               else {
-                 // echo "Here now --- ";
-                  $response['success'] = 'Group updated!';
-
-                  // dbga($_FILES);
-
-                  if(isset($_FILES['image']) && !empty($_FILES['image']) && $_FILES['image']['error'] != 4){
-                     // echo "uploading image ... ";
-                      $existing_image = FixometerHelper::hasImage($id, 'groups', true);
-                      if(count($existing_image) > 0){
-                          $Group->removeImage($id, $existing_image[0]);
-                      }
-                      $file = new FixometerFile;
-                      $group_avatar = $file->upload('image', 'image', $id, env('TBL_GROUPS'), false, true);
-                      $group_avatar = env('UPLOADS_URL') . 'mid_' . $group_avatar ;
+                  $existing_image = FixometerHelper::hasImage($id, 'groups', true);
+                  if( count($existing_image) > 0 ) {
+                      $group_avatar = env('UPLOADS_URL') . 'mid_' . $existing_image[0]->path;
                   }
                   else {
-                      $existing_image = FixometerHelper::hasImage($id, 'groups', true);
-                      if( count($existing_image) > 0 ) {
-                          $group_avatar = env('UPLOADS_URL') . 'mid_' . $existing_image[0]->path;
-                      }
-                      else {
-                          $group_avatar = 'null';
-                      }
-                  }
-
-                  if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
-
-                     /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
-                    $Host = $Group->findHost($id);
-
-                    $custom_fields = array(
-                                        array('key' => 'group_city',            'value' => $data['area']),
-                                        array('key' => 'group_host',            'value' => $Host->hostname),
-                                        array('key' => 'group_website',         'value' => $data['website']),
-                                        array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
-                                        array('key' => 'group_hash',            'value' => $id),
-                                        array('key' => 'group_avatar_url',      'value' => $group_avatar ),
-                                        array('key' => 'group_latitude',        'value' => $data['latitude']),
-                                        array('key' => 'group_longitude',       'value' => $data['longitude']),
-                                    );
-
-
-                    /** Start WP XML-RPC **/
-                    $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-                    $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
-
-                    $content = array(
-                                    'post_type' => 'group',
-                                    'post_title' => $data['name'],
-                                    'post_content' => $data['free_text'],
-                                    'custom_fields' => $custom_fields
-                                    );
-
-
-                    //Check for WP existence in DB
-                    $theGroup = $Group->findOne($id);
-                    if(!empty($theGroup->wordpress_post_id)){
-
-                        // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
-                        $thePost = $wpClient->getPost($theGroup->wordpress_post_id);
-
-                        foreach( $thePost['custom_fields'] as $i => $field ){
-                            foreach( $custom_fields as $k => $set_field){
-                                if($field['key'] == $set_field['key']){
-                                    $custom_fields[$k]['id'] = $field['id'];
-                                }
-                            }
-                        }
-
-                        $content['custom_fields'] = $custom_fields;
-                        $wpClient->editPost($theGroup->wordpress_post_id, $content);
-                    }
-                    else {
-                        $wpid = $wpClient->newPost($data['name'], $data['free_text'], $content);
-                        $this->Group->update(array('wordpress_post_id' => $wpid), $id);
-                    }
-
-                  }
-
-                  if(FixometerHelper::hasRole($user, 'Host')){
-                  //    header('Location: /host?action=gu&code=200');
+                      $group_avatar = 'null';
                   }
               }
 
-              // $this->set('response', $response);
+              if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
+
+                 /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
+                $Host = $Group->findHost($id);
+
+                $custom_fields = array(
+                                    array('key' => 'group_city',            'value' => $data['area']),
+                                    array('key' => 'group_host',            'value' => $Host->hostname),
+                                    array('key' => 'group_website',         'value' => $data['website']),
+                                    array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
+                                    array('key' => 'group_hash',            'value' => $id),
+                                    array('key' => 'group_avatar_url',      'value' => $group_avatar ),
+                                    array('key' => 'group_latitude',        'value' => $data['latitude']),
+                                    array('key' => 'group_longitude',       'value' => $data['longitude']),
+                                );
+
+
+                /** Start WP XML-RPC **/
+                $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
+                $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+
+                $content = array(
+                                'post_type' => 'group',
+                                'post_title' => $data['name'],
+                                'post_content' => $data['free_text'],
+                                'custom_fields' => $custom_fields
+                                );
+
+
+                //Check for WP existence in DB
+                $theGroup = $Group->findOne($id);
+                if(!empty($theGroup->wordpress_post_id)){
+
+                    // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
+                    $thePost = $wpClient->getPost($theGroup->wordpress_post_id);
+
+                    foreach( $thePost['custom_fields'] as $i => $field ){
+                        foreach( $custom_fields as $k => $set_field){
+                            if($field['key'] == $set_field['key']){
+                                $custom_fields[$k]['id'] = $field['id'];
+                            }
+                        }
+                    }
+
+                    $content['custom_fields'] = $custom_fields;
+                    $wpClient->editPost($theGroup->wordpress_post_id, $content);
+                }
+                else {
+                    $wpid = $wpClient->newPost($data['name'], $data['free_text'], $content);
+                    $this->Group->update(array('wordpress_post_id' => $wpid), $id);
+                }
+
+              }
+
+              if(FixometerHelper::hasRole($user, 'Host')){
+              //    header('Location: /host?action=gu&code=200');
+              }
           }
+
+          // $this->set('response', $response);
       }
       // $this->set('gmaps', true);
       // $this->set('js', array( 'head' => array( '/ext/geocoder.js')));
@@ -866,7 +895,7 @@ class GroupController extends Controller
         $response = null;
       }
 
-      $images = $File->findImages(env('TBL_EVENTS'), $id);
+      $images = $File->findImages(env('TBL_GROUPS'), $id);
 
       if (!isset($images)) {
         $images = null;
@@ -900,6 +929,26 @@ class GroupController extends Controller
       else {
           header('Location: /user/forbidden');
       }
+  }
+
+  public function deleteImage($group_id, $id, $path){
+
+      $user = Auth::user();
+
+      $is_host_of_group = FixometerHelper::userHasEditGroupPermission($group_id, $user->id);
+      if( FixometerHelper::hasRole($user, 'Administrator') || $is_host_of_group ){
+
+          $Image = new FixometerFile;
+          $Image->deleteImage($id, $path);
+
+          $return = [
+            'success' => true
+          ];
+
+      }
+
+      return redirect()->back()->with('message', 'Thank you, the image has been deleted');
+
   }
 
   public static function stats($id, $format = 'row'){

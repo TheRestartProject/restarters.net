@@ -18,7 +18,7 @@
         </div>
         <div class="form-group">
             <label for="tag-description">Description:</label>
-            <textarea class="form-control rte" rows="6" name="tag-description" id="tag-description"></textarea>
+            <textarea class="form-control rte" rows="3" name="tag-description" id="tag-description"></textarea>
         </div>
         <div class="form-group">
             <button class="btn btn-default" type="reset"><i class="fa fa-refresh"></i> reset</button>

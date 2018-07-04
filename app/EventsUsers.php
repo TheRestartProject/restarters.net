@@ -34,7 +34,7 @@ class EventsUsers extends Model
     }
 
     //Table Relations
-    public function eventUser() {
+    public function volunteer() {
       return $this->hasOne('App\User', 'id', 'user');
     }
 }

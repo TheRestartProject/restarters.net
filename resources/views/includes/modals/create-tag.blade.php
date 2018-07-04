@@ -7,9 +7,8 @@
             <span aria-hidden="true">&times;</span>
         </button>
 
-
-
         <form action="/tags/create" method="POST">
+
             @csrf
 
             <legend id="createTagLabel">@lang('admin.tags_modal_title')</legend>
@@ -21,7 +20,7 @@
 
             <div class="form-group">
                 <label for="tag-description">@lang('admin.description_optional'):</label>
-                <textarea name="tag-description" id="tag-description" class="form-control field textarea-large"></textarea>
+                <textarea name="tag-description" id="tag-description" class="form-control field" rows="6"></textarea>
             </div>
 
             <div class="button-group">
@@ -30,10 +29,7 @@
                 </div>
             </div>
 
-
         </form>
-
-
 
     </div>
   </div>

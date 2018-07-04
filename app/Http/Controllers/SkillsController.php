@@ -87,7 +87,7 @@ class SkillsController extends Controller
 
     Skills::find($id)->delete();
 
-    return Redirect::back()->with('message', 'Skill deleted!');
+    return Redirect::to('/skills')->with('message', 'Skill deleted!');
 
   }
 

@@ -29,7 +29,6 @@
                   <thead>
                       <tr>
 
-                          <th>ID</th>
                           <th>Name</th>
                           <th>Category Cluster</th>
                           <th>Weight [kg]</th>
@@ -43,13 +42,16 @@
                     @if(isset($list))
                       @foreach($list as $p)
                       <tr>
-                          <td><?php echo $p->idcategories; ?></td>
-                          <td><a href="/category/edit/{{ $p->idcategories }}"><?php echo $p->name; ?></a></td>
-                          @foreach($categories as $cluster)
-                            {!! $cluster->idclusters == $p->cluster ? '<td>'.$cluster->name.'</td>' : '' !!}
-                          @endforeach
-                          <td><?php echo $p->weight ?></td>
-                          <td><?php echo $p->footprint ?></td>
+                          <td><a href="/category/edit/{{ $p->idcategories }}">{{{ $p->name }}}</a></td>
+                          @if( !empty($p->cluster) )
+                            @foreach($categories as $cluster)
+                              {!! $cluster->idclusters == $p->cluster ? '<td>'.$cluster->name.'</td>' : '' !!}
+                            @endforeach
+                          @else
+                            <td>N/A</td>
+                          @endif
+                          <td>{{{ $p->weight }}}</td>
+                          <td>{{{ $p->footprint }}}</td>
                           @include('partials/footprint-reliability', ['reliability' => $p->footprint_reliability])
                       </tr>
                       @endforeach
@@ -60,16 +62,6 @@
 
         </div>
     </div>
-
-    <!-- <div class="d-flex justify-content-center">
-        <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-        </ul>
-        </nav>
-    </div> -->
 
   </div>
 </section>

@@ -6,7 +6,7 @@
 
       <div class="modal-header">
 
-        <h5 id="groupVolunteersLabel">@lang('groups.all_volunteers_group_name_header', ['group' => 'The Mighty Restarters'])</h5>
+        <h5 id="groupVolunteersLabel">@lang('groups.all_volunteers_group_name_header', ['group' => $group->name])</h5>
         @include('partials.cross')
 
       </div>
@@ -28,18 +28,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="table-cell-icon"><img src="{{{ url('images/placeholder.png') }}}" class="rounded" alt="Placeholder"></td>
-              <td><a href="{{{ route('profile') }}}">Dean Appleton-Claydon</a></td>
-              <td>
-                Communication<br>
-                Communication
-              </td>
-            </tr>
+            @foreach( $view_group->allVolunteers as $volunteer )
+              @include('partials.volunteer-row')
+            @endforeach
           </tbody>
         </table>
 
-        <button type="submit" class="btn btn-primary float-right">@lang('groups.join_group_button')</button>
+        <a href="/group/join/{{ $group->idgroups }}" class="btn btn-primary" id="join-group">@lang('groups.join_group_button')</a>
 
       </div>
 

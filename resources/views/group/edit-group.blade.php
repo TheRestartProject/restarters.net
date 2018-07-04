@@ -9,6 +9,7 @@
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="/">FIXOMETER</a></li>
               <li class="breadcrumb-item"><a href="/group">@lang('groups.groups')</a></li>
+              <li class="breadcrumb-item"><a href="/group/view/{{{ $formdata->idgroups }}}">{{{ $formdata->name }}}</a></li>
               <li class="breadcrumb-item active" aria-current="page">@lang('groups.edit_group')</li>
             </ol>
           </nav>
@@ -100,20 +101,27 @@
                   </div>
                 </div>
 
-
                 <div class="form-group">
 
-                    <div class="previews"></div>
-
-                    <label for="file">@lang('groups.group_image'):</label>
-
-                    <!-- <form id="dropzoneSingleEl" class="dropzone" action="/" method="post" enctype="multipart/form-data" data-field1="@lang('groups.field_group_images')" data-field2="@lang('groups.field_group_images_2')"> -->
-                        <div class="fallback">
-                            <input id="file" name="file" type="file"/>
+                  <div class="previews">
+                    @if( !empty($images) )
+                      @foreach($images as $image)
+                        <div class="dz-image">
+                          <img src="/uploads/{{ $image->path }}" alt="placeholder">
+                          <a href="/group/image/delete/{{ $formdata->idgroups }}/{{{ $image->idimages }}}/{{{ $image->path }}}" class="dz-remove" onclick="return confirm('Are you sure?');">Remove file</a>
                         </div>
-                    <!-- </form> -->
+                      @endforeach
+                    @endif
+                    <div class="uploads"></div>
+                  </div>
 
+                  <label for="file">@lang('groups.group_image'):</label>
 
+                  <!-- <form id="dropzoneSingleEl" class="dropzone" action="/" method="post" enctype="multipart/form-data" data-field1="@lang('groups.field_group_images')" data-field2="@lang('groups.field_group_images_2')"> -->
+                      <div class="fallback">
+                          <input id="file" name="file[]" type="file" multiple />
+                      </div>
+                  <!-- </form> -->
 
                 </div>
 

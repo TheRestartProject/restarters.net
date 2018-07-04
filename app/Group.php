@@ -158,4 +158,12 @@ class Group extends Model
         return $this->hasMany('App\UserGroups', 'group', 'idgroups')->where('role', 4);
     }
 
+    public function allVolunteers(){
+        return $this->hasMany('App\UserGroups', 'group', 'idgroups');
+    }
+
+    public function getLocation(){
+        return rtrim($this->location . ', ' . $this->area, ', ');
+    }
+
 }

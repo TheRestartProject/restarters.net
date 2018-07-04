@@ -33,8 +33,7 @@
                     </div>
                     <div class="button-group row">
                       <div class="col-lg-12 d-flex align-items-center justify-content-end">
-                        <button class="btn btn-default" type="reset"><i class="fa fa-refresh"></i>Reset</button>
-                        <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i>@lang('admin.save-brand')</button>
+                        <button class="btn btn-primary" type="submit">@lang('admin.save-brand')</button>
                       </div>
                     </div>
                 </form>

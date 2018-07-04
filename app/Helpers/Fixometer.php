@@ -673,4 +673,13 @@ class FixometerHelper {
 
   }
 
+  public static function userHasEditGroupPermission($group_id, $user_id, $role = 3) {
+
+      return !empty(\App\UserGroups::where('group', $group_id)
+                                  ->where('user', $user_id)
+                                    ->where('role', $role)
+                                      ->first());
+
+  }
+
 }

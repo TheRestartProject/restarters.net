@@ -106,7 +106,7 @@
                                   <div class="col-4 d-flex flex-column"><strong>{{{ str_plural('Host', count($hosts) ) }}}: </strong></div>
                                   <div class="col-8 d-flex flex-column">
                                     @foreach( $hosts as $host )
-                                      {{ $host->eventUser->name }}<br>
+                                      {{ $host->volunteer->name }}<br>
                                     @endforeach
                                   </div>
                                 @endif

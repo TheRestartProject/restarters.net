@@ -10,9 +10,6 @@
               <li class="breadcrumb-item active" aria-current="page">ROLES</li>
             </ol>
           </nav>
-          <div class="">
-            <a href="#" class="btn btn-primary disabled" aria-disabled="true">Create new role</a>
-          </div>
         </div>
       </div>
     </div>

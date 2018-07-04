@@ -44,27 +44,6 @@
         }
     }
 
-    h2 {
-        font-size: 18px;
-        margin: 0 0 10px 0;
-
-        sup {
-            font-size: 14px;
-            font-family: $font-family-second;
-            font-weight: 400;
-            left: 5px;
-            top: -3px;
-            a {
-                color: #000;
-                text-decoration: underline;
-
-                &:hover {
-                    text-decoration: none;
-                }
-            }
-        }
-    }
-
     &__filter {
         .breadcrumb {
             margin: 0;

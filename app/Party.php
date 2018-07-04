@@ -416,9 +416,9 @@ class Party extends Model
         return $this->hasOne('App\Host', 'idgroups', 'group');
     }
 
-    public function getEventDate() {
+    public function getEventDate($format = 'd/m/Y') {
 
-        return date('d/m/Y', strtotime($this->event_date));
+        return date($format, strtotime($this->event_date));
 
     }
 

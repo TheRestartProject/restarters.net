@@ -35,17 +35,13 @@ class CategoryController extends Controller
 
   public function index(){
 
-      // $this->set('title', 'Categories');
-      // $this->set('list', $this->Category->findAll());
-
       $Category = new Category;
 
       return view('category.index', [
-        'title' => 'Categories',
         'list' => $Category->findAll(),
-        'user' => Auth::user(),
         'categories'  => $Category->listed()
       ]);
+      
   }
 
   public function getEditCategory($id) {

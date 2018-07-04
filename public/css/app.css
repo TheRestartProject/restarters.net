@@ -16622,28 +16622,6 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
           box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.events h2 {
-  font-size: 18px;
-  margin: 0 0 10px 0;
-}
-
-.events h2 sup {
-  font-size: 14px;
-  font-family: "Open Sans", sans-serif;
-  font-weight: 400;
-  left: 5px;
-  top: -3px;
-}
-
-.events h2 sup a {
-  color: #000;
-  text-decoration: underline;
-}
-
-.events h2 sup a:hover {
-  text-decoration: none;
-}
-
 .events__filter .breadcrumb {
   margin: 0;
 }
@@ -17497,5 +17475,27 @@ table th {
   margin: 30px 0;
   text-align: center;
   color: #0394A6;
+}
+
+h2 {
+  font-size: 18px;
+  margin: 0 0 10px 0;
+}
+
+h2 sup {
+  font-size: 14px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 400;
+  left: 5px;
+  top: -3px;
+}
+
+h2 sup a {
+  color: #000;
+  text-decoration: underline;
+}
+
+h2 sup a:hover {
+  text-decoration: none;
 }
 

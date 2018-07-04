@@ -13,7 +13,7 @@
 
       <div class="modal-body">
 
-        <p>@lang('groups.share_stats_message', ['group' => 'The Mighty Restarters'])</p>
+        <p>@lang('groups.share_stats_message', ['group' => $group->name])</p>
 
         <div id="accordionGroup" class="accordion__share mt-4">
 

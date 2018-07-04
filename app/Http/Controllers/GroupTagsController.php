@@ -91,7 +91,7 @@ class GroupTagsController extends Controller
 
     GroupTags::find($id)->delete();
 
-    return Redirect::back()->with('message', 'Group Tag deleted!');
+    return Redirect::to('/tags')->with('message', 'Group Tag deleted!');
 
   }
 

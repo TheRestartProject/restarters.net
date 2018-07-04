@@ -81,5 +81,9 @@ class UserGroups extends Model
         }
     }
 
+    //Table Relations
+    public function volunteer() {
+      return $this->hasOne('App\User', 'id', 'user');
+    }
 
 }

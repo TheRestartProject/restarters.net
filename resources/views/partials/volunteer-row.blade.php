@@ -1,4 +1,4 @@
-@php( $user = $volunteer->eventUser )
+@php( $user = $volunteer->volunteer )
 @php( $user_skills = $user->userSkills )
 
 <tr class="volunteer-{{ $volunteer->user }}">
@@ -23,9 +23,11 @@
        {{{ $skill->skillName->skill_name }}}<br>
     @endforeach
   </td>
-  @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator'))
-    <td>
-      <a href="#" class="users-list__remove js-remove" data-remove-volunteer="{{ $volunteer->user }}" data-event-id="{{ $volunteer->event }}" data-type="{{{ $type }}}">Remove volunteer</a>
-    </td>
+  @if( isset($type) )
+    @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+      <td>
+        <a href="#" class="users-list__remove js-remove" data-remove-volunteer="{{ $volunteer->user }}" data-event-id="{{ $volunteer->event }}" data-type="{{{ $type }}}">Remove volunteer</a>
+      </td>
+    @endif
   @endif
 </tr>

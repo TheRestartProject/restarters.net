@@ -6,7 +6,7 @@
 
       <div class="modal-header">
 
-        <h5 id="inviteToGroupLabel">@lang('groups.invite_group_name_header', ['group' => 'The Mighty Restarters'])</h5>
+        <h5 id="inviteToGroupLabel">@lang('groups.invite_group_name_header', ['group' => $group->name])</h5>
         @include('partials.cross')
 
       </div>

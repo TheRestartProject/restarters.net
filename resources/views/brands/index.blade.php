@@ -30,11 +30,7 @@
                 <table class="table table-hover table-striped bootg" id="brands-table">
                     <thead>
                         <tr>
-                            <th data-column-id="brandID"  data-header-css-class="comm-cell" data-identifier="true" data-type="numeric">#</th>
-                            <th data-column-id="brand">Brand name</th>
-                            <th data-column-id="created-at">Created At</th>
-                            <th data-column-id="updated-at">Updated At</th>
-                            <th data-column-id="edit" data-header-css-class="comm-cell" data-formatter="editLink" data-sortable="false">Actions</th>
+                            <th>Brand name</th>
                         </tr>
                     </thead>
 
@@ -42,14 +38,7 @@
                       @if(isset($brands))
                         @foreach($brands as $brand)
                         <tr>
-                          <td><?php echo $brand->id; ?></td>
-                          <td><?php echo $brand->brand_name; ?></td>
-                          <td><?php echo $brand->created_at; ?></td>
-                          <td><?php echo $brand->updated_at; ?></td>
-                          <td>
-                            <a href="/brands/edit/<?php echo $brand->id; ?>" class="btn btn-warning">edit</a>
-                            <a href="/brands/delete/<?php echo $brand->id; ?>" class="btn btn-danger">delete</a>
-                          </td>
+                          <td><a href="/brands/edit/{{{ $brand->id }}}">{{{ $brand->brand_name }}}</td>
                         </tr>
                         @endforeach
                       @endif
