@@ -482,23 +482,23 @@ class PartyController extends Controller {
 
                   // if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
                       /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
-                      $Host = $Groups->findHost($group);
+                  //$Host = $Groups->findHost($group);
 
                       $custom_fields = array(
                                       // array('key' => 'party_host',            'value' => $Host->hostname),
                                       // array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' .$Host->path),
-                                      array('key' => 'party_grouphash',       'value' => $group),
-                                      array('key' => 'party_venue',           'value' => $venue),
-                                      array('key' => 'party_location',        'value' => $location),
-                                      array('key' => 'party_time',            'value' => $start . ' - ' . $end),
-                                      array('key' => 'party_date',            'value' => $event_date),
-                                      array('key' => 'party_timestamp',       'value' => strtotime($event_date)),
-                                      array('key' => 'party_timestamp_end',   'value' => strtotime($endTime)),
-                                      array('key' => 'party_stats',           'value' => $idParty),
-                                      array('key' => 'party_lat',             'value' => $latitude),
-                                      array('key' => 'party_lon',             'value' => $longitude)
-
-                                      );
+                                   array('key' => 'party_grouphash',       'value' => $data['group']),
+                                   array('key' => 'party_venue',           'value' => $data['venue']),
+                                   array('key' => 'party_location',        'value' => $data['location']),
+                                   array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
+                                   array('key' => 'party_date',            'value' => $wp_date),
+                                   array('key' => 'party_timestamp',       'value' => $timestamp),
+                                   // TODO: array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp), 
+                                   array('key' => 'party_stats',           'value' => $id),
+                                   // TODO: test lat and long are working correctly
+                                   array('key' => 'party_lat',             'value' => $latitude),  
+                                   array('key' => 'party_lon',             'value' => $longitude) 
+                        );
 
 
                       /** Start WP XML-RPC **/
@@ -511,9 +511,11 @@ class PartyController extends Controller {
                                       'custom_fields' => $custom_fields
                                       );
                       $party_name = !empty($data['venue']) ? $data['venue'] : $data['location'];
-                      $wpid = $wpClient->newPost($party_name, $free_text, $content);
+                      $wpid = $wpClient->newPost($party_name, $data['free_text'], $content);
 
-                      $Party->update(array('wordpress_post_id' => $wpid), $idParty);
+                      $theParty = Party::find($id);
+                      $theParty->wordpress_post_id = $wpid;
+                      $theParty->save();
                   // }
 
                   // $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
