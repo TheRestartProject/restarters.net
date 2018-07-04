@@ -141,6 +141,7 @@ class PartyController extends Controller {
 
       if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
 
+
           $error = array();
 
           // Add SuperHero Restarter!
@@ -251,9 +252,19 @@ class PartyController extends Controller {
                   ]);
 
                   /** let's create the image attachment! **/
+                  // if(isset($_FILES) && !empty($_FILES)){
+                  //     $file = new FixometerFile;
+                  //     $file->upload('file', 'image', $idParty, env('TBL_EVENTS'));
+                  // }
                   if(isset($_FILES) && !empty($_FILES)){
-                      $file = new FixometerFile;
-                      $file->upload('file', 'image', $idParty, env('TBL_EVENTS'));
+                      if(is_array($_FILES['file']['name'])) {
+                          $File = new FixometerFile;
+                          $files = FixometerHelper::rearrange($_FILES['file']);
+                          foreach($files as $upload){
+                              $File->upload($upload, 'image', $idParty, env('TBL_EVENTS'));
+                          }
+                      }
+                      else { }
                   }
 
                   if(FixometerHelper::hasRole($user, 'Host')){

@@ -142,7 +142,7 @@
                     <!-- <div class="dropzone" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')">
                         <div class="dz-default dz-message"></div> -->
                         <div class="fallback">
-                            <input id="file" name="file" type="file" multiple>
+                            <input id="file" name="file[]" type="file" multiple>
                         </div>
                     <!-- </div> -->
 
