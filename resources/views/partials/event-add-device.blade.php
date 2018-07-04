@@ -8,7 +8,7 @@
               <tr>
                   <td width="200">
                       <div class="form-control form-control__select">
-                          <select name="category" class="category select2">
+                          <select id="device-start" name="category" class="category select2">
                               <option value="0">-- Category --</option>
                               @foreach( $clusters as $cluster )
                               <optgroup label="{{{ $cluster->name }}}">
@@ -20,15 +20,15 @@
                               <option value="46">None of the above</option>
                           </select>
                       </div>
-                  </td>
-                  <td width="135" style="display: none;">
-                      <div class="form-group">
-                          <input type="number" class="form-control field weight" name="weight" placeholder="Est. weight kg" autocomplete="off" disabled>
+                      <div id="display-weight" style="display: none;">
+                          <div class="form-group">
+                              <input type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="Est. weight kg" autocomplete="off" disabled>
+                          </div>
                       </div>
                   </td>
-                  <td>
+                  <td width="150">
                       <div class="form-control form-control__select">
-                          <select name="brand" class="brand select2-tags-with-input">
+                          <select name="brand" class="brand select2-with-input">
                               <option value="0">-- Brand --</option>
                               @foreach($brands as $brand)
                                 <option value="{{ $brand->brand_name }}">{{ $brand->brand_name }}</option>
@@ -38,17 +38,17 @@
                   </td>
                   <td>
                       <div class="form-group">
-                          <input type="text" class="form-control field" class="model" name="model" placeholder="Model" autocomplete="off" required>
+                          <input type="text" class="form-control field" class="model" name="model" placeholder="Model" autocomplete="off">
                       </div>
                   </td>
                   <td width="100">
                       <div class="form-group">
-                          <input type="number" class="form-control field" class="age" name="age" min="0" placeholder="Age (yrs)" autocomplete="off" required>
+                          <input type="number" class="form-control field" class="age" name="age" min="0" placeholder="Age (yrs)" autocomplete="off">
                       </div>
                   </td>
                   <td>
                       <div class="form-group">
-                          <input type="text" class="form-control field" class="problem" name="problem" placeholder="Description of problem" autocomplete="off" required>
+                          <input type="text" class="form-control field" class="problem" name="problem" placeholder="Description of problem" autocomplete="off">
                       </div>
                   </td>
                   <td>
@@ -60,15 +60,15 @@
                               <option value="3">End of Life</option>
                           </select>
                       </div>
-                  </td>
-                  <td style="display: none;">
-                      <div class="form-control form-control__select">
-                          <select name="repair_details" class="repair_details select2" disabled>
-                              <option value="0">-- Repair details --</option>
-                              <option value="1">More time needed</option>
-                              <option value="2">Professional help</option>
-                              <option value="3">Do it yourself</option>
-                          </select>
+                      <div id="repair-more" style="display: none;">
+                          <div class="form-control form-control__select">
+                              <select name="repair_details" class="repair_details select2" disabled>
+                                  <option value="0">-- Repair details --</option>
+                                  <option value="1">More time needed</option>
+                                  <option value="2">Professional help</option>
+                                  <option value="3">Do it yourself</option>
+                              </select>
+                          </div>
                       </div>
                   </td>
                   <td>

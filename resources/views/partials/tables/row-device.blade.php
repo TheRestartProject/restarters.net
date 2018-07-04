@@ -1,6 +1,6 @@
 <tr>
     <td><a class="collapsed row-button" data-toggle="collapse" href="#row-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="row-1">Edit <span class="arrow">▴</span></a></td>
-    <td class="text-center"><a href="#">0</a></td>
+    <td class="text-center">0</td>
     <td>{{ $device->deviceCategory->name }}</td>
     <td>{{ $device->brand }}</td>
     <td>{{ $device->model }}</td>

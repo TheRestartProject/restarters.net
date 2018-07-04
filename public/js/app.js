@@ -24004,8 +24004,7 @@ jQuery(function () {
     jQuery('.select2').select2();
     jQuery('.table-row-details').find('select').select2();
     jQuery('.select2-tags').select2({ tags: true });
-    $(".select2-tags-with-input").select2({
-        tags: true,
+    $(".select2-with-input").select2({
         createTag: function createTag(params) {
             return {
                 id: params.term,
@@ -24020,12 +24019,12 @@ jQuery(function () {
         $field = jQuery('.repair_details');
         if ($value == 2) {
             $field.prop('disabled', false);
-            $field.parents('td').show();
+            $field.parents('#repair-more').show();
         } else {
             $field.val(0);
             $field.trigger('change');
             $field.prop('disabled', true);
-            $field.parents('td').hide();
+            $field.parents('#repair-more').hide();
         }
     });
 
@@ -24034,12 +24033,12 @@ jQuery(function () {
         $field = jQuery('.weight');
         if ($value === 46 || $value === '') {
             $field.prop('disabled', false);
-            $field.parents('td').show();
+            $field.parents('#display-weight').show();
         } else {
             $field.val('');
             $field.trigger('change');
             $field.prop('disabled', true);
-            $field.parents('td').hide();
+            $field.parents('#display-weight').hide();
         }
     });
 
@@ -24284,6 +24283,7 @@ $(document).ready(function () {
                     }
                     $('.table-row-details').removeAttr('style');
                     $form.trigger("reset");
+                    jQuery('#device-start').focus();
                     $('.btn-add').addClass('btn-success');
                     setTimeout(function (e) {
                         $('.btn-add').removeClass('btn-success');
