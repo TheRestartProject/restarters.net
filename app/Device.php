@@ -445,4 +445,8 @@ class Device extends Model
 
     }
 
+    public function deviceCategory(){
+        return $this->hasOne('App\Category', 'idcategories', 'category');
+    }
+
 }

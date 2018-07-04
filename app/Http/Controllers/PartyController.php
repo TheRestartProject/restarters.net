@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Brands;
 use App\Category;
+use App\Cluster;
 use App\Device;
 use App\EventsUsers;
 use App\Group;
@@ -677,7 +678,8 @@ class PartyController extends Controller {
 
       //Useful for add/edit device
       $brands = Brands::all();
-      $categories = Category::all();
+      //$categories = Category::all();
+      $clusters = Cluster::all();
       $event = Party::find($id);
 
       return view('events.view', [
@@ -693,7 +695,7 @@ class PartyController extends Controller {
         'hosts' => $hosts,
         'is_attending' => $is_attending,
         'brands' => $brands,
-        'categories' => $categories,
+        'clusters' => $clusters,
       ]);
 
   }

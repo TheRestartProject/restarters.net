@@ -14212,7 +14212,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .btn-add {
-  padding: 4px 10px;
+  padding: 10px;
 }
 
 .button-group__notice {
@@ -16794,6 +16794,11 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   width: 100%;
   height: 200px;
   margin: 30px 0 0 0;
+}
+
+.events .table-add td:first-child,
+.events .table-add th:first-child {
+  padding-left: 0;
 }
 
 .reporting {

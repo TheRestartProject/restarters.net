@@ -634,6 +634,44 @@ jQuery(function () {
     jQuery('.select2').select2();
     jQuery('.table-row-details').find('select').select2();
     jQuery('.select2-tags').select2({tags: true});
+    $(".select2-tags-with-input").select2({
+      tags: true,
+      createTag: function (params) {
+        return {
+          id: params.term,
+          text: params.term,
+          newOption: true
+        }
+      }
+    });
+
+    jQuery('.repair_status').on('change', function (e) {
+        $value = jQuery(this).val();
+        $field = jQuery('.repair_details');
+        if( $value == 2 ){
+          $field.prop('disabled', false);
+          $field.parents('td').show();
+        } else {
+          $field.val(0);
+          $field.trigger('change');
+          $field.prop('disabled', true);
+          $field.parents('td').hide();
+        }
+    });
+
+    jQuery('.category').on('change', function (e) {
+        $value = parseInt(jQuery(this).val());
+        $field = jQuery('.weight');
+        if( $value === 46 || $value === '' ){
+          $field.prop('disabled', false);
+          $field.parents('td').show();
+        } else {
+          $field.val('');
+          $field.trigger('change');
+          $field.prop('disabled', true);
+          $field.parents('td').hide();
+        }
+    });
 
     jQuery('.toggle-manual-invite').on('change', function (e) {
         $value = jQuery(this).val();
@@ -846,23 +884,10 @@ $( document ).ready(function() {
     }
   });
 
-  $('#add-device').on('submit', function(e) {
+  $('.add-device').on('submit', function(e) {
+
     e.preventDefault();
-    // var form_fields = JSON.stringify($(this).serialize());
-    // console.log(form_fields);
-
-    var form_array = {
-      repair_status:$('#repair_status').val(),
-      repair_details:$('#repair_details').val(),
-      spare_parts:$('#spare_parts').val(),
-      category:$('#category').val(),
-      brand:$('#brand').val(),
-      model:$('#model').val(),
-      age:$('#age').val(),
-      problem:$('#problem').val(),
-    };
-
-    var event_id = event_id = $('#event_id').val();
+    $form = $(this);
 
     $.ajax({
       headers: {
@@ -870,10 +895,25 @@ $( document ).ready(function() {
       },
       type: 'post',
       url: '/device/create',
-      data: { form_array : form_array, event_id : event_id },
-      success: function(data) {
-        if (data.error) {
-          alert(data.error);
+      data: {
+        repair_status: $form.find('select[name=repair_status]').val(),
+        repair_details: $form.find('select[name=repair_details]').val(),
+        spare_parts: $form.find('select[name=spare_parts]').val(),
+        category: $form.find('select[name=category]').val(),
+        brand: $form.find('select[name=brand]').val(),
+        model: $form.find('input[name=model]').val(),
+        age: $form.find('input[name=age]').val(),
+        problem: $form.find('input[name=problem]').val(),
+        event_id: $form.find('input[name=event_id]').val()
+      },
+      datatype: 'json',
+      success: function(json) {
+        console.log(json.success);
+        if( json.success ){
+          $(json.html).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
+          $('.table-row-details').removeAttr('style');
+        } else {
+          alert(json.error);
         }
       },
       error: function(error) {

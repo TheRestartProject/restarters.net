@@ -6,14 +6,14 @@ use Illuminate\Http\Request;
 
 use App\User;
 use App\Device;
-use App\Category;
+use App\Cluster;
 use App\Group;
 use App\Party;
 use App\Brands;
-
 use Auth;
 use FixometerHelper;
 use FixometerFile;
+use View;
 
 class DeviceController extends Controller
 {
@@ -331,85 +331,105 @@ class DeviceController extends Controller
   }
 
   public function ajaxCreate(Request $request) {
-    $post_data = $request->input('form_array');
 
-    $brand_name = Brands::find($post_data['brand'])->brand_name;
+    $repair_status  = $request->input('repair_status');
+    $repair_details = $request->input('repair_details');
+    $spare_parts    = $request->input('spare_parts');
+    $category       = $request->input('category');
+    $brand          = $request->input('brand');
+    $model          = $request->input('model');
+    $age            = $request->input('age');
+    $problem        = $request->input('problem');
+    $event_id       = $request->input('event_id');
 
-    $data = [];
+    $device = new Device;
+    $device->repair_status = $repair_status;
+    $device->problem = $repair_details;
+    $device->spare_parts = $spare_parts;
+    $device->category = $category;
+    $device->category_creation = $category;
+    $device->brand = $brand;
+    $device->model = $model;
+    $device->age = $age;
+    $device->problem = $problem;
+    $device->event = $event_id;
+    $device->repaired_by = Auth::id();
+    $device->save();
 
-    if ($post_data['repair_status'] == 2) {
-      switch ($post_data['repair_details']) {
-        case 1:
-            Device::create([
-              'event' => $request->input('event_id'),
-              'category' => $post_data['category'],
-              'category_creation' => $post_data['category'],
-              'brand' => $brand_name,
-              'model' => $post_data['model'],
-              'age' => $post_data['age'],
-              'problem' => $post_data['problem'],
-              'spare_parts' => $post_data['spare_parts'],
-              'repair_status' => $post_data['repair_status'],
-              'repaired_by' => Auth::id(),
-              'more_time_needed' => 1,
-            ]);
-            break;
-        case 2:
-            Device::create([
-              'event' => $request->input('event_id'),
-              'category' => $post_data['category'],
-              'category_creation' => $post_data['category'],
-              'brand' => $brand_name,
-              'model' => $post_data['model'],
-              'age' => $post_data['age'],
-              'problem' => $post_data['problem'],
-              'spare_parts' => $post_data['spare_parts'],
-              'repair_status' => $post_data['repair_status'],
-              'repaired_by' => Auth::id(),
-              'professional_help' => 1,
-            ]);
-            break;
-        case 3:
-            Device::create([
-              'event' => $request->input('event_id'),
-              'category' => $post_data['category'],
-              'category_creation' => $post_data['category'],
-              'brand' => $brand_name,
-              'model' => $post_data['model'],
-              'age' => $post_data['age'],
-              'problem' => $post_data['problem'],
-              'spare_parts' => $post_data['spare_parts'],
-              'repair_status' => $post_data['repair_status'],
-              'repaired_by' => Auth::id(),
-              'do_it_yourself' => 1,
-            ]);
-            break;
-      }
+    $brands = Brands::all();
+    // $categories = Category::all();
+    $clusters = Cluster::all();
 
-      if ($post_data['repair_status'] == 0) {
-        $data['error'] = "Device couldn't be added - no repair details added";
-        return json_encode($data);
-      }
+    $view = View::make('partials.tables.row-device', [
+      'device' => $device,
+      'clusters' => $clusters,
+      'brands' => $brands
+    ]);
 
-      $data['success'] = "Device added!";
-      return json_encode($data);
-    } else {
-      Device::create([
-        'event' => $request->input('event_id'),
-        'category' => $post_data['category'],
-        'category_creation' => $post_data['category'],
-        'brand' => $brand_name,
-        'model' => $post_data['model'],
-        'age' => $post_data['age'],
-        'problem' => $post_data['problem'],
-        'spare_parts' => $post_data['spare_parts'],
-        'repair_status' => $post_data['repair_status'],
-        'repaired_by' => Auth::id(),
-      ]);
+    $return['html'] = $view->render();
+    $return['success'] = true;
 
-      $data['success'] = "Device added!";
-      return json_encode($data);
-    }
+    return response()->json($return);
+
+    //$brand_name = Brands::find($brand)->brand_name;
+
+    // $data = [];
+    //
+    // if ($post_data['repair_status'] == 2) {
+    //   switch ($post_data['repair_details']) {
+    //     case 1:
+    //         Device::create([
+    //           'event' => $request->input('event_id'),
+    //           'category' => $post_data['category'],
+    //           'category_creation' => $post_data['category'],
+    //           'brand' => $brand_name,
+    //           'model' => $post_data['model'],
+    //           'age' => $post_data['age'],
+    //           'problem' => $post_data['problem'],
+    //           'spare_parts' => $post_data['spare_parts'],
+    //           'repair_status' => $post_data['repair_status'],
+    //           'repaired_by' => Auth::id(),
+    //           'more_time_needed' => 1,
+    //         ]);
+    //         break;
+    //     case 2:
+    //         Device::create([
+    //           'event' => $request->input('event_id'),
+    //           'category' => $post_data['category'],
+    //           'category_creation' => $post_data['category'],
+    //           'brand' => $brand_name,
+    //           'model' => $post_data['model'],
+    //           'age' => $post_data['age'],
+    //           'problem' => $post_data['problem'],
+    //           'spare_parts' => $post_data['spare_parts'],
+    //           'repair_status' => $post_data['repair_status'],
+    //           'repaired_by' => Auth::id(),
+    //           'professional_help' => 1,
+    //         ]);
+    //         break;
+    //     case 3:
+    //         Device::create([
+    //           'event' => $request->input('event_id'),
+    //           'category' => $post_data['category'],
+    //           'category_creation' => $post_data['category'],
+    //           'brand' => $brand_name,
+    //           'model' => $post_data['model'],
+    //           'age' => $post_data['age'],
+    //           'problem' => $post_data['problem'],
+    //           'spare_parts' => $post_data['spare_parts'],
+    //           'repair_status' => $post_data['repair_status'],
+    //           'repaired_by' => Auth::id(),
+    //           'do_it_yourself' => 1,
+    //         ]);
+    //         break;
+    //   }
+    //
+    //   if ($post_data['repair_status'] == 0) {
+    //     $data['error'] = "Device couldn't be added - no repair details added";
+    //   }
+    //
+    // } else {
+    // }
 
   }
 

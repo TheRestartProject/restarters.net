@@ -220,5 +220,10 @@
         margin: 30px 0 0 0;
     }
 
+    .table-add{
+      td:first-child, th:first-child {
+          padding-left: 0;
+      }
+    }
 
 }

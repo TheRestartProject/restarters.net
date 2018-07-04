@@ -532,4 +532,8 @@ class Party extends Model
 
     }
 
+    public function devices(){
+        return $this->hasMany('App\Device', 'event', 'idevents');
+    }
+
 }
