@@ -912,7 +912,10 @@ $( document ).ready(function() {
       success: function(json) {
         console.log(json.success);
         if( json.success ){
-          $(json.html).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
+          for (i = 0; i < $(json.html).length; i++) {
+              var row = $(json.html)[i];
+              $(row).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
+          }
           $('.table-row-details').removeAttr('style');
           $form.trigger("reset");
           $('.btn-add').addClass('btn-success');

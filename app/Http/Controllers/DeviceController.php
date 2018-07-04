@@ -345,38 +345,42 @@ class DeviceController extends Controller
     $event_id       = $request->input('event_id');
 
     // add quantity loop
+    for ($i=0; $i < $quantity; $i++) {
 
-    $device = new Device;
-    $device->category = $category;
-    $device->category_creation = $category;
-    //$device->weight = $weight;
-    $device->brand = $brand;
-    $device->model = $model;
-    $device->age = $age;
-    $device->problem = $problem;
-    $device->repair_status = $repair_status;
-    $device->problem = $repair_details;
-    $device->spare_parts = $spare_parts;
-    $device->event = $event_id;
-    $device->repaired_by = Auth::id();
-    $device->save();
+      $device[$i] = new Device;
+      $device[$i]->category = $category;
+      $device[$i]->category_creation = $category;
+      $device[$i]->estimate = $weight;
+      $device[$i]->brand = $brand;
+      $device[$i]->model = $model;
+      $device[$i]->age = $age;
+      $device[$i]->problem = $problem;
+      $device[$i]->repair_status = $repair_status;
+      $device[$i]->problem = $repair_details;
+      $device[$i]->spare_parts = $spare_parts;
+      $device[$i]->event = $event_id;
+      $device[$i]->repaired_by = Auth::id();
+      $device[$i]->save();
 
-    // add quantity loop
+    }
+    // end quantity loop
 
     $brands = Brands::all();
     $clusters = Cluster::all();
 
     //Change to handle loop
+    foreach ($device as $d) {
 
-    $view = View::make('partials.tables.row-device', [
-      'device' => $device,
-      'clusters' => $clusters,
-      'brands' => $brands
-    ]);
+      $views[] = View::make('partials.tables.row-device', [
+        'device' => $d,
+        'clusters' => $clusters,
+        'brands' => $brands
+      ])->render();
 
-    //Change to handle loop 
+    }
+    //end of handle loop
 
-    $return['html'] = $view->render();
+    $return['html'] = $views;
     $return['success'] = true;
 
     return response()->json($return);

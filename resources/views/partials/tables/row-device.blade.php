@@ -36,6 +36,32 @@
             <tbody>
                 <tr>
                     <td>
+                        <label for="nested-5">Brand:</label>
+                        <div class="form-control form-control__select">
+                            <select name="brand-{{ $device->iddevices }}" id="brand-{{ $device->iddevices }}">
+                                @foreach($brands as $brand)
+                                  @if ($device->brand == $brand->brand_name)
+                                    <option value="{{ $brand->id }}" selected>{{ $brand->brand_name }}</option>
+                                  @else
+                                    <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                  @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <label for="nested-6">Model:</label>
+                        <div class="form-group">
+                            <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}">
+                        </div>
+                    </td>
+                    <td>
+                        <label for="nested-7">Age:</label>
+                        <div class="form-group">
+                            <input type="text" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" value="{{ $device->age }}">
+                        </div>
+                    </td>
+                    <td>
                         <label for="status-{{ $device->iddevices }}">Status:</label>
                         <div class="form-control form-control__select">
                             <select class="checkStatus" name="status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}">
@@ -92,32 +118,6 @@
                                 <option value="2" selected>No</option>
                               @endif
                             </select>
-                        </div>
-                    </td>
-                    <td>
-                        <label for="nested-5">Brand:</label>
-                        <div class="form-control form-control__select">
-                            <select name="brand-{{ $device->iddevices }}" id="brand-{{ $device->iddevices }}">
-                                @foreach($brands as $brand)
-                                  @if ($device->brand == $brand->brand_name)
-                                    <option value="{{ $brand->id }}" selected>{{ $brand->brand_name }}</option>
-                                  @else
-                                    <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                                  @endif
-                                @endforeach
-                            </select>
-                        </div>
-                    </td>
-                    <td>
-                        <label for="nested-6">Model:</label>
-                        <div class="form-group">
-                            <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}">
-                        </div>
-                    </td>
-                    <td>
-                        <label for="nested-7">Age:</label>
-                        <div class="form-group">
-                            <input type="text" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" value="{{ $device->age }}">
                         </div>
                     </td>
                 </tr>
