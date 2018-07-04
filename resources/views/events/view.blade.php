@@ -54,24 +54,30 @@
 
             <div class="button-group button-group__r">
 
-                @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+                @if ( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator'))
                   <div class="dropdown">
                       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           Event actions
                       </button>
                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                           <a href="{{ url('/') }}/party/edit/{{ $formdata->id }}" class="dropdown-item">Edit event</a>
-                          @if( !$event->hasFinished() )
-                          <button data-toggle="modal" data-target="#event-invite-to" class="dropdown-item">Invite to event</button>
+                          @if( $event->isInProgress() || $event->hasFinished() )
+                            <button data-toggle="modal" data-target="#event-share-stats" class="dropdown-item">Share event stats</a>
+                          @else
+                            <button data-toggle="modal" data-target="#event-invite-to" class="dropdown-item">Invite</button>
                           @endif
-                          <button data-toggle="modal" data-target="#event-share-stats" class="dropdown-item">Share event stats</a>
                       </div>
                   </div>
                 @else
-                  @if( !$event->hasFinished() )
-                  <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite</button>
+                  @if( $event->hasFinished() )
+                    <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
+                  @else
+                    @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
+                      <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite</button>
+                    @else
+                      <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
+                    @endif
                   @endif
-                  <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
                 @endif
 
             </div>

@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\User;
-use App\Device;
+use App\Brands;
 use App\Category;
 use App\Cluster;
+use App\Device;
+use App\EventsUsers;
 use App\Group;
 use App\Party;
-use App\Brands;
+use App\User;
 use Auth;
 use FixometerHelper;
 use FixometerFile;
@@ -385,6 +386,7 @@ class DeviceController extends Controller
 
     $brands = Brands::all();
     $clusters = Cluster::all();
+    $is_attending = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
 
     //Change to handle loop
     foreach ($device as $d) {
@@ -392,7 +394,8 @@ class DeviceController extends Controller
       $views[] = View::make('partials.tables.row-device', [
         'device' => $d,
         'clusters' => $clusters,
-        'brands' => $brands
+        'brands' => $brands,
+        'is_attending' => $is_attending,
       ])->render();
 
     }
@@ -482,7 +485,9 @@ class DeviceController extends Controller
     if( $repair_status != 2 ) //Override
       $repair_details = 0;
 
-    if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($event_id, Auth::user()->id) ){
+    $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
+
+    if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || is_object($in_event) ){
 
       if ($repair_status == 2) {
         switch ($repair_details) {
@@ -532,12 +537,12 @@ class DeviceController extends Controller
 
         if ($repair_status == 0) {
           $data['error'] = "Device couldn't be updated - no repair details added";
-          return json_encode($data);
+          return response()->json($data);
         }
 
         $data['success'] = "Device updated!";
 
-        return json_encode($data);
+        return response()->json($data);
 
       } else {
 
@@ -558,7 +563,7 @@ class DeviceController extends Controller
 
         $data['success'] = "Device updated!";
 
-        return json_encode($data);
+        return response()->json($data);
 
       }
 

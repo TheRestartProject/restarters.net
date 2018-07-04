@@ -481,6 +481,8 @@ class PartyController extends Controller {
           else {
               $response['success'] = 'Event details updated <a href="/party/view/'.$id.'" class="btn btn-success">View event</a>';
 
+              $theParty = $Party->findThis($id);
+
               if( ( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) { //For testing purposes
 
                 $Party->where('idevents', $id)->update(['wordpress_post_id' => 99999]);
@@ -500,11 +502,11 @@ class PartyController extends Controller {
                                    array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
                                    array('key' => 'party_date',            'value' => $wp_date),
                                    array('key' => 'party_timestamp',       'value' => $timestamp),
-                                   // TODO: array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp), 
+                                   // TODO: array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp),
                                    array('key' => 'party_stats',           'value' => $id),
                                    // TODO: test lat and long are working correctly
-                                   array('key' => 'party_lat',             'value' => $latitude),  
-                                   array('key' => 'party_lon',             'value' => $longitude) 
+                                   array('key' => 'party_lat',             'value' => $latitude),
+                                   array('key' => 'party_lon',             'value' => $longitude)
                         );
 
 
@@ -525,58 +527,62 @@ class PartyController extends Controller {
                       $theParty->save();
                   // }
 
-                  // $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-                  // $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
-                  //
-                  // /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
+
+              } elseif(!empty($theParty->wordpress_post_id)){
+
+                  $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
+                  $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+
+                  /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                   // $theParty = $Party->findThis($id);
-                  // $Host = $Groups->findHost($data['group']);
-                  // $custom_fields = array(
-                  //                 //array('key' => 'party_host',            'value' => $Host->hostname),
-                  //                 //array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
-                  //                 array('key' => 'party_grouphash',       'value' => $data['group']),
-                  //                 array('key' => 'party_venue',           'value' => $data['venue']),
-                  //                 array('key' => 'party_location',        'value' => $data['location']),
-                  //                 array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
-                  //                 array('key' => 'party_date',            'value' => $wp_date),
-                  //                 array('key' => 'party_timestamp',       'value' => $theParty->event_timestamp),
-                  //                 array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp),
-                  //                 array('key' => 'party_stats',           'value' => $id),
-                  //                 array('key' => 'party_lat',             'value' => $data['latitude']),
-                  //                 array('key' => 'party_lon',             'value' => $data['longitude'])
-                  //                 );
-                  //
-                  //
-                  // $content = array(
-                  //                 'post_type' => 'party',
-                  //                 'post_title' => !empty($data['venue']) ? $data['venue'] : $data['location'],
-                  //                 'post_content' => $data['free_text'],
-                  //                 'custom_fields' => $custom_fields
-                  //                 );
-                  //
-                  //
-                  // // Check for WP existence in DB
-                  // if(!empty($theParty->wordpress_post_id)){
-                  //
-                  //     // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
-                  //     $thePost = $wpClient->getPost($theParty->wordpress_post_id);
-                  //
-                  //     foreach( $thePost['custom_fields'] as $i => $field ){
-                  //         foreach( $custom_fields as $k => $set_field){
-                  //             if($field['key'] == $set_field['key']){
-                  //                 $custom_fields[$k]['id'] = $field['id'];
-                  //             }
-                  //         }
-                  //     }
-                  //
-                  //     $content['custom_fields'] = $custom_fields;
-                  //     $wpClient->editPost($theParty->wordpress_post_id, $content);
-                  // }
+                  $Host = $Groups->findHost($data['group']);
+                  $custom_fields = array(
+                                  //array('key' => 'party_host',            'value' => $Host->hostname),
+                                  //array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
+                                  array('key' => 'party_grouphash',       'value' => $data['group']),
+                                  array('key' => 'party_venue',           'value' => $data['venue']),
+                                  array('key' => 'party_location',        'value' => $data['location']),
+                                  array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
+                                  array('key' => 'party_date',            'value' => $wp_date),
+                                  array('key' => 'party_timestamp',       'value' => $theParty->event_timestamp),
+                                  array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp),
+                                  array('key' => 'party_stats',           'value' => $id),
+                                  array('key' => 'party_lat',             'value' => $data['latitude']),
+                                  array('key' => 'party_lon',             'value' => $data['longitude'])
+                                  );
+
+
+                  $content = array(
+                                  'post_type' => 'party',
+                                  'post_title' => !empty($data['venue']) ? $data['venue'] : $data['location'],
+                                  'post_content' => $data['free_text'],
+                                  'custom_fields' => $custom_fields
+                                  );
+
+
+                  // Check for WP existence in DB
+                  if(!empty($theParty->wordpress_post_id)){
+
+                      // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
+                      $thePost = $wpClient->getPost($theParty->wordpress_post_id);
+
+                      foreach( $thePost['custom_fields'] as $i => $field ){
+                          foreach( $custom_fields as $k => $set_field){
+                              if($field['key'] == $set_field['key']){
+                                  $custom_fields[$k]['id'] = $field['id'];
+                              }
+                          }
+                      }
+
+                      $content['custom_fields'] = $custom_fields;
+                      $wpClient->editPost($theParty->wordpress_post_id, $content);
+                  }
                   // else {
                   //     // Brand new post -> we send it up and update the Fixometer
                   //     $wpid = $wpClient->newPost($Host->groupname, $free_text, $content);
                   //     $Party->update(array('wordpress_post_id' => $wpid), $id);
                   // }
+
               }
 
               if(isset($_POST['users']) && !empty($_POST['users'])){
@@ -708,6 +714,33 @@ class PartyController extends Controller {
 
   }
 
+  public function getJoinEvent($event_id) {
+
+    $user_id = Auth::id();
+
+    $not_in_event = empty(EventsUsers::where('event', $event_id)->where('user', $user_id)->first());
+
+    if ($not_in_event) {
+      try {
+        $user_group = EventsUsers::create([
+          'user' => $user_id,
+          'event' => $event_id,
+          'status' => 1,
+          'role' => 4,
+        ]);
+
+        $response['success'] = 'Thank you for your RSVP, we look forward to seeing you at the event';
+        return redirect()->back()->with('response', $response);
+      } catch (\Exception $e) {
+        $response['danger'] = 'Failed to join this event';
+        return redirect()->back()->with('response', $response);
+      }
+    } else {
+      $response['warning'] = 'You are already part of this event';
+      return redirect()->back()->with('response', $response);
+    }
+
+  }
 
   public function manage($id){
 

@@ -13,7 +13,7 @@
 
       <div class="modal-body">
 
-        <p>@lang('events.share_stats_message', ['date' => $formdata->event_date, 'event_name' => $formdata->venue, 'number_devices' => count($formdata->devices)])</p>
+        <p>@lang('events.share_stats_message', ['date' => $event->getEventDate(), 'event_name' => $formdata->venue, 'number_devices' => count($formdata->devices)])</p>
 
         <div id="accordionEvent" class="accordion__share mt-4">
 
@@ -29,11 +29,11 @@
 
                   <div class="form-group">
                       <label for="event_headline_stats_embed">@lang('events.embed_code_header'):</label>
-                      <input type="text" class="form-control field" id="event_headline_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/group/stats/1" frameborder="0" width="100%" height="115"></iframe>'>
+                      <input type="text" class="form-control field" id="event_headline_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/party/stats/{{{ $formdata->id }}}/wide" frameborder="0" width="100%" height="115"></iframe>'>
                   </div>
                   <small class="after-offset">@lang('events.headline_stats_message')</small>
 
-                  <iframe src="{{{ env('APP_URL') }}}/group/stats/1" frameborder="0" width="100%" height="115" class="form-control"></iframe>
+                  <iframe src="{{{ env('APP_URL') }}}/party/stats/{{{ $formdata->id }}}/wide" frameborder="0" width="100%" height="115" class="form-control"></iframe>
 
               </div>
             </div>
@@ -52,12 +52,12 @@
 
                   <div class="form-group">
                       <label for="event_co2_stats_embed">@lang('events.embed_code_header'):</label>
-                      <input type="text" class="form-control field" id="event_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/group/1" frameborder="0" width="700" height="850"></iframe>'>
+                      <input type="text" class="form-control field" id="event_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}" frameborder="0" width="700" height="850"></iframe>'>
                   </div>
                   <small class="after-offset">@lang('events.infographic_message')</small>
 
                   <div class="embed-responsive embed-responsive-21by9">
-                    <iframe src="{{{ env('APP_URL') }}}/outbound/info/group/1" frameborder="0" width="700" height="850" class="form-control embed-responsive-item"></iframe>
+                    <iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}" frameborder="0" width="700" height="850" class="form-control embed-responsive-item"></iframe>
                   </div>
 
               </div>

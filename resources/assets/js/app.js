@@ -597,44 +597,12 @@ function resetForm (e) {
 
 }
 
-Dropzone.autoDiscover = false;
-registration();
-onboarding();
-//initTokenfields();
-textEditor();
-numericInputs();
-eventsMap();
-truncate();
-nestedTable();
+function select2Fields(e) {
 
-jQuery(function () {
-
-
-    // jQuery('.dropdown-menu').on('hidden.bs.collapse', function () {
-    //     console.log('eve');
-    // });
-
-    jQuery('.users-list').find('[data-toggle="popover"]').popover();
-
-    jQuery('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
-        jQuery('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
-    });
-
-    jQuery('.table:not(.table-devices)').find('[data-toggle="popover"]').popover({
-        template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
-        placement:'top'
-    })
-
-    jQuery('.table-devices').find('[data-toggle="popover"]').popover();
-
-    jQuery('.table').find('[data-toggle="popover"]').on('click', function (e) {
-        jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
-    });
-
-    jQuery('.select2').select2();
-    jQuery('.table-row-details').find('select').select2();
-    jQuery('.select2-tags').select2({tags: true});
-    $(".select2-with-input").select2({
+    jQuery('.select2:not(.select2-hidden-accessible)').select2();
+    jQuery('.table-row-details').find('select:not(.select2-hidden-accessible)').select2();
+    jQuery('.select2-tags:not(.select2-hidden-accessible)').select2({tags: true});
+    $(".select2-with-input:not(.select2-hidden-accessible)").select2({
       tags: true,
       minimumInputLength: 2,
       formatInputTooShort: "Type a brand name",
@@ -659,6 +627,43 @@ jQuery(function () {
     //     $(this).siblings('select').select2('open');
     //   }
     // });
+
+}
+
+Dropzone.autoDiscover = false;
+registration();
+onboarding();
+//initTokenfields();
+textEditor();
+numericInputs();
+eventsMap();
+truncate();
+nestedTable();
+select2Fields();
+
+jQuery(function () {
+
+
+    // jQuery('.dropdown-menu').on('hidden.bs.collapse', function () {
+    //     console.log('eve');
+    // });
+
+    jQuery('.users-list').find('[data-toggle="popover"]').popover();
+
+    jQuery('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
+        jQuery('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
+    });
+
+    jQuery('.table:not(.table-devices)').find('[data-toggle="popover"]').popover({
+        template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
+        placement:'top'
+    })
+
+    jQuery('.table-devices').find('[data-toggle="popover"]').popover();
+
+    jQuery('.table').find('[data-toggle="popover"]').on('click', function (e) {
+        jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
+    });
 
     jQuery('.repair_status').on('change', function (e) {
         $value = jQuery(this).val();
@@ -909,17 +914,23 @@ $( document ).ready(function() {
       success: function(json) {
         console.log(json.success);
         if( json.success ){
+
           for (i = 0; i < $(json.html).length; i++) {
               var row = $(json.html)[i];
               $(row).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
           }
+
           $('.table-row-details').removeAttr('style');
           $form.trigger("reset");
           jQuery('#device-start').focus();
+
+          select2Fields();
+
           $('.btn-add').addClass('btn-success');
           setTimeout(function(e){
             $('.btn-add').removeClass('btn-success');
           },1000);
+
         } else {
           alert(json.error);
         }
@@ -931,7 +942,7 @@ $( document ).ready(function() {
 
   });
 
-  $('.edit-device').on('submit', function(e) {
+  jQuery(document).on('submit', '.edit-device', function (e) {
 
     e.preventDefault();
 
@@ -963,9 +974,14 @@ $( document ).ready(function() {
         event_id: $('#event_id').val(),
         // files:$('#file-'+device_id).val(),
       },
+      datatype: 'json',
       success: function(data) {
         if (data.error) {
           alert(data.error);
+        } else if (data.success) {
+          alert(data.success);
+        } else {
+          alert(data);
         }
       },
       error: function(error) {

@@ -68,21 +68,13 @@
 
           <table class="table table-events table-striped" role="table">
 
-            @if ( !is_null($group) )
-              @include('partials.tables.head-events', ['group_view' => true])
-            @else
-              @include('partials.tables.head-events')
-            @endif
+            @include('partials.tables.head-events')
 
             <tbody>
               @if( !$upcoming_events->isEmpty() )
                 @foreach ($upcoming_events as $event)
 
-                  @if ( !is_null($group) )
-                    @include('partials.tables.row-events', ['invite' => true, 'group_view' => true])
-                  @else
-                    @include('partials.tables.row-events', ['invite' => true])
-                  @endif
+                  @include('partials.tables.row-events', ['invite' => true])
 
                 @endforeach
               @else
@@ -106,22 +98,20 @@
 
           <table class="table table-events table-striped" role="table">
 
-              @if ( !is_null($group) )
-                @include('partials.tables.head-events', ['hide_invite' => true, 'group_view' => true])
-              @else
-                @include('partials.tables.head-events', ['hide_invite' => true])
-              @endif
+              @include('partials.tables.head-events', ['hide_invite' => true])
 
               <tbody>
+                @if( !$past_events->isEmpty() )
                   @foreach($past_events as $event)
 
-                    @if ( !is_null($group) )
-                      @include('partials.tables.row-events', ['invite' => false, 'group_view' => true, 'EmissionRatio' => $EmissionRatio])
-                    @else
-                      @include('partials.tables.row-events', ['invite' => false, 'EmissionRatio' => $EmissionRatio])
-                    @endif
+                    @include('partials.tables.row-events', ['invite' => false, 'EmissionRatio' => $EmissionRatio])
 
                   @endforeach
+                @else
+                  <tr>
+                    <td colspan="13" align="center" class="p-3">There are currently no past events for this group</td>
+                  </tr>
+                @endif
               </tbody>
 
           </table>

@@ -1109,6 +1109,7 @@ class UserController extends Controller
             'user' => $user->id,
             'event' => $acceptance->record_id,
             'status' => 1,
+            'role' => 4,
           ]);
           $acceptance->delete();
 
@@ -1118,6 +1119,7 @@ class UserController extends Controller
             'user' => $user->id,
             'group' => $acceptance->record_id,
             'status' => 1,
+            'role' => 4,
           ]);
           $acceptance->delete();
 

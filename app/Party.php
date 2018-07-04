@@ -468,7 +468,7 @@ class Party extends Model
         $event_start  = new \DateTime($this->event_date.' '.$this->start);
         $event_end    = new \DateTime($this->event_date.' '.$this->end);
 
-        if ( $event_start >= $date_now && $event_end <= $date_now )
+        if ( $date_now >= $event_start && $date_now <= $event_end )
           return true;
         else
           return false;
