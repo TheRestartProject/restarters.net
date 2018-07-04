@@ -1029,25 +1029,44 @@ class PartyController extends Controller {
 
   }
 
-  public function deleteimage(){
-      if(is_null($_GET['id']) || empty($_GET['id']) || !is_numeric($_GET['id'])){
-          return false;
-      }
+  // public function deleteimage(){
+  //     if(is_null($_GET['id']) || empty($_GET['id']) || !is_numeric($_GET['id'])){
+  //         return false;
+  //     }
+  //
+  //     else {
+  //         $id = $_GET['id'];
+  //         $path = $_GET['path'];
+  //         $Image = new FixometerFile;
+  //
+  //         $Image->deleteImage($id, $path);
+  //
+  //
+  //
+  //         echo json_encode(array('hey' => 'Deleting stuff here!'));
+  //
+  //
+  //     }
+  // }
 
-      else {
-          $id = $_GET['id'];
-          $path = $_GET['path'];
+  public function deleteImage($party_id, $id, $path){
+
+      $user = Auth::user();
+
+      $is_host_of_party = FixometerHelper::userHasEditPartyPermission($party_id, $user->id);
+      if( FixometerHelper::hasRole($user, 'Administrator') || $is_host_of_party ){
+
           $Image = new FixometerFile;
-
           $Image->deleteImage($id, $path);
 
-
-
-          echo json_encode(array('hey' => 'Deleting stuff here!'));
-
+          return redirect()->back()->with('message', 'Thank you, the image has been deleted');
 
       }
+
+      return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
+
   }
+
 
   public function getGroupEmails(Request $request){
 

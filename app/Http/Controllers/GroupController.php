@@ -802,8 +802,6 @@ class GroupController extends Controller
              // echo "Here now --- ";
               $response['success'] = 'Group updated!';
 
-              // dbga($_FILES);
-
               if(isset($_FILES['image']) && !empty($_FILES['image']) && $_FILES['image']['error'] != 4){
                  // echo "uploading image ... ";
                   $existing_image = FixometerHelper::hasImage($id, 'groups', true);
@@ -942,13 +940,11 @@ class GroupController extends Controller
           $Image = new FixometerFile;
           $Image->deleteImage($id, $path);
 
-          $return = [
-            'success' => true
-          ];
+          return redirect()->back()->with('message', 'Thank you, the image has been deleted');
 
       }
 
-      return redirect()->back()->with('message', 'Thank you, the image has been deleted');
+      return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
 
   }
 

@@ -111,6 +111,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::get('/party/view/{id}', 'PartyController@view');
   Route::post('/party/get-group-emails', 'PartyController@getGroupEmails');
   Route::post('/party/update-quantity', 'PartyController@updateQuantity');
+  Route::get('/party/image/delete/{idevents}/{id}/{path}', 'PartyController@deleteImage');
 
   //Role Controller
   Route::get('/role', 'RoleController@index')->name('roles');

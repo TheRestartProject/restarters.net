@@ -136,6 +136,7 @@
                         <div class="dz-image">
                           <img src="/uploads/{{ $image->path }}" alt="placeholder">
                           <a class="dz-remove">Remove file</a>
+                          <a href="/party/image/delete/{{ $formdata->id }}/{{{ $image->idimages }}}/{{{ $image->path }}}" class="dz-remove" onclick="return confirm('Are you sure?');">Remove file</a>
                         </div>
                       @endforeach
                     @endif

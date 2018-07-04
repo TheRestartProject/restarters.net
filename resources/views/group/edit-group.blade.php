@@ -119,7 +119,7 @@
 
                   <!-- <form id="dropzoneSingleEl" class="dropzone" action="/" method="post" enctype="multipart/form-data" data-field1="@lang('groups.field_group_images')" data-field2="@lang('groups.field_group_images_2')"> -->
                       <div class="fallback">
-                          <input id="file" name="file[]" type="file" multiple />
+                          <input id="file" name="image" type="file"/>
                       </div>
                   <!-- </form> -->
 
