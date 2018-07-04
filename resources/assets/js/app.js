@@ -636,12 +636,19 @@ jQuery(function () {
     jQuery('.select2-tags').select2({tags: true});
     $(".select2-with-input").select2({
       minimumInputLength: 2,
+      formatInputTooShort: "Type a brand name",
       createTag: function (params) {
         return {
           id: params.term,
           text: params.term,
           newOption: true
         }
+      }
+    });
+    $(document).on('focus', '.select2.select2-container', function (e) {
+      // only open on original attempt - close focus event should not fire open
+      if (e.originalEvent && $(this).find(".select2-selection--single").length > 0) {
+        $(this).siblings('select').select2('open');
       }
     });
 
