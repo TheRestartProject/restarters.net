@@ -635,24 +635,21 @@ jQuery(function () {
     jQuery('.table-row-details').find('select').select2();
     jQuery('.select2-tags').select2({tags: true});
     $(".select2-with-input").select2({
+      tags: true,
       minimumInputLength: 2,
+      formatInputTooShort: "Type a brand name",
       language: {
-      	inputTooShort: function() {
-      		return 'Type a brand name';
-      	}
+          inputTooShort: function inputTooShort() {
+              return 'Type a brand name';
+          }
       },
+      minimumInputLength: 2,
       createTag: function (params) {
         return {
           id: params.term,
           text: params.term,
           newOption: true
         }
-      }
-    });
-    $(document).on('focus', '.select2.select2-container', function (e) {
-      // only open on original attempt - close focus event should not fire open
-      if (e.originalEvent && $(this).find(".select2-selection--single").length > 0) {
-        $(this).siblings('select').select2('open');
       }
     });
 

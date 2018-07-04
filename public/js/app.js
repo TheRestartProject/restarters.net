@@ -23413,6 +23413,8 @@ module.exports = __webpack_require__(46);
 /* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -23979,6 +23981,7 @@ truncate();
 nestedTable();
 
 jQuery(function () {
+    var _$$select;
 
     // jQuery('.dropdown-menu').on('hidden.bs.collapse', function () {
     //     console.log('eve');
@@ -24004,27 +24007,22 @@ jQuery(function () {
     jQuery('.select2').select2();
     jQuery('.table-row-details').find('select').select2();
     jQuery('.select2-tags').select2({ tags: true });
-    $(".select2-with-input").select2({
+    $(".select2-with-input").select2((_$$select = {
+        tags: true,
         minimumInputLength: 2,
+        formatInputTooShort: "Type a brand name",
         language: {
             inputTooShort: function inputTooShort() {
                 return 'Type a brand name';
             }
-        },
-        createTag: function createTag(params) {
-            return {
-                id: params.term,
-                text: params.term,
-                newOption: true
-            };
         }
-    });
-    $(document).on('focus', '.select2.select2-container', function (e) {
-        // only open on original attempt - close focus event should not fire open
-        if (e.originalEvent && $(this).find(".select2-selection--single").length > 0) {
-            $(this).siblings('select').select2('open');
-        }
-    });
+    }, _defineProperty(_$$select, 'minimumInputLength', 2), _defineProperty(_$$select, 'createTag', function createTag(params) {
+        return {
+            id: params.term,
+            text: params.term,
+            newOption: true
+        };
+    }), _$$select));
 
     jQuery('.repair_status').on('change', function (e) {
         $value = jQuery(this).val();
