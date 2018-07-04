@@ -126,7 +126,7 @@ class DeviceController extends Controller
   public function edit($id){
       // $this->set('title', 'Edit Device');
       $user = Auth::user();
-      if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host') ){
+      if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($party, $user->id) ){
 
           $Device = new Device;
 
@@ -141,7 +141,7 @@ class DeviceController extends Controller
               //$data['event_date'] = dbDateNoTime($data['event_date']);
 
               $update = array(
-                              'event'             => $data['event'],
+                              // 'event'             => $data['event'],
                               'category'          => $data['category'],
                               'category_creation' => $data['category'],
                               'repair_status'     => $data['repair_status'],
@@ -149,7 +149,8 @@ class DeviceController extends Controller
                               'brand'             => $data['brand'],
                               'model'             => $data['model'],
                               'problem'           => $data['problem'],
-                              );
+                              'age'               => $data['age'],
+                          );
 
               $u = $Device->where('iddevices', $id)->update($update);
 
@@ -453,71 +454,78 @@ class DeviceController extends Controller
     $brand_name = Brands::find($post_data['brand'])->brand_name;
 
     $data = [];
+    $device = $Device->find($id);
+    $party = $device->event;
+    $user = Auth::user();
 
-    if ($post_data['repair_status'] == 2) {
-      switch ($post_data['repair_details']) {
-        case 1:
-            Device::find($id)->update([
-              'category' => $post_data['category'],
-              'category_creation' => $post_data['category'],
-              'brand' => $brand_name,
-              'model' => $post_data['model'],
-              'age' => $post_data['age'],
-              'problem' => $post_data['problem'],
-              'spare_parts' => $post_data['spare_parts'],
-              'repair_status' => $post_data['repair_status'],
-              'more_time_needed' => 1,
-            ]);
-            break;
-        case 2:
-            Device::find($id)->update([
-              'category' => $post_data['category'],
-              'category_creation' => $post_data['category'],
-              'brand' => $brand_name,
-              'model' => $post_data['model'],
-              'age' => $post_data['age'],
-              'problem' => $post_data['problem'],
-              'spare_parts' => $post_data['spare_parts'],
-              'repair_status' => $post_data['repair_status'],
-              'professional_help' => 1,
-            ]);
-            break;
-        case 3:
-            Device::find($id)->update([
-              'category' => $post_data['category'],
-              'category_creation' => $post_data['category'],
-              'brand' => $brand_name,
-              'model' => $post_data['model'],
-              'age' => $post_data['age'],
-              'problem' => $post_data['problem'],
-              'spare_parts' => $post_data['spare_parts'],
-              'repair_status' => $post_data['repair_status'],
-              'do_it_yourself' => 1,
-            ]);
-            break;
-      }
+    if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($party, $user->id) ){
 
-      if ($post_data['repair_status'] == 0) {
-        $data['error'] = "Device couldn't be updated - no repair details added";
+      if ($post_data['repair_status'] == 2) {
+        switch ($post_data['repair_details']) {
+          case 1:
+              Device::find($id)->update([
+                'category' => $post_data['category'],
+                'category_creation' => $post_data['category'],
+                'brand' => $brand_name,
+                'model' => $post_data['model'],
+                'age' => $post_data['age'],
+                'problem' => $post_data['problem'],
+                'spare_parts' => $post_data['spare_parts'],
+                'repair_status' => $post_data['repair_status'],
+                'more_time_needed' => 1,
+              ]);
+              break;
+          case 2:
+              Device::find($id)->update([
+                'category' => $post_data['category'],
+                'category_creation' => $post_data['category'],
+                'brand' => $brand_name,
+                'model' => $post_data['model'],
+                'age' => $post_data['age'],
+                'problem' => $post_data['problem'],
+                'spare_parts' => $post_data['spare_parts'],
+                'repair_status' => $post_data['repair_status'],
+                'professional_help' => 1,
+              ]);
+              break;
+          case 3:
+              Device::find($id)->update([
+                'category' => $post_data['category'],
+                'category_creation' => $post_data['category'],
+                'brand' => $brand_name,
+                'model' => $post_data['model'],
+                'age' => $post_data['age'],
+                'problem' => $post_data['problem'],
+                'spare_parts' => $post_data['spare_parts'],
+                'repair_status' => $post_data['repair_status'],
+                'do_it_yourself' => 1,
+              ]);
+              break;
+        }
+
+        if ($post_data['repair_status'] == 0) {
+          $data['error'] = "Device couldn't be updated - no repair details added";
+          return json_encode($data);
+        }
+
+        $data['success'] = "Device updated!";
+        return json_encode($data);
+      } else {
+        Device::find($id)->update([
+          'category' => $post_data['category'],
+          'category_creation' => $post_data['category'],
+          'brand' => $brand_name,
+          'model' => $post_data['model'],
+          'age' => $post_data['age'],
+          'problem' => $post_data['problem'],
+          'spare_parts' => $post_data['spare_parts'],
+          'repair_status' => $post_data['repair_status'],
+        ]);
+
+        $data['success'] = "Device updated!";
         return json_encode($data);
       }
 
-      $data['success'] = "Device updated!";
-      return json_encode($data);
-    } else {
-      Device::find($id)->update([
-        'category' => $post_data['category'],
-        'category_creation' => $post_data['category'],
-        'brand' => $brand_name,
-        'model' => $post_data['model'],
-        'age' => $post_data['age'],
-        'problem' => $post_data['problem'],
-        'spare_parts' => $post_data['spare_parts'],
-        'repair_status' => $post_data['repair_status'],
-      ]);
-
-      $data['success'] = "Device updated!";
-      return json_encode($data);
     }
   }
 
