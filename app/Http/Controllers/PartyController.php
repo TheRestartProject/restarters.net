@@ -321,7 +321,10 @@ class PartyController extends Controller {
           }
       }
 
-      $user_groups = UserGroups::where('user', Auth::user()->id)->pluck('group')->toArray();
+      $groups_user_is_host_of = UserGroups::where('user', Auth::user()->id)
+                              ->where('role', 3)
+                              ->pluck('group')
+                              ->toArray();
 
       return view('events.create', [ //party.create
         'title' => 'New Party',
@@ -329,7 +332,7 @@ class PartyController extends Controller {
         'gmaps' => true,
         'group_list' => $Groups->findAll(),
         'user' => $user,
-        'user_groups' => $user_groups,
+        'user_groups' => $groups_user_is_host_of,
       ]);
 
   }
@@ -409,7 +412,10 @@ class PartyController extends Controller {
       $co2Total = $Device->getWeights();
       $device_count_status = $Device->statusCount();
 
-      $user_groups = UserGroups::where('user', Auth::user()->id)->pluck('group')->toArray();
+      $groups_user_is_host_of = UserGroups::where('user', Auth::user()->id)
+                              ->where('role', 3)
+                              ->pluck('group')
+                              ->toArray();
 
       $images = $File->findImages(env('TBL_EVENTS'), $id);
 
@@ -618,7 +624,7 @@ class PartyController extends Controller {
             'co2Total' => $co2Total[0]->total_footprints,
             'wasteTotal' => $co2Total[0]->total_weights,
             'device_count_status' => $device_count_status,
-            'user_groups' => $user_groups,
+            'user_groups' => $groups_user_is_host_of,
             'images' => $images,
           ]);
       }
@@ -654,7 +660,7 @@ class PartyController extends Controller {
         'co2Total' => $co2Total[0]->total_footprints,
         'wasteTotal' => $co2Total[0]->total_weights,
         'device_count_status' => $device_count_status,
-        'user_groups' => $user_groups,
+        'user_groups' => $groups_user_is_host_of,
       ]);
   }
 
