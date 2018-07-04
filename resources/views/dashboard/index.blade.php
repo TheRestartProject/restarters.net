@@ -22,7 +22,7 @@
                 </div>
               @else
                 <div class="col-5 d-flex align-items-center justify-content-end">
-                  <a href="" class="step__link">Upload photo</a>
+                  <a href="/profile/edit/{{{ Auth::user()->id }}}#change-photo" class="step__link">Upload photo</a>
                 </div>
               @endif
             </div>
@@ -38,7 +38,7 @@
                 </div>
               @else
                 <div class="col-5 d-flex align-items-center justify-content-end">
-                  <a href="" class="step__link">Add Skills</a>
+                  <a href="/profile/edit/{{{ Auth::user()->id }}}#repair-skills" class="step__link">Add Skills</a>
                 </div>
               @endif
             </div>
@@ -56,7 +56,7 @@
                   </div>
                 @else
                   <div class="col-5 d-flex align-items-center justify-content-end">
-                    <a href="" class="step__link">Find a group</a>
+                    <a href="{{{ route('groups') }}}" class="step__link">Find a group</a>
                   </div>
                 @endif
               </div>
@@ -72,7 +72,7 @@
                   </div>
                 @else
                   <div class="col-5 d-flex align-items-center justify-content-end">
-                    <a href="" class="step__link">Find an event</a>
+                    <a href="{{{ route('events') }}}" class="step__link">Find an event</a>
                   </div>
                 @endif
               </div>

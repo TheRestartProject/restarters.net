@@ -246,7 +246,7 @@ class PartyController extends Controller {
                   EventsUsers::create([
                     'event' => $idParty,
                     'user' => $user->id,
-                    'status' => 2,
+                    'status' => 1,
                     'role' => 3,
                   ]);
 
@@ -846,7 +846,7 @@ class PartyController extends Controller {
               if($error == false){
                   // If is Admin, redir to host + group id
                   if(hasRole($this->user, 'Administrator')){
-                      header('Location: /host/index/' . $partygroup);
+                      header('Location: /group/view/' . $partygroup);
                   }
                   else {
                       header('Location: /host');

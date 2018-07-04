@@ -40,7 +40,7 @@
                     @if( FixometerHelper::hasRole( $user, 'Administrator' ) )
 
                       @foreach($grouplist as $g)
-                        <a class="dropdown-item" href="{{ url('/host/index') }}/{{ $g->id }}">
+                        <a class="dropdown-item" href="{{ url('/group/view') }}/{{ $g->id }}">
                           @if(!empty($g->path))
                             <img src="{{ url('/uploads/thumbnail_'.$g->path) }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
                           @else
@@ -53,7 +53,7 @@
                     @else
 
                       @foreach($userGroups as $g)
-                        <a class="dropdown-item" href="{{ url('/host/index/'.$g->idgroups) }}" title="Switch to {{ $g->name }}">
+                        <a class="dropdown-item" href="{{ url('/group/view/'.$g->idgroups) }}" title="Switch to {{ $g->name }}">
                           @if(!empty($g->path))
                             <img src="{{ url('/uploads/thumbnail_'.$g->path) }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
                           @else
@@ -87,7 +87,7 @@
                 @if( empty($group->path) )
                   <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="{{{ $group->name }}} group image" class="event-icon">
                 @else
-                  <img src="{{ url('/uploads/thumbnail_'. $group->path) }}" alt="{{{ $group->name }}} group image" class="event-icon">
+                  <img src="{{ url('/uploads/mid_'. $group->path) }}" alt="{{{ $group->name }}} group image" class="event-icon">
                 @endif
 
             </header>

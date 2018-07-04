@@ -40,7 +40,7 @@
                                 @endif
                             </div>
                             <div class="pull-left group-option">
-                                <a  href="/host/index/<?php echo $group->id; ?>" ><?php echo $group->name; ?></a>
+                                <a  href="/group/view/<?php echo $group->id; ?>" ><?php echo $group->name; ?></a>
                             </div>
                         </li>
 

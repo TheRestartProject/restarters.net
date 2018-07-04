@@ -97,7 +97,8 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::get('/outbound', 'OutboundController@index');
 
   //Party Controller
-  Route::get('/party/group/{group_id?}', 'PartyController@index')->name('events');
+  Route::get('/party/', 'PartyController@index')->name('events');
+  Route::get('/party/group/{group_id?}', 'PartyController@index')->name('group-events');
   Route::get('/party/create', 'PartyController@create');
   Route::post('/party/create', 'PartyController@create');
   Route::get('/party/manage/{id}', 'PartyController@manage');

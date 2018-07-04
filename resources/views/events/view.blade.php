@@ -33,11 +33,11 @@
 
             <header>
                 <h1>{{ $event->getEventName() }}</h1>
-                <p>Hosted by <a href="/host/index/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a>, {{ $formdata->location }}</p>
+                <p>Hosted by <a href="/group/view/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a>, {{ $formdata->location }}</p>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
-                        <li class="breadcrumb-item"><a href="/host/index/{{ $formdata->group_id }}">@lang('groups.groups')</a></li>
+                        <li class="breadcrumb-item"><a href="/group/view/{{ $formdata->group_id }}">@lang('groups.groups')</a></li>
                         <li class="breadcrumb-item active" aria-current="page">{{ trim($formdata->group_name) }}</li>
                     </ol>
                 </nav>

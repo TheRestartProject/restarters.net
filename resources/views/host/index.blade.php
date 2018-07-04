@@ -38,7 +38,7 @@
                                 @endif
                             </div>
                             <div class="pull-left">
-                                <a  href="/host/index/<?php echo $g->id; ?>" ><?php echo $g->name; ?></a>
+                                <a  href="/group/view/<?php echo $g->id; ?>" ><?php echo $g->name; ?></a>
                             </div>
                         </li>
 
@@ -66,7 +66,7 @@
           <p>You are a host of multiple groups.  You can switch to a different group by clicking the button(s) below.</p>
           @foreach($userGroups as $g) {
             @if($group->idgroups != $g->idgroups)
-              <a class="btn btn-primary" href="/host/index/<?php echo $g->idgroups; ?>"><img class="img-responsive pull-left" width="20" height="20" alt="<?php echo $g->name; ?>" src="/uploads/thumbnail_<?php echo $g->path; ?>">&nbsp;&nbsp;Switch to "<?php echo $g->name; ?>"</a>
+              <a class="btn btn-primary" href="/group/view/<?php echo $g->idgroups; ?>"><img class="img-responsive pull-left" width="20" height="20" alt="<?php echo $g->name; ?>" src="/uploads/thumbnail_<?php echo $g->path; ?>">&nbsp;&nbsp;Switch to "<?php echo $g->name; ?>"</a>
             @endif
           @endforeach
         </div>

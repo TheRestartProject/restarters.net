@@ -141,7 +141,7 @@
 
             <div class="row row-end">
 
-              <div class="col-lg-6 d-flex col-bottom">
+              <div class="col-lg-6 d-flex col-bottom" id="repair-skills">
                 <div class="edit-panel">
                   <h4>@lang('general.repair_skills')</h4>
                   <p>@lang('general.repair_skills_content')</p>
@@ -183,7 +183,7 @@
 
               </div>
 
-              <div class="col-lg-6 d-flex col-bottom">
+              <div class="col-lg-6 d-flex col-bottom" id="change-photo">
                 <div class="edit-panel">
                   <h4>@lang('general.change_photo')</h4>
                   <p>@lang('general.change_photo_text')</p>
