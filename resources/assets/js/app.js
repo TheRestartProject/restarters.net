@@ -896,14 +896,16 @@ $( document ).ready(function() {
       type: 'post',
       url: '/device/create',
       data: {
-        repair_status: $form.find('select[name=repair_status]').val(),
-        repair_details: $form.find('select[name=repair_details]').val(),
-        spare_parts: $form.find('select[name=spare_parts]').val(),
         category: $form.find('select[name=category]').val(),
+        weight: $form.find('input[name=weight]').val(),
         brand: $form.find('select[name=brand]').val(),
         model: $form.find('input[name=model]').val(),
         age: $form.find('input[name=age]').val(),
         problem: $form.find('input[name=problem]').val(),
+        repair_status: $form.find('select[name=repair_status]').val(),
+        repair_details: $form.find('select[name=repair_details]').val(),
+        spare_parts: $form.find('select[name=spare_parts]').val(),
+        quantity: $form.find('select[name=quantity]').val(),
         event_id: $form.find('input[name=event_id]').val()
       },
       datatype: 'json',
@@ -912,6 +914,11 @@ $( document ).ready(function() {
         if( json.success ){
           $(json.html).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
           $('.table-row-details').removeAttr('style');
+          $form.trigger("reset");
+          $('.btn-add').addClass('btn-success');
+          setTimeout(function(e){
+            $('.btn-add').removeClass('btn-success');
+          },1000);
         } else {
           alert(json.error);
         }

@@ -332,39 +332,49 @@ class DeviceController extends Controller
 
   public function ajaxCreate(Request $request) {
 
-    $repair_status  = $request->input('repair_status');
-    $repair_details = $request->input('repair_details');
-    $spare_parts    = $request->input('spare_parts');
     $category       = $request->input('category');
+    $weight         = $request->input('weight');
     $brand          = $request->input('brand');
     $model          = $request->input('model');
     $age            = $request->input('age');
     $problem        = $request->input('problem');
+    $repair_status  = $request->input('repair_status');
+    $repair_details = $request->input('repair_details');
+    $spare_parts    = $request->input('spare_parts');
+    $quantity       = $request->input('quantity');
     $event_id       = $request->input('event_id');
 
+    // add quantity loop
+
     $device = new Device;
-    $device->repair_status = $repair_status;
-    $device->problem = $repair_details;
-    $device->spare_parts = $spare_parts;
     $device->category = $category;
     $device->category_creation = $category;
+    //$device->weight = $weight;
     $device->brand = $brand;
     $device->model = $model;
     $device->age = $age;
     $device->problem = $problem;
+    $device->repair_status = $repair_status;
+    $device->problem = $repair_details;
+    $device->spare_parts = $spare_parts;
     $device->event = $event_id;
     $device->repaired_by = Auth::id();
     $device->save();
 
+    // add quantity loop
+
     $brands = Brands::all();
-    // $categories = Category::all();
     $clusters = Cluster::all();
+
+    //Change to handle loop
 
     $view = View::make('partials.tables.row-device', [
       'device' => $device,
       'clusters' => $clusters,
       'brands' => $brands
     ]);
+
+    //Change to handle loop 
 
     $return['html'] = $view->render();
     $return['success'] = true;
