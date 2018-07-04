@@ -267,7 +267,7 @@
                   </div>
 
                   <div class="events-link-wrap text-center">
-                    <a href="{{{ route('events', ['group_id' => $group->idgroups]) }}}">See all events</a>
+                    <a href="/party/group/{{{ $group->idgroups }}}">See all events</a>
                   </div>
                 </div>
 
