@@ -636,7 +636,11 @@ jQuery(function () {
     jQuery('.select2-tags').select2({tags: true});
     $(".select2-with-input").select2({
       minimumInputLength: 2,
-      formatInputTooShort: "Type a brand name",
+      language: {
+      	inputTooShort: function() {
+      		return 'Type a brand name';
+      	}
+      },
       createTag: function (params) {
         return {
           id: params.term,
