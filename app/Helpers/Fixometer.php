@@ -618,6 +618,10 @@ class FixometerHelper {
 
     $return = array();
 
+    // Try and get country long name to improve geocoding.
+    if (array_key_exists($country, FixometerHelper::getAllCountries())) {
+        $country = FixometerHelper::getAllCountries()[$country];
+    }
     $json = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=".urlencode($town_city.','.$country)."&sensor=false&key=".env('GOOGLE_API_CONSOLE_KEY'));
     $json = json_decode($json);
 
