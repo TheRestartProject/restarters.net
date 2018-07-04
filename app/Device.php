@@ -17,7 +17,7 @@ class Device extends Model
      *
      * @var array
      */
-    protected $fillable = ['event','category','category_creation','repair_status','spare_parts','brand','model','age','problem','repaired_by','do_it_yourself','professional_help','more_time_needed'];
+    protected $fillable = ['event','category','category_creation','repair_status','spare_parts','brand','model','age','problem','repaired_by','do_it_yourself','professional_help','more_time_needed','wiki'];
 
     /**
      * The attributes that should be hidden for arrays.

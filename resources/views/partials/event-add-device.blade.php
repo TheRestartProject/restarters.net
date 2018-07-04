@@ -1,3 +1,4 @@
+@if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) )
 <div class="table-responsive">
     <form class="add-device" method="post" onkeypress="return event.keyCode != 13;">
 
@@ -107,3 +108,4 @@
     </form>
 
 </div>
+@endif

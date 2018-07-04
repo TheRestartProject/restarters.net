@@ -424,6 +424,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Api' => __DIR__ . '/../..' . '/app/Api.php',
         'App\\Brands' => __DIR__ . '/../..' . '/app/Brands.php',
         'App\\Category' => __DIR__ . '/../..' . '/app/Category.php',
+        'App\\Cluster' => __DIR__ . '/../..' . '/app/Cluster.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Dashboard' => __DIR__ . '/../..' . '/app/Dashboard.php',
         'App\\Device' => __DIR__ . '/../..' . '/app/Device.php',

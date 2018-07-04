@@ -414,7 +414,7 @@ class DeviceController extends Controller
     //           'event' => $request->input('event_id'),
     //           'category' => $post_data['category'],
     //           'category_creation' => $post_data['category'],
-    //           'brand' => $brand_name,
+    //           'brand' => $brand,
     //           'model' => $post_data['model'],
     //           'age' => $post_data['age'],
     //           'problem' => $post_data['problem'],
@@ -429,7 +429,7 @@ class DeviceController extends Controller
     //           'event' => $request->input('event_id'),
     //           'category' => $post_data['category'],
     //           'category_creation' => $post_data['category'],
-    //           'brand' => $brand_name,
+    //           'brand' => $brand,
     //           'model' => $post_data['model'],
     //           'age' => $post_data['age'],
     //           'problem' => $post_data['problem'],
@@ -444,7 +444,7 @@ class DeviceController extends Controller
     //           'event' => $request->input('event_id'),
     //           'category' => $post_data['category'],
     //           'category_creation' => $post_data['category'],
-    //           'brand' => $brand_name,
+    //           'brand' => $brand,
     //           'model' => $post_data['model'],
     //           'age' => $post_data['age'],
     //           'problem' => $post_data['problem'],
@@ -465,7 +465,7 @@ class DeviceController extends Controller
 
   }
 
-  public function ajaxEdit($id, Request $request) {
+  public function ajaxEdit(Request $request, $id) {
 
     $category       = $request->input('category');
     $weight         = $request->input('weight');
@@ -476,12 +476,13 @@ class DeviceController extends Controller
     $repair_status  = $request->input('repair_status');
     $repair_details = $request->input('repair_details');
     $spare_parts    = $request->input('spare_parts');
-    $quantity       = $request->input('quantity');
     $event_id       = $request->input('event_id');
+    $wiki           = $request->input('wiki');
 
-    $user = Auth::user();
+    if( $repair_status != 2 ) //Override
+      $repair_details = 0;
 
-    if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($event_id, $user->id) ){
+    if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($event_id, Auth::user()->id) ){
 
       if ($repair_status == 2) {
         switch ($repair_details) {
@@ -496,6 +497,7 @@ class DeviceController extends Controller
                 'spare_parts' => $spare_parts,
                 'repair_status' => $repair_status,
                 'more_time_needed' => 1,
+                'wiki' => $wiki,
               ]);
               break;
           case 2:
@@ -509,6 +511,7 @@ class DeviceController extends Controller
                 'spare_parts' => $spare_parts,
                 'repair_status' => $repair_status,
                 'professional_help' => 1,
+                'wiki' => $wiki,
               ]);
               break;
           case 3:
@@ -522,6 +525,7 @@ class DeviceController extends Controller
                 'spare_parts' => $spare_parts,
                 'repair_status' => $repair_status,
                 'do_it_yourself' => 1,
+                'wiki' => $wiki,
               ]);
               break;
         }
@@ -532,8 +536,11 @@ class DeviceController extends Controller
         }
 
         $data['success'] = "Device updated!";
+
         return json_encode($data);
+
       } else {
+
         Device::find($id)->update([
           'category' => $category,
           'category_creation' => $category,
@@ -543,13 +550,20 @@ class DeviceController extends Controller
           'problem' => $problem,
           'spare_parts' => $spare_parts,
           'repair_status' => $repair_status,
+          'more_time_needed' => 0,
+          'professional_help' => 0,
+          'do_it_yourself' => 0,
+          'wiki' => $wiki,
         ]);
 
         $data['success'] = "Device updated!";
+
         return json_encode($data);
+
       }
 
     }
+
   }
 
   public function delete($id){

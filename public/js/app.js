@@ -24033,7 +24033,7 @@ jQuery(function () {
 
     jQuery('.repair_status').on('change', function (e) {
         $value = jQuery(this).val();
-        $field = jQuery('.repair_details');
+        $field = jQuery(this).parents('td').find('.repair_details');
         if ($value == 2) {
             $field.prop('disabled', false);
             $field.parents('#repair-more').show();
@@ -24047,7 +24047,7 @@ jQuery(function () {
 
     jQuery('.category').on('change', function (e) {
         $value = parseInt(jQuery(this).val());
-        $field = jQuery('.weight');
+        $field = jQuery(this).parents('td').find('.weight');
         if ($value === 46 || $value === '') {
             $field.prop('disabled', false);
             $field.parents('#display-weight').show();
@@ -24248,24 +24248,6 @@ $(document).ready(function () {
         updateParticipants();
     });
 
-    $('#repair_status').on('change', function () {
-        if ($(this).val() == 2) {
-            $('#repair_details').prop('disabled', false);
-        } else {
-            $('#repair_details').prop('disabled', true);
-        }
-    });
-
-    $('.checkStatus').on('change', function () {
-        var device_id = $(this).data('device');
-
-        if ($(this).val() == 2) {
-            $('#repair-info-' + device_id).prop('disabled', false);
-        } else {
-            $('#repair-info-' + device_id).prop('disabled', true);
-        }
-    });
-
     $('.add-device').on('submit', function (e) {
 
         e.preventDefault();
@@ -24319,6 +24301,12 @@ $(document).ready(function () {
 
         var device_id = $(this).data('device');
 
+        if ($('#wiki-' + device_id).is(':checked')) {
+            wiki = 1;
+        } else {
+            wiki = 0;
+        }
+
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $("input[name='_token']").val()
@@ -24326,17 +24314,18 @@ $(document).ready(function () {
             type: 'post',
             url: '/device/edit/' + device_id,
             data: {
-                event_id: $('#event_id').val(),
-                repair_status: $('#status-' + device_id).val(),
-                repair_details: $('#repair-info-' + device_id).val(),
-                spare_parts: $('#spare-parts-' + device_id).val(),
                 category: $('#category-' + device_id).val(),
+                weight: $('#weight-' + device_id).val(),
                 brand: $('#brand-' + device_id).val(),
                 model: $('#model-' + device_id).val(),
                 age: $('#age-' + device_id).val(),
                 problem: $('#problem-' + device_id).val(),
+                repair_status: $('#status-' + device_id).val(),
+                repair_details: $('#repair-info-' + device_id).val(),
+                spare_parts: $('#spare-parts-' + device_id).val(),
+                wiki: wiki,
+                event_id: $('#event_id').val()
                 // files:$('#file-'+device_id).val(),
-                wiki: $('#wiki-' + device_id).checked
             },
             success: function success(data) {
                 if (data.error) {
