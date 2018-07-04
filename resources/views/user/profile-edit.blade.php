@@ -93,14 +93,14 @@
                     <input type="text" class="form-control" id="email" name="email" value="{{ $user->email }}">
                   </div>
                   <div class="form-group col-lg-6">
-                    <label for="townCity">Town/City:</label>
+                    <label for="townCity">@lang('registration.town-city'):</label>
                     <input type="text" class="form-control" id="townCity" name="townCity" value="{{ $user->location }}">
                   </div>
                 </div>
                 <div class="form-row">
 
                   <div class="form-group col-lg-6">
-                      <label for="age">Age:</label>
+                      <label for="age">@lang('registration.age'):</label>
                       <div class="form-control form-control__select">
                           <select id="age" name="age" required aria-required="true" class="field select2">
                               @foreach(FixometerHelper::allAges() as $age)
@@ -116,7 +116,7 @@
                   </div>
 
                   <div class="form-group col-lg-6">
-                    <label for="gender">Gender:</label>
+                    <label for="gender">@lang('registration.gender'):</label>
                     <input id="gender" class="form-control" name="gender" value="{{ $user->gender }}">
                   </div>
                 </div>

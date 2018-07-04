@@ -9,6 +9,8 @@ return [
     |
     |
     */
+    'skills' => 'Skills',
+    'no_bio' => ':name has not yet entered a biography.',
     'edit_profile' => 'Edit profile',
     'panel_title_1' => 'Basic profile',
     'panel_title_2' => 'Emails & alerts',
