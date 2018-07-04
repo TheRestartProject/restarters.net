@@ -33,6 +33,12 @@ class FixometerFile extends Model {
             $clear = false;
         }
 
+        if ($clear) {
+          Xref::where('reference', $reference)
+                  ->where('reference_type', $referenceType)
+                    ->forceDelete();
+        }
+
         /** if we have no error, proceed to elaborate and upload **/
         if($user_file['error'] == UPLOAD_ERR_OK){
             $filename = $this->filename($user_file);

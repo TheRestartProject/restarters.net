@@ -64,6 +64,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   //Category Controller
   Route::get('/category', 'CategoryController@index')->name('category');
   Route::get('/category/edit/{id}', 'CategoryController@getEditCategory');
+  Route::post('/category/edit/{id}', 'CategoryController@postEditCategory');
 
   //Dashboard Controller
   Route::get('/dashboard', 'DashboardController@index')->name('dashboard');

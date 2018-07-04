@@ -12,6 +12,7 @@ class Category extends Model
     protected $table = 'categories';
     private $revision = 1;
     protected $primaryKey = 'idcategories';
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

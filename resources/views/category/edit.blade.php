@@ -16,6 +16,17 @@
       </div>
     </div>
 
+    @if (\Session::has('success'))
+        <div class="alert alert-success">
+            {!! \Session::get('success') !!}
+        </div>
+    @endif
+    @if (\Session::has('danger'))
+        <div class="alert alert-danger">
+            {!! \Session::get('danger') !!}
+        </div>
+    @endif
+
     <div class="edit-panel edit-panel__device">
          <h2>@lang('admin.edit-category')</h2>
 
@@ -26,19 +37,19 @@
         </div>
         <div class="row">
             <div class="col-lg-4">
-              <form action="/category/edit/{{ $ }}" method="post">
+              <form action="/category/edit/{{ $category->idcategories }}" method="post">
                 @csrf
                 <div class="form-group">
                     <label for="category_name">@lang('admin.category_name'):</label>
-                    <input type="text" id="category_name" class="field form-control" value="{{ $category->name }}">
+                    <input type="text" id="category_name" name="category_name" class="field form-control" value="{{ $category->name }}">
                 </div>
                 <div class="form-group">
                     <label for="weight">@lang('admin.weight'):</label>
-                    <input type="number" id="weight" class="field form-control" value="{{ $category->weight }}">
+                    <input type="number" id="weight" name="weight" class="field form-control" value="{{ $category->weight }}">
                 </div>
                 <div class="form-group">
                     <label for="co2_footprint">@lang('admin.co2_footprint'):</label>
-                    <input type="number" id="co2_footprint" class="field form-control" value="{{ $category->footprint }}">
+                    <input type="number" id="co2_footprint" name="co2_footprint" class="field form-control" value="{{ $category->footprint }}">
                 </div>
                 <div class="form-group">
                     <label for="reliability">@lang('admin.reliability'):</label>
@@ -61,7 +72,7 @@
 
                           @if(isset($categories))
                             <?php foreach($categories as $cluster){ ?>
-                            <option value="<?php echo $cluster->name; ?>"<?php echo ($cluster->idclusters == $category->cluster ? ' selected' : ''); ?>><?php echo $cluster->name; ?></option>
+                            <option value="<?php echo $cluster->idclusters; ?>"<?php echo ($cluster->idclusters == $category->cluster ? ' selected' : ''); ?>><?php echo $cluster->name; ?></option>
                             <?php } ?>
                           @endif
                         </select>

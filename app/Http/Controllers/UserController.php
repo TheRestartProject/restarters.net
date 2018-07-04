@@ -224,20 +224,22 @@ class UserController extends Controller
 
     public function postProfileTagsEdit(Request $request) {
 
-      $input_skills = $request->input('tags');
+      User::find(Auth::id())->skills()->sync($request->input('tags'));
 
-      $exisiting_skills = UsersSkills::where('user', Auth::id())->pluck('skill')->toArray();
-
-      $new_skills = array_diff($input_skills, $exisiting_skills);
-
-      foreach ($new_skills as $new_skill) {
-
-        UsersSkills::create([
-          'skill' => $new_skill,
-          'user' => Auth::id(),
-        ]);
-
-      }
+      // $input_skills = $request->input('tags');
+      //
+      // $exisiting_skills = UsersSkills::where('user', Auth::id())->pluck('skill')->toArray();
+      //
+      // $new_skills = array_diff($input_skills, $exisiting_skills);
+      //
+      // foreach ($new_skills as $new_skill) {
+      //
+      //   UsersSkills::create([
+      //     'skill' => $new_skill,
+      //     'user' => Auth::id(),
+      //   ]);
+      //
+      // }
 
       return redirect()->back()->with('message', 'User Skills Updated!');
 
