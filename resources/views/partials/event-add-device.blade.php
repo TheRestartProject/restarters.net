@@ -84,10 +84,9 @@
                   <td>
                     <input type="submit" class="btn btn-primary btn-add" value="Add">
                   </td>
-                  <td width="85">
+                  <td>
                       <div class="form-control form-control__select">
                           <select name="quantity" class="quantity select2">
-                              <option value="1">Quantity</option>
                               <option value="1">1</option>
                               <option value="2">2</option>
                               <option value="3">3</option>
