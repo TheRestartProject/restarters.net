@@ -61,33 +61,31 @@
           </section>
         @endif
 
-        @if( !is_null($groups_near_you) )
-          <section class="table-section" id="your-groups">
+        <section class="table-section" id="your-groups">
 
-            <h2>@lang('groups.groups_title2') <sup>(<a href="/group/all">See all groups</a>)</sup></h2>
+          <h2>@lang('groups.groups_title2') <sup>(<a href="/group/all">See all groups</a>)</sup></h2>
 
-            <table role="table" class="table table-striped table-hover">
-              @include('partials.tables.head-groups')
-              <tbody>
-                @if( !$groups_near_you->isEmpty() )
-                  @foreach ($groups_near_you as $group)
+          <table role="table" class="table table-striped table-hover">
+            @include('partials.tables.head-groups')
+            <tbody>
+              @if( !is_null($groups_near_you) )
+                @foreach ($groups_near_you as $group)
 
-                    @include('partials.tables.row-groups')
+                  @include('partials.tables.row-groups')
 
-                  @endforeach
-                @else
-                  <tr>
-                    <td colspan="13" align="center" class="p-3">
-                      There are no groups within your area, would you consider starting a group?
-                      <br><a href="/profile/edit/{{{ Auth::user()->id }}}">@lang('groups.create_groups')</a>
-                    </td>
-                  </tr>
-                @endif
-              </tbody>
-            </table>
+                @endforeach
+              @else
+                <tr>
+                  <td colspan="13" align="center" class="p-3">
+                    There are no groups within your area, would you consider starting a group?
+                    <br><a href="/profile/edit/{{{ Auth::user()->id }}}">@lang('groups.create_groups')</a>
+                  </td>
+                </tr>
+              @endif
+            </tbody>
+          </table>
 
-          </section>
-        @endif
+        </section>
 
         @if( !is_null($groups) )
           <section class="table-section" id="your-groups">

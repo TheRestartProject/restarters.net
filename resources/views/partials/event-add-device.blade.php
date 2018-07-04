@@ -18,7 +18,6 @@
                               </optgroup>
                               @endforeach
                               <option value="46">None of the above</option>
-                              <option value="46">Misc</option>
                           </select>
                       </div>
                   </td>
