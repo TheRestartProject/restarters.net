@@ -1,32 +1,34 @@
-<tr>
+<tr id="summary-{{ $device->iddevices }}">
     @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || ( is_object($is_attending) && $is_attending->status == 1 ) )
       <td><a class="collapsed row-button" data-toggle="collapse" href="#row-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="row-1">Edit <span class="arrow">▴</span></a></td>
     @endif
     <td class="text-center">0</td>
-    <td>{{ $device->deviceCategory->name }}</td>
-    <td>{{ $device->brand }}</td>
-    <td>{{ $device->model }}</td>
-    <td>{{ $device->age }}</td>
-    <td>{!! $device->problem !!}</td>
+    <td><div class="category">{{ $device->deviceCategory->name }}</div></td>
+    <td><div class="brand">{{ $device->brand }}</div></td>
+    <td><div class="model">{{ $device->model }}</div></td>
+    <td><div class="age">{{ $device->age }}</div></td>
+    <td><div class="problem">{!! $device->problem !!}</div></td>
     @if ( $device->repair_status == 1 )
-      <td><span class="badge badge-success">Fixed</span></td>
+      <td><div class="repair_status"><span class="badge badge-success">Fixed</span></div></td>
     @elseif ( $device->repair_status == 2 )
-      <td><span class="badge badge-warning">Repairable</span></td>
+      <td><div class="repair_status"><span class="badge badge-warning">Repairable</span></div></td>
     @else
-      <td><span class="badge badge-danger">End</span></td>
+      <td><div class="repair_status"><span class="badge badge-danger">End</span></div></td>
     @endif
     @if ($device->more_time_needed == 1)
-      <td>More time needed</td>
+      <td><div class="repair_details">More time needed</div></td>
     @elseif ($device->professional_help == 1)
-      <td>Professional help</td>
+      <td><div class="repair_details">Professional help</div></td>
     @elseif ($device->do_it_yourself == 1)
-      <td>Do it yourself</td>
+      <td><div class="repair_details">Do it yourself</div></td>
     @else
-      <td>N/A</td>
+      <td><div class="repair_details">N/A</div></td>
     @endif
     <td class="text-center">
       @if ($device->spare_parts == 1)
         <svg class="table-tick" width="21" height="17" viewBox="0 0 16 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;position:relative;z-index:1"><g><path d="M5.866,12.648l2.932,-2.933l-5.865,-5.866l-2.933,2.933l5.866,5.866Z" style="fill:#0394a6;"/><path d="M15.581,2.933l-2.933,-2.933l-9.715,9.715l2.933,2.933l9.715,-9.715Z" style="fill:#0394a6;"/></g></svg>
+      @else
+        <svg class="table-tick" style="display: none;" width="21" height="17" viewBox="0 0 16 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;position:relative;z-index:1"><g><path d="M5.866,12.648l2.932,-2.933l-5.865,-5.866l-2.933,2.933l5.866,5.866Z" style="fill:#0394a6;"/><path d="M15.581,2.933l-2.933,-2.933l-9.715,9.715l2.933,2.933l9.715,-9.715Z" style="fill:#0394a6;"/></g></svg>
       @endif
     </td>
     @if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) )

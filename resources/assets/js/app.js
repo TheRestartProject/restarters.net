@@ -942,7 +942,7 @@ $( document ).ready(function() {
           }
 
           $('.table-row-details').removeAttr('style');
-          
+
           $('#waste-insert').html( json.stats['ewaste'] );
           $('#co2-insert').html(  json.stats['co2'] );
           $('#fixed-insert').html(  json.stats['fixed_devices'] );
@@ -972,12 +972,26 @@ $( document ).ready(function() {
     e.preventDefault();
 
     var device_id = $(this).data('device');
+    var summary_row = $('#summary-'+device_id);
 
     if( $('#wiki-'+device_id).is(':checked') ){
-      wiki = 1;
+      $wiki = 1;
     } else {
-      wiki = 0;
+      $wiki = 0;
     }
+
+    $category = $('#category-'+device_id).val();
+    $category_name = $('#category-'+device_id+' option:selected').text();
+    $weight = $('#weight-'+device_id).val();
+    $brand = $('#brand-'+device_id).val();
+    $model = $('#model-'+device_id).val();
+    $age = $('#age-'+device_id).val();
+    $problem = $('#problem-'+device_id).val();
+    $repair_status = parseInt($('#status-'+device_id).val());
+    $repair_details = parseInt($('#repair-info-'+device_id).val());
+    $repair_details_name = $('#repair-info-'+device_id+' option:selected').text();
+    $spare_parts = parseInt($('#spare-parts-'+device_id).val());
+    $event_id = $('#event_id').val();
 
     $.ajax({
       headers: {
@@ -986,17 +1000,17 @@ $( document ).ready(function() {
       type: 'post',
       url: '/device/edit/'+device_id,
       data: {
-        category: $('#category-'+device_id).val(),
-        weight: $('#weight-'+device_id).val(),
-        brand: $('#brand-'+device_id).val(),
-        model: $('#model-'+device_id).val(),
-        age: $('#age-'+device_id).val(),
-        problem: $('#problem-'+device_id).val(),
-        repair_status: $('#status-'+device_id).val(),
-        repair_details: $('#repair-info-'+device_id).val(),
-        spare_parts: $('#spare-parts-'+device_id).val(),
-        wiki: wiki,
-        event_id: $('#event_id').val(),
+        category: $category,
+        weight: $weight,
+        brand: $brand,
+        model: $model,
+        age: $age,
+        problem: $problem,
+        repair_status: $repair_status,
+        repair_details: $repair_details,
+        spare_parts: $spare_parts,
+        wiki: $wiki,
+        event_id: $event_id,
         // files:$('#file-'+device_id).val(),
       },
       datatype: 'json',
@@ -1010,15 +1024,39 @@ $( document ).ready(function() {
 
         if (data.error) {
           alert(data.error);
-        } else if (data.success) {
-          alert(data.success);
+        // } else if (data.success) {
+        //   alert(data.success);
+        }
+
+        summary_row.find('.category').text($category_name);
+        summary_row.find('.brand').text($brand);
+        summary_row.find('.model').text($model);
+        summary_row.find('.age').text($age);
+        summary_row.find('.problem').text($problem);
+
+        if( $repair_status === 1 ){
+          summary_row.find('.repair_status').empty().html('<span class="badge badge-success">Fixed</span>');
+        } else if( $repair_status === 2 ){
+          summary_row.find('.repair_status').empty().html('<span class="badge badge-warning">Repairable</span>');
+        } else if( $repair_status === 3 ){
+          summary_row.find('.repair_status').empty().html('<span class="badge badge-danger">End</span>');
+        }
+
+        if( $repair_details === 0 ){
+          summary_row.find('.repair_details').text('N/A');
         } else {
-          alert(data);
+          summary_row.find('.repair_details').text($repair_details_name);
+        }
+
+        if( $spare_parts === 1 ){
+          summary_row.find('.table-tick').show();
+        } else {
+          summary_row.find('.table-tick').hide();
         }
 
       },
       error: function(error) {
-
+        alert(error);
       }
     });
 
