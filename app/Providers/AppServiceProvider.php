@@ -26,10 +26,12 @@ class AppServiceProvider extends ServiceProvider
           if( Auth::check() ){
 
             $notifications = Party::whereDate('events.event_date', '<', date('Y-m-d'))
+                                  ->whereDate('events.event_date', '>=', date("Y-m-d", strtotime("-6 months")))
                                     ->leftjoin('devices', 'devices.event', '=', 'events.idevents')
                                       ->join('groups', 'events.group', '=', 'idgroups')
                                         ->whereNull('devices.iddevices')
-                                          ->select('events.*', 'groups.name', 'groups.idgroups');
+                                          ->select('events.*', 'groups.name', 'groups.idgroups')
+                                            ->orderBy('events.event_date', 'DESC');
 
             if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') ){
               $event_ids = EventsUsers::where('user', Auth::id())->where('role', 3)->pluck('event')->toArray();
