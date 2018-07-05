@@ -989,7 +989,7 @@ $( document ).ready(function() {
     $problem = $('#problem-'+device_id).val();
     $repair_status = parseInt($('#status-'+device_id).val());
     $repair_details = parseInt($('#repair-info-'+device_id).val());
-    $repair_details_name = $('#repair-info-'+device_id+' option:selected').text();
+    // $repair_details_name = $('#repair-info-'+device_id+' option:selected').text();
     $spare_parts = parseInt($('#spare-parts-'+device_id).val());
     $event_id = $('#event_id').val();
 
@@ -1042,11 +1042,11 @@ $( document ).ready(function() {
           summary_row.find('.repair_status').empty().html('<span class="badge badge-danger">End</span>');
         }
 
-        if( $repair_details === 0 ){
-          summary_row.find('.repair_details').text('N/A');
-        } else {
-          summary_row.find('.repair_details').text($repair_details_name);
-        }
+        // if( $repair_details === 0 ){
+        //   summary_row.find('.repair_details').text('N/A');
+        // } else {
+        //   summary_row.find('.repair_details').text($repair_details_name);
+        // }
 
         if( $spare_parts === 1 ){
           summary_row.find('.table-tick').show();
