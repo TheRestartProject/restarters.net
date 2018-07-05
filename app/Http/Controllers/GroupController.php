@@ -774,6 +774,15 @@ class GroupController extends Controller
             $longitude = null;
           }
 
+          //Validation
+          if (empty($data['name'])) {
+            return redirect()->back()->with('error', 'Group name must not be empty');
+          }
+
+          if (is_null($latitude) || is_null($longitude)) {
+            return redirect()->back()->with('error', 'Invalid location - please try again!');
+          }
+
           $update = array(
                           'name'          => $data['name'],
                           'website'       => $data['website'],
@@ -901,6 +910,7 @@ class GroupController extends Controller
       }
 
       $tags = GroupTags::all();
+      $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
 
       return view('group.edit-group', [
         'response' => $response,
@@ -910,6 +920,7 @@ class GroupController extends Controller
         'user' => $user,
         'images' => $images,
         'tags' => $tags,
+        'group_tags' => $group_tags,
       ]);
 
   }

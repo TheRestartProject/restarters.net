@@ -46,7 +46,7 @@
                   <td>
                     <label for="nested-5">Category:</label>
                     <div class="form-control form-control__select">
-                        <select name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="select2">
+                        <select name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
                             <option value="0">-- Category --</option>
                             @foreach( $clusters as $cluster )
                             <optgroup label="{{{ $cluster->name }}}">
@@ -66,8 +66,21 @@
                             @endif
                         </select>
                     </div>
-                    </td>
-                    <td>
+                    @if( $device->category == 46 )
+                      <div id="display-weight">
+                          <div class="form-group">
+                              <input type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="Est. weight kg" autocomplete="off" value="{{ $device->estimate }}">
+                          </div>
+                      </div>
+                    @else
+                      <div id="display-weight" style="display: none;">
+                          <div class="form-group">
+                              <input type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="Est. weight kg" autocomplete="off" value="{{ $device->estimate }}" disabled>
+                          </div>
+                      </div>
+                    @endif
+                  </td>
+                  <td>
                         <label for="nested-5">Brand:</label>
                         <div class="form-control form-control__select">
                             <select name="brand-{{ $device->iddevices }}" class="select2-with-input" id="brand-{{ $device->iddevices }}">

@@ -53,6 +53,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::get('/user/edit/{id}', 'UserController@edit');
   Route::post('/user/edit/{id}', 'UserController@edit');
   Route::post('user/soft-delete', 'UserController@postSoftDeleteUser');
+  Route::get('/user/onboarding-complete', 'UserController@getOnboardingComplete');
 
   //Test NB: Remove after testing!!
   //Route::get('/test', 'PartyController@test');

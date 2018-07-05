@@ -1137,4 +1137,15 @@ class UserController extends Controller
 
 
     }
+
+    public function getOnboardingComplete() {
+      $user = Auth::user();
+
+      if ($user->number_of_logins < 2) {
+        $user->number_of_logins += 1;
+        $user->save();
+      }
+
+      return "true";
+    }
 }

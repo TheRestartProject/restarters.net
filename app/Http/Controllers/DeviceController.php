@@ -12,6 +12,7 @@ use App\EventsUsers;
 use App\Group;
 use App\Party;
 use App\User;
+use App\DeviceList;
 use Auth;
 use FixometerHelper;
 use FixometerFile;
@@ -115,6 +116,8 @@ class DeviceController extends Controller
       }
 
       // $this->set('list', $list);
+      //Use Eloquent for pagination NB: Will break search
+      $list = DeviceList::orderBy('sorter', 'DSC')->paginate(25);
 
       return view('device.index', [
         'title' => 'Devices',

@@ -154,6 +154,13 @@ function onboarding() {
 
 
         jQuery('#onboarding').on('hide.bs.modal', function (e) {
+            $.ajax({
+                headers: {
+                  'X-CSRF-TOKEN': $("input[name='_token']").val()
+                },
+                type: 'get',
+                url: '/user/onboarding-complete',
+            });
             jQuery('.modal-slideshow').slick('destroy');
         });
 
