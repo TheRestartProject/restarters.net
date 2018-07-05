@@ -202,7 +202,7 @@
                                     </div>
                                 </div>
                                 <div class="col-3 d-flex justify-content-end flex-column"><div class="d-flex justify-content-end">
-                                    <button type="submit" class="btn btn-primary btn-save2">Save</button></div>
+                                    <button type="submit" class="btn btn-primary btn-save2">Update</button></div>
                                 </div>
                             </div>
                         </div>

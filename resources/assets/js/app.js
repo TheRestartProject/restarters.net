@@ -978,7 +978,8 @@ $( document ).ready(function() {
 
     e.preventDefault();
 
-    var device_id = $(this).data('device');
+    var form = $(this);
+    var device_id = form.data('device');
     var summary_row = $('#summary-'+device_id);
 
     if( $('#wiki-'+device_id).is(':checked') ){
@@ -999,6 +1000,10 @@ $( document ).ready(function() {
     // $repair_details_name = $('#repair-info-'+device_id+' option:selected').text();
     $spare_parts = parseInt($('#spare-parts-'+device_id).val());
     $event_id = $('#event_id').val();
+
+    //Visual improvements
+    $(this).find(':input').attr("disabled", true);
+    $('.btn-save2').text('Saving...');
 
     $.ajax({
       headers: {
@@ -1034,6 +1039,17 @@ $( document ).ready(function() {
         // } else if (data.success) {
         //   alert(data.success);
         }
+
+        //Visual improvements
+        setTimeout(function(e){
+            form.find(':input').attr("disabled", false);
+            $('.btn-save2').addClass('btn-success').removeClass('btn-primary').text('Saved');
+        }, 1000);
+
+        //Visual improvements
+        setTimeout(function(e){
+            $('.btn-save2').removeClass('btn-success').addClass('btn-primary').text('Update');
+        }, 3000);
 
         summary_row.find('.category').text($category_name);
         summary_row.find('.brand').text($brand);
