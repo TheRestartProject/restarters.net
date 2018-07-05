@@ -23970,13 +23970,13 @@ function resetForm(e) {
     }
 }
 
-function select2Fields(e) {
-    var _$$select;
+function select2Fields() {
+    var _options;
 
-    jQuery('.select2:not(.select2-hidden-accessible)').select2();
-    jQuery('.table-row-details').find('select:not(.select2-hidden-accessible)').select2();
-    jQuery('.select2-tags:not(.select2-hidden-accessible)').select2({ tags: true });
-    $(".select2-with-input:not(.select2-hidden-accessible)").select2((_$$select = {
+    var $target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+
+    options = (_options = {
         tags: true,
         minimumInputLength: 2,
         formatInputTooShort: "Type a brand name",
@@ -23985,13 +23985,27 @@ function select2Fields(e) {
                 return 'Type a brand name';
             }
         }
-    }, _defineProperty(_$$select, 'minimumInputLength', 2), _defineProperty(_$$select, 'createTag', function createTag(params) {
+    }, _defineProperty(_options, 'minimumInputLength', 2), _defineProperty(_options, 'createTag', function createTag(params) {
         return {
             id: params.term,
             text: params.term,
             newOption: true
         };
-    }), _$$select));
+    }), _options);
+
+    if ($target === false) {
+
+        jQuery('.select2:not(.select2-hidden-accessible)').select2();
+        jQuery('.table-row-details').find('select:not(.select2-hidden-accessible)').select2();
+        jQuery('.select2-tags:not(.select2-hidden-accessible)').select2({ tags: true });
+        jQuery(".select2-with-input:not(.select2-hidden-accessible)").select2(options);
+    } else {
+
+        $target.find('.select2').select2();
+        $target.find('.table-row-details').select2();
+        $target.find('.select2-tags').select2({ tags: true });
+        $target.find(".select2-with-input").select2(options);
+    }
 
     // $(document).on('focus', '.select2.select2-container', function (e) {
     //   // only open on original attempt - close focus event should not fire open
@@ -24035,7 +24049,7 @@ jQuery(function () {
         jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
     });
 
-    jQuery('.repair_status').on('change', function (e) {
+    jQuery(document).on('change', '.repair_status', function (e) {
         $value = jQuery(this).val();
         $field = jQuery(this).parents('td').find('.repair_details');
         if ($value == 2) {
@@ -24049,7 +24063,7 @@ jQuery(function () {
         }
     });
 
-    jQuery('.category').on('change', function (e) {
+    jQuery(document).on('change', '.category', function (e) {
         $value = parseInt(jQuery(this).val());
         $field = jQuery(this).parents('td').find('.weight');
         if ($value === 46 || $value === '') {
@@ -24281,10 +24295,19 @@ $(document).ready(function () {
                 console.log(json.success);
                 if (json.success) {
 
+                    $form.trigger("reset");
+                    jQuery('#device-start').focus();
+
+                    $form.find(".select2-hidden-accessible").select2('data', {}); // clear out values selected
+                    $form.find(".select2-hidden-accessible").select2({ allowClear: false }); // re-init to show default stat
+
                     for (i = 0; i < $(json.html).length; i++) {
                         var row = $(json.html)[i];
-                        $(row).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
+                        $target = $(row).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
+                        select2Fields($target);
                     }
+
+                    $('.table-row-details').removeAttr('style');
 
                     $('#waste-insert').html(json.stats['ewaste']);
                     $('#co2-insert').html(json.stats['co2']);
@@ -24292,21 +24315,19 @@ $(document).ready(function () {
                     $('#repair-insert').html(json.stats['repairable_devices']);
                     $('#dead-insert').html(json.stats['dead_devices']);
 
-                    $('.table-row-details').removeAttr('style');
-                    $form.trigger("reset");
-                    jQuery('#device-start').focus();
-
-                    select2Fields();
-
                     $('.btn-add').addClass('btn-success');
+                    $('.btn-add').removeClass('btn-primary');
                     setTimeout(function (e) {
                         $('.btn-add').removeClass('btn-success');
+                        $('.btn-add').addClass('btn-primary');
                     }, 1000);
                 } else {
                     alert(json.error);
                 }
             },
-            error: function error(_error5) {}
+            error: function error(_error5) {
+                alert(_error5);
+            }
         });
     });
 

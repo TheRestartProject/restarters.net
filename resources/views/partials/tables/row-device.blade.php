@@ -98,7 +98,7 @@
                     <td>
                         <label for="status-{{ $device->iddevices }}">Status:</label>
                         <div class="form-control form-control__select">
-                            <select class="repair_status" name="status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}" placeholder="Description of problem">
+                            <select class="repair_status select2" name="status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}" placeholder="Description of problem">
                               <option value="0">-- Status --</option>
                               @if ( $device->repair_status == 1 )
                                 <option value="1" selected>Fixed</option>
@@ -119,7 +119,7 @@
                     <td>
                         <label for="repair-info-{{ $device->iddevices }}">Repair details:</label>
                         <div class="form-control form-control__select">
-                            <select class="repair_details" name="repair-info" id="repair-info-{{ $device->iddevices }}" @if( $device->repair_status != 2 ) disabled @endif>
+                            <select class="repair_details select2" name="repair-info" id="repair-info-{{ $device->iddevices }}" @if( $device->repair_status != 2 ) disabled @endif>
                               <option value="0">-- Repair Details --</option>
                               @if ( $device->more_time_needed == 1 )
                                 <option value="1" selected>More time needed</option>
@@ -144,7 +144,7 @@
                     <td>
                         <label for="spare_parts">Spare parts:</label>
                         <div class="form-control form-control__select">
-                            <select name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
+                            <select class="select2" name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
                               @if ($device->spare_parts == 1)
                                 <option value="1" selected>Yes</option>
                                 <option value="2">No</option>
