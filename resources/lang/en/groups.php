@@ -43,14 +43,14 @@ return [
     'groups_modal_title' => 'Would you like to start a community repair group?',
     'groups_modal_content' => 'We can help you get started, scheduling and announcing events, logging data and getting reports on their impact.',
 
-    'invite_group_name_header' => 'Invite to :group',
+    'invite_group_name_header' => 'Invite volunteers to :group',
     'invite_group_name_message' => 'Invite volunteers to affiliate themselves with your group, so that you can invite them more easily to your upcoming events.',
     'email_addresses_field' => 'Email addresses',
-    'type_email_addresses_message' => 'Type email addresses to manually invite to this group',
+    'type_email_addresses_message' => 'Type in the email addresses of the people you would like to invite to this group.  Press the tab or comma key after each email address.',
     'message_header' => 'Invitation message',
     'message_example_text' => '<add a custom message here if required>',
     'message_explainer' => 'An email will be sent to the invitees inviting them to join your group.  If you would like to, you can include an additional message within the email by filling in the box above.',
-    'send_invite_button' => 'Send invite',
+    'send_invite_button' => 'Send invites',
 
     'about_group_name_header' => 'About :group',
 

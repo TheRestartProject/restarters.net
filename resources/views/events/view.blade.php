@@ -64,7 +64,7 @@
                           @if( $event->isInProgress() || $event->hasFinished() )
                             <button data-toggle="modal" data-target="#event-share-stats" class="dropdown-item">Share event stats</a>
                           @else
-                            <button data-toggle="modal" data-target="#event-invite-to" class="dropdown-item">Invite</button>
+                            <button data-toggle="modal" data-target="#event-invite-to" class="dropdown-item">Invite volunteers</button>
                           @endif
                       </div>
                   </div>
@@ -73,7 +73,7 @@
                     <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
                   @else
                     @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
-                      <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite</button>
+                      <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite volunteers</button>
                     @else
                       <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
                     @endif

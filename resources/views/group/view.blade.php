@@ -105,7 +105,7 @@
                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                           <a class="dropdown-item" href="{{ url('/group/edit/'.$group->idgroups) }}">Edit group</a>
                           <a class="dropdown-item" href="{{ url('/party/create') }}">Add event</a>
-                          <a class="dropdown-item" data-toggle="modal" data-target="#invite-to-group" href="#">Invite to group</a>
+                          <a class="dropdown-item" data-toggle="modal" data-target="#invite-to-group" href="#">Invite volunteers</a>
                           <a class="dropdown-item" href="#" data-toggle="modal" data-target="#group-share-stats">Share group stats</a>
                       </div>
                   </div>
@@ -114,7 +114,7 @@
             @else
               <div class="button-group button-group__r">
                   @if ($in_group)
-                    <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#invite-to-group">Invite to group</a>
+                    <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#invite-to-group">Invite volunteers</a>
                   @else
                     <a class="btn btn-primary" href="/group/join/{{ $group->idgroups }}" id="join-group">@lang('groups.join_group_button')</a>
                   @endif
