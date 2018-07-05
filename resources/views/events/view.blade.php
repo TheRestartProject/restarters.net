@@ -284,7 +284,6 @@
                                   <th>Age</th>
                                   <th>Description of problem/solution</th>
                                   <th width="65px">Status</th>
-                                  <th><span class="sr-only">Repairable: more information</span></th>
                                   <th width="95px" class="text-center">Spare parts</th>
                                   @if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) )
                                     <th width="35px"></th>

@@ -108,7 +108,7 @@
                       @foreach($images as $image)
                         <div class="dz-image">
                           <img src="/uploads/{{ $image->path }}" alt="placeholder">
-                          <a href="/group/image/delete/{{ $formdata->idgroups }}/{{{ $image->idimages }}}/{{{ $image->path }}}" class="dz-remove" onclick="return confirm('Are you sure?');">Remove file</a>
+                          <a href="/group/image/delete/{{ $formdata->idgroups }}/{{{ $image->idimages }}}/{{{ $image->path }}}" class="dz-remove" onclick="return confirm('Are you sure? This cannot be undone.');">Remove file</a>
                         </div>
                       @endforeach
                     @endif
