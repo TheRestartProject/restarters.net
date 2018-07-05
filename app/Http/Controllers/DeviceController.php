@@ -401,8 +401,19 @@ class DeviceController extends Controller
     }
     //end of handle loop
 
+    $event = Party::find($event_id);
+
+    $Device = new Device;
+    $weights = $Device->getWeights();
+
+    $TotalWeight = $weights[0]->total_weights;
+    $TotalEmission = $weights[0]->total_footprints;
+    $EmissionRatio = $TotalEmission / $TotalWeight;
+    $stats = $event->getEventStats($EmissionRatio);
+
     $return['html'] = $views;
     $return['success'] = true;
+    $return['stats'] = $stats;
 
     return response()->json($return);
 
@@ -535,6 +546,17 @@ class DeviceController extends Controller
               break;
         }
 
+        $event = Party::find($event_id);
+
+        $Device = new Device;
+        $weights = $Device->getWeights();
+
+        $TotalWeight = $weights[0]->total_weights;
+        $TotalEmission = $weights[0]->total_footprints;
+        $EmissionRatio = $TotalEmission / $TotalWeight;
+        $stats = $event->getEventStats($EmissionRatio);
+        $data['stats'] = $stats;
+
         if ($repair_status == 0) {
           $data['error'] = "Device couldn't be updated - no repair details added";
           return response()->json($data);
@@ -560,6 +582,17 @@ class DeviceController extends Controller
           'do_it_yourself' => 0,
           'wiki' => $wiki,
         ]);
+
+        $event = Party::find($event_id);
+
+        $Device = new Device;
+        $weights = $Device->getWeights();
+
+        $TotalWeight = $weights[0]->total_weights;
+        $TotalEmission = $weights[0]->total_footprints;
+        $EmissionRatio = $TotalEmission / $TotalWeight;
+        $stats = $event->getEventStats($EmissionRatio);
+        $data['stats'] = $stats;
 
         $data['success'] = "Device updated!";
 

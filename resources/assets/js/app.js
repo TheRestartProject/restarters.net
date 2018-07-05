@@ -920,6 +920,12 @@ $( document ).ready(function() {
               $(row).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
           }
 
+          $('#waste-insert').html( json.stats['ewaste'] );
+          $('#co2-insert').html(  json.stats['co2'] );
+          $('#fixed-insert').html(  json.stats['fixed_devices'] );
+          $('#repair-insert').html(  json.stats['repairable_devices'] );
+          $('#dead-insert').html(  json.stats['dead_devices'] );
+
           $('.table-row-details').removeAttr('style');
           $form.trigger("reset");
           jQuery('#device-start').focus();
@@ -976,6 +982,13 @@ $( document ).ready(function() {
       },
       datatype: 'json',
       success: function(data) {
+
+        $('#waste-insert').html( data.stats.ewaste );
+        $('#co2-insert').html(  data.stats.co2 );
+        $('#fixed-insert').html(  data.stats.fixed_devices );
+        $('#repair-insert').html(  data.stats.repairable_devices );
+        $('#dead-insert').html(  data.stats.dead_devices );
+
         if (data.error) {
           alert(data.error);
         } else if (data.success) {
@@ -983,6 +996,7 @@ $( document ).ready(function() {
         } else {
           alert(data);
         }
+
       },
       error: function(error) {
 

@@ -695,6 +695,7 @@ class PartyController extends Controller {
       //$categories = Category::all();
       $clusters = Cluster::all();
       $event = Party::find($id);
+      // dd($event->getEventStats($this->EmissionRatio));
 
       return view('events.view', [
         'gmaps' => true,
