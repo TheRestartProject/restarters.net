@@ -107,5 +107,7 @@ return [
 
     'reporting' => 'Reporting',
     'events-filter' => 'Events filter',
-    'download-results' => 'Download Results (CSV)'
+    'download-results' => 'Download Results (CSV)',
+
+    'approve_event' => 'Approve Event'
 ];
