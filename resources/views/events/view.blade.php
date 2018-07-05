@@ -16,9 +16,9 @@
 
       @if( is_object($is_attending) )
           @if( $is_attending->status == 1 )
-            <div class="alert alert-success">
+            <div class="alert alert-success" style="min-height: 88px;">
                 @lang('events.rsvp_message')
-                <a href="/cancel-invite/{{{ $is_attending->event }}}" class="btn btn-success">@lang('events.rsvp_button')</a>
+                <a href="/party/cancel-invite/{{{ $is_attending->event }}}" class="btn btn-success">@lang('events.rsvp_button')</a>
             </div>
           @else
             <div class="alert alert-info">
