@@ -62,6 +62,7 @@ class GroupController extends Controller
         $your_groups = null;
         $groups_near_you = null;
         $groups = Group::orderBy('name', 'ASC')->paginate(env('PAGINATE'));
+        $your_area = null;
 
       } else {
 
@@ -69,6 +70,8 @@ class GroupController extends Controller
 
         //Get current logged in user
         $user = Auth::user();
+
+        $your_area = $user->location;
 
         //Look for groups where user ID exists in pivot table
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
@@ -98,7 +101,7 @@ class GroupController extends Controller
         'your_groups' => $your_groups,
         'groups_near_you' => $groups_near_you,
         'groups' => $groups,
-        'your_area' => $user->location
+        'your_area' => $your_area
       ]);
 
   }

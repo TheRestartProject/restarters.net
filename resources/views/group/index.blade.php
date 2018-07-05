@@ -69,7 +69,7 @@
             <table role="table" class="table table-striped table-hover">
               @include('partials.tables.head-groups')
               <tbody>
-                @if( !is_null($groups_near_you) )
+                @if( !is_null($groups_near_you) && count($groups_near_you) > 0 )
                   @foreach ($groups_near_you as $group)
 
                     @include('partials.tables.row-groups')
@@ -80,9 +80,9 @@
                     <td colspan="13" align="center" class="p-3">
                         @if ($your_area)
                       There are currently no groups near to your area ({{ $your_area }}). Would you consider starting a group?
-                      <br><a href="/profile/edit/{{{ Auth::user()->id }}}">@lang('groups.create_groups')</a>
+                      <br><a href="/group/create/">@lang('groups.create_groups')</a>
                         @else
-                      You do not currently have a town/city set.  You can set one in <a href="/profile/edit">your profile</a>.
+                      You do not currently have a town/city set.  You can set one in <a href="/profile/edit/{{ Auth::user()->id }}">your profile</a>.
                         @endif
                     </td>
                   </tr>
