@@ -1028,7 +1028,7 @@ class UserController extends Controller
       } else {
 
         $has_host_skills = Skills::where('category', 1)->whereIn('id', $skills)->count();
-        if( $has_host_skills > 0 ){
+        if( $has_host_skills > 3 ){
           $role = 3;
         } else {
           $role = 4;
