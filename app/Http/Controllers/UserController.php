@@ -116,7 +116,6 @@ class UserController extends Controller
           'email'           => 'required|string|email|max:255',
           'age'             => 'required',
           'country'         => 'required',
-          'gender'          => 'string|max:255',
       ];
 
       $validator = Validator::make($request->all(), $rules);
