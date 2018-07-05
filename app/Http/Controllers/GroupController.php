@@ -98,6 +98,7 @@ class GroupController extends Controller
         'your_groups' => $your_groups,
         'groups_near_you' => $groups_near_you,
         'groups' => $groups,
+        'your_area' => $user->location
       ]);
 
   }

@@ -85,7 +85,7 @@
             <li class="step">
               <div class="row">
                 <div class="col-7 d-flex align-items-center">
-                  <h4>Create a Restart Group</h4>
+                  <h4>Join or create a group</h4>
                 </div>
                 @if ($in_group)
                   <div class="col-5 d-flex align-items-center justify-content-end">
@@ -93,7 +93,7 @@
                   </div>
                 @else
                   <div class="col-5 d-flex align-items-center justify-content-end">
-                    <a href="" class="step__link">Create a group</a>
+                    <a href="{{ route('groups') }}" class="step__link">Check for groups nearby</a>
                   </div>
                 @endif
               </div>
@@ -101,7 +101,7 @@
             <li class="step">
               <div class="row">
                 <div class="col-7 d-flex align-items-center">
-                  <h4>Create a Restart event</h4>
+                  <h4>Host an event</h4>
                 </div>
                 @if ($in_event)
                   <div class="col-5 d-flex align-items-center justify-content-end">
@@ -109,7 +109,7 @@
                   </div>
                 @else
                   <div class="col-5 d-flex align-items-center justify-content-end">
-                    <a href="" class="step__link">Create an event</a>
+                    <a href="{{ route('events') }}" class="step__link">Create an event</a>
                   </div>
                 @endif
               </div>

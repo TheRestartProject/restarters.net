@@ -78,8 +78,12 @@
                 @else
                   <tr>
                     <td colspan="13" align="center" class="p-3">
-                      There are no groups within your area, would you consider starting a group?
+                        @if ($your_area)
+                      There are currently no groups near to your area ({{ $your_area }}). Would you consider starting a group?
                       <br><a href="/profile/edit/{{{ Auth::user()->id }}}">@lang('groups.create_groups')</a>
+                        @else
+                      You do not currently have a town/city set.  You can set one in <a href="/profile/edit">your profile</a>.
+                        @endif
                     </td>
                   </tr>
                 @endif
