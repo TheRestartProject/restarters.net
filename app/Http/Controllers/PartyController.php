@@ -481,7 +481,7 @@ class PartyController extends Controller {
           else {
               $response['success'] = 'Event details updated <a href="/party/view/'.$id.'" class="btn btn-success">View event</a>';
 
-              $theParty = $Party->findThis($id);
+              $theParty = $Party->findThis($id)[0];
 
               if( ( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) { //For testing purposes
 
@@ -502,9 +502,8 @@ class PartyController extends Controller {
                                    array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
                                    array('key' => 'party_date',            'value' => $wp_date),
                                    array('key' => 'party_timestamp',       'value' => $timestamp),
-                                   // TODO: array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp),
+                                   array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp),
                                    array('key' => 'party_stats',           'value' => $id),
-                                   // TODO: test lat and long are working correctly
                                    array('key' => 'party_lat',             'value' => $latitude),
                                    array('key' => 'party_lon',             'value' => $longitude)
                         );
@@ -529,13 +528,12 @@ class PartyController extends Controller {
 
 
               } elseif(!empty($theParty->wordpress_post_id)){
-
                   $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
                   $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
                   /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                   // $theParty = $Party->findThis($id);
-                  $Host = $Groups->findHost($data['group']);
+                  //$Host = $Groups->findHost($data['group']);
                   $custom_fields = array(
                                   //array('key' => 'party_host',            'value' => $Host->hostname),
                                   //array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
@@ -547,8 +545,8 @@ class PartyController extends Controller {
                                   array('key' => 'party_timestamp',       'value' => $theParty->event_timestamp),
                                   array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp),
                                   array('key' => 'party_stats',           'value' => $id),
-                                  array('key' => 'party_lat',             'value' => $data['latitude']),
-                                  array('key' => 'party_lon',             'value' => $data['longitude'])
+                                  array('key' => 'party_lat',             'value' => $latitude),
+                                  array('key' => 'party_lon',             'value' => $longitude)
                                   );
 
 
@@ -560,29 +558,19 @@ class PartyController extends Controller {
                                   );
 
 
-                  // Check for WP existence in DB
-                  if(!empty($theParty->wordpress_post_id)){
+                // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
+                $thePost = $wpClient->getPost($theParty->wordpress_post_id);
 
-                      // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
-                      $thePost = $wpClient->getPost($theParty->wordpress_post_id);
+                foreach( $thePost['custom_fields'] as $i => $field ){
+                    foreach( $custom_fields as $k => $set_field){
+                        if($field['key'] == $set_field['key']){
+                            $custom_fields[$k]['id'] = $field['id'];
+                        }
+                    }
+                }
 
-                      foreach( $thePost['custom_fields'] as $i => $field ){
-                          foreach( $custom_fields as $k => $set_field){
-                              if($field['key'] == $set_field['key']){
-                                  $custom_fields[$k]['id'] = $field['id'];
-                              }
-                          }
-                      }
-
-                      $content['custom_fields'] = $custom_fields;
-                      $wpClient->editPost($theParty->wordpress_post_id, $content);
-                  }
-                  // else {
-                  //     // Brand new post -> we send it up and update the Fixometer
-                  //     $wpid = $wpClient->newPost($Host->groupname, $free_text, $content);
-                  //     $Party->update(array('wordpress_post_id' => $wpid), $id);
-                  // }
-
+                $content['custom_fields'] = $custom_fields;
+                $wpClient->editPost($theParty->wordpress_post_id, $content);
               }
 
               if(isset($_POST['users']) && !empty($_POST['users'])){
