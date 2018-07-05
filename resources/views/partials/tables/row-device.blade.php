@@ -95,7 +95,7 @@
                     <td>
                         <label for="nested-7">Age:</label>
                         <div class="form-group">
-                            <input type="number" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" min="0" value="{{ $device->age }}" placeholder="Age (yrs)" autocomplete="off">
+                            <input type="number" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" min="0" step="0.5" value="{{ $device->age }}" placeholder="Age (yrs)" autocomplete="off">
                         </div>
                     </td>
                     <td>

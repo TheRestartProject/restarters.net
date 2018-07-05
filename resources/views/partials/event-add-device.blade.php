@@ -44,7 +44,7 @@
                   </td>
                   <td width="100">
                       <div class="form-group">
-                          <input type="number" class="form-control field" class="age" name="age" min="0" placeholder="Age (yrs)" autocomplete="off">
+                          <input type="number" class="form-control field" class="age" name="age" min="0" step="0.5" placeholder="Age (yrs)" autocomplete="off">
                       </div>
                   </td>
                   <td>
