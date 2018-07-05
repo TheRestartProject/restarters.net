@@ -147,7 +147,7 @@ class Group extends Model
     }
 
     public function groupImage(){
-        return $this->hasOne('App\Xref', 'reference', 'idgroups')->where('object_type', 5);
+        return $this->hasOne('App\Xref', 'reference', 'idgroups')->where('reference_type', env('TBL_GROUPS'));
     }
 
     public function allHosts(){
