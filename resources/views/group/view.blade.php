@@ -128,7 +128,11 @@
         <div class="row">
             <div class="col-lg-3">
 
-                <h2 id="about-grp">About the group <sup>(<a href="{{ url('/group/edit/'.$group->idgroups) }}">Edit group</a>)</sup></h2>
+                <h2 id="about-grp">About the group
+                  @if( FixometerHelper::hasRole( $user, 'Administrator' ) || $is_host_of_group )
+                    <sup>(<a href="{{ url('/group/edit/'.$group->idgroups) }}">Edit group</a>)</sup>
+                  @endif
+                </h2>
 
                 <div class="events__description">
                     <h3 class="events__side__heading" id="description">Description:</h3>

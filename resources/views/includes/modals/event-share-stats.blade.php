@@ -41,13 +41,13 @@
 
           <div class="card">
             <div class="card-header p-0" id="headingEventCO2">
-              <button class="btn btn-link" data-toggle="collapse" data-target="#collapseEventCO2" aria-expanded="true" aria-controls="collapseEventCO2">
+              <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseEventCO2" aria-expanded="false" aria-controls="collapseEventCO2">
                 @lang('events.co2_equivalence_visualisation_dropdown')
                 @include('partials.caret')
               </button>
             </div>
 
-            <div id="collapseEventCO2" class="collapse show" aria-labelledby="headingEventCO2" data-parent="#accordionEvent">
+            <div id="collapseEventCO2" class="collapse" aria-labelledby="headingEventCO2" data-parent="#accordionEvent">
               <div class="card-body">
 
                   <div class="form-group">

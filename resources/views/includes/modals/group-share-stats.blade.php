@@ -19,7 +19,7 @@
 
           <div class="card">
             <div class="card-header p-0" id="headingGroupHeadline">
-              <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseGroupHeadline" aria-expanded="false" aria-controls="collapseGroupHeadline">
+              <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseGroupHeadline" aria-expanded="true" aria-controls="collapseGroupHeadline">
                 @lang('groups.headline_stats_dropdown')
                 @include('partials.caret')
               </button>
@@ -41,13 +41,13 @@
 
           <div class="card">
             <div class="card-header p-0" id="headingGroupCO2">
-              <button class="btn btn-link" data-toggle="collapse" data-target="#collapseGroupCO2" aria-expanded="true" aria-controls="collapseGroupCO2">
+              <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseGroupCO2" aria-expanded="false" aria-controls="collapseGroupCO2">
                 @lang('groups.co2_equivalence_visualisation_dropdown')
                 @include('partials.caret')
               </button>
             </div>
 
-            <div id="collapseGroupCO2" class="collapse show" aria-labelledby="headingGroupCO2" data-parent="#accordionGroup">
+            <div id="collapseGroupCO2" class="collapse" aria-labelledby="headingGroupCO2" data-parent="#accordionGroup">
               <div class="card-body">
 
                   <div class="form-group">
