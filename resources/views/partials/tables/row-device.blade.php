@@ -7,7 +7,7 @@
     <td><div class="brand">{{ $device->brand }}</div></td>
     <td><div class="model">{{ $device->model }}</div></td>
     <td><div class="age">{{ $device->age }}</div></td>
-    <td><div class="problem">{!! $device->problem !!}</div></td>
+    <td><div class="problem">{!! str_limit($device->problem, 60, '...') !!}</div></td>
     @if ( $device->repair_status == 1 )
       <td><div class="repair_status"><span class="badge badge-success">Fixed</span></div></td>
     @elseif ( $device->repair_status == 2 )
