@@ -87,22 +87,22 @@
                         <div class="form-control form-control__select">
                             <select name="brand-{{ $device->iddevices }}" class="select2-with-input" id="brand-{{ $device->iddevices }}">
                                 @php($i = 1)
+                                @if( empty($device->brand) )
+                                  <option value="" selected></option>
+                                @else
+                                  <option value=""></option>
+                                @endif
                                 @foreach($brands as $brand)
-                                  @if( empty($device->brand) )
-                                    <option value="" selected></option>
-                                  @else
-                                    <option value=""></option>
-                                  @endif
                                   @if ($device->brand == $brand->brand_name)
                                     <option value="{{ $brand->brand_name }}" selected>{{ $brand->brand_name }}</option>
                                     @php($i++)
                                   @else
                                     <option value="{{ $brand->brand_name }}">{{ $brand->brand_name }}</option>
                                   @endif
-                                  @if( $i == 1 && !empty($device->brand) )
-                                    <option value="{{ $device->brand }}" selected>{{ $device->brand }}</option>
-                                  @endif
                                 @endforeach
+                                @if( $i == 1 && !empty($device->brand) )
+                                  <option value="{{ $device->brand }}" selected>{{ $device->brand }}</option>
+                                @endif
                             </select>
                         </div>
                     </td>
