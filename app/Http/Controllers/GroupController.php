@@ -835,7 +835,7 @@ class GroupController extends Controller
                   }
               }
 
-              if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
+              if(false/*env('APP_ENV') != 'development' && env('APP_ENV') != 'local'*/) {
 
                  /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                 $Host = $Group->findHost($id);
