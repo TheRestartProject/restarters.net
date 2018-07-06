@@ -89,7 +89,7 @@ class GroupController extends Controller
                                   ->having("distance", "<=", 150)
                                     ->whereNotIn('idgroups', $your_groups_uniques)
                                       ->orderBy('distance', 'ASC')
-                                        ->take(5)
+                                        ->take(10)
                                           ->get();
         } else {
           $groups_near_you = null;
