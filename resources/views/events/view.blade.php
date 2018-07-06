@@ -14,7 +14,7 @@
           </div>
       @endif
 
-      @if( is_object($is_attending) )
+      @if( is_object($is_attending) && !$event->hasFinished() )
           @if( $is_attending->status == 1 )
             <div class="alert alert-success" style="min-height: 88px;">
                 @lang('events.rsvp_message')
