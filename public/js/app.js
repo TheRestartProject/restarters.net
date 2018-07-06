@@ -24483,6 +24483,26 @@ $(document).ready(function () {
         });
     });
 
+    jQuery(document).on('click', '.delete-device', function (e) {
+
+        e.preventDefault();
+        if (window.confirm("Are you sure? This cannot be undone.")) {
+            $device = jQuery(this).data('device-id');
+            $href = $(this).attr('href');
+            $.ajax({
+                type: 'get',
+                url: $href,
+                success: function success(data) {
+                    $('#summary-' + $device).fadeOut(1000);
+                    $('#row-' + $device).fadeOut(1000);
+                },
+                error: function error(_error6) {
+                    alert(_error6);
+                }
+            });
+        }
+    });
+
     $('#description').on('summernote.change', function (e) {
         $('#free_text').val($('#description').summernote('code'));
     });

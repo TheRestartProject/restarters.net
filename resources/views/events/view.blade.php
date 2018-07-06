@@ -37,8 +37,9 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
-                        <li class="breadcrumb-item"><a href="/group/view/{{ $formdata->group_id }}">@lang('groups.groups')</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">{{ trim($formdata->group_name) }}</li>
+                        <li class="breadcrumb-item"><a href="{{ url('/group') }}">@lang('groups.groups')</a></li>
+                        <li class="breadcrumb-item"><a href="/group/view/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ $event->getEventName() }}</li>
                     </ol>
                 </nav>
                 @php( $group_image = $event->host->hostImage )
@@ -51,10 +52,9 @@
 
           </div>
           <div class="col-lg-3">
-
             <div class="button-group button-group__r">
-
-                @if ( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+              @if( Auth::check() )
+                @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
                   <div class="dropdown">
                       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           Event actions
@@ -79,10 +79,8 @@
                     @endif
                   @endif
                 @endif
-
+              @endif
             </div>
-
-
           </div>
         </div>
 
@@ -272,9 +270,7 @@
                       <table class="table table-repair" role="table" id="device-table">
                           <thead>
                               <tr>
-                                  @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || ( is_object($is_attending) && $is_attending->status == 1 ) )
-                                    <th width="55px"></th>
-                                  @endif
+                                  <th width="60px"></th>
                                   <th class="text-center"><svg width="22" height="17" viewBox="0 0 17 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="position:relative;z-index:1;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Camera</title><path d="M8.25,4.781c-1.367,0 -2.475,1.071 -2.475,2.391c0,1.32 1.108,2.39 2.475,2.39c1.367,0 2.475,-1.07 2.475,-2.39c0,-1.32 -1.108,-2.391 -2.475,-2.391Zm6.6,-2.39l-1.98,0c-0.272,0 -0.566,-0.204 -0.652,-0.454l-0.511,-1.484c-0.087,-0.249 -0.38,-0.453 -0.652,-0.453l-5.61,0c-0.272,0 -0.566,0.204 -0.652,0.454l-0.511,1.483c-0.087,0.25 -0.38,0.454 -0.652,0.454l-1.98,0c-0.908,0 -1.65,0.717 -1.65,1.593l0,7.172c0,0.877 0.742,1.594 1.65,1.594l13.2,0c0.907,0 1.65,-0.717 1.65,-1.594l0,-7.172c0,-0.876 -0.743,-1.593 -1.65,-1.593Zm-6.6,8.765c-2.278,0 -4.125,-1.784 -4.125,-3.984c0,-2.2 1.847,-3.985 4.125,-3.985c2.278,0 4.125,1.785 4.125,3.985c0,2.2 -1.847,3.984 -4.125,3.984Zm6.022,-6.057c-0.318,0 -0.577,-0.25 -0.577,-0.558c0,-0.308 0.259,-0.558 0.577,-0.558c0.32,0 0.578,0.25 0.578,0.558c0,0.308 -0.259,0.558 -0.578,0.558Z" style="fill:#0394a6;fill-rule:nonzero;"/></svg></th>
                                   <th>Category</th>
                                   <th>Brand</th>

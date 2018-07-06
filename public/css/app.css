@@ -92,7 +92,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   -ms-overflow-style: scrollbar;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 @-ms-viewport {
@@ -13933,7 +13933,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .alert-warning .btn:hover,
 .alert-success .btn:hover,
 .alert-delete .btn:hover {
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .alert-danger .btn:focus,
@@ -13942,7 +13942,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .alert-success .btn:focus,
 .alert-delete .btn:focus {
   text-decoration: underline;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .alert-success {
@@ -14799,11 +14799,11 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .navbar-laravel .caret {
   float: right;
-  margin: -27px 0 0 0;
+  margin: -25px 0 0 0;
   font-size: 10px;
   font-family: "Patua One", cursive, sans-serif;
   position: relative;
-  left: 13px;
+  left: 16px;
   z-index: 1;
 }
 
@@ -14829,8 +14829,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .navbar-laravel .navbar-brand {
   margin: auto 0;
-  padding: 11px 32px;
-  padding-right: 37px;
+  padding: 11px 32px 11px 30px;
+  padding-right: 45px;
   border: 1px solid #D9D9D9;
   border-top: 0;
   border-left: 0;
@@ -14839,11 +14839,13 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .navbar-laravel .navbar-brand svg {
   display: block;
+  height: 40px;
+  width: auto;
 }
 
 .navbar-laravel .navbar-brand .caret {
   font-size: 18px;
-  top: -7px;
+  top: -6px;
 }
 
 .navbar-laravel .navbar-brand .caret:after {
@@ -15031,7 +15033,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   width: 350px;
   height: 100%;
   height: 100vh;
-  z-index: 1;
+  z-index: 100;
   -webkit-box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.17);
           box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.17);
 }

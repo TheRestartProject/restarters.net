@@ -15,6 +15,7 @@ return array(
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Dashboard' => $baseDir . '/app/Dashboard.php',
     'App\\Device' => $baseDir . '/app/Device.php',
+    'App\\DeviceList' => $baseDir . '/app/DeviceList.php',
     'App\\EventsUsers' => $baseDir . '/app/EventsUsers.php',
     'App\\Exceptions\\Handler' => $baseDir . '/app/Exceptions/Handler.php',
     'App\\Export' => $baseDir . '/app/Export.php',
