@@ -15266,6 +15266,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .onboarding .modal-content ul {
   text-align: center;
   list-style-type: square;
+  list-style-position: inside;
 }
 
 .onboarding .modal-prev,
