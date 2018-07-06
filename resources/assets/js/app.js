@@ -604,40 +604,41 @@ function resetForm (e) {
 
 }
 
+tag_options = {
+  tags: true,
+  minimumInputLength: 2,
+  formatInputTooShort: "Type a brand name",
+  language: {
+      inputTooShort: function inputTooShort() {
+          return 'Type a brand name';
+      }
+  },
+  minimumInputLength: 2,
+  createTag: function (params) {
+    return {
+      id: params.term,
+      text: params.term,
+      newOption: true
+    }
+  }
+}
+
 function select2Fields($target = false) {
 
-    options = {
-      tags: true,
-      minimumInputLength: 2,
-      formatInputTooShort: "Type a brand name",
-      language: {
-          inputTooShort: function inputTooShort() {
-              return 'Type a brand name';
-          }
-      },
-      minimumInputLength: 2,
-      createTag: function (params) {
-        return {
-          id: params.term,
-          text: params.term,
-          newOption: true
-        }
-      }
-    }
 
     if( $target === false ){
 
-      jQuery('.select2:not(.select2-hidden-accessible)').select2();
-      jQuery('.table-row-details').find('select:not(.select2-hidden-accessible)').select2();
-      jQuery('.select2-tags:not(.select2-hidden-accessible)').select2({tags: true});
-      jQuery(".select2-with-input:not(.select2-hidden-accessible)").select2(options);
+      jQuery('.select2').select2();
+      //jQuery('.table-row-details').find('select').select2();
+      jQuery('.select2-tags').select2({tags: true});
+      jQuery(".select2-with-input").select2(tag_options);
 
     } else {
 
       $target.find('.select2').select2();
-      $target.find('.table-row-details').select2();
+      //$target.find('.table-row-details').select2();
       $target.find('.select2-tags').select2({tags: true});
-      $target.find(".select2-with-input").select2(options);
+      $target.find(".select2-with-input").select2(tag_options);
 
     }
 
@@ -936,39 +937,79 @@ $( document ).ready(function() {
         console.log(json.success);
         if( json.success ){
 
+          //Reset appearance
           $form.trigger("reset");
           jQuery('#device-start').focus();
 
-          $form.find(".select2-hidden-accessible").select2('data', {}); // clear out values selected
-          $form.find(".select2-hidden-accessible").select2({ allowClear: false }); // re-init to show default stat
+          $form.find(".select2.select2-hidden-accessible").select2('data', {}); // clear out values selected
+          $form.find(".select2.select2-hidden-accessible").select2({ allowClear: false }); // re-init to show default stat
 
+          $form.find(".select2-with-input.select2-hidden-accessible").select2('data', {}); // clear out values selected
+          $form.find(".select2-with-input.select2-hidden-accessible").select2(tag_options); // re-init to show default stat
+
+          $('#repair-more, #display-weight').hide();
+          //EO reset appearance
+
+          //Appending...
           for (i = 0; i < $(json.html).length; i++) {
               var row = $(json.html)[i];
               $target = $(row).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
               select2Fields($target);
           }
-
           $('.table-row-details').removeAttr('style');
+          //Finished appending
 
+          //Update stats
           $('#waste-insert').html( json.stats['ewaste'] );
           $('#co2-insert').html(  json.stats['co2'] );
           $('#fixed-insert').html(  json.stats['fixed_devices'] );
           $('#repair-insert').html(  json.stats['repairable_devices'] );
           $('#dead-insert').html(  json.stats['dead_devices'] );
 
+          //Give users some visual feedback
           $('.btn-add').addClass('btn-success');
           $('.btn-add').removeClass('btn-primary');
           setTimeout(function(e){
             $('.btn-add').removeClass('btn-success');
             $('.btn-add').addClass('btn-primary');
-          },1000);
+          }, 1000);
+
+        } else if( json ) {
+
+          var error_message = '';
+          var error_count = 0;
+          $.each( json, function( key, value) {
+            if( error_count > 0 ){
+              error_message += ', ' + value;
+            } else {
+              error_message += value;
+            }
+            error_count++;
+          });
+
+          alert(error_message);
 
         } else {
-          alert(json.error);
+
+          alert('Something went wrong, please try again1');
+
         }
+
+        console.log(json);
+
       },
-      error: function(error) {
-        alert(error);
+      error: function(json) {
+
+        if( json.responseJSON.message ){
+
+          alert(json.responseJSON.message);
+
+        } else {
+
+          alert('Something went wrong, please try again2');
+
+        }
+
       }
     });
 
@@ -1063,6 +1104,8 @@ $( document ).ready(function() {
           summary_row.find('.repair_status').empty().html('<span class="badge badge-warning">Repairable</span>');
         } else if( $repair_status === 3 ){
           summary_row.find('.repair_status').empty().html('<span class="badge badge-danger">End</span>');
+        } else {
+          summary_row.find('.repair_status').empty();
         }
 
         // if( $repair_details === 0 ){

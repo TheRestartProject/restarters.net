@@ -16,6 +16,7 @@ use App\DeviceList;
 use Auth;
 use FixometerHelper;
 use FixometerFile;
+use Illuminate\Support\Facades\Validator;
 use View;
 
 class DeviceController extends Controller
@@ -336,6 +337,16 @@ class DeviceController extends Controller
 
   public function ajaxCreate(Request $request) {
 
+    $rules = [
+        'category' => 'required|filled',
+    ];
+
+    $validator = Validator::make($request->all(), $rules);
+
+    if ($validator->fails()) {
+      return response()->json($validator->messages(), 200);
+    }
+
     $category       = $request->input('category');
     $weight         = $request->input('weight');
     $brand          = $request->input('brand');
@@ -496,6 +507,9 @@ class DeviceController extends Controller
     $event_id       = $request->input('event_id');
     $wiki           = $request->input('wiki');
 
+    if( empty($repair_status) ) //Override
+      $repair_status = 0;
+
     if( $repair_status != 2 ) //Override
       $repair_details = 0;
 
@@ -503,73 +517,70 @@ class DeviceController extends Controller
 
     if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || is_object($in_event) ){
 
-      if ($repair_status == 2) {
-        switch ($repair_details) {
-          case 1:
-              Device::find($id)->update([
-                'category' => $category,
-                'category_creation' => $category,
-                'brand' => $brand,
-                'model' => $model,
-                'age' => $age,
-                'problem' => $problem,
-                'spare_parts' => $spare_parts,
-                'repair_status' => $repair_status,
-                'more_time_needed' => 1,
-                'wiki' => $wiki,
-              ]);
-              break;
-          case 2:
-              Device::find($id)->update([
-                'category' => $category,
-                'category_creation' => $category,
-                'brand' => $brand,
-                'model' => $model,
-                'age' => $age,
-                'problem' => $problem,
-                'spare_parts' => $spare_parts,
-                'repair_status' => $repair_status,
-                'professional_help' => 1,
-                'wiki' => $wiki,
-              ]);
-              break;
-          case 3:
-              Device::find($id)->update([
-                'category' => $category,
-                'category_creation' => $category,
-                'brand' => $brand,
-                'model' => $model,
-                'age' => $age,
-                'problem' => $problem,
-                'spare_parts' => $spare_parts,
-                'repair_status' => $repair_status,
-                'do_it_yourself' => 1,
-                'wiki' => $wiki,
-              ]);
-              break;
+      // if ($repair_status == 2) {
+      //   switch ($repair_details) {
+      //     case 1:
+      //         Device::find($id)->update([
+      //           'category' => $category,
+      //           'category_creation' => $category,
+      //           'brand' => $brand,
+      //           'model' => $model,
+      //           'age' => $age,
+      //           'problem' => $problem,
+      //           'spare_parts' => $spare_parts,
+      //           'repair_status' => $repair_status,
+      //           'more_time_needed' => 1,
+      //           'wiki' => $wiki,
+      //         ]);
+      //         break;
+      //     case 2:
+      //         Device::find($id)->update([
+      //           'category' => $category,
+      //           'category_creation' => $category,
+      //           'brand' => $brand,
+      //           'model' => $model,
+      //           'age' => $age,
+      //           'problem' => $problem,
+      //           'spare_parts' => $spare_parts,
+      //           'repair_status' => $repair_status,
+      //           'professional_help' => 1,
+      //           'wiki' => $wiki,
+      //         ]);
+      //         break;
+      //     case 3:
+      //         Device::find($id)->update([
+      //           'category' => $category,
+      //           'category_creation' => $category,
+      //           'brand' => $brand,
+      //           'model' => $model,
+      //           'age' => $age,
+      //           'problem' => $problem,
+      //           'spare_parts' => $spare_parts,
+      //           'repair_status' => $repair_status,
+      //           'do_it_yourself' => 1,
+      //           'wiki' => $wiki,
+      //         ]);
+      //         break;
+      //   }
+
+
+        if( $repair_details == 1 ){
+          $more_time_needed = 1;
+        } else {
+          $more_time_needed = 0;
         }
 
-        $event = Party::find($event_id);
-
-        $Device = new Device;
-        $weights = $Device->getWeights();
-
-        $TotalWeight = $weights[0]->total_weights;
-        $TotalEmission = $weights[0]->total_footprints;
-        $EmissionRatio = $TotalEmission / $TotalWeight;
-        $stats = $event->getEventStats($EmissionRatio);
-        $data['stats'] = $stats;
-
-        if ($repair_status == 0) {
-          $data['error'] = "Device couldn't be updated - no repair details added";
-          return response()->json($data);
+        if( $repair_details == 2 ){
+          $professional_help = 1;
+        } else {
+          $professional_help = 0;
         }
 
-        $data['success'] = "Device updated!";
-
-        return response()->json($data);
-
-      } else {
+        if( $repair_details == 3 ){
+          $do_it_yourself = 1;
+        } else {
+          $do_it_yourself = 0;
+        }
 
         Device::find($id)->update([
           'category' => $category,
@@ -580,9 +591,9 @@ class DeviceController extends Controller
           'problem' => $problem,
           'spare_parts' => $spare_parts,
           'repair_status' => $repair_status,
-          'more_time_needed' => 0,
-          'professional_help' => 0,
-          'do_it_yourself' => 0,
+          'more_time_needed' => $more_time_needed,
+          'do_it_yourself' => $professional_help,
+          'professional_help' => $do_it_yourself,
           'wiki' => $wiki,
         ]);
 
@@ -597,11 +608,48 @@ class DeviceController extends Controller
         $stats = $event->getEventStats($EmissionRatio);
         $data['stats'] = $stats;
 
+        // if ($repair_status == 0) {
+        //   $data['error'] = "Device couldn't be updated - no repair details added";
+        //   return response()->json($data);
+        // }
+
         $data['success'] = "Device updated!";
 
         return response()->json($data);
 
-      }
+      // } else {
+      //
+      //   Device::find($id)->update([
+      //     'category' => $category,
+      //     'category_creation' => $category,
+      //     'brand' => $brand,
+      //     'model' => $model,
+      //     'age' => $age,
+      //     'problem' => $problem,
+      //     'spare_parts' => $spare_parts,
+      //     'repair_status' => $repair_status,
+      //     'more_time_needed' => 0,
+      //     'professional_help' => 0,
+      //     'do_it_yourself' => 0,
+      //     'wiki' => $wiki,
+      //   ]);
+      //
+      //   $event = Party::find($event_id);
+      //
+      //   $Device = new Device;
+      //   $weights = $Device->getWeights();
+      //
+      //   $TotalWeight = $weights[0]->total_weights;
+      //   $TotalEmission = $weights[0]->total_footprints;
+      //   $EmissionRatio = $TotalEmission / $TotalWeight;
+      //   $stats = $event->getEventStats($EmissionRatio);
+      //   $data['stats'] = $stats;
+      //
+      //   $data['success'] = "Device updated!";
+      //
+      //   return response()->json($data);
+      //
+      // }
 
     }
 

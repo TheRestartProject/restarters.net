@@ -10,7 +10,7 @@
                   <td width="200">
                       <div class="form-control form-control__select">
                           <select id="device-start" name="category" class="category select2">
-                              <option value="0">-- Category --</option>
+                              <option value="">-- Category --</option>
                               @foreach( $clusters as $cluster )
                               <optgroup label="{{{ $cluster->name }}}">
                                   @foreach( $cluster->categories as $category )
@@ -30,7 +30,8 @@
                   <td width="150">
                       <div class="form-control form-control__select">
                           <select name="brand" class="brand select2-with-input">
-                              <option value="0">-- Brand --</option>
+                              <option value="">-- Brand --</option>
+                              <option value=""></option>
                               @foreach($brands as $brand)
                                 <option value="{{ $brand->brand_name }}">{{ $brand->brand_name }}</option>
                               @endforeach
@@ -72,7 +73,6 @@
                           </div>
                       </div>
                   </td>
-                  <td>
                   <td>
                       <div class="form-control form-control__select">
                           <select name="spare_parts" class="spare_parts select2">

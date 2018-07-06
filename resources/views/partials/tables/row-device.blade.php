@@ -12,8 +12,10 @@
       <td><div class="repair_status"><span class="badge badge-success">Fixed</span></div></td>
     @elseif ( $device->repair_status == 2 )
       <td><div class="repair_status"><span class="badge badge-warning">Repairable</span></div></td>
-    @else
+    @elseif ( $device->repair_status == 3 )
       <td><div class="repair_status"><span class="badge badge-danger">End</span></div></td>
+    @else
+      <td><div class="repair_status"></div></td>
     @endif
     <?php /*
     @if ($device->more_time_needed == 1)
@@ -47,7 +49,7 @@
                     <label for="nested-5">Category:</label>
                     <div class="form-control form-control__select">
                         <select name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
-                            <option value="0">-- Category --</option>
+                            <option value="">-- Category --</option>
                             @foreach( $clusters as $cluster )
                             <optgroup label="{{{ $cluster->name }}}">
                                 @foreach( $cluster->categories as $category )
@@ -86,6 +88,11 @@
                             <select name="brand-{{ $device->iddevices }}" class="select2-with-input" id="brand-{{ $device->iddevices }}">
                                 @php($i = 1)
                                 @foreach($brands as $brand)
+                                  @if( empty($device->brand) )
+                                    <option value="" selected></option>
+                                  @else
+                                    <option value=""></option>
+                                  @endif
                                   @if ($device->brand == $brand->brand_name)
                                     <option value="{{ $brand->brand_name }}" selected>{{ $brand->brand_name }}</option>
                                     @php($i++)
@@ -181,7 +188,7 @@
                     </td>
                     <td colspan="3" class="table-cell-upload-td">
                         <div class="table-cell-upload">
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label for="file">Add image:</label>
 
                                 <form id="dropzoneEl" class="dropzone" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1="Add device images here" data-field2="Choose compelling images that show off your work">
@@ -192,7 +199,7 @@
 
                                 <div class="previews"></div>
 
-                            </div>
+                            </div> -->
 
                             <div class="row">
                                 <div class="col-9 d-flex align-content-center flex-column">
