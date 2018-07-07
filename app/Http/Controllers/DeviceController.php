@@ -131,8 +131,11 @@ class DeviceController extends Controller
 
   public function edit($id){
       // $this->set('title', 'Edit Device');
+
+      $device = Device::find($id);
+
       $user = Auth::user();
-      if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($party, $user->id) ){
+      if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->party, $user->id) ){
 
           $Device = new Device;
 
@@ -204,7 +207,7 @@ class DeviceController extends Controller
 
       }
       else {
-          header('Location: /user/forbidden');
+          return redirect('/user/forbidden');
       }
   }
 
