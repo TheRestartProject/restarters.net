@@ -667,7 +667,12 @@ class PartyController extends Controller {
       $images = $File->findImages(env('TBL_EVENTS'), $id);
       $party = $Party->findThis($id, true)[0];
       $hosts = EventsUsers::where('event', $id)->where('role', 3)->where('status', 1)->get();
-      $is_attending = EventsUsers::where('event', $id)->where('user', Auth::user()->id)->first();
+      
+      if( Auth::check() ){
+        $is_attending = EventsUsers::where('event', $id)->where('user', Auth::user()->id)->first();
+      } else {
+        $is_attending = null;
+      }
 
       //Info for attendance tabs
       $attendees = EventsUsers::where('event', $id)->where('status', 1);

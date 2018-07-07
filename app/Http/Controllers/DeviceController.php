@@ -655,7 +655,7 @@ class DeviceController extends Controller
 
   }
 
-  public function delete($id){
+  public function delete(Request $request, $id){
       $Device = new Device;
       $user = Auth::user();
 
@@ -664,15 +664,18 @@ class DeviceController extends Controller
       $party = $curr->event;
 
       if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($party, $user->id) ){
-          // echo $party; //die();
-
           $r = $curr->delete();
-
-          return redirect('/party/view/'.$party)->with('success', 'Device has been deleted!');
-
-      }
-      else {
-          return redirect('/party/view/'.$party->with('warning', 'You do not have the right permissions for deleting a device'));
+          if( $request->ajax() ){
+            return response()->json(['success' => true]);
+          } else {
+            return redirect('/party/view/'.$party)->with('success', 'Device has been deleted!');
+          }
+      } else {
+          if( $request->ajax() ){
+            return response()->json(['success' => false]);
+          } else {
+            return redirect('/party/view/'.$party->with('warning', 'You do not have the right permissions for deleting a device'));
+          }
       }
   }
 

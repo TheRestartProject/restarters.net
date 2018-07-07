@@ -1132,7 +1132,29 @@ $( document ).ready(function() {
 
   });
 
+  jQuery(document).on('click', '.delete-device', function (e) {
+
+    e.preventDefault();
+    if (window.confirm("Are you sure? This cannot be undone.")) {
+      $device = jQuery(this).data('device-id');
+      $href = $(this).attr('href');
+      $.ajax({
+        type: 'get',
+        url: $href,
+        success: function(data) {
+          $('#summary-'+$device).fadeOut(1000);
+          $('#row-'+$device).fadeOut(1000);
+        },
+        error: function(error) {
+          alert(error);
+        }
+      });
+    }
+
+  });
+
   $('#description').on('summernote.change', function(e) {
     $('#free_text').val($('#description').summernote('code'));
   });
+
 });

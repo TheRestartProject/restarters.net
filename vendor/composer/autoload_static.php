@@ -428,6 +428,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Dashboard' => __DIR__ . '/../..' . '/app/Dashboard.php',
         'App\\Device' => __DIR__ . '/../..' . '/app/Device.php',
+        'App\\DeviceList' => __DIR__ . '/../..' . '/app/DeviceList.php',
         'App\\EventsUsers' => __DIR__ . '/../..' . '/app/EventsUsers.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Export' => __DIR__ . '/../..' . '/app/Export.php',

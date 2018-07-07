@@ -22,8 +22,11 @@
                           </select>
                       </div>
                       <div id="display-weight" style="display: none;">
-                          <div class="form-group">
-                              <input type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="Est. weight kg" autocomplete="off" disabled>
+                          <div class="input-group">
+                              <input type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="Est. weight" autocomplete="off" disabled>
+                              <div class="input-group-append">
+                                <span class="input-group-text" id="validationTooltipUsernamePrepend">kg</span>
+                              </div>
                           </div>
                       </div>
                   </td>

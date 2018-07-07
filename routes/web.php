@@ -33,119 +33,140 @@ Route::get('/about', function() {
     return View::make('features.index');
 })->name('features');
 
+Route::get('/event/view/{id}', 'PartyController@view');
+
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
   Route::get('/', 'HomeController@index')->name('home');
 
   //User Controller
-  Route::get('/profile', 'UserController@index')->name('profile');
-  Route::get('/profile/{id}', 'UserController@index');
-  Route::get('/profile/edit/{id?}', 'UserController@getProfileEdit');
-  Route::post('profile/edit-info', 'UserController@postProfileInfoEdit');
-  Route::post('profile/edit-password', 'UserController@postProfilePasswordEdit');
-  Route::post('profile/edit-preferences', 'UserController@postProfilePreferencesEdit');
-  Route::post('profile/edit-tags', 'UserController@postProfileTagsEdit');
-  Route::post('profile/edit-photo', 'UserController@postProfilePictureEdit');
-  Route::post('/edit-user', 'UserController@postEdit');
-  Route::get('/user/create', 'UserController@create');
-  Route::post('/user/create', 'UserController@create');
-  Route::get('/user/all', 'UserController@all')->name('users');
-  Route::get('/user/edit/{id}', 'UserController@edit');
-  Route::post('/user/edit/{id}', 'UserController@edit');
-  Route::post('user/soft-delete', 'UserController@postSoftDeleteUser');
-  Route::get('/user/onboarding-complete', 'UserController@getOnboardingComplete');
+  Route::prefix('profile')->group(function () {
+    Route::get('/', 'UserController@index')->name('profile');
+    Route::get('/{id}', 'UserController@index');
+    Route::get('/edit/{id?}', 'UserController@getProfileEdit');
+    Route::post('/edit-info', 'UserController@postProfileInfoEdit');
+    Route::post('/edit-password', 'UserController@postProfilePasswordEdit');
+    Route::post('/edit-preferences', 'UserController@postProfilePreferencesEdit');
+    Route::post('/edit-tags', 'UserController@postProfileTagsEdit');
+    Route::post('/edit-photo', 'UserController@postProfilePictureEdit');
+  });
 
-  //Test NB: Remove after testing!!
-  //Route::get('/test', 'PartyController@test');
+  Route::post('/edit-user', 'UserController@postEdit');
+
+  Route::prefix('user')->group(function () {
+    Route::get('/create', 'UserController@create');
+    Route::post('/create', 'UserController@create');
+    Route::get('/all', 'UserController@all')->name('users');
+    Route::get('/edit/{id}', 'UserController@edit');
+    Route::post('/edit/{id}', 'UserController@edit');
+    Route::post('/soft-delete', 'UserController@postSoftDeleteUser');
+    Route::get('/onboarding-complete', 'UserController@getOnboardingComplete');
+  });
 
   //Admin Controller
-  Route::get('/admin', 'AdminController@index');
-  Route::get('/admin/stats', 'AdminController@stats');
+  Route::prefix('admin')->group(function () {
+    Route::get('/', 'AdminController@index');
+    Route::get('/stats', 'AdminController@stats');
+  });
 
   //Category Controller
-  Route::get('/category', 'CategoryController@index')->name('category');
-  Route::get('/category/edit/{id}', 'CategoryController@getEditCategory');
-  Route::post('/category/edit/{id}', 'CategoryController@postEditCategory');
+  Route::prefix('category')->group(function () {
+    Route::get('/', 'CategoryController@index')->name('category');
+    Route::get('/edit/{id}', 'CategoryController@getEditCategory');
+    Route::post('/edit/{id}', 'CategoryController@postEditCategory');
+  });
 
   //Dashboard Controller
-  Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
-  Route::get('/dashboard/host', 'DashboardController@getHostDash');
+  Route::prefix('dashboard')->group(function () {
+    Route::get('/', 'DashboardController@index')->name('dashboard');
+    Route::get('/host', 'DashboardController@getHostDash');
+  });
 
   //Device Controller
-  Route::get('/device', 'DeviceController@index')->name('devices');
-  Route::get('/device/search', 'DeviceController@index');
-  // Route::get('/device/edit/{id}', 'DeviceController@edit');
-  // Route::post('/device/edit/{id}', 'DeviceController@edit');
-  Route::post('/device/edit/{id}', 'DeviceController@ajaxEdit');
-  // Route::get('/device/create', 'DeviceController@create');
-  // Route::post('/device/create', 'DeviceController@create');
-  Route::post('/device/create', 'DeviceController@ajaxCreate');
-  Route::get('/device/delete/{id}', 'DeviceController@delete');
-  Route::post('/device/image-upload/{id}', 'DeviceController@imageUpload');
+  Route::prefix('device')->group(function () {
+    Route::get('/', 'DeviceController@index')->name('devices');
+    Route::get('/search', 'DeviceController@index');
+    Route::post('/edit/{id}', 'DeviceController@ajaxEdit');
+    Route::post('/create', 'DeviceController@ajaxCreate');
+    Route::get('/delete/{id}', 'DeviceController@delete');
+    Route::post('/image-upload/{id}', 'DeviceController@imageUpload');
+  });
 
   //Group Controller
-  Route::get('/group/create', 'GroupController@create')->name('create-group');
-  Route::post('/group/create', 'GroupController@create');
-  Route::get('/group/edit/{id}', 'GroupController@edit');
-  Route::post('/group/edit/{id}', 'GroupController@edit');
-  Route::get('/group/view/{id}', 'GroupController@view');
-  Route::post('/group/invite', 'GroupController@postSendInvite');
-  Route::get('/group/accept-invite/{id}/{hash}', 'GroupController@confirmInvite');
-  Route::get('/group/join/{id}', 'GroupController@getJoinGroup');
-  Route::get('/group/image/delete/{idgroups}/{id}/{path}', 'GroupController@deleteImage');
-  Route::get('/group/{all?}', 'GroupController@index')->name('groups');
+  Route::prefix('group')->group(function () {
+    Route::get('/create', 'GroupController@create')->name('create-group');
+    Route::post('/create', 'GroupController@create');
+    Route::get('/edit/{id}', 'GroupController@edit');
+    Route::post('/edit/{id}', 'GroupController@edit');
+    Route::get('/view/{id}', 'GroupController@view');
+    Route::post('/invite', 'GroupController@postSendInvite');
+    Route::get('/accept-invite/{id}/{hash}', 'GroupController@confirmInvite');
+    Route::get('/join/{id}', 'GroupController@getJoinGroup');
+    Route::get('/image/delete/{idgroups}/{id}/{path}', 'GroupController@deleteImage');
+    Route::get('/{all?}', 'GroupController@index')->name('groups');
+  });
 
   //Outbound Controller
   Route::get('/outbound', 'OutboundController@index');
 
   //Party Controller
-  Route::get('/party/', 'PartyController@index')->name('events');
-  Route::get('/party/group/{group_id?}', 'PartyController@index')->name('group-events');
-  Route::get('/party/create', 'PartyController@create');
-  Route::post('/party/create', 'PartyController@create');
-  Route::get('/party/manage/{id}', 'PartyController@manage');
-  Route::post('/party/manage/{id}', 'PartyController@manage');
-  Route::get('/party/edit/{id}', 'PartyController@edit');
-  Route::post('/party/edit/{id}', 'PartyController@edit');
-  Route::get('/party/deleteimage', 'PartyController@deleteimage');
-  Route::get('/party/join/{id}', 'PartyController@getJoinEvent');
-  Route::post('/party/invite', 'PartyController@postSendInvite');
-  Route::get('/party/accept-invite/{id}/{hash}', 'PartyController@confirmInvite');
-  Route::get('/party/cancel-invite/{id}', 'PartyController@cancelInvite');
-  Route::post('/party/remove-volunteer', 'PartyController@removeVolunteer');
-  Route::get('/party/view/{id}', 'PartyController@view');
-  Route::post('/party/get-group-emails', 'PartyController@getGroupEmails');
-  Route::post('/party/update-quantity', 'PartyController@updateQuantity');
-  Route::get('/party/image/delete/{idevents}/{id}/{path}', 'PartyController@deleteImage');
+  Route::prefix('party')->group(function () {
+    Route::get('/', 'PartyController@index')->name('events');
+    Route::get('/group/{group_id?}', 'PartyController@index')->name('group-events');
+    Route::get('/create', 'PartyController@create');
+    Route::post('/create', 'PartyController@create');
+    Route::get('/manage/{id}', 'PartyController@manage');
+    Route::post('/manage/{id}', 'PartyController@manage');
+    Route::get('/edit/{id}', 'PartyController@edit');
+    Route::post('/edit/{id}', 'PartyController@edit');
+    Route::get('/deleteimage', 'PartyController@deleteimage');
+    Route::get('/join/{id}', 'PartyController@getJoinEvent');
+    Route::post('/invite', 'PartyController@postSendInvite');
+    Route::get('/accept-invite/{id}/{hash}', 'PartyController@confirmInvite');
+    Route::get('/cancel-invite/{id}', 'PartyController@cancelInvite');
+    Route::post('/remove-volunteer', 'PartyController@removeVolunteer');
+    Route::get('/view/{id}', 'PartyController@view');
+    Route::post('/get-group-emails', 'PartyController@getGroupEmails');
+    Route::post('/update-quantity', 'PartyController@updateQuantity');
+    Route::get('/image/delete/{idevents}/{id}/{path}', 'PartyController@deleteImage');
+  });
 
   //Role Controller
-  Route::get('/role', 'RoleController@index')->name('roles');
-  Route::get('/role/edit/{id}', 'RoleController@edit');
-  Route::post('/role/edit/{id}', 'RoleController@edit');
+  Route::prefix('role')->group(function () {
+    Route::get('/', 'RoleController@index')->name('roles');
+    Route::get('/edit/{id}', 'RoleController@edit');
+    Route::post('/edit/{id}', 'RoleController@edit');
+  });
 
   //Brand Controller
-  Route::get('/brands', 'BrandsController@index')->name('brands');
-  Route::get('/brands/create', 'BrandsController@getCreateBrand');
-  Route::post('/brands/create', 'BrandsController@postCreateBrand');
-  Route::get('/brands/edit/{id}', 'BrandsController@getEditBrand');
-  Route::post('/brands/edit/{id}', 'BrandsController@postEditBrand');
-  Route::get('/brands/delete/{id}', 'BrandsController@getDeleteBrand');
+  Route::prefix('brands')->group(function () {
+    Route::get('/', 'BrandsController@index')->name('brands');
+    Route::get('/create', 'BrandsController@getCreateBrand');
+    Route::post('/create', 'BrandsController@postCreateBrand');
+    Route::get('/edit/{id}', 'BrandsController@getEditBrand');
+    Route::post('/edit/{id}', 'BrandsController@postEditBrand');
+    Route::get('/delete/{id}', 'BrandsController@getDeleteBrand');
+  });
 
   //Skills Controller
-  Route::get('/skills', 'SkillsController@index')->name('skills');
-  Route::get('/skills/create', 'SkillsController@getCreateSkill');
-  Route::post('/skills/create', 'SkillsController@postCreateSkill');
-  Route::get('/skills/edit/{id}', 'SkillsController@getEditSkill');
-  Route::post('/skills/edit/{id}', 'SkillsController@postEditSkill');
-  Route::get('/skills/delete/{id}', 'SkillsController@getDeleteSkill');
+  Route::prefix('skills')->group(function () {
+    Route::get('/', 'SkillsController@index')->name('skills');
+    Route::get('/create', 'SkillsController@getCreateSkill');
+    Route::post('/create', 'SkillsController@postCreateSkill');
+    Route::get('/edit/{id}', 'SkillsController@getEditSkill');
+    Route::post('/edit/{id}', 'SkillsController@postEditSkill');
+    Route::get('/delete/{id}', 'SkillsController@getDeleteSkill');
+  });
 
   //GroupTags Controller
-  Route::get('/tags', 'GroupTagsController@index')->name('tags');
-  Route::get('/tags/create', 'GroupTagsController@getCreateTag');
-  Route::post('/tags/create', 'GroupTagsController@postCreateTag');
-  Route::get('/tags/edit/{id}', 'GroupTagsController@getEditTag');
-  Route::post('/tags/edit/{id}', 'GroupTagsController@postEditTag');
-  Route::get('/tags/delete/{id}', 'GroupTagsController@getDeleteTag');
+  Route::prefix('tags')->group(function () {
+    Route::get('/', 'GroupTagsController@index')->name('tags');
+    Route::get('/create', 'GroupTagsController@getCreateTag');
+    Route::post('/create', 'GroupTagsController@postCreateTag');
+    Route::get('/edit/{id}', 'GroupTagsController@getEditTag');
+    Route::post('/edit/{id}', 'GroupTagsController@postEditTag');
+    Route::get('/delete/{id}', 'GroupTagsController@getDeleteTag');
+  });
 
   //Search Controller
   Route::get('/search', 'SearchController@index');
