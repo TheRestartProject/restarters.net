@@ -113,6 +113,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   //Party Controller
   Route::prefix('party')->group(function () {
     Route::get('/', 'PartyController@index')->name('events');
+    Route::get('/all', 'PartyController@allUpcoming')->name('all-upcoming-events');
     Route::get('/group/{group_id?}', 'PartyController@index')->name('group-events');
     Route::get('/create', 'PartyController@create');
     Route::post('/create', 'PartyController@create');

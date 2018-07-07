@@ -62,7 +62,7 @@
             @if( !is_null($group) )
               <h2>Upcoming {{{ $group->name }}} events</h2>
             @else
-              <h2>Upcoming events</h2>
+              <h2>Upcoming events for your groups <sup>(<a href="{{{ route('all-upcoming-events') }}}">See all upcoming)</a></sup></h2>
             @endif
           </header>
 

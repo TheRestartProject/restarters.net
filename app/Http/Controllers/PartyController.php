@@ -119,6 +119,17 @@ class PartyController extends Controller {
 
   }
 
+  public function allUpcoming()
+  {
+
+      $all_upcoming_events = Party::allUpcomingEvents()->paginate(env('PAGINATE'));
+
+      return view('events.all', [
+        'upcoming_events'  => $all_upcoming_events,
+      ]);
+
+  }
+
   public function create()
   {
       $user = Auth::user();
@@ -1280,7 +1291,7 @@ class PartyController extends Controller {
       }
 
       if (!is_null($host)) {
-        
+
         //Send Notification to Host
         $arr = [
           'user_name' => $user->name,
@@ -1290,7 +1301,7 @@ class PartyController extends Controller {
         ];
 
         Notification::send($host, new RSVPEvent($arr, $host));
-        
+
       }
 
       return redirect('/party/view/'.$user_event->event);
