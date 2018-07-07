@@ -23,7 +23,7 @@
 
           <div id="invite_div" class="form-group">
               <label for="manual_invite_box">@lang('groups.email_addresses_field'):</label>
-              <input type="text" id="manual_invite_box" name="manual_invite_box" class="tokenfield form-control">
+              <input type="text" id="manual_invite_box" name="manual_invite_box" class="tokenfield form-control" autocomplete="off">
           </div>
           <small class="after-offset">@lang('groups.type_email_addresses_message')</small>
 
@@ -33,7 +33,7 @@
               <small class="form-text text-muted">@lang('groups.message_explainer')</small>
           </div>
 
-          <button type="submit" class="btn btn-primary float-right">@lang('groups.send_invite_button')</button>
+          <button disabled type="submit" class="btn btn-primary float-right">@lang('groups.send_invite_button')</button>
         </form>
 
         <!-- <form action="#">
