@@ -26,7 +26,11 @@ function validateForm() {
 
     var validation = Array.prototype.filter.call(form, function (form) {
 
-        form.querySelectorAll('[required]').forEach(element => {
+        // Convert to Array, as IE doesn't support forEach on NodeList.
+        // See e.g. https://github.com/babel/babel/issues/6511#issuecomment-338076009
+        var requiredFields = form.querySelectorAll('[required]');
+        var requiredFieldsArray = Array.from(requiredFields);
+        requiredFieldsArray.forEach(element => {
 
             console.log(element.checkValidity());
 
