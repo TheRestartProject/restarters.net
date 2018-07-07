@@ -371,7 +371,7 @@ class UserController extends Controller
             // $sender = mail($email, $subject, $message, $headers);
 
             User::find($id)->notify(new ResetPassword([
-                'url' => env('APP_URL') . "/user/reset/?recovery=" . $data['recovery']
+                'url' => env('APP_URL') . "/user/reset?recovery=" . $data['recovery']
             ]));
 
             // if(!$sender){
@@ -486,7 +486,7 @@ class UserController extends Controller
             );
             $update = $user->update($data);
             if($update){
-              return redirect('login?reset=ok');
+              return redirect('login')->with('success', 'Password updated, please login to continue');
             }
             else {
               $response['danger'] = "Could not update the password.";

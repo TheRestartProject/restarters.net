@@ -11,6 +11,13 @@
                 <div class="col-lg-6 d-flex">
 
                     <form action="{{ route('login') }}" method="post" class="card card__login col-12">
+
+                        @if (\Session::has('success'))
+                            <div class="alert alert-success">
+                                {!! \Session::get('success') !!}
+                            </div>
+                        @endif
+
                         @csrf
 
                         {!! Honeypot::generate('my_name', 'my_time') !!}

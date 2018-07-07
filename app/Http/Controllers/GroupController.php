@@ -707,39 +707,34 @@ class GroupController extends Controller
 
   }
 
-  public function confirmInvite($group_id, $hash, $register_id = null) {
+  public function confirmInvite($group_id, $hash) {
 
     try {
       $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
       $user_group->status = 1;
-
-      if (is_null($register_id)) {
-        $user_group->save();
-        $user = User::find($user_group->user);
-        try {
-          $host = User::find(UserGroups::where('group', $group_id)->where('role', 3)->first()->user);
-        } catch (\Exception $e) {
-          $host = null;
-        }
-
-        if (!is_null($host)) {
-          //Send Notification to Host
-          $arr = [
-            'user_name' => $user->name,
-            'group_name' => Group::find($group_id)->name,
-            'group_url' => url('/group/view/'.$group_id),
-            'preferences' => url('/profile/edit/'.$host->id),
-          ];
-
-          Notification::send($host, new NewGroupMember($arr, $host));
-        }
-
-        return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
-
-      } else {
-        $user_group->user = $register_id;
-        $user_group->save();
+      $user_group->save();
+      
+      $user = User::find($user_group->user);
+      try {
+        $host = User::find(UserGroups::where('group', $group_id)->where('role', 3)->first()->user);
+      } catch (\Exception $e) {
+        $host = null;
       }
+
+      if (!is_null($host)) {
+        //Send Notification to Host
+        $arr = [
+          'user_name' => $user->name,
+          'group_name' => Group::find($group_id)->name,
+          'group_url' => url('/group/view/'.$group_id),
+          'preferences' => url('/profile/edit/'.$host->id),
+        ];
+
+        Notification::send($host, new NewGroupMember($arr, $host));
+      }
+
+      return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
+
     } catch (\Exception $e) {
       return false;
     }
