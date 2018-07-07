@@ -13899,7 +13899,6 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .alert-success,
 .alert-delete {
   border: 0;
-  padding-right: 185px;
   position: relative;
   z-index: 1;
   color: #FFF;

@@ -31,7 +31,6 @@
 
     &-danger, &-primary, &-warning, &-success, &-delete {
         border: 0;
-        padding-right: 185px;
         position: relative;
         z-index: 1;
         color: #FFF;
@@ -68,7 +67,7 @@
     &-success {
         background-color: #4AC54B;
     }
-    
+
     &-danger {
         background-color: #D23714;
     }
