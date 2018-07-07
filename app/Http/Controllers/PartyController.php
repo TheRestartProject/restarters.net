@@ -667,7 +667,7 @@ class PartyController extends Controller {
       $images = $File->findImages(env('TBL_EVENTS'), $id);
       $party = $Party->findThis($id, true)[0];
       $hosts = EventsUsers::where('event', $id)->where('role', 3)->where('status', 1)->get();
-      
+
       if( Auth::check() ){
         $is_attending = EventsUsers::where('event', $id)->where('user', Auth::user()->id)->first();
       } else {
@@ -1265,38 +1265,36 @@ class PartyController extends Controller {
 
   }
 
-  public function confirmInvite($event_id, $hash, $register_id = null) {
+  public function confirmInvite($event_id, $hash) {
 
     try {
       $user_event = EventsUsers::where('status', $hash)->where('event', $event_id)->first();
       $user_event->status = 1;
 
-      if (is_null($register_id)) {
-        $user_event->save();
-        $user = User::find($user_event->user);
-        try {
-          $host = User::find(EventsUsers::where('event', $event_id)->where('role', 3)->first()->user);
-        } catch (\Exception $e) {
-          $host = null;
-        }
-
-        if (!is_null($host)) {
-          //Send Notification to Host
-          $arr = [
-            'user_name' => $user->name,
-            'event_venue' => Party::find($event_id)->venue,
-            'event_url' => url('/event/view/'.$event_id),
-            'preferences' => url('/profile/edit/'.$host->id),
-          ];
-
-          Notification::send($host, new RSVPEvent($arr, $host));
-        }
-
-        return redirect('/party/view/'.$user_event->event);
-      } else {
-        $user_event->user = $register_id;
-        $user_event->save();
+      $user_event->save();
+      $user = User::find($user_event->user);
+      try {
+        $host = User::find(EventsUsers::where('event', $event_id)->where('role', 3)->first()->user);
+      } catch (\Exception $e) {
+        $host = null;
       }
+
+      if (!is_null($host)) {
+        
+        //Send Notification to Host
+        $arr = [
+          'user_name' => $user->name,
+          'event_venue' => Party::find($event_id)->venue,
+          'event_url' => url('/event/view/'.$event_id),
+          'preferences' => url('/profile/edit/'.$host->id),
+        ];
+
+        Notification::send($host, new RSVPEvent($arr, $host));
+        
+      }
+
+      return redirect('/party/view/'.$user_event->event);
+
     } catch (\Exception $e) {
       return false;
     }

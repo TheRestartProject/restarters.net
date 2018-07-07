@@ -572,7 +572,10 @@ class GroupController extends Controller
       //Checking user for validatity
       $in_group = !empty(UserGroups::where('group', $groupid)
                           ->where('user', $user->id)
-                            ->first());
+                            ->where(function ($query) {
+                                $query->where('status', '1')
+                                  ->orWhereNull('status');
+                            })->first());
 
       $is_host_of_group = FixometerHelper::userHasEditGroupPermission($groupid, $user->id);
 
