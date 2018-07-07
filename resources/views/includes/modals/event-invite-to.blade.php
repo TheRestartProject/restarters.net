@@ -15,7 +15,7 @@
 
         <p>@lang('events.invite_restarters_modal_description')</p>
 
-        <form action="/party/invite" method="post">
+        <form action="/party/invite" method="post" onkeypress="return event.keyCode != 13;">
           @csrf
 
           <input type="hidden" name="group_name" value="{{ $formdata->group_name }}">
@@ -30,7 +30,7 @@
 
           <div id="invite_div" class="form-group">
               <label for="manual_invite_box">@lang('events.manual_invite_box'):</label>
-              <input type="text" id="manual_invite_box" name="manual_invite_box" class="tokenfield form-control">
+              <input type="text" id="manual_invite_box" name="manual_invite_box" class="tokenfield form-control" autocomplete="off">
           </div>
           <small class="after-offset">@lang('events.type_email_addresses_message')</small>
 
@@ -40,7 +40,7 @@
               <small class="form-text text-muted">@lang('events.message_explainer')</small>
           </div>
 
-          <button type="submit" class="btn btn-primary float-right">@lang('events.send_invite_button')</button>
+          <button disabled type="submit" class="btn btn-primary float-right">@lang('events.send_invite_button')</button>
         </form>
 
       </div>

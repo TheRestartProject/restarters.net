@@ -878,12 +878,31 @@ $( document ).ready(function() {
   });
 });
 
+
+function tokenFieldCheck(){
+    var count_tokens = document.getElementById("manual_invite_box").value.split(",");
+    console.log(count_tokens.length);
+    if( $('#manual_invite_box').val() === '' ) {
+      $('#event-invite-to button').prop('disabled', true);
+    } else if( count_tokens.length === 0 ){
+      $('#event-invite-to button').prop('disabled', true);
+    } else {
+      $('#event-invite-to button').prop('disabled', false);
+    }
+}
+
+
 $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
     var existingTokens = $(this).tokenfield('getTokens');
     $.each(existingTokens, function(index, token) {
         if (token.value === event.attrs.value)
             event.preventDefault();
     });
+    tokenFieldCheck();
+});
+
+$('#manual_invite_box').on('tokenfield:removedtoken', function (event) {
+    tokenFieldCheck();
 });
 
 function updateParticipants() {
