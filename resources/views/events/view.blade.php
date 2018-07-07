@@ -244,10 +244,12 @@
                                 @foreach( $invited_summary as $volunteer )
                                   @include('partials.volunteer-badge', ['type' => 'invited'])
                                 @endforeach
-                                @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') || FixometerHelper::hasRole(Auth::user(), 'Administrator') ) && !$event->hasFinished() )
-                                  <li class="users-list__invite">
-                                      <button data-toggle="modal" data-target="#event-invite-to">Invite to join event</button>
-                                  </li>
+                                @if( Auth::check() )
+                                  @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') || FixometerHelper::hasRole(Auth::user(), 'Administrator') ) && !$event->hasFinished() )
+                                    <li class="users-list__invite">
+                                        <button data-toggle="modal" data-target="#event-invite-to">Invite to join event</button>
+                                    </li>
+                                  @endif
                                 @endif
                               </ul>
                               @if( count($invited) > 0 )
@@ -279,8 +281,10 @@
                                   <th>Description of problem/solution</th>
                                   <th width="65px">Status</th>
                                   <th width="95px" class="text-center">Spare parts</th>
-                                  @if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) )
-                                    <th width="35px"></th>
+                                  @if( Auth::check() )
+                                    @if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) )
+                                      <th width="35px"></th>
+                                    @endif
                                   @endif
                               </tr>
                           </thead>

@@ -1,4 +1,8 @@
-@include('layouts/header')
+@if( Auth::guest() )
+  @include('layouts/header_plain')
+@else
+  @include('layouts/header')
+@endif
 @yield('content')
 
 <!-- Modal -->

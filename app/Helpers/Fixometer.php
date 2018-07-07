@@ -44,6 +44,10 @@ class FixometerHelper {
   /** checks if user has a role **/
   public static function hasRole($user, $role){
 
+        if ( Auth::guest() ) {
+          return false;
+        }
+
         if (is_null($user)) {
           $user = Auth::user();
         }

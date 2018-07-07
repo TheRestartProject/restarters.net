@@ -33,7 +33,7 @@ Route::get('/about', function() {
     return View::make('features.index');
 })->name('features');
 
-Route::get('/event/view/{id}', 'PartyController@view');
+Route::get('/party/view/{id}', 'PartyController@view');
 
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
@@ -125,7 +125,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/accept-invite/{id}/{hash}', 'PartyController@confirmInvite');
     Route::get('/cancel-invite/{id}', 'PartyController@cancelInvite');
     Route::post('/remove-volunteer', 'PartyController@removeVolunteer');
-    Route::get('/view/{id}', 'PartyController@view');
     Route::post('/get-group-emails', 'PartyController@getGroupEmails');
     Route::post('/update-quantity', 'PartyController@updateQuantity');
     Route::get('/image/delete/{idevents}/{id}/{path}', 'PartyController@deleteImage');
