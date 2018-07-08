@@ -37,7 +37,7 @@ return [
     'user' => 'User',
     'reporting' => 'Reporting',
     'time_reporting' => 'Volunteer hours',
-    'party_reporting' => 'Party reporting',
+    'party_reporting' => 'Event reporting',
     'signmeup' => 'Sign me up!',
     'register-signin' => 'Register/Sign in',
     'introduction_message' => 'We are a global community of people who help others fix their electronics in community events. Join us!',
