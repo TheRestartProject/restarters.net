@@ -394,8 +394,7 @@ class Party extends Model
 
     public function scopeAllUpcomingEvents(){
         return $this->whereDate('event_date', '>=', date('Y-m-d'))
-                      ->orderBy('wordpress_post_id', 'ASC')
-                        ->orderBy('event_date', 'ASC');
+                    ->orderByRaw('UNIX_TIMESTAMP( CONCAT(`event_date`, " ", `start`) )');
     }
 
     public function scopeRequiresModeration(){
