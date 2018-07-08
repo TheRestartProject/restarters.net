@@ -154,7 +154,7 @@ class PartyController extends Controller {
       if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
 
 
-          $error = array(); 
+          $error = array();
 
           // Add SuperHero Restarter!
           // $_POST['users'][] = 29;
