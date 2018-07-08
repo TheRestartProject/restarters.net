@@ -1,5 +1,5 @@
 <section class="dashboard__block">
-    <img src="/images/dashboard/dashboard__restarters_in_your_area.jpg" alt="">
+    <img src="/images/dashboard/dashboard__restarters_in_your_area.jpg" alt="Volunteers meeting members of the public to help with their device problems">
     <div class="dashboard__block__content">
         <h4>Restarters in your area</h4>
         @if ( FixometerHelper::hasRole(Auth::user(), 'Restarter') )

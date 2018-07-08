@@ -31,8 +31,6 @@
           <div class="row">
               <div class="col-lg-4">
 
-                  <p>@lang('devices.edit_devices_details_content')</p>
-
                   <div class="form-group <?php if(isset($error) && isset($error['event']) && !empty($error['event'])) { echo "has-error"; } ?>">
                       <label for="event">Restart Party:</label>
                       <div class="form-control form-control__select">

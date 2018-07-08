@@ -1,5 +1,5 @@
 <section class="dashboard__block">
-    <img src="/images/dashboard/dashboard__getting-started-in-community-repair-1.png" alt="">
+    <img src="/images/dashboard/dashboard__getting-started-in-community-repair-1.png" alt="Materials for promoting upcoming Restart events">
     <div class="dashboard__block__content">
         <h4>Getting started in community repair</h4>
         <p>We offer materials on how to help organise repair events in your community.</p>

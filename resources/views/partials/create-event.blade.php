@@ -1,5 +1,5 @@
 <section class="dashboard__block">
-    <img src="/images/dashboard/dashboard__create_an_event.jpg" alt="">
+    <img src="/images/dashboard/dashboard__create_an_event.jpg" alt="A Restarter fixing a device at an event">
     <div class="dashboard__block__content">
       <h4>Create a new event</h4>
       <p>Create an event here to publicise it to our network, and to invite volunteers. Afterwards, you can log repairs and discover its impact.</p>

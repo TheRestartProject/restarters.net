@@ -17,7 +17,7 @@
       <div class="modal-slideshow">
         <div>
             <article>
-                <img src="/images/onboarding/onboarding_1.jpg" class="rounded-circle img-fluid" alt="" width="250">
+                <img src="/images/onboarding/onboarding_1.jpg" class="rounded-circle img-fluid" alt="Two Restarters attempting a fix" width="250">
                 <h1>@lang('onboarding.slide1_heading')</h1>
                 @lang('onboarding.slide1_content')
             </article>
@@ -25,7 +25,7 @@
 
         <div>
             <article>
-                <img src="/images/onboarding/onboarding_2.jpg" class="rounded-circle img-fluid" alt="" width="250">
+                <img src="/images/onboarding/onboarding_2.jpg" class="rounded-circle img-fluid" alt="A volunteer helping a member of the public with their phone" width="250">
                 <h1>@lang('onboarding.slide2_heading')</h1>
                 @lang('onboarding.slide2_content')
             </article>
@@ -33,7 +33,7 @@
 
         <div>
             <article>
-                <img src="/images/onboarding/onboarding_3.jpg" class="rounded-circle img-fluid" alt="" width="250">
+                <img src="/images/onboarding/onboarding_3.jpg" class="rounded-circle img-fluid" alt="A Restarter fixing a device at one of our events" width="250">
                 <h1>@lang('onboarding.slide3_heading')</h1>
                 @lang('onboarding.slide3_content')
             </article>

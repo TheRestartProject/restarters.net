@@ -1,5 +1,5 @@
 <section class="dashboard__block">
-    <img src="/images/dashboard/dashboard__how-to-set-up-a-group.png" alt="">
+    <img src="/images/dashboard/dashboard__how-to-set-up-a-group.png" alt="A screenshot of our Fixometer platform">
     <div class="dashboard__block__content">
         <h4>How to set up a group</h4>
         <p>Once you've gone through some preliminary steps to organise a group, we can create one for you here.</p>

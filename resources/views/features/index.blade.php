@@ -10,7 +10,7 @@
             <p>@lang('general.introduction_message')</p>
         </header>
         <div class="slideshow">
-            <div><img src="{{ url('/images/slides/0-onboard-overview.png') }}" alt=""></div>
+            <div><img src="{{ url('/images/slides/0-onboard-overview.png') }}" alt="Summary of our community platform"></div>
             <div><img src="{{ url('/images/slides/1-onboard-discussion.png') }}" alt="Learn how to organise and volunteer at events"><h2 class="featured-slide__heading">Learn how to organise and volunteer at events</h2></div>
             <div><img src="{{ url('/images/slides/2-onboard-technicalhelp.jpg') }}" alt="Get technical help, on tools, safety and risk"><h2 class="featured-slide__heading">Get technical help, on tools, safety and risk</h2></div>
             <div><img src="{{ url('/images/slides/3-onboard-manage-event.png') }}" alt="Announce an event, find people"><h2 class="featured-slide__heading">Announce an event, find people</h2></div>
