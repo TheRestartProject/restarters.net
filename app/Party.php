@@ -390,11 +390,10 @@ class Party extends Model
                             ->groupBy('idevents')
                               ->orderBy('wordpress_post_id', 'ASC')
                                 ->orderBy('event_date', 'ASC');
-    }
-
+    } 
     public function scopeAllUpcomingEvents(){
-        return $this->whereDate('event_date', '>=', date('Y-m-d'))
-                    ->orderByRaw('UNIX_TIMESTAMP( CONCAT(`event_date`, " ", `start`) )');
+        return $this->whereRaw('CONCAT(`event_date`, " ", `start`) > CURRENT_TIMESTAMP()')
+                    ->orderByRaw('CONCAT(`event_date`, " ", `start`)');
     }
 
     public function scopeRequiresModeration(){
