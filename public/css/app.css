@@ -13791,11 +13791,22 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   padding: 8px 15px 10px;
   width: 100%;
   text-align: left;
+  text-decoration: none;
+}
+
+.accordion__share .card-header .btn:hover {
+  text-decoration: underline;
+}
+
+.accordion__share .card-header .btn:active,
+.accordion__share .card-header .btn:focus {
+  text-decoration: none;
+  outline: 2px solid rgba(3, 148, 166, 0.5);
 }
 
 .accordion__share .card-header .btn .accordion-arrow {
   float: right;
-  margin-top: 12px;
+  margin-top: 6px;
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);
 }

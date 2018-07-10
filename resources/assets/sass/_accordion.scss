@@ -18,10 +18,20 @@
       padding: 8px 15px 10px;
       width: 100%;
       text-align: left;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      &:active, &:focus {
+        text-decoration: none;
+        outline: 2px solid rgba(3, 148, 166, 0.5);
+      }
 
       .accordion-arrow {
         float: right;
-        margin-top: 12px;
+        margin-top: 6px;
         transform: rotate(180deg);
       }
 
