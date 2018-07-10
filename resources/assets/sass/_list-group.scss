@@ -10,6 +10,17 @@
         margin: 0;
         font-family: $font-family-sans-serif;
 
+        &:hover {
+            text-decoration: underline;
+            background-color: #fff;
+        }
+
+        &:focus, &:active {
+            text-decoration: none;
+            outline: 2px solid rgba(3, 148, 166, 0.5);
+            background-color: #fff;
+        }
+
         &:first-child {
             border-top:1px solid #D9D9D9;
         }
