@@ -15,6 +15,14 @@ body {
   }
 }
 
+.overflow-hidden {
+  overflow: hidden;
+
+  body {
+    overflow: hidden;
+  }
+}
+
 .container {
   max-width: 1270px;
 }

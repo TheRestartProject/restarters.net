@@ -318,3 +318,17 @@
     }
 
 }
+
+.button-group-filters {
+    @include media-breakpoint-down(lg) {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: inherit;
+        padding-bottom: 10px;
+
+        .btn {
+            margin: auto 0;
+        }    
+    }
+}
+

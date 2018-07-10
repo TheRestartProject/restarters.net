@@ -24112,6 +24112,14 @@ jQuery(function () {
     if (window.location.hash === '#change-password' && jQuery('#list-account').length > 0) {
         jQuery('#list-account-list').tab('show');
     }
+
+    jQuery('#collapseFilter').on('show.bs.collapse', function () {
+        jQuery('html').addClass('overflow-hidden');
+    });
+
+    jQuery('#collapseFilter').on('hidden.bs.collapse', function () {
+        jQuery('html').removeClass('overflow-hidden');
+    });
 });
 
 jQuery(document).ready(function () {

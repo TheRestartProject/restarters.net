@@ -14374,6 +14374,26 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   background-color: #0062cc;
 }
 
+@media (max-width: 1199.98px) {
+  .button-group-filters {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-flow: row wrap;
+            flex-flow: row wrap;
+    -webkit-box-pack: inherit;
+        -ms-flex-pack: inherit;
+            justify-content: inherit;
+    padding-bottom: 10px;
+  }
+
+  .button-group-filters .btn {
+    margin: auto 0;
+  }
+}
+
 .badge {
   font-family: "Patua One", cursive, sans-serif;
 }
@@ -14431,6 +14451,12 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   padding-left: 0;
   padding-right: 0;
   border-radius: 0;
+}
+
+@media (max-width: 991.98px) {
+  .breadcrumb {
+    margin-bottom: 0;
+  }
 }
 
 .breadcrumb li {
@@ -15921,6 +15947,50 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   border-radius: 5px;
 }
 
+@media (max-width: 767.98px) {
+  .fixed-overlay {
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    background: #FFF;
+    height: 100%;
+    overflow: scroll;
+    padding: 30px;
+    background-color: #F9F9F9;
+  }
+
+  .fixed-overlay .block {
+    border: 0;
+    background-color: transparent;
+    padding: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .mobile-search-bar {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-line-pack: center;
+        align-content: center;
+    padding: 0 0 30px 0 !important;
+  }
+
+  .mobile-search-bar__close {
+    margin: auto 0 auto 30px;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+  }
+
+  .mobile-search-bar__close svg {
+    display: block;
+    margin: auto;
+  }
+}
+
 .edit-panel {
   background-color: #F9F9F9;
   border: 1px solid #D9D9D9;
@@ -17333,6 +17403,14 @@ body > .container {
   body {
     padding-bottom: 65px;
   }
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-hidden body {
+  overflow: hidden;
 }
 
 .container {

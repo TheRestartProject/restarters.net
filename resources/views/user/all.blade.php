@@ -3,14 +3,15 @@
   <div class="container">
     <div class="row justify-content-end">
       <div class="col">
-        <div class="d-flex justify-content-between">
+        <div class="d-md-flex justify-content-between">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
               <li class="breadcrumb-item active" aria-current="page">USERS</li>
             </ol>
           </nav>
-          <div class="">
+          <div class="button-group-filters">
+            <button class="reveal-filters btn btn-secondary d-md-none d-lg-none d-xl-none" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal filters</button>
             <a href="#" data-toggle="modal" data-target="#add" class="btn btn-primary">Create new user</a>
           </div>
         </div>
@@ -18,10 +19,12 @@
     </div>
     <div class="row justify-content-center">
       <div class="col-md-4 col-lg-3">
+        <aside class="collapse d-md-block d-lg-block d-xl-block fixed-overlay" id="collapseFilter">
         <form class="" action="index.html" method="post">
           <div class="form-row">
-            <div class="form-group col">
+            <div class="form-group col mobile-search-bar">
               <button type="submit" class="btn btn-primary btn-block">Search all users</button>
+              <button type="button" class="d--lg-none d-xl-none d-md-none mobile-search-bar__close" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><svg width="21" height="21" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></svg></button>
             </div>
           </div>
           <div class="block">
@@ -73,6 +76,7 @@
             </div>
           </div>
         </form>
+        </aside>
       </div>
       <div class="col-md-8 col-lg-9">
         <div class="table-responsive">

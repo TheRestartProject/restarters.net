@@ -107,3 +107,44 @@
   border-radius: 5px;
   }
 }
+
+.fixed-overlay {
+    @include media-breakpoint-down(sm) {
+      position: fixed;
+      width: 100%;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      background: #FFF;
+      height: 100%;
+      overflow: scroll;
+      padding: 30px;
+      background-color: #F9F9F9;
+
+      .block {
+        border: 0;
+        background-color: transparent;
+        padding: 0;
+      }
+    }
+}
+
+.mobile-search-bar {
+    @include media-breakpoint-down(sm) {
+      display: flex;
+      align-content: center;
+      padding: 0 0 30px 0 !important;
+
+      &__close {
+        margin: auto 0 auto 30px;
+        padding: 0;
+        background-color: transparent;
+        border: 0;
+
+        svg {
+          display: block;
+          margin: auto;
+        }
+      }
+    }
+}
