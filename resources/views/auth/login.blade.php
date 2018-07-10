@@ -49,7 +49,7 @@
 
 
                         <div class="row entry-panel__actions">
-                            <div class="col-8 align-content-center d-flex">
+                            <div class="col-8 align-content-center flex-column d-flex">
                                 <div class="row">
                                     <div class="col-12">
                                         <a class="entry-panel__link" href="/user/recover">@lang('auth.forgot_password')</a>
@@ -61,7 +61,7 @@
 
 
                             </div>
-                            <div class="col-4 align-content-center justify-content-end d-flex">
+                            <div class="col-4 align-content-center flex-column justify-content-end d-flex">
                                 <button type="submit" class="btn btn-primary">@lang('auth.login')</button>
                             </div>
                         </div>
