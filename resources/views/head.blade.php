@@ -17,7 +17,6 @@
         <title><?php echo $title; ?> | Fix-O-Meter</title>
 
         <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400|Patua+One">
         <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link rel="stylesheet" href="/components/fontawesome/css/font-awesome.min.css">
         <link rel="stylesheet" href="/components/bootstrap-select/dist/css/bootstrap-select.min.css">

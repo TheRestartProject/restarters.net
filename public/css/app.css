@@ -14728,6 +14728,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .user-name {
+  display: none;
   font-size: 16px;
   font-family: "Patua One", cursive, sans-serif;
   text-decoration: underline;
@@ -14735,9 +14736,14 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  display: inline-block;
   padding-left: 1px;
   margin: auto auto auto 9px;
+}
+
+@media (min-width: 992px) {
+  .user-name {
+    display: inline-block;
+  }
 }
 
 .nav-link:focus .user-name {
@@ -14778,7 +14784,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .navbar-laravel .badge:hover,
-.navbar-laravel .badge:focus {
+.navbar-laravel .badge:focus,
+.navbar-laravel .badge:active {
   background-color: #AF6713;
 }
 
@@ -14828,12 +14835,20 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .navbar-laravel .navbar-brand {
   margin: auto 0;
-  padding: 11px 32px 11px 30px;
-  padding-right: 45px;
-  border: 1px solid #D9D9D9;
-  border-top: 0;
-  border-left: 0;
-  border-bottom: 0;
+  padding: 11px 15px;
+  padding-right: 25px;
+  margin: auto 0;
+}
+
+@media (min-width: 576px) {
+  .navbar-laravel .navbar-brand {
+    padding: 11px 32px 11px 30px;
+    padding-right: 45px;
+    border: 1px solid #D9D9D9;
+    border-top: 0;
+    border-left: 0;
+    border-bottom: 0;
+  }
 }
 
 .navbar-laravel .navbar-brand svg {
@@ -14860,6 +14875,22 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   border-left: 0.3em solid transparent;
 }
 
+.navbar-laravel .navbar-brand:focus {
+  background-color: #F3F3F3;
+  outline: 0;
+}
+
+.navbar-laravel .navbar-brand:hover,
+.navbar-laravel .navbar-brand:active {
+  background-color: #0394A6;
+  color: #FFF;
+}
+
+.navbar-laravel .navbar-brand:hover svg path,
+.navbar-laravel .navbar-brand:active svg path {
+  fill: #FFF !important;
+}
+
 .navbar-laravel .navbar-nav {
   font-size: 18px;
 }
@@ -14869,16 +14900,11 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   position: relative;
   z-index: 1;
   font-family: "Patua One", cursive, sans-serif;
-}
-
-@media (min-width: 576px) {
-  .navbar-laravel .navbar-nav .nav-link {
-    padding: 11px 15px;
-    border: 1px solid #D9D9D9;
-    border-top: 0;
-    border-right: 0;
-    border-bottom: 0;
-  }
+  padding: 11px 15px;
+  border: 1px solid #D9D9D9;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
 }
 
 .navbar-laravel .navbar-nav .nav-link:hover,
@@ -14887,18 +14913,51 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   text-decoration: none;
 }
 
-.navbar-laravel .navbar-nav__left .nav-link {
-  padding-left: 40px;
+@media (max-width: 991.98px) {
+  .navbar-laravel .navbar-nav__left {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-flow: row wrap;
+            flex-flow: row wrap;
+    z-index: 1000;
+    background-color: #fff;
+    border-top: 2px solid #D9D9D9;
+  }
+
+  .navbar-laravel .navbar-nav__left li {
+    -webkit-box-flex: 1;
+        -ms-flex: 1 0 33.333%;
+            flex: 1 0 33.333%;
+    max-width: 33.333%;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    text-align: center;
+  }
 }
 
-@media (min-width: 576px) {
+.navbar-laravel .navbar-nav__left .nav-link {
+  border-right: 1px solid #D9D9D9;
+  border-left: 0;
+  padding-top: 18px;
+  padding-bottom: 18px;
+  padding-left: 50px;
+  padding-right: 35px;
+}
+
+@media (max-width: 991.98px) {
   .navbar-laravel .navbar-nav__left .nav-link {
-    border-right: 1px solid #D9D9D9;
-    border-left: 0;
-    padding-top: 18px;
-    padding-bottom: 18px;
-    padding-left: 50px;
-    padding-right: 35px;
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 100%;
   }
 }
 
@@ -14911,18 +14970,51 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   margin-top: -7px;
 }
 
+@media (max-width: 991.98px) {
+  .navbar-laravel .navbar-nav__left .nav-link svg {
+    position: relative;
+    display: inline-block;
+    left: auto;
+    top: auto;
+    margin: 0 5px 0 0;
+    top: 3px;
+    z-index: 1;
+  }
+}
+
 .navbar-laravel .navbar-nav__left .nav-link:focus {
   background-color: #F3F3F3;
   outline: 0;
 }
 
-.navbar-laravel .navbar-nav__left .nav-link:hover {
+.navbar-laravel .navbar-nav__left .nav-link:hover,
+.navbar-laravel .navbar-nav__left .nav-link:active {
   background-color: #0394A6;
   color: #FFF;
 }
 
-.navbar-laravel .navbar-nav__left .nav-link:hover svg path {
+.navbar-laravel .navbar-nav__left .nav-link:hover svg path,
+.navbar-laravel .navbar-nav__left .nav-link:active svg path {
   fill: #FFF !important;
+}
+
+@media (max-width: 991.98px) {
+  .navbar-laravel .navbar-nav:last-child {
+    margin: 0;
+    -webkit-box-flex: 1;
+        -ms-flex: 1 0 100%;
+            flex: 1 0 100%;
+    -webkit-box-pack: end;
+        -ms-flex-pack: end;
+            justify-content: flex-end;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-flow: row wrap;
+            flex-flow: row wrap;
+  }
 }
 
 .navbar-laravel .navbar-nav .dropdown-menu {
@@ -15021,6 +15113,27 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .navbar-dropdown > ul > li > ul > li a {
   display: block;
   color: #000;
+}
+
+@media (max-width: 991.98px) {
+  #navbarSupportedContent {
+    -webkit-box-flex: 1;
+        -ms-flex: auto;
+            flex: auto;
+    display: block;
+    -webkit-box-pack: end;
+        -ms-flex-pack: end;
+            justify-content: flex-end;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #account-nav {
+    position: absolute;
+    right: 0;
+    left: auto;
+    z-index: 1001;
+  }
 }
 
 .notifications {
