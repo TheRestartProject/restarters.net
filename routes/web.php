@@ -33,6 +33,10 @@ Route::get('/about', function() {
     return View::make('features.index');
 })->name('features');
 
+Route::get('/ui', function() {
+    return View::make('ui.index');
+})->name('ui');;
+
 Route::get('/party/view/{id}', 'PartyController@view');
 
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {

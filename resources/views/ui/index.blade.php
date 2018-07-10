@@ -1,5 +1,5 @@
-@include('fixometer/layouts/header_plain')
-@yield('content')
+@extends('layouts.app')
+@section('content')
 
 <section style="padding-top:50px;padding-bottom:50px;">
   <div class="container">
@@ -66,3 +66,4 @@
   </div>
 </section>
 
+@endsection
