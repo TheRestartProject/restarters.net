@@ -13870,27 +13870,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .alert-attendance {
-  border: 0;
-  padding-right: 300px;
-  position: relative;
-  z-index: 1;
-  color: #FFF;
-  background-color: #4AC54B;
   margin-bottom: 40px;
-}
-
-.alert-attendance .btn {
-  position: absolute;
-  font-family: "Patua One", cursive, sans-serif;
-  top: 50%;
-  margin-top: -23px;
-  right: 20px;
-  z-index: 2;
-  line-height: 1.2;
-  background-color: #3BA43D;
-  border: 1px solid #206821;
-  border-bottom-width: 3px;
-  color: #FFF;
 }
 
 .alert-danger,
@@ -13912,19 +13892,27 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .alert-success .btn,
 .alert-delete .btn {
   font-family: "Patua One", cursive, sans-serif;
-  top: 50%;
-  margin-top: -20px;
-  right: 20px;
-  z-index: 2;
   padding: 7px 15px;
   line-height: 1.2;
   color: #FFF;
   background-color: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(0, 0, 0, 0.7);
   border-bottom-width: 3px;
-  max-width: 165px;
   font-size: 18px;
-  position: absolute;
+  padding: 8px 28px;
+  display: block;
+  width: 100%;
+  margin-top: 15px;
+}
+
+@media (min-width: 768px) {
+  .alert-danger .btn,
+  .alert-primary .btn,
+  .alert-warning .btn,
+  .alert-success .btn,
+  .alert-delete .btn {
+    margin: auto;
+  }
 }
 
 .alert-danger .btn:hover,
@@ -13944,21 +13932,69 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   background-color: transparent;
 }
 
+.alert-nobutton {
+  padding-right: 20px !important;
+}
+
 .alert-success {
   background-color: #4AC54B;
+}
+
+.alert-success .btn {
+  background-color: #009400;
+  border: 1px solid #007C00;
+  border-bottom-width: 2px;
 }
 
 .alert-danger {
   background-color: #D23714;
 }
 
+.alert-danger .btn {
+  background-color: #BD3112;
+  border: 1px solid #9D290F;
+  border-bottom-width: 2px;
+}
+
+.alert-danger .btn:hover,
+.alert-danger .btn:focus,
+.alert-danger .btn:active {
+  border-color: #9D290F;
+}
+
 .alert-primary {
   background-color: #0394A6;
+}
+
+.alert-primary .btn {
+  background-color: #008B9D;
+  border: 1px solid #007483;
+  border-bottom-width: 2px;
+}
+
+.alert-primary .btn:hover,
+.alert-primary .btn:focus,
+.alert-primary .btn:active {
+  border-color: #007483;
 }
 
 .alert-warning,
 .alert-delete {
   background-color: #DE7600;
+}
+
+.alert-warning .btn,
+.alert-delete .btn {
+  background-color: #C76A00;
+  border: 1px solid #A65800;
+  border-bottom-width: 2px;
+}
+
+.alert-warning .btn:hover,
+.alert-warning .btn:focus,
+.alert-delete .btn:hover,
+.alert-delete .btn:focus {
+  border-color: #A65800;
 }
 
 .entry-panel {
@@ -14043,7 +14079,17 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   background-color: #D3D9DC;
   color: #666B6C;
   border: 0;
-  border-bottom: 3px solid #666B6C;
+  border-bottom: 3px solid #B0BBC0;
+  opacity: 1;
+}
+
+.btn:disabled:hover,
+.btn:disabled:focus {
+  background-color: #D3D9DC;
+  color: #666B6C;
+  border-bottom: 3px solid #B0BBC0;
+  text-decoration: none;
+  opacity: 1;
 }
 
 .btn-primary {
@@ -14069,7 +14115,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .btn-secondary {
   background-color: #EC7F00;
-  border-color: #BC6500;
+  border: 0;
+  border-bottom: 3px solid #BC6500;
 }
 
 .btn-secondary:focus {
@@ -14084,7 +14131,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .btn-danger {
   background-color: #D23714;
-  border-color: #872009;
+  border: 0;
+  border-bottom: 3px solid #872009;
   color: #FFF;
 }
 
@@ -14211,11 +14259,11 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .btn-add {
-  padding: 10px;
+  padding: 4px 10px;
 }
 
 .button-group__notice {
-  font-size: 13px;
+  font-size: 15px;
   display: block;
   margin: auto 0;
 }
@@ -15145,7 +15193,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   width: 350px;
   height: 100%;
   height: 100vh;
-  z-index: 100;
+  z-index: 900;
   -webkit-box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.17);
           box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.17);
 }
@@ -15159,6 +15207,12 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .notifications__inner {
   border-top: 1px solid #D9D9D9;
   padding: 20px 15px;
+}
+
+@media (max-width: 991.98px) {
+  .notifications__inner {
+    padding-bottom: 65px;
+  }
 }
 
 .notifications .alert-secondary {
@@ -17273,6 +17327,12 @@ body {
 html > .container,
 body > .container {
   margin-top: 50px;
+}
+
+@media (max-width: 991.98px) {
+  body {
+    padding-bottom: 65px;
+  }
 }
 
 .container {

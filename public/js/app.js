@@ -24108,6 +24108,10 @@ jQuery(function () {
     jQuery('.reset').on('click', resetForm);
 
     loadDropzones();
+
+    if (window.location.hash === '#change-password' && jQuery('#list-account').length > 0) {
+        jQuery('#list-account-list').tab('show');
+    }
 });
 
 jQuery(document).ready(function () {

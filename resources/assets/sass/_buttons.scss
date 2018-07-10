@@ -15,7 +15,16 @@
         background-color: #D3D9DC;
         color: #666B6C;
         border: 0;
-        border-bottom: 3px solid #666B6C;
+        border-bottom: 3px solid #B0BBC0;
+        opacity: 1;
+
+        &:hover, &:focus {
+            background-color: #D3D9DC;
+            color: #666B6C;
+            border-bottom: 3px solid #B0BBC0;
+            text-decoration: none;
+            opacity: 1;
+        }
     }
 }
 
@@ -26,7 +35,7 @@
     color: #FFF;
     font-size: 16px;
     border-radius: 3px;
-
+    
     &:focus {
         background-color: #00B0C6;
         color: #FFF;
@@ -42,7 +51,8 @@
 
 .btn-secondary {
     background-color: #EC7F00;
-    border-color: #BC6500;
+    border:0;
+    border-bottom: 3px solid #BC6500;
 
     &:focus {
         background-color: #AF6713;
@@ -58,7 +68,8 @@
 
 .btn-danger {
     background-color: #D23714;
-    border-color: #872009;
+    border:0;
+    border-bottom: 3px solid #872009;
     color: #FFF;
 
     &:focus {
@@ -71,7 +82,7 @@
         border-color: #F24C26;
         text-decoration: underline;
          color: #FFF;
-    }
+    } 
 }
 
 .btn-checkbox {
@@ -201,12 +212,12 @@
 }
 
 .btn-add {
-    padding: 10px;
+    padding: 4px 10px;
 }
 
 .button-group {
     &__notice {
-        font-size: 13px;
+        font-size: 15px;
         display: block;
         margin: auto 0;
     }

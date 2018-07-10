@@ -8,6 +8,13 @@ html, body {
   }
 }
 
+body {
+  // Fixed nav
+  @include media-breakpoint-down(md) {
+    padding-bottom: 65px;
+  }
+}
+
 .container {
   max-width: 1270px;
 }
