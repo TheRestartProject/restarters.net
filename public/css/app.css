@@ -14874,6 +14874,11 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   background-color: #AF6713;
 }
 
+.navbar-laravel .badge:active,
+.navbar-laravel .badge:focus {
+  outline-color: rgba(3, 148, 166, 0.5);
+}
+
 .navbar-laravel .badge span {
   position: relative;
   z-index: 1;
@@ -15984,10 +15989,13 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
     background-color: #F9F9F9;
   }
 
-  .fixed-overlay .block {
+  .fixed-overlay .block,
+  .fixed-overlay .edit-panel {
     border: 0;
     background-color: transparent;
-    padding: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
   }
 }
 

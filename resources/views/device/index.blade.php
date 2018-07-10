@@ -5,16 +5,19 @@
   <div class="container">
     <div class="row">
       <div class="col">
-        <div class="d-flex justify-content-between align-content-center">
+        <div class="d-md-flex justify-content-between align-content-center">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
               <li class="breadcrumb-item active" aria-current="page">@lang('devices.devices')</li>
             </ol>
           </nav>
-          <div class="btn-group">
+
+          <div class="btn-group button-group-filters">
+            <button class="reveal-filters btn btn-secondary d-md-none d-lg-none d-xl-none" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal filters</button>
             <a href="/export/devices" class="btn btn-primary btn-save"><i class="fa fa-download"></i>@lang('devices.export_device_data')</a>
           </div>
+
         </div>
       </div>
     </div>
@@ -22,101 +25,112 @@
     <div class="row justify-content-center">
 
         <div class="col-lg-3">
-            <button class="btn btn-primary btn-groups" type="submit">@lang('devices.search_all_devices')</button>
+            
 
-            <aside class="edit-panel edit-panel__side">
-                <legend>@lang('devices.by_taxonomy')</legend>
-                <div class="form-group">
-                    <label for="items_cat">@lang('devices.category'):</label>
-                    <!-- <div class="form-control form-control__select"> -->
-                        <select id="categories" name="categories" class="form-control select2-tags" multiple title="Choose categories...">
-                            @if(isset($categories))
-                              @foreach($categories as $cluster)
-                                <optgroup label="<?php echo $cluster->name; ?>">
-                                  @foreach($cluster->categories as $c)
-                                    <option value="<?php echo $c->idcategories; ?>"
-                                      <?php
-                                      if(isset($_GET['categories']) && !empty($_GET['categories'])){
-                                        // foreach($_GET['categories'] as $cat){
-                                          if ($_GET['categories']/*$cat*/ == $c->idcategories) { echo " selected "; }
-                                        // }
-                                      }
-                                      ?>
-                                    >
-                                    <?php echo $c->name; ?>
-                                    </option>
-                                  @endforeach
-                                </optgroup>
-                              @endforeach
-                            @endif
-                            <option value="46">Misc</option>
-                        </select>
-                    <!-- </div> -->
-                </div>
-                <div class="form-group">
-                    <label for="items_group">@lang('devices.group'):</label>
-                    <div class="form-control form-control__select">
-                      <select id="groups" name="groups" class="form-control" multiple data-live-search="true" title="Choose groups...">
-                        @if(isset($groups))
-                          @foreach($groups as $g)
-                            <option value="<?php echo $g->id; ?>"
-                              <?php
-                              if(isset($_GET['groups']) && !empty($_GET['groups'])){
-                                // foreach($_GET['groups'] as $grp){
-                                  if ($_GET['groups']/*$grp*/ == $g->id) { echo " selected "; }
-                                // }
-                              }
-                              ?>
-                            >
-                            <?php echo $g->name; ?>
-                            </option>
-                          @endforeach
-                        @endif
-                      </select>
+            <div class="collapse d-md-block d-lg-block d-xl-block fixed-overlay" id="collapseFilter">
+
+                <div class="form-row">
+                    <div class="form-group col mobile-search-bar">
+                        <button class="btn btn-primary btn-groups" type="submit">@lang('devices.search_all_devices')</button>
+                        <button type="button" class="d--lg-none d-xl-none d-md-none mobile-search-bar__close" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><svg width="21" height="21" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></svg></button>
                     </div>
                 </div>
 
-            </aside>
+                <aside class="edit-panel edit-panel__side">
+                    <legend>@lang('devices.by_taxonomy')</legend>
+                    <div class="form-group">
+                        <label for="items_cat">@lang('devices.category'):</label>
+                        <!-- <div class="form-control form-control__select"> -->
+                            <select id="categories" name="categories" class="form-control select2-tags" multiple title="Choose categories...">
+                                @if(isset($categories))
+                                @foreach($categories as $cluster)
+                                    <optgroup label="<?php echo $cluster->name; ?>">
+                                    @foreach($cluster->categories as $c)
+                                        <option value="<?php echo $c->idcategories; ?>"
+                                        <?php
+                                        if(isset($_GET['categories']) && !empty($_GET['categories'])){
+                                            // foreach($_GET['categories'] as $cat){
+                                            if ($_GET['categories']/*$cat*/ == $c->idcategories) { echo " selected "; }
+                                            // }
+                                        }
+                                        ?>
+                                        >
+                                        <?php echo $c->name; ?>
+                                        </option>
+                                    @endforeach
+                                    </optgroup>
+                                @endforeach
+                                @endif
+                                <option value="46">Misc</option>
+                            </select>
+                        <!-- </div> -->
+                    </div>
+                    <div class="form-group">
+                        <label for="items_group">@lang('devices.group'):</label>
+                        <div class="form-control form-control__select">
+                        <select id="groups" name="groups" class="form-control" multiple data-live-search="true" title="Choose groups...">
+                            @if(isset($groups))
+                            @foreach($groups as $g)
+                                <option value="<?php echo $g->id; ?>"
+                                <?php
+                                if(isset($_GET['groups']) && !empty($_GET['groups'])){
+                                    // foreach($_GET['groups'] as $grp){
+                                    if ($_GET['groups']/*$grp*/ == $g->id) { echo " selected "; }
+                                    // }
+                                }
+                                ?>
+                                >
+                                <?php echo $g->name; ?>
+                                </option>
+                            @endforeach
+                            @endif
+                        </select>
+                        </div>
+                    </div>
 
-            <aside class="edit-panel edit-panel__side">
-                <legend>@lang('devices.by_date')</legend>
-                <div class="form-group">
-                    <!-- <div class="input-group date from-date"> -->
-                      <label for="from-date">@lang('devices.from_date'):</label>
-                      <input type="date" class="field form-control" id="search-from-date" name="from-date" <?php if(isset($_GET['from-date']) && !empty($_GET['from-date'])){ echo ' value="' . $_GET['from-date'] . '"'; } ?> >
-                      <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                    <!-- </div> -->
-                </div>
-                <div class="form-group">
-                    <!-- <div class="input-group date to-date"> -->
-                      <label for="to-date">@lang('devices.to_date'):</label>
-                      <input type="date" class="field form-control" id="search-to-date" name="to-date" <?php if(isset($_GET['to-date']) && !empty($_GET['to-date'])){ echo ' value="' . $_GET['to-date'] . '"'; } ?> >
-                      <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                    <!-- </div> -->
-                </div>
+                </aside>
 
-            </aside>
+                <aside class="edit-panel edit-panel__side">
+                    <legend>@lang('devices.by_date')</legend>
+                    <div class="form-group">
+                        <!-- <div class="input-group date from-date"> -->
+                        <label for="from-date">@lang('devices.from_date'):</label>
+                        <input type="date" class="field form-control" id="search-from-date" name="from-date" <?php if(isset($_GET['from-date']) && !empty($_GET['from-date'])){ echo ' value="' . $_GET['from-date'] . '"'; } ?> >
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        <!-- </div> -->
+                    </div>
+                    <div class="form-group">
+                        <!-- <div class="input-group date to-date"> -->
+                        <label for="to-date">@lang('devices.to_date'):</label>
+                        <input type="date" class="field form-control" id="search-to-date" name="to-date" <?php if(isset($_GET['to-date']) && !empty($_GET['to-date'])){ echo ' value="' . $_GET['to-date'] . '"'; } ?> >
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        <!-- </div> -->
+                    </div>
 
-            <aside class="edit-panel edit-panel__side">
-                <legend>@lang('devices.various')</legend>
-                <div class="form-group">
-                    <label for="device_id">@lang('devices.device_id'):</label>
-                    <input type="text" class="form-control field" id="device_id" name="device_id" placeholder="Device Id..."  <?php if(isset($_GET['device_id']) && !empty($_GET['device_id'])){ echo ' value="' . $_GET['device_id'] . '"'; } ?> >
-                </div>
-                <div class="form-group">
-                    <label for="brand">@lang('devices.device_brand'):</label>
-                    <input type="text" class="form-control field" id="brand" name="brand" placeholder="Brand..." <?php if(isset($_GET['brand']) && !empty($_GET['brand'])){ echo ' value="' . $_GET['brand'] . '"'; } ?> >
-                </div>
-                <div class="form-group">
-                    <label for="model">@lang('devices.device_model'):</label>
-                    <input type="text" class="form-control field" id="model" name="model" placeholder="Model..." <?php if(isset($_GET['model']) && !empty($_GET['model'])){ echo ' value="' . $_GET['model'] . '"'; } ?> >
-                </div>
-                <div class="form-group">
-                    <label for="free-text">@lang('devices.search_comments'):</label>
-                    <input type="text" class="form-control field" id="free-text" name="free-text" placeholder="Search in the comment..."  <?php if(isset($_GET['free-text']) && !empty($_GET['free-text'])){ echo ' value="' . $_GET['free-text'] . '"'; } ?> >
-                </div>
+                </aside>
 
-            </aside>
+                <aside class="edit-panel edit-panel__side">
+                    <legend>@lang('devices.various')</legend>
+                    <div class="form-group">
+                        <label for="device_id">@lang('devices.device_id'):</label>
+                        <input type="text" class="form-control field" id="device_id" name="device_id" placeholder="Device Id..."  <?php if(isset($_GET['device_id']) && !empty($_GET['device_id'])){ echo ' value="' . $_GET['device_id'] . '"'; } ?> >
+                    </div>
+                    <div class="form-group">
+                        <label for="brand">@lang('devices.device_brand'):</label>
+                        <input type="text" class="form-control field" id="brand" name="brand" placeholder="Brand..." <?php if(isset($_GET['brand']) && !empty($_GET['brand'])){ echo ' value="' . $_GET['brand'] . '"'; } ?> >
+                    </div>
+                    <div class="form-group">
+                        <label for="model">@lang('devices.device_model'):</label>
+                        <input type="text" class="form-control field" id="model" name="model" placeholder="Model..." <?php if(isset($_GET['model']) && !empty($_GET['model'])){ echo ' value="' . $_GET['model'] . '"'; } ?> >
+                    </div>
+                    <div class="form-group">
+                        <label for="free-text">@lang('devices.search_comments'):</label>
+                        <input type="text" class="form-control field" id="free-text" name="free-text" placeholder="Search in the comment..."  <?php if(isset($_GET['free-text']) && !empty($_GET['free-text'])){ echo ' value="' . $_GET['free-text'] . '"'; } ?> >
+                    </div>
+
+                </aside>
+
+            </div><!-- /collapseFilter -->
         </div>
 
         <div class="col-lg-9">

@@ -121,10 +121,12 @@
       padding: 30px;
       background-color: #F9F9F9;
 
-      .block {
+      .block, .edit-panel {
         border: 0;
         background-color: transparent;
-        padding: 0;
+        padding-left: 0;
+        padding-right: 0;
+        padding-bottom: 0;
       }
     }
 }

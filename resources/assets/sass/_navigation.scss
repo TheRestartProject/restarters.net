@@ -84,6 +84,10 @@
             background-color: #AF6713;
         }
 
+        &:active, &:focus {
+            outline-color:rgba(3, 148, 166, 0.5);
+        }
+
         span {
             position:relative;
             z-index:1;
