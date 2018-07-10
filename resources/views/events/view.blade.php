@@ -17,13 +17,25 @@
       @if( is_object($is_attending) && !$event->hasFinished() )
           @if( $is_attending->status == 1 )
             <div class="alert alert-success" style="min-height: 88px;">
-                @lang('events.rsvp_message')
-                <a href="/party/cancel-invite/{{{ $is_attending->event }}}" class="btn btn-success">@lang('events.rsvp_button')</a>
+
+                <div class="row">
+                    <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.rsvp_message')</div>
+                    <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
+                    <button class="btn">@lang('events.rsvp_button')</button>
+                    </div>
+                </div>
+
             </div>
           @else
             <div class="alert alert-info">
-                @lang('events.pending_rsvp_message')
-                <a href="/party/accept-invite/{{{ $is_attending->event }}}/{{{ $is_attending->status }}}" class="btn btn-info">@lang('events.pending_rsvp_button')</a>
+
+                <div class="row">
+                    <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.pending_rsvp_message')</div>
+                    <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
+                        <button class="btn">@lang('events.rsvp_button')</button>
+                    </div>
+                </div>
+                
             </div>
           @endif
       @endif

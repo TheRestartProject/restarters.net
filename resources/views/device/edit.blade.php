@@ -153,8 +153,14 @@
     <br>
 
     <div class="alert alert-danger" role="alert">
-        <strong>@lang('devices.delete_device_content')</strong>
-        <a href="" class="btn">@lang('devices.delete_device')</a>
+
+          <div class="row">
+            <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center"><strong>@lang('devices.delete_device_content')</strong></div>
+            <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
+              <a href="" class="btn">@lang('devices.delete_device')</a>
+            </div>
+          </div>
+
     </div>
 
 
