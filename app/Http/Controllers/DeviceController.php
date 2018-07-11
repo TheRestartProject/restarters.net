@@ -10,6 +10,7 @@ use App\Cluster;
 use App\Device;
 use App\EventsUsers;
 use App\Group;
+use App\UserGroups;
 use App\Party;
 use App\User;
 use App\DeviceList;
@@ -116,14 +117,26 @@ class DeviceController extends Controller
         $list = $Device->getList();
       }
 
-      // $this->set('list', $list);
-      //Use Eloquent for pagination NB: Will break search
-      $list = DeviceList::orderBy('sorter', 'DSC')->paginate(25);
+      $user = Auth::user();
+
+      if (FixometerHelper::hasRole($user, 'Administrator')) {
+        $all_groups = Group::all();
+
+        $list = DeviceList::orderBy('sorter', 'DSC')->paginate(25);
+      } else {
+        $groups_user_ids = UserGroups::where('user', $user->id)
+                                ->pluck('group')
+                                ->toArray();
+
+        $all_devices = DeviceList::whereIn('idgroup', $groups_user_ids)->orderBy('sorter', 'DSC')->paginate(25);
+
+        $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
+      }
 
       return view('device.index', [
         'title' => 'Devices',
         'categories' => $categories,
-        'groups' => $Group->findAll(),
+        'groups' => $all_groups,
         'list' => $list,
       ]);
 
@@ -132,7 +145,7 @@ class DeviceController extends Controller
   public function search(Request $request) {
 
     $Group = new Group;
-    $Category   = new Category;
+    $Category = new Category;
 
     $all_devices = DeviceList::orderBy('sorter', 'DSC');
     $categories = $Category->listed();
@@ -170,12 +183,26 @@ class DeviceController extends Controller
         $all_devices = $all_devices->where('problem', 'like', '%'.$request->input('problem').'%');
     }
 
+    $user = Auth::user();
+
+    if (FixometerHelper::hasRole($user, 'Administrator')) {
+      $all_groups = Group::all();
+    } else {
+      $groups_user_ids = UserGroups::where('user', $user->id)
+                              ->pluck('group')
+                              ->toArray();
+
+      $all_devices = $all_devices->whereIn('idgroup', $groups_user_ids);
+
+      $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
+    }
+
     $all_devices = $all_devices->paginate(25);
 
     return view('device.index', [
       'title' => 'Devices',
       'categories' => $categories,
-      'groups' => $Group->findAll(),
+      'groups' => $all_groups,
       'list' => $all_devices,
     ]);
 

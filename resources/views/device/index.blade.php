@@ -84,14 +84,14 @@
                     <div class="form-group">
                         <!-- <div class="input-group date from-date"> -->
                         <label for="from-date">@lang('devices.from_date'):</label>
-                        <input type="date" class="field form-control" id="search-from-date" name="from-date" value="{{ $_GET['from-date'] }}" >
+                        <input type="date" class="field form-control" id="search-from-date" name="from-date" value="<?php if (isset($_GET['from-date'])) $_GET['from-date'] ?>" >
                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                         <!-- </div> -->
                     </div>
                     <div class="form-group">
                         <!-- <div class="input-group date to-date"> -->
                         <label for="to-date">@lang('devices.to_date'):</label>
-                        <input type="date" class="field form-control" id="search-to-date" name="to-date" value="{{ $_GET['to-date'] }}" >
+                        <input type="date" class="field form-control" id="search-to-date" name="to-date" value="<?php if (isset($_GET['to-date'])) $_GET['to-date'] ?>" >
                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                         <!-- </div> -->
                     </div>
@@ -102,19 +102,19 @@
                     <legend>@lang('devices.various')</legend>
                     <div class="form-group">
                         <label for="device_id">@lang('devices.device_id'):</label>
-                        <input type="text" class="form-control field" id="device_id" name="device_id" placeholder="Device Id..."  value="{{ $_GET['device_id'] }}" >
+                        <input type="text" class="form-control field" id="device_id" name="device_id" placeholder="Device Id..."  value="<?php if (isset($_GET['device_id'])) $_GET['device_id'] ?>" >
                     </div>
                     <div class="form-group">
                         <label for="brand">@lang('devices.device_brand'):</label>
-                        <input type="text" class="form-control field" id="brand" name="brand" placeholder="Brand..." value="{{ $_GET['brand'] }}" >
+                        <input type="text" class="form-control field" id="brand" name="brand" placeholder="Brand..." value="<?php if (isset($_GET['brand']))$_GET['brand'] ?>" >
                     </div>
                     <div class="form-group">
                         <label for="model">@lang('devices.device_model'):</label>
-                        <input type="text" class="form-control field" id="model" name="model" placeholder="Model..." value="{{ $_GET['model'] }}" >
+                        <input type="text" class="form-control field" id="model" name="model" placeholder="Model..." value="<?php if (isset($_GET['from-date'])) $_GET['model'] ?>" >
                     </div>
                     <div class="form-group">
                         <label for="problem">@lang('devices.search_comments'):</label>
-                        <input type="text" class="form-control field" id="problem" name="problem" placeholder="Search in the comment..."  value="{{ $_GET['problem'] }}" >
+                        <input type="text" class="form-control field" id="problem" name="problem" placeholder="Search in the comment..."  value="<?php if (isset($_GET['from-date'])) $_GET['problem'] ?>" >
                     </div>
 
                 </aside>
