@@ -51,10 +51,10 @@
             </div>
 
             <div class="button-group row">
-                <div class="col-sm-6 d-flex align-items-center justify-content-start">
+                <div class="col-6 d-flex align-items-center justify-content-start">
                     <a href="/skills/delete/{{ $skill->id }}" class="btn btn-primary btn-danger">@lang('admin.delete-skill')</a>
                 </div>
-                <div class="col-sm-6 d-flex align-items-center justify-content-end">
+                <div class="col-6 d-flex align-items-center justify-content-end">
                     <button type="submit" class="btn btn-primary btn-create">@lang('admin.save-skill')</button>
                 </div>
             </div>

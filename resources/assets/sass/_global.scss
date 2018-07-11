@@ -8,11 +8,12 @@ html, body {
   }
 }
 
-body, .container {
+footer {
   // Fixed nav
   @include media-breakpoint-down(md) {
-    padding-bottom: 65px;
+    min-height: 65px;
   }
+
 }
 
 .overflow-hidden {

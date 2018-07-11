@@ -13850,7 +13850,13 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .admin {
-  padding: 70px 0;
+  padding: 10px 0;
+}
+
+@media (min-width: 992px) {
+  .admin {
+    padding: 70px 0;
+  }
 }
 
 .admin .breadcrumb {
@@ -14411,6 +14417,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
   .button-group-filters .btn {
     margin: auto 0;
+    border-radius: 3px !important;
   }
 }
 
@@ -15907,7 +15914,13 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .modal-content {
-  padding: 30px 35px 40px;
+  padding: 30px 20px 20px;
+}
+
+@media (min-width: 768px) {
+  .modal-content {
+    padding: 30px 35px 40px;
+  }
 }
 
 .form-control {
@@ -16051,8 +16064,13 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .edit-panel__device {
-  padding: 60px;
   margin: 10px auto;
+}
+
+@media (min-width: 992px) {
+  .edit-panel__device {
+    padding: 60px;
+  }
 }
 
 .d-flex .edit-panel {
@@ -17465,9 +17483,8 @@ body > .container {
 }
 
 @media (max-width: 991.98px) {
-  body,
-  .container {
-    padding-bottom: 65px;
+  footer {
+    min-height: 65px;
   }
 }
 

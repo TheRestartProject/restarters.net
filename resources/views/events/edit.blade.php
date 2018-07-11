@@ -91,7 +91,7 @@
                       <div class="col-6">
                         <input type="time" id="field_event_time" name="start" class="form-control field" value="{{ date('H:i', strtotime($formdata->start)) }}">
                       </div>
-                      <div class="col-lg-6">
+                      <div class="col-6">
                         <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
                         <input type="time" id="field_event_time_2" name="end" class="form-control field" value="{{ date('H:i', strtotime($formdata->end)) }}">
                       </div>

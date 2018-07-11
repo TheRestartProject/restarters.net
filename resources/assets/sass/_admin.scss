@@ -1,7 +1,8 @@
 .admin {
-
-    padding: 70px 0;
-
+    padding: 10px 0;
+    @include media-breakpoint-up(lg) {
+        padding: 70px 0;
+    }
     .breadcrumb {
         margin: auto;
     }
