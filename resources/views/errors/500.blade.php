@@ -1,4 +1,10 @@
-@include('layouts.header') @yield('content')
+@if (Auth::check())
+    @include('layouts.header')
+@else
+    @include('layouts.header_plain')
+@endif
+
+@yield('content')
 
 <section class="errors">
     <div class="container">
