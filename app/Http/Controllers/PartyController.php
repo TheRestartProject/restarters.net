@@ -154,7 +154,7 @@ class PartyController extends Controller {
       if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
 
 
-          $error = array(); 
+          $error = array();
 
           // Add SuperHero Restarter!
           // $_POST['users'][] = 29;
@@ -1171,6 +1171,8 @@ class PartyController extends Controller {
           'success' => true
         ];
 
+        Party::where('idevents', $event_id)->decrement('volunteers');
+
       }
 
     }
@@ -1291,6 +1293,8 @@ class PartyController extends Controller {
       }
 
       if (!is_null($host)) {
+
+        Party::where('idevents', $event_id)->increment('volunteers');
 
         //Send Notification to Host
         $arr = [
