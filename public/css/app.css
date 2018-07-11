@@ -14430,6 +14430,10 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
     margin: auto 0;
     border-radius: 3px !important;
   }
+
+  .button-group-filters .btn:first-child {
+    margin-right: 10px;
+  }
 }
 
 .badge {

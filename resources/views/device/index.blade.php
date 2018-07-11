@@ -14,7 +14,7 @@
           </nav>
 
           <div class="btn-group button-group-filters">
-            <button class="reveal-filters btn btn-secondary d-md-none d-lg-none d-xl-none" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal filters</button>
+            <button class="reveal-filters btn btn-secondary d-lg-none d-xl-none" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal filters</button>
             <a href="/export/devices" class="btn btn-primary btn-save"><i class="fa fa-download"></i>@lang('devices.export_device_data')</a>
           </div>
 
@@ -27,7 +27,7 @@
         <div class="col-lg-3">
 
 
-            <div class="collapse d-md-block d-lg-block d-xl-block fixed-overlay" id="collapseFilter">
+            <div class="collapse d-lg-block d-xl-block fixed-overlay" id="collapseFilter">
 
               <form action="/device/search" method="get">
                 <div class="form-row">
