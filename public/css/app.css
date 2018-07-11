@@ -14112,12 +14112,15 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   border-radius: 3px;
 }
 
-.btn-primary:focus {
+.btn-primary:focus,
+.btn-primary.dropdown-toggle:focus,
+.btn-primary.dropdown-toggle:active {
   background-color: #00B0C6;
   color: #FFF;
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-primary.dropdown-toggle:hover {
   color: #FFF;
   background-color: #00B0C6;
   border-color: #00B0C6;
@@ -14130,11 +14133,14 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   border-bottom: 3px solid #BC6500;
 }
 
-.btn-secondary:focus {
+.btn-secondary:focus,
+.btn-secondary.dropdown-toggle:focus,
+.btn-secondary.dropdown-toggle:active {
   background-color: #AF6713;
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover,
+.btn-secondary.dropdown-toggle:hover {
   background-color: #AF6713;
   border-color: #AF6713;
   text-decoration: underline;
@@ -14147,12 +14153,15 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   color: #FFF;
 }
 
-.btn-danger:focus {
+.btn-danger:focus,
+.btn-danger.dropdown-toggle:focus,
+.btn-danger.dropdown-toggle:active {
   background-color: #F24C26;
   color: #FFF;
 }
 
-.btn-danger:hover {
+.btn-danger:hover,
+.btn-danger.dropdown-toggle:hover {
   background-color: #F24C26;
   border-color: #F24C26;
   text-decoration: underline;
@@ -16865,10 +16874,23 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .events header {
-  padding-left: 150px;
+  padding-left: 55px;
   position: relative;
   z-index: 1;
   font-size: 15px;
+  text-align: left;
+  padding-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .events header {
+    padding-left: 150px;
+    padding-bottom: 0px;
+  }
+}
+
+.events header button {
+  text-align: left;
 }
 
 .events header h1,
@@ -16900,11 +16922,17 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   left: 10px;
   top: 0;
   z-index: 1;
-  width: 115px;
+  width: 35px;
   height: auto;
   border-radius: 50%;
   -webkit-box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
           box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+  .events header .event-icon {
+    width: 115px;
+  }
 }
 
 .events__filter .breadcrumb {

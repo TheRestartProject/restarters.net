@@ -36,12 +36,12 @@
     font-size: 16px;
     border-radius: 3px;
     
-    &:focus {
+    &:focus, &.dropdown-toggle:focus, &.dropdown-toggle:active {
         background-color: #00B0C6;
         color: #FFF;
     }
 
-    &:hover {
+    &:hover, &.dropdown-toggle:hover {
         color: #FFF;
         background-color: #00B0C6;
         border-color: #00B0C6;
@@ -54,11 +54,11 @@
     border:0;
     border-bottom: 3px solid #BC6500;
 
-    &:focus {
+    &:focus, &.dropdown-toggle:focus, &.dropdown-toggle:active {
         background-color: #AF6713;
     }
 
-    &:hover {
+    &:hover, &.dropdown-toggle:hover {
         background-color: #AF6713;
         border-color: #AF6713;
         text-decoration: underline;
@@ -72,12 +72,12 @@
     border-bottom: 3px solid #872009;
     color: #FFF;
 
-    &:focus {
+    &:focus, &.dropdown-toggle:focus, &.dropdown-toggle:active {
         background-color: #F24C26;
          color: #FFF;
     }
 
-    &:hover {
+    &:hover, &.dropdown-toggle:hover {
         background-color: #F24C26;
         border-color: #F24C26;
         text-decoration: underline;
