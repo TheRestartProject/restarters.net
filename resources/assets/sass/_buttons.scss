@@ -335,7 +335,11 @@
 
         .btn {
             margin: auto 0;
-            border-radius:3px !important
+            border-radius:3px !important;
+
+            &:first-child {
+                margin-right: 10px;
+            }
         }    
     }
 }
