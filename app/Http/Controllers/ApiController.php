@@ -31,6 +31,7 @@ class ApiController extends Controller
       $result['items_fixed'] = $Device->statusCount()[0]->counter;
       $result['weights'] = $co2Total[0]->total_weights;
 
-      echo json_encode($result);
+      return response()
+          ->json($result, 200);
   }
 }
