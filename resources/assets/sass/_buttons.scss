@@ -151,7 +151,10 @@
 .btn-groups {
     width: 100%;
     display: block;
-    margin: 20px 0 10px 0;
+    margin:auto 0;
+    @include media-breakpoint-up(lg) {
+        margin: 20px 0 10px 0;
+    }
 }
 
 .btn-filter {
