@@ -4,7 +4,7 @@
 
     <div class="stat1">
         <span>
-                <i class="fa fa-group"></i>
+                <img style="height:40px" class="" alt="Volunteers" src="{{ asset('/icons/icon_pax.png') }}">
                 <span class="subtext">participants</span>
         </span>
         <?php echo $party->pax; ?>
