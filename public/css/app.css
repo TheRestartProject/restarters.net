@@ -14370,6 +14370,11 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
           box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
 }
 
+.btn-group__duo .btn {
+  padding-right: 10px;
+  padding-left: 14px;
+}
+
 .btn-group__duo .dropdown:first-child .btn {
   border-radius: 3px 0 0 3px;
   border-right: 1px solid #155E67;
