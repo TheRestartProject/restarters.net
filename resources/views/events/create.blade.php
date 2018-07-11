@@ -76,7 +76,7 @@
             <div class="col-lg-6">
               <div class="form-group">
                 <div class="row">
-                  <div class="col-7">
+                  <div class="col-lg-7">
                     <label for="event_date">@lang('events.field_event_date'):</label>
                     <input type="date" id="event_date" name="event_date" class="form-control field" required>
                   </div>
@@ -84,18 +84,18 @@
               </div>
               <div class="form-group">
                 <div class="row">
-                  <div class="col-7">
+                  <div class="col-lg-7">
                     <div class="form-group">
 
                       <label for="field_event_time">@lang('events.field_event_time'):</label>
 
                       <div class="row row-compressed">
 
-                        <div class="col-6">
+                        <div class="col-lg-6">
                           <input type="time" id="field_event_time" name="start" class="form-control field" required>
                         </div>
 
-                        <div class="col-6">
+                        <div class="col-lg-6">
                           <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
                           <input type="time" id="field_event_time_2" name="end" class="form-control field" required>
                         </div>
@@ -107,7 +107,7 @@
                   <div class="col-12">
 
                       <div class="row row-compressed">
-                          <div class="col-7">
+                          <div class="col-lg-7">
                             <div class="form-group">
                               <label for="autocomplete">@lang('events.field_event_venue'):</label>
                               <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" required>
@@ -125,7 +125,7 @@
 
                             </div>
                           </div>
-                          <div class="col-5">
+                          <div class="col-lg-5">
                             <div id="map-plugin" class="events__map"></div>
                           </div>
                       </div>

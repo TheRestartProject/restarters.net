@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-5">
+      <div class="col-lg-5">
         <div class="edit-panel">
           <h4>Edit role</h4>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed odio dui.</p>

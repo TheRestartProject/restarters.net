@@ -69,7 +69,7 @@
                     <div class="col-12">
 
                         <div class="row row-compressed">
-                            <div class="col-7">
+                            <div class="col-lg-7">
                               <div class="form-group">
                                 <label for="autocomplete">@lang('groups.location'):</label>
                                 <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock"  />
@@ -109,7 +109,7 @@
 
                               </div>
                             </div>
-                            <div class="col-5">
+                            <div class="col-lg-5">
                               <div id="map-plugin" class="events__map"></div>
                             </div>
                         </div>
