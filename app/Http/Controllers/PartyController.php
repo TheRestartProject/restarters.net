@@ -90,7 +90,7 @@ class PartyController extends Controller {
                               ->where('events.group', $group_id)
                                   ->paginate(env('PAGINATE'));
 
-        $group = Host::find($group_id);
+        $group = Group::find($group_id);
 
       } else {
 

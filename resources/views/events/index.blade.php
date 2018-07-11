@@ -12,10 +12,10 @@
             </ol>
           </nav>
           <div class="btn-group">
-            @if( $user_groups > 0 && is_null($group) )
+            @if( FixometerHelper::userCanCreateEvents(Auth::user()) && is_null($group) )
               <a href="/party/create" class="btn btn-primary btn-save">@lang('events.create_new_event')</a>
             @elseif( is_null($group) )
-              <a disabled title="Please create an group first" class="btn btn-primary btn-save disabled">@lang('events.create_new_event')</a>
+              <!--<a disabled title="Please create a group first" class="btn btn-primary btn-save disabled">@lang('events.create_new_event')</a>-->
             @endif
           </div>
         </div>

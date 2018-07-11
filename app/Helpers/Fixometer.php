@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Party;
 use App\Role;
 use App\Skills;
+use App\UserGroups;
 
 use App;
 use Auth;
@@ -101,6 +102,34 @@ class FixometerHelper {
         }
       }
   }
+
+    public static function userCanCreateEvents($user)
+    {
+        if ( Auth::guest() ) {
+            return false;
+        }
+
+        if (is_null($user)) {
+            $user = Auth::user();
+        }
+
+        $usersRole = $user->role()->first()->role;
+        $superusers = ['Root', 'Administrator'];
+
+        if (in_array($usersRole, $superusers)) {
+            return true;
+        }
+
+        $userIsHostOfAGroup = UserGroups::where('user', Auth::user()->id)
+                            ->where('role', 3)
+                            ->count() > 0;
+
+        if ($userIsHostOfAGroup) {
+            return true;
+        }
+
+        return false;
+    }
 
     public static function userIsHostOfGroup($groupId, $userId)
     {
