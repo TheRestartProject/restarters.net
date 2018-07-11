@@ -14222,7 +14222,13 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .btn-groups {
   width: 100%;
   display: block;
-  margin: 20px 0 10px 0;
+  margin: auto 0;
+}
+
+@media (min-width: 992px) {
+  .btn-groups {
+    margin: 20px 0 10px 0;
+  }
 }
 
 .btn-filter {
@@ -15356,6 +15362,13 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   -webkit-box-flex: 1;
       -ms-flex: 1 0 100%;
           flex: 1 0 100%;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 992px) {
+  .dashboard__block {
+    margin-bottom: 0;
+  }
 }
 
 .dashboard__block img {
