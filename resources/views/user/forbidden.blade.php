@@ -1,16 +1,48 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-6">
-            <h1><?php echo $title; ?></h1>
-            <p>Whatever you did, you weren't supposed (or <strong>allowed</strong>) to do that. </p>
-            <p>Please do something else.</p>
-            <p><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-              Or you might need to reset your session.
-            </a></p>
+<section class="errors">
+    <div class="container">
+
+        <div class="row justify-content-center">
+            <div class="col-12 align-self-center">
+                <h1>Sorry, but you do not have the permissions to perform that action.</h1>
+
+                <img class="rounded img-fluid" src="/images/broken-toaster.png" alt="Woman with broken toaster" />
+
+                <h2>
+                    Please let us know that you encountered this issue and we will look into it ASAP.
+                </h2>
+                <p>
+                    You can report the issue by sending an email to <a href="mailto:community@therestartproject.org">commmunity.therestartproject.org</a>, or by posting in the <a href="https://talk.restarters.net/c/restarters-dev">restarters.net development forum</a>.
+                </p>
+                <p>
+                    Please include the following details in your bug report:
+                </p>
+                <ul>
+                    @if (Auth::check())
+                    <li><strong>User</strong>: {{ Auth::user()->name }}</li>
+                    @endif
+                    <li><strong>Time</strong>: {{ now() }}</li>
+                    <li><strong>URL</strong>: {{ Request::url() }}</li>
+                    <li><strong>Previous URL</strong>: {{ URL::previous() }}</li>
+                </ul>
+
+                <p>Thanks!</p>
+
+                @if (Auth::check())
+                <p>
+                    In the meantime, you could try going <a href="{{ URL::previous() }}">back</a>, or returning to the <a href="/dashboard">dashboard</a>.
+                </p>
+                <p>
+                    If you continue to get an error, you could try <a href="/logout">logging out</a> and logging back in again.
+                </p>
+                @endif
+
+            </div>
         </div>
     </div>
-</div>
+
+</section>
+
 @endsection
