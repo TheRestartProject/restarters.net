@@ -190,8 +190,8 @@ Route::get('/outbound/info/group/{id}', function($id) {
   return App\Http\Controllers\OutboundController::info('group', $id);
 });
 
-Route::get('/group/stats/{id}', function($id) {
-  return App\Http\Controllers\GroupController::stats($id);
+Route::get('/group/stats/{id}/{format?}', function($id, $format = 'row') {
+    return App\Http\Controllers\GroupController::stats($id, $format);
 });
 
 Route::get('/admin/stats/1', function() {
