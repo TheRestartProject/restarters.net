@@ -39,6 +39,10 @@ Route::get('/ui', function() {
 
 Route::get('/party/view/{id}', 'PartyController@view');
 
+// Device export is also called from https://therestartproject.org/download-dataset,
+// so we allow anonymous access.
+Route::get('/export/devices', 'ExportController@devices');
+
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
   Route::get('/', 'HomeController@index')->name('home');
@@ -180,7 +184,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::get('/ajax/restarters_in_group', 'AjaxController@restarters_in_group');
 
   //Export Controller
-  Route::get('/export/devices', 'ExportController@devices');
   Route::get('/export/parties', 'ExportController@parties');
 
 });
