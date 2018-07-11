@@ -16026,8 +16026,14 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   background-color: #F9F9F9;
   border: 1px solid #D9D9D9;
   border-radius: 3px;
-  padding: 50px 45px 40px;
+  padding: 20px 20px 20px;
   margin: 0 0 30px 0;
+}
+
+@media (min-width: 992px) {
+  .edit-panel {
+    padding: 50px 45px 40px;
+  }
 }
 
 .edit-panel__side {
@@ -17431,7 +17437,8 @@ body > .container {
 }
 
 @media (max-width: 991.98px) {
-  body {
+  body,
+  .container {
     padding-bottom: 65px;
   }
 }

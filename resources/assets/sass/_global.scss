@@ -8,7 +8,7 @@ html, body {
   }
 }
 
-body {
+body, .container {
   // Fixed nav
   @include media-breakpoint-down(md) {
     padding-bottom: 65px;
