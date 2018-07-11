@@ -65,13 +65,13 @@
                         <!-- <div class="form-control form-control__select"> -->
                         <select id="groups" name="groups[]" class="form-control select2-tags" multiple data-live-search="true" title="Choose groups...">
                             @if(isset($groups))
-                            @foreach($groups as $g)
-                              @if (isset($_GET['groups']) && in_array($g->id, $_GET['groups']))
-                                <option value="<?php echo $g->id; ?>" selected><?php echo $g->name; ?></option>
-                              @else
-                                <option value="<?php echo $g->id; ?>"><?php echo $g->name; ?></option>
-                              @endif
-                            @endforeach
+                              @foreach($groups as $g)
+                                @if (isset($_GET['groups']) && in_array($g->id, $_GET['groups']))
+                                  <option value="<?php echo $g->id; ?>" selected><?php echo $g->name; ?></option>
+                                @else
+                                  <option value="<?php echo $g->id; ?>"><?php echo $g->name; ?></option>
+                                @endif
+                              @endforeach
                             @endif
                         </select>
                         <!-- </div> -->

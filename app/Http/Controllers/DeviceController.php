@@ -122,13 +122,15 @@ class DeviceController extends Controller
       if (FixometerHelper::hasRole($user, 'Administrator')) {
         $all_groups = Group::all();
 
-        $list = DeviceList::orderBy('sorter', 'DSC')->paginate(25);
+        $all_devices = DeviceList::orderBy('sorter', 'DSC')->paginate(25);
       } else {
         $groups_user_ids = UserGroups::where('user', $user->id)
                                 ->pluck('group')
                                 ->toArray();
 
-        $all_devices = DeviceList::whereIn('idgroup', $groups_user_ids)->orderBy('sorter', 'DSC')->paginate(25);
+        $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
+
+        $all_devices = DeviceList::whereIn('id', $device_ids)->orderBy('sorter', 'DSC')->paginate(25);
 
         $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
       }
@@ -137,7 +139,7 @@ class DeviceController extends Controller
         'title' => 'Devices',
         'categories' => $categories,
         'groups' => $all_groups,
-        'list' => $list,
+        'list' => $all_devices,
       ]);
 
   }
@@ -192,7 +194,9 @@ class DeviceController extends Controller
                               ->pluck('group')
                               ->toArray();
 
-      $all_devices = $all_devices->whereIn('idgroup', $groups_user_ids);
+      $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
+
+      $all_devices = $all_devices->whereIn('id', $device_ids);
 
       $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
     }
@@ -214,8 +218,10 @@ class DeviceController extends Controller
 
       $device = Device::find($id);
 
+      $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
+
       $user = Auth::user();
-      if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->party, $user->id) ){
+      if(FixometerHelper::hasRole($user, 'Administrator') || !empty($is_attending) ){
 
           $Device = new Device;
 
@@ -277,12 +283,15 @@ class DeviceController extends Controller
             $response = null;
           }
 
+          $brands = Brands::all();
+
           return view('device.edit', [
             'title' => 'Edit Device',
             'response' => $response,
             'categories' => $Categories->findAll(),
             'events' => $UserEvents,
             'formdata' => $device,
+            'brands' => $brands,
           ]);
 
       }

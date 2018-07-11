@@ -62,7 +62,28 @@
                   </div>
                   <div class="form-group">
                       <label for="brand">@lang('devices.brand'):</label>
-                      <input type="text" name="brand" id="brand" class="form-control field" value="<?php echo $formdata->brand; ?>">
+                      <!-- <input type="text" name="brand" id="brand" class="form-control field" value="<?php //echo $formdata->brand; ?>"> -->
+                      <div class="form-control form-control__select">
+                          <select name="brand" class="select2-with-input" id="brand">
+                              @php($i = 1)
+                              @if( empty($device->brand) )
+                                <option value="" selected></option>
+                              @else
+                                <option value=""></option>
+                              @endif
+                              @foreach($brands as $brand)
+                                @if ($formdata->brand == $brand->brand_name)
+                                  <option value="{{ $brand->brand_name }}" selected>{{ $brand->brand_name }}</option>
+                                  @php($i++)
+                                @else
+                                  <option value="{{ $brand->brand_name }}">{{ $brand->brand_name }}</option>
+                                @endif
+                              @endforeach
+                              @if( $i == 1 && !empty($formdata->brand) )
+                                <option value="{{ $formdata->brand }}" selected>{{ $formdata->brand }}</option>
+                              @endif
+                          </select>
+                      </div>
                   </div>
                   <div class="form-group">
                       <label for="model">@lang('devices.model'):</label>
