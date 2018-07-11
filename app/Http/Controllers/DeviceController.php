@@ -129,6 +129,59 @@ class DeviceController extends Controller
 
   }
 
+  public function search(Request $request) {
+
+    $Group = new Group;
+    $Category   = new Category;
+
+    $all_devices = DeviceList::orderBy('sorter', 'DSC');
+    $categories = $Category->listed();
+
+    if ($request->input('categories') !== null) {
+        $all_devices = $all_devices->whereIn('idcategory', $request->input('categories'));
+    }
+
+    if ($request->input('groups') !== null) {
+        $all_devices = $all_devices->whereIn('idgroup', $request->input('groups'));
+    }
+
+    if ($request->input('from-date') !== null && $request->input('to-date') == null) {
+        $all_devices = $all_devices->where('event_date', '>', strtotime($request->input('from-date')));
+    } elseif ($request->input('to-date') !== null && $request->input('from-date') == null) {
+        $all_devices = $all_devices->where('event_date', '<', strtotime($request->input('to-date')));
+    } elseif ($request->input('to-date') !== null && $request->input('from-date') == null) {
+        $all_devices = $all_devices->where('event_date', '>', $request->input('from-date'))
+                                      ->where('event_date', '<', $request->input('to-date'));
+    }
+
+    if ($request->input('device_id') !== null) {
+        $all_devices = $all_devices->where('id', '=', $request->input('device_id'));
+    }
+
+    if ($request->input('brand') !== null) {
+        $all_devices = $all_devices->where('brand', 'like', '%'.$request->input('brand').'%');
+    }
+
+    if ($request->input('model') !== null) {
+        $all_devices = $all_devices->where('model', 'like', '%'.$request->input('devimodel').'%');
+    }
+
+    if ($request->input('problem') !== null) {
+        $all_devices = $all_devices->where('problem', 'like', '%'.$request->input('problem').'%');
+    }
+
+    $all_devices = $all_devices->paginate(25);
+
+    return view('device.index', [
+      'title' => 'Devices',
+      'categories' => $categories,
+      'groups' => $Group->findAll(),
+      'list' => $all_devices,
+    ]);
+
+
+  }
+
   public function edit($id){
       // $this->set('title', 'Edit Device');
 

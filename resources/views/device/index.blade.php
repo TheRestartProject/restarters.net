@@ -25,10 +25,11 @@
     <div class="row justify-content-center">
 
         <div class="col-lg-3">
-            
+
 
             <div class="collapse d-md-block d-lg-block d-xl-block fixed-overlay" id="collapseFilter">
 
+              <form action="/device/search" method="get">
                 <div class="form-row">
                     <div class="form-group col mobile-search-bar">
                         <button class="btn btn-primary btn-groups" type="submit">@lang('devices.search_all_devices')</button>
@@ -41,22 +42,16 @@
                     <div class="form-group">
                         <label for="items_cat">@lang('devices.category'):</label>
                         <!-- <div class="form-control form-control__select"> -->
-                            <select id="categories" name="categories" class="form-control select2-tags" multiple title="Choose categories...">
+                            <select id="categories" name="categories[]" class="form-control select2-tags" multiple title="Choose categories...">
                                 @if(isset($categories))
                                 @foreach($categories as $cluster)
                                     <optgroup label="<?php echo $cluster->name; ?>">
                                     @foreach($cluster->categories as $c)
-                                        <option value="<?php echo $c->idcategories; ?>"
-                                        <?php
-                                        if(isset($_GET['categories']) && !empty($_GET['categories'])){
-                                            // foreach($_GET['categories'] as $cat){
-                                            if ($_GET['categories']/*$cat*/ == $c->idcategories) { echo " selected "; }
-                                            // }
-                                        }
-                                        ?>
-                                        >
-                                        <?php echo $c->name; ?>
-                                        </option>
+                                        @if (isset($_GET['categories']) && in_array($c->idcategories, $_GET['categories']))
+                                          <option value="<?php echo $c->idcategories; ?>" selected><?php echo $c->name; ?></option>
+                                        @else
+                                          <option value="<?php echo $c->idcategories; ?>"><?php echo $c->name; ?></option>
+                                        @endif
                                     @endforeach
                                     </optgroup>
                                 @endforeach
@@ -67,25 +62,19 @@
                     </div>
                     <div class="form-group">
                         <label for="items_group">@lang('devices.group'):</label>
-                        <div class="form-control form-control__select">
-                        <select id="groups" name="groups" class="form-control" multiple data-live-search="true" title="Choose groups...">
+                        <!-- <div class="form-control form-control__select"> -->
+                        <select id="groups" name="groups[]" class="form-control select2-tags" multiple data-live-search="true" title="Choose groups...">
                             @if(isset($groups))
                             @foreach($groups as $g)
-                                <option value="<?php echo $g->id; ?>"
-                                <?php
-                                if(isset($_GET['groups']) && !empty($_GET['groups'])){
-                                    // foreach($_GET['groups'] as $grp){
-                                    if ($_GET['groups']/*$grp*/ == $g->id) { echo " selected "; }
-                                    // }
-                                }
-                                ?>
-                                >
-                                <?php echo $g->name; ?>
-                                </option>
+                              @if (isset($_GET['groups']) && in_array($g->id, $_GET['groups']))
+                                <option value="<?php echo $g->id; ?>" selected><?php echo $g->name; ?></option>
+                              @else
+                                <option value="<?php echo $g->id; ?>"><?php echo $g->name; ?></option>
+                              @endif
                             @endforeach
                             @endif
                         </select>
-                        </div>
+                        <!-- </div> -->
                     </div>
 
                 </aside>
@@ -95,14 +84,14 @@
                     <div class="form-group">
                         <!-- <div class="input-group date from-date"> -->
                         <label for="from-date">@lang('devices.from_date'):</label>
-                        <input type="date" class="field form-control" id="search-from-date" name="from-date" <?php if(isset($_GET['from-date']) && !empty($_GET['from-date'])){ echo ' value="' . $_GET['from-date'] . '"'; } ?> >
+                        <input type="date" class="field form-control" id="search-from-date" name="from-date" value="{{ $_GET['from-date'] }}" >
                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                         <!-- </div> -->
                     </div>
                     <div class="form-group">
                         <!-- <div class="input-group date to-date"> -->
                         <label for="to-date">@lang('devices.to_date'):</label>
-                        <input type="date" class="field form-control" id="search-to-date" name="to-date" <?php if(isset($_GET['to-date']) && !empty($_GET['to-date'])){ echo ' value="' . $_GET['to-date'] . '"'; } ?> >
+                        <input type="date" class="field form-control" id="search-to-date" name="to-date" value="{{ $_GET['to-date'] }}" >
                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                         <!-- </div> -->
                     </div>
@@ -113,23 +102,23 @@
                     <legend>@lang('devices.various')</legend>
                     <div class="form-group">
                         <label for="device_id">@lang('devices.device_id'):</label>
-                        <input type="text" class="form-control field" id="device_id" name="device_id" placeholder="Device Id..."  <?php if(isset($_GET['device_id']) && !empty($_GET['device_id'])){ echo ' value="' . $_GET['device_id'] . '"'; } ?> >
+                        <input type="text" class="form-control field" id="device_id" name="device_id" placeholder="Device Id..."  value="{{ $_GET['device_id'] }}" >
                     </div>
                     <div class="form-group">
                         <label for="brand">@lang('devices.device_brand'):</label>
-                        <input type="text" class="form-control field" id="brand" name="brand" placeholder="Brand..." <?php if(isset($_GET['brand']) && !empty($_GET['brand'])){ echo ' value="' . $_GET['brand'] . '"'; } ?> >
+                        <input type="text" class="form-control field" id="brand" name="brand" placeholder="Brand..." value="{{ $_GET['brand'] }}" >
                     </div>
                     <div class="form-group">
                         <label for="model">@lang('devices.device_model'):</label>
-                        <input type="text" class="form-control field" id="model" name="model" placeholder="Model..." <?php if(isset($_GET['model']) && !empty($_GET['model'])){ echo ' value="' . $_GET['model'] . '"'; } ?> >
+                        <input type="text" class="form-control field" id="model" name="model" placeholder="Model..." value="{{ $_GET['model'] }}" >
                     </div>
                     <div class="form-group">
-                        <label for="free-text">@lang('devices.search_comments'):</label>
-                        <input type="text" class="form-control field" id="free-text" name="free-text" placeholder="Search in the comment..."  <?php if(isset($_GET['free-text']) && !empty($_GET['free-text'])){ echo ' value="' . $_GET['free-text'] . '"'; } ?> >
+                        <label for="problem">@lang('devices.search_comments'):</label>
+                        <input type="text" class="form-control field" id="problem" name="problem" placeholder="Search in the comment..."  value="{{ $_GET['problem'] }}" >
                     </div>
 
                 </aside>
-
+              </form>
             </div><!-- /collapseFilter -->
         </div>
 
@@ -191,8 +180,10 @@
                             <th scope="col" data-column-id="category">@lang('devices.category')</th>
                             <th scope="col" data-column-id="brand">@lang('devices.brand')</th>
                             <th scope="col" data-column-id="model">@lang('devices.model')</th>
-                            <th scope="col" data-column-id="location">@lang('devices.eventlocation')</th> <!-- <th scope="col" data-column-id="groupName">Event (Group)</th> -->
-                            <th scope="col" data-column-id="eventDate" data-header-css-class="mid-cell">@lang('devices.repair')</th>
+                            <th scope="col" data-column-id="comment">@lang('devices.comment')</th>
+                            <th scope="col" data-column-id="event">@lang('devices.eventgroup')</th>
+                            <th scope="col" data-column-id="eventDate" data-header-css-class="mid-cell">@lang('devices.eventdate')</th>
+                            <th scope="col" data-column-id="location">@lang('devices.location')</th> <!-- <th scope="col" data-column-id="groupName">Event (Group)</th> -->
 
                         </tr>
                     </thead>
@@ -206,8 +197,10 @@
                                 <td><?php echo $device->category_name; ?></td>
                                 <td><?php echo $device->brand; ?></td>
                                 <td><?php echo $device->model; ?></td>
-                                <td><?php echo $device->group_name . ", " . $device->event_location; ?></td>
+                                <td><?php echo $device->problem; ?></td>
+                                <td><?php echo $device->group_name; ?></td>
                                 <td><?php echo strftime('%Y-%m-%d', $device->event_date); ?></td>
+                                <td><?php echo $device->event_location; ?></td>
                               </tr>
                             @endforeach
                         @endif
