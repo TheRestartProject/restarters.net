@@ -223,6 +223,8 @@ class DeviceController extends Controller
       $user = Auth::user();
       if(FixometerHelper::hasRole($user, 'Administrator') || !empty($is_attending) ){
 
+          $is_host = FixometerHelper::userHasEditPartyPermission($device->event, $user->id);
+
           $Device = new Device;
 
           if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)){
@@ -292,6 +294,8 @@ class DeviceController extends Controller
             'events' => $UserEvents,
             'formdata' => $device,
             'brands' => $brands,
+            'user' => $user,
+            'is_host' => $is_host,
           ]);
 
       }

@@ -173,17 +173,18 @@
 
     <br>
 
-    <div class="alert alert-danger" role="alert">
+    @if (FixometerHelper::hasRole($user, 'Administrator') || $is_host)
+      <div class="alert alert-danger" role="alert">
 
-          <div class="row">
-            <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center"><strong>@lang('devices.delete_device_content')</strong></div>
-            <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
-              <a href="" class="btn">@lang('devices.delete_device')</a>
+            <div class="row">
+              <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center"><strong>@lang('devices.delete_device_content')</strong></div>
+              <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
+                <a href="" class="btn">@lang('devices.delete_device')</a>
+              </div>
             </div>
-          </div>
 
-    </div>
-
+      </div>
+    @endif
 
 
   </div>
