@@ -1,6 +1,6 @@
 <tr id="summary-{{ $device->iddevices }}">
     <td><a class="collapsed row-button" data-toggle="collapse" href="#row-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="row-1">
-    @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || ( is_object($is_attending) && $is_attending->status == 1 ) )
+    @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ||  ( is_object($is_attending) && $is_attending->status == 1 ) )
       Edit
     @else
       View
@@ -42,7 +42,7 @@
     <td><a data-device-id="{{{ $device->iddevices }}}" class="row-button delete-device" href="{{ url('/device/delete/'.$device->iddevices) }}"><svg width="15" height="15" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><g opacity="0.5"><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></g></svg></a></td>
     @endif
 </tr>
-@if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || ( is_object($is_attending) && $is_attending->status == 1 ) )
+@if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) || ( is_object($is_attending) && $is_attending->status == 1 ) )
 <tr class="collapse table-row-details" id="row-{{ $device->iddevices }}">
     <td colspan="11">
         <form id="data-{{ $device->iddevices }}" class="edit-device" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">

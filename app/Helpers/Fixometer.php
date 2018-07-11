@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Party;
 use App\Role;
 use App\Skills;
 
@@ -87,7 +88,10 @@ class FixometerHelper {
         return true;
       } else {
         if (FixometerHelper::hasRole(Auth::user(), 'Host')) {
-          if (empty(DB::table('events_users')->where('event', $partyId)->where('user', $userId)->first())) {
+          $group_id_of_event = Party::where('idevents', $partyId)->value('group');
+          if (FixometerHelper::userIsHostOfGroup($group_id_of_event, $userId)) {
+              return true;
+          } else if (empty(DB::table('events_users')->where('event', $partyId)->where('user', $userId)->first())) {
             return false;
           } else {
             return true;
@@ -97,6 +101,21 @@ class FixometerHelper {
         }
       }
   }
+
+    public static function userIsHostOfGroup($groupId, $userId)
+    {
+        $user_group_association = DB::table('users_groups')
+                                ->where('group', $groupId)
+                                ->where('user', $userId)
+                                ->where('role', 3)
+                                ->first();
+
+        if (!empty($user_group_association)) {
+            return true;
+        }
+
+        return false;
+    }
 
   /** Prints out Bootstrap alerts
    * finds key of response and
