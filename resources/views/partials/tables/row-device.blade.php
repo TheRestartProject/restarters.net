@@ -233,7 +233,6 @@
 @else
 <tr class="collapse table-row-details" id="row-{{ $device->iddevices }}">
     <td colspan="11">
-        <form id="data-{{ $device->iddevices }}" class="edit-device" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
         <table class="table">
             <tbody>
                 <tr>
@@ -403,7 +402,6 @@
                 </tr>
             </tbody>
         </table>
-        </form>
     </td>
 </tr>
 @endif
