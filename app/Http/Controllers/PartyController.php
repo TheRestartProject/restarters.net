@@ -722,20 +722,28 @@ class PartyController extends Controller {
   public function getJoinEvent($event_id) {
 
     $user_id = Auth::id();
+    $not_in_event = EventsUsers::where('event', $event_id)
+                                  ->where('user', $user_id)
+                                    ->where('status', '!=', 1)
+                                      ->first();
 
-    $not_in_event = empty(EventsUsers::where('event', $event_id)->where('user', $user_id)->first());
 
-    if ($not_in_event) {
+    if ( empty($not_in_event) ) {
+
       try {
-        $user_group = EventsUsers::create([
+
+        $user_event = EventsUsers::updateOrCreate([
           'user' => $user_id,
           'event' => $event_id,
+        ], [
           'status' => 1,
           'role' => 4,
         ]);
 
         $response['success'] = 'Thank you for your RSVP, we look forward to seeing you at the event';
+        
         return redirect()->back()->with('response', $response);
+
       } catch (\Exception $e) {
         $response['danger'] = 'Failed to join this event';
         return redirect()->back()->with('response', $response);
@@ -1294,11 +1302,14 @@ class PartyController extends Controller {
 
   public function confirmInvite($event_id, $hash) {
 
-    try {
-      $user_event = EventsUsers::where('status', $hash)->where('event', $event_id)->first();
-      $user_event->status = 1;
+    $user_event = EventsUsers::where('status', $hash)->where('event', $event_id)->first();
 
-      $user_event->save();
+    if ( !empty($user_event) ) {
+
+      EventsUsers::where('status', $hash)->where('event', $event_id)->update([
+        'status' => 1
+      ]);
+
       $user = User::find($user_event->user);
       try {
         $host = User::find(EventsUsers::where('event', $event_id)->where('role', 3)->first()->user);
@@ -1324,8 +1335,8 @@ class PartyController extends Controller {
 
       return redirect('/party/view/'.$user_event->event);
 
-    } catch (\Exception $e) {
-      return false;
+    } else {
+      return redirect('/party/view/'.$event_id)->with('warning', 'Something went wrong - this invite is invalid or has expired');
     }
 
   }
