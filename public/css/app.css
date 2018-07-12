@@ -14342,6 +14342,9 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   -webkit-box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
           box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
   padding: 5px 0;
+  max-height: 400px;
+  background: white;
+  overflow-y: auto;
 }
 
 .dropdown-menu__titles a {
