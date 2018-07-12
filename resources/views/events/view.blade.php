@@ -134,17 +134,22 @@
                                 @if( $event->isInProgress() || $event->hasFinished() )
                                 <div class="col-4 col-label d-flex flex-column"><strong>Participants:</strong></div>
                                 <div class="col-8 d-flex flex-column">
-
+                                  @if( Auth::check() )
+                                    @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
                                     <div>
-
-                                    <div class="input-group-qty">
-                                        <label for="participants_qty" class="sr-only">Quantity:</label>
-                                        <button class="increase btn-value">+</button>
-                                        <input name="participants_qty" id="participants_qty" maxlength="3" value="{{ $formdata->pax }}" title="Qty" class="input-text form-control qty" type="number">
-                                        <button class="decrease btn-value">–</button>
+                                      <div class="input-group-qty">
+                                          <label for="participants_qty" class="sr-only">Quantity:</label>
+                                          <button class="increase btn-value">+</button>
+                                          <input name="participants_qty" id="participants_qty" maxlength="3" value="{{ $formdata->pax }}" title="Qty" class="input-text form-control qty" type="number">
+                                          <button class="decrease btn-value">–</button>
+                                      </div>
                                     </div>
-
-                                    </div>
+                                    @else
+                                      {{ $formdata->pax }}
+                                    @endif
+                                  @else
+                                    {{ $formdata->pax }}
+                                  @endif
 
                                 </div>
                                 @endif

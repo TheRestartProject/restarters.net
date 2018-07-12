@@ -420,6 +420,7 @@ function textEditor() {
 }
 
 function updateParticipants() {
+
   var quantity = $('#participants_qty').val();
   var event_id = $('#event_id').val();
 
@@ -429,14 +430,23 @@ function updateParticipants() {
       },
       type: 'post',
       url: '/party/update-quantity',
-      data: {quantity : quantity, event_id : event_id},
-      success: function(data) {
-        console.log('quantity updated');
+      data: {
+        quantity : quantity,
+        event_id : event_id
+      },
+      datatype: 'json',
+      success: function(json) {
+        if( json.success ){
+          console.log('quantity updated');
+        } else {
+          alert('You are not a host of this event');
+        }
       },
       error: function(error) {
-        console.log('fail');
+        alert('Something has gone wrong');
       }
   });
+  
 }
 
 function numericInputs() {
@@ -920,26 +930,6 @@ $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
 $('#manual_invite_box').on('tokenfield:removedtoken', function (event) {
     tokenFieldCheck();
 });
-
-function updateParticipants() {
-  var quantity = $('#participants_qty').val();
-  var event_id = $('#event_id').val();
-
-  $.ajax({
-      headers: {
-        'X-CSRF-TOKEN': $("input[name='_token']").val()
-      },
-      type: 'post',
-      url: '/party/update-quantity',
-      data: {quantity : quantity, event_id : event_id},
-      success: function(data) {
-        console.log('quantity updated');
-      },
-      error: function(error) {
-        console.log('fail');
-      }
-  });
-}
 
 $( document ).ready(function() {
 
