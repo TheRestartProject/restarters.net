@@ -1,6 +1,7 @@
 .registration {
-    padding-top: 70px;
-
+    @include media-breakpoint-up(lg) {
+        padding-top: 70px;
+    }
     label sup {
         color: #FF0000;
         font-size: 16px;

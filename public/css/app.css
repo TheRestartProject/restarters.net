@@ -14681,8 +14681,10 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   background-color: #ffeeba;
 }
 
-.registration {
-  padding-top: 70px;
+@media (min-width: 992px) {
+  .registration {
+    padding-top: 70px;
+  }
 }
 
 .registration label sup {
