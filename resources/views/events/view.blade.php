@@ -117,7 +117,7 @@
                                 <div class="col-8 d-flex flex-column">{{ date('D jS M Y', $formdata->event_date) }}</div>
 
                                 <div class="col-4 d-flex flex-column"><strong>Time: </strong></div>
-                                <div class="col-8 d-flex flex-column">{{ date('H:ia', $formdata->event_timestamp) }} - {{ date('H:ia', $formdata->event_end_timestamp) }}</div>
+                                <div class="col-8 d-flex flex-column">{{ $event->getEventStartEnd() }}</div>
 
                                 <div class="col-4 d-flex flex-column"><strong>Address: </strong></div>
                                 <div class="col-8 d-flex flex-column"><address>{{ $formdata->location }}</address></div>
