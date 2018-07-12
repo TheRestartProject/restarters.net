@@ -29,7 +29,10 @@
 
         article {
             @extend .clear;
-            padding: 20px 30px 15px;
+            padding-bottom: 30px;
+            @include media-breakpoint-up(lg) {
+                padding: 20px 30px 15px;
+            }
         }
 
         h1 {
@@ -48,11 +51,17 @@
         }
 
         p:last-child {
-            margin-bottom: 40px;
+            @include media-breakpoint-up(lg) {
+                margin-bottom: 40px;
+            }
         }
 
         img {
-          margin: 0 auto 25px;
+            margin: 0 auto 25px;
+            max-width: 180px;
+            @include media-breakpoint-up(lg) {
+            max-width: 100%;
+            }
         }
 
         ul {
