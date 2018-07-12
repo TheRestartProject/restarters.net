@@ -17014,7 +17014,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .events .button-group {
   padding: 0;
   position: relative;
-  z-index: 10;
+  z-index: 9;
 }
 
 .events .nav-tabs {
