@@ -27,7 +27,7 @@
         @endif
 
         <aside class="registration__step registration__step--active" id="step-1" aria-labelledby="step-1-form-label">
-            <h3> @lang('registration.reg-step-1-heading')</h3>
+            <h3 id="step-1-form-label"> @lang('registration.reg-step-1-heading')</h3>
             <p class="registration__status">@lang('registration.step-1')</p>
 
             <legend id="step-1-form-label">@lang('registration.reg-step-1-1')</legend>

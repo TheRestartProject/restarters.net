@@ -91,6 +91,7 @@ function validateForm() {
 
 function formProcess(e) {
     var target = jQuery(this).data('target');
+    var targetLabel = document.getElementById(target+'-form-label');
     e.preventDefault();
 
     jQuery('.btn-next').attr('aria-expanded', 'false');
@@ -100,18 +101,22 @@ function formProcess(e) {
     } else {
         jQuery('.registration__step').removeClass('registration__step--active');
         jQuery('#' + target).addClass('registration__step--active');
+        if (targetLabel) { targetLabel.scrollIntoView(500) }
     }
 
 }
 
 function formProcessPrev(e) {
     var target = jQuery(this).data('target');
+    var targetLabel = document.getElementById(target+'-form-label');
     e.preventDefault();
 
     jQuery('.registration__step').removeClass('registration__step--active');
     jQuery('.btn-next').attr('aria-expanded','false');
     jQuery('#' + target).addClass('registration__step--active');
     jQuery(this).attr('aria-expanded', 'true');
+
+    if (targetLabel) { console.log(targetLabel); targetLabel.scrollIntoView(500) }
 
 }
 
