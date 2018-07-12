@@ -31,12 +31,8 @@
               <table class="table table-hover table-striped bootg" id="tags-table">
                   <thead>
                       <tr>
-                          <th data-column-id="tagID"  data-header-css-class="comm-cell" data-identifier="true" data-type="numeric">#</th>
-                          <th data-column-id="tag">Tag</th>
-                          <th data-column-id="tag-description">Description</th>
-                          <th data-column-id="created-at">Created At</th>
-                          <th data-column-id="updated-at">Updated At</th>
-                          <th data-column-id="edit" data-header-css-class="comm-cell" data-formatter="editLink" data-sortable="false">Actions</th>
+                          <th>Tag name</th>
+                          <th>Description</th>
                       </tr>
                   </thead>
 
@@ -44,15 +40,8 @@
                     @if(isset($tags))
                       @foreach($tags as $tag)
                       <tr>
-                        <td><?php echo $tag->id; ?></td>
-                        <td><?php echo $tag->tag_name; ?></td>
-                        <td><?php echo $tag->description; ?></td>
-                        <td><?php echo $tag->created_at; ?></td>
-                        <td><?php echo $tag->updated_at; ?></td>
-                        <td>
-                          <a href="/tags/edit/<?php echo $tag->id; ?>" class="btn btn-warning">edit</a>
-                          <a href="/tags/delete/<?php echo $tag->id; ?>" class="btn btn-danger">delete</a>
-                        </td>
+                        <td><a href="/tags/edit/{{{ $tag->id }}}">{{{ $tag->tag_name }}}</a></td>
+                        <td>{{{ str_limit(strip_tags($tag->description), 20, '...') }}}</td>
                       </tr>
                       @endforeach
                     @endif
