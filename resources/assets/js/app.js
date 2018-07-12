@@ -451,7 +451,7 @@ function updateParticipants() {
         alert('Something has gone wrong');
       }
   });
-  
+
 }
 
 function numericInputs() {
@@ -538,54 +538,67 @@ function nestedTable() {
 
 function loadDropzones() {
 
-    if (jQuery("#dropzoneEl").length > 0 ) {
+    if (jQuery(".dropzoneEl").length > 0 ) {
 
         var field1 = jQuery('.dropzone').data('field1');
         var field2 = jQuery('.dropzone').data('field2');
 
-        var instanceDropzone = new Dropzone("#dropzoneEl", {
-            autoProcessQueue: false,
-            paramName: "file", // The name that will be used to transfer the file
-            maxFilesize: 2,
-            parallelUploads: 100,
-            uploadMultiple: true,
-            createImageThumbnails: true,
-            thumbnailWidth: 70,
-            thumbnailHeight: 60,
-            thumbnailMethod: "contain",
-            addRemoveLinks: true,
-            previewsContainer: ".uploads",
-            init: function () {
+        var preview = ".uploads";
+        var dropzone_id = ".dropzoneEl";
 
-                jQuery(".dropzone .dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
+        $(".dropzoneEl").each(function( index ) {
+          // console.log($('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone);
+          if (typeof $('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone != "undefined") {
+            // Do nothing
+            // console.log('nothing');
+          } else {
 
-                var myDropzone = this;
-
-                // First change the button to actually tell Dropzone to process the queue.
-                this.element.querySelector("input[type=submit]").addEventListener("click", function(e) {
-                  // Make sure that the form isn't actually being sent.
-                  e.preventDefault();
-                  e.stopPropagation();
-                  myDropzone.processQueue();
-                });
-
-                // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead
-                // of the sending event because uploadMultiple is set to true.
-                this.on("sendingmultiple", function() {
-                  // Gets triggered when the form is actually being sent.
-                  // Hide the success button or the complete form.
-                });
-                this.on("successmultiple", function(files, response) {
-                  // Gets triggered when the files have successfully been sent.
-                  // Redirect user or notify of success.
-
-                });
-                this.on("errormultiple", function(files, response) {
-                  // Gets triggered when there was an error sending the files.
-                  // Maybe show form again, and notify user of error
-                });
-
-            }
+            var instanceDropzone = new Dropzone('#dropzoneEl-' + $(this).data('deviceid'), {
+                // autoProcessQueue: false,
+                paramName: "file", // The name that will be used to transfer the file
+                // maxFilesize: 2,
+                parallelUploads: 100,
+                uploadMultiple: true,
+                createImageThumbnails: true,
+                thumbnailWidth: 60,
+                thumbnailHeight: 60,
+                thumbnailMethod: "contain",
+                addRemoveLinks: true,
+                previewsContainer: ".uploads-" + $(this).data('deviceid'),
+                // init: function () {
+                //
+                //     jQuery(".dropzone .dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
+                //
+                //     var myDropzone = this;
+                //
+                //     // First change the button to actually tell Dropzone to process the queue.
+                //     this.element.querySelector("input[type=submit]").addEventListener("click", function(e) {
+                //       // Make sure that the form isn't actually being sent.
+                //       e.preventDefault();
+                //       e.stopPropagation();
+                //       myDropzone.processQueue();
+                //     });
+                //
+                //     // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead
+                //     // of the sending event because uploadMultiple is set to true.
+                //     this.on("sendingmultiple", function() {
+                //       // Gets triggered when the form is actually being sent.
+                //       // Hide the success button or the complete form.
+                //     });
+                //     this.on("successmultiple", function(files, response) {
+                //       // Gets triggered when the files have successfully been sent.
+                //       // Redirect user or notify of success.
+                //
+                //     });
+                //     this.on("errormultiple", function(files, response) {
+                //       // Gets triggered when there was an error sending the files.
+                //       // Maybe show form again, and notify user of error
+                //     });
+                //
+                // }
+            });
+            // console.log($('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone);
+          }
         });
 
     }
@@ -1008,6 +1021,8 @@ $( document ).ready(function() {
             $('.btn-add').addClass('btn-primary');
           }, 1000);
 
+          loadDropzones();
+
         } else if( json ) {
 
           var error_message = '';
@@ -1181,6 +1196,26 @@ $( document ).ready(function() {
       });
     }
 
+  });
+
+  $('.ajax-delete-image').on('click', function (e) {
+    e.preventDefault();
+
+    if (window.confirm("Are you sure? This cannot be undone.")) {
+      $this = jQuery(this);
+      $device = jQuery(this).data('device-id');
+      $href = $(this).attr('href');
+      $.ajax({
+        type: 'get',
+        url: $href,
+        success: function(data) {
+          $this.parent().fadeOut(1000);
+        },
+        error: function(error) {
+          alert(error);
+        }
+      });
+    }
   });
 
   $('#description').on('summernote.change', function(e) {

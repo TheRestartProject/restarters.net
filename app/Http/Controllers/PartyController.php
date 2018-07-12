@@ -700,6 +700,12 @@ class PartyController extends Controller {
       $clusters = Cluster::all();
       $event = Party::find($id);
       // dd($event->getEventStats($this->EmissionRatio));
+      $device_images = [];
+
+      //Get Device Images
+      foreach ($event->devices as $device) {
+        $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
+      }
 
       return view('events.view', [
         'gmaps' => true,
@@ -715,6 +721,7 @@ class PartyController extends Controller {
         'is_attending' => $is_attending,
         'brands' => $brands,
         'clusters' => $clusters,
+        'device_images' => $device_images,
       ]);
 
   }

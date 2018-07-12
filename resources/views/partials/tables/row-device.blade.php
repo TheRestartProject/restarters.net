@@ -1,5 +1,5 @@
 <tr id="summary-{{ $device->iddevices }}">
-    <td><a class="collapsed row-button" data-toggle="collapse" href="#row-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="row-1">
+    <td><a class="collapsed row-button" id="open-edit-device" data-toggle="collapse" href="#row-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="row-1">
     @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ||  ( is_object($is_attending) && $is_attending->status == 1 ) )
       Edit
     @else
@@ -225,9 +225,37 @@
                         </div>
                     </td>
                 </tr>
+                </form>
+                <tr>
+                  <td colspan="4">
+                    <div class="form-group">
+                        <label for="file">Add image:</label>
+
+                        <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1=" Device images here - " data-field2="Choose compelling images that show off your work">
+                            @csrf
+                            <div class="fallback" >
+                                <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />
+                            </div>
+                        </form>
+                    </div>
+                  </td>
+                  <td colspan="3">
+                    <label for="device-image-{{ $device->iddevices }}">Device Images:</label>
+                    <div class="previews">
+                      @if( isset($device_images[$device->iddevices]) && !empty($device_images[$device->iddevices]) )
+                        @foreach($device_images[$device->iddevices] as $device_image)
+                          <div id="device-image-{{ $device->iddevices }}" class="dz-image">
+                            <img src="/uploads/thumbnail_{{ $device_image->path }}" alt="placeholder">
+                            <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $device_image->idimages }}}/{{{ $device_image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">Remove file</a>
+                          </div>
+                        @endforeach
+                      @endif
+                      <div class="uploads-{{ $device->iddevices }}"></div>
+                    </div>
+                  </td>
+                </tr>
             </tbody>
         </table>
-        </form>
     </td>
 </tr>
 @else
