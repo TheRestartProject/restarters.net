@@ -35,7 +35,7 @@
                         <button class="btn">@lang('events.rsvp_button')</button>
                     </div>
                 </div>
-                
+
             </div>
           @endif
       @endif
@@ -73,10 +73,14 @@
                       </button>
                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                           <a href="{{ url('/') }}/party/edit/{{ $formdata->id }}" class="dropdown-item">Edit event</a>
-                          @if( $event->isInProgress() || $event->hasFinished() )
-                            <button data-toggle="modal" data-target="#event-share-stats" class="dropdown-item">Share event stats</a>
+                          @if( $event->hasFinished() )
+                            <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</a>
                           @else
-                            <button data-toggle="modal" data-target="#event-invite-to" class="dropdown-item">Invite volunteers</button>
+                            @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
+                              <button data-toggle="modal" data-target="#event-invite-to" class="btn dropdown-item">Invite volunteers</button>
+                            @else
+                              <a class="btn dropdown-item" href="/party/join/{{ $formdata->id }}">RSVP</a>
+                            @endif
                           @endif
                       </div>
                   </div>
