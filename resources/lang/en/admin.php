@@ -39,8 +39,8 @@ return [
         'edit-category' => 'Edit category',
         'save-skill' => 'Save skill',
         'edit-skill' => 'Edit skill',
-        'edit-category-content' => 'Lorem ipsum dolor sit amet, consectetur adip iscing elit. Praesent commodo cursus magna.',
-        'edit-skill-content' => 'Lorem ipsum dolor sit amet, consectetur adip iscing elit. Praesent commodo cursus magna.',
+        'edit-category-content' => '',
+        'edit-skill-content' => '',
         'group-tags' => 'Group tags',
         'delete-tag' => 'Delete tag',
         'save-tag' => 'Save tag',
@@ -50,7 +50,7 @@ return [
         'edit-tag' => 'Edit tag',
         'edit-brand' => 'Edit brand',
         'edit-group-tag' => 'Edit group tag',
-        'edit-group-tag-content' => 'Lorem ipsum dolor sit amet, consectetur adip iscing elit. Praesent commodo cursus magna.',
-        'edit-brand-content' => 'Lorem ipsum dolor sit amet, consectetur adip iscing elit. Praesent commodo cursus magna.'
+        'edit-group-tag-content' => '',
+        'edit-brand-content' => ''
 
     ];
