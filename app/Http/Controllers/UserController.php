@@ -225,21 +225,6 @@ class UserController extends Controller
 
       User::find(Auth::id())->skills()->sync($request->input('tags'));
 
-      // $input_skills = $request->input('tags');
-      //
-      // $exisiting_skills = UsersSkills::where('user', Auth::id())->pluck('skill')->toArray();
-      //
-      // $new_skills = array_diff($input_skills, $exisiting_skills);
-      //
-      // foreach ($new_skills as $new_skill) {
-      //
-      //   UsersSkills::create([
-      //     'skill' => $new_skill,
-      //     'user' => Auth::id(),
-      //   ]);
-      //
-      // }
-
       return redirect()->back()->with('message', 'User Skills Updated!');
 
     }
@@ -1093,16 +1078,8 @@ class UserController extends Controller
 
       $user->save();
 
-      if (!empty($skills)) {
-
-        foreach($skills as $skill) {
-          UsersSkills::create([
-            'skill' => $skill,
-            'user'  => $user->id,
-          ]);
-        }
-
-      }
+      if ( !empty($skills) )
+        User::find($user->id)->skills()->sync($skills);
 
       if ( !is_null($hash) ) {
 
