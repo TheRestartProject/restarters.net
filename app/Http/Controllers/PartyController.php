@@ -538,7 +538,7 @@ class PartyController extends Controller {
                   // }
 
 
-              } elseif(!empty($theParty->wordpress_post_id)){
+              } elseif( ( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && !empty($theParty->wordpress_post_id)){
                   $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
                   $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
@@ -741,7 +741,7 @@ class PartyController extends Controller {
         ]);
 
         $response['success'] = 'Thank you for your RSVP, we look forward to seeing you at the event';
-        
+
         return redirect()->back()->with('response', $response);
 
       } catch (\Exception $e) {

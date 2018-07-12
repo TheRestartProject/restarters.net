@@ -164,7 +164,7 @@
                         @foreach($images as $image)
                           <li>
                               <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
-                                <img src="/uploads/{{ $image->path }}" alt="placeholder" width="100">
+                                <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder" width="100">
                               </a>
                           </li>
                         @endforeach

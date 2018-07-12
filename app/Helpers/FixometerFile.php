@@ -59,48 +59,48 @@ class FixometerFile extends Model {
 
                     if($profile == true) {
                         $data['alt_text'] = "Profile Picture";
+                    }
 
-                        if($this->ext == 'jpg') {
-                            $profile_pic = imagecreatefromjpeg($this->path);
+                    if($this->ext == 'jpg') {
+                        $profile_pic = imagecreatefromjpeg($this->path);
 
-                        }
-                        elseif($this->ext == 'png') {
-                            $profile_pic = imagecreatefrompng($this->path);
-                        }
-
-
-                        if($data['width'] > $data['height']) {
-                            $biggestSide = $data['width'];
-                        }
-                        else {
-                            $biggestSide = $data['height'];
-                        }
+                    }
+                    elseif($this->ext == 'png') {
+                        $profile_pic = imagecreatefrompng($this->path);
+                    }
 
 
-                        $cropPercent = 1;
-                        $cropWidth   = $biggestSide*$cropPercent;
-                        $cropHeight  = $biggestSide*$cropPercent;
+                    if($data['width'] > $data['height']) {
+                        $biggestSide = $data['width'];
+                    }
+                    else {
+                        $biggestSide = $data['height'];
+                    }
 
-                        //getting the top left coordinate
-                        $c1 = array("x"=>( $data['width']-$cropWidth)/2, "y"=>( $data['height']-$cropHeight)/2);
 
-                        $thumbSize = 60;
-                        $midSize = 260;
+                    $cropPercent = 1;
+                    $cropWidth   = $biggestSide*$cropPercent;
+                    $cropHeight  = $biggestSide*$cropPercent;
 
-                        $thumb = imagecreatetruecolor($thumbSize, $thumbSize);
-                        $mid = imagecreatetruecolor($midSize, $midSize);
+                    //getting the top left coordinate
+                    $c1 = array("x"=>( $data['width']-$cropWidth)/2, "y"=>( $data['height']-$cropHeight)/2);
 
-                        imagecopyresampled($thumb, $profile_pic, 0, 0, $c1['x'], $c1['y'], $thumbSize, $thumbSize, $cropWidth, $cropHeight);
-                        imagecopyresampled($mid, $profile_pic, 0, 0, $c1['x'], $c1['y'], $midSize, $midSize, $cropWidth, $cropHeight);
+                    $thumbSize = 60;
+                    $midSize = 260;
 
-                        if($this->ext == 'jpg'){
-                            imagejpeg($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename, 85);
-                            imagejpeg($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename, 85);
-                        }
-                        elseif($this->ext == 'png') {
-                            imagepng($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename );
-                            imagepng($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename );
-                        }
+                    $thumb = imagecreatetruecolor($thumbSize, $thumbSize);
+                    $mid = imagecreatetruecolor($midSize, $midSize);
+
+                    imagecopyresampled($thumb, $profile_pic, 0, 0, $c1['x'], $c1['y'], $thumbSize, $thumbSize, $cropWidth, $cropHeight);
+                    imagecopyresampled($mid, $profile_pic, 0, 0, $c1['x'], $c1['y'], $midSize, $midSize, $cropWidth, $cropHeight);
+
+                    if($this->ext == 'jpg'){
+                        imagejpeg($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename, 85);
+                        imagejpeg($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename, 85);
+                    }
+                    elseif($this->ext == 'png') {
+                        imagepng($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename );
+                        imagepng($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename );
                     }
 
 
