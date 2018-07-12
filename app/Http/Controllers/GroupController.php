@@ -709,11 +709,14 @@ class GroupController extends Controller
 
   public function confirmInvite($group_id, $hash) {
 
-    try {
-      $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
-      $user_group->status = 1;
-      $user_group->save();
-      
+    $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
+
+    if ( !empty($user_group) ) {
+
+      UserGroups::where('status', $hash)->where('group', $group_id)->update([
+        'status' => 1
+      ]);
+
       $user = User::find($user_group->user);
       try {
         $host = User::find(UserGroups::where('group', $group_id)->where('role', 3)->first()->user);
@@ -735,8 +738,8 @@ class GroupController extends Controller
 
       return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
 
-    } catch (\Exception $e) {
-      return false;
+    } else {
+      return redirect('/group/view/'.$group_id)->with('warning', 'Something went wrong - this invite is invalid or has expired');
     }
 
   }
@@ -1019,15 +1022,19 @@ class GroupController extends Controller
   }
 
   public function getJoinGroup($group_id) {
+
     $user_id = Auth::id();
+    $not_in_group = UserGroups::where('group', $group_id)
+                                  ->where('user', $user_id)
+                                    ->where('status', '!=', 1)
+                                      ->first();
 
-    $not_in_group = empty(UserGroups::where('group', $group_id)->where('user', $user_id)->first());
-
-    if ($not_in_group) {
+    if ( empty($not_in_group) ) {
       try {
-        $user_group = UserGroups::create([
+        $user_group = UserGroups::updateOrCreate([
           'user' => $user_id,
           'group' => $group_id,
+        ], [
           'status' => 1,
           'role' => 4,
         ]);
