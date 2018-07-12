@@ -92,7 +92,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   -ms-overflow-style: scrollbar;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
 }
 
 @-ms-viewport {
@@ -13937,7 +13937,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .alert-warning .btn:hover,
 .alert-success .btn:hover,
 .alert-delete .btn:hover {
-  background-color: rgba(0, 0, 0, 0);
+  background-color: transparent;
 }
 
 .alert-danger .btn:focus,
@@ -13946,7 +13946,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .alert-success .btn:focus,
 .alert-delete .btn:focus {
   text-decoration: underline;
-  background-color: rgba(0, 0, 0, 0);
+  background-color: transparent;
 }
 
 .alert-nobutton {
