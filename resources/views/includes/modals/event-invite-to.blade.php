@@ -1,3 +1,4 @@
+@if( Auth::check() )
 <!-- Modal -->
 <div class="modal modal__invite fade" id="event-invite-to" tabindex="-1" role="dialog" aria-labelledby="inviteToEventLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -21,12 +22,13 @@
           <input type="hidden" name="group_name" value="{{ $formdata->group_name }}">
           <input type="hidden" id="event_id" name="event_id" value="{{ $formdata->id }}">
 
+          @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
           <div class="form-check">
             <input type="checkbox" name="invite_group" class="form-check-input" id="invites_to_volunteers" value="1">
             <label class="form-check-label" for="invites_to_volunteers">@lang('events.send_invites_to_restarters_tickbox', ['group' => $formdata->group_name])</label>
           </div>
-
           <br>
+          @endif
 
           <div id="invite_div" class="form-group">
               <label for="manual_invite_box">@lang('events.manual_invite_box'):</label>
@@ -49,3 +51,4 @@
     </div>
   </div>
 </div>
+@endif

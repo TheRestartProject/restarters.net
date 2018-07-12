@@ -740,6 +740,8 @@ class PartyController extends Controller {
           'role' => 4,
         ]);
 
+        Party::find($event_id)->increment('volunteers');
+
         $response['success'] = 'Thank you for your RSVP, we look forward to seeing you at the event';
 
         return redirect()->back()->with('response', $response);
@@ -1184,16 +1186,24 @@ class PartyController extends Controller {
       'success' => false
     ];
 
-    if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($event_id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+    //Has current logged in user got permission to remove volunteer
+    if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($event_id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator') ) {
 
+      //Let's get the user before we delete them
+      $volunteer = EventsUsers::where('user', $user_id)->where('event', $event_id)->first();
+
+      //Let's delete the user
       $delete_user = EventsUsers::where('user', $user_id)->where('event', $event_id)->delete();
       if( $delete_user == 1 ){
 
+        //If the user accepted the invitation, we decrement
+        if( $volunteer->status == 1 )
+          Party::find($event_id)->decrement('volunteers');
+
+        //Return JSON
         $return = [
           'success' => true
         ];
-
-        Party::where('idevents', $event_id)->decrement('volunteers');
 
       }
 
@@ -1317,9 +1327,9 @@ class PartyController extends Controller {
         $host = null;
       }
 
-      if (!is_null($host)) {
+      Party::find($event_id)->increment('volunteers');
 
-        Party::where('idevents', $event_id)->increment('volunteers');
+      if ( !is_null($host) ) {
 
         //Send Notification to Host
         $arr = [
