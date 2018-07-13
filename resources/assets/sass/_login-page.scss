@@ -22,7 +22,8 @@
     .entry-wrapper {
         margin: auto;
         @include media-breakpoint-up(xl) {
-            width: 960px;
+            //width: 960px;
+            width: 1150px;
         }
     }
     legend {
@@ -45,6 +46,6 @@
         font-weight: normal;
         font-size: 26px;
         line-height: 1;
-        white-space: nowrap;
+        //white-space: nowrap;
     }
 }

@@ -27,7 +27,7 @@
             padding: 15px;
             display: flex;
             flex-direction: column;
-            flex: 1 0 100%;
+            flex: 1 0 auto;
             border-radius:3px;
             position: relative;
             z-index: 1;
@@ -50,7 +50,7 @@
             font-weight: 400;
             padding: 0 0 15px 28px;
             color: $brand;
-            flex: 1;
+            flex: 1 0 auto;
         }
     }
 

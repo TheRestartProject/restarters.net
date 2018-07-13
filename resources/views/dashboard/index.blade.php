@@ -68,7 +68,7 @@
                 </div>
                 @if ($in_event)
                   <div class="col-5 d-flex align-items-center justify-content-end">
-                    <svg class="step__tick" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Tick</title><g fill="#78ca6e"><path d="M7.646 16.486l3.823-3.823-7.646-7.646L0 8.84l7.646 7.646z"/><path d="M20.309 3.823L16.486 0 3.823 12.663l3.823 3.823L20.309 3.823z"/></g></svg>
+                    <svg width="20" height="17" class="step__tick" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Tick</title><g fill="#78ca6e"><path d="M7.646 16.486l3.823-3.823-7.646-7.646L0 8.84l7.646 7.646z"/><path d="M20.309 3.823L16.486 0 3.823 12.663l3.823 3.823L20.309 3.823z"/></g></svg>
                   </div>
                 @else
                   <div class="col-5 d-flex align-items-center justify-content-end">

@@ -15375,8 +15375,10 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
       -ms-flex-direction: column;
           flex-direction: column;
   -webkit-box-flex: 1;
-      -ms-flex: 1 0 100%;
-          flex: 1 0 100%;
+      -ms-flex: 1 0 auto;
+          flex: 1 0 auto;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
   margin-bottom: 20px;
 }
 
@@ -15386,10 +15388,18 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   }
 }
 
+.dashboard__block__media {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  width: 100%;
+}
+
 .dashboard__block img {
   width: 100%;
   height: auto;
   display: block;
+  -ms-flex-line-pack: center;
+      align-content: center;
 }
 
 .dashboard__block__content {
@@ -15407,6 +15417,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
       -ms-flex: 1;
           flex: 1;
   font-size: 15px;
+  -ms-flex-preferred-size: auto;
+      flex-basis: auto;
 }
 
 .dashboard__block__content h4 {
@@ -15915,7 +15927,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 @media (min-width: 1200px) {
   .login-page .entry-wrapper {
-    width: 960px;
+    width: 1150px;
   }
 }
 
@@ -15940,7 +15952,6 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   font-weight: normal;
   font-size: 26px;
   line-height: 1;
-  white-space: nowrap;
 }
 
 .modal button[type=submit] {
@@ -16878,8 +16889,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
       -ms-flex-direction: column;
           flex-direction: column;
   -webkit-box-flex: 1;
-      -ms-flex: 1 0 100%;
-          flex: 1 0 100%;
+      -ms-flex: 1 0 auto;
+          flex: 1 0 auto;
   border-radius: 3px;
   position: relative;
   z-index: 1;
@@ -16904,8 +16915,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   padding: 0 0 15px 28px;
   color: #0394A6;
   -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+      -ms-flex: 1 0 auto;
+          flex: 1 0 auto;
 }
 
 .properties__small {
