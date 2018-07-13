@@ -91,11 +91,11 @@
 
                       <div class="row row-compressed">
 
-                        <div class="col-lg-6">
+                        <div class="col-6">
                           <input type="time" id="field_event_time" name="start" class="form-control field" required>
                         </div>
 
-                        <div class="col-lg-6">
+                        <div class="col-6">
                           <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
                           <input type="time" id="field_event_time_2" name="end" class="form-control field" required>
                         </div>
@@ -155,7 +155,7 @@
               <div class="offset-lg-4 col-lg-6 d-flex align-items-center justify-content-start">
                   <span class="button-group__notice">@lang('events.before_submit_text')</span>
               </div>
-              <div class="col-lg-2 d-flex align-items-center justify-content-end">
+              <div class="col-lg-2 d-flex align-items-center justify-content-end  pt-4 pt-lg-0 pb-4 pb-lg-0">
                   <input type="submit" class="btn btn-primary btn-create" id="create-event" value="@lang('events.create_event')">
               </div>
           </div>
