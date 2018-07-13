@@ -16262,6 +16262,11 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   margin: -1px 5px -5px -4px;
 }
 
+.table-tick {
+  display: block;
+  margin: auto;
+}
+
 .table.table-striped tbody tr {
   background-color: #EEF0F0;
 }
@@ -16420,8 +16425,10 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   vertical-align: top !important;
 }
 
-.table .table-cell-upload {
-  padding-left: 15px;
+@media (min-width: 768px) {
+  .table .table-cell-upload {
+    padding-left: 15px;
+  }
 }
 
 .table .table-cell-upload .form-group {
@@ -16564,6 +16571,27 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .row-button {
   white-space: nowrap;
+}
+
+@media (max-width: 991.98px) {
+  .nested-fields {
+    padding: 0 10px;
+  }
+}
+
+.nested-fields label {
+  font-family: "Patua One", cursive, sans-serif;
+  font-size: 16px;
+  margin-bottom: 7px;
+}
+
+.nested-fields label.form-check-label {
+  font-size: 15px;
+  font-family: "Open Sans", sans-serif;
+}
+
+.nested-fields .form-control {
+  margin-bottom: 15px;
 }
 
 .groups {
