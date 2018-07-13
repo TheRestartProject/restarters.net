@@ -16312,10 +16312,6 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   padding: 20px 0;
 }
 
-.table-repair {
-  min-width: 1000px;
-}
-
 .table-repair .arrow {
   -webkit-transform: rotate(0deg);
           transform: rotate(0deg);
@@ -16435,7 +16431,6 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .table-add {
   border: 0;
-  min-width: 1000px;
 }
 
 .table-add .form-group {
