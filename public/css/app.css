@@ -16556,6 +16556,10 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   width: 165px;
 }
 
+.row-button {
+  white-space: nowrap;
+}
+
 .groups {
   padding: 70px 0;
 }
