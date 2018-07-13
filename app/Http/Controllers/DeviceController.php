@@ -261,7 +261,7 @@ class DeviceController extends Controller
                   /** let's create the image attachment! **/
                   if(isset($_FILES) && !empty($_FILES)){
                       $file = new FixometerFile;
-                      $file->upload('devicePhoto', 'image', $id, env('TBL_EVENTS'));
+                      $file->upload('devicePhoto', 'image', $id, env('TBL_DEVICES'), true);
                   }
 
               }
@@ -773,6 +773,39 @@ class DeviceController extends Controller
             return redirect('/party/view/'.$party->with('warning', 'You do not have the right permissions for deleting a device'));
           }
       }
+  }
+
+  public function imageUpload(Request $request, $id) {
+
+    try {
+      if(isset($_FILES) && !empty($_FILES)){
+          $file = new FixometerFile;
+          $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
+      }
+
+      return "success - image uploaded";
+    } catch (\Exception $e) {
+      return "fail - image could not be uploaded";
+    }
+  }
+
+  public function deleteImage($device_id, $id, $path){
+
+      $user = Auth::user();
+
+      $event_id = Device::find($device_id)->event;
+      $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
+      if(FixometerHelper::hasRole($user, 'Administrator') || is_object($in_event) ){
+
+          $Image = new FixometerFile;
+          $Image->deleteImage($id, $path);
+
+          return redirect()->back()->with('message', 'Thank you, the image has been deleted');
+
+      }
+
+      return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
+
   }
 
     // public function test() {

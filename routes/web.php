@@ -94,11 +94,13 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   Route::prefix('device')->group(function () {
     Route::get('/', 'DeviceController@index')->name('devices');
     Route::get('/search', 'DeviceController@search');
-    Route::get('/edit/{id}', 'DeviceController@edit');
+    Route::get('/page-edit/{id}', 'DeviceController@edit');
+    Route::post('/page-edit/{id}', 'DeviceController@edit');
     Route::post('/edit/{id}', 'DeviceController@ajaxEdit');
     Route::post('/create', 'DeviceController@ajaxCreate');
     Route::get('/delete/{id}', 'DeviceController@delete');
     Route::post('/image-upload/{id}', 'DeviceController@imageUpload');
+    Route::get('/image/delete/{iddevices}/{id}/{path}', 'DeviceController@deleteImage');
   });
 
   //Group Controller

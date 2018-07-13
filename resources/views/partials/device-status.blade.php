@@ -2,7 +2,7 @@
     $state = '';
     $device = '';
     switch( $status ) :
-        case( 1 ):
+        case( 3 ):
           $state = 'danger';
           $device = 'end';
           break;
@@ -10,7 +10,7 @@
           $state = 'warning';
           $device = 'repairable';
           break;
-        case( 3 ):
+        case( 1 ):
           $state = 'success';
           $device = 'fixed';
           break;

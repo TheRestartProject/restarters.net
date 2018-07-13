@@ -26,7 +26,7 @@
 
         <h2>@lang('devices.edit_devices_details')</h2>
 
-        <form action="/device/edit/<?php echo $formdata->iddevices; ?>" method="post" enctype="multipart/form-data">
+        <form action="/device/page-edit/<?php echo $formdata->iddevices; ?>" method="post" enctype="multipart/form-data">
           @csrf
           <div class="row">
               <div class="col-lg-4">
