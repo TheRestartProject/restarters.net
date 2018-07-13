@@ -11,6 +11,7 @@
                     <table class="table table-add" role="table">
                         <tbody>
                             <tr>
+                                <th class="d-xs-table-cell d-md-none">Add device</th>
                                 <td width="200">
                                     <div class="form-control form-control__select">
                                         <select id="device-start" name="category" class="category select2">
@@ -34,7 +35,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td width="150">
+                                <td class="d-none d-sm-table-cell" width="150">
                                     <div class="form-control form-control__select">
                                         <select name="brand" class="brand select2-with-input">
                                             <option value="">-- Brand --</option>
@@ -45,17 +46,17 @@
                                         </select>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="d-none d-sm-table-cell">
                                     <div class="form-group">
                                         <input type="text" class="form-control field" class="model" name="model" placeholder="Model" autocomplete="off">
                                     </div>
                                 </td>
-                                <td width="100">
+                                <td class="d-none d-sm-table-cell" width="100">
                                     <div class="form-group">
                                         <input type="number" class="form-control field" class="age" name="age" min="0" step="0.5" placeholder="Age (yrs)" autocomplete="off">
                                     </div>
                                 </td>
-                                <td>
+                                <td class="d-none d-sm-table-cell">
                                     <div class="form-group">
                                         <input type="text" class="form-control field" class="problem" name="problem" placeholder="Description of problem" autocomplete="off">
                                     </div>
@@ -89,10 +90,10 @@
                                         </select>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="d-none d-sm-table-cell">
                                     <input type="submit" class="btn btn-primary btn-add" value="Add">
                                 </td>
-                                <td>
+                                <td class="d-none d-sm-table-cell">
                                     <div class="form-control form-control__select">
                                         <select name="quantity" class="quantity select2">
                                             <option value="1">1</option>

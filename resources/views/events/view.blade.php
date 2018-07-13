@@ -299,7 +299,7 @@
                                   <th class="d-none d-sm-table-cell">Brand</th>
                                   <th class="d-none d-sm-table-cell">Model</th>
                                   <th class="d-none d-sm-table-cell">Age</th>
-                                  <th>Description of problem/solution</th>
+                                  <th><span class="d-none d-sm-inline">Description of problem/solution</span></th>
                                   <th width="65px">Status</th>
                                   <th width="95px">Spare parts</th>
                                   @if( Auth::check() )

@@ -198,7 +198,7 @@
             border: 0;
 
             th {
-                padding-left: 10px;
+                padding-left: 10px !important;
                 font-family: $font-family-sans-serif;
                 font-size: 16px;
                 border: 0;
@@ -212,6 +212,10 @@
 
                 &:last-child {
                     padding: 0 10px 0 0;
+                }
+
+                @include media-breakpoint-down(sm) {
+                    width:25%;
                 }
             }
         }

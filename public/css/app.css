@@ -16447,7 +16447,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .table-add tr th {
-  padding-left: 10px;
+  padding-left: 10px !important;
   font-family: "Patua One", cursive, sans-serif;
   font-size: 16px;
   border: 0;
@@ -16462,6 +16462,12 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .table-add tr td:last-child {
   padding: 0 10px 0 0;
+}
+
+@media (max-width: 767.98px) {
+  .table-add tr td {
+    width: 25%;
+  }
 }
 
 .table-devices .badge {
