@@ -17133,6 +17133,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   background-color: #F9F9F9;
   border: 1px solid #D9D9D9;
   color: #5A5A5A;
+  overflow: hidden;
 }
 
 .events__description button {
@@ -17527,6 +17528,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   border-radius: 3px;
   position: relative;
   z-index: 1;
+  -ms-flex-preferred-size: auto;
+      flex-basis: auto;
 }
 
 .stat h3 {
