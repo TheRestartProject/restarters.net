@@ -54,11 +54,12 @@ class FixometerHelper {
           $user = Auth::user();
         }
 
-        if($user->role()->first()->role == 'Root'){
+        $usersRole = $user->role()->first()->role;
+        if($usersRole == 'Root'){
             return true;
         }
         else {
-            if($user->role()->first()->role == ucwords($role)){
+            if($usersRole == ucwords($role)){
                 return true;
             }
             else {
