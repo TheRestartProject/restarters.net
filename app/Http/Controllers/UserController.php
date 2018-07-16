@@ -95,7 +95,7 @@ class UserController extends Controller
     public function getProfileEdit($id = null) {
 
       if( is_null($id) || !FixometerHelper::hasRole(Auth::user(), 'Administrator') ){
-          $user = User::find(Auth::user()->id);
+          $user = Auth::user();
       } else {
           $user = User::find($id);
       }

@@ -47,7 +47,7 @@
                                 @foreach($categories as $cluster)
                                     <optgroup label="<?php echo $cluster->name; ?>">
                                     @foreach($cluster->categories as $c)
-                                        @if (isset($_GET['categories']) && in_array($c->idcategories, $_GET['categories']))
+                                        @if (!empty($selected_categories) && in_array($c->idcategories, $selected_categories))
                                           <option value="<?php echo $c->idcategories; ?>" selected><?php echo $c->name; ?></option>
                                         @else
                                           <option value="<?php echo $c->idcategories; ?>"><?php echo $c->name; ?></option>
@@ -66,10 +66,10 @@
                         <select id="groups" name="groups[]" class="form-control select2-tags" multiple data-live-search="true" title="Choose groups...">
                             @if(isset($groups))
                               @foreach($groups as $g)
-                                @if (isset($_GET['groups']) && in_array($g->id, $_GET['groups']))
-                                  <option value="<?php echo $g->id; ?>" selected><?php echo $g->name; ?></option>
+                                @if (!empty($selected_groups) && in_array($g->idgroups, $selected_groups))
+                                  <option value="<?php echo $g->idgroups; ?>" selected><?php echo $g->name; ?></option>
                                 @else
-                                  <option value="<?php echo $g->id; ?>"><?php echo $g->name; ?></option>
+                                  <option value="<?php echo $g->idgroups; ?>"><?php echo $g->name; ?></option>
                                 @endif
                               @endforeach
                             @endif
@@ -84,14 +84,14 @@
                     <div class="form-group">
                         <!-- <div class="input-group date from-date"> -->
                         <label for="from-date">@lang('devices.from_date'):</label>
-                        <input type="date" class="field form-control" id="search-from-date" name="from-date" value="<?php if (isset($_GET['from-date'])) $_GET['from-date'] ?>" >
+                        <input type="date" class="field form-control" id="search-from-date" name="from-date" value="{{ $from_date }}" >
                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                         <!-- </div> -->
                     </div>
                     <div class="form-group">
                         <!-- <div class="input-group date to-date"> -->
                         <label for="to-date">@lang('devices.to_date'):</label>
-                        <input type="date" class="field form-control" id="search-to-date" name="to-date" value="<?php if (isset($_GET['to-date'])) $_GET['to-date'] ?>" >
+                        <input type="date" class="field form-control" id="search-to-date" name="to-date" value="{{ $to_date }}" >
                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                         <!-- </div> -->
                     </div>
@@ -102,19 +102,19 @@
                     <legend>@lang('devices.various')</legend>
                     <div class="form-group">
                         <label for="device_id">@lang('devices.device_id'):</label>
-                        <input type="text" class="form-control field" id="device_id" name="device_id" placeholder="Device Id..."  value="<?php if (isset($_GET['device_id'])) $_GET['device_id'] ?>" >
+                        <input type="text" class="form-control field" id="device_id" name="device_id" placeholder="Device Id..."  value="{{ $device_id }}" >
                     </div>
                     <div class="form-group">
                         <label for="brand">@lang('devices.device_brand'):</label>
-                        <input type="text" class="form-control field" id="brand" name="brand" placeholder="Brand..." value="<?php if (isset($_GET['brand']))$_GET['brand'] ?>" >
+                        <input type="text" class="form-control field" id="brand" name="brand" placeholder="Brand..." value="{{ $brand }}" >
                     </div>
                     <div class="form-group">
                         <label for="model">@lang('devices.device_model'):</label>
-                        <input type="text" class="form-control field" id="model" name="model" placeholder="Model..." value="<?php if (isset($_GET['from-date'])) $_GET['model'] ?>" >
+                        <input type="text" class="form-control field" id="model" name="model" placeholder="Model..." value="{{ $model }}" >
                     </div>
                     <div class="form-group">
                         <label for="problem">@lang('devices.search_comments'):</label>
-                        <input type="text" class="form-control field" id="problem" name="problem" placeholder="Search in the comment..."  value="<?php if (isset($_GET['from-date'])) $_GET['problem'] ?>" >
+                        <input type="text" class="form-control field" id="problem" name="problem" placeholder="Search in the comment..."  value="{{ $problem }}" >
                     </div>
 
                 </aside>
@@ -192,7 +192,7 @@
                             @foreach($list as $device)
                               <tr>
                                 @include('partials/device-comment-photo', ['comment' => $device->problem ])
-                                <td><a href="/device/edit/<?php echo $device->id; ?>"><?php echo $device->id; ?></a></td>
+                                <td><a href="/device/page-edit/<?php echo $device->id; ?>"><?php echo $device->id; ?></a></td>
                                 @include('partials/device-status', ['status' => $device->repair_status])
                                 <td><?php echo $device->category_name; ?></td>
                                 <td><?php echo $device->brand; ?></td>
@@ -213,7 +213,11 @@
             <div class="d-flex justify-content-center">
                 <nav aria-label="Page navigation example">
                 <ul class="pagination">
+                  @if (!empty($_GET))
+                    {!! $list->appends(['categories' => $selected_categories, 'groups' => $selected_groups, 'from_date' => $from_date, 'to-date' => $to_date, 'device_id' => $device_id, 'brand' => $brand, 'model' => $model, 'problem' => $problem])->links() !!}
+                  @else
                     {!! $list->links() !!}
+                  @endif
                 </ul>
                 </nav>
             </div>

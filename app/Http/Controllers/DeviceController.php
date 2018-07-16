@@ -140,6 +140,14 @@ class DeviceController extends Controller
         'categories' => $categories,
         'groups' => $all_groups,
         'list' => $all_devices,
+        'selected_groups' => null,
+        'selected_categories' => null,
+        'from_date' => null,
+        'to_date' => null,
+        'device_id' => null,
+        'brand' => null,
+        'model' => null,
+        'problem' => null,
       ]);
 
   }
@@ -164,13 +172,13 @@ class DeviceController extends Controller
         $all_devices = $all_devices->where('event_date', '>', strtotime($request->input('from-date')));
     } elseif ($request->input('to-date') !== null && $request->input('from-date') == null) {
         $all_devices = $all_devices->where('event_date', '<', strtotime($request->input('to-date')));
-    } elseif ($request->input('to-date') !== null && $request->input('from-date') == null) {
-        $all_devices = $all_devices->where('event_date', '>', $request->input('from-date'))
-                                      ->where('event_date', '<', $request->input('to-date'));
+    } elseif ($request->input('to-date') !== null && $request->input('from-date') !== null) {
+        $all_devices = $all_devices->whereBetween('event_date', array(strtotime($request->input('from-date')),
+                                                                strtotime($request->input('to-date'))));
     }
 
     if ($request->input('device_id') !== null) {
-        $all_devices = $all_devices->where('id', '=', $request->input('device_id'));
+        $all_devices = $all_devices->where('id', 'like', $request->input('device_id').'%');
     }
 
     if ($request->input('brand') !== null) {
@@ -178,7 +186,7 @@ class DeviceController extends Controller
     }
 
     if ($request->input('model') !== null) {
-        $all_devices = $all_devices->where('model', 'like', '%'.$request->input('devimodel').'%');
+        $all_devices = $all_devices->where('model', 'like', '%'.$request->input('model').'%');
     }
 
     if ($request->input('problem') !== null) {
@@ -208,6 +216,14 @@ class DeviceController extends Controller
       'categories' => $categories,
       'groups' => $all_groups,
       'list' => $all_devices,
+      'selected_groups' => $request->input('groups'),
+      'selected_categories' => $request->input('categories'),
+      'from_date' => $request->input('from-date'),
+      'to_date' => $request->input('to-date'),
+      'device_id' => $request->input('device_id'),
+      'brand' => $request->input('brand'),
+      'model' => $request->input('model'),
+      'problem' => $request->input('problem'),
     ]);
 
 
