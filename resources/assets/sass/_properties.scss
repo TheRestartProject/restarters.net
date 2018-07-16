@@ -31,6 +31,7 @@
             border-radius:3px;
             position: relative;
             z-index: 1;
+            flex-basis: auto;
             > div {
               display: contents;
             }

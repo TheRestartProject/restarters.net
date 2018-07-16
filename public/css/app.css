@@ -16894,6 +16894,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   border-radius: 3px;
   position: relative;
   z-index: 1;
+  -ms-flex-preferred-size: auto;
+      flex-basis: auto;
 }
 
 .properties li > div > div {
