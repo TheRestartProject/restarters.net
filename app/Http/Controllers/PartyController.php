@@ -264,7 +264,7 @@ class PartyController extends Controller {
                     'role' => 3,
                   ]);
 
-                  // $all_admins = User::where('role', 2)->get(); //Used for Live
+                  // $all_admins = User::where('role', 2)->get(); //Used for Live NB: Uncomment when live
                   // $all_admins = User::where('role', 2)->where('id', 1)->get(); //Used for testing
 
                   //Send Emails to Admins notifying event creation
@@ -273,7 +273,7 @@ class PartyController extends Controller {
                     'event_url' => url('/event/view/'.$idParty),
                   ];
 
-                  Notification::send($all_admins, new ModerationEvent($arr));
+                  // Notification::send($all_admins, new ModerationEvent($arr));//NB: Uncomment when live
 
 
                   /** let's create the image attachment! **/
