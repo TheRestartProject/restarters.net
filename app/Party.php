@@ -418,6 +418,11 @@ class Party extends Model
 
     public function host(){
         return $this->hasOne('App\Host', 'idgroups', 'group');
+        }
+
+    // Doesn't work if called 'group' - I guess because a reserved SQL keyword.
+    public function theGroup(){
+        return $this->hasOne('App\Group', 'idgroups', 'group');
     }
 
     public function getEventDate($format = 'd/m/Y') {
