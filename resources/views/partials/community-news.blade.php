@@ -1,8 +1,8 @@
 <section class="dashboard__block">
 
     <div class="dashboard__block__content dashboard__block__content--table">
-      <h4>Community news</h4>
-      <p>The latest from our community blog - we are always looking for guest posts, send ideas to <a href="mailto:janet@therestartproject.org">janet@therestartproject.org</a></p>
+      <h4>@lang('partials.community_news')</h4>
+      <p>@lang('partials.community_news'_text)</p>
         <div class="table-responsive">
         <table role="table" class="table table-striped">
             <tbody>
@@ -15,7 +15,7 @@
         </table>
         </div>
         <div class="dashboard__links d-flex flex-row justify-content-end">
-            <a href="https://therestartproject.org/blog/" target="_blank" rel="noopener noreferrer">See more posts</a>
+            <a href="https://therestartproject.org/blog/" target="_blank" rel="noopener noreferrer">@lang('partials.see_more_posts')</a>
         </div>
     </div>
 </section>

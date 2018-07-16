@@ -1,7 +1,7 @@
 <section class="dashboard__block">
 
     <div class="dashboard__block__content dashboard__block__content--table">
-        <h4>Your recent events</h4>
+        <h4>@lang('partials.your_recent_events')</h4>
         @if ( FixometerHelper::hasRole(Auth::user(), 'Restarter') )
           <p>These are events you RSVP'ed to, or where a host logged your participation.</p>
         @else
@@ -31,14 +31,14 @@
                   @endforeach
                 @else
                   <tr>
-                    <td colspan="3" style="text-align: center">No Past Events</td>
+                    <td colspan="3" style="text-align: center">@lang('partials.no_past_events')</td>
                   </tr>
                 @endif
             </tbody>
         </table>
         </div>
         <div class="dashboard__links d-flex flex-row justify-content-end">
-            <a href="{{ url('/party') }}">See all events</a>
+            <a href="{{ url('/party') }}">@lang('partials.see_all_events')</a>
         </div>
     </div>
 </section>

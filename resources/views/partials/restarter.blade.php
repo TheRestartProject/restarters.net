@@ -1,7 +1,7 @@
 <section class="dashboard__block">
     <div class="dashboard__block__media"><img src="/images/dashboard/dashboard__restarters_in_your_area.jpg" alt="Volunteers meeting members of the public to help with their device problems"></div>
     <div class="dashboard__block__content">
-        <h4>Restarters in your area</h4>
+        <h4>@lang('partials.restarters_in_your_area')</h4>
         @if ( FixometerHelper::hasRole(Auth::user(), 'Restarter') )
           <p>Through this community, potential volunteers self-register and share their location. The platform is designed to connect organisers and fixers.</p>
         @else

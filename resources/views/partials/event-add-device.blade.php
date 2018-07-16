@@ -11,7 +11,7 @@
                     <table class="table table-add" role="table">
                         <tbody>
                             <tr>
-                                <th class="d-xs-table-cell d-md-none">Add device</th>
+                                <th class="d-xs-table-cell d-md-none">@lang('partials.add_device')</th>
                                 <td width="200">
                                     <div class="form-control form-control__select">
                                         <select id="device-start" name="category" class="category select2">
