@@ -124,7 +124,13 @@ class UserController extends Controller
           return redirect()->back()->withErrors($validator)->withInput();
       }
 
-      $user = User::find(Auth::user()->id)->update([
+      if ($request->input('id') !== null) {
+        $id = $request->input('id');
+      } else {
+        $id = Auth::id();
+      }
+
+      $user = User::find($id)->update([
         'email'    => $request->input('email'),
         'name'     => $request->input('name'),
         'country'  => $request->input('country'),
@@ -134,7 +140,7 @@ class UserController extends Controller
         'biography'=> $request->input('biography'),
       ]);
 
-      $user = User::find(Auth::user()->id);
+      $user = User::find($id);
 
       if (!empty($user->location)) {
 
@@ -166,7 +172,13 @@ class UserController extends Controller
 
     public function postProfilePasswordEdit(Request $request) {
 
-      $user = User::find(Auth::user()->id);
+      if ($request->input('id') !== null) {
+        $id = $request->input('id');
+      } else {
+        $id = Auth::id();
+      }
+
+      $user = User::find($id);
 
       if ($request->input('new-password') !== $request->input('new-password-repeat')) {
         return redirect()->back()->with('error', 'New Passwords do not match!');
@@ -192,7 +204,13 @@ class UserController extends Controller
 
     public function postSoftDeleteUser() {
 
-      $user = User::find(Auth::user()->id);
+      if ($request->input('id') !== null) {
+        $id = $request->input('id');
+      } else {
+        $id = Auth::id();
+      }
+
+      $user = User::find($id);
       $user->delete();
 
       return redirect()->back()->with('error', 'Account has been soft deleted');
@@ -201,7 +219,13 @@ class UserController extends Controller
 
     public function postProfilePreferencesEdit(Request $request) {
 
-      $user = User::find(Auth::user()->id);
+      if ($request->input('id') !== null) {
+        $id = $request->input('id');
+      } else {
+        $id = Auth::id();
+      }
+
+      $user = User::find($id);
 
       if ( $request->input('newsletter') !== null ):
         $user->newsletter = 1;
@@ -223,7 +247,13 @@ class UserController extends Controller
 
     public function postProfileTagsEdit(Request $request) {
 
-      User::find(Auth::id())->skills()->sync($request->input('tags'));
+      if ($request->input('id') !== null) {
+        $id = $request->input('id');
+      } else {
+        $id = Auth::id();
+      }
+
+      User::find($id)->skills()->sync($request->input('tags'));
 
       return redirect()->back()->with('message', 'User Skills Updated!');
 
@@ -231,9 +261,15 @@ class UserController extends Controller
 
     public function postProfilePictureEdit(Request $request) {
 
+      if ($request->input('id') !== null) {
+        $id = $request->input('id');
+      } else {
+        $id = Auth::id();
+      }
+
       if(isset($_FILES) && !empty($_FILES)){
           $file = new FixometerFile;
-          $file->upload('profilePhoto', 'image', Auth::id(), env('TBL_USERS'), false, true);
+          $file->upload('profilePhoto', 'image', $id, env('TBL_USERS'), false, true);
 
           return redirect()->back()->with('message', 'Profile Picture Updated!');
       }

@@ -11,7 +11,11 @@
             </ol>
           </nav>
           <div class="">
-            <a href="/profile" class="btn btn-primary btn-view">View profile</a>
+            @if (Auth::id() == $user->id)
+              <a href="/profile" class="btn btn-primary btn-view">View profile</a>
+            @else
+              <a href="/profile/{{ $user->id }}" class="btn btn-primary btn-view">View user profile</a>
+            @endif
           </div>
         </div>
       </div>
@@ -58,12 +62,20 @@
 
               <div class="form-row">
                 <div class="col-lg-6">
-                  <h4>@lang('general.profile')</h4>
-                  <p>@lang('general.profile_content')</p>
+                  @if (Auth::id() == $user->id)
+                    <h4>@lang('general.profile')</h4>
+                    <p>@lang('general.profile_content')</p>
+                  @else
+                    <h4>{{ $user->name }}'s @lang('general.other_profile')</h4>
+                    <p>@lang('general.profile_content')</p>
+                  @endif
                 </div>
               </div>
               <form action="/profile/edit-info" method="post">
                 @csrf
+
+                {{ Form::hidden('id', $user->id) }}
+
                 <div class="form-row">
                   <div class="form-group col-lg-6">
                     <label for="name">Name:</label>
@@ -149,6 +161,8 @@
 
                     @csrf
 
+                    {{ Form::hidden('id', $user->id) }}
+
                     <div class="form-group">
                       <label for="tags[]">@lang('general.your_repair_skills'):</label>
                       <div class="form-control form-control__select">
@@ -189,6 +203,9 @@
                   <p>@lang('general.change_photo_text')</p>
                   <form action="/profile/edit-photo" method="post" enctype="multipart/form-data">
                     @csrf
+
+                    {{ Form::hidden('id', $user->id) }}
+
                     <div class="form-row">
                       <div class="form-group col-lg-12">
                         <label for="profilePhoto">@lang('general.profile_picture'):</label>
@@ -229,6 +246,9 @@
 
               <form action="/profile/edit-password" method="post">
                 @csrf
+
+                {{ Form::hidden('id', $user->id) }}
+
                 <fieldset class="registration__offset2">
                   <div class="form-row">
                     <div class="form-group col-lg-6">
@@ -263,6 +283,8 @@
             <form action="/user/soft-delete" method="post" id="delete-form">
               @csrf
 
+              {{ Form::hidden('id', $user->id) }}
+
               <div class="alert alert-danger alert-delete" role="alert">
                 @lang('auth.delete_account_text')
                 <button type="submit" class="btn btn-danger" id="delete-form-submit">
@@ -286,6 +308,9 @@
 
               <form action="/profile/edit-preferences" method="post">
                   @csrf
+
+                  {{ Form::hidden('id', $user->id) }}
+
                   <fieldset class="email-options">
                       <div class="form-check d-flex align-items-center justify-content-start">
                           @if( $user->newsletter == 1 )
