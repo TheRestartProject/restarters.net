@@ -43,8 +43,8 @@ class ModerationGroup extends Notification
      */
     public function toMail($notifiable)
     {
-      if ($this->user !== null) {
-        if ($this->user->invites == 1) {
+      if ($notifiable !== null) {
+        if ($notifiable->invites == 1) {
           return (new MailMessage)
                       ->subject('Moderation Needed')
                       ->greeting('Hello!')

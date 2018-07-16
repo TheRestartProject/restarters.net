@@ -13,6 +13,7 @@ use App\UserGroups;
 use Auth;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
+use App\Notifications\ModerationGroup;
 use DB;
 use FixometerHelper;
 use FixometerFile;
@@ -192,6 +193,17 @@ class GroupController extends Controller
                         'status' => 1,
                         'role' => 3,
                       ]);
+
+                      // $all_admins = User::where('role', 2)->get(); //Used for Live NB: Uncomment when live
+                      // $all_admins = User::where('role', 2)->where('id', 1)->get(); //Used for testing
+
+                      //Send Emails to Admins notifying event creation
+                      $arr = [
+                        'group_name' => Group::find($idGroup)->name,
+                        'group_url' => url('/group/view/'.$idGroup),
+                      ];
+
+                      // Notification::send($all_admins, new ModerationGroup($arr));//NB: Uncomment when live
 
                       if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
 
