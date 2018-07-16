@@ -192,7 +192,7 @@
                             @foreach($list as $device)
                               <tr>
                                 @include('partials/device-comment-photo', ['comment' => $device->problem ])
-                                <td><a href="/device/edit/<?php echo $device->id; ?>"><?php echo $device->id; ?></a></td>
+                                <td><a href="/device/page-edit/<?php echo $device->id; ?>"><?php echo $device->id; ?></a></td>
                                 @include('partials/device-status', ['status' => $device->repair_status])
                                 <td><?php echo $device->category_name; ?></td>
                                 <td><?php echo $device->brand; ?></td>
