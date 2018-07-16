@@ -140,6 +140,14 @@ class DeviceController extends Controller
         'categories' => $categories,
         'groups' => $all_groups,
         'list' => $all_devices,
+        'selected_groups' => null,
+        'selected_categories' => null,
+        'from_date' => null,
+        'to_date' => null,
+        'device_id' => null,
+        'brand' => null,
+        'model' => null,
+        'problem' => null,
       ]);
 
   }
@@ -208,6 +216,14 @@ class DeviceController extends Controller
       'categories' => $categories,
       'groups' => $all_groups,
       'list' => $all_devices,
+      'selected_groups' => $request->input('groups'),
+      'selected_categories' => $request->input('categories'),
+      'from_date' => $request->input('from-date'),
+      'to_date' => $request->input('to-date'),
+      'device_id' => $request->input('device_id'),
+      'brand' => $request->input('brand'),
+      'model' => $request->input('model'),
+      'problem' => $request->input('problem'),
     ]);
 
 
