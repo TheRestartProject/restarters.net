@@ -350,3 +350,29 @@ h2 {
         }
     }
 }
+
+.collapse-header {
+  margin: 0;
+  @include media-breakpoint-up(lg) {
+    display: none;
+  }
+
+  a {
+    color: #000;
+    border-bottom: 2px solid #D9D9D9;
+    padding: 10px 0;
+    display: block;
+    background: url('../images/trapese-up.svg') no-repeat 100% 50%;
+
+    &.collapsed {
+      background: url('../images/trapese.svg') no-repeat 100% 50%;
+    }
+  }
+  
+}
+
+.collapse-section {
+  @include media-breakpoint-down(md) {
+    padding-top: 10px;
+  }
+}

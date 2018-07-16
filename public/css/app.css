@@ -17946,6 +17946,34 @@ h2 sup a:hover {
   text-decoration: none;
 }
 
+.collapse-header {
+  margin: 0;
+}
+
+@media (min-width: 992px) {
+  .collapse-header {
+    display: none;
+  }
+}
+
+.collapse-header a {
+  color: #000;
+  border-bottom: 2px solid #D9D9D9;
+  padding: 10px 0;
+  display: block;
+  background: url(/images/trapese-up.svg?3b5c979d5806c9b925d54543b5fd45b8) no-repeat 100% 50%;
+}
+
+.collapse-header a.collapsed {
+  background: url(/images/trapese.svg?7a53fb338a9d8d75913c632cc6644088) no-repeat 100% 50%;
+}
+
+@media (max-width: 991.98px) {
+  .collapse-section {
+    padding-top: 10px;
+  }
+}
+
 .errors {
   padding: 50px 0;
 }
