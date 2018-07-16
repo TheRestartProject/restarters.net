@@ -17,6 +17,7 @@ use App\UserGroups;
 use Auth;
 use App\Notifications\JoinEvent;
 use App\Notifications\RSVPEvent;
+use App\Notifications\ModerationEvent;
 use DateTime;
 use FixometerFile;
 use FixometerHelper;
@@ -262,6 +263,18 @@ class PartyController extends Controller {
                     'status' => 1,
                     'role' => 3,
                   ]);
+
+                  // $all_admins = User::where('role', 2)->get(); //Used for Live
+                  // $all_admins = User::where('role', 2)->where('id', 1)->get(); //Used for testing
+
+                  //Send Emails to Admins notifying event creation
+                  $arr = [
+                    'event_venue' => Party::find($idParty)->venue,
+                    'event_url' => url('/event/view/'.$idParty),
+                  ];
+
+                  Notification::send($all_admins, new ModerationEvent($arr));
+
 
                   /** let's create the image attachment! **/
                   // if(isset($_FILES) && !empty($_FILES)){
@@ -1105,43 +1118,23 @@ class PartyController extends Controller {
 
   }
 
-  // public function deleteimage(){
-  //     if(is_null($_GET['id']) || empty($_GET['id']) || !is_numeric($_GET['id'])){
-  //         return false;
-  //     }
+  // public function deleteImage($party_id, $id, $path){
   //
-  //     else {
-  //         $id = $_GET['id'];
-  //         $path = $_GET['path'];
+  //     $user = Auth::user();
+  //
+  //     $is_host_of_party = FixometerHelper::userHasEditPartyPermission($party_id, $user->id);
+  //     if( FixometerHelper::hasRole($user, 'Administrator') || $is_host_of_party ){
+  //
   //         $Image = new FixometerFile;
-  //
   //         $Image->deleteImage($id, $path);
   //
-  //
-  //
-  //         echo json_encode(array('hey' => 'Deleting stuff here!'));
-  //
+  //         return redirect()->back()->with('message', 'Thank you, the image has been deleted');
   //
   //     }
+  //
+  //     return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
+  //
   // }
-
-  public function deleteImage($party_id, $id, $path){
-
-      $user = Auth::user();
-
-      $is_host_of_party = FixometerHelper::userHasEditPartyPermission($party_id, $user->id);
-      if( FixometerHelper::hasRole($user, 'Administrator') || $is_host_of_party ){
-
-          $Image = new FixometerFile;
-          $Image->deleteImage($id, $path);
-
-          return redirect()->back()->with('message', 'Thank you, the image has been deleted');
-
-      }
-
-      return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
-
-  }
 
 
   public function getGroupEmails(Request $request){
@@ -1362,6 +1355,38 @@ class PartyController extends Controller {
 
       $user_event = EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->delete();
       return redirect('/party/view/'.$event_id)->with('success', 'You are no longer attending this event');
+
+  }
+
+  public function imageUpload(Request $request, $id) {
+
+    try {
+      if(isset($_FILES) && !empty($_FILES)){
+          $file = new FixometerFile;
+          $file->upload('file', 'image', $id, env('TBL_EVENTS'), true, false, true);
+      }
+
+      return "success - image uploaded";
+    } catch (\Exception $e) {
+      return "fail - image could not be uploaded";
+    }
+  }
+
+  public function deleteImage($event_id, $id, $path){
+
+      $user = Auth::user();
+
+      $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
+      if(FixometerHelper::hasRole($user, 'Administrator') || is_object($in_event) ){
+
+          $Image = new FixometerFile;
+          $Image->deleteImage($id, $path);
+
+          return redirect()->back()->with('message', 'Thank you, the image has been deleted');
+
+      }
+
+      return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
 
   }
 

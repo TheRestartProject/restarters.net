@@ -16,9 +16,9 @@ class ModerationEvent extends Notification
      *
      * @return void
      */
-    public function __construct($group)
+    public function __construct($arr)
     {
-        $this->group = $group;
+        $this->arr = $arr;
     }
 
     /**
@@ -43,8 +43,8 @@ class ModerationEvent extends Notification
         return (new MailMessage)
                     ->subject('Moderation Needed')
                     ->greeting('Hello!')
-                    ->line('Your moderation is needed for \'' . $this->group . '\'.')
-                    ->action('View event', url('/'))
+                    ->line('Your moderation is needed for \'' . $this->arr['event_venue'] . '\'.')
+                    ->action('View event', $this->arr['event_url'])
                     ->line('If you think this invitation was not intended for you, please discard this email.');
     }
 

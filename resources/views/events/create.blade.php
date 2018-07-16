@@ -92,12 +92,12 @@
                       <div class="row row-compressed">
 
                         <div class="col-6">
-                          <input type="time" id="field_event_time" name="start" class="form-control field" required>
+                          <input type="time" id="start-time" name="start" class="form-control field" required>
                         </div>
 
                         <div class="col-6">
                           <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
-                          <input type="time" id="field_event_time_2" name="end" class="form-control field" required>
+                          <input type="time" id="end-time" name="end" class="form-control field" required>
                         </div>
 
                       </div>

@@ -89,11 +89,11 @@
                     <div class="row row-compressed">
 
                       <div class="col-6">
-                        <input type="time" id="field_event_time" name="start" class="form-control field" value="{{ date('H:i', strtotime($formdata->start)) }}">
+                        <input type="time" id="start-time" name="start" class="form-control field" value="{{ date('H:i', strtotime($formdata->start)) }}">
                       </div>
                       <div class="col-6">
                         <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
-                        <input type="time" id="field_event_time_2" name="end" class="form-control field" value="{{ date('H:i', strtotime($formdata->end)) }}">
+                        <input type="time" id="end-time" name="end" class="form-control field" value="{{ date('H:i', strtotime($formdata->end)) }}">
                       </div>
                       </div>
 
@@ -126,31 +126,6 @@
                       </div>
 
                   </div>
-                </div>
-
-                <div class="form-group">
-
-                  <div class="previews">
-                    @if( !empty($images) )
-                      @foreach($images as $image)
-                        <div class="dz-image">
-                          <img src="/uploads/{{ $image->path }}" alt="placeholder">
-                          <a class="dz-remove">Remove file</a>
-                          <a href="/party/image/delete/{{ $formdata->id }}/{{{ $image->idimages }}}/{{{ $image->path }}}" class="dz-remove" onclick="return confirm('Are you sure? This cannot be undone.');">Remove file</a>
-                        </div>
-                      @endforeach
-                    @endif
-                    <div class="uploads"></div>
-                  </div>
-
-                  <label for="file">@lang('events.field_add_image'):</label>
-
-                  <!-- <form id="dropzoneEl" class="dropzone" action="/party/add-image/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')"> -->
-                      <div class="fallback">
-                          <input id="file" name="file[]" type="file" multiple />
-                      </div>
-                  <!-- </form> -->
-
                 </div>
 
                 @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') && is_null($formdata->wordpress_post_id) )
@@ -191,6 +166,45 @@
           </div>
 
           </form>
+          <div class="form-group row">
+
+              <div class="col-6 col-lg-6">
+                <label for="file">@lang('events.field_add_image'):</label>
+
+                <!-- <form id="dropzoneEl" class="dropzone" action="/party/add-image/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')"> -->
+                    <!-- <div class="fallback">
+                        <input id="file" name="file[]" type="file" multiple />
+                    </div> -->
+                <!-- </form> -->
+
+                <form id="dropzoneEl-{{ $formdata->id }}" data-deviceid="{{ $formdata->id }}" class="dropzone dropzoneEl" action="/party/image-upload/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1=" Event images here - " data-field2="Choose compelling images that show off your event">
+                    @csrf
+                    <div class="fallback" >
+                        <input id="file-{{ $formdata->id }}" name="file-{{ $formdata->id }}" type="file" multiple />
+                    </div>
+                </form>
+              </div>
+
+              <div class="col-6 col-lg-6">
+                <div class="previews">
+                  @if( !empty($images) )
+                    @foreach($images as $image)
+                      <!-- <div class="dz-image">
+                        <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder">
+                        <a class="dz-remove">Remove file</a>
+                        <a href="/party/image/delete/{{ $formdata->id }}/{{{ $image->idimages }}}/{{{ $image->path }}}" class="dz-remove" onclick="return confirm('Are you sure? This cannot be undone.');">Remove file</a>
+                      </div> -->
+                      <div id="device-image-{{ $formdata->id }}" class="dz-image">
+                        <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder">
+                        <a href="/party/image/delete/{{ $formdata->id }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $formdata->id }}" class="dz-remove ajax-delete-image">Remove file</a>
+                      </div>
+                    @endforeach
+                  @endif
+                  <div class="uploads-{{ $formdata->id }}"></div>
+                </div>
+              </div>
+
+          </div>
         </div>
 
       </div>

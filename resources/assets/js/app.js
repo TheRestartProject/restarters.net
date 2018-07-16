@@ -539,14 +539,22 @@ function nestedTable() {
 function loadDropzones() {
 
     if (jQuery(".dropzoneEl").length > 0 ) {
+        console.log(jQuery(".dropzoneEl").length);
 
         var field1 = jQuery('.dropzone').data('field1');
         var field2 = jQuery('.dropzone').data('field2');
 
         var preview = ".uploads";
         var dropzone_id = ".dropzoneEl";
+        var prefix = '';
 
         $(".dropzoneEl").each(function( index ) {
+          if ($(this).data('deviceid') !== undefined) {
+            prefix = '-'+$(this).data('deviceid');
+          } else {
+            prefix = '';
+          }
+
           // console.log($('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone);
           if (typeof $('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone != "undefined") {
             // Do nothing
@@ -918,6 +926,21 @@ $( document ).ready(function() {
       });
     }
   });
+
+  $('#start-time').on('change', function() {
+    var time = $(this).val().split(':');
+    var hours = (parseInt(time[0]) + 3).toString();
+
+    if (hours.length < 2) {
+      hours = '0' + hours;
+    }
+
+    var mins = time[1];
+
+    $('#end-time').val(hours+':'+mins);
+
+  });
+
 });
 
 

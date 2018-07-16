@@ -23921,14 +23921,22 @@ function nestedTable() {
 function loadDropzones() {
 
     if (jQuery(".dropzoneEl").length > 0) {
+        console.log(jQuery(".dropzoneEl").length);
 
         var field1 = jQuery('.dropzone').data('field1');
         var field2 = jQuery('.dropzone').data('field2');
 
         var preview = ".uploads";
         var dropzone_id = ".dropzoneEl";
+        var prefix = '';
 
         $(".dropzoneEl").each(function (index) {
+            if ($(this).data('deviceid') !== undefined) {
+                prefix = '-' + $(this).data('deviceid');
+            } else {
+                prefix = '';
+            }
+
             // console.log($('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone);
             if (typeof $('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone != "undefined") {
                 // Do nothing
@@ -24285,6 +24293,23 @@ $(document).ready(function () {
                 }
             });
         }
+    });
+
+    $('#start-time').on('change', function () {
+        var time = $(this).val().split(':');
+        var hours = (parseInt(time[0]) + 3).toString();
+
+        console.log(hours.length);
+
+        if (hours.length < 2) {
+            hours = '0' + hours;
+        }
+
+        var mins = time[1];
+        console.log(time);
+        console.log(hours);
+
+        $('#end-time').val(hours + ':' + mins);
     });
 });
 
@@ -63598,6 +63623,8 @@ var Dropzone = function (_Emitter) {
          * This is the element the hidden input field (which is used when clicking on the
          * dropzone to trigger file selection) will be appended to. This might
          * be important in case you use frameworks to switch the content of your page.
+         *
+         * Can be a selector string, or an element directly.
          */
         hiddenInputContainer: "body",
 
@@ -64109,7 +64136,7 @@ var Dropzone = function (_Emitter) {
           if (file.previewElement) {
             file.previewElement.classList.add("dz-processing");
             if (file._removeLink) {
-              return file._removeLink.textContent = this.options.dictCancelUpload;
+              return file._removeLink.innerHTML = this.options.dictCancelUpload;
             }
           }
         },
@@ -64174,7 +64201,7 @@ var Dropzone = function (_Emitter) {
         // Receives `file`
         complete: function complete(file) {
           if (file._removeLink) {
-            file._removeLink.textContent = this.options.dictRemoveFile;
+            file._removeLink.innerHTML = this.options.dictRemoveFile;
           }
           if (file.previewElement) {
             return file.previewElement.classList.add("dz-complete");
@@ -64437,7 +64464,7 @@ var Dropzone = function (_Emitter) {
           _this3.hiddenFileInput.style.left = "0";
           _this3.hiddenFileInput.style.height = "0";
           _this3.hiddenFileInput.style.width = "0";
-          document.querySelector(_this3.options.hiddenInputContainer).appendChild(_this3.hiddenFileInput);
+          Dropzone.getElement(_this3.options.hiddenInputContainer, 'hiddenInputContainer').appendChild(_this3.hiddenFileInput);
           return _this3.hiddenFileInput.addEventListener("change", function () {
             var files = _this3.hiddenFileInput.files;
 
@@ -65009,7 +65036,7 @@ var Dropzone = function (_Emitter) {
   }, {
     key: "accept",
     value: function accept(file, done) {
-      if (file.size > this.options.maxFilesize * 1024 * 1024) {
+      if (this.options.maxFilesize && file.size > this.options.maxFilesize * 1024 * 1024) {
         return done(this.options.dictFileTooBig.replace("{{filesize}}", Math.round(file.size / 1024 / 10.24) / 100).replace("{{maxFilesize}}", this.options.maxFilesize));
       } else if (!Dropzone.isValidFile(file, this.options.acceptedFiles)) {
         return done(this.options.dictInvalidFileType);
@@ -65182,7 +65209,7 @@ var Dropzone = function (_Emitter) {
     value: function resizeImage(file, width, height, resizeMethod, callback) {
       var _this11 = this;
 
-      return this.createThumbnail(file, width, height, resizeMethod, false, function (dataUrl, canvas) {
+      return this.createThumbnail(file, width, height, resizeMethod, true, function (dataUrl, canvas) {
         if (canvas == null) {
           // The image has not been resized
           return callback(file);
@@ -65291,18 +65318,18 @@ var Dropzone = function (_Emitter) {
             case 6:
               // 90° rotate right
               ctx.rotate(0.5 * Math.PI);
-              ctx.translate(0, -canvas.height);
+              ctx.translate(0, -canvas.width);
               break;
             case 7:
               // horizontal flip + 90 rotate right
               ctx.rotate(0.5 * Math.PI);
-              ctx.translate(canvas.width, -canvas.height);
+              ctx.translate(canvas.height, -canvas.width);
               ctx.scale(-1, 1);
               break;
             case 8:
               // 90° rotate left
               ctx.rotate(-0.5 * Math.PI);
-              ctx.translate(-canvas.width, 0);
+              ctx.translate(-canvas.height, 0);
               break;
           }
 
@@ -65544,6 +65571,8 @@ var Dropzone = function (_Emitter) {
 
             // Clear the data from the chunk
             chunk.dataBlock = null;
+            // Leaving this reference to xhr intact here will cause memory leaks in some browsers
+            chunk.xhr = null;
 
             for (var i = 0; i < file.upload.totalChunkCount; i++) {
               if (file.upload.chunks[i] === undefined) {
@@ -66075,7 +66104,7 @@ var Dropzone = function (_Emitter) {
 
 Dropzone.initClass();
 
-Dropzone.version = "5.4.0";
+Dropzone.version = "5.5.1";
 
 // This is a map of options for your different dropzones. Add configurations
 // to this object for your different dropzone elemens.

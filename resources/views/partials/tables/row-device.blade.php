@@ -48,7 +48,7 @@
         <form id="data-{{ $device->iddevices }}" class="edit-device" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
 
         <div class="row row-compressed-xs nested-fields d-lg-table col-lg-12">
-         
+
           <div class="col-6 col-lg-auto flex-column d-flex d-lg-table-cell">
 
             <label for="nested-5">Category:</label>
@@ -119,7 +119,7 @@
                 </select>
             </div>
 
-          </div>        
+          </div>
           <div class="col-6 col-lg-auto flex-column d-flex d-lg-table-cell">
 
               <label for="nested-6">Model:</label>
@@ -135,7 +135,7 @@
             </div>
           </div>
           <div class="col-4 col-lg-auto flex-column d-flex d-lg-table-cell">
-          
+
             <label for="repair-info-{{ $device->iddevices }}">Repair details:</label>
             <div class="form-control form-control__select">
                 <select class="repair_details select2" name="repair-info" id="repair-info-{{ $device->iddevices }}" @if( $device->repair_status != 2 ) disabled @endif>
@@ -215,7 +215,7 @@
 
             <div class="table-cell-upload">
 
-              <div class="form-group">
+              <!-- <div class="form-group">
                   <label for="file">Add image:</label>
 
                   <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1=" Device images here - " data-field2="Choose compelling images that show off your work">
@@ -224,9 +224,9 @@
                           <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />
                       </div>
                   </form>
-              </div>
+              </div> -->
 
-              <label for="device-image-{{ $device->iddevices }}">Device Images:</label>
+              <!-- <label for="device-image-{{ $device->iddevices }}">Device Images:</label>
               <div class="previews">
                 @if( isset($device_images[$device->iddevices]) && !empty($device_images[$device->iddevices]) )
                   @foreach($device_images[$device->iddevices] as $device_image)
@@ -237,7 +237,7 @@
                   @endforeach
                 @endif
                 <div class="uploads-{{ $device->iddevices }}"></div>
-              </div>
+              </div> -->
 
               <div class="row pb-2">
                   <div class="col-9 d-flex align-content-center flex-column">
@@ -251,7 +251,7 @@
                   </div>
               </div>
 
-              
+
             </div><!-- / table-cell-upload -->
 
 
@@ -260,13 +260,44 @@
 
         </div><!-- /row -->
 
+        </form>
+
+        <div class="row row-compressed-xs nested-fields table-row-more">
+          <div class="col-12 col-lg-8 flex-column d-flex">
+              <div class="form-group">
+                  <label for="file">Add image:</label>
+
+                  <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1=" Device images here - " data-field2="Choose compelling images that show off your work">
+                      @csrf
+                      <div class="fallback" >
+                          <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />
+                      </div>
+                  </form>
+              </div>
+            </div>
+            <div class="col-12 col-lg-4 flex-column d-flex">
+              <label for="device-image-{{ $device->iddevices }}">Device Images:</label>
+              <div class="previews">
+                @if( isset($device_images[$device->iddevices]) && !empty($device_images[$device->iddevices]) )
+                  @foreach($device_images[$device->iddevices] as $device_image)
+                    <div id="device-image-{{ $device->iddevices }}" class="dz-image">
+                      <img src="/uploads/thumbnail_{{ $device_image->path }}" alt="placeholder">
+                      <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $device_image->idimages }}}/{{{ $device_image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">Remove file</a>
+                    </div>
+                  @endforeach
+                @endif
+                <div class="uploads-{{ $device->iddevices }}"></div>
+              </div>
+          </div>
+        </div>
+
     </td>
 </tr>
 @else
 <tr class="collapse table-row-details" id="row-{{ $device->iddevices }}">
     <td colspan="11">
 
-    
+
         <table class="table">
             <tbody>
                 <tr>
