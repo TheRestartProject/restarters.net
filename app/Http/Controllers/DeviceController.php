@@ -172,13 +172,13 @@ class DeviceController extends Controller
         $all_devices = $all_devices->where('event_date', '>', strtotime($request->input('from-date')));
     } elseif ($request->input('to-date') !== null && $request->input('from-date') == null) {
         $all_devices = $all_devices->where('event_date', '<', strtotime($request->input('to-date')));
-    } elseif ($request->input('to-date') !== null && $request->input('from-date') == null) {
-        $all_devices = $all_devices->where('event_date', '>', $request->input('from-date'))
-                                      ->where('event_date', '<', $request->input('to-date'));
+    } elseif ($request->input('to-date') !== null && $request->input('from-date') !== null) {
+        $all_devices = $all_devices->whereBetween('event_date', array(strtotime($request->input('from-date')),
+                                                                strtotime($request->input('to-date'))));
     }
 
     if ($request->input('device_id') !== null) {
-        $all_devices = $all_devices->where('id', '=', $request->input('device_id'));
+        $all_devices = $all_devices->where('id', 'like', $request->input('device_id').'%');
     }
 
     if ($request->input('brand') !== null) {
@@ -186,7 +186,7 @@ class DeviceController extends Controller
     }
 
     if ($request->input('model') !== null) {
-        $all_devices = $all_devices->where('model', 'like', '%'.$request->input('devimodel').'%');
+        $all_devices = $all_devices->where('model', 'like', '%'.$request->input('model').'%');
     }
 
     if ($request->input('problem') !== null) {
