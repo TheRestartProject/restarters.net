@@ -40,12 +40,16 @@ class ModerationEvent extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-                    ->subject('Moderation Needed')
-                    ->greeting('Hello!')
-                    ->line('Your moderation is needed for \'' . $this->arr['event_venue'] . '\'.')
-                    ->action('View event', $this->arr['event_url'])
-                    ->line('If you think this invitation was not intended for you, please discard this email.');
+      if ($notifiable !== null) {
+        if ($notifiable->invites == 1) {
+          return (new MailMessage)
+                      ->subject('Moderation Needed')
+                      ->greeting('Hello!')
+                      ->line('Your moderation is needed for \'' . $this->arr['event_venue'] . '\'.')
+                      ->action('View event', $this->arr['event_url'])
+                      ->line('If you think this invitation was not intended for you, please discard this email.');
+        }
+      }
     }
 
     /**
