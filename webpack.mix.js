@@ -1,5 +1,13 @@
 let mix = require('laravel-mix');
 
+let webpack = require('webpack');
+
+mix.webpackConfig({
+    plugins: [
+        new webpack.IgnorePlugin(/^codemirror$/)
+    ]
+});
+
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management

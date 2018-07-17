@@ -622,11 +622,40 @@ function loadDropzones() {
                 jQuery(".dz-message").append('<small>'+field2+'</small>');
             },
             paramName: "file", // The name that will be used to transfer the file
-            maxFilesize: 4,
+            // maxFilesize: 4,
             maxFiles: 1,
             uploadMultiple: false,
             createImageThumbnails: true,
-            addRemoveLinks: true
+            addRemoveLinks: true,
+            thumbnailWidth: 60,
+            thumbnailHeight: 60,
+            thumbnailMethod: "contain",
+            previewsContainer: ".uploads-" + $("#dropzoneSingleEl").data('deviceid'),
+        });
+
+    }
+
+    if (jQuery("#dropzoneSingleEl-create").length > 0) {
+
+        var field1 = jQuery('#dropzoneSingleEl-create').data('field1');
+        var field2 = jQuery('#dropzoneSingleEl-create').data('field2');
+
+        var instanceDropzone = new Dropzone("#dropzoneSingleEl-create", {
+            init: function () {
+                jQuery(".dz-message").find('span').text(field1);
+                jQuery(".dz-message").append('<small>'+field2+'</small>');
+            },
+            paramName: "file", // The name that will be used to transfer the file
+            // maxFilesize: 4,
+            autoProcessQueue: false,
+            maxFiles: 1,
+            uploadMultiple: false,
+            createImageThumbnails: true,
+            addRemoveLinks: true,
+            thumbnailWidth: 60,
+            thumbnailHeight: 60,
+            thumbnailMethod: "contain",
+            previewsContainer: ".uploads",
         });
 
     }
@@ -738,6 +767,18 @@ jQuery(function () {
           $field.trigger('change');
           $field.prop('disabled', true);
           $field.parents('#repair-more').hide();
+        }
+    });
+
+    jQuery(document).on('change', '.repair_status_edit', function (e) {
+        $value = jQuery(this).val();
+        $field = $('#repair_details_edit');
+        if( $value == 2 ){
+          $field.prop('disabled', false);
+        } else {
+          $field.val(0);
+          $field.trigger('change');
+          $field.prop('disabled', true);
         }
     });
 

@@ -108,7 +108,7 @@
                           <div class="form-group">
                               <label for="repair_status">@lang('devices.repair_status'):</label>
                               <div class="form-control form-control__select">
-                                  <select name="repair_status" id="repair_status" class="form-control field select2">
+                                  <select name="repair_status" id="repair_status" class="form-control field select2 repair_status_edit">
                                     <option value="1" <?php echo ($formdata->repair_status == 1 ? ' selected' : ''); ?>>Fixed</option>
                                     <option value="2" <?php echo ($formdata->repair_status == 2 ? ' selected' : ''); ?>>Repairable</option>
                                     <option value="3" <?php echo ($formdata->repair_status == 3 ? ' selected' : ''); ?>>End of lifecycle</option>
@@ -121,10 +121,11 @@
                           <div class="form-group">
                               <label class="sr-only" for="repair_status_2">@lang('devices.repair_status'):</label>
                               <div class="form-control form-control__select form-control__nolabel">
-                                  <select name="repair_status_2" id="repair_status_2" class="form-control field select2">
+                                  <select name="repair_more" id="repair_details_edit" class="form-control field select2" <?php echo ($formdata->repair_status == 2 ? '' : 'disabled'); ?>>
+                                    <option value="0">-- Repair Details --</option>
                                     <option value="1" <?php echo ($formdata->more_time_needed == 1 ? ' selected' : '') ?>>More time needed</option>
-                                    <option value="1" <?php echo ($formdata->professional_help == 1 ? ' selected' : '') ?>>Professional help</option>
-                                    <option value="1" <?php echo ($formdata->do_it_yourself == 1 ? ' selected' : '') ?>>Do it yourself</option>
+                                    <option value="2" <?php echo ($formdata->professional_help == 1 ? ' selected' : '') ?>>Professional help</option>
+                                    <option value="3" <?php echo ($formdata->do_it_yourself == 1 ? ' selected' : '') ?>>Do it yourself</option>
                                   </select>
                               </div>
                           </div>

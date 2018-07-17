@@ -39,7 +39,7 @@
               <div class="col-lg-6">
                 <div class="form-group form-group__offset">
                     <label for="grp_name">@lang('groups.groups_name_of'):</label>
-                    <input type="text" class="form-control field" id="grp_name" name="name">
+                    <input type="text" class="form-control field" id="grp_name" name="name" required>
                 </div>
                 <small class="after-offset">@lang('groups.groups_group_small')</small>
 
@@ -129,6 +129,16 @@
                               <input id="file" name="file" type="file" />
                           </div>
                       <!-- </form> -->
+
+                      <!-- <div id="dropzoneSingleEl-create" name="dropzone" class="dropzone" action="/" method="post" enctype="multipart/form-data" data-field1="@lang('groups.field_group_images') " data-field2="@lang('groups.field_group_images_2')">
+                          <div class="fallback">
+                              <input id="file" name="file" type="file" />
+                          </div>
+                      </div>
+
+                      <div class="previews">
+                        <div class="uploads"></div>
+                      </div> -->
 
 
 

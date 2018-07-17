@@ -605,15 +605,15 @@ class PartyController extends Controller {
 
 
               /** let's create the image attachment! **/
-              if(isset($_FILES) && !empty($_FILES)){
-                  if(is_array($_FILES['file']['name'])) {
-                      $files = FixometerHelper::rearrange($_FILES['file']);
-                      foreach($files as $upload){
-                          $File->upload($upload, 'image', $id, env('TBL_EVENTS'));
-                      }
-                  }
-                  else { }
-              }
+              // if(isset($_FILES) && !empty($_FILES)){
+              //     if(is_array($_FILES['file']['name'])) {
+              //         $files = FixometerHelper::rearrange($_FILES['file']);
+              //         foreach($files as $upload){
+              //             $File->upload($upload, 'image', $id, env('TBL_EVENTS'));
+              //         }
+              //     }
+              //     else { }
+              // }
           }
           if(FixometerHelper::hasRole($user, 'Host')){
               header('Location: /host?action=pe&code=200');

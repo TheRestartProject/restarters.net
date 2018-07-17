@@ -1067,6 +1067,42 @@ class GroupController extends Controller
 
   }
 
+  public function imageUpload(Request $request, $id) {
+
+    try {
+      if(isset($_FILES) && !empty($_FILES)){
+          $existing_image = FixometerHelper::hasImage($id, 'groups', true);
+          if(count($existing_image) > 0){
+              $Group->removeImage($id, $existing_image[0]);
+          }
+          $file = new FixometerFile;
+          $file->upload('file', 'image', $id, env('TBL_GROUPS'), false, true, true);
+      }
+
+      return "success - image uploaded";
+    } catch (\Exception $e) {
+      return "fail - image could not be uploaded";
+    }
+  }
+
+  public function ajaxDeleteImage($group_id, $id, $path){
+
+      $user = Auth::user();
+
+      $is_host_of_group = FixometerHelper::userHasEditGroupPermission($group_id, $user->id);
+      if(FixometerHelper::hasRole($user, 'Administrator') || $is_host_of_group ){
+
+          $Image = new FixometerFile;
+          $Image->deleteImage($id, $path);
+
+          return 'Thank you, the image has been deleted';
+
+      }
+
+      return 'Sorry, but the image can\'t be deleted';
+
+  }
+
   // public function test() {
   //   $g = new Group;
   //   dd($g->findOne('1'));

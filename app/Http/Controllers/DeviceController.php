@@ -253,6 +253,30 @@ class DeviceController extends Controller
               // formatting dates for the DB
               //$data['event_date'] = dbDateNoTime($data['event_date']);
 
+              if( !isset($data['repair_more']) || empty($data['repair_more']) ) //Override
+                $data['repair_more'] = 0;
+
+              if( $data['repair_status'] != 2 ) //Override
+                $data['repair_more'] = 0;
+
+              if( $data['repair_more'] == 1 ){
+                $more_time_needed = 1;
+              } else {
+                $more_time_needed = 0;
+              }
+
+              if( $data['repair_more'] == 2 ){
+                $professional_help = 1;
+              } else {
+                $professional_help = 0;
+              }
+
+              if( $data['repair_more'] == 3 ){
+                $do_it_yourself = 1;
+              } else {
+                $do_it_yourself = 0;
+              }
+
               $update = array(
                               // 'event'             => $data['event'],
                               'category'          => $data['category'],
@@ -263,6 +287,9 @@ class DeviceController extends Controller
                               'model'             => $data['model'],
                               'problem'           => $data['problem'],
                               'age'               => $data['age'],
+                              'more_time_needed'  => $more_time_needed,
+                              'professional_help' => $professional_help,
+                              'do_it_yourself'    => $do_it_yourself,
                           );
 
               $u = $Device->where('iddevices', $id)->update($update);
