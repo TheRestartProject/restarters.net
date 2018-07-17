@@ -16,6 +16,7 @@ use App\User;
 use App\UserGroups;
 use Auth;
 use App\Notifications\JoinEvent;
+use App\Notifications\JoinGroup;
 use App\Notifications\RSVPEvent;
 use App\Notifications\ModerationEvent;
 use DateTime;
@@ -687,6 +688,7 @@ class PartyController extends Controller {
 
       $File = new FixometerFile;
       $Party = new Party;
+      $event = Party::find($id);
 
       //Event details
       $images = $File->findImages(env('TBL_EVENTS'), $id);
@@ -702,23 +704,39 @@ class PartyController extends Controller {
       //Info for attendance tabs
       $attendees = EventsUsers::where('event', $id)->where('status', 1);
       $attended = clone $attendees->get();
-      $attended_summary = clone $attendees->take(6)->get();
+
+      if( count($attended) > 5 && $event->hasFinished() && !Auth::guest() && !FixometerHelper::hasRole(Auth::user(), 'Restarter') ){
+        $attended_summary = clone $attendees->take(5)->get();
+      } else {
+        $attended_summary = clone $attendees->take(6)->get();
+      }
 
       $invites = EventsUsers::where('event', $id)->where('status', '!=', 1);
       $invited = clone $invites->get();
-      $invited_summary = clone $invites->take(6)->get();
+
+      if( count($invited) > 5 && !$event->hasFinished() && !Auth::guest() && !FixometerHelper::hasRole(Auth::user(), 'Restarter') ){
+        $invited_summary = clone $invites->take(5)->get();
+      } else {
+        $invited_summary = clone $invites->take(6)->get();
+      }
 
       //Useful for add/edit device
       $brands = Brands::all();
       //$categories = Category::all();
       $clusters = Cluster::all();
-      $event = Party::find($id);
       // dd($event->getEventStats($this->EmissionRatio));
       $device_images = [];
 
       //Get Device Images
       foreach ($event->devices as $device) {
         $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
+      }
+
+      //Retrieve group volunteers
+      if( $event->hasFinished() && !Auth::guest() ){
+          $group_volunteers = $this->getGroupEmails($id, true);
+      } else {
+          $group_volunteers = null;
       }
 
       return view('events.view', [
@@ -736,6 +754,7 @@ class PartyController extends Controller {
         'brands' => $brands,
         'clusters' => $clusters,
         'device_images' => $device_images,
+        'group_volunteers' => $group_volunteers,
       ]);
 
   }
@@ -1137,19 +1156,27 @@ class PartyController extends Controller {
   //
   // }
 
-
-  public function getGroupEmails(Request $request){
-
-    $event_id = $request->input('event_id');
+  public function getGroupEmails($event_id, $object = false){
 
     $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
               ->where('user', '!=', Auth::user()->id)
                 ->pluck('user')
                   ->toArray();
 
-    $group_users = User::whereIn('id', $group_user_ids)->pluck('email')->toArray();
+    $event_user_ids = EventsUsers::where('event', $event_id)
+              ->where('user', '!=', Auth::user()->id)
+                ->pluck('user')
+                  ->toArray();
 
-    return json_encode($group_users);
+    $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
+
+    if( $object == true ){
+      $group_users = User::whereIn('id', $unique_user_ids)->get();
+      return $group_users;
+    } else {
+      $group_users = User::whereIn('id', $unique_user_ids)->pluck('email')->toArray();
+      return json_encode($group_users);
+    }
 
   }
 
@@ -1362,6 +1389,64 @@ class PartyController extends Controller {
 
       $user_event = EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->delete();
       return redirect('/party/view/'.$event_id)->with('success', 'You are no longer attending this event');
+
+  }
+
+  public function addVolunteer(Request $request) {
+
+    // Get event ID
+    $event_id = $request->input('event');
+    $volunteer_email_address = $request->input('volunteer_email_address');
+
+    // Retrieve name if one exists, if no name exists and user is null as well. This volunteer is anonymous
+    if( $request->has('full_name') ){
+      $full_name = $request->input('full_name');
+    } else {
+      $full_name = null;
+    }
+
+    // User is null, this volunteer is either anonymous or no user exists
+    if( $request->has('user') && $request->input('user') !== 'not-registered' ){
+      $user = $request->input('user');
+    } else {
+      $user = null;
+    }
+
+    //Let's add the volunteer
+    EventsUsers::create([
+      'event' => $event_id,
+      'user' => $user,
+      'status' => 1,
+      'role' => 4,
+      'full_name' => $full_name,
+    ]);
+
+    // Send email
+    if( !is_null($volunteer_email_address) ){
+
+      $event = Party::find($event_id);
+      $from = User::find(Auth::user()->id);
+
+      $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
+      $url = url('/user/register/'.$hash);
+
+      $invite = Invite::create([
+        'record_id' => $event->theGroup->idgroups,
+        'email' => $volunteer_email_address,
+        'hash' => $hash,
+        'type' => 'group',
+      ]);
+
+      Notification::send($invite, new JoinGroup([
+        'name' => $from->name,
+        'group' => $event->theGroup->name,
+        'url' => $url,
+        'message' => null,
+      ]));
+
+    }
+
+    return redirect('/party/view/'.$event_id)->with('success', 'Volunteer has successfully been added to event');
 
   }
 

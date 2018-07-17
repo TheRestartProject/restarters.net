@@ -17,7 +17,7 @@ class EventsUsers extends Model
      *
      * @var array
      */
-    protected $fillable = ['event', 'user', 'status', 'role'];
+    protected $fillable = ['event', 'user', 'status', 'role', 'full_name'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -37,4 +37,15 @@ class EventsUsers extends Model
     public function volunteer() {
       return $this->hasOne('App\User', 'id', 'user');
     }
+
+    public function getFullName() {
+
+      if( !is_null($this->full_name) ){
+        return $this->full_name;
+      } else {
+        return 'Anonymous';
+      }
+
+    }
+
 }

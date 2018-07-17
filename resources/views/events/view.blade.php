@@ -234,7 +234,6 @@
                   </div>
                 @endif
 
-
                 <h2 id="attendance" class="d-none d-lg-block">Attendance</h2>
                 <h2 id="attendance" class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#events-attendance-section" role="button" aria-expanded="false" aria-controls="events-attendance-section">Attendance</a></h2>
 
@@ -250,26 +249,37 @@
                   <div class="tab-content" id="events-attendance-tabs">
                       <div class="tab-pane fade show active" id="attended" role="tabpanel" aria-labelledby="attended-tab">
                           <div class="users-list-wrap">
-                              @if( count($attended) == 0 && $event->hasFinished() )
-                                <p class="text-center m-2">No volunteers were recorded for this event</p>
-                              @elseif( count($attended) == 0 )
-                                <p class="text-center m-2">No volunteers are confirmed for this event</p>
+                              @if( count($attended) == 0 && !$event->hasFinished() )
+                                <p class="text-center m-2">No volunteers have yet been confirmed for this event</p>
+                              @elseif( count($attended) == 0 && $event->hasFinished() && ( FixometerHelper::hasRole(Auth::user(), 'Restarter') || Auth::guest() ) )
+                                <p class="text-center m-2">No volunteers were confirmed for this event</p>
                               @else
                                 <ul class="users-list">
                                   @foreach( $attended_summary as $volunteer )
                                     @include('partials.volunteer-badge', ['type' => 'attended'])
                                   @endforeach
+
+                                  @if( Auth::check() )
+                                    @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') || FixometerHelper::hasRole(Auth::user(), 'Administrator') ) && $event->hasFinished() )
+                                      <li class="users-list__invite">
+                                          <button data-toggle="modal" data-target="#event-add-volunteer">Add volunteer</button>
+                                      </li>
+                                    @endif
+                                  @endif
                                 </ul>
                                 @if( count($attended) > 0 )
-                                <a class="users-list__more" data-toggle="modal" data-target="#event-all-attended" href="#">See all @if( $event->hasFinished() ) attended @else confirmed @endif</a>
+                                  <a class="users-list__more" data-toggle="modal" data-target="#event-all-attended" href="#">See all @if( $event->hasFinished() ) attended @else confirmed @endif</a>
                                 @endif
                               @endif
                           </div>
                       </div>
                       <div class="tab-pane fade" id="invited" role="tabpanel" aria-labelledby="invited-tab">
                           <div class="users-list-wrap">
-                              @if( count($invited) == 0 && $event->hasFinished() )
+
+                              @if( count($invited) == 0 && !$event->hasFinished() && ( FixometerHelper::hasRole(Auth::user(), 'Restarter') || Auth::guest() ) )
                                 <p class="text-center m-2">No volunteers invites were recorded for this event</p>
+                              @elseif( count($invited) == 0 && $event->hasFinished() )
+                                <p class="text-center m-2">No volunteers invites were sent for this event</p>
                               @else
                                 <ul class="users-list">
                                   @foreach( $invited_summary as $volunteer )

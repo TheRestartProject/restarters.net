@@ -43,8 +43,9 @@ class JoinGroup extends Notification
      */
     public function toMail($notifiable)
     {
-      if ($this->user !== null) {
-        if ($this->user->invites == 1) {
+
+      if ( !is_null($this->user) ) {
+        if ( $this->user->invites == 1 ) {
           if (!is_null($this->arr['message'])) {
             return (new MailMessage)
                         ->subject('Group Invitation')
@@ -67,7 +68,7 @@ class JoinGroup extends Notification
           }
         }
       } else {
-        if (!is_null($this->arr['message'])) {
+        if ( !is_null($this->arr['message']) ) {
           return (new MailMessage)
                       ->subject('Group Invitation')
                       ->greeting('Hello!')

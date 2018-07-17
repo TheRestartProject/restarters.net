@@ -700,17 +700,14 @@ class GroupController extends Controller
     $message = $request->input('message_to_restarters');
 
     if (!empty($emails)) {
+
       $users = User::whereIn('email', $emails)->get();
-      // if (isset($invite_group) && $invite_group == 1) {
-      //   $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)->pluck('user')->toArray();
-      //   $group_users = User::whereIn('id', $group_user_ids)->get();
-      //
-      //   $users = $users->merge($group_users);
-      // }
+
       $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
       $from = User::find($from_id);
 
       foreach ($users as $user) {
+
         $user_group = UserGroups::where('user', $user->id)->where('group', $group_id)->first();
         if (is_null($user_group) || $user_group->status != "1") {
           $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
@@ -729,20 +726,22 @@ class GroupController extends Controller
             ]);
           }
 
-          $arr = array(
+          Notification::send($user, new JoinGroup([
             'name' => $from->name,
             'group' => $group_name,
             'url' => $url,
-            'message' => $message,
-          );
-          Notification::send($user, new JoinGroup($arr, $user));
+            'message' => $message
+          ], $user));
+
         } else {
           $not_sent[] = $user->email;
         }
       }
 
       if (!empty($non_users)) {
+
         foreach ($non_users as $non_user) {
+
           $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
           $url = url('/user/register/'.$hash);
 
@@ -753,22 +752,23 @@ class GroupController extends Controller
             'type' => 'group',
           ));
 
-          $arr = array(
+          Notification::send($invite, new JoinGroup([
             'name' => $from->name,
             'group' => $group_name,
             'url' => $url,
-            'message' => $message,
-          );
-          Notification::send($invite, new JoinGroup($arr));
-        }
-      }
+            'message' => $message
+          ]));
 
+        }
+
+      }
 
       if (!isset($not_sent)) {
         return redirect()->back()->with('success', 'Invites sent!');
       } else {
         return redirect()->back()->with('warning', 'Invites sent - apart from these ('.rtrim(implode(', ', $not_sent), ', ').') who have already joined the group or have been sent an invite');
       }
+      
     } else {
       return redirect()->back()->with('warning', 'You have not entered any emails!');
     }

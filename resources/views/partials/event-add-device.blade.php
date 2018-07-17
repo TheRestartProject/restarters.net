@@ -1,7 +1,7 @@
-@if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) )
+@if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) )
 
     <form class="add-device" method="post" onkeypress="return event.keyCode != 13;">
-    
+
       <input type="hidden" name="event_id" value="{{{ $formdata->id }}}">
 
         <div class="row">
@@ -112,7 +112,7 @@
                             </tr>
                         </tbody>
                     </table>
- 
+
                 </div>
             </div>
         </div>

@@ -797,14 +797,19 @@ jQuery(function () {
     });
 
     jQuery('.toggle-manual-invite').on('change', function (e) {
+
         $value = jQuery(this).val();
         $toggle = jQuery('.show-hide-manual-invite');
+
+        $('#full_name, #volunteer_email_address').val('');
+
         if( $value === 'not-registered' ){
           $toggle.show();
           $('#full_name').focus();
         } else {
           $toggle.hide();
         }
+
     });
 
     jQuery('.js-remove').on('click', removeUser);
@@ -907,9 +912,9 @@ $( document ).ready(function() {
           headers: {
             'X-CSRF-TOKEN': $("input[name='_token']").val()
           },
-          type: 'post',
-          url: '/party/get-group-emails',
-          data: {event_id : event_id},
+          type: 'get',
+          url: '/party/get-group-emails/'+event_id,
+          datatype: 'json',
           success: function(data) {
             var current_items = $('#manual_invite_box').tokenfield('getTokens');
             var new_items = $.parseJSON(data);
