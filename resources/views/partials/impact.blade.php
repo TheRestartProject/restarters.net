@@ -6,7 +6,7 @@
 
         <p>@lang('partials.the_impact_of_restarters')</p>
 
-        <ul class="properties">
+        <ul class="properties properties__small">
             <li>
                 <div>
                     <h3>@lang('partials.waste_prevented')</h3>
