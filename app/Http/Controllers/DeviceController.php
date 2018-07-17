@@ -278,19 +278,19 @@ class DeviceController extends Controller
               }
 
               $update = array(
-                              // 'event'             => $data['event'],
-                              'category'          => $data['category'],
-                              'category_creation' => $data['category'],
-                              'repair_status'     => $data['repair_status'],
-                              'spare_parts'       => $data['spare_parts'],
-                              'brand'             => $data['brand'],
-                              'model'             => $data['model'],
-                              'problem'           => $data['problem'],
-                              'age'               => $data['age'],
-                              'more_time_needed'  => $more_time_needed,
-                              'professional_help' => $professional_help,
-                              'do_it_yourself'    => $do_it_yourself,
-                          );
+                  'event'             => $data['event'],
+                  'category'          => $data['category'],
+                  'category_creation' => $data['category'],
+                  'repair_status'     => $data['repair_status'],
+                  'spare_parts'       => $data['spare_parts'],
+                  'brand'             => $data['brand'],
+                  'model'             => $data['model'],
+                  'problem'           => $data['problem'],
+                  'age'               => $data['age'],
+                  'more_time_needed'  => $more_time_needed,
+                  'professional_help' => $professional_help,
+                  'do_it_yourself'    => $do_it_yourself,
+              );
 
               $u = $Device->where('iddevices', $id)->update($update);
 
