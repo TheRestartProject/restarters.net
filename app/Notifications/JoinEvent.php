@@ -59,7 +59,7 @@ class JoinEvent extends Notification
                                     </tr>')
                           ->line('<tr>
                                     <td>Date/time:</td>
-                                    <td>'.$this->arr['event']->event_date.' '.$this->arr['event']->getEventStartEnd().'</td>
+                                    <td>'.$this->arr['event']->getEventDate().' '.$this->arr['event']->getEventStartEnd().'</td>
                                   </tr>')
                           ->line('<tr>
                                     <td>Location:</td>
@@ -89,7 +89,7 @@ class JoinEvent extends Notification
                                     </tr>')
                           ->line('<tr>
                                     <td>Date/time:</td>
-                                    <td>'.$this->arr['event']->event_date.' '.$this->arr['event']->getEventStartEnd().'</td>
+                                    <td>'.$this->arr['event']->getEventDate().' '.$this->arr['event']->getEventStartEnd().'</td>
                                   </tr>')
                           ->line('<tr>
                                     <td>Location:</td>
