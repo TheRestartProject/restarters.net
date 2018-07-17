@@ -5,8 +5,8 @@
         <h4>@lang('partials.our_global_environmental_impact')</h4>
 
         <p>@lang('partials.the_impact_of_restarters')</p>
-
-        <ul class="properties properties__small">
+        <div>
+        <ul class="properties properties__full">
             <li>
                 <div>
                     <h3>@lang('partials.waste_prevented')</h3>
@@ -22,6 +22,7 @@
                 </div>
             </li>
         </ul>
+        </div>
 
         <div class="dashboard__links d-flex flex-row justify-content-end">
             <a href="https://therestartproject.org/impact" target="_blank" rel="noopener noreferrer">@lang('partials.more_info')</a>

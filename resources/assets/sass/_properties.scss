@@ -68,6 +68,17 @@
         }
     }
 
+    &__full {
+        flex: 1 0 100%;
+        
+        li {
+            @include media-breakpoint-up(lg) {
+                flex: 1 0 50%;
+                max-width: 50%;
+            }
+        }
+    }
+
     &__repair-count {
         font-size: 14px;
 
