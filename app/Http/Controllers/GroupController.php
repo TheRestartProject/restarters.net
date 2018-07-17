@@ -65,6 +65,18 @@ class GroupController extends Controller
         $groups = Group::orderBy('name', 'ASC')->paginate(env('PAGINATE'));
         $your_area = null;
 
+        //Get all group tags
+        $all_group_tags = GroupTags::all();
+
+        return view('group.index', [
+          'your_groups' => $your_groups,
+          'groups_near_you' => $groups_near_you,
+          'groups' => $groups,
+          'your_area' => $your_area,
+          'all' => $all,
+          'all_group_tags' => $all_group_tags,
+        ]);
+
       } else {
 
         $groups = null;
@@ -102,7 +114,52 @@ class GroupController extends Controller
         'your_groups' => $your_groups,
         'groups_near_you' => $groups_near_you,
         'groups' => $groups,
-        'your_area' => $your_area
+        'your_area' => $your_area,
+        'all' => $all,
+      ]);
+
+  }
+
+  public function search(Request $request){
+
+      //All groups only
+      $your_groups = null;
+      $groups_near_you = null;
+      $groups = Group::orderBy('name', 'ASC');
+      $your_area = null;
+
+      if ($request->input('name') !== null) {
+        $groups = $groups->where('name', 'like', '%'.$request->input('name').'%');
+      }
+
+      if ($request->input('location') !== null) {
+        $groups = $groups->where('location', 'like', '%'.$request->input('location').'%');
+      }
+
+      if ($request->input('country') !== null) {
+        //Don't store country for group???
+      }
+
+      if ($request->input('tags') !== null) {
+        $groups = $groups->whereIn('idgroups', GrouptagsGroups::whereIn('group_tag', $request->input('tags'))->pluck('group'));
+      }
+
+      $groups = $groups->paginate(env('PAGINATE'));
+
+      //Get all group tags
+      $all_group_tags = GroupTags::all();
+
+      return view('group.index', [
+        'your_groups' => $your_groups,
+        'groups_near_you' => $groups_near_you,
+        'groups' => $groups,
+        'your_area' => $your_area,
+        'all' => true,
+        'all_group_tags' => $all_group_tags,
+        'name' => $request->input('name'),
+        'location' => $request->input('location'),
+        // 'selected_country' => $request->input('country'),
+        'selected_tags' => $request->input('tags'),
       ]);
 
   }

@@ -122,7 +122,7 @@ class DeviceController extends Controller
       if (FixometerHelper::hasRole($user, 'Administrator')) {
         $all_groups = Group::all();
 
-        $all_devices = DeviceList::orderBy('sorter', 'DSC')->paginate(25);
+        $all_devices = DeviceList::orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
       } else {
         $groups_user_ids = UserGroups::where('user', $user->id)
                                 ->pluck('group')
@@ -130,7 +130,7 @@ class DeviceController extends Controller
 
         $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
 
-        $all_devices = DeviceList::whereIn('id', $device_ids)->orderBy('sorter', 'DSC')->paginate(25);
+        $all_devices = DeviceList::whereIn('id', $device_ids)->orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
 
         $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
       }
@@ -209,7 +209,7 @@ class DeviceController extends Controller
       $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
     }
 
-    $all_devices = $all_devices->paginate(25);
+    $all_devices = $all_devices->paginate(env('PAGINATE'));
 
     return view('device.index', [
       'title' => 'Devices',

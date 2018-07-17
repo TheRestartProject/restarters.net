@@ -116,6 +116,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::post('/image-upload/{id}', 'GroupController@imageUpload');
     Route::get('/image/delete/{idgroups}/{id}/{path}', 'GroupController@ajaxDeleteImage');
     Route::get('/{all?}', 'GroupController@index')->name('groups');
+    Route::get('/all/search', 'GroupController@search');
   });
 
   //Outbound Controller
