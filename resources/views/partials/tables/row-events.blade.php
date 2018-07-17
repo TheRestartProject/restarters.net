@@ -29,11 +29,11 @@
       @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') )
         <td class="cell-moderation" colspan="8">Event requires <a href="/party/edit/{{ $event->idevents }}">moderation</a> by an admin</td>
       @else
-        <td class="cell-moderation" colspan="8">Event requires moderation by an admin</td>
+        <td class="cell-moderation" colspan="8">@lang('partials.event_requires_moderation_by_an_admin')</td>
       @endif
     @elseif( $event->isUpcoming() )
       <td class="cell-figure">{{{ $event->allInvited->count() }}}</td>
-      <td class="cell-rsvp" colspan="{{{ $invite === true ? 7 : 6 }}}">This event hasn't started <a href="/party/view/{{ $event->idevents }}">RSVP</a></td>
+      <td class="cell-rsvp" colspan="{{{ $invite === true ? 7 : 6 }}}">@lang('partials.this_event_hasnt_started') <a href="/party/view/{{ $event->idevents }}">RSVP</a></td>
     @elseif( !empty($devices) )
       @php( $stats = $event->getEventStats($EmissionRatio) )
       <td class="cell-figure">{{ $event->pax }}</td>
@@ -46,10 +46,10 @@
     @elseif( $event->isInProgress() )
       <td class="cell-figure">{{ $event->pax }}</td>
       <td class="cell-figure">{{ $event->volunteers }}</td>
-      <td class="cell-progress" colspan="{{{ $invite === true ? 6 : 5 }}}">No devices added <a href="/party/view/{{ $event->idevents }}#devices">Add a device</a></td>
+      <td class="cell-progress" colspan="{{{ $invite === true ? 6 : 5 }}}">@lang('partials.no_devices_added') <a href="/party/view/{{ $event->idevents }}#devices">@lang('partials.add_a_device')</a></td>
     @elseif( $event->hasFinished() )
       <td class="cell-figure">{{ $event->pax }}</td>
       <td class="cell-figure">{{ $event->volunteers }}</td>
-      <td class="cell-progress" colspan="{{{ $invite === true ? 6 : 5 }}}">No devices added <a href="/party/view/{{ $event->idevents }}#devices">Add a device</a></td>
+      <td class="cell-progress" colspan="{{{ $invite === true ? 6 : 5 }}}">@lang('partials.no_devices_added') <a href="/party/view/{{ $event->idevents }}#devices">@lang('partials.add_a_device')</a></td>
     @endif
 </tr>

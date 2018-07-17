@@ -13,21 +13,21 @@
     <td class="d-none d-md-table-cell"><div class="age">{{ $device->age }}</div></td>
     <td width="300"><div class="problem">{!! str_limit($device->problem, 60, '...') !!}</div></td>
     @if ( $device->repair_status == 1 )
-      <td><div class="repair_status"><span class="badge badge-success">Fixed</span></div></td>
+      <td><div class="repair_status"><span class="badge badge-success">@lang('partials.fixed')</span></div></td>
     @elseif ( $device->repair_status == 2 )
-      <td><div class="repair_status"><span class="badge badge-warning">Repairable</span></div></td>
+      <td><div class="repair_status"><span class="badge badge-warning">@lang('partials.repairable')</span></div></td>
     @elseif ( $device->repair_status == 3 )
-      <td><div class="repair_status"><span class="badge badge-danger">End</span></div></td>
+      <td><div class="repair_status"><span class="badge badge-danger">@lang('partials.end')</span></div></td>
     @else
       <td><div class="repair_status"></div></td>
     @endif
     <?php /*
     @if ($device->more_time_needed == 1)
-      <td><div class="repair_details">More time needed</div></td>
+      <td><div class="repair_details">@lang('partials.more_time')</div></td>
     @elseif ($device->professional_help == 1)
-      <td><div class="repair_details">Professional help</div></td>
+      <td><div class="repair_details">@lang('partials.professional_help')</div></td>
     @elseif ($device->do_it_yourself == 1)
-      <td><div class="repair_details">Do it yourself</div></td>
+      <td><div class="repair_details">@lang('partials.diy')</div></td>
     @else
       <td><div class="repair_details">N/A</div></td>
     @endif*/ ?>
@@ -51,10 +51,10 @@
 
           <div class="col-6 col-lg-auto flex-column d-flex d-lg-table-cell">
 
-            <label for="nested-5">Category:</label>
+            <label for="nested-5">@lang('partials.category'):</label>
             <div class="form-control form-control__select">
                 <select disabled name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
-                    <option value="">-- Category --</option>
+                    <option value="">-- @lang('partials.category') --</option>
                     @foreach( $clusters as $cluster )
                     <optgroup label="{{{ $cluster->name }}}">
                         @foreach( $cluster->categories as $category )
@@ -67,16 +67,16 @@
                     </optgroup>
                     @endforeach
                     @if( $device->category == 46 )
-                      <option value="46" selected>None of the above</option>
+                      <option value="46" selected>@lang('partials.category_none')</option>
                     @else
-                      <option value="46">None of the above</option>
+                      <option value="46">@lang('partials.category_none')</option>
                     @endif
                 </select>
             </div>
             @if( $device->category == 46 )
               <div id="display-weight">
                   <div class="form-input">
-                      <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="Est. weight" autocomplete="off" value="{{ $device->estimate }}">
+                      <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
                       <div class="input-group-append">
                         <span class="input-group-text" id="validationTooltipUsernamePrepend">kg</span>
                       </div>
@@ -85,7 +85,7 @@
             @else
               <div id="display-weight" style="display: none;">
                   <div class="form-input">
-                      <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="Est. weight" autocomplete="off" value="{{ $device->estimate }}" disabled>
+                      <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}" disabled>
                       <div class="input-group-append">
                         <span class="input-group-text" id="validationTooltipUsernamePrepend">kg</span>
                       </div>
@@ -122,40 +122,40 @@
           </div>
           <div class="col-6 col-lg-auto flex-column d-flex d-lg-table-cell">
 
-              <label for="nested-6">Model:</label>
+              <label for="nested-6">@lang('partials.model'):</label>
               <div class="form-group">
-                  <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}" placeholder="Model" autocomplete="off">
+                  <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}" placeholder="@lang('partials.model')" autocomplete="off">
               </div>
 
           </div>
           <div class="col-6 col-lg-auto flex-column d-flex d-lg-table-cell">
-            <label for="nested-7">Age:</label>
+            <label for="nested-7">@lang('partials.age'):</label>
             <div class="form-group">
-              <input type="number" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" min="0" step="0.5" value="{{ $device->age }}" placeholder="Age (yrs)" autocomplete="off">
+              <input type="number" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" min="0" step="0.5" value="{{ $device->age }}" placeholder="@lang('partials.age_placeholder')" autocomplete="off">
             </div>
           </div>
           <div class="col-4 col-lg-auto flex-column d-flex d-lg-table-cell">
 
-            <label for="repair-info-{{ $device->iddevices }}">Repair details:</label>
+            <label for="repair-info-{{ $device->iddevices }}">@lang('partials.repair_details'):</label>
             <div class="form-control form-control__select">
                 <select class="repair_details select2" name="repair-info" id="repair-info-{{ $device->iddevices }}" @if( $device->repair_status != 2 ) disabled @endif>
-                  <option value="0">-- Repair Details --</option>
+                  <option value="0">-- @lang('partials.repair_details') --</option>
                   @if ( $device->more_time_needed == 1 )
-                    <option value="1" selected>More time needed</option>
-                    <option value="2">Professional help</option>
-                    <option value="3">Do it yourself</option>
+                    <option value="1" selected>@lang('partials.more_time')</option>
+                    <option value="2">@lang('partials.professional_help')</option>
+                    <option value="3">@lang('partials.diy')</option>
                   @elseif ( $device->professional_help == 1 )
-                    <option value="1">More time needed</option>
-                    <option value="2" selected>Professional help</option>
-                    <option value="3">Do it yourself</option>
+                    <option value="1">@lang('partials.more_time')</option>
+                    <option value="2" selected>@lang('partials.professional_help')</option>
+                    <option value="3">@lang('partials.diy')</option>
                   @elseif ( $device->do_it_yourself == 1 )
-                    <option value="1" >More time needed</option>
-                    <option value="2">Professional help</option>
-                    <option value="3" selected>Do it yourself</option>
+                    <option value="1" >@lang('partials.more_time')</option>
+                    <option value="2">@lang('partials.professional_help')</option>
+                    <option value="3" selected>@lang('partials.diy')</option>
                   @else
-                    <option value="1">More time needed</option>
-                    <option value="2">Professional help</option>
-                    <option value="3">Do it yourself</option>
+                    <option value="1">@lang('partials.more_time')</option>
+                    <option value="2">@lang('partials.professional_help')</option>
+                    <option value="3">@lang('partials.diy')</option>
                   @endif
                 </select>
             </div>
@@ -163,22 +163,22 @@
           </div>
           <div class="col-4 col-lg-auto flex-column d-flex d-lg-table-cell">
 
-              <label for="status-{{ $device->iddevices }}">Status:</label>
+              <label for="status-{{ $device->iddevices }}">@lang('partials.status'):</label>
               <div class="form-control form-control__select">
                   <select class="repair_status select2" name="status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}" placeholder="Description of problem">
-                    <option value="0">-- Status --</option>
+                    <option value="0">-- @lang('partials.status') --</option>
                     @if ( $device->repair_status == 1 )
-                      <option value="1" selected>Fixed</option>
-                      <option value="2">Repairable</option>
-                      <option value="3">End of Life</option>
+                      <option value="1" selected>@lang('partials.fixed')</option>
+                      <option value="2">@lang('partials.repairable')</option>
+                      <option value="3">@lang('partials.end_of_life')</option>
                     @elseif ( $device->repair_status == 2 )
-                      <option value="1">Fixed</option>
-                      <option value="2" selected>Repairable</option>
-                      <option value="3">End of Life</option>
+                      <option value="1">@lang('partials.fixed')</option>
+                      <option value="2" selected>@lang('partials.repairable')</option>
+                      <option value="3">@lang('partials.end_of_life')</option>
                     @else
-                      <option value="1">Fixed</option>
-                      <option value="2">Repairable</option>
-                      <option value="3" selected>End of Life</option>
+                      <option value="1">@lang('partials.fixed')</option>
+                      <option value="2">@lang('partials.repairable')</option>
+                      <option value="3" selected>@lang('partials.end_of_life')</option>
                     @endif
                   </select>
               </div>
@@ -190,11 +190,11 @@
             <div class="form-control form-control__select">
                 <select class="select2" name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
                   @if ($device->spare_parts == 1)
-                    <option value="1" selected>Yes</option>
-                    <option value="2">No</option>
+                    <option value="1" selected>@lang('partials.yes')</option>
+                    <option value="2">@lang('partials.no')</option>
                   @else
-                    <option value="1">Yes</option>
-                    <option value="2" selected>No</option>
+                    <option value="1">@lang('partials.yes')</option>
+                    <option value="2" selected>@lang('partials.no')</option>
                   @endif
                 </select>
             </div>
@@ -205,7 +205,7 @@
         <div class="row row-compressed-xs nested-fields table-row-more">
           <div class="col-12 col-lg-8 flex-column d-flex">
 
-              <label for="description">Description of problem/solution:</label>
+              <label for="description">@lang('partials.description_of_problem_solution'):</label>
               <div class="form-group">
                   <textarea class="form-control" rows="6" name="problem-{{ $device->iddevices }}" id="problem-{{ $device->iddevices }}">{!! $device->problem !!}</textarea>
               </div>
@@ -232,7 +232,7 @@
                   @foreach($device_images[$device->iddevices] as $device_image)
                     <div id="device-image-{{ $device->iddevices }}" class="dz-image">
                       <img src="/uploads/thumbnail_{{ $device_image->path }}" alt="placeholder">
-                      <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $device_image->idimages }}}/{{{ $device_image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">Remove file</a>
+                      <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $device_image->idimages }}}/{{{ $device_image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">@lang('partials.remove_file')</a>
                     </div>
                   @endforeach
                 @endif
@@ -243,11 +243,11 @@
                   <div class="col-9 d-flex align-content-center flex-column">
                       <div class="form-check d-flex align-items-center justify-content-start">
                           <input class="form-check-input" type="checkbox" name="wiki-{{ $device->iddevices }}" id="wiki-{{ $device->iddevices }}" value="1" @if( $device->wiki == 1 ) checked @endif>
-                          <label class="form-check-label" for="wiki-{{ $device->iddevices }}">Could the solution comments help Restarters working on a similar device in future?  Or is it a fun case study?</label>
+                          <label class="form-check-label" for="wiki-{{ $device->iddevices }}">@lang('partials.solution_text')</label>
                       </div>
                   </div>
                   <div class="col-3 d-flex justify-content-end flex-column"><div class="d-flex justify-content-end">
-                      <button type="submit" class="btn btn-primary btn-save2">Update</button></div>
+                      <button type="submit" class="btn btn-primary btn-save2">@lang('partials.update')</button></div>
                   </div>
               </div>
 
@@ -265,7 +265,7 @@
         <div class="row row-compressed-xs nested-fields table-row-more">
           <div class="col-12 col-lg-8 flex-column d-flex">
               <div class="form-group">
-                  <label for="file">Add image:</label>
+                  <label for="file">@lang('partials.add_image'):</label>
 
                   <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1=" Device images here - " data-field2="Choose compelling images that show off your work">
                       @csrf
@@ -276,13 +276,13 @@
               </div>
             </div>
             <div class="col-12 col-lg-4 flex-column d-flex">
-              <label for="device-image-{{ $device->iddevices }}">Device Images:</label>
+              <label for="device-image-{{ $device->iddevices }}">@lang('partials.device_images'):</label>
               <div class="previews">
                 @if( isset($device_images[$device->iddevices]) && !empty($device_images[$device->iddevices]) )
                   @foreach($device_images[$device->iddevices] as $device_image)
                     <div id="device-image-{{ $device->iddevices }}" class="dz-image">
                       <img src="/uploads/thumbnail_{{ $device_image->path }}" alt="placeholder">
-                      <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $device_image->idimages }}}/{{{ $device_image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">Remove file</a>
+                      <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $device_image->idimages }}}/{{{ $device_image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">@lang('partials.remove_file')</a>
                     </div>
                   @endforeach
                 @endif
@@ -302,10 +302,10 @@
             <tbody>
                 <tr>
                   <td>
-                    <label for="nested-5">Category:</label>
+                    <label for="nested-5">@lang('partials.category'):</label>
                     <div class="form-control form-control__select">
                         <select disabled name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
-                            <option value="">-- Category --</option>
+                            <option value="">-- @lang('partials.category') --</option>
                             @foreach( $clusters as $cluster )
                             <optgroup label="{{{ $cluster->name }}}">
                                 @foreach( $cluster->categories as $category )
@@ -318,16 +318,16 @@
                             </optgroup>
                             @endforeach
                             @if( $device->category == 46 )
-                              <option value="46" selected>None of the above</option>
+                              <option value="46" selected>@lang('partials.category_none')</option>
                             @else
-                              <option value="46">None of the above</option>
+                              <option value="46">@lang('partials.category_none')</option>
                             @endif
                         </select>
                     </div>
                     @if( $device->category == 46 )
                       <div id="display-weight">
                           <div class="form-input">
-                              <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="Est. weight" autocomplete="off" value="{{ $device->estimate }}">
+                              <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
                               <div class="input-group-append">
                                 <span class="input-group-text" id="validationTooltipUsernamePrepend">kg</span>
                               </div>
@@ -336,7 +336,7 @@
                     @else
                       <div id="display-weight" style="display: none;">
                           <div class="form-input">
-                              <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="Est. weight" autocomplete="off" value="{{ $device->estimate }}" disabled>
+                              <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}" disabled>
                               <div class="input-group-append">
                                 <span class="input-group-text" id="validationTooltipUsernamePrepend">kg</span>
                               </div>
@@ -345,7 +345,7 @@
                     @endif
                   </td>
                   <td>
-                        <label for="nested-5">Brand:</label>
+                        <label for="nested-5">@lang('partials.brand'):</label>
                         <div class="form-control form-control__select">
                             <select disabled name="brand-{{ $device->iddevices }}" class="select2-with-input" id="brand-{{ $device->iddevices }}">
                                 @php($i = 1)
@@ -369,34 +369,34 @@
                         </div>
                     </td>
                     <td>
-                        <label for="nested-6">Model:</label>
+                        <label for="nested-6">@lang('partials.model'):</label>
                         <div class="form-group">
-                            <input disabled type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}" placeholder="Model" autocomplete="off">
+                            <input disabled type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}" placeholder="@lang('partials.model')" autocomplete="off">
                         </div>
                     </td>
                     <td>
-                        <label for="nested-7">Age:</label>
+                        <label for="nested-7">@lang('partials.age'):</label>
                         <div class="form-group">
-                            <input disabled type="number" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" min="0" step="0.5" value="{{ $device->age }}" placeholder="Age (yrs)" autocomplete="off">
+                            <input disabled type="number" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" min="0" step="0.5" value="{{ $device->age }}" placeholder="@lang('partials.age_placeholder')" autocomplete="off">
                         </div>
                     </td>
                     <td>
-                        <label for="status-{{ $device->iddevices }}">Status:</label>
+                        <label for="status-{{ $device->iddevices }}">@lang('partials.status'):</label>
                         <div class="form-control form-control__select">
-                            <select disabled class="repair_status select2" name="status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}" placeholder="Description of problem">
-                              <option value="0">-- Status --</option>
+                            <select disabled class="repair_status select2" name="status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}" placeholder="@lang('partials.description_of_problem')">
+                              <option value="0">-- @lang('partials.status') --</option>
                               @if ( $device->repair_status == 1 )
-                                <option value="1" selected>Fixed</option>
-                                <option value="2">Repairable</option>
-                                <option value="3">End of Life</option>
+                                <option value="1" selected>@lang('partials.fixed')</option>
+                                <option value="2">@lang('partials.repairable')</option>
+                                <option value="3">@lang('partials.end_of_life')</option>
                               @elseif ( $device->repair_status == 2 )
-                                <option value="1">Fixed</option>
-                                <option value="2" selected>Repairable</option>
-                                <option value="3">End of Life</option>
+                                <option value="1">@lang('partials.fixed')</option>
+                                <option value="2" selected>@lang('partials.repairable')</option>
+                                <option value="3">@lang('partials.end_of_life')</option>
                               @else
-                                <option value="1">Fixed</option>
-                                <option value="2">Repairable</option>
-                                <option value="3" selected>End of Life</option>
+                                <option value="1">@lang('partials.fixed')</option>
+                                <option value="2">@lang('partials.repairable')</option>
+                                <option value="3" selected>@lang('partials.end_of_life')</option>
                               @endif
                             </select>
                         </div>
@@ -405,37 +405,37 @@
                         <label for="repair-info-{{ $device->iddevices }}">Repair details:</label>
                         <div class="form-control form-control__select">
                             <select disabled class="repair_details select2" name="repair-info" id="repair-info-{{ $device->iddevices }}" @if( $device->repair_status != 2 ) disabled @endif>
-                              <option value="0">-- Repair Details --</option>
+                              <option value="0">-- @lang('partials.repair_details') --</option>
                               @if ( $device->more_time_needed == 1 )
-                                <option value="1" selected>More time needed</option>
-                                <option value="2">Professional help</option>
-                                <option value="3">Do it yourself</option>
+                                <option value="1" selected>@lang('partials.more_time')</option>
+                                <option value="2">@lang('partials.professional_help')</option>
+                                <option value="3">@lang('partials.diy')</option>
                               @elseif ( $device->professional_help == 1 )
-                                <option value="1">More time needed</option>
-                                <option value="2" selected>Professional help</option>
-                                <option value="3">Do it yourself</option>
+                                <option value="1">@lang('partials.more_time')</option>
+                                <option value="2" selected>@lang('partials.professional_help')</option>
+                                <option value="3">@lang('partials.diy')</option>
                               @elseif ( $device->do_it_yourself == 1 )
-                                <option value="1" >More time needed</option>
-                                <option value="2">Professional help</option>
-                                <option value="3" selected>Do it yourself</option>
+                                <option value="1" >@lang('partials.more_time')</option>
+                                <option value="2">@lang('partials.professional_help')</option>
+                                <option value="3" selected>@lang('partials.diy')</option>
                               @else
-                                <option value="1">More time needed</option>
-                                <option value="2">Professional help</option>
-                                <option value="3">Do it yourself</option>
+                                <option value="1">@lang('partials.more_time')</option>
+                                <option value="2">@lang('partials.professional_help')</option>
+                                <option value="3">@lang('partials.diy')</option>
                               @endif
                             </select>
                         </div>
                     </td>
                     <td>
-                        <label for="spare_parts">Spare parts:</label>
+                        <label for="spare_parts">@lang('partials.spare_parts'):</label>
                         <div class="form-control form-control__select">
                             <select disabled class="select2" name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
                               @if ($device->spare_parts == 1)
-                                <option value="1" selected>Yes</option>
-                                <option value="2">No</option>
+                                <option value="1" selected>@lang('partials.yes')</option>
+                                <option value="2">@lang('partials.no')</option>
                               @else
-                                <option value="1">Yes</option>
-                                <option value="2" selected>No</option>
+                                <option value="1">@lang('partials.yes')</option>
+                                <option value="2" selected>@lang('partials.no')</option>
                               @endif
                             </select>
                         </div>
@@ -443,7 +443,7 @@
                 </tr>
                 <tr class="table-row-more">
                     <td colspan="4">
-                        <label for="description">Description of problem/solution:</label>
+                        <label for="description">@lang('partials.description_of_problem_solution'):</label>
                         <div class="form-group">
                             <textarea disabled class="form-control" rows="6" name="problem-{{ $device->iddevices }}" id="problem-{{ $device->iddevices }}">{!! $device->problem !!}</textarea>
                         </div>

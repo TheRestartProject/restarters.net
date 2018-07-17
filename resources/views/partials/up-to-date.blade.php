@@ -6,7 +6,7 @@
       <p>@lang('partials.information_up_to_date_text')</p>
         @foreach($outdated_groups as $outdated_group)
           <div class="dashboard__links d-flex flex-row justify-content-end">
-              <a href="/group/edit/{{ $outdated_group->idgroups }}">Update {{ $outdated_group->name }}</a>
+              <a href="/group/edit/{{ $outdated_group->idgroups }}">@lang('partials.update') {{ $outdated_group->name }}</a>
           </div>
         @endforeach
     </div>

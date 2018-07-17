@@ -15,7 +15,7 @@
                                 <td width="200">
                                     <div class="form-control form-control__select">
                                         <select id="device-start" name="category" class="category select2">
-                                            <option value="">-- Category --</option>
+                                            <option value="">-- @lang('partials.category') --</option>
                                             @foreach( $clusters as $cluster )
                                             <optgroup label="{{{ $cluster->name }}}">
                                                 @foreach( $cluster->categories as $category )
@@ -23,7 +23,7 @@
                                                 @endforeach
                                             </optgroup>
                                             @endforeach
-                                            <option value="46">None of the above</option>
+                                            <option value="46">@lang('partials.category_none')</option>
                                         </select>
                                     </div>
                                     <div id="display-weight" style="display: none;">
@@ -38,7 +38,7 @@
                                 <td class="d-none d-sm-table-cell" width="150">
                                     <div class="form-control form-control__select">
                                         <select name="brand" class="brand select2-with-input">
-                                            <option value="">-- Brand --</option>
+                                            <option value="">-- @lang('partials.brand') --</option>
                                             <option value=""></option>
                                             @foreach($brands as $brand)
                                                 <option value="{{ $brand->brand_name }}">{{ $brand->brand_name }}</option>
@@ -64,19 +64,19 @@
                                 <td>
                                     <div class="form-control form-control__select">
                                         <select name="repair_status" class="repair_status select2">
-                                            <option value="0">-- Status --</option>
-                                            <option value="1">Fixed</option>
-                                            <option value="2">Repairable</option>
-                                            <option value="3">End of Life</option>
+                                            <option value="0">-- @lang('partials.status') --</option>
+                                            <option value="1">@lang('partials.fixed')</option>
+                                            <option value="2">@lang('partials.repairable')</option>
+                                            <option value="3">@lang('partials.end_of_life')</option>
                                         </select>
                                     </div>
                                     <div id="repair-more" style="display: none;">
                                         <div class="form-control form-control__select">
                                             <select name="repair_details" class="repair_details select2" disabled>
-                                                <option value="0">-- Repair details --</option>
-                                                <option value="1">More time needed</option>
-                                                <option value="2">Professional help</option>
-                                                <option value="3">Do it yourself</option>
+                                                <option value="0">-- @lang('partials.repair_details') --</option>
+                                                <option value="1">@lang('partials.more_time')</option>
+                                                <option value="2">@lang('partials.professional_help')</option>
+                                                <option value="3">@lang('partials.diy')</option>
                                             </select>
                                         </div>
                                     </div>
@@ -84,9 +84,9 @@
                                 <td>
                                     <div class="form-control form-control__select">
                                         <select name="spare_parts" class="spare_parts select2">
-                                            <option value="0">-- Spare parts --</option>
-                                            <option value="1">Yes</option>
-                                            <option value="2">No</option>
+                                            <option value="0">-- @lang('partials.spare_parts') --</option>
+                                            <option value="1">@lang('partials.yes')</option>
+                                            <option value="2">@lang('partials.no')</option>
                                         </select>
                                     </div>
                                 </td>

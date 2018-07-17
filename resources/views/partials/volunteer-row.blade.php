@@ -14,7 +14,7 @@
     <a href="/profile/{{ $user->id }}">
       {{ $user->name }}
       @if ( $volunteer->role == 3 )
-        <span class="badge badge-primary">Host</span>
+        <span class="badge badge-primary">@lang('partials.host')</span>
       @endif
     </a>
   </td>
@@ -26,7 +26,7 @@
   @if( isset($type) )
     @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator'))
       <td>
-        <a href="#" class="users-list__remove js-remove" data-remove-volunteer="{{ $volunteer->user }}" data-event-id="{{ $volunteer->event }}" data-type="{{{ $type }}}">Remove volunteer</a>
+        <a href="#" class="users-list__remove js-remove" data-remove-volunteer="{{ $volunteer->user }}" data-event-id="{{ $volunteer->event }}" data-type="{{{ $type }}}">@lang('partials.remove_volunteer')</a>
       </td>
     @endif
   @endif

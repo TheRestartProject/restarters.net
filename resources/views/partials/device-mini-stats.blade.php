@@ -28,27 +28,27 @@
         <div class="row row-compressed-xs properties__repair-count">
 
             @if( !is_null($most_seen) && !is_null($most_seen_type) )
-              <div class="col-6"><strong>Most seen:</strong></div>
+              <div class="col-6"><strong>@lang('partials.most_seen'):</strong></div>
               <div class="col-6">{{{ $most_seen }}} x {{{ $most_seen_type }}}</div>
             @else
-              <div class="col-6"><strong>Most seen:</strong></div>
+              <div class="col-6"><strong>@lang('partials.most_seen'):</strong></div>
               <div class="col-6">N/A</div>
             @endif
 
             @if( !is_null($most_repaired) && !is_null($most_repaired_type) )
-              <div class="col-6"><strong>Most repaired:</strong></div>
+              <div class="col-6"><strong>@lang('partials.most_repaired'):</strong></div>
               <div class="col-6">{{{ $most_repaired }}} x {{{ $most_repaired_type }}}</div>
             @else
-              <div class="col-6"><strong>Most repaired:</strong></div>
+              <div class="col-6"><strong>@lang('partials.most_repaired'):</strong></div>
               <div class="col-6">N/A</div>
             @endif
 
             @if( !is_null($least_repaired) && !is_null($least_repaired_type) )
-              <div class="col-6"><strong>Least repaired:</strong></div>
+              <div class="col-6"><strong>@lang('partials.least_repaired'):</strong></div>
               <div class="col-6">{{{ $least_repaired }}} x {{{ $least_repaired_type }}}</div>
             @else
-              <div class="col-6"><strong>Least repaired:</strong></div>
-              <div class="col-6">N/A</div>
+              <div class="col-6"><strong>@lang('partials.least_repaired'):</strong></div>
+              <div class="col-6">@lang('partials.n_a')</div>
             @endif
 
         </div>
