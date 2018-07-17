@@ -14,10 +14,12 @@
         margin-bottom: 2px;
         @include media-breakpoint-up(lg) {
             flex: 1 0 20%;
+            max-width: 20%;
         }
 
         &.properties__item__full {
             flex: 1 0 100% !important;
+            max-width: 100% !important;
         }
 
 
@@ -57,9 +59,11 @@
 
     &__small {
         flex: 1 0 50%;
+        
         li {
             @include media-breakpoint-up(lg) {
                 flex: 1 0 50%;
+                max-width: 50%;
             }
         }
     }

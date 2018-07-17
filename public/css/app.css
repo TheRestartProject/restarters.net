@@ -16944,6 +16944,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
     -webkit-box-flex: 1;
         -ms-flex: 1 0 20%;
             flex: 1 0 20%;
+    max-width: 20%;
   }
 }
 
@@ -16951,6 +16952,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   -webkit-box-flex: 1 !important;
       -ms-flex: 1 0 100% !important;
           flex: 1 0 100% !important;
+  max-width: 100% !important;
 }
 
 .properties li > div {
@@ -17008,6 +17010,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
     -webkit-box-flex: 1;
         -ms-flex: 1 0 50%;
             flex: 1 0 50%;
+    max-width: 50%;
   }
 }
 
