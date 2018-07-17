@@ -97,6 +97,16 @@ footer {
     margin-top: 0.45rem;
 }
 
+.form-check {
+    padding-left: 0;
+    .form-check-input {
+        margin: auto 0;
+        position: relative;
+        margin-right: 10px;
+        z-index: 1;
+    }
+}
+
 label.form-check-label {
     font-weight: 400;
     font-family: $font-family-second;
