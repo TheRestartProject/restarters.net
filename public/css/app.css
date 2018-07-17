@@ -15283,7 +15283,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   margin: 0 3px 0 0;
   position: relative;
   z-index: 1;
-  top: 3px;
+  top: 0;
 }
 
 .navbar-dropdown > ul > li > ul {
@@ -16694,7 +16694,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   margin: auto;
   position: relative;
   z-index: 1;
-  top: 4px;
+  top: 0;
   margin-right: 2px;
 }
 
@@ -17475,7 +17475,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .users-list li p svg {
-  top: 3px;
+  top: 0;
   position: relative;
   z-index: 1;
 }
