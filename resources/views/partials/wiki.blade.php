@@ -1,7 +1,7 @@
 <section class="dashboard__block">
     <div class="dashboard__block__content">
-        <h4>@partials('partials.wiki_title')</h4>
-        <p>@partials('partials.wiki_text')</p>
+        <h4>@lang('partials.wiki_title')</h4>
+        <p>@lang('partials.wiki_text')</p>
         <div class="table-responsive">
             <table role="table" class="table table-striped">
                 <tbody>
