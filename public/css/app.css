@@ -14459,13 +14459,6 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   border-bottom: 3px solid #155E67;
 }
 
-@media (max-width: 991.98px) {
-  .btn-group__duo .dropdown-menu {
-    right: -65px !important;
-    left: auto !important;
-  }
-}
-
 .btn-group__duo .dropdown-item {
   padding: 5px 10px;
   background-color: #0394A6;
