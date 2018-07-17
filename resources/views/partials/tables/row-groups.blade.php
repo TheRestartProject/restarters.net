@@ -9,6 +9,34 @@
   </td>
   <td><a href="/group/view/{{{ $group->idgroups }}}" title="edit group">{{{ $group->name }}}</a></td>
   <td>{{{ $group->getLocation() }}}</td>
-  <td class="text-center">{{{ $group->allHosts->count() }}}</td>
-  <td class="text-center">{{{ $group->allRestarters->count() }}}</td>
+  <td class="text-center">
+    <?php
+
+      $hosts = $group->allHosts;
+      $return = '';
+
+      foreach( $hosts as $host ){
+        $return .= trim($host->volunteer->name). ', ';
+      }
+
+    ?>
+    <span data-toggle="popover" data-content="{{{ rtrim($return, ', ') }}}" data-trigger="hover">
+      {{{ $group->allHosts->count() }}}
+    </span>
+  </td>
+  <td class="text-center">
+    <?php
+
+      $restarters = $group->allRestarters;
+      $return = '';
+
+      foreach( $restarters as $restarter ){
+        $return .= trim($restarter->volunteer->name). ', ';
+      }
+
+    ?>
+    <span data-toggle="popover" data-content="{{{ rtrim($return, ', ') }}}" data-trigger="hover">
+      {{{ $group->allRestarters->count() }}}
+    </span>
+  </td>
 </tr>
