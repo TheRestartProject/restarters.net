@@ -16212,6 +16212,24 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   line-height: 19px;
 }
 
+.edit-panel p a {
+  color: #000;
+  text-decoration: underline;
+}
+
+.edit-panel p a:hover {
+  text-decoration: none;
+}
+
+.edit-panel .btn-preferences {
+  color: #000;
+  text-decoration: underline;
+}
+
+.edit-panel .btn-preferences:hover {
+  text-decoration: none;
+}
+
 .edit-panel label {
   font-size: 16px;
 }
