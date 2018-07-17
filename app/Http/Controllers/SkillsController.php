@@ -47,7 +47,7 @@ class SkillsController extends Controller
       'description' => $request->input('skill_desc')
     ]);
 
-    return Redirect::to('skills/edit/'.$skill->id);
+    return Redirect::to('skills/edit/'.$skill->id)->with('success', 'Skill successfully created!');
 
   }
 
@@ -76,7 +76,7 @@ class SkillsController extends Controller
       'description' => $request->input('skill-description')
     ]);
 
-    return Redirect::back()->with('message', 'Skill updated!');
+    return Redirect::back()->with('success', 'Skill successfully updated!');
 
   }
 
@@ -87,7 +87,7 @@ class SkillsController extends Controller
 
     Skills::find($id)->delete();
 
-    return Redirect::to('/skills')->with('message', 'Skill deleted!');
+    return Redirect::to('/skills')->with('success', 'Skill successfully deleted!');
 
   }
 

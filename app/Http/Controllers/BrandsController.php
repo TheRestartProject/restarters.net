@@ -17,7 +17,7 @@ class BrandsController extends Controller
     if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
       return redirect('/user/forbidden');
 
-    $all_brands = Brands::all();
+    $all_brands = Brands::orderBy('brand_name', 'asc')->get();
 
     return view('brands.index', [
       'title' => 'Brands',
@@ -45,7 +45,7 @@ class BrandsController extends Controller
       'brand_name' => $request->input('brand_name')
     ]);
 
-    return Redirect::to('brands/edit/'.$brand->id);
+    return Redirect::to('brands/edit/'.$brand->id)->with('success', 'Brand successfully created!');
 
   }
 
@@ -72,7 +72,7 @@ class BrandsController extends Controller
       'brand_name' => $request->input('brand-name')
     ]);
 
-    return Redirect::back()->with('message', 'Brand updated!');
+    return Redirect::back()->with('success', 'Brand successfully updated!');
 
   }
 

@@ -202,7 +202,7 @@ class UserController extends Controller
 
     }
 
-    public function postSoftDeleteUser() {
+    public function postSoftDeleteUser(Request $request) {
 
       if ($request->input('id') !== null) {
         $id = $request->input('id');
@@ -211,9 +211,15 @@ class UserController extends Controller
       }
 
       $user = User::find($id);
+      $user_name = $user->name;
+      $user_id = $user->id;
       $user->delete();
 
-      return redirect()->back()->with('error', 'Account has been soft deleted');
+      if (Auth::id() !== $user_id) {
+        return redirect('user/all')->with('danger', $user_name.'\'s account has been soft deleted');
+      } else {
+        return redirect('login');
+      }
 
     }
 
@@ -714,7 +720,7 @@ class UserController extends Controller
                     'originalData' => $data,
                   ]);
                 } else {
-                  return redirect()->back()->with('response', $response);
+                  return redirect()->back()->with('success', 'User Successfully Created!');
                 }
             }
 
