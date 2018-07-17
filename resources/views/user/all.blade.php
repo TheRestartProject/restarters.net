@@ -17,6 +17,23 @@
         </div>
       </div>
     </div>
+
+    @if(isset($response))
+      @php( FixometerHelper::printResponse($response) )
+    @endif
+
+    @if (\Session::has('success'))
+        <div class="alert alert-success">
+            {!! \Session::get('success') !!}
+        </div>
+    @endif
+
+    @if (\Session::has('danger'))
+        <div class="alert alert-danger">
+            {!! \Session::get('danger') !!}
+        </div>
+    @endif
+
     <div class="row justify-content-center">
       <div class="col-md-4 col-lg-3">
         <aside class="collapse d-md-block d-lg-block d-xl-block fixed-overlay" id="collapseFilter">
@@ -78,6 +95,7 @@
         </form>
         </aside>
       </div>
+
       <div class="col-md-8 col-lg-9">
         <div class="table-responsive">
           <table class="table table-striped">

@@ -50,7 +50,7 @@ class GroupTagsController extends Controller
       'description' => $description
     ]);
 
-    return Redirect::to('tags/edit/'.$group_tag->id);
+    return Redirect::to('tags/edit/'.$group_tag->id)->with('success', 'Group Tag successfully created!');
 
   }
 
@@ -80,7 +80,7 @@ class GroupTagsController extends Controller
       'description' => $description
     ]);
 
-    return Redirect::back()->with('message', 'Group Tag updated!');
+    return Redirect::back()->with('success', 'Group Tag successfully updated!');
 
   }
 
@@ -91,7 +91,7 @@ class GroupTagsController extends Controller
 
     GroupTags::find($id)->delete();
 
-    return Redirect::to('/tags')->with('message', 'Group Tag deleted!');
+    return Redirect::to('/tags')->with('success', 'Group Tag successfully deleted!');
 
   }
 

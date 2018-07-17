@@ -117,7 +117,7 @@ class User extends Authenticatable
     public function getUserList() {//Tested!
 
         $Users = DB::select(DB::raw('SELECT users.id AS id, users.name, users.email, roles.role FROM users
-                INNER JOIN roles ON roles.idroles = users.role
+                INNER JOIN roles ON roles.idroles = users.role WHERE users.deleted_at IS NULL
                 ORDER BY users.id ASC')); //INNER JOIN sessions ON sessions.user = users.id, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at
 
         if(is_array($Users)){
