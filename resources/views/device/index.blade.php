@@ -41,7 +41,7 @@
                     <legend>@lang('devices.by_taxonomy')</legend>
                     <div class="form-group">
                         <label for="items_cat">@lang('devices.category'):</label>
-                        <!-- <div class="form-control form-control__select"> -->
+                        <div class="form-control form-control__select">
                             <select id="categories" name="categories[]" class="form-control select2-tags" multiple title="Choose categories...">
                                 @if(isset($categories))
                                 @foreach($categories as $cluster)
@@ -58,11 +58,11 @@
                                 @endif
                                 <option value="46">Misc</option>
                             </select>
-                        <!-- </div> -->
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="items_group">@lang('devices.group'):</label>
-                        <!-- <div class="form-control form-control__select"> -->
+                        <div class="form-control form-control__select">
                         <select id="groups" name="groups[]" class="form-control select2-tags" multiple data-live-search="true" title="Choose groups...">
                             @if(isset($groups))
                               @foreach($groups as $g)
@@ -74,7 +74,7 @@
                               @endforeach
                             @endif
                         </select>
-                        <!-- </div> -->
+                        </div>
                     </div>
 
                 </aside>

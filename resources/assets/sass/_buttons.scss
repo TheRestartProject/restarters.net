@@ -313,6 +313,10 @@
             top: -1px !important;
             background-color: $brand;
             border-bottom: 3px solid #155E67;
+            @include media-breakpoint-down(md) {
+                right: -65px !important;
+                left: auto !important;
+            }
         }
         .dropdown-item {
             padding: 5px 10px;
