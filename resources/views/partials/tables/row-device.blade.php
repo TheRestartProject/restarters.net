@@ -53,7 +53,7 @@
 
             <label for="nested-5">@lang('partials.category'):</label>
             <div class="form-control form-control__select">
-                <select disabled name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
+                <select name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
                     <option value="">-- @lang('partials.category') --</option>
                     @foreach( $clusters as $cluster )
                     <optgroup label="{{{ $cluster->name }}}">
@@ -281,8 +281,15 @@
                 @if( isset($device_images[$device->iddevices]) && !empty($device_images[$device->iddevices]) )
                   @foreach($device_images[$device->iddevices] as $device_image)
                     <div id="device-image-{{ $device->iddevices }}" class="dz-image">
+<<<<<<< HEAD
                       <img src="/uploads/thumbnail_{{ $device_image->path }}" alt="placeholder">
                       <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $device_image->idimages }}}/{{{ $device_image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">@lang('partials.remove_file')</a>
+=======
+                      <a href="/uploads/{{ $device_image->path }}" data-toggle="lightbox">
+                        <img src="/uploads/thumbnail_{{ $device_image->path }}" alt="placeholder">
+                      </a>
+                      <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $device_image->idimages }}}/{{{ $device_image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">Remove file</a>
+>>>>>>> 888503ca961ff5840031b455ae0496712648cb62
                     </div>
                   @endforeach
                 @endif

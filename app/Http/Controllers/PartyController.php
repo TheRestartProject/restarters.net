@@ -1257,11 +1257,14 @@ class PartyController extends Controller {
 
             }
 
+            $event = Party::find($event_id);
+
             $arr = array(
               'name' => $from->name,
               'group' => $group_name,
               'url' => $url,
               'message' => $message,
+              'event' => $event,
             );
             Notification::send($user, new JoinEvent($arr, $user));
 
@@ -1287,11 +1290,14 @@ class PartyController extends Controller {
             'type' => 'event',
           ));
 
+          $event = Party::find($event_id);
+
           $arr = array(
             'name' => $from->name,
             'group' => $group_name,
             'url' => $url,
             'message' => $message,
+            'event' => $event,
           );
 
           Notification::send($invite, new JoinEvent($arr));
