@@ -1,7 +1,7 @@
 <section class="dashboard__block">
     <div class="dashboard__block__content">
-        <h4>Wiki</h4>
-        <p>A changing selection of pages from our repair wiki.  Read and contribute advice for community repair!</p>
+        <h4>@partials('partials.wiki_title')</h4>
+        <p>@partials('partials.wiki_text')</p>
         <div class="table-responsive">
             <table role="table" class="table table-striped">
                 <tbody>

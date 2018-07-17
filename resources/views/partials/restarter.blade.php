@@ -3,9 +3,9 @@
     <div class="dashboard__block__content">
         <h4>@lang('partials.restarters_in_your_area')</h4>
         @if ( FixometerHelper::hasRole(Auth::user(), 'Restarter') )
-          <p>Through this community, potential volunteers self-register and share their location. The platform is designed to connect organisers and fixers.</p>
+          <p>@lang('partials.area_text_1')</p>
         @else
-          <p>Through this community, potential volunteers self-register and share their location. Here's a list of potential volunteers near you</p>
+          <p>@lang('partials.area_text_2')</p>
         @endif
         <div class="dashboard__links d-flex flex-row justify-content-end">
             @foreach ($all_groups as $g)

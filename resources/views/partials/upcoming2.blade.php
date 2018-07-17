@@ -1,7 +1,7 @@
 <section class="dashboard__block">
     <div class="dashboard__block__content dashboard__block__content--table">
-      <h4>Upcoming events</h4>
-      <p>Find and attend events.  If you have entered your town/city in your profile, you will see the events nearest to you.</p>
+      <h4>@lang('partials.upcoming_events')</h4>
+      <p>@lang('partials.upcoming_events_text_2')</p>
         <div class="table-responsive">
         <table role="table" class="table table-striped">
             <thead>
@@ -22,14 +22,14 @@
                 @endforeach
               @else
                 <tr>
-                  <td colspan="4" style="text-align: center">No Upcoming Events</td>
+                  <td colspan="4" style="text-align: center">@lang('partials.no_upcoming_events')</td>
                 </tr>
               @endif
             </tbody>
         </table>
         </div>
         <div class="dashboard__links d-flex flex-row justify-content-end">
-            <a href="{{ route('events') }}">See all events</a>
+            <a href="{{ route('events') }}">@lang('partials.see_all_events')</a>
         </div>
     </div>
 </section>

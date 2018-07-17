@@ -3,9 +3,9 @@
     <div class="dashboard__block__content dashboard__block__content--table">
         <h4>@lang('partials.your_recent_events')</h4>
         @if ( FixometerHelper::hasRole(Auth::user(), 'Restarter') )
-          <p>These are events you RSVP'ed to, or where a host logged your participation.</p>
+          <p>@lang('partials.your_recent_events_txt1')</p>
         @else
-          <p>Here's a list of recent events you have been a part of - all important contributions to your community and the environment. </p>
+          <p>@lang('partials.your_recent_events_txt2')</p>
         @endif
         <div class="table-responsive">
         <table role="table" class="table table-striped">
