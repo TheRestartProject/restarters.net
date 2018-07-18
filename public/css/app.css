@@ -15137,6 +15137,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
         -ms-flex-direction: column;
             flex-direction: column;
     text-align: center;
+    font-size: 16px;
   }
 }
 
