@@ -235,7 +235,7 @@
                 @endif
 
                 <h2 id="attendance" class="d-none d-lg-block">Attendance</h2>
-                <h2 id="attendance" class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#events-attendance-section" role="button" aria-expanded="false" aria-controls="events-attendance-section">Attendance</a></h2>
+                <h2 id="attendance" class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#events-attendance-section" role="button" aria-expanded="false" aria-controls="events-attendance-section">Attendance <span class="badge badge-pill badge-primary" id="attended-counter">{{ count($attended) }}</span></a></h2>
 
                 <div id="events-attendance-section" class="collapse d-lg-block collapse-section">
                   <ul class="nav nav-tabs" id="events-attendance" role="tablist">
