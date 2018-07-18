@@ -17017,6 +17017,10 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   }
 }
 
+.properties li.properties__item__full_xs svg {
+  top: 0;
+}
+
 @media (max-width: 991.98px) {
   .properties li.properties__item__full_xs {
     -webkit-box-flex: 1 !important;

@@ -30,6 +30,11 @@
         }
 
         &.properties__item__full_xs {
+
+            svg {
+                top: 0;
+            }
+
             @include media-breakpoint-down(md) {
             flex: 1 0 100% !important;
             max-width: 100% !important;
