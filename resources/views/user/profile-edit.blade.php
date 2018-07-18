@@ -285,7 +285,7 @@
 
               {{ Form::hidden('id', $user->id) }}
 
-              <div class="alert alert-danger alert-delete" role="alert">
+              <div class="alert alert-danger" role="alert">
                 <div class="row">
                   <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('auth.delete_account_text')</div>
                   <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center"><button type="submit" class="btn btn-danger" id="delete-form-submit">
