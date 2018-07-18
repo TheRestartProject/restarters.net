@@ -49,46 +49,79 @@
             <div class="form-row">
               <div class="form-group col">
                 <label for="name">Name:</label>
-                <input type="text" class="form-control" id="inputName" name="inputName" placeholder="Search by name">
+                @if (isset($name))
+                  <input type="text" class="form-control" id="inputName" name="name" placeholder="Search by name" value="{{ $name }}">
+                @else
+                  <input type="text" class="form-control" id="inputName" name="name" placeholder="Search by name">
+                @endif
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col">
                 <label for="inputEmail">Email:</label>
-                <input type="text" class="form-control" id="inputEmail" name="inputEmail" placeholder="Search by email address">
+                @if (isset($email))
+                  <input type="text" class="form-control" id="inputEmail" name="email" placeholder="Search by email address" value="{{ $email }}">
+                @else
+                  <input type="text" class="form-control" id="inputEmail" name="email" placeholder="Search by email address">
+                @endif
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col">
                 <label for="inputTownCity">Town/City:</label>
-                <input type="text" class="form-control" id="inputTownCity" name="inputTownCity" placeholder="E.g. Paris, London, Brussels">
+                @if (isset($location))
+                  <input type="text" class="form-control" id="inputTownCity" name="location" placeholder="E.g. Paris, London, Brussels" value="{{ $location }}">
+                @else
+                  <input type="text" class="form-control" id="inputTownCity" name="location" placeholder="E.g. Paris, London, Brussels">
+                @endif
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col">
                 <label for="inputCountry">Country:</label>
-                <select class="form-control" id="inputCountry" name="inputCountry">
-                  <option value="" selected>Choose country</option>
-                </select>
+                <div class="form-control form-control__select">
+                    <select id="country" name="country" class="field select2">
+                        <option value=""></option>
+                        @foreach (FixometerHelper::getAllCountries() as $country_code => $country_name)
+                          @if (isset($country) && $country_code == $country)
+                            <option value="{{ $country_code }}" selected>{{ $country_name }}</option>
+                          @else
+                            <option value="{{ $country_code }}">{{ $country_name }}</option>
+                          @endif
+                        @endforeach
+                    </select>
+                </div>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col">
-                <label for="inputRole">Role:</label>
-                <select class="form-control" id="inputRole" name="inputRole">
+                <label for="role">Role:</label>
+                <select class="form-control" id="inputRole" name="role">
                   <option value="" selected>Choose role</option>
-                  @foreach (FixometerHelper::allRoles() as $role)
-                    <option value="{{ $role->idroles }}">{{ $role->role }}</option>
+                  @foreach (FixometerHelper::allRoles() as $r)
+                    @if (isset($role) && $r->idroles == $role)
+                      <option value="{{ $r->idroles }}" selected>{{ $r->role }}</option>
+                    @else
+                      <option value="{{ $r->idroles }}">{{ $r->role }}</option>
+                    @endif
                   @endforeach
                 </select>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col">
-                <label for="inputPermission">Permission:</label>
-                <select class="form-control" id="inputPermission" name="inputPermission">
-                  <option value="" selected>Choose permission</option>
-                </select>
+                <label for="permission">Permission:</label>
+                <div class="form-control form-control__select">
+                <select id="permissions" name="permissions[]" class="form-control select2-tags" multiple data-live-search="true" title="Choose permissions...">
+                      @foreach (FixometerHelper::allPermissions() as $p)
+                        @if (isset($permissions) && in_array($p->idpermissions, $permissions))
+                          <option value="{{ $p->idpermissions }}" selected>{{ $p->permission }}</option>
+                        @else
+                          <option value="{{ $p->idpermissions }}">{{ $p->permission }}</option>
+                        @endif
+                      @endforeach
+                    </select>
+                </div>
               </div>
             </div>
           </div>
@@ -112,27 +145,76 @@
             <tbody>
               @foreach($userlist as $u)
 
-              <tr>
-                  <!-- <td><?php //echo $u->id; ?></td> -->
-                  <td>
+                @php( $display = true )
 
-                      @if(FixometerHelper::hasRole($user, 'Administrator'))
-                      <a href="/user/edit/<?php echo $u->id; ?>"><?php echo $u->name; ?></a>
-                      @else
-                      <?php echo $u->name; ?>
-                      @endif
+                <?php
+                  if (isset($permissions)) {
+                    foreach($permissions as $p) {
+                      $user_permissions = array_column($u->permissions, 'idpermissions');
+                      if(!in_array($p, $user_permissions)) {
+                        $display = false;
+                        break;
+                      }
+                    }
+                  }
+                ?>
 
-                  </td>
-                  <td><?php echo $u->email; ?></td>
-                  <td><?php echo $u->role; ?></td>
-                  <td><?php echo 'London';//echo $u->location; ?></td>
-                  <td><?php echo 'Group';//echo $u->groups; ?></td>
-                  <td data-value="<?php //echo $u->modified_at; ?>" ><?php //echo FixometerHelper::dateFormat($u->modified_at); ?></td>
-              </tr>
+                @if ($display)
+                  <tr>
+                      <!-- <td><?php //echo $u->id; ?></td> -->
+                      <td>
+
+                          @if(FixometerHelper::hasRole($user, 'Administrator'))
+                          <a href="/user/edit/<?php echo $u->id; ?>"><?php echo $u->name; ?></a>
+                          @else
+                          <?php echo $u->name; ?>
+                          @endif
+
+                      </td>
+                      <td><?php echo $u->email; ?></td>
+                      <td><?php echo $u->role; ?></td>
+                      <td><?php echo $u->location; ?></td>
+                      <td>
+                        @if (isset($u->groups))
+                          @php( $set_groups = false )
+
+                          @foreach($u->groups as $n => $g)
+                            @if ($n == count($u->groups) - 1)
+                              <a href="/group/view/{{ $g }}">{{ $g }}</a>
+                              @php( $set_groups = true )
+                            @else
+                              <a href="/group/view/{{ $g }}">{{ $g }}</a>,
+                              @php( $set_groups = true )
+                            @endif
+                          @endforeach
+
+                          @if(!$set_groups)
+                            N/A
+                          @endif
+                        @else
+                          N/A
+                        @endif
+                      </td>
+                      <td data-value="<?php //echo $u->modified_at; ?>" ><?php //echo FixometerHelper::dateFormat($u->modified_at); ?></td>
+                  </tr>
+                @endif
               @endforeach
             </tbody>
           </table>
         </div>
+
+        <div class="d-flex justify-content-center">
+          <nav aria-label="Page navigation example">
+            @if (!empty($_GET))
+              {!! $userlist->appends(['name' => $name, 'email' => $email, 'location' => $location, 'country' => $country, 'role' => $role, 'permissions' => $permissions ])->links() !!} <!-- 'selected_country' => $selected_country -->
+            @else
+              {!! $userlist->links() !!}
+            @endif
+          </nav>
+        </div>
+        <br>
+        <br>
+
       </div>
     </div>
   </div>
