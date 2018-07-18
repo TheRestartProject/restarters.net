@@ -1,3 +1,5 @@
+Header always set Access-Control-Allow-Origin "https://therestartproject.org"
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
