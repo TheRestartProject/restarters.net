@@ -91,8 +91,7 @@
                                               <ul>
                                                   <!-- <li><a href="#todo">@lang('general.time_reporting')</a></li>-->
                                                   <li><span class="text-muted">@lang('general.time_reporting') (coming soon)</span></li>
-                                                  <!--<li><a href="#todo">@lang('general.party_reporting')</a></li>-->
-                                                  <li><span class="text-muted">@lang('general.party_reporting') (coming soon)</span></li>
+                                                  <li><a href="/search">@lang('general.party_reporting')</a></li>
                                               </ul>
                                           </li>
                                         @endif

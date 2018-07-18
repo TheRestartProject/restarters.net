@@ -169,9 +169,9 @@ class SearchController extends Controller {
 
                       case 1:
 
-                          $party->co2 =  $party->co2 + (!empty($device->estimate) && $device->category == 46 ? ($device->estimate * $this->EmissionRatio) : $device->footprint);
+                          $party->co2 =  $party->co2 + (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $this->EmissionRatio) : $device->footprint);
                           $party->fixed_devices++;
-                          $totalWeight += (!empty($device->estimate) && $device->category==46 ? $device->estimate : $device->weight);
+                          $totalWeight += (!empty($device->estimate) && $device->category==46 ? intval($device->estimate) : $device->weight);
 
                           break;
                       case 2:
@@ -255,7 +255,7 @@ class SearchController extends Controller {
         $totalCO2 = null;
       }
 
-      if (!isset($Search)) {
+      if (!isset($partyIds)) {
         return view('search.index', [
           'charts' => true,
           'title' => 'Filter Stats',
