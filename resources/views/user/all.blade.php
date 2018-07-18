@@ -173,7 +173,13 @@
                       </td>
                       <td><?php echo $u->email; ?></td>
                       <td><?php echo $u->role; ?></td>
-                      <td><?php echo $u->location; ?></td>
+                      <td>
+                        @if (!empty($u->location))
+                          <?php echo $u->location; ?>
+                        @else
+                          N/A
+                        @endif
+                      </td>
                       <td>
                         @if (isset($u->groups))
                           @php( $set_groups = false )
@@ -205,7 +211,7 @@
 
         <div class="d-flex justify-content-center">
           <nav aria-label="Page navigation example">
-            @if (!empty($_GET))
+            @if (!empty($_GET) && isset($name))
               {!! $userlist->appends(['name' => $name, 'email' => $email, 'location' => $location, 'country' => $country, 'role' => $role, 'permissions' => $permissions ])->links() !!} <!-- 'selected_country' => $selected_country -->
             @else
               {!! $userlist->links() !!}
