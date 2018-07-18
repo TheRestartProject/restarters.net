@@ -17641,7 +17641,6 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   padding-left: 2px;
   padding-right: 2px;
   font-size: 22px;
-  white-space: nowrap;
 }
 
 .mini-stats li sup {
