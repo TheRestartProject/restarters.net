@@ -42,6 +42,6 @@
         "sortablejs": "^1.7.0",
         "summernote": "^0.8.10",
         "summernote-cleaner": "^1.0.0",
-        "tokenfield": "^0.9.9"
+        "tokenfield": "^0.9.10"
     }
 }
