@@ -66,25 +66,30 @@
             @endif
           </header>
 
-          <table class="table table-events table-striped" role="table">
+          <div class="table-responsive">
 
-            @include('partials.tables.head-events')
+            <table class="table table-events table-striped" role="table">
 
-            <tbody>
-              @if( !$upcoming_events->isEmpty() )
-                @foreach ($upcoming_events as $event)
+              @include('partials.tables.head-events')
 
-                  @include('partials.tables.row-events', ['invite' => true])
+              <tbody>
+                @if( !$upcoming_events->isEmpty() )
+                  @foreach ($upcoming_events as $event)
 
-                @endforeach
-              @else
-                <tr>
-                  <td colspan="13" align="center" class="p-3">There are currently no upcoming events for any of your groups<br><a href="{{{ route('groups') }}}">Find more groups</a></td>
-                </tr>
-              @endif
-            </tbody>
+                    @include('partials.tables.row-events', ['invite' => true])
 
-          </table>
+                  @endforeach
+                @else
+                  <tr>
+                    <td colspan="13" align="center" class="p-3">There are currently no upcoming events for any of your groups<br><a href="{{{ route('groups') }}}">Find more groups</a></td>
+                  </tr>
+                @endif
+              </tbody>
+
+            </table>
+
+          </div>
+
         </section>
 
         <section class="table-section" id="events-3">
@@ -95,6 +100,8 @@
               <h2>Past events</h2>
             @endif
           </header>
+
+          <div class="table-responsive">
 
           <table class="table table-events table-striped" role="table">
 
@@ -115,6 +122,9 @@
               </tbody>
 
           </table>
+
+          </div>
+          
         </section>
 
         <div class="d-flex justify-content-center">

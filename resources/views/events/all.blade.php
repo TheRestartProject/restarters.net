@@ -23,6 +23,8 @@
               <h2>All upcoming events</h2>
           </header>
 
+          <div class="table-responsive">
+
           <table class="table table-events table-striped" role="table">
 
             @include('partials.tables.head-events')
@@ -42,6 +44,9 @@
             </tbody>
 
           </table>
+
+          </div>
+          
         </section>
 
         <div class="d-flex justify-content-center">
