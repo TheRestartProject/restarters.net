@@ -584,6 +584,39 @@ class UserController extends Controller
         }
     }
 
+    public function search(Request $request) {
+
+        $user = User::find(Auth::id());
+
+        if(FixometerHelper::hasRole($user, 'Administrator')){
+            $User = new User;
+            //Have true as parameter for eloquent collection instead of array
+            $userlist = $User->getUserList(true);
+
+            //do searches
+            // $request
+
+            $userlist = $userlist->get();
+
+            //get permissions for every user
+            $userlist->map(function($user) use ($User) {
+               $user['permissions'] = $User->getRolePermissions($user->role);
+               return $user;
+            });
+
+            return view('user.all', [
+              'title' => 'Users',
+              'user' => $user,
+              'header' => true,
+              'userlist' => $userlist,
+            ]);
+
+        } else {
+            header('Location: /user/forbidden');
+        }
+    }
+
+
     public function create() {
 
         $user = Auth::user();

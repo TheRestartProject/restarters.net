@@ -155,7 +155,11 @@
                   <h6>@lang('devices.suitable')</h6>
 
                   <div class="form-check d-flex align-items-center justify-content-start">
-                      <input class="form-check-input" type="checkbox" name="opt-checkboxes" id="opt" value="option1">
+                      @if ($formdata->wiki == 1)
+                        <input class="form-check-input" type="checkbox" name="wiki" id="opt" value="1" checked>
+                      @else
+                        <input class="form-check-input" type="checkbox" name="wiki" id="opt" value="1">
+                      @endif
                       <label class="form-check-label" for="opt">@lang('devices.admin_device')</label>
                   </div>
 

@@ -114,19 +114,23 @@ class User extends Authenticatable
     //     }
     // }
 
-    public function getUserList() {//Tested!
+    public function getUserList($eloquent = false) {//Tested!
 
-        $Users = DB::select(DB::raw('SELECT users.id AS id, users.name, users.email, roles.role FROM users
-                INNER JOIN roles ON roles.idroles = users.role WHERE users.deleted_at IS NULL
-                ORDER BY users.id ASC')); //INNER JOIN sessions ON sessions.user = users.id, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at
+        if (!$eloquent) {
+          $Users = DB::select(DB::raw('SELECT users.id AS id, users.name, users.email, roles.role FROM users
+                  INNER JOIN roles ON roles.idroles = users.role WHERE users.deleted_at IS NULL
+                  ORDER BY users.id ASC')); //INNER JOIN sessions ON sessions.user = users.id, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at
 
-        if(is_array($Users)){
+          if(is_array($Users)){
 
-            $User = new User;
-            foreach($Users as $key => $user) {
+              $User = new User;
+              foreach($Users as $key => $user) {
 
-                $Users[$key]->permissions = $User->getRolePermissions($user->role);
-            }
+                  $Users[$key]->permissions = $User->getRolePermissions($user->role);
+              }
+          }
+        } else {
+          $Users = User::join('roles', 'users.role', '=', 'roles.idroles')->orderBy('users.id', 'ASC');
         }
 
         return $Users;

@@ -65,6 +65,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/create', 'UserController@create');
     Route::post('/create', 'UserController@create');
     Route::get('/all', 'UserController@all')->name('users');
+    Route::get('/all/search', 'UserController@search');
     Route::get('/edit/{id}', 'UserController@getProfileEdit');
     Route::post('/edit/{id}', 'UserController@edit');
     Route::post('/soft-delete', 'UserController@postSoftDeleteUser');
