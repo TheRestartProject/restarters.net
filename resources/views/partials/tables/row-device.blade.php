@@ -240,13 +240,13 @@
               </div> -->
 
               <div class="row pb-2">
-                  <div class="col-9 d-flex align-content-center flex-column">
+                  <div class="col-8 d-flex align-content-center flex-column">
                       <div class="form-check d-flex align-items-center justify-content-start">
                           <input class="form-check-input" type="checkbox" name="wiki-{{ $device->iddevices }}" id="wiki-{{ $device->iddevices }}" value="1" @if( $device->wiki == 1 ) checked @endif>
                           <label class="form-check-label" for="wiki-{{ $device->iddevices }}">@lang('partials.solution_text')</label>
                       </div>
                   </div>
-                  <div class="col-3 d-flex justify-content-end flex-column"><div class="d-flex justify-content-end">
+                  <div class="col-4 d-flex justify-content-end flex-column"><div class="d-flex justify-content-end">
                       <button type="submit" class="btn btn-primary btn-save2">@lang('partials.update')</button></div>
                   </div>
               </div>
@@ -275,7 +275,7 @@
                   </form>
               </div>
             </div>
-            <div class="col-12 col-lg-4 flex-column d-flex">
+            <div class="col-12 col-lg-4 flex-column d-flex device-images">
               <label for="device-image-{{ $device->iddevices }}">@lang('partials.device_images'):</label>
               <div class="previews">
                 @if( isset($device_images[$device->iddevices]) && !empty($device_images[$device->iddevices]) )

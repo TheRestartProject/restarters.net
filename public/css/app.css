@@ -14743,6 +14743,12 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 @media (min-width: 992px) {
+  .row-compressed-xs > div.device-images {
+    padding-left: 20px;
+  }
+}
+
+@media (min-width: 992px) {
   .registration {
     padding-top: 70px;
   }

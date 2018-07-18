@@ -27,3 +27,8 @@
     background-color: #ffeeba;
 }
 
+.row-compressed-xs > div.device-images {
+    @include media-breakpoint-up(lg) {
+        padding-left: 20px;
+    }
+}
