@@ -159,7 +159,9 @@
 
                     </div>
                     @if( !empty($images) )
-                      <h2>Event photos</h2>
+                      <h2 class="d-none d-lg-block">Event photos</h2>
+                      <h2 class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#event-photos-section" role="button" aria-expanded="false" aria-control"event-photos-section">Event photos <span class="badge badge-pill badge-primary" id="photos-counter">1</span></a></h2>
+                      <div id="event-photos-section" class="collapse d-lg-block collapse-section">
                       <ul class="photo-list">
                         @foreach($images as $image)
                           <li>
@@ -169,6 +171,7 @@
                           </li>
                         @endforeach
                       </ul>
+                      </div>
                     @endif
 
                 </aside>
