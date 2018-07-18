@@ -15122,7 +15122,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
     -webkit-box-direction: normal;
         -ms-flex-flow: row wrap;
             flex-flow: row wrap;
-    z-index: 1000;
+    z-index: 1500;
     background-color: #fff;
     border-top: 2px solid #D9D9D9;
   }
