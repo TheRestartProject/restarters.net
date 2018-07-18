@@ -17984,6 +17984,7 @@ table th {
   -webkit-box-flex: 1;
       -ms-flex: 1 0 25%;
           flex: 1 0 25%;
+  max-width: 25%;
 }
 
 .photo-list li a {
