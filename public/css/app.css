@@ -17023,10 +17023,6 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
       flex-basis: auto;
 }
 
-.properties li > div > div {
-  display: contents;
-}
-
 .properties li svg {
   position: absolute;
   left: 15px;
