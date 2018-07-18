@@ -14,6 +14,10 @@
         padding-right: 2px;
         font-size: 22px;
         //white-space: nowrap;
+        @include media-breakpoint-down(md) {
+            justify-content: center;
+            text-align: center;
+        }
 
         sup {
             color: #EC7F00;
@@ -21,6 +25,13 @@
             font-weight: 700;
             left: -4px;
             top: -8px;
+            @include media-breakpoint-down(md) {
+                top: auto;
+                left: auto;
+                display: block;
+                text-align: center;
+                margin-top: 10px;
+            }
         }
 
         svg {

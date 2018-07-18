@@ -1,5 +1,5 @@
 <div class="row row-compressed">
-    <div class="col-3">
+    <div class="d-none d-md-flex col-md-3">
         @if( $title == 1 )
           <img class="img-fluid" src="{{ url('/icons/Category_Icons-01.png') }}" alt="Computers and Home Office">
         @elseif( $title == 2 )
@@ -10,7 +10,7 @@
           <img class="img-fluid" src="{{ url('/icons/Category_Icons-04.png') }}" alt="Kitchen and Household Items">
         @endif
     </div>
-    <div class="col-9">
+    <div class="col-md-9">
 
         <ul class="mini-stats">
             <li>

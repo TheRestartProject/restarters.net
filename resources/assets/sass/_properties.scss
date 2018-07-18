@@ -22,6 +22,30 @@
             max-width: 100% !important;
         }
 
+        &.properties__item__half_xs {
+            @include media-breakpoint-down(md) {
+            flex: 1 0 50% !important;
+            max-width: 50% !important;
+            }
+        }
+
+        &.properties__item__full_xs {
+            @include media-breakpoint-down(md) {
+            flex: 1 0 100% !important;
+            max-width: 100% !important;
+
+                svg {
+                    top: 50%;
+                    margin-top: -10px;
+                }
+
+                h3 {
+                    padding-bottom: 0;
+                    flex: none;
+                    margin: auto 0;
+                }
+            }
+        }
 
         > div {
             background-color: #F9F9F9;
