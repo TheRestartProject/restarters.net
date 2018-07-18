@@ -40,7 +40,7 @@
                 <div class="form-row">
                     <div class="form-group col mobile-search-bar-md">
                         <button class="btn btn-primary btn-groups" type="submit">@lang('groups.search_groups')</button>
-                        <button type="button" class="d--lg-none d-xl-none d-md-none mobile-search-bar-md__close" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><svg width="21" height="21" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></svg></button>
+                        <button type="button" class="d-lg-none mobile-search-bar-md__close" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><svg width="21" height="21" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></svg></button>
                     </div>
                 </div>
 
@@ -109,6 +109,8 @@
 
             <h2>@lang('groups.groups_title1')</h2>
 
+            <div class="table-responsive">
+
             <table role="table" class="table table-striped table-hover">
               @include('partials.tables.head-groups')
               <tbody>
@@ -130,6 +132,8 @@
                 @endif
               </tbody>
             </table>
+
+            </div>
 
           </section>
         @endif
