@@ -339,10 +339,10 @@
                   </fieldset>
 
                   <div class="button-group row">
-                      <div class="col-xl-9 d-flex align-items-center justify-content-start">
+                      <div class="col-sm-9 d-flex align-items-center justify-content-start">
                           <a class="btn-preferences" href="{{ env('PLATFORM_COMMUNITY_URL') }}/u/{{ Auth::user()->username }}/preferences/emails">@lang('auth.set_preferences')</a>
                       </div>
-                      <div class="col-xl-3 d-flex align-items-center justify-content-end">
+                      <div class="col-sm-3 d-flex align-items-center justify-content-end">
                           <button class="btn btn-primary btn-save">@lang('auth.save_preferences')</button>
                       </div>
                   </div>
