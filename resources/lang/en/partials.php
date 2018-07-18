@@ -88,6 +88,7 @@ return [
     'est_weight' => 'Est. weight',
     'add_a_device' => 'Add a device',
     'this_event_hasnt_started' => 'This event hasn\'t started',
-    'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin'
+    'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
+    'save' => 'Save'
     
 ];

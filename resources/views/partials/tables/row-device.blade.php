@@ -240,14 +240,14 @@
               </div> -->
 
               <div class="row pb-2">
-                  <div class="col-8 d-flex align-content-center flex-column">
+                  <div class="col-md-8 d-flex align-content-center flex-column">
                       <div class="form-check d-flex align-items-center justify-content-start">
                           <input class="form-check-input" type="checkbox" name="wiki-{{ $device->iddevices }}" id="wiki-{{ $device->iddevices }}" value="1" @if( $device->wiki == 1 ) checked @endif>
                           <label class="form-check-label" for="wiki-{{ $device->iddevices }}">@lang('partials.solution_text')</label>
                       </div>
                   </div>
-                  <div class="col-4 d-flex justify-content-end flex-column"><div class="d-flex justify-content-end">
-                      <button type="submit" class="btn btn-primary btn-save2">@lang('partials.update')</button></div>
+                  <div class="col-md-4 d-flex justify-content-end flex-column"><div class="d-flex justify-content-end">
+                      <button type="submit" class="btn btn-primary btn-save2">@lang('partials.save')</button></div>
                   </div>
               </div>
 

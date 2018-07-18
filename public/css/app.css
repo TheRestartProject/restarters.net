@@ -16576,6 +16576,12 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   margin-bottom: 30px !important;
 }
 
+@media (max-width: 767.98px) {
+  .table .table-cell-upload .btn-primary {
+    width: 100%;
+  }
+}
+
 .table-add {
   border: 0;
 }
@@ -16723,6 +16729,9 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   font-family: "Patua One", sans-serif;
   font-size: 16px;
   margin-bottom: 7px;
+  -webkit-box-flex: 1;
+      -ms-flex: 1 0 auto;
+          flex: 1 0 auto;
 }
 
 .nested-fields label.form-check-label {
