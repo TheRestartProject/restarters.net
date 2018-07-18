@@ -16,7 +16,7 @@
     &__login {
         background-color: #F9F9F9;
         border: 1px solid #E9E9E9;
-        padding: 40px 35px 50px 35px;
+        padding: 40px 20px 50px 20px;
         display: flex;
         flex: 1 0 auto;
         margin-top: 10px;
@@ -24,6 +24,7 @@
         @include media-breakpoint-up(lg) {
             margin-top: 0;
             margin-bottom: 0;
+            padding: 40px 35px 50px 35px;
         }
 
         a {

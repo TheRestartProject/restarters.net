@@ -15697,7 +15697,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .card__login {
   background-color: #F9F9F9;
   border: 1px solid #E9E9E9;
-  padding: 40px 35px 50px 35px;
+  padding: 40px 20px 50px 20px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -15712,6 +15712,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   .card__login {
     margin-top: 0;
     margin-bottom: 0;
+    padding: 40px 35px 50px 35px;
   }
 }
 
