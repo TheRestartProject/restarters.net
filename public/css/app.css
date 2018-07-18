@@ -14374,7 +14374,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .button-group .dropdown-menu {
-  padding: 5px 0;
+  padding: 0;
   min-width: 100%;
   top: -1px !important;
   background-color: #0394A6;
