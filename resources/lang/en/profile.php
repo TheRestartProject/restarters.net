@@ -10,8 +10,11 @@ return [
     |
     */
     'skills' => 'Skills',
+    'my_skills' => 'My skills',
+    'biography' => 'Biography',
     'no_bio' => ':name has not yet entered a biography.',
     'edit_profile' => 'Edit profile',
+    'edit_user' => 'Edit user',
     'panel_title_1' => 'Basic profile',
     'panel_title_2' => 'Emails & alerts',
     'panel_content_1' => 'Lorem ipsum dolor sit amet, consectetur adip iscing elit. Praesent commodo cursus magna.',

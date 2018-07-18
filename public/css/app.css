@@ -17469,6 +17469,12 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   margin: auto;
 }
 
+.profile-header h3,
+.profile-header p {
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
 .users-list {
   padding: 0;
   margin: 0;
@@ -17781,7 +17787,14 @@ body {
 
 html > .container,
 body > .container {
-  margin-top: 50px;
+  padding-top: 20px;
+}
+
+@media (min-width: 768px) {
+  html > .container,
+  body > .container {
+    padding-top: 50px;
+  }
 }
 
 @media (max-width: 991.98px) {
@@ -17818,6 +17831,26 @@ body > .container {
 .block h6 {
   color: #0394A6;
   margin-bottom: 18px;
+}
+
+.block__profile {
+  margin-bottom: 15px;
+}
+
+.block__profile h4 {
+  color: #000;
+}
+
+.block__profile ul li {
+  list-style: none;
+  padding-left: 25px;
+  background-image: url(/images/star-colored.svg?eca0f92cdb3b62e9f5fc22baf8b12c11);
+  background-repeat: no-repeat;
+  background-position: 0 50%;
+  min-height: 11px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-family: "Patua One", sans-serif;
 }
 
 @media (min-width: 1200px) {

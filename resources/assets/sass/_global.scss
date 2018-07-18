@@ -4,7 +4,10 @@ html, body {
   color: #000000;
   font-family: $font-family-second;
   & > .container {
-    margin-top: 50px;
+    padding-top: 20px;
+    @include media-breakpoint-up(md) {
+      padding-top: 50px;
+    }
   }
 }
 
@@ -36,6 +39,25 @@ footer {
   h1, h2, h3, h4, h5, h6{
     color: $brand;
     margin-bottom: 18px;
+  }
+  &__profile {
+    margin-bottom: 15px;
+    h4 {
+      color: #000;
+    }
+    ul {
+      li {
+        list-style:none;
+        padding-left: 25px;
+        background-image: url('../images/star-colored.svg');
+        background-repeat: no-repeat;
+        background-position: 0 50%;
+        min-height: 11px;
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-family: $font-family-sans-serif;
+      }
+    }
   }
 }
 
