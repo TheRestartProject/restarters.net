@@ -28,6 +28,7 @@ use App\Skills;
 use App\User;
 use App\UserGroups;
 use App\UsersSkills;
+use App\RolePermissions;
 use Cache;
 use FixometerHelper;
 use FixometerFile;
@@ -561,16 +562,19 @@ class UserController extends Controller
 
 
     public function all() {
-        // $this->set('title', 'Users');
-
         $user = User::find(Auth::id());
-        // $this->set('user', $user);
-        // $this->set('header', true);
 
         if(FixometerHelper::hasRole($user, 'Administrator')){
             $User = new User;
-            $userlist = $User->getUserList();
-            // $this->set('userlist', $userlist);
+            $userlist = $User->getUserList(true)->paginate(env('PAGINATE'));
+
+            $UserGroups = new UserGroups;
+            //get permissions and group_ids for every user
+            $userlist->map(function($user) use ($User, $UserGroups) {
+               $user['permissions'] = $User->getRolePermissions($user->role);
+               $user['groups'] = $UserGroups->where('user', $user->id)->pluck('group')->toArray();
+               return $user;
+            });
 
             return view('user.all', [
               'title' => 'Users',
@@ -594,13 +598,33 @@ class UserController extends Controller
             $userlist = $User->getUserList(true);
 
             //do searches
-            // $request
+            if ($request->input('name') !== null) {
+              $userlist = $userlist->where('name', 'like', '%'.$request->input('name').'%');
+            }
 
-            $userlist = $userlist->get();
+            if ($request->input('email') !== null) {
+              $userlist = $userlist->where('email', 'like', '%'.$request->input('email').'%');
+            }
 
-            //get permissions for every user
-            $userlist->map(function($user) use ($User) {
+            if ($request->input('location') !== null) {
+              $userlist = $userlist->where('location', 'like', '%'.$request->input('location').'%');
+            }
+
+            if ($request->input('country') !== null) {
+              $userlist = $userlist->where('country', '=', $request->input('country'));
+            }
+
+            if ($request->input('role') !== null) {
+              $userlist = $userlist->where('users.role', '=', $request->input('role'));
+            }
+
+            $userlist = $userlist->paginate(env('PAGINATE'));
+
+            $UserGroups = new UserGroups;
+            //get permissions and group_ids for every user
+            $userlist->map(function($user) use ($User, $UserGroups) {
                $user['permissions'] = $User->getRolePermissions($user->role);
+               $user['groups'] = $UserGroups->where('user', $user->id)->pluck('group')->toArray();
                return $user;
             });
 
@@ -609,6 +633,12 @@ class UserController extends Controller
               'user' => $user,
               'header' => true,
               'userlist' => $userlist,
+              'name' => $request->input('name'),
+              'email' => $request->input('email'),
+              'location' => $request->input('location'),
+              'country' => $request->input('country'),
+              'role' => $request->input('role'),
+              'permissions' => $request->input('permissions'),
             ]);
 
         } else {

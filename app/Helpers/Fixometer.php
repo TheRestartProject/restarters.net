@@ -6,6 +6,7 @@ use App\Party;
 use App\Role;
 use App\Skills;
 use App\UserGroups;
+use App\Permissions;
 
 use App;
 use Auth;
@@ -40,6 +41,12 @@ class FixometerHelper {
   public static function allRoles() {
 
     return Role::all();
+
+  }
+
+  public static function allPermissions() {
+
+    return Permissions::all();
 
   }
 
