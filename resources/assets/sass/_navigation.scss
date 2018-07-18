@@ -203,6 +203,12 @@
                 border-right:0;
                 border-bottom:0;
             //}
+
+            // iPhone 5
+            @include media-breakpoint-down(sm) {
+                padding-left: 6px;
+                padding-right: 6px;
+            }
             &:hover, &:focus {
                 background-color: #fff;
                 text-decoration: none;

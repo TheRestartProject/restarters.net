@@ -64,12 +64,15 @@
     &__status {
         position: absolute;
         right: 35px;
-        top: 40px;
+        top: 20px;
         z-index: 2;
         color: #757575;
         font-size: 14px;
         margin: 0 0 20px 0;
         font-family: $font-family-second;
+        @include media-breakpoint-up(lg) {
+            top: 40px;
+        }
     }
 
     &__step {

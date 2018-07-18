@@ -14816,12 +14816,18 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .registration__status {
   position: absolute;
   right: 35px;
-  top: 40px;
+  top: 20px;
   z-index: 2;
   color: #757575;
   font-size: 14px;
   margin: 0 0 20px 0;
   font-family: "Open Sans", sans-serif;
+}
+
+@media (min-width: 992px) {
+  .registration__status {
+    top: 40px;
+  }
 }
 
 .registration__step {
@@ -15101,6 +15107,13 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   border-top: 0;
   border-right: 0;
   border-bottom: 0;
+}
+
+@media (max-width: 767.98px) {
+  .navbar-laravel .navbar-nav .nav-link {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
 }
 
 .navbar-laravel .navbar-nav .nav-link:hover,
