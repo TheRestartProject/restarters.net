@@ -139,6 +139,8 @@
 
             <h2>@lang('groups.groups_title2') <sup>(<a href="/group/all">See all groups</a>)</sup></h2>
 
+            <div class="table-responsive">
+
             <table role="table" class="table table-striped table-hover">
               @include('partials.tables.head-groups')
               <tbody>
@@ -163,6 +165,8 @@
               </tbody>
             </table>
 
+            </div>
+
           </section>
         @endif
 
@@ -170,6 +174,8 @@
           <section class="table-section" id="your-groups">
 
             <h2>@lang('groups.groups_title3')</h2>
+
+            <div class="table-responsive">
 
             <table role="table" class="table table-striped table-hover">
               @include('partials.tables.head-groups')
@@ -187,6 +193,8 @@
                 @endif
               </tbody>
             </table>
+
+            </div>
 
           </section>
 
