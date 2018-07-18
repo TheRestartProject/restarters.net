@@ -18,7 +18,8 @@
               @endif
             </ol>
           </nav>
-          <div class="btn-group">
+          <div class="btn-group button-group-filters">
+            <button class="reveal-filters btn btn-secondary d-lg-none d-xl-none" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal filters</button>
             @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host') )
               <a href="{{{ route('create-group') }}}" class="btn btn-primary btn-save">@lang('groups.create_groups')</a>
             @endif
@@ -33,13 +34,13 @@
         <div class="col-lg-3">
 
 
-            <div class="collapse d-lg-block d-xl-block fixed-overlay" id="collapseFilter">
+            <div class="collapse d-lg-block fixed-overlay-md" id="collapseFilter">
 
               <form action="/group/all/search" method="get">
                 <div class="form-row">
-                    <div class="form-group col mobile-search-bar">
+                    <div class="form-group col mobile-search-bar-md">
                         <button class="btn btn-primary btn-groups" type="submit">@lang('groups.search_groups')</button>
-                        <button type="button" class="d--lg-none d-xl-none d-md-none mobile-search-bar__close" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><svg width="21" height="21" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></svg></button>
+                        <button type="button" class="d--lg-none d-xl-none d-md-none mobile-search-bar-md__close" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><svg width="21" height="21" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></svg></button>
                     </div>
                 </div>
 
@@ -56,6 +57,7 @@
 
                     <div class="form-group">
                         <label for="tags">@lang('groups.group_tag'):</label>
+                        <div class="form-control form-control__select">
                         <select id="tags" name="tags[]" class="form-control select2-tags" multiple data-live-search="true" title="Choose group tags...">
                           @foreach ($all_group_tags as $group_tag)
                             @if(isset($selected_tags) && in_array($group_tag->id, $selected_tags))
@@ -65,6 +67,7 @@
                             @endif
                           @endforeach
                         </select>
+                        </div>
                     </div>
 
                     <div class="form-group">

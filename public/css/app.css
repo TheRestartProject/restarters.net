@@ -16138,6 +16138,30 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   }
 }
 
+@media (max-width: 991.98px) {
+  .fixed-overlay-md {
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    background: #FFF;
+    height: 100%;
+    overflow: scroll;
+    padding: 30px;
+    background-color: #F9F9F9;
+  }
+
+  .fixed-overlay-md .block,
+  .fixed-overlay-md .edit-panel {
+    border: 0;
+    background-color: transparent;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+  }
+}
+
 @media (max-width: 767.98px) {
   .mobile-search-bar {
     display: -webkit-box;
@@ -16156,6 +16180,29 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   }
 
   .mobile-search-bar__close svg {
+    display: block;
+    margin: auto;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .mobile-search-bar-md {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-line-pack: center;
+        align-content: center;
+    padding: 0 0 30px 0 !important;
+  }
+
+  .mobile-search-bar-md__close {
+    margin: auto 0 auto 30px;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+  }
+
+  .mobile-search-bar-md__close svg {
     display: block;
     margin: auto;
   }
