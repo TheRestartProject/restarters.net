@@ -200,7 +200,11 @@
 
           <div class="d-flex justify-content-center">
             <nav aria-label="Page navigation example">
-              {!! $groups->links() !!}
+              @if (!empty($_GET))
+                {!! $groups->appends(['name' => $name, 'location' => $location, 'selected_tags' => $selected_tags ])->links() !!} <!-- 'selected_country' => $selected_country -->
+              @else
+                {!! $groups->links() !!}
+              @endif
             </nav>
           </div>
         @endif

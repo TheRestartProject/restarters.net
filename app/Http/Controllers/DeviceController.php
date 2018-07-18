@@ -18,7 +18,9 @@ use Auth;
 use FixometerHelper;
 use FixometerFile;
 use Illuminate\Support\Facades\Validator;
+use App\Notifications\ReviewNotes;
 use View;
+use Notification;
 
 class DeviceController extends Controller
 {
@@ -250,6 +252,27 @@ class DeviceController extends Controller
               unset($data['files']);
               unset($data['users']);
 
+              $old_wiki = Device::find($id)->wiki;
+
+              if (isset($data['wiki'])) {
+                $wiki = 1;
+              } else {
+                $wiki = 0;
+              }
+
+              //Send Wiki Notification to Admins
+              if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
+                $all_admins = User::where('role', 2)->get();
+                $group_id = Party::find($data['event'])->group;
+
+                $arr = [
+                  'group_url' => url('/group/view/'.$group_id),
+                  'preferences' => url('/profile/edit'),
+                ];
+
+                Notification::send($all_admins, new ReviewNotes($arr));
+              }
+
               // formatting dates for the DB
               //$data['event_date'] = dbDateNoTime($data['event_date']);
 
@@ -290,6 +313,7 @@ class DeviceController extends Controller
                   'more_time_needed'  => $more_time_needed,
                   'professional_help' => $professional_help,
                   'do_it_yourself'    => $do_it_yourself,
+                  'wiki'              => $wiki,
               );
 
               $u = $Device->where('iddevices', $id)->update($update);
@@ -719,6 +743,21 @@ class DeviceController extends Controller
           $do_it_yourself = 1;
         } else {
           $do_it_yourself = 0;
+        }
+
+        $old_wiki = Device::find($id)->wiki;
+
+        //Send Wiki Notification to Admins
+        if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
+          $all_admins = User::where('role', 2)->get();
+          $group_id = Party::find($event_id)->group;
+
+          $arr = [
+            'group_url' => url('/group/view/'.$group_id),
+            'preferences' => url('/profile/edit'),
+          ];
+
+          Notification::send($all_admins, new ReviewNotes($arr));
         }
 
         Device::find($id)->update([

@@ -40,12 +40,16 @@ class ReviewNotes extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-                    ->subject('Review Notes')
-                    ->greeting('Hello!')
-                    ->line('A description of a repair has been marked suitable for the Wiki and is ready for your review.')
-                    ->action('View group', url('/'))
-                    ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr[1] . '">your preferences</a> on your account.');
+      if ($notifiable !== null) {
+        if ($notifiable->invites == 1) {
+          return (new MailMessage)
+                      ->subject('Review Notes')
+                      ->greeting('Hello!')
+                      ->line('A description of a repair has been marked suitable for the Wiki and is ready for your review.')
+                      ->action('View group', $this->arr['group_url'])
+                      ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'].'/'.$notifiable->id . '">your preferences</a> on your account.');
+        }
+      }
     }
 
     /**

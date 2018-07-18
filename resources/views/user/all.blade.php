@@ -37,7 +37,7 @@
     <div class="row justify-content-center">
       <div class="col-md-4 col-lg-3">
         <aside class="collapse d-md-block d-lg-block d-xl-block fixed-overlay" id="collapseFilter">
-        <form class="" action="index.html" method="post">
+        <form class="" action="/user/all/search" method="get">
           <div class="form-row">
             <div class="form-group col mobile-search-bar">
               <button type="submit" class="btn btn-primary btn-block">Search all users</button>
