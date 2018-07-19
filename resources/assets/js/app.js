@@ -10,6 +10,7 @@ require('select2');
 require('slick-carousel');
 require('summernote');
 require('ekko-lightbox');
+require('bootstrap4-datetimepicker');
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
 
@@ -721,6 +722,57 @@ function select2Fields($target = false) {
 
 }
 
+function customDates() {
+
+
+    if (jQuery('input[type="date"], .date, .date input').length > 0) {
+
+        jQuery('input[type="date"], .date, .date input').datetimepicker({
+            icons: {
+                time: "fa fa-clock-o",
+                date: "fa fa-calendar",
+                up: "fa fa-arrow-up",
+                down: "fa fa-arrow-down",
+                previous: 'fa fa-chevron-left',
+                next: 'fa fa-chevron-right',
+                today: 'fa fa-screenshot',
+                clear: 'fa fa-trash'
+            },
+            format: 'dd/mm/yyyy',
+            defaultDate: jQuery(this).val()
+        });
+        jQuery('.time').datetimepicker({
+            icons: {
+                time: "fa fa-clock-o",
+                date: "fa fa-calendar",
+                up: "fa fa-arrow-up",
+                down: "fa fa-arrow-down",
+                previous: 'fa fa-chevron-left',
+                next: 'fa fa-chevron-right',
+                today: 'fa fa-screenshot',
+                clear: 'fa fa-trash'
+            },
+            format: 'HH:mm',
+            defaultDate: jQuery(this).val()
+
+        });
+
+        jQuery('.from-date').datetimepicker({
+            useCurrent: false //Important! See issue #1075
+        });
+        jQuery('.to-date').datetimepicker({
+            useCurrent: false //Important! See issue #1075
+        });
+        jQuery(".from-date").on("dp.change", function (e) {
+            jQuery('.to-date').data("DateTimePicker").minDate(e.date);
+        });
+        jQuery(".to-date").on("dp.change", function (e) {
+            jQuery('.from-date').data("DateTimePicker").maxDate(e.date);
+        });
+    }
+
+}
+
 Dropzone.autoDiscover = false;
 registration();
 onboarding();
@@ -731,6 +783,7 @@ eventsMap();
 truncate();
 nestedTable();
 select2Fields();
+//customDates();
 
 jQuery(function () {
 
@@ -1290,5 +1343,6 @@ $( document ).ready(function() {
   $('#description').on('summernote.change', function(e) {
     $('#free_text').val($('#description').summernote('code'));
   });
+
 
 });
