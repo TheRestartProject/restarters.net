@@ -19,7 +19,7 @@
         button {
             text-align: left;
         }
-        
+
         h1 {
             font-size: 26px;
             margin: 10px 0 6px;
@@ -222,9 +222,11 @@
                 font-size: 26px;
             }
         }
-        .table-events td {
-            padding-top: 0;
-            padding-bottom: 0;
+        .table-events{
+          td {
+              padding-top: 0;
+              padding-bottom: 0;
+          }
         }
     }
 
@@ -240,4 +242,9 @@
       }
     }
 
+}
+
+.card .table-events .btn {
+    width: auto;
+    min-width: auto;
 }

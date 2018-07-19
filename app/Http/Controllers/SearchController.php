@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\Search;
-use App\Group;
-use App\Party;
 use App\Device;
-
+use App\Group;
+use App\GroupTags;
+use App\Party;
+use App\Search;
+use App\User;
 use Auth;
 use FixometerHelper;
 
@@ -101,7 +101,7 @@ class SearchController extends Controller {
         $searched_parties = null;
         $toTimeStamp = null;
         $fromTimeStamp = null;
-
+        $group_tags = null;
 
 
         /** collect params **/
@@ -134,7 +134,11 @@ class SearchController extends Controller {
           }
         }
 
-        $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp);
+        if( isset($_GET['group_tags']) && is_array($_GET['group_tags']) ){
+          $group_tags = $_GET['group_tags'];
+        }
+
+        $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags);
         if(count($PartyList) > 0 ){
           //dbga($PartyList[8]);
           $partyIds = array();
@@ -153,6 +157,7 @@ class SearchController extends Controller {
 
 
               $party->co2 = 0;
+              $party->ewaste = 0;
               $party->fixed_devices = 0;
               $party->repairable_devices = 0;
               $party->dead_devices = 0;
@@ -171,7 +176,10 @@ class SearchController extends Controller {
 
                           $party->co2 =  $party->co2 + (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $this->EmissionRatio) : $device->footprint);
                           $party->fixed_devices++;
-                          $totalWeight += (!empty($device->estimate) && $device->category==46 ? intval($device->estimate) : $device->weight);
+
+                          $ewaste = (!empty($device->estimate) && $device->category==46 ? intval($device->estimate) : $device->weight);
+                          $party->ewaste = $party->ewaste + $ewaste;
+                          $totalWeight += $ewaste;
 
                           break;
                       case 2:
@@ -270,6 +278,7 @@ class SearchController extends Controller {
           'totalCO2' => $totalCO2,
           'response' => $response,
           'user' => $user,
+          'group_tags' => GroupTags::all()
         ]);
       } else {
         return view('search.index', [
@@ -289,6 +298,7 @@ class SearchController extends Controller {
           'PartyList' => $PartyList,
           'response' => $response,
           'user' => $user,
+          'group_tags' => GroupTags::all()
         ]);
       }
 

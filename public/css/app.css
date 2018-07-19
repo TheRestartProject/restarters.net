@@ -17027,7 +17027,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .table-events th.cell-date,
 .table-events td.cell-date {
-  width: 115px;
+  width: 130px;
 }
 
 .table-events td.cell-name {
@@ -17772,6 +17772,11 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .events .table-add td:first-child,
 .events .table-add th:first-child {
   padding-left: 0;
+}
+
+.card .table-events .btn {
+  width: auto;
+  min-width: auto;
 }
 
 .reporting {

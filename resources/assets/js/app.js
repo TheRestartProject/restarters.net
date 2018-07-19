@@ -668,8 +668,8 @@ function resetForm (e) {
     var form = jQuery('#' + attr);
     form[0].reset();
 
-    if (form.find('#tags').length > 0 ) {
-        form.find('#tags').val('').trigger('change');
+    if (form.find('select').length > 0 ) {
+        form.find('select').val('').trigger('change');
     }
 
 }

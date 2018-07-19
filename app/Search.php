@@ -9,7 +9,7 @@ use DB;
 class Search extends Model
 {
 
-  public function parties($list = array(), $groups = array(), $from = null, $to = null){
+  public function parties($list = array(), $groups = array(), $from = null, $to = null, $group_tags = null){
       $conditions = array();
 
       $sql = 'SELECT
@@ -20,11 +20,14 @@ class Search extends Model
 
               INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
 
+              LEFT JOIN `grouptags_groups` as `gtag` ON `g`.`idgroups` = `gtag`.`group`
+
               LEFT JOIN (
                 SELECT COUNT(`dv`.`iddevices`) AS `device_count`, `dv`.`event`
                 FROM `devices` AS `dv`
                 GROUP BY  `dv`.`event`
               ) AS `d` ON `d`.`event` = `e`.`idevents`
+
               WHERE 1=1 ';
 
 
@@ -35,20 +38,25 @@ class Search extends Model
 
       //        TIMESTAMP(`e`.`event_date`, `e`.`start`) >= NOW() '; // added one day to make sure it only gets moved to the past the next day
 
-
       if(!is_null($groups)){
           $conditions[] = ' `e`.`group` IN (' . implode(', ', $groups) . ') ';
       }
+
       if(!is_null($from)){
         $conditions[] = ' UNIX_TIMESTAMP(`e`.`event_date`) >= ' . $from ;
       }
       if(!is_null($to)){
         $conditions[] = ' UNIX_TIMESTAMP(`e`.`event_date`) <= ' . $to ;
       }
+      if(!is_null($group_tags)){
+          $conditions[] = ' `gtag`.`group_tag` IN (' . implode(', ', $group_tags) . ') ';
+      }
       if(!empty($conditions)) {
         $sql .= ' AND ' . implode(' AND ', $conditions);
       }
-      $sql .= ' ORDER BY `e`.`event_date` DESC';
+      $sql .= ' GROUP BY  `e`.`idevents` ORDER BY `e`.`event_date` DESC';
+
+      //dd($sql);
 
       $parties = DB::select(DB::raw($sql));
 
