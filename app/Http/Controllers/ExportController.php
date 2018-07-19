@@ -6,9 +6,18 @@ use App\Device;
 use App\Group;
 use App\Party;
 use App\Search;
+use App\EventsUsers;
+use App\UserGroups;
+use App\User;
+use App\GroupTags;
+use App\GrouptagsGroups;
 
+use FixometerHelper;
+
+use DB;
 use Auth;
 use Response;
+use Illuminate\Http\Request;
 
 class ExportController extends Controller {
 
@@ -159,7 +168,7 @@ class ExportController extends Controller {
             $toTimeStamp = strtotime($toDate->format('Y-m-d'));
           }
         }
-        
+
         if( isset($_GET['group_tags']) && is_array($_GET['group_tags']) ){
           $group_tags = $_GET['group_tags'];
         }
@@ -270,6 +279,238 @@ class ExportController extends Controller {
     return view('export.parties', [
       'data' => $data,
     ]);
+  }
+
+  public function getTimeVolunteered($search = null, Request $request) {
+
+    $user = Auth::user();
+
+    //Get all group tags
+    $all_group_tags = GroupTags::all();
+
+    //Get all applicable groups
+    if (FixometerHelper::hasRole($user, 'Administrator')) {
+      $all_groups = Group::all();
+    } elseif (FixometerHelper::hasRole($user, 'Host')) {
+      $host_groups = UserGroups::where('user', $user->id)->where('role', 3)->pluck('group')->toArray();
+      $all_groups = Group::whereIn('groups.idgroups', $host_groups);
+    } elseif (FixometerHelper::hasRole($user, 'Restarter')) {
+      $all_groups = null;
+    }
+
+    //See whether it is a get search or index page
+    if (is_null($search)) {
+      $user_events = EventsUsers::join('users', 'events_users.user', 'users.id')
+                             ->join('events', 'events_users.event', 'events.idevents')
+                                ->join('groups', 'events.group', 'groups.idgroups')
+                                  ->whereNotNull('events_users.user')
+                                    ->orderBy('users.id', 'ASC');
+
+      if (FixometerHelper::hasRole($user, 'Host')) {
+        $user_events = $user_events->whereIn('groups.idgroups', $host_groups);
+      } elseif (FixometerHelper::hasRole($user, 'Restarter')) {
+        $user_events = $user_events->where('users.id', $user->id);
+      }
+
+      //total users
+        $total_users = clone $user_events;
+        $total_users = $total_users->distinct('id')->count('id');
+
+      //anonymous users
+        $anonymous_users = clone $user_events;
+        $anonymous_users = $anonymous_users->whereNull('id')->count('id');
+
+      //group count
+        $group_count = clone $user_events;
+        $group_count = $group_count->distinct('group')->count('group');
+
+      //average age
+        $average_age = clone $user_events;
+        $average_age = $average_age->distinct('id')->whereNotNull('age')->avg('age');
+
+      // dd($average_age);
+
+      //hours completed
+        $hours_completed = clone $user_events;
+        $hours_completed = $hours_completed->sum(DB::raw('TIMEDIFF(end, start)'))/60/60;
+
+      //country hours completed
+        $country_hours_completed = clone $user_events;
+        $country_hours_completed = $country_hours_completed->groupBy('country')->select('country', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
+        $country_hours_completed = $country_hours_completed->orderBy('hours')->take(5)->get();
+
+      //city hours completed
+        $city_hours_completed = clone $user_events;
+        $city_hours_completed = $city_hours_completed->groupBy('events.location')->select('events.location', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
+        $city_hours_completed = $city_hours_completed->orderBy('hours')->take(5)->get();
+
+      //Select all necessary information for table
+      $user_events = $user_events->select(
+                                          'users.id',
+                                          'users.name as username',
+                                          'events.start',
+                                          'events.end',
+                                          'events.event_date',
+                                          'events.location',
+                                          'groups.name as groupname'
+                                        )->paginate(env('PAGINATE'));
+
+      return view('reporting.time-volunteered', [
+        'user' => $user,
+        'user_events' => $user_events,
+        'all_groups' => $all_groups,
+        'all_group_tags' => $all_group_tags,
+        'group' => null,
+        'selected_tags' => $request->input('tags'),
+        'name' => null,
+        'age' => null,
+        'gender' => null,
+        'from_date' => null,
+        'to_date' => null,
+        'country' => null,
+        'region' => null,
+        'misc' => null,
+        'total_users' => $total_users,
+        'anonymous_users' => $anonymous_users,
+        'group_count' => $group_count,
+        'hours_completed' => $hours_completed,
+        'country_hours_completed' => $country_hours_completed,
+        'city_hours_completed' => $city_hours_completed,
+      ]);
+
+    } else {
+      //Misc
+        //Anonymous
+        if ($request->input('misc') !== null && $request->input('misc') == 1) {
+          $user_events = EventsUsers::leftJoin('users', 'events_users.user', 'users.id')
+                                 ->join('events', 'events_users.event', 'events.idevents')
+                                    ->join('groups', 'events.group', 'groups.idgroups')
+                                        ->orderBy('users.id', 'ASC');
+        } else {
+          $user_events = EventsUsers::join('users', 'events_users.user', 'users.id')
+                                 ->join('events', 'events_users.event', 'events.idevents')
+                                    ->join('groups', 'events.group', 'groups.idgroups')
+                                      ->whereNotNull('events_users.user')
+                                        ->orderBy('users.id', 'ASC');
+        }
+
+      if (FixometerHelper::hasRole($user, 'Host')) {
+        $user_events = $user_events->whereIn('groups.idgroups', $host_groups);
+      } elseif (FixometerHelper::hasRole($user, 'Restarter')) {
+        $user_events = $user_events->where('users.id', $user->id);
+      }
+
+      //Taxonomy
+        //Group filter
+        if ($request->input('group') !== null) {
+          $user_events = $user_events->where('groups.idgroups', $request->input('group'));
+        }
+
+        //Group tags filter
+        if ($request->input('tags') !== null) {
+          $user_events = $user_events->whereIn('groups.idgroups', GrouptagsGroups::whereIn('group_tag', $request->input('tags'))->pluck('group'));
+        }
+
+      //By users
+        //Name
+        if ($request->input('name') !== null) {
+          $user_events = $user_events->where('users.name', 'like', '%'.$request->input('name').'%');
+        }
+
+        //Birth year
+        if ($request->input('year') !== null) {
+          $user_events = $user_events->where('users.age', $request->input('year'));
+        }
+
+        //Gender
+        if ($request->input('gender') !== null) {
+          $user_events = $user_events->where('users.gender', 'like', '%'.$request->input('gender').'%');
+        }
+
+      //By date
+        if ($request->input('from-date') !== null && $request->input('to-date') == null) {
+            $user_events = $user_events->where('events.event_date', '>', strtotime($request->input('from-date')));
+        } elseif ($request->input('to-date') !== null && $request->input('from-date') == null) {
+            $user_events = $user_events->where('events.event_date', '<', strtotime($request->input('to-date')));
+        } elseif ($request->input('to-date') !== null && $request->input('from-date') !== null) {
+            $user_events = $user_events->whereBetween('events.event_date', array(strtotime($request->input('from-date')),
+                                                                    strtotime($request->input('to-date'))));
+        }
+
+      //By location
+        //Country
+        if ($request->input('country') !== null) {
+          $user_events = $user_events->where('country', $request->input('country'));
+        }
+
+        //Region
+          //Need to add this in later is disabled at the moment
+
+      //total users
+        $total_users = clone $user_events;
+        $total_users = $total_users->distinct('id')->count('id');
+
+      //anonymous users
+        $anonymous_users = clone $user_events;
+        $anonymous_users = $anonymous_users->whereNull('id')->count('id');
+
+      //group count
+        $group_count = clone $user_events;
+        $group_count = $group_count->distinct('group')->count('group');
+
+      //average age
+        $average_age = clone $user_events;
+        $average_age = $average_age->distinct('id')->avg('users.age');
+
+      //hours completed
+        $hours_completed = clone $user_events;
+        $hours_completed = $hours_completed->sum(DB::raw('TIMEDIFF(end, start)'))/60/60;
+
+      //country hours completed
+        $country_hours_completed = clone $user_events;
+        $country_hours_completed = $country_hours_completed->groupBy('country')->select('country', DB::raw('TIMEDIFF(end, start)/60/60 as hours'));
+        $country_hours_completed = $country_hours_completed->orderBy('hours')->get();
+
+      //city hours completed
+        $city_hours_completed = clone $user_events;
+        $city_hours_completed = $city_hours_completed->groupBy('events.location')->select('events.location', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
+        $city_hours_completed = $city_hours_completed->orderBy('hours')->take(5)->get();
+
+      //Select all necessary information for table
+      $user_events = $user_events->select(
+                                          'users.id',
+                                          'users.name as username',
+                                          'events.start',
+                                          'events.end',
+                                          'events.event_date',
+                                          'events.location',
+                                          'groups.name as groupname'
+                                        )->paginate(env('PAGINATE'));
+
+      return view('reporting.time-volunteered', [
+        'user' => $user,
+        'user_events' => $user_events,
+        'all_groups' => $all_groups,
+        'all_group_tags' => $all_group_tags,
+        'group' => $request->input('group'),
+        'selected_tags' => $request->input('tags'),
+        'name' => $request->input('name'),
+        'age' => $request->input('year'),
+        'gender' => $request->input('gender'),
+        'from_date' => $request->input('from-date'),
+        'to_date' => $request->input('to-date'),
+        'country' => $request->input('country'),
+        'region' => null,
+        'misc' => $request->input('misc'),
+        'total_users' => $total_users,
+        'anonymous_users' => $anonymous_users,
+        'group_count' => $group_count,
+        'hours_completed' => $hours_completed,
+        'country_hours_completed' => $country_hours_completed,
+        'city_hours_completed' => $city_hours_completed,
+      ]);
+    }
+
   }
 
 }

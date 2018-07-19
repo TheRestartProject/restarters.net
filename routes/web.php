@@ -192,6 +192,8 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
   //Export Controller
   Route::get('/export/parties', 'ExportController@parties');
+  Route::get('/reporting/time-volunteered', 'ExportController@getTimeVolunteered');
+  Route::get('/reporting/time-volunteered/{search}', 'ExportController@getTimeVolunteered');
 
 });
 
