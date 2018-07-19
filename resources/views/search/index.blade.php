@@ -23,7 +23,7 @@
               <?php
                 $exportUrl = $_GET;
                 unset($exportUrl['url']);
-                $exportUrl = http_build_query($exportUrl);
+                $exportUrl = urldecode(http_build_query($exportUrl));
               ?>
 
               <a class="btn btn-primary" href="/export/parties/?<?php echo $exportUrl; ?>">@lang('events.download-results')</a>

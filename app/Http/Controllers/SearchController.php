@@ -103,7 +103,6 @@ class SearchController extends Controller {
         $fromTimeStamp = null;
         $group_tags = null;
 
-
         /** collect params **/
         if(isset($_GET['groups'])){
           $searched_groups = filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT);

@@ -129,12 +129,12 @@ class ExportController extends Controller {
         $searched_parties = null;
         $toTimeStamp = null;
         $fromTimeStamp = null;
+        $group_tags = null;
 
         /** collect params **/
         if(isset($_GET['groups'])){
           $searched_groups = filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT);
         }
-
         if(isset($_GET['parties'])){
           $searched_parties = filter_var_array($_GET['parties'], FILTER_SANITIZE_NUMBER_INT);
         }
@@ -159,8 +159,12 @@ class ExportController extends Controller {
             $toTimeStamp = strtotime($toDate->format('Y-m-d'));
           }
         }
+        
+        if( isset($_GET['group_tags']) && is_array($_GET['group_tags']) ){
+          $group_tags = $_GET['group_tags'];
+        }
 
-        $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp);
+        $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags);
         $PartyArray = array();
         $need_attention = 0;
         $participants = 0;
