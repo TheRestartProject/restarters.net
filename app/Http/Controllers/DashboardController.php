@@ -119,18 +119,20 @@ class DashboardController extends Controller
       if (!is_null($user->latitude) && !is_null($user->longitude) ) { //Should the user have location info
 
         $upcoming_events = Party::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
-            ->having("distance", "<=", 150)
+            ->having("distance", "<=", 40)
               ->whereDate('event_date', '>', date('Y-m-d'))
-                ->orderBy('distance', 'ASC')
-                  ->take(3)
-                    ->get();
+                ->orderBy('event_date', 'ASC')
+                  ->orderBy('distance', 'ASC')
+                    ->take(3)
+                      ->get();
 
       } else { //Else show them the latest three
 
         $upcoming_events = Party::whereDate('event_date', '>=', date('Y-m-d'))
                                   ->select('events.*')
-                                    ->take(3)
-                                      ->get();
+                                    ->orderBy('event_date', 'ASC')
+                                      ->take(3)
+                                        ->get();
 
       }
 
