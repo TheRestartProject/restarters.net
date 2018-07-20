@@ -120,7 +120,7 @@ class DashboardController extends Controller
 
         $upcoming_events = Party::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
             ->having("distance", "<=", 40)
-              ->whereDate('event_date', '>', date('Y-m-d'))
+              ->whereDate('event_date', '>=', date('Y-m-d'))
                 ->orderBy('event_date', 'ASC')
                   ->orderBy('distance', 'ASC')
                     ->take(3)
