@@ -534,7 +534,9 @@ class Party extends Model
           'ewaste'              => number_format(round($ewaste), 0, '.' , ','),
           'fixed_devices'       => $fixed_devices,
           'repairable_devices'  => $repairable_devices,
-          'dead_devices'        => $dead_devices
+          'dead_devices'        => $dead_devices,
+          'participants'        => $this->pax,
+          'volunteers'          => $this->volunteers
         ];
 
       }

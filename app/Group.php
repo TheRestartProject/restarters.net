@@ -166,4 +166,44 @@ class Group extends Model
         return rtrim($this->location . ', ' . $this->area, ', ');
     }
 
+    public function getGroupStats($emissionRatio)
+    {
+      $Party = new Party;
+      $Device = new Device;
+
+      $allparties = $Party->ofThisGroup($this->idgroups, true, true);
+
+      $participants = 0;
+      $hours_volunteered = 0;
+      $co2 = 0;
+      $waste = 0;
+
+      foreach($allparties as $i => $party)
+      {
+          $partyco2 = 0;
+          $participants += $party->pax;
+          $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
+
+          foreach($party->devices as $device){
+              if($device->repair_status == env('DEVICE_FIXED')){
+                  $partyco2 +=     (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $emissionRatio) : $device->footprint);
+                  $waste +=   (!empty($device->estimate) && $device->category == 46 ? intval($device->estimate) : $device->weight);
+              }
+
+          }
+          $partyco2 =  intval(number_format(round($partyco2 * $Device->displacement), 0, '.' , ','));
+          $co2 += $partyco2;
+      }
+
+      $waste = number_format(round($waste), 0, '.', ',');
+
+      return [
+          'pax' => $participants,
+          'hours' => $hours_volunteered,
+          'parties' => count($allparties),
+          'co2' => $co2,
+          'waste' => $waste,
+      ];
+    }
+
 }

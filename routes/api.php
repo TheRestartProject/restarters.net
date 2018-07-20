@@ -21,3 +21,11 @@ use Illuminate\Http\Request;
 Route::get('/homepage_data', function() {
   return App\Http\Controllers\ApiController::homepage_data();
 });
+
+Route::get('/party/{id}/stats', function($id) {
+    return App\Http\Controllers\ApiController::partyStats($id);
+});
+
+Route::get('/group/{id}/stats', function($id) {
+    return App\Http\Controllers\ApiController::groupStats($id);
+});
