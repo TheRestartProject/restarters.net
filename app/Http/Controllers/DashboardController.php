@@ -9,6 +9,8 @@ use App\UserGroups;
 use App\UsersSkills;
 use App\EventsUsers;
 use App\Helpers\FixometerHelper;
+use App\Helpers\CachingRssRetriever;
+use App\Helpers\CachingWikiPageRetriever;
 use App\Device;
 
 use Auth;
@@ -132,8 +134,11 @@ class DashboardController extends Controller
 
       }
 
-      $news_feed = FixometerHelper::getRSSFeed(3);
-      $wiki_pages = FixometerHelper::getRandomWikiPages();
+      $rssRetriever = new CachingRssRetriever('https://therestartproject.org/feed');
+      $news_feed = $rssRetriever->getRSSFeed(3);
+
+      $wikiPagesRetriever = new CachingWikiPageRetriever(env('WIKI_URL') . '/api.php');
+      $wiki_pages = $wikiPagesRetriever->getRandomWikiPages(5);
 
       //Show onboarding modals on first login
       if ($user->number_of_logins == 1) {
