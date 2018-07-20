@@ -25,7 +25,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                          @foreach($country_hours_completed as $country_hours)
+                          @foreach($all_country_hours_completed as $country_hours)
                             <tr>
                               @if(!is_null($country_hours->country))
                                 <td>{{ $country_hours->country }}</td>

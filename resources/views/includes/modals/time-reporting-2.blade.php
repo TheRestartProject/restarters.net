@@ -26,7 +26,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                          @foreach($city_hours_completed as $city_hours)
+                          @foreach($all_city_hours_completed as $city_hours)
                             <tr>
                               @if(!is_null($city_hours->location))
                                 <td>{{ $city_hours->location }}</td>

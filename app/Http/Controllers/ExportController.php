@@ -303,8 +303,7 @@ class ExportController extends Controller {
       $user_events = EventsUsers::join('users', 'events_users.user', 'users.id')
                              ->join('events', 'events_users.event', 'events.idevents')
                                 ->join('groups', 'events.group', 'groups.idgroups')
-                                  ->whereNotNull('events_users.user')
-                                    ->orderBy('users.id', 'ASC');
+                                  ->whereNotNull('events_users.user');
 
       if (FixometerHelper::hasRole($user, 'Host')) {
         $user_events = $user_events->whereIn('groups.idgroups', $host_groups);
@@ -337,12 +336,17 @@ class ExportController extends Controller {
       //country hours completed
         $country_hours_completed = clone $user_events;
         $country_hours_completed = $country_hours_completed->groupBy('country')->select('country', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
-        $country_hours_completed = $country_hours_completed->orderBy('hours')->take(5)->get();
+        $all_country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->get();
+        $country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
 
       //city hours completed
         $city_hours_completed = clone $user_events;
         $city_hours_completed = $city_hours_completed->groupBy('events.location')->select('events.location', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
-        $city_hours_completed = $city_hours_completed->orderBy('hours')->take(5)->get();
+        $all_city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->get();
+        $city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
+
+      //order by users id
+      $user_events = $user_events->orderBy('users.id', 'ASC');
 
       //Select all necessary information for table
       $user_events = $user_events->select(
@@ -366,14 +370,12 @@ class ExportController extends Controller {
         if ($request->input('misc') !== null && $request->input('misc') == 1) {
           $user_events = EventsUsers::leftJoin('users', 'events_users.user', 'users.id')
                                  ->join('events', 'events_users.event', 'events.idevents')
-                                    ->join('groups', 'events.group', 'groups.idgroups')
-                                        ->orderBy('users.id', 'ASC');
+                                    ->join('groups', 'events.group', 'groups.idgroups');
         } else {
           $user_events = EventsUsers::join('users', 'events_users.user', 'users.id')
                                  ->join('events', 'events_users.event', 'events.idevents')
                                     ->join('groups', 'events.group', 'groups.idgroups')
-                                      ->whereNotNull('events_users.user')
-                                        ->orderBy('users.id', 'ASC');
+                                      ->whereNotNull('events_users.user');
         }
 
       if (FixometerHelper::hasRole($user, 'Host')) {
@@ -451,12 +453,17 @@ class ExportController extends Controller {
       //country hours completed
         $country_hours_completed = clone $user_events;
         $country_hours_completed = $country_hours_completed->groupBy('country')->select('country', DB::raw('TIMEDIFF(end, start)/60/60 as hours'));
-        $country_hours_completed = $country_hours_completed->orderBy('hours')->get();
+        $all_country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->get();
+        $country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
 
       //city hours completed
         $city_hours_completed = clone $user_events;
         $city_hours_completed = $city_hours_completed->groupBy('events.location')->select('events.location', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
-        $city_hours_completed = $city_hours_completed->orderBy('hours')->take(5)->get();
+        $all_city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->get();
+        $city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
+
+      //order by users id
+      $user_events = $user_events->orderBy('users.id', 'ASC');
 
       //Select all necessary information for table
       $user_events = $user_events->select(
@@ -496,7 +503,9 @@ class ExportController extends Controller {
         'group_count' => $group_count,
         'hours_completed' => $hours_completed,
         'country_hours_completed' => $country_hours_completed,
+        'all_country_hours_completed' => $all_country_hours_completed,
         'city_hours_completed' => $city_hours_completed,
+        'all_city_hours_completed' => $all_city_hours_completed,
       ]);
     } else {
       return array(

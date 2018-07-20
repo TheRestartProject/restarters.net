@@ -307,7 +307,7 @@
   </div>
 </section>
 
-@include('includes.modals.time-reporting-1', ['country_hours_completed' => $country_hours_completed])
-@include('includes.modals.time-reporting-2', ['city_hours_completed' => $city_hours_completed])
+@include('includes.modals.time-reporting-1', ['all_country_hours_completed' => $all_country_hours_completed])
+@include('includes.modals.time-reporting-2', ['all_city_hours_completed' => $all_city_hours_completed])
 
 @endsection
