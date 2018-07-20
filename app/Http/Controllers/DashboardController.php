@@ -122,9 +122,10 @@ class DashboardController extends Controller
             ->having("distance", "<=", 40)
               ->whereDate('event_date', '>=', date('Y-m-d'))
                 ->orderBy('event_date', 'ASC')
-                  ->orderBy('distance', 'ASC')
-                    ->take(3)
-                      ->get();
+                  ->orderBy('start', 'ASC')
+                    ->orderBy('distance', 'ASC')
+                      ->take(3)
+                        ->get();
 
       } else { //Else show them the latest three
 
