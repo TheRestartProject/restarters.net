@@ -311,59 +311,6 @@ class ExportController extends Controller {
         $user_events = $user_events->where('users.id', $user->id);
       }
 
-      //total users
-        $total_users = clone $user_events;
-        $total_users = $total_users->distinct('id')->count('id');
-
-      //anonymous users
-        $anonymous_users = clone $user_events;
-        $anonymous_users = $anonymous_users->whereNull('id')->count('id');
-
-      //group count
-        $group_count = clone $user_events;
-        $group_count = $group_count->distinct('group')->count('group');
-
-      //average age
-        $average_age = clone $user_events;
-        $average_age = $average_age->distinct('id')->whereNotNull('age')->avg('age');
-
-      // dd($average_age);
-
-      //hours completed
-        $hours_completed = clone $user_events;
-        $hours_completed = $hours_completed->sum(DB::raw('TIMEDIFF(end, start)'))/60/60;
-
-      //country hours completed
-        $country_hours_completed = clone $user_events;
-        $country_hours_completed = $country_hours_completed->groupBy('country')->select('country', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
-        $all_country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->get();
-        $country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
-
-      //city hours completed
-        $city_hours_completed = clone $user_events;
-        $city_hours_completed = $city_hours_completed->groupBy('events.location')->select('events.location', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
-        $all_city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->get();
-        $city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
-
-      //order by users id
-      $user_events = $user_events->orderBy('users.id', 'ASC');
-
-      //Select all necessary information for table
-      $user_events = $user_events->select(
-                                          'users.id',
-                                          'users.name as username',
-                                          'events.start',
-                                          'events.end',
-                                          'events.event_date',
-                                          'events.location',
-                                          'groups.name as groupname'
-                                        );
-
-      if (!$export) {
-        $user_events = $user_events->paginate(env('PAGINATE'));
-      } else {
-        $user_events = $user_events->get();
-      }
     } else {
       //Misc
         //Anonymous
@@ -429,57 +376,73 @@ class ExportController extends Controller {
 
         //Region
           //Need to add this in later is disabled at the moment
+    }
 
-      //total users
-        $total_users = clone $user_events;
-        $total_users = $total_users->distinct('id')->count('id');
+    //total users
+      $total_users = clone $user_events;
+      $total_users = $total_users->distinct('id')->count('id');
 
-      //anonymous users
-        $anonymous_users = clone $user_events;
-        $anonymous_users = $anonymous_users->whereNull('id')->count('id');
+    //anonymous users
+      $anonymous_users = clone $user_events;
+      $anonymous_users = $anonymous_users->whereNull('id')->count('id');
 
-      //group count
-        $group_count = clone $user_events;
-        $group_count = $group_count->distinct('group')->count('group');
+    //group count
+      $group_count = clone $user_events;
+      $group_count = $group_count->distinct('group')->count('group');
 
-      //average age
-        $average_age = clone $user_events;
-        $average_age = $average_age->distinct('id')->avg('users.age');
+    //average age
+      $average_age = clone $user_events;
+      $average_age = $average_age->distinct('id')->pluck('users.age')->toArray();
 
-      //hours completed
-        $hours_completed = clone $user_events;
-        $hours_completed = $hours_completed->sum(DB::raw('TIMEDIFF(end, start)'))/60/60;
-
-      //country hours completed
-        $country_hours_completed = clone $user_events;
-        $country_hours_completed = $country_hours_completed->groupBy('country')->select('country', DB::raw('TIMEDIFF(end, start)/60/60 as hours'));
-        $all_country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->get();
-        $country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
-
-      //city hours completed
-        $city_hours_completed = clone $user_events;
-        $city_hours_completed = $city_hours_completed->groupBy('events.location')->select('events.location', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
-        $all_city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->get();
-        $city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
-
-      //order by users id
-      $user_events = $user_events->orderBy('users.id', 'ASC');
-
-      //Select all necessary information for table
-      $user_events = $user_events->select(
-                                          'users.id',
-                                          'users.name as username',
-                                          'events.start',
-                                          'events.end',
-                                          'events.event_date',
-                                          'events.location',
-                                          'groups.name as groupname'
-                                        );
-      if (!$export) {
-        $user_events = $user_events->paginate(env('PAGINATE'));
-      } else {
-        $user_events = $user_events->get();
+      foreach ($average_age as $key => $value) {
+          if (!is_int(intval($value)) || intval($value) <= 0) {
+              unset($average_age[$key]);
+          } else {
+            $average_age[$key] = intval($value);
+          }
       }
+
+      if (!empty($average_age)) {
+        $average_age = array_sum($average_age)/count($average_age);
+        $average_age = intval(date('Y')) - $average_age;
+      } else {
+        $average_age = 0;
+      }
+
+    //hours completed
+      $hours_completed = clone $user_events;
+      $hours_completed = $hours_completed->sum(DB::raw('TIMEDIFF(end, start)'))/60/60;
+
+    //country hours completed
+      $country_hours_completed = clone $user_events;
+      $country_hours_completed = $country_hours_completed->groupBy('country')->select('country', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
+      $all_country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->get();
+      $country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
+
+    //city hours completed
+      $city_hours_completed = clone $user_events;
+      $city_hours_completed = $city_hours_completed->groupBy('events.location')->select('events.location', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
+      $all_city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->get();
+      $city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
+
+    //order by users id
+    $user_events = $user_events->orderBy('users.id', 'ASC');
+
+    //Select all necessary information for table
+    $user_events = $user_events->select(
+                                        'users.id',
+                                        'users.name as username',
+                                        'events.start',
+                                        'events.end',
+                                        'events.event_date',
+                                        'events.location',
+                                        'groups.name as groupname'
+                                      );
+
+    if (!$export) {
+      $user_events = $user_events->paginate(env('PAGINATE'));
+    } else {
+      $user_events = $user_events->get();
     }
 
     if (!$export) {
@@ -502,6 +465,7 @@ class ExportController extends Controller {
         'anonymous_users' => $anonymous_users,
         'group_count' => $group_count,
         'hours_completed' => $hours_completed,
+        'average_age' => $average_age,
         'country_hours_completed' => $country_hours_completed,
         'all_country_hours_completed' => $all_country_hours_completed,
         'city_hours_completed' => $city_hours_completed,
@@ -517,6 +481,7 @@ class ExportController extends Controller {
         'anonymous_users' => $anonymous_users,
         'group_count' => $group_count,
         'hours_completed' => $hours_completed,
+        'average_age' => $average_age,
         'country_hours_completed' => $country_hours_completed,
         'city_hours_completed' => $city_hours_completed,
       );
@@ -542,7 +507,7 @@ class ExportController extends Controller {
     $stats_headers = array('Hours Volunteered', 'Average age', 'Number of groups', 'Total number of users', 'Number of anonymous users');
     fputcsv($file, array('Overall Stats:'));
     fputcsv($file, $stats_headers);
-    fputcsv($file, array(number_format($data['hours_completed'], 0, '.', ','), 'N/A', $data['group_count'], $data['total_users'], $data['anonymous_users']));
+    fputcsv($file, array(number_format($data['hours_completed'], 0, '.', ','), $data['average_age'], $data['group_count'], $data['total_users'], $data['anonymous_users']));
     fputcsv($file, array());
 
     //Put breakdown by country in csv

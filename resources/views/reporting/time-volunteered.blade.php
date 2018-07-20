@@ -174,7 +174,7 @@
                 <li>
                     <div>
                     <h3>@lang('reporting.average_age')</h3>
-                    36
+                    {{ $average_age }}
                     </div>
                 </li>
                 <li>

@@ -19,6 +19,7 @@ use App\Notifications\JoinEvent;
 use App\Notifications\JoinGroup;
 use App\Notifications\RSVPEvent;
 use App\Notifications\ModerationEvent;
+use App\Notifications\EventDevices;
 use DateTime;
 use FixometerFile;
 use FixometerHelper;
@@ -271,7 +272,7 @@ class PartyController extends Controller {
                     //Send Emails to Admins notifying event creation
                     $arr = [
                       'event_venue' => Party::find($idParty)->venue,
-                      'event_url' => url('/event/view/'.$idParty),
+                      'event_url' => url('/party/view/'.$idParty),
                     ];
 
                     Notification::send($all_admins, new ModerationEvent($arr));
@@ -1369,7 +1370,7 @@ class PartyController extends Controller {
         $arr = [
           'user_name' => $user->name,
           'event_venue' => Party::find($event_id)->venue,
-          'event_url' => url('/event/view/'.$event_id),
+          'event_url' => url('/party/view/'.$event_id),
           'preferences' => url('/profile/edit/'.$host->id),
         ];
 
@@ -1479,6 +1480,38 @@ class PartyController extends Controller {
       }
 
       return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
+
+  }
+
+  public function emailHosts() {
+
+    if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
+
+      //Get all events and hosts
+      $event_users = EventsUsers::where('role', 3);
+      $event_ids = $event_users->pluck('event')->toArray();
+      $all_events = Party::whereIn('idevents', $event_ids)
+                            ->where('event_date', '=', date('Y-m-d', strtotime("-1 day")))
+                              ->get();
+
+      foreach($all_events as $event) {
+        $host_ids = $event_users->where('event', $event->idevents)->pluck('user')->toArray();
+
+        if (!empty($host_ids)) {
+          $hosts = User::whereIn('id', $host_ids)->get();
+
+          //Send Emails to Admins notifying event creation
+          $arr = [
+            'event_venue' => $event->venue,
+            'event_url' => url('/party/view/'.$event->idevents),
+            'preferences' => url('/profile/edit'),
+          ];
+
+          Notification::send($hosts, new EventDevices($arr));
+        }
+      }
+
+    }
 
   }
 
