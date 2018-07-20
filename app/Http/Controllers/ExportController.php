@@ -281,7 +281,7 @@ class ExportController extends Controller {
     ]);
   }
 
-  public function getTimeVolunteered($search = null, Request $request) {
+  public function getTimeVolunteered($search = null, $export = false, Request $request) {
 
     $user = Auth::user();
 
@@ -353,31 +353,13 @@ class ExportController extends Controller {
                                           'events.event_date',
                                           'events.location',
                                           'groups.name as groupname'
-                                        )->paginate(env('PAGINATE'));
+                                        );
 
-      return view('reporting.time-volunteered', [
-        'user' => $user,
-        'user_events' => $user_events,
-        'all_groups' => $all_groups,
-        'all_group_tags' => $all_group_tags,
-        'group' => null,
-        'selected_tags' => $request->input('tags'),
-        'name' => null,
-        'age' => null,
-        'gender' => null,
-        'from_date' => null,
-        'to_date' => null,
-        'country' => null,
-        'region' => null,
-        'misc' => null,
-        'total_users' => $total_users,
-        'anonymous_users' => $anonymous_users,
-        'group_count' => $group_count,
-        'hours_completed' => $hours_completed,
-        'country_hours_completed' => $country_hours_completed,
-        'city_hours_completed' => $city_hours_completed,
-      ]);
-
+      if (!$export) {
+        $user_events = $user_events->paginate(env('PAGINATE'));
+      } else {
+        $user_events = $user_events->get();
+      }
     } else {
       //Misc
         //Anonymous
@@ -485,8 +467,15 @@ class ExportController extends Controller {
                                           'events.event_date',
                                           'events.location',
                                           'groups.name as groupname'
-                                        )->paginate(env('PAGINATE'));
+                                        );
+      if (!$export) {
+        $user_events = $user_events->paginate(env('PAGINATE'));
+      } else {
+        $user_events = $user_events->get();
+      }
+    }
 
+    if (!$export) {
       return view('reporting.time-volunteered', [
         'user' => $user,
         'user_events' => $user_events,
@@ -509,7 +498,86 @@ class ExportController extends Controller {
         'country_hours_completed' => $country_hours_completed,
         'city_hours_completed' => $city_hours_completed,
       ]);
+    } else {
+      return array(
+        'user' => $user,
+        'user_events' => $user_events,
+        'all_groups' => $all_groups,
+        'all_group_tags' => $all_group_tags,
+        'total_users' => $total_users,
+        'anonymous_users' => $anonymous_users,
+        'group_count' => $group_count,
+        'hours_completed' => $hours_completed,
+        'country_hours_completed' => $country_hours_completed,
+        'city_hours_completed' => $city_hours_completed,
+      );
     }
+
+  }
+
+  public function exportTimeVolunteered(Request $request) {
+    if (!empty($request->all())) {
+      $data = $this->getTimeVolunteered(true, true, $request);
+    } else {
+      $data = $this->getTimeVolunteered(null, true, $request);
+    }
+
+    //Creat new file and set headers
+    $file_name = 'time_reporting.csv';
+    $file = fopen($file_name, 'w+');
+    $file_headers = array(
+        "Content-type" => "text/csv",
+    );
+
+    //Put stats in csv
+    $stats_headers = array('Hours Volunteered', 'Average age', 'Number of groups', 'Total number of users', 'Number of anonymous users');
+    fputcsv($file, array('Overall Stats:'));
+    fputcsv($file, $stats_headers);
+    fputcsv($file, array(number_format($data['hours_completed'], 0, '.', ','), 'N/A', $data['group_count'], $data['total_users'], $data['anonymous_users']));
+    fputcsv($file, array());
+
+    //Put breakdown by country in csv
+    $country_headers = array('Country name', 'Total hours');
+    fputcsv($file, array('Breakdown by country:'));
+    fputcsv($file, $country_headers);
+    foreach($data['country_hours_completed'] as $country_hours) {
+        if(!is_null($country_hours->country)) {
+          $country = $country_hours->country;
+        } else {
+          $country = 'N/A';
+        }
+        fputcsv($file, array($country, number_format($country_hours->hours/60/60, 0, '.', ',')));
+    }
+    fputcsv($file, array());
+
+    //Put breakdown by city in csv
+    $city_headers = array('Town/city name', 'Total hours');
+    fputcsv($file, array('Breakdown by city:'));
+    fputcsv($file, $city_headers);
+    foreach($data['city_hours_completed'] as $city_hours) {
+        if(!is_null($city_hours->location)) {
+          $city = $city_hours->location;
+        } else {
+          $city = 'N/A';
+        }
+        fputcsv($file, array($city, number_format($city_hours->hours/60/60, 0, '.', ',')));
+    }
+    fputcsv($file, array());
+
+    //Put users in csv
+    $users_headers = array('#', 'Hours', 'Event date', 'Restart group', 'Location');
+    fputcsv($file, array('Results:'));
+    fputcsv($file, $users_headers);
+    foreach($data['user_events'] as $ue) {
+          fputcsv($file, array($ue->id, date('H:i', strtotime($ue->end) - strtotime($ue->start)),
+                  date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location));
+    }
+    fputcsv($file, array());
+
+    //close file
+    fclose($file);
+
+    return Response::download($file_name, $file_name, $file_headers);
 
   }
 

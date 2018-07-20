@@ -26,26 +26,16 @@
                             </tr>
                         </thead>
                         <tbody>
+                          @foreach($city_hours_completed as $city_hours)
                             <tr>
-                                <td>London</td>
-                                <td>704</td>
+                              @if(!is_null($city_hours->location))
+                                <td>{{ $city_hours->location }}</td>
+                              @else
+                                <td>N/A</td>
+                              @endif
+                              <td>{{ number_format($city_hours->hours/60/60, 0, '.', ',') }}</td>
                             </tr>
-                            <tr>
-                                <td>Manchester</td>
-                                <td>250</td>
-                            </tr>
-                            <tr>
-                                <td>Edinburgh</td>
-                                <td>233</td>
-                            </tr>
-                            <tr>
-                                <td>Paris</td>
-                                <td>216</td>
-                            </tr>
-                            <tr>
-                                <td>Stockholm</td>
-                                <td>189</td>
-                            </tr>
+                          @endforeach
                         </tbody>
                     </table>
 

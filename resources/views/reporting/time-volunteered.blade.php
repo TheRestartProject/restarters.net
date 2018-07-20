@@ -16,7 +16,7 @@
             </nav>
 
           <div class="btn-group">
-            <a class="btn btn-primary" href="#">@lang('reporting.export_csv')</a>
+            <a class="btn btn-primary" href="/export/time-volunteered?{{ $_SERVER['QUERY_STRING'] }}">@lang('reporting.export_csv')</a>
           </div>
 
         </div>
@@ -201,7 +201,7 @@
 
                 <div class="col-lg-6">
 
-                    <h2 id="country-breakdown">@lang('reporting.breakdown_by_country') <sup>(<a role="button" data-toggle="modal" data-target="#time-reporting-modal-1" href="#time-reporting-modal-2">@lang('reporting.see_all_results')</a>)</sup></h2>
+                    <h2 id="country-breakdown">@lang('reporting.breakdown_by_country') <sup>(<a role="button" data-toggle="modal" data-target="#time-reporting-modal-1" href="#time-reporting-modal-1">@lang('reporting.see_all_results')</a>)</sup></h2>
 
                     <table class="table table-striped" role="table">
                         <thead>
@@ -307,7 +307,7 @@
   </div>
 </section>
 
-@include('includes.modals.time-reporting-1')
-@include('includes.modals.time-reporting-2')
+@include('includes.modals.time-reporting-1', ['country_hours_completed' => $country_hours_completed])
+@include('includes.modals.time-reporting-2', ['city_hours_completed' => $city_hours_completed])
 
 @endsection

@@ -25,26 +25,16 @@
                             </tr>
                         </thead>
                         <tbody>
+                          @foreach($country_hours_completed as $country_hours)
                             <tr>
-                                <td>United Kingdom</td>
-                                <td>2,388</td>
+                              @if(!is_null($country_hours->country))
+                                <td>{{ $country_hours->country }}</td>
+                              @else
+                                <td>N/A</td>
+                              @endif
+                              <td>{{ number_format($country_hours->hours/60/60, 0, '.', ',') }}</td>
                             </tr>
-                            <tr>
-                                <td>France</td>
-                                <td>942</td>
-                            </tr>
-                            <tr>
-                                <td>Sweden</td>
-                                <td>300</td>
-                            </tr>
-                            <tr>
-                                <td>United States of America</td>
-                                <td>124</td>
-                            </tr>
-                            <tr>
-                                <td>Germany</td>
-                                <td>78</td>
-                            </tr>
+                          @endforeach
                         </tbody>
                     </table>
         </div>
