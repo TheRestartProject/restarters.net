@@ -11,6 +11,8 @@ use App\User;
 use Auth;
 use FixometerHelper;
 
+use DateTime;
+
 class SearchController extends Controller {
 
   public $TotalWeight;
@@ -113,22 +115,22 @@ class SearchController extends Controller {
         }
 
         if(isset($_GET['from-date']) && !empty($_GET['from-date'])){
-          if (!DateTime::createFromFormat('d/m/Y', $_GET['from-date'])) {
+          if (!DateTime::createFromFormat('Y-m-d', $_GET['from-date'])) {
             $response['danger'] = 'Invalid "from date"';
             $fromTimeStamp = null;
           }
           else {
-            $fromDate = DateTime::createFromFormat('d/m/Y', $_GET['from-date']);
+            $fromDate = DateTime::createFromFormat('Y-m-d', $_GET['from-date']);
             $fromTimeStamp = strtotime($fromDate->format('Y-m-d'));
           }
         }
 
         if(isset($_GET['to-date']) && !empty($_GET['to-date'])){
-          if (!DateTime::createFromFormat('d/m/Y', $_GET['to-date'])) {
+          if (!DateTime::createFromFormat('Y-m-d', $_GET['to-date'])) {
             $response['danger'] = 'Invalid "to date"';
           }
           else {
-            $toDate = DateTime::createFromFormat('d/m/Y', $_GET['to-date']);
+            $toDate = DateTime::createFromFormat('Y-m-d', $_GET['to-date']);
             $toTimeStamp = strtotime($toDate->format('Y-m-d'));
           }
         }
