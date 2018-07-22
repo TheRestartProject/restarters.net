@@ -266,6 +266,8 @@ class PartyController extends Controller {
                     'role' => 3,
                   ]);
 
+                  Party::find($idParty)->increment('volunteers');
+
                   if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
                     $all_admins = User::where('role', 2)->get();
 
