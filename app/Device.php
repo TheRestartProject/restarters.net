@@ -449,4 +449,43 @@ class Device extends Model
         return $this->hasOne('App\Category', 'idcategories', 'category');
     }
 
+
+    public function co2Diverted($emissionRatio, $displacementFactor)
+    {
+        $footprint = 0;
+
+        if ($this->isFixed()) {
+            if ($this->deviceCategory->isMisc()) {
+                if (is_numeric($this->estimate)) {
+                    $footprint = $this->estimate * $emissionRatio;
+                }
+            } else {
+                $footprint = (float) $this->deviceCategory->footprint;
+            }
+        }
+
+        return $footprint * $displacementFactor;
+    }
+
+    public function ewasteDiverted()
+    {
+        $ewasteDiverted = 0;
+
+        if ($this->isFixed()) {
+            if ($this->deviceCategory->isMisc()) {
+                if (is_numeric($this->estimate)) {
+                    $ewasteDiverted = $this->estimate;
+                }
+            } else {
+                $ewasteDiverted = (float) $this->deviceCategory->weight;
+            }
+        }
+
+        return $ewasteDiverted;
+    }
+
+    public function isFixed()
+    {
+        return $this->repair_status == env('DEVICE_FIXED');
+    }
 }

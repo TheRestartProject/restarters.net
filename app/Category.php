@@ -62,4 +62,8 @@ class Category extends Model
       }
     }
 
+    public function isMisc()
+    {
+        return $this->idcategories == env('MISC_CATEGORY_ID');
+    }
 }
