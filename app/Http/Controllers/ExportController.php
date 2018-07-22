@@ -20,6 +20,8 @@ use Auth;
 use Response;
 use Illuminate\Http\Request;
 
+use DateTime;
+
 class ExportController extends Controller {
 
     public $TotalWeight;
@@ -151,22 +153,22 @@ class ExportController extends Controller {
         }
 
         if(isset($_GET['from-date']) && !empty($_GET['from-date'])){
-          if (!DateTime::createFromFormat('d/m/Y', $_GET['from-date'])) {
+          if (!DateTime::createFromFormat('Y-m-d', $_GET['from-date'])) {
             $response['danger'] = 'Invalid "from date"';
             $fromTimeStamp = null;
           }
           else {
-            $fromDate = DateTime::createFromFormat('d/m/Y', $_GET['from-date']);
+            $fromDate = DateTime::createFromFormat('Y-m-d', $_GET['from-date']);
             $fromTimeStamp = strtotime($fromDate->format('Y-m-d'));
           }
         }
 
         if(isset($_GET['to-date']) && !empty($_GET['to-date'])){
-          if (!DateTime::createFromFormat('d/m/Y', $_GET['to-date'])) {
+          if (!DateTime::createFromFormat('Y-m-d', $_GET['to-date'])) {
             $response['danger'] = 'Invalid "to date"';
           }
           else {
-            $toDate = DateTime::createFromFormat('d/m/Y', $_GET['to-date']);
+            $toDate = DateTime::createFromFormat('Y-m-d', $_GET['to-date']);
             $toTimeStamp = strtotime($toDate->format('Y-m-d'));
           }
         }
@@ -207,11 +209,10 @@ class ExportController extends Controller {
 
                 switch($device->repair_status){
                     case 1:
-                        $party->co2 += (!empty($device->estimate) && $device->category == 46 ? ((float)($device->estimate) * $this->EmissionRatio) : $device->footprint);
+                        $party->co2 += (!empty($device->estimate) && $device->category == 46) ? (float) ($device->estimate) * $this->EmissionRatio : $device->footprint;
                         $party->fixed_devices++;
                         //$totalWeight += (!empty($device->estimate) && $device->category==46 ? $device->estimate : $device->weight);
-                        $party->weight += (!empty($device->estimate) && $device->category==46 ? (float)($device->estimate) : $device->weight);
-
+                        $party->weight += (!empty($device->estimate) && $device->category==46 ? (float) ($device->estimate) : $device->weight);
                         break;
                     case 2:
                         $party->repairable_devices++;
@@ -229,18 +230,20 @@ class ExportController extends Controller {
 
             $totalCO2 += $party->co2;
 
+            $partyName = !is_null($party->venue) ? $party->venue : $party->location;
+            $groupName = $party->name; // because of the way the join in the query works
             $PartyArray[$i] = array(
               strftime('%d/%m/%Y', $party->event_timestamp),
-              '"' . $party->venue . '"',
-              '"' . $party->name . '"',
-              '"' .($party->pax  > 0 ? $party->pax : "0"). '"',
-              '"' .($party->volunteers  > 0 ? $party->volunteers : "0"). '"',
-              '"' .($party->co2 > 0 ? round($party->co2,2) : "0"). '"',
-              '"' .($party->weight > 0 ? round($party->weight,2) : "0"). '"',
-              '"' .($party->fixed_devices > 0 ? $party->fixed_devices : "0"). '"',
-              '"' .($party->repairable_devices > 0 ? $party->repairable_devices : "0"). '"',
-              '"' .($party->dead_devices > 0 ? $party->dead_devices : "0"). '"',
-              '"' .($party->hours_volunteered > 0 ? $party->hours_volunteered : "0"). '"',
+              $partyName,
+              $groupName,
+              ($party->pax  > 0 ? $party->pax : 0),
+              ($party->volunteers  > 0 ? $party->volunteers : 0),
+              ($party->co2 > 0 ? round($party->co2,2) : 0),
+              ($party->weight > 0 ? round($party->weight,2) : 0),
+              ($party->fixed_devices > 0 ? $party->fixed_devices : 0),
+              ($party->repairable_devices > 0 ? $party->repairable_devices : 0),
+              ($party->dead_devices > 0 ? $party->dead_devices : 0),
+              ($party->hours_volunteered > 0 ? $party->hours_volunteered : 0),
             );
         }
 
@@ -255,7 +258,7 @@ class ExportController extends Controller {
         fputcsv($file, $columns);
 
         foreach($PartyArray as $d) {
-            $d = array_filter((array) $d, 'utf8_encode');
+            //$d = array_filter((array) $d, 'utf8_encode');
             fputcsv($file, $d);
         }
         fclose($file);
