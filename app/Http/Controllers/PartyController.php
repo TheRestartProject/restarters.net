@@ -269,6 +269,8 @@ class PartyController extends Controller {
                     'role' => 3,
                   ]);
 
+                  Party::find($idParty)->increment('volunteers');
+
                   if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
                     $all_admins = User::where('role', 2)->get();
 
@@ -1423,6 +1425,8 @@ class PartyController extends Controller {
       'role' => 4,
       'full_name' => $full_name,
     ]);
+
+    Party::find($event_id)->increment('volunteers');
 
     // Send email
     if( !is_null($volunteer_email_address) ){
