@@ -289,6 +289,10 @@ class Party extends Model
             $sql .= ' WHERE `e`.`group` = :id ';
         }
 
+        // TODO: BUG: this does not work if you are an Admin, as the
+        // where statement hasn't been built.  Could fix with a WHERE 1=1,
+        // but leaving for now as we might deprecate this method anyway, and
+        // not sure what effect it might have in various parts of the app.
         if($only_past == true){
             $sql .= ' AND TIMESTAMP(`e`.`event_date`, `e`.`start`) < NOW()';
         }

@@ -16,7 +16,7 @@ class ApiController extends Controller
         $Party = new Party;
         $Device = new Device;
 
-        $allparties = $Party->ofThisGroup('admin', true, true);
+        $allparties = Party::pastEvents()->get();
 
         $participants = 0;
         $hours_volunteered = 0;
@@ -24,11 +24,10 @@ class ApiController extends Controller
         foreach ($allparties as $i => $party) {
             $participants += $party->pax;
 
-            // TODO: extract hours volunteered calculation out.
-            $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
+            $hours_volunteered += $party->hoursVolunteered();
         }
 
-        $co2Total = $Device ->getWeights();
+        $co2Total = $Device->getWeights();
 
         $result['hours_volunteered'] = $hours_volunteered;
         $result['items_fixed'] = $Device->statusCount()[0]->counter;
