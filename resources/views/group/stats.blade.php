@@ -21,14 +21,14 @@
       <div class="col">
           <h5>waste prevented</h5>
           <span class="largetext">
-              <?php echo $waste; ?> kg
+              {{ number_format($waste, 0) }} kg
           </span>
       </div>
 
       <div class="col">
           <h5>CO<sub>2</sub> emission prevented</h5>
 
-          <span class="largetext"><?php echo $co2; ?> kg</span>
+          <span class="largetext">{{ number_format($co2, 0) }} kg</span>
       </div>
 
   </div>
