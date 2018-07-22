@@ -195,7 +195,7 @@
 
                 @foreach($PartyList as $party)
 
-                @php( $partyYear = date('Y', $party->eventStartTimestamp) )
+                @php( $partyYear = date('Y', $party->event_timestamp) )
 
 
 
