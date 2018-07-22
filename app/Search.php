@@ -14,7 +14,7 @@ class Search extends Model
 
       $sql = 'SELECT
                 *,
-                `e`.`location` AS `venue`,
+                `e`.`location` AS `location`,
                 UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
               FROM `events` AS `e`
 
