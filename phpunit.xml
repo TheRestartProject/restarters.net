@@ -29,5 +29,9 @@
         <env name="SESSION_DRIVER" value="array"/>
         <env name="QUEUE_DRIVER" value="sync"/>
         <env name="MAIL_DRIVER" value="array"/>
+        <env name="DB_CONNECTION" value="mysql_testing"/>
+        <env name="DB_TEST_DATABASE" value="restarters_db_test"/>
+        <env name="DB_TEST_USERNAME" value="tester"/>
+        <env name="DB_TEST_PASSWORD" value="tester"/>
     </php>
 </phpunit>
