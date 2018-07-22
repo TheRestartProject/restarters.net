@@ -38,8 +38,8 @@
       @php( $stats = $event->getEventStats($EmissionRatio) )
       <td class="cell-figure">{{ $event->pax }}</td>
       <td class="cell-figure">{{ $event->volunteers }}</td>
-      <td class="cell-figure">{{{ $stats['ewaste'] }}}<small>kg<small></td>
-      <td class="cell-figure">{{{ $stats['co2'] }}}<small>kg<small></td>
+      <td class="cell-figure">{{{ number_format(round($stats['ewaste']), 0) }}}<small>kg<small></td>
+      <td class="cell-figure">{{{ number_format(round($stats['co2']), 0) }}}<small>kg<small></td>
       <td class="cell-figure">{{{ $stats['fixed_devices'] }}}</td>
       <td class="cell-figure">{{{ $stats['repairable_devices'] }}}</td>
       <td class="cell-figure">{{{ $stats['dead_devices'] }}}</td>
