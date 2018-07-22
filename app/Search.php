@@ -9,7 +9,7 @@ use DB;
 class Search extends Model
 {
 
-  public function parties($list = array(), $groups = array(), $from = null, $to = null, $group_tags = null){
+    public function parties($list = array(), $groups = array(), $from = null, $to = null, $group_tags = null, $allowedParties = null){
       $conditions = array();
 
       $sql = 'SELECT
@@ -50,6 +50,9 @@ class Search extends Model
       }
       if(!is_null($group_tags)){
           $conditions[] = ' `gtag`.`group_tag` IN (' . implode(', ', $group_tags) . ') ';
+      }
+      if(!is_null($allowedParties)){
+          $conditions[] = ' `e`.`idevents` IN (' . implode(', ', $allowedParties) . ') ';
       }
       if(!empty($conditions)) {
         $sql .= ' AND ' . implode(' AND ', $conditions);
