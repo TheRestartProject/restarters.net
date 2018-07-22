@@ -3,11 +3,7 @@
         @if( !isset($group_view) )
           <th></th>
         @endif
-        @if( isset($filter_view) )
-          <th scope="col" class="cell-locations">@lang('events.event_location')</th>
-        @else
-          <th scope="col">@lang('events.event_name')</th>
-        @endif
+        <th scope="col">@lang('events.event_name')</th>
         <th scope="col" class="cell-date">@lang('events.event_date')</th>
         <th scope="col" class="cell-date">@lang('events.event_time')</th>
         @if( !isset($group_view) )

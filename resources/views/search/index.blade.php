@@ -237,13 +237,7 @@
                                   <tr>
                                       <td class="cell-locations">
                                         <a href="/party/view/<?php echo $party->idevents; ?>">
-                                          @if( strlen($party->location) > 25 )
-                                            <span data-toggle="popover" data-content="{{{ $party->location }}}" data-trigger="hover">
-                                          @endif
-                                          {{ str_limit($party->location, 25, '...') }}
-                                          @if( strlen($party->location) > 25 )
-                                            </span>
-                                          @endif
+                                          {{ $party->getEventName() }}
                                         </a>
                                       </td>
                                       <td class="cell-date"><?php print date('d/m/Y', strtotime($party->event_date)); ?></td>
