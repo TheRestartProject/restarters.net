@@ -13,9 +13,9 @@ class EventVenue extends Migration
      */
     public function up()
     {
-        // DB::statement('ALTER TABLE `events`
-        //                 ADD COLUMN `venue` VARCHAR(255) NULL AFTER `end`;'
-        // );
+        DB::statement('ALTER TABLE `events`
+                        ADD COLUMN `venue` VARCHAR(255) NULL AFTER `end`;'
+        );
     }
 
     /**

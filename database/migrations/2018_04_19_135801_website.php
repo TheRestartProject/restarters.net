@@ -13,9 +13,9 @@ class Website extends Migration
      */
     public function up()
     {
-        // DB::statement('ALTER TABLE `groups`
-        //                 ADD COLUMN `website` TEXT NULL DEFAULT NULL AFTER `free_text`;'
-        // );
+        DB::statement('ALTER TABLE `groups`
+                         ADD COLUMN `website` TEXT NULL DEFAULT NULL AFTER `free_text`;'
+        );
     }
 
     /**
