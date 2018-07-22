@@ -10,6 +10,8 @@ use App\Group;
 use App\Party;
 use App\Device;
 
+use App\Helpers\FootprintRatioCalculator;
+
 use FixometerHelper;
 use Auth;
 
@@ -57,7 +59,9 @@ class AdminController extends Controller
       $Party = new Party;
       $Device = new Device;
 
-      $allparties = $Party->ofThisGroup('admin', true, true);
+      $allparties = Party::pastEvents()
+                  ->with('devices.deviceCategory')
+                  ->get();
 
       $participants = 0;
       $hours_volunteered = 0;
@@ -65,11 +69,9 @@ class AdminController extends Controller
       $weights = $Device->getWeights();
       $TotalWeight = $weights[0]->total_weights;
       $TotalEmission = $weights[0]->total_footprints;
-      if ($TotalWeight != 0) {
-         $EmissionRatio = $TotalEmission / $TotalWeight;
-      } else {
-         $EmissionRatio = $TotalEmission;
-      }
+
+      $footprintRatioCalculator = new FootprintRatioCalculator();
+      $EmissionRatio = $footprintRatioCalculator->calculateRatio();
 
       $need_attention = 0;
       foreach($allparties as $i => $party){
@@ -84,15 +86,13 @@ class AdminController extends Controller
           $party->guesstimates = false;
 
           $participants += $party->pax;
-          $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
+          $hours_volunteered += $party->hoursVolunteered();
 
-          foreach($party->devices as $device){
-
-
+          foreach($party->devices as $device) {
 
               switch($device->repair_status){
                   case 1:
-                      $party->co2 += (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $EmissionRatio) : $device->footprint);
+                      $party->co2 += $device->co2Diverted($EmissionRatio, $Device->displacement);
                       $party->fixed_devices++;
                       break;
                   case 2:
@@ -107,7 +107,7 @@ class AdminController extends Controller
               }
           }
 
-          $party->co2 = number_format(round($party->co2 * $Device->displacement), 0, '.' , ',');
+          $party->co2 = number_format(round($party->co2), 0);
       }
 
       $devices = $Device->ofAllGroups();
@@ -127,12 +127,10 @@ class AdminController extends Controller
           $wstats[$year->year] = $year->waste;
       }
 
-
       $co2Total = $Device->getWeights();
       $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
 
       $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
-
 
       $clusters = array();
 
