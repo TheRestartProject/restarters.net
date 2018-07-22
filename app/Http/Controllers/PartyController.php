@@ -1422,6 +1422,8 @@ class PartyController extends Controller {
       'full_name' => $full_name,
     ]);
 
+    Party::find($event_id)->increment('volunteers');
+
     // Send email
     if( !is_null($volunteer_email_address) ){
 
