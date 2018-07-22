@@ -15,6 +15,7 @@ use App\Session;
 use App\User;
 use App\UserGroups;
 use Auth;
+use App\Helpers\FootprintRatioCalculator;
 use App\Notifications\JoinEvent;
 use App\Notifications\JoinGroup;
 use App\Notifications\RSVPEvent;
@@ -67,7 +68,9 @@ class PartyController extends Controller {
 
       $this->TotalWeight = $weights[0]->total_weights;
       $this->TotalEmission = $weights[0]->total_footprints;
-      $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
+
+      $footprintRatioCalculator = new FootprintRatioCalculator();
+      $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
       // }
       //
       // $this->permissionsChecker = new PermissionsChecker($this->user, $this->hostParties);
@@ -725,7 +728,7 @@ class PartyController extends Controller {
       $brands = Brands::all();
       //$categories = Category::all();
       $clusters = Cluster::all();
-      // dd($event->getEventStats($this->EmissionRatio));
+
       $device_images = [];
 
       //Get Device Images
@@ -986,9 +989,9 @@ class PartyController extends Controller {
           if(!empty($party->devices)){
               foreach($party->devices as $device){
 
-                  if($device->repair_status == env('DEVICE_FIXED')){
-                      $party->co2     += (!empty($device->estimate) && $device->category==46 ? ($device->estimate * $this->EmissionRatio) : $device->footprint);
-                      $party->ewaste  += (!empty($device->estimate) && $device->category==46 ? $device->estimate : $device->weight);
+                  if ($device->isFixed()) {
+                      $party->co2     += $device->co2Diverted($this->EmissionRatio, $Device->displacement);
+                      $party->ewaste  += $device->ewasteDiverted();
                   }
 
                   switch($device->repair_status){
@@ -1005,7 +1008,7 @@ class PartyController extends Controller {
               }
           }
 
-          $party->co2 = number_format(round($party->co2 * $Device->displacement), 0, '.' , ',');
+          $party->co2 = number_format(round($party->co2), 0, '.', ',');
 
           // $this->set('party', $party);
           // $this->set('devices', $party->devices);
@@ -1098,15 +1101,14 @@ class PartyController extends Controller {
 
       $weights = $Device->getWeights();
 
-      $TotalWeight = $weights[0]->total_weights;
-      $TotalEmission = $weights[0]->total_footprints;
-      $EmissionRatio = $TotalEmission / $TotalWeight;
+      $footprintRatioCalculator = new FootprintRatioCalculator();
+      $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-      foreach($party->devices as $device){
+      foreach($party->devices as $device) {
 
-          if($device->repair_status == env('DEVICE_FIXED')){
-              $party->co2 += (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $EmissionRatio) : $device->footprint);
-              $party->ewaste += (!empty($device->estimate) && $device->category == 46  ? intval($device->estimate) : $device->weight);
+          if ($device->isFixed()) {
+              $party->co2 += $device->co2Diverted($emissionRatio, $Device->displacement);
+              $party->ewaste += $device->ewasteDiverted();
           }
 
           switch($device->repair_status){
@@ -1122,7 +1124,7 @@ class PartyController extends Controller {
           }
       }
 
-      $party->co2 = number_format(round($party->co2 * $Device->displacement), 0, '.' , ',');
+      $party->co2 = number_format(round($party->co2), 0, '.' , ',');
       // $this->set('party', $party);
       if(!is_null($class)) {
         return view('party.stats', [

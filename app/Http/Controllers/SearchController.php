@@ -8,8 +8,11 @@ use App\GroupTags;
 use App\Party;
 use App\Search;
 use App\User;
+use App\Helpers\FootprintRatioCalculator;
 use Auth;
 use FixometerHelper;
+
+use DateTime;
 
 class SearchController extends Controller {
 
@@ -36,7 +39,9 @@ class SearchController extends Controller {
 
           $this->TotalWeight = $weights[0]->total_weights;
           $this->TotalEmission = $weights[0]->total_footprints;
-          $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
+
+          $footprintRatioCalculator = new FootprintRatioCalculator();
+          $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
 
   //
   //         if(FixometerHelper::hasRole($this->user, 'Host')){
@@ -112,23 +117,24 @@ class SearchController extends Controller {
           $searched_parties = filter_var_array($_GET['parties'], FILTER_SANITIZE_NUMBER_INT);
         }
 
+
         if(isset($_GET['from-date']) && !empty($_GET['from-date'])){
-          if (!DateTime::createFromFormat('d/m/Y', $_GET['from-date'])) {
+          if (!DateTime::createFromFormat('Y-m-d', $_GET['from-date'])) {
             $response['danger'] = 'Invalid "from date"';
             $fromTimeStamp = null;
           }
           else {
-            $fromDate = DateTime::createFromFormat('d/m/Y', $_GET['from-date']);
+            $fromDate = DateTime::createFromFormat('Y-m-d', $_GET['from-date']);
             $fromTimeStamp = strtotime($fromDate->format('Y-m-d'));
           }
         }
 
         if(isset($_GET['to-date']) && !empty($_GET['to-date'])){
-          if (!DateTime::createFromFormat('d/m/Y', $_GET['to-date'])) {
+          if (!DateTime::createFromFormat('Y-m-d', $_GET['to-date'])) {
             $response['danger'] = 'Invalid "to date"';
           }
           else {
-            $toDate = DateTime::createFromFormat('d/m/Y', $_GET['to-date']);
+            $toDate = DateTime::createFromFormat('Y-m-d', $_GET['to-date']);
             $toTimeStamp = strtotime($toDate->format('Y-m-d'));
           }
         }
@@ -147,38 +153,28 @@ class SearchController extends Controller {
           $totalWeight = 0;
           $need_attention = 0;
         //  dbga($PartyList[12]->devices);
-          foreach($PartyList as $i => $party){
-              if($party->device_count == 0){
-                  $need_attention++;
-              }
-
+          foreach ($PartyList as $party) {
               $partyIds[] = $party->idevents;
-
 
               $party->co2 = 0;
               $party->ewaste = 0;
               $party->fixed_devices = 0;
               $party->repairable_devices = 0;
               $party->dead_devices = 0;
-              $party->guesstimates = false;
 
               $participants += $party->pax;
-              $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
+              $hours_volunteered += $party->hoursVolunteered();
 
-              foreach($party->devices as $device){
+              foreach ($party->devices as $device) {
 
-
-
-                  switch($device->repair_status){
+                  switch ($device->repair_status) {
 
                       case 1:
-
-                          $party->co2 =  $party->co2 + (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $this->EmissionRatio) : $device->footprint);
                           $party->fixed_devices++;
 
-                          $ewaste = (!empty($device->estimate) && $device->category==46 ? intval($device->estimate) : $device->weight);
-                          $party->ewaste = $party->ewaste + $ewaste;
-                          $totalWeight += $ewaste;
+                          $party->co2 += $device->co2Diverted($this->EmissionRatio, $Device->displacement);
+
+                          $party->ewaste += $device->ewasteDiverted();
 
                           break;
                       case 2:
@@ -188,13 +184,9 @@ class SearchController extends Controller {
                           $party->dead_devices++;
                           break;
                   }
-                  if($device->category == 46){
-                      $party->guesstimates = true;
-                  }
               }
 
-              $party->co2 = $party->co2 * $Device->displacement;
-
+              $totalWeight += $party->ewaste;
               $totalCO2 += $party->co2;
           }
 

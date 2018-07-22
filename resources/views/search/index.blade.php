@@ -195,7 +195,7 @@
 
                 @foreach($PartyList as $party)
 
-                @php( $partyYear = date('Y', $party->event_timestamp) )
+                @php( $partyYear = date('Y', $party->eventStartTimestamp) )
 
 
 
@@ -237,7 +237,7 @@
                                   <tr>
                                       <td class="cell-locations">
                                         <a href="/party/view/<?php echo $party->idevents; ?>">
-                                            {{ !is_null($party->venue) ? $party->venue : $party->location }}
+                                            {{ $party->getEventName() }}
                                         </a>
                                       </td>
                                       <td class="cell-date"><?php print date('d/m/Y', strtotime($party->event_date)); ?></td>

@@ -10,6 +10,7 @@ use App\Party;
 use App\Invite;
 use App\User;
 use App\UserGroups;
+use App\Helpers\FootprintRatioCalculator;
 use Auth;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
@@ -51,7 +52,8 @@ class GroupController extends Controller
 
       $this->TotalWeight = $weights[0]->total_weights;
       $this->TotalEmission = $weights[0]->total_footprints;
-      $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
+      $footprintRatioCalculator = new FootprintRatioCalculator();
+      $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
 
   }
 
@@ -467,7 +469,7 @@ class GroupController extends Controller
       if( ( isset($groupid) && is_numeric($groupid) ) || in_array($groupid, $gids) ) {
 
           //$group = (object) array_fill_keys( array('idgroups') , $groupid);
-          $group = $Group->findOne($groupid);
+          $group = Group::where('idgroups', $groupid)->first();
           // $this->set('grouplist', $Group->findList());
 
 
@@ -479,45 +481,13 @@ class GroupController extends Controller
       }
       // $this->set('userGroups', $groups);
 
-      $allparties = $Party->ofThisGroup($group->idgroups, true, true);
+      $groupStats = $group->getGroupStats($this->EmissionRatio);
+      $allPastEvents = Party::pastEvents()
+                     ->with('devices.deviceCategory')
+                     ->where('events.group', $group->idgroups)
+                     ->get();
 
-      $participants = 0;
-      $hours_volunteered = 0;
 
-      $need_attention = 0;
-      foreach($allparties as $i => $party){
-          if($party->device_count == 0){
-              $need_attention++;
-          }
-
-          $party->co2 = 0;
-          $party->fixed_devices = 0;
-          $party->repairable_devices = 0;
-          $party->dead_devices = 0;
-
-          $participants += $party->pax;
-          $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
-
-          foreach($party->devices as $device){
-              if($device->repair_status == env('DEVICE_FIXED')){
-                  $party->co2 += (!empty((float)$device->estimate) && $device->category == 46 ? ((float)$device->estimate * $this->EmissionRatio) : (float)$device->footprint);
-              }
-
-              switch($device->repair_status){
-                  case 1:
-                      $party->fixed_devices++;
-                      break;
-                  case 2:
-                      $party->repairable_devices++;
-                      break;
-                  case 3:
-                      $party->dead_devices++;
-                      break;
-              }
-          }
-
-          $party->co2 = number_format(round($party->co2 * $Device->displacement), 0, '.' , ',');
-      }
       // $this->set('pax', $participants);
       // $this->set('hours', $hours_volunteered);
       $weights = $Device->getWeights($group->idgroups);
@@ -657,14 +627,15 @@ class GroupController extends Controller
         'response' => $response,
         'grouplist' => $Group->findList(),
         'userGroups' => $groups,
-        'pax' => $participants,
-        'hours' => $hours_volunteered,
+        'pax' => $groupStats['pax'],
+        'hours' => $groupStats['hours'],
         'weights' => $weights,
-        'need_attention' => $need_attention,
         'group' => $group,
+        'groupCo2' => $groupStats['co2'],
+        'groupWaste' => $groupStats['waste'],
         'profile' => $User->getProfile($user->id),
         'upcomingparties' => $Party->findNextParties($group->idgroups),
-        'allparties' => $allparties,
+        'allparties' => $allPastEvents,
         'devices' => $Device->ofThisGroup($group->idgroups),
         'device_count_status' => $Device->statusCount(),
         'group_device_count_status' => $Device->statusCount($group->idgroups),
@@ -672,7 +643,7 @@ class GroupController extends Controller
         'bar_chart_stats' => array_reverse($stats, true),
         'waste_year_data' => $waste_years,
         'waste_bar_chart_stats' => array_reverse($wstats, true),
-        'co2Total' => $this->TotalEmission,
+        'co2Total' => $Party->TotalEmission,
         'co2ThisYear' => $co2ThisYear[0]->co2,
         'wasteTotal' => $this->TotalWeight,
         'wasteThisYear' => $wasteThisYear[0]->waste,
@@ -1032,18 +1003,15 @@ class GroupController extends Controller
 
   }
 
-  public static function stats($id, $format = 'row'){
-
-      $Party = new Party;
+  public static function stats($id, $format = 'row')
+  {
       $Device = new Device;
 
-      $weights = $Device->getWeights();
-      $TotalWeight = $weights[0]->total_weights;
-      $TotalEmission = $weights[0]->total_footprints;
-      $EmissionRatio = $TotalEmission / $TotalWeight;
+      $footprintRatioCalculator = new FootprintRatioCalculator();
+      $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
       $group = Group::where('idgroups', $id)->first();
-      $groupStats = $group->getGroupStats($EmissionRatio);
+      $groupStats = $group->getGroupStats($emissionRatio);
 
       $groupStats['format'] = $format;
 

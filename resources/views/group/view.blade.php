@@ -218,7 +218,7 @@
                                 <svg width="17" height="17" viewBox="0 0 13 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><path d="M12.15,0c0,0 -15.921,1.349 -11.313,10.348c0,0 0.59,-1.746 2.003,-3.457c0.852,-1.031 2,-2.143 3.463,-2.674c0.412,-0.149 0.696,0.435 0.094,0.727c0,0 -4.188,2.379 -4.732,6.112c0,0 1.805,1.462 3.519,1.384c1.714,-0.078 4.268,-1.078 4.707,-3.551c0.44,-2.472 1.245,-6.619 2.259,-8.889Z" style="fill:#0394a6;"/><path d="M1.147,13.369c0,0 0.157,-0.579 0.55,-2.427c0.394,-1.849 0.652,-0.132 0.652,-0.132l-0.25,2.576l-0.952,-0.017Z" style="fill:#0394a6;"/></g></svg>
                               </div>
                               <div class="col-6 col-lg-12 d-flex align-content-center flex-column">
-                                {{{ number_format(round($weights[0]->total_weights), 0, '.' , ',') }}} kg
+                                {{{ number_format(round($groupWaste), 0, '.' , ',') }}} kg
                               </div>
                           </div>
                         </div>
@@ -231,7 +231,7 @@
                               <svg width="20" height="12" viewBox="0 0 15 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><circle cx="2.854" cy="6.346" r="2.854" style="fill:#0394a6;"/><circle cx="11.721" cy="5.92" r="3.279" style="fill:#0394a6;"/><circle cx="7.121" cy="4.6" r="4.6" style="fill:#0394a6;"/><rect x="2.854" y="6.346" width="8.867" height="2.854" style="fill:#0394a6;"/></g></svg>
                             </div>
                             <div class="col-6 col-lg-12 d-flex align-content-center flex-column">
-                              {{{ number_format(round($weights[0]->total_footprints), 0, '.' , ',') }}} kg
+                              {{{ number_format(round($groupCo2), 0, '.' , ',') }}} kg
                             </div>
                           </div>
                         </div>
@@ -319,7 +319,7 @@
                                 @foreach($waste_year_data as $y)
                                     @php( $sum += $y->waste )
                                 @endforeach
-                                {{{  number_format(round($weights[0]->total_weights), 0, '.' , ',') }}} kg
+                                {{{  number_format(round($groupWaste), 0, '.' , ',') }}} kg
                                 <svg width="17" height="17" viewBox="0 0 13 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><path d="M12.15,0c0,0 -15.921,1.349 -11.313,10.348c0,0 0.59,-1.746 2.003,-3.457c0.852,-1.031 2,-2.143 3.463,-2.674c0.412,-0.149 0.696,0.435 0.094,0.727c0,0 -4.188,2.379 -4.732,6.112c0,0 1.805,1.462 3.519,1.384c1.714,-0.078 4.268,-1.078 4.707,-3.551c0.44,-2.472 1.245,-6.619 2.259,-8.889Z" style="fill:#0394a6;"/><path d="M1.147,13.369c0,0 0.157,-0.579 0.55,-2.427c0.394,-1.849 0.652,-0.132 0.652,-0.132l-0.25,2.576l-0.952,-0.017Z" style="fill:#0394a6;"/></g></svg>
                                 </div>
                             </li>
@@ -330,7 +330,7 @@
                                     @foreach($year_data as $y)
                                         @php( $sum += $y->co2 )
                                     @endforeach
-                                    {{{ number_format(round($weights[0]->total_footprints), 0, '.' , ',') }}} kg
+                                    {{{ number_format(round($groupCo2), 0, '.' , ',') }}} kg
                                     <svg width="20" height="12" viewBox="0 0 15 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><circle cx="2.854" cy="6.346" r="2.854" style="fill:#0394a6;"/><circle cx="11.721" cy="5.92" r="3.279" style="fill:#0394a6;"/><circle cx="7.121" cy="4.6" r="4.6" style="fill:#0394a6;"/><rect x="2.854" y="6.346" width="8.867" height="2.854" style="fill:#0394a6;"/></g></svg>
                                 </div>
                             </li>
@@ -342,24 +342,24 @@
                     if($sum > 6000) {
                         $consume_svg = 'svg-car1';
                         $consume_label = 'Equal to driving';
-                        $consume_eql_to = (1 / 0.12) * $weights[0]->total_footprints;
+                        $consume_eql_to = (1 / 0.12) * $groupCo2;
                         $consume_legend = number_format(round($consume_eql_to), 0, '.', ',') . ' km';
 
                         $manufacture_svg = 'svg-car2';
                         $manufacture_label = 'Like manufacturing';
-                        $manufacture_eql_to = round($weights[0]->total_footprints / 6000);
+                        $manufacture_eql_to = round($groupCo2 / 6000);
                         $manufacture_legend = $manufacture_eql_to . ' ' . str_plural('car', $manufacture_eql_to);
                     }
                     else {
                         $consume_svg = 'svg-tv';
                         $consume_label = 'Like watching TV for';
-                        $consume_eql_to = ((1 / 0.024) * $weights[0]->total_footprints ) / 24;
+                        $consume_eql_to = ((1 / 0.024) * $groupCo2) / 24;
                         $consume_eql_to = number_format(round($consume_eql_to), 0, '.', ',');
                         $consume_legend = $consume_eql_to . ' ' . str_plural('day', $consume_eql_to);
 
                         $manufacture_svg = 'svg-sofa';
                         $manufacture_label = 'Like manufacturing';
-                        $manufacture_eql_to = round($weights[0]->total_footprints / 100);
+                        $manufacture_eql_to = round($groupCo2 / 100);
                         $manufacture_legend = $manufacture_eql_to . ' ' . str_plural('sofa', $manufacture_eql_to);
                     }
                     ?>

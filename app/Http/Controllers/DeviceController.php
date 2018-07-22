@@ -14,6 +14,7 @@ use App\UserGroups;
 use App\Party;
 use App\User;
 use App\DeviceList;
+use App\Helpers\FootprintRatioCalculator;
 use Auth;
 use FixometerHelper;
 use FixometerFile;
@@ -580,13 +581,10 @@ class DeviceController extends Controller
 
     $event = Party::find($event_id);
 
-    $Device = new Device;
-    $weights = $Device->getWeights();
+    $footprintRatioCalculator = new FootprintRatioCalculator();
+    $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-    $TotalWeight = $weights[0]->total_weights;
-    $TotalEmission = $weights[0]->total_footprints;
-    $EmissionRatio = $TotalEmission / $TotalWeight;
-    $stats = $event->getEventStats($EmissionRatio);
+    $stats = $event->getEventStats($emissionRatio);
 
     $return['html'] = $views;
     $return['success'] = true;
@@ -777,13 +775,10 @@ class DeviceController extends Controller
 
         $event = Party::find($event_id);
 
-        $Device = new Device;
-        $weights = $Device->getWeights();
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-        $TotalWeight = $weights[0]->total_weights;
-        $TotalEmission = $weights[0]->total_footprints;
-        $EmissionRatio = $TotalEmission / $TotalWeight;
-        $stats = $event->getEventStats($EmissionRatio);
+        $stats = $event->getEventStats($emissionRatio);
         $data['stats'] = $stats;
 
         // if ($repair_status == 0) {

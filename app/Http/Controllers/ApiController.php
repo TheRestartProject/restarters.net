@@ -5,36 +5,38 @@ namespace App\Http\Controllers;
 use App\Group;
 use App\Party;
 use App\Device;
+use App\Helpers\FootprintRatioCalculator;
 
 class ApiController extends Controller
 {
-  public static function homepage_data() {
-      $result = array();
+    public static function homepage_data()
+    {
+        $result = array();
 
-      $Party = new Party;
-      $Device = new Device;
+        $Party = new Party;
+        $Device = new Device;
 
-      $allparties = $Party->ofThisGroup('admin', true, true);
+        $allparties = $Party->ofThisGroup('admin', true, true);
 
-      $participants = 0;
-      $hours_volunteered = 0;
+        $participants = 0;
+        $hours_volunteered = 0;
 
-      foreach($allparties as $i => $party){
-          $participants += $party->pax;
+        foreach ($allparties as $i => $party) {
+            $participants += $party->pax;
 
-          // TODO: extract hours volunteered calculation out.
-          $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
-      }
+            // TODO: extract hours volunteered calculation out.
+            $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
+        }
 
-      $co2Total = $Device ->getWeights();
+        $co2Total = $Device ->getWeights();
 
-      $result['hours_volunteered'] = $hours_volunteered;
-      $result['items_fixed'] = $Device->statusCount()[0]->counter;
-      $result['weights'] = $co2Total[0]->total_weights;
+        $result['hours_volunteered'] = $hours_volunteered;
+        $result['items_fixed'] = $Device->statusCount()[0]->counter;
+        $result['weights'] = $co2Total[0]->total_weights;
 
-      return response()
-          ->json($result, 200);
-  }
+        return response()
+            ->json($result, 200);
+    }
 
     public static function partyStats($partyId)
     {
@@ -76,13 +78,8 @@ class ApiController extends Controller
 
     public static function getEmissionRatio()
     {
-        $Device = new Device;
-        $weights = $Device->getWeights();
+        $footprintRatioCalculator = new FootprintRatioCalculator();
 
-        $TotalWeight = $weights[0]->total_weights;
-        $TotalEmission = $weights[0]->total_footprints;
-        $EmissionRatio = $TotalEmission / $TotalWeight;
-
-        return $EmissionRatio;
+        return $footprintRatioCalculator->calculateRatio();
     }
 }

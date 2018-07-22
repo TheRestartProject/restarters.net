@@ -3,6 +3,8 @@
 namespace App;
 
 use App\Device;
+use App\Helpers\FootprintRatioCalculator;
+
 use Illuminate\Database\Eloquent\Model;
 
 use DB;
@@ -26,7 +28,6 @@ class Party extends Model
      * @var array
      */
     protected $hidden = [];
-
 
     //Getters
     public function findAll() {//Tested
@@ -496,55 +497,71 @@ class Party extends Model
 
     }
 
-    public function getEventStats($emissionRatio) {
+    public function getEventStats($emissionRatio)
+    {
+        $Device = new Device;
 
-      $Device = new Device;
+        $co2Diverted = 0;
+        $ewasteDiverted = 0;
+        $fixed_devices = 0;
+        $repairable_devices = 0;
+        $dead_devices = 0;
 
-      $co2 = 0;
-      $ewaste = 0;
-      $fixed_devices = 0;
-      $repairable_devices = 0;
-      $dead_devices = 0;
+        if (!empty($this->allDevices)) {
+            foreach ($this->allDevices as $device) {
+                if ($device->isFixed()) {
+                    $co2Diverted += $device->co2Diverted($emissionRatio, $Device->displacement);
+                    $ewasteDiverted += $device->ewasteDiverted();
+                }
 
-      if( !empty($this->allDevices) ){
+                switch($device->repair_status) {
+                case 1:
+                    $fixed_devices++;
+                    break;
+                case 2:
+                    $repairable_devices++;
+                    break;
+                case 3:
+                    $dead_devices++;
+                    break;
+                }
+            }
 
-        foreach($this->allDevices as $device){
-
-          if( $device->repair_status == env('DEVICE_FIXED') ){
-            $co2     += (!empty((float)$device->estimate) && $device->category==46 ? ((float)$device->estimate * $emissionRatio) : (float)$device->footprint);
-            $ewaste  += (!empty((float)$device->estimate) && $device->category==46 ? (float)$device->estimate : $device->weight);
-          }
-
-          switch($device->repair_status){
-              case 1:
-                  $fixed_devices++;
-                  break;
-              case 2:
-                  $repairable_devices++;
-                  break;
-              case 3:
-                  $dead_devices++;
-                  break;
-          }
-
+            return [
+                'co2'                 => $co2Diverted,
+                'ewaste'              => $ewasteDiverted,
+                'fixed_devices'       => $fixed_devices,
+                'repairable_devices'  => $repairable_devices,
+                'dead_devices'        => $dead_devices,
+                'participants'        => $this->pax,
+                'volunteers'          => $this->volunteers
+            ];
         }
-
-        return [
-          'co2'                 => number_format(round($co2 * $Device->displacement), 0, '.' , ','),
-          'ewaste'              => number_format(round($ewaste), 0, '.' , ','),
-          'fixed_devices'       => $fixed_devices,
-          'repairable_devices'  => $repairable_devices,
-          'dead_devices'        => $dead_devices,
-          'participants'        => $this->pax,
-          'volunteers'          => $this->volunteers
-        ];
-
-      }
-
     }
 
     public function devices(){
         return $this->hasMany('App\Device', 'event', 'idevents');
     }
 
+    public function hoursVolunteered()
+    {
+        $lengthOfEventInHours = 3;
+        $extraHostHours = 9;
+        $hoursIfNoVolunteersRecorded = 12;
+
+        $hoursVolunteered = $extraHostHours;
+
+        if ($this->volunteers > 0) {
+            $hoursVolunteered += $this->volunteers * $lengthOfEventInHours;
+        } else {
+            $hoursVolunteered += $hoursIfNoVolunteersRecorded;
+        }
+
+        return $hoursVolunteered;
+    }
+
+    public function getEventStartTimestampAttribute()
+    {
+        return strtotime($this->event_date . ' ' . $this->start);
+    }
 }

@@ -2,71 +2,47 @@
 
 namespace App;
 
+use App\Device;
+
 use Illuminate\Database\Eloquent\Model;
 
 use DB;
 
 class Search extends Model
 {
+    public function parties($list = array(), $groups = array(), $from = null, $to = null, $group_tags = null)
+    {
+        $eventsQuery = Party::pastEvents()
+                     ->with('devices.deviceCategory')
+                     ->leftJoin('grouptags_groups as gtag', 'events.group', 'gtag.group');
 
-  public function parties($list = array(), $groups = array(), $from = null, $to = null, $group_tags = null){
-      $conditions = array();
+        if (!empty($list)) {
+            $eventsQuery->whereIn('events.idevents', $list);
+        }
 
-      $sql = 'SELECT
-                *,
-                `e`.`location` AS `venue`,
-                UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
-              FROM `events` AS `e`
+        if (!is_null($groups)) {
+            $eventsQuery->whereIn('events.group', $groups);
+        }
 
-              INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
+        if (!is_null($from)) {
+            $eventsQuery->whereRaw('UNIX_TIMESTAMP(event_date) >= ' . $from);
+        }
 
-              LEFT JOIN `grouptags_groups` as `gtag` ON `g`.`idgroups` = `gtag`.`group`
+        if (!is_null($to)) {
+            $eventsQuery->whereRaw('UNIX_TIMESTAMP(event_date) <= ' . $to);
+        }
 
-              LEFT JOIN (
-                SELECT COUNT(`dv`.`iddevices`) AS `device_count`, `dv`.`event`
-                FROM `devices` AS `dv`
-                GROUP BY  `dv`.`event`
-              ) AS `d` ON `d`.`event` = `e`.`idevents`
+        if (!is_null($group_tags)) {
+            $eventsQuery->whereIn('gtag.group_tag', $group_tags);
+        }
 
-              WHERE 1=1 ';
-
+        $eventsQuery->groupBy('events.idevents');
+        $eventsQuery->orderBy('events.event_date', 'desc');
 
 
-      if(!empty($list)){
-        $conditions[] = ' `e`.`idevents` IN (' . implode(', ', $list). ') ' ;
-      }
+        $parties = $eventsQuery->get();
 
-      //        TIMESTAMP(`e`.`event_date`, `e`.`start`) >= NOW() '; // added one day to make sure it only gets moved to the past the next day
-
-      if(!is_null($groups)){
-          $conditions[] = ' `e`.`group` IN (' . implode(', ', $groups) . ') ';
-      }
-
-      if(!is_null($from)){
-        $conditions[] = ' UNIX_TIMESTAMP(`e`.`event_date`) >= ' . $from ;
-      }
-      if(!is_null($to)){
-        $conditions[] = ' UNIX_TIMESTAMP(`e`.`event_date`) <= ' . $to ;
-      }
-      if(!is_null($group_tags)){
-          $conditions[] = ' `gtag`.`group_tag` IN (' . implode(', ', $group_tags) . ') ';
-      }
-      if(!empty($conditions)) {
-        $sql .= ' AND ' . implode(' AND ', $conditions);
-      }
-      $sql .= ' GROUP BY  `e`.`idevents` ORDER BY `e`.`event_date` DESC';
-
-      //dd($sql);
-
-      $parties = DB::select(DB::raw($sql));
-
-      $devices = new Device;
-      foreach($parties as $i => $party){
-        $parties[$i]->devices = $devices->ofThisEvent($party->idevents);
-      }
-
-      return $parties;
-
+        return $parties;
     }
 
     public function deviceStatusCount($parties){
