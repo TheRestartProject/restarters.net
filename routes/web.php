@@ -203,6 +203,10 @@ Route::get('/outbound/info/group/{id}', function($id) {
   return App\Http\Controllers\OutboundController::info('group', $id);
 });
 
+Route::get('/outbound/info/party/{id}', function($id) {
+    return App\Http\Controllers\OutboundController::info('party', $id);
+});
+
 Route::get('/group/stats/{id}/{format?}', function($id, $format = 'row') {
     return App\Http\Controllers\GroupController::stats($id, $format);
 });
@@ -217,8 +221,4 @@ Route::get('/admin/stats/2', function() {
 
 Route::get('/party/stats/{id}/wide', function($id) {
   return App\Http\Controllers\PartyController::stats($id);
-});
-
-Route::get('/outbound/info/party/{id}', function($id) {
-  return App\Http\Controllers\OutboundController::info('party', $id);
 });

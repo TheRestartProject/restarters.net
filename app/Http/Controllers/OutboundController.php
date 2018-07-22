@@ -6,6 +6,8 @@ use App\Group;
 use App\Party;
 use App\Device;
 
+use App\Helpers\FootprintRatioCalculator;
+
 class OutboundController extends Controller
 {
   // public function __construct($model, $controller, $action){
@@ -75,7 +77,8 @@ class OutboundController extends Controller
 	/** type can be either party or group
 	 * id is id of group or party to display
 	 * */
-	public static function info($type, $id){
+	public static function info($type, $id)
+    {
 		if(!is_numeric($id) && !filter_var($id, FILTER_VALIDATE_INT)){
 			die('Data not properaly formatted. Exiting.');
 		}
@@ -83,43 +86,21 @@ class OutboundController extends Controller
 			$info = array();
 			$co2 = 0;
 
-			$groups = new Group;
-			$parties = new Party;
-			$devices = new Device;
-
-			$weights = $devices->getWeights();
-
-			$TotalWeight = $weights[0]->total_weights;
-			$TotalEmission = $weights[0]->total_footprints;
-			$EmissionRatio = $TotalEmission / $TotalWeight;
+            $footprintRatioCalculator = new FootprintRatioCalculator();
+			$EmissionRatio = $footprintRatioCalculator->calculateRatio();
 
 			$id = (int)$id;
 			$id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
 
 			if(strtolower($type) == 'party'){
-				$weights = $devices->getPartyWeights($id);
-				$party = $parties->findThis($id, true)[0];
-				//dbga($party->devices);
-				foreach($party->devices as $device){
-					if($device->repair_status == env('DEVICE_FIXED')){
-						$co2 += (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $EmissionRatio) : $device->footprint);
-					}
-				}
+                $event = Party::where('idevents', $id)->first();
+                $eventStats = $event->getEventStats($EmissionRatio);
+                $co2 = $eventStats['co2'];
+			} elseif (strtolower($type) == 'group') {
+                $group = Group::where('idgroups', $id)->first();
+                $groupStats = $group->getGroupStats($EmissionRatio);
+                $co2 = $groupStats['co2'];
 			}
-			elseif(strtolower($type) == 'group'){
-				$weights = $devices->getWeights($id);
-				$allparties = $parties->ofThisGroup($id, true, true);
-				foreach($allparties as $party){
-					foreach($party->devices as $device){
-						if($device->repair_status == env('DEVICE_FIXED')){
-							$co2 += (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $EmissionRatio) : $device->footprint);
-						}
-					}
-				}
-
-				//$weights[0]->total_footprints = $co2;
-			}
-			$co2 = $co2 * $devices->displacement;
 
 			if($co2 > 6000) {
 				$info['consume_class'] 	= 'car';
@@ -145,8 +126,6 @@ class OutboundController extends Controller
 				$info['manufacture_label'] = 'or like the manufacture of <span class="dark">' . $info['manufacture_eql_to'] . '</span> sofas';
 				$info['manufacture_legend'] = ' 100kg of CO<sub>2</sub>';
 			}
-			// $this->set('info', $info);
-			// $this->set('co2', $co2);
 
       return view('outbound.info', [
         'info' => $info,
