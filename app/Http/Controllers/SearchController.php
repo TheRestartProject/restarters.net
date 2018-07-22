@@ -76,7 +76,7 @@ class SearchController extends Controller {
       }
 
       elseif(FixometerHelper::hasRole($user, 'Host')) {
-        $groups =   $Groups->ofThisUser($this->user->id);
+        $groups =   $Groups->ofThisUser($user->id);
         $groupIds = array();
         foreach( $groups as $i => $group ) {
           $groups[$i]->id = $group->idgroups;
