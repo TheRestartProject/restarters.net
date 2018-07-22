@@ -581,6 +581,12 @@ class UserController extends Controller
               'user' => $user,
               'header' => true,
               'userlist' => $userlist,
+              'name' => null,
+              'email' => null,
+              'location' => null,
+              'country' => null,
+              'role' => null,
+              'permissions' => null,
             ]);
 
         } else {
