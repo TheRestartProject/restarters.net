@@ -695,7 +695,7 @@ class FixometerHelper {
       if (\Cache::has('all_stats')) {
           $stats = \Cache::get('all_stats');
       } else {
-          $stats['allparties'] = $Party->ofThisGroup('admin', true, true);
+          $stats['allparties'] = $Party->ofThisGroup('admin', true, false);
           $stats['co2Total'] = $Device->getWeights();
           $stats['device_count_status'] = $Device->statusCount();
           \Cache::put('all_stats', $stats, 120);
