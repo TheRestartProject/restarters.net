@@ -207,10 +207,10 @@ class ExportController extends Controller {
 
                 switch($device->repair_status){
                     case 1:
-                        $party->co2 += (!empty($device->estimate) && $device->category == 46 ? (intval($device->estimate) * $this->EmissionRatio) : $device->footprint);
+                        $party->co2 += (!empty($device->estimate) && $device->category == 46) ? (float) ($device->estimate) * $this->EmissionRatio : $device->footprint;
                         $party->fixed_devices++;
                         //$totalWeight += (!empty($device->estimate) && $device->category==46 ? $device->estimate : $device->weight);
-                        $party->weight += (!empty($device->estimate) && $device->category==46 ? intval($device->estimate) : $device->weight);
+                        $party->weight += (!empty($device->estimate) && $device->category==46 ? (float) ($device->estimate) : $device->weight);
 
                         break;
                     case 2:
