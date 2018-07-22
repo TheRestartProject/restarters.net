@@ -1084,60 +1084,28 @@ class PartyController extends Controller {
 
   public static function stats($id, $class = null){
       $Device = new Device;
-      $Party = new Party;
-
-      // $this->set('framed', true);
-      $party = $Party->findThis($id, true)[0];
-
-      $need_attention = 0;
-
-      if(count($party->devices) == 0){
-          $need_attention++;
-      }
-
-      $party->co2 = 0;
-      $party->fixed_devices = 0;
-      $party->repairable_devices = 0;
-      $party->dead_devices = 0;
-      $party->ewaste = 0;
-
-      $weights = $Device->getWeights();
 
       $footprintRatioCalculator = new FootprintRatioCalculator();
       $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-      foreach($party->devices as $device) {
 
-          if ($device->isFixed()) {
-              $party->co2 += $device->co2Diverted($emissionRatio, $Device->displacement);
-              $party->ewaste += $device->ewasteDiverted();
-          }
+      // $this->set('framed', true);
+      $event = Party::where('idevents', $id)->first();
 
-          switch($device->repair_status){
-              case 1:
-                  $party->fixed_devices++;
-                  break;
-              case 2:
-                  $party->repairable_devices++;
-                  break;
-              case 3:
-                  $party->dead_devices++;
-                  break;
-          }
-      }
+      $eventStats = $event->getEventStats($emissionRatio);
 
-      $party->co2 = number_format(round($party->co2), 0, '.' , ',');
+      $eventStats['co2'] = number_format(round($eventStats['co2']), 0, '.' , ',');
       // $this->set('party', $party);
       if(!is_null($class)) {
         return view('party.stats', [
           'framed' => true,
-          'party' => $party,
+          'party' => $eventStats,
           'class' => 'wide',
         ]);
       } else {
         return view('party.stats', [
           'framed' => true,
-          'party' => $party,
+          'party' => $eventStats,
         ]);
       }
 
