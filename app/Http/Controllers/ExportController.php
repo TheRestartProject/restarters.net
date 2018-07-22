@@ -200,7 +200,7 @@ class ExportController extends Controller {
             $party->guesstimates = false;
 
             $participants += $party->pax;
-            $party->hours_volunteered = (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
+            $party->hours_volunteered = $party->hoursVolunteered();
             $hours_volunteered += $party->hours_volunteered;
 
             foreach($party->devices as $device){
@@ -209,10 +209,9 @@ class ExportController extends Controller {
 
                 switch($device->repair_status){
                     case 1:
-                        $party->co2 += (!empty($device->estimate) && $device->category == 46) ? (float) ($device->estimate) * $this->EmissionRatio : $device->footprint;
+                        $party->co2 += $device->co2Diverted($this->EmissionRatio, $Device->displacement);
                         $party->fixed_devices++;
-                        //$totalWeight += (!empty($device->estimate) && $device->category==46 ? $device->estimate : $device->weight);
-                        $party->weight += (!empty($device->estimate) && $device->category==46 ? (float) ($device->estimate) : $device->weight);
+                        $party->weight += $device->ewasteDiverted();
                         break;
                     case 2:
                         $party->repairable_devices++;
@@ -225,7 +224,6 @@ class ExportController extends Controller {
                     $party->guesstimates = true;
                 }
             }
-            $party->co2 = $party->co2 * $Device->displacement;
             $party->weight = $party->weight;
 
             $totalCO2 += $party->co2;
