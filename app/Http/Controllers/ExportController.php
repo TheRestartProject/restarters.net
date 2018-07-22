@@ -229,18 +229,20 @@ class ExportController extends Controller {
 
             $totalCO2 += $party->co2;
 
+            $partyName = !is_null($party->venue) ? $party->venue : $party->location;
+            $groupName = $party->name; // because of the way the join in the query works
             $PartyArray[$i] = array(
               strftime('%d/%m/%Y', $party->event_timestamp),
-              '"' . $party->venue . '"',
-              '"' . $party->name . '"',
-              '"' .($party->pax  > 0 ? $party->pax : "0"). '"',
-              '"' .($party->volunteers  > 0 ? $party->volunteers : "0"). '"',
-              '"' .($party->co2 > 0 ? round($party->co2,2) : "0"). '"',
-              '"' .($party->weight > 0 ? round($party->weight,2) : "0"). '"',
-              '"' .($party->fixed_devices > 0 ? $party->fixed_devices : "0"). '"',
-              '"' .($party->repairable_devices > 0 ? $party->repairable_devices : "0"). '"',
-              '"' .($party->dead_devices > 0 ? $party->dead_devices : "0"). '"',
-              '"' .($party->hours_volunteered > 0 ? $party->hours_volunteered : "0"). '"',
+              $partyName,
+              $groupName,
+              ($party->pax  > 0 ? $party->pax : 0),
+              ($party->volunteers  > 0 ? $party->volunteers : 0),
+              ($party->co2 > 0 ? round($party->co2,2) : 0),
+              ($party->weight > 0 ? round($party->weight,2) : 0),
+              ($party->fixed_devices > 0 ? $party->fixed_devices : 0),
+              ($party->repairable_devices > 0 ? $party->repairable_devices : 0),
+              ($party->dead_devices > 0 ? $party->dead_devices : 0),
+              ($party->hours_volunteered > 0 ? $party->hours_volunteered : 0),
             );
         }
 
@@ -255,7 +257,7 @@ class ExportController extends Controller {
         fputcsv($file, $columns);
 
         foreach($PartyArray as $d) {
-            $d = array_filter((array) $d, 'utf8_encode');
+            //$d = array_filter((array) $d, 'utf8_encode');
             fputcsv($file, $d);
         }
         fclose($file);
