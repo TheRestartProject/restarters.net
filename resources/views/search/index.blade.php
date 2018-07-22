@@ -104,6 +104,7 @@
                       <input type="date" name="to-date" id="to_date" class="field form-control" <?php if(isset($_GET['to-date']) && !empty($_GET['to-date'])){ echo ' value="' . $_GET['to-date'] . '"'; } ?>>
                   </div>
 
+                  @if (FixometerHelper::hasRole($user, 'Administrator'))
                   <div class="form-group">
                       <label for="tags">@lang('groups.group_tag2'):</label>
                       <div class="form-control form-control__select">
@@ -118,6 +119,7 @@
                           </select>
                       </div>
                   </div>
+                  @endif
 
                 </div>
             </form>
