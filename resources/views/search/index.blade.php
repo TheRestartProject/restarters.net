@@ -86,7 +86,7 @@
                                 }
                               }
                               ?>
-                            ><?php echo $party->venue; ?></option>
+                                >{{  $party->venue }} ({{ strftime('%d/%m/%Y', $party->event_timestamp) }})</option>
                             <?php } ?>
                           </optgroup>
                           @endforeach

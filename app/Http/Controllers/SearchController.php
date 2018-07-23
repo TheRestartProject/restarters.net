@@ -72,7 +72,7 @@ class SearchController extends Controller {
         $groups = $Groups->findList();
         $parties = $Parties->findAllSearchable();
         foreach( $parties as $i => $party ) {
-          $parties[$i]->venue = $party->location;
+          $parties[$i]->venue = !is_null($parties[$i]->venue) ? $parties[$i]->venue : $parties[$i]->location;
           $allowedParties[] = $party->id;
         }
       }
@@ -89,6 +89,7 @@ class SearchController extends Controller {
 
         foreach( $parties as $i => $party ) {
           $parties[$i]->id = $party->idevents;
+          $parties[$i]->venue = !is_null($parties[$i]->venue) ? $parties[$i]->venue : $parties[$i]->location;
           $allowedParties[] = $party->idevents;
         }
       }
