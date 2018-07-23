@@ -574,9 +574,9 @@ function loadDropzones() {
                 thumbnailMethod: "contain",
                 addRemoveLinks: true,
                 previewsContainer: ".uploads-" + $(this).data('deviceid'),
-                // init: function () {
-                //
-                //     jQuery(".dropzone .dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
+                init: function () {
+
+                    jQuery(".dropzone .dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
                 //
                 //     var myDropzone = this;
                 //
@@ -604,7 +604,7 @@ function loadDropzones() {
                 //       // Maybe show form again, and notify user of error
                 //     });
                 //
-                // }
+                }
             });
             // console.log($('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone);
           }

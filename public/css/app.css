@@ -14928,14 +14928,14 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   content: "\203A";
 }
 
-.dz-clickable .dropzone {
+.dz-clickable.dropzone {
   border-style: dashed;
   border-color: #BEC0C0;
   border-radius: 3px;
   background-color: #F8F8F8;
 }
 
-.dz-clickable .dropzone .dz-message {
+.dz-clickable.dropzone .dz-message {
   font-size: 16px;
   color: #000;
   font-family: "Patua One", sans-serif;
@@ -14945,7 +14945,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   padding-top: 22px;
 }
 
-.dz-clickable .dropzone .dz-message small {
+.dz-clickable.dropzone .dz-message small {
   font-family: "Open Sans", sans-serif;
   font-size: 13px;
   display: block;
