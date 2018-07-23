@@ -1537,13 +1537,13 @@ class PartyController extends Controller {
 
           if(env('APP_ENV') == 'development' || env('APP_ENV') == 'local') { //Testing purposes
 
-            $all_hosts = User::whereIn('id', [91,92,93])->get();
+            $all_restarters = User::whereIn('id', [91,92,93])->get();
 
           } else {
 
-            $all_hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
+            $all_restarters = User::join('events_users', 'events_users.user', '=', 'users.id')
                                   ->where('users.invites', 1)
-                                    ->where('events_users.role', 3)
+                                    ->where('events_users.role', 4)
                                       ->where('events_users.event', $event_id)
                                         ->get();
 
@@ -1556,7 +1556,7 @@ class PartyController extends Controller {
             'event_url' => url('/party/view/'.$event_id),
             'preferences' => url('/profile/edit'),
           ];
-          Notification::send($all_hosts, new EventRepairs($arr));
+          Notification::send($all_restarters, new EventRepairs($arr));
 
           return redirect()->back()->with('success', 'Thank you, all attendees have been informed');
 
