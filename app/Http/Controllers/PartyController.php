@@ -20,6 +20,7 @@ use App\Notifications\JoinGroup;
 use App\Notifications\RSVPEvent;
 use App\Notifications\ModerationEvent;
 use App\Notifications\EventDevices;
+use App\Notifications\EventRepairs;
 use DateTime;
 use FixometerFile;
 use FixometerHelper;
@@ -1479,11 +1480,11 @@ class PartyController extends Controller {
           $Image = new FixometerFile;
           $Image->deleteImage($id, $path);
 
-          return redirect()->back()->with('message', 'Thank you, the image has been deleted');
+          return redirect()->back()->with('success', 'Thank you, the image has been deleted');
 
       }
 
-      return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
+      return redirect()->back()->with('warning', 'Sorry, but the image can\'t be deleted');
 
   }
 
@@ -1516,6 +1517,7 @@ class PartyController extends Controller {
       }
 
     }
+  }
 
   /*
    *
@@ -1533,30 +1535,30 @@ class PartyController extends Controller {
       // We'll allow admins to send out email, just in case...
       if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || is_object($in_event) ){
 
-          if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
+          if(env('APP_ENV') == 'development' || env('APP_ENV') == 'local') { //Testing purposes
 
-            // $all_hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
-            //                       ->where('users.invites', 1)
-            //                         ->where('events_users.role', 3)
-            //                           ->where('events_users.event', $event_id)
-            //                             ->get();
+            $all_hosts = User::whereIn('id', [91,92,93])->get();
 
-            //Testing purposes
-            $all_hosts = User::whereIn('in', [91,92,93])->get();
+          } else {
 
-            $event = Party::find($event_id);
-
-            $arr = [
-              'event_name' => $event->getEventName(),
-              'event_url' => url('/party/view/'.$event_id),
-              'preferences' => url('/profile/edit'),
-            ];
-
-            Notification::send($all_hosts, new EventRepairs($arr));
+            $all_hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
+                                  ->where('users.invites', 1)
+                                    ->where('events_users.role', 3)
+                                      ->where('events_users.event', $event_id)
+                                        ->get();
 
           }
 
-          return redirect()->back()->with('message', 'Thank you, all attendees have been informed');
+          $event = Party::find($event_id);
+
+          $arr = [
+            'event_name' => $event->getEventName(),
+            'event_url' => url('/party/view/'.$event_id),
+            'preferences' => url('/profile/edit'),
+          ];
+          Notification::send($all_hosts, new EventRepairs($arr));
+
+          return redirect()->back()->with('success', 'Thank you, all attendees have been informed');
 
       } else {
 
