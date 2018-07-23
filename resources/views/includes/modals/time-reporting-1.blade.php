@@ -32,7 +32,7 @@
                               @else
                                 <td>N/A</td>
                               @endif
-                              <td>{{ number_format($country_hours->hours/60/60, 0, '.', ',') }}</td>
+                              <td>{{ substr($country_hours->event_hours, 0, -4) }}</td>
                             </tr>
                           @endforeach
                         </tbody>
