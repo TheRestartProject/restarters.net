@@ -38,5 +38,10 @@ return [
     'delete_account_text' => 'I understand that deleting my account will remove all of my personal data and
 this is a permanent action.',
     'save_preferences' => 'Save preferences',
-    'set_preferences' => 'Click here to set your email preferences for our discussion platform'
+    'set_preferences' => 'Click here to set your email preferences for our discussion platform',
+    'profile_admin' => 'Admin only',
+    'profile_admin_text' => 'Here admins have the ability to change a user\'s role or their associated groups',
+    'user_role' => 'User role',
+    'assigned_groups' => 'Assigned to groups',
+    'save_user' => 'Save user'
 ];

@@ -10,7 +10,7 @@ use DB;
 
 class Search extends Model
 {
-    public function parties($list = array(), $groups = array(), $from = null, $to = null, $group_tags = null)
+    public function parties($list = array(), $groups = array(), $from = null, $to = null, $group_tags = null, $allowedParties = null)
     {
         $eventsQuery = Party::pastEvents()
                      ->with('devices.deviceCategory')
@@ -34,6 +34,10 @@ class Search extends Model
 
         if (!is_null($group_tags)) {
             $eventsQuery->whereIn('gtag.group_tag', $group_tags);
+        }
+
+        if (!is_null($allowedParties)) {
+            $eventsQuery->whereIn('events.idevents', $allowedParties);
         }
 
         $eventsQuery->groupBy('events.idevents');

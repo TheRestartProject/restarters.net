@@ -280,6 +280,69 @@
 
             </div>
 
+
+            @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+              <div class="edit-panel">
+
+                <div class="form-row">
+                  <div class="col-lg-6">
+                    <h4>@lang('auth.profile_admin')</h4>
+                    <p>@lang('auth.profile_admin_text')</p>
+                  </div>
+                </div>
+
+                <form action="/profile/edit-admin-settings" method="post">
+                  @csrf
+
+                  {{ Form::hidden('id', $user->id) }}
+
+                  <fieldset class="user_role">
+                    <div class="form-row">
+                      <div class="form-group col-lg-6">
+                        <label for="user_role">@lang('auth.user_role'):</label>
+                        <select class="form-control" id="user_role" name="user_role">
+                          <option value="" selected>Choose role</option>
+                          @foreach (FixometerHelper::allRoles() as $r)
+                            @if (isset($user->role) && $r->idroles == $user->role)
+                              <option value="{{ $r->idroles }}" selected>{{ $r->role }}</option>
+                            @else
+                              <option value="{{ $r->idroles }}">{{ $r->role }}</option>
+                            @endif
+                          @endforeach
+                        </select>
+                      </div>
+                      <div class="form-group col-lg-6">
+                        <label for="assigned_groups">@lang('auth.assigned_groups'):</label>
+                        <div class="form-control form-control__select">
+                          <select id="assigned_groups" name="assigned_groups[]" class="form-control select2-tags" multiple data-live-search="true" title="Choose groups...">
+                              @if(isset($all_groups))
+                                @foreach($all_groups as $g)
+                                  @if (!empty($user_groups) && in_array($g->idgroups, $user_groups))
+                                    <option value="<?php echo $g->idgroups; ?>" selected><?php echo $g->name; ?></option>
+                                  @else
+                                    <option value="<?php echo $g->idgroups; ?>"><?php echo $g->name; ?></option>
+                                  @endif
+                                @endforeach
+                              @endif
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </fieldset>
+
+                  <div class="form-row">
+                    <div class="form-group col-lg-12">
+                      <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">@lang('auth.save_user')</button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+
+
+              </div>
+            @endif
+
             <form action="/user/soft-delete" method="post" id="delete-form">
               @csrf
 
@@ -291,8 +354,8 @@
                   <div class="col-md-4 d-flex flex-column align-content-center"><button type="submit" class="btn btn-danger" id="delete-form-submit">
                 @lang('auth.delete_account')</div>
                 </div>
-                
-                
+
+
                 </button>
               </div>
 

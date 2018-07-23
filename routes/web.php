@@ -57,6 +57,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::post('/edit-preferences', 'UserController@postProfilePreferencesEdit');
     Route::post('/edit-tags', 'UserController@postProfileTagsEdit');
     Route::post('/edit-photo', 'UserController@postProfilePictureEdit');
+    Route::post('/edit-admin-settings', 'UserController@postAdminEdit');
   });
 
   Route::post('/edit-user', 'UserController@postEdit');

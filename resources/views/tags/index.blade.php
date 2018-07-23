@@ -47,7 +47,7 @@
                       @foreach($tags as $tag)
                       <tr>
                         <td><a href="/tags/edit/{{{ $tag->id }}}">{{{ $tag->tag_name }}}</a></td>
-                        <td>{{{ str_limit(strip_tags($tag->description), 20, '...') }}}</td>
+                        <td>{{{ str_limit(strip_tags($tag->description), 150, '...') }}}</td>
                       </tr>
                       @endforeach
                     @endif

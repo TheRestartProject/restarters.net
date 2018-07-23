@@ -69,17 +69,19 @@ class SearchController extends Controller {
 
       $user = User::find(Auth::id());
 
+      $allowedParties = [];
       /** Get default data for the search dropdowns **/
       if(FixometerHelper::hasRole($user, 'Administrator')){
         $groups = $Groups->findList();
         $parties = $Parties->findAllSearchable();
         foreach( $parties as $i => $party ) {
-          $parties[$i]->venue = $party->location;
+          $parties[$i]->venue = !is_null($parties[$i]->venue) ? $parties[$i]->venue : $parties[$i]->location;
+          $allowedParties[] = $party->id;
         }
       }
 
       elseif(FixometerHelper::hasRole($user, 'Host')) {
-        $groups =   $Groups->ofThisUser($this->user->id);
+        $groups =   $Groups->ofThisUser($user->id);
         $groupIds = array();
         foreach( $groups as $i => $group ) {
           $groups[$i]->id = $group->idgroups;
@@ -90,6 +92,8 @@ class SearchController extends Controller {
 
         foreach( $parties as $i => $party ) {
           $parties[$i]->id = $party->idevents;
+          $parties[$i]->venue = !is_null($parties[$i]->venue) ? $parties[$i]->venue : $parties[$i]->location;
+          $allowedParties[] = $party->idevents;
         }
       }
       /** set parties to be grouped by group **/
@@ -143,7 +147,7 @@ class SearchController extends Controller {
           $group_tags = $_GET['group_tags'];
         }
 
-        $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags);
+        $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags, $allowedParties);
         if(count($PartyList) > 0 ){
           //dbga($PartyList[8]);
           $partyIds = array();

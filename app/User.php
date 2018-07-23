@@ -35,7 +35,7 @@ class User extends Authenticatable
     //Table Relations
 
     // public function userGroups() {
-    //   return $this->hasMany('App\UserGroup', 'user', 'id');
+    //   return $this->hasMany('App\UserGroups', 'user', 'id');
     // }
     //
     // public function rolePermissions() {
@@ -52,6 +52,10 @@ class User extends Authenticatable
 
     public function skills() {
       return $this->belongsToMany('App\UsersSkills', 'users_skills', 'user', 'skill');
+    }
+
+    public function userGroups() {
+      return $this->belongsToMany('App\UserGroups', 'users_groups', 'user', 'group');
     }
 
     //
