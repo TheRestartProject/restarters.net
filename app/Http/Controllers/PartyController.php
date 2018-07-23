@@ -1517,6 +1517,53 @@ class PartyController extends Controller {
 
     }
 
+  /*
+   *
+   * This sends an email to all user except the host logged in an email to ask for contributions
+   *
+   */
+  public function getContributions($event_id){
+
+      // Let's check that current logged in user is a host of the event
+      $in_event = EventsUsers::where('event', $event_id)
+                                ->where('user', Auth::user()->id)
+                                  ->where('role', 3)
+                                    ->first();
+
+      // We'll allow admins to send out email, just in case...
+      if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || is_object($in_event) ){
+
+          if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
+
+            // $all_hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
+            //                       ->where('users.invites', 1)
+            //                         ->where('events_users.role', 3)
+            //                           ->where('events_users.event', $event_id)
+            //                             ->get();
+
+            //Testing purposes
+            $all_hosts = User::whereIn('in', [91,92,93])->get();
+
+            $event = Party::find($event_id);
+
+            $arr = [
+              'event_name' => $event->getEventName(),
+              'event_url' => url('/party/view/'.$event_id),
+              'preferences' => url('/profile/edit'),
+            ];
+
+            Notification::send($all_hosts, new EventRepairs($arr));
+
+          }
+
+          return redirect()->back()->with('message', 'Thank you, all attendees have been informed');
+
+      } else {
+
+          return redirect()->back()->with('warning', 'Sorry, you are not the host of this event');
+
+      }
+
   }
 
 }

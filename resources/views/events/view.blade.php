@@ -74,7 +74,8 @@
                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                           <a href="{{ url('/') }}/party/edit/{{ $formdata->id }}" class="dropdown-item">Edit event</a>
                           @if( $event->hasFinished() )
-                            <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</a>
+                            <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>
+                            <a href="/contribution/{{ $formdata->id }}" class="btn dropdown-item">Request contributions</a>
                           @else
                             @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
                               <button data-toggle="modal" data-target="#event-invite-to" class="btn dropdown-item">Invite volunteers</button>
