@@ -102,11 +102,15 @@ class UserController extends Controller
       }
 
       $user_skills = UsersSkills::where('user', $id)->pluck('skill')->toArray();
+      $user_groups = UserGroups::where('user', $id)->pluck('group')->toArray();
+      $all_groups = Group::all();
 
       return view('user.profile-edit', [
         'user' => $user,
         'skills' => FixometerHelper::allSkills(),
         'user_skills' => $user_skills,
+        'user_groups' => $user_groups,
+        'all_groups' => $all_groups
       ]);
     }
 
@@ -282,6 +286,28 @@ class UserController extends Controller
       }
 
       return redirect()->back()->with('error', 'Failed to upload profile picture!');
+
+    }
+
+    public function postAdminEdit(Request $request) {
+
+      if ($request->input('id') !== null) {
+        $id = $request->input('id');
+      } else {
+        $id = Auth::id();
+      }
+
+      $user = User::find($id);
+
+      //set role for User
+      $user->update([
+        'role' => $request->input('user_role'),
+      ]);
+
+      // Change to sync with user_groups
+      $user->userGroups()->sync($request->input('assigned_groups'));
+
+      return redirect()->back()->with('message', 'Admin settings updated!');
 
     }
 
