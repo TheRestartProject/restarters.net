@@ -6,6 +6,7 @@
 
 require('./bootstrap');
 require('./bootstrap-tokenfield.min');
+require('./bootstrap-sortable.js');
 require('select2');
 require('slick-carousel');
 require('summernote');
@@ -961,6 +962,15 @@ $(".select2-dropdown").select2({
 
 $( document ).ready(function() {
   $('.tokenfield').tokenfield();
+
+  $('.filter-columns').on('click', function(e) {
+
+    $table = $('#sort-table');
+
+    var hide_columns = $table.find('.'+$(this).data('id'));
+    $(hide_columns).toggle();
+
+  });
 
   $("#invites_to_volunteers").on("click", function(){
     if (this.checked){

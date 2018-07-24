@@ -334,23 +334,23 @@ class DeviceController extends Controller
 
               }
 
-              // $this->set('response', $response);
           }
           $Events = New Party;
           $Categories = New Category;
+          $File = New FixometerFile;
 
           $UserEvents = $Events->findAll();
 
-
-          // $this->set('categories', $Categories->findAll());
-          // $this->set('events', $UserEvents);
-
           $device = $Device->findOne($id);
-          // $this->set('title', 'Edit Device');
-          // $this->set('formdata', $Device);
 
           if (!isset($response)) {
             $response = null;
+          }
+
+          $images = $File->findImages(env('TBL_DEVICES'), $id);
+
+          if (!isset($images)) {
+            $images = null;
           }
 
           $brands = Brands::all();
@@ -364,6 +364,7 @@ class DeviceController extends Controller
             'brands' => $brands,
             'user' => $user,
             'is_host' => $is_host,
+            'images' => $images,
           ]);
 
       }

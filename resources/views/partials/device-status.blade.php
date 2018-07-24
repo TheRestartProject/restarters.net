@@ -22,4 +22,4 @@
     endswitch;
 @endphp
 
-<td><span class="badge badge-{{ $state }}">@lang('devices.' . $device)</span></td>
+<td class="state"><span class="badge badge-{{ $state }}">@lang('devices.' . $device)</span></td>

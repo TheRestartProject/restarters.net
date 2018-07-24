@@ -131,30 +131,40 @@
 
                     <div class="d-flex flex-row align-content-center justify-content-end">
 
-                        <form action="/device/search" class="search field-form-input form-control" method="get">
-                          <input type="hidden" name="fltr" value="<?php echo bin2hex(openssl_random_pseudo_bytes(8)); ?>">
-                            <label for="search" class="sr-only">Search</label>
-                        <input placeholder="Quick search" id="search" type="search"><button type="submit"><span class="sr-only">Search</span><svg width="15" height="15" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M3.394 3.394a4.801 4.801 0 0 1 6.787 0 4.801 4.801 0 0 1 0 6.787 4.801 4.801 0 0 1-6.787 0 4.801 4.801 0 0 1 0-6.787zm1.094 1.094a3.252 3.252 0 1 1 4.599 4.599 3.252 3.252 0 0 1-4.599-4.599z"/><path d="M8.855 10.218l1.363-1.363 2.622 2.622a.964.964 0 0 1-1.363 1.363l-2.622-2.622z"/></svg></button></form>
-
 
                         <div class="btn-group btn-group__duo" role="group" aria-label="Filter options">
-
-                            <div class="dropdown">
-                                <button class="btn btn-primary dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">10</button>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                                    <a class="dropdown-item" href="#">Action</a>
-                                    <a class="dropdown-item" href="#">Another action</a>
-                                    <a class="dropdown-item" href="#">Something else here</a>
-                                </div>
-                            </div>
 
                             <div class="dropdown">
                                 <button class="btn btn-primary dropdown-toggle" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Items</span><svg width="14" height="12" viewBox="0 0 12 10" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M3.163.324A.324.324 0 0 0 2.84 0H.324A.324.324 0 0 0 0 .324v1.909c0 .179.145.324.324.324H2.84a.324.324 0 0 0 .323-.324V.324zm0 3.715a.324.324 0 0 0-.323-.324H.324A.324.324 0 0 0 0 4.039v1.91c0 .178.145.323.324.323H2.84a.323.323 0 0 0 .323-.323v-1.91zm0 3.715a.323.323 0 0 0-.323-.323H.324A.324.324 0 0 0 0 7.754v1.91c0 .179.145.324.324.324H2.84a.324.324 0 0 0 .323-.324v-1.91zM11.25.324A.324.324 0 0 0 10.926 0h-6.37a.323.323 0 0 0-.323.324v1.909c0 .179.144.324.323.324h6.37a.324.324 0 0 0 .324-.324V.324zm0 3.715a.324.324 0 0 0-.324-.324h-6.37a.323.323 0 0 0-.323.324v1.91c0 .178.144.323.323.323h6.37a.324.324 0 0 0 .324-.323v-1.91zm0 3.715a.324.324 0 0 0-.324-.323h-6.37a.323.323 0 0 0-.323.323v1.91c0 .179.144.324.323.324h6.37a.324.324 0 0 0 .324-.324v-1.91z" fill="#fff"/></svg>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
-                                    <a class="dropdown-item" href="#">Action</a>
-                                    <a class="dropdown-item" href="#">Another action</a>
-                                    <a class="dropdown-item" href="#">Something else here</a>
+                                    <label class="dropdown-item">
+                                      <input class="filter-columns" data-id="deviceID" type="checkbox" value="1" class="dropdown-item-checkbox" checked> #</input>
+                                    </label>
+                                    <label class="dropdown-item">
+                                      <input class="filter-columns" data-id="state" type="checkbox" value="1" class="dropdown-item-checkbox" checked> State</input>
+                                    </label>
+                                    <label class="dropdown-item">
+                                      <input class="filter-columns" data-id="category" type="checkbox" value="1" class="dropdown-item-checkbox" checked> Category</input>
+                                    </label>
+                                    <label class="dropdown-item">
+                                      <input class="filter-columns" data-id="brand" type="checkbox" value="1" class="dropdown-item-checkbox" checked> Brand</input>
+                                    </label>
+                                    <label class="dropdown-item">
+                                      <input class="filter-columns" data-id="model" type="checkbox" value="1" class="dropdown-item-checkbox" checked> Model</input>
+                                    </label>
+                                    <label class="dropdown-item">
+                                      <input class="filter-columns" data-id="comment" type="checkbox" value="1" class="dropdown-item-checkbox" checked> Comment</input>
+                                    </label>
+                                    <label class="dropdown-item">
+                                      <input class="filter-columns" data-id="eventGroup" type="checkbox" value="1" class="dropdown-item-checkbox" checked> Event (Group)</input>
+                                    </label>
+                                    <label class="dropdown-item">
+                                      <input class="filter-columns" data-id="eventDate" type="checkbox" value="1" class="dropdown-item-checkbox" checked> Event Date</input>
+                                    </label>
+                                    <label class="dropdown-item">
+                                      <input class="filter-columns" data-id="location" type="checkbox" value="1" class="dropdown-item-checkbox" checked> Location</input>
+                                    </label>
                                 </div>
                             </div>
 
@@ -169,21 +179,21 @@
 
             <br>
 
-            <div class="table-responsive">
-                <table class="table table-hover table-responsive table-striped bootg table-devices" id="devices-table">
+            <div class="table-responsive" id="sort-table">
+                <table class="table table-hover table-responsive table-striped bootg table-devices sortable" id="devices-table">
                     <thead>
                         <tr>
                             <th scope="col"></th> <!-- <th scope="col" data-column-id="comment">Comment</th> -->
                             <th scope="col"></th>
-                            <th scope="col" data-column-id="deviceID"  data-header-css-class="comm-cell" data-identifier="true" data-type="numeric">#</th> <!-- <th scope="col" data-column-id="edit" data-header-css-class="comm-cell" data-formatter="editLink" data-sortable="false">edit</th> -->
-                            <th scope="col" data-column-id="repairstatus" data-header-css-class="mid-cell" data-formatter="statusBox">@lang('devices.state')</th>
-                            <th scope="col" data-column-id="category">@lang('devices.category')</th>
-                            <th scope="col" data-column-id="brand">@lang('devices.brand')</th>
-                            <th scope="col" data-column-id="model">@lang('devices.model')</th>
-                            <th scope="col" data-column-id="comment">@lang('devices.comment')</th>
-                            <th scope="col" data-column-id="event">@lang('devices.eventgroup')</th>
-                            <th scope="col" data-column-id="eventDate" data-header-css-class="mid-cell">@lang('devices.eventdate')</th>
-                            <th scope="col" data-column-id="location">@lang('devices.location')</th> <!-- <th scope="col" data-column-id="groupName">Event (Group)</th> -->
+                            <th scope="col" class="deviceID" data-header-css-class="comm-cell" data-identifier="true" data-type="numeric">#</th> <!-- <th scope="col" data-column-id="edit" data-header-css-class="comm-cell" data-formatter="editLink" data-sortable="false">edit</th> -->
+                            <th scope="col" class="state" data-header-css-class="mid-cell" data-formatter="statusBox">@lang('devices.state')</th>
+                            <th scope="col" class="category">@lang('devices.category')</th>
+                            <th scope="col" class="brand">@lang('devices.brand')</th>
+                            <th scope="col" class="model">@lang('devices.model')</th>
+                            <th scope="col" class="comment">@lang('devices.comment')</th>
+                            <th scope="col" class="eventGroup">@lang('devices.eventgroup')</th>
+                            <th scope="col" class="eventDate" data-header-css-class="mid-cell">@lang('devices.eventdate')</th>
+                            <th scope="col" class="location">@lang('devices.location')</th> <!-- <th scope="col" data-column-id="groupName">Event (Group)</th> -->
 
                         </tr>
                     </thead>
@@ -192,15 +202,15 @@
                             @foreach($list as $device)
                               <tr>
                                 @include('partials/device-comment-photo', ['comment' => $device->problem ])
-                                <td><a href="/device/page-edit/<?php echo $device->id; ?>"><?php echo $device->id; ?></a></td>
+                                <td class="deviceID"><a href="/device/page-edit/<?php echo $device->id; ?>"><?php echo $device->id; ?></a></td>
                                 @include('partials/device-status', ['status' => $device->repair_status])
-                                <td><?php echo $device->category_name; ?></td>
-                                <td><?php echo $device->brand; ?></td>
-                                <td><?php echo $device->model; ?></td>
-                                <td><?php echo $device->problem; ?></td>
-                                <td><?php echo $device->group_name; ?></td>
-                                <td><?php echo strftime('%Y-%m-%d', $device->event_date); ?></td>
-                                <td><?php echo $device->event_location; ?></td>
+                                <td class="category"><?php echo $device->category_name; ?></td>
+                                <td class="brand"><?php echo $device->brand; ?></td>
+                                <td class="model"><?php echo $device->model; ?></td>
+                                <td class="comment"><?php echo $device->problem; ?></td>
+                                <td class="eventGroup"><?php echo $device->group_name; ?></td>
+                                <td class="eventDate"><?php echo strftime('%Y-%m-%d', $device->event_date); ?></td>
+                                <td class="location"><?php echo $device->event_location; ?></td>
                               </tr>
                             @endforeach
                         @endif
