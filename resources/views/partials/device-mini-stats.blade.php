@@ -1,5 +1,5 @@
 <div class="row row-compressed">
-    <div class="d-none d-md-flex col-md-3">
+    <div class="d-none d-md-block col-md-3">
         @if( $title == 1 )
           <img class="img-fluid" src="{{ url('/icons/Category_Icons-01.png') }}" alt="Computers and Home Office">
         @elseif( $title == 2 )

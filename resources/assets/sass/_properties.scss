@@ -63,8 +63,8 @@
             position: relative;
             z-index: 1;
             flex-basis: auto;
-            > div {
-              //display: contents;
+            > span {
+              display: contents;
             }
         }
 
@@ -88,7 +88,7 @@
 
     &__small {
         flex: 1 0 50%;
-        
+
         li {
             @include media-breakpoint-up(lg) {
                 flex: 1 0 50%;
@@ -99,7 +99,7 @@
 
     &__full {
         flex: 1 0 100%;
-        
+
         li {
             @include media-breakpoint-up(lg) {
                 flex: 1 0 50%;

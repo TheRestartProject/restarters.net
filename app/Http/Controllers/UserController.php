@@ -299,12 +299,12 @@ class UserController extends Controller
 
       $user = User::find($id);
 
-      //set role for User
+      // Set role for User
       $user->update([
         'role' => $request->input('user_role'),
       ]);
 
-      // Change to sync with user_groups
+      // Sync with user_groups
       $user->userGroups()->sync($request->input('assigned_groups'));
 
       return redirect()->back()->with('message', 'Admin settings updated!');
@@ -616,7 +616,7 @@ class UserController extends Controller
             ]);
 
         } else {
-            header('Location: /user/forbidden');
+            return redirect('/user/forbidden');
         }
     }
 

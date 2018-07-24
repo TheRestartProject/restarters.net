@@ -133,30 +133,16 @@
                   </div>
                 </div>
 
-
-                <div class="form-group">
-
-                    <div class="previews"></div>
-
-                    <label for="file">@lang('events.field_add_image'):</label>
-                    <!-- <div class="dropzone" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')">
-                        <div class="dz-default dz-message"></div> -->
-                        <div class="fallback">
-                            <input id="file" name="file[]" type="file" multiple>
-                        </div>
-                    <!-- </div> -->
-
-                </div>
               </div>
             </div>
           </div>
 
           <div class="button-group row">
-              <div class="offset-lg-4 col-lg-6 d-flex align-items-center justify-content-start">
+              <div class="offset-lg-3 col-lg-7 d-flex align-items-right justify-content-end text-right">
                   <span class="button-group__notice">@lang('events.before_submit_text')</span>
               </div>
-              <div class="col-lg-2 d-flex align-items-center justify-content-end  pt-4 pt-lg-0 pb-4 pb-lg-0">
-                  <input type="submit" class="btn btn-primary btn-create" id="create-event" value="@lang('events.create_event')">
+              <div class="col-lg-2 d-flex align-items-center justify-content-end">
+                  <input type="submit" class="btn btn-primary btn-block btn-create" id="create-event" value="@lang('events.create_event')">
               </div>
           </div>
 

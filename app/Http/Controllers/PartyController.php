@@ -21,6 +21,7 @@ use App\Notifications\JoinGroup;
 use App\Notifications\RSVPEvent;
 use App\Notifications\ModerationEvent;
 use App\Notifications\EventDevices;
+use App\Notifications\EventRepairs;
 use DateTime;
 use FixometerFile;
 use FixometerHelper;
@@ -1449,11 +1450,11 @@ class PartyController extends Controller {
           $Image = new FixometerFile;
           $Image->deleteImage($id, $path);
 
-          return redirect()->back()->with('message', 'Thank you, the image has been deleted');
+          return redirect()->back()->with('success', 'Thank you, the image has been deleted');
 
       }
 
-      return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
+      return redirect()->back()->with('warning', 'Sorry, but the image can\'t be deleted');
 
   }
 
@@ -1486,6 +1487,54 @@ class PartyController extends Controller {
       }
 
     }
+  }
+
+  /*
+   *
+   * This sends an email to all user except the host logged in an email to ask for contributions
+   *
+   */
+  public function getContributions($event_id){
+
+      // Let's check that current logged in user is a host of the event
+      $in_event = EventsUsers::where('event', $event_id)
+                                ->where('user', Auth::user()->id)
+                                  ->where('role', 3)
+                                    ->first();
+
+      // We'll allow admins to send out email, just in case...
+      if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || is_object($in_event) ){
+
+          if(env('APP_ENV') == 'development' || env('APP_ENV') == 'local') { //Testing purposes
+
+            $all_restarters = User::whereIn('id', [91,92,93])->get();
+
+          } else {
+
+            $all_restarters = User::join('events_users', 'events_users.user', '=', 'users.id')
+                                  ->where('users.invites', 1)
+                                    ->where('events_users.role', 4)
+                                      ->where('events_users.event', $event_id)
+                                        ->get();
+
+          }
+
+          $event = Party::find($event_id);
+
+          $arr = [
+            'event_name' => $event->getEventName(),
+            'event_url' => url('/party/view/'.$event_id),
+            'preferences' => url('/profile/edit'),
+          ];
+          Notification::send($all_restarters, new EventRepairs($arr));
+
+          return redirect()->back()->with('success', 'Thank you, all attendees have been informed');
+
+      } else {
+
+          return redirect()->back()->with('warning', 'Sorry, you are not the host of this event');
+
+      }
 
   }
 

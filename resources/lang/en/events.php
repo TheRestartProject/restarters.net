@@ -101,7 +101,7 @@ return [
     'field_event_county' => 'County/State',
     'field_event_zip' => 'Post/Zip code',
     'field_event_country' => 'Country',
-    'field_add_image' => 'Add image',
+    'field_add_image' => 'Add images',
 
     'before_submit_text' => 'Once confirmed by our community lead, your event will be made public on The Restart Project homepage.',
     'save_event' => 'Save Event',

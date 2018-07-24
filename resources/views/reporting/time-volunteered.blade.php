@@ -131,16 +131,6 @@
                               </select>
                           </div>
                       </div>
-                      <div class="form-group">
-                          <label for="country">@lang('reporting.region'):</label>
-                          <div class="form-control form-control__select">
-                              <select id="region" class="select2" disabled>
-                                  <option>@lang('reporting.placeholder_region')</option>
-                                  <!-- <option>Option 2</option>
-                                  <option>Option 3</option> -->
-                              </select>
-                          </div>
-                      </div>
                   </aside>
                   <aside class="edit-panel edit-panel__side">
                       <legend>@lang('reporting.miscellaneous')</legend>
@@ -168,7 +158,7 @@
                 <li>
                     <div>
                     <h3>@lang('reporting.hours_volunteered')</h3>
-                    {{ number_format($hours_completed, 0, '.', ',') }}
+                    {{ $hours_completed }}
                     </div>
                 </li>
                 <li>
@@ -218,7 +208,7 @@
                                 @else
                                   <td>N/A</td>
                                 @endif
-                                <td>{{ number_format($country_hours->hours/60/60, 0, '.', ',') }}</td>
+                                <td>{{ substr($country_hours->event_hours, 0, -4) }}</td>
                               </tr>
                             @endforeach
                         </tbody>
@@ -244,7 +234,7 @@
                               @else
                                 <td>N/A</td>
                               @endif
-                              <td>{{ number_format($city_hours->hours/60/60, 0, '.', ',') }}</td>
+                              <td>{{ substr($city_hours->event_hours, 0, -4) }}</td>
                             </tr>
                           @endforeach
                         </tbody>
@@ -269,13 +259,13 @@
                   <tbody>
                     @foreach($user_events as $ue)
                       <tr>
-                          @if (FixometerHelper::hasRole($user, 'Administrator') || $ue->id == $user->id)
-                            <td><a href="/profile/edit/{{ $ue->id }}">{{ $ue->id }}</a></td>
-                          @else
-                            <td>{{ $ue->id }}</td>
-                          @endif
+                          <td><a href="/party/view/{{ $ue->idevents }}">{{ $ue->idevents }}</a></td>
                           <td>{{ $ue->username }}</td>
-                          <td>{{ date('H:i', strtotime($ue->end) - strtotime($ue->start)) }}</td>
+                          @php
+                            $start_time = new DateTime($ue->start);
+                            $diff = $start_time->diff(new DateTime($ue->end));
+                          @endphp
+                          <td>{{ $diff->h.'.'.sprintf("%02d", $diff->i/60 * 100) }}</td>
                           <td>{{ date('d/m/Y', strtotime($ue->event_date)) }}</td>
                           <td>{{ $ue->groupname }}</td>
                           <td>{{ $ue->location }}</td>

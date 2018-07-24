@@ -14928,14 +14928,14 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   content: "\203A";
 }
 
-.dz-clickable .dropzone {
+.dz-clickable.dropzone {
   border-style: dashed;
   border-color: #BEC0C0;
   border-radius: 3px;
   background-color: #F8F8F8;
 }
 
-.dz-clickable .dropzone .dz-message {
+.dz-clickable.dropzone .dz-message {
   font-size: 16px;
   color: #000;
   font-family: "Patua One", sans-serif;
@@ -14945,7 +14945,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   padding-top: 22px;
 }
 
-.dz-clickable .dropzone .dz-message small {
+.dz-clickable.dropzone .dz-message small {
   font-family: "Open Sans", sans-serif;
   font-size: 13px;
   display: block;
@@ -14981,7 +14981,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .previews {
-  margin: 20px -5px;
+  margin: 0 -5px;
   padding: 0;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -17211,9 +17211,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .group-view .events-list-wrap,
 .group-view .events-link-wrap {
-  border-left: 1px #D9D9D9 solid;
-  border-right: 1px #D9D9D9 solid;
-  border-bottom: 1px #D9D9D9 solid;
+  border: 1px #D9D9D9 solid;
 }
 
 .group-view .events-list-wrap {
@@ -17433,6 +17431,10 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
       flex-basis: auto;
 }
 
+.properties li > div > span {
+  display: contents;
+}
+
 .properties li svg {
   position: absolute;
   left: 15px;
@@ -17613,48 +17615,6 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   z-index: 9;
 }
 
-.events .nav-tabs {
-  font-size: 16px;
-}
-
-.events .nav-tabs .nav-item {
-  margin-right: 3px;
-  font-family: "Patua One", sans-serif;
-}
-
-.events .nav-tabs .nav-link {
-  color: #000;
-  background-color: #F9F9F9;
-  border-color: #D9D9D9;
-  border-radius: 3px 3px 0 0;
-  padding: 10px 15px;
-}
-
-.events .nav-tabs .nav-link svg {
-  position: relative;
-  z-index: 1;
-  margin-right: 5px;
-}
-
-.events .nav-tabs .nav-link.active {
-  border-bottom: 1px #F9F9F9 solid;
-}
-
-.events .nav-tabs .nav-link:hover,
-.events .nav-tabs .nav-link:focus {
-  text-decoration: underline;
-}
-
-.events .tab-content {
-  background-color: #F9F9F9;
-  border-radius: 3px;
-  border-color: #D9D9D9;
-}
-
-.events .tab-panel {
-  border-radius: 3px;
-}
-
 .events__header {
   margin-bottom: 30px;
 }
@@ -17777,6 +17737,50 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .card .table-events .btn {
   width: auto;
   min-width: auto;
+}
+
+.nav-tabs {
+  font-size: 16px;
+  border: 0 none;
+}
+
+.nav-tabs .nav-item {
+  margin-right: 3px;
+  font-family: "Patua One", sans-serif;
+}
+
+.nav-tabs .nav-link {
+  color: #000;
+  background-color: #F9F9F9;
+  border-color: #D9D9D9;
+  border-radius: 3px 3px 0 0;
+  padding: 10px 15px;
+}
+
+.nav-tabs .nav-link svg {
+  position: relative;
+  z-index: 1;
+  margin-right: 5px;
+}
+
+.nav-tabs .nav-link.active {
+  border-bottom: 1px #F9F9F9 solid;
+  background-color: #F9F9F9;
+}
+
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+  text-decoration: underline;
+}
+
+.tab-content {
+  background-color: #F9F9F9;
+  border-radius: 3px;
+  border-color: #D9D9D9;
+}
+
+.tab-panel {
+  border-radius: 3px;
 }
 
 .reporting {

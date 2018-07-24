@@ -43,9 +43,9 @@ class EventRepairs extends Notification
         return (new MailMessage)
                     ->subject('Contribute Details')
                     ->greeting('Hello!')
-                    ->line('Thank you for joining us recently at  \'' . $this->arr[0] . '\',  please help improve the details of the repairs you carried out and add any photos you may have taken at the event. This will help us improve the quality of our data.')
-                    ->action('Contribute data', url('/'))
-                    ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr[1] . '">your preferences</a> on your account.');
+                    ->line('Thank you for joining us recently at  \'' . $this->arr['event_name'] . '\',  please help improve the details of the repairs you carried out and add any photos you may have taken at the event. This will help us improve the quality of our data.')
+                    ->action('Contribute data', url($this->arr['event_url']))
+                    ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'] . '">your preferences</a> on your account.');
     }
 
     /**

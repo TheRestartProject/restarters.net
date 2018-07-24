@@ -30589,6 +30589,9 @@ function loadDropzones() {
         var prefix = '';
 
         $(".dropzoneEl").each(function (index) {
+
+            $dropzone = $(this);
+
             if ($(this).data('deviceid') !== undefined) {
                 prefix = '-' + $(this).data('deviceid');
             } else {
@@ -30605,6 +30608,7 @@ function loadDropzones() {
                     // autoProcessQueue: false,
                     paramName: "file", // The name that will be used to transfer the file
                     // maxFilesize: 2,
+                    dictDefaultMessage: '',
                     parallelUploads: 100,
                     uploadMultiple: true,
                     createImageThumbnails: true,
@@ -30612,38 +30616,39 @@ function loadDropzones() {
                     thumbnailHeight: 60,
                     thumbnailMethod: "contain",
                     addRemoveLinks: true,
-                    previewsContainer: ".uploads-" + $(this).data('deviceid')
-                    // init: function () {
-                    //
-                    //     jQuery(".dropzone .dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
-                    //
-                    //     var myDropzone = this;
-                    //
-                    //     // First change the button to actually tell Dropzone to process the queue.
-                    //     this.element.querySelector("input[type=submit]").addEventListener("click", function(e) {
-                    //       // Make sure that the form isn't actually being sent.
-                    //       e.preventDefault();
-                    //       e.stopPropagation();
-                    //       myDropzone.processQueue();
-                    //     });
-                    //
-                    //     // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead
-                    //     // of the sending event because uploadMultiple is set to true.
-                    //     this.on("sendingmultiple", function() {
-                    //       // Gets triggered when the form is actually being sent.
-                    //       // Hide the success button or the complete form.
-                    //     });
-                    //     this.on("successmultiple", function(files, response) {
-                    //       // Gets triggered when the files have successfully been sent.
-                    //       // Redirect user or notify of success.
-                    //
-                    //     });
-                    //     this.on("errormultiple", function(files, response) {
-                    //       // Gets triggered when there was an error sending the files.
-                    //       // Maybe show form again, and notify user of error
-                    //     });
-                    //
-                    // }
+                    previewsContainer: ".uploads-" + $(this).data('deviceid'),
+                    init: function init() {
+
+                        //jQuery(".dropzone .dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
+                        $dropzone.find(".dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
+                        //
+                        //     var myDropzone = this;
+                        //
+                        //     // First change the button to actually tell Dropzone to process the queue.
+                        //     this.element.querySelector("input[type=submit]").addEventListener("click", function(e) {
+                        //       // Make sure that the form isn't actually being sent.
+                        //       e.preventDefault();
+                        //       e.stopPropagation();
+                        //       myDropzone.processQueue();
+                        //     });
+                        //
+                        //     // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead
+                        //     // of the sending event because uploadMultiple is set to true.
+                        //     this.on("sendingmultiple", function() {
+                        //       // Gets triggered when the form is actually being sent.
+                        //       // Hide the success button or the complete form.
+                        //     });
+                        //     this.on("successmultiple", function(files, response) {
+                        //       // Gets triggered when the files have successfully been sent.
+                        //       // Redirect user or notify of success.
+                        //
+                        //     });
+                        //     this.on("errormultiple", function(files, response) {
+                        //       // Gets triggered when there was an error sending the files.
+                        //       // Maybe show form again, and notify user of error
+                        //     });
+                        //
+                    }
                 });
                 // console.log($('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone);
             }

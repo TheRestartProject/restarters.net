@@ -362,13 +362,14 @@ class ExportController extends Controller {
         }
 
       //By date
-        if ($request->input('from-date') !== null && $request->input('to-date') == null) {
-            $user_events = $user_events->where('events.event_date', '>', strtotime($request->input('from-date')));
-        } elseif ($request->input('to-date') !== null && $request->input('from-date') == null) {
-            $user_events = $user_events->where('events.event_date', '<', strtotime($request->input('to-date')));
-        } elseif ($request->input('to-date') !== null && $request->input('from-date') !== null) {
-            $user_events = $user_events->whereBetween('events.event_date', array(strtotime($request->input('from-date')),
-                                                                    strtotime($request->input('to-date'))));
+      // dd($request->input('from_date'));
+        if ($request->input('from_date') !== null && $request->input('to_date') == null) {
+            $user_events = $user_events->whereDate('events.event_date', '>', $request->input('from_date'));
+        } elseif ($request->input('to_date') !== null && $request->input('from_date') == null) {
+            $user_events = $user_events->whereDate('events.event_date', '<', $request->input('to_date'));
+        } elseif ($request->input('to_date') !== null && $request->input('from_date') !== null) {
+            $user_events = $user_events->whereBetween('events.event_date', array($request->input('from_date'),
+                                                                    $request->input('to_date')));
         }
 
       //By location
@@ -383,11 +384,11 @@ class ExportController extends Controller {
 
     //total users
       $total_users = clone $user_events;
-      $total_users = $total_users->distinct('id')->count('id');
+      $total_users = $total_users->distinct('users.id')->count('users.id');
 
     //anonymous users
       $anonymous_users = clone $user_events;
-      $anonymous_users = $anonymous_users->whereNull('id')->count('id');
+      $anonymous_users = $anonymous_users->whereNull('user')->count('*');
 
     //group count
       $group_count = clone $user_events;
@@ -395,7 +396,7 @@ class ExportController extends Controller {
 
     //average age
       $average_age = clone $user_events;
-      $average_age = $average_age->distinct('id')->pluck('users.age')->toArray();
+      $average_age = $average_age->distinct('users.id')->pluck('users.age')->toArray();
 
       foreach ($average_age as $key => $value) {
           if (!is_int(intval($value)) || intval($value) <= 0) {
@@ -414,27 +415,28 @@ class ExportController extends Controller {
 
     //hours completed
       $hours_completed = clone $user_events;
-      $hours_completed = $hours_completed->sum(DB::raw('TIMEDIFF(end, start)'))/60/60;
+      $hours_completed = substr($hours_completed->sum(DB::raw('TIMEDIFF(end, start)')), 0, -4);
 
     //country hours completed
       $country_hours_completed = clone $user_events;
-      $country_hours_completed = $country_hours_completed->groupBy('country')->select('country', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
-      $all_country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->get();
-      $country_hours_completed = $country_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
+      $country_hours_completed = $country_hours_completed->groupBy('country')->select('country', DB::raw('SUM(TIMEDIFF(end, start)) as event_hours'));
+      $all_country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DSC')->get();
+      $country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DSC')->take(5)->get();
 
     //city hours completed
       $city_hours_completed = clone $user_events;
-      $city_hours_completed = $city_hours_completed->groupBy('events.location')->select('events.location', DB::raw('SUM(TIMEDIFF(end, start)) as hours'));
-      $all_city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->get();
-      $city_hours_completed = $city_hours_completed->orderBy('hours', 'DSC')->take(5)->get();
+      $city_hours_completed = $city_hours_completed->groupBy('events.location')->select('events.location', DB::raw('SUM(TIMEDIFF(end, start)) as event_hours'));
+      $all_city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DSC')->get();
+      $city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DSC')->take(5)->get();
 
     //order by users id
-    $user_events = $user_events->orderBy('users.id', 'ASC');
+    $user_events = $user_events->orderBy('events.event_date', 'DSC');
 
     //Select all necessary information for table
     $user_events = $user_events->select(
                                         'users.id',
                                         'users.name as username',
+                                        'events.idevents',
                                         'events.start',
                                         'events.end',
                                         'events.event_date',
@@ -459,8 +461,8 @@ class ExportController extends Controller {
         'name' => $request->input('name'),
         'age' => $request->input('year'),
         'gender' => $request->input('gender'),
-        'from_date' => $request->input('from-date'),
-        'to_date' => $request->input('to-date'),
+        'from_date' => $request->input('from_date'),
+        'to_date' => $request->input('to_date'),
         'country' => $request->input('country'),
         'region' => null,
         'misc' => $request->input('misc'),
@@ -510,7 +512,7 @@ class ExportController extends Controller {
     $stats_headers = array('Hours Volunteered', 'Average age', 'Number of groups', 'Total number of users', 'Number of anonymous users');
     fputcsv($file, array('Overall Stats:'));
     fputcsv($file, $stats_headers);
-    fputcsv($file, array(number_format($data['hours_completed'], 0, '.', ','), $data['average_age'], $data['group_count'], $data['total_users'], $data['anonymous_users']));
+    fputcsv($file, array($data['hours_completed'], $data['average_age'], $data['group_count'], $data['total_users'], $data['anonymous_users']));
     fputcsv($file, array());
 
     //Put breakdown by country in csv
@@ -523,7 +525,7 @@ class ExportController extends Controller {
         } else {
           $country = 'N/A';
         }
-        fputcsv($file, array($country, number_format($country_hours->hours/60/60, 0, '.', ',')));
+        fputcsv($file, array($country, substr($country_hours->event_hours, 0, -4)));
     }
     fputcsv($file, array());
 
@@ -537,7 +539,7 @@ class ExportController extends Controller {
         } else {
           $city = 'N/A';
         }
-        fputcsv($file, array($city, number_format($city_hours->hours/60/60, 0, '.', ',')));
+        fputcsv($file, array($city, substr($city_hours->event_hours, 0, -4)));
     }
     fputcsv($file, array());
 
@@ -546,7 +548,9 @@ class ExportController extends Controller {
     fputcsv($file, array('Results:'));
     fputcsv($file, $users_headers);
     foreach($data['user_events'] as $ue) {
-          fputcsv($file, array($ue->id, date('H:i', strtotime($ue->end) - strtotime($ue->start)),
+          $start_time = new DateTime($ue->start);
+          $diff = $start_time->diff(new DateTime($ue->end));
+          fputcsv($file, array($ue->idevents, $diff->h.'.'.sprintf("%02d", $diff->i/60 * 100),
                   date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location));
     }
     fputcsv($file, array());
