@@ -28,7 +28,7 @@
             <a class="nav-link active" data-toggle="tab" href="#details">Event details</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#photos">Event Photos</a>
+            <a class="nav-link" data-toggle="tab" href="#photos">Event photos</a>
           </li>
         </ul>
 
