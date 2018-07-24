@@ -78,43 +78,6 @@
         z-index: 9;
     }
 
-    .nav-tabs {
-        font-size: 16px;
-        .nav-item {
-            margin-right: 3px;
-            font-family: $font-family-sans-serif;
-        }
-        .nav-link {
-            color: #000;
-            background-color: #F9F9F9;
-            border-color: #D9D9D9;
-            border-radius: 3px 3px 0 0;
-            padding: 10px 15px;
-
-            svg {
-                position: relative;
-                z-index: 1;
-                margin-right: 5px;
-            }
-            &.active {
-                border-bottom: 1px #F9F9F9 solid;
-            }
-            &:hover, &:focus {
-                text-decoration: underline;
-            }
-        }
-    }
-
-    .tab-content {
-        background-color: #F9F9F9;
-        border-radius: 3px;
-        border-color: #D9D9D9;
-    }
-
-    .tab-panel {
-        border-radius: 3px;
-    }
-
     &__header {
         margin-bottom: 30px;
 
@@ -247,4 +210,43 @@
 .card .table-events .btn {
     width: auto;
     min-width: auto;
+}
+
+.nav-tabs {
+    font-size: 16px;
+    border: 0 none;
+    .nav-item {
+        margin-right: 3px;
+        font-family: $font-family-sans-serif;
+    }
+    .nav-link {
+        color: #000;
+        background-color: #F9F9F9;
+        border-color: #D9D9D9;
+        border-radius: 3px 3px 0 0;
+        padding: 10px 15px;
+
+        svg {
+            position: relative;
+            z-index: 1;
+            margin-right: 5px;
+        }
+        &.active {
+            border-bottom: 1px #F9F9F9 solid;
+            background-color: #F9F9F9;
+        }
+        &:hover, &:focus {
+            text-decoration: underline;
+        }
+    }
+}
+
+.tab-content {
+    background-color: #F9F9F9;
+    border-radius: 3px;
+    border-color: #D9D9D9;
+}
+
+.tab-panel {
+    border-radius: 3px;
 }

@@ -81,7 +81,7 @@ return [
     'description_of_problem' => 'Description of problem',
     'description_of_problem_solution' => 'Description of problem/solution',
     'solution_text' => 'Could the solution comments help Restarters working on a similar device in future?  Or is it a fun case study?',
-    'device_images' => 'Device Images',
+    'device_images' => 'Device images',
     'remove_file' => 'Remove file',
     'add_image' => 'Add image',
     'no_devices_added' => 'No devices added',
@@ -89,6 +89,6 @@ return [
     'add_a_device' => 'Add a device',
     'this_event_hasnt_started' => 'This event hasn\'t started',
     'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
-    'save' => 'Save'
-    
+    'save' => 'Save device'
+
 ];

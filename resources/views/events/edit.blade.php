@@ -23,45 +23,43 @@
           @php( FixometerHelper::printResponse($response) )
         @endif
 
-        <div class="container">
-          <ul class="nav nav-tabs">
-            <li class="nav-item">
-              <a class="nav-link active" data-toggle="tab" href="#details">Event details</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#photos">Event Photos</a>
-            </li>
-          </ul>
-        </div>
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#details">Event details</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#photos">Event Photos</a>
+          </li>
+        </ul>
 
         <div class="edit-panel">
-
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="form-group__offset">
-              <h4>@lang('events.edit_event')</h4>
-              <p>@lang('events.edit_event_content')</p>
-              </div>
-            </div>
-          </div>
 
           <div class="tab-content">
 
             <div class="tab-pane active" id="details">
 
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group__offset">
+                  <h4>@lang('events.edit_event')</h4>
+                  <p>@lang('events.edit_event_content')</p>
+                  </div>
+                </div>
+              </div>
+
               <form action="/party/edit/<?php echo $formdata->id; ?>" method="post" id="party-edit" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="id" value="<?php echo $formdata->id; ?>" >
 
-              <div class="row">
-                <div class="col-lg-6">
-                  <div class="form-group form-group__offset">
+                <div class="row">
+                  <div class="col-lg-6">
+                    <div class="form-group form-group__offset">
                       <label for="event_name">@lang('events.field_event_name'):</label>
                       <input type="text" class="form-control field" id="event_name" name="venue" value="{{ $formdata->venue }}">
                       <small id="nameHelpBlock" class="form-text text-muted">
                           @lang('events.field_event_name_helper')
                       </small>
-                  </div>
+                    </div>
 
                   @if ( ( FixometerHelper::hasRole($user, 'Host') && count($user_groups) > 1 ) || FixometerHelper::hasRole($user, 'Administrator') )
                   <div class="form-group form-group__offset">
@@ -88,6 +86,7 @@
 
                   <input type="hidden" name="free_text" id="free_text" value="{{ $formdata->free_text }}">
                 </div>
+
                 <div class="col-lg-6">
                   <div class="form-group">
                     <div class="row">
@@ -190,7 +189,7 @@
 
                 <div class="col-6 col-lg-6">
                   <label for="file">@lang('events.field_add_image'):</label>
-                  <form id="dropzoneEl-{{ $formdata->id }}" data-deviceid="{{ $formdata->id }}" class="dropzone dropzoneEl" action="/party/image-upload/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1=" Event images here - " data-field2="Choose compelling images that show off your event">
+                  <form id="dropzoneEl-{{ $formdata->id }}" data-deviceid="{{ $formdata->id }}" class="dropzone dropzoneEl" action="/party/image-upload/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')">
                       @csrf
                       <div class="dz-default dz-message"></div>
                       <div class="fallback">

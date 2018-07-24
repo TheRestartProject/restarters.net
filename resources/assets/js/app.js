@@ -550,6 +550,9 @@ function loadDropzones() {
         var prefix = '';
 
         $(".dropzoneEl").each(function( index ) {
+
+          $dropzone = $(this);
+
           if ($(this).data('deviceid') !== undefined) {
             prefix = '-'+$(this).data('deviceid');
           } else {
@@ -566,6 +569,7 @@ function loadDropzones() {
                 // autoProcessQueue: false,
                 paramName: "file", // The name that will be used to transfer the file
                 // maxFilesize: 2,
+                dictDefaultMessage: '',
                 parallelUploads: 100,
                 uploadMultiple: true,
                 createImageThumbnails: true,
@@ -576,7 +580,8 @@ function loadDropzones() {
                 previewsContainer: ".uploads-" + $(this).data('deviceid'),
                 init: function () {
 
-                    jQuery(".dropzone .dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
+                    //jQuery(".dropzone .dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
+                    $dropzone.find(".dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
                 //
                 //     var myDropzone = this;
                 //

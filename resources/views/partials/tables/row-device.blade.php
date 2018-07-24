@@ -203,7 +203,7 @@
 
         </div><!-- /row -->
         <div class="row row-compressed-xs nested-fields table-row-more">
-          <div class="col-12 col-lg-8 flex-column d-flex">
+          <div class="col-12 col-lg-6 flex-column d-flex">
 
               <label for="description">@lang('partials.description_of_problem_solution'):</label>
               <div class="form-group">
@@ -211,50 +211,23 @@
               </div>
 
           </div>
-          <div class="col-12 col-lg-4 flex-column d-flex">
+          <div class="col-12 col-lg-6 flex-column d-flex">
 
             <div class="table-cell-upload">
 
-              <!-- <div class="form-group">
-                  <label for="file">Add image:</label>
-
-                  <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1=" Device images here - " data-field2="Choose compelling images that show off your work">
-                      @csrf
-                      <div class="fallback" >
-                          <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />
-                      </div>
-                  </form>
-              </div> -->
-
-              <!-- <label for="device-image-{{ $device->iddevices }}">Device Images:</label>
-              <div class="previews">
-                @if( isset($device_images[$device->iddevices]) && !empty($device_images[$device->iddevices]) )
-                  @foreach($device_images[$device->iddevices] as $device_image)
-                    <div id="device-image-{{ $device->iddevices }}" class="dz-image">
-                      <img src="/uploads/thumbnail_{{ $device_image->path }}" alt="placeholder">
-                      <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $device_image->idimages }}}/{{{ $device_image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">@lang('partials.remove_file')</a>
-                    </div>
-                  @endforeach
-                @endif
-                <div class="uploads-{{ $device->iddevices }}"></div>
-              </div> -->
-
-              <div class="row pb-2">
-                  <div class="col-md-8 d-flex align-content-center flex-column">
+              <div class="row mt-4">
+                  <div class="col-md-12 d-flex align-content-center flex-column">
                       <div class="form-check d-flex align-items-center justify-content-start">
                           <input class="form-check-input" type="checkbox" name="wiki-{{ $device->iddevices }}" id="wiki-{{ $device->iddevices }}" value="1" @if( $device->wiki == 1 ) checked @endif>
                           <label class="form-check-label" for="wiki-{{ $device->iddevices }}">@lang('partials.solution_text')</label>
                       </div>
                   </div>
-                  <div class="col-md-4 d-flex justify-content-end flex-column"><div class="d-flex justify-content-end">
+                  <div class="col-md-12 d-flex justify-content-end flex-column"><div class="d-flex justify-content-end">
                       <button type="submit" class="btn btn-primary btn-save2">@lang('partials.save')</button></div>
                   </div>
               </div>
 
-
             </div><!-- / table-cell-upload -->
-
-
 
           </div>
 
@@ -263,19 +236,19 @@
         </form>
 
         <div class="row row-compressed-xs nested-fields table-row-more">
-          <div class="col-12 col-lg-8 flex-column d-flex">
+          <div class="col-12 col-lg-6 flex-column d-flex">
               <div class="form-group">
                   <label for="file">@lang('partials.add_image'):</label>
 
-                  <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1=" Device images here - " data-field2="Choose compelling images that show off your work">
+                  <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data"data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')">
                       @csrf
-                      <div class="fallback" >
+                      <div class="fallback">
                           <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />
                       </div>
                   </form>
               </div>
             </div>
-            <div class="col-12 col-lg-4 flex-column d-flex device-images">
+            <div class="col-12 col-lg-6 device-images">
               <label for="device-image-{{ $device->iddevices }}">@lang('partials.device_images'):</label>
               <div class="previews">
                 @if( isset($device_images[$device->iddevices]) && !empty($device_images[$device->iddevices]) )

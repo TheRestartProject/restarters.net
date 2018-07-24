@@ -12,12 +12,7 @@
       @endif
     </td>
     <td>
-      <a href="/profile/{{ $user->id }}">
-        {{ $user->name }}
-        @if ( $volunteer->role == 3 )
-          <span class="badge badge-primary">@lang('partials.host')</span>
-        @endif
-      </a>
+      <a href="/profile/{{ $user->id }}">{{ $user->name }}@if ( $volunteer->role == 3 )<span class="badge badge-primary">@lang('partials.host')</span>@endif</a>
     </td>
     @php( $user_skills = $user->userSkills )
     <td>
@@ -29,9 +24,7 @@
     <td class="table-cell-icon">
       <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{ $volunteer->getFullName() }}'s avatar" class="users-list__icon">
     </td>
-    <td>
-      {{{ $volunteer->getFullName() }}}
-    </td>
+    <td>{{{ $volunteer->getFullName() }}}</td>
     <td>
       N/A
     </td>
