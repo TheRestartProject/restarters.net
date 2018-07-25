@@ -587,10 +587,11 @@ class UserController extends Controller
 
 
 
-    public function all() {
+    public function all()
+    {
         $user = User::find(Auth::id());
 
-        if(FixometerHelper::hasRole($user, 'Administrator')){
+        if (FixometerHelper::hasRole($user, 'Administrator')) {
             $User = new User;
             $userlist = $User->getUserList(true)->paginate(env('PAGINATE'));
 

@@ -210,13 +210,17 @@
         </div>
 
         <div class="d-flex justify-content-center">
-          <nav aria-label="Page navigation example">
+          <nav aria-label="Pagination">
             @if (!empty($_GET) || isset($name))
               {!! $userlist->appends(['name' => $name, 'email' => $email, 'location' => $location, 'country' => $country, 'role' => $role, 'permissions' => $permissions ])->links() !!} <!-- 'selected_country' => $selected_country -->
             @else
               {!! $userlist->links() !!}
             @endif
           </nav>
+        </div>
+
+        <div class="d-flex justify-content-center">
+            Showing {{ $userlist->firstItem() }} to {{ $userlist->lastItem() }} of {{ $userlist->total() }} results
         </div>
         <br>
         <br>
