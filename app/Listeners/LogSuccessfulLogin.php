@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\User;
+use Illuminate\Http\Request;
 
 class LogSuccessfulLogin
 {
@@ -14,9 +15,9 @@ class LogSuccessfulLogin
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Request $request)
     {
-        //
+        $this->request = $request;
     }
 
     /**
@@ -27,6 +28,8 @@ class LogSuccessfulLogin
      */
     public function handle(Login $event)
     {
+
+        //dd($this->request->all());
         $u = User::find($event->user->id);
         $u->number_of_logins += 1;
         $u->save();

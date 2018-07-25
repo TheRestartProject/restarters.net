@@ -1902,7 +1902,7 @@
             try {
                 oldLocale = globalLocale._abbr;
                 var aliasedRequire = require;
-                __webpack_require__(162)("./" + name);
+                __webpack_require__(167)("./" + name);
                 getSetGlobalLocale(oldLocale);
             } catch (e) {}
         }
@@ -30063,7 +30063,7 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(136);
-module.exports = __webpack_require__(172);
+module.exports = __webpack_require__(171);
 
 
 /***/ }),
@@ -30082,14 +30082,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 __webpack_require__(137);
 __webpack_require__(160);
+__webpack_require__(193);
 __webpack_require__(161);
+__webpack_require__(162);
 __webpack_require__(163);
-__webpack_require__(164);
 __webpack_require__(165);
-__webpack_require__(167);
-__webpack_require__(168);
-window.Dropzone = __webpack_require__(169);
-window.Tokenfield = __webpack_require__(170);
+__webpack_require__(166);
+window.Dropzone = __webpack_require__(168);
+window.Tokenfield = __webpack_require__(169);
 
 if (jQuery('.slideshow').length > 0) {
     jQuery('.slideshow').slick({
@@ -53803,763 +53803,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 /* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_LOCAL_MODULE_0__, __WEBPACK_LOCAL_MODULE_0__factory, __WEBPACK_LOCAL_MODULE_0__module;var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
- * adding sorting ability to HTML tables with Bootstrap styling
- * @summary HTML tables sorting ability
- * @version 2.0.1
- * @requires tinysort, moment.js, jQuery
- * @license MIT
- * @author Matus Brlit (drvic10k)
- * @copyright Matus Brlit (drvic10k), bootstrap-sortable contributors
- */
-
-/**
- * TinySort is a small script that sorts HTML elements. It sorts by text- or attribute value, or by that of one of it's children.
- * @summary A nodeElement sorting script.
- * @version 2.3.6
- * @license MIT
- * @author Ron Valstar <ron@ronvalstar.nl>
- * @copyright Ron Valstar <ron@ronvalstar.nl>
- * @namespace tinysort
- */
-!function (e, t) {
-    "use strict";
-    function r() {
-        return t;
-    } true ? !(__WEBPACK_LOCAL_MODULE_0__factory = (r), (__WEBPACK_LOCAL_MODULE_0__module = { id: "tinysort", exports: {}, loaded: false }), __WEBPACK_LOCAL_MODULE_0__ = (typeof __WEBPACK_LOCAL_MODULE_0__factory === 'function' ? (__WEBPACK_LOCAL_MODULE_0__factory.call(__WEBPACK_LOCAL_MODULE_0__module.exports, __webpack_require__, __WEBPACK_LOCAL_MODULE_0__module.exports, __WEBPACK_LOCAL_MODULE_0__module)) : __WEBPACK_LOCAL_MODULE_0__factory), (__WEBPACK_LOCAL_MODULE_0__module.loaded = true), __WEBPACK_LOCAL_MODULE_0__ === undefined && (__WEBPACK_LOCAL_MODULE_0__ = __WEBPACK_LOCAL_MODULE_0__module.exports)) : e.tinysort = t;
-}(this, function () {
-    "use strict";
-    function e(e, n) {
-        function s() {
-            0 === arguments.length ? v({}) : t(arguments, function (e) {
-                v(x(e) ? { selector: e } : e);
-            }), d = $.length;
-        }function v(e) {
-            var t = !!e.selector,
-                n = t && ":" === e.selector[0],
-                o = r(e || {}, m);$.push(r({ hasSelector: t, hasAttr: !(o.attr === l || "" === o.attr), hasData: o.data !== l, hasFilter: n, sortReturnNumber: "asc" === o.order ? 1 : -1 }, o));
-        }function S() {
-            t(e, function (e, t) {
-                M ? M !== e.parentNode && (k = !1) : M = e.parentNode;var r = $[0],
-                    n = r.hasFilter,
-                    o = r.selector,
-                    a = !o || n && e.matchesSelector(o) || o && e.querySelector(o),
-                    l = a ? R : V,
-                    s = { elm: e, pos: t, posn: l.length };B.push(s), l.push(s);
-            }), D = R.slice(0);
-        }function y(e, t, r) {
-            for (var n = r(e.toString()), o = r(t.toString()), a = 0; n[a] && o[a]; a++) {
-                if (n[a] !== o[a]) {
-                    var l = Number(n[a]),
-                        s = Number(o[a]);return l == n[a] && s == o[a] ? l - s : n[a] > o[a] ? 1 : -1;
-                }
-            }return n.length - o.length;
-        }function N(e) {
-            for (var t, r, n = [], o = 0, a = -1, l = 0; t = (r = e.charAt(o++)).charCodeAt(0);) {
-                var s = 46 == t || t >= 48 && 57 >= t;s !== l && (n[++a] = "", l = s), n[a] += r;
-            }return n;
-        }function C(e, r) {
-            var n = 0;for (0 !== p && (p = 0); 0 === n && d > p;) {
-                var l = $[p],
-                    s = l.ignoreDashes ? f : u;if (t(h, function (e) {
-                    var t = e.prepare;t && t(l);
-                }), l.sortFunction) n = l.sortFunction(e, r);else if ("rand" == l.order) n = Math.random() < .5 ? 1 : -1;else {
-                    var c = a,
-                        g = w(e, l),
-                        m = w(r, l),
-                        v = "" === g || g === o,
-                        S = "" === m || m === o;if (g === m) n = 0;else if (l.emptyEnd && (v || S)) n = v && S ? 0 : v ? 1 : -1;else {
-                        if (!l.forceStrings) {
-                            var C = x(g) ? g && g.match(s) : a,
-                                b = x(m) ? m && m.match(s) : a;if (C && b) {
-                                var A = g.substr(0, g.length - C[0].length),
-                                    F = m.substr(0, m.length - b[0].length);A == F && (c = !a, g = i(C[0]), m = i(b[0]));
-                            }
-                        }n = g === o || m === o ? 0 : l.natural && (isNaN(g) || isNaN(m)) ? y(g, m, N) : m > g ? -1 : g > m ? 1 : 0;
-                    }
-                }t(h, function (e) {
-                    var t = e.sort;t && (n = t(l, c, g, m, n));
-                }), n *= l.sortReturnNumber, 0 === n && p++;
-            }return 0 === n && (n = e.pos > r.pos ? 1 : -1), n;
-        }function b() {
-            var e = R.length === B.length;if (k && e) O ? R.forEach(function (e, t) {
-                e.elm.style.order = t;
-            }) : M ? M.appendChild(A()) : console.warn("parentNode has been removed");else {
-                var t = $[0],
-                    r = t.place,
-                    n = "org" === r,
-                    o = "start" === r,
-                    a = "end" === r,
-                    l = "first" === r,
-                    s = "last" === r;if (n) R.forEach(F), R.forEach(function (e, t) {
-                    E(D[t], e.elm);
-                });else if (o || a) {
-                    var c = D[o ? 0 : D.length - 1],
-                        i = c && c.elm.parentNode,
-                        u = i && (o && i.firstChild || i.lastChild);u && (u !== c.elm && (c = { elm: u }), F(c), a && i.appendChild(c.ghost), E(c, A()));
-                } else if (l || s) {
-                    var f = D[l ? 0 : D.length - 1];E(F(f), A());
-                }
-            }
-        }function A() {
-            return R.forEach(function (e) {
-                q.appendChild(e.elm);
-            }), q;
-        }function F(e) {
-            var t = e.elm,
-                r = c.createElement("div");return e.ghost = r, t.parentNode.insertBefore(r, t), e;
-        }function E(e, t) {
-            var r = e.ghost,
-                n = r.parentNode;n.insertBefore(t, r), n.removeChild(r), delete e.ghost;
-        }function w(e, t) {
-            var r,
-                n = e.elm;return t.selector && (t.hasFilter ? n.matchesSelector(t.selector) || (n = l) : n = n.querySelector(t.selector)), t.hasAttr ? r = n.getAttribute(t.attr) : t.useVal ? r = n.value || n.getAttribute("value") : t.hasData ? r = n.getAttribute("data-" + t.data) : n && (r = n.textContent), x(r) && (t.cases || (r = r.toLowerCase()), r = r.replace(/\s+/g, " ")), null === r && (r = g), r;
-        }function x(e) {
-            return "string" == typeof e;
-        }x(e) && (e = c.querySelectorAll(e)), 0 === e.length && console.warn("No elements to sort");var D,
-            M,
-            q = c.createDocumentFragment(),
-            B = [],
-            R = [],
-            V = [],
-            $ = [],
-            k = !0,
-            z = e.length && e[0].parentNode,
-            L = z.rootNode !== document,
-            O = e.length && (n === o || n.useFlex !== !1) && !L && -1 !== getComputedStyle(z, null).display.indexOf("flex");return s.apply(l, Array.prototype.slice.call(arguments, 1)), S(), R.sort(C), b(), R.map(function (e) {
-            return e.elm;
-        });
-    }function t(e, t) {
-        for (var r, n = e.length, o = n; o--;) {
-            r = n - o - 1, t(e[r], r);
-        }
-    }function r(e, t, r) {
-        for (var n in t) {
-            (r || e[n] === o) && (e[n] = t[n]);
-        }return e;
-    }function n(e, t, r) {
-        h.push({ prepare: e, sort: t, sortBy: r });
-    }var o,
-        a = !1,
-        l = null,
-        s = window,
-        c = s.document,
-        i = parseFloat,
-        u = /(-?\d+\.?\d*)\s*$/g,
-        f = /(\d+\.?\d*)\s*$/g,
-        h = [],
-        d = 0,
-        p = 0,
-        g = String.fromCharCode(4095),
-        m = { selector: l, order: "asc", attr: l, data: l, useVal: a, place: "org", returns: a, cases: a, natural: a, forceStrings: a, ignoreDashes: a, sortFunction: l, useFlex: a, emptyEnd: a };return s.Element && function (e) {
-        e.matchesSelector = e.matchesSelector || e.mozMatchesSelector || e.msMatchesSelector || e.oMatchesSelector || e.webkitMatchesSelector || function (e) {
-            for (var t = this, r = (t.parentNode || t.document).querySelectorAll(e), n = -1; r[++n] && r[n] != t;) {}return !!r[n];
-        };
-    }(Element.prototype), r(n, { loop: t }), r(e, { plugin: n, defaults: m });
-}());
-
-(function (global, factory) {
-    if (true) {
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2), __WEBPACK_LOCAL_MODULE_0__, __webpack_require__(0)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-    } else {
-        factory(global.jQuery, global.tinysort, global.moment || undefined);
-    }
-})(this, function ($, tinysort, moment) {
-
-    var $document = $(document),
-        signClass,
-        sortEngine,
-        emptyEnd;
-
-    $.bootstrapSortable = function (options) {
-        if (options == undefined) {
-            initialize({});
-        } else if (options.constructor === Boolean) {
-            initialize({ applyLast: options });
-        } else if (options.sortingHeader !== undefined) {
-            sortByColumn(options.sortingHeader);
-        } else {
-            initialize(options);
-        }
-    };
-
-    function initialize(options) {
-        // Check if moment.js is available
-        var momentJsAvailable = typeof moment !== 'undefined';
-
-        // Set class based on sign parameter
-        signClass = !options.sign ? "arrow" : options.sign;
-
-        // Set sorting algorithm
-        if (options.customSort == 'default') options.customSort = defaultSortEngine;
-        sortEngine = options.customSort || sortEngine || defaultSortEngine;
-
-        emptyEnd = options.emptyEnd;
-
-        // Set attributes needed for sorting
-        $('table.sortable').each(function () {
-            var $this = $(this);
-            var applyLast = options.applyLast === true;
-            $this.find('span.sign').remove();
-
-            // Add placeholder cells for colspans
-            $this.find('> thead [colspan]').each(function () {
-                var colspan = parseFloat($(this).attr('colspan'));
-                for (var i = 1; i < colspan; i++) {
-                    $(this).after('<th class="colspan-compensate">');
-                }
-            });
-
-            // Add placeholder cells for rowspans in header
-            $this.find('> thead [rowspan]').each(function () {
-                var $cell = $(this);
-                var rowspan = parseFloat($cell.attr('rowspan'));
-                for (var i = 1; i < rowspan; i++) {
-                    var parentRow = $cell.parent('tr');
-                    var nextRow = parentRow.next('tr');
-                    var index = parentRow.children().index($cell);
-                    nextRow.children().eq(index).before('<th class="rowspan-compensate">');
-                }
-            });
-
-            // Set indexes to header cells
-            $this.find('> thead tr').each(function (rowIndex) {
-                $(this).find('th').each(function (columnIndex) {
-                    var $header = $(this);
-                    $header.addClass('nosort').removeClass('up down');
-                    $header.attr('data-sortcolumn', columnIndex);
-                    $header.attr('data-sortkey', columnIndex + '-' + rowIndex);
-                });
-            });
-
-            // Cleanup placeholder cells
-            $this.find('> thead .rowspan-compensate, .colspan-compensate').remove();
-
-            // Initialize sorting values specified in header
-            $this.find('th').each(function () {
-                var $header = $(this);
-                if ($header.attr('data-dateformat') !== undefined && momentJsAvailable) {
-                    var colNumber = parseFloat($header.attr('data-sortcolumn'));
-                    $this.find('td:nth-child(' + (colNumber + 1) + ')').each(function () {
-                        var $cell = $(this);
-                        $cell.attr('data-value', moment($cell.text(), $header.attr('data-dateformat')).format('YYYY/MM/DD/HH/mm/ss'));
-                    });
-                } else if ($header.attr('data-valueprovider') !== undefined) {
-                    var colNumber = parseFloat($header.attr('data-sortcolumn'));
-                    $this.find('td:nth-child(' + (colNumber + 1) + ')').each(function () {
-                        var $cell = $(this);
-                        $cell.attr('data-value', new RegExp($header.attr('data-valueprovider')).exec($cell.text())[0]);
-                    });
-                }
-            });
-
-            // Initialize sorting values
-            $this.find('td').each(function () {
-                var $cell = $(this);
-                if ($cell.attr('data-dateformat') !== undefined && momentJsAvailable) {
-                    $cell.attr('data-value', moment($cell.text(), $cell.attr('data-dateformat')).format('YYYY/MM/DD/HH/mm/ss'));
-                } else if ($cell.attr('data-valueprovider') !== undefined) {
-                    $cell.attr('data-value', new RegExp($cell.attr('data-valueprovider')).exec($cell.text())[0]);
-                } else {
-                    $cell.attr('data-value') === undefined && $cell.attr('data-value', $cell.text());
-                }
-            });
-
-            var context = lookupSortContext($this),
-                bsSort = context.bsSort;
-
-            $this.find('> thead th[data-defaultsort!="disabled"]').each(function (index) {
-                var $header = $(this);
-                var $sortTable = $header.closest('table.sortable');
-                $header.data('sortTable', $sortTable);
-                var sortKey = $header.attr('data-sortkey');
-                var thisLastSort = applyLast ? context.lastSort : -1;
-                bsSort[sortKey] = applyLast ? bsSort[sortKey] : $header.attr('data-defaultsort');
-                if (bsSort[sortKey] !== undefined && applyLast === (sortKey === thisLastSort)) {
-                    bsSort[sortKey] = bsSort[sortKey] === 'asc' ? 'desc' : 'asc';
-                    doSort($header, $sortTable);
-                }
-            });
-        });
-    }
-
-    // Clean up placeholder cells for rowspans in body
-    function removeRowspanPlaceholders(table) {
-        table.find('> tbody [rowspan-group]').each(function () {
-            var $this = $(this);
-            var id = $this.attr('rowspan-group');
-            var parentRow = $this.parent('tr');
-            var index = parentRow.children().index($this);
-
-            while (true) {
-                var nextRow = parentRow.next('tr');
-                if (!nextRow.is('tr')) break;
-                var nextCell = nextRow.children().eq(index);
-
-                if (nextCell.attr('rowspan-group') === id) {
-                    var rowspan = parseFloat($this.attr('rowspan')) || 1;
-                    $this.attr('rowspan', rowspan + 1);
-                    nextCell.remove();
-                } else {
-                    break;
-                }
-                parentRow = nextRow;
-            }
-        });
-    }
-
-    // Add placeholder cells for rowspans in body
-    function addRowspanPlaceholders(table) {
-        table.find('> tbody [rowspan]').each(function () {
-            var $cell = $(this);
-            var rowspan = parseFloat($cell.attr('rowspan'));
-            $cell.removeAttr('rowspan');
-            var rowSpanId = $cell.attr('rowspan-group') || guid();
-            $cell.attr('rowspan-group', rowSpanId);
-            $cell.attr('rowspan-value', rowspan);
-            var parentRow = $cell.parent('tr');
-            var index = parentRow.children().index($cell);
-            for (var i = 1; i < rowspan; i++) {
-                var compemnsationCell = $cell.clone(false);
-                var nextRow = parentRow.next('tr');
-                nextRow.children().eq(index).before(compemnsationCell);
-                parentRow = nextRow;
-            }
-        });
-    }
-
-    // Add click event to table header
-    $document.on('click', 'table.sortable>thead th[data-defaultsort!="disabled"]', function (e) {
-        sortByColumn(this);
-    });
-
-    // element is the header of the column to sort (the clicked header)
-    function sortByColumn(element) {
-        var $this = $(element),
-            $table = $this.data('sortTable') || $this.closest('table.sortable');
-        doSort($this, $table);
-    }
-
-    // Look up sorting data appropriate for the specified table (jQuery element).
-    // This allows multiple tables on one page without collisions.
-    function lookupSortContext($table) {
-        var context = $table.data("bootstrap-sortable-context");
-        if (context === undefined) {
-            context = { bsSort: [], lastSort: undefined };
-            $table.find('> thead th[data-defaultsort!="disabled"]').each(function (index) {
-                var $this = $(this);
-                var sortKey = $this.attr('data-sortkey');
-                context.bsSort[sortKey] = $this.attr('data-defaultsort');
-                if (context.bsSort[sortKey] !== undefined) {
-                    context.lastSort = sortKey;
-                }
-            });
-            $table.data("bootstrap-sortable-context", context);
-        }
-        return context;
-    }
-
-    function defaultSortEngine(rows, sortingParams) {
-        tinysort(rows, sortingParams);
-    }
-
-    // Sorting mechanism separated
-    function doSort($this, $table) {
-        $table.trigger('before-sort');
-
-        addRowspanPlaceholders($table);
-
-        var sortColumn = parseFloat($this.attr('data-sortcolumn')),
-            context = lookupSortContext($table),
-            bsSort = context.bsSort;
-
-        var colspan = $this.attr('colspan');
-        if (colspan) {
-            var mainSort = parseFloat($this.data('mainsort')) || 0;
-            var rowIndex = parseFloat($this.data('sortkey').split('-').pop());
-
-            // If there is one more row in header, delve deeper
-            if ($table.find('> thead tr').length - 1 > rowIndex) {
-                doSort($table.find('[data-sortkey="' + (sortColumn + mainSort) + '-' + (rowIndex + 1) + '"]'), $table);
-                return;
-            }
-            // Otherwise, just adjust the sortColumn
-            sortColumn = sortColumn + mainSort;
-        }
-
-        var localSignClass = $this.attr('data-defaultsign') || signClass;
-
-        // update arrow icon
-        $table.find('> thead th').each(function () {
-            $(this).removeClass('up').removeClass('down').addClass('nosort');
-        });
-
-        if ($.browser.mozilla) {
-            var moz_arrow = $table.find('> thead div.mozilla');
-            if (moz_arrow !== undefined) {
-                moz_arrow.find('.sign').remove();
-                moz_arrow.parent().html(moz_arrow.html());
-            }
-            $this.wrapInner('<div class="mozilla"></div>');
-            $this.children().eq(0).append('<span class="sign ' + localSignClass + '"></span>');
-        } else {
-            $table.find('> thead span.sign').remove();
-            $this.append('<span class="sign ' + localSignClass + '"></span>');
-        }
-
-        // sort direction
-        var sortKey = $this.attr('data-sortkey');
-        var initialDirection = $this.attr('data-firstsort') !== 'desc' ? 'desc' : 'asc';
-
-        var newDirection = bsSort[sortKey] || initialDirection;
-        if (context.lastSort === sortKey || bsSort[sortKey] === undefined) {
-            newDirection = newDirection === 'asc' ? 'desc' : 'asc';
-        }
-        bsSort[sortKey] = newDirection;
-        context.lastSort = sortKey;
-
-        if (bsSort[sortKey] === 'desc') {
-            $this.find('span.sign').addClass('up');
-            $this.addClass('up').removeClass('down nosort');
-        } else {
-            $this.addClass('down').removeClass('up nosort');
-        }
-
-        // remove rows that should not be sorted
-        var rows = $table.children('tbody').children('tr');
-        var fixedRows = [];
-        $(rows.filter('[data-disablesort="true"]').get().reverse()).each(function (index, fixedRow) {
-            var $fixedRow = $(fixedRow);
-            fixedRows.push({ index: rows.index($fixedRow), row: $fixedRow });
-            $fixedRow.remove();
-        });
-
-        // sort rows
-        var rowsToSort = rows.not('[data-disablesort="true"]');
-        if (rowsToSort.length != 0) {
-            var emptySorting = bsSort[sortKey] === 'asc' ? emptyEnd : false;
-            sortEngine(rowsToSort, { emptyEnd: emptySorting, selector: 'td:nth-child(' + (sortColumn + 1) + ')', order: bsSort[sortKey], data: 'value' });
-        }
-
-        // add back the fixed rows
-        $(fixedRows.reverse()).each(function (index, row) {
-            if (row.index === 0) {
-                $table.children('tbody').prepend(row.row);
-            } else {
-                $table.children('tbody').children('tr').eq(row.index - 1).after(row.row);
-            }
-        });
-
-        // add class to sorted column cells
-        $table.find('> tbody > tr > td.sorted,> thead th.sorted').removeClass('sorted');
-        rowsToSort.find('td:eq(' + sortColumn + ')').addClass('sorted');
-        $this.addClass('sorted');
-
-        removeRowspanPlaceholders($table);
-        $table.trigger('sorted');
-    }
-
-    // jQuery 1.9 removed this object
-    if (!$.browser) {
-        $.browser = { chrome: false, mozilla: false, opera: false, msie: false, safari: false };
-        var ua = navigator.userAgent;
-        $.each($.browser, function (c) {
-            $.browser[c] = new RegExp(c, 'i').test(ua) ? true : false;
-            if ($.browser.mozilla && c === 'mozilla') {
-                $.browser.mozilla = new RegExp('firefox', 'i').test(ua) ? true : false;
-            }
-            if ($.browser.chrome && c === 'safari') {
-                $.browser.safari = false;
-            }
-        });
-    }
-
-    function guid() {
-        function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-        }
-        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-    }
-
-    // Initialise on DOM ready
-    $($.bootstrapSortable);
-});
-
-/***/ }),
-/* 162 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var map = {
-	"./af": 12,
-	"./af.js": 12,
-	"./ar": 13,
-	"./ar-dz": 14,
-	"./ar-dz.js": 14,
-	"./ar-kw": 15,
-	"./ar-kw.js": 15,
-	"./ar-ly": 16,
-	"./ar-ly.js": 16,
-	"./ar-ma": 17,
-	"./ar-ma.js": 17,
-	"./ar-sa": 18,
-	"./ar-sa.js": 18,
-	"./ar-tn": 19,
-	"./ar-tn.js": 19,
-	"./ar.js": 13,
-	"./az": 20,
-	"./az.js": 20,
-	"./be": 21,
-	"./be.js": 21,
-	"./bg": 22,
-	"./bg.js": 22,
-	"./bm": 23,
-	"./bm.js": 23,
-	"./bn": 24,
-	"./bn.js": 24,
-	"./bo": 25,
-	"./bo.js": 25,
-	"./br": 26,
-	"./br.js": 26,
-	"./bs": 27,
-	"./bs.js": 27,
-	"./ca": 28,
-	"./ca.js": 28,
-	"./cs": 29,
-	"./cs.js": 29,
-	"./cv": 30,
-	"./cv.js": 30,
-	"./cy": 31,
-	"./cy.js": 31,
-	"./da": 32,
-	"./da.js": 32,
-	"./de": 33,
-	"./de-at": 34,
-	"./de-at.js": 34,
-	"./de-ch": 35,
-	"./de-ch.js": 35,
-	"./de.js": 33,
-	"./dv": 36,
-	"./dv.js": 36,
-	"./el": 37,
-	"./el.js": 37,
-	"./en-au": 38,
-	"./en-au.js": 38,
-	"./en-ca": 39,
-	"./en-ca.js": 39,
-	"./en-gb": 40,
-	"./en-gb.js": 40,
-	"./en-ie": 41,
-	"./en-ie.js": 41,
-	"./en-il": 42,
-	"./en-il.js": 42,
-	"./en-nz": 43,
-	"./en-nz.js": 43,
-	"./eo": 44,
-	"./eo.js": 44,
-	"./es": 45,
-	"./es-do": 46,
-	"./es-do.js": 46,
-	"./es-us": 47,
-	"./es-us.js": 47,
-	"./es.js": 45,
-	"./et": 48,
-	"./et.js": 48,
-	"./eu": 49,
-	"./eu.js": 49,
-	"./fa": 50,
-	"./fa.js": 50,
-	"./fi": 51,
-	"./fi.js": 51,
-	"./fo": 52,
-	"./fo.js": 52,
-	"./fr": 53,
-	"./fr-ca": 54,
-	"./fr-ca.js": 54,
-	"./fr-ch": 55,
-	"./fr-ch.js": 55,
-	"./fr.js": 53,
-	"./fy": 56,
-	"./fy.js": 56,
-	"./gd": 57,
-	"./gd.js": 57,
-	"./gl": 58,
-	"./gl.js": 58,
-	"./gom-latn": 59,
-	"./gom-latn.js": 59,
-	"./gu": 60,
-	"./gu.js": 60,
-	"./he": 61,
-	"./he.js": 61,
-	"./hi": 62,
-	"./hi.js": 62,
-	"./hr": 63,
-	"./hr.js": 63,
-	"./hu": 64,
-	"./hu.js": 64,
-	"./hy-am": 65,
-	"./hy-am.js": 65,
-	"./id": 66,
-	"./id.js": 66,
-	"./is": 67,
-	"./is.js": 67,
-	"./it": 68,
-	"./it.js": 68,
-	"./ja": 69,
-	"./ja.js": 69,
-	"./jv": 70,
-	"./jv.js": 70,
-	"./ka": 71,
-	"./ka.js": 71,
-	"./kk": 72,
-	"./kk.js": 72,
-	"./km": 73,
-	"./km.js": 73,
-	"./kn": 74,
-	"./kn.js": 74,
-	"./ko": 75,
-	"./ko.js": 75,
-	"./ky": 76,
-	"./ky.js": 76,
-	"./lb": 77,
-	"./lb.js": 77,
-	"./lo": 78,
-	"./lo.js": 78,
-	"./lt": 79,
-	"./lt.js": 79,
-	"./lv": 80,
-	"./lv.js": 80,
-	"./me": 81,
-	"./me.js": 81,
-	"./mi": 82,
-	"./mi.js": 82,
-	"./mk": 83,
-	"./mk.js": 83,
-	"./ml": 84,
-	"./ml.js": 84,
-	"./mn": 85,
-	"./mn.js": 85,
-	"./mr": 86,
-	"./mr.js": 86,
-	"./ms": 87,
-	"./ms-my": 88,
-	"./ms-my.js": 88,
-	"./ms.js": 87,
-	"./mt": 89,
-	"./mt.js": 89,
-	"./my": 90,
-	"./my.js": 90,
-	"./nb": 91,
-	"./nb.js": 91,
-	"./ne": 92,
-	"./ne.js": 92,
-	"./nl": 93,
-	"./nl-be": 94,
-	"./nl-be.js": 94,
-	"./nl.js": 93,
-	"./nn": 95,
-	"./nn.js": 95,
-	"./pa-in": 96,
-	"./pa-in.js": 96,
-	"./pl": 97,
-	"./pl.js": 97,
-	"./pt": 98,
-	"./pt-br": 99,
-	"./pt-br.js": 99,
-	"./pt.js": 98,
-	"./ro": 100,
-	"./ro.js": 100,
-	"./ru": 101,
-	"./ru.js": 101,
-	"./sd": 102,
-	"./sd.js": 102,
-	"./se": 103,
-	"./se.js": 103,
-	"./si": 104,
-	"./si.js": 104,
-	"./sk": 105,
-	"./sk.js": 105,
-	"./sl": 106,
-	"./sl.js": 106,
-	"./sq": 107,
-	"./sq.js": 107,
-	"./sr": 108,
-	"./sr-cyrl": 109,
-	"./sr-cyrl.js": 109,
-	"./sr.js": 108,
-	"./ss": 110,
-	"./ss.js": 110,
-	"./sv": 111,
-	"./sv.js": 111,
-	"./sw": 112,
-	"./sw.js": 112,
-	"./ta": 113,
-	"./ta.js": 113,
-	"./te": 114,
-	"./te.js": 114,
-	"./tet": 115,
-	"./tet.js": 115,
-	"./tg": 116,
-	"./tg.js": 116,
-	"./th": 117,
-	"./th.js": 117,
-	"./tl-ph": 118,
-	"./tl-ph.js": 118,
-	"./tlh": 119,
-	"./tlh.js": 119,
-	"./tr": 120,
-	"./tr.js": 120,
-	"./tzl": 121,
-	"./tzl.js": 121,
-	"./tzm": 122,
-	"./tzm-latn": 123,
-	"./tzm-latn.js": 123,
-	"./tzm.js": 122,
-	"./ug-cn": 124,
-	"./ug-cn.js": 124,
-	"./uk": 125,
-	"./uk.js": 125,
-	"./ur": 126,
-	"./ur.js": 126,
-	"./uz": 127,
-	"./uz-latn": 128,
-	"./uz-latn.js": 128,
-	"./uz.js": 127,
-	"./vi": 129,
-	"./vi.js": 129,
-	"./x-pseudo": 130,
-	"./x-pseudo.js": 130,
-	"./yo": 131,
-	"./yo.js": 131,
-	"./zh-cn": 132,
-	"./zh-cn.js": 132,
-	"./zh-hk": 133,
-	"./zh-hk.js": 133,
-	"./zh-tw": 134,
-	"./zh-tw.js": 134
-};
-function webpackContext(req) {
-	return __webpack_require__(webpackContextResolve(req));
-};
-function webpackContextResolve(req) {
-	var id = map[req];
-	if(!(id + 1)) // check for number or string
-		throw new Error("Cannot find module '" + req + "'.");
-	return id;
-};
-webpackContext.keys = function webpackContextKeys() {
-	return Object.keys(map);
-};
-webpackContext.resolve = webpackContextResolve;
-module.exports = webpackContext;
-webpackContext.id = 162;
-
-/***/ }),
-/* 163 */
-/***/ (function(module, exports, __webpack_require__) {
-
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;/*!
  * Select2 4.0.6-rc.1
  * https://select2.github.io
@@ -60413,7 +59656,7 @@ S2.define('jquery.select2',[
 
 
 /***/ }),
-/* 164 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -63433,7 +62676,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 165 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -64059,7 +63302,7 @@ var lists = {
     unique: unique
 };
 
-var isSupportAmd = "function" === 'function' && __webpack_require__(166); // eslint-disable-line
+var isSupportAmd = "function" === 'function' && __webpack_require__(164); // eslint-disable-line
 /**
  * returns whether font is installed or not.
  *
@@ -70754,7 +69997,7 @@ $$1.summernote = $$1.extend($$1.summernote, {
 
 
 /***/ }),
-/* 166 */
+/* 164 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
@@ -70763,14 +70006,14 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ }),
-/* 167 */
+/* 165 */
 /***/ (function(module, exports) {
 
 +function(a){"use strict";function b(a,b){if(!(a instanceof b))throw new TypeError("Cannot call a class as a function")}var c=function(){function a(a,b){for(var c=0;c<b.length;c++){var d=b[c];d.enumerable=d.enumerable||!1,d.configurable=!0,"value"in d&&(d.writable=!0),Object.defineProperty(a,d.key,d)}}return function(b,c,d){return c&&a(b.prototype,c),d&&a(b,d),b}}();(function(a){var d="ekkoLightbox",e=a.fn[d],f={title:"",footer:"",maxWidth:9999,maxHeight:9999,showArrows:!0,wrapping:!0,type:null,alwaysShowClose:!1,loadingMessage:'<div class="ekko-lightbox-loader"><div><div></div><div></div></div></div>',leftArrow:"<span>&#10094;</span>",rightArrow:"<span>&#10095;</span>",strings:{close:"Close",fail:"Failed to load image:",type:"Could not detect remote target type. Force the type using data-type"},doc:document,onShow:function(){},onShown:function(){},onHide:function(){},onHidden:function(){},onNavigate:function(){},onContentLoaded:function(){}},g=function(){function d(c,e){var g=this;b(this,d),this._config=a.extend({},f,e),this._$modalArrows=null,this._galleryIndex=0,this._galleryName=null,this._padding=null,this._border=null,this._titleIsShown=!1,this._footerIsShown=!1,this._wantedWidth=0,this._wantedHeight=0,this._touchstartX=0,this._touchendX=0,this._modalId="ekkoLightbox-"+Math.floor(1e3*Math.random()+1),this._$element=c instanceof jQuery?c:a(c),this._isBootstrap3=3==a.fn.modal.Constructor.VERSION[0];var h='<h4 class="modal-title">'+(this._config.title||"&nbsp;")+"</h4>",i='<button type="button" class="close" data-dismiss="modal" aria-label="'+this._config.strings.close+'"><span aria-hidden="true">&times;</span></button>',j='<div class="modal-header'+(this._config.title||this._config.alwaysShowClose?"":" hide")+'">'+(this._isBootstrap3?i+h:h+i)+"</div>",k='<div class="modal-footer'+(this._config.footer?"":" hide")+'">'+(this._config.footer||"&nbsp;")+"</div>",l='<div class="modal-body"><div class="ekko-lightbox-container"><div class="ekko-lightbox-item fade in show"></div><div class="ekko-lightbox-item fade"></div></div></div>',m='<div class="modal-dialog" role="document"><div class="modal-content">'+j+l+k+"</div></div>";a(this._config.doc.body).append('<div id="'+this._modalId+'" class="ekko-lightbox modal fade" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">'+m+"</div>"),this._$modal=a("#"+this._modalId,this._config.doc),this._$modalDialog=this._$modal.find(".modal-dialog").first(),this._$modalContent=this._$modal.find(".modal-content").first(),this._$modalBody=this._$modal.find(".modal-body").first(),this._$modalHeader=this._$modal.find(".modal-header").first(),this._$modalFooter=this._$modal.find(".modal-footer").first(),this._$lightboxContainer=this._$modalBody.find(".ekko-lightbox-container").first(),this._$lightboxBodyOne=this._$lightboxContainer.find("> div:first-child").first(),this._$lightboxBodyTwo=this._$lightboxContainer.find("> div:last-child").first(),this._border=this._calculateBorders(),this._padding=this._calculatePadding(),this._galleryName=this._$element.data("gallery"),this._galleryName&&(this._$galleryItems=a(document.body).find('*[data-gallery="'+this._galleryName+'"]'),this._galleryIndex=this._$galleryItems.index(this._$element),a(document).on("keydown.ekkoLightbox",this._navigationalBinder.bind(this)),this._config.showArrows&&this._$galleryItems.length>1&&(this._$lightboxContainer.append('<div class="ekko-lightbox-nav-overlay"><a href="#">'+this._config.leftArrow+'</a><a href="#">'+this._config.rightArrow+"</a></div>"),this._$modalArrows=this._$lightboxContainer.find("div.ekko-lightbox-nav-overlay").first(),this._$lightboxContainer.on("click","a:first-child",function(a){return a.preventDefault(),g.navigateLeft()}),this._$lightboxContainer.on("click","a:last-child",function(a){return a.preventDefault(),g.navigateRight()}),this.updateNavigation())),this._$modal.on("show.bs.modal",this._config.onShow.bind(this)).on("shown.bs.modal",function(){return g._toggleLoading(!0),g._handle(),g._config.onShown.call(g)}).on("hide.bs.modal",this._config.onHide.bind(this)).on("hidden.bs.modal",function(){return g._galleryName&&(a(document).off("keydown.ekkoLightbox"),a(window).off("resize.ekkoLightbox")),g._$modal.remove(),g._config.onHidden.call(g)}).modal(this._config),a(window).on("resize.ekkoLightbox",function(){g._resize(g._wantedWidth,g._wantedHeight)}),this._$lightboxContainer.on("touchstart",function(){g._touchstartX=event.changedTouches[0].screenX}).on("touchend",function(){g._touchendX=event.changedTouches[0].screenX,g._swipeGesure()})}return c(d,null,[{key:"Default",get:function(){return f}}]),c(d,[{key:"element",value:function(){return this._$element}},{key:"modal",value:function(){return this._$modal}},{key:"navigateTo",value:function(b){return b<0||b>this._$galleryItems.length-1?this:(this._galleryIndex=b,this.updateNavigation(),this._$element=a(this._$galleryItems.get(this._galleryIndex)),void this._handle())}},{key:"navigateLeft",value:function(){if(this._$galleryItems&&1!==this._$galleryItems.length){if(0===this._galleryIndex){if(!this._config.wrapping)return;this._galleryIndex=this._$galleryItems.length-1}else this._galleryIndex--;return this._config.onNavigate.call(this,"left",this._galleryIndex),this.navigateTo(this._galleryIndex)}}},{key:"navigateRight",value:function(){if(this._$galleryItems&&1!==this._$galleryItems.length){if(this._galleryIndex===this._$galleryItems.length-1){if(!this._config.wrapping)return;this._galleryIndex=0}else this._galleryIndex++;return this._config.onNavigate.call(this,"right",this._galleryIndex),this.navigateTo(this._galleryIndex)}}},{key:"updateNavigation",value:function(){if(!this._config.wrapping){var a=this._$lightboxContainer.find("div.ekko-lightbox-nav-overlay");0===this._galleryIndex?a.find("a:first-child").addClass("disabled"):a.find("a:first-child").removeClass("disabled"),this._galleryIndex===this._$galleryItems.length-1?a.find("a:last-child").addClass("disabled"):a.find("a:last-child").removeClass("disabled")}}},{key:"close",value:function(){return this._$modal.modal("hide")}},{key:"_navigationalBinder",value:function(a){return a=a||window.event,39===a.keyCode?this.navigateRight():37===a.keyCode?this.navigateLeft():void 0}},{key:"_detectRemoteType",value:function(a,b){return b=b||!1,!b&&this._isImage(a)&&(b="image"),!b&&this._getYoutubeId(a)&&(b="youtube"),!b&&this._getVimeoId(a)&&(b="vimeo"),!b&&this._getInstagramId(a)&&(b="instagram"),(!b||["image","youtube","vimeo","instagram","video","url"].indexOf(b)<0)&&(b="url"),b}},{key:"_isImage",value:function(a){return a&&a.match(/(^data:image\/.*,)|(\.(jp(e|g|eg)|gif|png|bmp|webp|svg)((\?|#).*)?$)/i)}},{key:"_containerToUse",value:function(){var a=this,b=this._$lightboxBodyTwo,c=this._$lightboxBodyOne;return this._$lightboxBodyTwo.hasClass("in")&&(b=this._$lightboxBodyOne,c=this._$lightboxBodyTwo),c.removeClass("in show"),setTimeout(function(){a._$lightboxBodyTwo.hasClass("in")||a._$lightboxBodyTwo.empty(),a._$lightboxBodyOne.hasClass("in")||a._$lightboxBodyOne.empty()},500),b.addClass("in show"),b}},{key:"_handle",value:function(){var a=this._containerToUse();this._updateTitleAndFooter();var b=this._$element.attr("data-remote")||this._$element.attr("href"),c=this._detectRemoteType(b,this._$element.attr("data-type")||!1);if(["image","youtube","vimeo","instagram","video","url"].indexOf(c)<0)return this._error(this._config.strings.type);switch(c){case"image":this._preloadImage(b,a),this._preloadImageByIndex(this._galleryIndex,3);break;case"youtube":this._showYoutubeVideo(b,a);break;case"vimeo":this._showVimeoVideo(this._getVimeoId(b),a);break;case"instagram":this._showInstagramVideo(this._getInstagramId(b),a);break;case"video":this._showHtml5Video(b,a);break;default:this._loadRemoteContent(b,a)}return this}},{key:"_getYoutubeId",value:function(a){if(!a)return!1;var b=a.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);return!(!b||11!==b[2].length)&&b[2]}},{key:"_getVimeoId",value:function(a){return!!(a&&a.indexOf("vimeo")>0)&&a}},{key:"_getInstagramId",value:function(a){return!!(a&&a.indexOf("instagram")>0)&&a}},{key:"_toggleLoading",value:function(b){return b=b||!1,b?(this._$modalDialog.css("display","none"),this._$modal.removeClass("in show"),a(".modal-backdrop").append(this._config.loadingMessage)):(this._$modalDialog.css("display","block"),this._$modal.addClass("in show"),a(".modal-backdrop").find(".ekko-lightbox-loader").remove()),this}},{key:"_calculateBorders",value:function(){return{top:this._totalCssByAttribute("border-top-width"),right:this._totalCssByAttribute("border-right-width"),bottom:this._totalCssByAttribute("border-bottom-width"),left:this._totalCssByAttribute("border-left-width")}}},{key:"_calculatePadding",value:function(){return{top:this._totalCssByAttribute("padding-top"),right:this._totalCssByAttribute("padding-right"),bottom:this._totalCssByAttribute("padding-bottom"),left:this._totalCssByAttribute("padding-left")}}},{key:"_totalCssByAttribute",value:function(a){return parseInt(this._$modalDialog.css(a),10)+parseInt(this._$modalContent.css(a),10)+parseInt(this._$modalBody.css(a),10)}},{key:"_updateTitleAndFooter",value:function(){var a=this._$element.data("title")||"",b=this._$element.data("footer")||"";return this._titleIsShown=!1,a||this._config.alwaysShowClose?(this._titleIsShown=!0,this._$modalHeader.css("display","").find(".modal-title").html(a||"&nbsp;")):this._$modalHeader.css("display","none"),this._footerIsShown=!1,b?(this._footerIsShown=!0,this._$modalFooter.css("display","").html(b)):this._$modalFooter.css("display","none"),this}},{key:"_showYoutubeVideo",value:function(a,b){var c=this._getYoutubeId(a),d=a.indexOf("&")>0?a.substr(a.indexOf("&")):"",e=this._$element.data("width")||560,f=this._$element.data("height")||e/(560/315);return this._showVideoIframe("//www.youtube.com/embed/"+c+"?badge=0&autoplay=1&html5=1"+d,e,f,b)}},{key:"_showVimeoVideo",value:function(a,b){var c=this._$element.data("width")||500,d=this._$element.data("height")||c/(560/315);return this._showVideoIframe(a+"?autoplay=1",c,d,b)}},{key:"_showInstagramVideo",value:function(a,b){var c=this._$element.data("width")||612,d=c+80;return a="/"!==a.substr(-1)?a+"/":a,b.html('<iframe width="'+c+'" height="'+d+'" src="'+a+'embed/" frameborder="0" allowfullscreen></iframe>'),this._resize(c,d),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_showVideoIframe",value:function(a,b,c,d){return c=c||b,d.html('<div class="embed-responsive embed-responsive-16by9"><iframe width="'+b+'" height="'+c+'" src="'+a+'" frameborder="0" allowfullscreen class="embed-responsive-item"></iframe></div>'),this._resize(b,c),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_showHtml5Video",value:function(a,b){var c=this._$element.data("width")||560,d=this._$element.data("height")||c/(560/315);return b.html('<div class="embed-responsive embed-responsive-16by9"><video width="'+c+'" height="'+d+'" src="'+a+'" preload="auto" autoplay controls class="embed-responsive-item"></video></div>'),this._resize(c,d),this._config.onContentLoaded.call(this),this._$modalArrows&&this._$modalArrows.css("display","none"),this._toggleLoading(!1),this}},{key:"_loadRemoteContent",value:function(b,c){var d=this,e=this._$element.data("width")||560,f=this._$element.data("height")||560,g=this._$element.data("disableExternalCheck")||!1;return this._toggleLoading(!1),g||this._isExternal(b)?(c.html('<iframe src="'+b+'" frameborder="0" allowfullscreen></iframe>'),this._config.onContentLoaded.call(this)):c.load(b,a.proxy(function(){return d._$element.trigger("loaded.bs.modal")})),this._$modalArrows&&this._$modalArrows.css("display","none"),this._resize(e,f),this}},{key:"_isExternal",value:function(a){var b=a.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);return"string"==typeof b[1]&&b[1].length>0&&b[1].toLowerCase()!==location.protocol||"string"==typeof b[2]&&b[2].length>0&&b[2].replace(new RegExp(":("+{"http:":80,"https:":443}[location.protocol]+")?$"),"")!==location.host}},{key:"_error",value:function(a){return console.error(a),this._containerToUse().html(a),this._resize(300,300),this}},{key:"_preloadImageByIndex",value:function(b,c){if(this._$galleryItems){var d=a(this._$galleryItems.get(b),!1);if("undefined"!=typeof d){var e=d.attr("data-remote")||d.attr("href");return("image"===d.attr("data-type")||this._isImage(e))&&this._preloadImage(e,!1),c>0?this._preloadImageByIndex(b+1,c-1):void 0}}}},{key:"_preloadImage",value:function(b,c){var d=this;c=c||!1;var e=new Image;return c&&!function(){var f=setTimeout(function(){c.append(d._config.loadingMessage)},200);e.onload=function(){f&&clearTimeout(f),f=null;var b=a("<img />");return b.attr("src",e.src),b.addClass("img-fluid"),b.css("width","100%"),c.html(b),d._$modalArrows&&d._$modalArrows.css("display",""),d._resize(e.width,e.height),d._toggleLoading(!1),d._config.onContentLoaded.call(d)},e.onerror=function(){return d._toggleLoading(!1),d._error(d._config.strings.fail+("  "+b))}}(),e.src=b,e}},{key:"_swipeGesure",value:function(){return this._touchendX<this._touchstartX?this.navigateRight():this._touchendX>this._touchstartX?this.navigateLeft():void 0}},{key:"_resize",value:function(b,c){c=c||b,this._wantedWidth=b,this._wantedHeight=c;var d=b/c,e=this._padding.left+this._padding.right+this._border.left+this._border.right,f=this._config.doc.body.clientWidth>575?20:0,g=this._config.doc.body.clientWidth>575?0:20,h=Math.min(b+e,this._config.doc.body.clientWidth-f,this._config.maxWidth);b+e>h?(c=(h-e-g)/d,b=h):b+=e;var i=0,j=0;this._footerIsShown&&(j=this._$modalFooter.outerHeight(!0)||55),this._titleIsShown&&(i=this._$modalHeader.outerHeight(!0)||67);var k=this._padding.top+this._padding.bottom+this._border.bottom+this._border.top,l=parseFloat(this._$modalDialog.css("margin-top"))+parseFloat(this._$modalDialog.css("margin-bottom")),m=Math.min(c,a(window).height()-k-l-i-j,this._config.maxHeight-k-i-j);c>m&&(b=Math.ceil(m*d)+e),this._$lightboxContainer.css("height",m),this._$modalDialog.css("flex",1).css("maxWidth",b);var n=this._$modal.data("bs.modal");if(n)try{n._handleUpdate()}catch(o){n.handleUpdate()}return this}}],[{key:"_jQueryInterface",value:function(b){var c=this;return b=b||{},this.each(function(){var e=a(c),f=a.extend({},d.Default,e.data(),"object"==typeof b&&b);new d(c,f)})}}]),d}();return a.fn[d]=g._jQueryInterface,a.fn[d].Constructor=g,a.fn[d].noConflict=function(){return a.fn[d]=e,g._jQueryInterface},g})(jQuery)}(jQuery);
 //# sourceMappingURL=ekko-lightbox.min.js.map
 
 /***/ }),
-/* 168 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! version : 5.2.3
@@ -73415,7 +72658,275 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 169 */
+/* 167 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var map = {
+	"./af": 12,
+	"./af.js": 12,
+	"./ar": 13,
+	"./ar-dz": 14,
+	"./ar-dz.js": 14,
+	"./ar-kw": 15,
+	"./ar-kw.js": 15,
+	"./ar-ly": 16,
+	"./ar-ly.js": 16,
+	"./ar-ma": 17,
+	"./ar-ma.js": 17,
+	"./ar-sa": 18,
+	"./ar-sa.js": 18,
+	"./ar-tn": 19,
+	"./ar-tn.js": 19,
+	"./ar.js": 13,
+	"./az": 20,
+	"./az.js": 20,
+	"./be": 21,
+	"./be.js": 21,
+	"./bg": 22,
+	"./bg.js": 22,
+	"./bm": 23,
+	"./bm.js": 23,
+	"./bn": 24,
+	"./bn.js": 24,
+	"./bo": 25,
+	"./bo.js": 25,
+	"./br": 26,
+	"./br.js": 26,
+	"./bs": 27,
+	"./bs.js": 27,
+	"./ca": 28,
+	"./ca.js": 28,
+	"./cs": 29,
+	"./cs.js": 29,
+	"./cv": 30,
+	"./cv.js": 30,
+	"./cy": 31,
+	"./cy.js": 31,
+	"./da": 32,
+	"./da.js": 32,
+	"./de": 33,
+	"./de-at": 34,
+	"./de-at.js": 34,
+	"./de-ch": 35,
+	"./de-ch.js": 35,
+	"./de.js": 33,
+	"./dv": 36,
+	"./dv.js": 36,
+	"./el": 37,
+	"./el.js": 37,
+	"./en-au": 38,
+	"./en-au.js": 38,
+	"./en-ca": 39,
+	"./en-ca.js": 39,
+	"./en-gb": 40,
+	"./en-gb.js": 40,
+	"./en-ie": 41,
+	"./en-ie.js": 41,
+	"./en-il": 42,
+	"./en-il.js": 42,
+	"./en-nz": 43,
+	"./en-nz.js": 43,
+	"./eo": 44,
+	"./eo.js": 44,
+	"./es": 45,
+	"./es-do": 46,
+	"./es-do.js": 46,
+	"./es-us": 47,
+	"./es-us.js": 47,
+	"./es.js": 45,
+	"./et": 48,
+	"./et.js": 48,
+	"./eu": 49,
+	"./eu.js": 49,
+	"./fa": 50,
+	"./fa.js": 50,
+	"./fi": 51,
+	"./fi.js": 51,
+	"./fo": 52,
+	"./fo.js": 52,
+	"./fr": 53,
+	"./fr-ca": 54,
+	"./fr-ca.js": 54,
+	"./fr-ch": 55,
+	"./fr-ch.js": 55,
+	"./fr.js": 53,
+	"./fy": 56,
+	"./fy.js": 56,
+	"./gd": 57,
+	"./gd.js": 57,
+	"./gl": 58,
+	"./gl.js": 58,
+	"./gom-latn": 59,
+	"./gom-latn.js": 59,
+	"./gu": 60,
+	"./gu.js": 60,
+	"./he": 61,
+	"./he.js": 61,
+	"./hi": 62,
+	"./hi.js": 62,
+	"./hr": 63,
+	"./hr.js": 63,
+	"./hu": 64,
+	"./hu.js": 64,
+	"./hy-am": 65,
+	"./hy-am.js": 65,
+	"./id": 66,
+	"./id.js": 66,
+	"./is": 67,
+	"./is.js": 67,
+	"./it": 68,
+	"./it.js": 68,
+	"./ja": 69,
+	"./ja.js": 69,
+	"./jv": 70,
+	"./jv.js": 70,
+	"./ka": 71,
+	"./ka.js": 71,
+	"./kk": 72,
+	"./kk.js": 72,
+	"./km": 73,
+	"./km.js": 73,
+	"./kn": 74,
+	"./kn.js": 74,
+	"./ko": 75,
+	"./ko.js": 75,
+	"./ky": 76,
+	"./ky.js": 76,
+	"./lb": 77,
+	"./lb.js": 77,
+	"./lo": 78,
+	"./lo.js": 78,
+	"./lt": 79,
+	"./lt.js": 79,
+	"./lv": 80,
+	"./lv.js": 80,
+	"./me": 81,
+	"./me.js": 81,
+	"./mi": 82,
+	"./mi.js": 82,
+	"./mk": 83,
+	"./mk.js": 83,
+	"./ml": 84,
+	"./ml.js": 84,
+	"./mn": 85,
+	"./mn.js": 85,
+	"./mr": 86,
+	"./mr.js": 86,
+	"./ms": 87,
+	"./ms-my": 88,
+	"./ms-my.js": 88,
+	"./ms.js": 87,
+	"./mt": 89,
+	"./mt.js": 89,
+	"./my": 90,
+	"./my.js": 90,
+	"./nb": 91,
+	"./nb.js": 91,
+	"./ne": 92,
+	"./ne.js": 92,
+	"./nl": 93,
+	"./nl-be": 94,
+	"./nl-be.js": 94,
+	"./nl.js": 93,
+	"./nn": 95,
+	"./nn.js": 95,
+	"./pa-in": 96,
+	"./pa-in.js": 96,
+	"./pl": 97,
+	"./pl.js": 97,
+	"./pt": 98,
+	"./pt-br": 99,
+	"./pt-br.js": 99,
+	"./pt.js": 98,
+	"./ro": 100,
+	"./ro.js": 100,
+	"./ru": 101,
+	"./ru.js": 101,
+	"./sd": 102,
+	"./sd.js": 102,
+	"./se": 103,
+	"./se.js": 103,
+	"./si": 104,
+	"./si.js": 104,
+	"./sk": 105,
+	"./sk.js": 105,
+	"./sl": 106,
+	"./sl.js": 106,
+	"./sq": 107,
+	"./sq.js": 107,
+	"./sr": 108,
+	"./sr-cyrl": 109,
+	"./sr-cyrl.js": 109,
+	"./sr.js": 108,
+	"./ss": 110,
+	"./ss.js": 110,
+	"./sv": 111,
+	"./sv.js": 111,
+	"./sw": 112,
+	"./sw.js": 112,
+	"./ta": 113,
+	"./ta.js": 113,
+	"./te": 114,
+	"./te.js": 114,
+	"./tet": 115,
+	"./tet.js": 115,
+	"./tg": 116,
+	"./tg.js": 116,
+	"./th": 117,
+	"./th.js": 117,
+	"./tl-ph": 118,
+	"./tl-ph.js": 118,
+	"./tlh": 119,
+	"./tlh.js": 119,
+	"./tr": 120,
+	"./tr.js": 120,
+	"./tzl": 121,
+	"./tzl.js": 121,
+	"./tzm": 122,
+	"./tzm-latn": 123,
+	"./tzm-latn.js": 123,
+	"./tzm.js": 122,
+	"./ug-cn": 124,
+	"./ug-cn.js": 124,
+	"./uk": 125,
+	"./uk.js": 125,
+	"./ur": 126,
+	"./ur.js": 126,
+	"./uz": 127,
+	"./uz-latn": 128,
+	"./uz-latn.js": 128,
+	"./uz.js": 127,
+	"./vi": 129,
+	"./vi.js": 129,
+	"./x-pseudo": 130,
+	"./x-pseudo.js": 130,
+	"./yo": 131,
+	"./yo.js": 131,
+	"./zh-cn": 132,
+	"./zh-cn.js": 132,
+	"./zh-hk": 133,
+	"./zh-hk.js": 133,
+	"./zh-tw": 134,
+	"./zh-tw.js": 134
+};
+function webpackContext(req) {
+	return __webpack_require__(webpackContextResolve(req));
+};
+function webpackContextResolve(req) {
+	var id = map[req];
+	if(!(id + 1)) // check for number or string
+		throw new Error("Cannot find module '" + req + "'.");
+	return id;
+};
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = 167;
+
+/***/ }),
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76953,7 +76464,7 @@ function __guardMethod__(obj, methodName, transform) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
-/* 170 */
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports =
@@ -78734,7 +78245,7 @@ exports.default = Tokenfield;
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = __webpack_require__(171);
+module.exports = __webpack_require__(170);
 
 /***/ }),
 /* 3 */
@@ -78793,7 +78304,7 @@ function ajax(params) {
 /******/ ]);
 
 /***/ }),
-/* 171 */
+/* 170 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -79101,10 +78612,520 @@ function isUndefined(arg) {
 
 
 /***/ }),
-/* 172 */
+/* 171 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 172 */,
+/* 173 */,
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */,
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_LOCAL_MODULE_0__, __WEBPACK_LOCAL_MODULE_0__factory, __WEBPACK_LOCAL_MODULE_0__module;var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
+ * adding sorting ability to HTML tables with Bootstrap styling
+ * @summary HTML tables sorting ability
+ * @version 2.0.1
+ * @requires tinysort, moment.js, jQuery
+ * @license MIT
+ * @author Matus Brlit (drvic10k)
+ * @copyright Matus Brlit (drvic10k), bootstrap-sortable contributors
+ */
+
+/**
+ * TinySort is a small script that sorts HTML elements. It sorts by text- or attribute value, or by that of one of it's children.
+ * @summary A nodeElement sorting script.
+ * @version 2.3.6
+ * @license MIT
+ * @author Ron Valstar <ron@ronvalstar.nl>
+ * @copyright Ron Valstar <ron@ronvalstar.nl>
+ * @namespace tinysort
+ */
+!function (e, t) {
+    "use strict";
+    function r() {
+        return t;
+    } true ? !(__WEBPACK_LOCAL_MODULE_0__factory = (r), (__WEBPACK_LOCAL_MODULE_0__module = { id: "tinysort", exports: {}, loaded: false }), __WEBPACK_LOCAL_MODULE_0__ = (typeof __WEBPACK_LOCAL_MODULE_0__factory === 'function' ? (__WEBPACK_LOCAL_MODULE_0__factory.call(__WEBPACK_LOCAL_MODULE_0__module.exports, __webpack_require__, __WEBPACK_LOCAL_MODULE_0__module.exports, __WEBPACK_LOCAL_MODULE_0__module)) : __WEBPACK_LOCAL_MODULE_0__factory), (__WEBPACK_LOCAL_MODULE_0__module.loaded = true), __WEBPACK_LOCAL_MODULE_0__ === undefined && (__WEBPACK_LOCAL_MODULE_0__ = __WEBPACK_LOCAL_MODULE_0__module.exports)) : e.tinysort = t;
+}(this, function () {
+    "use strict";
+    function e(e, n) {
+        function s() {
+            0 === arguments.length ? v({}) : t(arguments, function (e) {
+                v(x(e) ? { selector: e } : e);
+            }), d = $.length;
+        }function v(e) {
+            var t = !!e.selector,
+                n = t && ":" === e.selector[0],
+                o = r(e || {}, m);$.push(r({ hasSelector: t, hasAttr: !(o.attr === l || "" === o.attr), hasData: o.data !== l, hasFilter: n, sortReturnNumber: "asc" === o.order ? 1 : -1 }, o));
+        }function S() {
+            t(e, function (e, t) {
+                M ? M !== e.parentNode && (k = !1) : M = e.parentNode;var r = $[0],
+                    n = r.hasFilter,
+                    o = r.selector,
+                    a = !o || n && e.matchesSelector(o) || o && e.querySelector(o),
+                    l = a ? R : V,
+                    s = { elm: e, pos: t, posn: l.length };B.push(s), l.push(s);
+            }), D = R.slice(0);
+        }function y(e, t, r) {
+            for (var n = r(e.toString()), o = r(t.toString()), a = 0; n[a] && o[a]; a++) {
+                if (n[a] !== o[a]) {
+                    var l = Number(n[a]),
+                        s = Number(o[a]);return l == n[a] && s == o[a] ? l - s : n[a] > o[a] ? 1 : -1;
+                }
+            }return n.length - o.length;
+        }function N(e) {
+            for (var t, r, n = [], o = 0, a = -1, l = 0; t = (r = e.charAt(o++)).charCodeAt(0);) {
+                var s = 46 == t || t >= 48 && 57 >= t;s !== l && (n[++a] = "", l = s), n[a] += r;
+            }return n;
+        }function C(e, r) {
+            var n = 0;for (0 !== p && (p = 0); 0 === n && d > p;) {
+                var l = $[p],
+                    s = l.ignoreDashes ? f : u;if (t(h, function (e) {
+                    var t = e.prepare;t && t(l);
+                }), l.sortFunction) n = l.sortFunction(e, r);else if ("rand" == l.order) n = Math.random() < .5 ? 1 : -1;else {
+                    var c = a,
+                        g = w(e, l),
+                        m = w(r, l),
+                        v = "" === g || g === o,
+                        S = "" === m || m === o;if (g === m) n = 0;else if (l.emptyEnd && (v || S)) n = v && S ? 0 : v ? 1 : -1;else {
+                        if (!l.forceStrings) {
+                            var C = x(g) ? g && g.match(s) : a,
+                                b = x(m) ? m && m.match(s) : a;if (C && b) {
+                                var A = g.substr(0, g.length - C[0].length),
+                                    F = m.substr(0, m.length - b[0].length);A == F && (c = !a, g = i(C[0]), m = i(b[0]));
+                            }
+                        }n = g === o || m === o ? 0 : l.natural && (isNaN(g) || isNaN(m)) ? y(g, m, N) : m > g ? -1 : g > m ? 1 : 0;
+                    }
+                }t(h, function (e) {
+                    var t = e.sort;t && (n = t(l, c, g, m, n));
+                }), n *= l.sortReturnNumber, 0 === n && p++;
+            }return 0 === n && (n = e.pos > r.pos ? 1 : -1), n;
+        }function b() {
+            var e = R.length === B.length;if (k && e) O ? R.forEach(function (e, t) {
+                e.elm.style.order = t;
+            }) : M ? M.appendChild(A()) : console.warn("parentNode has been removed");else {
+                var t = $[0],
+                    r = t.place,
+                    n = "org" === r,
+                    o = "start" === r,
+                    a = "end" === r,
+                    l = "first" === r,
+                    s = "last" === r;if (n) R.forEach(F), R.forEach(function (e, t) {
+                    E(D[t], e.elm);
+                });else if (o || a) {
+                    var c = D[o ? 0 : D.length - 1],
+                        i = c && c.elm.parentNode,
+                        u = i && (o && i.firstChild || i.lastChild);u && (u !== c.elm && (c = { elm: u }), F(c), a && i.appendChild(c.ghost), E(c, A()));
+                } else if (l || s) {
+                    var f = D[l ? 0 : D.length - 1];E(F(f), A());
+                }
+            }
+        }function A() {
+            return R.forEach(function (e) {
+                q.appendChild(e.elm);
+            }), q;
+        }function F(e) {
+            var t = e.elm,
+                r = c.createElement("div");return e.ghost = r, t.parentNode.insertBefore(r, t), e;
+        }function E(e, t) {
+            var r = e.ghost,
+                n = r.parentNode;n.insertBefore(t, r), n.removeChild(r), delete e.ghost;
+        }function w(e, t) {
+            var r,
+                n = e.elm;return t.selector && (t.hasFilter ? n.matchesSelector(t.selector) || (n = l) : n = n.querySelector(t.selector)), t.hasAttr ? r = n.getAttribute(t.attr) : t.useVal ? r = n.value || n.getAttribute("value") : t.hasData ? r = n.getAttribute("data-" + t.data) : n && (r = n.textContent), x(r) && (t.cases || (r = r.toLowerCase()), r = r.replace(/\s+/g, " ")), null === r && (r = g), r;
+        }function x(e) {
+            return "string" == typeof e;
+        }x(e) && (e = c.querySelectorAll(e)), 0 === e.length && console.warn("No elements to sort");var D,
+            M,
+            q = c.createDocumentFragment(),
+            B = [],
+            R = [],
+            V = [],
+            $ = [],
+            k = !0,
+            z = e.length && e[0].parentNode,
+            L = z.rootNode !== document,
+            O = e.length && (n === o || n.useFlex !== !1) && !L && -1 !== getComputedStyle(z, null).display.indexOf("flex");return s.apply(l, Array.prototype.slice.call(arguments, 1)), S(), R.sort(C), b(), R.map(function (e) {
+            return e.elm;
+        });
+    }function t(e, t) {
+        for (var r, n = e.length, o = n; o--;) {
+            r = n - o - 1, t(e[r], r);
+        }
+    }function r(e, t, r) {
+        for (var n in t) {
+            (r || e[n] === o) && (e[n] = t[n]);
+        }return e;
+    }function n(e, t, r) {
+        h.push({ prepare: e, sort: t, sortBy: r });
+    }var o,
+        a = !1,
+        l = null,
+        s = window,
+        c = s.document,
+        i = parseFloat,
+        u = /(-?\d+\.?\d*)\s*$/g,
+        f = /(\d+\.?\d*)\s*$/g,
+        h = [],
+        d = 0,
+        p = 0,
+        g = String.fromCharCode(4095),
+        m = { selector: l, order: "asc", attr: l, data: l, useVal: a, place: "org", returns: a, cases: a, natural: a, forceStrings: a, ignoreDashes: a, sortFunction: l, useFlex: a, emptyEnd: a };return s.Element && function (e) {
+        e.matchesSelector = e.matchesSelector || e.mozMatchesSelector || e.msMatchesSelector || e.oMatchesSelector || e.webkitMatchesSelector || function (e) {
+            for (var t = this, r = (t.parentNode || t.document).querySelectorAll(e), n = -1; r[++n] && r[n] != t;) {}return !!r[n];
+        };
+    }(Element.prototype), r(n, { loop: t }), r(e, { plugin: n, defaults: m });
+}());
+
+(function (global, factory) {
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2), __WEBPACK_LOCAL_MODULE_0__, __webpack_require__(0)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else {
+        factory(global.jQuery, global.tinysort, global.moment || undefined);
+    }
+})(this, function ($, tinysort, moment) {
+
+    var $document = $(document),
+        signClass,
+        sortEngine,
+        emptyEnd;
+
+    $.bootstrapSortable = function (options) {
+        if (options == undefined) {
+            initialize({});
+        } else if (options.constructor === Boolean) {
+            initialize({ applyLast: options });
+        } else if (options.sortingHeader !== undefined) {
+            sortByColumn(options.sortingHeader);
+        } else {
+            initialize(options);
+        }
+    };
+
+    function initialize(options) {
+        // Check if moment.js is available
+        var momentJsAvailable = typeof moment !== 'undefined';
+
+        // Set class based on sign parameter
+        signClass = !options.sign ? "arrow" : options.sign;
+
+        // Set sorting algorithm
+        if (options.customSort == 'default') options.customSort = defaultSortEngine;
+        sortEngine = options.customSort || sortEngine || defaultSortEngine;
+
+        emptyEnd = options.emptyEnd;
+
+        // Set attributes needed for sorting
+        $('table.sortable').each(function () {
+            var $this = $(this);
+            var applyLast = options.applyLast === true;
+            $this.find('span.sign').remove();
+
+            // Add placeholder cells for colspans
+            $this.find('> thead [colspan]').each(function () {
+                var colspan = parseFloat($(this).attr('colspan'));
+                for (var i = 1; i < colspan; i++) {
+                    $(this).after('<th class="colspan-compensate">');
+                }
+            });
+
+            // Add placeholder cells for rowspans in header
+            $this.find('> thead [rowspan]').each(function () {
+                var $cell = $(this);
+                var rowspan = parseFloat($cell.attr('rowspan'));
+                for (var i = 1; i < rowspan; i++) {
+                    var parentRow = $cell.parent('tr');
+                    var nextRow = parentRow.next('tr');
+                    var index = parentRow.children().index($cell);
+                    nextRow.children().eq(index).before('<th class="rowspan-compensate">');
+                }
+            });
+
+            // Set indexes to header cells
+            $this.find('> thead tr').each(function (rowIndex) {
+                $(this).find('th').each(function (columnIndex) {
+                    var $header = $(this);
+                    $header.addClass('nosort').removeClass('up down');
+                    $header.attr('data-sortcolumn', columnIndex);
+                    $header.attr('data-sortkey', columnIndex + '-' + rowIndex);
+                });
+            });
+
+            // Cleanup placeholder cells
+            $this.find('> thead .rowspan-compensate, .colspan-compensate').remove();
+
+            // Initialize sorting values specified in header
+            $this.find('th').each(function () {
+                var $header = $(this);
+                if ($header.attr('data-dateformat') !== undefined && momentJsAvailable) {
+                    var colNumber = parseFloat($header.attr('data-sortcolumn'));
+                    $this.find('td:nth-child(' + (colNumber + 1) + ')').each(function () {
+                        var $cell = $(this);
+                        $cell.attr('data-value', moment($cell.text(), $header.attr('data-dateformat')).format('YYYY/MM/DD/HH/mm/ss'));
+                    });
+                } else if ($header.attr('data-valueprovider') !== undefined) {
+                    var colNumber = parseFloat($header.attr('data-sortcolumn'));
+                    $this.find('td:nth-child(' + (colNumber + 1) + ')').each(function () {
+                        var $cell = $(this);
+                        $cell.attr('data-value', new RegExp($header.attr('data-valueprovider')).exec($cell.text())[0]);
+                    });
+                }
+            });
+
+            // Initialize sorting values
+            $this.find('td').each(function () {
+                var $cell = $(this);
+                if ($cell.attr('data-dateformat') !== undefined && momentJsAvailable) {
+                    $cell.attr('data-value', moment($cell.text(), $cell.attr('data-dateformat')).format('YYYY/MM/DD/HH/mm/ss'));
+                } else if ($cell.attr('data-valueprovider') !== undefined) {
+                    $cell.attr('data-value', new RegExp($cell.attr('data-valueprovider')).exec($cell.text())[0]);
+                } else {
+                    $cell.attr('data-value') === undefined && $cell.attr('data-value', $cell.text());
+                }
+            });
+
+            var context = lookupSortContext($this),
+                bsSort = context.bsSort;
+
+            $this.find('> thead th[data-defaultsort!="disabled"]').each(function (index) {
+                var $header = $(this);
+                var $sortTable = $header.closest('table.sortable');
+                $header.data('sortTable', $sortTable);
+                var sortKey = $header.attr('data-sortkey');
+                var thisLastSort = applyLast ? context.lastSort : -1;
+                bsSort[sortKey] = applyLast ? bsSort[sortKey] : $header.attr('data-defaultsort');
+                if (bsSort[sortKey] !== undefined && applyLast === (sortKey === thisLastSort)) {
+                    bsSort[sortKey] = bsSort[sortKey] === 'asc' ? 'desc' : 'asc';
+                    doSort($header, $sortTable);
+                }
+            });
+        });
+    }
+
+    // Clean up placeholder cells for rowspans in body
+    function removeRowspanPlaceholders(table) {
+        table.find('> tbody [rowspan-group]').each(function () {
+            var $this = $(this);
+            var id = $this.attr('rowspan-group');
+            var parentRow = $this.parent('tr');
+            var index = parentRow.children().index($this);
+
+            while (true) {
+                var nextRow = parentRow.next('tr');
+                if (!nextRow.is('tr')) break;
+                var nextCell = nextRow.children().eq(index);
+
+                if (nextCell.attr('rowspan-group') === id) {
+                    var rowspan = parseFloat($this.attr('rowspan')) || 1;
+                    $this.attr('rowspan', rowspan + 1);
+                    nextCell.remove();
+                } else {
+                    break;
+                }
+                parentRow = nextRow;
+            }
+        });
+    }
+
+    // Add placeholder cells for rowspans in body
+    function addRowspanPlaceholders(table) {
+        table.find('> tbody [rowspan]').each(function () {
+            var $cell = $(this);
+            var rowspan = parseFloat($cell.attr('rowspan'));
+            $cell.removeAttr('rowspan');
+            var rowSpanId = $cell.attr('rowspan-group') || guid();
+            $cell.attr('rowspan-group', rowSpanId);
+            $cell.attr('rowspan-value', rowspan);
+            var parentRow = $cell.parent('tr');
+            var index = parentRow.children().index($cell);
+            for (var i = 1; i < rowspan; i++) {
+                var compemnsationCell = $cell.clone(false);
+                var nextRow = parentRow.next('tr');
+                nextRow.children().eq(index).before(compemnsationCell);
+                parentRow = nextRow;
+            }
+        });
+    }
+
+    // Add click event to table header
+    $document.on('click', 'table.sortable>thead th[data-defaultsort!="disabled"]', function (e) {
+        sortByColumn(this);
+    });
+
+    // element is the header of the column to sort (the clicked header)
+    function sortByColumn(element) {
+        var $this = $(element),
+            $table = $this.data('sortTable') || $this.closest('table.sortable');
+        doSort($this, $table);
+    }
+
+    // Look up sorting data appropriate for the specified table (jQuery element).
+    // This allows multiple tables on one page without collisions.
+    function lookupSortContext($table) {
+        var context = $table.data("bootstrap-sortable-context");
+        if (context === undefined) {
+            context = { bsSort: [], lastSort: undefined };
+            $table.find('> thead th[data-defaultsort!="disabled"]').each(function (index) {
+                var $this = $(this);
+                var sortKey = $this.attr('data-sortkey');
+                context.bsSort[sortKey] = $this.attr('data-defaultsort');
+                if (context.bsSort[sortKey] !== undefined) {
+                    context.lastSort = sortKey;
+                }
+            });
+            $table.data("bootstrap-sortable-context", context);
+        }
+        return context;
+    }
+
+    function defaultSortEngine(rows, sortingParams) {
+        tinysort(rows, sortingParams);
+    }
+
+    // Sorting mechanism separated
+    function doSort($this, $table) {
+        $table.trigger('before-sort');
+
+        addRowspanPlaceholders($table);
+
+        var sortColumn = parseFloat($this.attr('data-sortcolumn')),
+            context = lookupSortContext($table),
+            bsSort = context.bsSort;
+
+        var colspan = $this.attr('colspan');
+        if (colspan) {
+            var mainSort = parseFloat($this.data('mainsort')) || 0;
+            var rowIndex = parseFloat($this.data('sortkey').split('-').pop());
+
+            // If there is one more row in header, delve deeper
+            if ($table.find('> thead tr').length - 1 > rowIndex) {
+                doSort($table.find('[data-sortkey="' + (sortColumn + mainSort) + '-' + (rowIndex + 1) + '"]'), $table);
+                return;
+            }
+            // Otherwise, just adjust the sortColumn
+            sortColumn = sortColumn + mainSort;
+        }
+
+        var localSignClass = $this.attr('data-defaultsign') || signClass;
+
+        // update arrow icon
+        $table.find('> thead th').each(function () {
+            $(this).removeClass('up').removeClass('down').addClass('nosort');
+        });
+
+        if ($.browser.mozilla) {
+            var moz_arrow = $table.find('> thead div.mozilla');
+            if (moz_arrow !== undefined) {
+                moz_arrow.find('.sign').remove();
+                moz_arrow.parent().html(moz_arrow.html());
+            }
+            $this.wrapInner('<div class="mozilla"></div>');
+            $this.children().eq(0).append('<span class="sign ' + localSignClass + '"></span>');
+        } else {
+            $table.find('> thead span.sign').remove();
+            $this.append('<span class="sign ' + localSignClass + '"></span>');
+        }
+
+        // sort direction
+        var sortKey = $this.attr('data-sortkey');
+        var initialDirection = $this.attr('data-firstsort') !== 'desc' ? 'desc' : 'asc';
+
+        var newDirection = bsSort[sortKey] || initialDirection;
+        if (context.lastSort === sortKey || bsSort[sortKey] === undefined) {
+            newDirection = newDirection === 'asc' ? 'desc' : 'asc';
+        }
+        bsSort[sortKey] = newDirection;
+        context.lastSort = sortKey;
+
+        if (bsSort[sortKey] === 'desc') {
+            $this.find('span.sign').addClass('up');
+            $this.addClass('up').removeClass('down nosort');
+        } else {
+            $this.addClass('down').removeClass('up nosort');
+        }
+
+        // remove rows that should not be sorted
+        var rows = $table.children('tbody').children('tr');
+        var fixedRows = [];
+        $(rows.filter('[data-disablesort="true"]').get().reverse()).each(function (index, fixedRow) {
+            var $fixedRow = $(fixedRow);
+            fixedRows.push({ index: rows.index($fixedRow), row: $fixedRow });
+            $fixedRow.remove();
+        });
+
+        // sort rows
+        var rowsToSort = rows.not('[data-disablesort="true"]');
+        if (rowsToSort.length != 0) {
+            var emptySorting = bsSort[sortKey] === 'asc' ? emptyEnd : false;
+            sortEngine(rowsToSort, { emptyEnd: emptySorting, selector: 'td:nth-child(' + (sortColumn + 1) + ')', order: bsSort[sortKey], data: 'value' });
+        }
+
+        // add back the fixed rows
+        $(fixedRows.reverse()).each(function (index, row) {
+            if (row.index === 0) {
+                $table.children('tbody').prepend(row.row);
+            } else {
+                $table.children('tbody').children('tr').eq(row.index - 1).after(row.row);
+            }
+        });
+
+        // add class to sorted column cells
+        $table.find('> tbody > tr > td.sorted,> thead th.sorted').removeClass('sorted');
+        rowsToSort.find('td:eq(' + sortColumn + ')').addClass('sorted');
+        $this.addClass('sorted');
+
+        removeRowspanPlaceholders($table);
+        $table.trigger('sorted');
+    }
+
+    // jQuery 1.9 removed this object
+    if (!$.browser) {
+        $.browser = { chrome: false, mozilla: false, opera: false, msie: false, safari: false };
+        var ua = navigator.userAgent;
+        $.each($.browser, function (c) {
+            $.browser[c] = new RegExp(c, 'i').test(ua) ? true : false;
+            if ($.browser.mozilla && c === 'mozilla') {
+                $.browser.mozilla = new RegExp('firefox', 'i').test(ua) ? true : false;
+            }
+            if ($.browser.chrome && c === 'safari') {
+                $.browser.safari = false;
+            }
+        });
+    }
+
+    function guid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+        }
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+    }
+
+    // Initialise on DOM ready
+    $($.bootstrapSortable);
+});
 
 /***/ })
 /******/ ]);
