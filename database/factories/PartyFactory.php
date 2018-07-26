@@ -6,10 +6,15 @@ use Faker\Generator as Faker;
 
 $factory->define(App\Party::class, function (Faker $faker) {
     return [
-        'location' => $faker->name,
+        'location' => $faker->address,
         'group' => function () {
             return factory(Group::class)->create()->idgroups;
-        }
+        },
+        'venue' => $faker->streetName,
+        'event_date' => $faker->date(),
+        'start' => $faker->time(),
+        'end' => $faker->time(),
+        'free_text' => $faker->paragraph,
     ];
 });
 

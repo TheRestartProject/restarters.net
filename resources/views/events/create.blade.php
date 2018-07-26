@@ -25,7 +25,8 @@
         @endif
 
         <div class="edit-panel">
-          <form action="/party/create" method="post" enctype="multipart/form-data"> <!-- id="dropzoneEl" -->
+            {{-- <form action="/party/create" method="post" enctype="multipart/form-data">--}} <!-- id="dropzoneEl" -->
+          <form action="/party/create" method="post"> <!-- id="dropzoneEl" -->
 
           @csrf
 

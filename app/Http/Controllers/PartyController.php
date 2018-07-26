@@ -137,7 +137,7 @@ class PartyController extends Controller {
 
   }
 
-  public function create()
+  public function create(Request $request)
   {
       $user = Auth::user();
 
@@ -145,36 +145,14 @@ class PartyController extends Controller {
         return redirect('/user/forbidden');
 
       $Groups = new Group;
-      $Party = new Party;
 
-      // $this->set('grouplist', $Groups->findList());
-      //
-      // $this->set('title', 'New Party');
-      // $this->set('gmaps', true);
-      // $this->set('js',
-      //             array('head' => array(
-      //                             '/ext/geocoder.js'
-      //             )));
-      //
-      // $this->set('group_list', $Groups->findAll());
-
-      if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
-
+      if ($request->isMethod('post')) {
 
           $error = array();
 
-          // Add SuperHero Restarter!
-          // $_POST['users'][] = 29;
-          // if(empty($_POST['volunteers'])) {
-          //     $volunteers = count($_POST['users']);
-          // }
-          // else {
-          //     $volunteers = $_POST['volunteers'];
-          // }
+          if ($request->has('location')) {
 
-          if (!empty($_POST['location'])) {
-
-            $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($_POST['location'].',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
+            $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($request->input('location').',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
             $json = json_decode($json);
 
             if (is_object($json) && !empty($json->{'results'})) {
@@ -188,16 +166,14 @@ class PartyController extends Controller {
           }
 
           // We got data! Elaborate.
-          $event_date =       $_POST['event_date'];
-          $start      =       $_POST['start'];
-          $end        =       $_POST['end'];
+          $event_date =       $request->input('event_date');
+          $start      =       $request->input('start');
+          $end        =       $request->input('end');
           $pax        =       0;
-          $free_text  =       $_POST['free_text'];
-          $venue      =       $_POST['venue'];
-          $location   =       $_POST['location'];
-          // $latitude   =       $latitude;
-          // $longitude  =       $longitude;
-          $group      =       intval($_POST['group']);
+          $free_text  =       $request->input('free_text');
+          $venue      =       $request->input('venue');
+          $location   =       $request->input('location');
+          $group      =       $request->input('group');
 
 
           // saving this for wordpress
@@ -212,17 +188,6 @@ class PartyController extends Controller {
           if(!FixometerHelper::verify($start)){
               $error['name'] = 'We must have a starting date and time.';
           }
-          // if(!empty($latitude) || !empty($longitude)) {
-          //     // check that these values are floats.
-          //     $check_lat = filter_var($latitude, FILTER_VALIDATE_FLOAT);
-          //     $check_lon = filter_var($longitude, FILTER_VALIDATE_FLOAT);
-          //
-          //     if(!$check_lat || !$check_lon){
-          //         $error['location'] = 'Coordinates must be in the correct format.';
-          //     }
-          //
-          // }
-
 
           if(empty($error)) {
 
@@ -250,11 +215,12 @@ class PartyController extends Controller {
                               // 'volunteers'    => $volunteers,
                               'created_at'    => date('Y-m-d H:i:s')
                             );
+
+
+              $Party = new Party;
               $idParty = $Party->insertGetId($data);
 
-
-
-              if($idParty){
+              if($idParty) {
 
                   /** check and create User List **/
                   $_POST['users'][] = 29;
@@ -272,16 +238,16 @@ class PartyController extends Controller {
 
                   Party::find($idParty)->increment('volunteers');
 
+                  //Send Emails to Admins notifying event creation
                   if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
-                    $all_admins = User::where('role', 2)->get();
+                      $all_admins = User::where('role', 2)->where('invites', 1)->get();
 
-                    //Send Emails to Admins notifying event creation
-                    $arr = [
-                      'event_venue' => Party::find($idParty)->venue,
-                      'event_url' => url('/party/view/'.$idParty),
-                    ];
+                      $arr = [
+                        'event_venue' => Party::find($idParty)->venue,
+                        'event_url' => url('/party/view/'.$idParty),
+                      ];
 
-                    Notification::send($all_admins, new ModerationEvent($arr));
+                      Notification::send($all_admins, new ModerationEvent($arr));
                   }
 
 
@@ -299,16 +265,7 @@ class PartyController extends Controller {
                           }
                       }
                       else { }
-                  }
-
-                  if(FixometerHelper::hasRole($user, 'Host')){
-
-                      // $this->sendCreationNotificationEmail($venue, $location, $event_date, $start, $end, $group);
-                      // header('Location: /host?action=pc&code=200');
-
-                  } else if(FixometerHelper::hasRole($user, 'Administrator')){
-                    // header('Location: /admin?action=pc&code=200');
-                  }
+                      }
                }
               else {
                   $response['danger'] = 'Party could <strong>not</strong> be created. Something went wrong with the database.';
@@ -318,9 +275,6 @@ class PartyController extends Controller {
           else {
               $response['danger'] = 'Party could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.';
           }
-          // $this->set('response', $response);
-          // $this->set('error', $error);
-          // $this->set('udata', $_POST);
 
           if (!isset($response)) {
             $response = null;
