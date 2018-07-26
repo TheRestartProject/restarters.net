@@ -85,5 +85,4 @@ class UserGroups extends Model
     public function volunteer() {
       return $this->hasOne('App\User', 'id', 'user');
     }
-
 }

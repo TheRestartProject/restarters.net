@@ -599,7 +599,7 @@ class UserController extends Controller
             //get permissions and group_ids for every user
             $userlist->map(function($user) use ($User, $UserGroups) {
                $user['permissions'] = $User->getRolePermissions($user->role);
-               $user['groups'] = $UserGroups->where('user', $user->id)->pluck('group')->toArray();
+               $user['groups'] = $user->groups;
                $user['lastLogin'] = $user->lastLogin();
                $user['country'] = FixometerHelper::getCountryFromCountryCode($user->country);
 
@@ -672,7 +672,7 @@ class UserController extends Controller
             //get permissions and group_ids for every user
             $userlist->map(function($user) use ($User, $UserGroups) {
                $user['permissions'] = $User->getRolePermissions($user->role);
-               $user['groups'] = $UserGroups->where('user', $user->id)->pluck('group')->toArray();
+               $user['groups'] = $user->groups;
                $user['lastLogin'] = $user->lastLogin();
                $user['country'] = FixometerHelper::getCountryFromCountryCode($user->country);
 

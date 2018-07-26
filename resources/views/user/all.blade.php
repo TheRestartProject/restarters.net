@@ -182,25 +182,11 @@
                         @endif
                       </td>
                       <td>{{ $u->country }}</td>
-                      <td>
-                        @if (isset($u->groups))
-                          @php( $set_groups = false )
-
-                          @foreach($u->groups as $n => $g)
-                            @if ($n == count($u->groups) - 1)
-                              <a href="/group/view/{{ $g }}">{{ $g }}</a>
-                              @php( $set_groups = true )
-                            @else
-                              <a href="/group/view/{{ $g }}">{{ $g }}</a>,
-                              @php( $set_groups = true )
-                            @endif
-                          @endforeach
-
-                          @if(!$set_groups)
-                            N/A
-                          @endif
+                      <td class="text-center">
+                        @if (isset($u->groups) && $u->groups->count() > 0)
+                            <span class="popover-usergroups" data-toggle="popover" data-html="true" data-content="@include('partials.usergroups-popover')">{{ $u->groups->count() }}</span>
                         @else
-                          N/A
+                          0
                         @endif
                       </td>
                       <td><span title="{{ $u->lastLogin }}">{{ $u->lastLogin->diffForHumans() }}</span></td>

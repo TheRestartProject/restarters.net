@@ -32,16 +32,6 @@ class User extends Authenticatable
         'password', 'remember_token'
     ];
 
-    //Table Relations
-
-    // public function userGroups() {
-    //   return $this->hasMany('App\UserGroups', 'user', 'id');
-    // }
-    //
-    // public function rolePermissions() {
-    //   return $this->hasMany('App\RolePermissions', 'role', 'role');
-    // }
-    //
     public function role() {
       return $this->hasOne('App\Role', 'idroles', 'role');
     }
@@ -54,8 +44,8 @@ class User extends Authenticatable
       return $this->belongsToMany('App\UsersSkills', 'users_skills', 'user', 'skill');
     }
 
-    public function userGroups() {
-      return $this->belongsToMany('App\UserGroups', 'users_groups', 'user', 'group');
+    public function groups() {
+      return $this->belongsToMany('App\Group', 'users_groups', 'user', 'group');
     }
 
     //
