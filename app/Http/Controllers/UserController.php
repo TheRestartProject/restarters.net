@@ -601,6 +601,7 @@ class UserController extends Controller
                $user['permissions'] = $User->getRolePermissions($user->role);
                $user['groups'] = $UserGroups->where('user', $user->id)->pluck('group')->toArray();
                $user['lastLogin'] = $user->lastLogin();
+               $user['country'] = FixometerHelper::getCountryFromCountryCode($user->country);
 
                return $user;
             });
@@ -623,11 +624,11 @@ class UserController extends Controller
         }
     }
 
-    public function search(Request $request) {
-
+    public function search(Request $request)
+    {
         $user = User::find(Auth::id());
 
-        if(FixometerHelper::hasRole($user, 'Administrator')){
+        if (FixometerHelper::hasRole($user, 'Administrator')) {
             $User = new User;
             //Have true as parameter for eloquent collection instead of array
             $userlist = $User->getUserList(true);
@@ -653,6 +654,18 @@ class UserController extends Controller
               $userlist = $userlist->where('users.role', '=', $request->input('role'));
             }
 
+            if ($request->input('sort') !== null) {
+                $sortField = $request->input('sort');
+                if ($request->input('sortdir') == null) {
+                    $sortDir = 'asc';
+                } else {
+                    $sortDir = $request->input('sortdir');
+                }
+                $userlist->orderBy($sortField, $sortDir);
+            } else {
+                $userlist = $userlist->orderBy('users.id', 'asc');
+            }
+
             $userlist = $userlist->paginate(env('PAGINATE'));
 
             $UserGroups = new UserGroups;
@@ -661,6 +674,7 @@ class UserController extends Controller
                $user['permissions'] = $User->getRolePermissions($user->role);
                $user['groups'] = $UserGroups->where('user', $user->id)->pluck('group')->toArray();
                $user['lastLogin'] = $user->lastLogin();
+               $user['country'] = FixometerHelper::getCountryFromCountryCode($user->country);
 
                return $user;
             });

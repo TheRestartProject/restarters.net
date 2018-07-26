@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\User;
 
 use DB;
+use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -74,11 +75,40 @@ class ViewUsersTest extends TestCase
             'updated_at' => $lastLogin
         ]);
 
-        // When we visit the list of users
+        // When we visit the list of users and filter by that user
         $response = $this->get('/user/all/search?name=' . $user->name);
 
         // Then we should see the last login date for that user
         $response->assertSeeText($lastLogin->diffForHumans());
     }
 
+    /** @test */
+    public function admin_can_sort_user_list_by_last_login()
+    {
+        // Given we have users with various login times
+        $dateOfMostRecentLogin = new Carbon();
+        $dateOfLeastRecentLogin = new Carbon('-1 year');
+
+        $userWithMostRecentLogin = factory(User::class)->create([
+            'updated_at' => $dateOfMostRecentLogin,
+        ]);
+        $otherUsers = factory(User::class, 42)->create([
+            'updated_at' => new Carbon('-1 month'),
+        ]);
+        $userWithLeastRecentLogin = factory(User::class)->create([
+            'updated_at' => $dateOfLeastRecentLogin,
+        ]);
+
+        // When we visit the list of users and sort it by last login descending
+        $response = $this->get('/user/all/search?sort=lastlogin&sortdir=desc');
+
+        // Then the first result is the most recent login
+        $response->assertSeeText($dateOfMostRecentLogin->diffForHumans());
+
+        // When we visit the list of users and sort it by last login descending
+        $response = $this->get('/user/all/search?sort=lastlogin&sortdir=asc');
+
+        // Then the first result is the most recent login
+        $response->assertSeeText($dateOfLeastRecentLogin->diffForHumans());
+    }
 }

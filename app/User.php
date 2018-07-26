@@ -134,7 +134,7 @@ class User extends Authenticatable
               }
           }
         } else {
-          $Users = User::join('roles', 'users.role', '=', 'roles.idroles')->orderBy('users.id', 'ASC');
+          $Users = User::join('roles', 'users.role', '=', 'roles.idroles');
         }
 
         return $Users;

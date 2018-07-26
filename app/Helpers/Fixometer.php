@@ -12,6 +12,8 @@ use App;
 use Auth;
 use DB;
 
+use Request;
+
 class FixometerHelper {
 
   public static function allAges() {
@@ -602,6 +604,17 @@ class FixometerHelper {
 
   }
 
+    public static function getCountryFromCountryCode($countryCode)
+    {
+        $countriesArray = FixometerHelper::getAllCountries();
+
+        if (array_key_exists($countryCode, $countriesArray)) {
+            return $countriesArray[$countryCode];
+        }
+
+        return "";
+    }
+
   public static function checkDistance($object, $user){
 
     $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=".$object->latitude.",".$object->longitude."&destinations=".$user->latitude.",".$user->longitude;
@@ -714,4 +727,21 @@ class FixometerHelper {
 
   }
 
+    public static function buildSortQuery($columnName)
+    {
+        $newSortDir = 'asc';
+
+        if (Request::has('sort') && Request::input('sort') == $columnName) {
+            $existingSortDir = Request::input('sortdir');
+            if ($existingSortDir == 'asc')
+                $newSortDir = 'desc';
+            elseif ($existingSortDir == 'desc')
+                $newSortDir = 'asc';
+        }
+
+        $existing = Request::except(['sort', 'sortdir']);
+
+
+        return http_build_query($existing) . '&sort=' . $columnName . '&sortdir=' . $newSortDir;
+    }
 }

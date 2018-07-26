@@ -134,12 +134,13 @@
           <table class="table table-striped">
             <thead>
               <tr>
-                <th>Name</th>
+                <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.name') }}">Name</a></th>
                 <th>Email address</th>
-                <th>Role</th>
-                <th>Location</th>
+                <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.role') }}">Role</a></th>
+                <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.location') }}">Location</a></th>
+                <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.country') }}">Country</a></th>
                 <th>Groups</th>
-                <th>Last login</th>
+                <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.updated_at') }}">Last login</a></th>
               </tr>
             </thead>
             <tbody>
@@ -180,6 +181,7 @@
                           N/A
                         @endif
                       </td>
+                      <td>{{ $u->country }}</td>
                       <td>
                         @if (isset($u->groups))
                           @php( $set_groups = false )
@@ -212,7 +214,7 @@
         <div class="d-flex justify-content-center">
           <nav aria-label="Pagination">
             @if (!empty($_GET) || isset($name))
-              {!! $userlist->appends(['name' => $name, 'email' => $email, 'location' => $location, 'country' => $country, 'role' => $role, 'permissions' => $permissions ])->links() !!} <!-- 'selected_country' => $selected_country -->
+              {!! $userlist->appends(Request::except('page'))->links() !!} <!-- 'selected_country' => $selected_country -->
             @else
               {!! $userlist->links() !!}
             @endif
