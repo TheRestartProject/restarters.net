@@ -47,8 +47,8 @@ class ApiController extends Controller
 
         return response()
             ->json([
-                'kg_co2_diverted' => $eventStats['co2'],
-                'kg_waste_diverted' => $eventStats['ewaste'],
+                'kg_co2_diverted' => round($eventStats['co2']),
+                'kg_waste_diverted' => round($eventStats['ewaste']),
                 'num_fixed_devices' => $eventStats['fixed_devices'],
                 'num_repairable_devices' => $eventStats['repairable_devices'],
                 'num_dead_devices' => $eventStats['dead_devices'],
@@ -70,8 +70,8 @@ class ApiController extends Controller
                 'num_participants' => $groupStats['pax'],
                 'num_hours_volunteered' => $groupStats['hours'],
                 'num_parties' => $groupStats['parties'],
-                'kg_co2_diverted' => $groupStats['co2'],
-                'kg_waste_diverted' => $groupStats['waste'],
+                'kg_co2_diverted' => round($groupStats['co2']),
+                'kg_waste_diverted' => round($groupStats['waste']),
             ], 200);
     }
 
