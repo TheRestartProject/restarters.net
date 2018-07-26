@@ -387,15 +387,16 @@ class Party extends Model
     * Laravel specific code
     */
 
-    public function scopeUpcomingEvents(){
+    public function scopeUpcomingEvents()
+    {
         return $this->join('groups', 'groups.idgroups', '=', 'events.group')
-                      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-                        ->whereDate('event_date', '>=', date('Y-m-d'))
-                          ->select('events.*')
-                            ->groupBy('idevents')
-                              ->orderBy('wordpress_post_id', 'ASC')
-                                ->orderBy('event_date', 'ASC');
-    } 
+                     ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+                     ->whereDate('event_date', '>=', date('Y-m-d'))
+                     ->select('events.*')
+                     ->groupBy('idevents')
+                     ->orderBy('event_date', 'ASC');
+    }
+
     public function scopeAllUpcomingEvents(){
         return $this->whereRaw('CONCAT(`event_date`, " ", `start`) > CURRENT_TIMESTAMP()')
                     ->orderByRaw('CONCAT(`event_date`, " ", `start`)');

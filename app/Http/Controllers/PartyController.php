@@ -90,8 +90,8 @@ class PartyController extends Controller {
       if( !is_null($group_id) ){
 
         $upcoming_events = Party::upcomingEvents()
-                              ->where('events.group', $group_id)
-                                  ->get();
+                         ->where('events.group', $group_id)
+                         ->get();
 
         $past_events = Party::pastEvents()
                               ->where('events.group', $group_id)
@@ -102,9 +102,9 @@ class PartyController extends Controller {
       } else {
 
         $upcoming_events = Party::upcomingEvents()
-                              ->where('users_groups.user', Auth::user()->id)
-                                ->take(5)
-                                  ->get();
+                         ->where('users_groups.user', Auth::user()->id)
+                         ->take(5)
+                         ->get();
 
         $past_events = Party::pastEvents()->paginate(env('PAGINATE'));
 
