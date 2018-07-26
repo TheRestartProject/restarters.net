@@ -600,6 +600,8 @@ class UserController extends Controller
             $userlist->map(function($user) use ($User, $UserGroups) {
                $user['permissions'] = $User->getRolePermissions($user->role);
                $user['groups'] = $UserGroups->where('user', $user->id)->pluck('group')->toArray();
+               $user['lastLogin'] = $user->lastLogin();
+
                return $user;
             });
 
@@ -658,6 +660,8 @@ class UserController extends Controller
             $userlist->map(function($user) use ($User, $UserGroups) {
                $user['permissions'] = $User->getRolePermissions($user->role);
                $user['groups'] = $UserGroups->where('user', $user->id)->pluck('group')->toArray();
+               $user['lastLogin'] = $user->lastLogin();
+
                return $user;
             });
 

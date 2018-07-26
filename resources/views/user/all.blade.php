@@ -201,7 +201,7 @@
                           N/A
                         @endif
                       </td>
-                      <td data-value="<?php //echo $u->modified_at; ?>" ><?php //echo FixometerHelper::dateFormat($u->modified_at); ?></td>
+                      <td><span title="{{ $u->lastLogin }}">{{ $u->lastLogin->diffForHumans() }}</span></td>
                   </tr>
                 @endif
               @endforeach
