@@ -22,10 +22,9 @@ if ( jQuery('.slideshow').length > 0 ) {
         infinite: false,
         responsive: [
             {
-                breakpoint: 600,
+                breakpoint: 1024,
                 settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 2
+                    arrows: false
                 }
             },
             {

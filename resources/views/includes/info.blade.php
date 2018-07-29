@@ -6,8 +6,8 @@
           </a>
         </header>
     </div>
-    <div class="col-lg-8">
-        @if (!$agent->isMobile())
+    <div class="col-lg-8 d-none d-md-block">
+        @if (!$agent->isPhone())
         <div class="row row-compressed stats float-right text-center">
             <div class="stats__stat">
                 <div class="stat-figure">{{ number_format($device_count_status[0]->counter, 0, '.', ',') }}</div>
