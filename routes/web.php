@@ -29,9 +29,7 @@ Route::get('/user/forbidden', function () {
 Auth::routes();
 Route::get('/logout', 'UserController@logout');
 
-Route::get('/about', function() {
-    return View::make('features.index');
-})->name('features');
+Route::get('/about', 'AboutController@index')->name('features');
 
 // Route::get('/ui', function() {
 //     return View::make('ui.index');

@@ -1,31 +1,31 @@
-<div class="row row-expanded">
-    <div class="col-lg-6">
+<div class="row row-expanded" id="logostats-header">
+    <div class="col-lg-4">
         <header>
           <a href="/">
             @include('includes.logo')
           </a>
-          <br>
-          <!--<h4>@lang('login.lead')</h4>-->
         </header>
     </div>
-    <div class="col-lg-6">
-        <div class="row row-compressed stats">
-            <div class="col">
-                <h3>@lang('login.stat_1')</h3>
-                <strong>{{ number_format($device_count_status[0]->counter, 0, '.', ',') }}</strong>
+    <div class="col-lg-8">
+        @if (!$agent->isMobile())
+        <div class="row row-compressed stats float-right text-center">
+            <div class="stats__stat">
+                <div class="stat-figure">{{ number_format($device_count_status[0]->counter, 0, '.', ',') }}</div>
+                <div class="stat-header">@lang('login.stat_1')</div>
             </div>
-            <div class="col">
-                <h3 style="width: 115px;">@lang('login.stat_2')</h3>
-                <strong>{{ number_format(round($co2Total), 0, '.', ',') }} kg</strong>
+            <div class="stats__stat">
+                <div class="stat-figure">{{ number_format(round($co2Total), 0, '.', ',') }} kg</div>
+                <div class="stat-header">@lang('login.stat_2')</div>
             </div>
-            <div class="col">
-                <h3>@lang('login.stat_3')</h3>
-                <strong>{{ number_format(round($wasteTotal), 0, '.', ',') }} kg</strong>
+            <div class="stats__stat">
+                <div class="stat-figure">{{ number_format(round($wasteTotal), 0, '.', ',') }} kg</div>
+                <div class="stat-header">@lang('login.stat_3')</div>
             </div>
-            <div class="col">
-                <h3>@lang('login.stat_4')</h3>
-                <strong>{{ number_format($partiesCount, 0, '.', ',') }}</strong>
+            <div class="stats__stat">
+                <div class="stat-figure">{{ number_format($partiesCount, 0, '.', ',') }}</div>
+                <div class="stat-header">@lang('login.stat_4')</div>
             </div>
         </div>
+        @endif
     </div>
 </div>

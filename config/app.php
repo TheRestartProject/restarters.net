@@ -160,7 +160,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Msurguy\Honeypot\HoneypotServiceProvider::class,
-
+        App\Providers\AgentServiceProvider::class,
     ],
 
     /*

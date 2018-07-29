@@ -1,6 +1,10 @@
 .features {
+    @include media-breakpoint-up(lg) {
+        padding-top: 44px;
+    }
+
     padding: 10px 0;
-    height: 100%;
+    margin-bottom:30px;
 
     @extend .clear;
 
@@ -15,9 +19,9 @@
     }
 
     header, &__end {
-        max-width: 460px;
+        /*max-width: 460px;*/
         margin: auto;
-        padding: 35px 0;
+        padding: 0;
         text-align: center;
 
         @extend .clear;
@@ -35,32 +39,89 @@
         }
     }
 
-    header {
-        svg {
-            width: 260px;
-            height: auto !important;
-            display: block;
-            margin: 50px auto 30px auto;
+    &__end {
+        padding-top: 22px;
+
+        .btn {
+            margin: 0 10px;
         }
     }
 
+    header {
+        svg {
+            width: 204px;
+            height: auto !important;
+            display: block;
+            @include media-breakpoint-down(sm) {
+                margin: auto;
+            }
+        }
 
-}
-
-.featured-slide__heading {
-    font-size: 18px;
-    text-align: center;
-    margin: 15px auto;
-}
-
-.slideshow {
-    .slick-prev:before, .slick-next:before{
-        color:#f9a33f;
+        @include media-breakpoint-down(sm) {
+            text-align: center;
+        }
     }
 
-    img {
-        border: 1px solid #ddd;
-        box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 0 0 0 rgba(0,0,0,0.12);
+    h2 {
+        font-size: 24px;
+    }
+
+    .btn {
+        font-style: normal;
+        font-weight: 500;
+        border: .1875rem solid #151d1e;
+        border-radius: 4.5em 6.625em/5.625em 4.5em;
+        box-sizing: border-box;
+        display: inline-block;
+        padding: .3125em 1em .475em 1em;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .btn-primary {
+        background: #151d1e;
+        color: #fff;
+    }
+
+    .btn-secondary {
+        color: #151d1e;
+        background: #fff;
+    }
+
+    .stats {
+        margin-top: 0;
+    }
+
+    .featured-slide__heading {
+        font-size: 18px;
+        text-align: center;
+        margin: 15px auto;
+    }
+
+    .slideshow {
+        .slick-next {
+            background-image: url(/images/slides/arrow_dx@1x.png);
+            width: 35px;
+            height: 24px;
+        }
+
+        .slick-prev {
+            background-image: url(/images/slides/arrow_sx@1x.png);
+            width: 35px;
+            height: 24px;
+        }
+
+        .slick-disabled {
+            background: none;
+        }
+
+        .slick-prev:before, .slick-next:before {
+            content: '';
+        }
+
+        img {
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 0 0 0 rgba(0,0,0,0.12);
+        }
     }
 }
-

@@ -1,7 +1,10 @@
 .registration {
     @include media-breakpoint-up(lg) {
-        padding-top: 70px;
+        padding-top: 44px;
     }
+
+    padding: 10px 0;
+
     label sup {
         color: #FF0000;
         font-size: 16px;
@@ -10,12 +13,13 @@
     }
 
     header {
-        margin-top:50px;
-        text-align: center;
-
         svg {
-            width: 170px;
+            width: 204px;
             margin-bottom: 15px;
+            display: block;
+            @include media-breakpoint-down(sm) {
+                margin: auto;
+            }
         }
         p {
             font-size: 24px;

@@ -1,13 +1,28 @@
 .login-page {
+    @include media-breakpoint-up(lg) {
+        padding-top: 44px;
+    }
+
+    padding: 10px 0;
+
+    #logostats-header {
+        @include media-breakpoint-up(lg) {
+            margin-bottom: 60px;
+        }
+    }
+
     height: 100vh;
     @extend .clear;
 
     header {
-        margin-top: 50px;
-        text-align: center;
 
         svg {
-          margin-bottom: 15px;
+          width: 204px;
+          height: auto !important;
+          display: block;
+          @include media-breakpoint-down(sm) {
+              margin: auto;
+          }
         }
         p {
             padding: 0 15px;
@@ -34,17 +49,22 @@
 
 .stats {
     margin-bottom: 30px;
-    margin-top: 30px;
 
-    h3 {
+    &__stat {
+        border-right: 1px solid black;
+    }
+
+    .stat-text {
+        font-family: 'Open Sans';
         margin: 0 0 20px;
         color: $brand;
-        font-size: 18px;
+        font-size: 14px;
         line-height: 1;
     }
-    strong {
+    .stat-figure {
+        font-family: 'Patua One';
         font-weight: normal;
-        font-size: 26px;
+        font-size: 34px;
         line-height: 1;
         //white-space: nowrap;
     }
