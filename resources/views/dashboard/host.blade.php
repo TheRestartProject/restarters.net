@@ -2,8 +2,8 @@
   <div class="col-lg-4 col-dashboard">@include('partials.welcome-materials-host')</div>
   <div class="col-lg-4 col-dashboard">@include('partials.how-to')</div>
   <div class="col-lg-4 col-dashboard">@include('partials.discussion')</div>
-  <div class="col-lg-4 col-dashboard">@include('partials.wiki')</div>
-  <div class="col-lg-4 col-dashboard">@include('partials.community-news')</div>
+  <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.wiki')</div>
+  <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.community-news')</div>
 @else
     @if (!empty($inactive_groups))
         <div class="col-lg-4 col-dashboard">@include('partials.create-event')</div>
@@ -17,7 +17,7 @@
         <div class="col-lg-4 col-dashboard">@include('partials.up-to-date')</div>
     @endif
     <div class="col-lg-4 col-dashboard">@include('partials.discussion')</div>
-    <div class="col-lg-4 col-dashboard">@include('partials.wiki')</div>
-    <div class="col-lg-4 col-dashboard">@include('partials.community-news')</div>
+    <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.wiki')</div>
+    <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.community-news')</div>
 @endif
 

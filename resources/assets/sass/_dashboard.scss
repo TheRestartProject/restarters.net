@@ -25,6 +25,9 @@
         &__media {
             flex-shrink:0;
             width: 100%;
+            position:relative;
+            margin-top:-5px;
+            z-index:9;
         }
 
         img {
@@ -34,10 +37,45 @@
             align-content: center;
         }
 
+        &__header {
+            padding: 14px 20px;
+            background-position: top right;
+            z-index:10;
+            background-color:transparent;
+
+            &--wiki {
+                background-image: url(/images/dashboard/wiki_header@1x.png);
+                height: 75px;
+            }
+
+            &--community {
+                background-image: url(/images/dashboard/community_header@1x.png);
+                height: 74px;
+            }
+
+            &--discussion {
+                background-image: url(/images/dashboard/discussion_header@1x.png);
+                height: 73px;
+            }
+
+            h4 {
+                font-family: Asap;
+                font-size: 24px;
+                font-weight: bold;
+                font-style: normal;
+                font-stretch: normal;
+                line-height: 1;
+                letter-spacing: 0.1px;
+                text-align: left;
+                color: #ffffff;
+            }
+
+        }
+
         &__content {
             background-color: #F9F9F9;
             padding: 20px;
-            border-top: 1px solid #D9D9D9;
+            border-top: 0;
             display: flex;
             flex-direction: column;
             flex: 1;
@@ -45,7 +83,23 @@
             flex-basis: auto;
 
             h4 {
+                font-family: Asap;
                 font-size: 18px;
+                line-height: 1.5;
+                color: #0394a6;
+                font-weight: bold;
+            }
+
+            h5 {
+                font-family: Asap;
+                font-size: 16px;
+                font-weight: bold;
+                font-style: normal;
+                font-stretch: normal;
+                line-height: normal;
+                letter-spacing: normal;
+                text-align: left;
+                color: #000000;
             }
 
             h4, p {
@@ -60,11 +114,24 @@
     }
 
     &__links {
+        margin-top: 10px;
+
         a {
-            font-size: 14px;
+            font-family: 'Asap';
             color: #000;
             text-decoration: underline;
-            margin-top: 10px;
+
+            font-size: 14px;
+            font-weight: normal;
+            font-style: normal;
+            font-stretch: normal;
+            line-height: normal;
+            letter-spacing: normal;
+        }
+
+        &:before {
+            content:url('/images/dashboard/small_arrow.svg');
+            margin-right: 10px;
         }
     }
 

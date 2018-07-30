@@ -120,7 +120,7 @@
         </ul>
       </aside>
       @endif
-      @include('partials.impact')
+      @include('dashboard.blocks.impact')
     </div>
     <div class="col-lg-9">
       <div class="row row-compressed">

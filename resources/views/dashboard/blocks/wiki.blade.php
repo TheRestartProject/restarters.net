@@ -1,6 +1,8 @@
 <section class="dashboard__block">
-    <div class="dashboard__block__content">
+    <div class="dashboard__block__header dashboard__block__header--wiki">
         <h4>@lang('partials.wiki_title')</h4>
+    </div>
+    <div class="dashboard__block__content">
         <p>@lang('partials.wiki_text')</p>
         <div class="table-responsive">
             <table role="table" class="table table-striped">

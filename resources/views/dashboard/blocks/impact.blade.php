@@ -8,10 +8,42 @@
         <div>
         <ul class="properties properties__full">
             <li>
-                <div>
-                    <h3>@lang('partials.waste_prevented')</h3>
-                    {{ number_format($impact_stats[0]->total_weights,0,",",",") }} kg
-                    <svg width="17" height="17" viewBox="0 0 13 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><path d="M12.15,0c0,0 -15.921,1.349 -11.313,10.348c0,0 0.59,-1.746 2.003,-3.457c0.852,-1.031 2,-2.143 3.463,-2.674c0.412,-0.149 0.696,0.435 0.094,0.727c0,0 -4.188,2.379 -4.732,6.112c0,0 1.805,1.462 3.519,1.384c1.714,-0.078 4.268,-1.078 4.707,-3.551c0.44,-2.472 1.245,-6.619 2.259,-8.889Z" style="fill:#0394a6;"/><path d="M1.147,13.369c0,0 0.157,-0.579 0.55,-2.427c0.394,-1.849 0.652,-0.132 0.652,-0.132l-0.25,2.576l-0.952,-0.017Z" style="fill:#0394a6;"/></g></svg>
+                <div class="text-center">
+                    <img src="/images/dashboard/bin.svg" style="width:44px; display:block; margin:auto " />
+                    <span style="  font-family: Asap;
+                          font-size: 26px;
+
+                          font-weight: bold;
+
+                          font-style: normal;
+
+                          font-stretch: normal;
+
+                          line-height: normal;
+
+                          letter-spacing: normal;
+
+                          text-align: left;
+
+                                 color: #0394a6;">{{ number_format($impact_stats[0]->total_weights,0,",",",") }} kg</span>
+                    <h3 style="  font-family: Asap;
+
+                               font-size: 16px;
+
+                               font-weight: bold;
+
+                               font-style: normal;
+
+                               font-stretch: normal;
+
+                               line-height: normal;
+
+                               letter-spacing: normal;
+                               padding:0;
+
+                               text-align: center;
+
+                               color: #000000;" >@lang('partials.waste_prevented')</h3>
                 </div>
             </li>
             <li>
