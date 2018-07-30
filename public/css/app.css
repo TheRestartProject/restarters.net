@@ -16056,6 +16056,13 @@ table.sortable > thead th div.mozilla {
   border-right: 3px solid #f3f3f3;
 }
 
+@media (max-width: 767.98px) {
+  .dashboard__block .statbox {
+    border-right: none;
+    border-bottom: 3px solid #f3f3f3;
+  }
+}
+
 .dashboard__block .statbox img {
   display: block;
   margin: auto;

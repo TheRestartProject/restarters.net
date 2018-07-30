@@ -118,6 +118,10 @@
         .statbox {
             padding: 10px;
             border-right: 3px solid #f3f3f3;
+            @include media-breakpoint-down(sm) {
+                border-right: none;
+                border-bottom: 3px solid #f3f3f3;
+            }
 
             img {
                 display:block;
