@@ -15,6 +15,7 @@
     header {
         svg {
             width: 204px;
+            height: auto !important;
             margin-bottom: 15px;
             display: block;
             @include media-breakpoint-down(sm) {
