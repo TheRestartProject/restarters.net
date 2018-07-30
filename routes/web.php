@@ -200,6 +200,14 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
 });
 
+Route::get('/media-wiki', function() {
+    if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+      return view('mediawiki.index');
+    } else {
+      return redirect('/user/forbidden');
+    }
+});
+
 //iFrames
 Route::get('/outbound/info/group/{id}', function($id) {
   return App\Http\Controllers\OutboundController::info('group', $id);
