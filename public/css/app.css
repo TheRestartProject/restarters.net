@@ -15918,7 +15918,7 @@ table.sortable > thead th div.mozilla {
 }
 
 .dashboard {
-  padding: 50px 0;
+  padding: 20px 0;
 }
 
 .dashboard__aside {
@@ -15966,7 +15966,7 @@ table.sortable > thead th div.mozilla {
 }
 
 .dashboard__block__header {
-  padding: 14px 20px;
+  padding: 14px 50px 14px 20px;
   background-position: top right;
   z-index: 10;
   background-color: transparent;
@@ -16045,6 +16045,45 @@ table.sortable > thead th div.mozilla {
 
 .dashboard__block__content--table {
   border-top: 0;
+}
+
+.dashboard__block__content--background-white {
+  background-color: white;
+}
+
+.dashboard__block .statbox {
+  padding: 10px;
+  border-right: 3px solid #f3f3f3;
+}
+
+.dashboard__block .statbox img {
+  display: block;
+  margin: auto;
+}
+
+.dashboard__block .statbox .statfigure {
+  font-family: Asap;
+  font-size: 26px;
+  font-weight: bold;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  color: #0394a6;
+}
+
+.dashboard__block .statbox h3 {
+  font-family: Asap;
+  font-size: 16px;
+  font-weight: bold;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  padding: 0;
+  text-align: center;
+  color: #000000;
 }
 
 .dashboard__links {

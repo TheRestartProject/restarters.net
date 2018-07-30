@@ -8,7 +8,7 @@
                 <tr>
                     <th scope="col">@lang('events.event_name')</th>
                     <th scope="col" class="cell-date">@lang('events.event_date')/@lang('events.event_time')</th>
-                    <th scope="col" class="cell-locations">@lang('events.event_location')</th>
+                    <th scope="col" class="cell-locations d-none d-sm-block">@lang('events.event_location')</th>
                 </tr>
             </thead>
             <tbody>
@@ -17,7 +17,7 @@
                   <tr>
                     <td class="cell-name"><a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a></td>
                     <td class="cell-date">{{ $event->getEventDate() }}<br>{{ $event->getEventStartEnd() }}</td>
-                    <td class="cell-locations">{{ $event->location }}</td>
+                    <td class="d-none d-sm-block cell-locations">{{ $event->location }}</td>
                   </tr>
                 @endforeach
               @else
