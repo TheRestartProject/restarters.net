@@ -2,24 +2,16 @@
 @yield('content')
 <section class="features">
     <div class="container">
-        <div class="features__link"><a href="{{{ route('registration') }}}">@lang('general.register')</a> / <a href="{{{ route('login') }}}">@lang('general.login')</a></div>
-        <header>
-            <a href="{{{ route('login') }}}">
-              @include('includes/logo')
-            </a>
-            <p>@lang('general.introduction_message')</p>
-        </header>
+        @include('includes.info')
+        <h2 class="text-center" style="margin:20px 0">@lang('general.introduction_message')</h2>
         <div class="slideshow">
-            <div><img src="{{ url('/images/slides/0-onboard-overview.png') }}" alt="Summary of our community platform"></div>
-            <div><img src="{{ url('/images/slides/1-onboard-discussion.png') }}" alt="Learn how to organise and volunteer at events"><h2 class="featured-slide__heading">Learn how to organise and volunteer at events</h2></div>
-            <div><img src="{{ url('/images/slides/2-onboard-technicalhelp.jpg') }}" alt="Get technical help, on tools, safety and risk"><h2 class="featured-slide__heading">Get technical help, on tools, safety and risk</h2></div>
-            <div><img src="{{ url('/images/slides/3-onboard-manage-event.png') }}" alt="Announce an event, find people"><h2 class="featured-slide__heading">Announce an event, find people</h2></div>
-            <div><img src="{{ url('/images/slides/4-onboard-event.jpg') }}" alt="Host an event and share skills"><h2 class="featured-slide__heading">Host an event and share skills</h2></div>
-            <div><img src="{{ url('/images/slides/5-onboard-add-devices.png') }}" alt="Log the repairs, to reveal impact and help future repairers"><h2 class="featured-slide__heading">Log the repairs, to reveal impact and help future repairers</h2></div>
-            <div><img src="{{ url('/images/slides/6-onboard-barriers-to-repair.png') }}" alt="Bring down the barriers to repair "><h2 class="featured-slide__heading">Bring down the barriers to repair</h2></div>
+            @foreach ($slides as $slide)
+                <div><img src="{{ url('/images/slides/' . $slide['image'] . ($agent->isPhone() ? '_m' : '') . '.png') }}" alt="{{ $slide['text'] }}"></div>
+            @endforeach
         </div>
         <div class="features__end">
             <a href="{{{ route('registration') }}}" class="btn btn-primary">@lang('general.signmeup')</a>
+            <a href="{{{ route('login') }}}" class="btn btn-secondary">@lang('general.login')</a>
         </div>
     </div>
 </section>

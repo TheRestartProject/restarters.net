@@ -91,6 +91,11 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
             'League\\Csv\\' => 11,
             'Laravel\\Tinker\\' => 15,
         ),
+        'J' => 
+        array (
+            'Jenssegers\\Agent\\' => 17,
+            'Jaybizzle\\CrawlerDetect\\' => 24,
+        ),
         'I' => 
         array (
             'Illuminate\\' => 11,
@@ -279,6 +284,14 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         array (
             0 => __DIR__ . '/..' . '/laravel/tinker/src',
         ),
+        'Jenssegers\\Agent\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jenssegers/agent/src',
+        ),
+        'Jaybizzle\\CrawlerDetect\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src',
+        ),
         'Illuminate\\' => 
         array (
             0 => __DIR__ . '/..' . '/laravel/framework/src/Illuminate',
@@ -425,6 +438,10 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
             array (
                 0 => __DIR__ . '/..' . '/doctrine/collections/lib',
             ),
+            'Detection' => 
+            array (
+                0 => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/namespaced',
+            ),
         ),
     );
 
@@ -435,6 +452,8 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Brands' => __DIR__ . '/../..' . '/app/Brands.php',
         'App\\Category' => __DIR__ . '/../..' . '/app/Category.php',
         'App\\Cluster' => __DIR__ . '/../..' . '/app/Cluster.php',
+        'App\\Console\\Commands\\DevStatsDump' => __DIR__ . '/../..' . '/app/Console/Commands/DevStatsDump.php',
+        'App\\Console\\Commands\\FixViews' => __DIR__ . '/../..' . '/app/Console/Commands/FixViews.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Dashboard' => __DIR__ . '/../..' . '/app/Dashboard.php',
         'App\\Device' => __DIR__ . '/../..' . '/app/Device.php',
@@ -445,9 +464,13 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Group' => __DIR__ . '/../..' . '/app/Group.php',
         'App\\GroupTags' => __DIR__ . '/../..' . '/app/GroupTags.php',
         'App\\GrouptagsGroups' => __DIR__ . '/../..' . '/app/GrouptagsGroups.php',
+        'App\\Helpers\\CachingRssRetriever' => __DIR__ . '/../..' . '/app/Helpers/CachingRssRetriever.php',
+        'App\\Helpers\\CachingWikiPageRetriever' => __DIR__ . '/../..' . '/app/Helpers/CachingWikiPageRetriever.php',
         'App\\Helpers\\FixometerHelper' => __DIR__ . '/../..' . '/app/Helpers/Fixometer.php',
+        'App\\Helpers\\FootprintRatioCalculator' => __DIR__ . '/../..' . '/app/Helpers/FootprintRatioCalculator.php',
         'App\\Home' => __DIR__ . '/../..' . '/app/Home.php',
         'App\\Host' => __DIR__ . '/../..' . '/app/Host.php',
+        'App\\Http\\Controllers\\AboutController' => __DIR__ . '/../..' . '/app/Http/Controllers/AboutController.php',
         'App\\Http\\Controllers\\AdminController' => __DIR__ . '/../..' . '/app/Http/Controllers/AdminController.php',
         'App\\Http\\Controllers\\AjaxController' => __DIR__ . '/../..' . '/app/Http/Controllers/AjaxController.php',
         'App\\Http\\Controllers\\ApiController' => __DIR__ . '/../..' . '/app/Http/Controllers/ApiController.php',
@@ -473,9 +496,11 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Http\\Controllers\\SkillsController' => __DIR__ . '/../..' . '/app/Http/Controllers/SkillsController.php',
         'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
+        'App\\Http\\Middleware\\DummyCors' => __DIR__ . '/../..' . '/app/Http/Middleware/DummyCors.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
         'App\\Http\\Middleware\\HttpsProtocol' => __DIR__ . '/../..' . '/app/Http/Middleware/HttpsProtocol.php',
         'App\\Http\\Middleware\\RedirectIfAuthenticated' => __DIR__ . '/../..' . '/app/Http/Middleware/RedirectIfAuthenticated.php',
+        'App\\Http\\Middleware\\SetLocale' => __DIR__ . '/../..' . '/app/Http/Middleware/SetLocale.php',
         'App\\Http\\Middleware\\TrimStrings' => __DIR__ . '/../..' . '/app/Http/Middleware/TrimStrings.php',
         'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
@@ -655,6 +680,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'DeepCopy\\TypeFilter\\TypeFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeFilter/TypeFilter.php',
         'DeepCopy\\TypeMatcher\\TypeMatcher' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeMatcher/TypeMatcher.php',
         'DefaultSkills' => __DIR__ . '/../..' . '/database/seeds/DefaultSkills.php',
+        'Detection\\MobileDetect' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/namespaced/Detection/MobileDetect.php',
         'Doctrine\\Common\\Annotations\\Annotation' => __DIR__ . '/..' . '/doctrine/annotations/lib/Doctrine/Common/Annotations/Annotation.php',
         'Doctrine\\Common\\Annotations\\AnnotationException' => __DIR__ . '/..' . '/doctrine/annotations/lib/Doctrine/Common/Annotations/AnnotationException.php',
         'Doctrine\\Common\\Annotations\\AnnotationReader' => __DIR__ . '/..' . '/doctrine/annotations/lib/Doctrine/Common/Annotations/AnnotationReader.php',
@@ -2464,6 +2490,14 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'JakubOnderka\\PhpConsoleColor\\ConsoleColor' => __DIR__ . '/..' . '/jakub-onderka/php-console-color/src/JakubOnderka/PhpConsoleColor/ConsoleColor.php',
         'JakubOnderka\\PhpConsoleColor\\InvalidStyleException' => __DIR__ . '/..' . '/jakub-onderka/php-console-color/src/JakubOnderka/PhpConsoleColor/InvalidStyleException.php',
         'JakubOnderka\\PhpConsoleHighlighter\\Highlighter' => __DIR__ . '/..' . '/jakub-onderka/php-console-highlighter/src/JakubOnderka/PhpConsoleHighlighter/Highlighter.php',
+        'Jaybizzle\\CrawlerDetect\\CrawlerDetect' => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src/CrawlerDetect.php',
+        'Jaybizzle\\CrawlerDetect\\Fixtures\\AbstractProvider' => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src/Fixtures/AbstractProvider.php',
+        'Jaybizzle\\CrawlerDetect\\Fixtures\\Crawlers' => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src/Fixtures/Crawlers.php',
+        'Jaybizzle\\CrawlerDetect\\Fixtures\\Exclusions' => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src/Fixtures/Exclusions.php',
+        'Jaybizzle\\CrawlerDetect\\Fixtures\\Headers' => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src/Fixtures/Headers.php',
+        'Jenssegers\\Agent\\Agent' => __DIR__ . '/..' . '/jenssegers/agent/src/Agent.php',
+        'Jenssegers\\Agent\\AgentServiceProvider' => __DIR__ . '/..' . '/jenssegers/agent/src/AgentServiceProvider.php',
+        'Jenssegers\\Agent\\Facades\\Agent' => __DIR__ . '/..' . '/jenssegers/agent/src/Facades/Agent.php',
         'Laravel\\Tinker\\ClassAliasAutoloader' => __DIR__ . '/..' . '/laravel/tinker/src/ClassAliasAutoloader.php',
         'Laravel\\Tinker\\Console\\TinkerCommand' => __DIR__ . '/..' . '/laravel/tinker/src/Console/TinkerCommand.php',
         'Laravel\\Tinker\\TinkerCaster' => __DIR__ . '/..' . '/laravel/tinker/src/TinkerCaster.php',
@@ -2531,6 +2565,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'League\\Flysystem\\Util\\ContentListingFormatter' => __DIR__ . '/..' . '/league/flysystem/src/Util/ContentListingFormatter.php',
         'League\\Flysystem\\Util\\MimeType' => __DIR__ . '/..' . '/league/flysystem/src/Util/MimeType.php',
         'League\\Flysystem\\Util\\StreamHasher' => __DIR__ . '/..' . '/league/flysystem/src/Util/StreamHasher.php',
+        'Mobile_Detect' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/Mobile_Detect.php',
         'Mockery' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery.php',
         'Mockery\\Adapter\\Phpunit\\MockeryPHPUnitIntegration' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/Adapter/Phpunit/MockeryPHPUnitIntegration.php',
         'Mockery\\Adapter\\Phpunit\\MockeryTestCase' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/Adapter/Phpunit/MockeryTestCase.php',
@@ -4323,9 +4358,15 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
         'Symfony\\Polyfill\\Php72\\Php72' => __DIR__ . '/..' . '/symfony/polyfill-php72/Php72.php',
         'Tests\\CreatesApplication' => __DIR__ . '/../..' . '/tests/CreatesApplication.php',
-        'Tests\\Feature\\ExampleTest' => __DIR__ . '/../..' . '/tests/Feature/ExampleTest.php',
+        'Tests\\Feature\\CreateEventTest' => __DIR__ . '/../..' . '/tests/Feature/Events/CreateEventTest.php',
+        'Tests\\Feature\\DeviceStatsTest' => __DIR__ . '/../..' . '/tests/Feature/DeviceStatsTest.php',
+        'Tests\\Feature\\EventStatsTest' => __DIR__ . '/../..' . '/tests/Feature/EventStatsTest.php',
+        'Tests\\Feature\\GroupStatsTest' => __DIR__ . '/../..' . '/tests/Feature/GroupStatsTest.php',
+        'Tests\\Feature\\ModerateEventEmailTest' => __DIR__ . '/../..' . '/tests/Feature/Events/ModerationEventEmailTest.php',
+        'Tests\\Feature\\ViewUsersTest' => __DIR__ . '/../..' . '/tests/Feature/Admin/Users/ViewUsersTest.php',
         'Tests\\TestCase' => __DIR__ . '/../..' . '/tests/TestCase.php',
         'Tests\\Unit\\ExampleTest' => __DIR__ . '/../..' . '/tests/Unit/ExampleTest.php',
+        'Tests\\Unit\\WikiPageRetrieverTest' => __DIR__ . '/../..' . '/tests/Unit/WikiPageRetrieverTest.php',
         'Text_Template' => __DIR__ . '/..' . '/phpunit/php-text-template/src/Template.php',
         'TheSeer\\Tokenizer\\Exception' => __DIR__ . '/..' . '/theseer/tokenizer/src/Exception.php',
         'TheSeer\\Tokenizer\\NamespaceUri' => __DIR__ . '/..' . '/theseer/tokenizer/src/NamespaceUri.php',

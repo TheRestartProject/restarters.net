@@ -17,7 +17,24 @@ window.Tokenfield = require("tokenfield");
 
 if ( jQuery('.slideshow').length > 0 ) {
     jQuery('.slideshow').slick({
-        dots: true, arrows:true, infinite: false
+        dots: true,
+        arrows:true,
+        infinite: false,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    arrows: false
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    autoplay: true,
+                    arrows: false
+                }
+            }
+        ]
     });
 }
 
