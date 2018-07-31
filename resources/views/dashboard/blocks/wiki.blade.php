@@ -15,5 +15,8 @@
                 </tbody>
             </table>
         </div>
+        <div class="dashboard__links d-flex flex-row justify-content-end">
+            <a href="https://therestartproject.org/blog/" target="_blank" rel="noopener noreferrer">@lang('dashboard.visit_wiki')</a>
+        </div>
     </div>
 </section>
