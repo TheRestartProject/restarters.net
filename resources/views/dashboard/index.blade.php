@@ -3,7 +3,7 @@
 <section class="dashboard">
   <div class="container-fluid">
   <div class="row row-compressed">
-      @if (!$has_profile_pic || !$has_skills || !$in_group || !$in_event)
+      @if (true || !$has_profile_pic || !$has_skills || !$in_group || !$in_event)
           <div class="col-sm-3">
       <aside class="dashboard__aside">
         <ul class="steps">
