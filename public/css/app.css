@@ -15978,17 +15978,20 @@ table.sortable > thead th div.mozilla {
 }
 
 .dashboard__block__header--wiki {
-  background-image: url(/images/dashboard/wiki_header@1x.png);
+  background-image: url(/images/dashboard/wiki_header@2x.png);
+  background-size: auto 75px;
   height: 75px;
 }
 
 .dashboard__block__header--community {
-  background-image: url(/images/dashboard/community_header@1x.png);
+  background-image: url(/images/dashboard/community_header@2x.png);
+  background-size: auto 74px;
   height: 74px;
 }
 
 .dashboard__block__header--discussion {
-  background-image: url(/images/dashboard/discussion_header@1x.png);
+  background-image: url(/images/dashboard/discussion_header@2x.png);
+  background-size: auto 73px;
   height: 73px;
 }
 
