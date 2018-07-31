@@ -16025,7 +16025,7 @@ table.sortable > thead th div.mozilla {
 .dashboard__block__content--top-blue-border {
   background-position: top left;
   background-repeat: no-repeat;
-  background-image: url(/images/dashboard/line.svg);
+  background-image: url(/images/dashboard/line.png);
 }
 
 .dashboard__block__content h4 {
@@ -16123,7 +16123,7 @@ table.sortable > thead th div.mozilla {
 }
 
 .dashboard__links:before {
-  content: url("/images/dashboard/small_arrow.svg");
+  content: url("/images/dashboard/small_arrow.png");
   margin-right: 10px;
 }
 
