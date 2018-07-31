@@ -18,6 +18,15 @@
         @endif
 
         @include('includes/gmap')
+
+        <script src="{{ asset('js/gdpr-cookie-notice.js') }}"></script>
+        <script>
+         window.restarters = {};
+         restarters.cookie_domain = '{{ env('SESSION_DOMAIN') }}';
+         var gdprCookiesCheck = Cookies;
+         var gdprCurrentCookiesSelection = gdprCookiesCheck.getJSON('gdprcookienotice');
+         restarters.analyticsCookieEnabled = gdprCurrentCookiesSelection['analytics'];
+        </script>
     </head>
 
     @if ( isset($onboarding) && $onboarding )
