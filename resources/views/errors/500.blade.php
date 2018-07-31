@@ -28,6 +28,7 @@
                     @if (Auth::check())
                         <li><strong>User</strong>: {{ Auth::user()->name }}</li>
                     @endif
+                    <li><strong>Error</strong>:  500</li> 
                     <li><strong>Time</strong>: {{ now() }}</li>
                     <li><strong>URL</strong>: {{ Request::url() }}</li>
                     <li><strong>Previous URL</strong>: {{ URL::previous() }}</li>
