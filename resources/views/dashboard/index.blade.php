@@ -3,8 +3,8 @@
 <section class="dashboard">
   <div class="container-fluid">
   <div class="row row-compressed">
-    <div class="col-lg-3">
       @if (!$has_profile_pic || !$has_skills || !$in_group || !$in_event)
+          <div class="col-sm-3">
       <aside class="dashboard__aside">
         <ul class="steps">
           <li class="step step__active">
@@ -119,11 +119,14 @@
 
         </ul>
       </aside>
-      @endif
-      @include('partials.impact')
+{{-- @include('dashboard.blocks.impact') --}}
     </div>
-    <div class="col-lg-9">
+      @endif
+    <div class="col">
       <div class="row row-compressed">
+        <div class="col-12">
+        @include('dashboard.blocks.impact')
+        </div>
         @if (FixometerHelper::hasRole($user, 'Administrator'))
           @include('dashboard.restarter')
         @endif

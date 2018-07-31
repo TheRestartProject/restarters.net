@@ -1,7 +1,8 @@
 <section class="dashboard__block">
-
-    <div class="dashboard__block__content dashboard__block__content--table">
+    <div class="dashboard__block__header dashboard__block__header--community">
       <h4>@lang('partials.community_news')</h4>
+    </div>
+    <div class="dashboard__block__content dashboard__block__content--table">
       <p>@lang('partials.community_news_text')</p>
         <div class="table-responsive">
         <table role="table" class="table table-striped">

@@ -65,7 +65,7 @@ return [
     'upcoming_events' => 'Upcoming events',
 
     'event_datetime' => 'Date/time',
-    'event_name' => 'Event name',
+    'event_name' => 'Event',
     'event_date' => 'Date',
     'event_time' => 'Time',
     'event_location' => 'Location',
