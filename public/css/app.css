@@ -15974,6 +15974,7 @@ table.sortable > thead th div.mozilla {
   background-position: top right;
   z-index: 10;
   background-color: transparent;
+  background-repeat: no-repeat;
 }
 
 .dashboard__block__header--wiki {

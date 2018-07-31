@@ -46,6 +46,7 @@
             background-position: top right;
             z-index:10;
             background-color:transparent;
+            background-repeat: no-repeat;
 
             &--wiki {
                 background-image: url(/images/dashboard/wiki_header@1x.png);
