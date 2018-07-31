@@ -10,9 +10,9 @@
     @endif
     <div class="col-lg-6 col-dashboard">@include('partials.past')</div>
     <div class="col-lg-4 col-dashboard">@include('partials.how-to')</div>
-    @if (!empty($all_groups))
+{{-- @if (!empty($all_groups))
         <div class="col-lg-4 col-dashboard">@include('partials.in-your-area')</div>
-    @endif
+  @endif--}}
     @if (!empty($outdated_groups))
         <div class="col-lg-4 col-dashboard">@include('partials.up-to-date')</div>
     @endif

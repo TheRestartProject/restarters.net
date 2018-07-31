@@ -3,7 +3,7 @@
 <section class="dashboard">
   <div class="container-fluid">
   <div class="row row-compressed">
-      @if (!$has_profile_pic || !$has_skills || !$in_group || !$in_event)
+      @if (true || !$has_profile_pic || !$has_skills || !$in_group || !$in_event)
           <div class="col-sm-3">
       <aside class="dashboard__aside">
         <ul class="steps">
@@ -124,6 +124,9 @@
       @endif
     <div class="col">
       <div class="row row-compressed">
+        <div class="col-12">
+        @include('dashboard.blocks.impact')
+        </div>
         @if (FixometerHelper::hasRole($user, 'Administrator'))
           @include('dashboard.restarter')
         @endif
@@ -133,9 +136,6 @@
         @if (FixometerHelper::hasRole($user, 'Restarter'))
           @include('dashboard.restarter')
         @endif
-        <div class="col-12">
-            @include('dashboard.blocks.impact')
-        </div>
       </div>
     </div>
   </div>

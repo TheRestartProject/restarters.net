@@ -16,4 +16,5 @@ return [
         'join_group' => 'Join a group',
         'rsvp_event' => 'RSVP to an event',
         'devices_logged' => 'devices logged',
+        'visit_wiki' => 'Visit the wiki',
     ];
