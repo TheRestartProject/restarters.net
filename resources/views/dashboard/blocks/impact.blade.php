@@ -1,7 +1,7 @@
 <section class="dashboard__block dashboard__block--no-border">
     <div class="dashboard__block__content dashboard__block__content--background-white dashboard__block__content--top-blue-border">
 
-        <div class="d-flex flex-column flex-md-row justify-content-start">
+        <div class="d-flex flex-column flex-sm-row justify-content-start">
             <div class="col-sm-3 col-xl-2 statborder">
                 <h4>@lang('partials.our_global_environmental_impact')</h4>
 
