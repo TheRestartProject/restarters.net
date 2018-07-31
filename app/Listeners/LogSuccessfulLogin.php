@@ -2,11 +2,13 @@
 
 namespace App\Listeners;
 
-use Illuminate\Auth\Events\Login;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use App\User;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\Request;
+use Illuminate\Queue\InteractsWithQueue;
+use \Mediawiki\Api\ApiUser;
+use \Mediawiki\Api\MediawikiApi;
 
 class LogSuccessfulLogin
 {
@@ -29,9 +31,17 @@ class LogSuccessfulLogin
     public function handle(Login $event)
     {
 
-        //dd($this->request->all());
         $u = User::find($event->user->id);
         $u->number_of_logins += 1;
         $u->save();
+
+        if( !is_null($u->mediawiki) && !empty($u->mediawiki) ) {
+
+          $api = MediawikiApi::newFromApiEndpoint( env('WIKI_URL').'/api.php' );
+          $api->login( new ApiUser( $u->mediawiki, $this->request->input('password') ) );
+          //dd($api);
+
+        }
+
     }
 }

@@ -207,6 +207,7 @@
             <p class="registration__status">@lang('registration.step-4')</p>
 
             <fieldset>
+                <legend>@lang('registration.reg-step-4')</legend>
                 <div class="form-check d-flex align-items-top justify-content-start">
                     <input class="checkbox-top form-check-input" type="checkbox" name="consent_gdpr" id="consent_gdpr" value="1" @if( old('consent_gdpr') == 1 ) checked @endif>
                     <label class="form-check-label" for="consent_gdpr">

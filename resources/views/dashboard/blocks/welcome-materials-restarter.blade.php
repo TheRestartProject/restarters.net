@@ -1,6 +1,6 @@
 <section class="dashboard__block">
     <div class="dashboard__block__header dashboard__block__header--discussion">
-        <h4>Discussion Forum</h4>
+        <h4>@lang('dashboard.getting_started_header')</h4>
     </div>
     <div class="dashboard__block__media">
         <img src="/images/dashboard/dashboard__getting-started-in-community-repair-1.png" alt="Materials for promoting upcoming Restart events">

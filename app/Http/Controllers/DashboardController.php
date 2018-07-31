@@ -15,6 +15,7 @@ use App\Device;
 
 use Auth;
 use DB;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -42,6 +43,19 @@ class DashboardController extends Controller
       $in_group = !empty(UserGroups::where('user', Auth::id())->get()->toArray());
       $has_skills = !empty(UsersSkills::where('user', Auth::id())->get()->toArray());
       $in_event = !empty(EventsUsers::where('user', Auth::id())->get()->toArray());
+
+      // TODO: move this to it's own class, which caches results (on success).
+      $userExistsInDiscourse = false;
+      try {
+        $discourseApiKey = env('DISCOURSE_APIKEY');
+        $discourseApiUser = env('DISCOURSE_APIUSER');
+        $emailToSearchFor = trim($user->email);
+        $discourseQuery = sprintf('%s/admin/users/list/all.json?email=%s&api_key=%s&api_username=%s', env('DISCOURSE_URL'), $emailToSearchFor, $discourseApiKey, $discourseApiUser);
+        $discourseResult = json_decode(file_get_contents($discourseQuery));
+        $userExistsInDiscourse = count($discourseResult) >= 1;
+      } catch (\Exception $ex) {
+          Log::error('Error occurred while searching for user in Discourse');
+      }
 
       if (!is_null($user->idimages) && !is_null($user->path)) {
         $has_profile_pic = true;
@@ -154,9 +168,11 @@ class DashboardController extends Controller
       $impact_stats = $devices_gateway->getWeights();
 
       return view('dashboard.index', [
+          'show_getting_started' => !$userExistsInDiscourse || !$has_profile_pic || !$has_skills || !$in_group || !$in_event,
         'gmaps' => true,
         'user' => $user,
         'header' => true,
+          'user_exists_in_discourse' => $userExistsInDiscourse,
         'in_group' => $in_group,
         'has_skills' => $has_skills,
         'in_event' => $in_event,

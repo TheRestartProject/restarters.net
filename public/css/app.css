@@ -15974,20 +15974,24 @@ table.sortable > thead th div.mozilla {
   background-position: top right;
   z-index: 10;
   background-color: transparent;
+  background-repeat: no-repeat;
 }
 
 .dashboard__block__header--wiki {
-  background-image: url(/images/dashboard/wiki_header@1x.png);
+  background-image: url(/images/dashboard/wiki_header@2x.png);
+  background-size: auto 75px;
   height: 75px;
 }
 
 .dashboard__block__header--community {
-  background-image: url(/images/dashboard/community_header@1x.png);
+  background-image: url(/images/dashboard/community_header@2x.png);
+  background-size: auto 74px;
   height: 74px;
 }
 
 .dashboard__block__header--discussion {
-  background-image: url(/images/dashboard/discussion_header@1x.png);
+  background-image: url(/images/dashboard/discussion_header@2x.png);
+  background-size: auto 73px;
   height: 73px;
 }
 
@@ -16025,7 +16029,7 @@ table.sortable > thead th div.mozilla {
 .dashboard__block__content--top-blue-border {
   background-position: top left;
   background-repeat: no-repeat;
-  background-image: url(/images/dashboard/line.svg);
+  background-image: url(/images/dashboard/line.png);
 }
 
 .dashboard__block__content h4 {
@@ -16123,8 +16127,8 @@ table.sortable > thead th div.mozilla {
 }
 
 .dashboard__links:before {
-  content: url("/images/dashboard/small_arrow.svg");
-  margin-right: 10px;
+  content: url("/images/dashboard/small_arrow.png");
+  margin-right: 5px;
 }
 
 .dashboard .col-dashboard {
