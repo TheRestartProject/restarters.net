@@ -9,7 +9,10 @@
         <h5>@lang('partials.discussion')</h5>
         <p>@lang('partials.discussion_text')</p>
         <div class="dashboard__links d-flex flex-row justify-content-end">
-            <a href="https://talk.restarters.net" target="_blank" rel="noopener noreferrer">@lang('partials.join_the_discussion')</a>
+            <a href="https://talk.restarters.net/t/welcome-to-the-restarters-community/8" target="_blank" rel="noopener noreferrer">Welcome to the Restarters Community</a>
+        </div>
+        <div class="dashboard__links d-flex flex-row justify-content-end">
+            <a href="https://talk.restarters.net/t/introduce-yourself-here/44" target="_blank" rel="noopener noreferrer">Who is everyone?  Meet and greet</a>
         </div>
     </div>
 </section>
