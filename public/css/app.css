@@ -16125,7 +16125,7 @@ table.sortable > thead th div.mozilla {
 
 .dashboard__links:before {
   content: url("/images/dashboard/small_arrow.png");
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .dashboard .col-dashboard {
