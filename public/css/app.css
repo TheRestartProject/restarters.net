@@ -16548,6 +16548,39 @@ table.sortable > thead th div.mozilla {
           box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 0 0 0 rgba(0, 0, 0, 0.12);
 }
 
+.cookie-policy {
+  padding: 10px 0;
+  margin-bottom: 30px;
+}
+
+@media (min-width: 992px) {
+  .cookie-policy {
+    padding-top: 44px;
+  }
+}
+
+.cookie-policy header {
+  margin-bottom: 40px;
+}
+
+.cookie-policy header svg {
+  width: 204px;
+  height: auto !important;
+  display: block;
+}
+
+@media (max-width: 767.98px) {
+  .cookie-policy header svg {
+    margin: auto;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cookie-policy header {
+    text-align: center;
+  }
+}
+
 .steps {
   list-style: none;
   padding: 0;
@@ -19072,6 +19105,7 @@ h2 sup a:hover {
 
 .gdpr-cookie-notice-nav-item:hover {
   text-decoration: none;
+  color: white;
 }
 
 .gdpr-cookie-notice-nav-item-btn {

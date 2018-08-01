@@ -16,6 +16,30 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
     @include('includes/gmap')
+
+
+    <!-- Cookie banner with fine-grained opt-in -->
+    <script src="{{ asset('js/gdpr-cookie-notice.js') }}"></script>
+    <!-- Check to see if visitor has opted in to analytics cookies -->
+    <script>
+        window.restarters = {};
+        restarters.cookie_domain = '{{ env('SESSION_DOMAIN') }}';
+        var gdprCookiesCheck = Cookies;
+        var gdprCurrentCookiesSelection = gdprCookiesCheck.getJSON('gdprcookienotice');
+        restarters.analyticsCookieEnabled = (typeof gdprCurrentCookiesSelection !== 'undefined' && gdprCurrentCookiesSelection['analytics']);
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-{{ env('GOOGLE_ANALYTICS_TRACKING_ID') }}"></script>
+    <script>
+        if (restarters.analyticsCookieEnabled) {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '{{ env('GOOGLE_ANALYTICS_TRACKING_ID') }}');
+        }
+    </script>
   </head>
 
   @if ( isset($onboarding) && $onboarding )

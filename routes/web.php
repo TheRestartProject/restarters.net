@@ -31,6 +31,9 @@ Auth::routes();
 Route::get('/logout', 'UserController@logout');
 
 Route::get('/about', 'AboutController@index')->name('features');
+Route::get('/about/cookie-policy', function() {
+    return View::make('features.cookie-policy') ;
+});
 
 // Route::get('/ui', function() {
 //     return View::make('ui.index');

@@ -19,6 +19,13 @@ mix.webpackConfig({
  |
  */
 
+mix.scripts([
+    'node_modules/js-cookie/src/js.cookie.js',
+    'resources/assets/js/gdpr-cookie-notice/templates.js',
+    'resources/assets/js/gdpr-cookie-notice/script.js',
+    'resources/assets/js/gdpr-cookie-notice/en.js'
+], 'public/js/gdpr-cookie-notice.js');
+
 mix.js('resources/assets/js/app.js', 'public/js')
    .sass('resources/assets/sass/app.scss', 'public/css')
    .browserSync({
