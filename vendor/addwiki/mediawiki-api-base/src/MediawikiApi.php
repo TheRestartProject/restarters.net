@@ -286,7 +286,7 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 	 *
 	 * @return array as needed by ClientInterface::get and ClientInterface::post
 	 */
-	public function getClientRequestOptions( Request $request, $paramsKey ) {
+	private function getClientRequestOptions( Request $request, $paramsKey ) {
 		$params = array_merge( $request->getParams(), [ 'format' => 'json' ] );
 		if ( $paramsKey === 'multipart' ) {
 			$params = $this->encodeMultipartParams( $request, $params );
