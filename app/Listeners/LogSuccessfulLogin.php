@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\User;
+use Cookie;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\Request;
@@ -40,6 +41,17 @@ class LogSuccessfulLogin
           $api = MediawikiApi::newFromApiEndpoint( env('WIKI_URL').'/api.php' );
           $api->login( new ApiUser( $u->mediawiki, $this->request->input('password') ) );
           //dd($api);
+
+          $cookieJar = $api->getClient()->getConfig('cookies');
+          $cookieJarArray = $cookieJar->toArray();
+
+          if( !empty($cookieJarArray) ) {
+
+            foreach( $cookieJarArray as $cookie ){
+              Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires'], $cookie['Path'], $cookie['Domain'], $cookie['Secure'], $cookie['HttpOnly']));
+            }
+
+          }
 
         }
 

@@ -147,7 +147,7 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 	/**
 	 * @return ClientInterface
 	 */
-	private function getClient() {
+	public function getClient() {
 		if ( $this->client === null ) {
 			$clientFactory = new ClientFactory();
 			$clientFactory->setLogger( $this->logger );
@@ -286,7 +286,7 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 	 *
 	 * @return array as needed by ClientInterface::get and ClientInterface::post
 	 */
-	private function getClientRequestOptions( Request $request, $paramsKey ) {
+	public function getClientRequestOptions( Request $request, $paramsKey ) {
 		$params = array_merge( $request->getParams(), [ 'format' => 'json' ] );
 		if ( $paramsKey === 'multipart' ) {
 			$params = $this->encodeMultipartParams( $request, $params );
