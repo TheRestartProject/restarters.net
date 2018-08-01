@@ -12,6 +12,11 @@ class EncryptCookies extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        'UseCDNCache',
+        'UseDC',
+        'wiki_db_mw__session',
+        'wiki_db_mw_Token',
+        'wiki_db_mw_UserID',
+        'wiki_db_mw_UserName',
     ];
 }

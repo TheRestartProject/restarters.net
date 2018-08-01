@@ -48,7 +48,7 @@ class LogSuccessfulLogin
           if( !empty($cookieJarArray) ) {
 
             foreach( $cookieJarArray as $cookie ){
-              Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value']));
+              Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
             }
 
           }
