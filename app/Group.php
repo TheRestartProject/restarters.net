@@ -162,6 +162,15 @@ class Group extends Model
         return $this->hasMany('App\UserGroups', 'group', 'idgroups');
     }
 
+    public function allConfirmedVolunteers()
+    {
+        return $this->allVolunteers()
+            ->where(function ($query) {
+                $query->where('status', 1)
+                    ->orWhereNull('status');
+            });
+    }
+
     public function getLocation(){
         return rtrim($this->location . ', ' . $this->area, ', ');
     }

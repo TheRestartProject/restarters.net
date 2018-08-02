@@ -23,6 +23,11 @@
               {!! \Session::get('warning') !!}
           </div>
       @endif
+      @if ($has_pending_invite)
+          <div class="alert alert-info">
+              You have an invitation to this group.  Please click 'Join Group' if you would like to join.
+          </div>
+      @endif
 
       <div class="events__header row align-content-top">
           <div class="col-lg-7 d-flex flex-column">
@@ -154,13 +159,13 @@
                     <div class="users-list-wrap users-list__single">
                         <ul class="users-list">
 
-                            @foreach( $view_group->allVolunteers->take(3) as $volunteer )
+                            @foreach( $view_group->allConfirmedVolunteers->take(3) as $volunteer )
                               @include('partials.volunteer-badge')
                             @endforeach
 
                         </ul>
-                        @if( $view_group->allVolunteers->count() > 3 )
-                          <a class="users-list__more" href="#" data-toggle="modal" data-target="#group-volunteers">See all {{{ $view_group->allVolunteers->count() }}} volunteers</a>
+                        @if( $view_group->allConfirmedVolunteers->count() > 3 )
+                          <a class="users-list__more" href="#" data-toggle="modal" data-target="#group-volunteers">See all {{{ $view_group->allConfirmedVolunteers->count() }}} volunteers</a>
                         @endif
                     </div>
 

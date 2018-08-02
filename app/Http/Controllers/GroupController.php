@@ -620,8 +620,16 @@ class GroupController extends Controller
       $user_groups = UserGroups::where('user', Auth::user()->id)->count();
       $view_group = Group::find($groupid);
 
+      $hasPendingInvite = !empty(UserGroups::where('group', $groupid)
+                                             ->where('user', $user->id)
+                                             ->where(function ($query) {
+                                                 $query->where('status', '<>', '1')
+                                                       ->whereNotNull('status');
+                                             })->first());
+
       return view('group.view', [ //host.index
         'title' => 'Host Dashboard',
+        'has_pending_invite' => $hasPendingInvite,
         'showbadges' => true,
         'charts' => false,
         'response' => $response,
@@ -662,32 +670,38 @@ class GroupController extends Controller
 
   }
 
-  public function postSendInvite(Request $request) {
-
+  public function postSendInvite(Request $request)
+  {
     $from_id = Auth::id();
     $group_name = $request->input('group_name');
     $group_id = $request->input('group_id');
     $emails = explode(',', str_replace(' ', '', $request->input('manual_invite_box')));
     $message = $request->input('message_to_restarters');
 
-    if (!empty($emails)) {
+    if (empty($emails)) {
+        return redirect()->back()->with('warning', 'You have not entered any emails!');
+    }
 
       $users = User::whereIn('email', $emails)->get();
 
       $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
       $from = User::find($from_id);
 
+      // users already on the platform
       foreach ($users as $user) {
 
         $user_group = UserGroups::where('user', $user->id)->where('group', $group_id)->first();
+        // not already a confirmed member of the group
         if (is_null($user_group) || $user_group->status != "1") {
           $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
           $url = url('/').'/group/accept-invite/'.$group_id.'/'.$hash;
 
+          // already been invited once, set a new invite hash
           if (!is_null($user_group)) {
             $user_group->update([
               'status' => $hash,
             ]);
+          // not associated with the group at all yet
           } else {
             UserGroups::create([
               'user' => $user->id,
@@ -697,18 +711,23 @@ class GroupController extends Controller
             ]);
           }
 
-          Notification::send($user, new JoinGroup([
-            'name' => $from->name,
-            'group' => $group_name,
-            'url' => $url,
-            'message' => $message
-          ], $user));
+          if ($user->invites == 1) {
+              Notification::send($user, new JoinGroup([
+                  'name' => $from->name,
+                  'group' => $group_name,
+                  'url' => $url,
+                  'message' => $message
+              ], $user));
+          } else {
+              $not_sent[] = $user->email;
+          }
 
-        } else {
+        } else { // already a confirmed member of the group or been sent an invite
           $not_sent[] = $user->email;
         }
       }
 
+      // users not on the platform
       if (!empty($non_users)) {
 
         foreach ($non_users as $non_user) {
@@ -737,50 +756,51 @@ class GroupController extends Controller
       if (!isset($not_sent)) {
         return redirect()->back()->with('success', 'Invites sent!');
       } else {
-        return redirect()->back()->with('warning', 'Invites sent - apart from these ('.rtrim(implode(', ', $not_sent), ', ').') who have already joined the group or have been sent an invite');
+        return redirect()->back()->with('warning', 'Invites sent - apart from these ('.rtrim(implode(', ', $not_sent), ', ').') who have already joined the group, have already been sent an invite, or have not opted in to receive emails');
       }
-      
-    } else {
-      return redirect()->back()->with('warning', 'You have not entered any emails!');
-    }
-
   }
 
-  public function confirmInvite($group_id, $hash) {
+    public function confirmInvite($group_id, $hash)
+    {
+        // Find user/group relationship based on the invitation hash.
+        $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
+        $invitationIsValid = !empty($user_group);
 
-    $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
+        if (!$invitationIsValid) {
+            return redirect('/group/view/'.$group_id)->with('warning', 'Something went wrong - this invite is invalid or has expired');
+        }
 
-    if ( !empty($user_group) ) {
+        // Set user as confirmed member of group.
+        UserGroups::where('status', $hash)->where('group', $group_id)->update([
+            'status' => 1
+        ]);
 
-      UserGroups::where('status', $hash)->where('group', $group_id)->update([
-        'status' => 1
-      ]);
+        // Send emails to hosts of group to let them know.
+        // (only those that have opted in to receiving emails).
+        $user = User::find($user_group->user);
+        try {
+            $groupHostLinks = UserGroups::where('group', $group_id)->where('role', 3)->get();
+        } catch (\Exception $e) {
+            $groupHostLinks = null;
+        }
 
-      $user = User::find($user_group->user);
-      try {
-        $host = User::find(UserGroups::where('group', $group_id)->where('role', 3)->first()->user);
-      } catch (\Exception $e) {
-        $host = null;
-      }
+        if (!is_null($groupHostLinks)) {
+            $groupName = Group::find($group_id)->name;
+            foreach ($groupHostLinks as $groupHostLink) {
+                $host = User::where('id', $groupHostLink->user)->first();
+                if ($host->invites == 1) {
+                    $arr = [
+                        'user_name' => $user->name,
+                        'group_name' => $groupName,
+                        'group_url' => url('/group/view/'.$group_id),
+                        'preferences' => url('/profile/edit/'.$host->id),
+                    ];
+                    Notification::send($host, new NewGroupMember($arr, $host));
+                }
+            }
+        }
 
-      if (!is_null($host)) {
-        //Send Notification to Host
-        $arr = [
-          'user_name' => $user->name,
-          'group_name' => Group::find($group_id)->name,
-          'group_url' => url('/group/view/'.$group_id),
-          'preferences' => url('/profile/edit/'.$host->id),
-        ];
-
-        Notification::send($host, new NewGroupMember($arr, $host));
-      }
-
-      return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
-
-    } else {
-      return redirect('/group/view/'.$group_id)->with('warning', 'Something went wrong - this invite is invalid or has expired');
-    }
-
+        return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
   }
 
 
@@ -1021,36 +1041,35 @@ class GroupController extends Controller
   public function getJoinGroup($group_id) {
 
     $user_id = Auth::id();
-    $not_in_group = UserGroups::where('group', $group_id)
-                                  ->where('user', $user_id)
-                                    ->where('status', '!=', 1)
-                                      ->first();
+    $alreadyInGroup = UserGroups::where('group', $group_id)
+                    ->where('user', $user_id)
+                    ->where('status', 1)
+                    ->exists();
 
-    if ( empty($not_in_group) ) {
-      try {
+    if ($alreadyInGroup) {
+        $response['warning'] = 'You are already part of this group';
+
+        return redirect()->back()->with('response', $response);
+    };
+
+    try {
         $user_group = UserGroups::updateOrCreate([
-          'user' => $user_id,
-          'group' => $group_id,
+            'user' => $user_id,
+            'group' => $group_id,
         ], [
-          'status' => 1,
-          'role' => 4,
+            'status' => 1,
+            'role' => 4,
         ]);
 
         $response['success'] = 'Thanks for joining, you are now part of this group!';
 
         return redirect()->back()->with('response', $response);
 
-      } catch (\Exception $e) {
+    } catch (\Exception $e) {
         $response['danger'] = 'Failed to join this group';
 
         return redirect()->back()->with('response', $response);
-      }
-    } else {
-      $response['warning'] = 'You are already part of this group';
-
-      return redirect()->back()->with('response', $response);
     }
-
   }
 
   public function imageUpload(Request $request, $id) {
