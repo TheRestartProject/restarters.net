@@ -479,7 +479,6 @@ class PartyController extends Controller {
                   // if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
                       /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                   //$Host = $Groups->findHost($group);
-
                       $custom_fields = array(
                                       // array('key' => 'party_host',            'value' => $Host->hostname),
                                       // array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' .$Host->path),
@@ -488,7 +487,7 @@ class PartyController extends Controller {
                                    array('key' => 'party_location',        'value' => $data['location']),
                                    array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
                                    array('key' => 'party_date',            'value' => $wp_date),
-                                   array('key' => 'party_timestamp',       'value' => $timestamp),
+                                   array('key' => 'party_timestamp',       'value' => $theParty->event_timestamp),
                                    array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp),
                                    array('key' => 'party_stats',           'value' => $id),
                                    array('key' => 'party_lat',             'value' => $latitude),
