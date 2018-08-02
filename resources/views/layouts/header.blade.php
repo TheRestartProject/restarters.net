@@ -30,7 +30,7 @@
     </script>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-{{ env('GOOGLE_ANALYTICS_TRACKING_ID') }}"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('GOOGLE_ANALYTICS_TRACKING_ID') }}"></script>
     <script>
         if (restarters.analyticsCookieEnabled) {
             window.dataLayer = window.dataLayer || [];
