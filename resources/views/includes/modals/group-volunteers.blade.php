@@ -28,7 +28,7 @@
             </tr>
           </thead>
           <tbody>
-            @foreach( $view_group->allVolunteers as $volunteer )
+            @foreach( $view_group->allConfirmedVolunteers as $volunteer )
               @include('partials.volunteer-row')
             @endforeach
           </tbody>
