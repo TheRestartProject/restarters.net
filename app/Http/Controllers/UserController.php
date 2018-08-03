@@ -305,7 +305,7 @@ class UserController extends Controller
       ]);
 
       // Sync with user_groups
-      $user->userGroups()->sync($request->input('assigned_groups'));
+      $user->groups()->sync($request->input('assigned_groups'));
 
       return redirect()->back()->with('message', 'Admin settings updated!');
 
