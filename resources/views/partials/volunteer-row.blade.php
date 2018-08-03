@@ -12,7 +12,10 @@
       @endif
     </td>
     <td>
-      <a href="/profile/{{ $user->id }}">{{ $user->name }}@if ( $volunteer->role == 3 )<span class="badge badge-primary">@lang('partials.host')</span>@endif</a>
+        <a href="/profile/{{ $user->id }}">{{ $user->name }}</a>
+        @if ( $volunteer->role == 3 )
+            <span class="badge badge-primary">@lang('partials.host')</span>
+        @endif
     </td>
     @php( $user_skills = $user->userSkills )
     <td>
