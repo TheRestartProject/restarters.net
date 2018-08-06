@@ -244,7 +244,7 @@ class PartyController extends Controller {
 
                       $arr = [
                         'event_venue' => Party::find($idParty)->venue,
-                        'event_url' => url('/party/view/'.$idParty),
+                        'event_url' => url('/party/edit/'.$idParty),
                       ];
 
                       Notification::send($all_admins, new ModerationEvent($arr));
