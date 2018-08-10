@@ -11,7 +11,6 @@
                     <table class="table table-add" role="table">
                         <tbody>
                             <tr>
-                                <th class="d-xs-table-cell d-md-none">@lang('partials.add_device')</th>
                                 <td width="200">
                                     <div class="form-control form-control__select">
                                         <select id="device-start" name="category" class="category select2">
@@ -82,7 +81,7 @@
                                             <option value="3">@lang('partials.end_of_life')</option>
                                         </select>
                                     </div>
-                                    <div class="repair-more">
+                                    <div class="repair-more d-none">
                                         <div class="form-control form-control__select">
                                             <select name="repair_details" class="repair_details select2" disabled>
                                                 <option value="0">-- @lang('partials.repair_details') --</option>
@@ -93,7 +92,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="d-none d-sm-table-cell">
                                     <div class="form-control form-control__select">
                                         <select name="spare_parts" class="spare_parts select2">
                                             <option value="0">-- @lang('partials.spare_parts') --</option>
@@ -102,7 +101,7 @@
                                         </select>
                                     </div>
                                 </td>
-                                <td class="d-none d-sm-table-cell">
+                                <td class="d-table-cell d-sm-table-cell">
                                     <input type="submit" class="btn btn-primary btn-add" value="Add">
                                 </td>
                                 <td class="d-none d-sm-table-cell">

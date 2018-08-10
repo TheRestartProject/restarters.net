@@ -17373,12 +17373,6 @@ table.sortable > thead th div.mozilla {
   padding: 0 10px 0 0;
 }
 
-@media (max-width: 767.98px) {
-  .table-add tr td {
-    width: 25%;
-  }
-}
-
 .table-devices .badge {
   width: 60px;
   margin: auto;

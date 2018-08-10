@@ -837,12 +837,12 @@ jQuery(function () {
         $field = jQuery(this).parents('td').find('.repair_details');
         if( $value == 2 ){
           $field.prop('disabled', false);
-          $field.parents('#repair-more').show();
+          $field.parents('.repair-more').addClass('d-none');
         } else {
           $field.val(0);
           $field.trigger('change');
           $field.prop('disabled', true);
-          $field.parents('#repair-more').hide();
+          $field.parents('.repair-more').removeClass('d-none');
         }
     });
 
