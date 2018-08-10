@@ -863,12 +863,12 @@ jQuery(function () {
         $field = jQuery(this).parents('td').find('.weight');
         if( $value === 46 || $value === '' ){
           $field.prop('disabled', false);
-          $field.parents('#display-weight').show();
+          $field.parents('.display-weight').removeClass('d-none');
         } else {
           $field.val('');
           $field.trigger('change');
           $field.prop('disabled', true);
-          $field.parents('#display-weight').hide();
+            $field.parents('.display-weight').addClass('d-none');
         }
     });
 
@@ -1159,7 +1159,7 @@ $( document ).ready(function() {
           $form.find(".select2-with-input.select2-hidden-accessible").select2('data', {}); // clear out values selected
           $form.find(".select2-with-input.select2-hidden-accessible").select2(tag_options); // re-init to show default stat
 
-          $('#repair-more, #display-weight').hide();
+          $('.repair-more, .display-weight').addClass('d-none');
           //EO reset appearance
 
           //Appending...

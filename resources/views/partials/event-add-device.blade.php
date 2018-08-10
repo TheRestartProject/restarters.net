@@ -26,12 +26,24 @@
                                             <option value="46">@lang('partials.category_none')</option>
                                         </select>
                                     </div>
-                                    <div id="display-weight" style="display: none;">
+                                    <div class="display-weight d-none pt-1">
                                         <div class="input-group">
-                                            <input type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="Est. weight" autocomplete="off" disabled>
-                                            <div class="input-group-append">
-                                                <span class="input-group-text" id="validationTooltipUsernamePrepend">kg</span>
+                                            <div class="row">
+                                                <div class="col-9">
+
+                                                    <input type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="Est. weight" autocomplete="off" disabled>
+
+                                                </div>
+                                                <div class="col-3">
+
+                                                    <div class="input-group-append">
+                                                        <div id="validationTooltipUsernamePrepend">kg</div>
+                                                    </div>
+
+                                                </div>
                                             </div>
+                                            
+                                            
                                         </div>
                                     </div>
                                 </td>
@@ -70,7 +82,7 @@
                                             <option value="3">@lang('partials.end_of_life')</option>
                                         </select>
                                     </div>
-                                    <div id="repair-more" style="display: none;">
+                                    <div class="repair-more">
                                         <div class="form-control form-control__select">
                                             <select name="repair_details" class="repair_details select2" disabled>
                                                 <option value="0">-- @lang('partials.repair_details') --</option>

@@ -35,7 +35,7 @@
       @if ($device->spare_parts == 1)
         <svg class="table-tick" width="21" height="17" viewBox="0 0 16 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;position:relative;z-index:1"><g><path d="M5.866,12.648l2.932,-2.933l-5.865,-5.866l-2.933,2.933l5.866,5.866Z" style="fill:#0394a6;"/><path d="M15.581,2.933l-2.933,-2.933l-9.715,9.715l2.933,2.933l9.715,-9.715Z" style="fill:#0394a6;"/></g></svg>
       @else
-        <svg class="table-tick" style="display: none;" width="21" height="17" viewBox="0 0 16 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;position:relative;z-index:1"><g><path d="M5.866,12.648l2.932,-2.933l-5.865,-5.866l-2.933,2.933l5.866,5.866Z" style="fill:#0394a6;"/><path d="M15.581,2.933l-2.933,-2.933l-9.715,9.715l2.933,2.933l9.715,-9.715Z" style="fill:#0394a6;"/></g></svg>
+        <svg class="table-tick" width="21" height="17" viewBox="0 0 16 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;position:relative;z-index:1"><g><path d="M5.866,12.648l2.932,-2.933l-5.865,-5.866l-2.933,2.933l5.866,5.866Z" style="fill:#0394a6;"/><path d="M15.581,2.933l-2.933,-2.933l-9.715,9.715l2.933,2.933l9.715,-9.715Z" style="fill:#0394a6;"/></g></svg>
       @endif
     </td>
     @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) )
@@ -51,7 +51,7 @@
 
           <div class="col-6 col-lg-auto flex-column d-flex d-lg-table-cell">
 
-            <label for="nested-5">@lang('partials.category'):</label>
+            <label for="category-{{ $device->iddevices }}">@lang('partials.category'):</label>
             <div class="form-control form-control__select">
                 <select name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
                     <option value="">-- @lang('partials.category') --</option>
@@ -74,29 +74,51 @@
                 </select>
             </div>
             @if( $device->category == 46 )
-              <div id="display-weight">
+              <div class="display-weight d-none">
                   <div class="form-input">
-                      <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
-                      <div class="input-group-append">
-                        <span class="input-group-text" id="validationTooltipUsernamePrepend">kg</span>
+
+                      <div class="row">
+                        <div class="col-9">
+
+                          <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
+
+                        </div>
+                        <div class="col-3">
+
+                          <div class="input-group-append">
+                            <div>kg</div>
+                          </div>
+
+                        </div>
                       </div>
+                      
+                      
                   </div>
               </div>
             @else
-              <div id="display-weight" style="display: none;">
+              <div class="display-weight d-none">
                   <div class="form-input">
-                      <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}" disabled>
-                      <div class="input-group-append">
-                        <span class="input-group-text" id="validationTooltipUsernamePrepend">kg</span>
+
+                      <div class="row">
+                        <div class="col-9">
+                          <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}" disabled>
+                        </div>
+                        <div class="col-3">
+                          <div class="input-group-append">
+                            <div>kg</div>
+                          </div>
+                        </div>
                       </div>
+                      
+                     
                   </div>
               </div>
             @endif
 
           </div>
-          <div class="col-6 col-lg-auto flex-column d-flex d-lg-table-cell">
+          <div class="col-6 col-lg-auto flex-column d-flex d-lg-table-cell align-items-top">
 
-            <label for="nested-5">Brand:</label>
+            <label for="brand-{{ $device->iddevices }}" class="flex-0">Brand:</label>
             <div class="form-control form-control__select">
                 <select name="brand-{{ $device->iddevices }}" class="select2-with-input" id="brand-{{ $device->iddevices }}">
                     @php($i = 1)
@@ -129,7 +151,7 @@
 
           </div>
           <div class="col-6 col-lg-auto flex-column d-flex d-lg-table-cell">
-            <label for="nested-7">@lang('partials.age'):</label>
+            <label for="age-{{ $device->iddevices }}">@lang('partials.age'):</label>
             <div class="form-group">
               <input type="number" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" min="0" step="0.5" value="{{ $device->age }}" placeholder="@lang('partials.age_placeholder')" autocomplete="off">
             </div>
@@ -186,7 +208,7 @@
             </div>
           <div class="col-4 col-lg-auto flex-column d-flex d-lg-table-cell">
 
-            <label for="spare_parts">Spare parts:</label>
+            <label for="spare-parts-{{ $device->iddevices }}">Spare parts:</label>
             <div class="form-control form-control__select">
                 <select class="select2" name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
                   @if ($device->spare_parts == 1)
@@ -205,7 +227,7 @@
         <div class="row row-compressed-xs nested-fields table-row-more">
           <div class="col-12 col-lg-6 flex-column d-flex">
 
-              <label for="description">@lang('partials.description_of_problem_solution'):</label>
+              <label for="problem-{{ $device->iddevices }}">@lang('partials.description_of_problem_solution'):</label>
               <div class="form-group">
                   <textarea class="form-control" rows="6" name="problem-{{ $device->iddevices }}" id="problem-{{ $device->iddevices }}">{!! $device->problem !!}</textarea>
               </div>
@@ -238,7 +260,7 @@
         <div class="row row-compressed-xs nested-fields table-row-more">
           <div class="col-12 col-lg-6 flex-column d-flex">
               <div class="form-group">
-                  <label for="file">@lang('partials.add_image'):</label>
+                  <label>@lang('partials.add_image'):</label>
 
                   <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data"data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')">
                       @csrf
@@ -277,7 +299,7 @@
             <tbody>
                 <tr>
                   <td>
-                    <label for="nested-5">@lang('partials.category'):</label>
+                    <label for="category-{{ $device->iddevices }}">@lang('partials.category'):</label>
                     <div class="form-control form-control__select">
                         <select disabled name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
                             <option value="">-- @lang('partials.category') --</option>
@@ -300,27 +322,49 @@
                         </select>
                     </div>
                     @if( $device->category == 46 )
-                      <div id="display-weight">
+                      <div class="display-weight d-none">
                           <div class="form-input">
-                              <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
-                              <div class="input-group-append">
-                                <span class="input-group-text" id="validationTooltipUsernamePrepend">kg</span>
+
+                              <div class="row">
+                                <div class="col-9">
+                                  <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
+                                </div>
+                                <div class="col-3">
+                                  <div class="input-group-append">
+                                    <div>kg</div>
+                                  </div>
+                                </div>
                               </div>
+                              
+                              
                           </div>
                       </div>
                     @else
-                      <div id="display-weight" style="display: none;">
+                      <div class="display-weight d-none">
                           <div class="form-input">
-                              <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}" disabled>
-                              <div class="input-group-append">
-                                <span class="input-group-text" id="validationTooltipUsernamePrepend">kg</span>
+
+                              <div class="row">
+                                <div class="col-9">
+
+                                  <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}" disabled>
+
+                                </div>
+                                <div class="col-3">
+
+                                  <div class="input-group-append">
+                                    <div>kg</div>
+                                  </div>
+
+                                </div>
                               </div>
+                              
+                              
                           </div>
                       </div>
                     @endif
                   </td>
                   <td>
-                        <label for="nested-5">@lang('partials.brand'):</label>
+                        <label for="brand-{{ $device->iddevices }}" class="flex-0">@lang('partials.brand'):</label>
                         <div class="form-control form-control__select">
                             <select disabled name="brand-{{ $device->iddevices }}" class="select2-with-input" id="brand-{{ $device->iddevices }}">
                                 @php($i = 1)
