@@ -16,26 +16,34 @@ use Request;
 
 class FixometerHelper {
 
-  public static function allAges() {
+  public static function allAges($range = false) {
 
-    // return [
-    //   'N/A'   => 'N/A',
-    //   '16-20' => '16-20',
-    //   '20-30' => '20-30',
-    //   '30-40' => '30-40',
-    //   '40-50' => '40-50',
-    //   '50-60' => '50-60',
-    //   '60-70' => '60-70',
-    //   '70+'   => '70+',
-    // ];
+    if( $range ){
 
-    $ages = ['' => ''];
+      return [
+        ''      => 'N/A',
+        (intval(date('Y')) - 20).'-'.(intval(date('Y')) - 16) => '16-20',
+        (intval(date('Y')) - 30).'-'.(intval(date('Y')) - 21) => '21-30',
+        (intval(date('Y')) - 40).'-'.(intval(date('Y')) - 31) => '31-40',
+        (intval(date('Y')) - 50).'-'.(intval(date('Y')) - 41) => '41-50',
+        (intval(date('Y')) - 60).'-'.(intval(date('Y')) - 51) => '51-60',
+        (intval(date('Y')) - 70).'-'.(intval(date('Y')) - 61) => '61-70',
+        (intval(date('Y')) - 80).'-'.(intval(date('Y')) - 71) => '71-80',
+        (intval(date('Y')) - 90).'-'.(intval(date('Y')) - 81) => '81-90',
+        (intval(date('Y')) - 100).'-'.(intval(date('Y')) - 91) => '91-100',
+      ];
 
-    for ($i=intval(date('Y')) - 18; $i > intval(date('Y', strtotime("- 100 years"))); $i--) {
-      $ages[$i] = $i;
+    } else {
+
+      $ages = ['' => ''];
+
+      for ($i=intval(date('Y')) - 18; $i > intval(date('Y', strtotime("- 100 years"))); $i--) {
+        $ages[$i] = $i;
+      }
+
+      return $ages;
+
     }
-
-    return $ages;
 
   }
 

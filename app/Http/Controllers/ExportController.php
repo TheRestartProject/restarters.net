@@ -353,7 +353,7 @@ class ExportController extends Controller {
 
         //Birth year
         if ($request->input('year') !== null) {
-          $user_events = $user_events->where('users.age', $request->input('year'));
+          $user_events = $user_events->whereBetween('users.age', explode('-', $request->input('year')));
         }
 
         //Gender

@@ -79,11 +79,11 @@
                           <div class="form-control form-control__select">
                               <select id="age_range" name="year" class="select2">
                                   <option value="">@lang('reporting.placeholder_birth_year')</option>
-                                  @foreach(FixometerHelper::allAges() as $year)
-                                    @if(isset($age) && $age == $year)
-                                      <option value="{{ $year }}" selected>{{ $year }}</option>
+                                  @foreach(FixometerHelper::allAges(true) as $years => $range)
+                                    @if(isset($age) && $age == $years)
+                                      <option value="{{ $years }}" selected>{{ $range }}</option>
                                     @else
-                                      <option value="{{ $year }}">{{ $year }}</option>
+                                      <option value="{{ $years }}">{{ $range }}</option>
                                     @endif
                                   @endforeach
                               </select>
@@ -91,12 +91,6 @@
                       </div>
                       <div class="form-group">
                           <label for="gender">@lang('reporting.gender'):</label>
-                          <!-- <div class="form-control form-control__select">
-                              <select id="gender" class="select2">
-                                  <option value="">@lang('reporting.placeholder_gender')</option>
-
-                              </select>
-                          </div> -->
                           <input type="text" id="gender" name="gender" class="field form-control" placeholder="@lang('reporting.placeholder_gender_text')" value="{{ $gender }}">
                       </div>
                   </aside>
