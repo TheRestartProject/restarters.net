@@ -18697,6 +18697,7 @@ label.form-check-label {
 
 .form-control__select {
   padding: 0 !important;
+  height: auto;
 }
 
 .form-control__select select {

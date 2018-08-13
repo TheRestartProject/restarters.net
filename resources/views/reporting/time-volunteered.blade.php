@@ -36,12 +36,12 @@
                     <aside class="edit-panel edit-panel__side">
                         <legend>@lang('devices.by_taxonomy')</legend>
                         <div class="form-group">
-                            <label for="items_cat">@lang('groups.group'):</label>
+                            <label for="items_group">@lang('groups.group'):</label>
                             <div class="form-control form-control__select">
-                                <select id="items_cat" name="group" class="select2">
+                                <select id="items_group" name="groups[]" class="select2-tags" multiple>
                                     <option value="">@lang('reporting.placeholder_group')</option>
                                     @foreach($all_groups as $g)
-                                      @if(isset($group) && $group == $g->idgroups)
+                                      @if(isset($groups) && in_array($g->idgroups, $groups))
                                         <option value="{{ $g->idgroups }}" selected>{{ $g->name }}</option>
                                       @else
                                         <option value="{{ $g->idgroups }}">{{ $g->name }}</option>
@@ -51,9 +51,9 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="items_group">@lang('groups.group_tag2'):</label>
+                            <label for="items_group_tags">@lang('groups.group_tag2'):</label>
                             <div class="form-control form-control__select">
-                                <select id="items_group" name="tags[]" class="select2-tags" multiple data-live-search="true" title="Choose group tags...">
+                                <select id="items_group_tags" name="tags[]" class="select2-tags" multiple data-live-search="true" title="Choose group tags...">
                                     @foreach($all_group_tags as $group_tag)
                                       @if(isset($selected_tags) && in_array($group_tag->id, $selected_tags))
                                         <option value="{{ $group_tag->id }}" selected>{{ $group_tag->tag_name }}</option>
@@ -281,8 +281,8 @@
         <div class="d-flex justify-content-center">
           <nav aria-label="Page navigation example">
             <ul class="pagination">
-              @if (!empty($_GET) || isset($group))
-                {!! $user_events->appends(['group' => $group, 'selected_tags' => $selected_tags, 'name' => $name, 'age' => $age, 'gender' => $gender, 'from_date' => $from_date, 'to_date' => $to_date, 'country' => $country, 'misc' => $misc])->links() !!} <!-- 'selected_country' => $selected_country -->
+              @if (!empty($_GET) || isset($groups))
+                {!! $user_events->appends(['groups' => $groups, 'selected_tags' => $selected_tags, 'name' => $name, 'age' => $age, 'gender' => $gender, 'from_date' => $from_date, 'to_date' => $to_date, 'country' => $country, 'misc' => $misc])->links() !!} <!-- 'selected_country' => $selected_country -->
               @else
                 {{ $user_events->links() }}
               @endif

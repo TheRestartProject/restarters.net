@@ -336,8 +336,8 @@ class ExportController extends Controller {
 
       //Taxonomy
         //Group filter
-        if ($request->input('group') !== null) {
-          $user_events = $user_events->where('groups.idgroups', $request->input('group'));
+        if ($request->input('groups') !== null) {
+          $user_events = $user_events->whereIn('groups.idgroups', $request->input('groups'));
         }
 
         //Group tags filter
@@ -456,7 +456,7 @@ class ExportController extends Controller {
         'user_events' => $user_events,
         'all_groups' => $all_groups,
         'all_group_tags' => $all_group_tags,
-        'group' => $request->input('group'),
+        'groups' => $request->input('groups'),
         'selected_tags' => $request->input('tags'),
         'name' => $request->input('name'),
         'age' => $request->input('year'),
@@ -470,7 +470,7 @@ class ExportController extends Controller {
         'anonymous_users' => $anonymous_users,
         'group_count' => $group_count,
         'hours_completed' => $hours_completed,
-        'average_age' => $average_age,
+        'average_age' => number_format($average_age, 1),
         'country_hours_completed' => $country_hours_completed,
         'all_country_hours_completed' => $all_country_hours_completed,
         'city_hours_completed' => $city_hours_completed,
@@ -486,7 +486,7 @@ class ExportController extends Controller {
         'anonymous_users' => $anonymous_users,
         'group_count' => $group_count,
         'hours_completed' => $hours_completed,
-        'average_age' => $average_age,
+        'average_age' => number_format($average_age, 1),
         'country_hours_completed' => $country_hours_completed,
         'city_hours_completed' => $city_hours_completed,
       );
