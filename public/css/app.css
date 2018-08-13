@@ -14722,6 +14722,8 @@ table.sortable > thead th div.mozilla {
   background-color: #E4E4E4;
   border-bottom-color: #B6B6B6;
   color: #000;
+  -webkit-box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
 }
 
 [type="checkbox"]:checked + label.btn-checkbox {
