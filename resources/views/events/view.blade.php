@@ -54,9 +54,9 @@
                         <li class="breadcrumb-item active" aria-current="page">{{ $event->getEventName() }}</li>
                     </ol>
                 </nav>
-                @php( $group_image = $event->host->hostImage )
+                @php( $group_image = $event->theGroup->groupImage )
                 @if( is_object($group_image) && is_object($group_image->image) )
-                  <img src="{{ asset('/uploads/mid_' . $group_image->image->path) }}" alt="{{{ $event->host->name }}}" class="event-icon">
+                  <img src="{{ asset('/uploads/mid_' . $group_image->image->path) }}" alt="{{{ $event->theGroup->name }}}" class="event-icon">
                 @else
                   <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}" class="event-icon">
                 @endif

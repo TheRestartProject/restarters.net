@@ -60,7 +60,7 @@
                       @foreach($userGroups as $g)
                         <a class="dropdown-item" href="{{ url('/group/view/'.$g->idgroups) }}" title="Switch to {{ $g->name }}">
                           @if(!empty($g->path))
-                            <img src="{{ url('/uploads/thumbnail_'.$g->path) }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
+                            <img src="{{ url('/uploads/mid_'.$g->path) }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
                           @else
                             <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
                           @endif
@@ -89,10 +89,11 @@
                     </ol>
                 </nav>
 
-                @if( empty($group->path) )
-                  <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="{{{ $group->name }}} group image" class="event-icon">
+                @php( $groupImage = $group->groupImage )
+                @if( is_object($groupImage) && is_object($groupImage->image) )
+                  <img src="{{ asset('/uploads/mid_'. $groupImage->image->path) }}" alt="{{{ $group->name }}} group image" class="event-icon">
                 @else
-                  <img src="{{ url('/uploads/mid_'. $group->path) }}" alt="{{{ $group->name }}} group image" class="event-icon">
+                  <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="{{{ $group->name }}} group image" class="event-icon">
                 @endif
 
             </header>
