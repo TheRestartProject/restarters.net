@@ -762,6 +762,7 @@ class DeviceController extends Controller
         Device::find($id)->update([
           'category' => $category,
           'category_creation' => $category,
+          'estimate' => $weight,
           'brand' => $brand,
           'model' => $model,
           'age' => $age,

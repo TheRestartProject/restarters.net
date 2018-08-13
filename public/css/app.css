@@ -16812,6 +16812,11 @@ table.sortable > thead th div.mozilla {
   border-color: #0394A6;
 }
 
+.input-group .input-group-append .input-group-text {
+  border: 2px solid #BEC0C0;
+  border-left: 0 none;
+}
+
 .form-group label {
   font-family: "Patua One", sans-serif;
   font-size: 17px;
@@ -17491,7 +17496,7 @@ table.sortable > thead th div.mozilla {
   font-family: "Open Sans", sans-serif;
 }
 
-.nested-fields .form-control {
+.nested-fields > .form-control {
   margin-bottom: 15px;
 }
 

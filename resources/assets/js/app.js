@@ -1220,7 +1220,7 @@ $( document ).ready(function() {
 
         } else {
 
-          alert('Something went wrong, please try again2');
+          alert('Something went wrong, please try again'); 
 
         }
 

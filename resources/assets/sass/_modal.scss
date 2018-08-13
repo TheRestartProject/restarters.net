@@ -30,11 +30,16 @@
   }
 }
 
+.input-group .input-group-append .input-group-text {
+  border: 2px solid #BEC0C0;
+  border-left: 0 none;
+}
+
 .form-group {
   label {
     font-family: $font-family-sans-serif;
     font-size: 17px;
-  } 
+  }
 }
 
 .after-offset {
@@ -89,8 +94,8 @@
     padding: 40px 55px;
   }
   .close {
-    right: 35px !important;  
-    top: 20px !important;  
+    right: 35px !important;
+    top: 20px !important;
   }
 }
 
@@ -196,4 +201,3 @@
       }
     }
 }
-

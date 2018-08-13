@@ -74,43 +74,21 @@
                 </select>
             </div>
             @if( $device->category == 46 )
-              <div class="display-weight d-none">
-                  <div class="form-input">
-
-                      <div class="row">
-                        <div class="col-9">
-
-                          <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
-
-                        </div>
-                        <div class="col-3">
-
-                          <div class="input-group-append">
-                            <div>kg</div>
-                          </div>
-
-                        </div>
-                      </div>
-                      
-                      
+              <div class="display-weight pt-1 mb-2">
+                  <div class="input-group">
+                    <input type="number" class="form-control field weight" id="weight-{{ $device->iddevices }}" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
+                    <div class="input-group-append">
+                      <span class="input-group-text">kg</span>
+                    </div>
                   </div>
               </div>
             @else
               <div class="display-weight d-none">
-                  <div class="form-input">
-
-                      <div class="row">
-                        <div class="col-9">
-                          <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}" disabled>
-                        </div>
-                        <div class="col-3">
-                          <div class="input-group-append">
-                            <div>kg</div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                     
+                  <div class="input-group">
+                    <input disabled type="number" class="form-control field weight" id="weight-{{ $device->iddevices }}" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
+                    <div class="input-group-append">
+                      <span class="input-group-text">kg</span>
+                    </div>
                   </div>
               </div>
             @endif
@@ -322,44 +300,22 @@
                         </select>
                     </div>
                     @if( $device->category == 46 )
-                      <div class="display-weight d-none">
-                          <div class="form-input">
-
-                              <div class="row">
-                                <div class="col-9">
-                                  <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
-                                </div>
-                                <div class="col-3">
-                                  <div class="input-group-append">
-                                    <div>kg</div>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              
+                      <div class="display-weight pt-1 mb-2">
+                        <div class="input-group">
+                          <input type="number" class="form-control field weight" name="weight" id="weight-{{ $device->iddevices }}" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
+                          <div class="input-group-append">
+                            <div>kg</div>
                           </div>
+                        </div>
                       </div>
                     @else
                       <div class="display-weight d-none">
-                          <div class="form-input">
-
-                              <div class="row">
-                                <div class="col-9">
-
-                                  <input disabled type="number" class="form-control field weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}" disabled>
-
-                                </div>
-                                <div class="col-3">
-
-                                  <div class="input-group-append">
-                                    <div>kg</div>
-                                  </div>
-
-                                </div>
-                              </div>
-                              
-                              
+                        <div class="input-group">
+                          <input disabled type="number" class="form-control field weight" name="weight" id="weight-{{ $device->iddevices }}" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
+                          <div class="input-group-append">
+                            <div>kg</div>
                           </div>
+                        </div>
                       </div>
                     @endif
                   </td>
