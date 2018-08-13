@@ -1,4 +1,9 @@
 @extends('layouts.app')
+
+@section('title')
+    Dashboard
+@endsection
+
 @section('content')
 <section class="dashboard">
   <div class="container-fluid">

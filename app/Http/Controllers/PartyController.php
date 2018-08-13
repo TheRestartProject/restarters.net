@@ -466,7 +466,7 @@ class PartyController extends Controller {
               $response['danger'] = 'Something went wrong. Please check the data and try again.';
           }
           else {
-              $response['success'] = 'Event details updated <a href="/party/view/'.$id.'" class="btn btn-success">View event</a>';
+              $response['success'] = '<div class="row"><div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">Event details updated</div><div class="col-md-4 col-lg-3 d-flex flex-column align-content-center"><a href="/party/view/'.$id.'" class="btn btn-success">View event</a></div></div>';
 
               $theParty = $Party->findThis($id)[0];
 

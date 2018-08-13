@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    Devices
+@endsection
+
 @section('content')
 <section class="devices">
   <div class="container">
