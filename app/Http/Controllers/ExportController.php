@@ -382,6 +382,12 @@ class ExportController extends Controller {
           //Need to add this in later is disabled at the moment
     }
 
+
+    // Filter out the old 'superhero' Restarter that was automatically added
+    // in the old system (pre-July 2018) to any event that was created.
+    $user_events->where('users.id', '<>', 29);
+
+
     //total users
       $total_users = clone $user_events;
       $total_users = $total_users->distinct('users.id')->count('users.id');
