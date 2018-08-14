@@ -12,7 +12,7 @@ return [
     */
 
     'search-all-time-volunteered' => 'Search all time volunteered',
-    'by_users' => 'By users',
+    'by_users' => 'By volunteer',
     'by_location' => 'By location',
     'age_range' => 'Age range',
     'birth_year' => 'Birth Year',
@@ -45,11 +45,11 @@ return [
     'total_hours' => 'Total hours',
     'country_name' => 'Country name',
     'town_city_name' => 'Town/city name',
-    'restarter_name' => 'Restarter name',
+    'restarter_name' => 'Restarter',
     'hours' => 'Hours',
     'location' => 'Location',
     'event_date' => 'Event date',
-    'restart_group' => 'Restart group',
+    'restart_group' => 'Group',
     'export_csv' => 'Export to CSV'
 ]
 ?>
