@@ -72,6 +72,7 @@ return [
     'headline_stats_message' => 'This widget shows the headline stats for your group e.g. the number of participants at your parties; the hours volunteered',
 
     'edit_group'  => 'Edit group',
+    'edit_group_save_changes'  => 'Save changes',
     'edit_group_text'  => 'Go ahead and change or improve your group\'s profile.',
     'approve_group' => 'Approve group',
 

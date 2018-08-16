@@ -842,14 +842,14 @@ class GroupController extends Controller
           else {
               $response['success'] = 'Group updated!';
 
-              if(isset($_FILES['image']) && !empty($_FILES['image']) && $_FILES['image']['error'] != 4){
-                 // echo "uploading image ... ";
+              if(isset($_FILES['file']) && !empty($_FILES['file']) && $_FILES['file']['error'] != 4){
                   $existing_image = FixometerHelper::hasImage($id, 'groups', true);
                   if(count($existing_image) > 0){
-                      $Group->removeImage($id, $existing_image[0]);
+                      //$Group = new Group;
+                      //$Group->removeImage($id, $existing_image[0]);
                   }
                   $file = new FixometerFile;
-                  $group_avatar = $file->upload('image', 'image', $id, env('TBL_GROUPS'), false, true);
+                  $group_avatar = $file->upload('file', 'image', $id, env('TBL_GROUPS'), false, true);
                   $group_avatar = env('UPLOADS_URL') . 'mid_' . $group_avatar ;
               }
               else {

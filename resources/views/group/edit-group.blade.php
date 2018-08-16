@@ -146,47 +146,69 @@
                 </div>
                 @endif
 
+          <div class="form-group row">
+            <div class="col">
+                <label for="file">@lang('groups.group_image'):</label><br/>
+                <input id="file" name="file" type="file" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col">
+                <div class="previews">
+                    @if( !empty($images) )
+                        @foreach($images as $image)
+                            <div id="device-image-{{ $formdata->idgroups }}" class="dz-image">
+                                <img src="/uploads/mid_{{ $image->path }}" alt="">
+                                <a href="/party/image/delete/{{ $formdata->idgroups }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $formdata->idgroups }}" class="dz-remove ajax-delete-image">Remove file</a>
+                            </div>
+                        @endforeach
+                    @endif
+                    <div class="uploads-{{ $formdata->idgroups }}"></div>
+                </div>
+            </div>
+          </div>
+
               </div>
                 <div class="button-group row row-compressed-xs">
                     <div class="col-lg-12 d-flex align-items-center justify-content-end">
-                        <button type="submit" class="btn btn-primary btn-create">Edit group</button>
+                        <button type="submit" class="btn btn-primary btn-create">@lang('groups.edit_group_save_changes')</button>
                     </div>
                 </div>
 
             </div>
           </div>
-
           </form>
 
-          <div class="form-group row">
+          <!-- <div class="form-group row">
 
-              <div class="col-6 col-lg-6">
-                <label for="file">@lang('events.field_add_image'):</label>
+               <div class="col-6 col-lg-6">
+               <label for="file">@lang('events.field_add_image'):</label>
 
-                <form id="dropzoneSingleEl" data-deviceid="{{ $formdata->idgroups }}" class="dropzone dropzoneSingleEl" action="/group/image-upload/{{ $formdata->idgroups }}" method="post" enctype="multipart/form-data" data-field1=" Group image here - " data-field2="Choose a compelling image that shows off your group">
-                    @csrf
-                    <div class="fallback" >
-                        <input id="file-{{ $formdata->idgroups }}" name="file-{{ $formdata->idgroups }}" type="file" multiple />
-                    </div>
-                </form>
-              </div>
+               <form id="dropzoneSingleEl" data-deviceid="{{ $formdata->idgroups }}" class="dropzone dropzoneSingleEl" action="/group/image-upload/{{ $formdata->idgroups }}" method="post" enctype="multipart/form-data" data-field1=" Group image here - " data-field2="Choose a compelling image that shows off your group">
+               @csrf
+               <div class="fallback" >
+               <input id="file-{{ $formdata->idgroups }}" name="file-{{ $formdata->idgroups }}" type="file" multiple />
+               <input id="file" name="file" type="file" />
+               </div>
+               </form>
+               </div>
 
-              <div class="col-6 col-lg-6">
-                <div class="previews">
-                  @if( !empty($images) )
-                    @foreach($images as $image)
-                      <div id="device-image-{{ $formdata->idgroups }}" class="dz-image">
-                        <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder">
-                        <a href="/party/image/delete/{{ $formdata->idgroups }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $formdata->idgroups }}" class="dz-remove ajax-delete-image">Remove file</a>
-                      </div>
-                    @endforeach
-                  @endif
-                  <div class="uploads-{{ $formdata->idgroups }}"></div>
-                </div>
-              </div>
+               <div class="col-6 col-lg-6">
+               <div class="previews">
+               @if( !empty($images) )
+               @foreach($images as $image)
+               <div id="device-image-{{ $formdata->idgroups }}" class="dz-image">
+               <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder">
+               <a href="/party/image/delete/{{ $formdata->idgroups }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $formdata->idgroups }}" class="dz-remove ajax-delete-image">Remove file</a>
+               </div>
+               @endforeach
+               @endif
+               <div class="uploads-{{ $formdata->idgroups }}"></div>
+               </div>
+               </div>
 
-          </div>
-
+               </div>
+          -->
         </div>
 
       </div>
