@@ -19,6 +19,7 @@ use DB;
 use FixometerHelper;
 use FixometerFile;
 use Illuminate\Http\Request;
+use Illuminate\Log\Logger;
 use Notification;
 
 
@@ -265,33 +266,8 @@ class GroupController extends Controller
 
                         Notification::send($all_admins, new ModerationGroup($arr));
 
-                        /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
-                        $Host = $Group->findHost($idGroup);
-
-                        $custom_fields = array(
-                                        array('key' => 'group_city',            'value' => $area),
-                                        array('key' => 'group_host',            'value' => $Host->hostname),
-                                        array('key' => 'group_website',         'value' => $website),
-                                        array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' .$Host->path),
-                                        array('key' => 'group_hash',            'value' => $idGroup),
-                                        array('key' => 'group_avatar_url',      'value' => env('UPLOADS_URL') . 'mid_' . $group_avatar ),
-                                        array('key' => 'group_latitude',        'value' => $data['latitude']),
-                                        array('key' => 'group_longitude',       'value' => $data['longitude']),
-                                        );
-
-
-                        /** Start WP XML-RPC **/
-                        $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-                        $wpClient->setCredentials(WP_XMLRPC_ENDPOINT, WP_XMLRPC_USER, WP_XMLRPC_PSWD);
-
-                        $content = array(
-                                        'post_type' => 'group',
-                                        'custom_fields' => $custom_fields
-                                        );
-
-                        $wpid = $wpClient->newPost($data['name'], $text, $content);
-                        $Group->update(array('wordpress_post_id' => $wpid), $idGroup);
-
+                        // NGM: no push to Wordpress at group creation at present.
+                        // It only occurs following moderation.
                       }
 
                   }
@@ -303,11 +279,6 @@ class GroupController extends Controller
               else {
                   $response['danger'] = 'Group could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.';
               }
-
-
-              // $this->set('response', $response);
-              // $this->set('error', $error);
-              // $this->set('udata', $_POST);
 
               if (!isset($response)) {
                 $response = null;
@@ -804,20 +775,19 @@ class GroupController extends Controller
   }
 
 
-  public function edit($id) {
-
+  public function edit($id)
+  {
       $user = Auth::user();
       $Group = new Group;
       $File = new FixometerFile;
 
       $is_host_of_group = FixometerHelper::userHasEditGroupPermission($id, $user->id);
-      if( !FixometerHelper::hasRole($user, 'Administrator') && !$is_host_of_group )
-        return redirect('/user/forbidden');
+      if (!FixometerHelper::hasRole($user, 'Administrator') && !$is_host_of_group)
+          return redirect('/user/forbidden');
 
-      if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
+      if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
 
           $data = $_POST;
-          // dd($data);
 
           // remove the extra "files" field that Summernote generates -
           unset($data['files']);
@@ -865,14 +835,11 @@ class GroupController extends Controller
 
           }
 
-          // echo "Updated---";
           if(!$u) {
-
               $response['danger'] = 'Something went wrong. Please check the data and try again.';
               echo $response['danger'];
           }
           else {
-             // echo "Here now --- ";
               $response['success'] = 'Group updated!';
 
               if(isset($_FILES['image']) && !empty($_FILES['image']) && $_FILES['image']['error'] != 4){
@@ -895,73 +862,19 @@ class GroupController extends Controller
                   }
               }
 
-              if(false/*env('APP_ENV') != 'development' && env('APP_ENV') != 'local'*/) {
-
-                 /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
-                $Host = $Group->findHost($id);
-
-                $custom_fields = array(
-                                    array('key' => 'group_city',            'value' => $data['area']),
-                                    array('key' => 'group_host',            'value' => $Host->hostname),
-                                    array('key' => 'group_website',         'value' => $data['website']),
-                                    array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
-                                    array('key' => 'group_hash',            'value' => $id),
-                                    array('key' => 'group_avatar_url',      'value' => $group_avatar ),
-                                    array('key' => 'group_latitude',        'value' => $data['latitude']),
-                                    array('key' => 'group_longitude',       'value' => $data['longitude']),
-                                );
-
-
-                /** Start WP XML-RPC **/
-                $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-                $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
-
-                $content = array(
-                                'post_type' => 'group',
-                                'post_title' => $data['name'],
-                                'post_content' => $data['free_text'],
-                                'custom_fields' => $custom_fields
-                                );
-
-
-                //Check for WP existence in DB
-                $theGroup = $Group->findOne($id);
-                if(!empty($theGroup->wordpress_post_id)){
-
-                    // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
-                    $thePost = $wpClient->getPost($theGroup->wordpress_post_id);
-
-                    foreach( $thePost['custom_fields'] as $i => $field ){
-                        foreach( $custom_fields as $k => $set_field){
-                            if($field['key'] == $set_field['key']){
-                                $custom_fields[$k]['id'] = $field['id'];
-                            }
-                        }
-                    }
-
-                    $content['custom_fields'] = $custom_fields;
-                    $wpClient->editPost($theGroup->wordpress_post_id, $content);
-                }
-                else {
-                    $wpid = $wpClient->newPost($data['name'], $data['free_text'], $content);
-                    $this->Group->update(array('wordpress_post_id' => $wpid), $id);
-                }
-
-              }
-
-              if(FixometerHelper::hasRole($user, 'Host')){
-              //    header('Location: /host?action=gu&code=200');
+              $shouldUpdateWordpress = env('APP_ENV') != 'development' && env('APP_ENV') != 'local';
+              if ($shouldUpdateWordpress) {
+                  try {
+                      $this->updateGroupInWordpress($id, $data, $group_avatar, $latitude, $longitude);
+                  } catch (\Exception $ex) {
+                      $reponse['success'] = 'error pushing to wp';
+                      report($ex);
+                  }
               }
           }
-
-          // $this->set('response', $response);
       }
-      // $this->set('gmaps', true);
-      // $this->set('js', array( 'head' => array( '/ext/geocoder.js')));
 
       $group = $Group->findOne($id);
-      // $this->set('title', 'Edit Group ' . $Group->name );
-      // $this->set('formdata', $Group);
 
       if (!isset($response)) {
         $response = null;
@@ -986,8 +899,90 @@ class GroupController extends Controller
         'tags' => $tags,
         'group_tags' => $group_tags,
       ]);
-
   }
+
+
+    /** Not currently in use.
+    public function createGroupInWordpress()
+    {
+        $Host = $Group->findHost($idGroup);
+
+        $custom_fields = array(
+                        array('key' => 'group_city',            'value' => $area),
+                        array('key' => 'group_host',            'value' => $Host->hostname),
+                        array('key' => 'group_website',         'value' => $website),
+                        array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' .$Host->path),
+                        array('key' => 'group_hash',            'value' => $idGroup),
+                        array('key' => 'group_avatar_url',      'value' => env('UPLOADS_URL') . 'mid_' . $group_avatar ),
+                        array('key' => 'group_latitude',        'value' => $data['latitude']),
+                        array('key' => 'group_longitude',       'value' => $data['longitude']),
+                        );
+
+
+        $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
+        $wpClient->setCredentials(WP_XMLRPC_ENDPOINT, WP_XMLRPC_USER, WP_XMLRPC_PSWD);
+
+        $content = array(
+                        'post_type' => 'group',
+                        'custom_fields' => $custom_fields
+                        );
+
+        $wpid = $wpClient->newPost($data['name'], $text, $content);
+        $Group->update(array('wordpress_post_id' => $wpid), $idGroup);
+    }
+    */
+
+    public function updateGroupInWordpress($id, $data, $group_avatar, $latitude, $longitude)
+    {
+        // TODO: host.  Groups don't just have one host.  Is host
+        // displayed on the front-end anywhere?
+        // TODO: receiving area field from posted data.  It's currently not in the interface.
+        $group = Group::where('idgroups', $id)->first();
+
+        $custom_fields = array(
+            array('key' => 'group_city',            'value' => $group->area),
+                            //                                    array('key' => 'group_host',            'value' => $Host->hostname),
+            array('key' => 'group_website',         'value' => $data['website']),
+            //array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
+            array('key' => 'group_hash',            'value' => $id),
+            array('key' => 'group_avatar_url',      'value' => $group_avatar ),
+            array('key' => 'group_latitude',        'value' => $latitude),
+            array('key' => 'group_longitude',       'value' => $longitude),
+        );
+
+        /** Start WP XML-RPC **/
+        $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
+        $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+
+        $content = array(
+            'post_type' => 'group',
+            'post_title' => $data['name'],
+            'post_content' => $data['free_text'],
+            'custom_fields' => $custom_fields
+        );
+
+
+        if(!empty($group->wordpress_post_id)) {
+            // We need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
+            $existingPost = $wpClient->getPost($group->wordpress_post_id);
+
+            foreach ($existingPost['custom_fields'] as $i => $field) {
+                foreach ($custom_fields as $k => $set_field) {
+                    if($field['key'] == $set_field['key']) {
+                        $custom_fields[$k]['id'] = $field['id'];
+                    }
+                }
+            }
+
+            $content['custom_fields'] = $custom_fields;
+            $wpClient->editPost($group->wordpress_post_id, $content);
+        }
+        else {
+            $wpid = $wpClient->newPost($data['name'], $data['free_text'], $content);
+            $group->wordpress_post_id = $wpid;
+            $group->save();
+        }
+    }
 
   public function delete($id){
       if(FixometerHelper::hasRole($this->user, 'Administrator')){
