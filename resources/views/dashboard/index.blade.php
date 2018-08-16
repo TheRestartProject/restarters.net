@@ -140,7 +140,17 @@
 
         </ul>
       </aside>
-{{-- @include('dashboard.blocks.impact') --}}
+      {{--
+      @if ($show_fixfest_cta)
+    <aside>
+      @include('dashboard.blocks.fixfest') 
+    </aside>
+      @endif
+      <br/>
+      <aside>
+      @include('dashboard.blocks.repairday') 
+        </aside>
+        --}}
     </div>
       @endif
     <div class="col">
