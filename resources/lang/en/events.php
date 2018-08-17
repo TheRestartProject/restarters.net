@@ -110,5 +110,8 @@ return [
     'events-filter' => 'Events filter',
     'download-results' => 'Download Results (CSV)',
 
-    'approve_event' => 'Approve Event'
+    'approve_event' => 'Approve Event',
+
+    'field_event_device_images' => 'Add device images here',
+    'field_event_device_images_2' => '',
 ];

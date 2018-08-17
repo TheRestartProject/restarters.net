@@ -240,7 +240,7 @@
               <div class="form-group">
                   <label>@lang('partials.add_image'):</label>
 
-                  <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data"data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')">
+                  <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data"data-field1="@lang('events.field_event_device_images')" data-field2="@lang('events.field_event_device_images_2')">
                       @csrf
                       <div class="fallback">
                           <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />
