@@ -126,7 +126,7 @@ class ResponseTest extends ResponseTestCase
 
     public function testSetNotModified()
     {
-        $response = new Response();
+        $response = new Response('foo');
         $modified = $response->setNotModified();
         $this->assertObjectHasAttribute('headers', $modified);
         $this->assertObjectHasAttribute('content', $modified);
@@ -135,6 +135,11 @@ class ResponseTest extends ResponseTestCase
         $this->assertObjectHasAttribute('statusText', $modified);
         $this->assertObjectHasAttribute('charset', $modified);
         $this->assertEquals(304, $modified->getStatusCode());
+
+        ob_start();
+        $modified->sendContent();
+        $string = ob_get_clean();
+        $this->assertEmpty($string);
     }
 
     public function testIsSuccessful()
@@ -969,7 +974,7 @@ class ResponseTest extends ResponseTestCase
      */
     public function ianaCodesReasonPhrasesProvider()
     {
-        if (!in_array('https', stream_get_wrappers(), true)) {
+        if (!\in_array('https', stream_get_wrappers(), true)) {
             $this->markTestSkipped('The "https" wrapper is not available');
         }
 
@@ -997,7 +1002,7 @@ class ResponseTest extends ResponseTestCase
             $value = $xpath->query('.//ns:value', $record)->item(0)->nodeValue;
             $description = $xpath->query('.//ns:description', $record)->item(0)->nodeValue;
 
-            if (in_array($description, array('Unassigned', '(Unused)'), true)) {
+            if (\in_array($description, array('Unassigned', '(Unused)'), true)) {
                 continue;
             }
 

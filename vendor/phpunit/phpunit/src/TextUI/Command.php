@@ -68,6 +68,8 @@ class Command
     protected $longOptions = [
         'atleast-version='          => null,
         'bootstrap='                => null,
+        'cache-result'              => null,
+        'cache-result-file='        => null,
         'check-version'             => null,
         'colors=='                  => null,
         'columns='                  => null,
@@ -103,6 +105,7 @@ class Command
         'no-coverage'               => null,
         'no-logging'                => null,
         'no-extensions'             => null,
+        'order-by='                 => null,
         'printer='                  => null,
         'process-isolation'         => null,
         'repeat='                   => null,
@@ -113,6 +116,7 @@ class Command
         'reverse-list'              => null,
         'static-backup'             => null,
         'stderr'                    => null,
+        'stop-on-defect'            => null,
         'stop-on-error'             => null,
         'stop-on-failure'           => null,
         'stop-on-warning'           => null,
@@ -193,8 +197,7 @@ class Command
             return $this->handleListTestsXml($suite, $this->arguments['listTestsXml'], $exit);
         }
 
-        unset($this->arguments['test'], $this->arguments['testFile']
-        );
+        unset($this->arguments['test'], $this->arguments['testFile']);
 
         try {
             $result = $runner->doRun($suite, $this->arguments, $exit);
@@ -291,6 +294,16 @@ class Command
 
                 case '--bootstrap':
                     $this->arguments['bootstrap'] = $option[1];
+
+                    break;
+
+                case '--cache-result':
+                    $this->arguments['cacheResult'] = true;
+
+                    break;
+
+                case '--cache-result-file':
+                    $this->arguments['cacheResultFile'] = $option[1];
 
                     break;
 
@@ -490,6 +503,11 @@ class Command
 
                     break;
 
+                case '--order-by':
+                    $this->handleOrderByOption($option[1]);
+
+                    break;
+
                 case '--process-isolation':
                     $this->arguments['processIsolation'] = true;
 
@@ -502,6 +520,11 @@ class Command
 
                 case '--stderr':
                     $this->arguments['stderr'] = true;
+
+                    break;
+
+                case '--stop-on-defect':
+                    $this->arguments['stopOnDefect'] = true;
 
                     break;
 
@@ -693,7 +716,7 @@ class Command
                     break;
 
                 case '--random-order':
-                    $this->arguments['executionOrder'] = TestSuiteSorter::ORDER_RANDOMIZED;
+                    $this->handleOrderByOption('random');
 
                     break;
 
@@ -703,7 +726,7 @@ class Command
                     break;
 
                 case '--resolve-dependencies':
-                    $this->arguments['resolveDependencies'] = true;
+                    $this->handleOrderByOption('depends');
 
                     break;
 
@@ -713,7 +736,7 @@ class Command
                     break;
 
                 case '--reverse-order':
-                    $this->arguments['executionOrder'] = TestSuiteSorter::ORDER_REVERSED;
+                    $this->handleOrderByOption('reverse');
 
                     break;
 
@@ -1098,6 +1121,7 @@ Test Execution Options:
   --columns <n>               Number of columns to use for progress output
   --columns max               Use maximum number of columns for progress output
   --stderr                    Write to STDERR instead of STDOUT
+  --stop-on-defect            Stop execution upon first not-passed test
   --stop-on-error             Stop execution upon first error
   --stop-on-failure           Stop execution upon first error or failure
   --stop-on-warning           Stop execution upon first warning
@@ -1118,9 +1142,9 @@ Test Execution Options:
   --printer <printer>         TestListener implementation to use
 
   --resolve-dependencies      Resolve dependencies between tests
-  --random-order              Run tests in random order
+  --order-by=<order>          Run tests in order: default|reverse|random|defects|depends
   --random-order-seed=<N>     Use a specific random seed <N> for random order
-  --reverse-order             Run tests last-to-first
+  --cache-result              Write run result to cache to enable ordering tests defects-first
 
 Configuration Options:
 
@@ -1133,6 +1157,7 @@ Configuration Options:
   --include-path <path(s)>    Prepend PHP's include_path with given path(s)
   -d key[=value]              Sets a php.ini value
   --generate-configuration    Generate configuration file with suggested settings
+  --cache-result-file==<FILE> Specify result cache path and filename
 
 Miscellaneous Options:
 
@@ -1292,5 +1317,42 @@ EOT;
         }
 
         return TestRunner::SUCCESS_EXIT;
+    }
+
+    private function handleOrderByOption(string $value): void
+    {
+        foreach (\explode(',', $value) as $order) {
+            switch ($order) {
+                case 'default':
+                    $this->arguments['executionOrder']        = TestSuiteSorter::ORDER_DEFAULT;
+                    $this->arguments['executionOrderDefects'] = TestSuiteSorter::ORDER_DEFAULT;
+                    $this->arguments['resolveDependencies']   = false;
+
+                    break;
+
+                case 'reverse':
+                    $this->arguments['executionOrder'] = TestSuiteSorter::ORDER_REVERSED;
+
+                    break;
+
+                case 'random':
+                    $this->arguments['executionOrder'] = TestSuiteSorter::ORDER_RANDOMIZED;
+
+                    break;
+
+                case 'defects':
+                    $this->arguments['executionOrderDefects'] = TestSuiteSorter::ORDER_DEFECTS_FIRST;
+
+                    break;
+
+                case 'depends':
+                    $this->arguments['resolveDependencies'] = true;
+
+                    break;
+
+                default:
+                    $this->exitWithErrorMessage("unrecognized --order-by option: $order");
+            }
+        }
     }
 }

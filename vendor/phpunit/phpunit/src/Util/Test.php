@@ -782,6 +782,15 @@ final class Test
             $element = \explode(' ', $element);
             $element = $element[0];
 
+            if ($mode === 'covers' && \interface_exists($element)) {
+                throw new InvalidCoversTargetException(
+                    \sprintf(
+                        'Trying to @cover interface "%s".',
+                        $className
+                    )
+                );
+            }
+
             $codeList = \array_merge(
                 $codeList,
                 self::resolveElementToReflectionObjects($element)
@@ -1038,6 +1047,14 @@ final class Test
     private static function resolveReflectionObjectsToLines(array $reflectors): array
     {
         $result = [];
+
+        foreach ($reflectors as $reflector) {
+            if ($reflector instanceof ReflectionClass) {
+                foreach ($reflector->getTraits() as $trait) {
+                    $reflectors[] = $trait;
+                }
+            }
+        }
 
         foreach ($reflectors as $reflector) {
             $filename = $reflector->getFileName();

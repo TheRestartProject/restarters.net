@@ -62,7 +62,7 @@
 
                             </div>
                             <div class="col-6 col-md-4 align-content-center flex-column justify-content-end d-flex">
-                                <button type="submit" class="btn btn-primary">@lang('auth.login')</button>
+                                <button id="btn-login" type="submit" class="btn btn-primary">@lang('auth.login')</button>
                             </div>
                         </div>
 

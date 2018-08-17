@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * Profiler.
@@ -100,7 +100,7 @@ class Profiler
         }
 
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
-            $this->logger->warning('Unable to store the profiler information.', array('configured_storage' => get_class($this->storage)));
+            $this->logger->warning('Unable to store the profiler information.', array('configured_storage' => \get_class($this->storage)));
         }
 
         return $ret;
@@ -154,10 +154,6 @@ class Profiler
             $profile->setIp($request->getClientIp());
         } catch (ConflictingHeadersException $e) {
             $profile->setIp('Unknown');
-        }
-
-        if ($prevToken = $response->headers->get('X-Debug-Token')) {
-            $response->headers->set('X-Previous-Debug-Token', $prevToken);
         }
 
         $response->headers->set('X-Debug-Token', $profile->getToken());

@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\Debug\Exception\SilencedErrorContext;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
@@ -26,17 +25,14 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 {
     private $logger;
     private $containerPathPrefix;
-    private $currentRequest;
-    private $requestStack;
 
-    public function __construct($logger = null, string $containerPathPrefix = null, RequestStack $requestStack = null)
+    public function __construct($logger = null, string $containerPathPrefix = null)
     {
         if (null !== $logger && $logger instanceof DebugLoggerInterface) {
             $this->logger = $logger;
         }
 
         $this->containerPathPrefix = $containerPathPrefix;
-        $this->requestStack = $requestStack;
     }
 
     /**
@@ -44,7 +40,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $this->currentRequest = $this->requestStack && $this->requestStack->getMasterRequest() !== $request ? $request : null;
+        // everything is done as late as possible
     }
 
     /**
@@ -67,10 +63,9 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
             $containerDeprecationLogs = $this->getContainerDeprecationLogs();
             $this->data = $this->computeErrorsCount($containerDeprecationLogs);
             $this->data['compiler_logs'] = $this->getContainerCompilerLogs();
-            $this->data['logs'] = $this->sanitizeLogs(array_merge($this->logger->getLogs($this->currentRequest), $containerDeprecationLogs));
+            $this->data['logs'] = $this->sanitizeLogs(array_merge($this->logger->getLogs(), $containerDeprecationLogs));
             $this->data = $this->cloneVar($this->data);
         }
-        $this->currentRequest = null;
     }
 
     /**
@@ -223,7 +218,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
             return true;
         }
 
-        if ($exception instanceof \ErrorException && in_array($exception->getSeverity(), array(E_DEPRECATED, E_USER_DEPRECATED), true)) {
+        if ($exception instanceof \ErrorException && \in_array($exception->getSeverity(), array(E_DEPRECATED, E_USER_DEPRECATED), true)) {
             return true;
         }
 
@@ -234,14 +229,14 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     {
         $silencedLogs = array();
         $count = array(
-            'error_count' => $this->logger->countErrors($this->currentRequest),
+            'error_count' => $this->logger->countErrors(),
             'deprecation_count' => 0,
             'warning_count' => 0,
             'scream_count' => 0,
             'priorities' => array(),
         );
 
-        foreach ($this->logger->getLogs($this->currentRequest) as $log) {
+        foreach ($this->logger->getLogs() as $log) {
             if (isset($count['priorities'][$log['priority']])) {
                 ++$count['priorities'][$log['priority']]['count'];
             } else {

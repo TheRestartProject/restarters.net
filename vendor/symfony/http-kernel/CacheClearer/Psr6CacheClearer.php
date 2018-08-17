@@ -28,15 +28,6 @@ class Psr6CacheClearer implements CacheClearerInterface
         return isset($this->pools[$name]);
     }
 
-    public function getPool($name)
-    {
-        if (!$this->hasPool($name)) {
-            throw new \InvalidArgumentException(sprintf('Cache pool not found: %s.', $name));
-        }
-
-        return $this->pools[$name];
-    }
-
     public function clearPool($name)
     {
         if (!isset($this->pools[$name])) {
