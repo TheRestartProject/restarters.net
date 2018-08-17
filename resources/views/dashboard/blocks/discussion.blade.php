@@ -14,5 +14,13 @@
         <div class="dashboard__links d-flex flex-row justify-content-end">
             <a href="https://talk.restarters.net/t/introduce-yourself-here/44" target="_blank" rel="noopener noreferrer">Who is everyone?  Meet and greet</a>
         </div>
+        @if ($show_fixfest_cta)
+        <div class="dashboard__links d-flex flex-row justify-content-end">
+            <a href="https://talk.restarters.net/t/call-out-for-fixfest-uk-unconference/238" target="_blank" rel="noopener noreferrer"><strong>NEW</strong> Develop Fixfest UK's programme</a>
+        </div>
+        @endif
+        <div class="dashboard__links d-flex flex-row justify-content-end">
+            <a href="https://talk.restarters.net/t/save-the-date-international-repair-day-on-20-october/338" target="_blank" rel="noopener noreferrer"><strong>NEW</strong> Save the date - International Repair Day</a>
+        </div>
     </div>
 </section>
