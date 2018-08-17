@@ -1083,15 +1083,18 @@ class PartyController extends Controller {
   //
   // }
 
-  public function getGroupEmails($event_id, $object = false){
-
+  public function getGroupEmails($event_id, $object = false)
+  {
     $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
               ->where('user', '!=', Auth::user()->id)
                 ->pluck('user')
                   ->toArray();
 
+    // Users already associated with the event.
+    // (Not including those invited but not RSVPed)
     $event_user_ids = EventsUsers::where('event', $event_id)
               ->where('user', '!=', Auth::user()->id)
+                ->where('status', 1)
                 ->pluck('user')
                   ->toArray();
 
@@ -1104,7 +1107,6 @@ class PartyController extends Controller {
       $group_users = User::whereIn('id', $unique_user_ids)->pluck('email')->toArray();
       return json_encode($group_users);
     }
-
   }
 
   public function updateQuantity(Request $request) {
@@ -1339,14 +1341,28 @@ class PartyController extends Controller {
       $user = null;
     }
 
-    //Let's add the volunteer
-    EventsUsers::create([
-      'event' => $event_id,
-      'user' => $user,
-      'status' => 1,
-      'role' => 4,
-      'full_name' => $full_name,
-    ]);
+    // Check if user was invited but not RSVPed.
+    $invitedUserQuery = EventsUsers::where('event', $event_id)
+                 ->where('user', $user)
+                 ->where('status', '<>', 1)
+                 ->whereNotNull('status')
+                 ->where('role', 4);
+    $userWasInvited = $invitedUserQuery->count() == 1;
+
+    if ($userWasInvited) {
+        $invitedUser = $invitedUserQuery->first();
+        $invitedUser->status = 1;
+        $invitedUser->save();
+    } else {
+        //Let's add the volunteer
+        EventsUsers::create([
+        'event' => $event_id,
+        'user' => $user,
+        'status' => 1,
+        'role' => 4,
+        'full_name' => $full_name,
+        ]);
+    }
 
     Party::find($event_id)->increment('volunteers');
 
