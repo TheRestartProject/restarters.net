@@ -198,7 +198,7 @@
                             @foreach($country_hours_completed as $country_hours)
                               <tr>
                                 @if(!is_null($country_hours->country))
-                                  <td>{{ $country_hours->country }}</td>
+                                  <td>{{ FixometerHelper::getCountryFromCountryCode($country_hours->country) }}</td>
                                 @else
                                   <td>N/A</td>
                                 @endif
@@ -242,18 +242,16 @@
               <table class="table table-striped" role="table">
                   <thead>
                     <tr>
-                      <th>#</th>
                       <th>@lang('reporting.restarter_name')</th>
                       <th>@lang('reporting.hours')</th>
                       <th>@lang('reporting.event_date')</th>
+                      <th>@lang('reporting.event_name')</th>
                       <th>@lang('reporting.restart_group')</th>
-                      <th>@lang('reporting.location')</th>
                     </tr>
                   </thead>
                   <tbody>
                     @foreach($user_events as $ue)
                       <tr>
-                          <td><a href="/party/view/{{ $ue->idevents }}">{{ $ue->idevents }}</a></td>
                           <td>{{ $ue->username }}</td>
                           @php
                             $start_time = new DateTime($ue->start);
@@ -261,8 +259,8 @@
                           @endphp
                           <td>{{ $diff->h.'.'.sprintf("%02d", $diff->i/60 * 100) }}</td>
                           <td>{{ date('d/m/Y', strtotime($ue->event_date)) }}</td>
+                          <td><a href="/party/view/{{ $ue->idevents }}">{{ !is_null($ue->venue) ? $ue->venue : $ue->location }}</a></td>
                           <td>{{ $ue->groupname }}</td>
-                          <td>{{ $ue->location }}</td>
                       </tr>
                     @endforeach
                   </tbody>

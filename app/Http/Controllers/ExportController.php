@@ -284,6 +284,8 @@ class ExportController extends Controller {
     ]);
   }
 
+
+    // TODO: why is this in ExportController?
   public function getTimeVolunteered($search = null, $export = false, Request $request) {
 
     $user = Auth::user();
@@ -361,8 +363,7 @@ class ExportController extends Controller {
           $user_events = $user_events->where('users.gender', 'like', '%'.$request->input('gender').'%');
         }
 
-      //By date
-      // dd($request->input('from_date'));
+        //By date
         if ($request->input('from_date') !== null && $request->input('to_date') == null) {
             $user_events = $user_events->whereDate('events.event_date', '>', $request->input('from_date'));
         } elseif ($request->input('to_date') !== null && $request->input('from_date') == null) {
@@ -372,7 +373,7 @@ class ExportController extends Controller {
                                                                     $request->input('to_date')));
         }
 
-      //By location
+        //By location
         //Country
         if ($request->input('country') !== null) {
           $user_events = $user_events->where('country', $request->input('country'));
@@ -431,7 +432,7 @@ class ExportController extends Controller {
 
     //city hours completed
       $city_hours_completed = clone $user_events;
-      $city_hours_completed = $city_hours_completed->groupBy('events.location')->select('events.location', DB::raw('SUM(TIMEDIFF(end, start)) as event_hours'));
+      $city_hours_completed = $city_hours_completed->groupBy('users.location')->select('users.location', DB::raw('SUM(TIMEDIFF(end, start)) as event_hours'));
       $all_city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DSC')->get();
       $city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DSC')->take(5)->get();
 
@@ -447,6 +448,7 @@ class ExportController extends Controller {
                                         'events.end',
                                         'events.event_date',
                                         'events.location',
+                                        'events.venue',
                                         'groups.name as groupname'
                                       );
 

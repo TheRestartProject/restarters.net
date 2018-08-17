@@ -10,7 +10,7 @@
         <div class="modal-body">
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col">
 
                 <h5 id="time-reporting-modal-2-Label">@lang('reporting.breakdown_by_city')</h5>
                 <p>@lang('reporting.breakdown_by_city_content')</p>

@@ -9,7 +9,7 @@
 
         <div class="modal-body">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col">
 
                     <h5 id="time-reporting-modal-1-Label">@lang('reporting.breakdown_by_country')</h5>
                     <p>@lang('reporting.breakdown_by_country_content')</p>
@@ -28,7 +28,7 @@
                           @foreach($all_country_hours_completed as $country_hours)
                             <tr>
                               @if(!is_null($country_hours->country))
-                                <td>{{ $country_hours->country }}</td>
+                                <td>{{ FixometerHelper::getCountryFromCountryCode($country_hours->country) }}</td>
                               @else
                                 <td>N/A</td>
                               @endif
