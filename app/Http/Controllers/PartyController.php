@@ -144,6 +144,11 @@ class PartyController extends Controller {
       if( FixometerHelper::hasRole(Auth::user(), 'Restarter') )
         return redirect('/user/forbidden');
 
+      $groups_user_is_host_of = UserGroups::where('user', Auth::user()->id)
+                              ->where('role', 3)
+                              ->pluck('group')
+                              ->toArray();
+
       $Groups = new Group;
 
       if ($request->isMethod('post')) {
@@ -303,15 +308,10 @@ class PartyController extends Controller {
               'error' => $error,
               'udata' => $_POST,
               'user' => $user,
-              'user_groups' => $user_groups,
+              'user_groups' => $groups_user_is_host_of,
             ]);
           }
       }
-
-      $groups_user_is_host_of = UserGroups::where('user', Auth::user()->id)
-                              ->where('role', 3)
-                              ->pluck('group')
-                              ->toArray();
 
       return view('events.create', [ //party.create
         'title' => 'New Party',
