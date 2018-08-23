@@ -640,4 +640,675 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         //throw new PendingException();
     }
+
+// Scenario - DashboardFirstVisit_host.feature
+
+    
+    /**
+     * @Given the following account have been created as a host
+     */
+    public function theFollowingAccountHaveBeenCreatedAsAHost(TableNode $table)
+    {
+       // throw new PendingException();
+        $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When a host lands on dashboard
+     */
+    public function aHostLandsOnDashboard()
+    {
+       // throw new PendingException();
+        $this->visit('/dashboard');
+    }
+
+    /**
+     * @Then he would view all the activities that he can do with a journey of updating your profile.
+     */
+    public function heWouldViewAllTheActivitiesThatHeCanDoWithAJourneyOfUpdatingYourProfile()
+    {
+        //throw new PendingException();
+        //$this->assertPageAddress('/dashboard');
+        $this->visit('/dashboard');
+    }
+
+    /**
+     * @When host lands on dashboard, the getting started column is useful to build your profile
+     */
+    public function hostLandsOnDashboardTheGettingStartedColumnIsUsefulToBuildYourProfile()
+    {
+        //throw new PendingException();
+        $this->visit('/dashboard');
+    }
+
+    /**
+     * @Then the host can build his profile by clicking the links and following the process.
+     */
+    public function theHostCanBuildHisProfileByClickingTheLinksAndFollowingTheProcess()
+    {
+        //throw new PendingException();
+       // $this->assertPageAddress('/dashboard');
+        $this->visit('/dashboard');
+       // $this->clickLink('Upload photo');
+        // $this->clickLink('Add skills');
+        // $this->clickLink('Find a group');
+        // $this->clickLink('Find an event');
+    }
+
+    /**
+     * @When host lands on dashboard, he can view Getting started in community repair, How to host an event, Discussion, Wiki and Community news
+     */
+    public function hostLandsOnDashboardHeCanViewGettingStartedInCommunityRepairHowToHostAnEventDiscussionWikiAndCommunityNews()
+    {
+        //throw new PendingException();
+        $this->visit('/dashboard');
+        // $this->assertPageContainsText('Getting Started');
+        // $this->assertPageContainsText('Discussion');
+        // $this->assertPageContainsText('Upcoming events');
+        // $this->assertPageContainsText('Wiki');
+        // $this->assertPageContainsText('Getting started in community repair');
+        // $this->assertPageContainsText('Community news');
+    }
+
+    /**
+     * @Then the host should explore(by clicking the links provided) all the categories to get familiar with the platform.
+     */
+    public function theHostShouldExploreByClickingTheLinksProvidedAllTheCategoriesToGetFamiliarWithThePlatform()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/dashboard');
+        $this->visit('/dashboard');       
+        $this->clickLink('See all events');
+        $this->clickLink('View the materials');
+        }
+
+    /**
+     * @When host clicks on view the materials link on dashboard
+     */
+    public function hostClicksOnViewTheMaterialsLinkOnDashboard()
+    {
+        //throw new PendingException();
+        $this->visit('/dashboard');
+        $this->clickLink('View the materials');
+    }
+
+    /**
+     * @Then he will be landed on About the repair in your community category post on Discourse.
+     */
+    public function heWillBeLandedOnAboutTheRepairInYourCommunityCategoryPostOnDiscourse()
+    {
+       // throw new PendingException();
+         $this->clickLink('Join the discussion');
+        $this->assertPageAddress('https://talk.restarters.net/t/community-values/20');
+    }
+
+    /**
+     * @Then he will be landed on how to run a repair event post on Discourse.
+     */
+    public function heWillBeLandedOnHowToRunARepairEventPostOnDiscourse()
+    {
+        //throw new PendingException();
+
+    }
+
+    /**
+     * @When host clicks on Join the discussion link on dashboard
+     */
+    public function hostClicksOnJoinTheDiscussionLinkOnDashboard()
+    {
+        //throw new PendingException();
+        $this->clickLink('Join the discussion');
+         $this->visit('https://talk.restarters.net/');
+    }
+
+    /**
+     * @Then he will be landed on the homepage of the Discourse.
+     */
+    public function heWillBeLandedOnTheHomepageOfTheDiscourse()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When host clicks on the links in wiki blog on dashboard
+     */
+    public function hostClicksOnTheLinksInWikiBlogOnDashboard()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Then he will be landed on wiki page of that particular link.
+     */
+    public function heWillBeLandedOnWikiPageOfThatParticularLink()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then he will be landed on The Restart Project pages depending on the link.
+     */
+    public function heWillBeLandedOnTheRestartProjectPagesDependingOnTheLink()
+    {
+       // throw new PendingException();
+    }
+
+
+// Scenario - InviteRestarters.feature
+
+    /**
+     * @Given the following account have been created as an host
+     */
+    public function theFollowingAccountHaveBeenCreatedAsAnHost(TableNode $table)
+    {
+        // throw new PendingException();
+        $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When a user clicks on invite button, invite restarters a pop up screen is displayed
+     */
+    public function aUserClicksOnInviteButtonInviteRestartersAPopUpScreenIsDisplayed()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view/2#invited');
+        //$this->clickLink('Invite to join event');
+    }
+
+    /**
+     * @When user can check the checkbox so that all the restarters associated in that group will get the invite or host can send invites manually by entering the email address of the restarter as follows
+     */
+    public function userCanCheckTheCheckboxSoThatAllTheRestartersAssociatedInThatGroupWillGetTheInviteOrHostCanSendInvitesManuallyByEnteringTheEmailAddressOfTheRestarterAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+        $this->visit('/party/view/2#invited');
+        //$this->checkboxChecked();
+        $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When also can send an invitation message in the textarea provided as follows
+     */
+    public function alsoCanSendAnInvitationMessageInTheTextareaProvidedAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+        $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When click on send invite button
+     */
+    public function clickOnSendInviteButton()
+    {
+         //throw new PendingException();
+        $this->visit('/party/view/2#invited');
+        //$this->clickLink('Send invites');
+    }
+
+    /**
+     * @Then host will land on event page with number of invites in the attendace section also a message saying the invites have been sent successfully.
+     */
+    public function hostWillLandOnEventPageWithNumberOfInvitesInTheAttendaceSectionAlsoAMessageSayingTheInvitesHaveBeenSentSuccessfully()
+    {
+         //throw new PendingException();
+        $this->visit('/party/view/2#invited');
+        $this->assertPageContainsText('Attendance');
+    }
+
+    /**
+     * @When a user gives invalid email id
+     */
+    public function aUserGivesInvalidEmailId()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view/2#invited');
+        $this->fillField('Send invites to', 'gfhigfhkgh');
+
+    }
+
+    /**
+     * @When clicks on send invite button
+     */
+    public function clicksOnSendInviteButton()
+    {
+       // throw new PendingException();
+        $this->visit('/party/view/2#invited');
+        $this->clickLink('Send invites');
+    }
+
+    /**
+     * @Then an error message will display.
+     */
+    public function anErrorMessageWillDisplay()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view/2#invited');
+        $this->assertPageContainsText('Wrong Email address');
+    }
+
+    /**
+     * @When the user clicks the send invite button
+     */
+    public function theUserClicksTheSendInviteButton()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view/2#invited');
+        $this->clickLink('Send invites');
+    }
+
+    /**
+     * @Then the volunteer(s) that the user has sent sent invite to an event would receive an email about information on that event.
+     */
+    public function theVolunteerSThatTheUserHasSentSentInviteToAnEventWouldReceiveAnEmailAboutInformationOnThatEvent()
+    {
+        //throw new PendingException();
+    }
+
+
+// Scenario - InvitedRestarters.feature
+
+    /**
+     * @When a user clicks on see all invited link in the events page
+     */
+    public function aUserClicksOnSeeAllInvitedLinkInTheEventsPage()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view/2');
+        //$this->clickLink('See all confirmed');
+    }
+
+    /**
+     * @Then a pop up appears with all the list of restarters that have been invited
+     */
+    public function aPopUpAppearsWithAllTheListOfRestartersThatHaveBeenInvited()
+    {
+       // throw new PendingException();
+        $this->assertPageAddress('/party/view/2');
+        //$this->assertPageContainsText('An overview of who attended your event and their skills.');
+    }
+
+    /**
+     * @Then can view the restarter name with their skills.
+     */
+    public function canViewTheRestarterNameWithTheirSkills()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party/view/2');
+      // $this->assertPageContainsText('skills');
+    }
+
+
+// Scenario - ManageActivePastEvent_restarter.feature
+
+    /**
+     * @Given the following account have been created a restarter
+     */
+    public function theFollowingAccountHaveBeenCreatedARestarter(TableNode $table)
+    {
+        //throw new PendingException();
+        $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When a restarter clicks on particular event page
+     */
+    public function aRestarterClicksOnParticularEventPage()
+    {
+        //throw new PendingException();
+        $this->visit('/party');
+        //$this->clickLink('Restart HQ');
+    }
+
+    /**
+     * @When likes to view environmental impact, attendees, event details etc.,
+     */
+    public function likesToViewEnvironmentalImpactAttendeesEventDetailsEtc()
+    {
+        //throw new PendingException();
+         $this->visit('/party/view');
+        //$this->assertPageContainsText('Environmental impact');
+    }
+
+    /**
+     * @Then he can see on that particular event page.
+     */
+    public function heCanSeeOnThatParticularEventPage()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party/view');
+       // $this->visit('/party/view/1');
+    }
+
+    /**
+     * @When a restarter who attended the event wants to edit devices section
+     */
+    public function aRestarterWhoAttendedTheEventWantsToEditDevicesSection()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        //$this->assertPageContainsText('Edit');
+    }
+
+    /**
+     * @When should click on edit option
+     */
+    public function shouldClickOnEditOption()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        //$this->clickLink('Edit');
+    }
+
+    /**
+     * @Then he can view editable options of that device
+     */
+    public function heCanViewEditableOptionsOfThatDevice()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        //$this->assertPageContainsText('Category');
+    }
+
+    /**
+     * @Then save the changes by clicking on save button.
+     */
+    public function saveTheChangesByClickingOnSaveButton()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+       // $this->pressButton('Save device');
+    }
+
+    /**
+     * @When a restarter wants to view the volunteers who have attended that event
+     */
+    public function aRestarterWantsToViewTheVolunteersWhoHaveAttendedThatEvent()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        //$this->assertPageContainsText('See all attended');
+    }
+
+    /**
+     * @Then he can view in attendace section of the event page.
+     */
+    public function heCanViewInAttendaceSectionOfTheEventPage()
+    {
+        //throw new PendingException();
+        //$this->visit('/party/view/1');
+        $this->assertPageAddress('/party/view');
+       // $this->assertPageContainsText('Attendance');
+    }
+
+    /**
+     * @When a restarter wants to view the number of volunteers invited to the event
+     */
+    public function aRestarterWantsToViewTheNumberOfVolunteersInvitedToTheEvent()
+    {
+        //throw new PendingException();
+        //$this->visit('/party/view/1');
+        $this->assertPageAddress('/party/view');
+    }
+
+    /**
+     * @Then restarter can see in invited tab.
+     */
+    public function restarterCanSeeInInvitedTab()
+    {
+        //throw new PendingException();
+         $this->assertPageAddress('/party/view');
+        //$this->assertPageContainsText('Invited');
+        //$this->assertPageContainsText('See all attended');
+    }
+
+    /**
+     * @When a restarter wants to view the devices that hase been fixed, repairable and end of life
+     */
+    public function aRestarterWantsToViewTheDevicesThatHaseBeenFixedRepairableAndEndOfLife()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party/view');
+    }
+
+    /**
+     * @Then can see the list in the devices section
+     */
+    public function canSeeTheListInTheDevicesSection()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party/view');
+        //$this->assertPageContainsText('Devices');
+
+    }
+
+    /**
+     * @Given logged in as a restarter who didn't attend the event
+     */
+    public function loggedInAsARestarterWhoDidntAttendTheEvent()
+    {
+        //throw new PendingException();
+        $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When the user is on the edit party devices page
+     */
+    public function theUserIsOnTheEditPartyDevicesPage()
+    {
+       //throw new PendingException();
+        $this->assertPageAddress('/party/view');
+    }
+
+    /**
+     * @Then there should be no edit button or add button in the devices section
+     */
+    public function thereShouldBeNoEditButtonOrAddButtonInTheDevicesSection()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party/view');
+    }
+
+    /**
+     * @Then restarter can view the device only.
+     */
+    public function restarterCanViewTheDeviceOnly()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party/view');
+    }
+
+
+// Scenario - ManageActivePastEvents.feature
+
+    /**
+     * @When a host clicks on particular event page
+     */
+    public function aHostClicksOnParticularEventPage()
+    {
+       // throw new PendingException();
+        $this->visit('/party');
+    }
+
+    /**
+     * @When likes to either edit or update any changes or see environmental impact, attendees, event details etc.,
+     */
+    public function likesToEitherEditOrUpdateAnyChangesOrSeeEnvironmentalImpactAttendeesEventDetailsEtc()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+    }
+
+    /**
+     * @When a host wants to login the absence of volunteers who RSVPed and presence of volunteers who came directly to the event
+     */
+    public function aHostWantsToLoginTheAbsenceOfVolunteersWhoRsvpedAndPresenceOfVolunteersWhoCameDirectlyToTheEvent()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+    }
+
+    /**
+     * @When host wants to manage that
+     */
+    public function hostWantsToManageThat()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+    }
+
+    /**
+     * @Then he can manage it in the attendace section of the event page
+     */
+    public function heCanManageItInTheAttendaceSectionOfTheEventPage()
+    {
+       // throw new PendingException();
+        $this->visit('/party/view');
+       // $this->assertPageContainsText('Attendance');
+    }
+
+    /**
+     * @Then can delete or add a volunteer through the links provided.
+     */
+    public function canDeleteOrAddAVolunteerThroughTheLinksProvided()
+    {
+        // throw new PendingException();
+        $this->visit('/party/view');
+       // $this->clickLink('Remove volunteer');
+    }
+
+    /**
+     * @When a host wants to invite volunteers to the event, can send invite via emails
+     */
+    public function aHostWantsToInviteVolunteersToTheEventCanSendInviteViaEmails()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+       // $this->assertPageContainsText('Invited');
+    }
+
+    /**
+     * @When he can do this in the attendance section in invites tab
+     */
+    public function heCanDoThisInTheAttendanceSectionInInvitesTab()
+    {
+        // throw new PendingException();
+        $this->visit('/party/view');
+        //$this->assertPageContainsText('Invite to join event');
+    }
+
+    /**
+     * @Then host can see the number of invites sent to the volunteers in that tab.
+     */
+    public function hostCanSeeTheNumberOfInvitesSentToTheVolunteersInThatTab()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+       // $this->clickLink('See all attended');
+    }
+
+    /**
+     * @When a host has entered the devices that hase been fixed, repairable and end of life
+     */
+    public function aHostHasEnteredTheDevicesThatHaseBeenFixedRepairableAndEndOfLife()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        // $this->fillField('Category', '');
+        // $this->fillField('Brand', '');
+        // $this->fillField('Model', '');
+        // $this->fillField('Age', '');
+        // $this->fillField('Description of problem/solution', '');
+        // $this->fillField('Status', '');
+        // $this->fillField('Spare parts', '');
+    }
+
+    /**
+     * @When host wants to either add\/update a device then click on add button for a new device
+     */
+    public function hostWantsToEitherAddUpdateADeviceThenClickOnAddButtonForANewDevice()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        $this->pressButton('Add');
+    }
+
+    /**
+     * @When click on edit link of particular device to be updated and fill the details as  follows
+     */
+    public function clickOnEditLinkOfParticularDeviceToBeUpdatedAndFillTheDetailsAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        $this->clickLink('Edit');
+    }
+
+    /**
+     * @Then click on save button
+     */
+    public function clickOnSaveButton()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        $this->pressButton('Save device');
+    }
+
+    /**
+     * @Then we can find the new\/ updated device in the list of devices.
+     */
+    public function weCanFindTheNewUpdatedDeviceInTheListOfDevices()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+    }
+
+    /**
+     * @When 24hours has passed since an event has finished
+     */
+    public function hoursHasPassedSinceAnEventHasFinished()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then the post event device upload reminder email shouldbe sent to the host of the event.
+     */
+    public function thePostEventDeviceUploadReminderEmailShouldbeSentToTheHostOfTheEvent()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When the host clicks the send email to restarters button
+     */
+    public function theHostClicksTheSendEmailToRestartersButton()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then all the restarters that attended the event would receive an email to reminder them to edit device information.
+     */
+    public function allTheRestartersThatAttendedTheEventWouldReceiveAnEmailToReminderThemToEditDeviceInformation()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When the host\/restarter marks the description of a repair suitable to wiki and clicks save
+     */
+    public function theHostRestarterMarksTheDescriptionOfARepairSuitableToWikiAndClicksSave()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        $this->checkboxChecked('checkbox');
+        $this->pressButton('Save device');
+    }
+
+    /**
+     * @Then admin would receive an email to view the repair notes.
+     */
+    public function adminWouldReceiveAnEmailToViewTheRepairNotes()
+    {
+        //throw new PendingException();
+    }
 }
