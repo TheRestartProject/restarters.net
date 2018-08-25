@@ -1240,7 +1240,7 @@ class UserController extends Controller
       if ( !is_null($hash) ) {
 
         $acceptance = Invite::where('hash', $hash)->first();
-        if( $acceptance->type == 'event' ){
+        if( !empty($acceptance) && $acceptance->type == 'event' ){
 
           EventsUsers::create([
             'user' => $user->id,
@@ -1250,7 +1250,7 @@ class UserController extends Controller
           ]);
           $acceptance->delete();
 
-        } elseif( $acceptance->type == 'group' ){
+        } elseif( !empty($acceptance) && $acceptance->type == 'group' ){
 
           UserGroups::create([
             'user' => $user->id,
