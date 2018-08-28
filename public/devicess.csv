@@ -1,4 +1,4 @@
-Category,Brand,Model,Comments,"Repair Status","Spare parts (needed/used)","Restart Party Location","Restart Group","Restart Party Date"
+Category,Brand,Comments,"Repair Status","Spare parts (needed/used)","Restart Party Location","Restart Group","Restart Party Date"
 Mobile,"Motorola ","Moto G (3rd Generation)","Broken screen - client brought spare glass only, need additional part",Repairable,Yes,Cambridge,"Cambridge Area Repair Cafes",11/11/2017
 Tablet,Apple,"iPad mini 4","Defective home button - Advice given on how to source replacement home screen",Repairable,Yes,Cambridge,"Cambridge Area Repair Cafes",11/11/2017
 Tablet,Tesco,"Hudl 2","Completely dead","End of life",No,Cambridge,"Cambridge Area Repair Cafes",11/11/2017
@@ -3524,9 +3524,9 @@ Headphones,Skullcandy,"Lowrider Athletic","Transducer gone.","End of life",No,"T
 "Small kitchen item",Cuisinart,"DLC family, metallic","Gets power but no movement. No solution found ",Repairable,Yes,"Tooting Restart Party","Restart HQ",01/04/2017
 Lamp,,,Fuse,Fixed,No,"Tooting Restart Party","Restart HQ",01/04/2017
 Lamp,,,Fuse,Fixed,No,"Tooting Restart Party","Restart HQ",01/04/2017
-Lamp,IKEA,JANSJÃ,"Needed fraying wires needed taping with electrical tape",Fixed,No,"Tooting Restart Party","Restart HQ",01/04/2017
+Lamp,IKEA,JANSJÖ,"Needed fraying wires needed taping with electrical tape",Fixed,No,"Tooting Restart Party","Restart HQ",01/04/2017
 Printer/scanner,"HP ","Photosmart D7300","Epic paper jam.",Fixed,No,"Tooting Restart Party","Restart HQ",01/04/2017
-Tablet,Samsung,"Tab3 10 ","USB charging port damaged. Spare part available and repair very doable",Repairable,Yes,"Tooting Restart Party","Restart HQ",01/04/2017
+Tablet,Samsung,"Tab3 10""","USB charging port damaged. Spare part available and repair very doable",Repairable,Yes,"Tooting Restart Party","Restart HQ",01/04/2017
 Mobile,Apple,"iPhone 4s","Asks for iTunes only. Advice given, hopefully DIY ready",Repairable,No,"Tooting Restart Party","Restart HQ",01/04/2017
 Misc,,,"Microphone - broken wire ",Fixed,No,"Belsize Park Restart Party ","Restart HQ",13/04/2017
 "Laptop medium",Apple,Macbook,"Battery connector fault ",Fixed,No,"Belsize Park Restart Party ","Restart HQ",13/04/2017
@@ -3740,11 +3740,11 @@ Mobile,Apple,"Iphone 5","Doesn't charge","End of life",No,"Canning Town Library"
 "Laptop medium",Dell,,"Very slow",Repairable,No,"Canning Town Library","Restart the Capital ",02/11/2016
 "Portable radio","Roberts ",RD-8,"The record feature was broken on this one and there were power issues. The power issues were sorted. Record requires more",Fixed,No,"Sutton Central Library, Sutton ","Restart the Capital ",09/11/2016
 "Hi-Fi separates","Marantz ",1020,"CD player needed a deep cleaning. ",Fixed,No,"Sutton Central Library, Sutton ","Restart the Capital ",09/11/2016
-"Flat screen 32-37""",Samsung,"40 ","Power fault, could not be identified",Repairable,No,"Sutton Central Library, Sutton ","Restart the Capital ",09/11/2016
+"Flat screen 32-37""",Samsung,"40""","Power fault, could not be identified",Repairable,No,"Sutton Central Library, Sutton ","Restart the Capital ",09/11/2016
 "Portable radio",Sony,,"Needed a power source ",Repairable,Yes,"Tooting, Mushkil Aasaan","Restart the Capital ",12/11/2016
 "Portable radio",Philco,,"This one just worked, with some testing",Fixed,No,"Tooting, Mushkil Aasaan","Restart the Capital ",12/11/2016
 "Laptop medium",HP,,"Needs a new HD",Repairable,Yes,"Tooting, Mushkil Aasaan","Restart the Capital ",12/11/2016
-"Flat screen 32-37""",Samsung,"40 ","Needs a new chip",Repairable,Yes,"Tooting, Mushkil Aasaan","Restart the Capital ",12/11/2016
+"Flat screen 32-37""",Samsung,"40""","Needs a new chip",Repairable,Yes,"Tooting, Mushkil Aasaan","Restart the Capital ",12/11/2016
 Lamp,IKEA,Blender,"Needs a new power cable",Repairable,Yes,"Tooting, Mushkil Aasaan","Restart the Capital ",12/11/2016
 Misc,"Russell Hobbs",,"Iron was impossible to open","End of life",No,"Tooting, Mushkil Aasaan","Restart the Capital ",12/11/2016
 "Small kitchen item",Kenwood,,"Vintage (70s) mixer, needs a new belt",Repairable,Yes,"Tooting, Mushkil Aasaan","Restart the Capital ",12/11/2016
@@ -4841,7 +4841,7 @@ Mobile,Alcatel,1035D,,"End of life",No,"Vinovo, CN, Italia","Restarters LangheRo
 "Portable radio",Sanyo,,,Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",30/04/2016
 "Laptop medium",Hp,,,Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",30/04/2016
 "Small kitchen item",Nespresso,,,Repairable,No,"Alba, CN, Italia","Restarters LangheRoero",30/04/2016
-"Laptop medium",Apple,"MacBook 13 ",,Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",30/04/2016
+"Laptop medium",Apple,"MacBook 13""",,Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",30/04/2016
 "Laptop medium",Dell,,,"End of life",No,"Alba, CN, Italia","Restarters LangheRoero",30/04/2016
 "Desktop computer",Assemblato,,"installato Linux ",Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",30/04/2016
 "Desktop computer",Assemblato,,,Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",30/04/2016
@@ -4859,7 +4859,7 @@ Toy,Clementoni,"Grillo Parlante","Batteria ossidata, rimosso, pulito e riattivat
 Mobile,Samsung,S2,,Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",31/10/2015
 Mobile,Apple,"iPhone 4s",,Repairable,No,"Alba, CN, Italia","Restarters LangheRoero",31/10/2015
 Tablet,Samsung,"Galaxy Tab 2",,Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",31/10/2015
-"Small kitchen item",Mulinex,"macina caffÃ¨",,Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",31/10/2015
+"Small kitchen item",Mulinex,"macina caffè",,Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",31/10/2015
 "Small kitchen item",Rowenta,,,Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",31/10/2015
 Misc,Polti,,"Cambiare resistenza e guarnizione",Repairable,Yes,"Alba, CN, Italia","Restarters LangheRoero",31/10/2015
 Tablet,Acer,"Iconia Tab","tasto accensione incastrato e sprofondato",Fixed,No,"Alba, CN, Italia","Restarters LangheRoero",27/09/2015
@@ -4894,7 +4894,7 @@ Tablet,Apple,"iPad ","schermo rotto",Fixed,No,"Matera, PZ, italia","Restarters L
 "Laptop small",Apple,"MacBook Pro 13","fatta manutenzione sw",Fixed,No,"Matera, PZ, italia","Restarters LangheRoero",08/07/2014
 Mobile,Samsung,S3,"Schermo rotto",Repairable,No,"Matera, PZ, italia","Restarters LangheRoero",09/07/2014
 "PC Accessory",Asus,,Alimentatore,"End of life",No,"Matera, PZ, italia","Restarters LangheRoero",09/07/2014
-"Laptop small",Apple,"MacBook 13 ","Sostituito HD",Fixed,No,Roma,"Restarters LangheRoero",03/03/2015
+"Laptop small",Apple,"MacBook 13""","Sostituito HD",Fixed,No,Roma,"Restarters LangheRoero",03/03/2015
 "Portable radio",Kenwood,,"mostrato come pulire lente ottica",Repairable,No,Roma,"Restarters LangheRoero",03/03/2015
 "Laptop small",asus,"eepc 1201t","rimesso pasta dissipante su cpu",Fixed,No,Milano,"Restarters LangheRoero",12/04/2015
 Tablet,samsung,"galaxy tab ","cambiato display portato dal partecipante",Fixed,No,Milano,"Restarters LangheRoero",12/04/2015
@@ -5145,7 +5145,7 @@ Misc,"Electric saw",,,Fixed,No,"Deichmanske Hovedbibliotek","Restarters Oslo",28
 Headphones,AKG,,"Broken cord",Fixed,No,"Deichmanske Hovedbibliotek","Restarters Oslo",28/01/2017
 Misc,Earplugs,,"One earplugg does not give sound","End of life",No,"Deichmanske Hovedbibliotek","Restarters Oslo",28/01/2017
 "Handheld entertainment device",iPod,,"Turns off after charging",Repairable,No,"Deichmanske Hovedbibliotek","Restarters Oslo",28/01/2017
-Printer/scanner,Nikon,"13 Ã¥r","Bad connection",Fixed,No,"Deichmanske Hovedbibliotek","Restarters Oslo",28/01/2017
+Printer/scanner,Nikon,"13 år","Bad connection",Fixed,No,"Deichmanske Hovedbibliotek","Restarters Oslo",28/01/2017
 "Handheld entertainment device",,,"Bad connection",Fixed,No,"Deichmanske Hovedbibliotek","Restarters Oslo",28/01/2017
 "Decorative or safety lights",,,"Battery case broken",Fixed,No,"Deichmanske Hovedbibliotek","Restarters Oslo",28/01/2017
 Headphones,Bose,"2 years",,Fixed,No,"Deichmanske Hovedbibliotek","Restarters Oslo",28/01/2017
