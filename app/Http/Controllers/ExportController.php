@@ -45,6 +45,9 @@ class ExportController extends Controller {
 
         $Device = new Device;
 
+        // To not display column if the referring URL is therestartproject.org
+        $host = parse_url(\Request::server('HTTP_REFERER'), PHP_URL_HOST);
+
         $data = $Device->export();
         foreach($data as $i => $d){
             /** Fix date **/
@@ -71,7 +74,14 @@ class ExportController extends Controller {
 
             /** clean up linebreaks and commas **/
             $data[$i]->brand = preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d->brand)));
-            $data[$i]->model = preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d->model)));
+
+            // Do not include this column from therestartproject.org
+            if( $host == 'therestartproject.org' ){
+              unset($data[$i]->model);
+            } else {
+              $data[$i]->model = preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d->model)));
+            }
+
             $data[$i]->problem = preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d->problem)));
             $data[$i]->location = preg_replace( "/\r|\n/", "", utf8_encode($d->location));
             $data[$i]->category = utf8_encode($d->category);
@@ -80,18 +90,31 @@ class ExportController extends Controller {
 
         }
 
-        /** lets format the array **/
-        $columns = array(
-              "Category",
-              "Brand",
-              "Model",
-              "Comments",
-              "Repair Status",
-              "Spare parts (needed/used)",
-              "Restart Party Location",
-              "Restart Group",
-              "Restart Party Date",
-        );
+        // Do not include model column
+        if( $host == 'therestartproject.org' ){
+          $columns = array(
+                "Category",
+                "Brand",
+                "Comments",
+                "Repair Status",
+                "Spare parts (needed/used)",
+                "Restart Party Location",
+                "Restart Group",
+                "Restart Party Date",
+          );
+        } else {
+          $columns = array(
+                "Category",
+                "Brand",
+                "Model",
+                "Comments",
+                "Repair Status",
+                "Spare parts (needed/used)",
+                "Restart Party Location",
+                "Restart Group",
+                "Restart Party Date",
+          );
+        }
 
         $filename = 'devices.csv';
 
