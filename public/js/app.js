@@ -30528,6 +30528,26 @@ function updateParticipants() {
     });
 }
 
+function updateVolunteers() {
+    var quantity = $('#volunteer_qty').val();
+    var event_id = $('#event_id').val();
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $("input[name='_token']").val()
+        },
+        type: 'post',
+        url: '/party/update-volunteerquantity',
+        data: { quantity: quantity, event_id: event_id },
+        success: function success(data) {
+            console.log('quantity updated');
+        },
+        error: function error(_error2) {
+            console.log('fail');
+        }
+    });
+}
+
 function numericInputs() {
 
     jQuery('.decrease').on('click', function (e) {
@@ -30541,6 +30561,7 @@ function numericInputs() {
         }
 
         updateParticipants();
+        updateVolunteers();
     });
 
     jQuery('.increase').on('click', function (e) {
@@ -30552,6 +30573,7 @@ function numericInputs() {
         jQuery(this).parent().find('input[type="number"]').val(value + 1);
 
         updateParticipants();
+        updateVolunteers();
     });
 }
 
@@ -30583,7 +30605,7 @@ function removeUser() {
                 alert('Something has gone wrong');
             }
         },
-        error: function error(_error2) {
+        error: function error(_error3) {
             alert('Something has gone wrong');
         }
     });
@@ -31091,7 +31113,7 @@ $(document).ready(function () {
                     //
                     // // $('#manual_invite_box').tokenfield('setTokens', 'blue,red,white');
                 },
-                error: function error(_error3) {
+                error: function error(_error4) {
                     console.log('fail');
                 }
             });
@@ -31142,6 +31164,10 @@ $(document).ready(function () {
 
     $('#participants_qty').on('change', function () {
         updateParticipants();
+    });
+
+    $('#volunteer_qty').on('change', function () {
+        updateVolunteers();
     });
 
     $('.add-device').on('submit', function (e) {
@@ -31350,8 +31376,8 @@ $(document).ready(function () {
                     summary_row.find('.table-tick').hide();
                 }
             },
-            error: function error(_error4) {
-                alert(_error4);
+            error: function error(_error5) {
+                alert(_error5);
             }
         });
     });
@@ -31369,8 +31395,8 @@ $(document).ready(function () {
                     $('#summary-' + $device).fadeOut(1000);
                     $('#row-' + $device).fadeOut(1000);
                 },
-                error: function error(_error5) {
-                    alert(_error5);
+                error: function error(_error6) {
+                    alert(_error6);
                 }
             });
         }
@@ -31389,8 +31415,8 @@ $(document).ready(function () {
                 success: function success(data) {
                     $this.parent().fadeOut(1000);
                 },
-                error: function error(_error6) {
-                    alert(_error6);
+                error: function error(_error7) {
+                    alert(_error7);
                 }
             });
         }

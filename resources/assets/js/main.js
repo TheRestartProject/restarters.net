@@ -599,10 +599,35 @@ function updateParticipants() {
   });
 }
 
+
+function updateVolunteers() {
+  var quantity = $('#volunteer_qty').val();
+  var event_id = $('#event_id').val();
+
+  $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $("input[name='_token']").val()
+      },
+      type: 'post',
+      url: '/party/update-volunteerquantity',
+      data: {quantity : quantity, event_id : event_id},
+      success: function(data) {
+        console.log('quantity updated');
+      },
+      error: function(error) {
+        console.log('fail');
+      }
+  });
+}
+
 $( document ).ready(function() {
 
   $('#participants_qty').on('change', function() {
     updateParticipants();
+  });
+
+  $('#volunteer_qty').on('change', function() {
+    updateVolunteers();
   });
 
   $('#repair_status').on('change', function() {

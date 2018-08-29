@@ -1134,6 +1134,31 @@ class PartyController extends Controller {
 
   }
 
+  public function updateVolunteerQuantity(Request $request) {
+
+    $event_id = $request->input('event_id');
+    $quantity = $request->input('quantity');
+
+    $return = [
+      'success' => false
+    ];
+
+    if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($event_id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+
+      Party::find($event_id)->update([
+        'volunteers' => $quantity,
+      ]);
+
+      $return = [
+        'success' => true
+      ];
+
+    }
+
+    return response()->json($return);
+
+  }
+
   public function removeVolunteer(Request $request) {
 
     $user_id = $request->input('user_id');

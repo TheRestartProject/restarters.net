@@ -473,6 +473,26 @@ function updateParticipants() {
 
 }
 
+function updateVolunteers() {
+  var quantity = $('#volunteer_qty').val();
+  var event_id = $('#event_id').val();
+
+  $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $("input[name='_token']").val()
+      },
+      type: 'post',
+      url: '/party/update-volunteerquantity',
+      data: {quantity : quantity, event_id : event_id},
+      success: function(data) {
+        console.log('quantity updated');
+      },
+      error: function(error) {
+        console.log('fail');
+      }
+  });
+}
+
 function numericInputs() {
 
     jQuery('.decrease').on('click', function (e) {
@@ -486,6 +506,7 @@ function numericInputs() {
         }
 
         updateParticipants();
+        updateVolunteers();
 
     });
 
@@ -499,6 +520,7 @@ function numericInputs() {
         jQuery(this).parent().find('input[type="number"]').val(value + 1);
 
         updateParticipants();
+        updateVolunteers();
 
     });
 }
@@ -1120,6 +1142,10 @@ $( document ).ready(function() {
     updateParticipants();
   });
 
+  $('#volunteer_qty').on('change', function() {
+    updateVolunteers();
+  });
+
   $('.add-device').on('submit', function(e) {
 
     e.preventDefault();
@@ -1220,7 +1246,7 @@ $( document ).ready(function() {
 
         } else {
 
-          alert('Something went wrong, please try again'); 
+          alert('Something went wrong, please try again');
 
         }
 

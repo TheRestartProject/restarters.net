@@ -149,6 +149,9 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::post('/image-upload/{id}', 'PartyController@imageUpload');
     Route::get('/image/delete/{idevents}/{id}/{path}', 'PartyController@deleteImage');
     Route::get('/contribution/{id}', 'PartyController@getContributions');
+
+
+    Route::post('/update-volunteerquantity', 'PartyController@updateVolunteerQuantity');
   });
 
   //Role Controller

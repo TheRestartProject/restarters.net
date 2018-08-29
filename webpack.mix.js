@@ -29,5 +29,5 @@ mix.scripts([
 mix.js('resources/assets/js/app.js', 'public/js')
    .sass('resources/assets/sass/app.scss', 'public/css')
    .browserSync({
-       proxy: 'fixo.meter:8888'
+       proxy: 'fixometer:8888'
     });
