@@ -26,4 +26,4 @@ Scenario: Invalid email address
 
 Scenario: User triggers invitation to an event email
    When the user clicks the send invite button
-   Then the volunteer(s) that the user has sent sent invite to an event would receive an email about information on that event.
+   Then the volunteer that the user has sent sent invite to an event would receive an email about information on that event.

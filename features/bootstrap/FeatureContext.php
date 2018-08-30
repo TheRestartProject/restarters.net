@@ -1311,4 +1311,877 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         //throw new PendingException();
     }
+
+
+// Scenario - RecordVolunteer.feature
+
+    /**
+     * @When a user clicks on add volunteer button, a pop up screen of add volunteer is displayed
+     */
+    public function aUserClicksOnAddVolunteerButtonAPopUpScreenOfAddVolunteerIsDisplayed()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        //$this->clickLink('Add volunteer');
+    }
+
+    /**
+     * @When fill in the fields as follows
+     */
+    public function fillInTheFieldsAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        // $this->fillField('Group member', 'Not registered on fixometer');
+        // $this->fillField('Full name', 'Nora');
+        // $this->fillField('Volunteers email address (optional):', 'nora@fdg.com');
+    }
+
+    /**
+     * @When click on volunteer attended button
+     */
+    public function clickOnVolunteerAttendedButton()
+    {
+       // throw new PendingException();
+        $this->visit('/party/view');
+        //$this->pressButton('Volunteer attended');
+    }
+
+    /**
+     * @Then host will land on event page with the added volunteer in the list of volunteers attended with a message saying the volunteer has bee successfully recorded.
+     */
+    public function hostWillLandOnEventPageWithTheAddedVolunteerInTheListOfVolunteersAttendedWithAMessageSayingTheVolunteerHasBeeSuccessfullyRecorded()
+    {
+       // throw new PendingException();
+       //$this->visit('/party/view');
+       $this->assertPageAddress('/party/view');
+       //$this->assertPageContainsText('Volunteer has successfully been added to event');
+
+    }
+
+    /**
+     * @When a user gives invalid group name
+     */
+    public function aUserGivesInvalidGroupName()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+    }
+
+
+// Scenario - RestartersAttended.feature
+    
+    /**
+     * @When a user clicks on see all attended link in the events page
+     */
+    public function aUserClicksOnSeeAllAttendedLinkInTheEventsPage()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        //$this->pressButton('See all attended');
+    }
+
+    /**
+     * @Then a pop up appears with all the list of restarters that have attended
+     */
+    public function aPopUpAppearsWithAllTheListOfRestartersThatHaveAttended()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party/view');
+       //$this->assertPageContainsText('All restarters attended');
+    }
+
+    /**
+     * @Then can view the host of that party
+     */
+    public function canViewTheHostOfThatParty()
+    {
+       // throw new PendingException();
+        $this->assertPageAddress('/party/view');
+       // $this->assertPageContainsText('Host');
+    }
+
+    /**
+     * @Then can view the restarter name with their skills and also a link to remove the volunteer.
+     */
+    public function canViewTheRestarterNameWithTheirSkillsAndAlsoALinkToRemoveTheVolunteer()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party/view');
+        // $this->assertPageContainsText('Restarter');
+        // $this->assertPageContainsText('Skills');
+        // $this->assertPageContainsText('Remove volunteer');
+    }
+
+
+// Scenario - UpcomingEvent_restarter.feature
+
+    /**
+     * @Given the following account have been created as a restarter
+     */
+    public function theFollowingAccountHaveBeenCreatedAsARestarter(TableNode $table)
+    {
+        //throw new PendingException();
+        $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When a restarter wants to view the upcoming event details- event address, description, attendance
+     */
+    public function aRestarterWantsToViewTheUpcomingEventDetailsEventAddressDescriptionAttendance()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        // $this->assertPageContainsText('Event details');
+        // $this->assertPageContainsText('Description');
+        // $this->assertPageContainsText('Attendance');
+    }
+
+    /**
+     * @Then he can see on the upcoming event page.
+     */
+    public function heCanSeeOnTheUpcomingEventPage()
+    {
+        //throw new PendingException();
+        //$this->visit('/party/view');
+        $this->assertPageAddress('/party/view');
+    }
+
+    /**
+     * @When a restarter wants to attend the party and wants add to calendar
+     */
+    public function aRestarterWantsToAttendThePartyAndWantsAddToCalendar()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then click on add to calendar button
+     */
+    public function clickOnAddToCalendarButton()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then the event will be added to your calendar.
+     */
+    public function theEventWillBeAddedToYourCalendar()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When the volunteer clicks the RSVP button
+     */
+    public function theVolunteerClicksTheRsvpButton()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party/view');
+        //$this->pressButton('RSVP');
+    }
+
+    /**
+     * @Then the host(s) would receive an email about status of the volunteer.
+     */
+    public function theHostSWouldReceiveAnEmailAboutStatusOfTheVolunteer()
+    {
+        //throw new PendingException();
+    }
+
+
+// Scenario - ShareStats.feature
+
+    /**
+     * @When a user wants to share their stats to other places, click on Events stats embed button
+     */
+    public function aUserWantsToShareTheirStatsToOtherPlacesClickOnEventsStatsEmbedButton()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        //$this->pressButton('Share event stats');
+
+    }
+
+    /**
+     * @When a share your stats from this event pop up screen is displayed along with an infogrpahic
+     */
+    public function aShareYourStatsFromThisEventPopUpScreenIsDisplayedAlongWithAnInfogrpahic()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        // $this->isSelected('Headline stats');
+        // $this->isSelected('CO2 equivalence visualisation');
+    }
+
+    /**
+     * @When copy the links required and use them
+     */
+    public function copyTheLinksRequiredAndUseThem()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+    }
+
+    /**
+     * @When click on cancel symbol
+     */
+    public function clickOnCancelSymbol()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then the user will be back on events page.
+     */
+    public function theUserWillBeBackOnEventsPage()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+    }
+
+
+// Scenario - EditEvent.feature
+    
+    /**
+     * @Given the following account have been created as a host or an admin
+     */
+    public function theFollowingAccountHaveBeenCreatedAsAHostOrAnAdmin(TableNode $table)
+    {
+        //throw new PendingException();
+        $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When a host clicks on edit event page and changes\/updates the data as follows
+     */
+    public function aHostClicksOnEditEventPageAndChangesUpdatesTheDataAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+        $this->visit('/party/edit');
+        // $this->fillField('Name of event', 'sdfgdfg');
+        // $this->isSelected('Event group', 'fgdfg');
+        // $this->fillField('Description', 'dfg');
+        // $this->fillField('Date of event', '23/4/2018');
+        // $this->fillField('Start/end time', 'fg');
+        // $this->fillField('Venu address', '22, sefsdfgdfg');
+    }
+
+    /**
+     * @When clicks on save party button
+     */
+    public function clicksOnSavePartyButton()
+    {
+        //throw new PendingException();
+        $this->visit('/party/edit');
+       //$this->pressButton('Save event');
+    }
+
+    /**
+     * @Then host lands on all events page with the edited event in the list of events.
+     */
+    public function hostLandsOnAllEventsPageWithTheEditedEventInTheListOfEvents()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When a host copies and paste into the description box
+     */
+    public function aHostCopiesAndPasteIntoTheDescriptionBox()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When the data should loose all htmls and css properties it has
+     */
+    public function theDataShouldLooseAllHtmlsAndCssPropertiesItHas()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Then it show a message inside description box as text cleaned.
+     */
+    public function itShowAMessageInsideDescriptionBoxAsTextCleaned()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on date field, calendar should pop up
+     */
+    public function aHostClicksOnDateFieldCalendarShouldPopUp()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When select a date when to arrange party
+     */
+    public function selectADateWhenToArrangeParty()
+    {
+       //throw new PendingException();
+    }
+
+    /**
+     * @Then host lands on the same page and continues with next process.
+     */
+    public function hostLandsOnTheSamePageAndContinuesWithNextProcess()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on start time, automatically from then +3hr time is calculated as follows
+     */
+    public function aHostClicksOnStartTimeAutomaticallyFromThenHrTimeIsCalculatedAsFollows(TableNode $table)
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Then that time is stored in the end time field.
+     */
+    public function thatTimeIsStoredInTheEndTimeField()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on venue address, types the address
+     */
+    public function aHostClicksOnVenueAddressTypesTheAddress()
+    {
+       // throw new PendingException();
+        $this->visit('/party/edit');
+        $this->fillField('Venue address');
+    }
+
+    /**
+     * @Then automatically suggestions should show up and the place should be pointed in map.
+     */
+    public function automaticallySuggestionsShouldShowUpAndThePlaceShouldBePointedInMap()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When user clicks on add image text, then file explorer should open
+     */
+    public function userClicksOnAddImageTextThenFileExplorerShouldOpen()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When browse for the image
+     */
+    public function browseForTheImage()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When select the one needed
+     */
+    public function selectTheOneNeeded()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Then you will see the uploaded image thumbnail in that area.
+     */
+    public function youWillSeeTheUploadedImageThumbnailInThatArea()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When the admin clicks the approve event button
+     */
+    public function theAdminClicksTheApproveEventButton()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Then the host would receive an email about confirmation of that event.
+     */
+    public function theHostWouldReceiveAnEmailAboutConfirmationOfThatEvent()
+    {
+        //throw new PendingException();
+    }
+    
+
+// Scenario - EventPermissions.feature
+
+    /**
+     * @Given the following groups:
+     */
+    public function theFollowingGroups(TableNode $table)
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Given the following hosts:
+     */
+    public function theFollowingHosts(TableNode $table)
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Given Fry has created the following event:
+     */
+    public function fryHasCreatedTheFollowingEvent(TableNode $table)
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When Leyla tries to edit the event :arg1
+     */
+    public function leylaTriesToEditTheEvent($arg1)
+    {
+        //throw new PendingException();
+        $this->visit('/party/edit');
+        $this->fillField('Name', $arg1);
+    }
+
+    /**
+     * @Then she is able to do so
+     */
+    public function sheIsAbleToDoSo()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party/edit');
+    }
+
+
+// Scenario - AddAnEvent.feature
+
+    /**
+     * @When a host clicks on event page and fills the data as follows
+     */
+    public function aHostClicksOnEventPageAndFillsTheDataAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+         $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @Then he lands on events page and can see all the events in that page.
+     */
+    public function heLandsOnEventsPageAndCanSeeAllTheEventsInThatPage()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party');
+    }
+
+    /**
+     * @When a host enters all the data needed to create an event
+     */
+    public function aHostEntersAllTheDataNeededToCreateAnEvent()
+    {
+       // throw new PendingException();
+        $this->visit('/party/create');
+        $this->fillField('Name of event', 'sdfgdfg');
+        $this->isSelected('Event group', 'fgdfg');
+        $this->fillField('Description', 'dfg');
+        $this->fillField('Date of event', '23/4/2018');
+        $this->fillField('Start/end time', 'fg');
+        $this->fillField('Venu address', '22, sefsdfgdfg');
+    }
+
+    /**
+     * @When clicks on save button
+     */
+    public function clicksOnSaveButton()
+    {
+       // throw new PendingException();
+        $this->pressButton('Create event');
+    }
+
+    /**
+     * @Then a success message should appear on the same page.
+     */
+    public function aSuccessMessageShouldAppearOnTheSamePage()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When the user clicks on save event button
+     */
+    public function theUserClicksOnSaveEventButton()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then the admin would receive an notification email about event creation for moderation.
+     */
+    public function theAdminWouldReceiveAnNotificationEmailAboutEventCreationForModeration()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When user selects multiple images and click on upload button
+     */
+    public function userSelectsMultipleImagesAndClickOnUploadButton()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Then all the images should be uploaded with view of their thumbnails.
+     */
+    public function allTheImagesShouldBeUploadedWithViewOfTheirThumbnails()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Given logged in as a restarter
+     */
+    public function loggedInAsARestarter()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When the user is on the list of events page
+     */
+    public function theUserIsOnTheListOfEventsPage()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Then there should be no create event button.
+     */
+    public function thereShouldBeNoCreateEventButton()
+    {
+        //throw new PendingException();
+    }
+
+
+// Scenario - ViewAllEvents.feature
+
+    /**
+     * @When a host clicks on event page
+     */
+    public function aHostClicksOnEventPage()
+    {
+        //throw new PendingException();
+        $this->visit('/party');
+    }
+
+    /**
+     * @When a host wants to create a new event, should click on create new event button
+     */
+    public function aHostWantsToCreateANewEventShouldClickOnCreateNewEventButton()
+    {
+        //throw new PendingException();
+        $this->visit('/party');
+        $this->pressButton('Create new event');
+    }
+
+    /**
+     * @Then add an event page opens.
+     */
+    public function addAnEventPageOpens()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/party/create');
+    }
+
+    /**
+     * @When a host wants  to access\/check the group details
+     */
+    public function aHostWantsToAccessCheckTheGroupDetails()
+    {
+        //throw new PendingException();
+        $this->visit('/party/create');
+    }
+
+    /**
+     * @When clicks on the  group name link
+     */
+    public function clicksOnTheGroupNameLink()
+    {
+        //throw new PendingException();
+        $this->visit('/party/create');
+        $this->clickLink('Restart HQ');
+    }
+
+    /**
+     * @Then host lands on that particular group page.
+     */
+    public function hostLandsOnThatParticularGroupPage()
+    {
+        //throw new PendingException();
+        $this->assertPageAddress('/group/view');
+    }
+
+    /**
+     * @When a host\/admin wants to enter device data into a group, click on add a device link
+     */
+    public function aHostAdminWantsToEnterDeviceDataIntoAGroupClickOnAddADeviceLink()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When a restarter who attended the event can only edit the device data, click on edit link
+     */
+    public function aRestarterWhoAttendedTheEventCanOnlyEditTheDeviceDataClickOnEditLink()
+    {
+       //throw new PendingException();
+    }
+
+    /**
+     * @Then lands on the patrticular group page and enter\/edit the data.
+     */
+    public function landsOnThePatrticularGroupPageAndEnterEditTheData()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When a host wants to respond to the invite, click on the link RSVP
+     */
+    public function aHostWantsToRespondToTheInviteClickOnTheLinkRsvp()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then lands on that patrticular page.
+     */
+    public function landsOnThatPatrticularPage()
+    {
+        //throw new PendingException();
+    }
+
+
+// Scenario - AddAGroup.feature
+
+    /**
+     * @When a host clicks on add a group page and fills the data as follows
+     */
+    public function aHostClicksOnAddAGroupPageAndFillsTheDataAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+        $this->visit('/group/create');
+
+        foreach ($table as $row) {
+             $this->fillField('Name of group', $row[]);
+             $this->fillField('Your website', $row[]);
+             $this->fillField('Tell us about your group', $row[]);
+             $this->fillField('Group location', $row[]);
+             $this->fillField('Group image', $row[]);
+        }
+    }
+
+    /**
+     * @When clicks on create group button to create a new group
+     */
+    public function clicksOnCreateGroupButtonToCreateANewGroup()
+    {
+        //throw new PendingException();
+        $this->visit('/group/create');
+        $this->pressButton('Create group');
+    }
+
+    /**
+     * @Then he lands on group page with the newly created group in the list of gropus in that page.
+     */
+    public function heLandsOnGroupPageWithTheNewlyCreatedGroupInTheListOfGropusInThatPage()
+    {
+       //throw new PendingException();
+        //$this->assertPageAddress('/group/create');
+    }
+
+    /**
+     * @When a host clicks on group location, types the address
+     */
+    public function aHostClicksOnGroupLocationTypesTheAddress()
+    {
+        //throw new PendingException();
+    }
+
+
+// Scenario - AllMembersofGroup.feature
+
+    /**
+     * @When a user clicks on Join group from the group page
+     */
+    public function aUserClicksOnJoinGroupFromTheGroupPage()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+        $this->clickLink('Join group');
+    }
+
+    /**
+     * @Then a pop up appears with all the list of restarters with their skills
+     */
+    public function aPopUpAppearsWithAllTheListOfRestartersWithTheirSkills()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then can click on join group button.
+     */
+    public function canClickOnJoinGroupButton()
+    {
+        //throw new PendingException();
+    }
+
+
+// Scenario - BecomeAHost.feature
+
+    /**
+     * @When a restarter clicks on create new group
+     */
+    public function aRestarterClicksOnCreateNewGroup()
+    {
+       // throw new PendingException();
+        $this->visit('/group');
+        $this->pressButton('Create new group');
+    }
+
+    /**
+     * @Then a pop up appears with message and a button to get started.
+     */
+    public function aPopUpAppearsWithMessageAndAButtonToGetStarted()
+    {
+       // throw new PendingException();
+        $this->assertPageAddress('group/create');
+    }
+
+    /**
+     * @When a restarter does not want to create a group and wants to go back to all groups page
+     */
+    public function aRestarterDoesNotWantToCreateAGroupAndWantsToGoBackToAllGroupsPage()
+    {
+        //throw new PendingException();
+        $this->visit('/group/create');
+    }
+
+    /**
+     * @Then he should click on cancel to go back.
+     */
+    public function heShouldClickOnCancelToGoBack()
+    {
+        //throw new PendingException();
+    }
+
+
+// Scenario - EditGroup.feature
+    
+    /**
+     * @When a host clicks on edit group page and edits the data as follows
+     */
+    public function aHostClicksOnEditGroupPageAndEditsTheDataAsFollows(TableNode $table)
+    {
+       //throw new PendingException();
+    }
+
+    /**
+     * @When clicks on approve group button to save the changes
+     */
+    public function clicksOnApproveGroupButtonToSaveTheChanges()
+    {
+        //throw new PendingException();
+        $this->visit('group/edit');
+        $this->pressButton('Approve group');
+    }
+
+    /**
+     * @Then he lands on group page with the edited group in the list of gropus in that page.
+     */
+    public function heLandsOnGroupPageWithTheEditedGroupInTheListOfGropusInThatPage()
+    {
+       // throw new PendingException();
+        $this->assertPageAddress('/group');
+    }
+
+    /**
+     * @When an admin clicks on add new tag link beside group tags and edits the data as follows
+     */
+    public function anAdminClicksOnAddNewTagLinkBesideGroupTagsAndEditsTheDataAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then the edited tag appers in the field with cancel option, if needed we can delete the tag using cancel option.
+     */
+    public function theEditedTagAppersInTheFieldWithCancelOptionIfNeededWeCanDeleteTheTagUsingCancelOption()
+    {
+        //throw new PendingException();
+    }
+
+
+ // Scenario - EventsFilter.feature
+
+    /**
+     * @Given the following account have been created as an admin
+     */
+    public function theFollowingAccountHaveBeenCreatedAsAnAdmin(TableNode $table)
+    {
+        //throw new PendingException();
+        $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When an admin wants to search for an event, fill the fields as follows
+     */
+    public function anAdminWantsToSearchForAnEventFillTheFieldsAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+        $this->visit('/search');
+        // $this->fillField('By group', 'dfg');
+        // $this->fillField('By event', 'test');
+        // $this->fillField('From date', '05/06/2017');
+        // $this->fillField('To date', '05/09/2018');
+        // $this->fillField('Group tag', 'tagtest');
+    }
+
+    /**
+     * @When its not mandatory to fill all the details, they are optional
+     */
+    public function itsNotMandatoryToFillAllTheDetailsTheyAreOptional()
+    {
+        //throw new PendingException();
+         $this->visit('/search');
+    }
+
+    /**
+     * @When click on filter results button
+     */
+    public function clickOnFilterResultsButton()
+    {
+       // throw new PendingException();
+         $this->visit('/search');
+         //$this->pressButton('Filter results');
+    }
+
+    /**
+     * @Then he can view the filtered event results year wise in descending order along with other information.
+     */
+    public function heCanViewTheFilteredEventResultsYearWiseInDescendingOrderAlongWithOtherInformation()
+    {
+       // throw new PendingException();
+         $this->assertPageAddress('/search');
+         $this->assertPageContainsText('Key stats');
+    }
 }

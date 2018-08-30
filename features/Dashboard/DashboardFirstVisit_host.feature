@@ -19,7 +19,7 @@ Scenario: About Getting started
     
 Scenario: Activities present on dashboard
     When host lands on dashboard, he can view Getting started in community repair, How to host an event, Discussion, Wiki and Community news
-    Then the host should explore(by clicking the links provided) all the categories to get familiar with the platform.
+    Then the host should explore by clicking the links provided all the categories to get familiar with the platforms.
 
 Scenario: Host clicks on view the materials link on Getting started in community repair blog on dashboard
     When host clicks on view the materials link on dashboard
