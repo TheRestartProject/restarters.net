@@ -23,7 +23,8 @@ use App\Notifications\ReviewNotes;
 use View;
 use Notification;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Notifications\Messages\MailMessage;
+use Mail;
+use App\Mail\AbnormalDevices;
 
 class DeviceController extends Controller
 {
@@ -539,6 +540,11 @@ class DeviceController extends Controller
     // if the number of devices exceeds 4 then show the following message
     if($deviceCount > 4){
 
+      // Send to all users with the role of Administrator
+      // Mail::to(DB::table('users')->where('role', '=', 2)->email)->send(new AbnormalDevices());
+
+      // Send to the currently logged in user
+      Mail::to(Auth::user()->email)->send(new AbnormalDevices());
       $message  = 'Abnormal number of devices has been added!';
       return response()->json(['error' => $message]);
 
