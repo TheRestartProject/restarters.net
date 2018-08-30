@@ -2181,7 +2181,956 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     public function heCanViewTheFilteredEventResultsYearWiseInDescendingOrderAlongWithOtherInformation()
     {
        // throw new PendingException();
-         $this->assertPageAddress('/search');
+        // $this->assertPageAddress('/search');
+         $this->visit('/search');
          $this->assertPageContainsText('Key stats');
+    }
+
+
+// Scenario - GroupDescription.feature
+
+    /**
+     * @When a restarter wants to know about a group and clicks on read more link
+     */
+    public function aRestarterWantsToKnowAboutAGroupAndClicksOnReadMoreLink()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+        //$this->clickLink('Read more');
+    }
+
+    /**
+     * @Then a pop screen appears with full description of the group.
+     */
+    public function aPopScreenAppearsWithFullDescriptionOfTheGroup()
+    {
+        //throw new PendingException();
+        //$this->assertPageAddress('/group/view');
+         $this->visit('/group/view');
+    }
+
+    /**
+     * @When a restarter wants to close the pop up screen and go back to that group page
+     */
+    public function aRestarterWantsToCloseThePopUpScreenAndGoBackToThatGroupPage()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @Then he can click on cancel, will land on group page.
+     */
+    public function heCanClickOnCancelWillLandOnGroupPage()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+        //$this->assertPageAddress('/group/view');
+        //$this->pressButton('button');
+    }
+
+
+// Scenario - InviteUsertoGroup.feature
+
+    /**
+     * @When a user clicks on Invite to group from the group page
+     */
+    public function aUserClicksOnInviteToGroupFromTheGroupPage()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+        //$this->clickLink('Invite to group');
+    }
+
+    /**
+     * @Then a pop up appears, where email address and message should be entered as follows
+     */
+    public function aPopUpAppearsWhereEmailAddressAndMessageShouldBeEnteredAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+        //$this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+        // $this->fillField('Email addresses:', 'dsf@gfg.com');
+        // $this->fillField('Invitation message', 'hi!');
+    }
+
+    /**
+     * @Then can click on send invite button.
+     */
+    public function canClickOnSendInviteButton()
+    {
+       // throw new PendingException();
+        //$this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+        $this->pressButton('Send Invites');
+    }
+
+    /**
+     * @When the user clicks the send invite to group button
+     */
+    public function theUserClicksTheSendInviteToGroupButton()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+        //$this->clickLink('Invite to group');
+    }
+
+    /**
+     * @Then the volunteer that the user has sent sent invite to group would receive an email about information of that group.
+     */
+    public function theVolunteerThatTheUserHasSentSentInviteToGroupWouldReceiveAnEmailAboutInformationOfThatGroup()
+    {
+        //throw new PendingException();
+    }
+
+
+// Scenario - StatsEmbed.feature
+
+    /**
+     * @When a user wants to share their group stats to other places, click on Group stats embed button
+     */
+    public function aUserWantsToShareTheirGroupStatsToOtherPlacesClickOnGroupStatsEmbedButton()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+        //$this->pressButton('Share group stats');
+    }
+
+    /**
+     * @When a pop up appreas with iframe as headline stats and CO2 equivalence visualisation
+     */
+    public function aPopUpAppreasWithIframeAsHeadlineStatsAndCoEquivalenceVisualisation()
+    {
+       // throw new PendingException();
+        $this->visit('/group/view');
+        //$this->assertPageContainsText('Share your stats');
+    }
+
+    /**
+     * @When preview widget link is useful for how the iframe looks visulally on screen
+     */
+    public function previewWidgetLinkIsUsefulForHowTheIframeLooksVisulallyOnScreen()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Then the user will be back on group page.
+     */
+    public function theUserWillBeBackOnGroupPage()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+        //$this->assertPageAddress('/group/view');
+    }
+
+
+// Scenario - ViewAllGroups(admin).feature
+
+    /**
+     * @When an admin clicks on all groups link from the admin drop down
+     */
+    public function anAdminClicksOnAllGroupsLinkFromTheAdminDropDown()
+    {
+       // throw new PendingException();
+        $this->visit('/group');
+       // $this->clickLink('See all groups');
+    }
+
+    /**
+     * @Then he lands on all groups page and can see all the groups
+     */
+    public function heLandsOnAllGroupsPageAndCanSeeAllTheGroups()
+    {
+        //throw new PendingException();
+        //$this->assertPageAddress('/group/all');
+        $this->visit('/group/all');
+        //$this->assertPageContainsText('All restart groups');
+    }
+
+    /**
+     * @Then can even search for group.
+     */
+    public function canEvenSearchForGroup()
+    {
+        //throw new PendingException();
+        //$this->assertPageAddress('/group/all');
+        $this->visit('/group/all');
+        //$this->assertPageContainsText('By details');
+    }
+
+    /**
+     * @When an admin wants to search group, should enter the fields provided in the By details category as follows
+     */
+    public function anAdminWantsToSearchGroupShouldEnterTheFieldsProvidedInTheByDetailsCategoryAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When the fields here are optional, so can search by only country or only name etc.,
+     */
+    public function theFieldsHereAreOptionalSoCanSearchByOnlyCountryOrOnlyNameEtc()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then the admin can view the filtered group.
+     */
+    public function theAdminCanViewTheFilteredGroup()
+    {
+        //throw new PendingException();
+        $this->visit('/group/all');
+       // $this->assertPageAddress('/group/all');
+    }
+
+    /**
+     * @When a host wants to create a new group, should click on create new group button
+     */
+    public function aHostWantsToCreateANewGroupShouldClickOnCreateNewGroupButton()
+    {
+        //throw new PendingException();
+        $this->visit('/group/all');
+       // $this->pressButton('Create new group');
+    }
+
+    /**
+     * @Then add an group page opens.
+     */
+    public function addAnGroupPageOpens()
+    {
+        //throw new PendingException();
+        //$this->assertPageAddress('/group/create');
+        $this->visit('/group/all');
+
+    }
+
+    /**
+     * @When a host wants to access\/check the group details
+     */
+    public function aHostWantsToAccessCheckTheGroupDetails2()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When clicks on the group name link
+     */
+    public function clicksOnTheGroupNameLink2()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When a host wants to check who are the hosts and restarters
+     */
+    public function aHostWantsToCheckWhoAreTheHostsAndRestarters()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When clicks on the number link under their respective category
+     */
+    public function clicksOnTheNumberLinkUnderTheirRespectiveCategory()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then host can view the details on a pop up screen.
+     */
+    public function hostCanViewTheDetailsOnAPopUpScreen()
+    {
+        //throw new PendingException();
+    }
+
+
+// Scenario - ViewAllGroups.feature 
+
+    /**
+     * @When a host clicks on see all groups link
+     */
+    public function aHostClicksOnSeeAllGroupsLink()
+    {
+       // throw new PendingException();
+        $this->visit('/group');
+        //$this->clickLink('See all groups');
+    }
+
+    /**
+     * @Then he lands on all groups page and can see all the groups in that page.
+     */
+    public function heLandsOnAllGroupsPageAndCanSeeAllTheGroupsInThatPage()
+    {
+        //throw new PendingException();
+        //$this->assertPageAddress('/group/all');
+        $this->visit('/group/all');
+    }
+
+
+// Scenario - ViewGroup_admin.feature
+
+    /**
+     * @When an admin wants to know the information about a group
+     */
+    public function anAdminWantsToKnowTheInformationAboutAGroup()
+    {
+        //throw new PendingException();
+        $this->visit('/group');
+    }
+
+    /**
+     * @Then he can view on the particular group page
+     */
+    public function heCanViewOnTheParticularGroupPage()
+    {
+        //throw new PendingException();
+       // $this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @Then can find all the info like key stats, device breakdown, environmental impact, upcoming evetns and recently completed events.
+     */
+    public function canFindAllTheInfoLikeKeyStatsDeviceBreakdownEnvironmentalImpactUpcomingEvetnsAndRecentlyCompletedEvents()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+        //$this->assertPageContainsText('Key stats');
+    }
+
+    /**
+     * @When an admin wants to go to other group, he can click on Group name dropdown where other group names are present
+     */
+    public function anAdminWantsToGoToOtherGroupHeCanClickOnGroupNameDropdownWhereOtherGroupNamesArePresent()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+        //DROPDOWN??
+    }
+
+    /**
+     * @Then he can easily navigate to other groups.
+     */
+    public function heCanEasilyNavigateToOtherGroups()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @When an admin wants to know about a group
+     */
+    public function anAdminWantsToKnowAboutAGroup()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @Then he can view under about the group section
+     */
+    public function heCanViewUnderAboutTheGroupSection()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+       // $this->assertPageContainsText('About the group');
+    }
+
+    /**
+     * @Then can even click on read more for more info about the group.
+     */
+    public function canEvenClickOnReadMoreForMoreInfoAboutTheGroup()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+        //$this->clickLink('Read more');
+    }
+
+    /**
+     * @When an admin wants to know the volunteers who are present in that group
+     */
+    public function anAdminWantsToKnowTheVolunteersWhoArePresentInThatGroup()
+    {
+        //throw new PendingException();
+          $this->visit('/group/view');
+    }
+
+    /**
+     * @Then he can view under volunteers section.
+     */
+    public function heCanViewUnderVolunteersSection()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+        //$this->assertPageContainsText('Volunteers');
+    }
+
+    /**
+     * @When an admin wants to add the volunteers in that group
+     */
+    public function anAdminWantsToAddTheVolunteersInThatGroup()
+    {
+       // throw new PendingException();
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @Then he can click invite to group link under volunteers section.
+     */
+    public function heCanClickInviteToGroupLinkUnderVolunteersSection()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+        //$this->assertPageContainsText('Invite to group');
+    }
+
+    /**
+     * @When an admin wants to add an event
+     */
+    public function anAdminWantsToAddAnEvent()
+    {
+       // throw new PendingException();
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @Then he can click on add event link
+     */
+    public function heCanClickOnAddEventLink()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+        //$this->pressButton('Add event');
+    }
+
+    /**
+     * @Then can RSVP and can also add a device by clicking on respective links.
+     */
+    public function canRsvpAndCanAlsoAddADeviceByClickingOnRespectiveLinks()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/party/view');
+        $this->visit('/party/view');
+        //$this->pressButton('RSVP');
+    }
+
+    /**
+     * @When an admin wants to see all the events that completed recently
+     */
+    public function anAdminWantsToSeeAllTheEventsThatCompletedRecently()
+    {
+        //throw new PendingException();
+        $this->visit('/party');
+        //$this->assertPageContainsText('Past events');
+    }
+
+    /**
+     * @Then he can click on see all events links
+     */
+    public function heCanClickOnSeeAllEventsLinks()
+    {
+       // throw new PendingException();
+        // $this->assertPageAddress('/party');
+        $this->visit('/party');
+    }
+
+    /**
+     * @Then can add a device by clicking on its link.
+     */
+    public function canAddADeviceByClickingOnItsLink()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/party/view');
+        $this->visit('/party/view');
+        //$this->pressButton('Add');
+    }
+
+
+// Scenario - ViewGroup_host.feature
+
+    /**
+     * @When a host wants to know the information about a group
+     */
+    public function aHostWantsToKnowTheInformationAboutAGroup()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+
+    }
+
+    /**
+     * @Then can find all the info like group address, website, key stats, device breakdown, environmental impact, upcoming events and recently completed events.
+     */
+    public function canFindAllTheInfoLikeGroupAddressWebsiteKeyStatsDeviceBreakdownEnvironmentalImpactUpcomingEventsAndRecentlyCompletedEvents()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/group/view');
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @When a host wants to know about a group
+     */
+    public function aHostWantsToKnowAboutAGroup()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @When a host wants to know the volunteers who are present in that group
+     */
+    public function aHostWantsToKnowTheVolunteersWhoArePresentInThatGroup()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+       // $this->assertPageContainsText('See all volunteers');
+    }
+
+    /**
+     * @When a host wants to add the volunteers in that group
+     */
+    public function aHostWantsToAddTheVolunteersInThatGroup()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+       // $this->clickLink('Invite volunteers to group');
+    }
+
+    /**
+     * @When a host wants to add an event
+     */
+    public function aHostWantsToAddAnEvent()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+        //$this->pressButton('Add event');
+    }
+
+    /**
+     * @When a host wants to see all the events that completed recently
+     */
+    public function aHostWantsToSeeAllTheEventsThatCompletedRecently()
+    {
+        //throw new PendingException();
+        $this->visit('/party');
+    }
+
+
+// Scenario - ViewGroup_restarter.feature
+
+    /**
+     * @When a restarter wants to know the information about a group
+     */
+    public function aRestarterWantsToKnowTheInformationAboutAGroup()
+    {
+       // throw new PendingException();
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @When a restarter wants to know about a group
+     */
+    public function aRestarterWantsToKnowAboutAGroup()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @When a restarter wants to know the volunteers who are present in that group
+     */
+    public function aRestarterWantsToKnowTheVolunteersWhoArePresentInThatGroup()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+       // $this->clickLink('View all volunteers');
+    }
+
+    /**
+     * @When a restarter wants to join as a volunteer in that group
+     */
+    public function aRestarterWantsToJoinAsAVolunteerInThatGroup()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @Then he can click on join gropu link under volunteers section.
+     */
+    public function heCanClickOnJoinGropuLinkUnderVolunteersSection()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+        //$this->clickLink('Join group');
+    }
+
+    /**
+     * @When a restarter wants to attend an event
+     */
+    public function aRestarterWantsToAttendAnEvent()
+    {
+        //throw new PendingException();
+        $this->visit('/party');
+    }
+
+    /**
+     * @Then he can click on RSVP link
+     */
+    public function heCanClickOnRsvpLink()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+       // $this->pressButton('RSVP');
+
+    }
+
+    /**
+     * @Then can add a device to an event which is happening by clicking on add a device link.
+     */
+    public function canAddADeviceToAnEventWhichIsHappeningByClickingOnAddADeviceLink()
+    {
+        //throw new PendingException();
+        $this->visit('/party/view');
+        $this->pressButton('Add');
+    }
+
+    /**
+     * @When a restarter wants to see all the events that completed recently
+     */
+    public function aRestarterWantsToSeeAllTheEventsThatCompletedRecently()
+    {
+       // throw new PendingException();
+        $this->visit('/party');
+    }
+
+    /**
+     * @When the restarter clicks on join group button
+     */
+    public function theRestarterClicksOnJoinGroupButton()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+        $this->clickLink('Join group');
+    }
+
+    /**
+     * @Then the host would receive an notification email about that restarter joining the group.
+     */
+    public function theHostWouldReceiveAnNotificationEmailAboutThatRestarterJoiningTheGroup()
+    {
+        //throw new PendingException();
+    }
+
+
+// Scenario - YourGroups.feature
+
+    /**
+     * @When a host clicks on group page
+     */
+    public function aHostClicksOnGroupPage()
+    {
+        //throw new PendingException();
+        $this->visit('/group/view');
+    }
+
+    /**
+     * @Then he lands on group page and can see all the groups in that page
+     */
+    public function heLandsOnGroupPageAndCanSeeAllTheGroupsInThatPage()
+    {
+        //throw new PendingException();
+       // $this->assertPageAddress('/group');
+        $this->visit('/group');
+    }
+
+    /**
+     * @Then one section is the list of groups that host is involved
+     */
+    public function oneSectionIsTheListOfGroupsThatHostIsInvolved()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/group');
+        $this->visit('/group');
+       // $this->assertPageContainsText('Your groups');
+    }
+
+    /**
+     * @Then other section is the list of groups that are near to the host along with a see all groups link.
+     */
+    public function otherSectionIsTheListOfGroupsThatAreNearToTheHostAlongWithASeeAllGroupsLink()
+    {
+        //throw new PendingException();
+        // $this->assertPageAddress('/group');
+        $this->visit('/group');
+         // $this->assertPageContainsText('Groups nearest to you');
+    }
+
+
+// Scenario - EditDevice.feature
+    
+    /**
+     * @When a restarter clicks on edit devices page
+     */
+    public function aRestarterClicksOnEditDevicesPage()
+    {
+        //throw new PendingException();
+        $this->visit('/device/page-edit');
+    }
+
+    /**
+     * @When change\/update the fields as follows
+     */
+    public function changeUpdateTheFieldsAsFollows(TableNode $table)
+    {
+       // throw new PendingException();
+        $this->visit('/device/page-edit');
+    }
+
+    /**
+     * @When click on save device to save the changes
+     */
+    public function clickOnSaveDeviceToSaveTheChanges()
+    {
+        //throw new PendingException();
+        $this->visit('/device/page-edit');
+       // $this->pressButton('Save device');
+    }
+
+    /**
+     * @Then you will land on all devices page with the edited device on the list of devices.
+     */
+    public function youWillLandOnAllDevicesPageWithTheEditedDeviceOnTheListOfDevices()
+    {
+        //throw new PendingException();
+        //  $this->assertPageAddress('/device');
+        $this->visit('/device');
+    }
+
+    /**
+     * @When a restarter wants to delete a device, click on delete device button
+     */
+    public function aRestarterWantsToDeleteADeviceClickOnDeleteDeviceButton()
+    {
+        //throw new PendingException();
+        $this->visit('/device/page-edit');
+       // $this->pressButton('Delete device');
+    }
+
+    /**
+     * @Then you will land on all devices page and you won't be able to see the deleted device from the list of devices.
+     */
+    public function youWillLandOnAllDevicesPageAndYouWontBeAbleToSeeTheDeletedDeviceFromTheListOfDevices()
+    {
+       // throw new PendingException();
+      //  $this->assertPageAddress('/device');
+        $this->visit('/device');
+    }
+
+
+// Scenario - ViewAllDevices.feature
+
+    /**
+     * @When a restarter clicks on devices page
+     */
+    public function aRestarterClicksOnDevicesPage()
+    {
+        //throw new PendingException();
+        $this->visit('/device');
+    }
+
+    /**
+     * @Then he can see all the devices starting from recent ones on the top of the page.
+     */
+    public function heCanSeeAllTheDevicesStartingFromRecentOnesOnTheTopOfThePage()
+    {
+       // throw new PendingException();
+       // $this->assertPageAddress('/device');
+        $this->visit('/device');
+    }
+
+    /**
+     * @When a restarter wants to search for the devices, he can fill the fields as he want to search as follows
+     */
+    public function aRestarterWantsToSearchForTheDevicesHeCanFillTheFieldsAsHeWantToSearchAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When should click on search all devices button
+     */
+    public function shouldClickOnSearchAllDevicesButton()
+    {
+       // throw new PendingException();
+        $this->visit('/device');
+        //$this->pressButton('Search all devices');
+    }
+
+    /**
+     * @Then user can view the list or a particular device that searched for.
+     */
+    public function userCanViewTheListOrAParticularDeviceThatSearchedFor()
+    {
+        //throw new PendingException();
+        $this->visit('/device');
+    }
+
+
+// Scenario - BreakdownbyCountry.feature
+   
+    /**
+     * @When a restarter wants to see the total time volunteered country wise, click on see all results link in breakdown by country section
+     */
+    public function aRestarterWantsToSeeTheTotalTimeVolunteeredCountryWiseClickOnSeeAllResultsLinkInBreakdownByCountrySection()
+    {
+        //throw new PendingException();
+        $this->visit('/reporting/time-volunteered');
+       // $this->clickLink('See all results');
+    }
+
+    /**
+     * @Then a pop up appears with all the country names and the time volunteered in the countries.
+     */
+    public function aPopUpAppearsWithAllTheCountryNamesAndTheTimeVolunteeredInTheCountries()
+    {
+       // throw new PendingException();
+        //$this->assertPageAddress('/reporting/time-volunteered');
+          $this->visit('/reporting/time-volunteered');
+        //$this->assertPageContainsText('Volunteer hours grouped by volunteer country.');
+    }
+
+    /**
+     * @When a restarter wants to go back to time volunteered page, click on Cancel
+     */
+    public function aRestarterWantsToGoBackToTimeVolunteeredPageClickOnCancel()
+    {
+        //throw new PendingException();
+          $this->visit('/reporting/time-volunteered');
+         // $this->pressButton('button');
+    }
+
+    /**
+     * @Then the restarter will go back to time volunteered page.
+     */
+    public function theRestarterWillGoBackToTimeVolunteeredPage()
+    {
+        //throw new PendingException();
+        //$this->assertPageAddress('/reporting/time-volunteered');
+          $this->visit('/reporting/time-volunteered');
+    }
+
+
+// Scenario - Impact Analysis.feature
+
+    /**
+     * @Given the following events:
+     */
+    public function theFollowingEvents(TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Given the following devices logged for the :arg1 event:
+     */
+    public function theFollowingDevicesLoggedForTheEvent($arg1, TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When viewing the stats for the :arg1 event
+     */
+    public function viewingTheStatsForTheEvent($arg1)
+    {
+        //throw new PendingException();
+
+    }
+
+    /**
+     * @Then the stats should be:
+     */
+    public function theStatsShouldBe(TableNode $table)
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When viewing the stats for the :arg1 group
+     */
+    public function viewingTheStatsForTheGroup($arg1)
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Then the stats should be:
+     */
+    // public function theStatsShouldBe()
+    // {
+    //    // throw new PendingException();
+    // }
+
+
+// Scenario - Timevolunteered.feature
+    
+    /**
+     * @When a restarter wants to see the total time volunteered
+     */
+    public function aRestarterWantsToSeeTheTotalTimeVolunteered()
+    {
+        //throw new PendingException();
+        $this->visit('/reporting/time-volunteered');
+    }
+
+    /**
+     * @Then he can see all the information about volunteered time on time volunteered page.
+     */
+    public function heCanSeeAllTheInformationAboutVolunteeredTimeOnTimeVolunteeredPage()
+    {
+       // throw new PendingException();
+         //$this->assertPageAddress('/reporting/time-volunteered');
+         $this->visit('/reporting/time-volunteered');
+    }
+
+    /**
+     * @When a restarter wants to search for a particular period of time volunteered, he can fill the fields as he want to search as follows
+     */
+    public function aRestarterWantsToSearchForAParticularPeriodOfTimeVolunteeredHeCanFillTheFieldsAsHeWantToSearchAsFollows(TableNode $table)
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When should click on search all time volunteered
+     */
+    public function shouldClickOnSearchAllTimeVolunteered()
+    {
+        //throw new PendingException();
+         $this->visit('/reporting/time-volunteered');
+         //$this->pressButton('Search time volunteered');
+    }
+
+    /**
+     * @Then user can view the list of time volunteered.
+     */
+    public function userCanViewTheListOfTimeVolunteered()
+    {
+        //throw new PendingException();
+         //$this->assertPageAddress('/reporting/time-volunteered');
+         $this->visit('/reporting/time-volunteered');
     }
 }
