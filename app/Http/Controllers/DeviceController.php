@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Notifications\ReviewNotes;
 use View;
 use Notification;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class DeviceController extends Controller
 {
@@ -64,94 +66,94 @@ class DeviceController extends Controller
 
   public function index($search = null){
 
-      $Category   = new Category;
-      $Group      = new Group;
-      $Device     = new Device;
+    $Category   = new Category;
+    $Group      = new Group;
+    $Device     = new Device;
 
-      $categories = $Category->listed();
+    $categories = $Category->listed();
 
-      if(isset($_GET['fltr']) && !empty($_GET['fltr'])){
+    if(isset($_GET['fltr']) && !empty($_GET['fltr'])){
 
-        // Get params and clean them up
-        // DATES...
-        if(isset($_GET['from-date']) && !empty($_GET['from-date'])){
-          if (!DateTime::createFromFormat('d/m/Y', $_GET['from-date'])) {
-            $response['danger'] = 'Invalid "from date"';
-            $fromTimeStamp = null;
-          }
-          else {
-            $fromDate = DateTime::createFromFormat('d/m/Y', $_GET['from-date']);
-            $fromTimeStamp = strtotime($fromDate->format('Y-m-d'));
-          }
-        }
-        else{
-          $fromTimeStamp = 1;
-        }
-
-        if(isset($_GET['to-date']) && !empty($_GET['to-date'])){
-          if (!DateTime::createFromFormat('d/m/Y', $_GET['to-date'])) {
-            $response['danger'] = 'Invalid "to date"';
-          }
-          else {
-            $toDate = DateTime::createFromFormat('d/m/Y', $_GET['to-date']);
-            $toTimeStamp = strtotime($toDate->format('Y-m-d'));
-          }
+      // Get params and clean them up
+      // DATES...
+      if(isset($_GET['from-date']) && !empty($_GET['from-date'])){
+        if (!DateTime::createFromFormat('d/m/Y', $_GET['from-date'])) {
+          $response['danger'] = 'Invalid "from date"';
+          $fromTimeStamp = null;
         }
         else {
-          $toTimeStamp = time();
+          $fromDate = DateTime::createFromFormat('d/m/Y', $_GET['from-date']);
+          $fromTimeStamp = strtotime($fromDate->format('Y-m-d'));
         }
-
-        $params = array(
-          'brand'       => filter_var($_GET['brand'], FILTER_SANITIZE_STRING),
-          'model'       => filter_var($_GET['model'], FILTER_SANITIZE_STRING),
-          'problem'     => filter_var($_GET['free-text'], FILTER_SANITIZE_STRING),
-
-          'category'    => isset($_GET['categories']) ? filter_var($_GET['categories'], FILTER_SANITIZE_STRING) : null,//isset($_GET['categories']) ? implode(', ', filter_var_array($_GET['categories'], FILTER_SANITIZE_NUMBER_INT)) : null,
-          'group'       => isset($_GET['groups']) ? filter_var($_GET['groups'], FILTER_SANITIZE_STRING) : null,//isset($_GET['groups']) ? implode(', ', filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT)) : null,
-
-          'event_date'  => array($fromTimeStamp,  $toTimeStamp)
-
-        );
-
-
-        $list = $Device->getList($params);
-
-      } else {
-        $list = $Device->getList();
+      }
+      else{
+        $fromTimeStamp = 1;
       }
 
-      $user = Auth::user();
-
-      if (FixometerHelper::hasRole($user, 'Administrator')) {
-        $all_groups = Group::all();
-
-        $all_devices = DeviceList::orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
-      } else {
-        $groups_user_ids = UserGroups::where('user', $user->id)
-                                ->pluck('group')
-                                ->toArray();
-
-        $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
-
-        $all_devices = DeviceList::whereIn('id', $device_ids)->orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
-
-        $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
+      if(isset($_GET['to-date']) && !empty($_GET['to-date'])){
+        if (!DateTime::createFromFormat('d/m/Y', $_GET['to-date'])) {
+          $response['danger'] = 'Invalid "to date"';
+        }
+        else {
+          $toDate = DateTime::createFromFormat('d/m/Y', $_GET['to-date']);
+          $toTimeStamp = strtotime($toDate->format('Y-m-d'));
+        }
+      }
+      else {
+        $toTimeStamp = time();
       }
 
-      return view('device.index', [
-        'title' => 'Devices',
-        'categories' => $categories,
-        'groups' => $all_groups,
-        'list' => $all_devices,
-        'selected_groups' => null,
-        'selected_categories' => null,
-        'from_date' => null,
-        'to_date' => null,
-        'device_id' => null,
-        'brand' => null,
-        'model' => null,
-        'problem' => null,
-      ]);
+      $params = array(
+        'brand'       => filter_var($_GET['brand'], FILTER_SANITIZE_STRING),
+        'model'       => filter_var($_GET['model'], FILTER_SANITIZE_STRING),
+        'problem'     => filter_var($_GET['free-text'], FILTER_SANITIZE_STRING),
+
+        'category'    => isset($_GET['categories']) ? filter_var($_GET['categories'], FILTER_SANITIZE_STRING) : null,//isset($_GET['categories']) ? implode(', ', filter_var_array($_GET['categories'], FILTER_SANITIZE_NUMBER_INT)) : null,
+        'group'       => isset($_GET['groups']) ? filter_var($_GET['groups'], FILTER_SANITIZE_STRING) : null,//isset($_GET['groups']) ? implode(', ', filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT)) : null,
+
+        'event_date'  => array($fromTimeStamp,  $toTimeStamp)
+
+      );
+
+
+      $list = $Device->getList($params);
+
+    } else {
+      $list = $Device->getList();
+    }
+
+    $user = Auth::user();
+
+    if (FixometerHelper::hasRole($user, 'Administrator')) {
+      $all_groups = Group::all();
+
+      $all_devices = DeviceList::orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
+    } else {
+      $groups_user_ids = UserGroups::where('user', $user->id)
+      ->pluck('group')
+      ->toArray();
+
+      $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
+
+      $all_devices = DeviceList::whereIn('id', $device_ids)->orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
+
+      $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
+    }
+
+    return view('device.index', [
+      'title' => 'Devices',
+      'categories' => $categories,
+      'groups' => $all_groups,
+      'list' => $all_devices,
+      'selected_groups' => null,
+      'selected_categories' => null,
+      'from_date' => null,
+      'to_date' => null,
+      'device_id' => null,
+      'brand' => null,
+      'model' => null,
+      'problem' => null,
+    ]);
 
   }
 
@@ -164,36 +166,36 @@ class DeviceController extends Controller
     $categories = $Category->listed();
 
     if ($request->input('categories') !== null) {
-        $all_devices = $all_devices->whereIn('idcategory', $request->input('categories'));
+      $all_devices = $all_devices->whereIn('idcategory', $request->input('categories'));
     }
 
     if ($request->input('groups') !== null) {
-        $all_devices = $all_devices->whereIn('idgroup', $request->input('groups'));
+      $all_devices = $all_devices->whereIn('idgroup', $request->input('groups'));
     }
 
     if ($request->input('from-date') !== null && $request->input('to-date') == null) {
-        $all_devices = $all_devices->where('event_date', '>', strtotime($request->input('from-date')));
+      $all_devices = $all_devices->where('event_date', '>', strtotime($request->input('from-date')));
     } elseif ($request->input('to-date') !== null && $request->input('from-date') == null) {
-        $all_devices = $all_devices->where('event_date', '<', strtotime($request->input('to-date')));
+      $all_devices = $all_devices->where('event_date', '<', strtotime($request->input('to-date')));
     } elseif ($request->input('to-date') !== null && $request->input('from-date') !== null) {
-        $all_devices = $all_devices->whereBetween('event_date', array(strtotime($request->input('from-date')),
-                                                                strtotime($request->input('to-date'))));
+      $all_devices = $all_devices->whereBetween('event_date', array(strtotime($request->input('from-date')),
+      strtotime($request->input('to-date'))));
     }
 
     if ($request->input('device_id') !== null) {
-        $all_devices = $all_devices->where('id', 'like', $request->input('device_id').'%');
+      $all_devices = $all_devices->where('id', 'like', $request->input('device_id').'%');
     }
 
     if ($request->input('brand') !== null) {
-        $all_devices = $all_devices->where('brand', 'like', '%'.$request->input('brand').'%');
+      $all_devices = $all_devices->where('brand', 'like', '%'.$request->input('brand').'%');
     }
 
     if ($request->input('model') !== null) {
-        $all_devices = $all_devices->where('model', 'like', '%'.$request->input('model').'%');
+      $all_devices = $all_devices->where('model', 'like', '%'.$request->input('model').'%');
     }
 
     if ($request->input('problem') !== null) {
-        $all_devices = $all_devices->where('problem', 'like', '%'.$request->input('problem').'%');
+      $all_devices = $all_devices->where('problem', 'like', '%'.$request->input('problem').'%');
     }
 
     $user = Auth::user();
@@ -202,8 +204,8 @@ class DeviceController extends Controller
       $all_groups = Group::all();
     } else {
       $groups_user_ids = UserGroups::where('user', $user->id)
-                              ->pluck('group')
-                              ->toArray();
+      ->pluck('group')
+      ->toArray();
 
       $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
 
@@ -233,188 +235,188 @@ class DeviceController extends Controller
   }
 
   public function edit($id){
-      // $this->set('title', 'Edit Device');
+    // $this->set('title', 'Edit Device');
 
-      $device = Device::find($id);
+    $device = Device::find($id);
 
-      $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
+    $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
 
-      $user = Auth::user();
-      if(FixometerHelper::hasRole($user, 'Administrator') || !empty($is_attending) ){
+    $user = Auth::user();
+    if(FixometerHelper::hasRole($user, 'Administrator') || !empty($is_attending) ){
 
-          $is_host = FixometerHelper::userHasEditPartyPermission($device->event, $user->id);
+      $is_host = FixometerHelper::userHasEditPartyPermission($device->event, $user->id);
 
-          $Device = new Device;
+      $Device = new Device;
 
-          if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)){
+      if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)){
 
-              $data = $_POST;
-              // remove the extra "files" field that Summernote generates -
-              unset($data['files']);
-              unset($data['users']);
+        $data = $_POST;
+        // remove the extra "files" field that Summernote generates -
+        unset($data['files']);
+        unset($data['users']);
 
-              $old_wiki = Device::find($id)->wiki;
+        $old_wiki = Device::find($id)->wiki;
 
-              if (isset($data['wiki'])) {
-                $wiki = 1;
-              } else {
-                $wiki = 0;
-              }
+        if (isset($data['wiki'])) {
+          $wiki = 1;
+        } else {
+          $wiki = 0;
+        }
 
-              //Send Wiki Notification to Admins
-              if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
-                $all_admins = User::where('role', 2)->get();
-                $group_id = Party::find($data['event'])->group;
+        //Send Wiki Notification to Admins
+        if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
+          $all_admins = User::where('role', 2)->get();
+          $group_id = Party::find($data['event'])->group;
 
-                $arr = [
-                  'group_url' => url('/group/view/'.$group_id),
-                  'preferences' => url('/profile/edit'),
-                ];
+          $arr = [
+            'group_url' => url('/group/view/'.$group_id),
+            'preferences' => url('/profile/edit'),
+          ];
 
-                Notification::send($all_admins, new ReviewNotes($arr));
-              }
+          Notification::send($all_admins, new ReviewNotes($arr));
+        }
 
-              // formatting dates for the DB
-              //$data['event_date'] = dbDateNoTime($data['event_date']);
+        // formatting dates for the DB
+        //$data['event_date'] = dbDateNoTime($data['event_date']);
 
-              if( !isset($data['repair_more']) || empty($data['repair_more']) ) //Override
-                $data['repair_more'] = 0;
+        if( !isset($data['repair_more']) || empty($data['repair_more']) ) //Override
+        $data['repair_more'] = 0;
 
-              if( $data['repair_status'] != 2 ) //Override
-                $data['repair_more'] = 0;
+        if( $data['repair_status'] != 2 ) //Override
+        $data['repair_more'] = 0;
 
-              if( $data['repair_more'] == 1 ){
-                $more_time_needed = 1;
-              } else {
-                $more_time_needed = 0;
-              }
+        if( $data['repair_more'] == 1 ){
+          $more_time_needed = 1;
+        } else {
+          $more_time_needed = 0;
+        }
 
-              if( $data['repair_more'] == 2 ){
-                $professional_help = 1;
-              } else {
-                $professional_help = 0;
-              }
+        if( $data['repair_more'] == 2 ){
+          $professional_help = 1;
+        } else {
+          $professional_help = 0;
+        }
 
-              if( $data['repair_more'] == 3 ){
-                $do_it_yourself = 1;
-              } else {
-                $do_it_yourself = 0;
-              }
+        if( $data['repair_more'] == 3 ){
+          $do_it_yourself = 1;
+        } else {
+          $do_it_yourself = 0;
+        }
 
-              $update = array(
-                  'event'             => $data['event'],
-                  'category'          => $data['category'],
-                  'category_creation' => $data['category'],
-                  'repair_status'     => $data['repair_status'],
-                  'spare_parts'       => $data['spare_parts'],
-                  'brand'             => $data['brand'],
-                  'model'             => $data['model'],
-                  'problem'           => $data['problem'],
-                  'age'               => $data['age'],
-                  'more_time_needed'  => $more_time_needed,
-                  'professional_help' => $professional_help,
-                  'do_it_yourself'    => $do_it_yourself,
-                  'wiki'              => $wiki,
-              );
+        $update = array(
+          'event'             => $data['event'],
+          'category'          => $data['category'],
+          'category_creation' => $data['category'],
+          'repair_status'     => $data['repair_status'],
+          'spare_parts'       => $data['spare_parts'],
+          'brand'             => $data['brand'],
+          'model'             => $data['model'],
+          'problem'           => $data['problem'],
+          'age'               => $data['age'],
+          'more_time_needed'  => $more_time_needed,
+          'professional_help' => $professional_help,
+          'do_it_yourself'    => $do_it_yourself,
+          'wiki'              => $wiki,
+        );
 
-              $u = $Device->where('iddevices', $id)->update($update);
+        $u = $Device->where('iddevices', $id)->update($update);
 
-              if(!$u) {
-                  $response['danger'] = 'Something went wrong. Please check the data and try again.';
-              }
-              else {
-                  $response['success'] = 'Device updated!';
+        if(!$u) {
+          $response['danger'] = 'Something went wrong. Please check the data and try again.';
+        }
+        else {
+          $response['success'] = 'Device updated!';
 
 
-                  /** let's create the image attachment! **/
-                  if(isset($_FILES) && !empty($_FILES)){
-                      $file = new FixometerFile;
-                      $file->upload('devicePhoto', 'image', $id, env('TBL_DEVICES'), true);
-                  }
-
-              }
-
-          }
-          $Events = New Party;
-          $Categories = New Category;
-          $File = New FixometerFile;
-
-          $UserEvents = $Events->findAll();
-
-          $device = $Device->findOne($id);
-
-          if (!isset($response)) {
-            $response = null;
+          /** let's create the image attachment! **/
+          if(isset($_FILES) && !empty($_FILES)){
+            $file = new FixometerFile;
+            $file->upload('devicePhoto', 'image', $id, env('TBL_DEVICES'), true);
           }
 
-          $images = $File->findImages(env('TBL_DEVICES'), $id);
-
-          if (!isset($images)) {
-            $images = null;
-          }
-
-          $brands = Brands::all();
-
-          return view('device.edit', [
-            'title' => 'Edit Device',
-            'response' => $response,
-            'categories' => $Categories->findAll(),
-            'events' => $UserEvents,
-            'formdata' => $device,
-            'brands' => $brands,
-            'user' => $user,
-            'is_host' => $is_host,
-            'images' => $images,
-          ]);
+        }
 
       }
-      else {
-          return redirect('/user/forbidden');
+      $Events = New Party;
+      $Categories = New Category;
+      $File = New FixometerFile;
+
+      $UserEvents = $Events->findAll();
+
+      $device = $Device->findOne($id);
+
+      if (!isset($response)) {
+        $response = null;
       }
+
+      $images = $File->findImages(env('TBL_DEVICES'), $id);
+
+      if (!isset($images)) {
+        $images = null;
+      }
+
+      $brands = Brands::all();
+
+      return view('device.edit', [
+        'title' => 'Edit Device',
+        'response' => $response,
+        'categories' => $Categories->findAll(),
+        'events' => $UserEvents,
+        'formdata' => $device,
+        'brands' => $brands,
+        'user' => $user,
+        'is_host' => $is_host,
+        'images' => $images,
+      ]);
+
+    }
+    else {
+      return redirect('/user/forbidden');
+    }
   }
 
 
   public function ajax_update($id){
+    $this->set('title', 'Edit Device');
+    if(hasRole($this->user, 'Administrator') || hasRole($this->user, 'Host') ){
+      $Categories = new Category;
+      $Device = $this->Device->findOne($id);
+
       $this->set('title', 'Edit Device');
-      if(hasRole($this->user, 'Administrator') || hasRole($this->user, 'Host') ){
-          $Categories = new Category;
-          $Device = $this->Device->findOne($id);
+      $this->set('categories', $Categories->listed());
+      $this->set('formdata', $Device);
 
-          $this->set('title', 'Edit Device');
-          $this->set('categories', $Categories->listed());
-          $this->set('formdata', $Device);
+      return view('device.edit', [
+        'title' => 'Edit Device',
+        'categories' => $Categories->findAll(),
+        'formdata' => $Device,
+      ]);
 
-          return view('device.edit', [
-            'title' => 'Edit Device',
-            'categories' => $Categories->findAll(),
-            'formdata' => $Device,
-          ]);
-
-      }
-      else {
-          header('Location: /user/forbidden');
-      }
+    }
+    else {
+      header('Location: /user/forbidden');
+    }
   }
 
   public function ajax_update_save($id){
     if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)){
 
-        $data = $_POST;
-        $u = $this->Device->update($data, $id);
+      $data = $_POST;
+      $u = $this->Device->update($data, $id);
 
-        if(!$u) {
-            $response['response_type'] = 'danger';
-            $response['message'] = 'Something went wrong. Please check the data and try again.';
+      if(!$u) {
+        $response['response_type'] = 'danger';
+        $response['message'] = 'Something went wrong. Please check the data and try again.';
 
-        }
-        else {
-            $response['response_type'] = 'success';
-            $response['message'] = 'Device updated!';
-            $response['data'] = $data;
-            $response['id'] = $id;
-        }
+      }
+      else {
+        $response['response_type'] = 'success';
+        $response['message'] = 'Device updated!';
+        $response['data'] = $data;
+        $response['id'] = $id;
+      }
 
-        echo json_encode($response);
+      echo json_encode($response);
     }
   }
 
@@ -422,80 +424,80 @@ class DeviceController extends Controller
 
 
   public function create(){
-      $user = Auth::user();
+    $user = Auth::user();
 
-      if( FixometerHelper::hasRole($user, 'Restarter') ){
-          header('Location: /user/forbidden');
-      } else {
-          $Events = New Party;
-          $Categories = New Category;
+    if( FixometerHelper::hasRole($user, 'Restarter') ){
+      header('Location: /user/forbidden');
+    } else {
+      $Events = New Party;
+      $Categories = New Category;
 
-          $UserEvents = $Events->ofThisUser($user->id);
+      $UserEvents = $Events->ofThisUser($user->id);
 
-          if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
-              $error = array();
-              $data = array_filter($_POST);
-              $Device = new Device;
+      if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
+        $error = array();
+        $data = array_filter($_POST);
+        $Device = new Device;
 
-              if(!FixometerHelper::verify($data['event'])){ $error['event'] = 'Please select a Restart party.'; }
-              if(!FixometerHelper::verify($data['category'])){ $error['category'] = 'Please select a category for this device'; }
-              if(!FixometerHelper::verify($data['repair_status'])){ $error['repair_status'] = 'Please select a repair status.'; }
+        if(!FixometerHelper::verify($data['event'])){ $error['event'] = 'Please select a Restart party.'; }
+        if(!FixometerHelper::verify($data['category'])){ $error['category'] = 'Please select a category for this device'; }
+        if(!FixometerHelper::verify($data['repair_status'])){ $error['repair_status'] = 'Please select a repair status.'; }
 
-              if(!empty($error)){
-                  $response['danger'] = 'The device repair has <strong>not</strong> been saved.';
-              }
-              else {
-                  // add user id
-                  $data['repaired_by'] = $user->id;
-                  // add initial category (for backlogging upon revision)
-                  $data['category_creation'] = $data['category'];
+        if(!empty($error)){
+          $response['danger'] = 'The device repair has <strong>not</strong> been saved.';
+        }
+        else {
+          // add user id
+          $data['repaired_by'] = $user->id;
+          // add initial category (for backlogging upon revision)
+          $data['category_creation'] = $data['category'];
 
-                  $insert = array(
-                                  'event'             => $data['event'],
-                                  'category'          => $data['category'],
-                                  'category_creation' => $data['category'],
-                                  'repair_status'     => $data['repair_status'],
-                                  'spare_parts'       => $data['spare_parts'],
-                                  'brand'             => $data['brand'],
-                                  'model'             => $data['model'],
-                                  'problem'           => $data['problem'],
-                                  'repaired_by'       => $data['repaired_by'],
-                                  );
+          $insert = array(
+            'event'             => $data['event'],
+            'category'          => $data['category'],
+            'category_creation' => $data['category'],
+            'repair_status'     => $data['repair_status'],
+            'spare_parts'       => $data['spare_parts'],
+            'brand'             => $data['brand'],
+            'model'             => $data['model'],
+            'problem'           => $data['problem'],
+            'repaired_by'       => $data['repaired_by'],
+          );
 
-                  // save this!
-                  $insert = $Device->create($insert);
-                  if(!$insert){
-                      $response['danger'] = 'Error while saving the device to the DB.';
-                  }
-                  else {
-                      $response['success'] = 'Device saved!';
-                  }
-
-              }
+          // save this!
+          $insert = $Device->create($insert);
+          if(!$insert){
+            $response['danger'] = 'Error while saving the device to the DB.';
+          }
+          else {
+            $response['success'] = 'Device saved!';
           }
 
-          if (!isset($error)) {
-            $error = null;
-          }
-
-          if (!isset($response)) {
-            $response = null;
-          }
-
-          if (!isset($data)) {
-            $data = null;
-          }
-
-          return view('device.create', [
-            'title' => 'New Device',
-            'categories' => $Categories->findAll(),
-            'events' => $UserEvents,
-            'response' => $response,
-            'udata' => $data,
-            'error' => $error,
-          ]);
-
+        }
       }
+
+      if (!isset($error)) {
+        $error = null;
+      }
+
+      if (!isset($response)) {
+        $response = null;
+      }
+
+      if (!isset($data)) {
+        $data = null;
+      }
+
+      return view('device.create', [
+        'title' => 'New Device',
+        'categories' => $Categories->findAll(),
+        'events' => $UserEvents,
+        'response' => $response,
+        'udata' => $data,
+        'error' => $error,
+      ]);
+
+    }
 
 
   }
@@ -503,7 +505,7 @@ class DeviceController extends Controller
   public function ajaxCreate(Request $request) {
 
     $rules = [
-        'category' => 'required|filled',
+      'category' => 'required|filled',
     ];
 
     $validator = Validator::make($request->all(), $rules);
@@ -511,6 +513,13 @@ class DeviceController extends Controller
     if ($validator->fails()) {
       return response()->json($validator->messages(), 200);
     }
+
+
+    // $deviceCount = Wordlist::where('id', '<=', $correctedComparisons)->get();
+
+
+
+
 
     $category       = $request->input('category');
     $weight         = $request->input('weight');
@@ -523,6 +532,18 @@ class DeviceController extends Controller
     $spare_parts    = $request->input('spare_parts');
     $quantity       = $request->input('quantity');
     $event_id       = $request->input('event_id');
+
+    // get the number of rows in the DB where event id already exists
+    $deviceCount = DB::table('devices')->where('event', '=', $event_id)->count();
+
+    // if the number of devices exceeds 4 then show the following message
+    if($deviceCount > 4){
+
+      $message  = 'Abnormal number of devices has been added!';
+      return response()->json(['error' => $message]);
+
+    }
+
 
     // add quantity loop
     for ($i=0; $i < $quantity; $i++) {
@@ -575,23 +596,26 @@ class DeviceController extends Controller
         'clusters' => $clusters,
         'brands' => $brands,
         'is_attending' => $is_attending,
-      ])->render();
+        ])->render();
 
-    }
-    //end of handle loop
+      }
+      //end of handle loop
 
-    $event = Party::find($event_id);
+      $event = Party::find($event_id);
 
-    $footprintRatioCalculator = new FootprintRatioCalculator();
-    $emissionRatio = $footprintRatioCalculator->calculateRatio();
+      $footprintRatioCalculator = new FootprintRatioCalculator();
+      $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-    $stats = $event->getEventStats($emissionRatio);
+      $stats = $event->getEventStats($emissionRatio);
 
-    $return['html'] = $views;
-    $return['success'] = true;
-    $return['stats'] = $stats;
+      $return['html'] = $views;
+      $return['success'] = true;
+      $return['stats'] = $stats;
 
-    return response()->json($return);
+      return response()->json(array('return' => $return,
+      'deviceCount' => $deviceCount,
+
+    ));
 
     //$brand_name = Brands::find($brand)->brand_name;
 
@@ -670,10 +694,10 @@ class DeviceController extends Controller
     $wiki           = $request->input('wiki');
 
     if( empty($repair_status) ) //Override
-      $repair_status = 0;
+    $repair_status = 0;
 
     if( $repair_status != 2 ) //Override
-      $repair_details = 0;
+    $repair_details = 0;
 
     $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
 
@@ -726,71 +750,71 @@ class DeviceController extends Controller
       //   }
 
 
-        if( $repair_details == 1 ){
-          $more_time_needed = 1;
-        } else {
-          $more_time_needed = 0;
-        }
+      if( $repair_details == 1 ){
+        $more_time_needed = 1;
+      } else {
+        $more_time_needed = 0;
+      }
 
-        if( $repair_details == 2 ){
-          $professional_help = 1;
-        } else {
-          $professional_help = 0;
-        }
+      if( $repair_details == 2 ){
+        $professional_help = 1;
+      } else {
+        $professional_help = 0;
+      }
 
-        if( $repair_details == 3 ){
-          $do_it_yourself = 1;
-        } else {
-          $do_it_yourself = 0;
-        }
+      if( $repair_details == 3 ){
+        $do_it_yourself = 1;
+      } else {
+        $do_it_yourself = 0;
+      }
 
-        $old_wiki = Device::find($id)->wiki;
+      $old_wiki = Device::find($id)->wiki;
 
-        //Send Wiki Notification to Admins
-        if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
-          $all_admins = User::where('role', 2)->get();
-          $group_id = Party::find($event_id)->group;
+      //Send Wiki Notification to Admins
+      if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
+        $all_admins = User::where('role', 2)->get();
+        $group_id = Party::find($event_id)->group;
 
-          $arr = [
-            'group_url' => url('/group/view/'.$group_id),
-            'preferences' => url('/profile/edit'),
-          ];
+        $arr = [
+          'group_url' => url('/group/view/'.$group_id),
+          'preferences' => url('/profile/edit'),
+        ];
 
-          Notification::send($all_admins, new ReviewNotes($arr));
-        }
+        Notification::send($all_admins, new ReviewNotes($arr));
+      }
 
-        Device::find($id)->update([
-          'category' => $category,
-          'category_creation' => $category,
-          'estimate' => $weight,
-          'brand' => $brand,
-          'model' => $model,
-          'age' => $age,
-          'problem' => $problem,
-          'spare_parts' => $spare_parts,
-          'repair_status' => $repair_status,
-          'more_time_needed' => $more_time_needed,
-          'do_it_yourself' => $professional_help,
-          'professional_help' => $do_it_yourself,
-          'wiki' => $wiki,
-        ]);
+      Device::find($id)->update([
+        'category' => $category,
+        'category_creation' => $category,
+        'estimate' => $weight,
+        'brand' => $brand,
+        'model' => $model,
+        'age' => $age,
+        'problem' => $problem,
+        'spare_parts' => $spare_parts,
+        'repair_status' => $repair_status,
+        'more_time_needed' => $more_time_needed,
+        'do_it_yourself' => $professional_help,
+        'professional_help' => $do_it_yourself,
+        'wiki' => $wiki,
+      ]);
 
-        $event = Party::find($event_id);
+      $event = Party::find($event_id);
 
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+      $footprintRatioCalculator = new FootprintRatioCalculator();
+      $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-        $stats = $event->getEventStats($emissionRatio);
-        $data['stats'] = $stats;
+      $stats = $event->getEventStats($emissionRatio);
+      $data['stats'] = $stats;
 
-        // if ($repair_status == 0) {
-        //   $data['error'] = "Device couldn't be updated - no repair details added";
-        //   return response()->json($data);
-        // }
+      // if ($repair_status == 0) {
+      //   $data['error'] = "Device couldn't be updated - no repair details added";
+      //   return response()->json($data);
+      // }
 
-        $data['success'] = "Device updated!";
+      $data['success'] = "Device updated!";
 
-        return response()->json($data);
+      return response()->json($data);
 
       // } else {
       //
@@ -831,35 +855,35 @@ class DeviceController extends Controller
   }
 
   public function delete(Request $request, $id){
-      $Device = new Device;
-      $user = Auth::user();
+    $Device = new Device;
+    $user = Auth::user();
 
-      // get device party
-      $curr = $Device->find($id);
-      $party = $curr->event;
+    // get device party
+    $curr = $Device->find($id);
+    $party = $curr->event;
 
-      if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($party, $user->id) ){
-          $r = $curr->delete();
-          if( $request->ajax() ){
-            return response()->json(['success' => true]);
-          } else {
-            return redirect('/party/view/'.$party)->with('success', 'Device has been deleted!');
-          }
+    if(FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($party, $user->id) ){
+      $r = $curr->delete();
+      if( $request->ajax() ){
+        return response()->json(['success' => true]);
       } else {
-          if( $request->ajax() ){
-            return response()->json(['success' => false]);
-          } else {
-            return redirect('/party/view/'.$party->with('warning', 'You do not have the right permissions for deleting a device'));
-          }
+        return redirect('/party/view/'.$party)->with('success', 'Device has been deleted!');
       }
+    } else {
+      if( $request->ajax() ){
+        return response()->json(['success' => false]);
+      } else {
+        return redirect('/party/view/'.$party->with('warning', 'You do not have the right permissions for deleting a device'));
+      }
+    }
   }
 
   public function imageUpload(Request $request, $id) {
 
     try {
       if(isset($_FILES) && !empty($_FILES)){
-          $file = new FixometerFile;
-          $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
+        $file = new FixometerFile;
+        $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
       }
 
       return "success - image uploaded";
@@ -870,25 +894,25 @@ class DeviceController extends Controller
 
   public function deleteImage($device_id, $id, $path){
 
-      $user = Auth::user();
+    $user = Auth::user();
 
-      $event_id = Device::find($device_id)->event;
-      $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
-      if(FixometerHelper::hasRole($user, 'Administrator') || is_object($in_event) ){
+    $event_id = Device::find($device_id)->event;
+    $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
+    if(FixometerHelper::hasRole($user, 'Administrator') || is_object($in_event) ){
 
-          $Image = new FixometerFile;
-          $Image->deleteImage($id, $path);
+      $Image = new FixometerFile;
+      $Image->deleteImage($id, $path);
 
-          return redirect()->back()->with('message', 'Thank you, the image has been deleted');
+      return redirect()->back()->with('message', 'Thank you, the image has been deleted');
 
-      }
+    }
 
-      return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
+    return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
 
   }
 
-    // public function test() {
-    //   $g = new Device;
-    //   dd($g->export());
-    // }
+  // public function test() {
+  //   $g = new Device;
+  //   dd($g->export());
+  // }
 }
