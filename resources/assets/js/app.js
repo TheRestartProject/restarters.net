@@ -493,6 +493,11 @@ function updateVolunteers() {
   });
 }
 
+
+$("#show-button").click(function () {
+ $("#show-button").hide();
+});
+
 function numericInputs() {
 
     jQuery('.decrease').on('click', function (e) {
@@ -504,10 +509,7 @@ function numericInputs() {
         if (value > 0) {
             jQuery(this).parent().find('input[type="number"]').val(value - 1);
         }
-
         updateParticipants();
-        updateVolunteers();
-
     });
 
 
@@ -518,8 +520,33 @@ function numericInputs() {
         var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
 
         jQuery(this).parent().find('input[type="number"]').val(value + 1);
-
         updateParticipants();
+    });
+
+
+    jQuery('.decreasev').on('click', function (e) {
+
+        e.preventDefault();
+
+        var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
+
+        if (value > 0) {
+            jQuery(this).parent().find('input[type="number"]').val(value - 1);
+        }
+        $("#show-button").show();
+        updateVolunteers();
+
+    });
+
+
+    jQuery('.increasev').on('click', function (e) {
+
+        e.preventDefault();
+
+        var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
+
+        jQuery(this).parent().find('input[type="number"]').val(value + 1);
+        $("#show-button").show();
         updateVolunteers();
 
     });

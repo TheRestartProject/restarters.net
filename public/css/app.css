@@ -19408,3 +19408,25 @@ h2 sup a:hover {
   opacity: 1;
 }
 
+.warning {
+  display: none;
+  width: 351px;
+  height: 65px;
+  padding: 10px;
+  background-color: #ff9800;
+  color: white;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+  /* For IE8 and earlier */
+  font-size: 15px;
+  -webkit-transition: 0.7s;
+  transition: 0.7s;
+  cursor: pointer;
+}
+
+.warning:hover {
+  opacity: 1.0;
+  filter: alpha(opacity=100);
+  /* For IE8 and earlier */
+}
+
