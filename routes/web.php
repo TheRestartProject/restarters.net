@@ -19,7 +19,12 @@ Route::prefix('user')->group(function () {
     Route::post('recover', 'UserController@recover');
     Route::get('register/{hash?}', 'UserController@getRegister')->name('registration');
     Route::post('register/{hash?}', 'UserController@postRegister');
+    Route::post('register/check-valid-email',  'UserController@postEmail');
+
 });
+
+
+
 
 Route::get('/user/forbidden', function () {
     return view('user.forbidden', [

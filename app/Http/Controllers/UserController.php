@@ -1286,4 +1286,23 @@ class UserController extends Controller
 
       return "true";
     }
+
+
+    public function postEmail(Request $request) {
+
+      if( User::where("email", "=", $email)->exists()){
+        return response()->json([
+            'email' => $email,
+            'success' => true,
+            'message' => 'error'
+        ]);
+      } else {
+        return response()->json([
+            'email' => $email,
+            'success' => true,
+            'message' => 'continue'
+        ]);
+      }
+
+    }
 }

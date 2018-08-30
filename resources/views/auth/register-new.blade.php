@@ -76,9 +76,9 @@
                             <div class="form-group">
                                 <label for="email">@lang('auth.email_address'):<sup>*</sup></label>
                                 @if( Auth::check() )
-                                  <input type="email" class="form-control field" id="email" name="email" value="{{{ Auth::user()->email }}}" disabled aria-required="true">
+                                  <input type="email" class="form-control field" id="registeremail" name="email" value="{{{ Auth::user()->email }}}" disabled aria-required="true">
                                 @else
-                                  <input type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }} field" id="email" name="email" value="{{{ old('email') }}}" required aria-required="true">
+                                  <input type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }} field" id="registeremail" name="email" value="{{{ old('email') }}}" required aria-required="true">
                                 @endif
                                 <div class="invalid-feedback">@lang('auth.email_address_validation')</div>
                             </div>
