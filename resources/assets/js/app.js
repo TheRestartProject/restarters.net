@@ -1463,4 +1463,16 @@ function initAutocomplete() {
         }
       });
     });
+
+    // If event has attended or invited people then user cannot delete the event
+    $("#deleteEvent").click(function (e) {
+      if($('#countAttended').val() > 0 || $('#countInvited').val() > 0) {
+        e.preventDefault()
+        alert('Sorry you cannot delete this event as you have invited other volunteers?');
+      } else {
+
+        // If the event has no attended or invited then ask confirmation
+        return confirm('Please confirm to delete this event');
+      }
+    });
   });

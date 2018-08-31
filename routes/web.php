@@ -142,6 +142,11 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::post('/manage/{id}', 'PartyController@manage');
     Route::get('/edit/{id}', 'PartyController@edit');
     Route::post('/edit/{id}', 'PartyController@edit');
+
+    Route::get('/delete/{id}', 'PartyController@deleteEvent');
+    Route::post('/delete/{id}', 'PartyController@deleteEvent');
+
+
     Route::get('/deleteimage', 'PartyController@deleteimage');
     Route::get('/join/{id}', 'PartyController@getJoinEvent');
     Route::post('/invite', 'PartyController@postSendInvite');

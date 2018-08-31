@@ -72,7 +72,12 @@
               Event actions
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a href="{{ url('/') }}/party/edit/{{ $formdata->id }}" class="dropdown-item">Edit event</a>
+              <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">Edit event</a>
+
+              <a href="{{ url('/') }}/party/delete/{{ $formdata->id }}" id="deleteEvent" class="dropdown-item">delete event</a>
+              <input type="hidden" name="attended" id="countAttended" value="{{count($attended)}}">
+              <input type="hidden" name="invited" id="countInvited" value="{{count($invited)}}">
+
               @if( $event->hasFinished() )
               <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>
               <a href="/party/contribution/{{ $formdata->id }}" class="btn dropdown-item">Request contributions</a>
@@ -99,6 +104,13 @@
             @endif
           </div>
         </div>
+      </div>
+
+      <div class="row">
+          <div class="col-lg-12">
+            <p></p>
+            <p></p>
+          </div>
       </div>
 
       <div class="row">
