@@ -294,7 +294,7 @@ class UserController extends Controller
 
       return redirect()->back()->with('message', 'Profile Picture Updated!');
     }
-
+ 
     return redirect()->back()->with('error', 'Failed to upload profile picture!');
 
 
