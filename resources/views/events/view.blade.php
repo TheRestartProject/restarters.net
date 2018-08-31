@@ -77,7 +77,7 @@
               <a href="{{ url('/') }}/party/delete/{{ $formdata->id }}" id="deleteEvent" class="dropdown-item">delete event</a>
               <input type="hidden" name="attended" id="countAttended" value="{{count($attended)}}">
               <input type="hidden" name="invited" id="countInvited" value="{{count($invited)}}">
-
+              <input type="hidden" name="volunteers" id="countVolunteers" value="{{ $event->volunteers }}">
               @if( $event->hasFinished() )
               <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>
               <a href="/party/contribution/{{ $formdata->id }}" class="btn dropdown-item">Request contributions</a>

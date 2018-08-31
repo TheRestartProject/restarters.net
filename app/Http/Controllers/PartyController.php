@@ -1554,6 +1554,7 @@ public function deleteEvent($id){
       if($event == true){
 
         $device = DB::table('devices')->where('event', '=', $id)->delete();
+        $event_users = DB::table('events_users')->where('event', '=', $id)->delete();
         $event = DB::table('events')->where('idevents', '=', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->delete();
         // dd($event);
 
