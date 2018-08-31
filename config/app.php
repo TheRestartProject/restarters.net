@@ -161,6 +161,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Msurguy\Honeypot\HoneypotServiceProvider::class,
         App\Providers\AgentServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class,
     ],
 
     /*
@@ -211,6 +212,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'FixometerHelper' => App\Helpers\FixometerHelper::class,
         'Honeypot' => Msurguy\Honeypot\HoneypotFacade::class,
+        'Image' => Intervention\Image\Facades\Image::class,
 
     ],
 

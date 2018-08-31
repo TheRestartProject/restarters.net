@@ -16,7 +16,7 @@
         @endif
 
         <form id="register-form" method="post">
-
+          <input type="hidden" name="_token" value="{{ csrf_token() }}">
         @csrf
 
         {!! Honeypot::generate('my_name', 'my_time') !!}
@@ -65,9 +65,9 @@
                             <div class="form-group">
                                 <label for="name">@lang('general.your_name'):<sup>*</sup></label>
                                 @if( Auth::check() )
-                                  <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }} field" id="name" name="name" value="{{{ Auth::user()->name }}}" disabled aria-required="true">
+                                  <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }} field" id="registerName" name="name" value="{{{ Auth::user()->name }}}" disabled aria-required="true">
                                 @else
-                                  <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }} field" id="name" name="name" value="{{{ old('name') }}}" required aria-required="true">
+                                  <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }} field" id="registerName" name="name" value="{{{ old('name') }}}" required aria-required="true">
                                 @endif
                                 <div class="invalid-feedback">@lang('general.your_name_validation')</div>
                             </div>

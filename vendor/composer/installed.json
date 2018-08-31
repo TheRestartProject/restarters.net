@@ -1,5 +1,61 @@
 [
     {
+        "name": "addwiki/mediawiki-api-base",
+        "version": "2.4.0",
+        "version_normalized": "2.4.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/addwiki/mediawiki-api-base.git",
+            "reference": "33c147e91d05a48e953839fb3ad9e6386cfd85c1"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/addwiki/mediawiki-api-base/zipball/33c147e91d05a48e953839fb3ad9e6386cfd85c1",
+            "reference": "33c147e91d05a48e953839fb3ad9e6386cfd85c1",
+            "shasum": ""
+        },
+        "require": {
+            "guzzlehttp/guzzle": "~6.0",
+            "guzzlehttp/promises": "~1.0",
+            "php": ">=5.5",
+            "psr/log": "~1.0"
+        },
+        "require-dev": {
+            "jakub-onderka/php-parallel-lint": "0.9.2",
+            "mediawiki/mediawiki-codesniffer": "^13.0",
+            "phpunit/phpunit": "~4.8.0|~5.3.0"
+        },
+        "suggest": {
+            "etsy/phan": "Allows running static analysis on the package (requires PHP 7+)"
+        },
+        "time": "2017-11-02T10:53:36+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.4.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Mediawiki\\Api\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-2.0+"
+        ],
+        "authors": [
+            {
+                "name": "Addshore"
+            }
+        ],
+        "description": "A basic Mediawiki api base library",
+        "keywords": [
+            "mediawiki"
+        ]
+    },
+    {
         "name": "asm89/stack-cors",
         "version": "1.2.0",
         "version_normalized": "1.2.0.0",
@@ -1435,6 +1491,78 @@
             "remote",
             "wordpress",
             "xmlrpc"
+        ]
+    },
+    {
+        "name": "intervention/image",
+        "version": "2.4.2",
+        "version_normalized": "2.4.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Intervention/image.git",
+            "reference": "e82d274f786e3d4b866a59b173f42e716f0783eb"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Intervention/image/zipball/e82d274f786e3d4b866a59b173f42e716f0783eb",
+            "reference": "e82d274f786e3d4b866a59b173f42e716f0783eb",
+            "shasum": ""
+        },
+        "require": {
+            "ext-fileinfo": "*",
+            "guzzlehttp/psr7": "~1.1",
+            "php": ">=5.4.0"
+        },
+        "require-dev": {
+            "mockery/mockery": "~0.9.2",
+            "phpunit/phpunit": "^4.8 || ^5.7"
+        },
+        "suggest": {
+            "ext-gd": "to use GD library based image processing.",
+            "ext-imagick": "to use Imagick based image processing.",
+            "intervention/imagecache": "Caching extension for the Intervention Image library"
+        },
+        "time": "2018-05-29T14:19:03+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.4-dev"
+            },
+            "laravel": {
+                "providers": [
+                    "Intervention\\Image\\ImageServiceProvider"
+                ],
+                "aliases": {
+                    "Image": "Intervention\\Image\\Facades\\Image"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Intervention\\Image\\": "src/Intervention/Image"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Oliver Vogel",
+                "email": "oliver@olivervogel.com",
+                "homepage": "http://olivervogel.com/"
+            }
+        ],
+        "description": "Image handling and manipulation library with support for Laravel integration",
+        "homepage": "http://image.intervention.io/",
+        "keywords": [
+            "gd",
+            "image",
+            "imagick",
+            "laravel",
+            "thumbnail",
+            "watermark"
         ]
     },
     {
@@ -5549,62 +5677,6 @@
             "assert",
             "check",
             "validate"
-        ]
-    },
-    {
-        "name": "addwiki/mediawiki-api-base",
-        "version": "2.4.0",
-        "version_normalized": "2.4.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/addwiki/mediawiki-api-base.git",
-            "reference": "33c147e91d05a48e953839fb3ad9e6386cfd85c1"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/addwiki/mediawiki-api-base/zipball/33c147e91d05a48e953839fb3ad9e6386cfd85c1",
-            "reference": "33c147e91d05a48e953839fb3ad9e6386cfd85c1",
-            "shasum": ""
-        },
-        "require": {
-            "guzzlehttp/guzzle": "~6.0",
-            "guzzlehttp/promises": "~1.0",
-            "php": ">=5.5",
-            "psr/log": "~1.0"
-        },
-        "require-dev": {
-            "jakub-onderka/php-parallel-lint": "0.9.2",
-            "mediawiki/mediawiki-codesniffer": "^13.0",
-            "phpunit/phpunit": "~4.8.0|~5.3.0"
-        },
-        "suggest": {
-            "etsy/phan": "Allows running static analysis on the package (requires PHP 7+)"
-        },
-        "time": "2017-11-02T10:53:36+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.4.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Mediawiki\\Api\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "GPL-2.0+"
-        ],
-        "authors": [
-            {
-                "name": "Addshore"
-            }
-        ],
-        "description": "A basic Mediawiki api base library",
-        "keywords": [
-            "mediawiki"
         ]
     }
 ]
