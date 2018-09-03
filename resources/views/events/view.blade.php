@@ -175,9 +175,9 @@
                     <div>
                       <div class="input-group-qty">
                         <label for="volunteer_qty" class="sr-only">Quantity:</label>
-                        <button class="increasev btn-value">+</button>
+                        <button class="increaseVolunteers btn-value">+</button>
                         <input name="volunteer_qty" id="volunteer_qty" maxlength="3" value="{{ $event->volunteers }}" title="Qty" class="input-text form-control qty" type="number">
-                        <button class="decreasev btn-value">–</button>
+                        <button class="decreaseVolunteers btn-value">–</button>
                       </div>
                     </div>
                     @else
@@ -190,13 +190,12 @@
                   </div>
                   @endif
 
-                  <button class="warning" id="show-button">
-                      <strong>Warning!</strong> The number of volunteers differs from the count of volunteers
-                    </button>
-                  <style>
-
-
-                  </style>
+                  <div class="alert alert-warning" role="alert" id="warning_volunteers_message" style="font-size: 15px;">
+                      <strong>Warning!</strong> It is recommended to invite volunteers using the attendance section.
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
                 </div>
 
               </div>

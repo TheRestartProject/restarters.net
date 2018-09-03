@@ -539,7 +539,7 @@ class DeviceController extends Controller
     $deviceCount = DB::table('devices')->where('event', '=', $event_id)->count();
 
     // if the number of devices exceeds 4 then show the following message
-    if($deviceCount > 4){
+    if($deviceCount == env('DEVICE_ABNORMAL_MISC_COUNT', 5)){
 
       // Send to all users with the role of Administrator
       // Mail::to(DB::table('users')->where('role', '=', 2)->email)->send(new AbnormalDevices());

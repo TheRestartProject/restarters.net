@@ -30268,6 +30268,8 @@ function onboarding() {
   }
 }
 
+$("#warning_volunteers_message").hide();
+
 function serialize(tokenfield) {
   var items = tokenfield.getItems();
   //console.log(items);
@@ -30548,10 +30550,6 @@ function updateVolunteers() {
   });
 }
 
-$("#show-button").click(function () {
-  $("#show-button").hide();
-});
-
 function numericInputs() {
 
   jQuery('.decrease').on('click', function (e) {
@@ -30576,7 +30574,7 @@ function numericInputs() {
     updateParticipants();
   });
 
-  jQuery('.decreasev').on('click', function (e) {
+  jQuery('.decreaseVolunteers').on('click', function (e) {
 
     e.preventDefault();
 
@@ -30585,18 +30583,18 @@ function numericInputs() {
     if (value > 0) {
       jQuery(this).parent().find('input[type="number"]').val(value - 1);
     }
-    $("#show-button").show();
+    $("#warning_volunteers_message").fadeIn(200);
     updateVolunteers();
   });
 
-  jQuery('.increasev').on('click', function (e) {
+  jQuery('.increaseVolunteers').on('click', function (e) {
 
     e.preventDefault();
 
     var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
 
     jQuery(this).parent().find('input[type="number"]').val(value + 1);
-    $("#show-button").show();
+    $("#warning_volunteers_message").fadeIn(200);
     updateVolunteers();
   });
 }
