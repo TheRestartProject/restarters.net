@@ -320,7 +320,8 @@ class DeviceController extends Controller
           'wiki'              => $wiki,
         );
 
-        $u = $Device->where('iddevices', $id)->update($update);
+        // $u = $Device->where('iddevices', $id)->update($update);
+        $u = Device::findOrFail($id)->update($update);
 
         if(!$u) {
           $response['danger'] = 'Something went wrong. Please check the data and try again.';

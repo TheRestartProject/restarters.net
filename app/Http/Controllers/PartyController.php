@@ -461,7 +461,8 @@ public function edit($id, Request $request) {
       'longitude'   => $longitude,
     );
 
-    $u = $Party->where('idevents', $id)->update($update);
+    // $u = $Party->where('idevents', $id)->update($update);
+    $u = Party::findOrFail($id)->update($update);
 
     if(!$u) {
       $response['danger'] = 'Something went wrong. Please check the data and try again.';

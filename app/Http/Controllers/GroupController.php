@@ -826,7 +826,8 @@ class GroupController extends Controller
                           'longitude'     => $longitude,
                           );
 
-          $u = $Group->where('idgroups', $id)->update($update);
+          // $u = $Group->where('idgroups', $id)->update($update);
+          $u = Group::findOrFail($id)->update($update);
 
 
           if (!empty($_POST['group_tags'])) {
