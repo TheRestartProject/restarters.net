@@ -100,8 +100,22 @@ class FixometerFile extends Model {
                     $thumbSize = 60;
                     $midSize = 260;
 
+                    // Create image
                     $thumb = imagecreatetruecolor($thumbSize, $thumbSize);
                     $mid = imagecreatetruecolor($midSize, $midSize);
+
+                    // Set alphablending to on
+                    imagealphablending($thumb, false);
+                    imagealphablending($mid, false);
+
+                    imagesavealpha($thumb, true);
+                    imagesavealpha($mid, true);
+
+                    imagecolortransparent($thumb);
+                    imagecolortransparent($mid);
+
+                    imagepng($thumb);
+                    imagepng($mid);
 
                     imagecopyresampled($thumb, $profile_pic, 0, 0, $c1['x'], $c1['y'], $thumbSize, $thumbSize, $cropWidth, $cropHeight);
                     imagecopyresampled($mid, $profile_pic, 0, 0, $c1['x'], $c1['y'], $midSize, $midSize, $cropWidth, $cropHeight);
