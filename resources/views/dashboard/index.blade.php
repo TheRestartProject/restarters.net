@@ -119,6 +119,7 @@
                 @endif
               </div>
             </li>
+            @if ($in_group)
             <li class="step">
               <div class="row">
                 <div class="col-7 d-flex align-items-center">
@@ -135,6 +136,7 @@
                 @endif
               </div>
             </li>
+            @endif
 
           @endif
 
@@ -143,12 +145,12 @@
       {{--
       @if ($show_fixfest_cta)
     <aside>
-      @include('dashboard.blocks.fixfest') 
+      @include('dashboard.blocks.fixfest')
     </aside>
       @endif
       <br/>
       <aside>
-      @include('dashboard.blocks.repairday') 
+      @include('dashboard.blocks.repairday')
         </aside>
         --}}
     </div>

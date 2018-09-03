@@ -266,7 +266,22 @@ class UserController extends Controller
       $id = Auth::id();
     }
 
-    User::find($id)->skills()->sync($request->input('tags'));
+    // Get user
+    $user = User::find($id);
+
+    // Update skills
+    $skills = $request->input('tags');
+    $user->skills()->sync($skills);
+
+    // Look at role based on skills
+    $role = FixometerHelper::skillsDetermineRole($skills);
+
+    // Update existing user, if new role is greater than the old
+    if( $user->role > $role ){
+      $update_user = User::find($id)->update([
+        'role' => $role
+      ]);
+    }
 
     return redirect()->back()->with('message', 'User Skills Updated!');
 
@@ -1179,18 +1194,10 @@ public function postRegister(Request $request, $hash = null){
 
   } else {
 
-    if (is_null($skills)) {
-      $has_host_skills = 0;
-    }
-    else {
-      $has_host_skills = Skills::where('category', 1)->whereIn('id', $skills)->count();
-    }
-    if( $has_host_skills > 3 ){
-      $role = 3;
-    } else {
-      $role = 4;
-    }
+    // Let's decide whether what role to give
+    $role = FixometerHelper::skillsDetermineRole($skills);
 
+    // Then create that user
     $user = User::create([
       'name' => $request->input('name'),
       'email' => $request->input('email'),

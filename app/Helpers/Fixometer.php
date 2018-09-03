@@ -648,8 +648,8 @@ class FixometerHelper {
   public static function skillCategories() {
 
     return [
-      '1' => 'Organising Skills',
-      '2' => 'Technical Skills',
+      '1' => 'Organising skills - please select at least one if you’d like to host events',
+      '2' => 'Technical skills',
     ];
 
   }
@@ -735,21 +735,48 @@ class FixometerHelper {
 
   }
 
-    public static function buildSortQuery($columnName)
-    {
-        $newSortDir = 'asc';
+  public static function buildSortQuery($columnName)
+  {
+      $newSortDir = 'asc';
 
-        if (Request::has('sort') && Request::input('sort') == $columnName) {
-            $existingSortDir = Request::input('sortdir');
-            if ($existingSortDir == 'asc')
-                $newSortDir = 'desc';
-            elseif ($existingSortDir == 'desc')
-                $newSortDir = 'asc';
-        }
+      if (Request::has('sort') && Request::input('sort') == $columnName) {
+          $existingSortDir = Request::input('sortdir');
+          if ($existingSortDir == 'asc')
+              $newSortDir = 'desc';
+          elseif ($existingSortDir == 'desc')
+              $newSortDir = 'asc';
+      }
 
-        $existing = Request::except(['sort', 'sortdir']);
+      $existing = Request::except(['sort', 'sortdir']);
 
 
-        return http_build_query($existing) . '&sort=' . $columnName . '&sortdir=' . $newSortDir;
+      return http_build_query($existing) . '&sort=' . $columnName . '&sortdir=' . $newSortDir;
+  }
+
+  /*
+   *
+   * Looks at skills (object) and determines role (int)
+   *
+   */
+  public static function skillsDetermineRole($skills = null)
+  {
+
+    // If is null
+    if ( is_null($skills) ) {
+      $has_host_skills = 0;
+    } else {
+      $has_host_skills = \App\Skills::where('category', 1)->whereIn('id', $skills)->count();
     }
+
+    // If number of host skills is greater than or equal to amount, then give host role
+    if( $has_host_skills >= 1 ){
+      $role = 3;
+    } else {
+      $role = 4;
+    }
+
+    return $role;
+
+  }
+
 }
