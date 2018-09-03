@@ -3,12 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
+use OwenIt\Auditing\Contracts\Auditable;
 use DB;
 
-class Device extends Model
+class Device extends Model implements Auditable
 {
-
+    use \OwenIt\Auditing\Auditable;
     protected $table = 'devices';
     public $displacement = 0.5;
     protected $primaryKey = 'iddevices';

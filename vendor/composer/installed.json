@@ -2052,6 +2052,54 @@
         "homepage": "https://laravelcollective.com"
     },
     {
+        "name": "laravelista/lumen-vendor-publish",
+        "version": "2.1.0",
+        "version_normalized": "2.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/laravelista/lumen-vendor-publish.git",
+            "reference": "7684f731187277ac2ca7747558ec2ce3835bfc91"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/laravelista/lumen-vendor-publish/zipball/7684f731187277ac2ca7747558ec2ce3835bfc91",
+            "reference": "7684f731187277ac2ca7747558ec2ce3835bfc91",
+            "shasum": ""
+        },
+        "require": {
+            "illuminate/console": "^5.0",
+            "illuminate/filesystem": "^5.0",
+            "illuminate/support": "^5.0",
+            "league/flysystem": "^1.0"
+        },
+        "time": "2017-09-26T12:43:31+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Laravelista\\LumenVendorPublish\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Mario Basic",
+                "email": "mario.basic@outlook.com"
+            }
+        ],
+        "description": "vendor:publish for Lumen framework.",
+        "keywords": [
+            "command",
+            "console",
+            "lumen",
+            "publish",
+            "vendor"
+        ]
+    },
+    {
         "name": "league/csv",
         "version": "9.1.4",
         "version_normalized": "9.1.4.0",
@@ -2743,6 +2791,91 @@
             "laravel-zero",
             "php",
             "symfony"
+        ]
+    },
+    {
+        "name": "owen-it/laravel-auditing",
+        "version": "v8.0.1",
+        "version_normalized": "8.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/owen-it/laravel-auditing.git",
+            "reference": "81becc5ec606fc33581b21ac03ccc7132a49354d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/owen-it/laravel-auditing/zipball/81becc5ec606fc33581b21ac03ccc7132a49354d",
+            "reference": "81becc5ec606fc33581b21ac03ccc7132a49354d",
+            "shasum": ""
+        },
+        "require": {
+            "illuminate/console": "5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.* || 5.7.*",
+            "illuminate/database": "5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.* || 5.7.*",
+            "illuminate/filesystem": "5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.* || 5.7.*",
+            "php": ">=7.0.13"
+        },
+        "require-dev": {
+            "mockery/mockery": "^1.0",
+            "orchestra/database": "^3.5",
+            "orchestra/testbench": "^3.5",
+            "phpunit/phpunit": "^6.0"
+        },
+        "suggest": {
+            "laravelista/lumen-vendor-publish": "Needed to publish the package configuration in Lumen"
+        },
+        "time": "2018-08-28T10:57:05+00:00",
+        "type": "package",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "8.0-dev"
+            },
+            "laravel": {
+                "providers": [
+                    "OwenIt\\Auditing\\AuditingServiceProvider"
+                ]
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "OwenIt\\Auditing\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Quetzy Garcia",
+                "email": "quetzyg@altek.org"
+            },
+            {
+                "name": "Antério Vieira",
+                "email": "anteriovieira@gmail.com"
+            },
+            {
+                "name": "Raphael França",
+                "email": "raphaelfrancabsb@gmail.com"
+            }
+        ],
+        "description": "Audit changes of your Eloquent models in Laravel/Lumen",
+        "homepage": "http://laravel-auditing.com",
+        "keywords": [
+            "Accountability",
+            "Audit",
+            "auditing",
+            "changes",
+            "eloquent",
+            "history",
+            "laravel",
+            "log",
+            "logging",
+            "lumen",
+            "observer",
+            "record",
+            "revision",
+            "tracking"
         ]
     },
     {

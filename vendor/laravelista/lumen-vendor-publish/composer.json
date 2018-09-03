@@ -1,0 +1,30 @@
+{
+  "name": "laravelista/lumen-vendor-publish",
+  "description": "vendor:publish for Lumen framework.",
+  "license": "MIT",
+  "keywords": [
+    "lumen",
+    "vendor",
+    "publish",
+    "command",
+    "console"
+  ],
+  "authors": [
+    {
+      "name": "Mario Bašić",
+      "email": "mario.basic@outlook.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Laravelista\\LumenVendorPublish\\": "src"
+    }
+  },
+  "minimum-stability": "stable",
+  "require": {
+    "illuminate/console": "^5.0",
+    "illuminate/filesystem": "^5.0",
+    "illuminate/support": "^5.0",
+    "league/flysystem": "^1.0"
+  }
+}

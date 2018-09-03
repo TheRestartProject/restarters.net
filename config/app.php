@@ -162,6 +162,7 @@ return [
         Msurguy\Honeypot\HoneypotServiceProvider::class,
         App\Providers\AgentServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
+        OwenIt\Auditing\AuditingServiceProvider::class,
     ],
 
     /*

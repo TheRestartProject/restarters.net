@@ -6,12 +6,12 @@ use App\Device;
 use App\Helpers\FootprintRatioCalculator;
 
 use Illuminate\Database\Eloquent\Model;
-
+use OwenIt\Auditing\Contracts\Auditable;
 use DB;
 
-class Party extends Model
+class Party extends Model implements Auditable
 {
-
+    use \OwenIt\Auditing\Auditable;
     protected $table = 'events';
 
     protected $primaryKey = 'idevents';

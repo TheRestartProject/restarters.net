@@ -30,6 +30,9 @@
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#photos">Event photos</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#log">Event log</a>
+          </li>
         </ul>
 
         <div class="edit-panel">
@@ -215,6 +218,133 @@
             </div>
 
           </div>
+
+          <div class="tab-pane active" id="log">
+
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="form-group__offset">
+                <h4>@lang('events.edit_event')</h4>
+                <p>@lang('events.edit_event_content')</p>
+                </div>
+              </div>
+            </div>
+
+            <form action="/party/edit/<?php echo $formdata->id; ?>" method="post" id="party-edit" enctype="multipart/form-data">
+              @csrf
+              <input type="hidden" name="id" value="<?php echo $formdata->id; ?>" >
+
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group form-group__offset">
+                    <label for="event_name">@lang('events.field_event_name'):</label>
+                    <input type="text" class="form-control field" id="event_name" name="venue" value="{{ $formdata->venue }}">
+                    <small id="nameHelpBlock" class="form-text text-muted">
+                        @lang('events.field_event_name_helper')
+                    </small>
+                  </div>
+
+                @if ( ( FixometerHelper::hasRole($user, 'Host') && count($user_groups) > 1 ) || FixometerHelper::hasRole($user, 'Administrator') )
+                <div class="form-group form-group__offset">
+                    <label for="event_group">@lang('events.field_event_group'):</label>
+                    <div class="form-control form-control__select">
+                      <select name="group" id="event_group" class="field field select2" required>
+                        <option></option>
+                        @foreach($group_list as $group)
+                          @if( FixometerHelper::hasRole($user, 'Administrator') || in_array($group->id, $user_groups) )
+                            <option value="<?php echo $group->id; ?>" <?php echo($group->id == $formdata->group ? 'selected' : ''); ?>><?php echo $group->name; ?></option>
+                          @endif
+                        @endforeach
+                      </select>
+                    </div>
+                </div>
+                @else
+                  <input type="hidden" name="group" value="{{ $user_groups[0] }}">
+                @endif
+
+                <div class="form-group">
+                  <label for="event_desc">@lang('events.field_event_desc'):</label>
+                  <div class="rte" name="description" id="description">{!! $formdata->free_text !!}</div>
+                </div>
+
+                <input type="hidden" name="free_text" id="free_text" value="{{ $formdata->free_text }}">
+              </div>
+
+              <div class="col-lg-6">
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-lg-7">
+                      <label for="event_date">@lang('events.field_event_date'):</label>
+                      <input type="date" id="event_date" name="event_date" class="form-control field" value="<?php echo date('Y-m-d', $formdata->event_date); ?>">
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-lg-7">
+                         <div class="form-group">
+                      <label for="field_event_time">@lang('events.field_event_time'):</label>
+                      <div class="row row-compressed">
+
+                        <div class="col-6">
+                          <input type="time" id="start-time" name="start" class="form-control field" value="{{ date('H:i', strtotime($formdata->start)) }}">
+                        </div>
+                        <div class="col-6">
+                          <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
+                          <input type="time" id="end-time" name="end" class="form-control field" value="{{ date('H:i', strtotime($formdata->end)) }}">
+                        </div>
+                        </div>
+
+                      </div>
+                    </div>
+                    <div class="col-12">
+
+                        <div class="row row-compressed">
+                            <div class="col-md-7">
+                              <div class="form-group">
+                                <label for="autocomplete">@lang('events.field_event_venue'):</label>
+                                <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ $formdata->location }}"/>
+
+                                <small id="locationHelpBlock" class="form-text text-muted">
+                                  @lang('events.field_venue_helper')
+                                </small>
+
+                                <input type="hidden" id="street_number" disabled="true">
+                                <input type="hidden" id="route" disabled="true">
+                                <input type="hidden" id="locality" disabled="true">
+                                <input type="hidden" id="administrative_area_level_1" disabled="true">
+                                <input type="hidden" id="postal_code" disabled="true">
+                                <input type="hidden" id="country" disabled="true">
+
+                              </div>
+                            </div>
+                            <div class="col-lg-5">
+                              <div id="map-plugin" class="map events__map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+            <div class="button-group row">
+                <div class="offset-lg-3 col-lg-7 d-flex align-items-right justify-content-end text-right">
+                    @if( is_null($formdata->wordpress_post_id) )
+                      <span class="button-group__notice text-right">@lang('events.before_submit_text')</span>
+                    @endif
+                </div>
+                <div class="col-lg-2 d-flex align-items-center justify-content-end">
+                    <input type="submit" class="btn btn-primary btn-block btn-create" id="create-event" value="@lang('events.save_event')">
+                </div>
+            </div>
+
+          </form>
+
+        </div>
 
         </div>
 
