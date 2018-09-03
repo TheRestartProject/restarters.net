@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Auth;
 
 class AbnormalDevices extends Mailable
 {
@@ -28,6 +29,7 @@ class AbnormalDevices extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.abnormaldevices');
+        $name = Auth::user()->name;
+        return $this->markdown('emails.abnormaldevices')->with('name', $name);
     }
 }
