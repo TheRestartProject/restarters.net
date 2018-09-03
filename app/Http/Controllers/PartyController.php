@@ -140,15 +140,15 @@ class PartyController extends Controller {
 
   public function create(Request $request)
   {
-    $user = Auth::user();
 
-    if( FixometerHelper::hasRole(Auth::user(), 'Restarter') )
-    return redirect('/user/forbidden');
+    // Let's determine whether currently logged in user is associated with any groups
+    $user_groups = UserGroups::where('user', Auth::user()->id)
+                                ->where('role', 3)
+                                  ->get();
 
-    $groups_user_is_host_of = UserGroups::where('user', Auth::user()->id)
-    ->where('role', 3)
-    ->pluck('group')
-    ->toArray();
+    // Then let's redirect users away if they are a restarter or a host with no groups
+    if( FixometerHelper::hasRole(Auth::user(), 'Restarter') || ( count($user_groups) == 0 && FixometerHelper::hasRole(Auth::user(), 'Host') ) )
+      return redirect('/user/forbidden');
 
     $Groups = new Group;
 
@@ -237,7 +237,7 @@ class PartyController extends Controller {
 
           EventsUsers::create([
             'event' => $idParty,
-            'user' => $user->id,
+            'user' => Auth::user()->id,
             'status' => 1,
             'role' => 3,
           ]);
@@ -308,8 +308,8 @@ class PartyController extends Controller {
           'response' => $response,
           'error' => $error,
           'udata' => $_POST,
-          'user' => $user,
-          'user_groups' => $groups_user_is_host_of,
+          'user' => Auth::user(),
+          'user_groups' => $user_groups,
         ]);
       }
     }
@@ -319,8 +319,8 @@ class PartyController extends Controller {
       'grouplist' => $Groups->findList(),
       'gmaps' => true,
       'group_list' => $Groups->findAll(),
-      'user' => $user,
-      'user_groups' => $groups_user_is_host_of,
+      'user' => Auth::user(),
+      'user_groups' => $user_groups,
     ]);
 
   }

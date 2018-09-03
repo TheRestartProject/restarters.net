@@ -49,22 +49,32 @@
                   </small>
               </div>
 
-              @if ( ( FixometerHelper::hasRole($user, 'Host') && count($user_groups) > 1 ) || FixometerHelper::hasRole($user, 'Administrator') )
-              <div class="form-group form-group__offset">
+              @if ( count($user_groups) > 1 || FixometerHelper::hasRole($user, 'Administrator') )
+                <div class="form-group form-group__offset">
                   <label for="event_group">@lang('events.field_event_group'):</label>
                   <div class="form-control form-control__select">
                     <select name="group" id="event_group" class="field field select2" required>
                       <option></option>
-                      @foreach($group_list as $group)
-                        @if( FixometerHelper::hasRole($user, 'Administrator') || in_array($group->id, $user_groups) )
-                          <option value="<?php echo $group->id; ?>"><?php echo $group->name; ?></option>
-                        @endif
-                      @endforeach
+
+                      @if( FixometerHelper::hasRole($user, 'Administrator') )
+
+                        @foreach($group_list as $group)
+                            <option value="{{{ $group->id }}}">{{{ $group->name }}}</option>
+                        @endforeach
+
+                      @else
+
+                        @foreach($user_groups as $group)
+                          <option value="{{{ $group->id }}}">{{{ $group->name }}}</option>
+                        @endforeach
+
+                      @endif
+
                     </select>
                   </div>
-              </div>
+                </div>
               @else
-                <input type="hidden" name="group" value="{{ $user_groups[0] }}">
+                <input type="hidden" name="group" value="{{ $user_groups[0]->group }}">
               @endif
 
               <div class="form-group">
