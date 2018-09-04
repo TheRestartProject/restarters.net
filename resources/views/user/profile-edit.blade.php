@@ -327,7 +327,20 @@
                           </select>
                         </div>
                       </div>
-                    </div>
+
+
+                        <div class="form-group col-lg-6">
+                          <label for="preferences">Permissions</label>
+                          <hr>
+                          @foreach($all_preferences as $preference)
+                              <div class="checkbox">
+                                <input type="checkbox" @if(in_array($preference->id, $user_preferences)) checked @endif class="checkbox style-2 pull-right" name="preference" value="{{ $preference->id }}">{{ $preference->purpose }}
+                                <label>{{ $preference->name }}</label>
+                              </div>
+                          @endforeach
+                        </div>
+
+
                   </fieldset>
 
                   <div class="form-row">

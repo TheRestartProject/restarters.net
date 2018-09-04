@@ -99,6 +99,7 @@ return array(
     'App\\Statistics' => $baseDir . '/app/Statistics.php',
     'App\\User' => $baseDir . '/app/User.php',
     'App\\UserGroups' => $baseDir . '/app/UserGroups.php',
+    'App\\UsersPreferences' => $baseDir . '/app/UsersPreferences.php',
     'App\\UsersSkills' => $baseDir . '/app/UsersSkills.php',
     'App\\Xref' => $baseDir . '/app/Xref.php',
     'Asm89\\Stack\\Cors' => $vendorDir . '/asm89/stack-cors/src/Asm89/Stack/Cors.php',

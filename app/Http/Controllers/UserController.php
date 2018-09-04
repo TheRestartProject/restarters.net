@@ -6,6 +6,8 @@ use Auth;
 use App\Device;
 use App\EventsUsers;
 use App\Group;
+use App\Preferences;
+use App\UsersPreferences;
 use App\Http\Controllers\PartyController;
 use App\Invite;
 use App\Party;
@@ -105,14 +107,18 @@ class UserController extends Controller
 
     $user_skills = UsersSkills::where('user', $id)->pluck('skill')->toArray();
     $user_groups = UserGroups::where('user', $id)->pluck('group')->toArray();
+    $user_preferences = UsersPreferences::where('user_id', $id)->pluck('preference_id')->toArray();
     $all_groups = Group::all();
+    $all_preferences = Preferences::all();
 
     return view('user.profile-edit', [
       'user' => $user,
       'skills' => FixometerHelper::allSkills(),
       'user_skills' => $user_skills,
       'user_groups' => $user_groups,
-      'all_groups' => $all_groups
+      'user_preferences' => $user_preferences,
+      'all_groups' => $all_groups,
+      'all_preferences' => $all_preferences
     ]);
   }
 
