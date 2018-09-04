@@ -14,11 +14,13 @@ class CreateUsersPreferencesTable extends Migration
     public function up()
     {
         Schema::create('users_preferences', function (Blueprint $table) {
+
             $table->increments('id');
-            $table->integer('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->integer('preference_id')->unsigned();
+            $table->foreign('preference_id')->references('id')->on('preferences');
             $table->timestamps();
             $table->softDeletes();
+
         });
     }
 

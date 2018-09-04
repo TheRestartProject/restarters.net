@@ -83,6 +83,7 @@ return array(
     'App\\Outbound' => $baseDir . '/app/Outbound.php',
     'App\\Party' => $baseDir . '/app/Party.php',
     'App\\Permissions' => $baseDir . '/app/Permissions.php',
+    'App\\Preferences' => $baseDir . '/app/Preferences.php',
     'App\\Providers\\AgentServiceProvider' => $baseDir . '/app/Providers/AgentServiceProvider.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
     'App\\Providers\\AuthServiceProvider' => $baseDir . '/app/Providers/AuthServiceProvider.php',

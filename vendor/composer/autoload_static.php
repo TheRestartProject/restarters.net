@@ -546,6 +546,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Outbound' => __DIR__ . '/../..' . '/app/Outbound.php',
         'App\\Party' => __DIR__ . '/../..' . '/app/Party.php',
         'App\\Permissions' => __DIR__ . '/../..' . '/app/Permissions.php',
+        'App\\Preferences' => __DIR__ . '/../..' . '/app/Preferences.php',
         'App\\Providers\\AgentServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AgentServiceProvider.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
