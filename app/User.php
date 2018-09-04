@@ -48,6 +48,10 @@ class User extends Authenticatable
       return $this->belongsToMany('App\Group', 'users_groups', 'user', 'group');
     }
 
+    public function preferences() {
+      return $this->belongsToMany('App\Preferences', 'users_preferences');
+    }
+
     //
     // public function sessions() {
     //   return $this->hasMany('App\Session', 'user', 'id');
