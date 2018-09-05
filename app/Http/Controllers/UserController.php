@@ -341,12 +341,14 @@ class UserController extends Controller
 
     // IF Preferences Selected
     if($request->input('preferences')){
-    foreach ($request->input('preferences') as $checkbox) {
-      $values = new UsersPreferences();
-      $values->preference_id = $checkbox;
-      $values->user_id = $id = Auth::id();
-      $values->save();
-    }
+      UsersPreferences::where('user_id', Auth::id())->delete();
+
+      foreach ($request->input('preferences') as $checkbox) {
+        $values = new UsersPreferences();
+        $values->preference_id = $checkbox;
+        $values->user_id = $id = Auth::id();
+        $values->save();
+      }
     // IF Preferences Empty
     } else {
       UsersPreferences::where('user_id', Auth::id())->delete();
