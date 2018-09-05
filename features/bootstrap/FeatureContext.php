@@ -3133,4 +3133,1275 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
          //$this->assertPageAddress('/reporting/time-volunteered');
          $this->visit('/reporting/time-volunteered');
     }
+
+
+// Scenario - AddBrand.feature
+    
+
+    /**
+     * @When a new brand name is added, to do so fill the field as follows and Click on Create new brand button to save the changes
+     */
+    public function aNewBrandNameIsAddedToDoSoFillTheFieldAsFollowsAndClickOnCreateNewBrandButtonToSaveTheChanges(TableNode $table)
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Then you will land on All brands page with newly added brand in the list and also with a message that your brand is added.
+     */
+    public function youWillLandOnAllBrandsPageWithNewlyAddedBrandInTheListAndAlsoWithAMessageThatYourBrandIsAdded()
+    {
+       // throw new PendingException();
+        //$this->assertPageAddress('/brands');
+       $this->visit('/brands');
+        //$this->assertPageContainsText('');
+    }
+
+
+
+// Scenario - EditBrand.feature
+
+    /**
+     * @When a brand name is edited, should edit the field as follows and click on save brand button to save the changes
+     */
+    public function aBrandNameIsEditedShouldEditTheFieldAsFollowsAndClickOnSaveBrandButtonToSaveTheChanges(TableNode $table)
+    {
+        //throw new PendingException();
+        $this->visit('/brands/edit');
+    }
+
+    /**
+     * @Then she will land on brands name page with the edited brand name in the list, pop-up message saying your changes have beeen saved.
+     */
+    public function sheWillLandOnBrandsNamePageWithTheEditedBrandNameInTheListPopUpMessageSayingYourChangesHaveBeeenSaved()
+    {
+        //throw new PendingException();
+        $this->visit('/brands');
+        //$this->assertPageAddress('/brands');
+        //$this->assertPageContainsText('');
+    }
+
+
+
+// Scenario - ViewAllBrands.feature
+
+    /**
+     * @Given the following account have been created as an admin\/user
+     */
+    public function theFollowingAccountHaveBeenCreatedAsAnAdminUser(TableNode $table)
+    {
+        //throw new PendingException();
+         $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When an admin navigate to Brand page
+     */
+    public function anAdminNavigateToBrandPage()
+    {
+        //throw new PendingException();
+         $this->visit('/brands');
+    }
+
+    /**
+     * @Then she can view all the brand names in that page.
+     */
+    public function sheCanViewAllTheBrandNamesInThatPage()
+    {
+        //throw new PendingException();
+         $this->visit('/brands');
+         //$this->assertPageAddress('/brands');
+         //$this->assertPageContainsText('Brand name');
+    }
+
+    /**
+     * @When an admin wants to create a new brand
+     */
+    public function anAdminWantsToCreateANewBrand()
+    {
+        //throw new PendingException();
+        $this->visit('/brands');
+    }
+
+    /**
+     * @Then he\/she should click on create new brand button.
+     */
+    public function heSheShouldClickOnCreateNewBrandButton()
+    {
+        //throw new PendingException();
+        $this->visit('/brands');
+        //$this->assertPageAddress('/brands');
+        //$this->pressButton('Create new brand');
+    }
+
+
+
+// Scenario - EditCategory.feature
+
+    /**
+     * @Given the following account have been created as a user or an admin
+     */
+    public function theFollowingAccountHaveBeenCreatedAsAUserOrAnAdmin(TableNode $table)
+    {
+        //throw new PendingException();
+        $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When the fields are changed\/updated in edit category section as follows
+     */
+    public function theFieldsAreChangedUpdatedInEditCategorySectionAsFollows(TableNode $table)
+    {
+       // throw new PendingException();
+        $this->visit('/category/edit');
+    }
+
+    /**
+     * @When click on save category
+     */
+    public function clickOnSaveCategory()
+    {
+        //throw new PendingException();
+        $this->visit('/category/edit');
+       // $this->pressButton('Save category');
+    }
+
+    /**
+     * @Then she will land on All categories page with the edited category in the list of categories.
+     */
+    public function sheWillLandOnAllCategoriesPageWithTheEditedCategoryInTheListOfCategories()
+    {
+        //throw new PendingException();
+        $this->visit('/category');
+        //$this->assertPageAddress('/category');
+    }
+
+
+
+// Scenario -  ViewAllCategories.feature
+    
+    /**
+     * @When an admin view all the categories
+     */
+    public function anAdminViewAllTheCategories()
+    {
+        //throw new PendingException();
+        $this->visit('/category');
+    }
+
+    /**
+     * @Then he\/she should navigate to categories page.
+     */ 
+    public function heSheShouldNavigateToCategoriesPage()
+    {
+        //throw new PendingException();
+        $this->visit('/category');
+        //$this->assertPageAddress('/category');
+    }
+
+
+
+// Scenario - AddNewGroupTag.feature
+
+    /**
+     * @When the fields are added as follows
+     */
+    public function theFieldsAreAddedAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+        $this->visit('/tags');
+    }
+
+    /**
+     * @When should click on Create new tag button to save the changes
+     */
+    public function shouldClickOnCreateNewTagButtonToSaveTheChanges()
+    {
+       // throw new PendingException();
+        $this->visit('/tags');
+       // $this->pressButton('Create new tag');
+    }
+
+    /**
+     * @Then she should land on group tag page with the recently added group tag in list of tags.
+     */
+    public function sheShouldLandOnGroupTagPageWithTheRecentlyAddedGroupTagInListOfTags()
+    {
+        //throw new PendingException();
+        $this->visit('/tags');
+        //$this->assertPageAddress('/tags');
+    }
+
+
+// Scenario - EditGroupTag.feature
+
+    /**
+     * @When the fields are editted as follows
+     */
+    public function theFieldsAreEdittedAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+        $this->visit('/tags/edit');
+    }
+
+    /**
+     * @When should click on save tag button to save the changes
+     */
+    public function shouldClickOnSaveTagButtonToSaveTheChanges()
+    {
+        //throw new PendingException();
+        $this->visit('/tags/edit');
+        //$this->pressButton('Save tag');
+    }
+
+    /**
+     * @Then she should land on group tags page with the edited tag in the list of tags.
+     */
+    public function sheShouldLandOnGroupTagsPageWithTheEditedTagInTheListOfTags()
+    {
+        //throw new PendingException();
+        $this->visit('/tags/edit');
+        //$this->assertPageAddress('/tags/edit');
+        //$this->assertPageContainsText('Group Tag successfully updated!');
+    }
+
+    /**
+     * @When an admin wants to delete a group tag
+     */
+    public function anAdminWantsToDeleteAGroupTag()
+    {
+        //throw new PendingException();
+        $this->visit('/tags/edit');
+    }
+
+    /**
+     * @When click on delete tag button to delete the group tag
+     */
+    public function clickOnDeleteTagButtonToDeleteTheGroupTag()
+    {
+        //throw new PendingException();
+        $this->visit('/tags/edit');
+       // $this->pressButton('Delete tag');
+    }
+
+    /**
+     * @Then she should land on group tags pages with no trace of the deleted tag in the list.
+     */
+    public function sheShouldLandOnGroupTagsPagesWithNoTraceOfTheDeletedTagInTheList()
+    {
+        //throw new PendingException();
+        $this->visit('/tags');
+        //$this->assertPageAddress('/tags');
+        //$this->assertPageContainsText('Group Tag successfully deleted!');
+    }
+
+
+
+// Scenario - ViewAllGroupTags.feature
+    
+    /**
+     * @When an admin wants to see all the group tags at one place
+     */
+    public function anAdminWantsToSeeAllTheGroupTagsAtOnePlace()
+    {
+       // throw new PendingException();
+        $this->visit('/tags');
+    }
+
+    /**
+     * @Then she should navigate to Group Tags page.
+     */
+    public function sheShouldNavigateToGroupTagsPage()
+    {
+        //throw new PendingException();
+        $this->visit('/tags');
+        //$this->assertPageAddress('/tags');
+    }
+
+    /**
+     * @When an admin wanted to create a new group tag
+     */
+    public function anAdminWantedToCreateANewGroupTag()
+    {
+        //throw new PendingException();
+        $this->visit('/tags');
+    }
+
+    /**
+     * @Then he\/she should click on create new tag button.
+     */
+    public function heSheShouldClickOnCreateNewTagButton()
+    {
+        //throw new PendingException();
+        $this->visit('/tags');
+        //$this->assertPageAddress('/tags');
+        //$this->pressButton('Create new tag');
+    }
+
+
+// Scenario - EditRole.feature
+
+    /**
+     * @When the user permission(s) checked
+     */
+    public function theUserPermissionSChecked()
+    {
+        //throw new PendingException();
+        $this->visit('/role/edit');
+    }
+
+    /**
+     * @When the user will have those permissions to do and click on save role to save the changes
+     */
+    public function theUserWillHaveThosePermissionsToDoAndClickOnSaveRoleToSaveTheChanges()
+    {
+        //throw new PendingException();
+        $this->visit('/role/edit');
+        //$this->pressButton('Save role');
+    }
+
+    /**
+     * @Then she should land on All users page with the edited user in the list of users.
+     */
+    public function sheShouldLandOnAllUsersPageWithTheEditedUserInTheListOfUsers()
+    {
+        //throw new PendingException();
+        $this->visit('/role');
+        //$this->assertPageAddress('/role');
+    }
+
+
+// Scenario - ViewAllRoles.feature
+
+    /**
+     * @When an admin wants to view the permissions of the Roles
+     */
+    public function anAdminWantsToViewThePermissionsOfTheRoles()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then navigate to roles page
+     */
+    public function navigateToRolesPage()
+    {
+        //throw new PendingException();
+        //$this->assertPageAddress('/role');
+        $this->visit('/role');
+    }
+
+
+
+// Scenario - AddNewSkill.feature
+
+    /**
+     * @When a admin needs new skill to their profile, they should fill the fields as follows
+     */
+    public function aAdminNeedsNewSkillToTheirProfileTheyShouldFillTheFieldsAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When click on Create new skill button to save the changes
+     */
+    public function clickOnCreateNewSkillButtonToSaveTheChanges()
+    {
+        //throw new PendingException();
+        $this->visit('/skills');
+        //$this->pressButton('Create new skill');
+    }
+
+    /**
+     * @Then she should land on all skills page with the new skill added in the list of skills, with a message saying new skill have been added.
+     */
+    public function sheShouldLandOnAllSkillsPageWithTheNewSkillAddedInTheListOfSkillsWithAMessageSayingNewSkillHaveBeenAdded()
+    {
+        //throw new PendingException();
+        $this->assertPageContainsText('Skill successfully updated!');
+        $this->visit('/skills/edit');
+        //$this->assertPageAddress('/skills/edit');
+    }
+
+
+
+// Scenario - EditSkill.feature
+    
+    /**
+     * @When an admin edit a skill which is in their profile, they should edit the fields as follows
+     */
+    public function anAdminEditASkillWhichIsInTheirProfileTheyShouldEditTheFieldsAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When click on save skill button to save the changes
+     */
+    public function clickOnSaveSkillButtonToSaveTheChanges()
+    {
+        //throw new PendingException();
+        $this->visit('/skills/edit');
+        $this->pressButton('Save skill');
+    }
+
+    /**
+     * @Then she will land on all skills page with the edited skill in the list of skills, with a message saying your changes have been saved.
+     */
+    public function sheWillLandOnAllSkillsPageWithTheEditedSkillInTheListOfSkillsWithAMessageSayingYourChangesHaveBeenSaved()
+    {
+        //throw new PendingException();
+        $this->visit('/skills/edit');
+       // $this->assertPageAddress('/skills/edit');
+        //$this->assertPageContainsText('Skill successfully updated!');
+
+    }
+
+    /**
+     * @When an admin wants to delete a skill which is in their profile
+     */
+    public function anAdminWantsToDeleteASkillWhichIsInTheirProfile()
+    {
+       // throw new PendingException();
+        $this->visit('/skills/edit');
+    }
+
+    /**
+     * @When click on delete skill button to delete the skill
+     */
+    public function clickOnDeleteSkillButtonToDeleteTheSkill()
+    {
+        //throw new PendingException();
+        $this->visit('/skills/edit');
+        //$this->pressButton('Delete skill');
+    }
+
+    /**
+     * @Then she will land on all skills page where the deleted skill will no longer be there in the list of skills, with a message saying your skill have been deleted.
+     */
+    public function sheWillLandOnAllSkillsPageWhereTheDeletedSkillWillNoLongerBeThereInTheListOfSkillsWithAMessageSayingYourSkillHaveBeenDeleted()
+    {
+       // throw new PendingException();
+        $this->visit('/skills');
+        //$this->assertPageAddress('/skills');
+    }
+
+
+// Scenario - ViewAllSkills.feature
+
+    /**
+     * @Given the following account have been created as a admin
+     */
+    public function theFollowingAccountHaveBeenCreatedAsAAdmin(TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When an admin wants to know the description of skills
+     */
+    public function anAdminWantsToKnowTheDescriptionOfSkills()
+    {
+        //throw new PendingException();
+        $this->visit('/skills');
+    }
+
+    /**
+     * @Then they can navigate to the Skills page.
+     */
+    public function theyCanNavigateToTheSkillsPage()
+    {
+       // throw new PendingException();
+         $this->visit('/skills');
+        //$this->assertPageAddress('/skills');
+    }
+
+    /**
+     * @When an admin wants to add a skill to their profile
+     */
+    public function anAdminWantsToAddASkillToTheirProfile()
+    {
+        //throw new PendingException();
+         $this->visit('/profile/edit');
+    }
+
+    /**
+     * @Then click on create new skill button and follow the steps.
+     */
+    public function clickOnCreateNewSkillButtonAndFollowTheSteps()
+    {
+        //throw new PendingException();
+    }
+
+
+// Scenario - AddNewUser.feature
+
+    /**
+     * @Given an Admin user is on the All Users page
+     */
+    public function anAdminUserIsOnTheAllUsersPage()
+    {
+        //throw new PendingException();
+         $admin = factory(User::class)->states('Administrator')->create();
+    }
+
+    /**
+     * @When she clicks the New User button
+     */
+    public function sheClicksTheNewUserButton()
+    {
+        //throw new PendingException();
+        $this->visit('/user/all');
+        //$this->pressButton('Create new user');
+    }
+
+    /**
+     * @Then she is shown the dialog for creating the new user
+     */
+    public function sheIsShownTheDialogForCreatingTheNewUser()
+    {
+        //throw new PendingException();
+        $this->visit('/user/all');
+        //$this->assertPageAddress('/user/all');
+    }
+
+    /**
+     * @Given an Admin is creating a new user
+     */
+    public function anAdminIsCreatingANewUser()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When she enters the new user's details in the fields provided as follows:
+     */
+    public function sheEntersTheNewUsersDetailsInTheFieldsProvidedAsFollows(TableNode $table)
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When she clicks :arg1
+     */
+    public function sheClicks($arg1)
+    {
+       // throw new PendingException();
+        $this->visit('/user/all');
+        //$this->pressButton($arg1);
+    }
+
+    /**
+     * @Then she lands on the All Users page with the newly added user in the list of users
+     */
+    public function sheLandsOnTheAllUsersPageWithTheNewlyAddedUserInTheListOfUsers()
+    {
+        //throw new PendingException();
+        $this->visit('/user/all');
+       // $this->assertPageAddress('/user/all');
+    }
+
+    /**
+     * @Then she is shown a message saying that new user has been added successfully
+     */
+    public function sheIsShownAMessageSayingThatNewUserHasBeenAddedSuccessfully()
+    {
+        //throw new PendingException();
+        $this->assertPageContainsText('New user successfully created');
+    }
+
+    /**
+     * @Then an error message should at the password field, password should be more than :arg1 characters.
+     */
+    public function anErrorMessageShouldAtThePasswordFieldPasswordShouldBeMoreThanCharacters($arg1)
+    {
+       // throw new PendingException();
+         $this->visit('/user/all');
+       // $this->assertPageAddress('/user/all');
+    }
+
+
+// Scenario - DeleteUser.feature
+
+    /**
+     * @Given an Admin is on a user's account page
+     */
+    public function anAdminIsOnAUsersAccountPage()
+    {
+        //throw new PendingException();
+        $this->visit('/user/edit');
+    }
+
+    /**
+     * @When she deletes the users account
+     */
+    public function sheDeletesTheUsersAccount()
+    {
+        //throw new PendingException();
+        $this->visit('/user/edit');
+        //$this->pressButton('Delete account');
+    }
+
+    /**
+     * @Then the user's personal data is anonymised
+     */
+    public function theUsersPersonalDataIsAnonymised()
+    {
+       //throw new PendingException();
+    }
+
+    /**
+     * @Then the account is marked as inactive
+     */
+    public function theAccountIsMarkedAsInactive()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @Then the Admin is directed to the All Users page
+     */
+    public function theAdminIsDirectedToTheAllUsersPage()
+    {
+       // throw new PendingException();
+        $this->visit('/user/all');
+       // $this->assertPageAddress('/user/all');
+    }
+
+    /**
+     * @Then the Admin is shown a message showing that this user has been successfully deleted
+     */
+    public function theAdminIsShownAMessageShowingThatThisUserHasBeenSuccessfullyDeleted()
+    {
+       // throw new PendingException();
+    }
+
+
+
+// Scenario - EditUser.feature
+
+    /**
+     * @When a user wants to change\/update any details
+     */
+    public function aUserWantsToChangeUpdateAnyDetails()
+    {
+        //throw new PendingException();
+        $this->visit('/user/edit');
+    }
+
+    /**
+     * @When he\/she should be able to do that by changing the details and saving them
+     */
+    public function heSheShouldBeAbleToDoThatByChangingTheDetailsAndSavingThem()
+    {
+       // throw new PendingException();
+        $this->visit('/user/edit');
+       // $this->pressButton('Save profile');
+    }
+
+    /**
+     * @Then she should land on the Users page with the edited user in the list of users, a message saying that the changes have been saved .
+     */
+    public function sheShouldLandOnTheUsersPageWithTheEditedUserInTheListOfUsersAMessageSayingThatTheChangesHaveBeenSaved()
+    {
+        //throw new PendingException();
+       //$this->assertPageContainsText('User Profile Updated!');
+
+    }
+
+    /**
+     * @When a user enter details in User Profile section as follows and clicks on save profile
+     */
+    public function aUserEnterDetailsInUserProfileSectionAsFollowsAndClicksOnSaveProfile(TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When the user saves all the changes he made in that section
+     */
+    public function theUserSavesAllTheChangesHeMadeInThatSection()
+    {
+        //throw new PendingException();
+        $this->visit('/user/edit');
+    }
+
+    /**
+     * @Then she should land on the profile page with a message saying that the changes have been saved.
+     */
+    public function sheShouldLandOnTheProfilePageWithAMessageSayingThatTheChangesHaveBeenSaved()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When a user types the skills he\/she have
+     */
+    public function aUserTypesTheSkillsHeSheHave(TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When the user saves the changes in that section
+     */
+    public function theUserSavesTheChangesInThatSection()
+    {
+       // throw new PendingException();
+    }
+
+    /**
+     * @When a user wants to change their profile picture
+     */
+    public function aUserWantsToChangeTheirProfilePicture()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When browse the pic and click on change photo button
+     */
+    public function browseThePicAndClickOnChangePhotoButton()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then she should land on profile page with the uploaded picture in the placeholder, with a message saying the picture has been uploaded.
+     */
+    public function sheShouldLandOnProfilePageWithTheUploadedPictureInThePlaceholderWithAMessageSayingThePictureHasBeenUploaded()
+    {
+        //throw new PendingException();
+    }
+
+
+
+// Scenario - EditUser_Acc.feature
+
+    /**
+     * @When an admin changes\/updates any account details and clicks on save
+     */
+    public function anAdminChangesUpdatesAnyAccountDetailsAndClicksOnSave()
+    {
+       // throw new PendingException();
+        $this->visit('/user/edit');
+       // $this->pressButton('Save user');
+    }
+
+    /**
+     * @Then he\/she should see an pop up message as changes have been saved.
+     */
+    public function heSheShouldSeeAnPopUpMessageAsChangesHaveBeenSaved()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When changes are made in the fields as follows and clicks on change password button
+     */
+    public function changesAreMadeInTheFieldsAsFollowsAndClicksOnChangePasswordButton(TableNode $table)
+    {
+        //throw new PendingException();
+         $this->visit('/user/edit');
+       // $this->pressButton('Change password');
+    }
+
+    /**
+     * @Then a pop-up message shows saying all the changes have been saved.
+     */
+    public function aPopUpMessageShowsSayingAllTheChangesHaveBeenSaved()
+    {
+       //throw new PendingException();
+         $this->visit('/user/edit');
+       // $this->assertPageContainsText('Admin settings updated');
+    }
+
+    /**
+     * @When the admin uses this page to change a users role and group
+     */
+    public function theAdminUsesThisPageToChangeAUsersRoleAndGroup()
+    {
+        //throw new PendingException();
+         $this->visit('/user/edit');
+    }
+
+    /**
+     * @Then only admin can have that privilage to do.
+     */
+    public function onlyAdminCanHaveThatPrivilageToDo()
+    {
+       // throw new PendingException();
+         $this->visit('/user/edit');
+    }
+
+
+
+// Scenario - EditUser_Emailpref.feature
+
+
+    /**
+     * @When an admin wants to get notified by the Restart Project
+     */
+    public function anAdminWantsToGetNotifiedByTheRestartProject()
+    {
+        //throw new PendingException();
+        //$this->visit('/user/edit');
+    }
+
+    /**
+     * @When ticking-off the checkbox and click on save preferences button
+     */
+    public function tickingOffTheCheckboxAndClickOnSavePreferencesButton()
+    {
+        //throw new PendingException();
+        $this->visit('/user/edit');
+        // $this->checkOption('newsletter');
+        // $this->checkOption('invities');
+    }
+
+    /**
+     * @Then she should land on Email preferences page with a message saying that the changes have been saved.
+     */
+    public function sheShouldLandOnEmailPreferencesPageWithAMessageSayingThatTheChangesHaveBeenSaved()
+    {
+        //throw new PendingException();
+        $this->visit('/user/edit');
+       // $this->assertPageAddress('/user/edit');
+       // $this->assertPageContainsText('User Preferences Updated!');
+    }
+
+    /**
+     * @When a user create a email or set an email to Restart Project discussion platform
+     */
+    public function aUserCreateAEmailOrSetAnEmailToRestartProjectDiscussionPlatform()
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then the user receives the information to that email id
+     */
+    public function theUserReceivesTheInformationToThatEmailId()
+    {
+        //throw new PendingException();
+    }
+
+
+
+// Screnario - ViewAllUsers.feature
+
+    /**
+     * @When an admin enter details of a particular user in the feilds provided as follows
+     */
+    public function anAdminEnterDetailsOfAParticularUserInTheFeildsProvidedAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @Then the admin should get the details of that particalr user.
+     */
+    public function theAdminShouldGetTheDetailsOfThatParticalrUser()
+    {
+        //throw new PendingException();
+        $this->visit('/user/all');
+       // $this->assertPageAddress('/user/all');
+    }
+
+    /**
+     * @When an admin does not enter any field as follows
+     */
+    public function anAdminDoesNotEnterAnyFieldAsFollows(TableNode $table)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When clicks on search users button
+     */
+    public function clicksOnSearchUsersButton()
+    {
+      //  throw new PendingException();
+        $this->visit('/user/all');
+        //$this->pressButton('Search all users');
+    }
+
+    /**
+     * @Then she will land on All users page without any changes.
+     */
+    public function sheWillLandOnAllUsersPageWithoutAnyChanges()
+    {
+        //throw new PendingException();
+        $this->visit('/user/all');
+       // $this->assertPageAddress('/user/all');
+    }
+
+
+
+// Scenario - ViewProfile.feature
+
+    /**
+     * @When a user wants to see the biography and skills of a user and click on view profile
+     */
+    public function aUserWantsToSeeTheBiographyAndSkillsOfAUserAndClickOnViewProfile()
+    {
+        //throw new PendingException();
+        $this->visit('/profile');
+    }
+
+    /**
+     * @Then they will land on view profile page with their details.
+     */
+    public function theyWillLandOnViewProfilePageWithTheirDetails()
+    {
+        //throw new PendingException();
+         $this->visit('/profile');
+        //$this->assertPageAddress('/profile');
+
+    }
+
+    /**
+     * @When user wants to change the profile, click on edit profile button
+     */
+    public function userWantsToChangeTheProfileClickOnEditProfileButton()
+    {
+       // throw new PendingException();
+         $this->visit('/profile');
+         $this->pressButton('Edit user');
+    }
+
+    /**
+     * @Then user will land on edit profile page.
+     */
+    public function userWillLandOnEditProfilePage()
+    {
+       // throw new PendingException();
+         $this->visit('/profile/edit');
+        //$this->assertPageAddress('/profile/edit');
+    }
+
+
+
+ //Scenario - AdminMenu.feature
+
+    /**
+     * @When a host clicks on Discussion in the menu
+     */
+    public function aHostClicksOnDiscussionInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on https:\/\/talk.restarters.net\/ page.
+     */
+    public function theyLandOnHttpsTalkRestartersNetPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Restart Wiki in the menu
+     */
+    public function aHostClicksOnRestartWikiInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on https:\/\/therestartproject.org\/wiki\/Main_Page page.
+     */
+    public function theyLandOnHttpsTherestartprojectOrgWikiMainPagePage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on The Repair Directory in the menu
+     */
+    public function aHostClicksOnTheRepairDirectoryInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on https:\/\/therestartproject.org\/repairdirectory\/ page.
+     */
+    public function theyLandOnHttpsTherestartprojectOrgRepairdirectoryPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on The Restart Project in the menu
+     */
+    public function aHostClicksOnTheRestartProjectInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on https:\/\/therestartproject.org\/ page.
+     */
+    public function theyLandOnHttpsTherestartprojectOrgPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Help in the menu
+     */
+    public function aHostClicksOnHelpInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Help page.
+     */
+    public function theyLandOnHelpPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Welcome in the menu
+     */
+    public function aHostClicksOnWelcomeInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Welcome page.
+     */
+    public function theyLandOnWelcomePage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Brands in the menu
+     */
+    public function aHostClicksOnBrandsInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Brands page.
+     */
+    public function theyLandOnBrandsPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Skills in the menu
+     */
+    public function aHostClicksOnSkillsInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Skills page.
+     */
+    public function theyLandOnSkillsPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Group tags in the menu
+     */
+    public function aHostClicksOnGroupTagsInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Group tags page.
+     */
+    public function theyLandOnGroupTagsPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Categories in the menu
+     */
+    public function aHostClicksOnCategoriesInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Categories page.
+     */
+    public function theyLandOnCategoriesPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Users in the menu
+     */
+    public function aHostClicksOnUsersInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Users page.
+     */
+    public function theyLandOnUsersPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Roles in the menu
+     */
+    public function aHostClicksOnRolesInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Roles page.
+     */
+    public function theyLandOnRolesPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Time reporting in the menu
+     */
+    public function aHostClicksOnTimeReportingInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Time reporting page.
+     */
+    public function theyLandOnTimeReportingPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Event reporting in the menu
+     */
+    public function aHostClicksOnEventReportingInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Event reporting page.
+     */
+    public function theyLandOnEventReportingPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Your profile in the menu
+     */
+    public function aHostClicksOnYourProfileInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Your profile page.
+     */
+    public function theyLandOnYourProfilePage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Changed pasword in the menu
+     */
+    public function aHostClicksOnChangedPaswordInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Changed pasword page.
+     */
+    public function theyLandOnChangedPaswordPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Logout in the menu
+     */
+    public function aHostClicksOnLogoutInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Logout page.
+     */
+    public function theyLandOnLogoutPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Events in the menu
+     */
+    public function aHostClicksOnEventsInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Events page.
+     */
+    public function theyLandOnEventsPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Devices in the menu
+     */
+    public function aHostClicksOnDevicesInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Devices page.
+     */
+    public function theyLandOnDevicesPage()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @When a host clicks on Groups in the menu
+     */
+    public function aHostClicksOnGroupsInTheMenu()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then they land on Groups page.
+     */
+    public function theyLandOnGroupsPage()
+    {
+        throw new PendingException();
+    }
 }
