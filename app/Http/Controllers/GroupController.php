@@ -1104,6 +1104,72 @@ class GroupController extends Controller
 
   }
 
+  public function addHost(Request $request) {
+
+    $user_id = $request->input('user_id');
+    $group_id = $request->input('group_id');
+
+    $return = [
+      'success' => false
+    ];
+
+    //Has current logged in user got permission to add host
+    if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id()) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator') ) {
+
+      //Let's make the user a host
+      $volunteer = UserGroups::where('user', $user_id)
+                    ->where('group', $group_id)
+                      ->update([
+                        'role' => 3
+                      ]);
+
+      //Return JSON
+      $return = [
+        'success' => true
+      ];
+
+    }
+
+    return response()->json($return);
+
+  }
+
+  public function removeVolunteer(Request $request) {
+
+    $user_id = $request->input('user_id');
+    $group_id = $request->input('group_id');
+
+    $return = [
+      'success' => false
+    ];
+
+    //Has current logged in user got permission to remove volunteer
+    if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id()) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator') ) {
+
+      //Let's get the user before we delete them
+      $volunteer = UserGroups::where('user', $user_id)->where('group', $group_id)->first();
+
+      //Let's delete the user
+      $delete_user = UserGroups::where('user', $user_id)->where('group', $group_id)->delete();
+      if( $delete_user == 1 ){
+
+        //If the user accepted the invitation, we decrement
+        if( $volunteer->status == 1 )
+        Group::find($group_id)->decrement('pax');
+
+        //Return JSON
+        $return = [
+          'success' => true
+        ];
+
+      }
+
+    }
+
+    return response()->json($return);
+
+  }
+
   // public function test() {
   //   $g = new Group;
   //   dd($g->findOne('1'));
