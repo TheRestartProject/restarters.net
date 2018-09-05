@@ -7,7 +7,7 @@ class RssController extends Controller
   public function parties() {
       $Parties = new Party;
       // $this->set('parties', $Parties->findAll());
-      
+
       return $Parties->findAll();
   }
 
@@ -17,5 +17,6 @@ class RssController extends Controller
 
       return $Groups->findAll();
   }
+
 
 }

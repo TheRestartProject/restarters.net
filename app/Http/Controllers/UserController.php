@@ -339,8 +339,19 @@ class UserController extends Controller
     // Sync with user_groups
     $user->groups()->sync($request->input('assigned_groups'));
 
+    // IF Preferences Selected
+    if($request->input('preferences')){
+    foreach ($request->input('preferences') as $checkbox) {
+      $values = new UsersPreferences();
+      $values->preference_id = $checkbox;
+      $values->user_id = $id = Auth::id();
+      $values->save();
+    }
+    // IF Preferences Empty
+    } else {
+      UsersPreferences::where('user_id', Auth::id())->delete();
+    }
     return redirect()->back()->with('message', 'Admin settings updated!');
-
   }
 
   public function postEdit(Request $request) {
