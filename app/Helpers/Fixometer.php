@@ -779,4 +779,47 @@ class FixometerHelper {
 
   }
 
+
+  /** checks if user has Admin Permissions **/
+  public static function hasAdminPermission($user){
+
+        // Check if guest
+        if ( Auth::guest() ) {
+          return false;
+        }
+
+        // Check if user does not exist
+        if (is_null($user)) {
+          $user = Auth::user();
+        }
+
+        // Get Admin's Role
+        $user = Auth::user()->role;
+
+        // Check if User's Role is ID
+        if ( !is_numeric($user) ){
+          return response()->json(['message' => 'false']);
+        }
+
+        // Get the Admin Role ID
+        $adminRole = Role::where('idroles', '=', 2)->value('idroles');
+
+        // Check if Role is ID
+        if ( !is_numeric($adminRole) ){
+          return response()->json(['message' => 'false']);
+        }
+
+        // Check if UserRole ID matches AdminRole ID
+        if($user != $adminRole){
+          return response()->json(['message' => 'false']);
+        }
+
+        return [
+          '1' => 'True'
+        ];
+    }
+
+// Functionality to get user's Permissions
+// $user = Auth::user()->preferences()->where('preference_id', 3)->get()
+
 }

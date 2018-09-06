@@ -157,6 +157,11 @@
                                 <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
                                 <li><a href="@lang('general.discourse_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_discourse')</a></li>
                                 <li><a href="@lang('general.wiki_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_wiki')</a></li>
+                                @if ( FixometerHelper::hasAdminPermission(Auth::user() ) )
+                                <li>yes</li>
+                                @else
+                                <li>no</li>
+                                @endif
                                 <!-- <li><a href="#" target="_blank" rel="noopener noreferrer">The Repair Directory</a></li> -->
                             </ul>
                         </li>

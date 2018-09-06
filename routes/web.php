@@ -249,3 +249,15 @@ Route::get('/admin/stats/2', function() {
 Route::get('/party/stats/{id}/wide', function($id) {
   return App\Http\Controllers\PartyController::stats($id);
 });
+
+
+
+
+Route::get('/fooo', function(){
+
+  return FixometerHelper::hasPermission(Auth::user() );
+  // <li>{{$user}}</li>
+  // @else
+  // <li>no</li>
+  // @endif
+});
