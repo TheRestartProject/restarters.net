@@ -637,6 +637,7 @@ class GroupController extends Controller
         'is_host_of_group' => $is_host_of_group,
         'user_groups' => $user_groups,
         'view_group' => $view_group,
+        'group_id' => $groupid,
       ]);
 
   }
@@ -1104,10 +1105,10 @@ class GroupController extends Controller
 
   }
 
-  public function addHost(Request $request) {
+  public function addHost($group_id, $user_id, Request $request) {
 
-    $user_id = $request->input('user_id');
-    $group_id = $request->input('group_id');
+    // $user_id = $request->input('user_id');
+    // $group_id = $request->input('group_id');
 
     $return = [
       'success' => false
@@ -1130,14 +1131,16 @@ class GroupController extends Controller
 
     }
 
-    return response()->json($return);
+    // return response()->json($return);
+
+    return redirect()->back();
 
   }
 
-  public function removeVolunteer(Request $request) {
+  public function removeVolunteer($group_id, $user_id, Request $request) {
 
-    $user_id = $request->input('user_id');
-    $group_id = $request->input('group_id');
+    // $user_id = $request->input('user_id');
+    // $group_id = $request->input('group_id');
 
     $return = [
       'success' => false
@@ -1154,8 +1157,8 @@ class GroupController extends Controller
       if( $delete_user == 1 ){
 
         //If the user accepted the invitation, we decrement
-        if( $volunteer->status == 1 )
-        Group::find($group_id)->decrement('pax');
+        // if( $volunteer->status == 1 )
+        // Group::find($group_id)->decrement('pax');
 
         //Return JSON
         $return = [
@@ -1166,7 +1169,9 @@ class GroupController extends Controller
 
     }
 
-    return response()->json($return);
+    // return response()->json($return);
+
+    return redirect()->back();
 
   }
 

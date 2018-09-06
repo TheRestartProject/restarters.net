@@ -34,8 +34,13 @@ class ExportController extends Controller {
         $Device = new Device;
         $weights = $Device->getWeights();
 
-        $this->TotalWeight = $weights[0]->total_weights;
-        $this->TotalEmission = $weights[0]->total_footprints;
+        if (isset($weights[0]) && !empty($weights[0])) {
+          $this->TotalWeight = $weights[0]->total_weights;
+          $this->TotalEmission = $weights[0]->total_footprints;
+        } else {
+          $this->TotalWeight = null;
+          $this->TotalEmission = null;
+        }
         $footprintRatioCalculator = new FootprintRatioCalculator();
         $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
 
@@ -399,7 +404,7 @@ class ExportController extends Controller {
         //By location
         //Country
         if ($request->input('country') !== null) {
-          $user_events = $user_events->where('country', $request->input('country'));
+          $user_events = $user_events->where('users.country', $request->input('country'));
         }
 
         //Region
