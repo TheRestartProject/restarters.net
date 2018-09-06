@@ -798,7 +798,7 @@ class FixometerHelper {
 
         // Check if User's Role is ID
         if ( !is_numeric($user) ){
-          return response()->json(['message' => 'false']);
+          return false;
         }
 
         // Get the Admin Role ID
@@ -806,17 +806,19 @@ class FixometerHelper {
 
         // Check if Role is ID
         if ( !is_numeric($adminRole) ){
-          return response()->json(['message' => 'false']);
+          return false;
         }
 
         // Check if UserRole ID matches AdminRole ID
         if($user != $adminRole){
-          return response()->json(['message' => 'false']);
+          return false;
+        } else {
+          return true;
         }
 
-        return [
-          '1' => 'True'
-        ];
+
+
+
     }
 
 // Functionality to get user's Permissions

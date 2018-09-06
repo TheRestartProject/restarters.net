@@ -255,9 +255,5 @@ Route::get('/party/stats/{id}/wide', function($id) {
 
 Route::get('/fooo', function(){
 
-  return FixometerHelper::hasPermission(Auth::user() );
-  // <li>{{$user}}</li>
-  // @else
-  // <li>no</li>
-  // @endif
+  return FixometerHelper::hasAdminPermission(Auth::user() );
 });
