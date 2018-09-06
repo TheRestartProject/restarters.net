@@ -250,10 +250,8 @@ Route::get('/party/stats/{id}/wide', function($id) {
   return App\Http\Controllers\PartyController::stats($id);
 });
 
-
-
-
-Route::get('/fooo', function(){
-
-  return FixometerHelper::hasAdminPermission(Auth::user() );
-});
+// Test FixometerHelper function
+// Route::get('/fooo', function(){
+//
+//   return FixometerHelper::hasAdminPermission(Auth::user() );
+// });

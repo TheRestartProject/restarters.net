@@ -7,6 +7,7 @@ use App\Role;
 use App\Skills;
 use App\UserGroups;
 use App\Permissions;
+use App\RolePermissions;
 
 use App;
 use Auth;
@@ -800,10 +801,15 @@ class FixometerHelper {
         if ( !is_numeric($user) ){
           return false;
         }
+        // Check if Permission Exists
+        $adminPermission = RolePermissions::where('role', '=', 2)->where('permission', '=', 5)->exists();
+
+        if ($adminPermission === null) {
+           return false;
+        }
 
         // Get the Admin Role ID
         $adminRole = Role::where('idroles', '=', 2)->value('idroles');
-
         // Check if Role is ID
         if ( !is_numeric($adminRole) ){
           return false;
@@ -815,9 +821,6 @@ class FixometerHelper {
         } else {
           return true;
         }
-
-
-
 
     }
 
