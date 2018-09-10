@@ -18,9 +18,8 @@ Route::prefix('user')->group(function () {
     Route::get('recover', 'UserController@recover');
     Route::post('recover', 'UserController@recover');
     Route::get('register/{hash?}', 'UserController@getRegister')->name('registration');
-    Route::post('register/{hash?}', 'UserController@postRegister');
     Route::post('register/check-valid-email',  'UserController@postEmail');
-
+    Route::post('register/{hash?}', 'UserController@postRegister');
 });
 
 

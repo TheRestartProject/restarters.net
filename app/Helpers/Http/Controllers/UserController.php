@@ -296,19 +296,19 @@ class UserController extends Controller
   public function postProfilePictureEdit(Request $request) {
 
     if ($request->input('id') !== null) {
-        $id = $request->input('id');
-      } else {
-        $id = Auth::id();
-      }
+      $id = $request->input('id');
+    } else {
+      $id = Auth::id();
+    }
 
     if(isset($_FILES) && !empty($_FILES)){
 
-      $file = $request->file('profilePhoto');
-      $path = 'images/' . $file->getClientOriginalName();
-      $image = Image::make($file)
-      // ->resize(320, 240)
-      ->orientate()
-      ->save($path);
+      // $file = $request->file('profilePhoto');
+      // $path = 'images/' . $file->getClientOriginalName();
+      // $image = Image::make($file)
+      // // ->resize(320, 240)
+      // ->orientate()
+      // ->save($path);
 
       $file = new FixometerFile;
       $file->upload('profilePhoto', 'image', $id, env('TBL_USERS'), false, true);
@@ -349,7 +349,7 @@ class UserController extends Controller
         $values->user_id = $id = Auth::id();
         $values->save();
       }
-    // IF Preferences Empty
+      // IF Preferences Empty
     } else {
       UsersPreferences::where('user_id', Auth::id())->delete();
     }
@@ -1327,19 +1327,8 @@ public function getOnboardingComplete() {
 
 public function postEmail(Request $request) {
 
-  if( User::where("email", "=", $email)->exists()){
-    return response()->json([
-      'email' => $email,
-      'success' => true,
-      'message' => 'error'
-    ]);
-  } else {
-    return response()->json([
-      'email' => $email,
-      'success' => true,
-      'message' => 'continue'
-    ]);
+  if( User::where("email", "=", $request->get('email'))->exists()){
+    return response()->json(['message' => 'This email Address already exists, please choose another...']);
   }
-
 }
 }

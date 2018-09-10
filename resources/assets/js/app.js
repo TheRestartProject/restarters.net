@@ -1437,10 +1437,17 @@ function initAutocomplete() {
       $('#free_text').val($('#description').summernote('code'));
     });
 
+
+
+
+
+
+
+
     $("#registeremail").blur(function() {
 
+      if ( $(this).val().length > 0 ){
       var email = $('#registeremail').val();
-      console.log(email);
 
       $.ajax({
         headers: {
@@ -1452,14 +1459,23 @@ function initAutocomplete() {
           email : email
         },
         dataType : 'json',
-        success: function(){
-          alert('success!');
+        success: function(response){
+
+          alert(response['message']);
+
         },
         error: function(){
-          alert('error!');
         }
       });
+    }
     });
+
+
+
+
+
+
+
 
     // If event has attended or invited people then user cannot delete the event
     $("#deleteEvent").click(function (e) {

@@ -31450,26 +31450,26 @@ $(document).ready(function () {
 
   $("#registeremail").blur(function () {
 
-    var email = $('#registeremail').val();
-    console.log(email);
+    if ($(this).val().length > 0) {
+      var email = $('#registeremail').val();
 
-    $.ajax({
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      type: 'POST',
-      url: '/user/register/check-valid-email',
-      data: {
-        email: email
-      },
-      dataType: 'json',
-      success: function success() {
-        alert('success!');
-      },
-      error: function error() {
-        alert('error!');
-      }
-    });
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: '/user/register/check-valid-email',
+        data: {
+          email: email
+        },
+        dataType: 'json',
+        success: function success(response) {
+
+          alert(response['message']);
+        },
+        error: function error() {}
+      });
+    }
   });
 
   // If event has attended or invited people then user cannot delete the event
