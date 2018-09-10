@@ -31466,8 +31466,11 @@ $(document).ready(function () {
         success: function success(response) {
 
           alert(response['message']);
+          $('div.emailtest > .invalid-feedback').show();
         },
-        error: function error() {}
+        error: function error() {
+          $('.invalid-feedback').hide();
+        }
       });
     }
   });

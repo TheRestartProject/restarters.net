@@ -73,10 +73,13 @@
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="form-group">
+                            <div class="form-group emailtest">
                                 <label for="email">@lang('auth.email_address'):<sup>*</sup></label>
                                 @if( Auth::check() )
-                                  <input type="email" class="form-control field" id="registeremail" name="email" value="{{{ Auth::user()->email }}}" disabled aria-required="true">
+                                  <input type="email" class="form-control field is-valid" id="registeremail" name="email" value="{{{ Auth::user()->email }}}" disabled aria-required="true">
+                                  <div class="invalid-feedback">
+                                    Please choose a username.
+                                  </div>
                                 @else
                                   <input type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }} field" id="registeremail" name="email" value="{{{ old('email') }}}" required aria-required="true">
                                 @endif

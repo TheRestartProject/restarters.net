@@ -1462,9 +1462,11 @@ function initAutocomplete() {
         success: function(response){
 
           alert(response['message']);
+          $('div.emailtest > .invalid-feedback').show();
 
         },
         error: function(){
+          $('.invalid-feedback').hide();
         }
       });
     }
