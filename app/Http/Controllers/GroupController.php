@@ -1110,6 +1110,9 @@ class GroupController extends Controller
     //Has current logged in user got permission to add host
     if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id()) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator') ) {
 
+      // Retrieve user
+      $user = User::find($user_id);
+
       //Let's make the user a host
       $volunteer = UserGroups::where('user', $user_id)
                     ->where('group', $group_id)
@@ -1117,18 +1120,11 @@ class GroupController extends Controller
                         'role' => 3
                       ]);
 
-      // User should be automatically updated to host
-      $update_role = User::where('id', $user_id)->where('role', '>', 3)->update([
-        'role' => 3
-      ]);
-
-
-      return redirect()->back()->with('message', 'Thanks, '.trim($update_role->name).' is now a host of your group');
-
+      return redirect()->back()->with('success', 'We have made '.$user->name.' a host for this group');
 
     }
 
-    return redirect()->back()->with('message', 'You do not have permission to do this');
+    return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
 
   }
 
@@ -1137,22 +1133,27 @@ class GroupController extends Controller
     //Has current logged in user got permission to remove volunteer
     if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id()) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator') ) {
 
-      // Grab user info
+      // Retrieve user
       $user = User::find($user_id);
 
-      // Let's delete the user
+      //Let's delete the user
       $delete_user = UserGroups::where('user', $user_id)->where('group', $group_id)->delete();
       if( $delete_user == 1 ){
 
-        return redirect()->back()->with('message', trim($user->name).' has been removed from the group');
+        return redirect()->back()->with('success', 'We have removed '.$user->name.' from this group');
+
+      } else {
+
+        return redirect()->back()->with('warning', 'We are unable to remove '.$user->name.' from this group');
 
       }
 
-      return redirect()->back()->with('message', 'Sorry, we were not able to remove volunteer from the group');
+    } else {
+
+      return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
 
     }
 
-    return redirect()->back()->with('message', 'You do not have permission to do this');
 
   }
 
