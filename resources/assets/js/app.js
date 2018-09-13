@@ -195,8 +195,6 @@ function onboarding() {
   }
 }
 
-$("#warning_volunteers_message").hide();
-
 function serialize(tokenfield) {
   var items = tokenfield.getItems();
   //console.log(items);
@@ -475,9 +473,19 @@ function initAutocomplete() {
 
   }
 
+  var current_volunteers = parseInt(jQuery('input[name=volunteer_qty]').val());
+
   function updateVolunteers() {
+
     var quantity = $('#volunteer_qty').val();
     var event_id = $('#event_id').val();
+
+    // Let's see whether there's been a manual change
+    if( quantity != current_volunteers ){
+      $("#warning_volunteers_message").fadeIn(200);
+    } else {
+      $("#warning_volunteers_message").hide();
+    }
 
     $.ajax({
       headers: {
@@ -520,30 +528,26 @@ function initAutocomplete() {
       updateParticipants();
     });
 
-
     jQuery('.decreaseVolunteers').on('click', function (e) {
 
       e.preventDefault();
 
       var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
-
       if (value > 0) {
         jQuery(this).parent().find('input[type="number"]').val(value - 1);
       }
-      $("#warning_volunteers_message").fadeIn(200);
+
       updateVolunteers();
 
     });
-
 
     jQuery('.increaseVolunteers').on('click', function (e) {
 
       e.preventDefault();
 
       var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
-
       jQuery(this).parent().find('input[type="number"]').val(value + 1);
-      $("#warning_volunteers_message").fadeIn(200);
+
       updateVolunteers();
 
     });
@@ -1167,7 +1171,10 @@ function initAutocomplete() {
     });
 
     $('#volunteer_qty').on('change', function() {
+
+      var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
       updateVolunteers();
+
     });
 
     $('.add-device').on('submit', function(e) {
@@ -1437,57 +1444,41 @@ function initAutocomplete() {
       $('#free_text').val($('#description').summernote('code'));
     });
 
-
-
-
-
-
-
-
     $("#registeremail").blur(function() {
 
       if ( $(this).val().length > 0 ){
-      var email = $('#registeremail').val();
 
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        type:'POST',
-        url:'/user/register/check-valid-email',
-        data: {
-          email : email
-        },
-        dataType : 'json',
-        success: function(response){
+        var email = $('#registeremail').val();
 
-          alert(response['message']);
-          $('div.emailtest > .invalid-feedback').show();
+        $.ajax({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          type:'POST',
+          url:'/user/register/check-valid-email',
+          data: {
+            email : email
+          },
+          dataType : 'json',
+          success: function(response){
+            $('div.emailtest > .invalid-feedback').text(response['message']).show();
+          },
+          error: function(){
+            $('.invalid-feedback').hide();
+          }
+        });
 
-        },
-        error: function(){
-          $('.invalid-feedback').hide();
-        }
-      });
-    }
+      }
     });
-
-
-
-
-
-
-
 
     // If event has attended or invited people then user cannot delete the event
     $("#deleteEvent").click(function (e) {
       if($('#countAttended').val() > 0 || $('#countInvited').val() > 0 || $('#countVolunteers').val() > 0) {
         e.preventDefault()
-        alert('Sorry you cannot delete this event as you have invited other volunteers?');
+        alert('Sorry you cannot delete this event as you have invited other volunteers');
       } else {
-
-        // If the event has no attended or invited then ask confirmation
-        return confirm('Please confirm to delete this event');
+        return confirm('Are you sure you want to delete this event?');
       }
     });
+
   });

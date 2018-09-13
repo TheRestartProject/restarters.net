@@ -18333,7 +18333,6 @@ table.sortable > thead th div.mozilla {
   padding: 15px;
   padding-left: 60px;
   position: relative;
-  z-index: 1;
   font-size: 13px;
   border-bottom: 1px #D9D9D9 solid;
   -webkit-box-flex: 1;
@@ -18434,8 +18433,30 @@ table.sortable > thead th div.mozilla {
   margin: auto;
 }
 
+.users-list .dropdown-menu {
+  border-radius: 3px;
+  z-index: 9999;
+}
+
+.users-list .dropdown-menu .dropdown-item {
+  padding: 0.25rem 1.5rem;
+}
+
 span.popover-usergroups {
   text-decoration: underline;
+}
+
+.btn-group-volunteers button {
+  text-decoration: underline;
+  color: #000;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.btn-group-volunteers button:hover {
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .mini-stats {

@@ -516,13 +516,6 @@ class DeviceController extends Controller
       return response()->json($validator->messages(), 200);
     }
 
-
-    // $deviceCount = Wordlist::where('id', '<=', $correctedComparisons)->get();
-
-
-
-
-
     $category       = $request->input('category');
     $weight         = $request->input('weight');
     $brand          = $request->input('brand');
@@ -537,20 +530,6 @@ class DeviceController extends Controller
 
     // get the number of rows in the DB where event id already exists
     $deviceCount = DB::table('devices')->where('event', '=', $event_id)->count();
-
-    // if the number of devices exceeds 4 then show the following message
-    if($deviceCount > env('DEVICE_ABNORMAL_MISC_COUNT', 5)){
-
-      // Send to all users with the role of Administrator
-      // Mail::to(DB::table('users')->where('role', '=', 2)->email)->send(new AbnormalDevices());
-
-      // Send to the currently logged in user
-      Mail::to(Auth::user()->email)->send(new AbnormalDevices());
-      $message  = 'Abnormal number of devices has been added!';
-      return response()->json(['error' => $message]);
-
-    }
-
 
     // add quantity loop
     for ($i=0; $i < $quantity; $i++) {
@@ -618,6 +597,14 @@ class DeviceController extends Controller
       $return['html'] = $views;
       $return['success'] = true;
       $return['stats'] = $stats;
+
+      // If the number of devices exceeds set amount then show the following message
+      if( $deviceCount > env('DEVICE_ABNORMAL_MISC_COUNT', 5) ) {
+
+        // Send to all users with the role of Administrator - awaiting preference logic
+        // Mail::to(Auth::user()->email)->send(new AbnormalDevices());
+
+      }
 
       return response()->json(array('return' => $return,
       'deviceCount' => $deviceCount,

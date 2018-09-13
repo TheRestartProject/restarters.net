@@ -328,19 +328,18 @@
                         </div>
                       </div>
 
-                        <div class="form-group col-lg-6">
-                          <label for="preferences">Permissions</label>
-                          <hr>
+                        <div class="form-group col-lg-12">
+                          <label>Permissions</label>
                           @foreach($all_preferences as $preference)
-                              <div class="checkbox">
-                                @if(in_array($preference->id, $user_preferences))
-                                <input type="checkbox"  checked class="checkbox style-2 pull-right" name="preferences[]" value="{{ $preference->id }}">{{ $preference->purpose }}
-                                <label>{{ $preference->name }}</label>
-                                @else
-                                <input type="checkbox" class="checkbox style-2 pull-right" name="preferences[]" value="{{ $preference->id }}">{{ $preference->purpose }}
-                                <label>{{ $preference->name }}</label>
-                                @endif
-                              </div>
+                            <div class="form-group form-check">
+                              <input @if(in_array($preference->id, $user_preferences)) checked @endif type="checkbox" class="form-check-input" id="preference-{{ $preference->id }}" name="preferences[]" value="{{ $preference->id }}">
+                              <label class="form-check-label" for="preference-{{ $preference->id }}">
+                                {{ $preference->name }}
+                              </label>
+                              @if( !empty($preference->purpose) )
+                                <small class="form-text text-muted">{{{ $preference->purpose }}}</small>
+                              @endif
+                            </div>
                           @endforeach
                         </div>
 

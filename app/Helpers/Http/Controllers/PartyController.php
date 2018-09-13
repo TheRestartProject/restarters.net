@@ -652,6 +652,10 @@ public function view($id) {
   $Party = new Party;
   $event = Party::find($id);
 
+  // If event no longer exists
+  if( empty($event) )
+    abort(404);
+
   //Event details
   $images = $File->findImages(env('TBL_EVENTS'), $id);
   $party = $Party->findThis($id, true)[0];
@@ -1535,40 +1539,40 @@ public function getContributions($event_id){
 }
 
 
-
-
 public function deleteEvent($id){
+
+  if( !isset($id) )
+    abort(404);
 
   $user = User::find(Auth::id());
 
   // Check for authentication
-  if( !FixometerHelper::hasRole($user, 'Host') && !FixometerHelper::hasRole($user, 'Administrator')){
+  if( !FixometerHelper::userHasEditPartyPermission($id, Auth::id()) || !FixometerHelper::hasRole($user, 'Administrator')){
 
     return redirect()->back()->with('warning', 'You do not have permission to delete this event');
 
-  }else{
+  } else {
 
-    if( !is_null($id) && is_numeric($id) ) {
+    // Check to see whether the columns volunteers and pax has a value less than or equal to zero
+    $event = Party::where('idevents', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->first();
+    if( !empty($event) ) {
 
-      // Check to see whether the columns volunteers and pax has a value less than or equal to zero
-      $event = DB::table('events')->where('idevents', '=', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->get();
-      if($event == true){
+      // Let's delete everything just to be certain
+      $device = Device::where('event', $id)->delete();
+      $event_users = EventsUsers::where('event', $id)->delete();
+      $event = Party::where('idevents', $id)->delete();
 
-        $device = DB::table('devices')->where('event', '=', $id)->delete();
-        $event_users = DB::table('events_users')->where('event', '=', $id)->delete();
-        $event = DB::table('events')->where('idevents', '=', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->delete();
-        // dd($event);
+      // Let the user know everything has been done
+      return redirect('/party')->with('success', 'Event has been deleted');
 
-        $response['success'] = 'Event has been deleted!';
-        return redirect('/party')->with('response', $response);
-      }
-    }
-    else {
-      return redirect()->back()->with('warning', 'You do not have permission to delete this event');
+    } else {
+      return redirect()->back()->with('warning', 'You are not able to delete this event as volunteers have been invited');
     }
 
     return redirect()->back()->with('warning', 'You do not have permission to delete this event');
+
   }
+
 }
 
 }

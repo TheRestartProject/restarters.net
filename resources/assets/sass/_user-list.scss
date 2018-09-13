@@ -69,7 +69,6 @@
         padding: 15px;
         padding-left: 60px;
         position: relative;
-        z-index: 1;
         font-size: 13px;
         border-bottom: 1px #D9D9D9 solid;
         flex: 1 0 100%;
@@ -159,8 +158,31 @@
         }
 
     }
+
+    .dropdown-menu {
+      border-radius: 3px;
+      z-index: 9999;
+      .dropdown-item {
+        padding: 0.25rem 1.5rem;
+      }
+    }
+
 }
 
 span.popover-usergroups {
     text-decoration: underline;
+}
+
+.btn-group-volunteers {
+  button {
+    text-decoration: underline;
+    color: #000;
+    background-color: transparent;
+    border: 0;
+    padding: 0;
+    &:hover {
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
 }

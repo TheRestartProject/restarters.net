@@ -7,7 +7,7 @@ use App\Role;
 use App\Skills;
 use App\UserGroups;
 use App\Permissions;
-use App\RolePermissions;
+use App\UsersPreferences;
 
 use App;
 use Auth;
@@ -781,50 +781,25 @@ class FixometerHelper {
   }
 
 
-  /** checks if user has Admin Permissions **/
-  public static function hasAdminPermission($user){
+  /** checks if user has preference **/
+  public static function hasPreference( $preference_id ){
 
-        // Check if guest
-        if ( Auth::guest() ) {
-          return false;
-        }
+    // Check if guest
+    if ( Auth::guest() )
+      return false;
 
-        // Check if user does not exist
-        if (is_null($user)) {
-          $user = Auth::user();
-        }
+    // Check if Permission Exists
+    $has_permission = UsersPreferences::where('user_id', Auth::user()->id)
+                                        ->where('preference_id', $preference_id)
+                                          ->first();
 
-        // Get Admin's Role
-        $user = Auth::user()->role;
-
-        // Check if User's Role is ID
-        if ( !is_numeric($user) ){
-          return false;
-        }
-        // Check if Permission Exists
-        $adminPermission = RolePermissions::where('role', '=', 2)->where('permission', '=', 5)->exists();
-
-        if ($adminPermission === null) {
-           return false;
-        }
-
-        // Get the Admin Role ID
-        $adminRole = Role::where('idroles', '=', 2)->value('idroles');
-        // Check if Role is ID
-        if ( !is_numeric($adminRole) ){
-          return false;
-        }
-
-        // Check if UserRole ID matches AdminRole ID
-        if($user != $adminRole){
-          return false;
-        } else {
-          return true;
-        }
-
+    // Does user have it?
+    if ( empty($has_permission) ) {
+      return false;
+    } else {
+      return true;
     }
 
-// Functionality to get user's Permissions
-// $user = Auth::user()->preferences()->where('preference_id', 3)->get()
+  }
 
 }

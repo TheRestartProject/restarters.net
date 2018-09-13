@@ -6,27 +6,19 @@ use App\Device;
 use App\Helpers\FootprintRatioCalculator;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 use DB;
 
 class Party extends Model implements Auditable
 {
+
+    use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
+
     protected $table = 'events';
-
     protected $primaryKey = 'idevents';
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = ['group', 'event_date', 'start', 'end', 'venue', 'location', 'latitude', 'longitude', 'free_text', 'pax', 'volunteers', 'hours', 'wordpress_post_id', 'created_at', 'updated_at'];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
     protected $hidden = [];
 
     //Getters

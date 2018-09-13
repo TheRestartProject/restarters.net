@@ -10,7 +10,7 @@ use DB;
 class Group extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
-    
+
     protected $table = 'groups';
     protected $primaryKey = 'idgroups';
     /**
@@ -161,7 +161,7 @@ class Group extends Model implements Auditable
     }
 
     public function allVolunteers(){
-        return $this->hasMany('App\UserGroups', 'group', 'idgroups');
+        return $this->hasMany('App\UserGroups', 'group', 'idgroups')->orderBy('role','ASC');
     }
 
     public function allConfirmedVolunteers()

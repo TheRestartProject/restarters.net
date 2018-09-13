@@ -35,9 +35,16 @@
 
   @if( isset($type) )
     @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator'))
-      <td>
-        <a href="#" class="users-list__remove js-remove" data-remove-volunteer="{{ $volunteer->user }}" data-event-id="{{ $volunteer->event }}" data-type="{{{ $type }}}">@lang('partials.remove_volunteer')</a>
-      </td>
+      @if( $type == 'group' )
+        <td>
+          @include('partials.volunteer-dropdown')
+        </td>
+      @else
+        <td align="right">
+          <a href="#" class="users-list__remove js-remove" data-remove-volunteer="{{ $volunteer->user }}" data-event-id="{{ $volunteer->event }}" data-type="{{{ $type }}}">@lang('partials.remove_volunteer')</a>
+        </td>
+      @endif
     @endif
   @endif
+
 </tr>

@@ -125,8 +125,8 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/image/delete/{idgroups}/{id}/{path}', 'GroupController@ajaxDeleteImage');
     Route::get('/{all?}', 'GroupController@index')->name('groups');
     Route::get('/all/search', 'GroupController@search');
-    Route::get('/add-host/{group_id}/{user_id}', 'GroupController@addHost');
-    Route::get('/remove-volunteer/{group_id}/{user_id}', 'GroupController@removeVolunteer');
+    Route::get('/make-host/{group_id}/{user_id}', 'GroupController@getMakeHost');
+    Route::get('/remove-volunteer/{group_id}/{user_id}', 'GroupController@getRemoveVolunteer');
   });
 
   //Outbound Controller
@@ -143,11 +143,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::post('/manage/{id}', 'PartyController@manage');
     Route::get('/edit/{id}', 'PartyController@edit');
     Route::post('/edit/{id}', 'PartyController@edit');
-
     Route::get('/delete/{id}', 'PartyController@deleteEvent');
-    Route::post('/delete/{id}', 'PartyController@deleteEvent');
-
-
     Route::get('/deleteimage', 'PartyController@deleteimage');
     Route::get('/join/{id}', 'PartyController@getJoinEvent');
     Route::post('/invite', 'PartyController@postSendInvite');
@@ -160,7 +156,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::post('/image-upload/{id}', 'PartyController@imageUpload');
     Route::get('/image/delete/{idevents}/{id}/{path}', 'PartyController@deleteImage');
     Route::get('/contribution/{id}', 'PartyController@getContributions');
-
 
     Route::post('/update-volunteerquantity', 'PartyController@updateVolunteerQuantity');
   });
@@ -248,9 +243,3 @@ Route::get('/admin/stats/2', function() {
 Route::get('/party/stats/{id}/wide', function($id) {
   return App\Http\Controllers\PartyController::stats($id);
 });
-
-// Test FixometerHelper function
-// Route::get('/fooo', function(){
-//
-//   return FixometerHelper::hasAdminPermission(Auth::user() );
-// });

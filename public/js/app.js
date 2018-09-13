@@ -30268,8 +30268,6 @@ function onboarding() {
   }
 }
 
-$("#warning_volunteers_message").hide();
-
 function serialize(tokenfield) {
   var items = tokenfield.getItems();
   //console.log(items);
@@ -30530,9 +30528,19 @@ function updateParticipants() {
   });
 }
 
+var current_volunteers = parseInt(jQuery('input[name=volunteer_qty]').val());
+
 function updateVolunteers() {
+
   var quantity = $('#volunteer_qty').val();
   var event_id = $('#event_id').val();
+
+  // Let's see whether there's been a manual change
+  if (quantity != current_volunteers) {
+    $("#warning_volunteers_message").fadeIn(200);
+  } else {
+    $("#warning_volunteers_message").hide();
+  }
 
   $.ajax({
     headers: {
@@ -30579,11 +30587,10 @@ function numericInputs() {
     e.preventDefault();
 
     var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
-
     if (value > 0) {
       jQuery(this).parent().find('input[type="number"]').val(value - 1);
     }
-    $("#warning_volunteers_message").fadeIn(200);
+
     updateVolunteers();
   });
 
@@ -30592,9 +30599,8 @@ function numericInputs() {
     e.preventDefault();
 
     var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
-
     jQuery(this).parent().find('input[type="number"]').val(value + 1);
-    $("#warning_volunteers_message").fadeIn(200);
+
     updateVolunteers();
   });
 }
@@ -31189,6 +31195,8 @@ $(document).ready(function () {
   });
 
   $('#volunteer_qty').on('change', function () {
+
+    var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
     updateVolunteers();
   });
 
@@ -31451,6 +31459,7 @@ $(document).ready(function () {
   $("#registeremail").blur(function () {
 
     if ($(this).val().length > 0) {
+
       var email = $('#registeremail').val();
 
       $.ajax({
@@ -31464,9 +31473,7 @@ $(document).ready(function () {
         },
         dataType: 'json',
         success: function success(response) {
-
-          alert(response['message']);
-          $('div.emailtest > .invalid-feedback').show();
+          $('div.emailtest > .invalid-feedback').text(response['message']).show();
         },
         error: function error() {
           $('.invalid-feedback').hide();
@@ -31479,11 +31486,9 @@ $(document).ready(function () {
   $("#deleteEvent").click(function (e) {
     if ($('#countAttended').val() > 0 || $('#countInvited').val() > 0 || $('#countVolunteers').val() > 0) {
       e.preventDefault();
-      alert('Sorry you cannot delete this event as you have invited other volunteers?');
+      alert('Sorry you cannot delete this event as you have invited other volunteers');
     } else {
-
-      // If the event has no attended or invited then ask confirmation
-      return confirm('Please confirm to delete this event');
+      return confirm('Are you sure you want to delete this event?');
     }
   });
 });

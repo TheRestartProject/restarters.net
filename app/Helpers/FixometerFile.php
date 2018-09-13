@@ -4,6 +4,7 @@ use App\Xref;
 use App\Images;
 
 use Illuminate\Database\Eloquent\Model;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class FixometerFile extends Model {
 
@@ -63,6 +64,11 @@ class FixometerFile extends Model {
                 $data = array();
                 $this->path = $path;
                 $data['path'] = $this->file;
+
+                // Fix orientation
+                $image = Image::make($path)
+                ->orientate()
+                ->save($path);
 
                 if($type === 'image'){
                     $size = getimagesize($this->path);

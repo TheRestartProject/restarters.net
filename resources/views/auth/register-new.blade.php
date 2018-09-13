@@ -83,7 +83,7 @@
                                 @else
                                   <input type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }} field" id="registeremail" name="email" value="{{{ old('email') }}}" required aria-required="true">
                                 @endif
-                                <div class="invalid-feedback">@lang('auth.email_address_validation')</div>
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                         <div class="col-lg-6">

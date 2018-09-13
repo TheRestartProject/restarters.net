@@ -73,8 +73,9 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">Edit event</a>
-
-              <a href="{{ url('/') }}/party/delete/{{ $formdata->id }}" id="deleteEvent" class="dropdown-item">delete event</a>
+              @if( !$event->isInProgress() || !$event->hasFinished() )
+              <a href="{{ url('/') }}/party/delete/{{ $formdata->id }}" id="deleteEvent" class="dropdown-item">Delete event</a>
+              @endif
               <input type="hidden" name="attended" id="countAttended" value="{{count($attended)}}">
               <input type="hidden" name="invited" id="countInvited" value="{{count($invited)}}">
               <input type="hidden" name="volunteers" id="countVolunteers" value="{{ $event->volunteers }}">
@@ -168,34 +169,35 @@
                   @endif
 
                   @if( $event->isInProgress() || $event->hasFinished() )
-                  <div class="col-4 col-label d-flex flex-column"><strong>Volunteers:</strong></div>
-                  <div class="col-8 d-flex flex-column">
-                    @if( Auth::check() )
-                    @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-                    <div>
-                      <div class="input-group-qty">
-                        <label for="volunteer_qty" class="sr-only">Quantity:</label>
-                        <button class="increaseVolunteers btn-value">+</button>
-                        <input name="volunteer_qty" id="volunteer_qty" maxlength="3" value="{{ $event->volunteers }}" title="Qty" class="input-text form-control qty" type="number">
-                        <button class="decreaseVolunteers btn-value">–</button>
-                      </div>
-                    </div>
-                    @else
-                    {{ $event->volunteers }}
-                    @endif
-                    @else
-                    {{ $event->volunteers }}
-                    @endif
 
-                  </div>
+                    <div class="col-4 col-label d-flex flex-column"><strong>Volunteers:</strong></div>
+
+                    <div class="col-8 d-flex flex-column">
+                      @if( Auth::check() )
+                      @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+                      <div>
+                        <div class="input-group-qty">
+                          <label for="volunteer_qty" class="sr-only">Quantity:</label>
+                          <button class="increaseVolunteers btn-value">+</button>
+                          <input name="volunteer_qty" id="volunteer_qty" maxlength="3" value="{{ $event->volunteers }}" title="Qty" class="input-text form-control qty" type="number">
+                          <button class="decreaseVolunteers btn-value">–</button>
+                        </div>
+                      </div>
+                      @else
+                      {{ $event->volunteers }}
+                      @endif
+                      @else
+                      {{ $event->volunteers }}
+                      @endif
+
+                    </div>
+
+                    <div class="col-12 invalid-feedback" id="warning_volunteers_message" style="display: none;">
+                      It is recommended to invite volunteers using the attendance section.
+                    </div>
+
                   @endif
 
-                  <div class="alert alert-warning" role="alert" id="warning_volunteers_message" style="font-size: 15px;">
-                      <strong>Warning!</strong> It is recommended to invite volunteers using the attendance section.
-                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
                 </div>
 
               </div>

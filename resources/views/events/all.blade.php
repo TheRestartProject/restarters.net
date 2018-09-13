@@ -16,6 +16,17 @@
       </div>
     </div>
 
+    @if (\Session::has('success'))
+    <div class="alert alert-success">
+      {!! \Session::get('success') !!}
+    </div>
+    @endif
+    @if (\Session::has('warning'))
+    <div class="alert alert-warning">
+      {!! \Session::get('warning') !!}
+    </div>
+    @endif
+
     <div class="row justify-content-center">
       <div class="col-lg-12">
 
@@ -46,7 +57,7 @@
           </table>
 
           </div>
-          
+
         </section>
 
         <div class="d-flex justify-content-center">

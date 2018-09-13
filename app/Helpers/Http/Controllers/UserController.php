@@ -1328,7 +1328,7 @@ public function getOnboardingComplete() {
 public function postEmail(Request $request) {
 
   if( User::where("email", "=", $request->get('email'))->exists()){
-    return response()->json(['message' => 'This email Address already exists, please choose another...']);
+    return response()->json(['message' =>  __('auth.email_address_validation')]);
   }
 }
 }

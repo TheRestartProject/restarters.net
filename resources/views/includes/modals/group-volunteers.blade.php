@@ -25,11 +25,12 @@
               <th></th>
               <th scope="col">@lang('groups.restarter_column_table')</th>
               <th scope="col">@lang('groups.skills_column_table')</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             @foreach( $view_group->allConfirmedVolunteers as $volunteer )
-              @include('partials.volunteer-row')
+              @include('partials.volunteer-row', ['type' => 'group'])
             @endforeach
           </tbody>
         </table>
