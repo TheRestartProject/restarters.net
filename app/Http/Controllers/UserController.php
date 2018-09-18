@@ -12,19 +12,6 @@ use App\Http\Controllers\PartyController;
 use App\Invite;
 use App\Party;
 use App\Notifications\ResetPassword;
-// use App\Notifications\JoinGroup;
-// use App\Notifications\JoinEvent;
-// use App\Notifications\EventDevices;
-// use App\Notifications\EventRepairs;
-// use App\Notifications\NewRegister;
-// use App\Notifications\RSVPEvent;
-// use App\Notifications\NewGroupMember;
-// use App\Notifications\ModerationEvent;
-// use App\Notifications\EventConfirmed;
-// use App\Notifications\ModerationGroup;
-// use App\Notifications\GroupConfirmed;
-// use App\Notifications\ReviewNotes;
-// use App\Notifications\AccountCreated;
 use App\Role;
 use App\Skills;
 use App\User;
@@ -324,12 +311,12 @@ class UserController extends Controller
   public function postAdminEdit(Request $request) {
 
     if ($request->input('id') !== null) {
-      $id = $request->input('id');
+      $user_id = $request->input('id');
     } else {
-      $id = Auth::id();
+      $user_id = Auth::id();
     }
 
-    $user = User::find($id);
+    $user = User::find($user_id);
 
     // Set role for User
     $user->update([
@@ -341,17 +328,17 @@ class UserController extends Controller
 
     // IF Preferences Selected
     if($request->input('preferences')){
-      UsersPreferences::where('user_id', Auth::id())->delete();
+      UsersPreferences::where('user_id', $user_id)->delete();
 
       foreach ($request->input('preferences') as $checkbox) {
         $values = new UsersPreferences();
         $values->preference_id = $checkbox;
-        $values->user_id = $id = Auth::id();
+        $values->user_id = $user_id;
         $values->save();
       }
       // IF Preferences Empty
     } else {
-      UsersPreferences::where('user_id', Auth::id())->delete();
+      UsersPreferences::where('user_id', $user_id)->delete();
     }
     return redirect()->back()->with('message', 'Admin settings updated!');
   }
