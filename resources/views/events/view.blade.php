@@ -193,7 +193,7 @@
                     </div>
 
                     <div class="col-12 invalid-feedback" id="warning_volunteers_message" style="display: none;">
-                      It is recommended to invite volunteers using the attendance section.
+                      @lang('events.warning_volunteers_message')
                     </div>
 
                   @endif
