@@ -99,6 +99,7 @@ return array(
     'App\\Statistics' => $baseDir . '/app/Statistics.php',
     'App\\User' => $baseDir . '/app/User.php',
     'App\\UserGroups' => $baseDir . '/app/UserGroups.php',
+    'App\\UsersPermissions' => $baseDir . '/app/UsersPermissions.php',
     'App\\UsersPreferences' => $baseDir . '/app/UsersPreferences.php',
     'App\\UsersSkills' => $baseDir . '/app/UsersSkills.php',
     'App\\Xref' => $baseDir . '/app/Xref.php',

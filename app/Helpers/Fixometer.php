@@ -8,6 +8,7 @@ use App\Skills;
 use App\UserGroups;
 use App\Permissions;
 use App\UsersPreferences;
+use App\UsersPermissions;
 
 use App;
 use Auth;
@@ -782,15 +783,38 @@ class FixometerHelper {
 
 
   /** checks if user has preference **/
-  public static function hasPreference( $preference_id ){
+  public static function hasPreference( $slug ){
+
+    // Check if guest
+    if ( Auth::guest() )
+      return false;
+
+    // Check if preference exists
+    $has_preference = UsersPreferences::join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
+                                      ->where('users_preferences.user_id', Auth::user()->id)
+                                        ->where('preferences.slug', $slug)
+                                          ->first();
+
+    // Does user have it?
+    if ( empty($has_preference) ) {
+      return false;
+    } else {
+      return true;
+    }
+
+  }
+
+  /** checks if user has preference **/
+  public static function hasPermission( $slug ){
 
     // Check if guest
     if ( Auth::guest() )
       return false;
 
     // Check if Permission Exists
-    $has_permission = UsersPreferences::where('user_id', Auth::user()->id)
-                                        ->where('preference_id', $preference_id)
+    $has_permission = UsersPermissions::join('permissions', 'permissions.idpermissions', '=', 'users_permissions.permission_id')
+                                      ->where('users_permissions.user_id', Auth::user()->id)
+                                        ->where('permissions.slug', $slug)
                                           ->first();
 
     // Does user have it?

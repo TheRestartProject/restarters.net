@@ -562,6 +562,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Statistics' => __DIR__ . '/../..' . '/app/Statistics.php',
         'App\\User' => __DIR__ . '/../..' . '/app/User.php',
         'App\\UserGroups' => __DIR__ . '/../..' . '/app/UserGroups.php',
+        'App\\UsersPermissions' => __DIR__ . '/../..' . '/app/UsersPermissions.php',
         'App\\UsersPreferences' => __DIR__ . '/../..' . '/app/UsersPreferences.php',
         'App\\UsersSkills' => __DIR__ . '/../..' . '/app/UsersSkills.php',
         'App\\Xref' => __DIR__ . '/../..' . '/app/Xref.php',

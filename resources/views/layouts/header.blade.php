@@ -157,7 +157,7 @@
                                 <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
                                 <li><a href="@lang('general.discourse_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_discourse')</a></li>
                                 <li><a href="@lang('general.wiki_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_wiki')</a></li>
-                                @if ( FixometerHelper::hasPreference(1) )
+                                @if ( FixometerHelper::hasPermission('repair-directory') )
                                   <li><a href="https://map.restarters.net/admin" target="_blank" rel="noopener noreferrer">Repair Directory</a></li>
                                 @endif
                             </ul>

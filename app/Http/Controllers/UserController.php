@@ -7,7 +7,9 @@ use App\Device;
 use App\EventsUsers;
 use App\Group;
 use App\Preferences;
+use App\Permissions;
 use App\UsersPreferences;
+use App\UsersPermissions;
 use App\Http\Controllers\PartyController;
 use App\Invite;
 use App\Party;
@@ -94,9 +96,13 @@ class UserController extends Controller
 
     $user_skills = UsersSkills::where('user', $id)->pluck('skill')->toArray();
     $user_groups = UserGroups::where('user', $id)->pluck('group')->toArray();
+
     $user_preferences = UsersPreferences::where('user_id', $id)->pluck('preference_id')->toArray();
+    $user_permissions = UsersPermissions::where('user_id', $id)->pluck('permission_id')->toArray();
+
     $all_groups = Group::all();
     $all_preferences = Preferences::all();
+    $all_permissions = Permissions::all();
 
     return view('user.profile-edit', [
       'user' => $user,
@@ -104,8 +110,10 @@ class UserController extends Controller
       'user_skills' => $user_skills,
       'user_groups' => $user_groups,
       'user_preferences' => $user_preferences,
+      'user_permissions' => $user_permissions,
       'all_groups' => $all_groups,
-      'all_preferences' => $all_preferences
+      'all_preferences' => $all_preferences,
+      'all_permissions' => $all_permissions
     ]);
   }
 
@@ -323,24 +331,12 @@ class UserController extends Controller
       'role' => $request->input('user_role'),
     ]);
 
-    // Sync with user_groups
+    // Sync relevant pivots
     $user->groups()->sync($request->input('assigned_groups'));
+    $user->preferences()->sync($request->input('preferences'));
+    $user->permissions()->sync($request->input('permissions'));
 
-    // IF Preferences Selected
-    if($request->input('preferences')){
-      UsersPreferences::where('user_id', $user_id)->delete();
-
-      foreach ($request->input('preferences') as $checkbox) {
-        $values = new UsersPreferences();
-        $values->preference_id = $checkbox;
-        $values->user_id = $user_id;
-        $values->save();
-      }
-      // IF Preferences Empty
-    } else {
-      UsersPreferences::where('user_id', $user_id)->delete();
-    }
-    return redirect()->back()->with('message', 'Admin settings updated!');
+    return redirect()->back()->with('message', 'Admin settings updated');
   }
 
   public function postEdit(Request $request) {

@@ -328,20 +328,35 @@
                         </div>
                       </div>
 
-                        <div class="form-group col-lg-12">
-                          <label>Preferences:</label>
-                          @foreach($all_preferences as $preference)
-                            <div class="form-group form-check">
-                              <input @if(in_array($preference->id, $user_preferences)) checked @endif type="checkbox" class="form-check-input" id="preference-{{ $preference->id }}" name="preferences[]" value="{{ $preference->id }}">
-                              <label class="form-check-label" for="preference-{{ $preference->id }}">
-                                {{ $preference->name }}
-                              </label>
-                              @if( !empty($preference->purpose) )
-                                <small class="form-text text-muted">{{{ $preference->purpose }}}</small>
-                              @endif
-                            </div>
-                          @endforeach
-                        </div>
+                      <div class="form-group col-lg-6">
+                        <label>Preferences:</label>
+                        @foreach($all_preferences as $preference)
+                          <div class="form-group form-check">
+                            <input @if(in_array($preference->id, $user_preferences)) checked @endif type="checkbox" class="form-check-input" id="preference-{{ $preference->id }}" name="preferences[]" value="{{ $preference->id }}">
+                            <label class="form-check-label" for="preference-{{ $preference->id }}">
+                              {{ $preference->name }}
+                            </label>
+                            @if( !empty($preference->purpose) )
+                              <small class="form-text text-muted">{{{ $preference->purpose }}}</small>
+                            @endif
+                          </div>
+                        @endforeach
+                      </div>
+
+                      <div class="form-group col-lg-6">
+                        <label>Permissions:</label>
+                        @foreach($all_permissions as $permission)
+                          <div class="form-group form-check">
+                            <input @if(in_array($permission->idpermissions, $user_permissions)) checked @endif type="checkbox" class="form-check-input" id="permission-{{ $permission->idpermissions }}" name="permissions[]" value="{{ $permission->idpermissions }}">
+                            <label class="form-check-label" for="permission-{{ $permission->idpermissions }}">
+                              {{ $permission->permission }}
+                            </label>
+                            @if( !empty($permission->purpose) )
+                              <small class="form-text text-muted">{{{ $permission->purpose }}}</small>
+                            @endif
+                          </div>
+                        @endforeach
+                      </div>
 
 
                   </fieldset>

@@ -49,7 +49,11 @@ class User extends Authenticatable
     }
 
     public function preferences() {
-      return $this->belongsToMany('App\User', 'users_preferences');
+      return $this->belongsToMany('App\User', 'users_preferences', 'user_id', 'preference_id');
+    }
+
+    public function permissions() {
+      return $this->belongsToMany('App\User', 'users_permissions', 'user_id', 'permission_id');
     }
 
     //

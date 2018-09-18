@@ -14,12 +14,10 @@ class UsersPreferences extends Model {
    */
   protected $fillable = ['preference_id', 'user_id'];
 
-  protected $primaryKey = 'id';
+  public function preferences() {
 
-  public function reference() {
+    return $this->belongsToMany('App\Preferences', 'users_preferences', 'user_id', 'preference_id');
 
-    return $this->belongsToMany('App\Preferences', 'users_preferences');
-    
   }
 
 }
