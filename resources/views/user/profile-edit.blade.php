@@ -329,7 +329,7 @@
                       </div>
 
                         <div class="form-group col-lg-12">
-                          <label>Permissions</label>
+                          <label>Preferences:</label>
                           @foreach($all_preferences as $preference)
                             <div class="form-group form-check">
                               <input @if(in_array($preference->id, $user_preferences)) checked @endif type="checkbox" class="form-check-input" id="preference-{{ $preference->id }}" name="preferences[]" value="{{ $preference->id }}">
