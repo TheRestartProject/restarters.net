@@ -14,10 +14,4 @@ class UsersPermissions extends Model {
    */
   protected $fillable = ['permission_id', 'user_id'];
 
-  public function permissions() {
-
-    return $this->belongsToMany('App\Permissions', 'users_permissions', 'user_id', 'permission_id');
-
-  }
-
 }

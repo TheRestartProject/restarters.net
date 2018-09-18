@@ -14,10 +14,4 @@ class UsersPreferences extends Model {
    */
   protected $fillable = ['preference_id', 'user_id'];
 
-  public function preferences() {
-
-    return $this->belongsToMany('App\Preferences', 'users_preferences', 'user_id', 'preference_id');
-
-  }
-
 }
