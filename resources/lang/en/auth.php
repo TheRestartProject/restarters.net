@@ -16,7 +16,7 @@ return [
     'failed' => 'These credentials do not match our records.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'email_address' => 'Email address',
-    'email_address_validation' => 'An account with this email address already exists, please login to continue',
+    'email_address_validation' => 'An account with this email address already exists. Have you tried logging in?',
     'sign_in' => 'I remembered.  Let me sign in',
     'forgotten_pw' => 'Forgotten your password?',
     'forgotten_pw_text' => 'It happens to all of us. Simply enter your email to receive a password reset message.',
