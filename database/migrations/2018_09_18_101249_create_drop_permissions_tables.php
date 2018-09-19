@@ -37,7 +37,6 @@ class CreateDropPermissionsTables extends Migration
             $table->dropColumn('created_at');
             $table->dropColumn('updated_at');
             $table->dropColumn('deleted_at');
-            $table->dropColumn('users');
 
         });
 
