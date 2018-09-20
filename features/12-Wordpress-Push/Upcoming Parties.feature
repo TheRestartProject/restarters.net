@@ -1,11 +1,11 @@
-Feature: Upcoming Parties
+#Feature: Upcoming Parties
 
-A list of upcoming parties.
+#A list of upcoming parties.
 
-They should display until the end time of the party.
+#They should display until the end time of the party.
 
-How many should be listed - all future ones?
-------------------------------------------------------------------------------------------------------------------
+#How many should be listed - all future ones?
+#-------------------------------------------------------------------------------------------------------#-----------
 
 Feature: Upcoming Parties
     As an Admin

@@ -1,3 +1,5 @@
+@current
+
 Feature: Edit Role
     As an admin
     In order to create/edit/delete a user and to create a party

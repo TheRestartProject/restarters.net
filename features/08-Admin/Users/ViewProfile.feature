@@ -1,4 +1,3 @@
-@current
 Feature: View profile of an User
     As a User (All roles)
     In to see the profile of the user

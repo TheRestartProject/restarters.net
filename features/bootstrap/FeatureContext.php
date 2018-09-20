@@ -3451,7 +3451,8 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     public function theUserPermissionSChecked()
     {
         //throw new PendingException();
-        $this->visit('/role/edit');
+        $this->visit('/role/edit');     
+        $page = $this->getSession()->getPage()->getHtml();
     }
 
     /**
@@ -3461,7 +3462,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         //throw new PendingException();
         $this->visit('/role/edit');
-        //$this->pressButton('Save role');
+        $this->pressButton('Save role');
     }
 
     /**
@@ -4064,7 +4065,7 @@ public function before(BeforeScenarioScope $scope)
         //$driver = $this->getSession()->getDriver();
         $page = $this->getSession()->getPage();
         $html = $page->GetContent();
-        //echo $html;
+        //echo $page;
         //$this->getSession()->visit($this->locatePath('/blog'))
         //$this->visit('/login');
         //sleep(1000000);
@@ -4104,7 +4105,7 @@ public function before(BeforeScenarioScope $scope)
     {
        // throw new PendingException();
          $this->visit('/profile');
-         $this->pressButton('Edit user');
+         $this->clickLink('Edit user');
     }
 
     /**
@@ -4113,8 +4114,8 @@ public function before(BeforeScenarioScope $scope)
     public function userWillLandOnEditProfilePage()
     {
        // throw new PendingException();
-        //$this->visit('/profile/edit');
-        $this->assertPageAddress('/profile/edit');
+        $this->visit('/profile/edit');
+        //$this->assertPageAddress('/profile/edit');
     }
 
 
