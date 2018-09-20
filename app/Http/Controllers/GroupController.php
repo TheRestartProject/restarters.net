@@ -1113,9 +1113,16 @@ class GroupController extends Controller
       // Retrieve user
       $user = User::find($user_id);
 
-      //Let's make the user a host
+      // Let's make the user a host
       $volunteer = UserGroups::where('user', $user_id)
                     ->where('group', $group_id)
+                      ->update([
+                        'role' => 3
+                      ]);
+
+      // Update user's role as well, but don't demote admins!
+      $update_role = User::where('id', $user_id)
+                    ->where('role', '>', 3)
                       ->update([
                         'role' => 3
                       ]);
