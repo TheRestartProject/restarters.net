@@ -66,9 +66,8 @@ class FixometerFile extends Model {
                 $data['path'] = $this->file;
 
                 // Fix orientation
-                $image = Image::make($path)
-                ->orientate()
-                ->save($path);
+                $image = Image::make($path)->orientate()->save($path);
+
 
                 if($type === 'image'){
                     $size = getimagesize($this->path);
@@ -90,9 +89,11 @@ class FixometerFile extends Model {
 
                     if($data['width'] > $data['height']) {
                         $biggestSide = $data['width'];
+                        $resize_height = true;
                     }
                     else {
                         $biggestSide = $data['height'];
+                        $resize_height = false;
                     }
 
 
@@ -106,38 +107,71 @@ class FixometerFile extends Model {
                     $thumbSize = 60;
                     $midSize = 260;
 
-                    // Create image
-                    $thumb = imagecreatetruecolor($thumbSize, $thumbSize);
-                    $mid = imagecreatetruecolor($midSize, $midSize);
-
-                    // Set alphablending to off picking default color as black
-                    imagealphablending($thumb, false);
-                    imagealphablending($mid, false);
-
-                    // Preserve transparency
-                    imagesavealpha($thumb, true);
-                    imagesavealpha($mid, true);
-
-                    // Transparent color only contains one parameter, no color is specified which means the identifier will be -1
-                    imagecolortransparent($thumb);
-                    imagecolortransparent($mid);
+                    // // Create image
+                    // $thumb = imagecreatetruecolor($thumbSize, $thumbSize);
+                    // $mid = imagecreatetruecolor($midSize, $midSize);
+                    //
+                    // // Set alphablending to off picking default color as black
+                    // imagealphablending($thumb, false);
+                    // imagealphablending($mid, false);
+                    //
+                    // // Preserve transparency
+                    // imagesavealpha($thumb, true);
+                    // imagesavealpha($mid, true);
+                    //
+                    // // Transparent color only contains one parameter, no color is specified which means the identifier will be -1
+                    // imagecolortransparent($thumb);
+                    // imagecolortransparent($mid);
 
                     // View result in browser as array
                     // imagepng($thumb);
                     // imagepng($mid);
 
-                    imagecopyresampled($thumb, $profile_pic, 0, 0, $c1['x'], $c1['y'], $thumbSize, $thumbSize, $cropWidth, $cropHeight);
-                    imagecopyresampled($mid, $profile_pic, 0, 0, $c1['x'], $c1['y'], $midSize, $midSize, $cropWidth, $cropHeight);
+                    // imagecopyresized($thumb, $profile_pic, 0, 0, $c1['x'], $c1['y'], $thumbSize, $thumbSize, $cropWidth, $cropHeight);
+                    // imagecopyresized($mid, $profile_pic, 0, 0, $c1['x'], $c1['y'], $midSize, $midSize, $cropWidth, $cropHeight);
 
-                    if($this->ext == 'jpg'){
-                        imagejpeg($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename, 85);
-                        imagejpeg($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename, 85);
-                    }
-                    elseif($this->ext == 'png') {
-                        imagepng($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename );
-                        imagepng($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename );
+                    // open file a image resource
+
+                    // Let's make images, which we will resize or crop
+                    $thumb = Image::make($path);
+                    $mid = Image::make($path);
+
+                    if( $resize_height ) { // Resize before crop
+                      
+                      $thumb->resize(null, $thumbSize, function ($constraint) {
+                          $constraint->aspectRatio();
+                      });
+                      
+                      $mid->resize(null, $midSize, function ($constraint) {
+                          $constraint->aspectRatio();
+                      });
+                      
+                    } else {
+                      
+                      $thumb->resize($thumbSize, null, function ($constraint) {
+                          $constraint->aspectRatio();
+                      });
+                      
+                      $mid->resize($midSize, null, function ($constraint) {
+                          $constraint->aspectRatio();
+                      });
+                      
                     }
 
+                    $thumb->crop($thumbSize, $thumbSize)
+                      ->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename, 85);
+
+                    $mid->crop($midSize, $midSize)
+                      ->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename, 85);
+
+                    // if($this->ext == 'jpg'){
+                    //     imagejpeg($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename, 85);
+                    //     imagejpeg($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename, 85);
+                    // }
+                    // elseif($this->ext == 'png') {
+                    //     imagepng($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename );
+                    //     imagepng($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename );
+                    // }
 
                     $this->table = 'images';
                     $Images = new Images;
