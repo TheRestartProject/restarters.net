@@ -71,7 +71,7 @@ return array(
     'Cron\\' => array($vendorDir . '/dragonmantank/cron-expression/src/Cron'),
     'Collective\\Html\\' => array($vendorDir . '/laravelcollective/html/src'),
     'Carbon\\' => array($vendorDir . '/nesbot/carbon/src/Carbon'),
-    'Behat\\Mink\\Driver\\' => array($vendorDir . '/behat/mink-browserkit-driver/src'),
+    'Behat\\Mink\\Driver\\' => array($vendorDir . '/behat/mink-browserkit-driver/src', $vendorDir . '/behat/mink-goutte-driver/src', $vendorDir . '/behat/mink-selenium2-driver/src'),
     'Behat\\Mink\\' => array($vendorDir . '/behat/mink/src'),
     'Barryvdh\\Debugbar\\' => array($vendorDir . '/barryvdh/laravel-debugbar/src'),
     'Barryvdh\\Cors\\' => array($vendorDir . '/barryvdh/laravel-cors/src'),

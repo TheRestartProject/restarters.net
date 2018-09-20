@@ -9,13 +9,17 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
+use Behat\Mink\Driver\Selenium2Driver;
 use PHPUnit_Framework_Assert as PHPUnit;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
 /**
  * Defines application features from the specific context.
  */
 class FeatureContext extends MinkContext implements Context, SnippetAcceptingContext
 {
+    use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
+
     /**
      * Initializes context.
      *
@@ -4041,6 +4045,38 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
 // Scenario - ViewProfile.feature
 
+    /** @BeforeScenario */
+public function before(BeforeScenarioScope $scope)
+{
+    $this->getSession()->restart();
+}
+
+    /**
+     * @Given I am logged in
+     */
+    public function iAmLoggedIn()
+    {
+        
+        //throw new PendingException();
+        $user = factory(User::class)->create();
+        $this->visit('/login');
+        $this->assertPageAddress('/login');
+        //$driver = $this->getSession()->getDriver();
+        $page = $this->getSession()->getPage();
+        $html = $page->GetContent();
+        //echo $html;
+        //$this->getSession()->visit($this->locatePath('/blog'))
+        //$this->visit('/login');
+        //sleep(1000000);
+        //dd($page);
+        //$element = $page->findAll('css', 'div');
+        //dd($element);
+
+        $this->fillField('email', $user->email);
+        $this->fillField('password','secret');
+        $this->pressButton('Login');
+    }
+
     /**
      * @When a user wants to see the biography and skills of a user and click on view profile
      */
@@ -4056,8 +4092,8 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     public function theyWillLandOnViewProfilePageWithTheirDetails()
     {
         //throw new PendingException();
-         $this->visit('/profile');
-        //$this->assertPageAddress('/profile');
+         //$this->visit('/profile');
+        $this->assertPageAddress('/profile');
 
     }
 
@@ -4077,8 +4113,8 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     public function userWillLandOnEditProfilePage()
     {
        // throw new PendingException();
-         $this->visit('/profile/edit');
-        //$this->assertPageAddress('/profile/edit');
+        //$this->visit('/profile/edit');
+        $this->assertPageAddress('/profile/edit');
     }
 
 
@@ -4404,4 +4440,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         throw new PendingException();
     }
+
+    
+    
 }

@@ -3,15 +3,13 @@ default:
         Laracasts\Behat: 
             env_path: .env.behat
         Behat\MinkExtension:
-            default_session: laravel
+            #default_session: laravel
             base_url: "http://127.0.0.1:8000"
-            laravel: ~
+            #laravel: ~
             show_cmd: firefox.exe %s
-            #sessions:
-            #  first_session:
-            #    goutte: ~
-              #second_session:
-              #  selenium2: ~
+            sessions:
+              first_session:
+                goutte: ~
     
     suites:
         default:
