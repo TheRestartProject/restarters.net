@@ -185,7 +185,7 @@ class SqlServerGrammar extends Grammar
     {
         $constraint = $this->compileRowConstraint($query);
 
-        return "select * from ({$sql}) as temp_table where row_num {$constraint}";
+        return "select * from ({$sql}) as temp_table where row_num {$constraint} order by row_num";
     }
 
     /**
@@ -298,7 +298,7 @@ class SqlServerGrammar extends Grammar
     {
         $joins = ' '.$this->compileJoins($query, $query->joins);
 
-        $alias = strpos(strtolower($table), ' as ') !== false
+        $alias = stripos($table, ' as ') !== false
                 ? explode(' as ', $table)[1] : $table;
 
         return trim("delete {$alias} from {$table}{$joins} {$where}");
@@ -364,7 +364,7 @@ class SqlServerGrammar extends Grammar
     {
         $table = $alias = $this->wrapTable($table);
 
-        if (strpos(strtolower($table), '] as [') !== false) {
+        if (stripos($table, '] as [') !== false) {
             $alias = '['.explode('] as [', $table)[1];
         }
 

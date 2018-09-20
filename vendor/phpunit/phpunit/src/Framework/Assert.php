@@ -60,7 +60,6 @@ use PHPUnit\Util\Xml;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
-use ReflectionProperty;
 use Traversable;
 
 /**
@@ -1259,10 +1258,6 @@ abstract class Assert
      */
     public static function assertSame($expected, $actual, string $message = ''): void
     {
-        if (\is_bool($expected) && \is_bool($actual)) {
-            static::assertEquals($expected, $actual, $message);
-        }
-
         static::assertThat(
             $actual,
             new IsIdentical($expected),
@@ -1791,14 +1786,14 @@ abstract class Assert
 
         unset($tmp);
 
-        static::assertEquals(
+        static::assertSame(
             $expectedElement->tagName,
             $actualElement->tagName,
             $message
         );
 
         if ($checkAttributes) {
-            static::assertEquals(
+            static::assertSame(
                 $expectedElement->attributes->length,
                 $actualElement->attributes->length,
                 \sprintf(
@@ -1832,7 +1827,7 @@ abstract class Assert
         Xml::removeCharacterDataNodes($expectedElement);
         Xml::removeCharacterDataNodes($actualElement);
 
-        static::assertEquals(
+        static::assertSame(
             $expectedElement->childNodes->length,
             $actualElement->childNodes->length,
             \sprintf(
@@ -2355,30 +2350,25 @@ abstract class Assert
         }
 
         try {
-            $attribute = new ReflectionProperty($object, $attributeName);
-        } catch (ReflectionException $e) {
             $reflector = new ReflectionObject($object);
 
-            while ($reflector = $reflector->getParentClass()) {
+            do {
                 try {
                     $attribute = $reflector->getProperty($attributeName);
 
-                    break;
+                    if (!$attribute || $attribute->isPublic()) {
+                        return $object->$attributeName;
+                    }
+
+                    $attribute->setAccessible(true);
+                    $value = $attribute->getValue($object);
+                    $attribute->setAccessible(false);
+
+                    return $value;
                 } catch (ReflectionException $e) {
                 }
-            }
-        }
-
-        if (isset($attribute)) {
-            if (!$attribute || $attribute->isPublic()) {
-                return $object->$attributeName;
-            }
-
-            $attribute->setAccessible(true);
-            $value = $attribute->getValue($object);
-            $attribute->setAccessible(false);
-
-            return $value;
+            } while ($reflector = $reflector->getParentClass());
+        } catch (ReflectionException $e) {
         }
 
         throw new Exception(

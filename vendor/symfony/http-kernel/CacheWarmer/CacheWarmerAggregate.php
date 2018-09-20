@@ -22,7 +22,6 @@ class CacheWarmerAggregate implements CacheWarmerInterface
 {
     private $warmers;
     private $optionalsEnabled = false;
-    private $onlyOptionalsEnabled = false;
 
     public function __construct(iterable $warmers = array())
     {
@@ -34,11 +33,6 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         $this->optionalsEnabled = true;
     }
 
-    public function enableOnlyOptionalWarmers()
-    {
-        $this->onlyOptionalsEnabled = $this->optionalsEnabled = true;
-    }
-
     /**
      * Warms up the cache.
      *
@@ -48,9 +42,6 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     {
         foreach ($this->warmers as $warmer) {
             if (!$this->optionalsEnabled && $warmer->isOptional()) {
-                continue;
-            }
-            if ($this->onlyOptionalsEnabled && !$warmer->isOptional()) {
                 continue;
             }
 

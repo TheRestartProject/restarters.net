@@ -1028,4 +1028,17 @@ class TestTest extends TestCase
         $this->assertArrayHasKey('theClassAnnotation', $result['class']);
         $this->assertArrayHasKey('theTraitAnnotation', $result['class']);
     }
+
+    public function testCoversAnnotationIncludesTraitsUsedByClass(): void
+    {
+        $this->assertSame(
+            [
+                TEST_FILES_PATH . '3194.php' => \array_merge(\range(21, 29), \range(13, 19))
+            ],
+            Test::getLinesToBeCovered(
+                \Test3194::class,
+                'testOne'
+            )
+        );
+    }
 }

@@ -2,8 +2,18 @@
 @yield('content')
 <section class="features">
     <div class="container">
+<<<<<<< HEAD
         @include('includes.info')
         <h2 class="text-center" style="margin:20px 0">@lang('general.introduction_message')</h2>
+=======
+        <div class="features__link"><a href="{{{ route('registration') }}}" alt="Sign me up!">@lang('general.register')</a> / <a href="{{{ route('login') }}}">@lang('general.login')</a></div>
+        <header>
+            <a href="{{{ route('login') }}}">
+              @include('includes/logo')
+            </a>
+            <p>@lang('general.introduction_message')</p>
+        </header>
+>>>>>>> test-framework-testing
         <div class="slideshow">
             @foreach ($slides as $slide)
                 <div><img src="{{ url('/images/slides/' . $slide['image'] . ($agent->isPhone() ? '_m' : '') . '.png') }}" alt="{{ $slide['text'] }}"></div>

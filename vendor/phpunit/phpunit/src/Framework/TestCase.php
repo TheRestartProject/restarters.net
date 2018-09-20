@@ -894,17 +894,13 @@ abstract class TestCase extends Assert implements Test, SelfDescribing
                 }
             }
         } catch (Throwable $_e) {
-            if (!isset($e)) {
-                $e = $_e;
-            }
+            $e = $e ?? $_e;
         }
 
         try {
             $this->stopOutputBuffering();
         } catch (RiskyTestError $_e) {
-            if (!isset($e)) {
-                $e = $_e;
-            }
+            $e = $e ?? $_e;
         }
 
         if (isset($_e)) {
@@ -1122,6 +1118,14 @@ abstract class TestCase extends Assert implements Test, SelfDescribing
     }
 
     /**
+     * Gets the data set of a TestCase.
+     */
+    public function getProvidedData(): array
+    {
+        return $this->data;
+    }
+
+    /**
      * Override to run the test and assert its state.
      *
      * @throws AssertionFailedError
@@ -1144,52 +1148,48 @@ abstract class TestCase extends Assert implements Test, SelfDescribing
 
         try {
             $testResult = $this->{$this->name}(...\array_values($testArguments));
-        } catch (Throwable $t) {
-            $exception = $t;
-        }
-
-        if (isset($exception)) {
-            if ($this->checkExceptionExpectations($exception)) {
-                if ($this->expectedException !== null) {
-                    $this->assertThat(
-                        $exception,
-                        new ExceptionConstraint(
-                            $this->expectedException
-                        )
-                    );
-                }
-
-                if ($this->expectedExceptionMessage !== null) {
-                    $this->assertThat(
-                        $exception,
-                        new ExceptionMessage(
-                            $this->expectedExceptionMessage
-                        )
-                    );
-                }
-
-                if ($this->expectedExceptionMessageRegExp !== null) {
-                    $this->assertThat(
-                        $exception,
-                        new ExceptionMessageRegularExpression(
-                            $this->expectedExceptionMessageRegExp
-                        )
-                    );
-                }
-
-                if ($this->expectedExceptionCode !== null) {
-                    $this->assertThat(
-                        $exception,
-                        new ExceptionCode(
-                            $this->expectedExceptionCode
-                        )
-                    );
-                }
-
-                return;
+        } catch (Throwable $exception) {
+            if (!$this->checkExceptionExpectations($exception)) {
+                throw $exception;
             }
 
-            throw $exception;
+            if ($this->expectedException !== null) {
+                $this->assertThat(
+                    $exception,
+                    new ExceptionConstraint(
+                        $this->expectedException
+                    )
+                );
+            }
+
+            if ($this->expectedExceptionMessage !== null) {
+                $this->assertThat(
+                    $exception,
+                    new ExceptionMessage(
+                        $this->expectedExceptionMessage
+                    )
+                );
+            }
+
+            if ($this->expectedExceptionMessageRegExp !== null) {
+                $this->assertThat(
+                    $exception,
+                    new ExceptionMessageRegularExpression(
+                        $this->expectedExceptionMessageRegExp
+                    )
+                );
+            }
+
+            if ($this->expectedExceptionCode !== null) {
+                $this->assertThat(
+                    $exception,
+                    new ExceptionCode(
+                        $this->expectedExceptionCode
+                    )
+                );
+            }
+
+            return;
         }
 
         if ($this->expectedException !== null) {
@@ -1548,14 +1548,6 @@ abstract class TestCase extends Assert implements Test, SelfDescribing
     protected function prophesize($classOrInterface = null): ObjectProphecy
     {
         return $this->getProphet()->prophesize($classOrInterface);
-    }
-
-    /**
-     * Gets the data set of a TestCase.
-     */
-    protected function getProvidedData(): array
-    {
-        return $this->data;
     }
 
     /**
