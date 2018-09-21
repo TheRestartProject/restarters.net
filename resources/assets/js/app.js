@@ -473,7 +473,7 @@ function initAutocomplete() {
 
   }
 
-  var current_volunteers = parseInt(jQuery('.users-list li:not(.users-list__invite)').length);
+  var current_volunteers = parseInt(jQuery('#attended-counter').html());
 
   function updateVolunteers() {
 
