@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Auth;
 use App\Skills;
+use App\UsersSkills;
 use FixometerHelper;
 
 use Illuminate\Http\Request;
@@ -91,7 +92,7 @@ class SkillsController extends Controller
 
     // We can only delete the data in the pivot table if the delete was successful
     if( $skill == 1 )
-      UsersSkills::where('skill_id', $id)->delete();
+      UsersSkills::where('skill', $id)->delete();
 
     // Then redirect back
     return Redirect::to('/skills')->with('success', 'Skill successfully deleted!');

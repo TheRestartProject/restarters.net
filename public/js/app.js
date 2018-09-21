@@ -30528,7 +30528,7 @@ function updateParticipants() {
   });
 }
 
-var current_volunteers = parseInt(jQuery('input[name=volunteer_qty]').val());
+var current_volunteers = parseInt(jQuery('.users-list li:not(.users-list__invite)').length);
 
 function updateVolunteers() {
 
