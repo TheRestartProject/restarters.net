@@ -209,4 +209,16 @@ class User extends Authenticatable
     {
         return $this->updated_at;
     }
+
+    /**
+     * Anonymise user details before soft deletion.
+     */
+    public function anonymise()
+    {
+        $this->name = "Deleted User";
+        $this->email = $this->id . "@deleted.com";
+        $this->username = $this->id . '-deleted';
+
+        // TODO: country, city, gender, age, also required?
+    }
 }

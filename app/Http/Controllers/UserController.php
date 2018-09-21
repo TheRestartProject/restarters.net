@@ -219,12 +219,16 @@ class UserController extends Controller
     }
 
     $user = User::find($id);
-    $user_name = $user->name;
+    $old_user_name = $user->name;
     $user_id = $user->id;
+
+    // Anonymise user.
+    $user->anonymise();
+    $user->save();
     $user->delete();
 
     if (Auth::id() !== $user_id) {
-      return redirect('user/all')->with('danger', $user_name.'\'s account has been soft deleted');
+      return redirect('user/all')->with('danger', $old_user_name.'\'s account has been soft deleted');
     } else {
       return redirect('login');
     }
