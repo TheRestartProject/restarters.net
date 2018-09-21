@@ -82,11 +82,18 @@ class SkillsController extends Controller
 
   public function getDeleteSkill($id) {
 
+    // Are you an admin?
     if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
       return redirect('/user/forbidden');
 
-    Skills::find($id)->delete();
+    // If we have permission, let's delete
+    $skill = Skills::find($id)->delete();
 
+    // We can only delete the data in the pivot table if the delete was successful
+    if( $skill == 1 )
+      UsersSkills::where('skill_id', $id)->delete();
+
+    // Then redirect back
     return Redirect::to('/skills')->with('success', 'Skill successfully deleted!');
 
   }
