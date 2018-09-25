@@ -684,6 +684,7 @@ $( document ).ready(function() {
       data: { form_array : form_array, event_id : event_id },
       success: function(data) {
         if (data.error) {
+          alert('test');
           alert(data.error);
         }
       },

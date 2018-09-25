@@ -1182,6 +1182,11 @@ function initAutocomplete() {
       e.preventDefault();
       $form = $(this);
 
+      if( $form.find('select[name=category]').val() === '' ) {
+        alert('Category field is required');
+        return false;
+      }
+
       $.ajax({
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
@@ -1203,7 +1208,6 @@ function initAutocomplete() {
         },
         datatype: 'json',
         success: function(json) {
-          console.log(json.success);
           if( json.success ){
 
             //Reset appearance
@@ -1262,7 +1266,7 @@ function initAutocomplete() {
 
           } else {
 
-            alert('Something went wrong, please try again1');
+            alert('Something went wrong, please try again');
 
           }
 

@@ -606,7 +606,7 @@ class DeviceController extends Controller
 
       }
 
-      return response()->json(array('return' => $return,
+      return response()->json(array($return,
       'deviceCount' => $deviceCount,
 
     ));
