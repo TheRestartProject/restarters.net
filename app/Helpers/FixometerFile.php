@@ -104,7 +104,7 @@ class FixometerFile extends Model {
                     //getting the top left coordinate
                     $c1 = array("x"=>( $data['width']-$cropWidth)/2, "y"=>( $data['height']-$cropHeight)/2);
 
-                    $thumbSize = 60;
+                    $thumbSize = 80;
                     $midSize = 260;
 
                     // // Create image
@@ -137,25 +137,25 @@ class FixometerFile extends Model {
                     $mid = Image::make($path);
 
                     if( $resize_height ) { // Resize before crop
-                      
+
                       $thumb->resize(null, $thumbSize, function ($constraint) {
                           $constraint->aspectRatio();
                       });
-                      
+
                       $mid->resize(null, $midSize, function ($constraint) {
                           $constraint->aspectRatio();
                       });
-                      
+
                     } else {
-                      
+
                       $thumb->resize($thumbSize, null, function ($constraint) {
                           $constraint->aspectRatio();
                       });
-                      
+
                       $mid->resize($midSize, null, function ($constraint) {
                           $constraint->aspectRatio();
                       });
-                      
+
                     }
 
                     $thumb->crop($thumbSize, $thumbSize)
