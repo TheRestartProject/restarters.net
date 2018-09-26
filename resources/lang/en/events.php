@@ -36,12 +36,12 @@ return [
     'remove_volunteer_link' => 'Remove volunteer',
 
     'invite_restarters_modal_heading' => 'Invite volunteers to the event',
-    'invite_restarters_modal_description' => 'A repair event is nothing without volunteers. Use this tool to invite them. ',
-    'send_invites_to_restarters_tickbox' => 'Send invites to all Restarters affiliated with :group',
+    'invite_restarters_modal_description' => 'A repair event is nothing without volunteers. Invite them to your event here.',
+    'send_invites_to_restarters_tickbox' => 'Add invites for group members. Members marked with a ⚠️ will be invited but will not be sent an email.',
     'manual_invite_box' => 'Send invites to',
-    'type_email_addresses_message' => 'Type in the email addresses of the people you would like to invite to this event.  Press the tab or comma key after each email address.',
+    'type_email_addresses_message' => 'Note: you can also manually type in the email address of anyone else you would like to invite to this event.  Press the tab, enter or comma key after each email address that you enter.',
     'message_to_restarters' => 'Invitation message',
-    'message_explainer' => 'An email with the event details will be sent to the invitees inviting them to RSVP.  If you would like to, you can include an additional message within the email by filling in the box above.',
+    'message_explainer' => 'An invitation with the event details will be sent to the invitees.  If you would like to, you can include an additional message within the invitation by filling in the box above.',
     'sample_text_message_to_restarters' => '<add a custom message here if required>',
     'send_invite_button' => 'Send invites',
 

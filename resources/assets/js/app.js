@@ -1063,64 +1063,38 @@ function initAutocomplete() {
           datatype: 'json',
           success: function(data) {
             var current_items = $('#manual_invite_box').tokenfield('getTokens');
-              console.debug(data);
-            //var new_items = $.parseJSON(data);
-              var new_items = data;
-              console.debug(new_items);
+            var new_items = data;
 
             var pop_arr = [];
 
+            // Keep all the items that were already there.
             current_items.forEach(function(current_item) {
-              //pop_arr.push('{ value: "' + current_item.value + '", label: "' + current_item.label + '"}');
+                var manual_email = {
+                    value: current_item.value,
+                    label: current_item.value
+                };
+                pop_arr.push(manual_email);
             });
 
+            // Add the new items - i.e. existing volunteers for the group.
             new_items.forEach(function(new_item) {
+                var label = '';
+                if (! new_item.invites)
+                    label += '\u{26A0} ';
+                label += new_item.name;
+
                 var volunteer = {
                     value: new_item.email,
-                    label: new_item.name
+                    label: label
                 };
-                pop_arr.push(volunteer);//'{ value: "' + new_item.email + '", label: "' + new_item.name + '"}');
+                pop_arr.push(volunteer);
             });
 
-            // var populate_arr = new_items.filter(function(obj) { return current_items.indexOf(obj) == -1; });
-            // var populate_arr = pop_arr + new_items;
-
-            // console.log($('#manual_invite_box').tokenfield('getTokens'));
-
             $('#manual_invite_box').tokenfield('setTokens', pop_arr);
-
-            // // console.log("current: "+current_items);
-            // // console.log("new: "+new_items);
-            // // console.log("pop: "+populate_arr);
-            //
-            // // console.log(populate_arr.toString() + ","+ current_items.toString());
-            // var pop_str = "";
-            //
-            // current_items.forEach(function(email) {
-            //   pop_str += '"'+email+'",\n';
-            // });
-            //
-            // populate_arr.forEach(function(email) {
-            //   pop_str += '"'+email+'",\n';
-            // });
-            //
-            // var final_output = pop_str.substring(0, pop_str.length - 2);
-            //
-            // console.log(final_output);
-            //
-            // // $("#prepopulate").val('{ "items_new" : [' + final_output + ']\n}');
-            //
-            // var tokens = $("#manual_invite_box").tokenfield('getTokens');
-            //
-            // console.log($('#test').tokenfield('getTokens'));
-            //
-            // console.log(tokens);
-            //
-            // // $('#manual_invite_box').tokenfield('setTokens', 'blue,red,white');
-
           },
-          error: function(error) {
-            console.log('fail');
+            error: function(xhr, status, error) {
+                var err = JSON.parse(xhr.responseText);
+                console.log(err);
           }
         });
       }

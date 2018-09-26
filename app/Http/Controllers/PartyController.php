@@ -1115,7 +1115,17 @@ public function getGroupEmails($event_id, $object = false)
   }
 }
 
-    public function getGroupEmailsWithNames($event_id, $object = false)
+
+    /**
+     * This is called via ajax in the Invite Volunteers to Event modal.
+     * It finds the users associated with the group that the event is for,
+     * in order to quickly add them to the list of invitees.
+     *
+     * @param int $event_id The event for which to find associated users.
+     *
+     * @return Response json formatted array of relevant info on users in the group.
+     */
+    public function getGroupEmailsWithNames($event_id)
     {
         $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
                         ->where('user', '!=', Auth::user()->id)
@@ -1132,7 +1142,7 @@ public function getGroupEmails($event_id, $object = false)
 
         $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
 
-        $group_users = User::whereIn('id', $unique_user_ids)->select('name', 'email')->get()->toArray();
+        $group_users = User::whereIn('id', $unique_user_ids)->select('name', 'email', 'invites')->get()->toArray();
         return response()->json($group_users);
     }
 
