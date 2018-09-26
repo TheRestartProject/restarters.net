@@ -34,6 +34,8 @@
               <h2>All upcoming events</h2>
           </header>
 
+          <p>There are {{ $upcoming_events_count }} upcoming events.
+
           <div class="table-responsive">
 
           <table class="table table-events table-striped" role="table">

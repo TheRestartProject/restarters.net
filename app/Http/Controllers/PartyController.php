@@ -127,16 +127,17 @@ class PartyController extends Controller {
 
   }
 
-  public function allUpcoming()
-  {
+    public function allUpcoming()
+    {
+        $allUpcomingEventsQuery = Party::allUpcomingEvents();
+        $allUpcomingEventsCount = $allUpcomingEventsQuery->count();
+        $allUpcomingEvents = $allUpcomingEventsQuery->paginate(env('PAGINATE'));
 
-    $all_upcoming_events = Party::allUpcomingEvents()->paginate(env('PAGINATE'));
-
-    return view('events.all', [
-      'upcoming_events'  => $all_upcoming_events,
-    ]);
-
-  }
+        return view('events.all', [
+            'upcoming_events_count' => $allUpcomingEventsCount,
+            'upcoming_events'  => $allUpcomingEvents,
+        ]);
+    }
 
   public function create(Request $request)
   {
