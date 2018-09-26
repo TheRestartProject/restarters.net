@@ -1059,20 +1059,27 @@ function initAutocomplete() {
             'X-CSRF-TOKEN': $("input[name='_token']").val()
           },
           type: 'get',
-          url: '/party/get-group-emails/'+event_id,
+          url: '/party/get-group-emails-with-names/'+event_id,
           datatype: 'json',
           success: function(data) {
             var current_items = $('#manual_invite_box').tokenfield('getTokens');
-            var new_items = $.parseJSON(data);
+              console.debug(data);
+            //var new_items = $.parseJSON(data);
+              var new_items = data;
+              console.debug(new_items);
 
             var pop_arr = [];
 
             current_items.forEach(function(current_item) {
-              pop_arr.push(current_item.value);
+              //pop_arr.push('{ value: "' + current_item.value + '", label: "' + current_item.label + '"}');
             });
 
             new_items.forEach(function(new_item) {
-              pop_arr.push(new_item);
+                var volunteer = {
+                    value: new_item.email,
+                    label: new_item.name
+                };
+                pop_arr.push(volunteer);//'{ value: "' + new_item.email + '", label: "' + new_item.name + '"}');
             });
 
             // var populate_arr = new_items.filter(function(obj) { return current_items.indexOf(obj) == -1; });

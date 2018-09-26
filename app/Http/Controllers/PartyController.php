@@ -1115,6 +1115,27 @@ public function getGroupEmails($event_id, $object = false)
   }
 }
 
+    public function getGroupEmailsWithNames($event_id, $object = false)
+    {
+        $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
+                        ->where('user', '!=', Auth::user()->id)
+                        ->pluck('user')
+                        ->toArray();
+
+        // Users already associated with the event.
+        // (Not including those invited but not RSVPed)
+        $event_user_ids = EventsUsers::where('event', $event_id)
+                        ->where('user', '!=', Auth::user()->id)
+                        ->where('status', 1)
+                        ->pluck('user')
+                        ->toArray();
+
+        $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
+
+        $group_users = User::whereIn('id', $unique_user_ids)->select('name', 'email')->get()->toArray();
+        return response()->json($group_users);
+    }
+
 public function updateQuantity(Request $request) {
 
   $event_id = $request->input('event_id');

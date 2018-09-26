@@ -152,6 +152,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::post('/remove-volunteer', 'PartyController@removeVolunteer');
     Route::post('/add-volunteer', 'PartyController@addVolunteer');
     Route::get('/get-group-emails/{event_id}', 'PartyController@getGroupEmails');
+    Route::get('/get-group-emails-with-names/{event_id}', 'PartyController@getGroupEmailsWithNames');
     Route::post('/update-quantity', 'PartyController@updateQuantity');
     Route::post('/image-upload/{id}', 'PartyController@imageUpload');
     Route::get('/image/delete/{idevents}/{id}/{path}', 'PartyController@deleteImage');
