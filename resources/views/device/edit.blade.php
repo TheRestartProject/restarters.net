@@ -211,7 +211,8 @@
                       @if( !empty($images) )
                         @foreach($images as $image)
                           <div id="device-image-{{ $formdata->iddevices }}" class="dz-image">
-                            <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder">
+                            <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
+                            <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder"></a>
                             <a href="/device/image/delete/{{ $formdata->iddevices }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $formdata->iddevices }}" class="dz-remove ajax-delete-image">Remove file</a>
                           </div>
                         @endforeach
