@@ -48,4 +48,5 @@
   </div>
 </div>
 
+@include('partials.languages')
 @include('layouts/footer')

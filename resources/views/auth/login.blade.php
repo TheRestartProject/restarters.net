@@ -5,7 +5,7 @@
 
         @include('includes.info')
 
-        <div class="row row-expanded">
+        <div class="row row-expanded pb-3">
             <div class="col-lg-6 d-flex">
 
                 <form action="{{ route('login') }}" method="post" class="card card__login col-12">

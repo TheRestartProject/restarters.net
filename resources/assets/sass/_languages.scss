@@ -10,29 +10,62 @@
     width: 100%;
     @extend .clear;
 
+    @include media-breakpoint-up(lg) { 
+        justify-content: flex-end;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        z-index: 10;
+    }
+
     .dropdown-menu {
         border: 0;
         width: 100%;
         border-radius: 0;
         margin: 0;
-        padding: 10px 0;
+        padding: 0;
         box-shadow: 0 -10px 15px rgba(0, 0, 0, 0.4);
-        top: -2px !important;
+        background: transparent;
+        top:-2px !important;
+        transform: translate3d(0px, -142px, 0px) !important;
+        @include media-breakpoint-up(lg) {
+            width: auto;
+            left: auto !important;
+            right: 0 !important;
+            width: 190px;
+        }
     }
 
     .dropdown-item {
         font-family: $font-family-sans-serif;
         font-weight: 600;
-        padding: 10px 30px;
+        padding: 5px 30px;
         display: block;
+        background: #FFF;
+        @include media-breakpoint-up(lg) {
+            padding: 5px 20px;
+        }
+
+        &:first-child {
+            padding-top: 10px;
+        }
+
+        &:last-child {
+            padding-bottom: 10px;
+        }
     }
 
     button.dropdown-toggle {
         color: #000;
         border: 0;
         border-radius: 0;
-        padding: 22px 30px;
+        padding: 22px 20px;
         display: block;
+        @include media-breakpoint-up(lg) {
+            border-left: 1px solid #D9D9D9 !important;
+            padding-left: 50px;
+            padding-right: 50px;
+        }
 
         &:hover, &:focus, &:active {
             background-color: #FFF !important;

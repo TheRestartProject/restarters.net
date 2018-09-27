@@ -9,6 +9,10 @@ html, body {
       padding-top: 50px;
     }
   }
+
+  @include media-breakpoint-up(lg) {
+    padding-bottom: 61px;
+  }
 }
 
 footer {
