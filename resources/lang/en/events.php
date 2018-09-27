@@ -37,7 +37,7 @@ return [
 
     'invite_restarters_modal_heading' => 'Invite volunteers to the event',
     'invite_restarters_modal_description' => 'A repair event is nothing without volunteers. Invite them to your event here.',
-    'send_invites_to_restarters_tickbox' => 'Add invites for group members. Members marked with a ⚠️ will be invited but will not be sent an email.',
+    'send_invites_to_restarters_tickbox' => 'Add invites for group members. Members marked with a ⚠ will be invited but won\'t be sent an email due to their notification settings.',
     'manual_invite_box' => 'Send invites to',
     'type_email_addresses_message' => 'Note: you can also manually type in the email address of anyone else you would like to invite to this event.  Press the tab, enter or comma key after each email address that you enter.',
     'message_to_restarters' => 'Invitation message',
