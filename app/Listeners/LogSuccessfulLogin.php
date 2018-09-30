@@ -7,6 +7,7 @@ use Cookie;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\InteractsWithQueue;
 use \Mediawiki\Api\ApiUser;
 use \Mediawiki\Api\MediawikiApi;
@@ -38,19 +39,22 @@ class LogSuccessfulLogin
 
         if( !is_null($u->mediawiki) && !empty($u->mediawiki) ) {
 
-          $api = MediawikiApi::newFromApiEndpoint( env('WIKI_URL').'/api.php' );
-          $api->login( new ApiUser( $u->mediawiki, $this->request->input('password') ) );
-          //dd($api);
+          try {
+            $api = MediawikiApi::newFromApiEndpoint( env('WIKI_URL').'/api.php' );
+            $api->login( new ApiUser( $u->mediawiki, $this->request->input('password') ) );
 
-          $cookieJar = $api->getClient()->getConfig('cookies');
-          $cookieJarArray = $cookieJar->toArray();
+            $cookieJar = $api->getClient()->getConfig('cookies');
+            $cookieJarArray = $cookieJar->toArray();
 
-          if( !empty($cookieJarArray) ) {
+            if( !empty($cookieJarArray) ) {
 
-            foreach( $cookieJarArray as $cookie ){
-              Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
+                foreach( $cookieJarArray as $cookie ){
+                Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
+                }
+
             }
-
+          } catch (\Exception $ex) {
+            Log::error("Failed to log user '" . $u->mediawiki . "' in to mediawiki: " . $ex->getMessage());
           }
 
         }
