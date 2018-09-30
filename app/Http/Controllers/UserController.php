@@ -6,6 +6,7 @@ use Auth;
 use App\Device;
 use App\EventsUsers;
 use App\Group;
+use App\Mail\RegistrationWelcome;
 use App\Preferences;
 use App\Permissions;
 use App\UsersPreferences;
@@ -25,6 +26,8 @@ use FixometerHelper;
 use FixometerFile;
 use Notification;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -1286,6 +1289,17 @@ public function postRegister(Request $request, $hash = null){
 
     }
 
+  }
+
+  // Send post-registration welcome email.
+  try {
+      // invites column is currently a proxy to determine if the member wishes to receive emails.
+      if ($user->invites == 1) {
+          $firstName = $user->getFirstName();
+          Mail::to($user)->send(new RegistrationWelcome($firstName));
+      }
+  } catch (\Exception $ex) {
+      Log::error('Failed to send post-registration welcome email: ' . $ex->getMessage());
   }
 
   //Session::createSession($user->id);

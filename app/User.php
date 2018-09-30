@@ -221,4 +221,18 @@ class User extends Authenticatable
 
         // TODO: country, city, gender, age, also required?
     }
+
+
+    /**
+     * Attempt to get first name from full name.
+     */
+    public function getFirstName()
+    {
+        if ($this->name == '')
+            return '';
+
+        $nameParts = explode(' ', $this->name);
+
+        return $nameParts[0];
+    }
 }
