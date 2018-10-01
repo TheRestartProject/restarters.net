@@ -39,6 +39,10 @@ Route::get('/about/cookie-policy', function() {
     return View::make('features.cookie-policy') ;
 });
 
+// Temp
+Route::get('/visualisations', function() {
+    return View::make('visualisations') ;
+});
 // Route::get('/ui', function() {
 //     return View::make('ui.index');
 // })->name('ui');;

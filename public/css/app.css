@@ -19,6 +19,7 @@
 .user__header:after,
 .users-list__single:after,
 .language-bar:after,
+.widget:after,
 .clear:before,
 .registration fieldset:before,
 .registration .fieldset:before,
@@ -37,7 +38,8 @@
 .events-card__details:before,
 .user__header:before,
 .users-list__single:before,
-.language-bar:before {
+.language-bar:before,
+.widget:before {
   content: "";
   display: table;
   clear: both;
@@ -19571,5 +19573,62 @@ h2 sup a:hover {
 .language-bar.show button.dropdown-toggle:after {
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);
+}
+
+.widget {
+  -ms-flex-preferred-size: auto;
+      flex-basis: auto;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  background-color: #FFF;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+@media (min-width: 992px) {
+  .widget {
+    padding: 20px 40px;
+  }
+}
+
+.widget h2 {
+  color: #0394A6;
+  font-size: 35px;
+  margin: 0;
+}
+
+.widget p {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.widget__1 svg {
+  margin: 80px auto;
+  display: block;
+  max-width: 100%;
+}
+
+@media (min-width: 992px) {
+  .widget__1 svg {
+    margin: 120px auto;
+  }
+}
+
+.widget__1 svg:not(:root) {
+  overflow: hidden;
+}
+
+.widget__item {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 15px;
+}
+
+.widget__item svg {
+  position: relative;
+  z-index: 3;
+  margin: auto;
 }
 

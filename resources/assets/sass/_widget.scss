@@ -1,0 +1,53 @@
+.widget {
+    @extend .clear;
+    flex-basis: auto;
+    flex: 1;
+    background-color: #FFF;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 40px;
+    @include media-breakpoint-up(lg) {
+        padding:20px 40px;
+    }
+
+    h2 {
+        color: $brand;
+        font-size: 35px;
+        margin: 0;
+    }
+
+    p {
+        font-size: 32px;
+        font-weight: 600;
+    }
+
+    &__1 {
+        svg {
+            margin: 80px auto;
+            
+            @include media-breakpoint-up(lg) {
+                margin: 120px auto;
+            }
+            display: block;
+            max-width: 100%;
+
+            &:not(:root) {
+                overflow: hidden;
+            }
+        }
+    }
+
+    &__item {
+        position: relative;
+        z-index: 1;
+        padding-bottom: 15px;
+
+        svg {
+            position: relative;
+            z-index: 3;
+            margin: auto;
+        }
+
+    }
+
+}
