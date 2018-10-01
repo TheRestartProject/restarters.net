@@ -24,7 +24,7 @@
     &__1 {
         svg {
             margin: 80px auto;
-            
+
             @include media-breakpoint-up(lg) {
                 margin: 120px auto;
             }
@@ -48,6 +48,10 @@
             margin: auto;
         }
 
+    }
+
+    &__summary {
+        
     }
 
 }
