@@ -167,19 +167,25 @@
 
   <div class="tab-pane" id="log">
     @if($audits)
+    <div class="row">
+      <div class="col">
+        <h4>Group Changes</h4>
+        <p>Changes made on group <strong>{{ $formdata->name }}</strong></p>
+      </div>
+    </div>
     <ul>
         @forelse ($audits as $audit)
-        <li>
-            @lang('article.updated.metadata', $audit->getMetadata())
+        <li style="padding-top:10px;">
+            @lang('group-audits.updated.metadata', $audit->getMetadata())
 
             @foreach ($audit->getModified() as $attribute => $modified)
             <ul>
-                <li>@lang('article.'.$audit->event.'.modified.'.$attribute, $modified)</li>
+                <li>@lang('group-audits.'.$audit->event.'.modified.'.$attribute, $modified)</li>
             </ul>
             @endforeach
         </li>
         @empty
-        <p>@lang('article.unavailable_audits')</p>
+        <p>@lang('group-audits.unavailable_audits')</p>
         @endforelse
     </ul>
     @endif

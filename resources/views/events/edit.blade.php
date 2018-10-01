@@ -30,9 +30,9 @@
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#photos">Event photos</a>
           </li>
-          <!-- <li class="nav-item">
+          <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#log">Event log</a>
-          </li> -->
+          </li>
         </ul>
 
         <div class="edit-panel">
@@ -220,10 +220,31 @@
 
           </div>
 
-          <!-- <div class="tab-pane" id="log">
+          <div class="tab-pane" id="log">
+            @if($audits)
+            <div class="row">
+              <div class="col">
+                <h4>Event Changes</h4>
+                <p>Changes made on event <strong>{{ $formdata->venue }}</strong></p>
+              </div>
+            </div>
+            <ul>
+                @forelse ($audits as $audit)
+                <li style="padding-top:10px;">
+                    @lang('event-audits.updated.metadata', $audit->getMetadata())
 
-
-          </div> -->
+                    @foreach ($audit->getModified() as $attribute => $modified)
+                    <ul>
+                        <li>@lang('event-audits.'.$audit->event.'.modified.'.$attribute, $modified)</li>
+                    </ul>
+                    @endforeach
+                </li>
+                @empty
+                <p>@lang('event-audits.unavailable_audits')</p>
+                @endforelse
+            </ul>
+            @endif
+          </div>
 
         </div>
 

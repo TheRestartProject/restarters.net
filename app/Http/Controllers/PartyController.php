@@ -631,6 +631,8 @@ public function edit($id, Request $request) {
   //
   // $this->set('grouplist', $Groups->findList());
 
+  compact($audits = Party::findOrFail($id)->audits);
+
   return view('events.edit', [ //party.edit
     'gmaps' => true,
     'images' => $images,
@@ -644,6 +646,7 @@ public function edit($id, Request $request) {
     'wasteTotal' => $co2Total[0]->total_weights,
     'device_count_status' => $device_count_status,
     'user_groups' => $groups_user_is_host_of,
+    'audits' => $audits,
   ]);
 }
 

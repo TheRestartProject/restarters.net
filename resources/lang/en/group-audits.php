@@ -7,7 +7,7 @@
 return [
     // ...
 
-    'unavailable_audits' => 'No Article Audits available',
+    'unavailable_audits' => 'No changes have been made to this group!',
 
     'updated'            => [
         'metadata' => 'On :audit_created_at, :user_name updated record <strong>:audit_url</strong>',

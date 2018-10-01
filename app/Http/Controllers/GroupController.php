@@ -891,8 +891,7 @@ class GroupController extends Controller
       $tags = GroupTags::all();
       $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
 
-      // $audits = $Group->findOne($id);
-      compact($audits = $Group->find($id)->audits);
+      compact($audits = $Group->findOrFail($id)->audits);
 
       return view('group.edit-group', [
         'response' => $response,
