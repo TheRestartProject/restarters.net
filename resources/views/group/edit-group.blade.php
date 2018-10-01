@@ -28,9 +28,9 @@
           <li class="nav-item">
             <a class="nav-link active" data-toggle="tab" href="#details">Group details</a>
           </li>
-          <!-- <li class="nav-item">
+          <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#log">Group log</a>
-          </li> -->
+          </li>
         </ul>
 
         <div class="edit-panel">
@@ -165,9 +165,25 @@
 
   </div>
 
-  <!-- <div class="tab-pane" id="log">
+  <div class="tab-pane" id="log">
+    @if($audits)
+    <ul>
+        @forelse ($audits as $audit)
+        <li>
+            @lang('article.updated.metadata', $audit->getMetadata())
 
-  </div> -->
+            @foreach ($audit->getModified() as $attribute => $modified)
+            <ul>
+                <li>@lang('article.'.$audit->event.'.modified.'.$attribute, $modified)</li>
+            </ul>
+            @endforeach
+        </li>
+        @empty
+        <p>@lang('article.unavailable_audits')</p>
+        @endforelse
+    </ul>
+    @endif
+  </div>
 </div>
 
 </div>
