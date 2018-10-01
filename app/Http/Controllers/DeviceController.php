@@ -329,9 +329,8 @@ class DeviceController extends Controller
         else {
           $response['success'] = 'Device updated!';
 
-
           /** let's create the image attachment! **/
-          if(isset($_FILES) && !empty($_FILES)){
+          if(isset($_FILES) && !empty($_FILES['files']['name'])){
             $file = new FixometerFile;
             $file->upload('devicePhoto', 'image', $id, env('TBL_DEVICES'), true);
           }
