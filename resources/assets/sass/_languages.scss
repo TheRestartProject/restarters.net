@@ -12,10 +12,10 @@
 
     @include media-breakpoint-up(lg) { 
         justify-content: flex-end;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        z-index: 10;
+        // position: absolute;
+        // bottom: 0;
+        // left: 0;
+        // z-index: 10;
     }
 
     .dropdown-menu {
