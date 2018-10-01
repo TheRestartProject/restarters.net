@@ -53,6 +53,10 @@
         &:last-child {
             padding-bottom: 10px;
         }
+
+        &:hover, &:focus {
+            text-decoration: underline;
+        }
     }
 
     button.dropdown-toggle {

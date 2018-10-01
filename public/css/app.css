@@ -19517,6 +19517,11 @@ h2 sup a:hover {
   padding-bottom: 10px;
 }
 
+.language-bar .dropdown-item:hover,
+.language-bar .dropdown-item:focus {
+  text-decoration: underline;
+}
+
 .language-bar button.dropdown-toggle {
   color: #000;
   border: 0;
