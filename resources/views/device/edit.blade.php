@@ -32,6 +32,9 @@
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#photos">Device photos</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#log">Device log</a>
+          </li>
         </ul>
 
         <div class="edit-panel">
@@ -222,6 +225,34 @@
                   </div>
 
               </div>
+
+            </div>
+
+            <div class="tab-pane" id="log">
+
+              @if($audits)
+              <div class="row">
+                <div class="col">
+                  <h4>Device Changes</h4>
+                  <p>Changes made on device <strong>{{ $formdata->name }}</strong></p>
+                </div>
+              </div>
+              <ul>
+                  @forelse ($audits as $audit)
+                  <li style="padding-top:10px;">
+                      @lang('device-audits.updated.metadata', $audit->getMetadata())
+
+                      @foreach ($audit->getModified() as $attribute => $modified)
+                      <ul>
+                          <li>@lang('device-audits.'.$audit->event.'.modified.'.$attribute, $modified)</li>
+                      </ul>
+                      @endforeach
+                  </li>
+                  @empty
+                  <p>@lang('device-audits.unavailable_audits')</p>
+                  @endforelse
+              </ul>
+              @endif
 
             </div>
 

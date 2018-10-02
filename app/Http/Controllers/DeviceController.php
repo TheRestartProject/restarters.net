@@ -358,6 +358,8 @@ class DeviceController extends Controller
 
       $brands = Brands::all();
 
+      $audits = Device::findOrFail($id)->audits;
+
       return view('device.edit', [
         'title' => 'Edit Device',
         'response' => $response,
@@ -368,6 +370,7 @@ class DeviceController extends Controller
         'user' => $user,
         'is_host' => $is_host,
         'images' => $images,
+        'audits' => $audits,
       ]);
 
     }

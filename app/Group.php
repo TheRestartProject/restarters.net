@@ -18,7 +18,7 @@ class Group extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = ['name', 'website', 'area', 'location', 'latitude', 'latitude', 'longitude', 'free_text'];
+    protected $fillable = ['name', 'website', 'area', 'location', 'latitude', 'longitude', 'free_text'];
 
     /**
      * The attributes that should be hidden for arrays.
