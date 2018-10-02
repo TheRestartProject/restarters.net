@@ -1,7 +1,7 @@
 .widget {
     @extend .clear;
     flex-basis: auto;
-    flex: 1;
+    flex: 1 0 auto;
     background-color: #FFF;
     padding: 20px;
     text-align: center;
@@ -26,7 +26,7 @@
             margin: 80px auto;
 
             @include media-breakpoint-up(lg) {
-                margin: 120px auto;
+                margin: 170px auto;
             }
             display: block;
             max-width: 100%;

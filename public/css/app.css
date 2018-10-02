@@ -19579,8 +19579,8 @@ h2 sup a:hover {
   -ms-flex-preferred-size: auto;
       flex-basis: auto;
   -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+      -ms-flex: 1 0 auto;
+          flex: 1 0 auto;
   background-color: #FFF;
   padding: 20px;
   text-align: center;
@@ -19612,7 +19612,7 @@ h2 sup a:hover {
 
 @media (min-width: 992px) {
   .widget__1 svg {
-    margin: 120px auto;
+    margin: 170px auto;
   }
 }
 
