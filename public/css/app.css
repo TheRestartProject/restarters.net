@@ -14918,6 +14918,30 @@ table.sortable > thead th div.mozilla {
           box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
 }
 
+.btn-marked {
+  background-color: transparent;
+  border: 0;
+  color: #000;
+  padding: 0;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.btn-marked svg {
+  margin-right: 2px;
+  width: 13px;
+  height: 9px;
+  margin-top: -3px;
+}
+
+.status-read .btn-marked {
+  text-decoration: underline;
+}
+
+.status-read .btn-marked svg {
+  display: none;
+}
+
 .btn-group__duo .btn {
   padding-right: 10px;
   padding-left: 14px;
@@ -15889,6 +15913,7 @@ table.sortable > thead th div.mozilla {
   margin-bottom: 10px;
   padding: 15px;
   padding-left: 55px;
+  padding-bottom: 10px;
   background-repeat: no-repeat;
   background-position: 20px 20px;
 }
