@@ -12,6 +12,7 @@ require('slick-carousel');
 require('summernote');
 require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
+require('./misc/notifications');
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
 

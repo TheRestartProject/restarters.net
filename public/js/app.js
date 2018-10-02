@@ -30088,6 +30088,7 @@ __webpack_require__(164);
 __webpack_require__(165);
 __webpack_require__(167);
 __webpack_require__(168);
+__webpack_require__(194);
 window.Dropzone = __webpack_require__(169);
 window.Tokenfield = __webpack_require__(170);
 
@@ -79207,6 +79208,45 @@ function isUndefined(arg) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 173 */,
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */,
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */,
+/* 194 */
+/***/ (function(module, exports) {
+
+function toggleRead(event) {
+    event.preventDefault();
+    $(this).parents('.card').toggleClass('status-read');
+}
+
+jQuery('.btn-marked').on('click', toggleRead);
+
+// function loadOlder(event) {
+//     event.preventDefault();
+//     // AJAX call
+// }
+
+// jQuery('.js-load').on('click', loadOlder);
 
 /***/ })
 /******/ ]);
