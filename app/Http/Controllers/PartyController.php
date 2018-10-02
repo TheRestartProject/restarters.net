@@ -594,6 +594,8 @@ public function edit($id, Request $request) {
 
     $party = $Party->findThis($id)[0];
 
+    $audits = Party::findOrFail($id)->audits;
+
     return view('events.edit', [ //party.edit
       'response' => $response,
       'gmaps' => true,
@@ -609,6 +611,7 @@ public function edit($id, Request $request) {
       'device_count_status' => $device_count_status,
       'user_groups' => $groups_user_is_host_of,
       'images' => $images,
+      'audits' => $audits,
     ]);
   }
 
@@ -631,7 +634,7 @@ public function edit($id, Request $request) {
   //
   // $this->set('grouplist', $Groups->findList());
 
-  compact($audits = Party::findOrFail($id)->audits);
+  $audits = Party::findOrFail($id)->audits;
 
   return view('events.edit', [ //party.edit
     'gmaps' => true,
@@ -1601,6 +1604,8 @@ public function deleteEvent($id){
       return redirect('/party')->with('success', 'Event has been deleted');
 
     } else {
+
+      // Comment
       return redirect()->back()->with('warning', 'You are not able to delete this event as volunteers have been invited');
     }
 
