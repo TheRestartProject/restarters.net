@@ -15957,6 +15957,10 @@ table.sortable > thead th div.mozilla {
   text-transform: uppercase;
 }
 
+.notifications .card__restart {
+  background-image: url(/images/restart.svg?d22bd15f0950d15e0343cbd4fb99b088);
+}
+
 .notifications .card__parties {
   background-image: url(/images/parties.svg?4a9033fd163577ff604975e1a55baca2);
 }

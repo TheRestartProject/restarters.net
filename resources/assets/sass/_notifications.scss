@@ -88,6 +88,10 @@
             text-transform: uppercase;
         }
 
+        &__restart {
+            background-image: url('../images/restart.svg');
+        }
+
         &__parties {
             background-image: url('../images/parties.svg');
         }
