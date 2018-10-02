@@ -1593,6 +1593,9 @@ public function deleteEvent($id){
 
     // Check to see whether the columns volunteers and pax has a value less than or equal to zero
     $event = Party::where('idevents', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->first();
+    $event = FixometerHelper::hasRole($user, 'Administrator');
+    
+
     if( !empty($event) ) {
 
       // Let's delete everything just to be certain
