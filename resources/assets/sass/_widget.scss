@@ -51,7 +51,20 @@
     }
 
     &__summary {
-        
+        padding-top: 20px;
+
+        p {
+            font-size: 16px;
+            font-weight: 400;
+            color: $brand;
+        }
+
+        svg {
+            display: inline-block;
+            width: 100px;
+            height: auto;
+            margin: 0 2px;
+        }
     }
 
 }

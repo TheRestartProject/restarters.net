@@ -19632,3 +19632,20 @@ h2 sup a:hover {
   margin: auto;
 }
 
+.widget__summary {
+  padding-top: 20px;
+}
+
+.widget__summary p {
+  font-size: 16px;
+  font-weight: 400;
+  color: #0394A6;
+}
+
+.widget__summary svg {
+  display: inline-block;
+  width: 100px;
+  height: auto;
+  margin: 0 2px;
+}
+
