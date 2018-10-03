@@ -172,6 +172,8 @@ class PartyController extends Controller {
         $longitude = null;
       }
 
+
+
       // We got data! Elaborate.
       $event_date =       $request->input('event_date');
       $start      =       $request->input('start');
@@ -181,7 +183,7 @@ class PartyController extends Controller {
       $venue      =       $request->input('venue');
       $location   =       $request->input('location');
       $group      =       $request->input('group');
-
+      $user_id    =       Auth::user()->id;
 
       // saving this for wordpress
       $wp_date = $event_date;
@@ -220,9 +222,9 @@ class PartyController extends Controller {
           'group'         => $group,
           'hours'         => $hours,
           // 'volunteers'    => $volunteers,
+          'user_id'       => $user_id,
           'created_at'    => date('Y-m-d H:i:s')
         );
-
 
         $Party = new Party;
         $idParty = $Party->insertGetId($data);
@@ -1592,11 +1594,13 @@ public function deleteEvent($id){
   } else {
 
     // Check to see whether the columns volunteers and pax has a value less than or equal to zero
-    $event = Party::where('idevents', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->first();
-    $event = FixometerHelper::hasRole($user, 'Administrator');
-    
+    // $testing = Party::where('idevents', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->where('user_id')->first();
 
-    if( !empty($event) ) {
+    // Check to see whether the current user is the owner/creator of the event OR the logged in user is an Administrator
+    $checkUserAuthority = Party::where('idevents', $id)->where('user_id', $user->id)->first();
+    $adminRole = FixometerHelper::hasRole($user, 'Administrator');
+
+    if( !is_null($checkUserAuthority) || !is_null($adminRole)) {
 
       // Let's delete everything just to be certain
       $device = Device::where('event', $id)->delete();
@@ -1609,7 +1613,7 @@ public function deleteEvent($id){
     } else {
 
       // Comment
-      return redirect()->back()->with('warning', 'You are not able to delete this event as volunteers have been invited');
+      return redirect()->back()->with('warning', 'You do not have permission to delete this event');
     }
 
     return redirect()->back()->with('warning', 'You do not have permission to delete this event');

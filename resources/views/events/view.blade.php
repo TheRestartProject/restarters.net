@@ -74,7 +74,7 @@
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">Edit event</a>
               @if( !$event->isInProgress() || !$event->hasFinished() )
-              <a href="{{ url('/') }}/party/delete/{{ $formdata->id }}" id="deleteEvent" class="dropdown-item">Delete event</a>
+              <a id="deleteEvent" href="{{ url('/') }}/party/delete/{{ $formdata->id }}" class="dropdown-item">Delete event</a>
               @endif
               <input type="hidden" name="attended" id="countAttended" value="{{count($attended)}}">
               <input type="hidden" name="invited" id="countInvited" value="{{count($invited)}}">
