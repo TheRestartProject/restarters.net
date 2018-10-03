@@ -36,7 +36,15 @@ class JoinEvent extends Notification
             return [];
 
         $channels = [];
-        if ($notifiable->invites) {
+
+        // If we're sending to a registered user, only send by mail channel if opted in to emails.
+        if ($this->user !== null) {
+            // Note: in future we will also add the 'database' channel here.
+            if ($notifiable->invites) {
+                $channels[] = 'mail';
+            }
+        } else { // Unregistered users
+            // We can only send by email.
             $channels[] = 'mail';
         }
 
