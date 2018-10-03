@@ -210,7 +210,7 @@ class GroupController extends Controller
               // }
               if (!empty($location)) {
 
-                $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($location.',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
+                $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($location)."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
                 $json = json_decode($json);
 
                 if (is_object($json) && !empty($json->{'results'})) {
@@ -796,7 +796,7 @@ class GroupController extends Controller
 
           if (!empty($data['location'])) {
 
-            $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($data['location'].',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
+            $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($data['location'])."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
             $json = json_decode($json);
 
             if (is_object($json) && !empty($json->{'results'})) {
