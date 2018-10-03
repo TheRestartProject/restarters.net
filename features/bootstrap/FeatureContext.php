@@ -3451,8 +3451,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     public function theUserPermissionSChecked()
     {
         //throw new PendingException();
-        $this->visit('/role/edit');     
-        $page = $this->getSession()->getPage()->getHtml();
+        $this->visit('/role/edit');        
     }
 
     /**
