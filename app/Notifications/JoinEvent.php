@@ -32,7 +32,15 @@ class JoinEvent extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        if ($notifiable == null)
+            return [];
+
+        $channels = [];
+        if ($notifiable->invites) {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
     }
 
     /**
