@@ -599,6 +599,7 @@ class DeviceController extends Controller
       $return['html'] = $views;
       $return['success'] = true;
       $return['stats'] = $stats;
+      $return['deviceCount'] = $deviceCount;
 
       // If the number of devices exceeds set amount then show the following message
       if( $deviceCount > env('DEVICE_ABNORMAL_MISC_COUNT', 5) ) {
@@ -608,10 +609,7 @@ class DeviceController extends Controller
 
       }
 
-      return response()->json(array($return,
-      'deviceCount' => $deviceCount,
-
-    ));
+      return response()->json($return);
 
     //$brand_name = Brands::find($brand)->brand_name;
 
