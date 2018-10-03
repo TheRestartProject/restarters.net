@@ -23,6 +23,7 @@ use App\Notifications\ReviewNotes;
 use View;
 use Notification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Mail;
 use App\Mail\AbnormalDevices;
 
@@ -765,16 +766,24 @@ class DeviceController extends Controller
       $old_wiki = Device::find($id)->wiki;
 
       //Send Wiki Notification to Admins
-      if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
-        $all_admins = User::where('role', 2)->get();
-        $group_id = Party::find($event_id)->group;
+      try {
+          if ($wiki == 1 && $old_wiki !== 1) {
+              $currentUser = Auth::user();
 
-        $arr = [
-          'group_url' => url('/group/view/'.$group_id),
-          'preferences' => url('/profile/edit'),
-        ];
+              $all_admins = User::where('role', 2)->get();
+              $group_id = Party::find($event_id)->group;
 
-        Notification::send($all_admins, new ReviewNotes($arr));
+              $arr = [
+                  'device_url' => url('/device/page-edit/' . $id),
+                  'current_user_name' => $currentUser->name,
+                  'group_url' => url('/group/view/'.$group_id),
+                  'preferences' => url('/profile/edit'),
+              ];
+
+              Notification::send($all_admins, new ReviewNotes($arr));
+          }
+      } catch (\Exception $ex) {
+          Log::error("An error occurred while sending ReviewNotes email: " . $ex->getMessage());
       }
 
       Device::find($id)->update([
