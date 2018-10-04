@@ -254,9 +254,9 @@ class GroupController extends Controller
                         'role' => 3,
                       ]);
 
-                      if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
+                      if(env('APP_ENV') == 'local') {
 
-                          $all_admins = User::where('role', 2)->where('invites', 1)->get();
+                        $all_admins = User::where('role', 2)->where('invites', 1)->get();
 
                         //Send Emails to Admins notifying event creation
                         $arr = [

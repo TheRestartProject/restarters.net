@@ -256,7 +256,7 @@ class PartyController extends Controller {
               'event_url' => url('/party/edit/'.$idParty),
             ];
 
-            Notification::send($all_admins, new ModerationEvent($admin));
+            Notification::send($admin, new ModerationEvent($arr));
           }
 
 

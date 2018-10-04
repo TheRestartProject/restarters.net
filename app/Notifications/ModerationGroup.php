@@ -32,7 +32,7 @@ class ModerationGroup extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -63,8 +63,10 @@ class ModerationGroup extends Notification
      */
     public function toArray($notifiable)
     {
-        return [
-            //
-        ];
+      return [
+          'title' => 'Group Created:',
+          'event_venue' => $this->arr['group_name'],
+          'event_url' => $this->arr['group_url'],
+      ];
     }
 }
