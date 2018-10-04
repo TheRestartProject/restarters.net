@@ -189,7 +189,7 @@
                     @foreach ($user->notifications as $notification)
                     <div class="card card__parties">
                         <div class="card-body">
-                            <h5 class="card-title">{{{ $notification->data['title'] }}} <a href="{{{ $notification->data['event_url'] }}}">{{{ $notification->data['event_venue'] }}}</a></h5>
+                            <h5 class="card-title">{{{ $notification->data['title'] }}} <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a></h5>
                             <time> {{{ date('D, jS M Y', strtotime($notification->created_at)) }}} </time>
                         </div>
                       </div>

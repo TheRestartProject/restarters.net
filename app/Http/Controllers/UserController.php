@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Support\Facades\Input;
+use App\Notifications\NewUser;
 
 
 class UserController extends Controller
@@ -856,7 +857,7 @@ class UserController extends Controller
       if (!isset($data)) {
         $data = null;
       }
-
+      dd("testing");
       if (!isset($_POST['modal'])) {
         return view('user.create', [
           'title' => 'New User',
@@ -1260,6 +1261,18 @@ public function postRegister(Request $request, $hash = null){
   }
 
   $user->save();
+
+  if(env('APP_ENV') == 'local') {
+    $all_admins = User::where('role', 2)->where('invites', 1)->get();
+      foreach ($all_admins as $admin)
+
+      $arr = [
+        'id' => $user->id,
+        'name' => $request->input('name'),
+      ];
+
+      Notification::send($admin, new NewUser($arr));
+  }
 
   if ( !empty($skills) )
   User::find($user->id)->skills()->sync($skills);

@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class ModerationGroup extends Notification
+class NewUser extends Notification
 {
     use Queueable;
 
@@ -16,12 +16,9 @@ class ModerationGroup extends Notification
      *
      * @return void
      */
-    protected $arr;
-    protected $user;
-    public function __construct($arr, $user = null)
+    public function __construct($arr)
     {
         $this->arr = $arr;
-        $this->user = $user;
     }
 
     /**
@@ -43,16 +40,12 @@ class ModerationGroup extends Notification
      */
     public function toMail($notifiable)
     {
-      if ($notifiable !== null) {
-        if ($notifiable->invites == 1) {
           return (new MailMessage)
-                      ->subject('Moderation Needed')
+                      ->subject('New User')
                       ->greeting('Hello!')
-                      ->line('Your moderation is needed for \'' . $this->arr['group_name'] . '\'.')
-                      ->action('View group', $this->arr['group_url'])
-                      ->line('If you think this invitation was not intended for you, please discard this email.');
-        }
-      }
+                      ->line('A new User has joined \'' . $this->arr['name'] . '\'. User ID for reference: \'' . $this->arr['id'] . '\'.')
+                      ->line('If you think this email was not intended for you, please discard.')
+                      ->line('Thank you.');
     }
 
     /**
@@ -64,9 +57,9 @@ class ModerationGroup extends Notification
     public function toArray($notifiable)
     {
       return [
-          'title' => 'Group Created:',
-          'name' => $this->arr['group_name'],
-          'url' => $this->arr['group_url'],
+          'title' => 'New User has joined:',
+          'name' => $this->arr['name'],
+          'url' => '',
       ];
     }
 }

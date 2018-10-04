@@ -62,8 +62,8 @@ class ModerationEvent extends Notification
     {
         return [
             'title' => 'Event Created:',
-            'event_venue' => $this->arr['event_venue'],
-            'event_url' => $this->arr['event_url'],
+            'name' => $this->arr['event_venue'],
+            'url' => $this->arr['event_url'],
         ];
     }
 }
