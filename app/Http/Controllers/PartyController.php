@@ -250,13 +250,13 @@ class PartyController extends Controller {
           //Send Emails to Admins notifying event creation
           if(env('APP_ENV') == 'local') {
             $all_admins = User::where('role', 2)->where('invites', 1)->get();
-
+            foreach ($all_admins as $admin)
             $arr = [
               'event_venue' => Party::find($idParty)->venue,
               'event_url' => url('/party/edit/'.$idParty),
             ];
 
-            Notification::send($all_admins, new ModerationEvent($arr));
+            Notification::send($all_admins, new ModerationEvent($admin));
           }
 
 

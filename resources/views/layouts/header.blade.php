@@ -87,12 +87,12 @@
 
                             <li><button class="badge badge-pill badge-info" data-toggle="collapse" data-target="#notifications" aria-expanded="false" aria-controls="notifications"><svg width="14" height="20" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><g fill="#fff"><ellipse cx="5.25" cy="4.868" rx="3.908" ry="3.94"/><path d="M4.158 13.601h2.184v.246h-.001A1.097 1.097 0 0 1 5.25 15a1.097 1.097 0 0 1-1.092-1.101l.001-.052h-.001v-.246z"/><ellipse cx=".671" cy="12.337" rx=".671" ry=".677"/><path d="M.671 11.66h9.158v1.353H.671z"/><ellipse cx="5.25" cy=".927" rx=".92" ry=".927"/><ellipse cx="9.829" cy="12.337" rx=".671" ry=".677"/><path d="M1.342 4.439h7.815v8.574H1.342z"/><path d="M0 12.337h10.5v.677H0z"/></g></svg>
                               @if(isset($notifications))
+                              @php( $user = Auth::user() )
                                 <span>{{{ $notifications->count() + $user->notifications->count() }}}</span>
                               @endif
                             </button></li>
 
                             <li class="nav-item dropdown">
-                              @php( $user = Auth::user() )
                                 @if (!is_null($user))
                                   <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-target="#account-nav" aria-controls="account-nav" data-toggle="collapse" aria-haspopup="true" aria-expanded="false" aria-label="Toggle account navigation" v-pre>
                                     @if ( isset( $user->getProfile($user->id)->path ) && !is_null( $user->getProfile($user->id)->path ) )
