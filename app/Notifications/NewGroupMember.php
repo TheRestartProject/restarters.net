@@ -32,7 +32,7 @@ class NewGroupMember extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -64,7 +64,9 @@ class NewGroupMember extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+          'title' => 'A new volunteer has joined (\'' . $this->arr['group_name'] . '\':',
+          'name' => $this->arr['user_name'],
+          'url' => '',
         ];
     }
 }
