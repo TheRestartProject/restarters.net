@@ -248,7 +248,7 @@ class PartyController extends Controller {
           Party::find($idParty)->increment('volunteers');
 
           //Send Emails to Admins notifying event creation
-          if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
+          if(env('APP_ENV') == 'local') {
             $all_admins = User::where('role', 2)->where('invites', 1)->get();
 
             $arr = [
