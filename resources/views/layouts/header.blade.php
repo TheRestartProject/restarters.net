@@ -186,15 +186,27 @@
 
                   @if( isset($user->notifications) && is_object($user->notifications) && $user->notifications->count() > 0 )
                   <div class="cards">
-                    @foreach ($user->notifications as $notification)
+
+                    @foreach ($user->unReadNotifications as $notification)
+                    <div style="background-color: #FFEED7;" class="card card__parties">
+                        <div class="card-body">
+                            <h5 class="card-title">{{{ $notification->data['title'] }}} <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a></h5>
+                              <time> {{{ date('D, jS M Y', strtotime($notification->created_at)) }}}</time>
+                              <p><a href="{{ route('markAsRead') }}">MARK AS READ</a></p>
+                        </div>
+                      </div>
+                    @endforeach
+
+                    @foreach ($user->readNotifications as $notification)
                     <div class="card card__parties">
                         <div class="card-body">
                             <h5 class="card-title">{{{ $notification->data['title'] }}} <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a></h5>
                             <time> {{{ date('D, jS M Y', strtotime($notification->created_at)) }}} </time>
+                            <p>MARKED AS READ</p>
                         </div>
                       </div>
-
                     @endforeach
+
                   </div>
                   @endif
 

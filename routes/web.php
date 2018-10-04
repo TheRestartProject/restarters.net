@@ -244,3 +244,8 @@ Route::get('/admin/stats/2', function() {
 Route::get('/party/stats/{id}/wide', function($id) {
   return App\Http\Controllers\PartyController::stats($id);
 });
+
+Route::get('markAsRead', function(){
+    auth()->user()->unReadNotifications->markAsRead();
+    return  redirect()->back();
+})->name('markAsRead');
