@@ -20,6 +20,7 @@ use FixometerHelper;
 use FixometerFile;
 use Illuminate\Http\Request;
 use Illuminate\Log\Logger;
+use Illuminate\Support\Facades\Log;
 use Notification;
 
 
@@ -757,18 +758,22 @@ class GroupController extends Controller
         }
 
         if (!is_null($groupHostLinks)) {
-            $groupName = Group::find($group_id)->name;
-            foreach ($groupHostLinks as $groupHostLink) {
-                $host = User::where('id', $groupHostLink->user)->first();
-                if ($host->invites == 1) {
-                    $arr = [
-                        'user_name' => $user->name,
-                        'group_name' => $groupName,
-                        'group_url' => url('/group/view/'.$group_id),
-                        'preferences' => url('/profile/edit/'.$host->id),
-                    ];
-                    Notification::send($host, new NewGroupMember($arr, $host));
+            try {
+                $groupName = Group::find($group_id)->name;
+                foreach ($groupHostLinks as $groupHostLink) {
+                    $host = User::where('id', $groupHostLink->user)->first();
+                    if ($host->invites == 1) {
+                        $arr = [
+                            'user_name' => $user->name,
+                            'group_name' => $groupName,
+                            'group_url' => url('/group/view/'.$group_id),
+                            'preferences' => url('/profile/edit/'.$host->id),
+                        ];
+                        Notification::send($host, new NewGroupMember($arr, $host));
+                    }
                 }
+            } catch (\Exception $ex) {
+                Log::error("An error occurred when notifying of group invite confirmation: " . $ex->getMessage());
             }
         }
 
