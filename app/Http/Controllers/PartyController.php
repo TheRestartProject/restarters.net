@@ -26,6 +26,7 @@ use DateTime;
 use FixometerFile;
 use FixometerHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Notification;
 use DB;
 
@@ -1363,16 +1364,19 @@ public function confirmInvite($event_id, $hash) {
 
     if ( !is_null($host) ) {
 
-      //Send Notification to Host
-      $arr = [
-        'user_name' => $user->name,
-        'event_venue' => Party::find($event_id)->venue,
-        'event_url' => url('/party/view/'.$event_id),
-        'preferences' => url('/profile/edit/'.$host->id),
-      ];
+      try {
+          //Send Notification to Host
+          $arr = [
+              'user_name' => $user->name,
+              'event_venue' => Party::find($event_id)->venue,
+              'event_url' => url('/party/view/'.$event_id),
+              'preferences' => url('/profile/edit/'.$host->id),
+          ];
 
-      Notification::send($host, new RSVPEvent($arr, $host));
-
+          Notification::send($host, new RSVPEvent($arr, $host));
+      } catch (\Exception $ex) {
+          Log::error("An error occurred when trying to notify host of invitation confirmation: " . $ex->getMessage());
+      }
     }
 
     return redirect('/party/view/'.$user_event->event);
