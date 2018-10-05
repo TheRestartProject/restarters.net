@@ -177,7 +177,7 @@
 
                 <h2 id="key-stats">Volunteers nearby</h2>
 
-                <p>These volunteers are already registered on Restarters.net within 10 miles of your group already on Restarters.net.  You can invite them to join your group here.  (Note: volunteers marked with a ⚠ will be invited but won't be sent an email due to their notification settings.)</p>
+                <p>These volunteers are already registered on Restarters.net and within 10 miles of your group.  You can invite them to join your group here.  (Note: volunteers marked with a ⚠ will be invited but won't be sent an email due to their notification settings.)</p>
 
                 <p>Back to main <a href="{{ url('/group/view/' . $group->idgroups) }}">group page</a>.
 
