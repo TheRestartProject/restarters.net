@@ -127,6 +127,8 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/all/search', 'GroupController@search');
     Route::get('/make-host/{group_id}/{user_id}', 'GroupController@getMakeHost');
     Route::get('/remove-volunteer/{group_id}/{user_id}', 'GroupController@getRemoveVolunteer');
+    Route::get('/nearby/{id}', 'GroupController@volunteersNearby');
+    Route::get('/nearbyinvite/{groupId}/{userId}', 'GroupController@inviteNearbyRestarter');
   });
 
   //Outbound Controller

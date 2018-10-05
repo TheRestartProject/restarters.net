@@ -1172,4 +1172,327 @@ class GroupController extends Controller
 
   }
 
+    public function volunteersNearby($groupid)
+    {
+      // $this->set('title', 'Host Dashboard');
+      // $this->set('showbadges', true);
+      // $this->set('charts', false);
+
+      // $this->set('css', array('/components/perfect-scrollbar/css/perfect-scrollbar.min.css'));
+      // $this->set('js', array('foot' => array('/components/perfect-scrollbar/js/min/perfect-scrollbar.jquery.min.js')));
+
+      if(isset($_GET['action']) && isset($_GET['code'])){
+          $actn = $_GET['action'];
+          $code = $_GET['code'];
+
+          switch($actn){
+              case 'gu':
+                  $response['success'] = 'Group updated.';
+                  break;
+              case 'pe':
+                  $response['success'] = 'Party updated.';
+                  break;
+              case 'pc':
+                  $response['success'] = 'Party created.';
+                  break;
+              case 'ue':
+                  $response['success'] = 'Profile updated.';
+                  break;
+              case 'de':
+                  if($code == 200 ) { $response['success'] = 'Party deleted.'; }
+                  elseif( $code == 403 ) { $response['danger'] = 'Couldn\'t delete the party!'; }
+                  elseif( $code == 500 ) { $response['warning'] = 'The party has been deleted, but <strong>something went wrong while deleting it from WordPress</strong>. <br /> You\'ll need to do that manually!';  }
+                  break;
+          }
+
+          // $this->set('response', $response);
+      }
+
+      $user = User::find(Auth::id());
+
+      //Object Instances
+      $Group  = new Group;
+      $User   = new User;
+      $Party  = new Party;
+      $Device = new Device;
+      $groups = $Group->ofThisUser($user->id);
+
+      // get list of ids to check in if condition
+      $gids = array();
+      foreach($groups as $group){
+        $gids[] = $group->idgroups;
+      }
+
+      if( ( isset($groupid) && is_numeric($groupid) ) || in_array($groupid, $gids) ) {
+
+          //$group = (object) array_fill_keys( array('idgroups') , $groupid);
+          $group = Group::where('idgroups', $groupid)->first();
+          // $this->set('grouplist', $Group->findList());
+
+
+
+      }
+      else {
+          $group = $groups[0];
+          unset($groups[0]);
+      }
+      // $this->set('userGroups', $groups);
+      if( !is_null($group->latitude) && !is_null($group->longitude) ){
+          $restarters_nearby = User::select(DB::raw('*, ( 6371 * acos( cos( radians('.$group->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$group->longitude.') ) + sin( radians('.$group->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
+                           ->having("distance", "<=", 10)
+                           ->orderBy('name', 'ASC')
+                           ->get();
+          foreach ($restarters_nearby as $restarter) {
+              $membership = UserGroups::where('user', $restarter->id)->where('group', $groupid)->first();
+              $restarter->notAMember = $membership == null;
+              $restarter->hasPendingInvite = !empty(UserGroups::where('group', $groupid)
+                                         ->where('user', $restarter->id)
+                                         ->where(function ($query) {
+                                             $query->where('status', '<>', '1')
+                                                 ->whereNotNull('status');
+                                         })->first());
+          }
+      } else {
+          $restarters_nearby = null;
+      }
+
+      $groupStats = $group->getGroupStats($this->EmissionRatio);
+      $allPastEvents = Party::pastEvents()
+                     ->with('devices.deviceCategory')
+                     ->where('events.group', $group->idgroups)
+                     ->get();
+
+
+      // $this->set('pax', $participants);
+      // $this->set('hours', $hours_volunteered);
+      $weights = $Device->getWeights($group->idgroups);
+      // $this->set('weights', $weights);
+
+      $devices = $Device->ofThisGroup($group->idgroups);
+
+      /*
+      foreach($devices as $i => $device){
+
+      }
+      */
+
+      // $this->set('need_attention', $need_attention);
+      //
+      // $this->set('group', $group);
+      // $this->set('profile', $User->profilePage($this->user->id));
+      //
+      // $this->set('upcomingparties', $Party->findNextParties($group->idgroups));
+      // $this->set('allparties', $allparties);
+      //
+      // $this->set('devices', $Device->ofThisGroup($group->idgroups));
+      //
+      //
+      // $this->set('device_count_status', $Device->statusCount());
+      // $this->set('group_device_count_status', $Device->statusCount($group->idgroups));
+
+      // more stats...
+
+      /** co2 counters **/
+      $co2_years = $Device->countCO2ByYear($group->idgroups);
+      // $this->set('year_data', $co2_years);
+      $stats = array();
+      foreach($co2_years as $year){
+          $stats[$year->year] = $year->co2;
+      }
+      // $this->set('bar_chart_stats', array_reverse($stats, true));
+
+      $waste_years = $Device->countWasteByYear($group->idgroups);
+
+      //dbga($waste_years);
+
+      // $this->set('waste_year_data', $waste_years);
+      $wstats = array();
+      foreach($waste_years as $year){
+          $wstats[$year->year] = $year->waste;
+      }
+      // $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
+
+
+      // $co2Total = $Device->getWeights();
+      $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
+
+      // $this->set('co2Total', $this->TotalEmission);
+      // $this->set('co2ThisYear', $co2ThisYear[0]->co2);
+
+      $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
+
+      // $this->set('wasteTotal', $this->TotalWeight);
+      // $this->set('wasteThisYear', $wasteThisYear[0]->waste);
+
+
+      $clusters = array();
+
+      for($i = 1; $i <= 4; $i++) {
+          $cluster = $Device->countByCluster($i, $group->idgroups);
+          $total = 0;
+          foreach($cluster as $state){
+              $total += $state->counter;
+          }
+          $cluster['total'] = $total;
+          $clusters['all'][$i] = $cluster;
+      }
+
+
+      for($y = date('Y', time()); $y>=2013; $y--){
+
+          for($i = 1; $i <= 4; $i++) {
+              //$cluster = $Device->countByCluster($i, $group->idgroups);
+              $cluster = $Device->countByCluster($i, $group->idgroups, $y);
+
+              $total = 0;
+              foreach($cluster as $state){
+                  $total += $state->counter;
+              }
+              $cluster['total'] = $total;
+              $clusters[$y][$i] = $cluster;
+          }
+      }
+      // $this->set('clusters', $clusters);
+
+      // most/least stats for clusters
+      $mostleast = array();
+      for($i = 1; $i <= 4; $i++){
+          $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i, $group->idgroups);
+          $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i, $group->idgroups);
+          $mostleast[$i]['least_repaired'] = $Device->findMostSeen(3, $i, $group->idgroups);
+
+      }
+
+      // $this->set('mostleast', $mostleast);
+      //
+      // $this->set('top', $Device->findMostSeen(1, null, $group->idgroups));
+
+      if (!isset($response)) {
+        $response = null;
+      }
+
+      //Event tabs
+      $upcoming_events = Party::upcomingEvents()
+                            ->where('events.group', $group->idgroups)
+                              ->take(5)
+                                ->get();
+
+      $past_events = Party::pastEvents()
+                            ->where('events.group', $group->idgroups)
+                              ->take(5)
+                                ->get();
+
+      //Checking user for validatity
+      $in_group = !empty(UserGroups::where('group', $groupid)
+                          ->where('user', $user->id)
+                            ->where(function ($query) {
+                                $query->where('status', '1')
+                                  ->orWhereNull('status');
+                            })->first());
+
+      $is_host_of_group = FixometerHelper::userHasEditGroupPermission($groupid, $user->id);
+
+      $user_groups = UserGroups::where('user', Auth::user()->id)->count();
+      $view_group = Group::find($groupid);
+
+      $hasPendingInvite = !empty(UserGroups::where('group', $groupid)
+                                             ->where('user', $user->id)
+                                             ->where(function ($query) {
+                                                 $query->where('status', '<>', '1')
+                                                       ->whereNotNull('status');
+                                             })->first());
+
+      return view('group.nearby', [ //host.index
+        'title' => 'Host Dashboard',
+        'has_pending_invite' => $hasPendingInvite,
+        'showbadges' => true,
+        'charts' => false,
+        'response' => $response,
+        'grouplist' => $Group->findList(),
+        'userGroups' => $groups,
+        'pax' => $groupStats['pax'],
+        'hours' => $groupStats['hours'],
+        'weights' => $weights,
+        'group' => $group,
+        'groupCo2' => $groupStats['co2'],
+        'groupWaste' => $groupStats['waste'],
+        'profile' => $User->getProfile($user->id),
+        'upcomingparties' => $Party->findNextParties($group->idgroups),
+        'allparties' => $allPastEvents,
+        'devices' => $Device->ofThisGroup($group->idgroups),
+        'device_count_status' => $Device->statusCount(),
+        'group_device_count_status' => $Device->statusCount($group->idgroups),
+        'year_data' => $co2_years,
+        'bar_chart_stats' => array_reverse($stats, true),
+        'waste_year_data' => $waste_years,
+        'waste_bar_chart_stats' => array_reverse($wstats, true),
+        'co2Total' => $Party->TotalEmission,
+        'co2ThisYear' => $co2ThisYear[0]->co2,
+        'wasteTotal' => $this->TotalWeight,
+        'wasteThisYear' => $wasteThisYear[0]->waste,
+        'clusters' => $clusters,
+        'mostleast' => $mostleast,
+        'top' => $Device->findMostSeen(1, null, $group->idgroups),
+        'user' => $user,
+        'upcoming_events' => $upcoming_events,
+        'past_events' => $past_events,
+        'EmissionRatio' => $Party->EmissionRatio,
+        'in_group' => $in_group,
+        'is_host_of_group' => $is_host_of_group,
+        'user_groups' => $user_groups,
+        'view_group' => $view_group,
+        'group_id' => $groupid,
+        'restarters_nearby' => $restarters_nearby
+      ]);
+    }
+
+    public function inviteNearbyRestarter($groupId, $userId)
+    {
+        $user_group = UserGroups::where('user', $userId)->where('group', $groupId)->first();
+        $user = User::where('id', $userId)->first();
+
+        // not already a confirmed member of the group
+        if (is_null($user_group) || $user_group->status != "1") {
+            $hash = substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 );
+            $url = url('/').'/group/accept-invite/'.$groupId.'/'.$hash;
+
+            // already been invited once, set a new invite hash
+            if (!is_null($user_group)) {
+                $user_group->update([
+                    'status' => $hash,
+                ]);
+            // not associated with the group at all yet
+            } else {
+                UserGroups::create([
+                'user' => $userId,
+                'group' => $groupId,
+                'status' => $hash,
+                'role' => 4,
+                ]);
+            }
+
+            try {
+                $from = Auth::user();
+                $group = Group::where('idgroups', $groupId)->first();
+                if ($user->invites == 1) {
+                    Notification::send($user, new JoinGroup([
+                        'name' => $from->name,
+                        'group' => $group->name,
+                        'url' => $url,
+                        'message' => null
+                    ], $user));
+                } else {
+                    $not_sent[] = $user->email;
+                }
+            } catch (\Exception $ex) {
+                Log::error("An error occurred while sending invitation to nearby Restarter:" . $ex->getMessage());
+            }
+
+        } else { // already a confirmed member of the group or been sent an invite
+            $not_sent[] = $user->email;
+        }
+
+        return redirect('/group/nearby/' . $groupId)->with('success', $user->name . ' has been invited');
+    }
+
 }
