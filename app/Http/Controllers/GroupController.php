@@ -1239,7 +1239,7 @@ class GroupController extends Controller
       // $this->set('userGroups', $groups);
       if( !is_null($group->latitude) && !is_null($group->longitude) ){
           $restarters_nearby = User::select(DB::raw('*, ( 6371 * acos( cos( radians('.$group->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$group->longitude.') ) + sin( radians('.$group->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
-                           ->having("distance", "<=", 10)
+                           ->having("distance", "<=", 20)
                            ->orderBy('name', 'ASC')
                            ->get();
           foreach ($restarters_nearby as $restarter) {
