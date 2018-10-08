@@ -20,6 +20,7 @@ use App\Notifications\JoinEvent;
 use App\Notifications\JoinGroup;
 use App\Notifications\RSVPEvent;
 use App\Notifications\NotifyHostRSVPInvitesMade;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Notifications\ModerationEvent;
 use App\Notifications\EventDevices;
 use App\Notifications\EventRepairs;
@@ -477,6 +478,23 @@ public function edit($id, Request $request) {
       $theParty = $Party->findThis($id)[0];
 
       if( ( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) { //For testing purposes
+
+        // Notify all Restarters of relevant Group if a new Event has been approved for moderation
+        $event = Party::find($id);
+        if (!empty($GroupRestarters = UserGroups::where('group', $event->group)->where('role', 4)->get())) {
+          foreach ($GroupRestarters as $GroupRestarter) {
+
+            $GroupRestarter = User::find($GroupRestarter->user);
+
+            $arr = [
+              'event_venue' => $event->venue,
+              'event_url' => url('/party/view/'.$event->idevents),
+            ];
+
+            Notification::send($GroupRestarter, new NotifyRestartersOfNewEvent($arr));
+          }
+        }   // End of Group Restarters
+
 
         $Party->where('idevents', $id)->update(['wordpress_post_id' => 99999]);
 
