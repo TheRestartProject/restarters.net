@@ -19,6 +19,7 @@ use App\Helpers\FootprintRatioCalculator;
 use App\Notifications\JoinEvent;
 use App\Notifications\JoinGroup;
 use App\Notifications\RSVPEvent;
+use App\Notifications\NotifyHostRSVPInvitesMade;
 use App\Notifications\ModerationEvent;
 use App\Notifications\EventDevices;
 use App\Notifications\EventRepairs;
@@ -757,6 +758,8 @@ public function getJoinEvent($event_id) {
 
       Party::find($event_id)->increment('volunteers');
 
+      //Comment
+
       $response['success'] = 'Thank you for your RSVP, we look forward to seeing you at the event';
 
       return redirect()->back()->with('response', $response);
@@ -1293,6 +1296,19 @@ public function postSendInvite(Request $request) {
           'message' => $message,
           'event' => $event,
         );
+
+        // Creator of Event
+        $userCreator = User::findOrFail($event->user_id);
+
+        $event_details = [
+          'event_venue' => $event->venue,
+          'event_url' => url('/party/edit/'.$event->idevents),
+        ];
+
+        // Notify Host of Event
+        Notification::send($userCreator, new NotifyHostRSVPInvitesMade($event_details));
+
+        // Send Invites
         Notification::send($user, new JoinEvent($arr, $user));
 
       } else {
@@ -1612,7 +1628,6 @@ public function deleteEvent($id){
 
     } else {
 
-      // Comment
       return redirect()->back()->with('warning', 'You do not have permission to delete this event');
     }
 
