@@ -192,7 +192,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{{ $notification->data['title'] }}} <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a></h5>
                               <time> {{{ date('D, jS M Y', strtotime($notification->created_at)) }}}</time>
-                              <p><a href="{{ route('markAsRead') }}">MARK AS READ</a></p>
+                            </br><p class="pull-right"><a href="{{ route('markAsRead', ['id' => $notification->id]) }}">MARK AS READ</a></p>
                         </div>
                       </div>
                     @endforeach
@@ -202,7 +202,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{{ $notification->data['title'] }}} <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a></h5>
                             <time> {{{ date('D, jS M Y', strtotime($notification->created_at)) }}} </time>
-                            <p>MARKED AS READ</p>
+                          </br><p class="pull-right"><img src="images/checked.svg" alt=""> MARKED AS READ</p>
                         </div>
                       </div>
                     @endforeach
