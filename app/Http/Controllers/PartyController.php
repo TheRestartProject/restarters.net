@@ -1297,16 +1297,17 @@ public function postSendInvite(Request $request) {
           'event' => $event,
         );
 
-        // Creator of Event
-        $userCreator = User::findOrFail($event->user_id);
+        // Get Creator of Event
+        if (!empty($userCreator = User::find($event->user_id))) {
 
-        $event_details = [
-          'event_venue' => $event->venue,
-          'event_url' => url('/party/edit/'.$event->idevents),
-        ];
+          $event_details = [
+            'event_venue' => $event->venue,
+            'event_url' => url('/party/edit/'.$event->idevents),
+          ];
 
-        // Notify Host of Event
-        Notification::send($userCreator, new NotifyHostRSVPInvitesMade($event_details));
+          // Notify Host of Event
+          Notification::send($userCreator, new NotifyHostRSVPInvitesMade($event_details));
+        }
 
         // Send Invites
         Notification::send($user, new JoinEvent($arr, $user));
