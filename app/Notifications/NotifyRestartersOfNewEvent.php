@@ -38,13 +38,19 @@ class NotifyRestartersOfNewEvent extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
-    }
+     public function toMail($notifiable)
+     {
+       if ($notifiable !== null) {
+         if ($notifiable->invites == 1) {
+           return (new MailMessage)
+                       ->subject('There is a New Event')
+                       ->greeting('Hello!')
+                       ->line('There has been a new Event added to your Group: \'' . $this->arr['event_venue'] . '\'.')
+                       ->action('View event', $this->arr['event_url'])
+                       ->line('If you think this invitation was not intended for you, please discard this email.');
+         }
+       }
+     }
 
     /**
      * Get the array representation of the notification.
