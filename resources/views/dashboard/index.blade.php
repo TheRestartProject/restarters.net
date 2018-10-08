@@ -27,7 +27,7 @@
                 </div>
               @else
                 <div class="col-5 d-flex align-items-center justify-content-end">
-                  <a href="{{ env('DISCOURSE_URL') }}" class="step__link">Join</a>
+                  <a href="{{ env('DISCOURSE_URL') }}/login" class="step__link">Join</a>
                 </div>
               @endif
             </div>
