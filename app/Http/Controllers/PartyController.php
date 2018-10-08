@@ -776,8 +776,6 @@ public function getJoinEvent($event_id) {
 
       Party::find($event_id)->increment('volunteers');
 
-      //Comment
-
       $response['success'] = 'Thank you for your RSVP, we look forward to seeing you at the event';
 
       return redirect()->back()->with('response', $response);

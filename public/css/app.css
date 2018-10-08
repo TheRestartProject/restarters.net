@@ -15907,11 +15907,6 @@ table.sortable > thead th div.mozilla {
   color: #000;
 }
 
-.notifications .card p a {
-  text-decoration: underline;
-  color: #000;
-}
-
 .notifications .card time {
   font-size: 12px;
   text-transform: uppercase;
@@ -19579,3 +19574,4 @@ h2 sup a:hover {
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);
 }
+

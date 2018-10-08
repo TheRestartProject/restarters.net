@@ -195,6 +195,39 @@ class GroupController extends Controller
 
 
 
+
+
+
+
+              // UNFINISHED GET DISTANCE FOR USER'S LOCATION VS GROUP LOCATION...
+              //First Address
+              $latitude1 = '51.879478';
+              $longitude1 = '0.866109';
+
+              //Second Address
+              $latitude2 = '51.833557';
+              $longitude2 = '0.908947';
+              // https://gist.github.com/nirendra/7685002
+              $theta = $longitude1 - $longitude2;
+              $miles = (sin(deg2rad($latitude1)) * sin(deg2rad($latitude2))) + (cos(deg2rad($latitude1)) * cos(deg2rad($latitude2)) * cos(deg2rad($theta)));
+              $miles = acos($miles);
+              $miles = rad2deg($miles);
+              $miles = $miles * 60 * 1.1515;
+              $feet = $miles * 5280;
+              $yards = $feet / 3;
+              $kilometers = $miles * 1.609344;
+              $meters = $kilometers * 1000;
+
+              dd($kilometers, $miles, $meters);
+
+
+
+
+
+
+
+
+
               if(empty($name)){
                   $error['name'] = 'Please input a name.';
               }
