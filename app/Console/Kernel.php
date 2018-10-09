@@ -56,6 +56,7 @@ class Kernel extends ConsoleKernel
           }
 
         })->timezone('Europe/London')->dailyAt('09:30');
+        // replace '->timezone('Europe/London')->dailyAt('09:30');' with '->everyMinute(); for testing purposes'
     }
 
     /**
