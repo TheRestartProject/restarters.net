@@ -239,12 +239,11 @@ class GroupController extends Controller
 
 
           // -------------------------------------------------- NOTIFY USERS OF NEW GROUP WITHIN 25 MILES ------------------------------------------------- //
-          // CODE: https://gist.github.com/nirendra/7685002
-          // Get Lat and Long from Location: https://www.latlong.net/
-          // Distance Calculator from Coordiantes example: https://gps-coordinates.org/distance-between-coordinates.php
           // Get all Users
           $users = User::all();
+
           foreach ( $users as $user ) {
+
             //Users location
             $userLatitude = $user->latitude;
             $userLongitude =$user->longitude;
@@ -259,12 +258,10 @@ class GroupController extends Controller
             //If calculated distance is less than 25 for the user then send notification...
             if($miles < 25){
               $arr = [
-                'group_name' => $name,s
+                'group_name' => $name,
                 'group_url' => url('/group/view/'.$idGroup),
               ];
-
               Notification::send($user, new NewGroupWithinRadius($arr));
-              // dd("Distance of Group Locations: ", "Latitude: ".$latitude. ", Longitude: ".$longitude, "Distance between two locations in miles: " . $miles);
             }
           }
           // -------------------------------------------------- END NOTIFY USERS OF NEW GROUP WITHIN 25 MILES -------------------------------------------------- //
