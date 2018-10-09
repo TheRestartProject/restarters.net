@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class NewGroupWithinRadius extends Notification
+class NotifyAdminNoDevices extends Notification
 {
     use Queueable;
 
@@ -31,6 +31,8 @@ class NewGroupWithinRadius extends Notification
      public function via($notifiable)
      {
          return ['database'];
+         // return ['mail', 'database'];
+
      }
 
     /**
@@ -44,10 +46,11 @@ class NewGroupWithinRadius extends Notification
        if ($notifiable !== null) {
          if ($notifiable->invites == 1) {
            return (new MailMessage)
-                       ->subject('New Group nearby')
+                       ->subject('Moderation Needed')
                        ->greeting('Hello!')
-                       ->line('A new group has appeared nearby \'' . $this->arr['group_name'] . '\'.')
-                       ->action('View group', $this->arr['group_url'])
+                       ->line('Your moderation is needed for \'' . $this->arr['event_venue'] . '\'.')
+                       ->line('No devices have been added against this event.')
+                       ->action('View event', $this->arr['event_url'])
                        ->line('If you think this invitation was not intended for you, please discard this email.');
          }
        }
@@ -62,9 +65,9 @@ class NewGroupWithinRadius extends Notification
      public function toArray($notifiable)
      {
        return [
-           'title' => 'New Group nearby:',
-           'name' => $this->arr['group_name'],
-           'url' => $this->arr['group_url'],
+           'title' => 'Moderation Needed (No Devices):',
+           'name' => $this->arr['event_venue'],
+           'url' => $this->arr['event_url'],
        ];
      }
 }

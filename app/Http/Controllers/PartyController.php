@@ -129,29 +129,29 @@ class PartyController extends Controller {
 
   }
 
-    public function allUpcoming()
-    {
-        $allUpcomingEventsQuery = Party::allUpcomingEvents();
-        $allUpcomingEventsCount = $allUpcomingEventsQuery->count();
-        $allUpcomingEvents = $allUpcomingEventsQuery->paginate(env('PAGINATE'));
+  public function allUpcoming()
+  {
+    $allUpcomingEventsQuery = Party::allUpcomingEvents();
+    $allUpcomingEventsCount = $allUpcomingEventsQuery->count();
+    $allUpcomingEvents = $allUpcomingEventsQuery->paginate(env('PAGINATE'));
 
-        return view('events.all', [
-            'upcoming_events_count' => $allUpcomingEventsCount,
-            'upcoming_events'  => $allUpcomingEvents,
-        ]);
-    }
+    return view('events.all', [
+      'upcoming_events_count' => $allUpcomingEventsCount,
+      'upcoming_events'  => $allUpcomingEvents,
+    ]);
+  }
 
   public function create(Request $request)
   {
 
     // Let's determine whether currently logged in user is associated with any groups
     $user_groups = UserGroups::where('user', Auth::user()->id)
-                                ->where('role', 3)
-                                  ->get();
+    ->where('role', 3)
+    ->get();
 
     // Then let's redirect users away if they are a restarter or a host with no groups
     if( FixometerHelper::hasRole(Auth::user(), 'Restarter') || ( count($user_groups) == 0 && FixometerHelper::hasRole(Auth::user(), 'Host') ) )
-      return redirect('/user/forbidden');
+    return redirect('/user/forbidden');
 
     $Groups = new Group;
 
@@ -682,7 +682,7 @@ public function view($id) {
 
   // If event no longer exists
   if( empty($event) )
-    abort(404);
+  abort(404);
 
   //Event details
   $images = $File->findImages(env('TBL_EVENTS'), $id);
@@ -1144,35 +1144,35 @@ public function getGroupEmails($event_id, $object = false)
 }
 
 
-    /**
-     * This is called via ajax in the Invite Volunteers to Event modal.
-     * It finds the users associated with the group that the event is for,
-     * in order to quickly add them to the list of invitees.
-     *
-     * @param int $event_id The event for which to find associated users.
-     *
-     * @return Response json formatted array of relevant info on users in the group.
-     */
-    public function getGroupEmailsWithNames($event_id)
-    {
-        $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
-                        ->where('user', '!=', Auth::user()->id)
-                        ->pluck('user')
-                        ->toArray();
+/**
+* This is called via ajax in the Invite Volunteers to Event modal.
+* It finds the users associated with the group that the event is for,
+* in order to quickly add them to the list of invitees.
+*
+* @param int $event_id The event for which to find associated users.
+*
+* @return Response json formatted array of relevant info on users in the group.
+*/
+public function getGroupEmailsWithNames($event_id)
+{
+  $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
+  ->where('user', '!=', Auth::user()->id)
+  ->pluck('user')
+  ->toArray();
 
-        // Users already associated with the event.
-        // (Not including those invited but not RSVPed)
-        $event_user_ids = EventsUsers::where('event', $event_id)
-                        ->where('user', '!=', Auth::user()->id)
-                        ->where('status', 1)
-                        ->pluck('user')
-                        ->toArray();
+  // Users already associated with the event.
+  // (Not including those invited but not RSVPed)
+  $event_user_ids = EventsUsers::where('event', $event_id)
+  ->where('user', '!=', Auth::user()->id)
+  ->where('status', 1)
+  ->pluck('user')
+  ->toArray();
 
-        $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
+  $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
 
-        $group_users = User::whereIn('id', $unique_user_ids)->select('name', 'email', 'invites')->get()->toArray();
-        return response()->json($group_users);
-    }
+  $group_users = User::whereIn('id', $unique_user_ids)->select('name', 'email', 'invites')->get()->toArray();
+  return response()->json($group_users);
+}
 
 public function updateQuantity(Request $request) {
 
@@ -1615,7 +1615,7 @@ public function getContributions($event_id){
 public function deleteEvent($id){
 
   if( !isset($id) )
-    abort(404);
+  abort(404);
 
   $user = User::find(Auth::id());
 
@@ -1652,6 +1652,11 @@ public function deleteEvent($id){
 
   }
 
+}
+
+
+public function noDataEntered() {
+  return redirect('/party');
 }
 
 }

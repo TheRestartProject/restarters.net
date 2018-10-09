@@ -256,7 +256,7 @@ class GroupController extends Controller
             $miles = $miles * 60 * 1.1515;
 
             //If calculated distance is less than 25 for the user then send notification...
-            if($miles < 25){
+            if($miles <= 25){
               $arr = [
                 'group_name' => $name,
                 'group_url' => url('/group/view/'.$idGroup),

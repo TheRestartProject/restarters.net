@@ -12,23 +12,23 @@
 */
 
 Route::prefix('user')->group(function () {
-    Route::get('/', 'HomeController@index');
-    Route::get('reset', 'UserController@reset');
-    Route::post('reset', 'UserController@reset');
-    Route::get('recover', 'UserController@recover');
-    Route::post('recover', 'UserController@recover');
-    Route::get('register/{hash?}', 'UserController@getRegister')->name('registration');
-    Route::post('register/check-valid-email',  'UserController@postEmail');
-    Route::post('register/{hash?}', 'UserController@postRegister');
+  Route::get('/', 'HomeController@index');
+  Route::get('reset', 'UserController@reset');
+  Route::post('reset', 'UserController@reset');
+  Route::get('recover', 'UserController@recover');
+  Route::post('recover', 'UserController@recover');
+  Route::get('register/{hash?}', 'UserController@getRegister')->name('registration');
+  Route::post('register/check-valid-email',  'UserController@postEmail');
+  Route::post('register/{hash?}', 'UserController@postRegister');
 });
 
 
 
 
 Route::get('/user/forbidden', function () {
-    return view('user.forbidden', [
-      'title' => 'Oops'
-    ]);
+  return view('user.forbidden', [
+    'title' => 'Oops'
+  ]);
 });
 
 Auth::routes();
@@ -36,7 +36,7 @@ Route::get('/logout', 'UserController@logout');
 
 Route::get('/about', 'AboutController@index')->name('features');
 Route::get('/about/cookie-policy', function() {
-    return View::make('features.cookie-policy') ;
+  return View::make('features.cookie-policy') ;
 });
 
 // Route::get('/ui', function() {
@@ -213,11 +213,11 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 });
 
 Route::get('/media-wiki', function() {
-    if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
-      return view('mediawiki.index');
-    } else {
-      return redirect('/user/forbidden');
-    }
+  if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+    return view('mediawiki.index');
+  } else {
+    return redirect('/user/forbidden');
+  }
 });
 
 //iFrames
@@ -226,11 +226,11 @@ Route::get('/outbound/info/group/{id}', function($id) {
 });
 
 Route::get('/outbound/info/party/{id}', function($id) {
-    return App\Http\Controllers\OutboundController::info('party', $id);
+  return App\Http\Controllers\OutboundController::info('party', $id);
 });
 
 Route::get('/group/stats/{id}/{format?}', function($id, $format = 'row') {
-    return App\Http\Controllers\GroupController::stats($id, $format);
+  return App\Http\Controllers\GroupController::stats($id, $format);
 });
 
 Route::get('/admin/stats/1', function() {
@@ -246,6 +246,6 @@ Route::get('/party/stats/{id}/wide', function($id) {
 });
 
 Route::get('markAsRead/{id}', function($id){
-    auth()->user()->unReadNotifications->where('id', $id)->markAsRead();
-    return  redirect()->back();
+  auth()->user()->unReadNotifications->where('id', $id)->markAsRead();
+  return  redirect()->back();
 })->name('markAsRead');
