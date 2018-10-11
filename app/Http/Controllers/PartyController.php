@@ -481,21 +481,21 @@ public function edit($id, Request $request) {
 
         // Notify all Restarters of relevant Group if a new Event has been approved for moderation
         $event = Party::find($id);
-        if (!empty($GroupRestarters = UserGroups::where('group', $event->group)->where('role', 4)->get())) {
-          foreach ($GroupRestarters as $GroupRestarter) {
-
-            $GroupRestarter = User::find($GroupRestarter->user);
-
-            $arr = [
-              'event_venue' => $event->venue,
-              'event_url' => url('/party/view/'.$event->idevents),
-            ];
-
-            Notification::send($GroupRestarter, new NotifyRestartersOfNewEvent($arr));
+        if ($GroupRestarters = UserGroups::where('group', $event->group)->where('role', 4)->get()) {  //Get users within group by group id and role of restarter
+          if (!$GroupRestarters->isEmpty()) { //If there are restarters against the group
+            foreach ($GroupRestarters as $GroupRestarter) { //Loop through each restarter
+              $user = User::where('id', $GroupRestarter->user)->first();  //Match the restarter and get their details
+              if ($user->invites == 1) {  //If the restarter has opted to have invites
+                $arr = [
+                  'event_venue' => $event->venue,
+                  'event_url' => url('/party/view/'.$event->idevents),
+                ];
+                Notification::send($user, new NotifyRestartersOfNewEvent($arr, $user)); //Send user a notification and email
+              }
+            }
           }
-        }   // End of Group Restarters
-
-
+        }
+        
         $Party->where('idevents', $id)->update(['wordpress_post_id' => 99999]);
 
       } elseif( ( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) {

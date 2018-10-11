@@ -16,9 +16,12 @@ class NotifyRestartersOfNewEvent extends Notification
      *
      * @return void
      */
-    public function __construct($arr)
+     protected $arr;
+     protected $user;
+    public function __construct($arr, $user = null)
     {
         $this->arr = $arr;
+        $this->user = $user;
     }
 
     /**
@@ -40,8 +43,8 @@ class NotifyRestartersOfNewEvent extends Notification
      */
      public function toMail($notifiable)
      {
-       if ($notifiable !== null) {
-         if ($notifiable->invites == 1) {
+       if ($this->user !== null) {
+         if ($this->user->invites == 1) {
            return (new MailMessage)
                        ->subject('There is a New Event')
                        ->greeting('Hello!')
