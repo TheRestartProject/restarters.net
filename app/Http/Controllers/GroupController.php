@@ -236,37 +236,38 @@ class GroupController extends Controller
 
         if( is_numeric($idGroup) && $idGroup !== false ){
 
-
+          $idGroup = Group::find($idGroup);
+          $lat1 = $idGroup->latitude;
+          $lon1 = $idGroup->longitude;
 
           // -------------------------------------------------- NOTIFY USERS OF NEW GROUP WITHIN 25 MILES ------------------------------------------------- //
           // Get all Users
-          $users = User::all();
-
+          $users = User::whereNotNull('location')->get();
           foreach ( $users as $user ) {
 
-            //Users location
-            $userLatitude = $user->latitude;
-            $userLongitude =$user->longitude;
+            $lat2 = $user->latitude;
+            $lon2 = $user->longitude;
 
-            //Calculation
-            $theta = $longitude - $userLongitude;
-            $miles = (sin(deg2rad($latitude)) * sin(deg2rad($userLatitude))) + (cos(deg2rad($latitude)) * cos(deg2rad($userLatitude)) * cos(deg2rad($theta)));
-            $miles = acos($miles);
-            $miles = rad2deg($miles);
-            $miles = $miles * 60 * 1.1515;
+            $theta = $lon1 - $lon2;
+            $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+            $dist = acos($dist);
+            $dist = rad2deg($dist);
+            $miles = $dist * 60 * 1.1515;
+            $miles * 0.8684;
 
             //If calculated distance is less than 25 for the user then send notification...
             if($miles <= 25){
               $arr = [
                 'group_name' => $name,
-                'group_url' => url('/group/view/'.$idGroup),
+                'group_url' => url('/group/view/'.$idGroup->idgroups),
               ];
               Notification::send($user, new NewGroupWithinRadius($arr));
+
             }
           }
           // -------------------------------------------------- END NOTIFY USERS OF NEW GROUP WITHIN 25 MILES -------------------------------------------------- //
 
-
+          $idGroup = $idGroup->idgroups;
 
           $response['success'] = 'Group created correctly.';
 
