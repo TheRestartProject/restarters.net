@@ -495,7 +495,7 @@ public function edit($id, Request $request) {
             }
           }
         }
-        
+
         $Party->where('idevents', $id)->update(['wordpress_post_id' => 99999]);
 
       } elseif( ( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) {
@@ -1321,7 +1321,7 @@ public function postSendInvite(Request $request) {
             'event_url' => url('/party/edit/'.$event->idevents),
           ];
 
-          // Notify Host of Event
+          // Notify Host of event that Invites have been sent out
           Notification::send($userCreator, new NotifyHostRSVPInvitesMade($event_details));
         }
 

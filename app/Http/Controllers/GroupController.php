@@ -1091,6 +1091,25 @@ public function getJoinGroup($group_id) {
       'role' => 4,
     ]);
 
+
+      // A new User has joined your group
+      $group = Group::find($group_id);
+      $groupHostLinks = UserGroups::where('group', $group->idgroups)->where('role', 3)->get();
+
+      foreach ($groupHostLinks as $groupHostLink) {
+        $host = User::where('id', $groupHostLink->user)->first();
+        if ($host->invites == 1) {
+          $arr = [
+            'user_name' => Auth::user()->name,
+            'group_name' => $group->name,
+            'group_url' => url('/group/view/'.$group->idgroups),
+            'preferences' => url('/profile/edit/'.$host->id),
+          ];
+          Notification::send($host, new NewGroupMember($arr, $host));
+        }
+      }
+
+
     $response['success'] = 'Thanks for joining, you are now part of this group!';
 
     return redirect()->back()->with('response', $response);
