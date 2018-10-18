@@ -12,12 +12,12 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
-        '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
         '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
         '4a1f389d6ce373bda9e57857d3b61c84' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/helpers.php',
@@ -125,6 +125,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
+            'Goutte\\' => 7,
         ),
         'F' => 
         array (
@@ -382,6 +383,10 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
+        'Goutte\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/fabpot/goutte/Goutte',
+        ),
         'Fideloper\\Proxy\\' => 
         array (
             0 => __DIR__ . '/..' . '/fideloper/proxy/src',
@@ -445,6 +450,8 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'Behat\\Mink\\Driver\\' => 
         array (
             0 => __DIR__ . '/..' . '/behat/mink-browserkit-driver/src',
+            1 => __DIR__ . '/..' . '/behat/mink-goutte-driver/src',
+            2 => __DIR__ . '/..' . '/behat/mink-selenium2-driver/src',
         ),
         'Behat\\Mink\\' => 
         array (
@@ -469,6 +476,13 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
     );
 
     public static $prefixesPsr0 = array (
+        'W' => 
+        array (
+            'WebDriver' => 
+            array (
+                0 => __DIR__ . '/..' . '/instaclick/php-webdriver/lib',
+            ),
+        ),
         'P' => 
         array (
             'Prophecy\\' => 
@@ -1018,6 +1032,9 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'Behat\\Mink\\Driver\\BrowserKitDriver' => __DIR__ . '/..' . '/behat/mink-browserkit-driver/src/BrowserKitDriver.php',
         'Behat\\Mink\\Driver\\CoreDriver' => __DIR__ . '/..' . '/behat/mink/src/Driver/CoreDriver.php',
         'Behat\\Mink\\Driver\\DriverInterface' => __DIR__ . '/..' . '/behat/mink/src/Driver/DriverInterface.php',
+        'Behat\\Mink\\Driver\\GoutteDriver' => __DIR__ . '/..' . '/behat/mink-goutte-driver/src/GoutteDriver.php',
+        'Behat\\Mink\\Driver\\Goutte\\Client' => __DIR__ . '/..' . '/behat/mink-goutte-driver/src/Goutte/Client.php',
+        'Behat\\Mink\\Driver\\Selenium2Driver' => __DIR__ . '/..' . '/behat/mink-selenium2-driver/src/Selenium2Driver.php',
         'Behat\\Mink\\Element\\DocumentElement' => __DIR__ . '/..' . '/behat/mink/src/Element/DocumentElement.php',
         'Behat\\Mink\\Element\\Element' => __DIR__ . '/..' . '/behat/mink/src/Element/Element.php',
         'Behat\\Mink\\Element\\ElementInterface' => __DIR__ . '/..' . '/behat/mink/src/Element/ElementInterface.php',
@@ -2217,6 +2234,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'Faker\\ValidGenerator' => __DIR__ . '/..' . '/fzaninotto/faker/src/Faker/ValidGenerator.php',
         'Fideloper\\Proxy\\TrustProxies' => __DIR__ . '/..' . '/fideloper/proxy/src/TrustProxies.php',
         'Fideloper\\Proxy\\TrustedProxyServiceProvider' => __DIR__ . '/..' . '/fideloper/proxy/src/TrustedProxyServiceProvider.php',
+        'Goutte\\Client' => __DIR__ . '/..' . '/fabpot/goutte/Goutte/Client.php',
         'GuzzleHttp\\Client' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/Client.php',
         'GuzzleHttp\\ClientInterface' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/ClientInterface.php',
         'GuzzleHttp\\Cookie\\CookieJar' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/Cookie/CookieJar.php',
@@ -5492,6 +5510,64 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Property\\Property' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Property/Property.php',
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Rule\\Processor' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Rule/Processor.php',
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Rule\\Rule' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Rule/Rule.php',
+        'WebDriver\\AbstractWebDriver' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/AbstractWebDriver.php',
+        'WebDriver\\AppCacheStatus' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/AppCacheStatus.php',
+        'WebDriver\\ApplicationCache' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/ApplicationCache.php',
+        'WebDriver\\Browser' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Browser.php',
+        'WebDriver\\Capability' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Capability.php',
+        'WebDriver\\ClassLoader' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/ClassLoader.php',
+        'WebDriver\\Container' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Container.php',
+        'WebDriver\\Element' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Element.php',
+        'WebDriver\\Exception' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception.php',
+        'WebDriver\\Exception\\CurlExec' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/CurlExec.php',
+        'WebDriver\\Exception\\ElementIsNotSelectable' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/ElementIsNotSelectable.php',
+        'WebDriver\\Exception\\ElementNotVisible' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/ElementNotVisible.php',
+        'WebDriver\\Exception\\IMEEngineActivationFailed' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/IMEEngineActivationFailed.php',
+        'WebDriver\\Exception\\IMENotAvailable' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/IMENotAvailable.php',
+        'WebDriver\\Exception\\InvalidCookieDomain' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/InvalidCookieDomain.php',
+        'WebDriver\\Exception\\InvalidElementCoordinates' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/InvalidElementCoordinates.php',
+        'WebDriver\\Exception\\InvalidElementState' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/InvalidElementState.php',
+        'WebDriver\\Exception\\InvalidRequest' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/InvalidRequest.php',
+        'WebDriver\\Exception\\InvalidSelector' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/InvalidSelector.php',
+        'WebDriver\\Exception\\JavaScriptError' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/JavaScriptError.php',
+        'WebDriver\\Exception\\JsonParameterExpected' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/JsonParameterExpected.php',
+        'WebDriver\\Exception\\MoveTargetOutOfBounds' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/MoveTargetOutOfBounds.php',
+        'WebDriver\\Exception\\NoAlertOpenError' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/NoAlertOpenError.php',
+        'WebDriver\\Exception\\NoParametersExpected' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/NoParametersExpected.php',
+        'WebDriver\\Exception\\NoSuchDriver' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/NoSuchDriver.php',
+        'WebDriver\\Exception\\NoSuchElement' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/NoSuchElement.php',
+        'WebDriver\\Exception\\NoSuchFrame' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/NoSuchFrame.php',
+        'WebDriver\\Exception\\NoSuchWindow' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/NoSuchWindow.php',
+        'WebDriver\\Exception\\ObsoleteCommand' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/ObsoleteCommand.php',
+        'WebDriver\\Exception\\ScriptTimeout' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/ScriptTimeout.php',
+        'WebDriver\\Exception\\SessionNotCreated' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/SessionNotCreated.php',
+        'WebDriver\\Exception\\StaleElementReference' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/StaleElementReference.php',
+        'WebDriver\\Exception\\Timeout' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/Timeout.php',
+        'WebDriver\\Exception\\UnableToSetCookie' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/UnableToSetCookie.php',
+        'WebDriver\\Exception\\UnexpectedAlertOpen' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/UnexpectedAlertOpen.php',
+        'WebDriver\\Exception\\UnexpectedParameters' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/UnexpectedParameters.php',
+        'WebDriver\\Exception\\UnknownCommand' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/UnknownCommand.php',
+        'WebDriver\\Exception\\UnknownError' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/UnknownError.php',
+        'WebDriver\\Exception\\UnknownLocatorStrategy' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/UnknownLocatorStrategy.php',
+        'WebDriver\\Exception\\XPathLookupError' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Exception/XPathLookupError.php',
+        'WebDriver\\Frame' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Frame.php',
+        'WebDriver\\Ime' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Ime.php',
+        'WebDriver\\Key' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Key.php',
+        'WebDriver\\LocatorStrategy' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/LocatorStrategy.php',
+        'WebDriver\\Log' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Log.php',
+        'WebDriver\\LogType' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/LogType.php',
+        'WebDriver\\SauceLabs\\Capability' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/SauceLabs/Capability.php',
+        'WebDriver\\SauceLabs\\SauceRest' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/SauceLabs/SauceRest.php',
+        'WebDriver\\ServiceFactory' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/ServiceFactory.php',
+        'WebDriver\\Service\\CurlService' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Service/CurlService.php',
+        'WebDriver\\Service\\CurlServiceInterface' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Service/CurlServiceInterface.php',
+        'WebDriver\\Session' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Session.php',
+        'WebDriver\\Storage' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Storage.php',
+        'WebDriver\\Timeouts' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Timeouts.php',
+        'WebDriver\\Touch' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Touch.php',
+        'WebDriver\\WebDriver' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/WebDriver.php',
+        'WebDriver\\WebDriverInterface' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/WebDriverInterface.php',
+        'WebDriver\\Window' => __DIR__ . '/..' . '/instaclick/php-webdriver/lib/WebDriver/Window.php',
         'Webmozart\\Assert\\Assert' => __DIR__ . '/..' . '/webmozart/assert/src/Assert.php',
         'Whoops\\Exception\\ErrorException' => __DIR__ . '/..' . '/filp/whoops/src/Whoops/Exception/ErrorException.php',
         'Whoops\\Exception\\Formatter' => __DIR__ . '/..' . '/filp/whoops/src/Whoops/Exception/Formatter.php',
