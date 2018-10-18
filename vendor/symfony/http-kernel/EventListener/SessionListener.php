@@ -22,6 +22,8 @@ use Psr\Container\ContainerInterface;
  */
 class SessionListener extends AbstractSessionListener
 {
+    private $container;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

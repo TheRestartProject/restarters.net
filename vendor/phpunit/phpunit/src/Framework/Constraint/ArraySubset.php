@@ -28,14 +28,14 @@ class ArraySubset extends Constraint
     /**
      * @var bool
      */
-    private $checkForObjectIdentity;
+    private $strict;
 
-    public function __construct(iterable $subset, bool $checkForObjectIdentity = false)
+    public function __construct(iterable $subset, bool $strict = false)
     {
         parent::__construct();
 
-        $this->checkForObjectIdentity = $checkForObjectIdentity;
-        $this->subset                 = $subset;
+        $this->strict = $strict;
+        $this->subset = $subset;
     }
 
     /**
@@ -64,7 +64,7 @@ class ArraySubset extends Constraint
 
         $patched = \array_replace_recursive($other, $this->subset);
 
-        if ($this->checkForObjectIdentity) {
+        if ($this->strict) {
             $result = $other === $patched;
         } else {
             $result = $other == $patched;

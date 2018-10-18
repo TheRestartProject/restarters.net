@@ -33,13 +33,11 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
 {
     private $resolverServiceId;
     private $controllerTag;
-    private $controllerLocator;
 
-    public function __construct(string $resolverServiceId = 'argument_resolver.service', string $controllerTag = 'controller.service_arguments', string $controllerLocator = 'argument_resolver.controller_locator')
+    public function __construct(string $resolverServiceId = 'argument_resolver.service', string $controllerTag = 'controller.service_arguments')
     {
         $this->resolverServiceId = $resolverServiceId;
         $this->controllerTag = $controllerTag;
-        $this->controllerLocator = $controllerLocator;
     }
 
     public function process(ContainerBuilder $container)
@@ -62,7 +60,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
             while ($def instanceof ChildDefinition) {
                 $def = $container->findDefinition($def->getParent());
                 $class = $class ?: $def->getClass();
-                $bindings = $def->getBindings();
+                $bindings += $def->getBindings();
             }
             $class = $parameterBag->resolveValue($class);
 
@@ -128,7 +126,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                     if (isset($arguments[$r->name][$p->name])) {
                         $target = $arguments[$r->name][$p->name];
                         if ('?' !== $target[0]) {
-                            $invalidBehavior = ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE;
+                            $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
                         } elseif ('' === $target = (string) substr($target, 1)) {
                             throw new InvalidArgumentException(sprintf('A "%s" tag must have non-empty "id" attributes for service "%s".', $this->controllerTag, $id));
                         } elseif ($p->allowsNull() && !$p->isOptional()) {
@@ -138,22 +136,17 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         $binding = $bindings[$bindingName];
 
                         list($bindingValue, $bindingId) = $binding->getValues();
-                        $binding->setValues(array($bindingValue, $bindingId, true));
 
                         if (!$bindingValue instanceof Reference) {
-                            $args[$p->name] = new Reference('.value.'.$container->hash($bindingValue));
-                            $container->register((string) $args[$p->name], 'mixed')
-                                ->setFactory('current')
-                                ->addArgument(array($bindingValue));
-                        } else {
-                            $args[$p->name] = $bindingValue;
+                            continue;
                         }
+
+                        $binding->setValues(array($bindingValue, $bindingId, true));
+                        $args[$p->name] = $bindingValue;
 
                         continue;
                     } elseif (!$type || !$autowire) {
                         continue;
-                    } elseif (!$p->allowsNull()) {
-                        $invalidBehavior = ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE;
                     }
 
                     if (Request::class === $type) {
@@ -171,18 +164,16 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         throw new InvalidArgumentException($message);
                     }
 
-                    $args[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior) : new Reference($target, $invalidBehavior);
+                    $args[$p->name] = $type ? new TypedReference($target, $type, $r->class, $invalidBehavior) : new Reference($target, $invalidBehavior);
                 }
                 // register the maps as a per-method service-locators
                 if ($args) {
-                    $controllers[$id.'::'.$r->name] = ServiceLocatorTagPass::register($container, $args);
+                    $controllers[$id.':'.$r->name] = ServiceLocatorTagPass::register($container, $args);
                 }
             }
         }
 
         $container->getDefinition($this->resolverServiceId)
-            ->replaceArgument(0, $controllerLocatorRef = ServiceLocatorTagPass::register($container, $controllers));
-
-        $container->setAlias($this->controllerLocator, (string) $controllerLocatorRef);
+            ->replaceArgument(0, ServiceLocatorTagPass::register($container, $controllers));
     }
 }

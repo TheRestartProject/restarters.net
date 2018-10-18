@@ -58,6 +58,13 @@
                             </div>
 
 
+<<<<<<< HEAD
+=======
+                            </div>
+                            <div class="col-6 col-md-4 align-content-center flex-column justify-content-end d-flex">
+                                <button id="btn-login" type="submit" class="btn btn-primary">@lang('auth.login')</button>
+                            </div>
+>>>>>>> test-framework-testing
                         </div>
                         <div class="col-6 col-md-4 align-content-center flex-column justify-content-end d-flex">
                             <button type="submit" class="btn btn-primary">@lang('auth.login')</button>

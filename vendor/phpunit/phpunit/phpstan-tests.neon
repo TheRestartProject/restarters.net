@@ -1,5 +1,8 @@
 parameters:
     ignoreErrors:
+        # https://github.com/phpstan/phpstan/issues/1185
+        - '#Function xdebug_disable not found.#'
+
         # parent calls are intentionally omitted
         - '#Issue244Exception::__construct\(\) does not call parent constructor from Exception.#'
         - '#Issue244ExceptionIntCode::__construct\(\) does not call parent constructor from Exception.#'
@@ -41,6 +44,7 @@ parameters:
         - '#Result of method ClassWithAllPossibleReturnTypes::methodWithVoidReturnTypeDeclaration\(\) \(void\) is used#'
 
     excludes_analyse:
-        # duplicated classname OneTest
         - tests/_files/phpunit-example-extension/tests/OneTest.php
         - tests/Regression/Trac/783/OneTest.php
+        - tests/_files/3194.php
+        - tests/_files/RouterTest.php
