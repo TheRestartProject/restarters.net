@@ -147,6 +147,7 @@ class Encrypter implements EncrypterContract
         }
 
         return $unserialize ? unserialize($decrypted) : $decrypted;
+        app('encrypter')->decrypt(request()->cookie(self::COOKIE), false);
     }
 
     /**

@@ -12,3 +12,7 @@ Scenario: View all the invited restarters
    When a user clicks on see all invited link in the events page
    Then a pop up appears with all the list of restarters that have been invited
    And can view the restarter name with their skills.
+
+# Scenario: View all the new users invited
+#   When a user clicks on see all invited link in the events page
+#  Then a link should say the number of new users invited.
