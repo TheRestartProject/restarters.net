@@ -43,52 +43,46 @@ class JoinGroup extends Notification
      */
     public function toMail($notifiable)
     {
+        $subject = 'Invitation from ' . $this->arr['name'] . ' to join ' . $this->arr['group'];
+        $introLine = 'You have received this email because you have been invited by ' . $this->arr['name'] . ' to join the community repair group <b>' . $this->arr['group'] . '</b> on restarters.net.';
+        $actionText = 'Click to join group';
+        $ignoreLine = 'If you think this invitation was not intended for you, please disregard this email.';
 
-      if ( !is_null($this->user) ) {
-        if ( $this->user->invites == 1 ) {
-          if (!is_null($this->arr['message'])) {
-            return (new MailMessage)
-                        ->subject('Group Invitation')
-                        ->greeting('Hello!')
-                        ->line('You have received this email because you have been invited by ' . $this->arr['name'] . ' to join the Restart Group \'' . $this->arr['group'] . '\'.')
-                        ->line('')
-                        ->line($this->arr['name'] . ' attached this message with the invite:')
-                        ->line('')
-                        ->line($this->arr['message'])
-                        ->line('')
-                        ->action('Join group', $this->arr['url'])
-                        ->line('If you think this invitation was not intended for you, please discard this email.');
-          } else {
-            return (new MailMessage)
-                        ->subject('Group Invitation')
-                        ->greeting('Hello!')
-                        ->line('You have received this email because you have been invited by ' . $this->arr['name'] . ' to join the Restart Group \'' . $this->arr['group'] . '\'.')
-                        ->action('Join group', $this->arr['url'])
-                        ->line('If you think this invitation was not intended for you, please discard this email.');
-          }
-        }
-      } else {
-        if ( !is_null($this->arr['message']) ) {
-          return (new MailMessage)
-                      ->subject('Group Invitation')
+
+        if ( !is_null($this->user) ) { // user is already on the platform
+            if ( $this->user->invites == 1 ) { // user has opted in to receive emails
+                $mail = (new MailMessage)
+                      ->subject($subject)
                       ->greeting('Hello!')
-                      ->line('You have received this email because you have been invited by ' . $this->arr['name'] . ' to join the Restart Group \'' . $this->arr['group'] . '\'.')
-                      ->line('')
-                      ->line($this->arr['name'] . ' attached this message with the invite:')
-                      ->line('')
-                      ->line($this->arr['message'])
-                      ->line('')
-                      ->action('Join group', $this->arr['url'])
-                      ->line('If you think this invitation was not intended for you, please discard this email.');
-        } else {
-          return (new MailMessage)
-                      ->subject('Group Invitation')
-                      ->greeting('Hello!')
-                      ->line('You have received this email because you have been invited by ' . $this->arr['name'] . ' to join the Restart Group \'' . $this->arr['group'] . '\'.')
-                      ->action('Join group', $this->arr['url'])
-                      ->line('If you think this invitation was not intended for you, please discard this email.');
+                      ->line($introLine)
+                      ->action($actionText, $this->arr['url']);
+                if (!is_null($this->arr['message'])) { // host has added a message
+                    $mail->line($this->arr['name'] . ' attached this message with the invite:')
+                        ->line('')
+                        ->line('"' . $this->arr['message'] . '"');
+                }
+                $mail->line($ignoreLine);
+
+                return $mail;
+            }
+        } else { // users not yet on the platform
+            $mail = (new MailMessage)
+                    ->subject($subject)
+                    ->greeting('Hello!')
+                    ->line($introLine)
+                    ->action($actionText, $this->arr['url'])
+                  ->line('You can find out more about restarters.net <a href="' . env('APP_URL') . '/about">here</a>.');
+
+            if ( !is_null($this->arr['message']) ) { // host has added a message
+                $mail->line($this->arr['name'] . ' attached this message with the invite:')
+                     ->line('')
+                     ->line('"' . $this->arr['message'] . '"');
+            }
+
+            $mail->line($ignoreLine);
+
+            return $mail;
         }
-      }
     }
 
     /**

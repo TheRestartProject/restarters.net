@@ -1293,11 +1293,8 @@ public function postRegister(Request $request, $hash = null){
 
   // Send post-registration welcome email.
   try {
-      // invites column is currently a proxy to determine if the member wishes to receive emails.
-      if ($user->invites == 1) {
-          $firstName = $user->getFirstName();
-          Mail::to($user)->send(new RegistrationWelcome($firstName));
-      }
+        $firstName = $user->getFirstName();
+        Mail::to($user)->send(new RegistrationWelcome($firstName));
   } catch (\Exception $ex) {
       Log::error('Failed to send post-registration welcome email: ' . $ex->getMessage());
   }

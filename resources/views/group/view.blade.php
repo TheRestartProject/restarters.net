@@ -112,6 +112,7 @@
                           <a class="dropdown-item" href="{{ url('/group/edit/'.$group->idgroups) }}">Edit group</a>
                           <a class="dropdown-item" href="{{ url('/party/create') }}">Add event</a>
                           <a class="dropdown-item" data-toggle="modal" data-target="#invite-to-group" href="#">Invite volunteers</a>
+                          <a class="dropdown-item" href="{{ url('/group/nearby/'.$group->idgroups) }}#">Volunteers nearby</a>
                           <a class="dropdown-item" href="#" data-toggle="modal" data-target="#group-share-stats">Share group stats</a>
                       </div>
                   </div>

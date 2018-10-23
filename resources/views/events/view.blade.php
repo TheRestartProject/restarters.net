@@ -21,7 +21,7 @@
       <div class="row">
         <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.rsvp_message')</div>
         <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
-          <button class="btn btn-success">@lang('events.rsvp_button')</button>
+          <a href="/party/cancel-invite/{{{ $is_attending->event }}}" class="btn btn-success">@lang('events.rsvp_button')</a>
         </div>
       </div>
 
@@ -32,7 +32,7 @@
       <div class="row">
         <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.pending_rsvp_message')</div>
         <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
-          <button class="btn btn-info">@lang('events.rsvp_button')</button>
+          <a href="/party/accept-invite/{{{ $is_attending->event }}}/{{{ $is_attending->status }}}" class="btn btn-info">@lang('events.pending_rsvp_button')</a>
         </div>
       </div>
 
@@ -74,11 +74,12 @@
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">Edit event</a>
               @if( !$event->isInProgress() || !$event->hasFinished() )
-              <a href="{{ url('/') }}/party/delete/{{ $formdata->id }}" id="deleteEvent" class="dropdown-item">Delete event</a>
+              <form action="{{ url('/') }}/party/delete/{{ $formdata->id }}" method="post">
+                <input type="hidden" name="attended" id="countAttended" value="{{count($attended)}}">
+                <input type="hidden" name="invited" id="countInvited" value="{{count($invited)}}">
+                <input type="hidden" name="volunteers" id="countVolunteers" value="{{ $event->volunteers }}">
+                <button  id="deleteEvent" class="dropdown-item">Delete event</button>
               @endif
-              <input type="hidden" name="attended" id="countAttended" value="{{count($attended)}}">
-              <input type="hidden" name="invited" id="countInvited" value="{{count($invited)}}">
-              <input type="hidden" name="volunteers" id="countVolunteers" value="{{ $event->volunteers }}">
               @if( $event->hasFinished() )
               <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>
               <a href="/party/contribution/{{ $formdata->id }}" class="btn dropdown-item">Request contributions</a>

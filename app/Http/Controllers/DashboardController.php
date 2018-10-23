@@ -167,8 +167,6 @@ class DashboardController extends Controller
       $devices_gateway = new Device;
       $impact_stats = $devices_gateway->getWeights();
 
-      $show_fixfest_cta = $user->country == 'GB';
-
       return view('dashboard.index', [
           'show_getting_started' => !$userExistsInDiscourse || !$has_profile_pic || !$has_skills || !$in_group || !$in_event,
         'gmaps' => true,
@@ -188,7 +186,6 @@ class DashboardController extends Controller
         'onboarding' => $onboarding,
         'impact_stats' => $impact_stats,
           'wiki_pages' => $wiki_pages,
-          'show_fixfest_cta' => $show_fixfest_cta,
       ]);
 
       /*

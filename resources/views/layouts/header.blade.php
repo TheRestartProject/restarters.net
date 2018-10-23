@@ -155,7 +155,7 @@
                             <svg width="11" height="14" viewBox="0 0 9 11" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M8.55 0H0v10.687l4.253-3.689 4.297 3.689V0z" fill="#0394a6"/></svg> @lang('general.menu_tools')
                             <ul>
                                 <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                                <li><a href="@lang('general.discourse_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_discourse')</a></li>
+                                <li><a href="{{ env('DISCOURSE_URL') }}/login" target="_blank" rel="noopener noreferrer">@lang('general.menu_discourse')</a></li>
                                 <li><a href="@lang('general.wiki_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_wiki')</a></li>
                                 @if ( FixometerHelper::hasPermission('repair-directory') )
                                   <li><a href="https://map.restarters.net/admin" target="_blank" rel="noopener noreferrer">Repair Directory</a></li>

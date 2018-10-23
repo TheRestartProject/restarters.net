@@ -23,6 +23,7 @@ use App\Notifications\ReviewNotes;
 use View;
 use Notification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Mail;
 use App\Mail\AbnormalDevices;
 
@@ -329,9 +330,8 @@ class DeviceController extends Controller
         else {
           $response['success'] = 'Device updated!';
 
-
           /** let's create the image attachment! **/
-          if(isset($_FILES) && !empty($_FILES)){
+          if(isset($_FILES) && !empty($_FILES['files']['name'])){
             $file = new FixometerFile;
             $file->upload('devicePhoto', 'image', $id, env('TBL_DEVICES'), true);
           }
@@ -359,6 +359,8 @@ class DeviceController extends Controller
 
       $brands = Brands::all();
 
+      $audits = Device::findOrFail($id)->audits;
+
       return view('device.edit', [
         'title' => 'Edit Device',
         'response' => $response,
@@ -369,6 +371,7 @@ class DeviceController extends Controller
         'user' => $user,
         'is_host' => $is_host,
         'images' => $images,
+        'audits' => $audits,
       ]);
 
     }
@@ -597,6 +600,7 @@ class DeviceController extends Controller
       $return['html'] = $views;
       $return['success'] = true;
       $return['stats'] = $stats;
+      $return['deviceCount'] = $deviceCount;
 
       // If the number of devices exceeds set amount then show the following message
       if( $deviceCount > env('DEVICE_ABNORMAL_MISC_COUNT', 5) ) {
@@ -606,10 +610,7 @@ class DeviceController extends Controller
 
       }
 
-      return response()->json(array($return,
-      'deviceCount' => $deviceCount,
-
-    ));
+      return response()->json($return);
 
     //$brand_name = Brands::find($brand)->brand_name;
 
@@ -765,16 +766,24 @@ class DeviceController extends Controller
       $old_wiki = Device::find($id)->wiki;
 
       //Send Wiki Notification to Admins
-      if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
-        $all_admins = User::where('role', 2)->get();
-        $group_id = Party::find($event_id)->group;
+      try {
+          if ($wiki == 1 && $old_wiki !== 1) {
+              $currentUser = Auth::user();
 
-        $arr = [
-          'group_url' => url('/group/view/'.$group_id),
-          'preferences' => url('/profile/edit'),
-        ];
+              $all_admins = User::where('role', 2)->get();
+              $group_id = Party::find($event_id)->group;
 
-        Notification::send($all_admins, new ReviewNotes($arr));
+              $arr = [
+                  'device_url' => url('/device/page-edit/' . $id),
+                  'current_user_name' => $currentUser->name,
+                  'group_url' => url('/group/view/'.$group_id),
+                  'preferences' => url('/profile/edit'),
+              ];
+
+              Notification::send($all_admins, new ReviewNotes($arr));
+          }
+      } catch (\Exception $ex) {
+          Log::error("An error occurred while sending ReviewNotes email: " . $ex->getMessage());
       }
 
       Device::find($id)->update([
