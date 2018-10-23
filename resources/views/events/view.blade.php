@@ -79,6 +79,7 @@
                 <input type="hidden" name="invited" id="countInvited" value="{{count($invited)}}">
                 <input type="hidden" name="volunteers" id="countVolunteers" value="{{ $event->volunteers }}">
                 <button  id="deleteEvent" class="dropdown-item">Delete event</button>
+              </form>
               @endif
               @if( $event->hasFinished() )
               <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>

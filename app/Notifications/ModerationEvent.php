@@ -29,7 +29,7 @@ class ModerationEvent extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -61,7 +61,9 @@ class ModerationEvent extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+            'title' => 'Event Created:',
+            'name' => $this->arr['event_venue'],
+            'url' => $this->arr['event_url'],
         ];
     }
 }

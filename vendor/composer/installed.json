@@ -2097,7 +2097,8 @@
             "lumen",
             "publish",
             "vendor"
-        ]
+        ],
+        "abandoned": true
     },
     {
         "name": "league/csv",
@@ -2315,6 +2316,70 @@
         "keywords": [
             "debug",
             "debugbar"
+        ]
+    },
+    {
+        "name": "mcamara/laravel-localization",
+        "version": "1.3.12",
+        "version_normalized": "1.3.12.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/mcamara/laravel-localization.git",
+            "reference": "515a24cb1db61980384c4da9cf86740573f5b740"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/mcamara/laravel-localization/zipball/515a24cb1db61980384c4da9cf86740573f5b740",
+            "reference": "515a24cb1db61980384c4da9cf86740573f5b740",
+            "shasum": ""
+        },
+        "require": {
+            "laravel/framework": "~5.2.0||~5.3.0||~5.4.0||~5.5.0||~5.6.0||~5.7.0",
+            "php": ">=7.0.0"
+        },
+        "require-dev": {
+            "orchestra/testbench-browser-kit": "~3.4",
+            "phpunit/phpunit": "6.0.*"
+        },
+        "suggest": {
+            "ext-intl": "*"
+        },
+        "time": "2018-10-05T07:45:18+00:00",
+        "type": "library",
+        "extra": {
+            "laravel": {
+                "providers": [
+                    "Mcamara\\LaravelLocalization\\LaravelLocalizationServiceProvider"
+                ],
+                "aliases": {
+                    "LaravelLocalization": "Mcamara\\LaravelLocalization\\Facades\\LaravelLocalization"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [],
+            "psr-0": {
+                "Mcamara\\LaravelLocalization": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Marc Cámara",
+                "email": "mcamara88@gmail.com",
+                "role": "Developer"
+            }
+        ],
+        "description": "Easy localization for Laravel",
+        "homepage": "https://github.com/mcamara/laravel-localization",
+        "keywords": [
+            "laravel",
+            "localization",
+            "php"
         ]
     },
     {

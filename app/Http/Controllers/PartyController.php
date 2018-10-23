@@ -19,6 +19,8 @@ use App\Helpers\FootprintRatioCalculator;
 use App\Notifications\JoinEvent;
 use App\Notifications\JoinGroup;
 use App\Notifications\RSVPEvent;
+use App\Notifications\NotifyHostRSVPInvitesMade;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Notifications\ModerationEvent;
 use App\Notifications\EventDevices;
 use App\Notifications\EventRepairs;
@@ -128,29 +130,29 @@ class PartyController extends Controller {
 
   }
 
-    public function allUpcoming()
-    {
-        $allUpcomingEventsQuery = Party::allUpcomingEvents();
-        $allUpcomingEventsCount = $allUpcomingEventsQuery->count();
-        $allUpcomingEvents = $allUpcomingEventsQuery->paginate(env('PAGINATE'));
+  public function allUpcoming()
+  {
+    $allUpcomingEventsQuery = Party::allUpcomingEvents();
+    $allUpcomingEventsCount = $allUpcomingEventsQuery->count();
+    $allUpcomingEvents = $allUpcomingEventsQuery->paginate(env('PAGINATE'));
 
-        return view('events.all', [
-            'upcoming_events_count' => $allUpcomingEventsCount,
-            'upcoming_events'  => $allUpcomingEvents,
-        ]);
-    }
+    return view('events.all', [
+      'upcoming_events_count' => $allUpcomingEventsCount,
+      'upcoming_events'  => $allUpcomingEvents,
+    ]);
+  }
 
   public function create(Request $request)
   {
 
     // Let's determine whether currently logged in user is associated with any groups
     $user_groups = UserGroups::where('user', Auth::user()->id)
-                                ->where('role', 3)
-                                  ->get();
+    ->where('role', 3)
+    ->get();
 
     // Then let's redirect users away if they are a restarter or a host with no groups
     if( FixometerHelper::hasRole(Auth::user(), 'Restarter') || ( count($user_groups) == 0 && FixometerHelper::hasRole(Auth::user(), 'Host') ) )
-      return redirect('/user/forbidden');
+    return redirect('/user/forbidden');
 
     $Groups = new Group;
 
@@ -173,6 +175,8 @@ class PartyController extends Controller {
         $longitude = null;
       }
 
+
+
       // We got data! Elaborate.
       $event_date =       $request->input('event_date');
       $start      =       $request->input('start');
@@ -182,7 +186,7 @@ class PartyController extends Controller {
       $venue      =       $request->input('venue');
       $location   =       $request->input('location');
       $group      =       $request->input('group');
-
+      $user_id    =       Auth::user()->id;
 
       // saving this for wordpress
       $wp_date = $event_date;
@@ -221,9 +225,9 @@ class PartyController extends Controller {
           'group'         => $group,
           'hours'         => $hours,
           // 'volunteers'    => $volunteers,
+          'user_id'       => $user_id,
           'created_at'    => date('Y-m-d H:i:s')
         );
-
 
         $Party = new Party;
         $idParty = $Party->insertGetId($data);
@@ -247,15 +251,15 @@ class PartyController extends Controller {
           Party::find($idParty)->increment('volunteers');
 
           //Send Emails to Admins notifying event creation
-          if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
+          if(env('APP_ENV') == 'local') {
             $all_admins = User::where('role', 2)->where('invites', 1)->get();
-
+            foreach ($all_admins as $admin)
             $arr = [
               'event_venue' => Party::find($idParty)->venue,
               'event_url' => url('/party/edit/'.$idParty),
             ];
 
-            Notification::send($all_admins, new ModerationEvent($arr));
+            Notification::send($admin, new ModerationEvent($arr));
           }
 
 
@@ -476,6 +480,23 @@ public function edit($id, Request $request) {
 
       if( ( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) { //For testing purposes
 
+        // Notify all Restarters of relevant Group if a new Event has been approved for moderation
+        $event = Party::find($id);
+        if ($GroupRestarters = UserGroups::where('group', $event->group)->where('role', 4)->get()) {  //Get users within group by group id and role of restarter
+          if (!$GroupRestarters->isEmpty()) { //If there are restarters against the group
+            foreach ($GroupRestarters as $GroupRestarter) { //Loop through each restarter
+              $user = User::where('id', $GroupRestarter->user)->first();  //Match the restarter and get their details
+              if ($user->invites == 1) {  //If the restarter has opted to have invites
+                $arr = [
+                  'event_venue' => $event->venue,
+                  'event_url' => url('/party/view/'.$event->idevents),
+                ];
+                Notification::send($user, new NotifyRestartersOfNewEvent($arr, $user)); //Send user a notification and email
+              }
+            }
+          }
+        }
+
         $Party->where('idevents', $id)->update(['wordpress_post_id' => 99999]);
 
       } elseif( ( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) {
@@ -662,7 +683,7 @@ public function view($id) {
 
   // If event no longer exists
   if( empty($event) )
-    abort(404);
+  abort(404);
 
   //Event details
   $images = $File->findImages(env('TBL_EVENTS'), $id);
@@ -1124,35 +1145,35 @@ public function getGroupEmails($event_id, $object = false)
 }
 
 
-    /**
-     * This is called via ajax in the Invite Volunteers to Event modal.
-     * It finds the users associated with the group that the event is for,
-     * in order to quickly add them to the list of invitees.
-     *
-     * @param int $event_id The event for which to find associated users.
-     *
-     * @return Response json formatted array of relevant info on users in the group.
-     */
-    public function getGroupEmailsWithNames($event_id)
-    {
-        $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
-                        ->where('user', '!=', Auth::user()->id)
-                        ->pluck('user')
-                        ->toArray();
+/**
+* This is called via ajax in the Invite Volunteers to Event modal.
+* It finds the users associated with the group that the event is for,
+* in order to quickly add them to the list of invitees.
+*
+* @param int $event_id The event for which to find associated users.
+*
+* @return Response json formatted array of relevant info on users in the group.
+*/
+public function getGroupEmailsWithNames($event_id)
+{
+  $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
+  ->where('user', '!=', Auth::user()->id)
+  ->pluck('user')
+  ->toArray();
 
-        // Users already associated with the event.
-        // (Not including those invited but not RSVPed)
-        $event_user_ids = EventsUsers::where('event', $event_id)
-                        ->where('user', '!=', Auth::user()->id)
-                        ->where('status', 1)
-                        ->pluck('user')
-                        ->toArray();
+  // Users already associated with the event.
+  // (Not including those invited but not RSVPed)
+  $event_user_ids = EventsUsers::where('event', $event_id)
+  ->where('user', '!=', Auth::user()->id)
+  ->where('status', 1)
+  ->pluck('user')
+  ->toArray();
 
-        $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
+  $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
 
-        $group_users = User::whereIn('id', $unique_user_ids)->select('name', 'email', 'invites')->get()->toArray();
-        return response()->json($group_users);
-    }
+  $group_users = User::whereIn('id', $unique_user_ids)->select('name', 'email', 'invites')->get()->toArray();
+  return response()->json($group_users);
+}
 
 public function updateQuantity(Request $request) {
 
@@ -1292,6 +1313,20 @@ public function postSendInvite(Request $request) {
           'message' => $message,
           'event' => $event,
         );
+
+        // Get Creator of Event
+        if (!empty($userCreator = User::find($event->user_id))) {
+
+          $event_details = [
+            'event_venue' => $event->venue,
+            'event_url' => url('/party/edit/'.$event->idevents),
+          ];
+
+          // Notify Host of event that Invites have been sent out
+          Notification::send($userCreator, new NotifyHostRSVPInvitesMade($event_details));
+        }
+
+        // Send Invites
         Notification::send($user, new JoinEvent($arr, $user));
 
       } else {
@@ -1584,7 +1619,7 @@ public function getContributions($event_id){
 public function deleteEvent($id){
 
   if( !isset($id) )
-    abort(404);
+  abort(404);
 
   $user = User::find(Auth::id());
 
@@ -1596,8 +1631,13 @@ public function deleteEvent($id){
   } else {
 
     // Check to see whether the columns volunteers and pax has a value less than or equal to zero
-    $event = Party::where('idevents', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->first();
-    if( !empty($event) ) {
+    // $testing = Party::where('idevents', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->where('user_id')->first();
+
+    // Check to see whether the current user is the owner/creator of the event OR the logged in user is an Administrator
+    $checkUserAuthority = Party::where('idevents', $id)->where('user_id', $user->id)->first();
+    $adminRole = FixometerHelper::hasRole($user, 'Administrator');
+
+    if( !is_null($checkUserAuthority) || !is_null($adminRole)) {
 
       // Let's delete everything just to be certain
       $device = Device::where('event', $id)->delete();
@@ -1608,13 +1648,19 @@ public function deleteEvent($id){
       return redirect('/party')->with('success', 'Event has been deleted');
 
     } else {
-      return redirect()->back()->with('warning', 'You are not able to delete this event as volunteers have been invited');
+
+      return redirect()->back()->with('warning', 'You do not have permission to delete this event');
     }
 
     return redirect()->back()->with('warning', 'You do not have permission to delete this event');
 
   }
 
+}
+
+
+public function noDataEntered() {
+  return redirect('/party');
 }
 
 }
