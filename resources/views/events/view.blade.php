@@ -73,7 +73,7 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">Edit event</a>
-              @if( !$event->isInProgress() || !$event->hasFinished() )
+              @if( !$event->isInProgress() && !$event->hasFinished() )
               <form action="{{ url('/') }}/party/delete/{{ $formdata->id }}" method="post">
                 @csrf
                 <button id="deleteEvent" class="dropdown-item" data-party-id="{{$formdata->id}}" data-count-attended="{{count($attended)}}" data-count-invited="{{count($invited)}}" data-count-volunteers="{{$event->volunteers}}">Delete event</button>
