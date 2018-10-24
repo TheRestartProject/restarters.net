@@ -14387,6 +14387,13 @@ table.sortable > thead th div.mozilla {
   z-index: 1;
 }
 
+#accordion-log .card .btn {
+  font-family: "Open Sans", sans-serif;
+  font-size: 15px;
+  line-height: 19px;
+  color: #000;
+}
+
 .admin {
   padding: 10px 0;
 }

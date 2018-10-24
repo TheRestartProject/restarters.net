@@ -1,4 +1,4 @@
-.accordion__share { 
+.accordion__share {
 
   border-top: 1px solid rgba(0, 0, 0, 0.125);
 
@@ -83,4 +83,13 @@
     right: 15px;
     z-index: 1;
   }
+}
+
+#accordion-log {
+    .card .btn {
+        font-family: $font-family-second;
+        font-size: 15px;
+        line-height: 19px;
+        color: #000;
+    }
 }
