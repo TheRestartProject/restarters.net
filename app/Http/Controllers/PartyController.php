@@ -11,6 +11,7 @@ use App\Group;
 use App\Host;
 use App\Invite;
 use App\Party;
+use App\Audits;
 use App\Session;
 use App\User;
 use App\UserGroups;
@@ -1640,6 +1641,7 @@ public function deleteEvent($id){
     if( !is_null($checkUserAuthority) || !is_null($adminRole)) {
 
       // Let's delete everything just to be certain
+      $audits = Audits::where('auditable_type', 'App\Party')->where('auditable_id', $id)->delete();
       $device = Device::where('event', $id)->delete();
       $event_users = EventsUsers::where('event', $id)->delete();
       $event = Party::where('idevents', $id)->delete();

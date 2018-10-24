@@ -1459,9 +1459,27 @@ function initAutocomplete() {
 
     // If event has attended or invited people then user cannot delete the event
     $("#deleteEvent").click(function (e) {
-      if($('#countAttended').val() > 0 || $('#countInvited').val() > 0 || $('#countVolunteers').val() > 0) {
+      if($(this).attr('data-count-attended') > 0 || $(this).attr('data-count-invited') > 0 || $(this).attr('data-count-volunteers') > 0) {
         return confirm('Are you sure you want to delete this event?');
+
+        id = $(this).attr('data-party-id');
+
+        $.ajax({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          type:'POST',
+          url:'/party/delete/'+id,
+          data: {
+            "id" : id,
+          },
+          dataType : 'json',
+        });
+
       }
     });
+
+
+
 
   });
