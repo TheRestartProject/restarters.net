@@ -595,27 +595,7 @@ public function view($groupid) {
     // $this->set('top', $Device->findMostSeen(1, null, $group->idgroups));
 
     if (!isset($response)) {
-      $response = null;
-    }
-
-    if (!is_null($groupHostLinks)) {
-        try {
-            $groupName = Group::find($group_id)->name;
-            foreach ($groupHostLinks as $groupHostLink) {
-                $host = User::where('id', $groupHostLink->user)->first();
-                if ($host->invites == 1) {
-                    $arr = [
-                        'user_name' => $user->name,
-                        'group_name' => $groupName,
-                        'group_url' => url('/group/view/'.$group_id),
-                        'preferences' => url('/profile/edit/'.$host->id),
-                    ];
-                    Notification::send($host, new NewGroupMember($arr, $host));
-                }
-            }
-        } catch (\Exception $ex) {
-            Log::error("An error occurred when notifying of group invite confirmation: " . $ex->getMessage());
-        }
+        $response = null;
     }
 
     //Event tabs
@@ -807,7 +787,7 @@ public function confirmInvite($group_id, $hash)
     $groupHostLinks = null;
   }
 
-  if (!is_null($groupHostLinks)) {
+  if ( !is_null($groupHostLinks) ) {
     $groupName = Group::find($group_id)->name;
     foreach ($groupHostLinks as $groupHostLink) {
       $host = User::where('id', $groupHostLink->user)->first();
