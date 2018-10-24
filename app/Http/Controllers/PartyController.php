@@ -230,17 +230,16 @@ class PartyController extends Controller {
           'created_at'    => date('Y-m-d H:i:s')
         );
 
-        $Party = new Party;
-        $idParty = $Party->insertGetId($data);
-
-        if($idParty) {
+        $party = Party::create($data);
+        $idParty = $party->idevents;
+        if( is_numeric($idParty) ) {
 
           /** check and create User List **/
-          $_POST['users'][] = 29;
-          if(isset($_POST['users']) && !empty($_POST['users'])){
-            $users = $_POST['users'];
-            $Party->createUserList($idParty, $users);
-          }
+          // $_POST['users'][] = 29;
+          // if(isset($_POST['users']) && !empty($_POST['users'])){
+          //   $users = $_POST['users'];
+          //   $Party->createUserList($idParty, $users);
+          // }
 
           EventsUsers::create([
             'event' => $idParty,
@@ -252,16 +251,14 @@ class PartyController extends Controller {
           Party::find($idParty)->increment('volunteers');
 
           //Send Emails to Admins notifying event creation
-          if(env('APP_ENV') == 'local') {
-            $all_admins = User::where('role', 2)->where('invites', 1)->get();
-            foreach ($all_admins as $admin)
-            $arr = [
+          $all_admins = User::where('role', 2)->where('invites', 1)->get();
+          foreach ($all_admins as $admin)
+          $arr = [
               'event_venue' => Party::find($idParty)->venue,
               'event_url' => url('/party/edit/'.$idParty),
-            ];
+          ];
 
-            Notification::send($admin, new ModerationEvent($arr));
-          }
+          Notification::send($admin, new ModerationEvent($arr));
 
 
           /** let's create the image attachment! **/
@@ -279,8 +276,7 @@ class PartyController extends Controller {
             }
             else { }
           }
-        }
-        else {
+        } else {
           $response['danger'] = 'Party could <strong>not</strong> be created. Something went wrong with the database.';
         }
 

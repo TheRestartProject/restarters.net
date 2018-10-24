@@ -5,7 +5,7 @@
           <div class="card-header p-0" id="heading{{{ $audit->id }}}">
             <h5 class="mb-0">
               <button class="btn btn-link text-left" type="button" data-toggle="collapse" data-target="#collapse{{{ $audit->id }}}" aria-expanded="true" aria-controls="collapse{{{ $audit->id }}}">
-                  @lang('event-audits.updated.metadata', $audit->getMetadata())
+                  @lang($type.'.'.$audit->event.'.metadata', $audit->getMetadata())
               </button>
             </h5>
           </div>
@@ -24,7 +24,7 @@
           </div>
       </div>
   @empty
-      <div class="card">@lang('event-audits.unavailable_audits')</div>
+      <div class="text-center">@lang('event-audits.unavailable_audits')</div>
   @endforelse
 
 </div>
