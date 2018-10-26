@@ -2,17 +2,17 @@
 
 namespace App\Helpers;
 
-use App\Party;
-use App\Role;
-use App\Skills;
-use App\UserGroups;
-use App\Permissions;
-use App\UsersPreferences;
-use App\UsersPermissions;
-
 use App;
 use Auth;
 use DB;
+use App\Party;
+use App\Permissions;
+use App\Role;
+use App\Skills;
+use App\User;
+use App\UserGroups;
+use App\UsersPreferences;
+use App\UsersPermissions;
 
 use Request;
 
@@ -822,6 +822,65 @@ class FixometerHelper {
       return false;
     } else {
       return true;
+    }
+
+  }
+
+  /** Returns users who have a particular preference by slug **/
+  public static function usersWhoHavePreference( $slug ){
+
+      return User::join('users_preferences', 'users_preferences.user_id', '=', 'users.id')
+                      ->join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
+                        ->where('preferences.slug', $slug)
+                          ->select('users.*')
+                            ->get();
+
+  }
+
+  public static function notificationClasses( $modal ){
+
+    $modal = str_replace("App\Notifications\\", "", $modal);
+
+    $user_array = [
+        //'AccountCreated', doesn't appear to be in use
+        //'NewRegister',
+        'AdminNewUser',
+        'ResetPassword',
+    ];
+
+    $event_array = [
+        'EventConfirmed',
+        'EventDevices',
+        'EventRepairs',
+        'JoinEvent',
+        'AdminModerationEvent',
+        'NotifyHostRSVPInvitesMade',
+        'NotifyRestartersOfNewEvent',
+        'RSVPEvent',
+    ];
+
+    $group_array = [
+        'GroupConfirmed',
+        'JoinGroup',
+        'AdminModerationGroup',
+        'NewGroupMember',
+        'NewGroupWithinRadius',
+    ];
+
+    $device_array = [
+        'NotifyAdminNoDevices',
+        'ReviewNotes',
+    ];
+
+
+    if( in_array($modal, $user_array) ) {
+        return 'card__restart';
+    } elseif( in_array($modal, $event_array) ) {
+        return 'card__parties';
+    } elseif( in_array($modal, $group_array) ) {
+        return 'card__groups';
+    } elseif( in_array($modal, $device_array) ) {
+        return 'card__devices';
     }
 
   }

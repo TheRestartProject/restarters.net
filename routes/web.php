@@ -43,9 +43,16 @@ Route::get('/about/cookie-policy', function() {
 Route::get('/visualisations', function() {
     return View::make('visualisations') ;
 });
-// Route::get('/ui', function() {
-//     return View::make('ui.index');
-// })->name('ui');;
+Route::get('/test', function() {
+
+      // Notify relevant users
+      $notify_users = \FixometerHelper::usersWhoHavePreference('admin-new-user');
+      \Notification::send($notify_users, new \App\Notifications\AdminNewUser([
+        'id' => 100,
+        'name' => 'Hsssooman',
+      ]));
+
+});
 
 Route::get('/party/view/{id}', 'PartyController@view');
 

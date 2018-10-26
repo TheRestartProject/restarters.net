@@ -14,7 +14,7 @@ use App\Helpers\FootprintRatioCalculator;
 use Auth;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
-use App\Notifications\ModerationGroup;
+use App\Notifications\AdminModerationGroup;
 use App\Notifications\NewGroupWithinRadius;
 use DB;
 use FixometerHelper;
@@ -241,6 +241,30 @@ class GroupController extends Controller
           $lat1 = $idGroup->latitude;
           $lon1 = $idGroup->longitude;
 
+          $idGroup = $idGroup->idgroups;
+
+          $response['success'] = 'Group created correctly.';
+
+          if(isset($_FILES) && !empty($_FILES)){
+            $file = new FixometerFile;
+            $group_avatar = $file->upload('file', 'image', $idGroup, env('TBL_GROUPS'), false, true);
+          }
+
+          //Associate current logged in user as a host
+          UserGroups::create([
+            'user' => Auth::user()->id,
+            'group' => $idGroup,
+            'status' => 1,
+            'role' => 3,
+          ]);
+
+          // Notify relevant users
+          $notify_users = FixometerHelper::usersWhoHavePreference('admin-moderate-group');
+          Notification::send($notify_users, new AdminModerationGroup([
+            'group_name' => Group::find($idGroup)->name,
+            'group_url' => url('/group/edit/'.$idGroup),
+          ]));
+
           // -------------------------------------------------- NOTIFY USERS OF NEW GROUP WITHIN 25 MILES ------------------------------------------------- //
           // Get all Users
           $users = User::whereNotNull('location')->get();
@@ -260,46 +284,13 @@ class GroupController extends Controller
             if($miles <= 25){
               $arr = [
                 'group_name' => $name,
-                'group_url' => url('/group/view/'.$idGroup->idgroups),
+                'group_url' => url('/group/view/'.$idGroup),
               ];
               Notification::send($user, new NewGroupWithinRadius($arr));
 
             }
           }
           // -------------------------------------------------- END NOTIFY USERS OF NEW GROUP WITHIN 25 MILES -------------------------------------------------- //
-
-          $idGroup = $idGroup->idgroups;
-
-          $response['success'] = 'Group created correctly.';
-
-          if(isset($_FILES) && !empty($_FILES)){
-            $file = new FixometerFile;
-            $group_avatar = $file->upload('file', 'image', $idGroup, env('TBL_GROUPS'), false, true);
-          }
-
-          //Associate current logged in user as a host
-          UserGroups::create([
-            'user' => Auth::user()->id,
-            'group' => $idGroup,
-            'status' => 1,
-            'role' => 3,
-          ]);
-
-          if(env('APP_ENV') == 'local') {
-
-            $all_admins = User::where('role', 2)->where('invites', 1)->get();
-
-            //Send Emails to Admins notifying event creation
-            $arr = [
-              'group_name' => Group::find($idGroup)->name,
-              'group_url' => url('/group/view/'.$idGroup),
-            ];
-
-            Notification::send($all_admins, new ModerationGroup($arr));
-
-            // NGM: no push to Wordpress at group creation at present.
-            // It only occurs following moderation.
-          }
 
         }
         else {
@@ -767,11 +758,8 @@ public function confirmInvite($group_id, $hash)
 {
   // Find user/group relationship based on the invitation hash.
   $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
-  $invitationIsValid = !empty($user_group);
-
-  if (!$invitationIsValid) {
+  if ( empty($user_group) )
     return redirect('/group/view/'.$group_id)->with('warning', 'Something went wrong - this invite is invalid or has expired');
-  }
 
   // Set user as confirmed member of group.
   UserGroups::where('status', $hash)->where('group', $group_id)->update([
@@ -781,26 +769,22 @@ public function confirmInvite($group_id, $hash)
   // Send emails to hosts of group to let them know.
   // (only those that have opted in to receiving emails).
   $user = User::find($user_group->user);
-  try {
-    $groupHostLinks = UserGroups::where('group', $group_id)->where('role', 3)->get();
-  } catch (\Exception $e) {
-    $groupHostLinks = null;
-  }
 
-  if ( !is_null($groupHostLinks) ) {
-    $groupName = Group::find($group_id)->name;
-    foreach ($groupHostLinks as $groupHostLink) {
-      $host = User::where('id', $groupHostLink->user)->first();
-      if ($host->invites == 1) {
-        $arr = [
-          'user_name' => $user->name,
-          'group_name' => $groupName,
-          'group_url' => url('/group/view/'.$group_id),
-          'preferences' => url('/profile/edit/'.$host->id),
-        ];
-        Notification::send($host, new NewGroupMember($arr, $host));
-      }
-    }
+  $group_hosts = User::join('users_groups', 'users_groups.user', '=', 'users.id')
+                        ->where('users_groups.group', $group_id)
+                          ->where('users_groups.role', 3)
+                            ->where('users.invites', 1)
+                              ->select('users.*')
+                                ->get();
+
+  if ( !empty($group_hosts) ) {
+
+    Notification::send($group_hosts, new NewGroupMember([
+      'user_name' => $user->name,
+      'group_name' => Group::find($group_id)->name,
+      'group_url' => url('/group/view/'.$group_id),
+    ]));
+
   }
 
   return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');

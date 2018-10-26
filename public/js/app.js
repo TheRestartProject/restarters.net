@@ -73545,18 +73545,24 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 /***/ (function(module, exports) {
 
 function toggleRead(event) {
-    event.preventDefault();
-    $(this).parents('.card').toggleClass('status-read');
+  event.preventDefault();
+
+  $button = $(this);
+
+  $.ajax({
+    type: 'get',
+    url: $button.attr('href'),
+    success: function success(data) {
+      $button.parents('.card').addClass('status-is-read');
+      $button.parents('.card').toggleClass('status-read');
+    },
+    error: function error(_error) {
+      alert('Cannot mark as read, please report');
+    }
+  });
 }
 
 jQuery('.btn-marked').on('click', toggleRead);
-
-// function loadOlder(event) {
-//     event.preventDefault();
-//     // AJAX call
-// }
-
-// jQuery('.js-load').on('click', loadOlder);
 
 /***/ }),
 /* 170 */

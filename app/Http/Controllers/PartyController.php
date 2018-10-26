@@ -22,7 +22,7 @@ use App\Notifications\JoinGroup;
 use App\Notifications\RSVPEvent;
 use App\Notifications\NotifyHostRSVPInvitesMade;
 use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Notifications\ModerationEvent;
+use App\Notifications\AdminModerationEvent;
 use App\Notifications\EventDevices;
 use App\Notifications\EventRepairs;
 use DateTime;
@@ -250,22 +250,15 @@ class PartyController extends Controller {
 
           Party::find($idParty)->increment('volunteers');
 
-          //Send Emails to Admins notifying event creation
-          $all_admins = User::where('role', 2)->where('invites', 1)->get();
-          foreach ($all_admins as $admin)
-          $arr = [
+          // Notify relevant users
+          $notify_users = FixometerHelper::usersWhoHavePreference('admin-moderate-event');
+          Notification::send($notify_users, new AdminModerationEvent([
               'event_venue' => Party::find($idParty)->venue,
               'event_url' => url('/party/edit/'.$idParty),
-          ];
-
-          Notification::send($admin, new ModerationEvent($arr));
+          ]));
 
 
           /** let's create the image attachment! **/
-          // if(isset($_FILES) && !empty($_FILES)){
-          //     $file = new FixometerFile;
-          //     $file->upload('file', 'image', $idParty, env('TBL_EVENTS'));
-          // }
           if(isset($_FILES) && !empty($_FILES)){
             if(is_array($_FILES['file']['name'])) {
               $File = new FixometerFile;

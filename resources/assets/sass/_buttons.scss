@@ -35,7 +35,7 @@
     color: #FFF;
     font-size: 16px;
     border-radius: 3px;
-    
+
     &:focus, &.dropdown-toggle:focus, &.dropdown-toggle:active {
         background-color: #00B0C6;
         color: #FFF;
@@ -82,7 +82,7 @@
         border-color: #F24C26;
         text-decoration: underline;
          color: #FFF;
-    } 
+    }
 }
 
 .btn-checkbox {
@@ -299,12 +299,17 @@
 }
 
 .btn-marked {
+    diplay: none;
+}
+
+.btn-marked, .marked-as-read {
     background-color:transparent;
     border: 0;
     color: #000;
     padding: 0;
     text-transform: uppercase;
     font-size: 12px;
+    display: none;
 
     svg {
         margin-right: 2px;
@@ -314,12 +319,14 @@
     }
 
     .status-read & {
-        svg {
-            display: none;
-        }
         text-decoration: underline;
     }
 }
+
+.status-read .btn-marked, .status-is-read .marked-as-read {
+    display: block;
+}
+
 
 .btn-group {
 
@@ -377,7 +384,6 @@
             &:first-child {
                 margin-right: 10px;
             }
-        }    
+        }
     }
 }
-

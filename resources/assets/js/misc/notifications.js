@@ -1,13 +1,19 @@
 function toggleRead(event) {
     event.preventDefault();
-    $(this).parents('.card').toggleClass('status-read');
+
+    $button = $(this);
+
+    $.ajax({
+      type: 'get',
+      url: $button.attr('href'),
+      success: function(data) {
+        $button.parents('.card').addClass('status-is-read');
+        $button.parents('.card').toggleClass('status-read');
+      },
+      error: function(error) {
+        alert('Cannot mark as read, please report')
+      }
+    });
 }
 
 jQuery('.btn-marked').on('click',toggleRead);
-
-// function loadOlder(event) {
-//     event.preventDefault();
-//     // AJAX call
-// }
-
-// jQuery('.js-load').on('click', loadOlder);

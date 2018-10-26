@@ -16,12 +16,9 @@ class NewGroupMember extends Notification
      *
      * @return void
      */
-    protected $arr;
-    protected $user;
-    public function __construct($arr, $user = null)
+    public function __construct($arr)
     {
         $this->arr = $arr;
-        $this->user = $user;
     }
 
     /**
@@ -43,16 +40,12 @@ class NewGroupMember extends Notification
      */
     public function toMail($notifiable)
     {
-      if ($this->user !== null) {
-        if ($this->user->invites == 1) {
-          return (new MailMessage)
-                      ->subject('New Group Member')
-                      ->greeting('Hello!')
-                      ->line('A new volunteer, ' . $this->arr['user_name'] . ', has joined your group \'' . $this->arr['group_name'] . '\'.')
-                      ->action('Go to group', $this->arr['group_url'])
-                      ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'] . '">your preferences</a> on your account.');
-        }
-      }
+        return (new MailMessage)
+                  ->subject('New Group Member')
+                  ->greeting('Hello!')
+                  ->line('A new volunteer, ' . $this->arr['user_name'] . ', has joined your group \'' . $this->arr['group_name'] . '\'.')
+                  ->action('Go to group', $this->arr['group_url'])
+                  ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
     }
 
     /**
@@ -64,9 +57,9 @@ class NewGroupMember extends Notification
     public function toArray($notifiable)
     {
         return [
-          'title' => 'A new volunteer has joined (\'' . $this->arr['group_name'] . '\':',
-          'name' => $this->arr['user_name'],
-          'url' => '',
+          'title' => 'A new volunteer has joined ' . $this->arr['user_name'] . ':',
+          'name' => $this->arr['group_name'],
+          'url' => $this->arr['group_url'],
         ];
     }
 }

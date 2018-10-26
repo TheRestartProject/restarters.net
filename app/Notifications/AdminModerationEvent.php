@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class ModerationEvent extends Notification
+class AdminModerationEvent extends Notification
 {
     use Queueable;
 
@@ -40,16 +40,12 @@ class ModerationEvent extends Notification
      */
     public function toMail($notifiable)
     {
-      if ($notifiable !== null) {
-        if ($notifiable->invites == 1) {
           return (new MailMessage)
                       ->subject('Moderation Needed')
                       ->greeting('Hello!')
                       ->line('Your moderation is needed for \'' . $this->arr['event_venue'] . '\'.')
                       ->action('View event', $this->arr['event_url'])
                       ->line('If you think this invitation was not intended for you, please discard this email.');
-        }
-      }
     }
 
     /**
@@ -61,7 +57,7 @@ class ModerationEvent extends Notification
     public function toArray($notifiable)
     {
         return [
-            'title' => 'Event Created:',
+            'title' => 'The following event needs moderating:',
             'name' => $this->arr['event_venue'],
             'url' => $this->arr['event_url'],
         ];
