@@ -16,8 +16,10 @@ class RSVPEvent extends Notification
      *
      * @return void
      */
+
     protected $arr;
     protected $user;
+
     public function __construct($arr, $user = null)
     {
         $this->arr = $arr;
@@ -32,7 +34,7 @@ class RSVPEvent extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -43,16 +45,12 @@ class RSVPEvent extends Notification
      */
     public function toMail($notifiable)
     {
-      if ($this->user !== null) {
-        if ($this->user->invites == 1) {
           return (new MailMessage)
                       ->subject('RSVP Event')
                       ->greeting('Hello!')
                       ->line('A volunteer, ' . $this->arr['user_name'] . ', has sent you an RSVP for \'' . $this->arr['event_venue'] . '\'. You can view the event below to see the latest activity.')
                       ->action('View your event', $this->arr['event_url'])
-                      ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'] . '">your preferences</a> on your account.');
-        }
-      }
+                      ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
     }
 
     /**
@@ -64,7 +62,9 @@ class RSVPEvent extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+            'title' => $this->arr['user_name'].' is attending your event:',
+            'name' => $this->arr['event_venue'],
+            'url' => $this->arr['event_url'],
         ];
     }
 }

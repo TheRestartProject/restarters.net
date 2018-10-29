@@ -468,24 +468,31 @@ public function edit($id, Request $request) {
 
       $theParty = $Party->findThis($id)[0];
 
-      if( ( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) { //For testing purposes
+      // Notify all Restarters of relevant Group if a new Event has been approved for moderation
+      $event = Party::find($id);
+      $group = Group::find($event->group);
 
-        // Notify all Restarters of relevant Group if a new Event has been approved for moderation
-        $event = Party::find($id);
-        if ($GroupRestarters = UserGroups::where('group', $event->group)->where('role', 4)->get()) {  //Get users within group by group id and role of restarter
-          if (!$GroupRestarters->isEmpty()) { //If there are restarters against the group
-            foreach ($GroupRestarters as $GroupRestarter) { //Loop through each restarter
-              $user = User::where('id', $GroupRestarter->user)->first();  //Match the restarter and get their details
-              if ($user->invites == 1) {  //If the restarter has opted to have invites
-                $arr = [
-                  'event_venue' => $event->venue,
-                  'event_url' => url('/party/view/'.$event->idevents),
-                ];
-                Notification::send($user, new NotifyRestartersOfNewEvent($arr, $user)); //Send user a notification and email
-              }
-            }
-          }
-        }
+      // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
+      $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
+                                ->where('users_groups.group', $event->group)
+                                  ->where('users_groups.role', 4)
+                                    ->where('users.invites', 1)
+                                      ->select('users.*')
+                                        ->get();
+
+      // If there are restarters against the group
+      if ( !$group_restarters->isEmpty() ) {
+
+          // Send user a notification and email
+          Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
+            'event_venue' => $event->venue,
+            'event_url' => url('/party/view/'.$event->idevents),
+            'event_group' => $group->name,
+          ]));
+
+      }
+
+      if( ( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) { //For testing purposes
 
         $Party->where('idevents', $id)->update(['wordpress_post_id' => 99999]);
 
@@ -1374,31 +1381,42 @@ public function confirmInvite($event_id, $hash) {
 
   if ( !empty($user_event) ) {
 
+    // Update event invite
     EventsUsers::where('status', $hash)->where('event', $event_id)->update([
       'status' => 1
     ]);
 
-    $user = User::find($user_event->user);
-    try {
-      $host = User::find(EventsUsers::where('event', $event_id)->where('role', 3)->first()->user);
-    } catch (\Exception $e) {
-      $host = null;
-    }
-
+    // Increment volunteers column to include latest invite
     Party::find($event_id)->increment('volunteers');
 
-    if ( !is_null($host) ) {
+    // Get users who have appropriate role and permission to email
+    try {
+      $hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
+                        ->where('events_users.event', $event_id)
+                          ->where('events_users.role', 3)
+                            ->where('users.invites', 1)
+                              ->select('users.*')
+                                ->get();
+
+    } catch (\Exception $e) {
+      $hosts = null;
+    }
+
+
+    if ( !is_null($hosts) ) {
 
       try {
+
+          // Get user information
+          $user = User::find($user_event->user);
+
           //Send Notification to Host
-          $arr = [
+          Notification::send($hosts, new RSVPEvent([
               'user_name' => $user->name,
               'event_venue' => Party::find($event_id)->venue,
               'event_url' => url('/party/view/'.$event_id),
-              'preferences' => url('/profile/edit/'.$host->id),
-          ];
+          ]));
 
-          Notification::send($host, new RSVPEvent($arr, $host));
       } catch (\Exception $ex) {
           Log::error("An error occurred when trying to notify host of invitation confirmation: " . $ex->getMessage());
       }

@@ -43,16 +43,12 @@ class NotifyRestartersOfNewEvent extends Notification
      */
      public function toMail($notifiable)
      {
-       if ($this->user !== null) {
-         if ($this->user->invites == 1) {
-           return (new MailMessage)
-                       ->subject('There is a New Event')
-                       ->greeting('Hello!')
-                       ->line('There has been a new Event added to your Group: \'' . $this->arr['event_venue'] . '\'.')
-                       ->action('View event', $this->arr['event_url'])
-                       ->line('If you think this invitation was not intended for you, please discard this email.');
-         }
-       }
+         return (new MailMessage)
+                     ->subject('There is a new event')
+                     ->greeting('Hello!')
+                     ->line('There has been a new event added to your group: \'' . $this->arr['event_venue'] . '\'.')
+                     ->action('View event', $this->arr['event_url'])
+                     ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
      }
 
     /**
@@ -64,7 +60,7 @@ class NotifyRestartersOfNewEvent extends Notification
     public function toArray($notifiable)
     {
       return [
-          'title' => 'A new Event has been Created:',
+          'title' => 'A new event has been created for group ' . $this->arr['event_group'] . ':',
           'name' => $this->arr['event_venue'],
           'url' => $this->arr['event_url'],
       ];
