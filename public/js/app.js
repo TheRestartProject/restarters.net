@@ -30100,6 +30100,7 @@ __webpack_require__(164);
 __webpack_require__(165);
 __webpack_require__(167);
 __webpack_require__(168);
+__webpack_require__(169);
 window.Dropzone = __webpack_require__(170);
 window.Tokenfield = __webpack_require__(171);
 
@@ -31469,12 +31470,42 @@ $(document).ready(function () {
 
   // If event has attended or invited people then user cannot delete the event
   $("#deleteEvent").click(function (e) {
-    if ($('#countAttended').val() > 0 || $('#countInvited').val() > 0 || $('#countVolunteers').val() > 0) {
-      e.preventDefault();
-      alert('Sorry you cannot delete this event as you have invited other volunteers');
-    } else {
+    if ($(this).attr('data-count-attended') > 0 || $(this).attr('data-count-invited') > 0 || $(this).attr('data-count-volunteers') > 0) {
       return confirm('Are you sure you want to delete this event?');
+
+      id = $(this).attr('data-party-id');
+
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: '/party/delete/' + id,
+        data: {
+          "id": id
+        },
+        dataType: 'json'
+      });
     }
+  });
+
+  $('.locale').click(function (e) {
+    var language = $(this).attr('hreflang');
+    alert(language);
+    $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      type: 'POST',
+      url: '/locale',
+      dataType: 'json',
+      data: {
+        "language": language
+      },
+      success: function success(data) {
+        alert('success');
+      }
+    });
   });
 });
 
@@ -73531,7 +73562,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 169 */,
+/* 169 */
+/***/ (function(module, exports) {
+
+throw new Error("Module build failed: Error: ENOENT: no such file or directory, open '/Applications/MAMP/htdocs/fixometer/resources/assets/js/misc/notifications.js'");
+
+/***/ }),
 /* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 

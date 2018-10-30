@@ -319,7 +319,7 @@ class Builder
      */
     protected function parseSub($query)
     {
-        if ($query instanceof self) {
+        if ($query instanceof self || $query instanceof EloquentBuilder) {
             return [$query->toSql(), $query->getBindings()];
         } elseif (is_string($query)) {
             return [$query, []];
@@ -1389,7 +1389,7 @@ class Builder
     {
         $type = $not ? 'NotExists' : 'Exists';
 
-        $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
+        $this->wheres[] = compact('type', 'query', 'boolean');
 
         $this->addBinding($query->getBindings(), 'where');
 
@@ -1415,7 +1415,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'columns', 'operator', 'values', 'boolean');
 
-        $this->addBinding($values);
+        $this->addBinding($this->cleanBindings($values));
 
         return $this;
     }
@@ -2057,7 +2057,7 @@ class Builder
     protected function withoutSelectAliases(array $columns)
     {
         return array_map(function ($column) {
-            return is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false
+            return is_string($column) && ($aliasPosition = stripos($column, ' as ')) !== false
                     ? substr($column, 0, $aliasPosition) : $column;
         }, $columns);
     }
@@ -2084,7 +2084,7 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @param  string  $column
-     * @param  string  $alias
+     * @param  string|null  $alias
      * @return bool
      */
     public function chunkById($count, callable $callback, $column = 'id', $alias = null)

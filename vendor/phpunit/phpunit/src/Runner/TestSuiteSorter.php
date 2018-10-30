@@ -32,26 +32,86 @@ final class TestSuiteSorter
     public const ORDER_REVERSED = 2;
 
     /**
+     * @var int
+     */
+    public const ORDER_DEFECTS_FIRST = 3;
+
+    /**
+     * @var int
+     */
+    public const ORDER_DURATION = 4;
+
+    /**
+     * List of sorting weights for all test result codes. A higher number gives higher priority.
+     */
+    private const DEFECT_SORT_WEIGHT = [
+        BaseTestRunner::STATUS_ERROR      => 6,
+        BaseTestRunner::STATUS_FAILURE    => 5,
+        BaseTestRunner::STATUS_WARNING    => 4,
+        BaseTestRunner::STATUS_INCOMPLETE => 3,
+        BaseTestRunner::STATUS_RISKY      => 2,
+        BaseTestRunner::STATUS_SKIPPED    => 1,
+        BaseTestRunner::STATUS_UNKNOWN    => 0,
+    ];
+
+    /**
+     * @var array<string, int> Associative array of (string => DEFECT_SORT_WEIGHT) elements
+     */
+    private $defectSortOrder = [];
+
+    /**
+     * @var TestResultCacheInterface
+     */
+    private $cache;
+
+    public function __construct(?TestResultCacheInterface $cache = null)
+    {
+        $this->cache = $cache ?? new NullTestResultCache;
+    }
+
+    /**
      * @throws Exception
      */
-    public function reorderTestsInSuite(Test $suite, int $order, bool $resolveDependencies): void
+    public function reorderTestsInSuite(Test $suite, int $order, bool $resolveDependencies, int $orderDefects): void
     {
-        if ($order !== self::ORDER_DEFAULT && $order !== self::ORDER_REVERSED && $order !== self::ORDER_RANDOMIZED) {
+        $allowedOrders = [
+            self::ORDER_DEFAULT,
+            self::ORDER_REVERSED,
+            self::ORDER_RANDOMIZED,
+            self::ORDER_DURATION,
+        ];
+
+        if (!\in_array($order, $allowedOrders, true)) {
             throw new Exception(
-                '$order must be one of TestSuiteSorter::ORDER_DEFAULT, TestSuiteSorter::ORDER_REVERSED, or TestSuiteSorter::ORDER_RANDOMIZED'
+                '$order must be one of TestSuiteSorter::ORDER_DEFAULT, TestSuiteSorter::ORDER_REVERSED, or TestSuiteSorter::ORDER_RANDOMIZED, or TestSuiteSorter::ORDER_DURATION'
             );
         }
 
-        if ($suite instanceof TestSuite && !empty($suite->tests())) {
+        $allowedOrderDefects = [
+            self::ORDER_DEFAULT,
+            self::ORDER_DEFECTS_FIRST,
+        ];
+
+        if (!\in_array($orderDefects, $allowedOrderDefects, true)) {
+            throw new Exception(
+                '$orderDefects must be one of TestSuiteSorter::ORDER_DEFAULT, TestSuiteSorter::ORDER_DEFECTS_FIRST'
+            );
+        }
+
+        if ($suite instanceof TestSuite) {
             foreach ($suite as $_suite) {
-                $this->reorderTestsInSuite($_suite, $order, $resolveDependencies);
+                $this->reorderTestsInSuite($_suite, $order, $resolveDependencies, $orderDefects);
             }
 
-            $this->sort($suite, $order, $resolveDependencies);
+            if ($orderDefects === self::ORDER_DEFECTS_FIRST) {
+                $this->addSuiteToDefectSortOrder($suite);
+            }
+
+            $this->sort($suite, $order, $resolveDependencies, $orderDefects);
         }
     }
 
-    private function sort(TestSuite $suite, int $order, bool $resolveDependencies): void
+    private function sort(TestSuite $suite, int $order, bool $resolveDependencies, int $orderDefects): void
     {
         if (empty($suite->tests())) {
             return;
@@ -61,6 +121,12 @@ final class TestSuiteSorter
             $suite->setTests($this->reverse($suite->tests()));
         } elseif ($order === self::ORDER_RANDOMIZED) {
             $suite->setTests($this->randomize($suite->tests()));
+        } elseif ($order === self::ORDER_DURATION && $this->cache !== null) {
+            $suite->setTests($this->sortByDuration($suite->tests()));
+        }
+
+        if ($orderDefects === self::ORDER_DEFECTS_FIRST && $this->cache !== null) {
+            $suite->setTests($this->sortDefectsFirst($suite->tests()));
         }
 
         if ($resolveDependencies && !($suite instanceof DataProviderTestSuite) && $this->suiteOnlyContainsTests($suite)) {
@@ -68,11 +134,29 @@ final class TestSuiteSorter
         }
     }
 
+    private function addSuiteToDefectSortOrder(TestSuite $suite): void
+    {
+        $max = 0;
+
+        foreach ($suite->tests() as $test) {
+            if (!isset($this->defectSortOrder[$test->getName()])) {
+                $this->defectSortOrder[$test->getName()] = self::DEFECT_SORT_WEIGHT[$this->cache->getState($test->getName())];
+                $max                                     = \max($max, $this->defectSortOrder[$test->getName()]);
+            }
+        }
+
+        $this->defectSortOrder[$suite->getName()] = $max;
+    }
+
     private function suiteOnlyContainsTests(TestSuite $suite): bool
     {
-        return \array_reduce($suite->tests(), function ($carry, $test) {
-            return $carry && ($test instanceof TestCase || $test instanceof DataProviderTestSuite);
-        }, true);
+        return \array_reduce(
+            $suite->tests(),
+            function ($carry, $test) {
+                return $carry && ($test instanceof TestCase || $test instanceof DataProviderTestSuite);
+            },
+            true
+        );
     }
 
     private function reverse(array $tests): array
@@ -85,6 +169,70 @@ final class TestSuiteSorter
         \shuffle($tests);
 
         return $tests;
+    }
+
+    private function sortDefectsFirst(array $tests): array
+    {
+        \usort(
+            $tests,
+            function ($left, $right) {
+                return $this->cmpDefectPriorityAndTime($left, $right);
+            }
+        );
+
+        return $tests;
+    }
+
+    private function sortByDuration(array $tests): array
+    {
+        \usort(
+            $tests,
+            function ($left, $right) {
+                return $this->cmpDuration($left, $right);
+            }
+        );
+
+        return $tests;
+    }
+
+    /**
+     * Comparator callback function to sort tests for "reach failure as fast as possible":
+     * 1. sort tests by defect weight defined in self::DEFECT_SORT_WEIGHT
+     * 2. when tests are equally defective, sort the fastest to the front
+     * 3. do not reorder successful tests
+     */
+    private function cmpDefectPriorityAndTime(Test $a, Test $b): int
+    {
+        if (!$a instanceof TestCase || !$b instanceof TestCase) {
+            return 0;
+        }
+
+        $priorityA = $this->defectSortOrder[$a->getName()] ?? 0;
+        $priorityB = $this->defectSortOrder[$b->getName()] ?? 0;
+
+        if ($priorityB <=> $priorityA) {
+            // Sort defect weight descending
+            return $priorityB <=> $priorityA;
+        }
+
+        if ($priorityA || $priorityB) {
+            return $this->cmpDuration($a, $b);
+        }
+
+        // do not change execution order
+        return 0;
+    }
+
+    /**
+     * Compares test duration for sorting tests by duration ascending.
+     */
+    private function cmpDuration(Test $a, Test $b): int
+    {
+        if (!$a instanceof TestCase || !$b instanceof TestCase) {
+            return 0;
+        }
+
+        return $this->cache->getTime($a->getName()) <=> $this->cache->getTime($b->getName());
     }
 
     /**
@@ -108,9 +256,12 @@ final class TestSuiteSorter
         $i            = 0;
 
         do {
-            $todoNames = \array_map(function ($test) {
-                return $this->getNormalizedTestName($test);
-            }, $tests);
+            $todoNames = \array_map(
+                function ($test) {
+                    return $this->getNormalizedTestName($test);
+                },
+                $tests
+            );
 
             if (!$tests[$i]->hasDependencies() || empty(\array_intersect($this->getNormalizedDependencyNames($tests[$i]), $todoNames))) {
                 $newTestOrder = \array_merge($newTestOrder, \array_splice($tests, $i, 1));
@@ -150,11 +301,12 @@ final class TestSuiteSorter
             $testClass = \get_class($test);
         }
 
-        $names = \array_map(function ($name) use ($testClass) {
-            return \strpos($name, '::') === false
-                ? $testClass . '::' . $name
-                : $name;
-        }, $test->getDependencies());
+        $names = \array_map(
+            function ($name) use ($testClass) {
+                return \strpos($name, '::') === false ? $testClass . '::' . $name : $name;
+            },
+            $test->getDependencies()
+        );
 
         return $names;
     }

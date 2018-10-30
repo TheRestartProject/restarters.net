@@ -20,6 +20,8 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\TrustProxies::class,
         \App\Http\Middleware\HttpsProtocol::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \App\Http\Middleware\LangaugeSwitcher::class,
     ];
 
     /**
@@ -62,5 +64,12 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verifyUserConsent' => \App\Http\Middleware\VerifyUserConsent::class,
+
+        /**** OTHER MIDDLEWARE ****/
+    		'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+    		'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
+    		'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
+        'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
+    		// REDIRECTION MIDDLEWARE
     ];
 }

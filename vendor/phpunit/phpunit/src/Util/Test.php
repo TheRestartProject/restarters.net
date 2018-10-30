@@ -173,7 +173,7 @@ final class Test
             foreach (\range(0, $count - 1) as $i) {
                 $requires[$matches['name'][$i]] = [
                     'version'  => $matches['version'][$i],
-                    'operator' => $matches['operator'][$i]
+                    'operator' => $matches['operator'][$i],
                 ];
             }
         }
@@ -188,7 +188,7 @@ final class Test
                     $versionConstraintParser = new VersionConstraintParser;
 
                     $requires[$matches['name'][$i] . '_constraint'] = [
-                        'constraint' => $versionConstraintParser->parse(\trim($matches['constraint'][$i]))
+                        'constraint' => $versionConstraintParser->parse(\trim($matches['constraint'][$i])),
                     ];
                 } catch (\PharIo\Version\Exception $e) {
                     throw new Warning($e->getMessage(), $e->getCode(), $e);
@@ -220,7 +220,7 @@ final class Test
 
                 $requires['extension_versions'][$matches['value'][$i]] = [
                     'version'  => $matches['version'][$i],
-                    'operator' => $matches['operator'][$i]
+                    'operator' => $matches['operator'][$i],
                 ];
             }
         }
@@ -390,7 +390,7 @@ final class Test
             }
 
             return [
-                'class' => $class, 'code' => $code, 'message' => $message, 'message_regex' => $messageRegExp
+                'class' => $class, 'code' => $code, 'message' => $message, 'message_regex' => $messageRegExp,
             ];
         }
 
@@ -508,7 +508,7 @@ final class Test
 
         return [
             'class'  => self::$annotationCache[$className],
-            'method' => $methodName !== null ? self::$annotationCache[$cacheKey] : []
+            'method' => $methodName !== null ? self::$annotationCache[$cacheKey] : [],
         ];
     }
 
@@ -526,7 +526,7 @@ final class Test
             if (\preg_match('#/\*\*?\s*@(?P<name>[A-Za-z_-]+)(?:[ \t]+(?P<value>.*?))?[ \t]*\r?\*/$#m', $line, $matches)) {
                 $annotations[\strtolower($matches['name'])] = [
                     'line'  => $lineNumber,
-                    'value' => $matches['value']
+                    'value' => $matches['value'],
                 ];
             }
 
@@ -565,7 +565,7 @@ final class Test
                 $className,
                 $methodName,
                 'backupStaticAttributes'
-            )
+            ),
         ];
     }
 
@@ -782,6 +782,15 @@ final class Test
             $element = \explode(' ', $element);
             $element = $element[0];
 
+            if ($mode === 'covers' && \interface_exists($element)) {
+                throw new InvalidCoversTargetException(
+                    \sprintf(
+                        'Trying to @cover interface "%s".',
+                        $element
+                    )
+                );
+            }
+
             $codeList = \array_merge(
                 $codeList,
                 self::resolveElementToReflectionObjects($element)
@@ -889,7 +898,7 @@ final class Test
             'beforeClass' => ['setUpBeforeClass'],
             'before'      => ['setUp'],
             'after'       => ['tearDown'],
-            'afterClass'  => ['tearDownAfterClass']
+            'afterClass'  => ['tearDownAfterClass'],
         ];
     }
 
@@ -1038,6 +1047,14 @@ final class Test
     private static function resolveReflectionObjectsToLines(array $reflectors): array
     {
         $result = [];
+
+        foreach ($reflectors as $reflector) {
+            if ($reflector instanceof ReflectionClass) {
+                foreach ($reflector->getTraits() as $trait) {
+                    $reflectors[] = $trait;
+                }
+            }
+        }
 
         foreach ($reflectors as $reflector) {
             $filename = $reflector->getFileName();
