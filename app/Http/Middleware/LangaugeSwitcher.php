@@ -21,6 +21,10 @@ class LangaugeSwitcher
     {
         if ( session('locale') ) {
 
+          App::setLocale(session('locale'));
+          LaravelLocalization::setLocale(session('locale'));
+
+        } else {
           $agent = new Agent();
           foreach( $languages = $agent->languages() as $language => $value ){
             if( in_array($value, LaravelLocalization::getSupportedLanguagesKeys()) ){
@@ -30,7 +34,6 @@ class LangaugeSwitcher
 
             }
           }
-
         }
         return $next($request);
     }
