@@ -2,14 +2,14 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use App;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Session;
+use Closure;
 use Illuminate\Support\Facades\Config;
+use LaravelLocalization;
+use Jenssegers\Agent\Agent;
 
 class LangaugeSwitcher
-{ 
+{
     /**
      * Handle an incoming request.
      *
@@ -19,13 +19,33 @@ class LangaugeSwitcher
      */
     public function handle($request, Closure $next)
     {
-        // App::setLocale(Session::has('locale') ? Session::get('locale') : Config::get('app.locale'));
+        if ( session('locale') ) {
 
-        $locale = $request->cookie('locale', Config::get('app.locale'));
-        App::setLocale($locale);
-        Carbon::setLocale($locale);
+          $agent = new Agent();
+          foreach( $languages = $agent->languages() as $language => $value ){
+            if( in_array($value, LaravelLocalization::getSupportedLanguagesKeys()) ){
 
+              App::setLocale(session('locale', $value));
+              LaravelLocalization::setLocale(session('locale', $value));
 
+            }
+          }
+
+        }
         return $next($request);
     }
+
+
+
+
+    // $language = $agent->languages(); // Browser language
+    //
+    // $browser = $agent->browser(); // Get User Browser
+    // $version = $agent->version($browser); // Get Browser Version
+    //
+    // $platform = $agent->platform(); // Get User OS
+    // $version = $agent->version($platform); // Get User OS version
+
+
+
 }

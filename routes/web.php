@@ -264,7 +264,5 @@ Route::get('markAsRead/{id}', function($id){
 })->name('markAsRead');
 
 Route::post('/locale', 'LocaleController@handle');
-
-Route::get('testing123', function (){
-
-});
+Route::get('/set-lang/{locale}', 'LocaleController@setLang');
+// Route::post('/locale', 'LocaleController@handle')->middleware(['auth', 'localize']);
