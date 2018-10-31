@@ -10,12 +10,19 @@
     width: 100%;
     @extend .clear;
 
-    @include media-breakpoint-up(lg) { 
+    @include media-breakpoint-up(lg) {
         justify-content: flex-end;
         // position: absolute;
         // bottom: 0;
         // left: 0;
         // z-index: 10;
+    }
+
+    .fixed-layout &,
+    .login-page & {
+        position: fixed;
+        bottom: 0;
+        z-index: 10;
     }
 
     .dropdown-menu {
@@ -26,8 +33,11 @@
         padding: 0;
         box-shadow: 0 -10px 15px rgba(0, 0, 0, 0.4);
         background: transparent;
-        top:-2px !important;
-        transform: translate3d(0px, -142px, 0px) !important;
+        bottom: 64px;
+        transform: none !important;
+        top: auto !important;
+
+        //transform: translate3d(0px, -142px, 0px) !important;
         @include media-breakpoint-up(lg) {
             width: auto;
             left: auto !important;
@@ -42,6 +52,7 @@
         padding: 5px 30px;
         display: block;
         background: #FFF;
+
         @include media-breakpoint-up(lg) {
             padding: 5px 20px;
         }
@@ -54,7 +65,8 @@
             padding-bottom: 10px;
         }
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
             text-decoration: underline;
         }
     }
@@ -65,13 +77,16 @@
         border-radius: 0;
         padding: 22px 20px;
         display: block;
+
         @include media-breakpoint-up(lg) {
             border-left: 1px solid #D9D9D9 !important;
             padding-left: 50px;
             padding-right: 50px;
         }
 
-        &:hover, &:focus, &:active {
+        &:hover,
+        &:focus,
+        &:active {
             background-color: #FFF !important;
             color: #000;
             box-shadow: none !important;
@@ -81,7 +96,8 @@
 
         &:after {
             transition: all ease-in-out 0.2s;
-            position: relative;z-index: 1;
+            position: relative;
+            z-index: 1;
             right: -2px;
         }
 
@@ -97,6 +113,7 @@
             background-color: #FFF !important;
             color: #000;
         }
+
         button.dropdown-toggle {
             &:after {
                 transform: rotate(180deg);
@@ -105,4 +122,9 @@
     }
 
 
+}
+
+.fixed-layout,
+.login-page {
+    padding-bottom: 65px;
 }
