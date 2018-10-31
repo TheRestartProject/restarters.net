@@ -16,9 +16,9 @@ use Symfony\Component\Process\Exception\RuntimeException;
 /**
  * PhpProcess runs a PHP script in an independent process.
  *
- * $p = new PhpProcess('<?php echo "foo"; ?>');
- * $p->run();
- * print $p->getOutput()."\n";
+ *     $p = new PhpProcess('<?php echo "foo"; ?>');
+ *     $p->run();
+ *     print $p->getOutput()."\n";
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -38,7 +38,7 @@ class PhpProcess extends Process
         } else {
             $php = array_merge(array($php), $executableFinder->findArguments());
         }
-        if ('phpdbg' === PHP_SAPI) {
+        if ('phpdbg' === \PHP_SAPI) {
             $file = tempnam(sys_get_temp_dir(), 'dbg');
             file_put_contents($file, $script);
             register_shutdown_function('unlink', $file);

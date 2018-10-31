@@ -46,7 +46,7 @@ class RouteCollectionBuilder
     /**
      * Import an external routing resource and returns the RouteCollectionBuilder.
      *
-     *  $routes->import('blog.yml', '/blog');
+     *     $routes->import('blog.yml', '/blog');
      *
      * @param mixed       $resource
      * @param string|null $prefix
@@ -358,7 +358,7 @@ class RouteCollectionBuilder
         if ($this->loader->supports($resource, $type)) {
             $collections = $this->loader->load($resource, $type);
 
-            return is_array($collections) ? $collections : array($collections);
+            return \is_array($collections) ? $collections : array($collections);
         }
 
         if (null === $resolver = $this->loader->getResolver()) {
@@ -371,6 +371,6 @@ class RouteCollectionBuilder
 
         $collections = $loader->load($resource, $type);
 
-        return is_array($collections) ? $collections : array($collections);
+        return \is_array($collections) ? $collections : array($collections);
     }
 }

@@ -49,7 +49,7 @@ class PhptTestCase implements Test, SelfDescribing
         'report_memleaks=0',
         'report_zend_debug=0',
         'safe_mode=0',
-        'xdebug.default_enable=0'
+        'xdebug.default_enable=0',
     ];
 
     /**
@@ -150,7 +150,7 @@ class PhptTestCase implements Test, SelfDescribing
         }
 
         if ($result->getCollectCodeCoverageInformation()) {
-            $this->renderForCoverage($settings);
+            $this->renderForCoverage($code);
         }
 
         Timer::start();
@@ -269,22 +269,18 @@ class PhptTestCase implements Test, SelfDescribing
         foreach ($assertions as $sectionName => $sectionAssertion) {
             if (isset($sections[$sectionName])) {
                 $sectionContent = \preg_replace('/\r\n/', "\n", \trim($sections[$sectionName]));
-                $assertion      = $sectionAssertion;
                 $expected       = $sectionName === 'EXPECTREGEX' ? "/{$sectionContent}/" : $sectionContent;
 
-                break;
+                if ($expected === null) {
+                    throw new Exception('No PHPT expectation found');
+                }
+                Assert::$sectionAssertion($expected, $actual);
+
+                return;
             }
         }
 
-        if (!isset($assertion)) {
-            throw new Exception('No PHPT assertion found');
-        }
-
-        if (!isset($expected)) {
-            throw new Exception('No PHPT expectation found');
-        }
-
-        Assert::$assertion($expected, $actual);
+        throw new Exception('No PHPT assertion found');
     }
 
     /**
@@ -349,7 +345,7 @@ class PhptTestCase implements Test, SelfDescribing
             'CGI',
             'EXPECTHEADERS',
             'EXTENSIONS',
-            'PHPDBG'
+            'PHPDBG',
         ];
 
         foreach (\file($this->filename) as $line) {
@@ -398,7 +394,7 @@ class PhptTestCase implements Test, SelfDescribing
             'FILE',
             'EXPECT',
             'EXPECTF',
-            'EXPECTREGEX'
+            'EXPECTREGEX',
         ];
         $testDirectory = \dirname($this->filename) . \DIRECTORY_SEPARATOR;
 
@@ -431,8 +427,8 @@ class PhptTestCase implements Test, SelfDescribing
             [
                 'EXPECT',
                 'EXPECTF',
-                'EXPECTREGEX'
-            ]
+                'EXPECTREGEX',
+            ],
         ];
 
         foreach ($requiredSections as $section) {
@@ -467,11 +463,11 @@ class PhptTestCase implements Test, SelfDescribing
         return \str_replace(
             [
                 '__DIR__',
-                '__FILE__'
+                '__FILE__',
             ],
             [
                 "'" . \dirname($this->filename) . "'",
-                "'" . $this->filename . "'"
+                "'" . $this->filename . "'",
             ],
             $code
         );
@@ -479,16 +475,16 @@ class PhptTestCase implements Test, SelfDescribing
 
     private function getCoverageFiles(): array
     {
-        $baseDir          = \dirname($this->filename) . \DIRECTORY_SEPARATOR;
+        $baseDir          = \dirname(\realpath($this->filename)) . \DIRECTORY_SEPARATOR;
         $basename         = \basename($this->filename, 'phpt');
 
         return [
             'coverage' => $baseDir . $basename . 'coverage',
-            'job'      => $baseDir . $basename . 'php'
+            'job'      => $baseDir . $basename . 'php',
         ];
     }
 
-    private function renderForCoverage(array &$settings): void
+    private function renderForCoverage(string &$job): void
     {
         $files = $this->getCoverageFiles();
 
@@ -521,22 +517,21 @@ class PhptTestCase implements Test, SelfDescribing
                 'globals'          => $globals,
                 'job'              => $files['job'],
                 'coverageFile'     => $files['coverage'],
-                'autoPrependFile'  => \var_export(
-                    !empty($settings['auto_prepend_file']) ? $settings['auto_prepend_file'] : false,
-                    true
-                )
             ]
         );
 
-        \file_put_contents($files['job'], $template->render());
-
-        $settings['auto_prepend_file'] = $files['job'];
+        \file_put_contents($files['job'], $job);
+        $job = $template->render();
     }
 
     private function cleanupForCoverage(): array
     {
         $files    = $this->getCoverageFiles();
         $coverage = @\unserialize(\file_get_contents($files['coverage']));
+
+        if ($coverage === false) {
+            $coverage = [];
+        }
 
         foreach ($files as $file) {
             @\unlink($file);

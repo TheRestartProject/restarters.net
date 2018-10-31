@@ -10,6 +10,8 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+use App\Events\AddEvent;
+
 
 Route::prefix('user')->group(function () {
   Route::get('/', 'HomeController@index');
@@ -36,7 +38,7 @@ Route::get('/logout', 'UserController@logout');
 
 Route::get('/about', 'AboutController@index')->name('features');
 Route::get('/about/cookie-policy', function() {
-  return View::make('features.cookie-policy') ;
+  return View::make('features.cookie-policy');
 });
 
 // Temp
@@ -262,3 +264,23 @@ Route::get('markAsRead/{id}', function($id){
   auth()->user()->unReadNotifications->where('id', $id)->markAsRead();
   return  redirect()->back();
 })->name('markAsRead');
+
+Route::post('/locale', 'LocaleController@handle');
+Route::get('/set-lang/{locale}', 'LocaleController@setLang');
+// Route::post('/locale', 'LocaleController@handle')->middleware(['auth', 'localize']);
+
+
+use App\Events\AddEventError;
+
+Route::get('testing123', function () {
+
+
+    // Event::listen(new AddEvent($event));
+    $user = Auth::user();
+
+    event(new AddEventError($user));
+
+
+
+    return 'Hello World';
+});

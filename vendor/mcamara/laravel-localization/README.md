@@ -3,6 +3,7 @@
 [![Join the chat at https://gitter.im/mcamara/laravel-localization](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mcamara/laravel-localization?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Latest Stable Version](https://poser.pugx.org/mcamara/laravel-localization/version.png)](https://packagist.org/packages/mcamara/laravel-localization) [![Total Downloads](https://poser.pugx.org/mcamara/laravel-localization/d/total.png)](https://packagist.org/packages/mcamara/laravel-localization) [![Build Status](https://travis-ci.org/mcamara/laravel-localization.png)](https://travis-ci.org/mcamara/laravel-localization)
+[![Open Source Helpers](https://www.codetriage.com/mcamara/laravel-localization/badges/users.svg)](https://www.codetriage.com/mcamara/laravel-localization)
 
 Easy i18n localization for Laravel, an useful tool to combine with Laravel localization classes.
 
@@ -13,14 +14,14 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
     - <a href="#composer">Composer</a>
     - <a href="#manually">Manually</a>
     - <a href="#laravel">Laravel</a>
+- <a href="#config">Config</a>
+    - <a href="#config-files">Config files</a>
+    - <a href="#service-providers">Service providers</a>
 - <a href="#usage">Usage</a>
     - <a href="#middleware">Middleware</a>
 - <a href="#helpers">Helpers</a>
     - <a href="#route-model-binding">Route Model Binding</a>
 - <a href="#translated-routes">Translated Routes</a>
-- <a href="#config">Config</a>
-    - <a href="#config-files">Config files</a>
-    - <a href="#service-providers">Service providers</a>
 - <a href="#caching-routes">Caching routes</a>
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
@@ -59,6 +60,53 @@ You may also register the `LaravelLocalization` facade:
                 'LaravelLocalization' => Mcamara\LaravelLocalization\Facades\LaravelLocalization::class,
         ],
 ```
+
+## Config
+
+### Config Files
+
+In order to edit the default configuration (where for e.g. you can find `supportedLocales`) for this package you may execute:
+
+```
+php artisan vendor:publish --provider="Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider"
+```
+
+After that, `config/laravellocalization.php` will be created. Inside this file you will find all the fields that can be edited in this package.
+
+### Service Providers
+
+Otherwise, you can use `ConfigServiceProviders` (check <a href="https://raw.githubusercontent.com/mcamara/laravel-localization/master/src/config/config.php">this file</a> for more info).
+
+For example, editing the default config service provider that Laravel loads when it's installed. This file is placed in `app/providers/ConfigServicePovider.php` and would look like this:
+
+```php
+<?php namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+class ConfigServiceProvider extends ServiceProvider {
+	public function register()
+	{
+		config([
+			'laravellocalization.supportedLocales' => [
+				'ace' => array( 'name' => 'Achinese', 'script' => 'Latn', 'native' => 'Aceh' ),
+				'ca'  => array( 'name' => 'Catalan', 'script' => 'Latn', 'native' => 'català' ),
+				'en'  => array( 'name' => 'English', 'script' => 'Latn', 'native' => 'English' ),
+			],
+
+			'laravellocalization.useAcceptLanguageHeader' => true,
+
+			'laravellocalization.hideDefaultLocaleInURL' => true
+		]);
+	}
+
+}
+```
+
+This config would add Catalan and Achinese as languages and override any other previous supported locales and all the other options in the package.
+
+You can create your own config providers and add them on your application config file (check the providers array in `config/app.php`).
+
 
 ## Usage
 
@@ -158,7 +206,7 @@ In order to activate it, you just have to attach this middleware to the routes y
 
 If you want to hide the default locale but always show other locales in the url, switch the `hideDefaultLocaleInURL` config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
 
-**IMPORTANT** - When `hideDefaultLocaleInURL` is set to true, the unlocalized root is treated as the applications default locale `app.locale`.  Because of this language negotiation using the Accept-Language header will **NEVER** occur when `hideDefaultLocaleInURL` is true.
+When `hideDefaultLocaleInURL` and `useAcceptLanguageHeader` are both set to true,then the language negotiation using the Accept-Language header will only occur while the session('locale') is empty. After negotiation, the session('locale') will be set accordingly and will not be called again.
 
 ### Set current locale as view-base-path
 
@@ -168,6 +216,18 @@ Now you can wrap your views in language-based folders like the translation files
 
 `resources/views/en/`, `resources/views/fr`, ...
 
+### Map your own custom lang url segments
+
+As you can modify the supportedLocales even by renaming their keys, it is possible to use the string ```uk``` instead of ```en-GB``` to provide custom lang url segments. Of course, you need to prevent any collisions with already existing keys and should stick to the convention as long as possible. But if you are using such a custom key, you have to store your mapping to the ```localesMapping``` array. This ```
+localesMapping``` is needed to enable the LanguageNegotiator to correctly assign the desired locales based on HTTP Accept Language Header. Here is a quick example how to map HTTP Accept Language Header 'en-GB' to url segment 'uk':
+
+```php
+// config/laravellocalization.php
+
+'localesMapping' => [
+	'en-GB' => 'uk'
+],
+```
 
 ## Helpers
 
@@ -481,52 +541,6 @@ Event::listen('routes.translation', function($locale, $attributes)
 ```
 
 Be sure to pass the locale and the attributes as parameters to the closure. You may also use Event Subscribers, see: [http://laravel.com/docs/events#event-subscribers](http://laravel.com/docs/events#event-subscribers)
-
-## Config
-
-### Config Files
-
-In order to edit the default configuration for this package you may execute:
-
-```
-php artisan vendor:publish --provider="Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider"
-```
-
-After that, `config/laravellocalization.php` will be created. Inside this file you will find all the fields that can be edited in this package.
-
-### Service Providers
-
-Otherwise, you can use `ConfigServiceProviders` (check <a href="https://raw.githubusercontent.com/mcamara/laravel-localization/master/src/config/config.php">this file</a> for more info).
-
-For example, editing the default config service provider that Laravel loads when it's installed. This file is placed in `app/providers/ConfigServicePovider.php` and would look like this:
-
-```php
-<?php namespace App\Providers;
-
-use Illuminate\Support\ServiceProvider;
-
-class ConfigServiceProvider extends ServiceProvider {
-	public function register()
-	{
-		config([
-			'laravellocalization.supportedLocales' => [
-				'ace' => array( 'name' => 'Achinese', 'script' => 'Latn', 'native' => 'Aceh' ),
-				'ca'  => array( 'name' => 'Catalan', 'script' => 'Latn', 'native' => 'català' ),
-				'en'  => array( 'name' => 'English', 'script' => 'Latn', 'native' => 'English' ),
-			],
-
-			'laravellocalization.useAcceptLanguageHeader' => true,
-
-			'laravellocalization.hideDefaultLocaleInURL' => true
-		]);
-	}
-
-}
-```
-
-This config would add Catalan and Achinese as languages and override any other previous supported locales and all the other options in the package.
-
-You can create your own config providers and add them on your application config file (check the providers array in `config/app.php`).
 
 ## Caching routes
 

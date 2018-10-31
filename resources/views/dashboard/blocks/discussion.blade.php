@@ -14,8 +14,5 @@
         <div class="dashboard__links d-flex flex-row justify-content-end">
             <a href="https://talk.restarters.net/t/introduce-yourself-here/44" target="_blank" rel="noopener noreferrer">Who is everyone?  Meet and greet</a>
         </div>
-        <div class="dashboard__links d-flex flex-row justify-content-end">
-            <a href="https://talk.restarters.net/t/save-the-date-international-repair-day-on-20-october/338" target="_blank" rel="noopener noreferrer"><strong>20th OCT</strong> Save the date - International Repair Day</a>
-        </div>
     </div>
 </section>
