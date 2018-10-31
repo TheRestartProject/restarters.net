@@ -13,8 +13,28 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'Illuminate\Auth\Events\Login' => [
-          'App\Listeners\LogSuccessfulLogin',
+        // 'Illuminate\Auth\Events\Login' => [
+        //   'App\Listeners\LogSuccessfulLogin',
+        // ],
+
+        // Notify When Add Event Error Occurs
+        'App\Events\AddEventError' => [
+          'App\Listeners\NotifyAddEventError',
+        ],
+
+        // Notify When Edit Event Error Occurs
+        'App\Events\EditEventError' => [
+          'App\Listeners\NotifyEditEventError',
+        ],
+
+        // Notify When Add Group Error Occurs
+        'App\Events\AddGroupError' => [
+          'App\Listeners\NotifyAddGroupError',
+        ],
+
+        // Notify When Edit Group Error Occurs
+        'App\Events\EditGroupError' => [
+          'App\Listeners\NotifyEditGroupError',
         ],
     ];
 
