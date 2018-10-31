@@ -32,6 +32,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Notification;
 use DB;
+use App\Events\ApproveEvent;
+use App\Events\EditEvent;
 
 class PartyController extends Controller {
 
@@ -498,6 +500,9 @@ public function edit($id, Request $request) {
 
       } elseif( ( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) {
 
+        // Send WordPress Notification
+        event(new ApproveEvent($party = Party::findOrFail($id)));
+
         // if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
         /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
         //$Host = $Groups->findHost($group);
@@ -536,6 +541,9 @@ public function edit($id, Request $request) {
 
 
       } elseif( ( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && !empty($theParty->wordpress_post_id)){
+
+        event(new EditEvent($party = Party::findOrFail($id)));
+        
         $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
         $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 

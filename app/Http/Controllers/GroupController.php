@@ -23,7 +23,8 @@ use Illuminate\Http\Request;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Log;
 use Notification;
-
+use App\Events\ApproveGroup;
+use App\Events\EditGroup;
 
 class GroupController extends Controller
 {
@@ -844,6 +845,10 @@ public function edit($id)
 
     // $u = $Group->where('idgroups', $id)->update($update);
     $u = Group::findOrFail($id)->update($update);
+
+    // Yet to be used
+    // event(new ApproveGroup(Group::findOrFail($id)));
+    // event(new EditGroup(Group::findOrFail($id)));
 
 
     if (!empty($_POST['group_tags'])) {

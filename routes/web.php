@@ -10,8 +10,6 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-use App\Events\AddEvent;
-
 
 Route::prefix('user')->group(function () {
   Route::get('/', 'HomeController@index');
@@ -268,19 +266,3 @@ Route::get('markAsRead/{id}', function($id){
 Route::post('/locale', 'LocaleController@handle');
 Route::get('/set-lang/{locale}', 'LocaleController@setLang');
 // Route::post('/locale', 'LocaleController@handle')->middleware(['auth', 'localize']);
-
-
-use App\Events\AddEventError;
-
-Route::get('testing123', function () {
-
-
-    // Event::listen(new AddEvent($event));
-    $user = Auth::user();
-
-    event(new AddEventError($user));
-
-
-
-    return 'Hello World';
-});

@@ -30075,7 +30075,7 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(136);
-module.exports = __webpack_require__(173);
+module.exports = __webpack_require__(172);
 
 
 /***/ }),
@@ -30100,9 +30100,9 @@ __webpack_require__(164);
 __webpack_require__(165);
 __webpack_require__(167);
 __webpack_require__(168);
-__webpack_require__(169);
-window.Dropzone = __webpack_require__(170);
-window.Tokenfield = __webpack_require__(171);
+__webpack_require__(194);
+window.Dropzone = __webpack_require__(169);
+window.Tokenfield = __webpack_require__(170);
 
 if (jQuery('.slideshow').length > 0) {
   jQuery('.slideshow').slick({
@@ -31569,7 +31569,7 @@ if (token) {
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.10';
+  var VERSION = '4.17.11';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -31833,7 +31833,7 @@ if (token) {
   var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboRange + rsVarRange + ']');
 
   /** Used to detect strings that need a more robust regexp to match words. */
-  var reHasUnicodeWord = /[a-z][A-Z]|[A-Z]{2,}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/;
+  var reHasUnicodeWord = /[a-z][A-Z]|[A-Z]{2}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/;
 
   /** Used to assign default `context` object properties. */
   var contextProps = [
@@ -32779,20 +32779,6 @@ if (token) {
       }
     }
     return result;
-  }
-
-  /**
-   * Gets the value at `key`, unless `key` is "__proto__".
-   *
-   * @private
-   * @param {Object} object The object to query.
-   * @param {string} key The key of the property to get.
-   * @returns {*} Returns the property value.
-   */
-  function safeGet(object, key) {
-    return key == '__proto__'
-      ? undefined
-      : object[key];
   }
 
   /**
@@ -35252,7 +35238,7 @@ if (token) {
           if (isArguments(objValue)) {
             newValue = toPlainObject(objValue);
           }
-          else if (!isObject(objValue) || (srcIndex && isFunction(objValue))) {
+          else if (!isObject(objValue) || isFunction(objValue)) {
             newValue = initCloneObject(srcValue);
           }
         }
@@ -38173,6 +38159,22 @@ if (token) {
         array[length] = isIndex(index, arrLength) ? oldArray[index] : undefined;
       }
       return array;
+    }
+
+    /**
+     * Gets the value at `key`, unless `key` is "__proto__".
+     *
+     * @private
+     * @param {Object} object The object to query.
+     * @param {string} key The key of the property to get.
+     * @returns {*} Returns the property value.
+     */
+    function safeGet(object, key) {
+      if (key == '__proto__') {
+        return;
+      }
+
+      return object[key];
     }
 
     /**
@@ -73542,30 +73544,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 /***/ }),
 /* 169 */
-/***/ (function(module, exports) {
-
-function toggleRead(event) {
-  event.preventDefault();
-
-  $button = $(this);
-
-  $.ajax({
-    type: 'get',
-    url: $button.attr('href'),
-    success: function success(data) {
-      $button.parents('.card').addClass('status-is-read');
-      $button.parents('.card').toggleClass('status-read');
-    },
-    error: function error(_error) {
-      alert('Cannot mark as read, please report');
-    }
-  });
-}
-
-jQuery('.btn-marked').on('click', toggleRead);
-
-/***/ }),
-/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77103,7 +77081,7 @@ function __guardMethod__(obj, methodName, transform) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
-/* 171 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports =
@@ -78884,7 +78862,7 @@ exports.default = Tokenfield;
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = __webpack_require__(172);
+module.exports = __webpack_require__(171);
 
 /***/ }),
 /* 3 */
@@ -78943,7 +78921,7 @@ function ajax(params) {
 /******/ ]);
 
 /***/ }),
-/* 172 */
+/* 171 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -79251,10 +79229,55 @@ function isUndefined(arg) {
 
 
 /***/ }),
-/* 173 */
+/* 172 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 173 */,
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */,
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */,
+/* 194 */
+/***/ (function(module, exports) {
+
+function toggleRead(event) {
+  event.preventDefault();
+
+  $button = $(this);
+
+  $.ajax({
+    type: 'get',
+    url: $button.attr('href'),
+    success: function success(data) {
+      $button.parents('.card').addClass('status-is-read');
+      $button.parents('.card').toggleClass('status-read');
+    },
+    error: function error(_error) {
+      alert('Cannot mark as read, please report');
+    }
+  });
+}
+
+jQuery('.btn-marked').on('click', toggleRead);
 
 /***/ })
 /******/ ]);

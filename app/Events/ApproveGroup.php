@@ -9,20 +9,20 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use App\Group;
 
-class AddEventError
+class ApproveGroup
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $user;
-
+    public $group;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($user)
-    {
-        $this->user = $user;
-    }
+     public function __construct(Group $group)
+     {
+         $this->group = $group;
+     }
 }
