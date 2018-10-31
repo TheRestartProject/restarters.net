@@ -84,3 +84,12 @@
     z-index: 1;
   }
 }
+
+#accordion-log {
+    .card .btn {
+        font-family: $font-family-second;
+        font-size: 15px;
+        line-height: 19px;
+        color: #000;
+    }
+}

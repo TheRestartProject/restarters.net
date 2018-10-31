@@ -28,9 +28,11 @@
           <li class="nav-item">
             <a class="nav-link active" data-toggle="tab" href="#details">Group details</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#log">Group log</a>
-          </li>
+          @if($audits)
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#log">Group log</a>
+              </li>
+          @endif
         </ul>
 
         <div class="edit-panel">
@@ -165,31 +167,23 @@
 
   </div>
 
-  <div class="tab-pane" id="log">
-    @if($audits)
-    <div class="row">
-      <div class="col">
-        <h4>Group Changes</h4>
-        <p>Changes made on group <strong>{{ $formdata->name }}</strong></p>
-      </div>
-    </div>
-    <ul>
-        @forelse ($audits as $audit)
-        <li style="padding-top:10px;">
-            @lang('group-audits.updated.metadata', $audit->getMetadata())
+  @if($audits)
 
-            @foreach ($audit->getModified() as $attribute => $modified)
-            <ul>
-                <li>@lang('group-audits.'.$audit->event.'.modified.'.$attribute, $modified)</li>
-            </ul>
-            @endforeach
-        </li>
-        @empty
-        <p>@lang('group-audits.unavailable_audits')</p>
-        @endforelse
-    </ul>
-    @endif
-  </div>
+      <div class="tab-pane" id="log">
+
+        <div class="row">
+          <div class="col">
+            <h4>Group changes</h4>
+            <p>Changes made on group <strong>{{ $formdata->name }}</strong></p>
+          </div>
+        </div>
+
+        @include('partials.log-accordion', ['type' => 'group-audits'])
+
+      </div>
+
+  @endif
+
 </div>
 
 </div>

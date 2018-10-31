@@ -11,6 +11,7 @@ use App\Group;
 use App\Host;
 use App\Invite;
 use App\Party;
+use App\Audits;
 use App\Session;
 use App\User;
 use App\UserGroups;
@@ -19,7 +20,9 @@ use App\Helpers\FootprintRatioCalculator;
 use App\Notifications\JoinEvent;
 use App\Notifications\JoinGroup;
 use App\Notifications\RSVPEvent;
-use App\Notifications\ModerationEvent;
+use App\Notifications\NotifyHostRSVPInvitesMade;
+use App\Notifications\NotifyRestartersOfNewEvent;
+use App\Notifications\AdminModerationEvent;
 use App\Notifications\EventDevices;
 use App\Notifications\EventRepairs;
 use DateTime;
@@ -128,29 +131,29 @@ class PartyController extends Controller {
 
   }
 
-    public function allUpcoming()
-    {
-        $allUpcomingEventsQuery = Party::allUpcomingEvents();
-        $allUpcomingEventsCount = $allUpcomingEventsQuery->count();
-        $allUpcomingEvents = $allUpcomingEventsQuery->paginate(env('PAGINATE'));
+  public function allUpcoming()
+  {
+    $allUpcomingEventsQuery = Party::allUpcomingEvents();
+    $allUpcomingEventsCount = $allUpcomingEventsQuery->count();
+    $allUpcomingEvents = $allUpcomingEventsQuery->paginate(env('PAGINATE'));
 
-        return view('events.all', [
-            'upcoming_events_count' => $allUpcomingEventsCount,
-            'upcoming_events'  => $allUpcomingEvents,
-        ]);
-    }
+    return view('events.all', [
+      'upcoming_events_count' => $allUpcomingEventsCount,
+      'upcoming_events'  => $allUpcomingEvents,
+    ]);
+  }
 
   public function create(Request $request)
   {
 
     // Let's determine whether currently logged in user is associated with any groups
     $user_groups = UserGroups::where('user', Auth::user()->id)
-                                ->where('role', 3)
-                                  ->get();
+    ->where('role', 3)
+    ->get();
 
     // Then let's redirect users away if they are a restarter or a host with no groups
     if( FixometerHelper::hasRole(Auth::user(), 'Restarter') || ( count($user_groups) == 0 && FixometerHelper::hasRole(Auth::user(), 'Host') ) )
-      return redirect('/user/forbidden');
+    return redirect('/user/forbidden');
 
     $Groups = new Group;
 
@@ -173,6 +176,8 @@ class PartyController extends Controller {
         $longitude = null;
       }
 
+
+
       // We got data! Elaborate.
       $event_date =       $request->input('event_date');
       $start      =       $request->input('start');
@@ -182,7 +187,7 @@ class PartyController extends Controller {
       $venue      =       $request->input('venue');
       $location   =       $request->input('location');
       $group      =       $request->input('group');
-
+      $user_id    =       Auth::user()->id;
 
       // saving this for wordpress
       $wp_date = $event_date;
@@ -221,21 +226,20 @@ class PartyController extends Controller {
           'group'         => $group,
           'hours'         => $hours,
           // 'volunteers'    => $volunteers,
+          'user_id'       => $user_id,
           'created_at'    => date('Y-m-d H:i:s')
         );
 
-
-        $Party = new Party;
-        $idParty = $Party->insertGetId($data);
-
-        if($idParty) {
+        $party = Party::create($data);
+        $idParty = $party->idevents;
+        if( is_numeric($idParty) ) {
 
           /** check and create User List **/
-          $_POST['users'][] = 29;
-          if(isset($_POST['users']) && !empty($_POST['users'])){
-            $users = $_POST['users'];
-            $Party->createUserList($idParty, $users);
-          }
+          // $_POST['users'][] = 29;
+          // if(isset($_POST['users']) && !empty($_POST['users'])){
+          //   $users = $_POST['users'];
+          //   $Party->createUserList($idParty, $users);
+          // }
 
           EventsUsers::create([
             'event' => $idParty,
@@ -246,24 +250,15 @@ class PartyController extends Controller {
 
           Party::find($idParty)->increment('volunteers');
 
-          //Send Emails to Admins notifying event creation
-          if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
-            $all_admins = User::where('role', 2)->where('invites', 1)->get();
-
-            $arr = [
+          // Notify relevant users
+          $notify_users = FixometerHelper::usersWhoHavePreference('admin-moderate-event');
+          Notification::send($notify_users, new AdminModerationEvent([
               'event_venue' => Party::find($idParty)->venue,
               'event_url' => url('/party/edit/'.$idParty),
-            ];
-
-            Notification::send($all_admins, new ModerationEvent($arr));
-          }
+          ]));
 
 
           /** let's create the image attachment! **/
-          // if(isset($_FILES) && !empty($_FILES)){
-          //     $file = new FixometerFile;
-          //     $file->upload('file', 'image', $idParty, env('TBL_EVENTS'));
-          // }
           if(isset($_FILES) && !empty($_FILES)){
             if(is_array($_FILES['file']['name'])) {
               $File = new FixometerFile;
@@ -274,8 +269,7 @@ class PartyController extends Controller {
             }
             else { }
           }
-        }
-        else {
+        } else {
           $response['danger'] = 'Party could <strong>not</strong> be created. Something went wrong with the database.';
         }
 
@@ -474,6 +468,30 @@ public function edit($id, Request $request) {
 
       $theParty = $Party->findThis($id)[0];
 
+      // Notify all Restarters of relevant Group if a new Event has been approved for moderation
+      $event = Party::find($id);
+      $group = Group::find($event->group);
+
+      // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
+      $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
+                                ->where('users_groups.group', $event->group)
+                                  ->where('users_groups.role', 4)
+                                    ->where('users.invites', 1)
+                                      ->select('users.*')
+                                        ->get();
+
+      // If there are restarters against the group
+      if ( !$group_restarters->isEmpty() ) {
+
+          // Send user a notification and email
+          Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
+            'event_venue' => $event->venue,
+            'event_url' => url('/party/view/'.$event->idevents),
+            'event_group' => $group->name,
+          ]));
+
+      }
+
       if( ( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) { //For testing purposes
 
         $Party->where('idevents', $id)->update(['wordpress_post_id' => 99999]);
@@ -662,7 +680,7 @@ public function view($id) {
 
   // If event no longer exists
   if( empty($event) )
-    abort(404);
+  abort(404);
 
   //Event details
   $images = $File->findImages(env('TBL_EVENTS'), $id);
@@ -1124,35 +1142,35 @@ public function getGroupEmails($event_id, $object = false)
 }
 
 
-    /**
-     * This is called via ajax in the Invite Volunteers to Event modal.
-     * It finds the users associated with the group that the event is for,
-     * in order to quickly add them to the list of invitees.
-     *
-     * @param int $event_id The event for which to find associated users.
-     *
-     * @return Response json formatted array of relevant info on users in the group.
-     */
-    public function getGroupEmailsWithNames($event_id)
-    {
-        $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
-                        ->where('user', '!=', Auth::user()->id)
-                        ->pluck('user')
-                        ->toArray();
+/**
+* This is called via ajax in the Invite Volunteers to Event modal.
+* It finds the users associated with the group that the event is for,
+* in order to quickly add them to the list of invitees.
+*
+* @param int $event_id The event for which to find associated users.
+*
+* @return Response json formatted array of relevant info on users in the group.
+*/
+public function getGroupEmailsWithNames($event_id)
+{
+  $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
+  ->where('user', '!=', Auth::user()->id)
+  ->pluck('user')
+  ->toArray();
 
-        // Users already associated with the event.
-        // (Not including those invited but not RSVPed)
-        $event_user_ids = EventsUsers::where('event', $event_id)
-                        ->where('user', '!=', Auth::user()->id)
-                        ->where('status', 1)
-                        ->pluck('user')
-                        ->toArray();
+  // Users already associated with the event.
+  // (Not including those invited but not RSVPed)
+  $event_user_ids = EventsUsers::where('event', $event_id)
+  ->where('user', '!=', Auth::user()->id)
+  ->where('status', 1)
+  ->pluck('user')
+  ->toArray();
 
-        $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
+  $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
 
-        $group_users = User::whereIn('id', $unique_user_ids)->select('name', 'email', 'invites')->get()->toArray();
-        return response()->json($group_users);
-    }
+  $group_users = User::whereIn('id', $unique_user_ids)->select('name', 'email', 'invites')->get()->toArray();
+  return response()->json($group_users);
+}
 
 public function updateQuantity(Request $request) {
 
@@ -1292,6 +1310,20 @@ public function postSendInvite(Request $request) {
           'message' => $message,
           'event' => $event,
         );
+
+        // Get Creator of Event
+        if (!empty($userCreator = User::find($event->user_id))) {
+
+          $event_details = [
+            'event_venue' => $event->venue,
+            'event_url' => url('/party/edit/'.$event->idevents),
+          ];
+
+          // Notify Host of event that Invites have been sent out
+          Notification::send($userCreator, new NotifyHostRSVPInvitesMade($event_details));
+        }
+
+        // Send Invites
         Notification::send($user, new JoinEvent($arr, $user));
 
       } else {
@@ -1349,31 +1381,42 @@ public function confirmInvite($event_id, $hash) {
 
   if ( !empty($user_event) ) {
 
+    // Update event invite
     EventsUsers::where('status', $hash)->where('event', $event_id)->update([
       'status' => 1
     ]);
 
-    $user = User::find($user_event->user);
-    try {
-      $host = User::find(EventsUsers::where('event', $event_id)->where('role', 3)->first()->user);
-    } catch (\Exception $e) {
-      $host = null;
-    }
-
+    // Increment volunteers column to include latest invite
     Party::find($event_id)->increment('volunteers');
 
-    if ( !is_null($host) ) {
+    // Get users who have appropriate role and permission to email
+    try {
+      $hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
+                        ->where('events_users.event', $event_id)
+                          ->where('events_users.role', 3)
+                            ->where('users.invites', 1)
+                              ->select('users.*')
+                                ->get();
+
+    } catch (\Exception $e) {
+      $hosts = null;
+    }
+
+
+    if ( !is_null($hosts) ) {
 
       try {
+
+          // Get user information
+          $user = User::find($user_event->user);
+
           //Send Notification to Host
-          $arr = [
+          Notification::send($hosts, new RSVPEvent([
               'user_name' => $user->name,
               'event_venue' => Party::find($event_id)->venue,
               'event_url' => url('/party/view/'.$event_id),
-              'preferences' => url('/profile/edit/'.$host->id),
-          ];
+          ]));
 
-          Notification::send($host, new RSVPEvent($arr, $host));
       } catch (\Exception $ex) {
           Log::error("An error occurred when trying to notify host of invitation confirmation: " . $ex->getMessage());
       }
@@ -1584,7 +1627,7 @@ public function getContributions($event_id){
 public function deleteEvent($id){
 
   if( !isset($id) )
-    abort(404);
+  abort(404);
 
   $user = User::find(Auth::id());
 
@@ -1596,10 +1639,16 @@ public function deleteEvent($id){
   } else {
 
     // Check to see whether the columns volunteers and pax has a value less than or equal to zero
-    $event = Party::where('idevents', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->first();
-    if( !empty($event) ) {
+    // $testing = Party::where('idevents', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->where('user_id')->first();
+
+    // Check to see whether the current user is the owner/creator of the event OR the logged in user is an Administrator
+    $checkUserAuthority = Party::where('idevents', $id)->where('user_id', $user->id)->first();
+    $adminRole = FixometerHelper::hasRole($user, 'Administrator');
+
+    if( !is_null($checkUserAuthority) || !is_null($adminRole)) {
 
       // Let's delete everything just to be certain
+      $audits = Audits::where('auditable_type', 'App\Party')->where('auditable_id', $id)->delete();
       $device = Device::where('event', $id)->delete();
       $event_users = EventsUsers::where('event', $id)->delete();
       $event = Party::where('idevents', $id)->delete();
@@ -1608,13 +1657,19 @@ public function deleteEvent($id){
       return redirect('/party')->with('success', 'Event has been deleted');
 
     } else {
-      return redirect()->back()->with('warning', 'You are not able to delete this event as volunteers have been invited');
+
+      return redirect()->back()->with('warning', 'You do not have permission to delete this event');
     }
 
     return redirect()->back()->with('warning', 'You do not have permission to delete this event');
 
   }
 
+}
+
+
+public function noDataEntered() {
+  return redirect('/party');
 }
 
 }

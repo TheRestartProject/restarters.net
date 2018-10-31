@@ -30075,7 +30075,11 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(136);
+<<<<<<< HEAD
 module.exports = __webpack_require__(172);
+=======
+module.exports = __webpack_require__(173);
+>>>>>>> 1dd1311512b1b4073948620611dcd24383d75106
 
 
 /***/ }),
@@ -30100,8 +30104,14 @@ __webpack_require__(164);
 __webpack_require__(165);
 __webpack_require__(167);
 __webpack_require__(168);
+<<<<<<< HEAD
 window.Dropzone = __webpack_require__(169);
 window.Tokenfield = __webpack_require__(170);
+=======
+__webpack_require__(169);
+window.Dropzone = __webpack_require__(170);
+window.Tokenfield = __webpack_require__(171);
+>>>>>>> 1dd1311512b1b4073948620611dcd24383d75106
 
 if (jQuery('.slideshow').length > 0) {
   jQuery('.slideshow').slick({
@@ -31469,11 +31479,30 @@ $(document).ready(function () {
 
   // If event has attended or invited people then user cannot delete the event
   $("#deleteEvent").click(function (e) {
+<<<<<<< HEAD
     if ($('#countAttended').val() > 0 || $('#countInvited').val() > 0 || $('#countVolunteers').val() > 0) {
       e.preventDefault();
       alert('Sorry you cannot delete this event as you have invited other volunteers');
     } else {
       return confirm('Are you sure you want to delete this event?');
+=======
+    if ($(this).attr('data-count-attended') > 0 || $(this).attr('data-count-invited') > 0 || $(this).attr('data-count-volunteers') > 0) {
+      return confirm('Are you sure you want to delete this event?');
+
+      id = $(this).attr('data-party-id');
+
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: '/party/delete/' + id,
+        data: {
+          "id": id
+        },
+        dataType: 'json'
+      });
+>>>>>>> 1dd1311512b1b4073948620611dcd24383d75106
     }
   });
 });
@@ -73530,6 +73559,33 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 /***/ }),
 /* 169 */
+<<<<<<< HEAD
+=======
+/***/ (function(module, exports) {
+
+function toggleRead(event) {
+  event.preventDefault();
+
+  $button = $(this);
+
+  $.ajax({
+    type: 'get',
+    url: $button.attr('href'),
+    success: function success(data) {
+      $button.parents('.card').addClass('status-is-read');
+      $button.parents('.card').toggleClass('status-read');
+    },
+    error: function error(_error) {
+      alert('Cannot mark as read, please report');
+    }
+  });
+}
+
+jQuery('.btn-marked').on('click', toggleRead);
+
+/***/ }),
+/* 170 */
+>>>>>>> 1dd1311512b1b4073948620611dcd24383d75106
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77067,7 +77123,11 @@ function __guardMethod__(obj, methodName, transform) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
+<<<<<<< HEAD
 /* 170 */
+=======
+/* 171 */
+>>>>>>> 1dd1311512b1b4073948620611dcd24383d75106
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports =
@@ -78848,7 +78908,11 @@ exports.default = Tokenfield;
 /* 2 */
 /***/ (function(module, exports) {
 
+<<<<<<< HEAD
 module.exports = __webpack_require__(171);
+=======
+module.exports = __webpack_require__(172);
+>>>>>>> 1dd1311512b1b4073948620611dcd24383d75106
 
 /***/ }),
 /* 3 */
@@ -78907,7 +78971,11 @@ function ajax(params) {
 /******/ ]);
 
 /***/ }),
+<<<<<<< HEAD
 /* 171 */
+=======
+/* 172 */
+>>>>>>> 1dd1311512b1b4073948620611dcd24383d75106
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -79215,7 +79283,11 @@ function isUndefined(arg) {
 
 
 /***/ }),
+<<<<<<< HEAD
 /* 172 */
+=======
+/* 173 */
+>>>>>>> 1dd1311512b1b4073948620611dcd24383d75106
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin

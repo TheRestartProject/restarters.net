@@ -73,12 +73,11 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">Edit event</a>
-              @if( !$event->isInProgress() || !$event->hasFinished() )
+              @if( !$event->isInProgress() && !$event->hasFinished() )
               <form action="{{ url('/') }}/party/delete/{{ $formdata->id }}" method="post">
-                <input type="hidden" name="attended" id="countAttended" value="{{count($attended)}}">
-                <input type="hidden" name="invited" id="countInvited" value="{{count($invited)}}">
-                <input type="hidden" name="volunteers" id="countVolunteers" value="{{ $event->volunteers }}">
-                <button  id="deleteEvent" class="dropdown-item">Delete event</button>
+                @csrf
+                <button id="deleteEvent" class="dropdown-item" data-party-id="{{$formdata->id}}" data-count-attended="{{count($attended)}}" data-count-invited="{{count($invited)}}" data-count-volunteers="{{$event->volunteers}}">Delete event</button>
+              </form>
               @endif
               @if( $event->hasFinished() )
               <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>

@@ -9,6 +9,9 @@
  */
 namespace PHPUnit\Util\TestDox;
 
+use PHPUnit\Framework\TestCase;
+use SebastianBergmann\Exporter\Exporter;
+
 /**
  * Prettifies class and method names for use in TestDox documentation.
  */
@@ -22,25 +25,70 @@ final class NamePrettifier
     /**
      * Prettifies the name of a test class.
      */
-    public function prettifyTestClass(string $name): string
+    public function prettifyTestClass(string $className): string
     {
-        $title = $name;
+        try {
+            $annotations = \PHPUnit\Util\Test::parseTestMethodAnnotations($className);
 
-        if (\substr($name, -1 * \strlen('Test')) === 'Test') {
-            $title = \substr($title, 0, \strripos($title, 'Test'));
+            if (isset($annotations['class']['testdox'][0])) {
+                return $annotations['class']['testdox'][0];
+            }
+        } catch (\ReflectionException $e) {
         }
 
-        if (\strpos($name, 'Tests') === 0) {
-            $title = \substr($title, \strlen('Tests'));
-        } elseif (\strpos($name, 'Test') === 0) {
-            $title = \substr($title, \strlen('Test'));
+        $result = $className;
+
+        if (\substr($className, -1 * \strlen('Test')) === 'Test') {
+            $result = \substr($result, 0, \strripos($result, 'Test'));
         }
 
-        if ($title[0] === '\\') {
-            $title = \substr($title, 1);
+        if (\strpos($className, 'Tests') === 0) {
+            $result = \substr($result, \strlen('Tests'));
+        } elseif (\strpos($className, 'Test') === 0) {
+            $result = \substr($result, \strlen('Test'));
         }
 
-        return $title;
+        if ($result[0] === '\\') {
+            $result = \substr($result, 1);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function prettifyTestCase(TestCase $test): string
+    {
+        $annotations                = $test->getAnnotations();
+        $annotationWithPlaceholders = false;
+
+        if (isset($annotations['method']['testdox'][0])) {
+            $result = $annotations['method']['testdox'][0];
+
+            if (\strpos($result, '$') !== false) {
+                $annotation   = $annotations['method']['testdox'][0];
+                $providedData = $this->mapTestMethodParameterNamesToProvidedDataValues($test);
+
+                $result = \trim(
+                    \str_replace(
+                        \array_keys($providedData),
+                        $providedData,
+                        $annotation
+                    )
+                );
+
+                $annotationWithPlaceholders = true;
+            }
+        } else {
+            $result = $this->prettifyTestMethod($test->getName(false));
+        }
+
+        if ($test->usesDataProvider() && !$annotationWithPlaceholders) {
+            $result .= $test->getDataSetAsString(false);
+        }
+
+        return $result;
     }
 
     /**
@@ -101,5 +149,42 @@ final class NamePrettifier
         }
 
         return $buffer;
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    private function mapTestMethodParameterNamesToProvidedDataValues(TestCase $test): array
+    {
+        $reflector          = new \ReflectionMethod(\get_class($test), $test->getName(false));
+        $providedData       = [];
+        $providedDataValues = $test->getProvidedData();
+        $i                  = 0;
+
+        foreach ($reflector->getParameters() as $parameter) {
+            $value = $providedDataValues[$i++];
+
+            if (\is_object($value)) {
+                $reflector = new \ReflectionObject($value);
+
+                if ($reflector->hasMethod('__toString')) {
+                    $value = (string) $value;
+                }
+            }
+
+            if (!\is_scalar($value)) {
+                $value = \gettype($value);
+            }
+
+            if (\is_bool($value) || \is_numeric($value)) {
+                $exporter = new Exporter;
+
+                $value = $exporter->export($value);
+            }
+
+            $providedData['$' . $parameter->getName()] = $value;
+        }
+
+        return $providedData;
     }
 }

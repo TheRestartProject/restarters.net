@@ -19,7 +19,7 @@
 
           <div class="btn-group button-group-filters">
             <button class="reveal-filters btn btn-secondary d-lg-none d-xl-none" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal filters</button>
-            <a href="/export/devices" class="btn btn-primary btn-save"><i class="fa fa-download"></i>@lang('devices.export_device_data')</a>
+            <a href="/export/devices/?{{{ Request::getQueryString() }}}" class="btn btn-primary btn-save"><i class="fa fa-download"></i>@lang('devices.export_device_data')</a>
           </div>
 
         </div>
@@ -33,7 +33,7 @@
 
             <div class="collapse d-lg-block d-xl-block fixed-overlay-md" id="collapseFilter">
 
-              <form action="/device/search" method="get">
+              <form action="/device/search/" method="get">
                 <div class="form-row">
                     <div class="form-group col mobile-search-bar-md">
                         <button class="btn btn-primary btn-groups" type="submit">@lang('devices.search_all_devices')</button>

@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use App\Notifications\ModerationEvent;
+use App\Notifications\AdminModerationEvent;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
@@ -27,10 +27,10 @@ class ModerateEventEmailTest extends TestCase
             'event_url' => url('/party/view/'.$event->id),
         ];
 
-        Notification::send($admins, new ModerationEvent($arr));
+        Notification::send($admins, new AdminModerationEvent($arr));
 
         Notification::assertSentTo(
-            [$admins], ModerationEvent::class
+            [$admins], AdminModerationEvent::class
         );
     }
 }

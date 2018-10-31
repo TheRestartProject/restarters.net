@@ -15,6 +15,7 @@ use App\Http\Controllers\PartyController;
 use App\Invite;
 use App\Party;
 use App\Notifications\ResetPassword;
+use App\Notifications\AdminNewUser;
 use App\Role;
 use App\Skills;
 use App\User;
@@ -856,7 +857,7 @@ class UserController extends Controller
       if (!isset($data)) {
         $data = null;
       }
-
+      dd("testing");
       if (!isset($_POST['modal'])) {
         return view('user.create', [
           'title' => 'New User',
@@ -1261,9 +1262,18 @@ public function postRegister(Request $request, $hash = null){
 
   $user->save();
 
-  if ( !empty($skills) )
-  User::find($user->id)->skills()->sync($skills);
+  // Notify relevant users
+  $notify_users = FixometerHelper::usersWhoHavePreference('admin-new-user');
+  Notification::send($notify_users, new AdminNewUser([
+    'id' => $user->id,
+    'name' => $user->name,
+  ]));
 
+  // Sync user skills
+  if ( !empty($skills) )
+    User::find($user->id)->skills()->sync($skills);
+
+  // If this is an invite
   if ( !is_null($hash) ) {
 
     $acceptance = Invite::where('hash', $hash)->first();

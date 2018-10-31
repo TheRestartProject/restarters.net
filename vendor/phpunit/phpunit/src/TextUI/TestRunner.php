@@ -14,6 +14,7 @@ use PHPUnit\Framework\Error\Notice;
 use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\Test;
+use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestListener;
 use PHPUnit\Framework\TestResult;
 use PHPUnit\Framework\TestSuite;
@@ -25,9 +26,12 @@ use PHPUnit\Runner\Filter\Factory;
 use PHPUnit\Runner\Filter\IncludeGroupFilterIterator;
 use PHPUnit\Runner\Filter\NameFilterIterator;
 use PHPUnit\Runner\Hook;
+use PHPUnit\Runner\NullTestResultCache;
+use PHPUnit\Runner\ResultCacheExtension;
 use PHPUnit\Runner\StandardTestSuiteLoader;
 use PHPUnit\Runner\TestHook;
 use PHPUnit\Runner\TestListenerAdapter;
+use PHPUnit\Runner\TestResultCache;
 use PHPUnit\Runner\TestSuiteLoader;
 use PHPUnit\Runner\TestSuiteSorter;
 use PHPUnit\Runner\Version;
@@ -38,6 +42,7 @@ use PHPUnit\Util\Printer;
 use PHPUnit\Util\TestDox\HtmlResultPrinter;
 use PHPUnit\Util\TestDox\TextResultPrinter;
 use PHPUnit\Util\TestDox\XmlResultPrinter;
+use PHPUnit\Util\XdebugFilterScriptGenerator;
 use ReflectionClass;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Exception as CodeCoverageException;
@@ -50,6 +55,7 @@ use SebastianBergmann\CodeCoverage\Report\Text as TextReport;
 use SebastianBergmann\CodeCoverage\Report\Xml\Facade as XmlReport;
 use SebastianBergmann\Comparator\Comparator;
 use SebastianBergmann\Environment\Runtime;
+use SebastianBergmann\Invoker\Invoker;
 
 /**
  * A TestRunner for the Command Line Interface (CLI)
@@ -152,32 +158,51 @@ class TestRunner extends BaseTestRunner
 
         $this->handleConfiguration($arguments);
 
-        $this->processSuiteFilters($suite, $arguments);
+        if (\is_int($arguments['columns']) && $arguments['columns'] < 16) {
+            $arguments['columns']   = 16;
+            $tooFewColumnsRequested = true;
+        }
 
         if (isset($arguments['bootstrap'])) {
             $GLOBALS['__PHPUNIT_BOOTSTRAP'] = $arguments['bootstrap'];
         }
 
-        if ($arguments['backupGlobals'] === true) {
-            $suite->setBackupGlobals(true);
-        }
+        if ($suite instanceof TestCase || $suite instanceof TestSuite) {
+            if ($arguments['backupGlobals'] === true) {
+                $suite->setBackupGlobals(true);
+            }
 
-        if ($arguments['backupStaticAttributes'] === true) {
-            $suite->setBackupStaticAttributes(true);
-        }
+            if ($arguments['backupStaticAttributes'] === true) {
+                $suite->setBackupStaticAttributes(true);
+            }
 
-        if ($arguments['beStrictAboutChangesToGlobalState'] === true) {
-            $suite->setBeStrictAboutChangesToGlobalState(true);
+            if ($arguments['beStrictAboutChangesToGlobalState'] === true) {
+                $suite->setBeStrictAboutChangesToGlobalState(true);
+            }
         }
 
         if ($arguments['executionOrder'] === TestSuiteSorter::ORDER_RANDOMIZED) {
             \mt_srand($arguments['randomOrderSeed']);
         }
 
-        if ($arguments['executionOrder'] !== TestSuiteSorter::ORDER_DEFAULT || $arguments['resolveDependencies']) {
-            $sorter = new TestSuiteSorter;
+        if ($arguments['cacheResult']) {
+            if (isset($arguments['cacheResultFile'])) {
+                $cache = new TestResultCache($arguments['cacheResultFile']);
+            } else {
+                $cache = new TestResultCache;
+            }
 
-            $sorter->reorderTestsInSuite($suite, $arguments['executionOrder'], $arguments['resolveDependencies']);
+            $this->extensions[] = new ResultCacheExtension($cache);
+        }
+
+        if ($arguments['executionOrder'] !== TestSuiteSorter::ORDER_DEFAULT || $arguments['executionOrderDefects'] !== TestSuiteSorter::ORDER_DEFAULT || $arguments['resolveDependencies']) {
+            $cache = $cache ?? new NullTestResultCache;
+
+            $cache->load();
+
+            $sorter = new TestSuiteSorter($cache);
+
+            $sorter->reorderTestsInSuite($suite, $arguments['executionOrder'], $arguments['resolveDependencies'], $arguments['executionOrderDefects']);
 
             unset($sorter);
         }
@@ -251,6 +276,10 @@ class TestRunner extends BaseTestRunner
 
         if ($arguments['stopOnSkipped']) {
             $result->stopOnSkipped(true);
+        }
+
+        if ($arguments['stopOnDefect']) {
+            $result->stopOnDefect(true);
         }
 
         if ($arguments['registerMockObjectsFromTestArgumentsRecursively']) {
@@ -328,6 +357,10 @@ class TestRunner extends BaseTestRunner
                     $extension
                 );
             }
+        }
+
+        if (isset($tooFewColumnsRequested)) {
+            $this->writeMessage('Error', 'Less than 16 columns requested, number of columns set to 16');
         }
 
         if ($this->runtime->discardsComments()) {
@@ -436,7 +469,7 @@ class TestRunner extends BaseTestRunner
             $codeCoverageReports = 0;
         }
 
-        if ($codeCoverageReports > 0) {
+        if ($codeCoverageReports > 0 || isset($arguments['xdebugFilterFile'])) {
             $codeCoverage = new CodeCoverage(
                 null,
                 $this->codeCoverageFilter
@@ -521,6 +554,17 @@ class TestRunner extends BaseTestRunner
                 }
             }
 
+            if (isset($arguments['xdebugFilterFile'], $filterConfiguration)) {
+                $filterScriptGenerator = new XdebugFilterScriptGenerator;
+                $script                = $filterScriptGenerator->generate($filterConfiguration['whitelist']);
+                \file_put_contents($arguments['xdebugFilterFile'], $script);
+
+                $this->write("\n");
+                $this->write(\sprintf('Wrote Xdebug filter script to %s ' . \PHP_EOL, $arguments['xdebugFilterFile']));
+
+                exit(self::SUCCESS_EXIT);
+            }
+
             if (!$this->codeCoverageFilter->hasWhitelist()) {
                 if (!$whitelistFromConfigurationFile && !$whitelistFromOption) {
                     $this->writeMessage('Error', 'No whitelist is configured, no code coverage will be generated.');
@@ -548,12 +592,24 @@ class TestRunner extends BaseTestRunner
         $result->beStrictAboutOutputDuringTests($arguments['disallowTestOutput']);
         $result->beStrictAboutTodoAnnotatedTests($arguments['disallowTodoAnnotatedTests']);
         $result->beStrictAboutResourceUsageDuringSmallTests($arguments['beStrictAboutResourceUsageDuringSmallTests']);
+
+        if ($arguments['enforceTimeLimit'] === true) {
+            if (!\class_exists(Invoker::class)) {
+                $this->writeMessage('Error', 'Package phpunit/php-invoker is required for enforcing time limits');
+            }
+
+            if (!\extension_loaded('pcntl') || \strpos(\ini_get('disable_functions'), 'pcntl') !== false) {
+                $this->writeMessage('Error', 'PHP extension pcntl is required for enforcing time limits');
+            }
+        }
         $result->enforceTimeLimit($arguments['enforceTimeLimit']);
+        $result->setDefaultTimeLimit($arguments['defaultTimeLimit']);
         $result->setTimeoutForSmallTests($arguments['timeoutForSmallTests']);
         $result->setTimeoutForMediumTests($arguments['timeoutForMediumTests']);
         $result->setTimeoutForLargeTests($arguments['timeoutForLargeTests']);
 
         if ($suite instanceof TestSuite) {
+            $this->processSuiteFilters($suite, $arguments);
             $suite->setRunTestInSeparateProcess($arguments['processIsolation']);
         }
 
@@ -806,6 +862,18 @@ class TestRunner extends BaseTestRunner
                 $arguments['bootstrap'] = $phpunitConfiguration['bootstrap'];
             }
 
+            if (isset($phpunitConfiguration['cacheResult']) && !isset($arguments['cacheResult'])) {
+                $arguments['cacheResult'] = $phpunitConfiguration['cacheResult'];
+            }
+
+            if (isset($phpunitConfiguration['cacheResultFile']) && !isset($arguments['cacheResultFile'])) {
+                $arguments['cacheResultFile'] = $phpunitConfiguration['cacheResultFile'];
+            }
+
+            if (isset($phpunitConfiguration['cacheTokens']) && !isset($arguments['cacheTokens'])) {
+                $arguments['cacheTokens'] = $phpunitConfiguration['cacheTokens'];
+            }
+
             if (isset($phpunitConfiguration['cacheTokens']) && !isset($arguments['cacheTokens'])) {
                 $arguments['cacheTokens'] = $phpunitConfiguration['cacheTokens'];
             }
@@ -832,6 +900,10 @@ class TestRunner extends BaseTestRunner
 
             if (isset($phpunitConfiguration['processIsolation']) && !isset($arguments['processIsolation'])) {
                 $arguments['processIsolation'] = $phpunitConfiguration['processIsolation'];
+            }
+
+            if (isset($phpunitConfiguration['stopOnDefect']) && !isset($arguments['stopOnDefect'])) {
+                $arguments['stopOnDefect'] = $phpunitConfiguration['stopOnDefect'];
             }
 
             if (isset($phpunitConfiguration['stopOnError']) && !isset($arguments['stopOnError'])) {
@@ -894,6 +966,10 @@ class TestRunner extends BaseTestRunner
                 $arguments['disallowTestOutput'] = $phpunitConfiguration['disallowTestOutput'];
             }
 
+            if (isset($phpunitConfiguration['defaultTimeLimit']) && !isset($arguments['defaultTimeLimit'])) {
+                $arguments['defaultTimeLimit'] = $phpunitConfiguration['defaultTimeLimit'];
+            }
+
             if (isset($phpunitConfiguration['enforceTimeLimit']) && !isset($arguments['enforceTimeLimit'])) {
                 $arguments['enforceTimeLimit'] = $phpunitConfiguration['enforceTimeLimit'];
             }
@@ -928,6 +1004,10 @@ class TestRunner extends BaseTestRunner
 
             if (isset($phpunitConfiguration['executionOrder']) && !isset($arguments['executionOrder'])) {
                 $arguments['executionOrder'] = $phpunitConfiguration['executionOrder'];
+            }
+
+            if (isset($phpunitConfiguration['executionOrderDefects']) && !isset($arguments['executionOrderDefects'])) {
+                $arguments['executionOrderDefects'] = $phpunitConfiguration['executionOrderDefects'];
             }
 
             if (isset($phpunitConfiguration['resolveDependencies']) && !isset($arguments['resolveDependencies'])) {
@@ -1116,6 +1196,7 @@ class TestRunner extends BaseTestRunner
         $arguments['backupStaticAttributes']                          = $arguments['backupStaticAttributes'] ?? null;
         $arguments['beStrictAboutChangesToGlobalState']               = $arguments['beStrictAboutChangesToGlobalState'] ?? null;
         $arguments['beStrictAboutResourceUsageDuringSmallTests']      = $arguments['beStrictAboutResourceUsageDuringSmallTests'] ?? false;
+        $arguments['cacheResult']                                     = $arguments['cacheResult'] ?? false;
         $arguments['cacheTokens']                                     = $arguments['cacheTokens'] ?? false;
         $arguments['colors']                                          = $arguments['colors'] ?? ResultPrinter::COLOR_DEFAULT;
         $arguments['columns']                                         = $arguments['columns'] ?? 80;
@@ -1126,10 +1207,12 @@ class TestRunner extends BaseTestRunner
         $arguments['crap4jThreshold']                                 = $arguments['crap4jThreshold'] ?? 30;
         $arguments['disallowTestOutput']                              = $arguments['disallowTestOutput'] ?? false;
         $arguments['disallowTodoAnnotatedTests']                      = $arguments['disallowTodoAnnotatedTests'] ?? false;
+        $arguments['defaultTimeLimit']                                = $arguments['defaultTimeLimit'] ?? 0;
         $arguments['enforceTimeLimit']                                = $arguments['enforceTimeLimit'] ?? false;
         $arguments['excludeGroups']                                   = $arguments['excludeGroups'] ?? [];
         $arguments['failOnRisky']                                     = $arguments['failOnRisky'] ?? false;
         $arguments['failOnWarning']                                   = $arguments['failOnWarning'] ?? false;
+        $arguments['executionOrderDefects']                           = $arguments['executionOrderDefects'] ?? TestSuiteSorter::ORDER_DEFAULT;
         $arguments['groups']                                          = $arguments['groups'] ?? [];
         $arguments['processIsolation']                                = $arguments['processIsolation'] ?? false;
         $arguments['processUncoveredFilesFromWhitelist']              = $arguments['processUncoveredFilesFromWhitelist'] ?? false;
@@ -1148,6 +1231,7 @@ class TestRunner extends BaseTestRunner
         $arguments['stopOnRisky']                                     = $arguments['stopOnRisky'] ?? false;
         $arguments['stopOnSkipped']                                   = $arguments['stopOnSkipped'] ?? false;
         $arguments['stopOnWarning']                                   = $arguments['stopOnWarning'] ?? false;
+        $arguments['stopOnDefect']                                    = $arguments['stopOnDefect'] ?? false;
         $arguments['strictCoverage']                                  = $arguments['strictCoverage'] ?? false;
         $arguments['testdoxExcludeGroups']                            = $arguments['testdoxExcludeGroups'] ?? [];
         $arguments['testdoxGroups']                                   = $arguments['testdoxGroups'] ?? [];
