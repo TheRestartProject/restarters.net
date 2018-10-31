@@ -2,7 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use Auth;
+use App\User;
 use Closure;
+use FixometerHelper;
 
 class VerifyTranslationAccess
 {
@@ -15,6 +18,19 @@ class VerifyTranslationAccess
      */
     public function handle($request, Closure $next)
     {
-        return $next($request);
+
+        $has_preference = User::join('users_preferences', 'users_preferences.user_id', '=', 'users.id')
+                                  ->join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
+                                    ->where('users.id', Auth::user()->id)
+                                      ->where('preferences.slug', 'verify-translation-access')
+                                        ->select('users.*')
+                                          ->first();
+                                          
+        if( !empty($has_preference) ){
+          return $next($request);
+        } else {
+          abort(404);
+        }
+
     }
 }
