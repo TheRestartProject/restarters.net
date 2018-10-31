@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>Translation Manager</title>
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
@@ -83,9 +84,10 @@
     </script>
 </head>
 <body>
-<header class="navbar navbar-static-top navbar-inverse" id="top" role="banner">
+<header class="navbar navbar-default" id="top" role="banner">
     <div class="container-fluid">
         <div class="navbar-header">
+            <a class="navbar-brand" href="/" style="padding: 0;">@include('includes/logo')</a>
             <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
@@ -95,6 +97,7 @@
             <a href="<?php echo action('\Barryvdh\TranslationManager\Controller@getIndex') ?>" class="navbar-brand">
                 Translation Manager
             </a>
+            </button>
         </div>
     </div>
 </header>
@@ -238,7 +241,7 @@
                                 &times;
                             </button>
                             <?php echo $locale ?>
-                            
+
                         </div>
                     </li>
                 <?php endforeach; ?>
