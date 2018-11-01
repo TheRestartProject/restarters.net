@@ -21,7 +21,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrustProxies::class,
         \App\Http\Middleware\HttpsProtocol::class,
         \Illuminate\Session\Middleware\StartSession::class,
-        \App\Http\Middleware\LangaugeSwitcher::class,
+        \App\Http\Middleware\LanguageSwitcher::class,
     ];
 
     /**

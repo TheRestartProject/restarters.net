@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Config;
 use LaravelLocalization;
 use Jenssegers\Agent\Agent;
 
-class LangaugeSwitcher
+class LanguageSwitcher
 {
     /**
      * Handle an incoming request.
@@ -57,7 +57,7 @@ class LangaugeSwitcher
             }
 
           }
-          
+
         }
         return $next($request);
     }

@@ -64,7 +64,7 @@ return array(
     'App\\Http\\Kernel' => $baseDir . '/app/Http/Kernel.php',
     'App\\Http\\Middleware\\EncryptCookies' => $baseDir . '/app/Http/Middleware/EncryptCookies.php',
     'App\\Http\\Middleware\\HttpsProtocol' => $baseDir . '/app/Http/Middleware/HttpsProtocol.php',
-    'App\\Http\\Middleware\\LangaugeSwitcher' => $baseDir . '/app/Http/Middleware/LangaugeSwitcher.php',
+    'App\\Http\\Middleware\\LanguageSwitcher' => $baseDir . '/app/Http/Middleware/LanguageSwitcher.php',
     'App\\Http\\Middleware\\RedirectIfAuthenticated' => $baseDir . '/app/Http/Middleware/RedirectIfAuthenticated.php',
     'App\\Http\\Middleware\\TrimStrings' => $baseDir . '/app/Http/Middleware/TrimStrings.php',
     'App\\Http\\Middleware\\TrustProxies' => $baseDir . '/app/Http/Middleware/TrustProxies.php',
