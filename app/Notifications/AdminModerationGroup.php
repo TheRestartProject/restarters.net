@@ -48,7 +48,7 @@ class AdminModerationGroup extends Notification
                   ->greeting('Hello!')
                   ->line('Your moderation is needed for \'' . $this->arr['group_name'] . '\'.')
                   ->action('View group', $this->arr['group_url'])
-                  ->line('If you think this invitation was not intended for you, please discard this email.');
+                  ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
     }
 
     /**

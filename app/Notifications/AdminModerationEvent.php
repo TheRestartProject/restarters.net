@@ -45,7 +45,7 @@ class AdminModerationEvent extends Notification
                       ->greeting('Hello!')
                       ->line('Your moderation is needed for \'' . $this->arr['event_venue'] . '\'.')
                       ->action('View event', $this->arr['event_url'])
-                      ->line('If you think this invitation was not intended for you, please discard this email.');
+                      ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
     }
 
     /**

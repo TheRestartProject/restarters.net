@@ -857,6 +857,8 @@ class FixometerHelper {
         'NotifyHostRSVPInvitesMade',
         'NotifyRestartersOfNewEvent',
         'RSVPEvent',
+        'AdminWordPressCreateEventFailure',
+        'AdminWordPressEditEventFailure',
     ];
 
     $group_array = [
@@ -865,11 +867,14 @@ class FixometerHelper {
         'AdminModerationGroup',
         'NewGroupMember',
         'NewGroupWithinRadius',
+        'AdminWordPressCreateGroupFailure',
+        'AdminWordPressEditGroupFailure',
     ];
 
     $device_array = [
         'NotifyAdminNoDevices',
         'ReviewNotes',
+        'AdminAbnormalDevices',
     ];
 
 
