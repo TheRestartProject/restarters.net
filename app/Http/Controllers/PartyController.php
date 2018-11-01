@@ -496,12 +496,12 @@ public function edit($id, Request $request) {
 
       if( ( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) { //For testing purposes
 
+        // Send WordPress Notification if event approved with POSTed data
+        event(new ApproveEvent($party = Party::findOrFail($id), $data));
+
         $Party->where('idevents', $id)->update(['wordpress_post_id' => 99999]);
 
       } elseif( ( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) {
-
-        // Send WordPress Notification
-        event(new ApproveEvent($party = Party::findOrFail($id)));
 
         // if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
         /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
@@ -542,8 +542,9 @@ public function edit($id, Request $request) {
 
       } elseif( ( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && !empty($theParty->wordpress_post_id)){
 
-        event(new EditEvent($party = Party::findOrFail($id)));
-        
+        // Send WordPress Notification if event edited with POSTed data
+        event(new EditEvent($party = Party::findOrFail($id), $data));
+
         $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
         $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 

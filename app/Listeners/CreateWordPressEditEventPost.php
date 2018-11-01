@@ -6,7 +6,9 @@ use App\Events\EditEvent;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Notification;
+use App\Notifications\AdminEditEventNotification;
 use App\Party;
+use FixometerHelper;
 
 class CreateWordPressEditEventPost
 {
@@ -28,21 +30,22 @@ class CreateWordPressEditEventPost
      */
     public function handle(EditEvent $event)
     {
-      if ( empty($event->group) )
+      // Set event variable
+      $theParty = Party::find($event->party->idevents);
+      $data = $event->data;
+      
+      if ( !empty($theParty) ){
 
-      $theParty = Party::find($event->event->idgroups);
-
-      try {
+        try {
 
         //Yet to be made
 
         } catch (\Exception $e) {
 
-
           $notify_users = FixometerHelper::usersWhoHavePreference('admin-edit-wordpress-event-failure');
-          Notification::send($notify_users, new AdminEditWordpressEventFailure([
-              'event_venue' => $theParty->venue,
-              'event_url' => url('/party/edit/'.$theParty->idevents),
+          Notification::send($notify_users, new AdminEditEventNotification([
+            'event_venue' => $theParty->venue,
+            'event_url' => url('/party/edit/'.$theParty->idevents),
           ]));
 
       }

@@ -6,7 +6,9 @@ use App\Events\EditGroup;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Notification;
+use App\Notifications\AdminEditGroupNotification;
 use App\Group;
+use FixometerHelper;
 
 class CreateWordPressEditGroupPost
 {
@@ -28,18 +30,22 @@ class CreateWordPressEditGroupPost
      */
     public function handle(EditGroup $event)
     {
-      if ( empty($event->group) )
+      // Set event variable
+      $theGroup = Group::find($event->group->idgroups);
+      $data = $event->data;
+      
+      if ( !empty($theGroup) ){
 
-      try {
+        try {
 
         //Yet to be made
 
         } catch (\Exception $e) {
 
           $notify_users = FixometerHelper::usersWhoHavePreference('admin-edit-wordpress-group-failure');
-          Notification::send($notify_users, new AdminEditWordpressGroupFailure([
-            'group_name' => $event->group->name,
-            'group_url' => url('/group/edit/'.$event->group->idgroups),
+          Notification::send($notify_users, new AdminEditGroupNotification([
+            'group_name' => $theGroup->name,
+            'group_url' => url('/group/edit/'.$theGroup->idgroups),
           ]));
 
       }

@@ -328,7 +328,7 @@
                         </div>
                       </div>
 
-                      <div class="form-group col-lg-6">
+                      <div class="form-group col-lg-6 pr-0">
                         <label>Preferences:</label>
                         @foreach($all_preferences as $preference)
                           <div class="form-group form-check">
