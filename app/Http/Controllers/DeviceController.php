@@ -8,24 +8,25 @@ use App\Brands;
 use App\Category;
 use App\Cluster;
 use App\Device;
+use App\DeviceList;
 use App\EventsUsers;
 use App\Group;
-use App\UserGroups;
 use App\Party;
 use App\User;
-use App\DeviceList;
+use App\UserGroups;
 use App\Helpers\FootprintRatioCalculator;
+use App\Notifications\ReviewNotes;
+use App\Notifications\AdminAbnormalDevices;
 use Auth;
 use FixometerHelper;
 use FixometerFile;
 use Illuminate\Support\Facades\Validator;
-use App\Notifications\ReviewNotes;
-use View;
-use Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Notification;
 use Mail;
-use App\Mail\AbnormalDevices;
+use View;
+
 
 class DeviceController extends Controller
 {
@@ -531,7 +532,8 @@ class DeviceController extends Controller
     $event_id       = $request->input('event_id');
 
     // get the number of rows in the DB where event id already exists
-    $deviceCount = DB::table('devices')->where('event', '=', $event_id)->count();
+    $deviceCount = DB::table('devices')->where('event', $event_id)->count();
+    $deviceMiscCount = DB::table('devices')->where('category', 46)->where('event', $event_id)->count();
 
     // add quantity loop
     for ($i=0; $i < $quantity; $i++) {
@@ -602,10 +604,13 @@ class DeviceController extends Controller
       $return['deviceCount'] = $deviceCount;
 
       // If the number of devices exceeds set amount then show the following message
-      if( $deviceCount > env('DEVICE_ABNORMAL_MISC_COUNT', 5) ) {
+      if( $deviceMiscCount == env('DEVICE_ABNORMAL_MISC_COUNT', 5) ) {
 
-        // Send to all users with the role of Administrator - awaiting preference logic
-        // Mail::to(Auth::user()->email)->send(new AbnormalDevices());
+        $notify_users = FixometerHelper::usersWhoHavePreference('admin-abnormal-devices');
+        Notification::send($notify_users, new AdminAbnormalDevices([
+          'event_venue' => $event->getEventName(),
+          'event_url' => url('/party/edit/'.$event->id),
+        ]));
 
       }
 
