@@ -19539,6 +19539,13 @@ h2 sup a:hover {
   }
 }
 
+.fixed-layout .language-bar,
+.login-page .language-bar {
+  position: fixed;
+  bottom: 0;
+  z-index: 10;
+}
+
 .language-bar .dropdown-menu {
   border: 0;
   width: 100%;
@@ -19548,9 +19555,10 @@ h2 sup a:hover {
   -webkit-box-shadow: 0 -10px 15px rgba(0, 0, 0, 0.4);
           box-shadow: 0 -10px 15px rgba(0, 0, 0, 0.4);
   background: transparent;
-  top: -2px !important;
-  -webkit-transform: translate3d(0px, -142px, 0px) !important;
-          transform: translate3d(0px, -142px, 0px) !important;
+  bottom: 64px;
+  -webkit-transform: none !important;
+          transform: none !important;
+  top: auto !important;
 }
 
 @media (min-width: 992px) {
@@ -19638,6 +19646,11 @@ h2 sup a:hover {
 .language-bar.show button.dropdown-toggle:after {
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);
+}
+
+.fixed-layout,
+.login-page {
+  padding-bottom: 65px;
 }
 
 .widget {

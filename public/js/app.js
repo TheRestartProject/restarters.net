@@ -30075,7 +30075,7 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(136);
-module.exports = __webpack_require__(172);
+module.exports = __webpack_require__(173);
 
 
 /***/ }),
@@ -30100,9 +30100,9 @@ __webpack_require__(164);
 __webpack_require__(165);
 __webpack_require__(167);
 __webpack_require__(168);
-__webpack_require__(194);
-window.Dropzone = __webpack_require__(169);
-window.Tokenfield = __webpack_require__(170);
+__webpack_require__(169);
+window.Dropzone = __webpack_require__(170);
+window.Tokenfield = __webpack_require__(171);
 
 if (jQuery('.slideshow').length > 0) {
   jQuery('.slideshow').slick({
@@ -73544,6 +73544,30 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 /***/ }),
 /* 169 */
+/***/ (function(module, exports) {
+
+function toggleRead(event) {
+  event.preventDefault();
+
+  $button = $(this);
+
+  $.ajax({
+    type: 'get',
+    url: $button.attr('href'),
+    success: function success(data) {
+      $button.parents('.card').addClass('status-is-read');
+      $button.parents('.card').toggleClass('status-read');
+    },
+    error: function error(_error) {
+      alert('Cannot mark as read, please report');
+    }
+  });
+}
+
+jQuery('.btn-marked').on('click', toggleRead);
+
+/***/ }),
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77081,7 +77105,7 @@ function __guardMethod__(obj, methodName, transform) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
-/* 170 */
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports =
@@ -78862,7 +78886,7 @@ exports.default = Tokenfield;
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = __webpack_require__(171);
+module.exports = __webpack_require__(172);
 
 /***/ }),
 /* 3 */
@@ -78921,7 +78945,7 @@ function ajax(params) {
 /******/ ]);
 
 /***/ }),
-/* 171 */
+/* 172 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -79229,55 +79253,10 @@ function isUndefined(arg) {
 
 
 /***/ }),
-/* 172 */
+/* 173 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 173 */,
-/* 174 */,
-/* 175 */,
-/* 176 */,
-/* 177 */,
-/* 178 */,
-/* 179 */,
-/* 180 */,
-/* 181 */,
-/* 182 */,
-/* 183 */,
-/* 184 */,
-/* 185 */,
-/* 186 */,
-/* 187 */,
-/* 188 */,
-/* 189 */,
-/* 190 */,
-/* 191 */,
-/* 192 */,
-/* 193 */,
-/* 194 */
-/***/ (function(module, exports) {
-
-function toggleRead(event) {
-  event.preventDefault();
-
-  $button = $(this);
-
-  $.ajax({
-    type: 'get',
-    url: $button.attr('href'),
-    success: function success(data) {
-      $button.parents('.card').addClass('status-is-read');
-      $button.parents('.card').toggleClass('status-read');
-    },
-    error: function error(_error) {
-      alert('Cannot mark as read, please report');
-    }
-  });
-}
-
-jQuery('.btn-marked').on('click', toggleRead);
 
 /***/ })
 /******/ ]);
