@@ -259,39 +259,27 @@ class GroupController extends Controller
             'role' => 3,
           ]);
 
-          // Notify relevant users
-          $notify_users = FixometerHelper::usersWhoHavePreference('admin-moderate-group');
-          Notification::send($notify_users, new AdminModerationGroup([
-            'group_name' => Group::find($idGroup)->name,
+          // Notify relevant admins
+          $notify_admins = FixometerHelper::usersWhoHavePreference('admin-moderate-group');
+          Notification::send($notify_admins, new AdminModerationGroup([
+            'group_name' => $name,
             'group_url' => url('/group/edit/'.$idGroup),
           ]));
 
-          // -------------------------------------------------- NOTIFY USERS OF NEW GROUP WITHIN 25 MILES ------------------------------------------------- //
-          // Get all Users
-          $users = User::whereNotNull('location')->get();
-          foreach ( $users as $user ) {
+          // Notify nearest users
+          if( is_numeric($lat1) && is_numeric($lon1) ){
 
-            $lat2 = $user->latitude;
-            $lon2 = $user->longitude;
+            $restarters_nearby = User::nearbyRestarters($lat1, $lon1, 25)
+                                        ->where('invites', 1)
+                                          ->orderBy('name', 'ASC')
+                                            ->get();
 
-            $theta = $lon1 - $lon2;
-            $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
-            $dist = acos($dist);
-            $dist = rad2deg($dist);
-            $miles = $dist * 60 * 1.1515;
-            $miles * 0.8684;
+            Notification::send($restarters_nearby, new NewGroupWithinRadius([
+              'group_name' => $name,
+              'group_url' => url('/group/view/'.$idGroup),
+            ]));
 
-            //If calculated distance is less than 25 for the user then send notification...
-            if($miles <= 25){
-              $arr = [
-                'group_name' => $name,
-                'group_url' => url('/group/view/'.$idGroup),
-              ];
-              Notification::send($user, new NewGroupWithinRadius($arr));
-
-            }
           }
-          // -------------------------------------------------- END NOTIFY USERS OF NEW GROUP WITHIN 25 MILES -------------------------------------------------- //
 
         }
         else {
@@ -1284,10 +1272,7 @@ public function getRemoveVolunteer($group_id, $user_id, Request $request) {
       }
       // $this->set('userGroups', $groups);
       if( !is_null($group->latitude) && !is_null($group->longitude) ){
-          $restarters_nearby = User::select(DB::raw('*, ( 6371 * acos( cos( radians('.$group->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$group->longitude.') ) + sin( radians('.$group->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
-                           ->having("distance", "<=", 20)
-                           ->orderBy('name', 'ASC')
-                           ->get();
+          $restarters_nearby = User::nearbyRestarters($group->latitude, $group->longitude, 20)->orderBy('name', 'ASC')->get();
           foreach ($restarters_nearby as $restarter) {
               $membership = UserGroups::where('user', $restarter->id)->where('group', $groupid)->first();
               $restarter->notAMember = $membership == null;

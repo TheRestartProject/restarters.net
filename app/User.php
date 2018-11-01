@@ -177,6 +177,17 @@ class User extends Authenticatable
 
     }
 
+    public function scopeNearbyRestarters($query, $latitude, $longitude, $radius = 20)
+    {
+
+        return $query->select(DB::raw('*, ( 6371 * acos( cos( radians('.$latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
+                        ->whereNotNull('location')
+                          ->whereNotNull('latitude')
+                            ->whereNotNull('longitude')
+                              ->having("distance", "<=", $radius);
+                              
+    }
+
     /*
     *
     * This allows us to check whether consent has been provided - couples with custom middleware

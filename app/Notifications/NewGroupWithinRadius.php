@@ -41,16 +41,12 @@ class NewGroupWithinRadius extends Notification
      */
      public function toMail($notifiable)
      {
-       if ($notifiable !== null) {
-         if ($notifiable->invites == 1) {
-           return (new MailMessage)
-                       ->subject('New Group nearby')
-                       ->greeting('Hello!')
-                       ->line('A new group has appeared nearby \'' . $this->arr['group_name'] . '\'.')
-                       ->action('View group', $this->arr['group_url'])
-                       ->line('If you think this invitation was not intended for you, please discard this email.');
-         }
-       }
+         return (new MailMessage)
+                     ->subject('A new Restart Group near to you')
+                     ->greeting('Hello!')
+                     ->line('A new group \'' . $this->arr['group_name'] . '\' has appeared near your location.')
+                     ->action('View group', $this->arr['group_url'])
+                     ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
      }
 
     /**
