@@ -89,7 +89,7 @@
                             <li><button class="badge badge-pill badge-info" data-toggle="collapse" data-target="#notifications" aria-expanded="false" aria-controls="notifications"><svg width="14" height="20" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><g fill="#fff"><ellipse cx="5.25" cy="4.868" rx="3.908" ry="3.94"/><path d="M4.158 13.601h2.184v.246h-.001A1.097 1.097 0 0 1 5.25 15a1.097 1.097 0 0 1-1.092-1.101l.001-.052h-.001v-.246z"/><ellipse cx=".671" cy="12.337" rx=".671" ry=".677"/><path d="M.671 11.66h9.158v1.353H.671z"/><ellipse cx="5.25" cy=".927" rx=".92" ry=".927"/><ellipse cx="9.829" cy="12.337" rx=".671" ry=".677"/><path d="M1.342 4.439h7.815v8.574H1.342z"/><path d="M0 12.337h10.5v.677H0z"/></g></svg>
                               @if(isset($notifications))
                               @php( $user = Auth::user() )
-                                <span>{{{ $user->notifications->count() }}}</span>
+                                <span>{{{ $user->unReadNotifications->count() }}}</span>
                               @endif
                             </button></li>
 
@@ -190,7 +190,7 @@
             <div class="notifications__scroll">
                 <div id="tabs" class="notifications__inner">
 
-                  @if( isset($user->notifications) && is_object($user->notifications) && $user->notifications->count() > 0 )
+                  @if( isset($user->notifications) && is_object($user->notifications) && $user->unReadNotifications->count() > 0 )
                   <div class="cards">
 
                     @foreach ($user->unReadNotifications as $notification)
@@ -206,18 +206,6 @@
                     </div>
                     @endforeach
 
-                    @foreach ($user->readNotifications as $notification)
-                    <div class="card status-is-read {{{ FixometerHelper::notificationClasses($notification->type) }}}">
-                        <div class="card-body">
-                            <h5 class="card-title mb-1">{{{ $notification->data['title'] }}} <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a></h5>
-                            <time>{{{ date('D, jS M Y', strtotime($notification->created_at)) }}}</time>
-                            <div class="d-flex flex-row justify-content-end mt-1">
-                              <span class="marked-as-read"><svg width="13px" height="9" viewBox="0 0 54 37" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Green tick icon</title><path d="M4.615 14.064a.969.969 0 0 0-1.334 0l-3 2.979a.868.868 0 0 0 0 1.279l18.334 18c.333.35.916.35 1.291 0l3.042-2.983a.869.869 0 0 0 0-1.28L4.615 14.064z" fill="#0394a6"/><path d="M53.365 4.584a.913.913 0 0 0 .041-1.287L50.365.272c-.334-.358-.959-.363-1.292-.013L15.99 32.109a.873.873 0 0 0 0 1.284l3 3.029a.97.97 0 0 0 1.333.012l33.042-31.85z" fill="#0394a6"/></svg> Marked as read</span>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-
                   </div>
                 @else
                   <div class="alert alert-secondary" role="alert">
@@ -225,6 +213,21 @@
                       <p>@lang('general.alert_uptodate_text')</p>
                   </div>
                 @endif
+                <div class="cards">
+
+                  @foreach ($user->readNotifications as $notification)
+                  <div class="card status-is-read {{{ FixometerHelper::notificationClasses($notification->type) }}}" style="display: none;">
+                      <div class="card-body">
+                          <h5 class="card-title mb-1">{{{ $notification->data['title'] }}} <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a></h5>
+                          <time>{{{ date('D, jS M Y', strtotime($notification->created_at)) }}}</time>
+                          <div class="d-flex flex-row justify-content-end mt-1">
+                            <span class="marked-as-read"><svg width="13px" height="9" viewBox="0 0 54 37" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Green tick icon</title><path d="M4.615 14.064a.969.969 0 0 0-1.334 0l-3 2.979a.868.868 0 0 0 0 1.279l18.334 18c.333.35.916.35 1.291 0l3.042-2.983a.869.869 0 0 0 0-1.28L4.615 14.064z" fill="#0394a6"/><path d="M53.365 4.584a.913.913 0 0 0 .041-1.287L50.365.272c-.334-.358-.959-.363-1.292-.013L15.99 32.109a.873.873 0 0 0 0 1.284l3 3.029a.97.97 0 0 0 1.333.012l33.042-31.85z" fill="#0394a6"/></svg> Marked as read</span>
+                          </div>
+                      </div>
+                  </div>
+                  @endforeach
+
+                </div>
                 <button class="notifications__older js-load">View older notifications</button>
             </div>
         </div>

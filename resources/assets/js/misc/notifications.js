@@ -16,4 +16,11 @@ function toggleRead(event) {
     });
 }
 
+function showOlderNotifications(event) {
+    event.preventDefault();
+
+    $('.card.status-is-read').slideDown();
+}
+
 jQuery('.btn-marked').on('click',toggleRead);
+jQuery('.js-load').on('click',showOlderNotifications);

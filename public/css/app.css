@@ -2311,6 +2311,11 @@ pre code {
   opacity: 1;
 }
 
+.form-control:-ms-input-placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
 .form-control::-ms-input-placeholder {
   color: #6c757d;
   opacity: 1;
@@ -15911,6 +15916,9 @@ table.sortable > thead th div.mozilla {
   display: block;
   color: #000;
   text-decoration: underline;
+  width: 100%;
+  background: transparent;
+  border: 0 none;
 }
 
 .notifications__older:hover,
@@ -15978,7 +15986,7 @@ table.sortable > thead th div.mozilla {
 }
 
 .notifications .card__parties {
-  background-image: url(/images/parties.svg?4a9033fd163577ff604975e1a55baca2);
+  background-image: url(/images/parties.svg?7e699b9e57b58c249fd5d25940a3b473);
 }
 
 .notifications .card__groups {
