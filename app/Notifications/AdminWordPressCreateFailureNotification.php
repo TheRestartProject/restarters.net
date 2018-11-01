@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class AdminApproveEventNotification extends Notification
+class AdminWordPressCreateFailureNotification extends Notification
 {
     use Queueable;
 
@@ -42,9 +42,9 @@ class AdminApproveEventNotification extends Notification
      public function toMail($notifiable)
      {
        return (new MailMessage)
-                   ->subject('Event Approved')
+                   ->subject('Event WordPress failure')
                    ->greeting('Hello!')
-                   ->line('Event \'' . $this->arr['event_venue'] . '\' has been approved.')
+                   ->line('Event \'' . $this->arr['event_venue'] . '\' failed to create a WordPress post during admin approval.')
                    ->action('View event', $this->arr['event_url'])
                    ->line('If you think this invitation was not intended for you, please discard this email.');
      }
@@ -58,7 +58,7 @@ class AdminApproveEventNotification extends Notification
      public function toArray($notifiable)
      {
        return [
-           'title' => 'Event Approved:',
+           'title' => 'Event failed to create a new WordPress post:',
            'name' => $this->arr['event_venue'],
            'url' => $this->arr['event_url'],
        ];
