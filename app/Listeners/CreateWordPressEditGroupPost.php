@@ -3,12 +3,12 @@
 namespace App\Listeners;
 
 use App\Events\EditGroup;
+use App\Group;
+use App\Notifications\AdminWordPressEditGroupFailure;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Notification;
-use App\Notifications\AdminWordPressEditGroupFailure;
-use App\Group;
 use FixometerHelper;
+use Notification;
 
 class CreateWordPressEditGroupPost
 {
@@ -82,6 +82,10 @@ class CreateWordPressEditGroupPost
             'group_url' => url('/group/edit/'.$group->idgroups),
           ]));
 
+        }
+
       }
+
     }
+
 }

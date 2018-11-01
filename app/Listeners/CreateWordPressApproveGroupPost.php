@@ -42,8 +42,6 @@ class CreateWordPressApproveGroupPost
 
         try {
 
-          print $grousp;
-
           if( ( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) { // For testing purposes
 
             $group->update(['wordpress_post_id' => 99999]);
