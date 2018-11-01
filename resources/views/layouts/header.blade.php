@@ -46,8 +46,9 @@
         }
     </script>
   </head>
-
-  @if ( isset($onboarding) && $onboarding )
+  @if( Request::is('login') || Request::is('user/register') )
+    <body class="fixed-layout">
+  @elseif ( isset($onboarding) && $onboarding )
     <body class="onboarding">
   @else
     <body>
