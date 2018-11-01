@@ -161,11 +161,10 @@ class DeviceController extends Controller
 
   public function search(Request $request) {
 
-    $Group = new Group;
     $Category = new Category;
+    $categories = $Category->listed();
 
     $all_devices = DeviceList::orderBy('sorter', 'DSC');
-    $categories = $Category->listed();
 
     if ($request->input('categories') !== null) {
       $all_devices = $all_devices->whereIn('idcategory', $request->input('categories'));
