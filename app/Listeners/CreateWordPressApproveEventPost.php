@@ -6,7 +6,7 @@ use App\Events\ApproveEvent;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Notification;
-use App\Notifications\AdminWordPressCreateFailureNotification;
+use App\Notifications\AdminWordPressCreateEventFailure;
 use App\Party;
 use FixometerHelper;
 
@@ -86,7 +86,7 @@ class CreateWordPressApproveEventPost
          } catch (\Exception $e) {
 
              $notify_users = FixometerHelper::usersWhoHavePreference('admin-approve-wordpress-event-failure');
-             Notification::send($notify_users, new AdminWordPressCreateFailureNotification([
+             Notification::send($notify_users, new AdminWordPressCreateEventFailure([
                'event_venue' => $theParty->venue,
                'event_url' => url('/party/edit/'.$theParty->idevents),
              ]));

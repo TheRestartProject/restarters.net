@@ -6,7 +6,7 @@ use App\Events\EditGroup;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Notification;
-use App\Notifications\AdminEditGroupNotification;
+use App\Notifications\AdminWordPressEditGroupFailure;
 use App\Group;
 use FixometerHelper;
 
@@ -30,22 +30,56 @@ class CreateWordPressEditGroupPost
      */
     public function handle(EditGroup $event)
     {
+
       // Set event variable
-      $theGroup = Group::find($event->group->idgroups);
+      $id = $event->group->idgroups;
       $data = $event->data;
-      
-      if ( !empty($theGroup) ){
+
+      // Define model
+      $group = Group::find($id);
+
+      if ( !empty($group) && env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ){
 
         try {
 
-        //Yet to be made
+          if( is_numeric($group->wordpress_post_id) ){
+
+            // TODO: host.  Groups don't just have one host.  Is host
+            // displayed on the front-end anywhere?
+            // TODO: receiving area field from posted data.  It's currently not in the interface.
+
+            $custom_fields = array(
+              array('key' => 'group_city',            'value' => $group->area),
+              array('key' => 'group_website',         'value' => $group->website),
+              array('key' => 'group_hash',            'value' => $id),
+              array('key' => 'group_avatar_url',      'value' => $data['group_avatar']),
+              array('key' => 'group_latitude',        'value' => $group->latitude),
+              array('key' => 'group_longitude',       'value' => $group->longitude),
+            );
+
+            /** Start WP XML-RPC **/
+            $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
+            $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+
+            $content = array(
+              'post_type' => 'group',
+              'post_title' => $group->name,
+              'post_content' => $group->free_text,
+              'custom_fields' => $custom_fields
+            );
+
+            $wpid = $wpClient->newPost($data['name'], $data['free_text'], $content);
+            $group->wordpress_post_id = $wpid;
+            $group->save();
+
+          }
 
         } catch (\Exception $e) {
 
           $notify_users = FixometerHelper::usersWhoHavePreference('admin-edit-wordpress-group-failure');
-          Notification::send($notify_users, new AdminEditGroupNotification([
-            'group_name' => $theGroup->name,
-            'group_url' => url('/group/edit/'.$theGroup->idgroups),
+          Notification::send($notify_users, new AdminWordPressEditGroupFailure([
+            'group_name' => $group->name,
+            'group_url' => url('/group/edit/'.$group->idgroups),
           ]));
 
       }

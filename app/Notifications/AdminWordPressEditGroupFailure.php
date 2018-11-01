@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class AdminApproveGroupNotification extends Notification
+class AdminWordPressEditGroupFailure extends Notification
 {
     use Queueable;
 
@@ -42,11 +42,11 @@ class AdminApproveGroupNotification extends Notification
      public function toMail($notifiable)
      {
        return (new MailMessage)
-                   ->subject('Group Approved')
+                   ->subject('Group WordPress failure')
                    ->greeting('Hello!')
-                   ->line('Group \'' . $this->arr['group_name'] . '\' has been approved.')
+                   ->line('Group \'' . $this->arr['group_name'] . '\' failed to post to WordPress during an edit to the group.')
                    ->action('View group', $this->arr['group_url'])
-                   ->line('If you think this invitation was not intended for you, please discard this email.');
+                   ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
      }
 
     /**
@@ -58,7 +58,7 @@ class AdminApproveGroupNotification extends Notification
      public function toArray($notifiable)
      {
        return [
-           'title' => 'Group Approved:',
+           'title' => 'Group failed to save to an existing WordPress post:',
            'name' => $this->arr['group_name'],
            'url' => $this->arr['group_url'],
        ];

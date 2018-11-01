@@ -884,15 +884,28 @@ public function edit($id)
         }
       }
 
-      $shouldUpdateWordpress = env('APP_ENV') != 'development' && env('APP_ENV') != 'local';
-      if ($shouldUpdateWordpress) {
-        try {
-          $this->updateGroupInWordpress($id, $data, $group_avatar, $latitude, $longitude);
-        } catch (\Exception $ex) {
-          $reponse['success'] = 'error pushing to wp';
-          report($ex);
-        }
+      // Now pass group avatar via the data array
+      $data['group_avatar'] = $group_avatar;
+
+      // Get group model to pass to event handler
+      $group = Group::find($id);
+
+      // Send WordPress Notification if group approved with POSTed data
+      if ( isset($data['moderate']) && $data['moderate'] == 'approve' ) {
+        event(new ApproveGroup($group, $data));
+      } elseif ( !empty($group->wordpress_post_id) ) {
+        event(new EditGroup($group, $data));
       }
+
+      // $shouldUpdateWordpress = env('APP_ENV') != 'development' && env('APP_ENV') != 'local';
+      // if ($shouldUpdateWordpress) {
+      //   try {
+      //     $this->updateGroupInWordpress($id, $data, $group_avatar, $latitude, $longitude);
+      //   } catch (\Exception $ex) {
+      //     $reponse['success'] = 'error pushing to wp';
+      //     report($ex);
+      //   }
+      // }
     }
   }
 

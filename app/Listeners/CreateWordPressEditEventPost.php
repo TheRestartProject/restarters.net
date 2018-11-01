@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\EditEvent;
 use App\Party;
-use App\Notifications\AdminWordPressEditFailureNotification;
+use App\Notifications\AdminWordPressEditEventFailure;
 use FixometerHelper;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -93,7 +93,7 @@ class CreateWordPressEditEventPost
         } catch (\Exception $e) {
 
           $notify_users = FixometerHelper::usersWhoHavePreference('admin-edit-wordpress-event-failure');
-          Notification::send($notify_users, new AdminWordPressEditFailureNotification([
+          Notification::send($notify_users, new AdminWordPressEditEventFailure([
             'event_venue' => $theParty->venue,
             'event_url' => url('/party/edit/'.$theParty->idevents),
           ]));
