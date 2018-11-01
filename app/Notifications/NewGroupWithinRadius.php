@@ -58,7 +58,7 @@ class NewGroupWithinRadius extends Notification
      public function toArray($notifiable)
      {
        return [
-           'title' => 'New Group nearby:',
+           'title' => 'A new Restart Group available near you:',
            'name' => $this->arr['group_name'],
            'url' => $this->arr['group_url'],
        ];

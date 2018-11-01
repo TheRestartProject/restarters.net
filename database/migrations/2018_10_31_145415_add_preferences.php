@@ -58,6 +58,11 @@ class AddPreferences extends Migration
           'purpose' => NULL,
           'slug' => 'admin-edit-wordpress-group-failure',
         ]);
+        DB::table('preferences')->insert([
+          'name' => 'Admin No Devices',
+          'purpose' => NULL,
+          'slug' => 'admin-no-devices',
+        ]);
     }
 
     /**

@@ -43,12 +43,12 @@ class Kernel extends ConsoleKernel
 
           foreach ( $parties as $party ) {
 
-            $all_admins = User::where('role', 2)->where('invites', 1)->get();
+            $all_admins = FixometerHelper::usersWhoHavePreference('admin-no-devices');
             Notification::send($all_admins, new Mail([
               'event_venue' => $party->venue,
               'event_url' => url('/party/edit/'.$party->idevents),
             ]));
-            
+
           }
 
         })->timezone('Europe/London')->dailyAt('09:30');

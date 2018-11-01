@@ -30,9 +30,7 @@ class NotifyAdminNoDevices extends Notification
      */
      public function via($notifiable)
      {
-         return ['database'];
-         // return ['mail', 'database'];
-
+         return ['mail', 'database'];
      }
 
     /**
@@ -61,7 +59,7 @@ class NotifyAdminNoDevices extends Notification
      public function toArray($notifiable)
      {
        return [
-           'title' => 'Moderation Needed (No Devices):',
+           'title' => 'Moderation needed on event with no devices:',
            'name' => $this->arr['event_venue'],
            'url' => $this->arr['event_url'],
        ];
