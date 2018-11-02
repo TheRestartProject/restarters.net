@@ -29,3 +29,7 @@ Route::get('/party/{id}/stats', function($id) {
 Route::get('/group/{id}/stats', function($id) {
     return App\Http\Controllers\ApiController::groupStats($id);
 });
+
+Route::get('/event/group-tag/{group_tag_id}', function($group_tag_id) {
+    return App\Http\Controllers\ApiController::getEventsByGroupTag($group_tag_id);
+});

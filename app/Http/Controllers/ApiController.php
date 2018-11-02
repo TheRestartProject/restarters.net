@@ -81,4 +81,16 @@ class ApiController extends Controller
 
         return $footprintRatioCalculator->calculateRatio();
     }
+
+    public static function getEventsByGroupTag($group_tag_id)
+    {
+
+        $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+                ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
+                  ->where('grouptags_groups.group_tag', $group_tag_id)
+                    ->select('events.*')
+                      ->get();
+
+        return response()->json($events, 200);
+    }
 }
