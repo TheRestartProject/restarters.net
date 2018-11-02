@@ -22,9 +22,6 @@ Route::prefix('user')->group(function () {
   Route::post('register/{hash?}', 'UserController@postRegister');
 });
 
-
-
-
 Route::get('/user/forbidden', function () {
   return view('user.forbidden', [
     'title' => 'Oops'
@@ -42,16 +39,6 @@ Route::get('/about/cookie-policy', function() {
 // Temp
 Route::get('/visualisations', function() {
     return View::make('visualisations') ;
-});
-Route::get('/test', function() {
-
-      // Notify relevant users
-      $notify_users = \FixometerHelper::usersWhoHavePreference('admin-new-user');
-      \Notification::send($notify_users, new \App\Notifications\AdminNewUser([
-        'id' => 100,
-        'name' => 'Hsssooman',
-      ]));
-
 });
 
 Route::get('/party/view/{id}', 'PartyController@view');
@@ -263,6 +250,4 @@ Route::get('markAsRead/{id}', function($id){
   return  redirect()->back();
 })->name('markAsRead');
 
-Route::post('/locale', 'LocaleController@handle');
 Route::get('/set-lang/{locale}', 'LocaleController@setLang');
-// Route::post('/locale', 'LocaleController@handle')->middleware(['auth', 'localize']);
