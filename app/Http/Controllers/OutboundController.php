@@ -86,20 +86,36 @@ class OutboundController extends Controller
 			$info = array();
 			$co2 = 0;
 
-            $footprintRatioCalculator = new FootprintRatioCalculator();
+      $footprintRatioCalculator = new FootprintRatioCalculator();
 			$EmissionRatio = $footprintRatioCalculator->calculateRatio();
 
 			$id = (int)$id;
 			$id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
 
 			if(strtolower($type) == 'party'){
-                $event = Party::where('idevents', $id)->first();
-                $eventStats = $event->getEventStats($EmissionRatio);
-                $co2 = $eventStats['co2'];
+
+        $event = Party::where('idevents', $id)->first();
+        $eventStats = $event->getEventStats($EmissionRatio);
+        $co2 = $eventStats['co2'];
+
 			} elseif (strtolower($type) == 'group') {
-                $group = Group::where('idgroups', $id)->first();
-                $groupStats = $group->getGroupStats($EmissionRatio);
-                $co2 = $groupStats['co2'];
+
+        $group = Group::where('idgroups', $id)->first();
+        $groupStats = $group->getGroupStats($EmissionRatio);
+        $co2 = $groupStats['co2'];
+
+			} elseif (strtolower($type) == 'group-tag') {
+
+        $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
+                  ->where('grouptags_groups.group_tag', $id)
+                    ->select('groups.*')
+                      ->get();
+				$co2 = 0;
+				foreach( $groups as $group ) {
+          $groupStats = $group->getGroupStats($EmissionRatio);
+          $co2 += $groupStats['co2'];
+				}
+
 			}
 
 			if($co2 > 6000) {

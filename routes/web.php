@@ -225,12 +225,20 @@ Route::get('/outbound/info/group/{id}', function($id) {
   return App\Http\Controllers\OutboundController::info('group', $id);
 });
 
+Route::get('/outbound/info/group-tag/{id}', function($id) {
+  return App\Http\Controllers\OutboundController::info('group-tag', $id);
+});
+
 Route::get('/outbound/info/party/{id}', function($id) {
   return App\Http\Controllers\OutboundController::info('party', $id);
 });
 
 Route::get('/group/stats/{id}/{format?}', function($id, $format = 'row') {
   return App\Http\Controllers\GroupController::stats($id, $format);
+});
+
+Route::get('/group-tag/stats/{group_tag_id}/{format?}', function($group_tag_id, $format = 'row') {
+  return App\Http\Controllers\GroupController::statsByGroupTag($group_tag_id, $format);
 });
 
 Route::get('/admin/stats/1', function() {
