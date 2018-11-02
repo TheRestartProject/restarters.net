@@ -30,6 +30,18 @@ Route::get('/group/{id}/stats', function($id) {
     return App\Http\Controllers\ApiController::groupStats($id);
 });
 
-Route::get('/event/group-tag/{group_tag_id}', function($group_tag_id) {
-    return App\Http\Controllers\ApiController::getEventsByGroupTag($group_tag_id);
+Route::get('/{api_key}/event/group-tag/{group_tag_id}', function($api_key, $group_tag_id) {
+
+    if ( $api_key == env('API_KEY') ) {
+
+      return App\Http\Controllers\ApiController::getEventsByGroupTag($group_tag_id);
+
+    } else {
+
+      return response()->json([
+        'message' => 'Invalid API key',
+      ]);
+
+    }
+
 });
