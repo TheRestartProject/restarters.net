@@ -77,34 +77,39 @@ class OutboundController extends Controller
 	/** type can be either party or group
 	 * id is id of group or party to display
 	 * */
-	public static function info($type, $id)
-    {
-		if(!is_numeric($id) && !filter_var($id, FILTER_VALIDATE_INT)){
-			die('Data not properaly formatted. Exiting.');
-		}
-		else {
+	public static function info($type, $id, $format = 'fixometer') {
+
+		// Ensure that ID is a number, otherwise show 404
+		if( !is_numeric($id) && !filter_var($id, FILTER_VALIDATE_INT) ){
+
+			abort(404);
+
+		} else {
+
+			// Define variables
 			$info = array();
 			$co2 = 0;
-
-      $footprintRatioCalculator = new FootprintRatioCalculator();
-			$EmissionRatio = $footprintRatioCalculator->calculateRatio();
-
 			$id = (int)$id;
 			$id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
 
-			if(strtolower($type) == 'party'){
+			// Calculators
+      $footprintRatioCalculator = new FootprintRatioCalculator();
+			$EmissionRatio = $footprintRatioCalculator->calculateRatio();
 
-        $event = Party::where('idevents', $id)->first();
+			// Get the data by type
+			if ( strtolower($type) == 'party' ) {
+
+        $event = Party::find($id);
         $eventStats = $event->getEventStats($EmissionRatio);
         $co2 = $eventStats['co2'];
 
-			} elseif (strtolower($type) == 'group') {
+			} elseif ( strtolower($type) == 'group' ) {
 
-        $group = Group::where('idgroups', $id)->first();
+        $group = Group::find($id);
         $groupStats = $group->getGroupStats($EmissionRatio);
         $co2 = $groupStats['co2'];
 
-			} elseif (strtolower($type) == 'group-tag') {
+			} elseif ( strtolower($type) == 'group-tag' ) {
 
         $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
                   ->where('grouptags_groups.group_tag', $id)
@@ -118,36 +123,110 @@ class OutboundController extends Controller
 
 			}
 
-			if($co2 > 6000) {
-				$info['consume_class'] 	= 'car';
-				$info['consume_image'] 	= 'Counters_C2_Driving.svg';
-				$info['consume_label'] 	= 'Equal to driving';
-				$info['consume_eql_to'] = (1 / 0.12) * $co2;
-				$info['consume_eql_to'] = number_format(round($info['consume_eql_to']), 0, '.', ',') . '<small>km</small>';
+			if ( $format == 'fixometer' ) {
 
-				$info['manufacture_eql_to'] = round($co2 / 6000);
-				$info['manufacture_img'] 	= 'Icons_04_Assembly_Line.svg';
-				$info['manufacture_label'] 	= 'or like the manufacture of <span class="dark">' . $info['manufacture_eql_to'] . '</span> cars';
-				$info['manufacture_legend'] = ' 6000kg of CO<sub>2</sub>';
+				if ( $co2 > 6000 ) {
+
+					$info['consume_class'] 	= 'car';
+					$info['consume_image'] 	= 'Counters_C2_Driving.svg';
+					$info['consume_label'] 	= 'Equal to driving';
+					$info['consume_eql_to'] = (1 / 0.12) * $co2;
+					$info['consume_eql_to'] = number_format(round($info['consume_eql_to']), 0, '.', ',') . '<small>km</small>';
+
+					$info['manufacture_eql_to'] = round($co2 / 6000);
+					$info['manufacture_img'] 	= 'Icons_04_Assembly_Line.svg';
+					$info['manufacture_label'] 	= 'or like the manufacture of <span class="dark">' . $info['manufacture_eql_to'] . '</span> cars';
+					$info['manufacture_legend'] = ' 6000kg of CO<sub>2</sub>';
+
+				} else {
+
+					$info['consume_class'] 	= 'tv';
+					$info['consume_image'] 	= 'Counters_C1_TV.svg';
+					$info['consume_label'] 	= 'Like watching TV for';
+					$info['consume_eql_to'] = ((1 / 0.024) * $co2 ) / 24;
+					$info['consume_eql_to'] = number_format(round($info['consume_eql_to']), 0, '.', ',') . ' <small>days</small>';
+
+					$info['manufacture_eql_to'] = round($co2 / 100);
+					$info['manufacture_img'] = 'Icons_03_Sofa.svg';
+					$info['manufacture_label'] = 'or like the manufacture of <span class="dark">' . $info['manufacture_eql_to'] . '</span> sofas';
+					$info['manufacture_legend'] = ' 100kg of CO<sub>2</sub>';
+
+				}
+
+	      return view('outbound.info', [
+	        'info' => $info,
+	  			'co2' => $co2,
+	      ]);
+
+			} else {
+
+				// Consume: driving vs. watching TV
+				if ( $format == 'consume' && $co2 >= 6000 ) { // Driving graphic
+
+					$title = 'Equal to driving';
+					$measure = 'km';
+					$equal_to = number_format(round((1 / 0.12) * $co2), 0, '.', ',');
+
+				} else if ( $format == 'consume' && $co2 < 6000 ) { // Watching TV
+
+					$title = 'Watching TV for';
+					$measure = 'day';
+					$equal_to = number_format(((1 / 0.024) * $co2 ) / 24, 0, '.', ',');
+
+				} else if ( $format == 'manufacture' && $co2 > 6000 ) { // Display whole cars
+
+					$title = 'Like manufacturing';
+					$measure = 'car';
+					$equal_to = round($co2 / 6000);
+
+				} else if ( $format == 'manufacture' && $co2 > 3000 && $co2 <= 6000 ) { // Display whole cars
+
+					$title = 'Like manufacturing';
+					$measure = 'car';
+					$equal_to = round($co2 / 333);
+
+				} else if ( $format == 'manufacture' && $co2 > 900 && $co2 <= 3000 ) { // Display half cars
+
+					$title = 'Like manufacturing';
+					$measure = 'half car';
+					$equal_to = round($co2 / 233);
+
+				} else { // Display sofa
+
+					$title = 'Like manufacturing';
+					$measure = 'sofa';
+					$equal_to = round($co2 / 100);
+
+				}
+
+				return view('visualisations', [
+					'format' 		=> $format,
+					'co2' 			=> $co2,
+					'title' 		=> $title,
+					'measure' 	=> $measure,
+					'equal_to' 	=> $equal_to,
+				]);
+
 			}
-			else {
-				$info['consume_class'] 	= 'tv';
-				$info['consume_image'] 	= 'Counters_C1_TV.svg';
-				$info['consume_label'] 	= 'Like watching TV for';
-				$info['consume_eql_to'] = ((1 / 0.024) * $co2 ) / 24;
-				$info['consume_eql_to'] = number_format(round($info['consume_eql_to']), 0, '.', ',') . ' <small>days</small>';
 
-				$info['manufacture_eql_to'] = round($co2 / 100);
-				$info['manufacture_img'] = 'Icons_03_Sofa.svg';
-				$info['manufacture_label'] = 'or like the manufacture of <span class="dark">' . $info['manufacture_eql_to'] . '</span> sofas';
-				$info['manufacture_legend'] = ' 100kg of CO<sub>2</sub>';
-			}
+		}
 
-      return view('outbound.info', [
-        'info' => $info,
-  			'co2' => $co2,
-      ]);
+		abort(404);
+
+	}
+
+	public function visualisationEmbed($type, $id) {
+
+		if( is_numeric($id) ) {
+
+
+
+		} else {
+
+			abort(404);
+
 		}
 
 	}
+
 }

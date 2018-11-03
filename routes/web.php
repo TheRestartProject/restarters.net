@@ -221,16 +221,8 @@ Route::get('/media-wiki', function() {
 });
 
 //iFrames
-Route::get('/outbound/info/group/{id}', function($id) {
-  return App\Http\Controllers\OutboundController::info('group', $id);
-});
-
-Route::get('/outbound/info/group-tag/{id}', function($id) {
-  return App\Http\Controllers\OutboundController::info('group-tag', $id);
-});
-
-Route::get('/outbound/info/party/{id}', function($id) {
-  return App\Http\Controllers\OutboundController::info('party', $id);
+Route::get('/outbound/info/{type}/{id}/{format?}', function($type, $id, $format = 'fixometer') {
+  return App\Http\Controllers\OutboundController::info($type, $id, $format);
 });
 
 Route::get('/group/stats/{id}/{format?}', function($id, $format = 'row') {

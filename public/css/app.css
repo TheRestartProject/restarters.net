@@ -19670,7 +19670,6 @@ h2 sup a:hover {
   background-color: #FFF;
   padding: 20px;
   text-align: center;
-  margin-bottom: 40px;
 }
 
 @media (min-width: 992px) {
@@ -19691,7 +19690,7 @@ h2 sup a:hover {
 }
 
 .widget__1 svg {
-  margin: 80px auto;
+  margin: auto;
   display: block;
   max-width: 100%;
 }

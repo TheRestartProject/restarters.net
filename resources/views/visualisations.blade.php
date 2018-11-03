@@ -1,17 +1,12 @@
-@extends('layouts.app')
+@include('layouts.header_plain', ['iframe' => true])
 
-@section('content')
+@yield('content')
 
-<section style="background:#F7F5ED">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6 d-flex flex-column">
-                @include('partials.visualisations.event')
-            </div>
-            <div class="col-lg-6 d-flex flex-column">
-                @include('partials.visualisations.group')
-            </div>
-        </div>
-    </div>
-</section>
-@endsection
+  @if( $format == 'consume' )
+    @include('partials.visualisations.consume')
+  @elseif( $format == 'manufacture' )
+    @include('partials.visualisations.manufacture')
+  @endif
+  
+</body>
+</html>
