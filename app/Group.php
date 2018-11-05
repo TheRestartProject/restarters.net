@@ -18,7 +18,7 @@ class Group extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = ['name', 'website', 'area', 'location', 'latitude', 'longitude', 'free_text', 'wordpress_post_id'];
+    protected $fillable = ['name', 'website', 'area', 'location', 'latitude', 'longitude', 'country', 'free_text', 'wordpress_post_id'];
 
     /**
      * The attributes that should be hidden for arrays.

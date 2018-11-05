@@ -123,7 +123,7 @@ class FixometerHelper {
             return true;
 
         }
-        
+
         return false;
 
       }
@@ -673,20 +673,36 @@ class FixometerHelper {
 
   }
 
-  public static function getLatLongFromCityCountry($town_city, $country) {
+  public static function getLatLongFromCityCountry($town_city = null, $country = null) {
 
     $return = array();
+    $query = '';
 
     // Try and get country long name to improve geocoding.
-    if (array_key_exists($country, FixometerHelper::getAllCountries())) {
-        $country = FixometerHelper::getAllCountries()[$country];
-    }
-    $json = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=".urlencode($town_city.','.$country)."&sensor=false&key=".env('GOOGLE_API_CONSOLE_KEY'));
+    if ( !is_null($country) && array_key_exists($country, FixometerHelper::getAllCountries()) )
+      $country = FixometerHelper::getAllCountries()[$country];
+
+    if( !is_null($town_city) )
+      $query .= $town_city;
+
+    if( !is_null($country) )
+      $query .= ','.$country;
+
+    $json = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=".urlencode($query)."&sensor=false&key=".env('GOOGLE_API_CONSOLE_KEY'));
     $json = json_decode($json);
 
     if (is_object($json) && !empty($json->{'results'})) {
         $return[] = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
         $return[] = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+    }
+
+    // Retrieve country
+    if( isset($json->results[0]) ) {
+        foreach($json->results[0]->address_components as $addressComponent) {
+            if(in_array('country', $addressComponent->types)) {
+                $return[] = $addressComponent->long_name;
+            }
+        }
     }
 
     return $return;

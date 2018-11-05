@@ -134,21 +134,17 @@ class GroupController extends Controller
     $groups = Group::orderBy('name', 'ASC');
     $your_area = null;
 
-    if ($request->input('name') !== null) {
+    if ($request->input('name') !== null)
       $groups = $groups->where('name', 'like', '%'.$request->input('name').'%');
-    }
 
-    if ($request->input('location') !== null) {
+    if ($request->input('location') !== null)
       $groups = $groups->where('location', 'like', '%'.$request->input('location').'%');
-    }
 
-    if ($request->input('country') !== null) {
-      //Don't store country for group???
-    }
+    if ($request->input('country') !== null)
+      $groups = $groups->where('country', $request->input('country'));
 
-    if ($request->input('tags') !== null) {
+    if ($request->input('tags') !== null)
       $groups = $groups->whereIn('idgroups', GrouptagsGroups::whereIn('group_tag', $request->input('tags'))->pluck('group'));
-    }
 
     $groups = $groups->paginate(env('PAGINATE'));
 
@@ -164,7 +160,7 @@ class GroupController extends Controller
       'all_group_tags' => $all_group_tags,
       'name' => $request->input('name'),
       'location' => $request->input('location'),
-      // 'selected_country' => $request->input('country'),
+      'selected_country' => $request->input('country'),
       'selected_tags' => $request->input('tags'),
     ]);
 
@@ -210,17 +206,15 @@ class GroupController extends Controller
         // }
         if (!empty($location)) {
 
-          $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($location.',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
-          $json = json_decode($json);
-
-          if (is_object($json) && !empty($json->{'results'})) {
-            $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
-            $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
-          }
+          $lat_long = FixometerHelper::getLatLongFromCityCountry($location);
+          $latitude = $lat_long[0];
+          $longitude = $lat_long[1];
+          $country = $lat_long[2];
 
         } else {
           $latitude = null;
           $longitude = null;
+          $country = null;
         }
 
         if(empty($error)) {
@@ -232,6 +226,7 @@ class GroupController extends Controller
           'location'      => $location,
           'latitude'      => $latitude,
           'longitude'     => $longitude,
+          'country'       => $country,
           'free_text'     => $text,
         );
         $idGroup = $Group->create($data)->idgroups;
@@ -800,17 +795,15 @@ public function edit($id)
 
     if (!empty($data['location'])) {
 
-      $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($data['location'].',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
-      $json = json_decode($json);
-
-      if (is_object($json) && !empty($json->{'results'})) {
-        $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
-        $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
-      }
+      $lat_long = FixometerHelper::getLatLongFromCityCountry($data['location']);
+      $latitude = $lat_long[0];
+      $longitude = $lat_long[1];
+      $country = $lat_long[2];
 
     } else {
       $latitude = null;
       $longitude = null;
+      $country = null;
     }
 
     //Validation
@@ -829,6 +822,7 @@ public function edit($id)
       'location'      => $data['location'],
       'latitude'      => $latitude,
       'longitude'     => $longitude,
+      'country'       => $country,
     );
 
     // $u = $Group->where('idgroups', $id)->update($update);

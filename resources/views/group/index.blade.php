@@ -90,7 +90,11 @@
                             <select id="country" name="country" class="field select2">
                                 <option value=""></option>
                                 @foreach (FixometerHelper::getAllCountries() as $country_code => $country_name)
-                                  <option value="{{ $country_code }}">{{ $country_name }}</option>
+                                  @if( $country_name == $selected_country )
+                                    <option selected value="{{ $country_name }}">{{ $country_name }}</option>
+                                  @else
+                                    <option value="{{ $country_name }}">{{ $country_name }}</option>
+                                  @endif
                                 @endforeach
                             </select>
                         </div>
