@@ -31375,6 +31375,9 @@ $(document).ready(function () {
           $('.btn-save2').removeClass('btn-success').addClass('btn-primary').text('Update');
         }, 3000);
 
+        // Reset if none of the above is selected
+        if ($category_name === 'None of the above') $category_name = 'Misc';
+
         summary_row.find('.category').text($category_name);
         summary_row.find('.brand').text($brand);
         summary_row.find('.model').text($model);
