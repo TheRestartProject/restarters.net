@@ -189,7 +189,7 @@ class OutboundController extends Controller
 
 					$title = 'Like manufacturing';
 					$measure = 'half car';
-					$equal_to = round($co2 / 6000);
+					$equal_to = round($co2 / 3000);
 
 				} else { // Display sofa
 
