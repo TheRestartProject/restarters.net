@@ -66,11 +66,12 @@
                               </div>
                               <?php if(isset($error) && isset($error['event']) && !empty($error['event'])) { echo '<span class="help-block text-danger">' . $error['event'] . '</span>'; } ?>
                           </div>
+
                           <div class="form-group <?php if(isset($error) && isset($error['category']) && !empty($error['category'])) { echo "has-error"; } ?>">
 
                               <label for="category">Category:</label>
                               <div class="form-control form-control__select">
-                                  <select id="category" name="category"  class="form-control field select2">
+                                  <select id="category" name="category" class="form-control category field select2">
                                       <option></option>
                                       @if(isset($categories))
                                         <?php foreach($categories as $category){ ?>
@@ -81,6 +82,21 @@
                               </div>
                               <?php if(isset($error) && isset($error['category']) && !empty($error['category'])) { echo '<span class="help-block text-danger">' . $error['category'] . '</span>'; } ?>
                           </div>
+
+                          @if( $formdata->category == 46 )
+                            <div class="form-group <?php if(isset($error) && isset($error['weight']) && !empty($error['weight'])) { echo "has-error"; } ?>">
+                              <label for="category">Weight:</label>
+                              <div class="display-weight pt-1 mb-2">
+                                  <div class="input-group">
+                                    <input type="number" class="form-control field weight" id="weight" name="weight" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $formdata->estimate }}">
+                                    <div class="input-group-append">
+                                      <span class="input-group-text">kg</span>
+                                    </div>
+                                  </div>
+                              </div>
+                            </div>
+                          @endif
+
                           <div class="form-group">
                               <label for="brand">@lang('devices.brand'):</label>
                               <!-- <input type="text" name="brand" id="brand" class="form-control field" value="<?php //echo $formdata->brand; ?>"> -->

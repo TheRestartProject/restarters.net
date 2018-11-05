@@ -305,10 +305,17 @@ class DeviceController extends Controller
           $do_it_yourself = 0;
         }
 
+        if( $data['category'] == 46 && isset($data['weight']) ){
+          $weight = $data['weight'];
+        } else {
+          $weight = null;
+        }
+
         $update = array(
           'event'             => $data['event'],
           'category'          => $data['category'],
           'category_creation' => $data['category'],
+          'estimate'          => $weight,
           'repair_status'     => $data['repair_status'],
           'spare_parts'       => $data['spare_parts'],
           'brand'             => $data['brand'],
