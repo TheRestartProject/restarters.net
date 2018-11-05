@@ -91,10 +91,13 @@ class DashboardController extends Controller
       //Host specific queries
       if (FixometerHelper::hasRole($user, 'Host') && $in_group) {
 
-        $outdated_groups = Group::whereIn('idgroups', $group_ids)
-                                ->whereDate('updated_at', '<=', date('Y-m-d', strtotime("-3 Months")) )
-                                  ->take(3)
-                                    ->get();
+        $outdated_groups = Group::join('users_groups', 'groups.idgroups', '=', 'users_groups.group')
+                                ->where('users_groups.user', Auth::user()->id)
+                                  ->where('users_groups.role', 3)
+                                    ->whereDate('updated_at', '<=', date('Y-m-d', strtotime("-3 Months")) )
+                                      ->select('groups.*')
+                                        ->take(3)
+                                          ->get();
 
         if (empty($outdated_groups->toArray())) {
           $outdated_groups = null;
