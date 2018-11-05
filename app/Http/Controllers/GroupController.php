@@ -638,7 +638,7 @@ public function view($groupid) {
       'user' => $user,
       'upcoming_events' => $upcoming_events,
       'past_events' => $past_events,
-      'EmissionRatio' => $Party->EmissionRatio,
+      'EmissionRatio' => $this->EmissionRatio,
       'in_group' => $in_group,
       'is_host_of_group' => $is_host_of_group,
       'user_groups' => $user_groups,
