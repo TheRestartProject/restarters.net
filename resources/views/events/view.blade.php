@@ -66,42 +66,42 @@
       <div class="col-lg-3">
         <div class="button-group button-group__r">
           @if( Auth::check() )
-          @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-          <div class="dropdown">
-            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Event actions
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">Edit event</a>
-              @if( !$event->isInProgress() && !$event->hasFinished() )
-              <form action="{{ url('/') }}/party/delete/{{ $formdata->id }}" method="post">
-                @csrf
-                <button id="deleteEvent" class="dropdown-item" data-party-id="{{$formdata->id}}" data-count-attended="{{count($attended)}}" data-count-invited="{{count($invited)}}" data-count-volunteers="{{$event->volunteers}}">Delete event</button>
-              </form>
-              @endif
-              @if( $event->hasFinished() )
-              <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>
-              <a href="/party/contribution/{{ $formdata->id }}" class="btn dropdown-item">Request contributions</a>
+            @if( FixometerHelper::userHasEditPartyPermission($formdata->id) )
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Event actions
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">Edit event</a>
+                @if( !$event->isInProgress() && !$event->hasFinished() )
+                <form action="{{ url('/') }}/party/delete/{{ $formdata->id }}" method="post">
+                  @csrf
+                  <button id="deleteEvent" class="dropdown-item" data-party-id="{{$formdata->id}}" data-count-attended="{{count($attended)}}" data-count-invited="{{count($invited)}}" data-count-volunteers="{{$event->volunteers}}">Delete event</button>
+                </form>
+                @endif
+                @if( $event->hasFinished() )
+                  <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>
+                  <a href="/party/contribution/{{ $formdata->id }}" class="btn dropdown-item">Request contributions</a>
+                @else
+                  @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
+                  <button data-toggle="modal" data-target="#event-invite-to" class="btn dropdown-item">Invite volunteers</button>
+                  @else
+                  <a class="btn dropdown-item" href="/party/join/{{ $formdata->id }}">RSVP</a>
+                  @endif
+                @endif
+              </div>
+            </div>
+            @else
+            @if( $event->hasFinished() )
+            <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
               @else
               @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
-              <button data-toggle="modal" data-target="#event-invite-to" class="btn dropdown-item">Invite volunteers</button>
+              <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite volunteers</button>
               @else
-              <a class="btn dropdown-item" href="/party/join/{{ $formdata->id }}">RSVP</a>
+              <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
               @endif
               @endif
-            </div>
-          </div>
-          @else
-          @if( $event->hasFinished() )
-          <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
-            @else
-            @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
-            <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite volunteers</button>
-            @else
-            <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
-            @endif
-            @endif
-            @endif
+              @endif
             @endif
           </div>
         </div>

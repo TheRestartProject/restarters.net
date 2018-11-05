@@ -1506,13 +1506,7 @@ public function emailHosts() {
 public function getContributions($event_id){
 
   // Let's check that current logged in user is a host of the event
-  $in_event = EventsUsers::where('event', $event_id)
-  ->where('user', Auth::user()->id)
-  ->where('role', 3)
-  ->first();
-
-  // We'll allow admins to send out email, just in case...
-  if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || is_object($in_event) ){
+  if( FixometerHelper::userHasEditPartyPermission($event_id) ){
 
     if(env('APP_ENV') == 'development' || env('APP_ENV') == 'local') { //Testing purposes
 
@@ -1530,12 +1524,11 @@ public function getContributions($event_id){
 
     $event = Party::find($event_id);
 
-    $arr = [
+    Notification::send($all_restarters, new EventRepairs([
       'event_name' => $event->getEventName(),
       'event_url' => url('/party/view/'.$event_id),
       'preferences' => url('/profile/edit'),
-    ];
-    Notification::send($all_restarters, new EventRepairs($arr));
+    ]));
 
     return redirect()->back()->with('success', 'Thank you, all attendees have been informed');
 

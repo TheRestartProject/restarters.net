@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App;
 use Auth;
 use DB;
+use App\EventsUsers;
 use App\Party;
 use App\Permissions;
 use App\Role;
@@ -102,25 +103,33 @@ class FixometerHelper {
       return date('D, j M Y, H:i', $timestamp);
   }
 
-  public static function userHasEditPartyPermission($partyId, $userId)
+  public static function userHasEditPartyPermission($partyId, $userId = null, $role = 3)
   {
+
+      if( is_null($userId) )
+        $userId = Auth::user()->id;
+
       if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
         return true;
       } else {
-        if (FixometerHelper::hasRole(Auth::user(), 'Host')) {
-          $group_id_of_event = Party::where('idevents', $partyId)->value('group');
-          if (FixometerHelper::userIsHostOfGroup($group_id_of_event, $userId)) {
-              return true;
-          } else if (empty(DB::table('events_users')->where('event', $partyId)->where('user', $userId)->first())) {
-            return false;
-          } else {
+
+        //if (FixometerHelper::hasRole(Auth::user(), 'Host')) {
+          $event_users = EventsUsers::where('user', $userId)
+                                      ->where('role', $role)
+                                        ->where('event', $partyId)
+                                          ->get();
+
+          if ( !$event_users->isEmpty() ) {
             return true;
+          } else {
+            return false;
           }
-        } else {
+        //} else {
           return false;
-        }
+        //}
       }
-  }
+
+    }
 
     public static function userCanCreateEvents($user)
     {
