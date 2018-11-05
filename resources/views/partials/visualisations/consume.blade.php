@@ -5,5 +5,6 @@
     @else
       <p>{{{ $equal_to }}} {{{ str_plural($measure, $equal_to) }}}</p>
     @endif
+    <br>
     @include('partials.visualisations.'.$measure.'-svg')
 </aside>

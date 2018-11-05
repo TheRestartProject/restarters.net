@@ -1,3 +1,4 @@
+@if( $event->hasFinished() )
 <!-- Modal -->
 <div class="modal fade" id="event-share-stats" tabindex="-1" role="dialog" aria-labelledby="eventShareStatsLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
@@ -50,14 +51,34 @@
             <div id="collapseEventCO2" class="collapse" aria-labelledby="headingEventCO2" data-parent="#accordionEvent">
               <div class="card-body">
 
+                  <p>@lang('events.infographic_message')</p>
+
                   <div class="form-group">
                       <label for="event_co2_stats_embed">@lang('events.embed_code_header'):</label>
-                      <input type="text" class="form-control field" id="event_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}" frameborder="0" width="700" height="850"></iframe>'>
+                      <input type="text" class="form-control field" id="event_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/manufacture" frameborder="0" width="700" height="850"></iframe>'>
                   </div>
-                  <small class="after-offset">@lang('events.infographic_message')</small>
+                  @if( round($stats['co2']) > 900 )
+                    <small class="after-offset">@lang('visualisation.message_manufacture_high')</small>
+                  @else
+                    <small class="after-offset">@lang('visualisation.message_manufacture_low')</small>
+                  @endif
 
                   <div class="embed-responsive embed-responsive-21by9">
-                    <iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}" frameborder="0" width="700" height="850" class="form-control embed-responsive-item"></iframe>
+                    <iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/manufacture" frameborder="0" width="700" height="850" class="form-control embed-responsive-item"></iframe>
+                  </div>
+
+                  <div class="form-group">
+                      <label for="event_co2_stats_embed">@lang('events.embed_code_header'):</label>
+                      <input type="text" class="form-control field" id="event_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/consume" frameborder="0" width="700" height="850"></iframe>'>
+                  </div>
+                  @if( round($stats['co2']) > 6000 )
+                    <small class="after-offset">@lang('visualisation.message_consume_high')</small>
+                  @else
+                    <small class="after-offset">@lang('visualisation.message_consume_low')</small>
+                  @endif
+
+                  <div class="embed-responsive embed-responsive-21by9">
+                    <iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/consume" frameborder="0" width="700" height="850" class="form-control embed-responsive-item"></iframe>
                   </div>
 
               </div>
@@ -72,3 +93,4 @@
     </div>
   </div>
 </div>
+@endif

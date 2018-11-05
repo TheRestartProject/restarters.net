@@ -1,7 +1,7 @@
 <aside class="widget widget__2">
     <h2>{{{ $title }}}</h2>
     <p title="{{{ $co2 }}}kg of CO2">{{{ $equal_to }}} {{{ str_plural($measure, $equal_to) }}}</p>
-
+    <br>
     <div class="row row-compressed">
 
         @php( $item = 1 )
