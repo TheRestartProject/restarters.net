@@ -839,10 +839,10 @@ public function edit($id)
     // event(new EditGroup(Group::findOrFail($id)));
 
 
-    if (!empty($_POST['group_tags'])) {
-
+    if ( !empty($_POST['group_tags']) ) {
       $Group->find($id)->group_tags()->sync($_POST['group_tags']);
-
+    } else {
+      $Group->find($id)->group_tags()->sync([]);
     }
 
     if(!$u) {
@@ -1095,7 +1095,7 @@ public static function statsByGroupTag($group_tag_id, $format = 'row')
   $groupStats['format'] = $format;
 
   return view('group.stats', $groupStats);
-  
+
 }
 
 public function getJoinGroup($group_id) {
