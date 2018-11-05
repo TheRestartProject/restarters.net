@@ -113,20 +113,19 @@ class FixometerHelper {
         return true;
       } else {
 
-        //if (FixometerHelper::hasRole(Auth::user(), 'Host')) {
+        if (FixometerHelper::hasRole(Auth::user(), 'Host')) {
           $event_users = EventsUsers::where('user', $userId)
                                       ->where('role', $role)
                                         ->where('event', $partyId)
                                           ->get();
 
-          if ( !$event_users->isEmpty() ) {
+          if ( !$event_users->isEmpty() )
             return true;
-          } else {
-            return false;
-          }
-        //} else {
-          return false;
-        //}
+
+        }
+        
+        return false;
+
       }
 
     }
