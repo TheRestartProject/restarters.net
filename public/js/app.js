@@ -30082,7 +30082,7 @@ module.exports = __webpack_require__(173);
 /* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _tag_options;
+var _tag_options, _tag_options_with_inp;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -30802,12 +30802,25 @@ tag_options = (_tag_options = {
     }
   }
 }, _defineProperty(_tag_options, 'minimumInputLength', 2), _defineProperty(_tag_options, 'createTag', function createTag(params) {
+  return null;
+}), _tag_options);
+
+tag_options_with_input = (_tag_options_with_inp = {
+  tags: true,
+  minimumInputLength: 2,
+  formatInputTooShort: "Type a brand name",
+  language: {
+    inputTooShort: function inputTooShort() {
+      return 'Type a brand name';
+    }
+  }
+}, _defineProperty(_tag_options_with_inp, 'minimumInputLength', 2), _defineProperty(_tag_options_with_inp, 'createTag', function createTag(params) {
   return {
     id: params.term,
     text: params.term,
     newOption: true
   };
-}), _tag_options);
+}), _tag_options_with_inp);
 
 function select2Fields() {
   var $target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
@@ -30816,15 +30829,13 @@ function select2Fields() {
   if ($target === false) {
 
     jQuery('.select2').select2();
-    //jQuery('.table-row-details').find('select').select2();
-    jQuery('.select2-tags').select2({ tags: true });
-    jQuery(".select2-with-input").select2(tag_options);
+    jQuery('.select2-tags').select2(tag_options);
+    jQuery(".select2-with-input").select2(tag_options_with_input);
   } else {
 
     $target.find('.select2').select2();
-    //$target.find('.table-row-details').select2();
-    $target.find('.select2-tags').select2({ tags: true });
-    $target.find(".select2-with-input").select2(tag_options);
+    $target.find('.select2-tags').select2(tag_options);
+    $target.find(".select2-with-input").select2(tag_options_with_input);
   }
 
   // $(document).on('focus', '.select2.select2-container', function (e) {

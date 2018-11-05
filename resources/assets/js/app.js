@@ -759,6 +759,21 @@ function initAutocomplete() {
     },
     minimumInputLength: 2,
     createTag: function (params) {
+      return null;
+    }
+  }
+
+  tag_options_with_input = {
+    tags: true,
+    minimumInputLength: 2,
+    formatInputTooShort: "Type a brand name",
+    language: {
+      inputTooShort: function inputTooShort() {
+        return 'Type a brand name';
+      }
+    },
+    minimumInputLength: 2,
+    createTag: function (params) {
       return {
         id: params.term,
         text: params.term,
@@ -773,16 +788,14 @@ function initAutocomplete() {
     if( $target === false ){
 
       jQuery('.select2').select2();
-      //jQuery('.table-row-details').find('select').select2();
-      jQuery('.select2-tags').select2({tags: true});
-      jQuery(".select2-with-input").select2(tag_options);
+      jQuery('.select2-tags').select2(tag_options);
+      jQuery(".select2-with-input").select2(tag_options_with_input);
 
     } else {
 
       $target.find('.select2').select2();
-      //$target.find('.table-row-details').select2();
-      $target.find('.select2-tags').select2({tags: true});
-      $target.find(".select2-with-input").select2(tag_options);
+      $target.find('.select2-tags').select2(tag_options);
+      $target.find(".select2-with-input").select2(tag_options_with_input);
 
     }
 
