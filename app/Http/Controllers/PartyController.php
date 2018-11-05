@@ -149,9 +149,11 @@ class PartyController extends Controller {
   {
 
     // Let's determine whether currently logged in user is associated with any groups
-    $user_groups = UserGroups::where('user', Auth::user()->id)
-    ->where('role', 3)
-    ->get();
+    $user_groups = UserGroups::join('groups', 'groups.idgroups', '=', 'users_groups.group')
+                                ->where('user', Auth::user()->id)
+                                  ->where('role', 3)
+                                    ->select('groups.idgroups AS id', 'groups.name')
+                                      ->get();
 
     // Then let's redirect users away if they are a restarter or a host with no groups
     if( FixometerHelper::hasRole(Auth::user(), 'Restarter') || ( count($user_groups) == 0 && FixometerHelper::hasRole(Auth::user(), 'Host') ) )
