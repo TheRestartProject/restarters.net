@@ -750,15 +750,7 @@ function initAutocomplete() {
 
   tag_options = {
     tags: true,
-    minimumInputLength: 2,
-    formatInputTooShort: "Type a brand name",
-    language: {
-      inputTooShort: function inputTooShort() {
-        return 'Type a brand name';
-      }
-    },
-    minimumInputLength: 2,
-    createTag: function (params) {
+    createTag: function (params) { 
       return null;
     }
   }

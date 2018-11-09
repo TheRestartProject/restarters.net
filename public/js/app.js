@@ -30082,7 +30082,7 @@ module.exports = __webpack_require__(173);
 /* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _tag_options, _tag_options_with_inp;
+var _tag_options_with_inp;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -30792,18 +30792,12 @@ function resetForm(e) {
   }
 }
 
-tag_options = (_tag_options = {
+tag_options = {
   tags: true,
-  minimumInputLength: 2,
-  formatInputTooShort: "Type a brand name",
-  language: {
-    inputTooShort: function inputTooShort() {
-      return 'Type a brand name';
-    }
+  createTag: function createTag(params) {
+    return null;
   }
-}, _defineProperty(_tag_options, 'minimumInputLength', 2), _defineProperty(_tag_options, 'createTag', function createTag(params) {
-  return null;
-}), _tag_options);
+};
 
 tag_options_with_input = (_tag_options_with_inp = {
   tags: true,
