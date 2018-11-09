@@ -202,7 +202,7 @@ class ExportController extends Controller {
           }
 
         }
-        
+
         fclose($file);
 
         $headers = array(
@@ -527,7 +527,7 @@ class ExportController extends Controller {
 
     //country hours completed
       $country_hours_completed = clone $user_events;
-      $country_hours_completed = $country_hours_completed->groupBy('country')->select('country', DB::raw('SUM(TIMEDIFF(end, start)) as event_hours'));
+      $country_hours_completed = $country_hours_completed->groupBy('users.country')->select('users.country', DB::raw('SUM(TIMEDIFF(end, start)) as event_hours'));
       $all_country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DSC')->get();
       $country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DSC')->take(5)->get();
 
