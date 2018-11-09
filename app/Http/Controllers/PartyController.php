@@ -1507,8 +1507,10 @@ public function emailHosts() {
 */
 public function getContributions($event_id){
 
-  // Let's check that current logged in user is a host of the event
-  if( FixometerHelper::userHasEditPartyPermission($event_id) ){
+  $event = Party::find($event_id);
+
+  // Let's check that current logged in user is a host of the event or a host of the group
+  if( FixometerHelper::userHasEditPartyPermission($event_id) || FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id) ){
 
     if(env('APP_ENV') == 'development' || env('APP_ENV') == 'local') { //Testing purposes
 
@@ -1523,8 +1525,6 @@ public function getContributions($event_id){
       ->get();
 
     }
-
-    $event = Party::find($event_id);
 
     Notification::send($all_restarters, new EventRepairs([
       'event_name' => $event->getEventName(),

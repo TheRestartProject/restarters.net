@@ -66,7 +66,7 @@
       <div class="col-lg-3">
         <div class="button-group button-group__r">
           @if( Auth::check() )
-            @if( FixometerHelper::userHasEditPartyPermission($formdata->id) )
+            @if( FixometerHelper::userHasEditPartyPermission($formdata->id) || FixometerHelper::userIsHostOfGroup($formdata->group_id, Auth::user()->id) )
             <div class="dropdown">
               <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Event actions
