@@ -145,7 +145,7 @@ class PartyController extends Controller {
     ]);
   }
 
-  public function create(Request $request)
+  public function create(Request $request, $group_id = null)
   {
 
     // Let's determine whether currently logged in user is associated with any groups
@@ -310,6 +310,7 @@ class PartyController extends Controller {
           'udata' => $_POST,
           'user' => Auth::user(),
           'user_groups' => $user_groups,
+          'selected_group_id' => $group_id,
         ]);
       }
     }
@@ -321,6 +322,7 @@ class PartyController extends Controller {
       'group_list' => $Groups->findAll(),
       'user' => Auth::user(),
       'user_groups' => $user_groups,
+      'selected_group_id' => $group_id,
     ]);
 
   }
