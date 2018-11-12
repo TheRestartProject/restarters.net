@@ -30939,18 +30939,6 @@ jQuery(function () {
     }
   });
 
-  jQuery(document).on('change', '.repair_status_edit', function (e) {
-    $value = jQuery(this).val();
-    $field = $('#repair_details_edit');
-    if ($value == 2) {
-      $field.prop('disabled', false);
-    } else {
-      $field.val(0);
-      $field.trigger('change');
-      $field.prop('disabled', true);
-    }
-  });
-
   jQuery(document).on('change', '.category', function (e) {
     $value = parseInt(jQuery(this).val());
     $field = jQuery(this).parents('td').find('.weight');
@@ -79434,6 +79422,28 @@ jQuery('.useful-repair-urls').on('keyup', 'input', function (e) {
 jQuery('.useful-repair-urls').on('enterKey', 'input', createNewDeviceUrl);
 jQuery('.useful-repair-urls').on('change', '.save-url input', editDeviceUrl);
 jQuery('.useful-repair-urls').on('change', '.error', clearErrorClass);
+
+jQuery(function () {
+
+  jQuery(document).on('change', 'select[name=repair_status]', function (e) {
+
+    $status = $(this).val();
+    $repair_details = $('#repair_details_edit');
+
+    if ($status == 1) {
+
+      $repair_details.parents('.col-lg-4').hide();
+      $repair_details.val(0).trigger('change');
+    } else if ($status == 2) {
+
+      $repair_details.parents('.col-lg-4').show();
+    } else {
+
+      $repair_details.parents('.col-lg-4').hide();
+      $repair_details.val(0).trigger('change');
+    }
+  });
+});
 
 /***/ })
 /******/ ]);

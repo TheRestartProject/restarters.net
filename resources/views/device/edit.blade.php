@@ -153,12 +153,12 @@
                                       <?php if(isset($error) && isset($error['repair_status']) && !empty($error['repair_status'])) { echo '<span class="help-block text-danger">' . $error['repair_status'] . '</span>'; } ?>
                                   </div>
                               </div>
-                              <div class="col-lg-4">
+                              <div class="col-lg-4" <?php echo ($formdata->repair_status == 2 ? '' : 'style="display: none;"'); ?>>
                                   <div class="form-group">
-                                      <label class="sr-only" for="repair_status_2">@lang('devices.repair_status'):</label>
-                                      <div class="form-control form-control__select form-control__nolabel">
-                                          <select name="repair_more" id="repair_details_edit" class="form-control field select2" <?php echo ($formdata->repair_status == 2 ? '' : 'disabled'); ?>>
-                                            <option value="0">-- Repair Details --</option>
+                                      <label for="repair_status_2">@lang('devices.repair_details'):</label>
+                                      <div class="form-control form-control__select">
+                                          <select name="repair_more" id="repair_details_edit" class="form-control field select2">
+                                            <option value="0">-- Repair details --</option>
                                             <option value="1" <?php echo ($formdata->more_time_needed == 1 ? ' selected' : '') ?>>More time needed</option>
                                             <option value="2" <?php echo ($formdata->professional_help == 1 ? ' selected' : '') ?>>Professional help</option>
                                             <option value="3" <?php echo ($formdata->do_it_yourself == 1 ? ' selected' : '') ?>>Do it yourself</option>

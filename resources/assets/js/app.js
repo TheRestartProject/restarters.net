@@ -903,18 +903,6 @@ function initAutocomplete() {
       }
     });
 
-    jQuery(document).on('change', '.repair_status_edit', function (e) {
-      $value = jQuery(this).val();
-      $field = $('#repair_details_edit');
-      if( $value == 2 ){
-        $field.prop('disabled', false);
-      } else {
-        $field.val(0);
-        $field.trigger('change');
-        $field.prop('disabled', true);
-      }
-    });
-
     jQuery(document).on('change', '.category', function (e) {
       $value = parseInt(jQuery(this).val());
       $field = jQuery(this).parents('td').find('.weight');

@@ -145,3 +145,29 @@ jQuery('.useful-repair-urls').on('keyup', 'input', function(e){
 jQuery('.useful-repair-urls').on('enterKey', 'input', createNewDeviceUrl);
 jQuery('.useful-repair-urls').on('change', '.save-url input', editDeviceUrl);
 jQuery('.useful-repair-urls').on('change', '.error', clearErrorClass);
+
+jQuery(function () {
+
+  jQuery(document).on('change', 'select[name=repair_status]', function (e) {
+
+    $status = $(this).val();
+    $repair_details = $('#repair_details_edit');
+
+    if( $status == 1 ){
+
+      $repair_details.parents('.col-lg-4').hide();
+      $repair_details.val(0).trigger('change');
+
+    } else if( $status == 2 ){
+
+      $repair_details.parents('.col-lg-4').show();
+
+    } else {
+
+      $repair_details.parents('.col-lg-4').hide();
+      $repair_details.val(0).trigger('change');
+
+    }
+  });
+
+});
