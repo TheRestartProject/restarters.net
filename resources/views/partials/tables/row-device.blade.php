@@ -208,6 +208,8 @@
                   <textarea class="form-control" rows="6" name="problem-{{ $device->iddevices }}" id="problem-{{ $device->iddevices }}">{!! $device->problem !!}</textarea>
               </div>
 
+              @include('partials.useful-repair-urls', ['urls' => $device->urls, 'device' => $device])
+
           </div>
           <div class="col-12 col-lg-6 flex-column d-flex">
 

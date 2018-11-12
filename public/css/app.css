@@ -15272,6 +15272,39 @@ table.sortable > thead th div.mozilla {
   }
 }
 
+.useful-repair-urls .input-group {
+  margin-top: 0.5rem;
+}
+
+.useful-repair-urls .input-group .form-control {
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.useful-repair-urls .input-group .form-control.error {
+  border-color: red;
+}
+
+.useful-repair-urls .input-group .btn-link {
+  font-size: 35px;
+  color: #00B0C6;
+  padding: 0 10px;
+  line-height: 0px;
+}
+
+.useful-repair-urls .input-group .btn-link:hover {
+  text-decoration: none;
+}
+
+.useful-repair-urls .input-group .btn-link span {
+  position: relative;
+  top: -2px;
+}
+
+.useful-repair-urls label {
+  margin-bottom: 0 !important;
+}
+
 .registration {
   padding: 10px 0;
 }

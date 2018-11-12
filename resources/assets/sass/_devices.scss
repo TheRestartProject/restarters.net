@@ -14,7 +14,7 @@
         font-size: 26px;
         margin: 0 0 20px 0;
     }
-    
+
     legend {
         color: $brand;
         font-size: 20px;
@@ -31,4 +31,44 @@
     @include media-breakpoint-up(lg) {
         padding-left: 20px;
     }
+}
+
+.useful-repair-urls {
+
+  .input-group {
+
+    margin-top: 0.5rem;
+
+    .form-control {
+      border-top-right-radius: 0.25rem;
+      border-bottom-right-radius: 0.25rem;
+
+      &.error {
+        border-color: red;
+      }
+
+    }
+
+    .btn-link {
+      font-size: 35px;
+      color: #00B0C6;
+      padding: 0 10px;
+      line-height: 0px;
+
+      &:hover {
+        text-decoration: none;
+      }
+
+      span {
+        position: relative;
+        top: -2px;
+      }
+
+    }
+  }
+
+  label {
+    margin-bottom: 0 !important;
+  }
+
 }

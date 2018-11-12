@@ -139,7 +139,6 @@
 
                       </div>
                       <div class="offset-lg-1 col-lg-7">
-                          <?php //dd($formdata); ?>
                           <div class="row">
                               <div class="col-lg-4">
                                   <div class="form-group">
@@ -180,14 +179,12 @@
                               </div>
                           </div>
 
-
                           <div class="form-group">
                               <label for="problem">@lang('devices.devices_description'):</label>
-                              <!-- <div id="textarea-1" class="rte"></div>
-                              <noscript> -->
-                                  <textarea class="form-control rte" name="problem" id="problem"><?php echo $formdata->problem; ?></textarea>
-                              <!-- </noscript> -->
+                              <textarea class="form-control rte" name="problem" id="problem"><?php echo $formdata->problem; ?></textarea>
                           </div>
+
+                          @include('partials.useful-repair-urls', ['urls' => $formdata->urls, 'device' => $formdata])
 
                           <h6>@lang('devices.suitable')</h6>
 

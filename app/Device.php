@@ -464,6 +464,9 @@ AND devices.event = events.idevents ';
         return $this->hasOne('App\Category', 'idcategories', 'category');
     }
 
+    public function urls(){
+        return $this->hasMany('App\DeviceUrl', 'device_id', 'iddevices');
+    }
 
     public function co2Diverted($emissionRatio, $displacementFactor)
     {

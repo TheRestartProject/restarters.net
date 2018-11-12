@@ -77,6 +77,7 @@ return array(
     'App\\Listeners\\CreateWordPressApproveGroupPost' => $baseDir . '/app/Listeners/CreateWordPressApproveGroupPost.php',
     'App\\Listeners\\CreateWordPressEditEventPost' => $baseDir . '/app/Listeners/CreateWordPressEditEventPost.php',
     'App\\Listeners\\CreateWordPressEditGroupPost' => $baseDir . '/app/Listeners/CreateWordPressEditGroupPost.php',
+    'App\\Listeners\\LogSuccessfulLogin' => $baseDir . '/app/Listeners/LogSuccessfulLogin.php',
     'App\\Mail\\RegistrationWelcome' => $baseDir . '/app/Mail/RegistrationWelcome.php',
     'App\\Notifications\\AccountCreated' => $baseDir . '/app/Notifications/AccountCreated.php',
     'App\\Notifications\\AdminAbnormalDevices' => $baseDir . '/app/Notifications/AdminAbnormalDevices.php',

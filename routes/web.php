@@ -97,6 +97,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   });
 
   //Device Controller
+  Route::resource('device-url', 'DeviceUrlController');
   Route::prefix('device')->group(function () {
     Route::get('/', 'DeviceController@index')->name('devices');
     Route::get('/search', 'DeviceController@search');

@@ -540,6 +540,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Listeners\\CreateWordPressApproveGroupPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressApproveGroupPost.php',
         'App\\Listeners\\CreateWordPressEditEventPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressEditEventPost.php',
         'App\\Listeners\\CreateWordPressEditGroupPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressEditGroupPost.php',
+        'App\\Listeners\\LogSuccessfulLogin' => __DIR__ . '/../..' . '/app/Listeners/LogSuccessfulLogin.php',
         'App\\Mail\\RegistrationWelcome' => __DIR__ . '/../..' . '/app/Mail/RegistrationWelcome.php',
         'App\\Notifications\\AccountCreated' => __DIR__ . '/../..' . '/app/Notifications/AccountCreated.php',
         'App\\Notifications\\AdminAbnormalDevices' => __DIR__ . '/../..' . '/app/Notifications/AdminAbnormalDevices.php',
