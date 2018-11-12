@@ -72,3 +72,13 @@
   }
 
 }
+
+.col-device-auto {
+  -webkit-box-orient: vertical !important;
+  -webkit-box-direction: normal !important;
+  -ms-flex-direction: column !important;
+  flex-direction: column !important;
+  display: table-cell !important;
+  width: auto;
+  max-width: none;
+}

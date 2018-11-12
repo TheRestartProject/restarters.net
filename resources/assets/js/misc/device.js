@@ -151,48 +151,48 @@ jQuery(function () {
   jQuery(document).on('change', 'select[name=repair_status]', function (e) {
 
     $status = $(this).val();
-    $repair_details = $('#repair_details_edit');
-    $spare_parts = $('#spare_parts');
-    $end_of_life = $('#repair_end_of_life');
+    $repair_details = $(this).parents('.row').find('.repair-details-edit');
+    $spare_parts = $(this).parents('.row').find('.spare-parts');
+    $end_of_life = $(this).parents('.row').find('.repair-end-of-life');
 
     if( $status == 1 ){
 
       // Reset and hide repair details
-      $repair_details.parents('.col-lg-4').hide();
+      $repair_details.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
       $repair_details.val(0).trigger('change');
 
       // Reset and hide spare parts
-      $spare_parts.parents('.col-lg-4').hide();
+      $spare_parts.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
       $spare_parts.val(0).trigger('change');
 
       // Reset and hide end of life select
-      $end_of_life.parents('.col-lg-4').hide();
+      $end_of_life.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
       $end_of_life.val(0).trigger('change');
 
     } else if( $status == 2 ){
 
       // Show repair details field
-      $repair_details.parents('.col-lg-4').show();
+      $repair_details.parents('.col-4').addClass('col-device-auto');
 
       // Show spare parts field
-      $spare_parts.parents('.col-lg-4').show();
+      $spare_parts.parents('.col-4').addClass('col-device-auto');
 
       // Reset and hide end of life select
-      $end_of_life.parents('.col-lg-4').hide();
+      $end_of_life.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
       $end_of_life.val(0).trigger('change');
 
     } else {
 
       // Reset and hide repair details
-      $repair_details.parents('.col-lg-4').hide();
+      $repair_details.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
       $repair_details.val(0).trigger('change');
 
       // Reset and hide spare parts
-      $spare_parts.parents('.col-lg-4').hide();
+      $spare_parts.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
       $spare_parts.val(0).trigger('change');
 
       // Show end of life field
-      $end_of_life.parents('.col-lg-4').show();
+      $end_of_life.parents('.col-4').addClass('col-device-auto');
 
     }
   });

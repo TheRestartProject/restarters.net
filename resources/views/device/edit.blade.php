@@ -140,11 +140,11 @@
                       </div>
                       <div class="offset-lg-1 col-lg-7">
                           <div class="row">
-                              <div class="col-lg-4">
+                              <div class="col-4 col-lg-auto flex-column d-flex d-lg-table-cell">
                                   <div class="form-group">
                                       <label for="repair_status">@lang('devices.repair_status'):</label>
                                       <div class="form-control form-control__select">
-                                          <select name="repair_status" id="repair_status" class="form-control field select2 repair_status_edit">
+                                          <select name="repair_status" id="repair_status" class="form-control field select2 repair-status">
                                             <option value="1" <?php echo ($formdata->repair_status == 1 ? ' selected' : ''); ?>>Fixed</option>
                                             <option value="2" <?php echo ($formdata->repair_status == 2 ? ' selected' : ''); ?>>Repairable</option>
                                             <option value="3" <?php echo ($formdata->repair_status == 3 ? ' selected' : ''); ?>>End of lifecycle</option>
@@ -153,11 +153,11 @@
                                       <?php if(isset($error) && isset($error['repair_status']) && !empty($error['repair_status'])) { echo '<span class="help-block text-danger">' . $error['repair_status'] . '</span>'; } ?>
                                   </div>
                               </div>
-                              <div class="col-lg-4" <?php echo ($formdata->repair_status == 2 ? '' : 'style="display: none;"'); ?>>
+                              <div class="col-4 <?php echo ($formdata->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
                                   <div class="form-group">
                                       <label for="repair_status_2">@lang('devices.repair_details'):</label>
                                       <div class="form-control form-control__select">
-                                          <select name="repair_more" id="repair_details_edit" class="form-control field select2">
+                                          <select name="repair_more" id="repair_details_edit" class="form-control field select2 repair-details-edit">
                                             <option value="0">-- Repair details --</option>
                                             <option value="1" <?php echo ($formdata->more_time_needed == 1 ? ' selected' : '') ?>>More time needed</option>
                                             <option value="2" <?php echo ($formdata->professional_help == 1 ? ' selected' : '') ?>>Professional help</option>
@@ -166,11 +166,11 @@
                                       </div>
                                   </div>
                               </div>
-                              <div class="col-lg-4" <?php echo ($formdata->repair_status == 2 ? '' : 'style="display: none;"'); ?>>
+                              <div class="col-4 <?php echo ($formdata->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
                                   <div class="form-group">
                                       <label for="spare_parts">@lang('devices.spare_parts_required'):</label>
                                       <div class="form-control form-control__select">
-                                          <select name="spare_parts" id="spare_parts" class="form-control field select2">
+                                          <select name="spare_parts" id="spare_parts" class="form-control field select2 spare-parts">
                                             <option value="0">-- Select --</option>
                                             <option value="1" <?php echo ($formdata->spare_parts == 1 ? ' selected' : '') ?>>Yes</option>
                                             <option value="2" <?php echo ($formdata->spare_parts == 2 ? ' selected' : '') ?>>No</option>
@@ -178,11 +178,11 @@
                                       </div>
                                   </div>
                               </div>
-                              <div class="col-lg-4" <?php echo ($formdata->repair_status == 3 ? '' : 'style="display: none;"'); ?>>
+                              <div class="col-4 <?php echo ($formdata->repair_status == 3 ? 'col-device-auto' : 'd-none'); ?>">
                                   <div class="form-group">
                                       <label for="repair_end_of_life">@lang('devices.repair_end_of_life'):</label>
                                       <div class="form-control form-control__select">
-                                          <select name="end_of_life" id="repair_end_of_life" class="form-control field select2">
+                                          <select name="end_of_life" id="repair_end_of_life" class="form-control field select2 repair-end-of-life">
                                             <option value="0">-- Select --</option>
                                           </select>
                                       </div>

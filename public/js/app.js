@@ -30075,7 +30075,7 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(136);
-module.exports = __webpack_require__(173);
+module.exports = __webpack_require__(174);
 
 
 /***/ }),
@@ -30101,9 +30101,9 @@ __webpack_require__(165);
 __webpack_require__(167);
 __webpack_require__(168);
 __webpack_require__(169);
-__webpack_require__(196);
-window.Dropzone = __webpack_require__(170);
-window.Tokenfield = __webpack_require__(171);
+__webpack_require__(170);
+window.Dropzone = __webpack_require__(171);
+window.Tokenfield = __webpack_require__(172);
 
 if (jQuery('.slideshow').length > 0) {
   jQuery('.slideshow').slick({
@@ -30925,19 +30925,19 @@ jQuery(function () {
     jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
   });
 
-  jQuery(document).on('change', '.repair_status', function (e) {
-    $value = jQuery(this).val();
-    $field = jQuery(this).parents('td').find('.repair_details');
-    if ($value == 2) {
-      $field.prop('disabled', false);
-      $field.parents('.repair-more').removeClass('d-none');
-    } else {
-      $field.val(0);
-      $field.trigger('change');
-      $field.prop('disabled', true);
-      $field.parents('.repair-more').addClass('d-none');
-    }
-  });
+  // jQuery(document).on('change', '.repair_status', function (e) {
+  //   $value = jQuery(this).val();
+  //   $field = jQuery(this).parents('td').find('.repair_details');
+  //   if( $value == 2 ){
+  //     $field.prop('disabled', false);
+  //     $field.parents('.repair-more').removeClass('d-none');
+  //   } else {
+  //     $field.val(0);
+  //     $field.trigger('change');
+  //     $field.prop('disabled', true);
+  //     $field.parents('.repair-more').addClass('d-none');
+  //   }
+  // });
 
   jQuery(document).on('change', '.category', function (e) {
     $value = parseInt(jQuery(this).val());
@@ -73570,6 +73570,196 @@ jQuery('.js-load').on('click', showOlderNotifications);
 
 /***/ }),
 /* 170 */
+/***/ (function(module, exports) {
+
+function validUrl(url) {
+  if (/^(http|https|ftp):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,14}(:[0-9]{1,5})?(\/.*)?$/i.test(url)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function createNewDeviceUrl(event) {
+
+  event.preventDefault();
+
+  // Prepare our variables
+  $row = $(this).parents('.input-group');
+  $btn = $row.find('.btn');
+  $value = $row.find('.form-control');
+  $device_id = $row.data('device_id');
+
+  // If entered value is not empty and is a valid URL
+  if ($value.val() !== '' && validUrl($value.val())) {
+
+    // Let's save our data
+    $.ajax({
+      type: 'POST',
+      url: '/device-url',
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      data: {
+        device_id: $device_id,
+        url: $value.val()
+      },
+      success: function success(data) {
+
+        // Clone row ready to be used again
+        $row.attr('data-id', data.success).clone().find(".form-control").val("").end().appendTo('.additional-urls');
+
+        // Existing row to be different in appearance and behaviour
+        $btn.find('span').text('-');
+        $row.removeClass('add-url');
+        $row.addClass('save-url');
+
+        // Now focus into the new input
+        $('.additional-urls input:last').focus();
+      },
+      error: function error(_error) {
+        alert('Cannot create device URL, please try again');
+      }
+    });
+  } else {
+
+    // Make obvious what field has an error and focus into it
+    $value.addClass('error');
+    $value.focus();
+    alert('Please enter a URL to proceed');
+  }
+}
+
+function editDeviceUrl(event) {
+
+  event.preventDefault();
+
+  // Prepare our variables
+  $row = $(this).parents('.input-group');
+  $value = $row.find('.form-control');
+  $id = $row.data('id');
+
+  // If entered value is not empty and is a valid URL
+  if ($value.val() !== '' && validUrl($value.val())) {
+
+    // Let's save our data
+    $.ajax({
+      type: 'PUT',
+      url: '/device-url/' + $id,
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      data: {
+        url: $value.val()
+      },
+      error: function error(_error2) {
+        alert('Cannot create device URL, please try again');
+      }
+    });
+  } else {
+
+    // Make obvious what field has an error and focus into it
+    $value.addClass('error');
+    $value.focus();
+    alert('Please enter a URL to continue');
+  }
+}
+
+function removeNewDeviceUrl(event) {
+
+  event.preventDefault();
+
+  $row = $(this).parents('.input-group');
+  $id = $row.data('id');
+
+  // If entered value is not empty and is a valid URL
+  if (confirm('Are you sure you want to remove this URL?')) {
+    // Let's save our data
+    $.ajax({
+      type: 'DELETE',
+      url: '/device-url/' + $id,
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      success: function success() {
+
+        $row.remove();
+      },
+      error: function error(_error3) {
+        alert('Cannot create device URL, please try again');
+      }
+    });
+  }
+}
+
+function clearErrorClass(event) {
+
+  event.preventDefault();
+  $(this).removeClass('error');
+}
+
+jQuery('.useful-repair-urls').on('click', '.save-url .btn', removeNewDeviceUrl);
+jQuery('.useful-repair-urls').on('click', '.add-url .btn', createNewDeviceUrl);
+jQuery('.useful-repair-urls').on('keyup', 'input', function (e) {
+  if (e.keyCode == 13) {
+    $(this).trigger("enterKey");
+  }
+});
+jQuery('.useful-repair-urls').on('enterKey', 'input', createNewDeviceUrl);
+jQuery('.useful-repair-urls').on('change', '.save-url input', editDeviceUrl);
+jQuery('.useful-repair-urls').on('change', '.error', clearErrorClass);
+
+jQuery(function () {
+
+  jQuery(document).on('change', 'select[name=repair_status]', function (e) {
+
+    $status = $(this).val();
+    $repair_details = $(this).parents('.row').find('.repair-details-edit');
+    $spare_parts = $(this).parents('.row').find('.spare-parts');
+    $end_of_life = $(this).parents('.row').find('.repair-end-of-life');
+
+    if ($status == 1) {
+
+      // Reset and hide repair details
+      $repair_details.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $repair_details.val(0).trigger('change');
+
+      // Reset and hide spare parts
+      $spare_parts.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $spare_parts.val(0).trigger('change');
+
+      // Reset and hide end of life select
+      $end_of_life.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $end_of_life.val(0).trigger('change');
+    } else if ($status == 2) {
+
+      // Show repair details field
+      $repair_details.parents('.col-4').addClass('col-device-auto');
+
+      // Show spare parts field
+      $spare_parts.parents('.col-4').addClass('col-device-auto');
+
+      // Reset and hide end of life select
+      $end_of_life.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $end_of_life.val(0).trigger('change');
+    } else {
+
+      // Reset and hide repair details
+      $repair_details.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $repair_details.val(0).trigger('change');
+
+      // Reset and hide spare parts
+      $spare_parts.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $spare_parts.val(0).trigger('change');
+
+      // Show end of life field
+      $end_of_life.parents('.col-4').addClass('col-device-auto');
+    }
+  });
+});
+
+/***/ }),
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77107,7 +77297,7 @@ function __guardMethod__(obj, methodName, transform) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
-/* 171 */
+/* 172 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports =
@@ -78888,7 +79078,7 @@ exports.default = Tokenfield;
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = __webpack_require__(172);
+module.exports = __webpack_require__(173);
 
 /***/ }),
 /* 3 */
@@ -78947,7 +79137,7 @@ function ajax(params) {
 /******/ ]);
 
 /***/ }),
-/* 172 */
+/* 173 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -79255,222 +79445,10 @@ function isUndefined(arg) {
 
 
 /***/ }),
-/* 173 */
+/* 174 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 174 */,
-/* 175 */,
-/* 176 */,
-/* 177 */,
-/* 178 */,
-/* 179 */,
-/* 180 */,
-/* 181 */,
-/* 182 */,
-/* 183 */,
-/* 184 */,
-/* 185 */,
-/* 186 */,
-/* 187 */,
-/* 188 */,
-/* 189 */,
-/* 190 */,
-/* 191 */,
-/* 192 */,
-/* 193 */,
-/* 194 */,
-/* 195 */,
-/* 196 */
-/***/ (function(module, exports) {
-
-function validUrl(url) {
-  if (/^(http|https|ftp):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,14}(:[0-9]{1,5})?(\/.*)?$/i.test(url)) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-function createNewDeviceUrl(event) {
-
-  event.preventDefault();
-
-  // Prepare our variables
-  $row = $(this).parents('.input-group');
-  $btn = $row.find('.btn');
-  $value = $row.find('.form-control');
-  $device_id = $row.data('device_id');
-
-  // If entered value is not empty and is a valid URL
-  if ($value.val() !== '' && validUrl($value.val())) {
-
-    // Let's save our data
-    $.ajax({
-      type: 'POST',
-      url: '/device-url',
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      data: {
-        device_id: $device_id,
-        url: $value.val()
-      },
-      success: function success(data) {
-
-        // Clone row ready to be used again
-        $row.attr('data-id', data.success).clone().find(".form-control").val("").end().appendTo('.additional-urls');
-
-        // Existing row to be different in appearance and behaviour
-        $btn.find('span').text('-');
-        $row.removeClass('add-url');
-        $row.addClass('save-url');
-
-        // Now focus into the new input
-        $('.additional-urls input:last').focus();
-      },
-      error: function error(_error) {
-        alert('Cannot create device URL, please try again');
-      }
-    });
-  } else {
-
-    // Make obvious what field has an error and focus into it
-    $value.addClass('error');
-    $value.focus();
-    alert('Please enter a URL to proceed');
-  }
-}
-
-function editDeviceUrl(event) {
-
-  event.preventDefault();
-
-  // Prepare our variables
-  $row = $(this).parents('.input-group');
-  $value = $row.find('.form-control');
-  $id = $row.data('id');
-
-  // If entered value is not empty and is a valid URL
-  if ($value.val() !== '' && validUrl($value.val())) {
-
-    // Let's save our data
-    $.ajax({
-      type: 'PUT',
-      url: '/device-url/' + $id,
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      data: {
-        url: $value.val()
-      },
-      error: function error(_error2) {
-        alert('Cannot create device URL, please try again');
-      }
-    });
-  } else {
-
-    // Make obvious what field has an error and focus into it
-    $value.addClass('error');
-    $value.focus();
-    alert('Please enter a URL to continue');
-  }
-}
-
-function removeNewDeviceUrl(event) {
-
-  event.preventDefault();
-
-  $row = $(this).parents('.input-group');
-  $id = $row.data('id');
-
-  // If entered value is not empty and is a valid URL
-  if (confirm('Are you sure you want to remove this URL?')) {
-    // Let's save our data
-    $.ajax({
-      type: 'DELETE',
-      url: '/device-url/' + $id,
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      success: function success() {
-
-        $row.remove();
-      },
-      error: function error(_error3) {
-        alert('Cannot create device URL, please try again');
-      }
-    });
-  }
-}
-
-function clearErrorClass(event) {
-
-  event.preventDefault();
-  $(this).removeClass('error');
-}
-
-jQuery('.useful-repair-urls').on('click', '.save-url .btn', removeNewDeviceUrl);
-jQuery('.useful-repair-urls').on('click', '.add-url .btn', createNewDeviceUrl);
-jQuery('.useful-repair-urls').on('keyup', 'input', function (e) {
-  if (e.keyCode == 13) {
-    $(this).trigger("enterKey");
-  }
-});
-jQuery('.useful-repair-urls').on('enterKey', 'input', createNewDeviceUrl);
-jQuery('.useful-repair-urls').on('change', '.save-url input', editDeviceUrl);
-jQuery('.useful-repair-urls').on('change', '.error', clearErrorClass);
-
-jQuery(function () {
-
-  jQuery(document).on('change', 'select[name=repair_status]', function (e) {
-
-    $status = $(this).val();
-    $repair_details = $('#repair_details_edit');
-    $spare_parts = $('#spare_parts');
-    $end_of_life = $('#repair_end_of_life');
-
-    if ($status == 1) {
-
-      // Reset and hide repair details
-      $repair_details.parents('.col-lg-4').hide();
-      $repair_details.val(0).trigger('change');
-
-      // Reset and hide spare parts
-      $spare_parts.parents('.col-lg-4').hide();
-      $spare_parts.val(0).trigger('change');
-
-      // Reset and hide end of life select
-      $end_of_life.parents('.col-lg-4').hide();
-      $end_of_life.val(0).trigger('change');
-    } else if ($status == 2) {
-
-      // Show repair details field
-      $repair_details.parents('.col-lg-4').show();
-
-      // Show spare parts field
-      $spare_parts.parents('.col-lg-4').show();
-
-      // Reset and hide end of life select
-      $end_of_life.parents('.col-lg-4').hide();
-      $end_of_life.val(0).trigger('change');
-    } else {
-
-      // Reset and hide repair details
-      $repair_details.parents('.col-lg-4').hide();
-      $repair_details.val(0).trigger('change');
-
-      // Reset and hide spare parts
-      $spare_parts.parents('.col-lg-4').hide();
-      $spare_parts.val(0).trigger('change');
-
-      // Show end of life field
-      $end_of_life.parents('.col-lg-4').show();
-    }
-  });
-});
 
 /***/ })
 /******/ ]);

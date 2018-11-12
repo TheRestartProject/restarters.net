@@ -15305,6 +15305,16 @@ table.sortable > thead th div.mozilla {
   margin-bottom: 0 !important;
 }
 
+.col-device-auto {
+  -webkit-box-orient: vertical !important;
+  -webkit-box-direction: normal !important;
+  -ms-flex-direction: column !important;
+  flex-direction: column !important;
+  display: table-cell !important;
+  width: auto;
+  max-width: none;
+}
+
 .registration {
   padding: 10px 0;
 }
@@ -17419,7 +17429,7 @@ table.sortable > thead th div.mozilla {
 .table-row-details td .table tr td {
   background-color: transparent;
   padding: 0 3px 0 0;
-  vertical-align: bottom;
+  vertical-align: top;
 }
 
 .table-row-details td .table tr td:last-child {

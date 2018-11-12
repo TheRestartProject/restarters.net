@@ -889,19 +889,19 @@ function initAutocomplete() {
       jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
     });
 
-    jQuery(document).on('change', '.repair_status', function (e) {
-      $value = jQuery(this).val();
-      $field = jQuery(this).parents('td').find('.repair_details');
-      if( $value == 2 ){
-        $field.prop('disabled', false);
-        $field.parents('.repair-more').removeClass('d-none');
-      } else {
-        $field.val(0);
-        $field.trigger('change');
-        $field.prop('disabled', true);
-        $field.parents('.repair-more').addClass('d-none');
-      }
-    });
+    // jQuery(document).on('change', '.repair_status', function (e) {
+    //   $value = jQuery(this).val();
+    //   $field = jQuery(this).parents('td').find('.repair_details');
+    //   if( $value == 2 ){
+    //     $field.prop('disabled', false);
+    //     $field.parents('.repair-more').removeClass('d-none');
+    //   } else {
+    //     $field.val(0);
+    //     $field.trigger('change');
+    //     $field.prop('disabled', true);
+    //     $field.parents('.repair-more').addClass('d-none');
+    //   }
+    // });
 
     jQuery(document).on('change', '.category', function (e) {
       $value = parseInt(jQuery(this).val());
