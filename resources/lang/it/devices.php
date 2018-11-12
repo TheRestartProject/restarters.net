@@ -39,6 +39,7 @@ return [
         'repair' => 'Repair date',
         'repair_status' => 'Status',
         'repair_details' => 'Repair details',
+        'repair_end_of_life' => 'End of life',
         'graphic-comment' => 'Comment',
         'graphic-camera' => 'Camera',
         'end' => 'End',

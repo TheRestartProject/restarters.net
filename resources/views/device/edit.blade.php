@@ -166,13 +166,24 @@
                                       </div>
                                   </div>
                               </div>
-                              <div class="col-lg-4">
+                              <div class="col-lg-4" <?php echo ($formdata->repair_status == 2 ? '' : 'style="display: none;"'); ?>>
                                   <div class="form-group">
                                       <label for="spare_parts">@lang('devices.spare_parts_required'):</label>
                                       <div class="form-control form-control__select">
-                                          <select name="spare_parts" id="spare_parts_1" class="form-control field select2">
+                                          <select name="spare_parts" id="spare_parts" class="form-control field select2">
+                                            <option value="0">-- Select --</option>
                                             <option value="1" <?php echo ($formdata->spare_parts == 1 ? ' selected' : '') ?>>Yes</option>
                                             <option value="2" <?php echo ($formdata->spare_parts == 2 ? ' selected' : '') ?>>No</option>
+                                          </select>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="col-lg-4" <?php echo ($formdata->repair_status == 3 ? '' : 'style="display: none;"'); ?>>
+                                  <div class="form-group">
+                                      <label for="repair_end_of_life">@lang('devices.repair_end_of_life'):</label>
+                                      <div class="form-control form-control__select">
+                                          <select name="end_of_life" id="repair_end_of_life" class="form-control field select2">
+                                            <option value="0">-- Select --</option>
                                           </select>
                                       </div>
                                   </div>

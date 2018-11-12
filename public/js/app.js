@@ -79429,18 +79429,45 @@ jQuery(function () {
 
     $status = $(this).val();
     $repair_details = $('#repair_details_edit');
+    $spare_parts = $('#spare_parts');
+    $end_of_life = $('#repair_end_of_life');
 
     if ($status == 1) {
 
+      // Reset and hide repair details
       $repair_details.parents('.col-lg-4').hide();
       $repair_details.val(0).trigger('change');
+
+      // Reset and hide spare parts
+      $spare_parts.parents('.col-lg-4').hide();
+      $spare_parts.val(0).trigger('change');
+
+      // Reset and hide end of life select
+      $end_of_life.parents('.col-lg-4').hide();
+      $end_of_life.val(0).trigger('change');
     } else if ($status == 2) {
 
+      // Show repair details field
       $repair_details.parents('.col-lg-4').show();
+
+      // Show spare parts field
+      $spare_parts.parents('.col-lg-4').show();
+
+      // Reset and hide end of life select
+      $end_of_life.parents('.col-lg-4').hide();
+      $end_of_life.val(0).trigger('change');
     } else {
 
+      // Reset and hide repair details
       $repair_details.parents('.col-lg-4').hide();
       $repair_details.val(0).trigger('change');
+
+      // Reset and hide spare parts
+      $spare_parts.parents('.col-lg-4').hide();
+      $spare_parts.val(0).trigger('change');
+
+      // Show end of life field
+      $end_of_life.parents('.col-lg-4').show();
     }
   });
 });
