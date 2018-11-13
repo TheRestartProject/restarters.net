@@ -8433,6 +8433,53 @@ jsonPWrapper ({
               "WasExecuted": false,
               "WasSuccessful": false
             }
+          },
+          {
+            "Name": "Export filtered devices",
+            "Slug": "export-filtered-devices",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "Given",
+                "NativeKeyword": "Given ",
+                "Name": "user wants to get the data of filtered devices",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "a user clicks on edit devices page",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "enters the data needed to filter",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "click on export file button",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "the user will get the data of the filtered list of devices only.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
           }
         ],
         "Background": {
@@ -10643,7 +10690,7 @@ jsonPWrapper ({
                 },
                 "StepComments": [
                   {
-                    "Text": "# Updating details in the Repair skills section"
+                    "Text": "# Updating details in the Repair skills section, only prefixed skills in the system are saved"
                   }
                 ],
                 "AfterLastStepComments": []
@@ -11668,6 +11715,65 @@ jsonPWrapper ({
               "WasExecuted": false,
               "WasSuccessful": false
             }
+          },
+          {
+            "Name": "Admin can select the type of emails he/she would like to receive",
+            "Slug": "admin-can-select-the-type-of-emails-heshe-would-like-to-receive",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "Given",
+                "NativeKeyword": "Given ",
+                "Name": "admin wants to select the type of emails",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "the user clicks on the checkboxes in the preferences section",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "the user wil get emails accordingly.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
+          },
+          {
+            "Name": "Admin receives email when abnormal number of Misc devices are added",
+            "Slug": "admin-receives-email-when-abnormal-number-of-misc-devices-are-added",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "user enters abnormal number of misc devices",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "the admin gets an email about the scenario.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
           }
         ],
         "Background": {
@@ -11862,6 +11968,86 @@ jsonPWrapper ({
                 "Keyword": "Then",
                 "NativeKeyword": "Then ",
                 "Name": "there will be a welcome message.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
+          },
+          {
+            "Name": "Mark as read",
+            "Slug": "mark-as-read",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "Given",
+                "NativeKeyword": "Given ",
+                "Name": "there are notifications",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "a host wants to mark the notification as read",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "click on mark as read link",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "the user will be able to see the text changed to marked as read",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "als othe background color changes.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
+          },
+          {
+            "Name": "View old notifications",
+            "Slug": "view-old-notifications",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "Given",
+                "NativeKeyword": "Given ",
+                "Name": "there are old notifications",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "a host clikcs on view old notifications link",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "users will see the list of older notifications.",
                 "StepComments": [],
                 "AfterLastStepComments": []
               }
@@ -13101,10 +13287,10 @@ jsonPWrapper ({
       },
       {
         "Folder": "06-Devices",
-        "Total": 4,
+        "Total": 5,
         "Passing": 0,
         "Failing": 0,
-        "Inconclusive": 4
+        "Inconclusive": 5
       },
       {
         "Folder": "07-Reporting",
@@ -13122,17 +13308,17 @@ jsonPWrapper ({
       },
       {
         "Folder": "09-Emails",
-        "Total": 13,
+        "Total": 15,
         "Passing": 0,
         "Failing": 0,
-        "Inconclusive": 13
+        "Inconclusive": 15
       },
       {
         "Folder": "10-Notifications",
-        "Total": 5,
+        "Total": 7,
         "Passing": 0,
         "Failing": 0,
-        "Inconclusive": 5
+        "Inconclusive": 7
       },
       {
         "Folder": "11-Navigation",
@@ -13229,10 +13415,10 @@ jsonPWrapper ({
       }
     ],
     "Scenarios": {
-      "Total": 264,
+      "Total": 269,
       "Passing": 0,
       "Failing": 0,
-      "Inconclusive": 264
+      "Inconclusive": 269
     },
     "Features": {
       "Total": 82,
@@ -13244,6 +13430,6 @@ jsonPWrapper ({
   "Configuration": {
     "SutName": "Restart Community Software",
     "SutVersion": "4.0.0(Beta)",
-    "GeneratedOn": "13 November 2018 16:22:08"
+    "GeneratedOn": "13 November 2018 17:34:41"
   }
 });
