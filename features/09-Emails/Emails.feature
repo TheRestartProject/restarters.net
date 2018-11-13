@@ -73,3 +73,12 @@ Scenario: Email notification to host by volunteer when he has sent an RSVP (7)
    Given host has received an email notification about a volunteer attending the event
    When the host clicks on View your event button
    Then the host land on upcoming event page.
+
+Scenario: Admin can select the type of emails he/she would like to receive
+   Given admin wants to select the type of emails
+   When the user clicks on the checkboxes in the preferences section
+   Then the user wil get emails accordingly.
+
+Scenario: Admin receives email when abnormal number of Misc devices are added
+   When user enters abnormal number of misc devices
+   Then the admin gets an email about the scenario.

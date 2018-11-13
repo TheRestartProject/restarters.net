@@ -19,3 +19,10 @@ Scenario: search for a particular device
    | flat screen   | Restart HQ    | 23/04/2017  | 23/04/2017  |               |              |              |                 |
    And should click on search all devices button
    Then user can view the list or a particular device that searched for.
+
+Scenario: Export filtered devices
+   Given user wants to get the data of filtered devices 
+   When a user clicks on edit devices page
+   And enters the data needed to filter 
+   And click on export file button
+   Then the user will get the data of the filtered list of devices only.

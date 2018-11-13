@@ -23,7 +23,7 @@ Scenario: Editing User Profile
     Then she should land on the profile page with a message saying that the changes have been saved.
 
 Scenario: Editing Repair Skills
-# Updating details in the Repair skills section
+# Updating details in the Repair skills section, only prefixed skills in the system are saved
    When a user types the skills he/she have 
     | Key Skills      | 
     | Mobiles devices |

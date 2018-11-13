@@ -19,3 +19,4 @@ Scenario: Edit devices
 Scenario: delete device  
    When a restarter wants to delete a device, click on delete device button
    Then you will land on all devices page and you won't be able to see the deleted device from the list of devices.
+
