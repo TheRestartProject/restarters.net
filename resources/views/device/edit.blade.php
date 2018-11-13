@@ -55,7 +55,7 @@
                           <div class="form-group <?php if(isset($error) && isset($error['event']) && !empty($error['event'])) { echo "has-error"; } ?>">
                               <label for="event">Restart Party:</label>
                               <div class="form-control form-control__select">
-                                  <select id="event" name="event"  class="form-control field select2">
+                                  <select id="event" name="event" class="form-control field select2">
                                       <option></option>
                                       @if(isset($events))
                                         <?php foreach($events as $event){ ?>
@@ -99,7 +99,6 @@
 
                           <div class="form-group">
                               <label for="brand">@lang('devices.brand'):</label>
-                              <!-- <input type="text" name="brand" id="brand" class="form-control field" value="<?php //echo $formdata->brand; ?>"> -->
                               <div class="form-control form-control__select">
                                   <select name="brand" class="select2-with-input" id="brand">
                                       @php($i = 1)
@@ -145,9 +144,10 @@
                                       <label for="repair_status">@lang('devices.repair_status'):</label>
                                       <div class="form-control form-control__select">
                                           <select name="repair_status" id="repair_status" class="form-control field select2 repair-status">
+                                            <option value="0">Please select</option>
                                             <option value="1" <?php echo ($formdata->repair_status == 1 ? ' selected' : ''); ?>>Fixed</option>
                                             <option value="2" <?php echo ($formdata->repair_status == 2 ? ' selected' : ''); ?>>Repairable</option>
-                                            <option value="3" <?php echo ($formdata->repair_status == 3 ? ' selected' : ''); ?>>End of lifecycle</option>
+                                            <option value="3" <?php echo ($formdata->repair_status == 3 ? ' selected' : ''); ?>>End-of-life</option>
                                           </select>
                                       </div>
                                       <?php if(isset($error) && isset($error['repair_status']) && !empty($error['repair_status'])) { echo '<span class="help-block text-danger">' . $error['repair_status'] . '</span>'; } ?>
@@ -158,7 +158,7 @@
                                       <label for="repair_status_2">@lang('devices.repair_details'):</label>
                                       <div class="form-control form-control__select">
                                           <select name="repair_more" id="repair_details_edit" class="form-control field select2 repair-details-edit">
-                                            <option value="0">-- Repair details --</option>
+                                            <option value="0">Please select</option>
                                             <option value="1" <?php echo ($formdata->more_time_needed == 1 ? ' selected' : '') ?>>More time needed</option>
                                             <option value="2" <?php echo ($formdata->professional_help == 1 ? ' selected' : '') ?>>Professional help</option>
                                             <option value="3" <?php echo ($formdata->do_it_yourself == 1 ? ' selected' : '') ?>>Do it yourself</option>
@@ -166,14 +166,15 @@
                                       </div>
                                   </div>
                               </div>
-                              <div class="col-4 <?php echo ($formdata->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
+                              <div class="col-4 <?php echo ($formdata->repair_status == 1 || $formdata->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
                                   <div class="form-group">
                                       <label for="spare_parts">@lang('devices.spare_parts_required'):</label>
                                       <div class="form-control form-control__select">
                                           <select name="spare_parts" id="spare_parts" class="form-control field select2 spare-parts">
-                                            <option value="0">-- Select --</option>
-                                            <option value="1" <?php echo ($formdata->spare_parts == 1 ? ' selected' : '') ?>>Yes</option>
-                                            <option value="2" <?php echo ($formdata->spare_parts == 2 ? ' selected' : '') ?>>No</option>
+                                            <option value="0">Please select</option>
+                                            <option value="1" @if ($formdata->spare_parts == 1) selected @endif>@lang('partials.yes_manufacturer')</option>
+                                            <option value="3" @if ($formdata->spare_parts == 3) selected @endif>@lang('partials.yes_third_party')</option>
+                                            <option value="2" @if ($formdata->spare_parts == 2) selected @endif>@lang('partials.no')</option>
                                           </select>
                                       </div>
                                   </div>
@@ -183,7 +184,12 @@
                                       <label for="repair_end_of_life">@lang('devices.repair_end_of_life'):</label>
                                       <div class="form-control form-control__select">
                                           <select name="end_of_life" id="repair_end_of_life" class="form-control field select2 repair-end-of-life">
-                                            <option value="0">-- Select --</option>
+                                            <option value="0">Please select</option>
+                                            <option value="1" @if ($formdata->end_of_life == 1) selected @endif>@lang('partials.spare_parts_not_available')</option>
+                                            <option value="2" @if ($formdata->end_of_life == 2) selected @endif>@lang('partials.spare_parts_too_expensive')</option>
+                                            <option value="3" @if ($formdata->end_of_life == 3) selected @endif>@lang('partials.no_way_to_open_product')</option>
+                                            <option value="4" @if ($formdata->end_of_life == 4) selected @endif>@lang('partials.repair_information_not_available')</option>
+                                            <option value="5" @if ($formdata->end_of_life == 5) selected @endif>@lang('partials.lack_of_equipment')</option>
                                           </select>
                                       </div>
                                   </div>
@@ -325,7 +331,7 @@
       </div>
       <div class="radio">
           <label>
-              <input type="radio" name="repair_status" id="repair_status_3" value="3" <?php //echo ($formdata->end_of_lifecycle == 1 ? ' checked' : ''); ?>> End of lifecycle
+              <input type="radio" name="repair_status" id="repair_status_3" value="3" <?php //echo ($formdata->end_of_lifecycle == 1 ? ' checked' : ''); ?>> End-of-life
           </label>
       </div>
       <?php //if(isset($error) && isset($error['repair_status']) && !empty($error['repair_status'])) { echo '<span class="help-block text-danger">' . $error['repair_status'] . '</span>'; } ?>

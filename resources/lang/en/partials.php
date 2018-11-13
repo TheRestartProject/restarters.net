@@ -59,7 +59,7 @@ return [
     'category' => 'Category',
     'category_none' => 'None of the above',
     'brand' => 'Brand',
-    'status' => 'Status',
+    'status' => 'Repair status',
     'fixed' => 'Fixed',
     'model' => 'Model',
     'age' => 'Age',
@@ -67,12 +67,14 @@ return [
     'spare_parts' => 'Spare parts',
     'repairable' => 'Repairable',
     'end' => 'End',
-    'end_of_life' => 'End of life',
-    'repair_details' => 'Repair details',
+    'end_of_life' => 'End-of-life',
+    'repair_details' => 'Next steps',
     'more_time' => 'More time needed',
     'professional_help' => 'Professional help',
     'diy' => 'Do it yourself',
     'yes' => 'Yes',
+    'yes_manufacturer' => 'Yes - from manufacturer',
+    'yes_third_party' => 'Yes - from 3rd party',
     'no' => 'No',
     'n_a' => 'N/A',
     'least_repaired' => 'Least repaired',
@@ -89,6 +91,11 @@ return [
     'add_a_device' => 'Add a device',
     'this_event_hasnt_started' => 'This event hasn\'t started',
     'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
-    'save' => 'Save device'
+    'save' => 'Save device',
+    'spare_parts_not_available' => 'Spare parts not available',
+    'spare_parts_too_expensive' => 'Spare parts too expensive',
+    'no_way_to_open_product' => 'No way to open the product',
+    'repair_information_not_available' => 'Repair information not available',
+    'lack_of_equipment' => 'Lack of equipment'
 
 ];

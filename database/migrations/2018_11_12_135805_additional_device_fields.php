@@ -22,6 +22,7 @@ class AdditionalDeviceFields extends Migration
 
         Schema::table('devices', function (Blueprint $table) {
             $table->tinyInteger('end_of_life')->after('do_it_yourself')->nullable();
+            $table->tinyInteger('parts_provider')->after('spare_parts')->nullable();
         });
     }
 

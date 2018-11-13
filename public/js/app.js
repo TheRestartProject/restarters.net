@@ -73719,19 +73719,20 @@ jQuery(function () {
     $end_of_life = $(this).parents('.row').find('.repair-end-of-life');
 
     if ($status == 1) {
+      // Fixed
 
       // Reset and hide repair details
       $repair_details.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
       $repair_details.val(0).trigger('change');
 
-      // Reset and hide spare parts
-      $spare_parts.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
-      $spare_parts.val(0).trigger('change');
+      // Show spare parts field
+      $spare_parts.parents('.col-4').addClass('col-device-auto');
 
       // Reset and hide end of life select
       $end_of_life.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
       $end_of_life.val(0).trigger('change');
     } else if ($status == 2) {
+      // Repairable
 
       // Show repair details field
       $repair_details.parents('.col-4').addClass('col-device-auto');
@@ -73742,7 +73743,8 @@ jQuery(function () {
       // Reset and hide end of life select
       $end_of_life.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
       $end_of_life.val(0).trigger('change');
-    } else {
+    } else if ($status == 3) {
+      // End of life
 
       // Reset and hide repair details
       $repair_details.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
@@ -73754,6 +73756,19 @@ jQuery(function () {
 
       // Show end of life field
       $end_of_life.parents('.col-4').addClass('col-device-auto');
+    } else {
+
+      // Reset and hide repair details
+      $repair_details.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $repair_details.val(0).trigger('change');
+
+      // Reset and hide spare parts
+      $spare_parts.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $spare_parts.val(0).trigger('change');
+
+      // Reset and hide end of life field
+      $end_of_life.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $end_of_life.val(0).trigger('change');
     }
   });
 });
