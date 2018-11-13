@@ -48,6 +48,7 @@ class DeviceUrlController extends Controller
           // Create URL
           $create = DeviceUrl::create([
             'device_id' => $request->input('device_id'),
+            'source' => $request->input('source'),
             'url' => $request->input('url')
           ]);
 
@@ -104,7 +105,8 @@ class DeviceUrlController extends Controller
 
             // Create URL
             $update = DeviceUrl::find($deviceUrl->id)->update([
-              'url' => $request->input('url')
+              'url' => $request->input('url'),
+              'source' => $request->input('source')
             ]);
 
             // Return information

@@ -40,9 +40,8 @@
     margin-top: 0.5rem;
 
     .form-control {
-      border-top-right-radius: 0.25rem;
-      border-bottom-right-radius: 0.25rem;
-
+      border-radius: 0.25rem;
+      
       &.error {
         border-color: red;
       }

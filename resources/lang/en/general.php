@@ -70,4 +70,5 @@ return [
     'restartproject_url' => 'https://therestartproject.org',
     'discourse_url' => 'https://talk.restarters.net',
     'wiki_url' => 'https://wiki.restarters.net',
+    'please_select' => 'Please select',
 ];

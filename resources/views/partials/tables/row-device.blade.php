@@ -52,7 +52,7 @@
             <label for="category-{{ $device->iddevices }}">@lang('partials.category'):</label>
             <div class="form-control form-control__select">
                 <select name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
-                    <option value="">Please select</option>
+                    <option value="">@lang('general.please_select')</option>
                     @foreach( $clusters as $cluster )
                     <optgroup label="{{{ $cluster->name }}}">
                         @foreach( $cluster->categories as $category )
@@ -136,7 +136,7 @@
             <label for="status-{{ $device->iddevices }}">@lang('partials.status'):</label>
             <div class="form-control form-control__select">
                 <select class="select2 repair-status" name="repair_status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}" placeholder="Description of problem">
-                  <option value="0">Please select</option>
+                  <option value="0">@lang('general.please_select')</option>
                   @if ( $device->repair_status == 1 )
                     <option value="1" selected>@lang('partials.fixed')</option>
                     <option value="2">@lang('partials.repairable')</option>
@@ -158,7 +158,7 @@
             <label for="repair-info-{{ $device->iddevices }}">@lang('partials.repair_details'):</label>
             <div class="form-control form-control__select">
                 <select class="repair_details select2 repair-details-edit" name="repair-info" id="repair-info-{{ $device->iddevices }}">
-                  <option value="0">Please select</option>
+                  <option value="0">@lang('general.please_select')</option>
                   @if ( $device->more_time_needed == 1 )
                     <option value="1" selected>@lang('partials.more_time')</option>
                     <option value="2">@lang('partials.professional_help')</option>
@@ -184,7 +184,7 @@
             <label for="spare-parts-{{ $device->iddevices }}">@lang('devices.spare_parts_required'):</label>
             <div class="form-control form-control__select">
                 <select class="select2 spare-parts" name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
-                  <option value="0">Please select</option>
+                  <option value="0">@lang('general.please_select')</option>
                   <option value="1" @if ($device->spare_parts == 1) selected @endif>@lang('partials.yes_manufacturer')</option>
                   <option value="3" @if ($device->spare_parts == 3) selected @endif>@lang('partials.yes_third_party')</option>
                   <option value="2" @if ($device->spare_parts == 2) selected @endif>@lang('partials.no')</option>
@@ -196,7 +196,7 @@
             <label for="repair_end_of_life">@lang('devices.repair_end_of_life'):</label>
             <div class="form-control form-control__select">
               <select name="end_of_life" id="repair_end_of_life" class="form-control field select2 repair-end-of-life">
-                <option value="0">Please select</option>
+                <option value="0">@lang('general.please_select')</option>
                 <option value="1" @if ($device->end_of_life == 1) selected @endif>@lang('partials.spare_parts_not_available')</option>
                 <option value="2" @if ($device->end_of_life == 2) selected @endif>@lang('partials.spare_parts_too_expensive')</option>
                 <option value="3" @if ($device->end_of_life == 3) selected @endif>@lang('partials.no_way_to_open_product')</option>
@@ -287,7 +287,7 @@
                     <label for="category-{{ $device->iddevices }}">@lang('partials.category'):</label>
                     <div class="form-control form-control__select">
                         <select disabled name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
-                            <option value="">Please select</option>
+                            <option value="">@lang('general.please_select')</option>
                             @foreach( $clusters as $cluster )
                             <optgroup label="{{{ $cluster->name }}}">
                                 @foreach( $cluster->categories as $category )
@@ -366,7 +366,7 @@
                         <label for="status-{{ $device->iddevices }}">@lang('devices.repair_status'):</label>
                         <div class="form-control form-control__select">
                             <select disabled class="repair_status select2" name="repair_status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}" placeholder="@lang('partials.description_of_problem')">
-                              <option value="0">Please select</option>
+                              <option value="0">@lang('general.please_select')</option>
                               @if ( $device->repair_status == 1 )
                                 <option value="1" selected>@lang('partials.fixed')</option>
                                 <option value="2">@lang('partials.repairable')</option>
@@ -388,7 +388,7 @@
                         <label for="repair-info-{{ $device->iddevices }}">@lang('devices.repair_details'):</label>
                         <div class="form-control form-control__select">
                             <select disabled class="repair_details select2" name="repair-info" id="repair-info-{{ $device->iddevices }}" @if( $device->repair_status != 2 ) disabled @endif>
-                              <option value="0">Please select</option>
+                              <option value="0">@lang('general.please_select')</option>
                               @if ( $device->more_time_needed == 1 )
                                 <option value="1" selected>@lang('partials.more_time')</option>
                                 <option value="2">@lang('partials.professional_help')</option>
@@ -415,7 +415,7 @@
                         <label for="spare_parts">@lang('devices.spare_parts_required'):</label>
                         <div class="form-control form-control__select">
                             <select disabled class="select2" name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
-                              <option value="0">Please select</option>
+                              <option value="0">@lang('general.please_select')</option>
                               <option value="1" @if ($device->spare_parts == 1) selected @endif>@lang('partials.yes_manufacturer')</option>
                               <option value="3" @if ($device->spare_parts == 3) selected @endif>@lang('partials.yes_third_party')</option>
                               <option value="2" @if ($device->spare_parts == 2) selected @endif>@lang('partials.no')</option>
@@ -428,7 +428,7 @@
                         <label for="spare_parts">@lang('devices.repair_end_of_life'):</label>
                         <div class="form-control form-control__select">
                           <select disabled name="end_of_life" id="repair_end_of_life" class="form-control field select2 repair-end-of-life">
-                            <option value="0">Please select</option>
+                            <option value="0">@lang('general.please_select')</option>
                             <option value="1" @if ($device->end_of_life == 1) selected @endif>@lang('partials.spare_parts_not_available')</option>
                             <option value="2" @if ($device->end_of_life == 2) selected @endif>@lang('partials.spare_parts_too_expensive')</option>
                             <option value="3" @if ($device->end_of_life == 3) selected @endif>@lang('partials.no_way_to_open_product')</option>

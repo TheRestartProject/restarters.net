@@ -15277,8 +15277,7 @@ table.sortable > thead th div.mozilla {
 }
 
 .useful-repair-urls .input-group .form-control {
-  border-top-right-radius: 0.25rem;
-  border-bottom-right-radius: 0.25rem;
+  border-radius: 0.25rem;
 }
 
 .useful-repair-urls .input-group .form-control.error {

@@ -64,5 +64,8 @@ return [
         'delete_device_content' => 'Delete this device from the Fixometer',
         'delete_device' => 'Delete device',
 
-        'n/a' => 'N/A'
+        'n/a' => 'N/A',
+        
+        'from_manufacturer' => 'From manufacturer',
+        'from_third_party' => 'From third party',
     ];

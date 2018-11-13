@@ -18,6 +18,7 @@ class AdditionalDeviceFields extends Migration
             $table->integer('device_id');
             $table->foreign('device_id')->references('iddevices')->on('devices');
             $table->string('url');
+            $table->tinyInteger('source')->nullable();
         });
 
         Schema::table('devices', function (Blueprint $table) {

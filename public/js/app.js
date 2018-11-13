@@ -73587,11 +73587,16 @@ function createNewDeviceUrl(event) {
   // Prepare our variables
   $row = $(this).parents('.input-group');
   $btn = $row.find('.btn');
-  $value = $row.find('.form-control');
+  $value = $row.find('input.form-control');
+  $source = $row.find('.form-control select');
   $device_id = $row.data('device_id');
 
   // If entered value is not empty and is a valid URL
   if ($value.val() !== '' && validUrl($value.val())) {
+
+    // Prevent multiple clicks
+    $fields = $row.find('input, select, button');
+    $fields.prop('disabled', true);
 
     // Let's save our data
     $.ajax({
@@ -73602,22 +73607,36 @@ function createNewDeviceUrl(event) {
       },
       data: {
         device_id: $device_id,
-        url: $value.val()
+        url: $value.val(),
+        source: $source.val()
       },
       success: function success(data) {
 
-        // Clone row ready to be used again
-        $row.attr('data-id', data.success).clone().find(".form-control").val("").end().appendTo('.additional-urls');
+        // Now remove disabled fields
+        setTimeout(function () {
 
-        // Existing row to be different in appearance and behaviour
-        $btn.find('span').text('-');
-        $row.removeClass('add-url');
-        $row.addClass('save-url');
+          $fields.prop('disabled', false);
+        }, 500);
 
-        // Now focus into the new input
-        $('.additional-urls input:last').focus();
+        setTimeout(function () {
+
+          // Clone row ready to be used again
+          $row.attr('data-id', data.success).clone().find(".form-control").val("").end().appendTo('.additional-urls');
+
+          // Existing row to be different in appearance and behaviour
+          $btn.find('span').text('-');
+          $row.removeClass('add-url');
+          $row.addClass('save-url');
+
+          // Now focus into the new input
+          $('.additional-urls input:last').focus();
+        }, 600);
       },
       error: function error(_error) {
+
+        // Now remove disabled fields
+        $fields.prop('disabled', false);
+
         alert('Cannot create device URL, please try again');
       }
     });
@@ -73636,11 +73655,16 @@ function editDeviceUrl(event) {
 
   // Prepare our variables
   $row = $(this).parents('.input-group');
-  $value = $row.find('.form-control');
+  $value = $row.find('input.form-control');
+  $source = $row.find('.form-control select');
   $id = $row.data('id');
 
   // If entered value is not empty and is a valid URL
   if ($value.val() !== '' && validUrl($value.val())) {
+
+    // Prevent multiple clicks
+    $fields = $row.find('input, select, button');
+    $fields.prop('disabled', true);
 
     // Let's save our data
     $.ajax({
@@ -73650,9 +73674,21 @@ function editDeviceUrl(event) {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       },
       data: {
-        url: $value.val()
+        url: $value.val(),
+        source: $source.val()
+      },
+      success: function success(data) {
+
+        // Now remove disabled fields
+        setTimeout(function () {
+          $fields.prop('disabled', false);
+        }, 500);
       },
       error: function error(_error2) {
+
+        // Now remove disabled fields
+        $fields.prop('disabled', false);
+
         alert('Cannot create device URL, please try again');
       }
     });
@@ -73707,6 +73743,7 @@ jQuery('.useful-repair-urls').on('keyup', 'input', function (e) {
 });
 jQuery('.useful-repair-urls').on('enterKey', 'input', createNewDeviceUrl);
 jQuery('.useful-repair-urls').on('change', '.save-url input', editDeviceUrl);
+jQuery('.useful-repair-urls').on('change', '.save-url select', editDeviceUrl);
 jQuery('.useful-repair-urls').on('change', '.error', clearErrorClass);
 
 jQuery(function () {
