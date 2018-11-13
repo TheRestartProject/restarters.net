@@ -82,7 +82,7 @@
                   </div>
                 </div>
               @else
-                <input type="hidden" name="group" value="{{ $user_groups[0]->group }}">
+                <input type="hidden" name="group" value="{{ $user_groups[0]->id }}">
               @endif
 
               <div class="form-group">
