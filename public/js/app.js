@@ -31485,6 +31485,9 @@ $(document).ready(function () {
       });
     }
   });
+
+  // Set min height so the language menu sits just under the overall height of the browser window
+  $('body > .container').css('min-height', $(window).height() - $('nav.navbar').height() + 'px');
 });
 
 /***/ }),

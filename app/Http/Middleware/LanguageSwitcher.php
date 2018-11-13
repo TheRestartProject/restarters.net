@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App;
+use Auth;
 use Closure;
 use Illuminate\Support\Facades\Config;
 use LaravelLocalization;
@@ -48,6 +49,12 @@ class LanguageSwitcher
 
                 // Set locale on localisation package
                 LaravelLocalization::setLocale($locale);
+
+                // Set in database
+                if( !Auth::guest() )
+                  Auth::user()->update([
+                    'language' => $locale
+                  ]);
 
                 // Break loop and continue with next request
                 return $next($request);

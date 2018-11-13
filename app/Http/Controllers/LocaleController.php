@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App;
+use Auth;
 use LaravelLocalization;
 
 class LocaleController extends Controller
@@ -15,6 +16,12 @@ class LocaleController extends Controller
         // Set app locale
         App::setLocale($locale);
         LaravelLocalization::setLocale($locale);
+
+        // Set in database
+        if( !Auth::guest() )
+          Auth::user()->update([
+            'language' => $locale
+          ]);
 
         // Redirect where you came from
         return back();

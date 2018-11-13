@@ -40,6 +40,11 @@ class DashboardController extends Controller
 
       $user = User::getProfile(Auth::id());
 
+      // Update language every time you go to the dashboard
+      Auth::user()->update([
+        'language' => session('locale')
+      ]);
+
       $in_group = !empty(UserGroups::where('user', Auth::id())->get()->toArray());
       $has_skills = !empty(UsersSkills::where('user', Auth::id())->get()->toArray());
       $in_event = !empty(EventsUsers::where('user', Auth::id())->get()->toArray());

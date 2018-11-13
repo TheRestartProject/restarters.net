@@ -38,6 +38,7 @@ class AdditionalDeviceFields extends Migration
 
         Schema::table('devices', function (Blueprint $table) {
             $table->dropColumn('end_of_life');
+            $table->dropColumn('parts_provider');
         });
     }
 }

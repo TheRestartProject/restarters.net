@@ -5,6 +5,7 @@ html, body {
   font-family: $font-family-second;
   & > .container {
     padding-top: 20px;
+    min-height: 1200px;
     @include media-breakpoint-up(md) {
       padding-top: 50px;
     }

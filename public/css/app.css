@@ -18704,6 +18704,7 @@ body {
 html > .container,
 body > .container {
   padding-top: 20px;
+  min-height: 1200px;
 }
 
 @media (min-width: 768px) {

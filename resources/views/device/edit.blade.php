@@ -1,4 +1,4 @@
-@lang('general.please_select')@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
 
