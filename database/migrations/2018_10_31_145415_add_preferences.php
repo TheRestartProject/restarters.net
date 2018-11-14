@@ -13,6 +13,7 @@ class AddPreferences extends Migration
      */
     public function up()
     {
+        // Additional preferences
         DB::table('preferences')->insert([
           'name' => 'Admin New User',
           'purpose' => NULL,
@@ -32,11 +33,6 @@ class AddPreferences extends Migration
           'name' => 'Admin Abnormal Devices',
           'purpose' => NULL,
           'slug' => 'admin-abnormal-devices',
-        ]);
-        DB::table('preferences')->insert([
-          'name' => 'Verify Translation Access',
-          'purpose' => NULL,
-          'slug' => 'verify-translation-access',
         ]);
         DB::table('preferences')->insert([
           'name' => 'Admin Approve WordPress Event Failure',
@@ -62,6 +58,13 @@ class AddPreferences extends Migration
           'name' => 'Admin No Devices',
           'purpose' => NULL,
           'slug' => 'admin-no-devices',
+        ]);
+
+        // Additional permission
+        DB::table('permissions')->insert([
+          'name' => 'Verify Translation Access',
+          'purpose' => NULL,
+          'slug' => 'verify-translation-access',
         ]);
     }
 

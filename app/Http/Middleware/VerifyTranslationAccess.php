@@ -19,14 +19,14 @@ class VerifyTranslationAccess
     public function handle($request, Closure $next)
     {
 
-        $has_preference = User::join('users_preferences', 'users_preferences.user_id', '=', 'users.id')
-                                  ->join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
+        $has_permission = User::join('users_permissions', 'users_permissions.user_id', '=', 'users.id')
+                                  ->join('permissions', 'permissions.idpermissions', '=', 'users_permissions.permission_id')
                                     ->where('users.id', Auth::user()->id)
-                                      ->where('preferences.slug', 'verify-translation-access')
+                                      ->where('permissions.slug', 'verify-translation-access')
                                         ->select('users.*')
                                           ->first();
-                                          
-        if( !empty($has_preference) ){
+
+        if( !empty($has_permission) ){
           return $next($request);
         } else {
           abort(404);
