@@ -17,7 +17,7 @@ class Device extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = ['event','category','category_creation','estimate','repair_status','spare_parts','brand','model','age','problem','repaired_by','do_it_yourself','professional_help','more_time_needed','wiki'];
+    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'model', 'age', 'problem', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -466,6 +466,10 @@ AND devices.event = events.idevents ';
 
     public function urls(){
         return $this->hasMany('App\DeviceUrl', 'device_id', 'iddevices');
+    }
+
+    public function barriers(){
+        return $this->belongsToMany('App\Barrier', 'devices_barriers', 'device_id', 'barrier_id');
     }
 
     public function co2Diverted($emissionRatio, $displacementFactor)

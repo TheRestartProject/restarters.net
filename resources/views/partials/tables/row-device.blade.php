@@ -154,7 +154,7 @@
             </div>
           </div>
 
-          <div class="col-4 <?php echo ($device->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
+          <div class="col-4 col-device <?php echo ($device->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
             <label for="repair-info-{{ $device->iddevices }}">@lang('partials.repair_details'):</label>
             <div class="form-control form-control__select">
                 <select class="repair_details select2 repair-details-edit" name="repair-info" id="repair-info-{{ $device->iddevices }}">
@@ -180,23 +180,22 @@
             </div>
           </div>
 
-          <div class="col-4 <?php echo ($device->repair_status == 1 || $device->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
+          <div class="col-4 col-device <?php echo ($device->repair_status == 1 || $device->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
             <label for="spare-parts-{{ $device->iddevices }}">@lang('devices.spare_parts_required'):</label>
             <div class="form-control form-control__select">
                 <select class="select2 spare-parts" name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
                   <option value="0">@lang('general.please_select')</option>
                   <option value="1" @if ($device->spare_parts == 1) selected @endif>@lang('partials.yes_manufacturer')</option>
-                  <option value="3" @if ($device->spare_parts == 3) selected @endif>@lang('partials.yes_third_party')</option>
+                  <option value="3" @if ($device->parts_provider == 2) selected @endif>@lang('partials.yes_third_party')</option>
                   <option value="2" @if ($device->spare_parts == 2) selected @endif>@lang('partials.no')</option>
                 </select>
             </div>
           </div>
 
-          <div class="col-4 <?php echo ($device->repair_status == 3 ? 'col-device-auto' : 'd-none'); ?>">
-            <label for="repair_end_of_life">@lang('devices.repair_end_of_life'):</label>
+          <div class="col-4 col-device <?php echo ($device->repair_status == 3 ? 'col-device-auto' : 'd-none'); ?>">
+            <label for="repair_barrier">@lang('devices.repair_barrier'):</label>
             <div class="form-control form-control__select">
-              <select name="end_of_life" id="repair_end_of_life" class="form-control field select2 repair-end-of-life">
-                <option value="0">@lang('general.please_select')</option>
+              <select name="barrier-{{ $device->iddevices }}[]" multiple id="barrier-{{ $device->iddevices }}" class="form-control field select2 repair-barrier">
                 <option value="1" @if ($device->end_of_life == 1) selected @endif>@lang('partials.spare_parts_not_available')</option>
                 <option value="2" @if ($device->end_of_life == 2) selected @endif>@lang('partials.spare_parts_too_expensive')</option>
                 <option value="3" @if ($device->end_of_life == 3) selected @endif>@lang('partials.no_way_to_open_product')</option>
@@ -417,7 +416,7 @@
                             <select disabled class="select2" name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
                               <option value="0">@lang('general.please_select')</option>
                               <option value="1" @if ($device->spare_parts == 1) selected @endif>@lang('partials.yes_manufacturer')</option>
-                              <option value="3" @if ($device->spare_parts == 3) selected @endif>@lang('partials.yes_third_party')</option>
+                              <option value="3" @if ($device->parts_provider == 2) selected @endif>@lang('partials.yes_third_party')</option>
                               <option value="2" @if ($device->spare_parts == 2) selected @endif>@lang('partials.no')</option>
                             </select>
                         </div>
@@ -425,10 +424,9 @@
                     @endif
                     @if( $device->repair_status == 3 )
                     <td>
-                        <label for="spare_parts">@lang('devices.repair_end_of_life'):</label>
+                        <label for="barrier-{{ $device->iddevices }}">@lang('devices.repair_barrier'):</label>
                         <div class="form-control form-control__select">
-                          <select disabled name="end_of_life" id="repair_end_of_life" class="form-control field select2 repair-end-of-life">
-                            <option value="0">@lang('general.please_select')</option>
+                          <select disabled name="barrier-{{ $device->iddevices }}[]" multiple id="barrier-{{ $device->iddevices }}" class="form-control field select2 repair-barrier">
                             <option value="1" @if ($device->end_of_life == 1) selected @endif>@lang('partials.spare_parts_not_available')</option>
                             <option value="2" @if ($device->end_of_life == 2) selected @endif>@lang('partials.spare_parts_too_expensive')</option>
                             <option value="3" @if ($device->end_of_life == 3) selected @endif>@lang('partials.no_way_to_open_product')</option>

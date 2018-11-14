@@ -31219,7 +31219,10 @@ $(document).ready(function () {
           $form.find(".select2-with-input.select2-hidden-accessible").select2('data', {}); // clear out values selected
           $form.find(".select2-with-input.select2-hidden-accessible").select2(tag_options); // re-init to show default stat
 
-          $('.repair-more, .display-weight').addClass('d-none');
+          $form.find('.display-weight').addClass('d-none');
+          $form.find('.repair-more').removeClass('col-device-auto');
+          $form.find('.repair-details-edit, .spare-parts, .repair-barrier').parents('.col-device').addClass('d-none');
+          $form.find('.repair-details-edit, .spare-parts, .repair-barrier').parents('.col-device').removeClass('col-device-auto');
           //EO reset appearance
 
           //Appending...
@@ -31306,6 +31309,7 @@ $(document).ready(function () {
     $repair_details = parseInt($('#repair-info-' + device_id).val());
     // $repair_details_name = $('#repair-info-'+device_id+' option:selected').text();
     $spare_parts = parseInt($('#spare-parts-' + device_id).val());
+    $barrier = parseInt($('#barrier-' + device_id).val());
     $event_id = $('#event_id').val();
 
     //Visual improvements
@@ -31329,7 +31333,8 @@ $(document).ready(function () {
         repair_details: $repair_details,
         spare_parts: $spare_parts,
         wiki: $wiki,
-        event_id: $event_id
+        event_id: $event_id,
+        barrier: $barrier
         // files:$('#file-'+device_id).val(),
       },
       datatype: 'json',
@@ -73754,61 +73759,61 @@ jQuery(function () {
   jQuery(document).on('change', 'select[name=repair_status]', function (e) {
 
     $status = $(this).val();
-    $repair_details = $(this).parents('.row').find('.repair-details-edit');
-    $spare_parts = $(this).parents('.row').find('.spare-parts');
-    $end_of_life = $(this).parents('.row').find('.repair-end-of-life');
+    $repair_details = $(this).parents('form').find('.repair-details-edit');
+    $spare_parts = $(this).parents('form').find('.spare-parts');
+    $barrier = $(this).parents('form').find('.repair-barrier');
 
     if ($status == 1) {
       // Fixed
 
       // Reset and hide repair details
-      $repair_details.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $repair_details.parents('.col-device').addClass('d-none').removeClass('col-device-auto');
       $repair_details.val(0).trigger('change');
 
       // Show spare parts field
-      $spare_parts.parents('.col-4').addClass('col-device-auto');
+      $spare_parts.parents('.col-device').addClass('col-device-auto');
 
       // Reset and hide end of life select
-      $end_of_life.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
-      $end_of_life.val(0).trigger('change');
+      $barrier.parents('.col-device').addClass('d-none').removeClass('col-device-auto');
+      $barrier.val(0).trigger('change');
     } else if ($status == 2) {
       // Repairable
 
       // Show repair details field
-      $repair_details.parents('.col-4').addClass('col-device-auto');
+      $repair_details.parents('.col-device').addClass('col-device-auto');
 
       // Show spare parts field
-      $spare_parts.parents('.col-4').addClass('col-device-auto');
+      $spare_parts.parents('.col-device').addClass('col-device-auto');
 
       // Reset and hide end of life select
-      $end_of_life.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
-      $end_of_life.val(0).trigger('change');
+      $barrier.parents('.col-device').addClass('d-none').removeClass('col-device-auto');
+      $barrier.val(0).trigger('change');
     } else if ($status == 3) {
       // End of life
 
       // Reset and hide repair details
-      $repair_details.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $repair_details.parents('.col-device').addClass('d-none').removeClass('col-device-auto');
       $repair_details.val(0).trigger('change');
 
       // Reset and hide spare parts
-      $spare_parts.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $spare_parts.parents('.col-device').addClass('d-none').removeClass('col-device-auto');
       $spare_parts.val(0).trigger('change');
 
       // Show end of life field
-      $end_of_life.parents('.col-4').addClass('col-device-auto');
+      $barrier.parents('.col-device').addClass('col-device-auto');
     } else {
 
       // Reset and hide repair details
-      $repair_details.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $repair_details.parents('.col-device').addClass('d-none').removeClass('col-device-auto');
       $repair_details.val(0).trigger('change');
 
       // Reset and hide spare parts
-      $spare_parts.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
+      $spare_parts.parents('.col-device').addClass('d-none').removeClass('col-device-auto');
       $spare_parts.val(0).trigger('change');
 
       // Reset and hide end of life field
-      $end_of_life.parents('.col-4').addClass('d-none').removeClass('col-device-auto');
-      $end_of_life.val(0).trigger('change');
+      $barrier.parents('.col-device').addClass('d-none').removeClass('col-device-auto');
+      $barrier.val(0).trigger('change');
     }
   });
 });

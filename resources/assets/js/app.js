@@ -1196,7 +1196,10 @@ function initAutocomplete() {
             $form.find(".select2-with-input.select2-hidden-accessible").select2('data', {}); // clear out values selected
             $form.find(".select2-with-input.select2-hidden-accessible").select2(tag_options); // re-init to show default stat
 
-            $('.repair-more, .display-weight').addClass('d-none');
+            $form.find('.display-weight').addClass('d-none');
+            $form.find('.repair-more').removeClass('col-device-auto');
+            $form.find('.repair-details-edit, .spare-parts, .repair-barrier').parents('.col-device').addClass('d-none');
+            $form.find('.repair-details-edit, .spare-parts, .repair-barrier').parents('.col-device').removeClass('col-device-auto');
             //EO reset appearance
 
             //Appending...
@@ -1291,6 +1294,7 @@ function initAutocomplete() {
       $repair_details = parseInt($('#repair-info-'+device_id).val());
       // $repair_details_name = $('#repair-info-'+device_id+' option:selected').text();
       $spare_parts = parseInt($('#spare-parts-'+device_id).val());
+      $barrier = parseInt($('#barrier-'+device_id).val());
       $event_id = $('#event_id').val();
 
       //Visual improvements
@@ -1315,6 +1319,7 @@ function initAutocomplete() {
           spare_parts: $spare_parts,
           wiki: $wiki,
           event_id: $event_id,
+          barrier: $barrier,
           // files:$('#file-'+device_id).val(),
         },
         datatype: 'json',

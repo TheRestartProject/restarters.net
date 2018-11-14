@@ -75,7 +75,7 @@ return [
     'yes' => 'Yes',
     'yes_manufacturer' => 'Yes - from manufacturer',
     'yes_third_party' => 'Yes - from 3rd party',
-    'no' => 'No',
+    'no' => 'Not needed',
     'n_a' => 'N/A',
     'least_repaired' => 'Least repaired',
     'most_repaired' => 'Most repaired',

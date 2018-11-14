@@ -41,7 +41,7 @@
 
     .form-control {
       border-radius: 0.25rem;
-      
+
       &.error {
         border-color: red;
       }
@@ -80,4 +80,8 @@
   display: table-cell !important;
   width: auto;
   max-width: none;
+}
+
+td.col-device-auto {
+  min-width: 100px;
 }

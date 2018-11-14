@@ -39,7 +39,7 @@ return [
         'repair' => 'Repair date',
         'repair_status' => 'Repair status',
         'repair_details' => 'Next steps',
-        'repair_end_of_life' => 'Barriers to repair?',
+        'repair_barrier' => 'Barriers to repair?',
         'graphic-comment' => 'Comment',
         'graphic-camera' => 'Camera',
         'end' => 'End',

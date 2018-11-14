@@ -153,7 +153,7 @@
                                       <?php if(isset($error) && isset($error['repair_status']) && !empty($error['repair_status'])) { echo '<span class="help-block text-danger">' . $error['repair_status'] . '</span>'; } ?>
                                   </div>
                               </div>
-                              <div class="col-4 <?php echo ($formdata->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
+                              <div class="col-4 col-device <?php echo ($formdata->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
                                   <div class="form-group">
                                       <label for="repair_status_2">@lang('devices.repair_details'):</label>
                                       <div class="form-control form-control__select">
@@ -166,30 +166,29 @@
                                       </div>
                                   </div>
                               </div>
-                              <div class="col-4 <?php echo ($formdata->repair_status == 1 || $formdata->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
+                              <div class="col-4 col-device <?php echo ($formdata->repair_status == 1 || $formdata->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
                                   <div class="form-group">
                                       <label for="spare_parts">@lang('devices.spare_parts_required'):</label>
                                       <div class="form-control form-control__select">
                                           <select name="spare_parts" id="spare_parts" class="form-control field select2 spare-parts">
                                             <option value="0">@lang('general.please_select')</option>
                                             <option value="1" @if ($formdata->spare_parts == 1) selected @endif>@lang('partials.yes_manufacturer')</option>
-                                            <option value="3" @if ($formdata->spare_parts == 3) selected @endif>@lang('partials.yes_third_party')</option>
+                                            <option value="3" @if ($formdata->parts_provider == 2) selected @endif>@lang('partials.yes_third_party')</option>
                                             <option value="2" @if ($formdata->spare_parts == 2) selected @endif>@lang('partials.no')</option>
                                           </select>
                                       </div>
                                   </div>
                               </div>
-                              <div class="col-4 <?php echo ($formdata->repair_status == 3 ? 'col-device-auto' : 'd-none'); ?>">
+                              <div class="col-4 col-device <?php echo ($formdata->repair_status == 3 ? 'col-device-auto' : 'd-none'); ?>">
                                   <div class="form-group">
-                                      <label for="repair_end_of_life">@lang('devices.repair_end_of_life'):</label>
+                                      <label for="repair_barrier">@lang('devices.repair_barrier'):</label>
                                       <div class="form-control form-control__select">
-                                          <select name="end_of_life" id="repair_end_of_life" class="form-control field select2 repair-end-of-life">
-                                            <option value="0">@lang('general.please_select')</option>
-                                            <option value="1" @if ($formdata->end_of_life == 1) selected @endif>@lang('partials.spare_parts_not_available')</option>
-                                            <option value="2" @if ($formdata->end_of_life == 2) selected @endif>@lang('partials.spare_parts_too_expensive')</option>
-                                            <option value="3" @if ($formdata->end_of_life == 3) selected @endif>@lang('partials.no_way_to_open_product')</option>
-                                            <option value="4" @if ($formdata->end_of_life == 4) selected @endif>@lang('partials.repair_information_not_available')</option>
-                                            <option value="5" @if ($formdata->end_of_life == 5) selected @endif>@lang('partials.lack_of_equipment')</option>
+                                          <select name="barrier[]" multiple id="repair_barrier" class="form-control field select2 repair-barrier">
+                                            <option value="1" @if ( $formdata->barriers->contains(1) ) selected @endif>@lang('partials.spare_parts_not_available')</option>
+                                            <option value="2" @if ( $formdata->barriers->contains(2) ) selected @endif>@lang('partials.spare_parts_too_expensive')</option>
+                                            <option value="3" @if ($formdata->barrier == 3) selected @endif>@lang('partials.no_way_to_open_product')</option>
+                                            <option value="4" @if ($formdata->barrier == 4) selected @endif>@lang('partials.repair_information_not_available')</option>
+                                            <option value="5" @if ($formdata->barrier == 5) selected @endif>@lang('partials.lack_of_equipment')</option>
                                           </select>
                                       </div>
                                   </div>

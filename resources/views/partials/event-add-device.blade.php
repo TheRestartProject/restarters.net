@@ -69,23 +69,35 @@
                                             <option value="3">@lang('partials.end_of_life')</option>
                                         </select>
                                     </div>
-                                    <div class="repair-more d-none">
+                                    <div class="d-none col-device">
                                         <div class="form-control form-control__select">
-                                            <select name="repair_details" class="repair_details select2" disabled>
-                                                <option value="0">-- @lang('partials.repair_details') --</option>
-                                                <option value="1">@lang('partials.more_time')</option>
-                                                <option value="2">@lang('partials.professional_help')</option>
-                                                <option value="3">@lang('partials.diy')</option>
+                                            <select name="repair_details" id="repair_details_edit" class="form-control field select2 repair-details-edit">
+                                              <option value="0">-- Next steps --</option>
+                                              <option value="1">@lang('partials.more_time')</option>
+                                              <option value="2">@lang('partials.professional_help')</option>
+                                              <option value="3">@lang('partials.diy')</option>
                                             </select>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="d-none d-sm-table-cell">
+                                <td class="d-none col-device">
                                     <div class="form-control form-control__select">
-                                        <select name="spare_parts" class="spare_parts select2">
-                                            <option value="0">-- @lang('partials.spare_parts') --</option>
-                                            <option value="1">@lang('partials.yes')</option>
-                                            <option value="2">@lang('partials.no')</option>
+                                        <select name="spare_parts" class="spare_parts spare-parts select2">
+                                          <option value="0">-- Spare parts --</option>
+                                          <option value="1">@lang('partials.yes_manufacturer')</option>
+                                          <option value="3">@lang('partials.yes_third_party')</option>
+                                          <option value="2">@lang('partials.no')</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td class="d-none col-device">
+                                    <div class="form-control form-control__select">
+                                        <select name="barrier[]" multiple id="repair_barrier" class="form-control field select2 repair-barrier">
+                                          <option value="1">@lang('partials.spare_parts_not_available')</option>
+                                          <option value="2">@lang('partials.spare_parts_too_expensive')</option>
+                                          <option value="3">@lang('partials.no_way_to_open_product')</option>
+                                          <option value="4">@lang('partials.repair_information_not_available')</option>
+                                          <option value="5">@lang('partials.lack_of_equipment')</option>
                                         </select>
                                     </div>
                                 </td>

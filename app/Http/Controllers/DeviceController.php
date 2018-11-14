@@ -282,10 +282,10 @@ class DeviceController extends Controller
         //$data['event_date'] = dbDateNoTime($data['event_date']);
 
         if( !isset($data['repair_more']) || empty($data['repair_more']) ) //Override
-        $data['repair_more'] = 0;
+          $data['repair_more'] = 0;
 
         if( $data['repair_status'] != 2 ) //Override
-        $data['repair_more'] = 0;
+          $data['repair_more'] = 0;
 
         if( $data['repair_more'] == 1 ){
           $more_time_needed = 1;
@@ -311,6 +311,27 @@ class DeviceController extends Controller
           $weight = null;
         }
 
+        // New logic Nov 2018
+        if( $data['spare_parts'] == 3 ) { // Third party
+          $data['spare_parts'] = 1;
+          $parts_provider = 2;
+        } else if( $data['spare_parts'] == 1 ) { // Manufacturer
+          $data['spare_parts'] = 1;
+          $parts_provider = 1;
+        } else { // Not needed
+          $data['spare_parts'] = 2;
+          $parts_provider = null;
+        }
+
+        if( !isset($data['barrier']) ) {
+          $data['barrier'] = null;
+        } else if( in_array(1, $data['barrier']) || in_array(2, $data['barrier']) ) { // 'Spare parts not available' or 'spare parts too expensive' selected
+          $data['spare_parts'] = 1;
+        } else if( count($data['barrier']) > 0 ) {
+          $data['spare_parts'] = 2;
+        }
+        // EO new logic Nov 2018
+
         $update = array(
           'event'             => $data['event'],
           'category'          => $data['category'],
@@ -318,6 +339,7 @@ class DeviceController extends Controller
           'estimate'          => $weight,
           'repair_status'     => $data['repair_status'],
           'spare_parts'       => $data['spare_parts'],
+          'parts_provider'    => $parts_provider,
           'brand'             => $data['brand'],
           'model'             => $data['model'],
           'problem'           => $data['problem'],
@@ -329,7 +351,11 @@ class DeviceController extends Controller
         );
 
         // $u = $Device->where('iddevices', $id)->update($update);
-        $u = Device::findOrFail($id)->update($update);
+        $u = Device::find($id)->update($update);
+
+        // Update barriers
+        if( isset($data['barrier']) && !empty($data['barrier']) )
+          $device = Device::find($id)->barriers()->sync($data['barrier']);
 
         if(!$u) {
           $response['danger'] = 'Something went wrong. Please check the data and try again.';
@@ -573,7 +599,29 @@ class DeviceController extends Controller
         $device[$i]->do_it_yourself = 0;
       }
 
+      // New logic Nov 2018
+      if( $spare_parts == 3 ) { // Third party
+        $spare_parts = 1;
+        $parts_provider = 2;
+      } else if( $spare_parts== 1 ) { // Manufacturer
+        $spare_parts = 1;
+        $parts_provider = 1;
+      } else { // Not needed
+        $spare_parts = 2;
+        $parts_provider = null;
+      }
+
+      if( !isset($barrier) ) {
+        $barrier = null;
+      } else if( in_array(1, $barrier) || in_array(2, $barrier) ) { // 'Spare parts not available' or 'spare parts too expensive' selected
+        $spare_parts = 1;
+      } else if( count($barrier) > 0 ) {
+        $spare_parts = 2;
+      }
+      // EO new logic Nov 2018
+
       $device[$i]->spare_parts = $spare_parts;
+      $device[$i]->parts_provider = $parts_provider;
       $device[$i]->event = $event_id;
       $device[$i]->repaired_by = Auth::id();
       $device[$i]->save();
@@ -694,6 +742,7 @@ class DeviceController extends Controller
     $age            = $request->input('age');
     $problem        = $request->input('problem');
     $repair_status  = $request->input('repair_status');
+    $barrier        = $request->input('barrier');
     $repair_details = $request->input('repair_details');
     $spare_parts    = $request->input('spare_parts');
     $event_id       = $request->input('event_id');
@@ -797,6 +846,27 @@ class DeviceController extends Controller
           Log::error("An error occurred while sending ReviewNotes email: " . $ex->getMessage());
       }
 
+      // New logic Nov 2018
+      if( $spare_parts == 3 ) { // Third party
+        $spare_parts = 1;
+        $parts_provider = 2;
+      } else if( $spare_parts== 1 ) { // Manufacturer
+        $spare_parts = 1;
+        $parts_provider = 1;
+      } else { // Not needed
+        $spare_parts = 2;
+        $parts_provider = null;
+      }
+
+      if( !isset($barrier) ) {
+        $barrier = null;
+      } else if( in_array(1, $barrier) || in_array(2, $barrier) ) { // 'Spare parts not available' or 'spare parts too expensive' selected
+        $spare_parts = 1;
+      } else if( count($barrier) > 0 ) {
+        $spare_parts = 2;
+      }
+      // EO new logic Nov 2018
+
       Device::find($id)->update([
         'category' => $category,
         'category_creation' => $category,
@@ -806,6 +876,7 @@ class DeviceController extends Controller
         'age' => $age,
         'problem' => $problem,
         'spare_parts' => $spare_parts,
+        'parts_provider' => $parts_provider,
         'repair_status' => $repair_status,
         'more_time_needed' => $more_time_needed,
         'do_it_yourself' => $professional_help,

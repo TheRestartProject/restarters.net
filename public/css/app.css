@@ -15314,6 +15314,10 @@ table.sortable > thead th div.mozilla {
   max-width: none;
 }
 
+td.col-device-auto {
+  min-width: 100px;
+}
+
 .registration {
   padding: 10px 0;
 }
