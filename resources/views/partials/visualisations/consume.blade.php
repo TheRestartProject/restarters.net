@@ -6,5 +6,5 @@
       <p>{{{ $equal_to }}} {{{ str_plural($measure, $equal_to) }}}</p>
     @endif
     <br>
-    @include('partials.visualisations.'.$measure.'-svg')
+    <div class="p-5">@include('partials.visualisations.'.$measure.'-svg')</div>
 </aside>
