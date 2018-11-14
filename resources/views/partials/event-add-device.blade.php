@@ -93,11 +93,9 @@
                                 <td class="d-none col-device">
                                     <div class="form-control form-control__select">
                                         <select name="barrier[]" multiple id="repair_barrier" class="form-control field select2 repair-barrier">
-                                          <option value="1">@lang('partials.spare_parts_not_available')</option>
-                                          <option value="2">@lang('partials.spare_parts_too_expensive')</option>
-                                          <option value="3">@lang('partials.no_way_to_open_product')</option>
-                                          <option value="4">@lang('partials.repair_information_not_available')</option>
-                                          <option value="5">@lang('partials.lack_of_equipment')</option>
+                                          @foreach( FixometerHelper::allBarriers() as $barrier )
+                                            <option value="{{{ $barrier->id }}}">{{{ $barrier->barrier }}}</option>
+                                          @endforeach
                                         </select>
                                     </div>
                                 </td>

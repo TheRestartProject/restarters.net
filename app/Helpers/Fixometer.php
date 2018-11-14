@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App;
 use Auth;
 use DB;
+use App\Barrier;
 use App\EventsUsers;
 use App\Party;
 use App\Permissions;
@@ -911,6 +912,12 @@ class FixometerHelper {
     } elseif( in_array($modal, $device_array) ) {
         return 'card__devices';
     }
+
+  }
+
+  public static function allBarriers(){
+
+      return Barrier::all();
 
   }
 

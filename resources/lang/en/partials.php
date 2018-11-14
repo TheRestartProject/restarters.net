@@ -92,10 +92,5 @@ return [
     'this_event_hasnt_started' => 'This event hasn\'t started',
     'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
     'save' => 'Save device',
-    'spare_parts_not_available' => 'Spare parts not available',
-    'spare_parts_too_expensive' => 'Spare parts too expensive',
-    'no_way_to_open_product' => 'No way to open the product',
-    'repair_information_not_available' => 'Repair information not available',
-    'lack_of_equipment' => 'Lack of equipment'
 
 ];

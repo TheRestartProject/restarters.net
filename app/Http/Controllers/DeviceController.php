@@ -354,8 +354,11 @@ class DeviceController extends Controller
         $u = Device::find($id)->update($update);
 
         // Update barriers
-        if( isset($data['barrier']) && !empty($data['barrier']) )
+        if( isset($data['barrier']) && !empty($data['barrier']) && $data['repair_status'] == 3 ) { // Only sync when repair status is end-of-life
           $device = Device::find($id)->barriers()->sync($data['barrier']);
+        } else {
+          $device = Device::find($id)->barriers()->sync([]);
+        }
 
         if(!$u) {
           $response['danger'] = 'Something went wrong. Please check the data and try again.';
@@ -563,6 +566,7 @@ class DeviceController extends Controller
     $spare_parts    = $request->input('spare_parts');
     $quantity       = $request->input('quantity');
     $event_id       = $request->input('event_id');
+    $barrier        = $request->input('barrier');
 
     // get the number of rows in the DB where event id already exists
     $deviceCount = DB::table('devices')->where('event', $event_id)->count();
@@ -625,6 +629,13 @@ class DeviceController extends Controller
       $device[$i]->event = $event_id;
       $device[$i]->repaired_by = Auth::id();
       $device[$i]->save();
+
+      // Update barriers
+      if( isset($barrier) && !empty($barrier) && $repair_status == 3 ) { // Only sync when repair status is end-of-life
+        Device::find($device[$i]->iddevices)->barriers()->sync($barrier);
+      } else {
+        Device::find($device[$i]->iddevices)->barriers()->sync([]);
+      }
 
     }
     // end quantity loop
@@ -883,6 +894,13 @@ class DeviceController extends Controller
         'professional_help' => $do_it_yourself,
         'wiki' => $wiki,
       ]);
+
+      // Update barriers
+      if( isset($barrier) && !empty($barrier) && $repair_status == 3 ) { // Only sync when repair status is end-of-life
+        $device = Device::find($id)->barriers()->sync($barrier);
+      } else {
+        $device = Device::find($id)->barriers()->sync([]);
+      }
 
       $event = Party::find($event_id);
 

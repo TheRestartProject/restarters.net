@@ -196,11 +196,9 @@
             <label for="repair_barrier">@lang('devices.repair_barrier'):</label>
             <div class="form-control form-control__select">
               <select name="barrier-{{ $device->iddevices }}[]" multiple id="barrier-{{ $device->iddevices }}" class="form-control field select2 repair-barrier">
-                <option value="1" @if ($device->end_of_life == 1) selected @endif>@lang('partials.spare_parts_not_available')</option>
-                <option value="2" @if ($device->end_of_life == 2) selected @endif>@lang('partials.spare_parts_too_expensive')</option>
-                <option value="3" @if ($device->end_of_life == 3) selected @endif>@lang('partials.no_way_to_open_product')</option>
-                <option value="4" @if ($device->end_of_life == 4) selected @endif>@lang('partials.repair_information_not_available')</option>
-                <option value="5" @if ($device->end_of_life == 5) selected @endif>@lang('partials.lack_of_equipment')</option>
+                @foreach( FixometerHelper::allBarriers() as $barrier )
+                  <option value="{{{ $barrier->id }}}" @if ( $device->barriers->contains($barrier->id) ) selected @endif>{{{ $barrier->barrier }}}</option>
+                @endforeach
               </select>
             </div>
           </div>
@@ -308,7 +306,7 @@
                     @if( $device->category == 46 )
                       <div class="display-weight pt-1 mb-2">
                         <div class="input-group">
-                          <input type="number" class="form-control field weight" name="weight" id="weight-{{ $device->iddevices }}" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
+                          <input disabled type="number" class="form-control field weight" name="weight" id="weight-{{ $device->iddevices }}" min="0.01" step=".01" placeholder="@lang('partials.est_weight')" autocomplete="off" value="{{ $device->estimate }}">
                           <div class="input-group-append">
                             <span class="input-group-text">kg</span>
                           </div>
@@ -374,10 +372,14 @@
                                 <option value="1">@lang('partials.fixed')</option>
                                 <option value="2" selected>@lang('partials.repairable')</option>
                                 <option value="3">@lang('partials.end_of_life')</option>
-                              @else
+                              @elseif ( $device->repair_status == 3 )
                                 <option value="1">@lang('partials.fixed')</option>
                                 <option value="2">@lang('partials.repairable')</option>
                                 <option value="3" selected>@lang('partials.end_of_life')</option>
+                              @else
+                                <option value="1">@lang('partials.fixed')</option>
+                                <option value="2">@lang('partials.repairable')</option>
+                                <option value="3">@lang('partials.end_of_life')</option>
                               @endif
                             </select>
                         </div>
@@ -427,11 +429,9 @@
                         <label for="barrier-{{ $device->iddevices }}">@lang('devices.repair_barrier'):</label>
                         <div class="form-control form-control__select">
                           <select disabled name="barrier-{{ $device->iddevices }}[]" multiple id="barrier-{{ $device->iddevices }}" class="form-control field select2 repair-barrier">
-                            <option value="1" @if ($device->end_of_life == 1) selected @endif>@lang('partials.spare_parts_not_available')</option>
-                            <option value="2" @if ($device->end_of_life == 2) selected @endif>@lang('partials.spare_parts_too_expensive')</option>
-                            <option value="3" @if ($device->end_of_life == 3) selected @endif>@lang('partials.no_way_to_open_product')</option>
-                            <option value="4" @if ($device->end_of_life == 4) selected @endif>@lang('partials.repair_information_not_available')</option>
-                            <option value="5" @if ($device->end_of_life == 5) selected @endif>@lang('partials.lack_of_equipment')</option>
+                            @foreach( FixometerHelper::allBarriers() as $barrier )
+                              <option value="{{{ $barrier->id }}}" @if ( $device->barriers->contains($barrier->id) ) selected @endif>{{{ $barrier->barrier }}}</option>
+                            @endforeach
                           </select>
                         </div>
                     </td>

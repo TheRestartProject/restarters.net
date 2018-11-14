@@ -1180,7 +1180,8 @@ function initAutocomplete() {
           repair_details: $form.find('select[name=repair_details]').val(),
           spare_parts: $form.find('select[name=spare_parts]').val(),
           quantity: $form.find('select[name=quantity]').val(),
-          event_id: $form.find('input[name=event_id]').val()
+          event_id: $form.find('input[name=event_id]').val(),
+          barrier: $form.find('#repair_barrier').val()
         },
         datatype: 'json',
         success: function(json) {
@@ -1294,7 +1295,7 @@ function initAutocomplete() {
       $repair_details = parseInt($('#repair-info-'+device_id).val());
       // $repair_details_name = $('#repair-info-'+device_id+' option:selected').text();
       $spare_parts = parseInt($('#spare-parts-'+device_id).val());
-      $barrier = parseInt($('#barrier-'+device_id).val());
+      $barrier = $('#barrier-'+device_id).val();
       $event_id = $('#event_id').val();
 
       //Visual improvements
