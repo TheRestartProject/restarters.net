@@ -35,6 +35,23 @@ class AdditionalDeviceFields extends Migration
         Schema::table('devices', function (Blueprint $table) {
             $table->tinyInteger('parts_provider')->after('spare_parts')->nullable();
         });
+
+        DB::table('barriers')->insert([
+          'barrier' => 'Spare parts not available',
+        ]);
+        DB::table('barriers')->insert([
+          'barrier' => 'Spare parts too expensive',
+        ]);
+        DB::table('barriers')->insert([
+          'barrier' => 'No way to open the product',
+        ]);
+        DB::table('barriers')->insert([
+          'barrier' => 'Repair information not available',
+        ]);
+        DB::table('barriers')->insert([
+          'barrier' => 'Lack of equipment',
+        ]);
+
     }
 
     /**
