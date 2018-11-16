@@ -47,7 +47,7 @@ class NotifyAdminNoDevices extends Notification
      public function toMail($notifiable)
      {
          return (new MailMessage)
-                     ->subject('Moderation Needed')
+                     ->subject('Recent event with no devices added')
                      ->greeting('Hello!')
                      ->line('Your moderation is needed for \'' . $this->arr['event_venue'] . '\'.')
                      ->line('No devices have been added against this event.')

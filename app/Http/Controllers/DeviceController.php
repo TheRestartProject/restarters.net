@@ -568,9 +568,8 @@ class DeviceController extends Controller
     $event_id       = $request->input('event_id');
     $barrier        = $request->input('barrier');
 
-    // get the number of rows in the DB where event id already exists
-    $deviceCount = DB::table('devices')->where('event', $event_id)->count();
-    $deviceMiscCount = DB::table('devices')->where('category', 46)->where('event', $event_id)->count();
+    // Get party for later
+    $event = Party::find($event_id);
 
     // add quantity loop
     for ($i=0; $i < $quantity; $i++) {
@@ -637,6 +636,18 @@ class DeviceController extends Controller
         Device::find($device[$i]->iddevices)->barriers()->sync([]);
       }
 
+      // If the number of devices exceeds set amount then show the following message
+      $deviceMiscCount = DB::table('devices')->where('category', 46)->where('event', $event_id)->count();
+      if( $deviceMiscCount == env('DEVICE_ABNORMAL_MISC_COUNT', 5) ) {
+
+        $notify_users = FixometerHelper::usersWhoHavePreference('admin-abnormal-devices');
+        Notification::send($notify_users, new AdminAbnormalDevices([
+          'event_venue' => $event->getEventName(),
+          'event_url' => url('/party/edit/'.$event->id),
+        ]));
+
+      }
+
     }
     // end quantity loop
 
@@ -657,28 +668,19 @@ class DeviceController extends Controller
       }
       //end of handle loop
 
-      $event = Party::find($event_id);
-
       $footprintRatioCalculator = new FootprintRatioCalculator();
       $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
       $stats = $event->getEventStats($emissionRatio);
 
+      // get the number of rows in the DB where event id already exists
+      $deviceCount = DB::table('devices')->where('event', $event_id)->count();
+
       $return['html'] = $views;
       $return['success'] = true;
       $return['stats'] = $stats;
       $return['deviceCount'] = $deviceCount;
-
-      // If the number of devices exceeds set amount then show the following message
-      if( $deviceMiscCount == env('DEVICE_ABNORMAL_MISC_COUNT', 5) ) {
-
-        $notify_users = FixometerHelper::usersWhoHavePreference('admin-abnormal-devices');
-        Notification::send($notify_users, new AdminAbnormalDevices([
-          'event_venue' => $event->getEventName(),
-          'event_url' => url('/party/edit/'.$event->id),
-        ]));
-
-      }
+      $return['deviceMiscCount'] = $deviceMiscCount;
 
       return response()->json($return);
 

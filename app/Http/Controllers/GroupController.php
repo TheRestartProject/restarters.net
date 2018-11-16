@@ -261,20 +261,6 @@ class GroupController extends Controller
             'group_url' => url('/group/edit/'.$idGroup),
           ]));
 
-          // Notify nearest users
-          if( is_numeric($lat1) && is_numeric($lon1) ){
-
-            $restarters_nearby = User::nearbyRestarters($lat1, $lon1, 25)
-                                        ->orderBy('name', 'ASC')
-                                          ->get();
-
-            Notification::send($restarters_nearby, new NewGroupWithinRadius([
-              'group_name' => $name,
-              'group_url' => url('/group/view/'.$idGroup),
-            ]));
-
-          }
-
         }
         else {
           $response['danger'] = 'Group could <strong>not</strong> be created. Something went wrong with the database.';
@@ -857,7 +843,23 @@ public function edit($id)
 
       // Send WordPress Notification if group approved with POSTed data
       if ( isset($data['moderate']) && $data['moderate'] == 'approve' ) {
+        
         event(new ApproveGroup($group, $data));
+
+        // Notify nearest users
+        if( !is_null($latitude) && !is_null($longitude) ){
+
+          $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
+                                      ->orderBy('name', 'ASC')
+                                        ->get();
+
+          Notification::send($restarters_nearby, new NewGroupWithinRadius([
+            'group_name' => $group->name,
+            'group_url' => url('/group/view/'.$id),
+          ]));
+
+        }
+
       } elseif ( !empty($group->wordpress_post_id) ) {
         event(new EditGroup($group, $data));
       }

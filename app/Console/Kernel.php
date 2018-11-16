@@ -7,6 +7,7 @@ use App\Mail\NotifyAdminNoDevices;
 use App\Notifications\NotifyAdminNoDevices as Mail;
 use App\User;
 use Carbon\Carbon;
+use FixometerHelper;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Notification;
@@ -51,8 +52,8 @@ class Kernel extends ConsoleKernel
 
           }
 
-        })->timezone('Europe/London')->dailyAt('09:30');
-        // replace '->timezone('Europe/London')->dailyAt('09:30');' with '->everyMinute(); for testing purposes'
+        })->cron('0 0 */3 * *');
+
     }
 
     /**
