@@ -32,7 +32,7 @@
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#photos">Device photos</a>
           </li>
-          @if($audits)
+          @if( $audits && FixometerHelper::hasRole(Auth::user(), 'Administrator') )
               <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#log">Device log</a>
               </li>
@@ -257,7 +257,7 @@
 
             </div>
 
-            @if($audits)
+            @if( $audits && FixometerHelper::hasRole(Auth::user(), 'Administrator') )
                 <div class="tab-pane" id="log">
 
                   <div class="row">

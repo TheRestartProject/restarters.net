@@ -24,7 +24,7 @@
           </div>
       </div>
   @empty
-      <div class="text-center">@lang('event-audits.unavailable_audits')</div>
+      <div class="text-center">@lang($type.'.unavailable_audits')</div>
   @endforelse
 
 </div>
