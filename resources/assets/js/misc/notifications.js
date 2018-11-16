@@ -2,6 +2,7 @@ function toggleRead(event) {
     event.preventDefault();
 
     $button = $(this);
+    $counter = $('button.badge.badge-pill.badge-info span');
 
     $.ajax({
       type: 'get',
@@ -9,6 +10,7 @@ function toggleRead(event) {
       success: function(data) {
         $button.parents('.card').addClass('status-is-read');
         $button.parents('.card').toggleClass('status-read');
+        $counter.text( parseInt($counter.text()) - 1 );
       },
       error: function(error) {
         alert('Cannot mark as read, please report')

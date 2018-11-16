@@ -228,7 +228,7 @@
                   @endforeach
 
                 </div>
-                <button class="notifications__older js-load">View older notifications</button>
+                <button class="notifications__older js-load">View read notifications</button>
             </div>
         </div>
     </aside>

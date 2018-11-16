@@ -265,9 +265,8 @@ class GroupController extends Controller
           if( is_numeric($lat1) && is_numeric($lon1) ){
 
             $restarters_nearby = User::nearbyRestarters($lat1, $lon1, 25)
-                                        ->where('invites', 1)
-                                          ->orderBy('name', 'ASC')
-                                            ->get();
+                                        ->orderBy('name', 'ASC')
+                                          ->get();
 
             Notification::send($restarters_nearby, new NewGroupWithinRadius([
               'group_name' => $name,
@@ -301,24 +300,9 @@ class GroupController extends Controller
       }
 
       if( is_numeric($idGroup) && $idGroup !== false ){
-        //NB: Dean I believe this is where this should go for sending the group moderation emails
-        // $user = User::find($user_group->user);
-        // try {
-        //   $host = User::find(UserGroups::where('group', $group_id)->where('role', 3)->first()->user);
-        // } catch (\Exception $e) {
-        //   $host = null;
-        // }
-        //
-        // if (!is_null($host)) {
-        //   //Send Notification to Host
-        //   $arr = [
-        //     'group_name' => Group::find($group_id)->name,
-        //     'group_url' => url('/group/view/'.$group_id),
-        //   ];
-        //
-        //   Notification::send($host, new NewGroupMember($arr, $host));
 
         return redirect('/group/edit/'.$idGroup)->with('response', $response);
+
       } else {
         return view('group.create', [
           'title' => 'New Group',
@@ -757,9 +741,8 @@ public function confirmInvite($group_id, $hash)
   $group_hosts = User::join('users_groups', 'users_groups.user', '=', 'users.id')
                         ->where('users_groups.group', $group_id)
                           ->where('users_groups.role', 3)
-                            ->where('users.invites', 1)
-                              ->select('users.*')
-                                ->get();
+                            ->select('users.*')
+                              ->get();
 
   if ( !empty($group_hosts) ) {
 
@@ -1122,15 +1105,13 @@ public function getJoinGroup($group_id) {
 
       foreach ($groupHostLinks as $groupHostLink) {
         $host = User::where('id', $groupHostLink->user)->first();
-        if ($host->invites == 1) {
-          $arr = [
-            'user_name' => Auth::user()->name,
-            'group_name' => $group->name,
-            'group_url' => url('/group/view/'.$group->idgroups),
-            'preferences' => url('/profile/edit/'.$host->id),
-          ];
-          Notification::send($host, new NewGroupMember($arr, $host));
-        }
+        $arr = [
+          'user_name' => Auth::user()->name,
+          'group_name' => $group->name,
+          'group_url' => url('/group/view/'.$group->idgroups),
+          'preferences' => url('/profile/edit/'.$host->id),
+        ];
+        Notification::send($host, new NewGroupMember($arr, $host));
       }
 
 

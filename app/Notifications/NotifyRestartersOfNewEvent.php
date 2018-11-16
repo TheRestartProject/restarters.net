@@ -32,7 +32,12 @@ class NotifyRestartersOfNewEvent extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+
+        if( $notifiable->invites == 1 )
+          return ['mail', 'database'];
+
+        return ['database'];
+
     }
 
     /**

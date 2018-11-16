@@ -485,9 +485,8 @@ public function edit($id, Request $request) {
       $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
                                 ->where('users_groups.group', $event->group)
                                   ->where('users_groups.role', 4)
-                                    ->where('users.invites', 1)
-                                      ->select('users.*')
-                                        ->get();
+                                    ->select('users.*')
+                                      ->get();
 
       // If there are restarters against the group
       if ( !$group_restarters->isEmpty() ) {
@@ -1320,9 +1319,8 @@ public function confirmInvite($event_id, $hash) {
       $hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
                         ->where('events_users.event', $event_id)
                           ->where('events_users.role', 3)
-                            ->where('users.invites', 1)
-                              ->select('users.*')
-                                ->get();
+                            ->select('users.*')
+                              ->get();
 
     } catch (\Exception $e) {
       $hosts = null;

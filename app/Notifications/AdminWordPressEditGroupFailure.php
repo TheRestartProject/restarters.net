@@ -30,7 +30,12 @@ class AdminWordPressEditGroupFailure extends Notification
      */
      public function via($notifiable)
      {
+
+       if( $notifiable->invites == 1 )
          return ['mail', 'database'];
+
+       return ['database'];
+
      }
 
     /**
