@@ -1551,9 +1551,9 @@ public function deleteEvent($id){
   $user = User::find(Auth::id());
 
   // Check for authentication
-  if( !FixometerHelper::userHasEditPartyPermission($id, Auth::id()) || !FixometerHelper::hasRole($user, 'Administrator')){
+  if( !FixometerHelper::userHasEditPartyPermission($id) ){
 
-    return redirect()->back()->with('warning', 'You do not have permission to delete this event');
+    return redirect()->back()->with('warning', 'You do not have permission to delete this event1');
 
   } else {
 
@@ -1577,10 +1577,10 @@ public function deleteEvent($id){
 
     } else {
 
-      return redirect()->back()->with('warning', 'You do not have permission to delete this event');
+      return redirect()->back()->with('warning', 'You do not have permission to delete this event2');
     }
 
-    return redirect()->back()->with('warning', 'You do not have permission to delete this event');
+    return redirect()->back()->with('warning', 'You do not have permission to delete this event3');
 
   }
 
