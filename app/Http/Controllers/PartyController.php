@@ -1545,47 +1545,29 @@ public function getContributions($event_id){
 
 public function deleteEvent($id){
 
-  if( !isset($id) )
-  abort(404);
+  $user = Auth::user();
+  $event = Party::find($id);
 
-  $user = User::find(Auth::id());
+  if( !isset($id) || is_null($event) )
+    abort(404);
 
   // Check for authentication
-  if( !FixometerHelper::userHasEditPartyPermission($id) ){
+  if( FixometerHelper::userHasEditPartyPermission($id) || FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id) ) {
 
-    return redirect()->back()->with('warning', 'You do not have permission to delete this event1');
+    // Let's delete everything just to be certain
+    $audits = Audits::where('auditable_type', 'App\Party')->where('auditable_id', $id)->delete();
+    $device = Device::where('event', $id)->delete();
+    $event_users = EventsUsers::where('event', $id)->delete();
+    $event = Party::where('idevents', $id)->delete();
 
-  } else {
-
-    // Check to see whether the columns volunteers and pax has a value less than or equal to zero
-    // $testing = Party::where('idevents', $id)->where('volunteers', '<=', 0)->where('pax', '<=', 0)->where('user_id')->first();
-
-    // Check to see whether the current user is the owner/creator of the event OR the logged in user is an Administrator
-    $checkUserAuthority = Party::where('idevents', $id)->where('user_id', $user->id)->first();
-    $adminRole = FixometerHelper::hasRole($user, 'Administrator');
-
-    if( !is_null($checkUserAuthority) || !is_null($adminRole)) {
-
-      // Let's delete everything just to be certain
-      $audits = Audits::where('auditable_type', 'App\Party')->where('auditable_id', $id)->delete();
-      $device = Device::where('event', $id)->delete();
-      $event_users = EventsUsers::where('event', $id)->delete();
-      $event = Party::where('idevents', $id)->delete();
-
-      // Let the user know everything has been done
-      return redirect('/party')->with('success', 'Event has been deleted');
-
-    } else {
-
-      return redirect()->back()->with('warning', 'You do not have permission to delete this event2');
-    }
-
-    return redirect()->back()->with('warning', 'You do not have permission to delete this event3');
+    // Let the user know everything has been done
+    return redirect('/party')->with('success', 'Event has been deleted');
 
   }
 
-}
+  return redirect()->back()->with('warning', 'You do not have permission to delete this event');
 
+}
 
 public function noDataEntered() {
   return redirect('/party');
