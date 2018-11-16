@@ -62,7 +62,7 @@ class AddPreferences extends Migration
 
         // Additional permission
         DB::table('permissions')->insert([
-          'name' => 'Verify Translation Access',
+          'permission' => 'Verify Translation Access',
           'purpose' => NULL,
           'slug' => 'verify-translation-access',
         ]);
