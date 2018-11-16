@@ -26,7 +26,7 @@ class FixometerFile extends Model {
 
         $clear = true; // purge pre-existing images from db - this is the default behaviour
 
-        if(is_string($file)){
+        if( is_string($file) && isset($_FILES[$file]) ){
             $user_file = $_FILES[$file];
         }
         elseif(is_array($file)){ // multiple file uploads means we do not purge pre-existing images
