@@ -1375,10 +1375,11 @@ function initAutocomplete() {
           //   summary_row.find('.repair_details').text($repair_details_name);
           // }
 
-          if( $spare_parts === 1 ){
-            summary_row.find('.table-tick').show();
-          } else {
+          // Hide tick when no spare parts selected or not needed
+          if( $spare_parts == 0 || $spare_parts == 2 ){
             summary_row.find('.table-tick').hide();
+          } else {
+            summary_row.find('.table-tick').show();
           }
 
         },
