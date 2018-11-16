@@ -767,9 +767,9 @@ class DeviceController extends Controller
     if( $repair_status != 2 ) //Override
     $repair_details = 0;
 
-    $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
+    $event = Party::find($event_id);
 
-    if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || is_object($in_event) ){
+    if( FixometerHelper::userHasEditPartyPermission($event_id) || FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id) ) {
 
       // if ($repair_status == 2) {
       //   switch ($repair_details) {
