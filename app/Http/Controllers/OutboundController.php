@@ -7,6 +7,7 @@ use App\Party;
 use App\Device;
 
 use App\Helpers\FootprintRatioCalculator;
+use Request;
 
 class OutboundController extends Controller
 {
@@ -77,7 +78,7 @@ class OutboundController extends Controller
 	/** type can be either party or group
 	 * id is id of group or party to display
 	 * */
-	public static function info($type, $id, $format = 'fixometer') {
+	public static function info($type, $id, $format = 'fixometer', $return = 'view' ) {
 
 		// Ensure that ID is a number, otherwise show 404
 		if( !is_numeric($id) && !filter_var($id, FILTER_VALIDATE_INT) ){
@@ -153,10 +154,18 @@ class OutboundController extends Controller
 
 				}
 
-	      return view('outbound.info', [
-	        'info' => $info,
-	  			'co2' => $co2,
-	      ]);
+				// Return json for api.php
+				if (Request::is('api*')) {
+						return response()->json([
+							'info' => $info,
+							'co2' => $co2,
+						]);
+				} else {
+						return view('outbound.info', [
+							'info' => $info,
+							'co2' => $co2,
+						]);
+				}
 
 			} else {
 
@@ -199,13 +208,24 @@ class OutboundController extends Controller
 
 				}
 
-				return view('visualisations', [
-					'format' 		=> $format,
-					'co2' 			=> $co2,
-					'title' 		=> $title,
-					'measure' 	=> $measure,
-					'equal_to' 	=> $equal_to,
-				]);
+				// Return json for api.php
+				if (Request::is('api*')) {
+						return response()->json([
+							'format' 		=> $format,
+							'co2' 			=> $co2,
+							'title' 		=> $title,
+							'measure' 	=> $measure,
+							'equal_to' 	=> $equal_to,
+						]);
+				} else {
+						return view('visualisations', [
+							'format' 		=> $format,
+							'co2' 			=> $co2,
+							'title' 		=> $title,
+							'measure' 	=> $measure,
+							'equal_to' 	=> $equal_to,
+						]);
+				}
 
 			}
 

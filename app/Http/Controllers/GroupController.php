@@ -843,7 +843,7 @@ public function edit($id)
 
       // Send WordPress Notification if group approved with POSTed data
       if ( isset($data['moderate']) && $data['moderate'] == 'approve' ) {
-        
+
         event(new ApproveGroup($group, $data));
 
         // Notify nearest users
@@ -1073,7 +1073,12 @@ public static function statsByGroupTag($group_tag_id, $format = 'row')
 
   $groupStats['format'] = $format;
 
-  return view('group.stats', $groupStats);
+  // Return json for api.php
+	if (\Request::is('api*')) {
+		return response()->json($groupStats);
+	} else {
+    return view('group.stats', $groupStats);
+	}
 
 }
 
