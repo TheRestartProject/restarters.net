@@ -32,14 +32,16 @@ Scenario: No notifications
     When a host clikcs on notification symbol, even though they did not get any notification(for the first time)
     Then there will be a welcome message.
 
-Scenario: Mark as read
-    Given there are notifications
-    When a host wants to mark the notification as read
-    And click on mark as read link
-    Then the user will be able to see the text changed to marked as read
-    And als othe background color changes.
+Scenario: Notifications in fixometer of activity in talk
+#Volunteer engagement. Talk is a very important part of the platform, where people can get involved and be active even if there are no events or groups currently near them. 
+#In fact, for a number of people it's where they're likely to spend more time. We want to highlight activity and encourage participation and use of Talk as much as possible.
+    When a user is interested in a topic or few on discourse and something has happened on those topics
+    Then the user will get a notification about it
+    And can navigate to talk by clicking the link from the notification.
 
-Scenario: View old notifications
-    Given there are old notifications
-    When a host clikcs on view old notifications link
-    Then users will see the list of older notifications.    
+Scenario: Notifications of discourse activity in fixometer
+#Volunteer engagement.
+    When a user is related to any groups or events and something has happened on those
+    Then the user will get a notification about it on talk
+    And can navigate to fixometer by the notification displayed in the dicourse
+    And can have a detailed notification about it in fixometer and navigate from there.
