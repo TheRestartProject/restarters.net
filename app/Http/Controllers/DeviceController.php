@@ -643,7 +643,7 @@ class DeviceController extends Controller
         $notify_users = FixometerHelper::usersWhoHavePreference('admin-abnormal-devices');
         Notification::send($notify_users, new AdminAbnormalDevices([
           'event_venue' => $event->getEventName(),
-          'event_url' => url('/party/edit/'.$event->id),
+          'event_url' => url('/party/edit/'.$event_id),
         ]));
 
       }
