@@ -318,8 +318,13 @@ class DeviceController extends Controller
         } else if( $data['spare_parts'] == 1 ) { // Manufacturer
           $data['spare_parts'] = 1;
           $parts_provider = 1;
-        } else { // Not needed
+        } else if( $data['spare_parts'] == 2 ) { // Not needed
           $data['spare_parts'] = 2;
+          $parts_provider = null;
+        } else if( $data['spare_parts'] == 4 ) { // Historical data, resets spare parts to 1 but keeps parts provider as null
+          $data['spare_parts'] = 1;
+          $parts_provider = null;
+        } else {
           $parts_provider = null;
         }
 
@@ -606,11 +611,13 @@ class DeviceController extends Controller
       if( $spare_parts == 3 ) { // Third party
         $spare_parts = 1;
         $parts_provider = 2;
-      } else if( $spare_parts== 1 ) { // Manufacturer
+      } else if( $spare_parts == 1 ) { // Manufacturer
         $spare_parts = 1;
         $parts_provider = 1;
-      } else { // Not needed
+      } else if( $spare_parts == 2 ) { // Not needed
         $spare_parts = 2;
+        $parts_provider = null;
+      } else {
         $parts_provider = null;
       }
 
@@ -863,11 +870,16 @@ class DeviceController extends Controller
       if( $spare_parts == 3 ) { // Third party
         $spare_parts = 1;
         $parts_provider = 2;
-      } else if( $spare_parts== 1 ) { // Manufacturer
+      } else if( $spare_parts == 1 ) { // Manufacturer
         $spare_parts = 1;
         $parts_provider = 1;
-      } else { // Not needed
+      } else if( $spare_parts == 2 ) { // Not needed
         $spare_parts = 2;
+        $parts_provider = null;
+      } else if( $spare_parts == 4 ) { // Historical data, resets spare parts to 1 but keeps parts provider as null
+        $spare_parts = 1;
+        $parts_provider = null;
+      } else {
         $parts_provider = null;
       }
 

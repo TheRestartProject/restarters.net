@@ -30800,6 +30800,10 @@ tag_options = {
   }
 };
 
+repair_barrier_options = {
+  placeholder: "-- Choose barriers to repair --"
+};
+
 tag_options_with_input = (_tag_options_with_inp = {
   tags: true,
   minimumInputLength: 2,
@@ -30824,11 +30828,13 @@ function select2Fields() {
   if ($target === false) {
 
     jQuery('.select2').select2();
+    jQuery('.select2-repair-barrier').select2(repair_barrier_options);
     jQuery('.select2-tags').select2(tag_options);
     jQuery(".select2-with-input").select2(tag_options_with_input);
   } else {
 
     $target.find('.select2').select2();
+    $target.find('.select2-repair-barrier').select2(repair_barrier_options);
     $target.find('.select2-tags').select2(tag_options);
     $target.find(".select2-with-input").select2(tag_options_with_input);
   }

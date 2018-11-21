@@ -15318,6 +15318,10 @@ td.col-device-auto {
   min-width: 100px;
 }
 
+.form-control__select_placeholder .select2-container--default .select2-search--inline .select2-search__field {
+  width: 250px !important;
+}
+
 .registration {
   padding: 10px 0;
 }

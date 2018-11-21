@@ -91,8 +91,8 @@
                                     </div>
                                 </td>
                                 <td class="d-none col-device">
-                                    <div class="form-control form-control__select">
-                                        <select name="barrier[]" multiple id="repair_barrier" class="form-control field select2 repair-barrier">
+                                    <div class="form-control form-control__select form-control__select_placeholder">
+                                        <select name="barrier[]" multiple placeholder="-- Choose barriers to repair --" id="repair_barrier" class="form-control field select2-repair-barrier repair-barrier">
                                           @foreach( FixometerHelper::allBarriers() as $barrier )
                                             <option value="{{{ $barrier->id }}}">{{{ $barrier->barrier }}}</option>
                                           @endforeach

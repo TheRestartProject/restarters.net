@@ -171,10 +171,10 @@
                                       <label for="spare_parts">@lang('devices.spare_parts_required'):</label>
                                       <div class="form-control form-control__select">
                                           <select name="spare_parts" id="spare_parts" class="form-control field select2 spare-parts">
-                                            <option value="0">@lang('general.please_select')</option>
-                                            <option value="1" @if ($formdata->spare_parts == 1) selected @endif>@lang('partials.yes_manufacturer')</option>
-                                            <option value="3" @if ($formdata->parts_provider == 2) selected @endif>@lang('partials.yes_third_party')</option>
-                                            <option value="2" @if ($formdata->spare_parts == 2) selected @endif>@lang('partials.no')</option>
+                                            <option @if ( $formdata->spare_parts == 1 && is_null($formdata->parts_provider) ) value="4" @else value="0" @endif>@lang('general.please_select')</option>
+                                            <option value="1" @if ( $formdata->spare_parts == 1 && !is_null($formdata->parts_provider) ) selected @endif>@lang('partials.yes_manufacturer')</option>
+                                            <option value="3" @if ( $formdata->parts_provider == 2 ) selected @endif>@lang('partials.yes_third_party')</option>
+                                            <option value="2" @if ( $formdata->spare_parts == 2 ) selected @endif>@lang('partials.no')</option>
                                           </select>
                                       </div>
                                   </div>
@@ -182,8 +182,8 @@
                               <div class="col-4 col-device <?php echo ($formdata->repair_status == 3 ? 'col-device-auto' : 'd-none'); ?>">
                                   <div class="form-group">
                                       <label for="repair_barrier">@lang('devices.repair_barrier'):</label>
-                                      <div class="form-control form-control__select">
-                                          <select name="barrier[]" multiple id="repair_barrier" class="form-control field select2 repair-barrier">
+                                      <div class="form-control form-control__select form-control__select_placeholder">
+                                          <select name="barrier[]" multiple id="repair_barrier" class="form-control field select2-repair-barrier repair-barrier">
                                             @foreach( FixometerHelper::allBarriers() as $barrier )
                                               <option value="{{{ $barrier->id }}}" @if ( $formdata->barriers->contains($barrier->id) ) selected @endif>{{{ $barrier->barrier }}}</option>
                                             @endforeach

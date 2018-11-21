@@ -48,7 +48,7 @@ return [
         'age' => 'Age',
         'restart-party' => 'Restart party',
         'category_of_device' => 'Category of device',
-        'spare_parts_required' => 'Spare parts required',
+        'spare_parts_required' => 'Spare parts required?',
         'save_device' => 'Save device',
         'admin_device' => 'Let administrators know that above solution is suitable for Restart Wiki',
         'devices_description' => 'Description of problem/solution',

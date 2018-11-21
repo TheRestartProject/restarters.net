@@ -85,3 +85,10 @@
 td.col-device-auto {
   min-width: 100px;
 }
+
+// This is a workaround to display the input, thus displaying the placeholder. Only needed for repair_barrier field
+.form-control__select_placeholder {
+  .select2-container--default .select2-search--inline .select2-search__field {
+      width: 250px !important;
+  }
+}
