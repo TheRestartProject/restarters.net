@@ -1,4 +1,4 @@
-Feature: Invite volunteers to a group 
+Feature: Invite volunteers to a group by email
    As a User (All roles)   
    In order to invite volunteers to a group    
    I should be able to click on invite to group link.
@@ -17,4 +17,4 @@ Scenario: Invite volunteers to a group
 
 Scenario: User triggers invitation to group email
    When the user clicks the send invite to group button
-   Then the volunteer that the user has sent sent invite to group would receive an email about information of that group.
+   Then the volunteer that the user has sent invite to group would receive an email about information of that group.

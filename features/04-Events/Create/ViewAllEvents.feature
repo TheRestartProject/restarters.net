@@ -30,3 +30,13 @@ Scenario: Add/edit a device
 Scenario: To RSVP
     When a host wants to respond to the invite, click on the link RSVP
     Then lands on that patrticular page.
+
+Scenario: View only upcoming events
+    When a user wants to view upcoming events related to their groups and events they have RSVPed
+    Then they can view in their personal feed
+    And also on a public feed specifically to group updates.
+
+Scenario: View all events feed for admins
+    When an admin wants to view all the upcoming events
+    Then they can view in all events feed
+    And only restart office members have access to see this feed.
