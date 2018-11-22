@@ -3243,6 +3243,72 @@ jsonPWrapper ({
               "WasExecuted": false,
               "WasSuccessful": false
             }
+          },
+          {
+            "Name": "View only upcoming events",
+            "Slug": "view-only-upcoming-events",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "a user wants to view upcoming events related to their groups and events they have RSVPed",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "they can view in their personal feed",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "also on a public feed specifically to group updates.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
+          },
+          {
+            "Name": "View all events feed for admins",
+            "Slug": "view-all-events-feed-for-admins",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "an admin wants to view all the upcoming events",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "they can view in all events feed",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "only restart office members have access to see this feed.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
           }
         ],
         "Background": {
@@ -5118,6 +5184,134 @@ jsonPWrapper ({
       }
     },
     {
+      "RelativeFolder": "04-Events\\Stats\\SocialMediaStats.feature",
+      "Feature": {
+        "Name": "Sharing social media friendly Stats",
+        "Description": "As a User (all roles)  \r\nIn order to share the stats of a particular event or to social media platforms   \r\nI should be able to click on social media friendly stats button.",
+        "FeatureElements": [
+          {
+            "Name": "Sharing social media friendly images for their events impact stats",
+            "Slug": "sharing-social-media-friendly-images-for-their-events-impact-stats",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "Given",
+                "NativeKeyword": "Given ",
+                "Name": "the user is a host or volunteere of the event",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "a user clicks on the the share social media friendly stats button on the event page",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "they can see the images on a popup screen",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "can share them.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
+          },
+          {
+            "Name": "Sharing social media friendly images for their group impact stats",
+            "Slug": "sharing-social-media-friendly-images-for-their-group-impact-stats",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "Given",
+                "NativeKeyword": "Given ",
+                "Name": "the user is a member of the group",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "a user clicks on the the share social media friendly stats button on the group page",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "they can see the images on a popup screen",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "can share them.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
+          }
+        ],
+        "Background": {
+          "Name": "",
+          "Description": "",
+          "Steps": [
+            {
+              "Keyword": "Given",
+              "NativeKeyword": "Given ",
+              "Name": "the following account have been created as an host",
+              "TableArgument": {
+                "HeaderRow": [
+                  "Email",
+                  "Password"
+                ],
+                "DataRows": [
+                  [
+                    "dean@wecreatedigital.co.uk",
+                    "dean"
+                  ]
+                ]
+              },
+              "StepComments": [],
+              "AfterLastStepComments": []
+            }
+          ],
+          "Tags": [],
+          "Result": {
+            "WasExecuted": false,
+            "WasSuccessful": false
+          }
+        },
+        "Result": {
+          "WasExecuted": false,
+          "WasSuccessful": false
+        },
+        "Tags": []
+      },
+      "Result": {
+        "WasExecuted": false,
+        "WasSuccessful": false
+      }
+    },
+    {
       "RelativeFolder": "04-Events\\UpcomingEvent_restarter.feature",
       "Feature": {
         "Name": "Upcoming events details",
@@ -5995,7 +6189,7 @@ jsonPWrapper ({
     {
       "RelativeFolder": "05-Groups\\InviteUsertoGroup.feature",
       "Feature": {
-        "Name": "Invite volunteers to a group",
+        "Name": "Invite volunteers to a group by email",
         "Description": "As a User (All roles)   \r\nIn order to invite volunteers to a group    \r\nI should be able to click on invite to group link.",
         "FeatureElements": [
           {
@@ -6058,7 +6252,7 @@ jsonPWrapper ({
               {
                 "Keyword": "Then",
                 "NativeKeyword": "Then ",
-                "Name": "the volunteer that the user has sent sent invite to group would receive an email about information of that group.",
+                "Name": "the volunteer that the user has sent invite to group would receive an email about information of that group.",
                 "StepComments": [],
                 "AfterLastStepComments": []
               }
@@ -6100,6 +6294,23 @@ jsonPWrapper ({
             "WasSuccessful": false
           }
         },
+        "Result": {
+          "WasExecuted": false,
+          "WasSuccessful": false
+        },
+        "Tags": []
+      },
+      "Result": {
+        "WasExecuted": false,
+        "WasSuccessful": false
+      }
+    },
+    {
+      "RelativeFolder": "05-Groups\\InviteVolunteers_ToGroup_ByLink.feature",
+      "Feature": {
+        "Name": "Invite volunteers to a group by link",
+        "Description": "As a User (All roles)   \r\nIn order to invite volunteers to a group    \r\nI should be able to click on 'invite to group' link to include in manual email.",
+        "FeatureElements": [],
         "Result": {
           "WasExecuted": false,
           "WasSuccessful": false
@@ -8345,7 +8556,7 @@ jsonPWrapper ({
       "RelativeFolder": "06-Devices\\ViewAllDevices.feature",
       "Feature": {
         "Name": "View all devices",
-        "Description": "As a user (all roles)  \r\nIn order to see all the devices that was taken to restart party   \r\nI should be able to navigate devices page.",
+        "Description": "As a user (admins)  \r\nIn order to see all the devices that was taken to restart party   \r\nI should be able to navigate devices page.",
         "FeatureElements": [
           {
             "Name": "View all devices",
@@ -8355,7 +8566,7 @@ jsonPWrapper ({
               {
                 "Keyword": "When",
                 "NativeKeyword": "When ",
-                "Name": "a restarter clicks on devices page",
+                "Name": "an admin clicks on devices page",
                 "StepComments": [],
                 "AfterLastStepComments": []
               },
@@ -8381,7 +8592,7 @@ jsonPWrapper ({
               {
                 "Keyword": "When",
                 "NativeKeyword": "When ",
-                "Name": "a restarter wants to search for the devices, he can fill the fields as he want to search as follows",
+                "Name": "an admin wants to search for the devices, he can fill the fields as he want to search as follows",
                 "TableArgument": {
                   "HeaderRow": [
                     "Category",
@@ -8421,6 +8632,13 @@ jsonPWrapper ({
                 "AfterLastStepComments": []
               },
               {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "can also edit, delete the devices",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
                 "Keyword": "Then",
                 "NativeKeyword": "Then ",
                 "Name": "user can view the list or a particular device that searched for.",
@@ -8435,42 +8653,86 @@ jsonPWrapper ({
             }
           },
           {
-            "Name": "Export filtered devices",
-            "Slug": "export-filtered-devices",
+            "Name": "View all devices and filter them by the hosts and restarters also",
+            "Slug": "view-all-devices-and-filter-them-by-the-hosts-and-restarters-also",
             "Description": "",
             "Steps": [
               {
-                "Keyword": "Given",
-                "NativeKeyword": "Given ",
-                "Name": "user wants to get the data of filtered devices",
-                "StepComments": [],
-                "AfterLastStepComments": []
-              },
-              {
                 "Keyword": "When",
                 "NativeKeyword": "When ",
-                "Name": "a user clicks on edit devices page",
+                "Name": "a host/restarter clicks on devices page",
+                "StepComments": [
+                  {
+                    "Text": "#example: Repairer is at an event trying to fix an Apple iPhone 5s. They should be able to easily log in to restarters.net on their mobile/tablet, search for brand Apple, model iPhone, and see past repair problems and solutions and sources of repair"
+                  }
+                ],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "he can only view the devices starting from recent ones on the top of the page",
                 "StepComments": [],
                 "AfterLastStepComments": []
               },
               {
                 "Keyword": "And",
                 "NativeKeyword": "And ",
-                "Name": "enters the data needed to filter",
+                "Name": "can search for devices filtering by brand, model",
                 "StepComments": [],
                 "AfterLastStepComments": []
               },
               {
                 "Keyword": "And",
                 "NativeKeyword": "And ",
-                "Name": "click on export file button",
+                "Name": "can see past repair problems and solutions/sources of repair",
                 "StepComments": [],
                 "AfterLastStepComments": []
               },
               {
                 "Keyword": "Then",
                 "NativeKeyword": "Then ",
-                "Name": "the user will get the data of the filtered list of devices only.",
+                "Name": "they should be able to see the filtered results.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
+          },
+          {
+            "Name": "Hosts wants to view how many devices they have fixed at their group's event",
+            "Slug": "hosts-wants-to-view-how-many-devices-they-have-fixed-at-their-groups-event",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "a host filters by repair status",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "also can order (either ascending or descending) devices by each column by clicking on headers",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "he can only view the result devices",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "cannot export them.",
                 "StepComments": [],
                 "AfterLastStepComments": []
               }
@@ -11818,6 +12080,80 @@ jsonPWrapper ({
       }
     },
     {
+      "RelativeFolder": "09-Emails\\InvitationEmails_NotOnPlatform.feature",
+      "Feature": {
+        "Name": "Invite emails that are sent to people who are not on platform",
+        "Description": "As a user (all roles)  \r\nIn order to invite people to the platform   \r\nI should be able to send emails with details of the platform along with sign up button.",
+        "FeatureElements": [
+          {
+            "Name": "Inviting new people to the platform",
+            "Slug": "inviting-new-people-to-the-platform",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "the admin invites new users, enters the email id of the people and clicks on send button",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "the new people will get the email containing information about the platform, benefits and why would someone want to sign up along with sign up button.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
+          }
+        ],
+        "Background": {
+          "Name": "",
+          "Description": "",
+          "Steps": [
+            {
+              "Keyword": "Given",
+              "NativeKeyword": "Given ",
+              "Name": "the following account have been created an admin",
+              "TableArgument": {
+                "HeaderRow": [
+                  "Email",
+                  "Password"
+                ],
+                "DataRows": [
+                  [
+                    "dean@wecreatedigital.co.uk",
+                    "dean"
+                  ]
+                ]
+              },
+              "StepComments": [],
+              "AfterLastStepComments": []
+            }
+          ],
+          "Tags": [],
+          "Result": {
+            "WasExecuted": false,
+            "WasSuccessful": false
+          }
+        },
+        "Result": {
+          "WasExecuted": false,
+          "WasSuccessful": false
+        },
+        "Tags": []
+      },
+      "Result": {
+        "WasExecuted": false,
+        "WasSuccessful": false
+      }
+    },
+    {
       "RelativeFolder": "10-Notifications\\Notifications.feature",
       "Feature": {
         "Name": "View Notifications",
@@ -11979,42 +12315,35 @@ jsonPWrapper ({
             }
           },
           {
-            "Name": "Mark as read",
-            "Slug": "mark-as-read",
+            "Name": "Notifications in fixometer of activity in talk",
+            "Slug": "notifications-in-fixometer-of-activity-in-talk",
             "Description": "",
             "Steps": [
               {
-                "Keyword": "Given",
-                "NativeKeyword": "Given ",
-                "Name": "there are notifications",
-                "StepComments": [],
-                "AfterLastStepComments": []
-              },
-              {
                 "Keyword": "When",
                 "NativeKeyword": "When ",
-                "Name": "a host wants to mark the notification as read",
-                "StepComments": [],
-                "AfterLastStepComments": []
-              },
-              {
-                "Keyword": "And",
-                "NativeKeyword": "And ",
-                "Name": "click on mark as read link",
-                "StepComments": [],
+                "Name": "a user is interested in a topic or few on discourse and something has happened on those topics",
+                "StepComments": [
+                  {
+                    "Text": "#Volunteer engagement. Talk is a very important part of the platform, where people can get involved and be active even if there are no events or groups currently near them."
+                  },
+                  {
+                    "Text": "#In fact, for a number of people it's where they're likely to spend more time. We want to highlight activity and encourage participation and use of Talk as much as possible."
+                  }
+                ],
                 "AfterLastStepComments": []
               },
               {
                 "Keyword": "Then",
                 "NativeKeyword": "Then ",
-                "Name": "the user will be able to see the text changed to marked as read",
+                "Name": "the user will get a notification about it",
                 "StepComments": [],
                 "AfterLastStepComments": []
               },
               {
                 "Keyword": "And",
                 "NativeKeyword": "And ",
-                "Name": "als othe background color changes.",
+                "Name": "can navigate to talk by clicking the link from the notification.",
                 "StepComments": [],
                 "AfterLastStepComments": []
               }
@@ -12026,28 +12355,39 @@ jsonPWrapper ({
             }
           },
           {
-            "Name": "View old notifications",
-            "Slug": "view-old-notifications",
+            "Name": "Notifications of discourse activity in fixometer",
+            "Slug": "notifications-of-discourse-activity-in-fixometer",
             "Description": "",
             "Steps": [
               {
-                "Keyword": "Given",
-                "NativeKeyword": "Given ",
-                "Name": "there are old notifications",
-                "StepComments": [],
-                "AfterLastStepComments": []
-              },
-              {
                 "Keyword": "When",
                 "NativeKeyword": "When ",
-                "Name": "a host clikcs on view old notifications link",
-                "StepComments": [],
+                "Name": "a user is related to any groups or events and something has happened on those",
+                "StepComments": [
+                  {
+                    "Text": "#Volunteer engagement."
+                  }
+                ],
                 "AfterLastStepComments": []
               },
               {
                 "Keyword": "Then",
                 "NativeKeyword": "Then ",
-                "Name": "users will see the list of older notifications.",
+                "Name": "the user will get a notification about it on talk",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "can navigate to fixometer by the notification displayed in the dicourse",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "And",
+                "NativeKeyword": "And ",
+                "Name": "can have a detailed notification about it in fixometer and navigate from there.",
                 "StepComments": [],
                 "AfterLastStepComments": []
               }
@@ -13244,6 +13584,87 @@ jsonPWrapper ({
         "WasExecuted": false,
         "WasSuccessful": false
       }
+    },
+    {
+      "RelativeFolder": "13-Wiki\\EditingWikiPage.feature",
+      "Feature": {
+        "Name": "Editing a wiki page",
+        "Description": "As a user\r\nIn order to edit a wiki page\r\nThe user should have the wiki badge",
+        "FeatureElements": [
+          {
+            "Name": "Editing wiki page",
+            "Slug": "editing-wiki-page",
+            "Description": "",
+            "Steps": [
+              {
+                "Keyword": "Given",
+                "NativeKeyword": "Given ",
+                "Name": "the user has an account in restarters.net and a wiki badge on discourse",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "When",
+                "NativeKeyword": "When ",
+                "Name": "a user logs in to thier wiki account",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              },
+              {
+                "Keyword": "Then",
+                "NativeKeyword": "Then ",
+                "Name": "they should have the permission to edit the wiki page.",
+                "StepComments": [],
+                "AfterLastStepComments": []
+              }
+            ],
+            "Tags": [],
+            "Result": {
+              "WasExecuted": false,
+              "WasSuccessful": false
+            }
+          }
+        ],
+        "Background": {
+          "Name": "",
+          "Description": "",
+          "Steps": [
+            {
+              "Keyword": "Given",
+              "NativeKeyword": "Given ",
+              "Name": "the following user accounts have been created",
+              "TableArgument": {
+                "HeaderRow": [
+                  "Email",
+                  "Password"
+                ],
+                "DataRows": [
+                  [
+                    "fry@planetexpress.com",
+                    "fry!"
+                  ]
+                ]
+              },
+              "StepComments": [],
+              "AfterLastStepComments": []
+            }
+          ],
+          "Tags": [],
+          "Result": {
+            "WasExecuted": false,
+            "WasSuccessful": false
+          }
+        },
+        "Result": {
+          "WasExecuted": false,
+          "WasSuccessful": false
+        },
+        "Tags": []
+      },
+      "Result": {
+        "WasExecuted": false,
+        "WasSuccessful": false
+      }
     }
   ],
   "Summary": {
@@ -13273,10 +13694,10 @@ jsonPWrapper ({
       },
       {
         "Folder": "04-Events",
-        "Total": 61,
+        "Total": 65,
         "Passing": 0,
         "Failing": 0,
-        "Inconclusive": 61
+        "Inconclusive": 65
       },
       {
         "Folder": "05-Groups",
@@ -13287,10 +13708,10 @@ jsonPWrapper ({
       },
       {
         "Folder": "06-Devices",
-        "Total": 5,
+        "Total": 6,
         "Passing": 0,
         "Failing": 0,
-        "Inconclusive": 5
+        "Inconclusive": 6
       },
       {
         "Folder": "07-Reporting",
@@ -13308,10 +13729,10 @@ jsonPWrapper ({
       },
       {
         "Folder": "09-Emails",
-        "Total": 15,
+        "Total": 16,
         "Passing": 0,
         "Failing": 0,
-        "Inconclusive": 15
+        "Inconclusive": 16
       },
       {
         "Folder": "10-Notifications",
@@ -13333,6 +13754,13 @@ jsonPWrapper ({
         "Passing": 0,
         "Failing": 0,
         "Inconclusive": 6
+      },
+      {
+        "Folder": "13-Wiki",
+        "Total": 1,
+        "Passing": 0,
+        "Failing": 0,
+        "Inconclusive": 1
       }
     ],
     "NotTestedFolders": [
@@ -13412,24 +13840,31 @@ jsonPWrapper ({
         "Passing": 0,
         "Failing": 0,
         "Inconclusive": 0
+      },
+      {
+        "Folder": "13-Wiki",
+        "Total": 0,
+        "Passing": 0,
+        "Failing": 0,
+        "Inconclusive": 0
       }
     ],
     "Scenarios": {
-      "Total": 269,
+      "Total": 276,
       "Passing": 0,
       "Failing": 0,
-      "Inconclusive": 269
+      "Inconclusive": 276
     },
     "Features": {
-      "Total": 82,
+      "Total": 86,
       "Passing": 0,
       "Failing": 0,
-      "Inconclusive": 82
+      "Inconclusive": 86
     }
   },
   "Configuration": {
     "SutName": "Restart Community Software",
     "SutVersion": "4.0.0(Beta)",
-    "GeneratedOn": "13 November 2018 17:34:41"
+    "GeneratedOn": "22 November 2018 16:26:23"
   }
 });
