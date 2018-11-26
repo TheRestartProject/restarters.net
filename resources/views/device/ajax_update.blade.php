@@ -103,7 +103,7 @@
                              name="repair_status"
                              id="repair_status_3"
                              value="3"
-                             <?php echo 0; //($formdata->repair_status == 3 ? 'checked="checked"' : ''); ?>> End of lifecycle
+                             <?php echo 0; //($formdata->repair_status == 3 ? 'checked="checked"' : ''); ?>> End-of-life
                   </label>
               </div>
             </div>

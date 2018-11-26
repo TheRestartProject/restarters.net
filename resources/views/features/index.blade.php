@@ -15,4 +15,6 @@
         </div>
     </div>
 </section>
+
+@include('partials.languages')
 @include('layouts/footer')

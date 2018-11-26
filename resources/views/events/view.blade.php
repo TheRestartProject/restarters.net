@@ -66,43 +66,42 @@
       <div class="col-lg-3">
         <div class="button-group button-group__r">
           @if( Auth::check() )
-          @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-          <div class="dropdown">
-            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Event actions
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">Edit event</a>
-              @if( !$event->isInProgress() || !$event->hasFinished() )
-              <form action="{{ url('/') }}/party/delete/{{ $formdata->id }}" method="post">
-                <input type="hidden" name="attended" id="countAttended" value="{{count($attended)}}">
-                <input type="hidden" name="invited" id="countInvited" value="{{count($invited)}}">
-                <input type="hidden" name="volunteers" id="countVolunteers" value="{{ $event->volunteers }}">
-                <button  id="deleteEvent" class="dropdown-item">Delete event</button>
-              @endif
-              @if( $event->hasFinished() )
-              <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>
-              <a href="/party/contribution/{{ $formdata->id }}" class="btn dropdown-item">Request contributions</a>
+            @if( FixometerHelper::userHasEditPartyPermission($formdata->id) || FixometerHelper::userIsHostOfGroup($formdata->group_id, Auth::user()->id) )
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Event actions
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">Edit event</a>
+                @if( !$event->isInProgress() && !$event->hasFinished() )
+                <form action="{{ url('/') }}/party/delete/{{ $formdata->id }}" method="post">
+                  @csrf
+                  <button id="deleteEvent" class="dropdown-item" data-party-id="{{$formdata->id}}" data-count-attended="{{count($attended)}}" data-count-invited="{{count($invited)}}" data-count-volunteers="{{$event->volunteers}}">Delete event</button>
+                </form>
+                @endif
+                @if( $event->hasFinished() )
+                  <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>
+                  <a href="/party/contribution/{{ $formdata->id }}" class="btn dropdown-item">Request contributions</a>
+                @else
+                  @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
+                  <button data-toggle="modal" data-target="#event-invite-to" class="btn dropdown-item">Invite volunteers</button>
+                  @else
+                  <a class="btn dropdown-item" href="/party/join/{{ $formdata->id }}">RSVP</a>
+                  @endif
+                @endif
+              </div>
+            </div>
+            @else
+            @if( $event->hasFinished() )
+            <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
               @else
               @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
-              <button data-toggle="modal" data-target="#event-invite-to" class="btn dropdown-item">Invite volunteers</button>
+              <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite volunteers</button>
               @else
-              <a class="btn dropdown-item" href="/party/join/{{ $formdata->id }}">RSVP</a>
+              <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
               @endif
               @endif
-            </div>
-          </div>
-          @else
-          @if( $event->hasFinished() )
-          <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
-            @else
-            @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
-            <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite volunteers</button>
-            @else
-            <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
-            @endif
-            @endif
-            @endif
+              @endif
             @endif
           </div>
         </div>
@@ -232,14 +231,14 @@
               <li>
                 <div>
                   <h3>Waste prevented</h3>
-                  <span id="waste-insert">{{ number_format(round($stats['ewaste']), 0) }}</span> kg
+                  <span id="waste-insert">{{ number_format(round($stats['ewaste']), 0, '.', ',') }}</span> kg
                   <svg width="16" height="18" viewBox="0 0 13 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><path d="M12.15,0c0,0 -15.921,1.349 -11.313,10.348c0,0 0.59,-1.746 2.003,-3.457c0.852,-1.031 2,-2.143 3.463,-2.674c0.412,-0.149 0.696,0.435 0.094,0.727c0,0 -4.188,2.379 -4.732,6.112c0,0 1.805,1.462 3.519,1.384c1.714,-0.078 4.268,-1.078 4.707,-3.551c0.44,-2.472 1.245,-6.619 2.259,-8.889Z" style="fill:#0394a6;"/><path d="M1.147,13.369c0,0 0.157,-0.579 0.55,-2.427c0.394,-1.849 0.652,-0.132 0.652,-0.132l-0.25,2.576l-0.952,-0.017Z" style="fill:#0394a6;"/></g></svg>
                 </div>
               </li>
               <li>
                 <div>
                   <h3>CO<sub>2</sub> emissions prevented</h3>
-                  <span id="co2-insert">{{ number_format(round($stats['co2']), 0, ',', '.') }}</span> kg
+                  <span id="co2-insert">{{ number_format(round($stats['co2']), 0, '.', ',') }}</span> kg
                   <svg width="20" height="12" viewBox="0 0 15 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><circle cx="2.854" cy="6.346" r="2.854" style="fill:#0394a6;"/><circle cx="11.721" cy="5.92" r="3.279" style="fill:#0394a6;"/><circle cx="7.121" cy="4.6" r="4.6" style="fill:#0394a6;"/><rect x="2.854" y="6.346" width="8.867" height="2.854" style="fill:#0394a6;"/></g></svg>
                 </div>
               </li>

@@ -17,7 +17,7 @@ h1,h2,h3 {
     @extend .Font-PatuaOne;
     font-weight: 400;
     small, a {
-      @extend .Font-OpenSans;
+      @extend .Font-OpenSans; 
     }
 }
 

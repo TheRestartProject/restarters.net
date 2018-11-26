@@ -69,23 +69,33 @@
                                             <option value="3">@lang('partials.end_of_life')</option>
                                         </select>
                                     </div>
-                                    <div class="repair-more d-none">
+                                    <div class="d-none col-device">
                                         <div class="form-control form-control__select">
-                                            <select name="repair_details" class="repair_details select2" disabled>
-                                                <option value="0">-- @lang('partials.repair_details') --</option>
-                                                <option value="1">@lang('partials.more_time')</option>
-                                                <option value="2">@lang('partials.professional_help')</option>
-                                                <option value="3">@lang('partials.diy')</option>
+                                            <select name="repair_details" id="repair_details_edit" class="form-control field select2 repair-details-edit">
+                                              <option value="0">-- Next steps --</option>
+                                              <option value="1">@lang('partials.more_time')</option>
+                                              <option value="2">@lang('partials.professional_help')</option>
+                                              <option value="3">@lang('partials.diy')</option>
                                             </select>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="d-none d-sm-table-cell">
+                                <td class="d-none col-device">
                                     <div class="form-control form-control__select">
-                                        <select name="spare_parts" class="spare_parts select2">
-                                            <option value="0">-- @lang('partials.spare_parts') --</option>
-                                            <option value="1">@lang('partials.yes')</option>
-                                            <option value="2">@lang('partials.no')</option>
+                                        <select name="spare_parts" class="spare_parts spare-parts select2">
+                                          <option value="0">-- Spare parts --</option>
+                                          <option value="1">@lang('partials.yes_manufacturer')</option>
+                                          <option value="3">@lang('partials.yes_third_party')</option>
+                                          <option value="2">@lang('partials.no')</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td class="d-none col-device">
+                                    <div class="form-control form-control__select form-control__select_placeholder">
+                                        <select name="barrier[]" multiple placeholder="-- Choose barriers to repair --" id="repair_barrier" class="form-control field select2-repair-barrier repair-barrier">
+                                          @foreach( FixometerHelper::allBarriers() as $barrier )
+                                            <option value="{{{ $barrier->id }}}">{{{ $barrier->barrier }}}</option>
+                                          @endforeach
                                         </select>
                                     </div>
                                 </td>

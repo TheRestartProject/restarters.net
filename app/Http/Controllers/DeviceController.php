@@ -8,24 +8,25 @@ use App\Brands;
 use App\Category;
 use App\Cluster;
 use App\Device;
+use App\DeviceList;
 use App\EventsUsers;
 use App\Group;
-use App\UserGroups;
 use App\Party;
 use App\User;
-use App\DeviceList;
+use App\UserGroups;
 use App\Helpers\FootprintRatioCalculator;
+use App\Notifications\ReviewNotes;
+use App\Notifications\AdminAbnormalDevices;
 use Auth;
 use FixometerHelper;
 use FixometerFile;
 use Illuminate\Support\Facades\Validator;
-use App\Notifications\ReviewNotes;
-use View;
-use Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Notification;
 use Mail;
-use App\Mail\AbnormalDevices;
+use View;
+
 
 class DeviceController extends Controller
 {
@@ -161,11 +162,10 @@ class DeviceController extends Controller
 
   public function search(Request $request) {
 
-    $Group = new Group;
     $Category = new Category;
+    $categories = $Category->listed();
 
     $all_devices = DeviceList::orderBy('sorter', 'DSC');
-    $categories = $Category->listed();
 
     if ($request->input('categories') !== null) {
       $all_devices = $all_devices->whereIn('idcategory', $request->input('categories'));
@@ -282,10 +282,10 @@ class DeviceController extends Controller
         //$data['event_date'] = dbDateNoTime($data['event_date']);
 
         if( !isset($data['repair_more']) || empty($data['repair_more']) ) //Override
-        $data['repair_more'] = 0;
+          $data['repair_more'] = 0;
 
         if( $data['repair_status'] != 2 ) //Override
-        $data['repair_more'] = 0;
+          $data['repair_more'] = 0;
 
         if( $data['repair_more'] == 1 ){
           $more_time_needed = 1;
@@ -305,12 +305,46 @@ class DeviceController extends Controller
           $do_it_yourself = 0;
         }
 
+        if( $data['category'] == 46 && isset($data['weight']) ){
+          $weight = $data['weight'];
+        } else {
+          $weight = null;
+        }
+
+        // New logic Nov 2018
+        if( $data['spare_parts'] == 3 ) { // Third party
+          $data['spare_parts'] = 1;
+          $parts_provider = 2;
+        } else if( $data['spare_parts'] == 1 ) { // Manufacturer
+          $data['spare_parts'] = 1;
+          $parts_provider = 1;
+        } else if( $data['spare_parts'] == 2 ) { // Not needed
+          $data['spare_parts'] = 2;
+          $parts_provider = null;
+        } else if( $data['spare_parts'] == 4 ) { // Historical data, resets spare parts to 1 but keeps parts provider as null
+          $data['spare_parts'] = 1;
+          $parts_provider = null;
+        } else {
+          $parts_provider = null;
+        }
+
+        if( !isset($data['barrier']) ) {
+          $data['barrier'] = null;
+        } else if( in_array(1, $data['barrier']) || in_array(2, $data['barrier']) ) { // 'Spare parts not available' or 'spare parts too expensive' selected
+          $data['spare_parts'] = 1;
+        } else if( count($data['barrier']) > 0 ) {
+          $data['spare_parts'] = 2;
+        }
+        // EO new logic Nov 2018
+
         $update = array(
           'event'             => $data['event'],
           'category'          => $data['category'],
           'category_creation' => $data['category'],
+          'estimate'          => $weight,
           'repair_status'     => $data['repair_status'],
           'spare_parts'       => $data['spare_parts'],
+          'parts_provider'    => $parts_provider,
           'brand'             => $data['brand'],
           'model'             => $data['model'],
           'problem'           => $data['problem'],
@@ -322,7 +356,14 @@ class DeviceController extends Controller
         );
 
         // $u = $Device->where('iddevices', $id)->update($update);
-        $u = Device::findOrFail($id)->update($update);
+        $u = Device::find($id)->update($update);
+
+        // Update barriers
+        if( isset($data['barrier']) && !empty($data['barrier']) && $data['repair_status'] == 3 ) { // Only sync when repair status is end-of-life
+          $device = Device::find($id)->barriers()->sync($data['barrier']);
+        } else {
+          $device = Device::find($id)->barriers()->sync([]);
+        }
 
         if(!$u) {
           $response['danger'] = 'Something went wrong. Please check the data and try again.';
@@ -530,9 +571,10 @@ class DeviceController extends Controller
     $spare_parts    = $request->input('spare_parts');
     $quantity       = $request->input('quantity');
     $event_id       = $request->input('event_id');
+    $barrier        = $request->input('barrier');
 
-    // get the number of rows in the DB where event id already exists
-    $deviceCount = DB::table('devices')->where('event', '=', $event_id)->count();
+    // Get party for later
+    $event = Party::find($event_id);
 
     // add quantity loop
     for ($i=0; $i < $quantity; $i++) {
@@ -565,10 +607,53 @@ class DeviceController extends Controller
         $device[$i]->do_it_yourself = 0;
       }
 
+      // New logic Nov 2018
+      if( $spare_parts == 3 ) { // Third party
+        $spare_parts = 1;
+        $parts_provider = 2;
+      } else if( $spare_parts == 1 ) { // Manufacturer
+        $spare_parts = 1;
+        $parts_provider = 1;
+      } else if( $spare_parts == 2 ) { // Not needed
+        $spare_parts = 2;
+        $parts_provider = null;
+      } else {
+        $parts_provider = null;
+      }
+
+      if( !isset($barrier) ) {
+        $barrier = null;
+      } else if( in_array(1, $barrier) || in_array(2, $barrier) ) { // 'Spare parts not available' or 'spare parts too expensive' selected
+        $spare_parts = 1;
+      } else if( count($barrier) > 0 ) {
+        $spare_parts = 2;
+      }
+      // EO new logic Nov 2018
+
       $device[$i]->spare_parts = $spare_parts;
+      $device[$i]->parts_provider = $parts_provider;
       $device[$i]->event = $event_id;
       $device[$i]->repaired_by = Auth::id();
       $device[$i]->save();
+
+      // Update barriers
+      if( isset($barrier) && !empty($barrier) && $repair_status == 3 ) { // Only sync when repair status is end-of-life
+        Device::find($device[$i]->iddevices)->barriers()->sync($barrier);
+      } else {
+        Device::find($device[$i]->iddevices)->barriers()->sync([]);
+      }
+
+      // If the number of devices exceeds set amount then show the following message
+      $deviceMiscCount = DB::table('devices')->where('category', 46)->where('event', $event_id)->count();
+      if( $deviceMiscCount == env('DEVICE_ABNORMAL_MISC_COUNT', 5) ) {
+
+        $notify_users = FixometerHelper::usersWhoHavePreference('admin-abnormal-devices');
+        Notification::send($notify_users, new AdminAbnormalDevices([
+          'event_venue' => $event->getEventName(),
+          'event_url' => url('/party/edit/'.$event_id),
+        ]));
+
+      }
 
     }
     // end quantity loop
@@ -590,25 +675,19 @@ class DeviceController extends Controller
       }
       //end of handle loop
 
-      $event = Party::find($event_id);
-
       $footprintRatioCalculator = new FootprintRatioCalculator();
       $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
       $stats = $event->getEventStats($emissionRatio);
 
+      // get the number of rows in the DB where event id already exists
+      $deviceCount = DB::table('devices')->where('event', $event_id)->count();
+
       $return['html'] = $views;
       $return['success'] = true;
       $return['stats'] = $stats;
       $return['deviceCount'] = $deviceCount;
-
-      // If the number of devices exceeds set amount then show the following message
-      if( $deviceCount > env('DEVICE_ABNORMAL_MISC_COUNT', 5) ) {
-
-        // Send to all users with the role of Administrator - awaiting preference logic
-        // Mail::to(Auth::user()->email)->send(new AbnormalDevices());
-
-      }
+      $return['deviceMiscCount'] = $deviceMiscCount;
 
       return response()->json($return);
 
@@ -683,6 +762,7 @@ class DeviceController extends Controller
     $age            = $request->input('age');
     $problem        = $request->input('problem');
     $repair_status  = $request->input('repair_status');
+    $barrier        = $request->input('barrier');
     $repair_details = $request->input('repair_details');
     $spare_parts    = $request->input('spare_parts');
     $event_id       = $request->input('event_id');
@@ -694,9 +774,9 @@ class DeviceController extends Controller
     if( $repair_status != 2 ) //Override
     $repair_details = 0;
 
-    $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
+    $event = Party::find($event_id);
 
-    if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || is_object($in_event) ){
+    if( FixometerHelper::userHasEditPartyPermission($event_id) || FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id) ) {
 
       // if ($repair_status == 2) {
       //   switch ($repair_details) {
@@ -786,6 +866,32 @@ class DeviceController extends Controller
           Log::error("An error occurred while sending ReviewNotes email: " . $ex->getMessage());
       }
 
+      // New logic Nov 2018
+      if( $spare_parts == 3 ) { // Third party
+        $spare_parts = 1;
+        $parts_provider = 2;
+      } else if( $spare_parts == 1 ) { // Manufacturer
+        $spare_parts = 1;
+        $parts_provider = 1;
+      } else if( $spare_parts == 2 ) { // Not needed
+        $spare_parts = 2;
+        $parts_provider = null;
+      } else if( $spare_parts == 4 ) { // Historical data, resets spare parts to 1 but keeps parts provider as null
+        $spare_parts = 1;
+        $parts_provider = null;
+      } else {
+        $parts_provider = null;
+      }
+
+      if( !isset($barrier) ) {
+        $barrier = null;
+      } else if( in_array(1, $barrier) || in_array(2, $barrier) ) { // 'Spare parts not available' or 'spare parts too expensive' selected
+        $spare_parts = 1;
+      } else if( count($barrier) > 0 ) {
+        $spare_parts = 2;
+      }
+      // EO new logic Nov 2018
+
       Device::find($id)->update([
         'category' => $category,
         'category_creation' => $category,
@@ -795,12 +901,20 @@ class DeviceController extends Controller
         'age' => $age,
         'problem' => $problem,
         'spare_parts' => $spare_parts,
+        'parts_provider' => $parts_provider,
         'repair_status' => $repair_status,
         'more_time_needed' => $more_time_needed,
         'do_it_yourself' => $professional_help,
         'professional_help' => $do_it_yourself,
         'wiki' => $wiki,
       ]);
+
+      // Update barriers
+      if( isset($barrier) && !empty($barrier) && $repair_status == 3 ) { // Only sync when repair status is end-of-life
+        $device = Device::find($id)->barriers()->sync($barrier);
+      } else {
+        $device = Device::find($id)->barriers()->sync([]);
+      }
 
       $event = Party::find($event_id);
 

@@ -50,14 +50,34 @@
             <div id="collapseGroupCO2" class="collapse" aria-labelledby="headingGroupCO2" data-parent="#accordionGroup">
               <div class="card-body">
 
+                  <p>@lang('groups.infographic_message')</p>
+
                   <div class="form-group">
                       <label for="group_co2_stats_embed">@lang('groups.embed_code_header'):</label>
-                      <input type="text" class="form-control field" id="group_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/group/{{{ $group->idgroups }}}" frameborder="0" width="700" height="850"></iframe>'>
+                      <input type="text" class="form-control field" id="group_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/group/{{{ $group->idgroups }}}/manufacture" frameborder="0" width="700" height="850"></iframe>'>
                   </div>
-                  <small class="after-offset">@lang('groups.infographic_message')</small>
+                  @if( round($groupCo2) > 900 )
+                    <small class="after-offset">@lang('visualisation.message_manufacture_high')</small>
+                  @else
+                    <small class="after-offset">@lang('visualisation.message_manufacture_low')</small>
+                  @endif
 
                   <div class="embed-responsive embed-responsive-21by9">
-                    <iframe src="{{{ env('APP_URL') }}}/outbound/info/group/{{{ $group->idgroups }}}" frameborder="0" width="700" height="850" class="form-control embed-responsive-item"></iframe>
+                    <iframe src="{{{ env('APP_URL') }}}/outbound/info/group/{{{ $group->idgroups }}}/manufacture" frameborder="0" width="700" height="850" class="form-control embed-responsive-item"></iframe>
+                  </div>
+
+                  <div class="form-group">
+                      <label for="group_co2_stats_embed">@lang('groups.embed_code_header'):</label>
+                      <input type="text" class="form-control field" id="group_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/group/{{{ $group->idgroups }}}/consume" frameborder="0" width="700" height="850"></iframe>'>
+                  </div>
+                  @if( round($groupCo2) > 6000 )
+                    <small class="after-offset">@lang('visualisation.message_consume_high')</small>
+                  @else
+                    <small class="after-offset">@lang('visualisation.message_consume_low')</small>
+                  @endif
+
+                  <div class="embed-responsive embed-responsive-21by9">
+                    <iframe src="{{{ env('APP_URL') }}}/outbound/info/group/{{{ $group->idgroups }}}/consume" frameborder="0" width="700" height="850" class="form-control embed-responsive-item"></iframe>
                   </div>
 
               </div>

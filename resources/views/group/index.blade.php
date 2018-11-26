@@ -90,7 +90,11 @@
                             <select id="country" name="country" class="field select2">
                                 <option value=""></option>
                                 @foreach (FixometerHelper::getAllCountries() as $country_code => $country_name)
-                                  <option value="{{ $country_code }}">{{ $country_name }}</option>
+                                  @if( isset($selected_country) && $country_name == $selected_country )
+                                    <option selected value="{{ $country_name }}">{{ $country_name }}</option>
+                                  @else
+                                    <option value="{{ $country_name }}">{{ $country_name }}</option>
+                                  @endif
                                 @endforeach
                             </select>
                         </div>
@@ -209,11 +213,7 @@
 
           <div class="d-flex justify-content-center">
             <nav aria-label="Page navigation example">
-              @if (isset($name) || isset($location) || isset($selected_tags))
-                {!! $groups->appends(['name' => $name, 'location' => $location, 'selected_tags' => $selected_tags ])->links() !!} <!-- 'selected_country' => $selected_country -->
-              @else
-                {!! $groups->links() !!}
-              @endif
+              {!! $groups->appends($_GET)->links() !!}
             </nav>
           </div>
         @endif

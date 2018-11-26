@@ -12,6 +12,7 @@
 
         <!-- Styles -->
         @if( isset($iframe) )
+          <link href="{{ asset('css/app.css') }}" rel="stylesheet">
           <link href="{{ asset('css/iframe.css') }}" rel="stylesheet">
         @else
           <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -48,8 +49,9 @@
         </script>
 
     </head>
-
-    @if ( isset($onboarding) && $onboarding )
+    @if( Request::is('login') || Request::is('user/register') )
+      <body class="fixed-layout">
+    @elseif ( isset($onboarding) && $onboarding )
       <body class="onboarding">
     @else
       <body>

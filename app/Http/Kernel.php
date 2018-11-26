@@ -31,13 +31,16 @@ class Kernel extends HttpKernel
         'web' => [
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
             // \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \App\Http\Middleware\LanguageSwitcher::class,
         ],
-
+        'translation' => [
+            \App\Http\Middleware\VerifyTranslationAccess::class,
+        ],
         'api' => [
             'throttle:60,1',
             'bindings',
@@ -62,5 +65,12 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verifyUserConsent' => \App\Http\Middleware\VerifyUserConsent::class,
+
+        /**** OTHER MIDDLEWARE ****/
+    		'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+    		'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
+    		'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
+        'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
+    		// REDIRECTION MIDDLEWARE
     ];
 }

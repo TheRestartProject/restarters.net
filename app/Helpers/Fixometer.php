@@ -2,17 +2,19 @@
 
 namespace App\Helpers;
 
-use App\Party;
-use App\Role;
-use App\Skills;
-use App\UserGroups;
-use App\Permissions;
-use App\UsersPreferences;
-use App\UsersPermissions;
-
 use App;
 use Auth;
 use DB;
+use App\Barrier;
+use App\EventsUsers;
+use App\Party;
+use App\Permissions;
+use App\Role;
+use App\Skills;
+use App\User;
+use App\UserGroups;
+use App\UsersPreferences;
+use App\UsersPermissions;
 
 use Request;
 
@@ -102,15 +104,18 @@ class FixometerHelper {
       return date('D, j M Y, H:i', $timestamp);
   }
 
-  public static function userHasEditPartyPermission($partyId, $userId)
+  public static function userHasEditPartyPermission($partyId, $userId = null)
   {
+      if( is_null($userId) )
+        $userId = Auth::user()->id;
+
       if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
         return true;
       } else {
         if (FixometerHelper::hasRole(Auth::user(), 'Host')) {
           $group_id_of_event = Party::where('idevents', $partyId)->value('group');
           if (FixometerHelper::userIsHostOfGroup($group_id_of_event, $userId)) {
-              return true;
+            return true;
           } else if (empty(DB::table('events_users')->where('event', $partyId)->where('user', $userId)->first())) {
             return false;
           } else {
@@ -121,6 +126,7 @@ class FixometerHelper {
         }
       }
   }
+
 
     public static function userCanCreateEvents($user)
     {
@@ -665,20 +671,36 @@ class FixometerHelper {
 
   }
 
-  public static function getLatLongFromCityCountry($town_city, $country) {
+  public static function getLatLongFromCityCountry($town_city = null, $country = null) {
 
     $return = array();
+    $query = '';
 
     // Try and get country long name to improve geocoding.
-    if (array_key_exists($country, FixometerHelper::getAllCountries())) {
-        $country = FixometerHelper::getAllCountries()[$country];
-    }
-    $json = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=".urlencode($town_city.','.$country)."&sensor=false&key=".env('GOOGLE_API_CONSOLE_KEY'));
+    if ( !is_null($country) && array_key_exists($country, FixometerHelper::getAllCountries()) )
+      $country = FixometerHelper::getAllCountries()[$country];
+
+    if( !is_null($town_city) )
+      $query .= $town_city;
+
+    if( !is_null($country) )
+      $query .= ','.$country;
+
+    $json = file_get_contents("https://maps.google.com/maps/api/geocode/json?address=".urlencode($query)."&sensor=false&key=".env('GOOGLE_API_CONSOLE_KEY'));
     $json = json_decode($json);
 
     if (is_object($json) && !empty($json->{'results'})) {
         $return[] = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
         $return[] = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+    }
+
+    // Retrieve country
+    if( isset($json->results[0]) ) {
+        foreach($json->results[0]->address_components as $addressComponent) {
+            if(in_array('country', $addressComponent->types)) {
+                $return[] = $addressComponent->long_name;
+            }
+        }
     }
 
     return $return;
@@ -823,6 +845,76 @@ class FixometerHelper {
     } else {
       return true;
     }
+
+  }
+
+  /** Returns users who have a particular preference by slug **/
+  public static function usersWhoHavePreference( $slug ){
+
+      return User::join('users_preferences', 'users_preferences.user_id', '=', 'users.id')
+                      ->join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
+                        ->where('preferences.slug', $slug)
+                          ->select('users.*')
+                            ->get();
+
+  }
+
+  public static function notificationClasses( $modal ){
+
+    $modal = str_replace("App\Notifications\\", "", $modal);
+
+    $user_array = [
+        //'AccountCreated', doesn't appear to be in use
+        //'NewRegister',
+        'AdminNewUser',
+        'ResetPassword',
+    ];
+
+    $event_array = [
+        'EventConfirmed',
+        'EventDevices',
+        'EventRepairs',
+        'JoinEvent',
+        'AdminModerationEvent',
+        'NotifyHostRSVPInvitesMade',
+        'NotifyRestartersOfNewEvent',
+        'RSVPEvent',
+        'AdminWordPressCreateEventFailure',
+        'AdminWordPressEditEventFailure',
+    ];
+
+    $group_array = [
+        'GroupConfirmed',
+        'JoinGroup',
+        'AdminModerationGroup',
+        'NewGroupMember',
+        'NewGroupWithinRadius',
+        'AdminWordPressCreateGroupFailure',
+        'AdminWordPressEditGroupFailure',
+    ];
+
+    $device_array = [
+        'NotifyAdminNoDevices',
+        'ReviewNotes',
+        'AdminAbnormalDevices',
+    ];
+
+
+    if( in_array($modal, $user_array) ) {
+        return 'card__restart';
+    } elseif( in_array($modal, $event_array) ) {
+        return 'card__parties';
+    } elseif( in_array($modal, $group_array) ) {
+        return 'card__groups';
+    } elseif( in_array($modal, $device_array) ) {
+        return 'card__devices';
+    }
+
+  }
+
+  public static function allBarriers(){
+
+      return Barrier::all();
 
   }
 

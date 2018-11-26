@@ -12,23 +12,20 @@
 */
 
 Route::prefix('user')->group(function () {
-    Route::get('/', 'HomeController@index');
-    Route::get('reset', 'UserController@reset');
-    Route::post('reset', 'UserController@reset');
-    Route::get('recover', 'UserController@recover');
-    Route::post('recover', 'UserController@recover');
-    Route::get('register/{hash?}', 'UserController@getRegister')->name('registration');
-    Route::post('register/check-valid-email',  'UserController@postEmail');
-    Route::post('register/{hash?}', 'UserController@postRegister');
+  Route::get('/', 'HomeController@index');
+  Route::get('reset', 'UserController@reset');
+  Route::post('reset', 'UserController@reset');
+  Route::get('recover', 'UserController@recover');
+  Route::post('recover', 'UserController@recover');
+  Route::get('register/{hash?}', 'UserController@getRegister')->name('registration');
+  Route::post('register/check-valid-email',  'UserController@postEmail');
+  Route::post('register/{hash?}', 'UserController@postRegister');
 });
 
-
-
-
 Route::get('/user/forbidden', function () {
-    return view('user.forbidden', [
-      'title' => 'Oops'
-    ]);
+  return view('user.forbidden', [
+    'title' => 'Oops'
+  ]);
 });
 
 Auth::routes();
@@ -36,12 +33,13 @@ Route::get('/logout', 'UserController@logout');
 
 Route::get('/about', 'AboutController@index')->name('features');
 Route::get('/about/cookie-policy', function() {
-    return View::make('features.cookie-policy') ;
+  return View::make('features.cookie-policy');
 });
 
-// Route::get('/ui', function() {
-//     return View::make('ui.index');
-// })->name('ui');;
+// Temp
+Route::get('/visualisations', function() {
+    return View::make('visualisations') ;
+});
 
 Route::get('/party/view/{id}', 'PartyController@view');
 
@@ -99,6 +97,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
   });
 
   //Device Controller
+  Route::resource('device-url', 'DeviceUrlController');
   Route::prefix('device')->group(function () {
     Route::get('/', 'DeviceController@index')->name('devices');
     Route::get('/search', 'DeviceController@search');
@@ -139,13 +138,13 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/', 'PartyController@index')->name('events');
     Route::get('/all', 'PartyController@allUpcoming')->name('all-upcoming-events');
     Route::get('/group/{group_id?}', 'PartyController@index')->name('group-events');
-    Route::get('/create', 'PartyController@create');
+    Route::get('/create/{group_id?}', 'PartyController@create');
     Route::post('/create', 'PartyController@create');
     Route::get('/manage/{id}', 'PartyController@manage');
     Route::post('/manage/{id}', 'PartyController@manage');
     Route::get('/edit/{id}', 'PartyController@edit');
     Route::post('/edit/{id}', 'PartyController@edit');
-    Route::get('/delete/{id}', 'PartyController@deleteEvent');
+    Route::post('/delete/{id}', 'PartyController@deleteEvent');
     Route::get('/deleteimage', 'PartyController@deleteimage');
     Route::get('/join/{id}', 'PartyController@getJoinEvent');
     Route::post('/invite', 'PartyController@postSendInvite');
@@ -215,24 +214,24 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 });
 
 Route::get('/media-wiki', function() {
-    if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
-      return view('mediawiki.index');
-    } else {
-      return redirect('/user/forbidden');
-    }
+  if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+    return view('mediawiki.index');
+  } else {
+    return redirect('/user/forbidden');
+  }
 });
 
 //iFrames
-Route::get('/outbound/info/group/{id}', function($id) {
-  return App\Http\Controllers\OutboundController::info('group', $id);
-});
-
-Route::get('/outbound/info/party/{id}', function($id) {
-    return App\Http\Controllers\OutboundController::info('party', $id);
+Route::get('/outbound/info/{type}/{id}/{format?}', function($type, $id, $format = 'fixometer') {
+  return App\Http\Controllers\OutboundController::info($type, $id, $format);
 });
 
 Route::get('/group/stats/{id}/{format?}', function($id, $format = 'row') {
-    return App\Http\Controllers\GroupController::stats($id, $format);
+  return App\Http\Controllers\GroupController::stats($id, $format);
+});
+
+Route::get('/group-tag/stats/{group_tag_id}/{format?}', function($group_tag_id, $format = 'row') {
+  return App\Http\Controllers\GroupController::statsByGroupTag($group_tag_id, $format);
 });
 
 Route::get('/admin/stats/1', function() {
@@ -246,3 +245,10 @@ Route::get('/admin/stats/2', function() {
 Route::get('/party/stats/{id}/wide', function($id) {
   return App\Http\Controllers\PartyController::stats($id);
 });
+
+Route::get('markAsRead/{id}', function($id){
+  auth()->user()->unReadNotifications->where('id', $id)->markAsRead();
+  return  redirect()->back();
+})->name('markAsRead');
+
+Route::get('/set-lang/{locale}', 'LocaleController@setLang');

@@ -20,7 +20,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'location', 'age', 'gender', 'country', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude'
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'location', 'age', 'gender', 'country', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude'
     ];
 
     /**
@@ -174,6 +174,17 @@ class User extends Authenticatable
 
         $r = DB::select(DB::raw('SELECT COUNT(id) AS emails FROM ' . $this->table . ' WHERE email = :email'), array('email' => $email));
         return ($r[0]->emails > 0) ? false : true;
+
+    }
+
+    public function scopeNearbyRestarters($query, $latitude, $longitude, $radius = 20)
+    {
+
+        return $query->select(DB::raw('*, ( 6371 * acos( cos( radians('.$latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
+                        ->whereNotNull('location')
+                          ->whereNotNull('latitude')
+                            ->whereNotNull('longitude')
+                              ->having("distance", "<=", $radius);
 
     }
 

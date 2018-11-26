@@ -14,7 +14,7 @@
         font-size: 26px;
         margin: 0 0 20px 0;
     }
-    
+
     legend {
         color: $brand;
         font-size: 20px;
@@ -31,4 +31,64 @@
     @include media-breakpoint-up(lg) {
         padding-left: 20px;
     }
+}
+
+.useful-repair-urls {
+
+  .input-group {
+
+    margin-top: 0.5rem;
+
+    .form-control {
+      border-radius: 0.25rem;
+
+      &.error {
+        border-color: red;
+      }
+
+    }
+
+    .btn-link {
+      font-size: 35px;
+      color: #00B0C6;
+      padding: 0 10px;
+      line-height: 0px;
+
+      &:hover {
+        text-decoration: none;
+      }
+
+      span {
+        position: relative;
+        top: -2px;
+      }
+
+    }
+  }
+
+  label {
+    margin-bottom: 0 !important;
+  }
+
+}
+
+.col-device-auto {
+  -webkit-box-orient: vertical !important;
+  -webkit-box-direction: normal !important;
+  -ms-flex-direction: column !important;
+  flex-direction: column !important;
+  display: table-cell !important;
+  width: auto;
+  max-width: none;
+}
+
+td.col-device-auto {
+  min-width: 100px;
+}
+
+// This is a workaround to display the input, thus displaying the placeholder. Only needed for repair_barrier field
+.form-control__select_placeholder {
+  .select2-container--default .select2-search--inline .select2-search__field {
+      width: 250px !important;
+  }
 }

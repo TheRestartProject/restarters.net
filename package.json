@@ -12,7 +12,7 @@
     "devDependencies": {
         "axios": "^0.18",
         "bootstrap": "^4.1.3",
-        "browser-sync": "^2.24.6",
+        "browser-sync": "^2.26.3",
         "browser-sync-webpack-plugin": "2.0.1",
         "cross-env": "^5.2.0",
         "jquery": "^3.3.1",
@@ -22,6 +22,7 @@
         "vue": "^2.5.17"
     },
     "dependencies": {
+        "ajv": "^6.5.4",
         "bootstrap-fileinput": "^4.4.9",
         "bootstrap-select": "^1.12.4",
         "bootstrap-tokenfield": "^0.12.0",
@@ -32,13 +33,14 @@
         "ekko-lightbox": "^5.3.0",
         "floatthead": "^2.1.2",
         "font-awesome": "^4.7.0",
+        "imagemin": "^5.3.1",
         "jquery-bootgrid": "^1.3.1",
         "jquery-chained": "^2.0.0-beta.2",
         "js-cookie": "^2.2.0",
         "moment": "^2.22.2",
         "npm": "^6.3.0",
         "perfect-scrollbar": "^1.4.0",
-        "select2": "^4.0.6-rc.1",
+        "select2": "~4.0",
         "slick-carousel": "^1.8.1",
         "sortablejs": "^1.7.0",
         "summernote": "^0.8.10",

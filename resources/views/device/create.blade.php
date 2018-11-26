@@ -83,7 +83,7 @@
                                             </div>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="repair_status" id="repair_status_3" value="3"> End of lifecycle
+                                                    <input type="radio" name="repair_status" id="repair_status_3" value="3"> End-of-life
                                                 </label>
                                             </div>
                                             <?php if(isset($error) && isset($error['repair_status']) && !empty($error['repair_status'])) { echo '<span class="help-block text-danger">' . $error['repair_status'] . '</span>'; } ?>

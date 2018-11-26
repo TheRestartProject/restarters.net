@@ -59,13 +59,21 @@
                       @if( FixometerHelper::hasRole($user, 'Administrator') )
 
                         @foreach($group_list as $group)
+                          @if( $group->id == $selected_group_id )
+                            <option selected value="{{{ $group->id }}}">{{{ $group->name }}}</option>
+                          @else
                             <option value="{{{ $group->id }}}">{{{ $group->name }}}</option>
+                          @endif
                         @endforeach
 
                       @else
 
                         @foreach($user_groups as $group)
-                          <option value="{{{ $group->id }}}">{{{ $group->name }}}</option>
+                          @if( $group->id == $selected_group_id )
+                            <option selected value="{{{ $group->id }}}">{{{ $group->name }}}</option>
+                          @else
+                            <option value="{{{ $group->id }}}">{{{ $group->name }}}</option>
+                          @endif
                         @endforeach
 
                       @endif
@@ -74,7 +82,7 @@
                   </div>
                 </div>
               @else
-                <input type="hidden" name="group" value="{{ $user_groups[0]->group }}">
+                <input type="hidden" name="group" value="{{ $user_groups[0]->id }}">
               @endif
 
               <div class="form-group">

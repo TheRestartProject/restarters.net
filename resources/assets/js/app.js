@@ -12,6 +12,8 @@ require('slick-carousel');
 require('summernote');
 require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
+require('./misc/notifications');
+require('./misc/device');
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
 
@@ -749,6 +751,17 @@ function initAutocomplete() {
 
   tag_options = {
     tags: true,
+    createTag: function (params) {
+      return null;
+    }
+  }
+
+  repair_barrier_options = {
+    placeholder: "-- Choose barriers to repair --"
+  }
+
+  tag_options_with_input = {
+    tags: true,
     minimumInputLength: 2,
     formatInputTooShort: "Type a brand name",
     language: {
@@ -772,16 +785,16 @@ function initAutocomplete() {
     if( $target === false ){
 
       jQuery('.select2').select2();
-      //jQuery('.table-row-details').find('select').select2();
-      jQuery('.select2-tags').select2({tags: true});
-      jQuery(".select2-with-input").select2(tag_options);
+      jQuery('.select2-repair-barrier').select2(repair_barrier_options);
+      jQuery('.select2-tags').select2(tag_options);
+      jQuery(".select2-with-input").select2(tag_options_with_input);
 
     } else {
 
       $target.find('.select2').select2();
-      //$target.find('.table-row-details').select2();
-      $target.find('.select2-tags').select2({tags: true});
-      $target.find(".select2-with-input").select2(tag_options);
+      $target.find('.select2-repair-barrier').select2(repair_barrier_options);
+      $target.find('.select2-tags').select2(tag_options);
+      $target.find(".select2-with-input").select2(tag_options_with_input);
 
     }
 
@@ -882,31 +895,19 @@ function initAutocomplete() {
       jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
     });
 
-    jQuery(document).on('change', '.repair_status', function (e) {
-      $value = jQuery(this).val();
-      $field = jQuery(this).parents('td').find('.repair_details');
-      if( $value == 2 ){
-        $field.prop('disabled', false);
-        $field.parents('.repair-more').removeClass('d-none');
-      } else {
-        $field.val(0);
-        $field.trigger('change');
-        $field.prop('disabled', true);
-        $field.parents('.repair-more').addClass('d-none');
-      }
-    });
-
-    jQuery(document).on('change', '.repair_status_edit', function (e) {
-      $value = jQuery(this).val();
-      $field = $('#repair_details_edit');
-      if( $value == 2 ){
-        $field.prop('disabled', false);
-      } else {
-        $field.val(0);
-        $field.trigger('change');
-        $field.prop('disabled', true);
-      }
-    });
+    // jQuery(document).on('change', '.repair_status', function (e) {
+    //   $value = jQuery(this).val();
+    //   $field = jQuery(this).parents('td').find('.repair_details');
+    //   if( $value == 2 ){
+    //     $field.prop('disabled', false);
+    //     $field.parents('.repair-more').removeClass('d-none');
+    //   } else {
+    //     $field.val(0);
+    //     $field.trigger('change');
+    //     $field.prop('disabled', true);
+    //     $field.parents('.repair-more').addClass('d-none');
+    //   }
+    // });
 
     jQuery(document).on('change', '.category', function (e) {
       $value = parseInt(jQuery(this).val());
@@ -1185,7 +1186,8 @@ function initAutocomplete() {
           repair_details: $form.find('select[name=repair_details]').val(),
           spare_parts: $form.find('select[name=spare_parts]').val(),
           quantity: $form.find('select[name=quantity]').val(),
-          event_id: $form.find('input[name=event_id]').val()
+          event_id: $form.find('input[name=event_id]').val(),
+          barrier: $form.find('#repair_barrier').val()
         },
         datatype: 'json',
         success: function(json) {
@@ -1201,7 +1203,10 @@ function initAutocomplete() {
             $form.find(".select2-with-input.select2-hidden-accessible").select2('data', {}); // clear out values selected
             $form.find(".select2-with-input.select2-hidden-accessible").select2(tag_options); // re-init to show default stat
 
-            $('.repair-more, .display-weight').addClass('d-none');
+            $form.find('.display-weight').addClass('d-none');
+            $form.find('.repair-more').removeClass('col-device-auto');
+            $form.find('.repair-details-edit, .spare-parts, .repair-barrier').parents('.col-device').addClass('d-none');
+            $form.find('.repair-details-edit, .spare-parts, .repair-barrier').parents('.col-device').removeClass('col-device-auto');
             //EO reset appearance
 
             //Appending...
@@ -1296,6 +1301,7 @@ function initAutocomplete() {
       $repair_details = parseInt($('#repair-info-'+device_id).val());
       // $repair_details_name = $('#repair-info-'+device_id+' option:selected').text();
       $spare_parts = parseInt($('#spare-parts-'+device_id).val());
+      $barrier = $('#barrier-'+device_id).val();
       $event_id = $('#event_id').val();
 
       //Visual improvements
@@ -1320,6 +1326,7 @@ function initAutocomplete() {
           spare_parts: $spare_parts,
           wiki: $wiki,
           event_id: $event_id,
+          barrier: $barrier,
           // files:$('#file-'+device_id).val(),
         },
         datatype: 'json',
@@ -1348,6 +1355,10 @@ function initAutocomplete() {
             $('.btn-save2').removeClass('btn-success').addClass('btn-primary').text('Update');
           }, 3000);
 
+          // Reset if none of the above is selected
+          if( $category_name === 'None of the above' )
+            $category_name = 'Misc';
+
           summary_row.find('.category').text($category_name);
           summary_row.find('.brand').text($brand);
           summary_row.find('.model').text($model);
@@ -1370,10 +1381,11 @@ function initAutocomplete() {
           //   summary_row.find('.repair_details').text($repair_details_name);
           // }
 
-          if( $spare_parts === 1 ){
-            summary_row.find('.table-tick').show();
-          } else {
+          // Hide tick when no spare parts selected or not needed
+          if( $spare_parts == 0 || $spare_parts == 2 ){
             summary_row.find('.table-tick').hide();
+          } else {
+            summary_row.find('.table-tick').show();
           }
 
         },
@@ -1458,12 +1470,27 @@ function initAutocomplete() {
 
     // If event has attended or invited people then user cannot delete the event
     $("#deleteEvent").click(function (e) {
-      if($('#countAttended').val() > 0 || $('#countInvited').val() > 0 || $('#countVolunteers').val() > 0) {
-        e.preventDefault()
-        alert('Sorry you cannot delete this event as you have invited other volunteers');
-      } else {
+      if($(this).attr('data-count-attended') > 0 || $(this).attr('data-count-invited') > 0 || $(this).attr('data-count-volunteers') > 0) {
         return confirm('Are you sure you want to delete this event?');
+
+        id = $(this).attr('data-party-id');
+
+        $.ajax({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          type:'POST',
+          url:'/party/delete/'+id,
+          data: {
+            "id" : id,
+          },
+          dataType : 'json',
+        });
+
       }
     });
+
+    // Set min height so the language menu sits just under the overall height of the browser window
+    $('body > .container').css('min-height', ( $(window).height() - $('nav.navbar').height() ) +'px');
 
   });

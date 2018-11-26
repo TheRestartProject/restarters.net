@@ -170,7 +170,7 @@ $(document).ready(function () {
       '</div>' +
       '<div class="radio">' +
       '<label>' +
-      '<input type="radio" name="device[' + n + '][repair_status]" id="device[' + n + '][repair_status_3]" value="3"> End of lifecycle' +
+      '<input type="radio" name="device[' + n + '][repair_status]" id="device[' + n + '][repair_status_3]" value="3"> End-of-life' +
       '</label>' +
       '</div>' +
       '</div>' +

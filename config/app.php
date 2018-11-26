@@ -163,6 +163,8 @@ return [
         App\Providers\AgentServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
+        Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class,
+        Barryvdh\TranslationManager\ManagerServiceProvider::class,
     ],
 
     /*
@@ -214,7 +216,7 @@ return [
         'FixometerHelper' => App\Helpers\FixometerHelper::class,
         'Honeypot' => Msurguy\Honeypot\HoneypotFacade::class,
         'Image' => Intervention\Image\Facades\Image::class,
-
+        'LaravelLocalization' => Mcamara\LaravelLocalization\Facades\LaravelLocalization::class,
     ],
 
 ];

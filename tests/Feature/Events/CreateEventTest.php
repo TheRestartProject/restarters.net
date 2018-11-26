@@ -51,7 +51,7 @@ class CreateEventTest extends TestCase
         $response->assertSuccessful();
 
         //Notification::assertSentTo(
-        //   [$admins], ModerationEvent::class
+        //   [$admins], AdminModerationEvent::class
         //        );
     }
 }

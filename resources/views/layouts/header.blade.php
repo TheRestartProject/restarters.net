@@ -46,8 +46,9 @@
         }
     </script>
   </head>
-
-  @if ( isset($onboarding) && $onboarding )
+  @if( Request::is('login') || Request::is('user/register') )
+    <body class="fixed-layout">
+  @elseif ( isset($onboarding) && $onboarding )
     <body class="onboarding">
   @else
     <body>
@@ -87,12 +88,12 @@
 
                             <li><button class="badge badge-pill badge-info" data-toggle="collapse" data-target="#notifications" aria-expanded="false" aria-controls="notifications"><svg width="14" height="20" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><g fill="#fff"><ellipse cx="5.25" cy="4.868" rx="3.908" ry="3.94"/><path d="M4.158 13.601h2.184v.246h-.001A1.097 1.097 0 0 1 5.25 15a1.097 1.097 0 0 1-1.092-1.101l.001-.052h-.001v-.246z"/><ellipse cx=".671" cy="12.337" rx=".671" ry=".677"/><path d="M.671 11.66h9.158v1.353H.671z"/><ellipse cx="5.25" cy=".927" rx=".92" ry=".927"/><ellipse cx="9.829" cy="12.337" rx=".671" ry=".677"/><path d="M1.342 4.439h7.815v8.574H1.342z"/><path d="M0 12.337h10.5v.677H0z"/></g></svg>
                               @if(isset($notifications))
-                                <span>{{{ $notifications->count() }}}</span>
+                              @php( $user = Auth::user() )
+                                <span>{{{ $user->unReadNotifications->count() }}}</span>
                               @endif
                             </button></li>
 
                             <li class="nav-item dropdown">
-                              @php( $user = Auth::user() )
                                 @if (!is_null($user))
                                   <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-target="#account-nav" aria-controls="account-nav" data-toggle="collapse" aria-haspopup="true" aria-expanded="false" aria-label="Toggle account navigation" v-pre>
                                     @if ( isset( $user->getProfile($user->id)->path ) && !is_null( $user->getProfile($user->id)->path ) )
@@ -106,15 +107,20 @@
                                 <div id="account-nav" class="dropdown-menu collapse navbar-dropdown" aria-labelledby="navbarDropdown">
 
                                     <ul>
-                                        @if ( FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+                                        @if ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasPermission('verify-translation-access') )
                                           <li><svg width="15" height="15" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><g fill="#0394a6"><path d="M5.625 1.185a4.456 4.456 0 0 1 4.454 4.454 4.456 4.456 0 0 1-4.454 4.454 4.456 4.456 0 0 1-4.454-4.454 4.456 4.456 0 0 1 4.454-4.454zm0 2.28a2.175 2.175 0 0 1 0 4.347 2.174 2.174 0 0 1 0-4.347z"/><ellipse cx="4.854" cy=".162" rx=".205" ry=".162"/><ellipse cx="6.396" cy=".162" rx=".205" ry=".162"/><path d="M4.854 0h1.542v1.046H4.854z"/><path d="M6.601.162H4.649l-.206 1.172h2.364L6.601.162z"/><ellipse cx="6.396" cy="11.088" rx=".205" ry=".162"/><ellipse cx="4.854" cy="11.088" rx=".205" ry=".162"/><path d="M4.854 10.204h1.542v1.046H4.854z"/><path d="M4.649 11.088h1.952l.206-1.172H4.443l.206 1.172zM1.102 2.193c.081-.081.197-.094.261-.031.063.064.049.18-.031.26-.08.081-.196.094-.26.031-.063-.064-.05-.18.03-.26zm1.091-1.091c.08-.08.196-.093.26-.03.063.064.05.18-.031.26-.08.08-.196.094-.26.031-.063-.064-.05-.18.031-.261z"/><path d="M2.193 1.102L1.102 2.193l.74.739 1.09-1.09-.739-.74z"/><path d="M2.453 1.072L1.072 2.453l.683.973 1.671-1.671-.973-.683zm7.695 7.985c-.081.081-.197.094-.261.031-.063-.064-.049-.18.031-.26.08-.081.196-.094.26-.031.063.064.05.18-.03.26zm-1.091 1.091c-.08.08-.196.093-.26.03-.063-.064-.05-.18.031-.26.08-.08.196-.094.26-.031.063.064.05.18-.031.261z"/><path d="M9.057 10.148l1.091-1.091-.74-.739-1.09 1.09.739.74z"/><path d="M8.797 10.178l1.381-1.381-.683-.973-1.671 1.671.973.683zM0 6.396c0-.114.073-.206.162-.206.09 0 .163.092.163.206 0 .113-.073.205-.163.205-.089 0-.162-.092-.162-.205zm0-1.542c0-.113.073-.205.162-.205.09 0 .163.092.163.205 0 .114-.073.206-.163.206C.073 5.06 0 4.968 0 4.854z"/><path d="M0 4.854v1.542h1.046V4.854H0z"/><path d="M.162 4.649v1.952l1.172.206V4.443l-1.172.206zm11.088.205c0 .114-.073.206-.162.206-.09 0-.163-.092-.163-.206 0-.113.073-.205.163-.205.089 0 .162.092.162.205zm0 1.542c0 .113-.073.205-.162.205-.09 0-.163-.092-.163-.205 0-.114.073-.206.163-.206.089 0 .162.092.162.206z"/><path d="M11.25 6.396V4.854h-1.046v1.542h1.046z"/><path d="M11.088 6.601V4.649l-1.172-.206v2.364l1.172-.206zm-8.895 3.547c-.081-.081-.094-.197-.031-.261.064-.063.18-.049.26.031.081.08.094.196.031.26-.064.063-.18.05-.26-.03zM1.102 9.057c-.08-.08-.093-.196-.03-.26.064-.063.18-.05.26.031.08.08.094.196.031.26-.064.063-.18.05-.261-.031z"/><path d="M1.102 9.057l1.091 1.091.739-.74-1.09-1.09-.74.739z"/><path d="M1.072 8.797l1.381 1.381.973-.683-1.671-1.671-.683.973zm7.985-7.695c.081.081.094.197.031.261-.064.063-.18.049-.26-.031-.081-.08-.094-.196-.031-.26.064-.063.18-.05.26.03zm1.091 1.091c.08.08.093.196.03.26-.064.063-.18.05-.26-.031-.08-.08-.094-.196-.031-.26.064-.063.18-.05.261.031z"/><path d="M10.148 2.193L9.057 1.102l-.739.74 1.09 1.09.74-.739z"/><path d="M10.178 2.453L8.797 1.072l-.973.683 1.671 1.671.683-.973z"/></g></svg>Administrator
                                               <ul>
-                                                  <li><a href="{{ route('brands') }}">Brands</a></li>
-                                                  <li><a href="{{ route('skills') }}">Skills</a></li>
-                                                  <li><a href="{{ route('tags') }}">Group tags</a></li>
-                                                  <li><a href="{{ route('category') }}">Categories</a></li>
-                                                  <li><a href="{{ route('users') }}">Users</a></li>
-                                                  <li><a href="{{ route('roles') }}">Roles</a></li>
+                                                  @if ( FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+                                                    <li><a href="{{ route('brands') }}">Brands</a></li>
+                                                    <li><a href="{{ route('skills') }}">Skills</a></li>
+                                                    <li><a href="{{ route('tags') }}">Group tags</a></li>
+                                                    <li><a href="{{ route('category') }}">Categories</a></li>
+                                                    <li><a href="{{ route('users') }}">Users</a></li>
+                                                    <li><a href="{{ route('roles') }}">Roles</a></li>
+                                                  @endif
+                                                  @if ( FixometerHelper::hasPermission('verify-translation-access') )
+                                                    <li><a href="/translations">Translations</a></li>
+                                                  @endif
                                               </ul>
                                           </li>
                                         @endif
@@ -183,40 +189,46 @@
         <aside id="notifications" class="notifications collapse">
             <div class="notifications__scroll">
                 <div id="tabs" class="notifications__inner">
-                    @if( isset($notifications) && is_object($notifications) && $notifications->count() > 0 )
-                      <div class="cards">
 
-                          @foreach( $notifications as $event )
-                          <div class="card card__parties">
-                              <div class="card-body">
-                                  <h5 class="card-title">Your group <a href="/group/view/{{{ $event->idgroups }}}">{{{ $event->name }}}</a> is missing devices from the event <a href="/party/view/{{{ $event->idevents }}}">{{{ $event->getEventName() }}}</a></h5>
-                                  <time>{{{ $event->getEventDate('D, jS M Y') }}}</time>
-                              </div>
+                  @if( isset($user->notifications) && is_object($user->notifications) && $user->unReadNotifications->count() > 0 )
+                  <div class="cards">
+
+                    @foreach ($user->unReadNotifications as $notification)
+                    <div class="card status-read {{{ FixometerHelper::notificationClasses($notification->type) }}}">
+                        <div class="card-body">
+                            <h5 class="card-title mb-1">{{{ $notification->data['title'] }}} <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a></h5>
+                            <time>{{{ date('D, jS M Y', strtotime($notification->created_at)) }}}</time>
+                            <div class="d-flex flex-row justify-content-end mt-1">
+                              <a href="{{ route('markAsRead', ['id' => $notification->id]) }}" class="btn-marked">Mark as read</a>
+                              <span class="marked-as-read"><svg width="13px" height="9" viewBox="0 0 54 37" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Green tick icon</title><path d="M4.615 14.064a.969.969 0 0 0-1.334 0l-3 2.979a.868.868 0 0 0 0 1.279l18.334 18c.333.35.916.35 1.291 0l3.042-2.983a.869.869 0 0 0 0-1.28L4.615 14.064z" fill="#0394a6"/><path d="M53.365 4.584a.913.913 0 0 0 .041-1.287L50.365.272c-.334-.358-.959-.363-1.292-.013L15.99 32.109a.873.873 0 0 0 0 1.284l3 3.029a.97.97 0 0 0 1.333.012l33.042-31.85z" fill="#0394a6"/></svg> Marked as read</span>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+
+                  </div>
+                @else
+                  <div class="alert alert-secondary" role="alert">
+                      <h3>@lang('general.alert_uptodate')</h3>
+                      <p>@lang('general.alert_uptodate_text')</p>
+                  </div>
+                @endif
+                <div class="cards">
+
+                  @foreach ($user->readNotifications as $notification)
+                  <div class="card status-is-read {{{ FixometerHelper::notificationClasses($notification->type) }}}" style="display: none;">
+                      <div class="card-body">
+                          <h5 class="card-title mb-1">{{{ $notification->data['title'] }}} <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a></h5>
+                          <time>{{{ date('D, jS M Y', strtotime($notification->created_at)) }}}</time>
+                          <div class="d-flex flex-row justify-content-end mt-1">
+                            <span class="marked-as-read"><svg width="13px" height="9" viewBox="0 0 54 37" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><title>Green tick icon</title><path d="M4.615 14.064a.969.969 0 0 0-1.334 0l-3 2.979a.868.868 0 0 0 0 1.279l18.334 18c.333.35.916.35 1.291 0l3.042-2.983a.869.869 0 0 0 0-1.28L4.615 14.064z" fill="#0394a6"/><path d="M53.365 4.584a.913.913 0 0 0 .041-1.287L50.365.272c-.334-.358-.959-.363-1.292-.013L15.99 32.109a.873.873 0 0 0 0 1.284l3 3.029a.97.97 0 0 0 1.333.012l33.042-31.85z" fill="#0394a6"/></svg> Marked as read</span>
                           </div>
-                          @endforeach
-
-                          <?php /*<div class="card card__devices">
-                              <div class="card-body">
-                                  <h5 class="card-title"><a href="#">Restart HQ</a> needs event <a href="#">London School of Economics</a> approved</h5>
-                                  <time>Tues, 15th May 2018</time>
-                              </div>
-                          </div>
-
-                          <div class="card card__groups">
-                              <div class="card-body">
-                                  <h5 class="card-title"><a href="#">Restart HQ</a> needs event <a href="#">London School of Economics</a> approved</h5>
-                                  <time>Tues, 15th May 2018</time>
-                              </div>
-                          </div>*/ ?>
-
                       </div>
-                    @else
-                      <div class="alert alert-secondary" role="alert">
-                          <h3>@lang('general.alert_uptodate')</h3>
-                          <p>@lang('general.alert_uptodate_text')</p>
-                      </div>
-                    @endif
+                  </div>
+                  @endforeach
 
                 </div>
+                <button class="notifications__older js-load">View read notifications</button>
             </div>
-        </aside>
+        </div>
+    </aside>

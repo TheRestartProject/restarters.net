@@ -29,3 +29,27 @@ Route::get('/party/{id}/stats', function($id) {
 Route::get('/group/{id}/stats', function($id) {
     return App\Http\Controllers\ApiController::groupStats($id);
 });
+
+Route::get('/{api_key}/event/group-tag/{group_tag_id}', function($api_key, $group_tag_id) {
+
+    if ( $api_key == env('API_KEY') ) {
+
+      return App\Http\Controllers\ApiController::getEventsByGroupTag($group_tag_id);
+
+    } else {
+
+      return response()->json([
+        'message' => 'Invalid API key',
+      ]);
+
+    }
+
+});
+
+Route::get('/outbound/info/{type}/{id}/{format?}', function($type, $id, $format = 'fixometer') {
+  return App\Http\Controllers\OutboundController::info($type, $id, $format);
+});
+
+Route::get('/group-tag/stats/{group_tag_id}/{format?}', function($group_tag_id, $format = 'row') {
+  return App\Http\Controllers\GroupController::statsByGroupTag($group_tag_id, $format);
+});

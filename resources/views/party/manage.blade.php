@@ -437,7 +437,7 @@
                                     </div>
                                     <div class="radio">
                                         <label>
-                                            <input type="radio" name="device[<?php echo $i; ?>][repair_status]" id="device[<?php echo $i; ?>][repair_status_3]" value="3">End of lifecycle
+                                            <input type="radio" name="device[<?php echo $i; ?>][repair_status]" id="device[<?php echo $i; ?>][repair_status_3]" value="3">End-of-life
                                         </label>
                                     </div>
                                 </div>

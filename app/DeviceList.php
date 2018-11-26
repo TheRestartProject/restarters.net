@@ -31,5 +31,25 @@ class DeviceList extends Model
 
 
     //Getters
+    function getRepairStatus() {
+
+      switch( $this->repair_status ) {
+        case 1:
+          return 'Fixed';
+        case 2:
+          return 'Repairable';
+        case 3:
+          return 'End of life';
+        default:
+          return 'Unknown';
+      }
+
+    }
+
+    function getSpareParts() {
+
+      return ($this->spare_parts == 1 ? 'Yes' : 'No');
+
+    }
 
 }

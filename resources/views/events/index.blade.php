@@ -29,6 +29,11 @@
 
     <div class="row justify-content-center">
       <div class="col-lg-12">
+        @if (\Session::has('success'))
+        <div class="alert alert-success" role="alert">
+          {!! \Session::get('success') !!}
+        </div>
+        @endif
 
         @if ( FixometerHelper::hasRole(Auth::user(), 'Administrator') && is_null($group) )
 
@@ -129,7 +134,7 @@
           </table>
 
           </div>
-          
+
         </section>
 
         <div class="d-flex justify-content-center">

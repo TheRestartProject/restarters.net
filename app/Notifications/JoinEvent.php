@@ -71,8 +71,8 @@ class JoinEvent extends Notification
                                     <td>Date:</td>
                                     <td>'.$this->arr['event']->getEventDate('D jS M Y') . '</td>
                                   </tr>
-                                  <tr> 
-                                    <td>Time:</td>' . 
+                                  <tr>
+                                    <td>Time:</td>' .
                                     '<td>' . $this->arr['event']->getEventStartEnd().'</td>
                                   </tr>
                                     <tr>

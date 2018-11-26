@@ -13,9 +13,27 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'Illuminate\Auth\Events\Login' => [
-          'App\Listeners\LogSuccessfulLogin',
-        ],
+
+      // Notify When Approve Event Occurs
+      'App\Events\ApproveEvent' => [
+        'App\Listeners\CreateWordPressApproveEventPost',
+      ],
+
+      // Notify When Edit Event Occurs
+      'App\Events\EditEvent' => [
+        'App\Listeners\CreateWordPressEditEventPost',
+      ],
+
+      // Notify When Approve Group Occurs
+      'App\Events\ApproveGroup' => [
+        'App\Listeners\CreateWordPressApproveGroupPost',
+      ],
+
+      // Notify When Edit Group Occurs
+      'App\Events\EditGroup' => [
+        'App\Listeners\CreateWordPressEditGroupPost',
+      ],
+
     ];
 
     /**

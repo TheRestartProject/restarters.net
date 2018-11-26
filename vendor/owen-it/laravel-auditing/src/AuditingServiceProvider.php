@@ -1,16 +1,4 @@
 <?php
-/**
- * This file is part of the Laravel Auditing package.
- *
- * @author     Antério Vieira <anteriovieira@gmail.com>
- * @author     Quetzy Garcia  <quetzyg@altek.org>
- * @author     Raphael França <raphaelfrancabsb@gmail.com>
- * @copyright  2015-2018
- *
- * For the full copyright and license information,
- * please view the LICENSE.md file that was distributed
- * with this source code.
- */
 
 namespace OwenIt\Auditing;
 
@@ -35,8 +23,9 @@ class AuditingServiceProvider extends ServiceProvider
         $config = __DIR__.'/../config/audit.php';
         $migration = __DIR__.'/../database/migrations/audits.stub';
 
+        // Lumen lacks a config_path() helper, so we use base_path()
         $this->publishes([
-            $config => config_path('audit.php'),
+            $config => base_path('config/audit.php'),
         ], 'config');
 
         $this->publishes([
