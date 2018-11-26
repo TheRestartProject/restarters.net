@@ -63,7 +63,7 @@ class AdminModerationEvent extends Notification
     public function toArray($notifiable)
     {
         return [
-            'title' => 'The following new event has been created:',
+            'title' => 'New event created:',
             'name' => $this->arr['event_venue'],
             'url' => $this->arr['event_url'],
         ];
