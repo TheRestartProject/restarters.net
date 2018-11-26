@@ -184,7 +184,6 @@ class GroupController extends Controller
         // We got data! Elaborate. //NB:: Taken out frequency as it doesn't appear in the post data might be gmaps
         $name       =       $_POST['name'];
         $website    =       $_POST['website'];
-        // $area       =       $_POST['area'];
         // $freq       =       $_POST['frequency'];
         $location   =       $_POST['location'];
         // $latitude   =       $_POST['latitude'];
@@ -221,7 +220,6 @@ class GroupController extends Controller
           // No errors. We can proceed and create the User.
           $data = array(  'name'          => $name,
           'website'       => $website,
-          // 'area'          => $area,
           // 'frequency'     => $freq,
           'location'      => $location,
           'latitude'      => $latitude,
@@ -789,6 +787,7 @@ public function edit($id)
       'website'       => $data['website'],
       'free_text'     => $data['free_text'],
       'location'      => $data['location'],
+      'area'          => $data['area'],
       'latitude'      => $latitude,
       'longitude'     => $longitude,
       'country'       => $country,

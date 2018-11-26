@@ -154,6 +154,11 @@
                     </select>
                   </div>
 
+                  <br>
+
+                  <label class="groups-tags-label" for="area">@lang('groups.area')</label>
+                  <input type="text" name="area" class="form-control field" value="{{ $formdata->area }}" />
+
                   @if( is_null($formdata->wordpress_post_id) )
                     <br>
                     <label class="groups-tags-label" for="moderate">@lang('groups.approve_group')</label>

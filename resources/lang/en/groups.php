@@ -31,6 +31,7 @@ return [
     'groups_group_small' => 'A couple of examples include \'Restarters Torino\' or \'Nottingham Fixers\'',
     'groups_location' => 'Location',
     'location' => 'Group location',
+    'area' => 'Area',
     'groups_frequency' => 'Frequency',
     'groups_hosts' => 'No. Hosts',
     'groups_restarters' => 'No. Restarters',
