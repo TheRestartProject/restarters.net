@@ -46,11 +46,12 @@ class AdminModerationEvent extends Notification
     public function toMail($notifiable)
     {
           return (new MailMessage)
-                      ->subject('Moderation Needed')
+                      ->subject('New event created: ' . $this->arr['event_venue'])
                       ->greeting('Hello!')
-                      ->line('Your moderation is needed for \'' . $this->arr['event_venue'] . '\'.')
+                      ->line('A new event has been created: \'' . $this->arr['event_venue'] . '\'.')
                       ->action('View event', $this->arr['event_url'])
-                      ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
+                      ->line('This event might need your moderation, if it hasn\'t yet been moderated by another administrator.')
+                      ->line('If you would like to stop receiving these notifications, please edit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
     }
 
     /**
@@ -62,7 +63,7 @@ class AdminModerationEvent extends Notification
     public function toArray($notifiable)
     {
         return [
-            'title' => 'The following event needs moderating:',
+            'title' => 'The following new event has been created:',
             'name' => $this->arr['event_venue'],
             'url' => $this->arr['event_url'],
         ];
