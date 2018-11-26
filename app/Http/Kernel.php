@@ -20,8 +20,6 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\TrustProxies::class,
         \App\Http\Middleware\HttpsProtocol::class,
-        \Illuminate\Session\Middleware\StartSession::class,
-        \App\Http\Middleware\LanguageSwitcher::class,
     ];
 
     /**
@@ -37,6 +35,8 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \App\Http\Middleware\LanguageSwitcher::class,
         ],
         'translation' => [
             \App\Http\Middleware\VerifyTranslationAccess::class,
