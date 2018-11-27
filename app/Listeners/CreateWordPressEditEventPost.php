@@ -8,6 +8,7 @@ use App\Notifications\AdminWordPressEditEventFailure;
 use FixometerHelper;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 use Notification;
 
 class CreateWordPressEditEventPost
@@ -91,7 +92,7 @@ class CreateWordPressEditEventPost
           }
 
         } catch (\Exception $e) {
-
+            Log::error("An error occurred during Wordpress event update: " . $e->getMessage());
           $notify_users = FixometerHelper::usersWhoHavePreference('admin-edit-wordpress-event-failure');
           Notification::send($notify_users, new AdminWordPressEditEventFailure([
             'event_venue' => $theParty->venue,
