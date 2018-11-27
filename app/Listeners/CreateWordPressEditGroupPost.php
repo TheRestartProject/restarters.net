@@ -7,6 +7,7 @@ use App\Group;
 use App\Notifications\AdminWordPressEditGroupFailure;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 use FixometerHelper;
 use Notification;
 
@@ -44,17 +45,15 @@ class CreateWordPressEditGroupPost
 
           if( is_numeric($group->wordpress_post_id) ){
 
-            // TODO: host.  Groups don't just have one host.  Is host
-            // displayed on the front-end anywhere?
-            // TODO: receiving area field from posted data.  It's currently not in the interface.
-
             $custom_fields = array(
-              array('key' => 'group_city',            'value' => $group->area),
-              array('key' => 'group_website',         'value' => $group->website),
-              array('key' => 'group_hash',            'value' => $id),
-              array('key' => 'group_avatar_url',      'value' => $data['group_avatar']),
-              array('key' => 'group_latitude',        'value' => $group->latitude),
-              array('key' => 'group_longitude',       'value' => $group->longitude),
+                array('key' => 'group_city',            'value' => $group->area),
+                //                                    array('key' => 'group_host',            'value' => $Host->hostname),
+                array('key' => 'group_website',         'value' => $data['website']),
+                //array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
+                array('key' => 'group_hash',            'value' => $id),
+                array('key' => 'group_avatar_url',      'value' => $data['group_avatar']),
+                array('key' => 'group_latitude',        'value' => $data['latitude']),
+                array('key' => 'group_longitude',       'value' => $data['longitude']),
             );
 
             /** Start WP XML-RPC **/
@@ -62,20 +61,37 @@ class CreateWordPressEditGroupPost
             $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
             $content = array(
-              'post_type' => 'group',
-              'post_title' => $group->name,
-              'post_content' => $group->free_text,
-              'custom_fields' => $custom_fields
+                'post_type' => 'group',
+                'post_title' => $data['name'],
+                'post_content' => $data['free_text'],
+                'custom_fields' => $custom_fields
             );
 
-            $wpid = $wpClient->newPost($data['name'], $data['free_text'], $content);
-            $group->wordpress_post_id = $wpid;
-            $group->save();
 
+            if(!empty($group->wordpress_post_id)) {
+                // We need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
+                $existingPost = $wpClient->getPost($group->wordpress_post_id);
+
+                foreach ($existingPost['custom_fields'] as $i => $field) {
+                foreach ($custom_fields as $k => $set_field) {
+                    if($field['key'] == $set_field['key']) {
+                    $custom_fields[$k]['id'] = $field['id'];
+                    }
+                }
+                }
+
+                $content['custom_fields'] = $custom_fields;
+                $wpClient->editPost($group->wordpress_post_id, $content);
+            }
+            else {
+                $wpid = $wpClient->newPost($data['name'], $data['free_text'], $content);
+                $group->wordpress_post_id = $wpid;
+                $group->save();
+            }
           }
 
         } catch (\Exception $e) {
-
+            Log::error("An error occurred during Wordpress group editing: " . $e->getMessage());
           $notify_users = FixometerHelper::usersWhoHavePreference('admin-edit-wordpress-group-failure');
           Notification::send($notify_users, new AdminWordPressEditGroupFailure([
             'group_name' => $group->name,

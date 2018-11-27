@@ -772,6 +772,8 @@ public function edit($id)
       $longitude = null;
       $country = null;
     }
+    $data['latitude'] = $latitude;
+    $data['longitude'] = $longitude;
 
     //Validation
     if (empty($data['name'])) {
