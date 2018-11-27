@@ -58,7 +58,7 @@ class CreateWordPressEditEventPost
               array('key' => 'party_venue',           'value' => $data['venue']),
               array('key' => 'party_location',        'value' => $data['location']),
               array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
-              array('key' => 'party_date',            'value' => $wp_date),
+              array('key' => 'party_date',            'value' => $data['event_date']),
               array('key' => 'party_timestamp',       'value' => $theParty->event_timestamp),
               array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp),
               array('key' => 'party_stats',           'value' => $id),
