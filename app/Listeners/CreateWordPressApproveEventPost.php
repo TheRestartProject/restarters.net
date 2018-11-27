@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Notification;
 use App\Notifications\AdminWordPressCreateEventFailure;
 use App\Party;
+use Illuminate\Support\Facades\Log;
 use FixometerHelper;
 
 class CreateWordPressApproveEventPost
@@ -48,6 +49,9 @@ class CreateWordPressApproveEventPost
 
            } elseif( ( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve' ) {
 
+               $startTimestamp = strtotime($data['event_date'] . ' ' . $data['start']);
+               $endTimestamp = strtotime($data['event_date'] . ' ' . $data['end']);
+
              // if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
              /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
              //$Host = $Groups->findHost($group);
@@ -58,12 +62,12 @@ class CreateWordPressApproveEventPost
                array('key' => 'party_venue',           'value' => $data['venue']),
                array('key' => 'party_location',        'value' => $data['location']),
                array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
-               array('key' => 'party_date',            'value' => $wp_date),
-               array('key' => 'party_timestamp',       'value' => $theParty->event_timestamp),
-               array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp),
+               array('key' => 'party_date',            'value' => $data['event_date']),
+               array('key' => 'party_timestamp',       'value' => $startTimestamp),
+               array('key' => 'party_timestamp_end',   'value' => $endTimestamp),
                array('key' => 'party_stats',           'value' => $id),
-               array('key' => 'party_lat',             'value' => $latitude),
-               array('key' => 'party_lon',             'value' => $longitude)
+               array('key' => 'party_lat',             'value' => $data['latitude']),
+               array('key' => 'party_lon',             'value' => $data['longitude'])
              );
 
              /** Start WP XML-RPC **/
@@ -84,7 +88,7 @@ class CreateWordPressApproveEventPost
 
          // If WordPress message fails then send Notification to Admins with Preference
          } catch (\Exception $e) {
-
+             Log::error("An error occurred during Wordpress event creation: " . $e->getMessage());
              $notify_users = FixometerHelper::usersWhoHavePreference('admin-approve-wordpress-event-failure');
              Notification::send($notify_users, new AdminWordPressCreateEventFailure([
                'event_venue' => $theParty->venue,

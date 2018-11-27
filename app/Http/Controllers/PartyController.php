@@ -179,6 +179,8 @@ class PartyController extends Controller {
         $latitude = null;
         $longitude = null;
       }
+      $data['latitude'] = $latitude;
+      $data['longitude'] = $longitude;
 
 
 
