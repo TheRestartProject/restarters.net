@@ -47,6 +47,8 @@ class CreateWordPressEditEventPost
 
             $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
             $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+            $startTimestamp = strtotime($data['event_date'] . ' ' . $data['start']);
+            $endTimestamp = strtotime($data['event_date'] . ' ' . $data['end']);
 
             /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
             // $theParty = $Party->findThis($id);
@@ -59,8 +61,8 @@ class CreateWordPressEditEventPost
               array('key' => 'party_location',        'value' => $data['location']),
               array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
               array('key' => 'party_date',            'value' => $data['event_date']),
-              array('key' => 'party_timestamp',       'value' => $theParty->event_timestamp),
-              array('key' => 'party_timestamp_end',   'value' => $theParty->event_end_timestamp),
+              array('key' => 'party_timestamp',       'value' => $startTimestamp),
+              array('key' => 'party_timestamp_end',   'value' => $endTimestamp),
               array('key' => 'party_stats',           'value' => $id),
               array('key' => 'party_lat',             'value' => $data['latitude']),
               array('key' => 'party_lon',             'value' => $data['longitude'])
