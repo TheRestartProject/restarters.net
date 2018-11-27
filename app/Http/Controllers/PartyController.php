@@ -449,6 +449,8 @@ public function edit($id, Request $request) {
       $latitude = null;
       $longitude = null;
     }
+    $data['latitude'] = $latitude;
+    $data['longitude'] = $longitude;
 
     $update = array(
       'event_date'  => $data['event_date'],
