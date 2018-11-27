@@ -481,31 +481,33 @@ public function edit($id, Request $request) {
 
       $theParty = $Party->findThis($id)[0];
 
-      // Notify all Restarters of relevant Group if a new Event has been approved for moderation
-      $event = Party::find($id);
-      $group = Group::find($event->group);
 
-      // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
-      $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
-                                ->where('users_groups.group', $event->group)
-                                  ->where('users_groups.role', 4)
-                                    ->select('users.*')
-                                      ->get();
-
-      // If there are restarters against the group
-      if ( !$group_restarters->isEmpty() ) {
-
-          // Send user a notification and email
-          Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
-            'event_venue' => $event->venue,
-            'event_url' => url('/party/view/'.$event->idevents),
-            'event_group' => $group->name,
-          ]));
-
-      }
-
-      // Send WordPress Notification if event approved with POSTed data
+      // If event has just been approved, email Restarters attached to group, and push to Wordpress.
       if ( isset($data['moderate']) && $data['moderate'] == 'approve' ) {
+
+        // Notify Restarters of relevant Group
+        $event = Party::find($id);
+        $group = Group::find($event->group);
+
+        // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
+        $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
+                                    ->where('users_groups.group', $event->group)
+                                    ->where('users_groups.role', 4)
+                                        ->select('users.*')
+                                        ->get();
+
+        // If there are restarters against the group
+        if ( !$group_restarters->isEmpty() ) {
+
+            // Send user a notification and email
+            Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
+                'event_venue' => $event->venue,
+                'event_url' => url('/party/view/'.$event->idevents),
+                'event_group' => $group->name,
+            ]));
+
+        }
+
         event(new ApproveEvent($event, $data));
       } elseif ( !empty($theParty->wordpress_post_id) ) {
         event(new EditEvent($event, $data));

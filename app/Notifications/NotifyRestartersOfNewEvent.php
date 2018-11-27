@@ -49,7 +49,7 @@ class NotifyRestartersOfNewEvent extends Notification
      public function toMail($notifiable)
      {
          return (new MailMessage)
-                     ->subject('There is a new event')
+                     ->subject('New event for ' . $this->arr['event_group'])
                      ->greeting('Hello!')
                      ->line('There has been a new event added to your group: \'' . $this->arr['event_venue'] . '\'.')
                      ->action('View event', $this->arr['event_url'])
