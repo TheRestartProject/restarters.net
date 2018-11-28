@@ -62,7 +62,7 @@ class NewGroupMember extends Notification
     public function toArray($notifiable)
     {
         return [
-          'title' => 'A new volunteer has joined ' . $this->arr['user_name'] . ':',
+            'title' => 'A new volunteer, ' . $this->arr['user_name'] . ', has joined ',
           'name' => $this->arr['group_name'],
           'url' => $this->arr['group_url'],
         ];
