@@ -46,7 +46,7 @@ class NewGroupMember extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                  ->subject('New Group Member')
+                  ->subject('New group member joined ' . $this->arr['group_name'])
                   ->greeting('Hello!')
                   ->line('A new volunteer, ' . $this->arr['user_name'] . ', has joined your group \'' . $this->arr['group_name'] . '\'.')
                   ->action('Go to group', $this->arr['group_url'])
