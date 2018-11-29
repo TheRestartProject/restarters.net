@@ -20,7 +20,7 @@ return [
     'profile_admin_text' => 'Here admins have the ability to change a user\'s role or their associated groups',
     'user_role' => 'User role',
     'assigned_groups' => 'Assigned to groups',
-    'save_user' => 'Save user'
+    'save_user' => 'Save user',
 
     'email_address' => 'Courriel',
     'email_address_validation' => 'Svp tapez une adresse courriel valide',
