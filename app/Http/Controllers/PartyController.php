@@ -706,6 +706,7 @@ public function getJoinEvent($event_id) {
       Party::find($event_id)->increment('volunteers');
 
       $response['success'] = 'Thank you for your RSVP, we look forward to seeing you at the event';
+      $this->notifyHostsOfRsvp($user_event, $event_id);
 
       return redirect()->back()->with('response', $response);
 
@@ -719,6 +720,38 @@ public function getJoinEvent($event_id) {
   }
 
 }
+
+    public function notifyHostsOfRsvp($user_event, $event_id)
+    {
+        // Get users who have appropriate role and permission to email
+        try {
+            $hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
+                ->where('events_users.event', $event_id)
+                ->where('events_users.role', 3)
+                ->select('users.*')
+                ->get();
+        } catch (\Exception $e) {
+            $hosts = null;
+        }
+
+        if ( !is_null($hosts) ) {
+            try {
+
+                // Get user information
+                $user = User::find($user_event->user);
+
+                //Send Notification to Host
+                Notification::send($hosts, new RSVPEvent([
+                    'user_name' => $user->name,
+                    'event_venue' => Party::find($event_id)->venue,
+                    'event_url' => url('/party/view/'.$event_id),
+                ]));
+
+            } catch (\Exception $ex) {
+                Log::error("An error occurred when trying to notify host of invitation confirmation: " . $ex->getMessage());
+            }
+        }
+    }
 
 public function manage($id){
 
@@ -1320,37 +1353,7 @@ public function confirmInvite($event_id, $hash) {
     // Increment volunteers column to include latest invite
     Party::find($event_id)->increment('volunteers');
 
-    // Get users who have appropriate role and permission to email
-    try {
-      $hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
-                        ->where('events_users.event', $event_id)
-                          ->where('events_users.role', 3)
-                            ->select('users.*')
-                              ->get();
-
-    } catch (\Exception $e) {
-      $hosts = null;
-    }
-
-
-    if ( !is_null($hosts) ) {
-
-      try {
-
-          // Get user information
-          $user = User::find($user_event->user);
-
-          //Send Notification to Host
-          Notification::send($hosts, new RSVPEvent([
-              'user_name' => $user->name,
-              'event_venue' => Party::find($event_id)->venue,
-              'event_url' => url('/party/view/'.$event_id),
-          ]));
-
-      } catch (\Exception $ex) {
-          Log::error("An error occurred when trying to notify host of invitation confirmation: " . $ex->getMessage());
-      }
-    }
+    $this->notifyHostsOfRsvp($user_event, $event_id);
 
     return redirect('/party/view/'.$user_event->event);
 
