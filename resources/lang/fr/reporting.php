@@ -50,7 +50,7 @@ return [
 
     'event_name' => 'Event',
     'restart_group' => 'Group',
-    'export_csv' => 'Export to CSV'
+    'export_csv' => 'Export to CSV',
     'restarter_name' => 'Restarter name',
     'hours' => 'Hours',
     'location' => 'Location',
