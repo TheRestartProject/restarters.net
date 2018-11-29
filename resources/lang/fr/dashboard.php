@@ -1,12 +1,5 @@
 <?php
 
-return array (
-  'devices_logged' => 'devices logged',
-  'visit_wiki' => 'Visit the wiki',
-  'discussion_header' => 'Discussion Forum',
-  'join_discussion' => 'Join the discussion',
-);
-
 return [
 
     /*
@@ -23,5 +16,9 @@ return [
         'join_group' => 'Rejoignez un groupe',
         'rsvp_event' => 'RSVP à un événement',
         'devices_logged' => 'devices logged',
+	'devices_logged' => 'devices logged',
+	'visit_wiki' => 'Visit the wiki',
+	'discussion_header' => 'Discussion Forum',
+	'join_discussion' => 'Join the discussion'
     ];
 ?>

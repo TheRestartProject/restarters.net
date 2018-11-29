@@ -74,7 +74,6 @@ return [
     'headline_stats_dropdown' => 'Headline stats',
     'co2_equivalence_visualisation_dropdown' => 'CO<sub>2</sub> equivalence visualisation',
     'embed_code_header' => 'Embed code',
-<<<<<<< HEAD
     'infographic_message' => 'An infographic of an easy-to-understand equivalent of the CO<sub>2</sub> emissions that your group has prevented, such as equivalent number of cars manufactured.',
     'headline_stats_message' => 'This widget shows the headline stats for your group e.g. the number of participants at your parties; the hours volunteered',
 
