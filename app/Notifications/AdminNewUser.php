@@ -49,7 +49,7 @@ class AdminNewUser extends Notification
                       ->subject('New User Registration')
                       ->greeting('Hello!')
                       ->line('A new user "' . $this->arr['name'] . '" has joined the Restarters community.')
-                      ->action('View profile', url('/user/edit/'.$this->arr['id']) )
+                      ->action('View profile', url('/profile/'.$this->arr['id']) )
                       ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
     }
 
@@ -64,7 +64,7 @@ class AdminNewUser extends Notification
       return [
           'title' => 'New user has joined the community:',
           'name' => $this->arr['name'],
-          'url' => url('/user/edit/'.$this->arr['id']),
+          'url' => url('/profile/'.$this->arr['id']),
       ];
     }
 }
