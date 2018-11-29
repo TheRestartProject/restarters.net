@@ -1,5 +1,6 @@
 .admin {
     padding: 10px 0;
+    min-height: 100%;
     @include media-breakpoint-up(lg) {
         padding: 70px 0;
     }
