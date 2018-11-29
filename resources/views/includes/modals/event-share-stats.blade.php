@@ -34,7 +34,7 @@
                   </div>
                   <small class="after-offset">@lang('events.headline_stats_message')</small>
 
-                  <iframe src="{{{ env('APP_URL') }}}/party/stats/{{{ $formdata->id }}}/wide" frameborder="0" width="100%" height="115" class="form-control"></iframe>
+                  <iframe src="{{{ env('APP_URL') }}}/party/stats/{{{ $formdata->id }}}/wide" frameborder="0" width="100%" height="115" id="headlineStats" class="form-control"></iframe>
 
               </div>
             </div>
