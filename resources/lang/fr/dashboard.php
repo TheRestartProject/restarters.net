@@ -1,14 +1,24 @@
 <?php
 
-return array (
-  'devices_logged' => 'devices logged',
-  'getting_started_header' => 'Getting Started',
-  'getting_started_text' => 'Welcome to the Restarters community space.  Here are a few actions to get you started:',
-  'add_avatar' => 'Add an avatar',
-  'add_skills' => 'Add your skills',
-  'join_group' => 'Join a group',
-  'rsvp_event' => 'RSVP to an event',
-  'visit_wiki' => 'Visit the wiki',
-  'discussion_header' => 'Discussion Forum',
-  'join_discussion' => 'Join the discussion',
-);
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    |
+    |
+    */
+        'getting_started_header' => 'Pour commencer',
+        'getting_started_text' => 'Bienvenue dans l\'espace communautaire des Restarters. Voici quelques actions pour vous aider à démarrer:',
+        'add_avatar' => 'Ajoutez un avatar',
+        'add_skills' => 'Ajoutez vos compétences',
+        'join_group' => 'Rejoignez un groupe',
+        'rsvp_event' => 'RSVP à un événement',
+        'devices_logged' => 'devices logged',
+	'devices_logged' => 'devices logged',
+	'visit_wiki' => 'Visit the wiki',
+	'discussion_header' => 'Discussion Forum',
+	'join_discussion' => 'Join the discussion'
+    ];
+?>

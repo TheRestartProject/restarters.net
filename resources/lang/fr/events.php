@@ -16,6 +16,7 @@ return [
     'pending_rsvp_message' => 'You have an invite pending for this event',
     'pending_rsvp_button' => 'I am attending',
 
+
     'warning_volunteers_message' => 'Please note that the number of volunteers does not match the attendance record.  Do you need to add or remove volunteers?',
 
     'share_stats_header' => 'Share your stats',
@@ -36,12 +37,14 @@ return [
     'remove_volunteer_link' => 'Remove volunteer',
 
     'invite_restarters_modal_heading' => 'Invite volunteers to the event',
+
     'invite_restarters_modal_description' => 'A repair event is nothing without volunteers. Invite them to your event here.',
     'send_invites_to_restarters_tickbox' => 'Add invites for group members. Members marked with a ⚠ will be invited but won\'t be sent an email due to their notification settings.',
     'manual_invite_box' => 'Send invites to',
     'type_email_addresses_message' => 'Note: you can also manually type in the email address of anyone else you would like to invite to this event.  Press the tab, enter or comma key after each email address that you enter.',
     'message_to_restarters' => 'Invitation message',
     'message_explainer' => 'An invitation with the event details will be sent to the invitees.  If you would like to, you can include an additional message within the invitation by filling in the box above.',
+    
     'sample_text_message_to_restarters' => '<add a custom message here if required>',
     'send_invite_button' => 'Send invites',
 
@@ -58,7 +61,9 @@ return [
     'event' => 'Event',
     'by_event' => 'By event',
     'by_group' => 'By group',
-    'create_new_event' => 'Create new event',
+
+    'create_new_event' => 'Créer un nouvel événement',
+
     'create_event' => 'Create event',
     'edit_event' => 'Edit event',
     'edit_event_content' => 'Go ahead and change or improve your event information.',
@@ -67,34 +72,36 @@ return [
     'upcoming_events' => 'Upcoming events',
 
     'event_datetime' => 'Date/time',
-    'event_name' => 'Event',
+
+    'event_name' => 'Nom de l\'événement',
     'event_date' => 'Date',
-    'event_time' => 'Time',
-    'event_location' => 'Location',
+    'event_time' => 'Heure',
+    'event_location' => 'Lieu',
     'event_all' => 'See all events',
 
     'stat-0' => 'Participants',
-    'stat-1' => 'Invited',
+    'stat-1' => 'Invités',
     'stat-2' => 'Restarters',
-    'stat-3' => 'Repairable devices',
-    'stat-4' => 'End-of-life devices',
-    'stat-5' => 'Fixed devices',
-    'stat-6' => 'CO2 emissions prevented',
-    'stat-7' => 'Waste prevented',
+    'stat-3' => 'Appareils réparables',
+    'stat-4' => 'Appareils en fin de vie',
+    'stat-5' => 'Appareils réparés',
+    'stat-6' => 'Émissions de CO2 évitées',
+    'stat-7' => 'Déchets évités',
 
     'add_event' => 'Add event',
-    'add_an_event' => 'Add an event',
-    'add_event_content' => 'Announce your event on The Restart Project website and to fixers near you.',
+    'add_an_event' => 'Ajouter un événement',
+    'add_event_content' => 'Annoncez votre événement sur le site du Restart Project, et faites‐en part à tous les Restarters de votre entourage.',
 
-    'field_venue_helper' => 'I.e. the place where the fixing happens!',
+    'field_venue_helper' => 'i.e. l’endroit où va se dérouler l’événement',
 
-    'field_event_name' => 'Name of event',
-    'field_event_name_helper' => 'Please enter a neighbourhood or the name of the venue - please no \'Restart Party\' or \'Repair Cafe\'.',
+    'field_event_name' => 'Nom de l’événement',
+    'field_event_name_helper' => 'Svp tapez le nom d’un lieu – évitez \'Restart Party\' ou \'Repair Cafe\'.',
     'field_event_group' => 'Event group',
     'field_event_desc' => 'Description',
-    'field_event_date' => 'Date of event',
-    'field_event_time' => 'Start/end time',
-    'field_event_venue' => 'Venue address',
+    'field_event_date' => 'Date de l’événement',
+    'field_event_time' => 'Heures de début et de fin',
+    'field_event_venue' => 'Adresse du lieu',
+
     'field_event_images' => 'Add event images here',
     'field_event_images_2' => 'Choose an image for your event',
     'field_event_street_address' => 'Street address',
@@ -103,9 +110,11 @@ return [
     'field_event_county' => 'County/State',
     'field_event_zip' => 'Post/Zip code',
     'field_event_country' => 'Country',
-    'field_add_image' => 'Add images',
 
-    'before_submit_text' => 'Once confirmed by our community lead, your event will be made public on The Restart Project homepage.',
+    'field_add_image' => 'Ajoutez une image',
+
+    'before_submit_text' => 'Une fois confirmé par notre responsable communautaire, votre événement sera rendu public sur la page d\'accueil du Restart Project.',
+
     'save_event' => 'Save Event',
 
     'reporting' => 'Reporting',
@@ -116,4 +125,5 @@ return [
 
     'field_event_device_images' => 'Add device images here',
     'field_event_device_images_2' => '',
+
 ];
