@@ -510,6 +510,7 @@ public function edit($id, Request $request) {
 
         event(new ApproveEvent($event, $data));
       } elseif ( !empty($theParty->wordpress_post_id) ) {
+        $event = Party::find($id);
         event(new EditEvent($event, $data));
       }
 
