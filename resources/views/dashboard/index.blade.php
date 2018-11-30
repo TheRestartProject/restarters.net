@@ -157,9 +157,6 @@
       @endif
     <div class="col">
       <div class="row row-compressed">
-        <div class="col-12">
-        @include('dashboard.blocks.impact')
-        </div>
         @if (FixometerHelper::hasRole($user, 'Administrator'))
           @include('dashboard.restarter')
         @endif
@@ -169,6 +166,9 @@
         @if (FixometerHelper::hasRole($user, 'Restarter'))
           @include('dashboard.restarter')
         @endif
+        <div class="col-12">
+            @include('dashboard.blocks.impact')
+        </div>
       </div>
     </div>
   </div>
