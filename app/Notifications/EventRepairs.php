@@ -29,7 +29,11 @@ class EventRepairs extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        if ($notifiable->invites == 1) {
+            return ['database', 'mail'];
+        }
+
+        return ['database'];
     }
 
     /**
@@ -41,10 +45,10 @@ class EventRepairs extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Contribute Details')
+                    ->subject('Help us log repair info for ' . $this->arr['event_name'])
                     ->greeting('Hello!')
-                    ->line('Thank you for joining us recently at  \'' . $this->arr['event_name'] . '\',  please help improve the details of the repairs you carried out and add any photos you may have taken at the event. This will help us improve the quality of our data.')
-                    ->action('Contribute data', url($this->arr['event_url']))
+                    ->line('Thank you for being part of the recent \'' . $this->arr['event_name'] . '\' event.  Please help us to improve the details of the repairs you carried out by adding any useful information or photos you have.  Any extra details you can add will help future repair attempts.')
+                    ->action('Contribute repair info', url($this->arr['event_url']))
                     ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'] . '">your preferences</a> on your account.');
     }
 
@@ -57,7 +61,9 @@ class EventRepairs extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+            'title' => 'Help us log repair info for ',
+            'name' => $this->arr['event_name'],
+            'url' => $this->arr['event_url'],
         ];
     }
 }

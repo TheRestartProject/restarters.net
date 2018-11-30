@@ -1513,41 +1513,32 @@ public function emailHosts() {
 * This sends an email to all user except the host logged in an email to ask for contributions
 *
 */
-public function getContributions($event_id){
-
+public function getContributions($event_id)
+{
   $event = Party::find($event_id);
 
-  // Let's check that current logged in user is a host of the event or a host of the group
-  if( FixometerHelper::userHasEditPartyPermission($event_id) || FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id) ){
+  // Check that current logged in user is a host of the event or a host of the group
+  if (FixometerHelper::userHasEditPartyPermission($event_id) || FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id)) {
 
-    if(env('APP_ENV') == 'development' || env('APP_ENV') == 'local') { //Testing purposes
-
-      $all_restarters = User::whereIn('id', [91,92,93])->get();
-
-    } else {
-
-      $all_restarters = User::join('events_users', 'events_users.user', '=', 'users.id')
-      ->where('users.invites', 1)
-      ->where('events_users.role', 4)
-      ->where('events_users.event', $event_id)
-      ->get();
-
-    }
+    $all_restarters = User::join('events_users', 'events_users.user', '=', 'users.id')
+    ->where('events_users.status', 1)
+    ->where('events_users.role', 4)
+    ->where('events_users.event', $event_id)
+    ->get();
 
     Notification::send($all_restarters, new EventRepairs([
       'event_name' => $event->getEventName(),
-      'event_url' => url('/party/view/'.$event_id),
+      'event_url' => url('/party/view/'.$event_id . '#devices'),
       'preferences' => url('/profile/edit'),
     ]));
 
-    return redirect()->back()->with('success', 'Thank you, all attendees have been informed');
+    return redirect()->back()->with('success', 'Thanks - all Restarters that attended have been sent a notification');
 
   } else {
 
-    return redirect()->back()->with('warning', 'Sorry, you are not the host of this event');
+    return redirect()->back()->with('warning', 'Sorry - you do not have the correct permissions for this action');
 
   }
-
 }
 
 
