@@ -11,4 +11,5 @@ return array (
   'visit_wiki' => 'Visit the wiki',
   'discussion_header' => 'Discussion Forum',
   'join_discussion' => 'Join the discussion',
+  'log_devices' => 'Log devices'
 );

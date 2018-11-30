@@ -79,11 +79,12 @@ class DashboardController extends Controller
       //If users has events, let's see whether they have any past events
       if ($in_event) {
         $past_events = Party::whereIn('idevents', $event_ids)
-                                ->whereDate('event_date', '<', date('Y-m-d'))
-                                  ->join('groups', 'events.group', '=', 'idGroups')
-                                    ->select('events.*', 'groups.name')
-                                      ->take(3)
-                                        ->get();
+                     ->whereDate('event_date', '<', date('Y-m-d'))
+                     ->join('groups', 'events.group', '=', 'idGroups')
+                     ->select('events.*', 'groups.name')
+                     ->orderBy('events.event_date', 'desc')
+                     ->take(3)
+                     ->get();
 
           if (empty($past_events->toArray())) {
             $past_events = null;
