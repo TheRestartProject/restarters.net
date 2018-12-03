@@ -58,7 +58,7 @@
             </div>
             <div class="form-group">
                 <label for="skill-description">Description:</label>
-                <textarea class="form-control rte" rows="6" name="skill-description" id="skill-description">{{ $skill->description }}</textarea>
+                <textarea class="form-control" rows="6" name="skill-description" id="skill-description">{{ $skill->description }}</textarea>
             </div>
 
             <div class="button-group row">
