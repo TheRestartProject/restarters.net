@@ -332,7 +332,7 @@ class ExportController extends Controller {
             $partyName = !is_null($party->venue) ? $party->venue : $party->location;
             $groupName = $party->name; // because of the way the join in the query works
             $PartyArray[$i] = array(
-              strftime('%d/%m/%Y', $party->event_timestamp),
+              date('d/m/Y', strtotime($party->event_date)),
               $partyName,
               $groupName,
               ($party->pax  > 0 ? $party->pax : 0),
