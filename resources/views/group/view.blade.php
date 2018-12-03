@@ -49,7 +49,7 @@
                           @if(!empty($g->path))
                             <img src="{{ url('/uploads/thumbnail_'.$g->path) }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
                           @else
-                            <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
+                            <img src="{{ url('/images/placeholder_small.jpg') }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
                           @endif
                           <span>{{ $g->name }}</span>
                         </a>
@@ -62,7 +62,7 @@
                           @if(!empty($g->path))
                             <img src="{{ url('/uploads/mid_'.$g->path) }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
                           @else
-                            <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
+                            <img src="{{ url('/images/placeholder_small.jpg') }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
                           @endif
                           <span>{{ $g->name }}</span>
                         </a>
