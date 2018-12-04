@@ -3,7 +3,7 @@
         <h4>@lang('dashboard.discussion_header')</h4>
     </div>
     <div class="dashboard__block__media">
-        <img src="/images/dashboard/dashboard__discussion.jpg" alt="Our discussion platform">
+        <img src="/images/dashboard/dashboard_discussion.jpg" alt="Our discussion platform">
     </div>
     <div class="dashboard__block__content">
         <h5>@lang('partials.discussion')</h5>
