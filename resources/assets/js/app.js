@@ -347,7 +347,6 @@ function initAutocomplete() {
 
       initAutocomplete();
 
-      jQuery('.field-geolocate').on('focus',geolocate);
       // var map, places, infoWindow;
       // var markers = [];
       // var autocomplete;
