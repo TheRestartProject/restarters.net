@@ -54,6 +54,10 @@ class Kernel extends ConsoleKernel
 
         })->cron('0 0 */3 * *');
 
+        $schedule->command('sync:discourseusernames')
+            ->daily()
+            ->sendOutputTo(storage_path() . '/logs/discourse_usernames.log')
+            ->emailOutputTo(env('SEND_COMMAND_LOGS_TO'), 'tech@therestartproject.org');
     }
 
     /**
