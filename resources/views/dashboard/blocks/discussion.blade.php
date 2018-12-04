@@ -6,7 +6,6 @@
         <img src="/images/dashboard/dashboard__discussion.jpg" alt="Our discussion platform">
     </div>
     <div class="dashboard__block__content">
-        <h5>@lang('partials.discussion')</h5>
         <p>@lang('partials.discussion_text')</p>
         <div class="dashboard__links dashboard__links__new d-flex flex-row justify-content-end">
             <a href="https://talk.restarters.net/t/community-update-november-2018-fixometer-updates-roundup/786" target="_blank" rel="noopener noreferrer"><strong>NEW</strong> Community Update: Nov 2018</a>
