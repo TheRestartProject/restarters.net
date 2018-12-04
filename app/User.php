@@ -246,4 +246,19 @@ class User extends Authenticatable
 
         return $nameParts[0];
     }
+
+    public function existsOnDiscourse()
+    {
+        try {
+            $discourseApiKey = env('DISCOURSE_APIKEY');
+            $discourseApiUser = env('DISCOURSE_APIUSER');
+            $emailToSearchFor = trim($this->email);
+            $discourseQuery = sprintf('%s/admin/users/list/all.json?email=%s&api_key=%s&api_username=%s', env('DISCOURSE_URL'), $this->email, $discourseApiKey, $discourseApiUser);
+            $discourseResult = json_decode(file_get_contents($discourseQuery));
+
+            return count($discourseResult) >= 1;
+        } catch (\Exception $ex) {
+            return false;
+        }
+    }
 }
