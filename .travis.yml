@@ -9,7 +9,7 @@ before_script:
   - mkdir -p build/logs
 
 script:
-  - ./vendor/bin/phpcs --standard=PSR2 ./app
+  - ./vendor/bin/phpcs --report=summary --standard=PSR2 ./app
 
 cache:
   directories:
