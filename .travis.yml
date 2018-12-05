@@ -4,6 +4,7 @@ php:
   - 7.2
 
 before_script:
+  - cp .env.example .env
   - composer install --prefer-source
   - mkdir -p build/logs
 
