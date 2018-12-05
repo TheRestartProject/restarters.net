@@ -37,21 +37,18 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
 
-          $parties = Party::doesnthave('devices')
+            $parties = Party::doesnthave('devices')
             ->where('event_date', '>=', date("Y-m-d", strtotime(Carbon::now()->subDays(env('NO_DATA_ENTERED', 5)))))
               ->where('event_date', '<=', date("Y-m-d", strtotime(Carbon::now())))
                 ->get();
 
-          foreach ( $parties as $party ) {
-
-            $all_admins = FixometerHelper::usersWhoHavePreference('admin-no-devices');
-            Notification::send($all_admins, new Mail([
-              'event_venue' => $party->venue,
-              'event_url' => url('/party/edit/'.$party->idevents),
-            ]));
-
-          }
-
+            foreach ($parties as $party) {
+                $all_admins = FixometerHelper::usersWhoHavePreference('admin-no-devices');
+                Notification::send($all_admins, new Mail([
+                'event_venue' => $party->venue,
+                'event_url' => url('/party/edit/'.$party->idevents),
+                ]));
+            }
         })->cron('0 0 */3 * *');
 
         $schedule->command('sync:discourseusernames')

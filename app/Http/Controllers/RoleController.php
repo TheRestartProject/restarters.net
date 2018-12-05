@@ -30,11 +30,12 @@ class RoleController extends Controller
     // }
 
     //Custom Functions
-    public function index() {
+    public function index()
+    {
 
         $user = User::find(Auth::id());
 
-        if(FixometerHelper::hasRole($user, 'Administrator')){
+        if (FixometerHelper::hasRole($user, 'Administrator')) {
             //Send user to roles page
             // $this->set('title', 'Roles');
             // $this->set('roleList', $this->Role->findAll());
@@ -48,40 +49,37 @@ class RoleController extends Controller
         }
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
 
         $user = Auth::user();
 
-        if(FixometerHelper::hasRole($user, 'Administrator')){
-
+        if (FixometerHelper::hasRole($user, 'Administrator')) {
             $role = Role::where('idroles', $id)->first();
 
-            if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
-
+            if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
                 $permissions = $_POST['permissions'] ;
                 $formid = (int)substr(strrchr($_POST['formId'], '_'), 1);
 
                 $update = $role->edit($formid, $permissions);
-                if(!$update) {
+                if (!$update) {
                     $response['danger'] = 'Something went wrong. Could <strong>not</strong> update the permissions.';
-                }
-                else {
+                } else {
                     $response['success'] = 'Permissions for this Role have been updated.';
                 }
                 // $this->set('response', $response);
-
             }
 
             // $this->set('title', 'Edit <span class="orange">' . $role->role . '</span> Role');
 
             $permissionsList = $role->rolePermissions($role->idroles);
             $activePerms = array();
-            foreach($permissionsList as $p){
+            foreach ($permissionsList as $p) {
                 $activePerms[] = $p->permission;
             }
 
             if (!isset($response)) {
-              $response = null;
+                $response = null;
             }
 
             return view('role.edit', [
@@ -92,9 +90,7 @@ class RoleController extends Controller
               'activePermissions' => $activePerms,
               'role_name' => $role->role,
             ]);
-
         }
-
     }
 
     // public function test() {

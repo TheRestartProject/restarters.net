@@ -13,12 +13,12 @@ class HttpsProtocol
      * @param  \Closure  $next
      * @return mixed
      */
-     public function handle($request, Closure $next)
-     {
-         if ( !$request->secure() && ( env('APP_ENV') === 'development' || env('APP_ENV') === 'production' ) ) {
-             return redirect()->secure($request->getRequestUri(), 301);
-         }
+    public function handle($request, Closure $next)
+    {
+        if (!$request->secure() && ( env('APP_ENV') === 'development' || env('APP_ENV') === 'production' )) {
+            return redirect()->secure($request->getRequestUri(), 301);
+        }
 
-         return $next($request);
-     }
+        return $next($request);
+    }
 }

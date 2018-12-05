@@ -16,11 +16,11 @@ class AdminWordPressEditEventFailure extends Notification
      *
      * @return void
      */
-     public function __construct($arr, $user = null)
-     {
-         $this->arr = $arr;
-         $this->user = $user;
-     }
+    public function __construct($arr, $user = null)
+    {
+        $this->arr = $arr;
+        $this->user = $user;
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -28,15 +28,15 @@ class AdminWordPressEditEventFailure extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-     public function via($notifiable)
-     {
+    public function via($notifiable)
+    {
 
-       if( $notifiable->invites == 1 )
-         return ['mail', 'database'];
+        if ($notifiable->invites == 1) {
+            return ['mail', 'database'];
+        }
 
-       return ['database'];
-
-     }
+        return ['database'];
+    }
 
     /**
      * Get the mail representation of the notification.
@@ -44,15 +44,15 @@ class AdminWordPressEditEventFailure extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-     public function toMail($notifiable)
-     {
-       return (new MailMessage)
-                   ->subject('Event WordPress failure')
-                   ->greeting('Hello!')
-                   ->line('Event \'' . $this->arr['event_venue'] . '\' failed to post to WordPress during an edit to the event.')
-                   ->action('View event', $this->arr['event_url'])
-                   ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
-     }
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+                  ->subject('Event WordPress failure')
+                  ->greeting('Hello!')
+                  ->line('Event \'' . $this->arr['event_venue'] . '\' failed to post to WordPress during an edit to the event.')
+                  ->action('View event', $this->arr['event_url'])
+                  ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
+    }
 
     /**
      * Get the array representation of the notification.
@@ -60,12 +60,12 @@ class AdminWordPressEditEventFailure extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-     public function toArray($notifiable)
-     {
-       return [
-           'title' => 'Event failed to save to an existing WordPress post:',
-           'name' => $this->arr['event_venue'],
-           'url' => $this->arr['event_url'],
-       ];
-     }
+    public function toArray($notifiable)
+    {
+        return [
+          'title' => 'Event failed to save to an existing WordPress post:',
+          'name' => $this->arr['event_venue'],
+          'url' => $this->arr['event_url'],
+        ];
+    }
 }

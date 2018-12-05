@@ -49,8 +49,8 @@ class JoinGroup extends Notification
         $ignoreLine = 'If you think this invitation was not intended for you, please disregard this email.';
 
 
-        if ( !is_null($this->user) ) { // user is already on the platform
-            if ( $this->user->invites == 1 ) { // user has opted in to receive emails
+        if (!is_null($this->user)) { // user is already on the platform
+            if ($this->user->invites == 1) { // user has opted in to receive emails
                 $mail = (new MailMessage)
                       ->subject($subject)
                       ->greeting('Hello!')
@@ -73,7 +73,7 @@ class JoinGroup extends Notification
                     ->action($actionText, $this->arr['url'])
                   ->line('You can find out more about restarters.net <a href="' . env('APP_URL') . '/about">here</a>.');
 
-            if ( !is_null($this->arr['message']) ) { // host has added a message
+            if (!is_null($this->arr['message'])) { // host has added a message
                 $mail->line($this->arr['name'] . ' attached this message with the invite:')
                      ->line('')
                      ->line('"' . $this->arr['message'] . '"');

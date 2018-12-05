@@ -31,4 +31,3 @@ where
         return $result[0]->emission_ratio;
     }
 }
-

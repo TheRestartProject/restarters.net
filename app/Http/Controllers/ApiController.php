@@ -46,7 +46,8 @@ class ApiController extends Controller
         $eventStats = $event->getEventStats($emissionRatio);
 
         return response()
-            ->json([
+            ->json(
+                [
                 'kg_co2_diverted' => round($eventStats['co2']),
                 'kg_waste_diverted' => round($eventStats['ewaste']),
                 'num_fixed_devices' => $eventStats['fixed_devices'],
@@ -54,8 +55,9 @@ class ApiController extends Controller
                 'num_dead_devices' => $eventStats['dead_devices'],
                 'num_participants' => $eventStats['participants'],
                 'num_volunteers' => $eventStats['volunteers'],
-            ]
-            , 200);
+                ],
+                200
+            );
     }
 
     public static function groupStats($groupId)

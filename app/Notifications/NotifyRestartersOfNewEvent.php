@@ -16,8 +16,8 @@ class NotifyRestartersOfNewEvent extends Notification
      *
      * @return void
      */
-     protected $arr;
-     protected $user;
+    protected $arr;
+    protected $user;
     public function __construct($arr, $user = null)
     {
         $this->arr = $arr;
@@ -33,11 +33,11 @@ class NotifyRestartersOfNewEvent extends Notification
     public function via($notifiable)
     {
 
-        if( $notifiable->invites == 1 )
-          return ['mail', 'database'];
+        if ($notifiable->invites == 1) {
+            return ['mail', 'database'];
+        }
 
         return ['database'];
-
     }
 
     /**
@@ -46,15 +46,15 @@ class NotifyRestartersOfNewEvent extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-     public function toMail($notifiable)
-     {
-         return (new MailMessage)
-                     ->subject('New event for ' . $this->arr['event_group'])
-                     ->greeting('Hello!')
-                     ->line('There has been a new event added to your group: \'' . $this->arr['event_venue'] . '\'.')
-                     ->action('View event', $this->arr['event_url'])
-                     ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
-     }
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+                    ->subject('New event for ' . $this->arr['event_group'])
+                    ->greeting('Hello!')
+                    ->line('There has been a new event added to your group: \'' . $this->arr['event_venue'] . '\'.')
+                    ->action('View event', $this->arr['event_url'])
+                    ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
+    }
 
     /**
      * Get the array representation of the notification.
@@ -64,10 +64,10 @@ class NotifyRestartersOfNewEvent extends Notification
      */
     public function toArray($notifiable)
     {
-      return [
+        return [
           'title' => 'A new event has been created for group ' . $this->arr['event_group'] . ':',
           'name' => $this->arr['event_venue'],
           'url' => $this->arr['event_url'],
-      ];
+        ];
     }
 }

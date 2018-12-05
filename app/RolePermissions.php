@@ -29,6 +29,4 @@ class RolePermissions extends Model
 
 
     //Getters
-
-
 }

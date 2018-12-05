@@ -8,7 +8,8 @@ use LaravelLocalization;
 
 class LocaleController extends Controller
 {
-    public function setLang($locale) {
+    public function setLang($locale)
+    {
 
         // Get local from URL and set in the session
         session()->put('locale', $locale);
@@ -18,14 +19,13 @@ class LocaleController extends Controller
         LaravelLocalization::setLocale($locale);
 
         // Set in database
-        if( !Auth::guest() )
-          Auth::user()->update([
+        if (!Auth::guest()) {
+            Auth::user()->update([
             'language' => $locale
-          ]);
+            ]);
+        }
 
         // Redirect where you came from
         return back();
-
     }
-
 }

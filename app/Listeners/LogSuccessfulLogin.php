@@ -37,27 +37,22 @@ class LogSuccessfulLogin
         $u->number_of_logins += 1;
         $u->save();
 
-        if( !is_null($u->mediawiki) && !empty($u->mediawiki) ) {
+        if (!is_null($u->mediawiki) && !empty($u->mediawiki)) {
+            try {
+                $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
+                $api->login(new ApiUser($u->mediawiki, $this->request->input('password')));
 
-          try {
-            $api = MediawikiApi::newFromApiEndpoint( env('WIKI_URL').'/api.php' );
-            $api->login( new ApiUser( $u->mediawiki, $this->request->input('password') ) );
+                $cookieJar = $api->getClient()->getConfig('cookies');
+                $cookieJarArray = $cookieJar->toArray();
 
-            $cookieJar = $api->getClient()->getConfig('cookies');
-            $cookieJarArray = $cookieJar->toArray();
-
-            if( !empty($cookieJarArray) ) {
-
-                foreach( $cookieJarArray as $cookie ){
-                Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
+                if (!empty($cookieJarArray)) {
+                    foreach ($cookieJarArray as $cookie) {
+                        Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
+                    }
                 }
-
+            } catch (\Exception $ex) {
+                Log::error("Failed to log user '" . $u->mediawiki . "' in to mediawiki: " . $ex->getMessage());
             }
-          } catch (\Exception $ex) {
-            Log::error("Failed to log user '" . $u->mediawiki . "' in to mediawiki: " . $ex->getMessage());
-          }
-
         }
-
     }
 }

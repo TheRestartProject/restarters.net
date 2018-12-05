@@ -94,8 +94,9 @@ class SyncDiscourseUsernames extends Command
                 }
             }
 
-            if ($pagedResultsCount < 100)
+            if ($pagedResultsCount < 100) {
                 break;
+            }
 
             $resultsPage++;
         }

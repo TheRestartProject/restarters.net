@@ -18,8 +18,7 @@ class CachingRssRetriever
 
     public function getRSSFeed($num_posts = 3)
     {
-        if (Cache::has($this->cacheKey))
-        {
+        if (Cache::has($this->cacheKey)) {
             return Cache::get($this->cacheKey);
         }
 
@@ -28,8 +27,7 @@ class CachingRssRetriever
             $xml = new SimpleXMLElement(file_get_contents($this->feedLocation));
             $i = 0;
 
-            foreach($xml->channel->item as $xml_item)
-            {
+            foreach ($xml->channel->item as $xml_item) {
                 $newsItem = new \stdClass;
                 $newsItem->link = (string)($xml_item->link);
                 $newsItem->title = (string)($xml_item->title);
@@ -42,7 +40,7 @@ class CachingRssRetriever
             }
 
             Cache::put($this->cacheKey, $news_feed, 60);
-        } catch (\Exception $ex){
+        } catch (\Exception $ex) {
         }
 
         return $news_feed;

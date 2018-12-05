@@ -34,32 +34,35 @@ class Category extends Model
 
 
     //Getters
-    public function findAll() {
-      try {
-        return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` WHERE `revision` = :rev'), array('rev' => $this->revision));
-      } catch (\Illuminate\Database\QueryException $e) {
-        return false;
-      }
+    public function findAll()
+    {
+        try {
+            return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` WHERE `revision` = :rev'), array('rev' => $this->revision));
+        } catch (\Illuminate\Database\QueryException $e) {
+            return false;
+        }
     }
 
-    public function listed(){
-      $clusters = DB::select(DB::raw('SELECT * FROM clusters ORDER BY idclusters ASC'));
+    public function listed()
+    {
+        $clusters = DB::select(DB::raw('SELECT * FROM clusters ORDER BY idclusters ASC'));
 
-      $sql = 'SELECT * FROM `' . $this->table . '` WHERE `revision` = :rev AND `cluster` = :cluster ORDER BY `idcategories` ASC';
+        $sql = 'SELECT * FROM `' . $this->table . '` WHERE `revision` = :rev AND `cluster` = :cluster ORDER BY `idcategories` ASC';
 
-      foreach($clusters as $k => $cluster){
-        $clusters[$k]->categories = DB::select(DB::raw($sql), array('rev' => $this->revision, 'cluster' => $cluster->idclusters));
-      }
+        foreach ($clusters as $k => $cluster) {
+            $clusters[$k]->categories = DB::select(DB::raw($sql), array('rev' => $this->revision, 'cluster' => $cluster->idclusters));
+        }
 
-      return $clusters;
+        return $clusters;
     }
 
-    public function findAllByRevision($rev) {
-      try {
-        DB::select(DB::raw('SELECT * FROM `' . $this->table . '` WHERE `revision` = :rev'), array('rev' => $rev));
-      } catch (\Illuminate\Database\QueryException $e) {
-        return false;
-      }
+    public function findAllByRevision($rev)
+    {
+        try {
+            DB::select(DB::raw('SELECT * FROM `' . $this->table . '` WHERE `revision` = :rev'), array('rev' => $rev));
+        } catch (\Illuminate\Database\QueryException $e) {
+            return false;
+        }
     }
 
     public function isMisc()

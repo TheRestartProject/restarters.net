@@ -29,23 +29,24 @@ class EventsUsers extends Model
     public $timestamps = false;
 
     //Table Relations
-    public function role() {
-      return $this->hasOne('App\Role', 'role', 'role');
+    public function role()
+    {
+        return $this->hasOne('App\Role', 'role', 'role');
     }
 
     //Table Relations
-    public function volunteer() {
-      return $this->hasOne('App\User', 'id', 'user');
+    public function volunteer()
+    {
+        return $this->hasOne('App\User', 'id', 'user');
     }
 
-    public function getFullName() {
+    public function getFullName()
+    {
 
-      if( !is_null($this->full_name) ){
-        return $this->full_name;
-      } else {
-        return 'Anonymous';
-      }
-
+        if (!is_null($this->full_name)) {
+            return $this->full_name;
+        } else {
+            return 'Anonymous';
+        }
     }
-
 }

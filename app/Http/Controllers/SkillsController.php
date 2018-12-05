@@ -13,90 +13,97 @@ use Illuminate\Support\Facades\Redirect;
 class SkillsController extends Controller
 {
 
-  public function index() {
+    public function index()
+    {
 
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-    $all_skills = Skills::all();
+        $all_skills = Skills::all();
 
-    return view('skills.index', [
-      'title' => 'Skills',
-      'skills' => $all_skills
-    ]);
-  }
+        return view('skills.index', [
+        'title' => 'Skills',
+        'skills' => $all_skills
+        ]);
+    }
 
-  public function getCreateSkill() {
+    public function getCreateSkill()
+    {
 
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-    return view('skills.create', [
-      'title' => 'Add Skill',
-    ]);
+        return view('skills.create', [
+        'title' => 'Add Skill',
+        ]);
+    }
 
-  }
+    public function postCreateSkill(Request $request)
+    {
 
-  public function postCreateSkill(Request $request) {
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
+        $skill = Skills::create([
+        'skill_name'  => $request->input('skill_name'),
+        // 'category'    => $request->input('category'),
+        'description' => $request->input('skill_desc')
+        ]);
 
-    $skill = Skills::create([
-      'skill_name'  => $request->input('skill_name'),
-      // 'category'    => $request->input('category'),
-      'description' => $request->input('skill_desc')
-    ]);
+        return Redirect::to('skills/edit/'.$skill->id)->with('success', 'Skill successfully created!');
+    }
 
-    return Redirect::to('skills/edit/'.$skill->id)->with('success', 'Skill successfully created!');
+    public function getEditSkill($id)
+    {
 
-  }
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-  public function getEditSkill($id) {
+        $skill = Skills::find($id);
 
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
+        return view('skills.edit', [
+        'title' => 'Edit Skill',
+        'skill' => $skill,
+        ]);
+    }
 
-    $skill = Skills::find($id);
+    public function postEditSkill($id, Request $request)
+    {
 
-    return view('skills.edit', [
-      'title' => 'Edit Skill',
-      'skill' => $skill,
-    ]);
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-  }
+        Skills::find($id)->update([
+        'skill_name'  => $request->input('skill-name'),
+        'category'  => $request->input('category'),
+        'description' => $request->input('skill-description')
+        ]);
 
-  public function postEditSkill($id, Request $request) {
+        return Redirect::back()->with('success', 'Skill successfully updated!');
+    }
 
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
+    public function getDeleteSkill($id)
+    {
 
-    Skills::find($id)->update([
-      'skill_name'  => $request->input('skill-name'),
-      'category'  => $request->input('category'),
-      'description' => $request->input('skill-description')
-    ]);
+      // Are you an admin?
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-    return Redirect::back()->with('success', 'Skill successfully updated!');
+      // If we have permission, let's delete
+        $skill = Skills::find($id)->delete();
 
-  }
+      // We can only delete the data in the pivot table if the delete was successful
+        if ($skill == 1) {
+            UsersSkills::where('skill', $id)->delete();
+        }
 
-  public function getDeleteSkill($id) {
-
-    // Are you an admin?
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
-
-    // If we have permission, let's delete
-    $skill = Skills::find($id)->delete();
-
-    // We can only delete the data in the pivot table if the delete was successful
-    if( $skill == 1 )
-      UsersSkills::where('skill', $id)->delete();
-
-    // Then redirect back
-    return Redirect::to('/skills')->with('success', 'Skill successfully deleted!');
-
-  }
-
+      // Then redirect back
+        return Redirect::to('/skills')->with('success', 'Skill successfully deleted!');
+    }
 }

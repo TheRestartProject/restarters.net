@@ -30,11 +30,11 @@ class NotifyHostRSVPInvitesMade extends Notification
     public function via($notifiable)
     {
 
-        if( $notifiable->invites == 1 )
-          return ['mail', 'database'];
+        if ($notifiable->invites == 1) {
+            return ['mail', 'database'];
+        }
 
         return ['database'];
-
     }
 
     /**
@@ -43,15 +43,15 @@ class NotifyHostRSVPInvitesMade extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-     public function toMail($notifiable)
-     {
-           return (new MailMessage)
-                       ->subject('Invites have been sent to your event')
-                       ->greeting('Hello!')
-                       ->line('There have been invites sent out to your event: \'' . $this->event_details['event_venue'] . '\'. URL for reference: \'' . $this->event_details['event_url'] . '\'.')
-                       ->line('If you think this email was not intended for you, please discard.')
-                       ->line('Thank you.');
-     }
+    public function toMail($notifiable)
+    {
+          return (new MailMessage)
+                      ->subject('Invites have been sent to your event')
+                      ->greeting('Hello!')
+                      ->line('There have been invites sent out to your event: \'' . $this->event_details['event_venue'] . '\'. URL for reference: \'' . $this->event_details['event_url'] . '\'.')
+                      ->line('If you think this email was not intended for you, please discard.')
+                      ->line('Thank you.');
+    }
 
     /**
      * Get the event_detailsay representation of the notification.
@@ -59,12 +59,12 @@ class NotifyHostRSVPInvitesMade extends Notification
      * @param  mixed  $notifiable
      * @return event_detailsay
      */
-     public function toArray($notifiable)
-     {
-       return [
-           'title' => 'Invites have been sent to your event:',
-           'name' => $this->event_details['event_venue'],
-           'url' => $this->event_details['event_url'],
-       ];
-     }
+    public function toArray($notifiable)
+    {
+        return [
+          'title' => 'Invites have been sent to your event:',
+          'name' => $this->event_details['event_venue'],
+          'url' => $this->event_details['event_url'],
+        ];
+    }
 }

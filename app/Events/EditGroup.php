@@ -21,9 +21,9 @@ class EditGroup
      *
      * @return void
      */
-     public function __construct(Group $group, $data)
-     {
-         $this->group = $group;
-         $this->data = $data;
-     }
+    public function __construct(Group $group, $data)
+    {
+        $this->group = $group;
+        $this->data = $data;
+    }
 }

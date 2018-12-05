@@ -26,5 +26,4 @@ class GrouptagsGroups extends Model
     protected $hidden = [];
 
     public $timestamps = false;
-
 }

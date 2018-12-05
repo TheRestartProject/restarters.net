@@ -33,11 +33,11 @@ class AdminModerationGroup extends Notification
     public function via($notifiable)
     {
       
-        if( $notifiable->invites == 1 )
-          return ['mail', 'database'];
+        if ($notifiable->invites == 1) {
+            return ['mail', 'database'];
+        }
 
         return ['database'];
-
     }
 
     /**
@@ -48,7 +48,7 @@ class AdminModerationGroup extends Notification
      */
     public function toMail($notifiable)
     {
-      return (new MailMessage)
+        return (new MailMessage)
                   ->subject('New group created: ' . $this->arr['group_name'])
                   ->greeting('Hello!')
                   ->line('A new group has been created: \'' . $this->arr['group_name'] . '\'.')
@@ -65,10 +65,10 @@ class AdminModerationGroup extends Notification
      */
     public function toArray($notifiable)
     {
-      return [
+        return [
           'title' => 'New group created:',
           'name' => $this->arr['group_name'],
           'url' => $this->arr['group_url'],
-      ];
+        ];
     }
 }

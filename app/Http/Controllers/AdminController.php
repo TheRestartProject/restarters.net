@@ -17,161 +17,161 @@ use Auth;
 
 class AdminController extends Controller
 {
-  public $TotalWeight;
-  public $TotalEmission;
-  public $EmissionRatio;
+    public $TotalWeight;
+    public $TotalEmission;
+    public $EmissionRatio;
 
-  public function __construct(){ //($model, $controller, $action)
-  //     parent::__construct($model, $controller, $action);
-  //
-  //     if (Auth::check()) {
-  //         $user = User::getProfile(Auth::id());
-  //         $this->set('user', $user);//send to the view
-  //         $this->set('header', true);//send to the view
-  //
-  //         if(!FixometerHelper::hasRole($user, 'Administrator') &&  $action != 'stats') {
-  //             header('Location: /user/forbidden');
-  //         }
-  //
-  //         else {
+    public function __construct()
+    {
+ //($model, $controller, $action)
+    //     parent::__construct($model, $controller, $action);
+    //
+    //     if (Auth::check()) {
+    //         $user = User::getProfile(Auth::id());
+    //         $this->set('user', $user);//send to the view
+    //         $this->set('header', true);//send to the view
+    //
+    //         if(!FixometerHelper::hasRole($user, 'Administrator') &&  $action != 'stats') {
+    //             header('Location: /user/forbidden');
+    //         }
+    //
+    //         else {
               $Device = new Device;
               $weights = $Device->getWeights();
 
               $this->TotalWeight = $weights[0]->total_weights;//send to view
               $this->TotalEmission = $weights[0]->total_footprints;//send to view
-              if ($this->TotalWeight != 0) {//send to view
-                $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
-              } else {
-                $this->EmissionRatio = $this->TotalEmission;
-              }
-  //
-  //
-  //         }
-  //     } else {
-  //       header('Location: /user/login');
-  //     }
-  }
+        if ($this->TotalWeight != 0) {//send to view
+            $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
+        } else {
+            $this->EmissionRatio = $this->TotalEmission;
+        }
+    //
+    //
+    //         }
+    //     } else {
+    //       header('Location: /user/login');
+    //     }
+    }
 
-  public static function stats($section = 1, $paragraph_only = false){
-      //Object Instances
-      $Group = new Group;
-      $User = new User;
-      $Party = new Party;
-      $Device = new Device;
+    public static function stats($section = 1, $paragraph_only = false)
+    {
+        //Object Instances
+        $Group = new Group;
+        $User = new User;
+        $Party = new Party;
+        $Device = new Device;
 
-      $allparties = Party::pastEvents()
+        $allparties = Party::pastEvents()
                   ->with('devices.deviceCategory')
                   ->get();
 
-      $participants = 0;
-      $hours_volunteered = 0;
+        $participants = 0;
+        $hours_volunteered = 0;
 
-      $weights = $Device->getWeights();
-      $TotalWeight = $weights[0]->total_weights;
-      $TotalEmission = $weights[0]->total_footprints;
+        $weights = $Device->getWeights();
+        $TotalWeight = $weights[0]->total_weights;
+        $TotalEmission = $weights[0]->total_footprints;
 
-      $footprintRatioCalculator = new FootprintRatioCalculator();
-      $EmissionRatio = $footprintRatioCalculator->calculateRatio();
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $EmissionRatio = $footprintRatioCalculator->calculateRatio();
 
-      $need_attention = 0;
-      foreach($allparties as $i => $party){
-          if($party->device_count == 0){
-              $need_attention++;
-          }
+        $need_attention = 0;
+        foreach ($allparties as $i => $party) {
+            if ($party->device_count == 0) {
+                $need_attention++;
+            }
 
-          $party->co2 = 0;
-          $party->fixed_devices = 0;
-          $party->repairable_devices = 0;
-          $party->dead_devices = 0;
-          $party->guesstimates = false;
+            $party->co2 = 0;
+            $party->fixed_devices = 0;
+            $party->repairable_devices = 0;
+            $party->dead_devices = 0;
+            $party->guesstimates = false;
 
-          $participants += $party->pax;
-          $hours_volunteered += $party->hoursVolunteered();
+            $participants += $party->pax;
+            $hours_volunteered += $party->hoursVolunteered();
 
-          foreach($party->devices as $device) {
+            foreach ($party->devices as $device) {
+                switch ($device->repair_status) {
+                    case 1:
+                        $party->co2 += $device->co2Diverted($EmissionRatio, $Device->displacement);
+                        $party->fixed_devices++;
+                        break;
+                    case 2:
+                        $party->repairable_devices++;
+                        break;
+                    case 3:
+                        $party->dead_devices++;
+                        break;
+                }
+                if ($device->category == 46) {
+                    $party->guesstimates = true;
+                }
+            }
 
-              switch($device->repair_status){
-                  case 1:
-                      $party->co2 += $device->co2Diverted($EmissionRatio, $Device->displacement);
-                      $party->fixed_devices++;
-                      break;
-                  case 2:
-                      $party->repairable_devices++;
-                      break;
-                  case 3:
-                      $party->dead_devices++;
-                      break;
-              }
-              if($device->category == 46){
-                  $party->guesstimates = true;
-              }
-          }
+            $party->co2 = number_format(round($party->co2), 0);
+        }
 
-          $party->co2 = number_format(round($party->co2), 0);
-      }
+        $devices = $Device->ofAllGroups();
 
-      $devices = $Device->ofAllGroups();
+        // more stats...
 
-      // more stats...
+        /** co2 counters **/
+        $co2_years = $Device->countCO2ByYear();
+        $stats = array();
+        foreach ($co2_years as $year) {
+            $stats[$year->year] = $year->co2;
+        }
 
-      /** co2 counters **/
-      $co2_years = $Device->countCO2ByYear();
-      $stats = array();
-      foreach($co2_years as $year){
-          $stats[$year->year] = $year->co2;
-      }
+        $waste_years = $Device->countWasteByYear();
+        $wstats = array();
+        foreach ($waste_years as $year) {
+            $wstats[$year->year] = $year->waste;
+        }
 
-      $waste_years = $Device->countWasteByYear();
-      $wstats = array();
-      foreach($waste_years as $year){
-          $wstats[$year->year] = $year->waste;
-      }
+        $co2Total = $Device->getWeights();
+        $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
 
-      $co2Total = $Device->getWeights();
-      $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
+        $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
 
-      $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
+        $clusters = array();
 
-      $clusters = array();
-
-      for($i = 1; $i <= 4; $i++) {
-          $cluster = $Device->countByCluster($i);
-          $total = 0;
-          foreach($cluster as $state){
-              $total += $state->counter;
-          }
-          $cluster['total'] = $total;
-          $clusters['all'][$i] = $cluster;
-      }
+        for ($i = 1; $i <= 4; $i++) {
+            $cluster = $Device->countByCluster($i);
+            $total = 0;
+            foreach ($cluster as $state) {
+                $total += $state->counter;
+            }
+            $cluster['total'] = $total;
+            $clusters['all'][$i] = $cluster;
+        }
 
 
-      for($y = date('Y', time()); $y>=2013; $y--){
+        for ($y = date('Y', time()); $y>=2013; $y--) {
+            for ($i = 1; $i <= 4; $i++) {
+                //$cluster = $Device->countByCluster($i, $group->idgroups);
+                $cluster = $Device->countByCluster($i, null, $y);
 
-          for($i = 1; $i <= 4; $i++) {
-              //$cluster = $Device->countByCluster($i, $group->idgroups);
-              $cluster = $Device->countByCluster($i, null, $y);
+                $total = 0;
+                foreach ($cluster as $state) {
+                    $total += $state->counter;
+                }
+                $cluster['total'] = $total;
+                $clusters[$y][$i] = $cluster;
+            }
+        }
 
-              $total = 0;
-              foreach($cluster as $state){
-                  $total += $state->counter;
-              }
-              $cluster['total'] = $total;
-              $clusters[$y][$i] = $cluster;
-          }
-      }
+        // most/least stats for clusters
+        $mostleast = array();
+        for ($i = 1; $i <= 4; $i++) {
+            $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i);
+            $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i);
+            $mostleast[$i]['least_repaired'] = $Device->findMostSeen(3, $i);
+        }
 
-      // most/least stats for clusters
-      $mostleast = array();
-      for($i = 1; $i <= 4; $i++){
-          $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i);
-          $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i);
-          $mostleast[$i]['least_repaired'] = $Device->findMostSeen(3, $i);
+        $user = User::find(Auth::id());
 
-      }
-
-      $user = User::find(Auth::id());
-
-      return view('admin.stats', [
+        return view('admin.stats', [
         'section' => $section,
         'paragraph_only' => $paragraph_only,
         'grouplist' => $Group->findList(),
@@ -197,167 +197,162 @@ class AdminController extends Controller
         'clusters' => $clusters,
         'mostleast' => $mostleast,
         'top' => $Device->findMostSeen(1, null, null),
-      ]);
+        ]);
+    }
 
-  }
+    public static function index()
+    {
 
-  public static function index(){
+        // $this->set('title', 'Administrator Dashboard');
+        // $this->set('charts', true);
 
-      // $this->set('title', 'Administrator Dashboard');
-      // $this->set('charts', true);
+        //Not required now since jquery has been added globally
+        // $this->set('css', array('/components/perfect-scrollbar/css/perfect-scrollbar.min.css'));
+        // $this->set('js', array('foot' => array('/components/perfect-scrollbar/js/min/perfect-scrollbar.jquery.min.js')));
+        if (isset($_GET['action']) && isset($_GET['code'])) {
+            $actn = $_GET['action'];
+            $code = $_GET['code'];
 
-      //Not required now since jquery has been added globally
-      // $this->set('css', array('/components/perfect-scrollbar/css/perfect-scrollbar.min.css'));
-      // $this->set('js', array('foot' => array('/components/perfect-scrollbar/js/min/perfect-scrollbar.jquery.min.js')));
-      if(isset($_GET['action']) && isset($_GET['code'])){
-          $actn = $_GET['action'];
-          $code = $_GET['code'];
+            switch ($actn) {
+                case 'gu':
+                    $response['success'] = 'Group updated.';
+                    break;
+                case 'pe':
+                    $response['success'] = 'Party updated.';
+                    break;
+                case 'pc':
+                    $response['success'] = 'Party created.';
+                    break;
+                case 'ue':
+                    $response['success'] = 'Profile updated.';
+            }
 
-          switch($actn){
-              case 'gu':
-                  $response['success'] = 'Group updated.';
-                  break;
-              case 'pe':
-                  $response['success'] = 'Party updated.';
-                  break;
-              case 'pc':
-                  $response['success'] = 'Party created.';
-                  break;
-              case 'ue':
-                  $response['success'] = 'Profile updated.';
-          }
+            // $this->set('response', $response);
+        }
 
-          // $this->set('response', $response);
-      }
+        //Object Instances
+        $Group = new Group;
+        $User = new User;
+        $Party = new Party;
+        $Device = new Device;
 
-      //Object Instances
-      $Group = new Group;
-      $User = new User;
-      $Party = new Party;
-      $Device = new Device;
+        $allparties = $Party->ofThisGroup('admin', true, true);
 
-      $allparties = $Party->ofThisGroup('admin', true, true);
+        $participants = 0;
+        $hours_volunteered = 0;
+        $need_attention = 0;
 
-      $participants = 0;
-      $hours_volunteered = 0;
-      $need_attention = 0;
+        $weights = $Device->getWeights();
+        $TotalWeight = $weights[0]->total_weights;
+        $TotalEmission = $weights[0]->total_footprints;
+        if ($TotalWeight != 0) {
+            $EmissionRatio = $TotalEmission / $TotalWeight;
+        } else {
+            $EmissionRatio = $TotalEmission;
+        }
 
-      $weights = $Device->getWeights();
-      $TotalWeight = $weights[0]->total_weights;
-      $TotalEmission = $weights[0]->total_footprints;
-      if ($TotalWeight != 0) {
-         $EmissionRatio = $TotalEmission / $TotalWeight;
-      } else {
-         $EmissionRatio = $TotalEmission;
-      }
+        foreach ($allparties as $i => $party) {
+            if ($party->device_count == 0) {
+                $need_attention++;
+            }
 
-      foreach($allparties as $i => $party){
-          if($party->device_count == 0){
-              $need_attention++;
-          }
+            $party->co2 = 0;
+            $party->fixed_devices = 0;
+            $party->repairable_devices = 0;
+            $party->dead_devices = 0;
+            $party->guesstimates = false;
 
-          $party->co2 = 0;
-          $party->fixed_devices = 0;
-          $party->repairable_devices = 0;
-          $party->dead_devices = 0;
-          $party->guesstimates = false;
+            $participants += $party->pax;
+            $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
 
-          $participants += $party->pax;
-          $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
+            foreach ($party->devices as $device) {
+                switch ($device->repair_status) {
+                    case 1:
+                        $party->co2 += (!empty($device->estimate) && $device->category == 46 && is_numeric($device->estimate) ? ($device->estimate * $EmissionRatio) : $device->footprint);
+                        $party->fixed_devices++;
+                        break;
+                    case 2:
+                        $party->repairable_devices++;
+                        break;
+                    case 3:
+                        $party->dead_devices++;
+                        break;
+                }
+                if ($device->category == 46) {
+                    $party->guesstimates = true;
+                }
+            }
 
-          foreach($party->devices as $device){
+            $party->co2 = number_format(round($party->co2 * $Device->displacement), 0, '.', ',');
+        }
 
+        $weights = $Device->getWeights();
+        $devices = $Device->ofAllGroups();
 
+        // more stats...
 
-              switch($device->repair_status){
-                  case 1:
-                      $party->co2 += (!empty($device->estimate) && $device->category == 46 && is_numeric($device->estimate) ? ($device->estimate * $EmissionRatio) : $device->footprint);
-                      $party->fixed_devices++;
-                      break;
-                  case 2:
-                      $party->repairable_devices++;
-                      break;
-                  case 3:
-                      $party->dead_devices++;
-                      break;
-              }
-              if($device->category == 46){
-                  $party->guesstimates = true;
-              }
-          }
+        /** co2 counters **/
+        $co2_years = $Device->countCO2ByYear();
+        $co2_years = array();
+        // $this->set('year_data', $co2_years);
+        $stats = array();
+        foreach ($co2_years as $year) {
+            $stats[$year->year] = $year->co2;
+        }
 
-          $party->co2 = number_format(round($party->co2 * $Device->displacement), 0, '.' , ',');
-      }
-
-      $weights = $Device->getWeights();
-      $devices = $Device->ofAllGroups();
-
-      // more stats...
-
-      /** co2 counters **/
-      $co2_years = $Device->countCO2ByYear();
-      $co2_years = array();
-      // $this->set('year_data', $co2_years);
-      $stats = array();
-      foreach($co2_years as $year){
-          $stats[$year->year] = $year->co2;
-      }
-
-      $waste_years = $Device->countWasteByYear();
-      $wstats = array();
-      foreach($waste_years as $year){
-          $wstats[$year->year] = $year->waste;
-      }
+        $waste_years = $Device->countWasteByYear();
+        $wstats = array();
+        foreach ($waste_years as $year) {
+            $wstats[$year->year] = $year->waste;
+        }
 
 
-      $co2Total = $Device->getWeights();
-      $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
+        $co2Total = $Device->getWeights();
+        $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
 
 
-      $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
+        $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
 
-      $clusters = array();
+        $clusters = array();
 
-      for($i = 1; $i <= 4; $i++) {
-          $cluster = $Device->countByCluster($i);
-          $total = 0;
-          foreach($cluster as $state){
-              $total += $state->counter;
-          }
-          $cluster['total'] = $total;
-          $clusters['all'][$i] = $cluster;
-      }
-
-
-      for($y = date('Y', time()); $y>=2013; $y--){
-
-          for($i = 1; $i <= 4; $i++) {
-              $cluster = $Device->countByCluster($i, null, $y);
-
-              $total = 0;
-              foreach($cluster as $state){
-                  $total += $state->counter;
-              }
-              $cluster['total'] = $total;
-              $clusters[$y][$i] = $cluster;
-          }
-      }
-
-      // most/least stats for clusters
-      $mostleast = array();
-      for($i = 1; $i <= 4; $i++){
-          $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i);
-          $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i);
-          $mostleast[$i]['least_repaired'] = $Device->findMostSeen(3, $i);
-
-      }
+        for ($i = 1; $i <= 4; $i++) {
+            $cluster = $Device->countByCluster($i);
+            $total = 0;
+            foreach ($cluster as $state) {
+                $total += $state->counter;
+            }
+            $cluster['total'] = $total;
+            $clusters['all'][$i] = $cluster;
+        }
 
 
-      if (!isset($response)) {
-        $response = null;
-      }
+        for ($y = date('Y', time()); $y>=2013; $y--) {
+            for ($i = 1; $i <= 4; $i++) {
+                $cluster = $Device->countByCluster($i, null, $y);
 
-      return view('admin.index', [
+                $total = 0;
+                foreach ($cluster as $state) {
+                    $total += $state->counter;
+                }
+                $cluster['total'] = $total;
+                $clusters[$y][$i] = $cluster;
+            }
+        }
+
+        // most/least stats for clusters
+        $mostleast = array();
+        for ($i = 1; $i <= 4; $i++) {
+            $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i);
+            $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i);
+            $mostleast[$i]['least_repaired'] = $Device->findMostSeen(3, $i);
+        }
+
+
+        if (!isset($response)) {
+            $response = null;
+        }
+
+        return view('admin.index', [
         'title' => 'Administrator Dashboard',
         'charts' => true,
         'response' => $response,
@@ -383,196 +378,192 @@ class AdminController extends Controller
         'clusters' => $clusters,
         'mostleast' => $mostleast,
         'top' => $Device->findMostSeen(1, null, null),
-      ]);
+        ]);
+    }
 
-  }
+    public function eventsCsv()
+    {
 
-  public function eventsCsv(){
+        // $this->set('title', 'Administrator Dashboard');
+        // $this->set('charts', true);
+        //
+        // $this->set('css', array('/components/perfect-scrollbar/css/perfect-scrollbar.min.css'));
+        // $this->set('js', array('foot' => array('/components/perfect-scrollbar/js/min/perfect-scrollbar.jquery.min.js')));
 
-      // $this->set('title', 'Administrator Dashboard');
-      // $this->set('charts', true);
-      //
-      // $this->set('css', array('/components/perfect-scrollbar/css/perfect-scrollbar.min.css'));
-      // $this->set('js', array('foot' => array('/components/perfect-scrollbar/js/min/perfect-scrollbar.jquery.min.js')));
+        if (isset($_GET['action']) && isset($_GET['code'])) {
+            $actn = $_GET['action'];
+            $code = $_GET['code'];
 
-      if(isset($_GET['action']) && isset($_GET['code'])){
-          $actn = $_GET['action'];
-          $code = $_GET['code'];
+            switch ($actn) {
+                case 'gu':
+                    $response['success'] = 'Group updated.';
+                    break;
+                case 'pe':
+                    $response['success'] = 'Party updated.';
+                    break;
+                case 'pc':
+                    $response['success'] = 'Party created.';
+                    break;
+                case 'ue':
+                    $response['success'] = 'Profile updated.';
+            }
 
-          switch($actn){
-              case 'gu':
-                  $response['success'] = 'Group updated.';
-                  break;
-              case 'pe':
-                  $response['success'] = 'Party updated.';
-                  break;
-              case 'pc':
-                  $response['success'] = 'Party created.';
-                  break;
-              case 'ue':
-                  $response['success'] = 'Profile updated.';
-          }
+            // $this->set('response', $response);
+        }
 
-          // $this->set('response', $response);
-      }
-
-      //Object Instances
-      $Group = new Group;
-      $User = new User;
-      $Party = new Party;
-      $Device = new Device;
-
-
-      // $this->set('grouplist', $Group->findList());
-
-      $allparties = $Party->ofThisGroup2('admin', true, true);
-
-      $participants = 0;
-      $hours_volunteered = 0;
-
-      $need_attention = 0;
-      foreach($allparties as $i => $party){
-          if($party->device_count == 0){
-              $need_attention++;
-          }
-
-          $party->co2 = 0;
-          $party->ewaste = 0;
-          $party->fixed_devices = 0;
-          $party->repairable_devices = 0;
-          $party->dead_devices = 0;
-          $party->guesstimates = false;
-
-          $weights = $Device->getWeights();
-          $TotalWeight = $weights[0]->total_weights;
-          $TotalEmission = $weights[0]->total_footprints;
-          if ($TotalWeight != 0) {
-             $EmissionRatio = $TotalEmission / $TotalWeight;
-          } else {
-             $EmissionRatio = $TotalEmission;
-          }
-
-          $participants += $party->pax;
-          $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
-
-          foreach($party->devices as $device){
+        //Object Instances
+        $Group = new Group;
+        $User = new User;
+        $Party = new Party;
+        $Device = new Device;
 
 
-              switch($device->repair_status){
-                  case 1:
-                      $party->co2 += (!empty($device->estimate) && $device->category == 46 && is_numeric($device->estimate) ? ($device->estimate * $EmissionRatio) : $device->footprint);
-                      $party->ewaste  += (!empty($device->estimate) && $device->category==46 && is_numeric($device->estimate) ? $device->estimate : $device->weight);
-                      $party->fixed_devices++;
-                      break;
-                  case 2:
-                      $party->repairable_devices++;
-                      break;
-                  case 3:
-                      $party->dead_devices++;
-                      break;
-              }
-              if($device->category == 46){
-                  $party->guesstimates = true;
-              }
-          }
+        // $this->set('grouplist', $Group->findList());
 
-          $party->co2 = number_format(round($party->co2 * $Device->displacement), 0, '.' , ',');
-      }
-      // $this->set('pax', $participants);
-      // $this->set('hours', $hours_volunteered);
+        $allparties = $Party->ofThisGroup2('admin', true, true);
 
-      $weights = $Device->getWeights();
-      $devices = $Device->ofAllGroups();
+        $participants = 0;
+        $hours_volunteered = 0;
 
-      // $this->set('showbadges', $Device->guesstimates());
-      //
-      // $this->set('need_attention', $need_attention);
-      //
-      // $this->set('profile', $User->profilePage($this->user->id));
-      //
-      // $this->set('upcomingparties', $Party->findNextParties());
-      // $this->set('allparties', $allparties);
+        $need_attention = 0;
+        foreach ($allparties as $i => $party) {
+            if ($party->device_count == 0) {
+                $need_attention++;
+            }
 
-      // $this->set('devices', $devices);
-      // $this->set('weights', $weights);
-      //
-      // $this->set('device_count_status', $Device->statusCount());
+            $party->co2 = 0;
+            $party->ewaste = 0;
+            $party->fixed_devices = 0;
+            $party->repairable_devices = 0;
+            $party->dead_devices = 0;
+            $party->guesstimates = false;
 
+            $weights = $Device->getWeights();
+            $TotalWeight = $weights[0]->total_weights;
+            $TotalEmission = $weights[0]->total_footprints;
+            if ($TotalWeight != 0) {
+                $EmissionRatio = $TotalEmission / $TotalWeight;
+            } else {
+                $EmissionRatio = $TotalEmission;
+            }
 
-      // more stats...
+            $participants += $party->pax;
+            $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
 
-      /** co2 counters **/
-      $co2_years = $Device->countCO2ByYear();
-      // $this->set('year_data', $co2_years);
-      $stats = array();
-      foreach($co2_years as $year){
-          $stats[$year->year] = $year->co2;
-      }
-      // $this->set('bar_chart_stats', array_reverse($stats, true));
+            foreach ($party->devices as $device) {
+                switch ($device->repair_status) {
+                    case 1:
+                        $party->co2 += (!empty($device->estimate) && $device->category == 46 && is_numeric($device->estimate) ? ($device->estimate * $EmissionRatio) : $device->footprint);
+                        $party->ewaste  += (!empty($device->estimate) && $device->category==46 && is_numeric($device->estimate) ? $device->estimate : $device->weight);
+                        $party->fixed_devices++;
+                        break;
+                    case 2:
+                        $party->repairable_devices++;
+                        break;
+                    case 3:
+                        $party->dead_devices++;
+                        break;
+                }
+                if ($device->category == 46) {
+                    $party->guesstimates = true;
+                }
+            }
 
-      $waste_years = $Device->countWasteByYear();
-      // $this->set('waste_year_data', $waste_years);
-      $wstats = array();
-      foreach($waste_years as $year){
-          $wstats[$year->year] = $year->waste;
-      }
-      // $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
+            $party->co2 = number_format(round($party->co2 * $Device->displacement), 0, '.', ',');
+        }
+        // $this->set('pax', $participants);
+        // $this->set('hours', $hours_volunteered);
 
+        $weights = $Device->getWeights();
+        $devices = $Device->ofAllGroups();
 
-      $co2Total = $Device->getWeights();
-      $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
+        // $this->set('showbadges', $Device->guesstimates());
+        //
+        // $this->set('need_attention', $need_attention);
+        //
+        // $this->set('profile', $User->profilePage($this->user->id));
+        //
+        // $this->set('upcomingparties', $Party->findNextParties());
+        // $this->set('allparties', $allparties);
 
-      // $this->set('co2Total', $co2Total[0]->total_footprints);
-      // $this->set('co2ThisYear', $co2ThisYear[0]->co2);
-
-      $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
-
-      // $this->set('wasteTotal', $co2Total[0]->total_weights);
-      // $this->set('wasteThisYear', $wasteThisYear[0]->waste);
-
-
-      $clusters = array();
-
-      for($i = 1; $i <= 4; $i++) {
-          $cluster = $Device->countByCluster($i);
-          $total = 0;
-          foreach($cluster as $state){
-              $total += $state->counter;
-          }
-          $cluster['total'] = $total;
-          $clusters['all'][$i] = $cluster;
-      }
+        // $this->set('devices', $devices);
+        // $this->set('weights', $weights);
+        //
+        // $this->set('device_count_status', $Device->statusCount());
 
 
-      for($y = date('Y', time()); $y>=2013; $y--){
+        // more stats...
 
-          for($i = 1; $i <= 4; $i++) {
-              //$cluster = $Device->countByCluster($i, $group->idgroups);
-              $cluster = $Device->countByCluster($i, null, $y);
+        /** co2 counters **/
+        $co2_years = $Device->countCO2ByYear();
+        // $this->set('year_data', $co2_years);
+        $stats = array();
+        foreach ($co2_years as $year) {
+            $stats[$year->year] = $year->co2;
+        }
+        // $this->set('bar_chart_stats', array_reverse($stats, true));
 
-              $total = 0;
-              foreach($cluster as $state){
-                  $total += $state->counter;
-              }
-              $cluster['total'] = $total;
-              $clusters[$y][$i] = $cluster;
-          }
-      }
-      // $this->set('clusters', $clusters);
+        $waste_years = $Device->countWasteByYear();
+        // $this->set('waste_year_data', $waste_years);
+        $wstats = array();
+        foreach ($waste_years as $year) {
+            $wstats[$year->year] = $year->waste;
+        }
+        // $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
 
-      // most/least stats for clusters
-      $mostleast = array();
-      for($i = 1; $i <= 4; $i++){
-          $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i);
-          $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i);
-          $mostleast[$i]['least_repaired'] = $Device->findMostSeen(3, $i);
 
-      }
+        $co2Total = $Device->getWeights();
+        $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
 
-      // $this->set('mostleast', $mostleast);
-      // $this->set('top', $Device->findMostSeen(1, null, null));
+        // $this->set('co2Total', $co2Total[0]->total_footprints);
+        // $this->set('co2ThisYear', $co2ThisYear[0]->co2);
 
-      return view('admin.eventsCsv', [//csv
+        $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
+
+        // $this->set('wasteTotal', $co2Total[0]->total_weights);
+        // $this->set('wasteThisYear', $wasteThisYear[0]->waste);
+
+
+        $clusters = array();
+
+        for ($i = 1; $i <= 4; $i++) {
+            $cluster = $Device->countByCluster($i);
+            $total = 0;
+            foreach ($cluster as $state) {
+                $total += $state->counter;
+            }
+            $cluster['total'] = $total;
+            $clusters['all'][$i] = $cluster;
+        }
+
+
+        for ($y = date('Y', time()); $y>=2013; $y--) {
+            for ($i = 1; $i <= 4; $i++) {
+                //$cluster = $Device->countByCluster($i, $group->idgroups);
+                $cluster = $Device->countByCluster($i, null, $y);
+
+                $total = 0;
+                foreach ($cluster as $state) {
+                    $total += $state->counter;
+                }
+                $cluster['total'] = $total;
+                $clusters[$y][$i] = $cluster;
+            }
+        }
+        // $this->set('clusters', $clusters);
+
+        // most/least stats for clusters
+        $mostleast = array();
+        for ($i = 1; $i <= 4; $i++) {
+            $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i);
+            $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i);
+            $mostleast[$i]['least_repaired'] = $Device->findMostSeen(3, $i);
+        }
+
+        // $this->set('mostleast', $mostleast);
+        // $this->set('top', $Device->findMostSeen(1, null, null));
+
+        return view('admin.eventsCsv', [//csv
         'title' => 'Administrator Dashboard',
         'charts' => true,
         'response' => $response,
@@ -598,7 +589,6 @@ class AdminController extends Controller
         'clusters' => $clusters,
         'mostleast' => $mostleast,
         'top' => $Device->findMostSeen(1, null, null),
-      ]);
-  }
-
+        ]);
+    }
 }

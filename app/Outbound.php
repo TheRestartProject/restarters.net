@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Outbound extends Model {
+class Outbound extends Model
+{
     #code
 }

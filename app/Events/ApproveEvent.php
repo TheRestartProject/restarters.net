@@ -21,9 +21,9 @@ class ApproveEvent
      *
      * @return void
      */
-     public function __construct(Party $party, $data)
-     {
-         $this->party = $party;
-         $this->data = $data;
-     }
+    public function __construct(Party $party, $data)
+    {
+        $this->party = $party;
+        $this->data = $data;
+    }
 }

@@ -29,8 +29,9 @@ class ReviewNotes extends Notification
      */
     public function via($notifiable)
     {
-        if ($notifiable == null)
+        if ($notifiable == null) {
             return [];
+        }
 
         $channels = [];
         if ($notifiable->invites) {
@@ -48,16 +49,16 @@ class ReviewNotes extends Notification
      */
     public function toMail($notifiable)
     {
-      if ($notifiable !== null) {
-        if ($notifiable->invites == 1) {
-          return (new MailMessage)
+        if ($notifiable !== null) {
+            if ($notifiable->invites == 1) {
+                return (new MailMessage)
                       ->subject('A repair has been marked as suitable for the wiki')
                       ->greeting('Hello!')
                       ->line($this->arr['current_user_name'] . ' has marked a repair as suitable for the wiki.')
                       ->action('View device', $this->arr['device_url'])
                       ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'].'/'.$notifiable->id . '">your preferences</a> on your account.');
+            }
         }
-      }
     }
 
     /**
