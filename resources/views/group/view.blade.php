@@ -75,7 +75,7 @@
                   <h1>{{{ $group->name }}}</h1>
                 @endif
 
-                <p>{{{ $group->location . (!empty($group->area) ? ', ' . $group->area : '') }}}</p>
+                <p>{{{ $group->location }}}</p>
 
                 @if( !empty($group->website) )
                   <a class="events__header__url" href="{{{ $group->website }}}" rel="noopener noreferrer">{{{ $group->website }}}</a>
