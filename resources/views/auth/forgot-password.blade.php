@@ -1,9 +1,10 @@
 @include('layouts.header_plain')
 @yield('content')
-<section class="entry-wrapper align-items-center justify-content-center">
+<section class="login-page">
         <div class="container">
-
+           <div class="align-items-center justify-content-center d-flex">
             @include('includes.logo')
+           </div>
 
             <div class="entry-panel card card__login col-12 mt-5 text-left">
 
@@ -36,5 +37,7 @@
             </div><!-- /.entry-panel -->
 
         </div>
+ @include('partials.languages')
     </section>
-    @include('layouts.footer')
+   
+@include('layouts.footer')
