@@ -31,6 +31,4 @@ class Skills extends Model
 
 
     //Getters
-
-
 }

@@ -6,7 +6,8 @@ use App\Images;
 use Illuminate\Database\Eloquent\Model;
 use Intervention\Image\ImageManagerStatic as Image;
 
-class FixometerFile extends Model {
+class FixometerFile extends Model
+{
 
     public $path;
     public $file;
@@ -22,45 +23,44 @@ class FixometerFile extends Model {
      * to database, depending on filetype
      * */
 
-    public function upload($file, $type, $reference = null, $referenceType = null, $multiple = false, $profile = false, $ajax = false){
+    public function upload($file, $type, $reference = null, $referenceType = null, $multiple = false, $profile = false, $ajax = false)
+    {
 
         $clear = true; // purge pre-existing images from db - this is the default behaviour
 
-        if( is_string($file) && isset($_FILES[$file]) ){
+        if (is_string($file) && isset($_FILES[$file])) {
             $user_file = $_FILES[$file];
-        }
-        elseif(is_array($file)){ // multiple file uploads means we do not purge pre-existing images
+        } elseif (is_array($file)) { // multiple file uploads means we do not purge pre-existing images
             $user_file = $file;
             $clear = false;
         }
 
         if ($multiple) {
-          $clear = false;
+            $clear = false;
         }
 
         if ($clear) {
-          Xref::where('reference', $reference)
+            Xref::where('reference', $reference)
                   ->where('reference_type', $referenceType)
                     ->forceDelete();
         }
 
         if ($ajax) {
-          $error = $user_file['error'][0];
-          $tmp_name = $user_file['tmp_name'][0];
+            $error = $user_file['error'][0];
+            $tmp_name = $user_file['tmp_name'][0];
         } else {
-          $error = $user_file['error'];
-          $tmp_name = $user_file['tmp_name'];
+            $error = $user_file['error'];
+            $tmp_name = $user_file['tmp_name'];
         }
 
         /** if we have no error, proceed to elaborate and upload **/
-        if($error == UPLOAD_ERR_OK){
+        if ($error == UPLOAD_ERR_OK) {
             $filename = $this->filename($tmp_name);
             $this->file = $filename;
             $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/'. $filename;
-            if(!move_uploaded_file($tmp_name, $path)){
+            if (!move_uploaded_file($tmp_name, $path)) {
                 return false;
-            }
-            else {
+            } else {
                 $data = array();
                 $this->path = $path;
                 $data['path'] = $this->file;
@@ -69,29 +69,26 @@ class FixometerFile extends Model {
                 $image = Image::make($path)->orientate()->save($path);
 
 
-                if($type === 'image'){
+                if ($type === 'image') {
                     $size = getimagesize($this->path);
                     $data['width']  = $size[0];
                     $data['height'] = $size[1];
 
-                    if($profile == true) {
+                    if ($profile == true) {
                         $data['alt_text'] = "Profile Picture";
                     }
 
-                    if($this->ext == 'jpg') {
+                    if ($this->ext == 'jpg') {
                         $profile_pic = imagecreatefromjpeg($this->path);
-
-                    }
-                    elseif($this->ext == 'png') {
+                    } elseif ($this->ext == 'png') {
                         $profile_pic = imagecreatefrompng($this->path);
                     }
 
 
-                    if($data['width'] > $data['height']) {
+                    if ($data['width'] > $data['height']) {
                         $biggestSide = $data['width'];
                         $resize_height = true;
-                    }
-                    else {
+                    } else {
                         $biggestSide = $data['height'];
                         $resize_height = false;
                     }
@@ -136,26 +133,22 @@ class FixometerFile extends Model {
                     $thumb = Image::make($path);
                     $mid = Image::make($path);
 
-                    if( $resize_height ) { // Resize before crop
+                    if ($resize_height) { // Resize before crop
+                        $thumb->resize(null, $thumbSize, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
 
-                      $thumb->resize(null, $thumbSize, function ($constraint) {
-                          $constraint->aspectRatio();
-                      });
-
-                      $mid->resize(null, $midSize, function ($constraint) {
-                          $constraint->aspectRatio();
-                      });
-
+                        $mid->resize(null, $midSize, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
                     } else {
+                        $thumb->resize($thumbSize, null, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
 
-                      $thumb->resize($thumbSize, null, function ($constraint) {
-                          $constraint->aspectRatio();
-                      });
-
-                      $mid->resize($midSize, null, function ($constraint) {
-                          $constraint->aspectRatio();
-                      });
-
+                        $mid->resize($midSize, null, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
                     }
 
                     $thumb->crop($thumbSize, $thumbSize)
@@ -178,7 +171,7 @@ class FixometerFile extends Model {
 
                     $image = $Images->create($data)->id;
                     //echo "REF: " . $reference. " - REF TYPE: ".$referenceType." - IMAGE: ".$image;
-                    if(is_numeric($image) && !is_null($reference) && !is_null($referenceType)){
+                    if (is_numeric($image) && !is_null($reference) && !is_null($referenceType)) {
                         $xref = Xref::create([
                           'object' => $image,
                           'object_type' => env('TBL_IMAGES'),
@@ -187,18 +180,12 @@ class FixometerFile extends Model {
                         ]);
                     }
                 }
-
-
-
             }
             return $filename;
-
         }
         /** else, we raise exceptions and errors! **/
         else {
-
         }
-
     }
 
     /**
@@ -206,31 +193,30 @@ class FixometerFile extends Model {
      * correct file extension
      * (MIME check with Finfo!)
      * */
-    public function filename($tmp_name){
+    public function filename($tmp_name)
+    {
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $ext = array_search(
             $finfo->file($tmp_name),
-                array(
+            array(
                     'jpg' => 'image/jpeg',
                     'png' => 'image/png',
                     'gif' => 'image/gif',
                 ),
-            true);
+            true
+        );
 
-        if(empty($ext) || !$ext || is_null($ext)) {
+        if (empty($ext) || !$ext || is_null($ext)) {
             return false;
-        }
-
-        else {
+        } else {
             $this->ext = $ext;
-            $filename = time() . sha1_file( $tmp_name) . rand(1, 15000) . '.' . $ext;
+            $filename = time() . sha1_file($tmp_name) . rand(1, 15000) . '.' . $ext;
             return $filename;
         }
-
-
     }
 
-    public function findImages($of_ref_type, $ref_id){
+    public function findImages($of_ref_type, $ref_id)
+    {
 
         $sql = 'SELECT * FROM `images` AS `i`
                     INNER JOIN `xref` AS `x` ON `x`.`object` = `i`.`idimages`
@@ -238,64 +224,60 @@ class FixometerFile extends Model {
                     `x`.`reference_type` = :refType AND
                     `x`.`reference` = :refId';
         try {
-          return DB::select(DB::raw($sql), array('refType' => $of_ref_type, 'refId' => $ref_id));
+            return DB::select(DB::raw($sql), array('refType' => $of_ref_type, 'refId' => $ref_id));
         } catch (\Illuminate\Database\QueryException $e) {
-          return db($e);
+            return db($e);
         }
-
     }
 
-    public function deleteImage($id, $path){
-        $del = unlink( $_SERVER['DOCUMENT_ROOT'].'/uploads/' . $path);
+    public function deleteImage($id, $path)
+    {
+        $del = unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/' . $path);
 
         $sql = 'DELETE FROM `images` WHERE `idimages` = :id';
 
         try {
-          return DB::delete(DB::raw($sql), array('id' => $id));
+            return DB::delete(DB::raw($sql), array('id' => $id));
         } catch (\Illuminate\Database\QueryException $e) {
-          return db($e);
+            return db($e);
         }
 
         $sql = 'DELETE FROM `xref` WHERE `object` = :id AND `object_type` = '.env('TBL_IMAGES');
 
         try {
-          return DB::delete(DB::raw($sql), array('id' => $id));
+            return DB::delete(DB::raw($sql), array('id' => $id));
         } catch (\Illuminate\Database\QueryException $e) {
-          return db($e);
+            return db($e);
         }
     }
 
-    public function simpleUpload($file, $object = 'device', $object_id, $title = null){
+    public function simpleUpload($file, $object = 'device', $object_id, $title = null)
+    {
 
-      if($file['error'] == 0) {
-        $filename = $this->filename($file);
-        $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/'. $filename;
+        if ($file['error'] == 0) {
+            $filename = $this->filename($file);
+            $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/'. $filename;
 
 
-        if(!move_uploaded_file($file['tmp_name'], $path)){
-          return false;
+            if (!move_uploaded_file($file['tmp_name'], $path)) {
+                return false;
+            } else {
+                $size = getimagesize($path);
+
+                $data['path']     = $filename;
+                $data['width']    = $size[0];
+                $data['height']   = $size[1];
+                $data['alt_text'] = $title;
+
+                $Images = new Images;
+
+                $image = $Images->create($data);
+
+                if (is_numeric($image)  && !is_null($object_id)) {
+                    $xref = new Xref('object', $image, env('TBL_IMAGES'), $object_id, env('TBL_DEVICES'));
+                    $xref->createXref(true);
+                }
+            }
         }
-        else {
-
-          $size = getimagesize($path);
-
-          $data['path']     = $filename;
-          $data['width']    = $size[0];
-          $data['height']   = $size[1];
-          $data['alt_text'] = $title;
-
-          $Images = new Images;
-
-          $image = $Images->create($data);
-
-          if(is_numeric($image)  && !is_null($object_id)){
-              $xref = new Xref('object', $image, env('TBL_IMAGES'), $object_id, env('TBL_DEVICES'));
-              $xref->createXref(true);
-          }
-        }
-      }
-
-
     }
-
 }

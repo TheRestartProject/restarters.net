@@ -18,5 +18,4 @@ class Invite extends Model
     protected $fillable = [
         'email', 'record_id', 'hash', 'type'
     ];
-
 }

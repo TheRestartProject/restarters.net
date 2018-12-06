@@ -12,87 +12,92 @@ use Illuminate\Support\Facades\Redirect;
 class GroupTagsController extends Controller
 {
 
-  public function index() {
+    public function index()
+    {
 
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-    $all_tags = GroupTags::all();
+        $all_tags = GroupTags::all();
 
-    return view('tags.index', [
-      'title' => 'Group Tags',
-      'tags' => $all_tags
-    ]);
+        return view('tags.index', [
+        'title' => 'Group Tags',
+        'tags' => $all_tags
+        ]);
+    }
 
-  }
+    public function getCreateTag()
+    {
 
-  public function getCreateTag() {
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
+        return view('tags.create', [
+        'title' => 'Add Group Tag',
+        ]);
+    }
 
-    return view('tags.create', [
-      'title' => 'Add Group Tag',
-    ]);
+    public function postCreateTag(Request $request)
+    {
 
-  }
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-  public function postCreateTag(Request $request) {
+        $name = $request->input('tag-name');
+        $description = $request->input('tag-description');
 
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
+        $group_tag = GroupTags::create([
+        'tag_name'    => $name,
+        'description' => $description
+        ]);
 
-    $name = $request->input('tag-name');
-    $description = $request->input('tag-description');
+        return Redirect::to('tags/edit/'.$group_tag->id)->with('success', 'Group Tag successfully created!');
+    }
 
-    $group_tag = GroupTags::create([
-      'tag_name'    => $name,
-      'description' => $description
-    ]);
+    public function getEditTag($id)
+    {
 
-    return Redirect::to('tags/edit/'.$group_tag->id)->with('success', 'Group Tag successfully created!');
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-  }
+        $tag = GroupTags::find($id);
 
-  public function getEditTag($id) {
+        return view('tags.edit', [
+        'title' => 'Edit Group Tag',
+        'tag'   => $tag,
+        ]);
+    }
 
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
+    public function postEditTag($id, Request $request)
+    {
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-    $tag = GroupTags::find($id);
+        $name = $request->input('tag-name');
+        $description = $request->input('tag-description');
 
-    return view('tags.edit', [
-      'title' => 'Edit Group Tag',
-      'tag'   => $tag,
-    ]);
+        GroupTags::find($id)->update([
+        'tag_name'    => $name,
+        'description' => $description
+        ]);
 
-  }
+        return Redirect::back()->with('success', 'Group Tag successfully updated!');
+    }
 
-  public function postEditTag($id, Request $request) {
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
+    public function getDeleteTag($id)
+    {
 
-    $name = $request->input('tag-name');
-    $description = $request->input('tag-description');
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return redirect('/user/forbidden');
+        }
 
-    GroupTags::find($id)->update([
-      'tag_name'    => $name,
-      'description' => $description
-    ]);
+        GroupTags::find($id)->delete();
 
-    return Redirect::back()->with('success', 'Group Tag successfully updated!');
-
-  }
-
-  public function getDeleteTag($id) {
-
-    if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-      return redirect('/user/forbidden');
-
-    GroupTags::find($id)->delete();
-
-    return Redirect::to('/tags')->with('success', 'Group Tag successfully deleted!');
-
-  }
-
+        return Redirect::to('/tags')->with('success', 'Group Tag successfully deleted!');
+    }
 }

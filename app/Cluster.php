@@ -24,8 +24,8 @@ class Cluster extends Model
      */
     protected $hidden = [];
 
-    public function categories(){
+    public function categories()
+    {
         return $this->hasMany('App\Category', 'cluster', 'idclusters');
     }
-
 }

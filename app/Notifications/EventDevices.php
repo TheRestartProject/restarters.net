@@ -40,17 +40,16 @@ class EventDevices extends Notification
      */
     public function toMail($notifiable)
     {
-      if ($notifiable !== null) {
-        if ($notifiable->invites == 1) {
-
-          return (new MailMessage)
+        if ($notifiable !== null) {
+            if ($notifiable->invites == 1) {
+                return (new MailMessage)
                       ->subject('Contribute Devices')
                       ->greeting('Hello!')
                       ->line('Thank you for hosting the event \'' . $this->arr['event_venue'] . '\', please help us outline what devices were bought to the event and the status of their repair. This will help us improve the quality of our data.')
                       ->action('Contribute data', $this->arr['event_url'])
                       ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'].'/'.$notifiable->id . '">your preferences</a> on your account.');
+            }
         }
-      }
     }
 
     /**

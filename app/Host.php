@@ -4,23 +4,24 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Host extends Model {
+class Host extends Model
+{
 
     protected $table = 'groups';
     protected $primaryKey = 'idgroups';
 
-    public function hostImage(){
+    public function hostImage()
+    {
         return $this->hasOne('App\Xref', 'reference', 'idgroups')->where('object_type', 5);
     }
 
-    public function getGroupName() {
+    public function getGroupName()
+    {
 
-      if( !empty($this->area) ) {
-        return $this->location . ', ' . $this->area;
-      } else {
-        return $this->location;
-      }
-
+        if (!empty($this->area)) {
+            return $this->location . ', ' . $this->area;
+        } else {
+            return $this->location;
+        }
     }
-
 }

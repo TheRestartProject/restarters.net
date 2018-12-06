@@ -31,6 +31,4 @@ class Brands extends Model
 
 
     //Getters
-
-
 }

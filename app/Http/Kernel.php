@@ -67,10 +67,10 @@ class Kernel extends HttpKernel
         'verifyUserConsent' => \App\Http\Middleware\VerifyUserConsent::class,
 
         /**** OTHER MIDDLEWARE ****/
-    		'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
-    		'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
-    		'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
+            'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+            'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
+            'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
         'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
-    		// REDIRECTION MIDDLEWARE
+            // REDIRECTION MIDDLEWARE
     ];
 }

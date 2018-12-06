@@ -25,14 +25,13 @@ class GroupTags extends Model
     protected $hidden = [];
 
     //Table Relations
-    public function group_tags() {
-      return $this->belongsToMany('App\GrouptagsGroups');
+    public function group_tags()
+    {
+        return $this->belongsToMany('App\GrouptagsGroups');
     }
 
     // Setters
 
 
     //Getters
-
-
 }

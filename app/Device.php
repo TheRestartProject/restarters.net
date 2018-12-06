@@ -33,57 +33,56 @@ class Device extends Model implements Auditable
 
 
     //Getters
-    public function getList($params = null){//Tested!
+    public function getList($params = null)
+    {
+//Tested!
         $sql = 'SELECT * FROM `view_devices_list`';
 
-        if(!is_null($params)){
+        if (!is_null($params)) {
+            $sql .= ' WHERE 1=1 AND ';
 
-          $sql .= ' WHERE 1=1 AND ';
+            $params = array_filter($params);
+            foreach ($params as $field => $value) {
+                if ($field == 'brand' || $field == 'model' || $field == 'problem') {
+                    $params[$field] = '%' . strtolower($value) . '%';
+                } elseif ($field == 'event_date') {
+                    $params[$field] = implode(' AND ', $value);
+                }
+            }
 
-          $params = array_filter($params);
-          foreach($params as $field => $value){
-            if($field == 'brand' || $field == 'model' || $field == 'problem'){
-              $params[$field] = '%' . strtolower($value) . '%';
-            }
-            elseif($field == 'event_date') {
-              $params[$field] = implode(' AND ', $value);
-            }
-          }
+            $clauses = array();
 
-          $clauses = array();
+            foreach ($params as $f => $v) {
+                if ($f == 'event_date') {
+                    $clauses[] = 'event_date BETWEEN ' . $v;
+                }
+                if ($f == 'category' || $f == 'group') {
+                    $clauses[] = 'id' . $f . ' IN (' . $v . ')';
+                } elseif ($f == 'brand' || $f == 'model' || $f == 'problem') {
+                    $clauses[] = $f . ' LIKE :' . $f;
+                }
+            }
 
-          foreach($params as $f => $v){
-            if($f == 'event_date'){
-              $clauses[] = 'event_date BETWEEN ' . $v;
-            }
-            if($f == 'category' || $f == 'group'){
-              $clauses[] = 'id' . $f . ' IN (' . $v . ')';
-            }
-            elseif( $f == 'brand' || $f == 'model' || $f == 'problem') {
-              $clauses[] = $f . ' LIKE :' . $f;
-            }
-          }
-
-          $sql .= implode(' AND ', $clauses);
+            $sql .= implode(' AND ', $clauses);
         }
 
         $sql .= ' ORDER BY `sorter` DESC';
 
         if (!empty($params) && array_key_exists('event_date', $params)) {
-          unset($params['event_date']);
+            unset($params['event_date']);
         }
 
         if ($params != null) {
-          return DB::select(DB::raw($sql), $params);
+            return DB::select(DB::raw($sql), $params);
         } else {
-          return DB::select(DB::raw($sql));
+            return DB::select(DB::raw($sql));
         }
     }
 
     public function getWeights($group = null)
     {
         $sql =
-'SELECT
+        'SELECT
 
 sum(case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) as `total_weights`,
 
@@ -98,7 +97,7 @@ FROM devices, categories, events,
 
 WHERE devices.category = categories.idcategories and devices.repair_status = 1
 AND devices.event = events.idevents ';
-;
+        ;
 
         // Using two named parameters for displacement due to restriction of Laravel/MySQL.
         // see e.g.: https://github.com/laravel/framework/issues/12715
@@ -113,7 +112,8 @@ AND devices.event = events.idevents ';
         return DB::select(DB::raw($sql), $params);
     }
 
-    public function getPartyWeights($party){
+    public function getPartyWeights($party)
+    {
         return DB::select(DB::raw('SELECT
                 ROUND(SUM(`weight`), 0) + ROUND(SUM(`estimate`), 0) AS `total_weights`,
                 ROUND(SUM(`footprint`) * ' . $this->displacement . ', 0) + (ROUND(SUM(`estimate`) * (SELECT * FROM `view_waste_emission_ratio`), 0))  AS `total_footprints`
@@ -123,7 +123,8 @@ AND devices.event = events.idevents ';
             WHERE `d`.`repair_status` = 1 AND `c`.`idcategories` != 46 AND `e`.`idevents` = :id'), array('id' => $party));
     }
 
-    public function getCounts(){
+    public function getCounts()
+    {
         return DB::select(DB::raw('SELECT
                     COUNT(`category`) AS `catcount`,
                     ROUND(SUM(`weight`), 2) AS `catcount_weight`,
@@ -135,7 +136,8 @@ AND devices.event = events.idevents ';
                 ORDER BY `catcount` DESC'));
     }
 
-    public function getByYears($repair_status){
+    public function getByYears($repair_status)
+    {
         return DB::select(DB::raw('SELECT
                     COUNT(`iddevices`) AS `total_devices`,
                     YEAR(`event_date`) AS `event_year`
@@ -146,11 +148,15 @@ AND devices.event = events.idevents ';
                 ORDER BY `event_year` ASC'), array('rp' => $repair_status));
     }
 
-    public function ofThisUser($id){//Tested
+    public function ofThisUser($id)
+    {
+//Tested
         return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` WHERE `repaired_by` = :id'), array('id' => $id));
     }
 
-    public function ofThisEvent($event){//Tested
+    public function ofThisEvent($event)
+    {
+//Tested
         return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 LEFT JOIN (
@@ -162,54 +168,59 @@ AND devices.event = events.idevents ';
                 WHERE `event` = :event'), array('event' => $event));
     }
 
-    public function ofThisGroup($group){//Tested
+    public function ofThisGroup($group)
+    {
+//Tested
         return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`
                 WHERE `group` = :group'), array('group' => $group));
     }
 
-    public function ofAllGroups() {//Tested
+    public function ofAllGroups()
+    {
+//Tested
         return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`'));
     }
 
-    public function statusCount($g = null, $year = null){
+    public function statusCount($g = null, $year = null)
+    {
         $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
                 FROM `'. $this->table .'` AS `d`';
-        if( (!is_null($g) && is_numeric($g)) || (!is_null($year) && is_numeric($year)) ){
+        if ((!is_null($g) && is_numeric($g)) || (!is_null($year) && is_numeric($year))) {
             $sql .= ' INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event` ';
         }
 
         $sql .= ' WHERE `repair_status` > 0 ';
 
-        if(!is_null($g) && is_numeric($g)){
+        if (!is_null($g) && is_numeric($g)) {
             $sql .= ' AND `group` = :g ';
         }
-        if(!is_null($year) && is_numeric($year)){
+        if (!is_null($year) && is_numeric($year)) {
             $sql .= ' AND YEAR(`event_date`) = :year ';
         }
 
         $sql .= ' GROUP BY `status`';
 
-        if(!is_null($year) && is_numeric($year)){
-          $sql .= ', `event`';
+        if (!is_null($year) && is_numeric($year)) {
+            $sql .= ', `event`';
         }
 
-        if(!is_null($g) && is_numeric($g) && is_null($year)){
+        if (!is_null($g) && is_numeric($g) && is_null($year)) {
             return DB::select(DB::raw($sql), array('g' => $g));
-        } elseif(!is_null($year) && is_numeric($year) && is_null($g)){
+        } elseif (!is_null($year) && is_numeric($year) && is_null($g)) {
             return DB::select(DB::raw($sql), array('year' => $year));
-        } elseif(!is_null($year) && is_numeric($year) && !is_null($g) && is_numeric($g)) {
+        } elseif (!is_null($year) && is_numeric($year) && !is_null($g) && is_numeric($g)) {
             return DB::select(DB::raw($sql), array('year' => $year, 'g' => $g));
         } else {
             return DB::select(DB::raw($sql));
         }
-
     }
 
-    public function partyStatusCount($event){
+    public function partyStatusCount($event)
+    {
         $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
                 FROM `'. $this->table .'` AS `d`';
 
@@ -217,16 +228,16 @@ AND devices.event = events.idevents ';
 
         $sql .= ' GROUP BY `status`';
 
-        if(!is_null($event) && is_numeric($event)){
+        if (!is_null($event) && is_numeric($event)) {
             $sql .= ' AND `event` = :event ';
         }
 
 
         return DB::select(DB::raw($sql), array('event' => $event));
-
     }
 
-    public function countByCluster($cluster, $group = null, $year = null){
+    public function countByCluster($cluster, $group = null, $year = null)
+    {
         $sql = 'SELECT COUNT(*) AS `counter`, `repair_status` FROM `' . $this->table . '` AS `d`
                 INNER JOIN `events` AS `e`
                     ON `d`.`event` = `e`.`idevents`
@@ -234,10 +245,10 @@ AND devices.event = events.idevents ';
                     ON `d`.`category` = `c`.`idcategories`
                 WHERE `c`.`cluster` = :cluster AND `d`.`repair_status` > 0 ';
 
-        if(!is_null($group)){
+        if (!is_null($group)) {
             $sql.=' AND `e`.`group` = :group ';
         }
-        if(!is_null($year)){
+        if (!is_null($year)) {
             $sql.=' AND YEAR(`e`.`event_date`) = :year ';
         }
 
@@ -246,22 +257,22 @@ AND devices.event = events.idevents ';
                 ';
 
         try {
-          if(!is_null($group) && is_numeric($group) && is_null($year)){
-              return DB::select(DB::raw($sql), array('group' => $group, 'cluster' => $cluster));
-          } elseif(!is_null($year) && is_numeric($year) && is_null($group)){
-              return DB::select(DB::raw($sql), array('year' => $year, 'cluster' => $cluster));
-          } elseif(!is_null($year) && is_numeric($year) && !is_null($group) && is_numeric($group)) {
-              return DB::select(DB::raw($sql), array('year' => $year, 'group' => $group, 'cluster' => $cluster));
-          } else {
-              return DB::select(DB::raw($sql), array('cluster' => $cluster));
-          }
+            if (!is_null($group) && is_numeric($group) && is_null($year)) {
+                return DB::select(DB::raw($sql), array('group' => $group, 'cluster' => $cluster));
+            } elseif (!is_null($year) && is_numeric($year) && is_null($group)) {
+                return DB::select(DB::raw($sql), array('year' => $year, 'cluster' => $cluster));
+            } elseif (!is_null($year) && is_numeric($year) && !is_null($group) && is_numeric($group)) {
+                return DB::select(DB::raw($sql), array('year' => $year, 'group' => $group, 'cluster' => $cluster));
+            } else {
+                return DB::select(DB::raw($sql), array('cluster' => $cluster));
+            }
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
-
     }
 
-    public function countCO2ByYear($group = null, $year = null) {
+    public function countCO2ByYear($group = null, $year = null)
+    {
         $sql = 'SELECT
                     (ROUND(SUM(`c`.`footprint`), 0) * ' . $this->displacement . ') + ( CASE WHEN `d`.`category` = 46 THEN IFNULL(ROUND(SUM(`estimate`) * (SELECT * FROM `view_waste_emission_ratio`), 0),0) ELSE 0 END) AS `co2`,
                     YEAR(`e`.`event_date`) AS `year`
@@ -272,32 +283,32 @@ AND devices.event = events.idevents ';
                     ON `d`.`category` = `c`.`idcategories`
                 WHERE `d`.`repair_status` = 1 ';
 
-        if(!is_null($group)){
+        if (!is_null($group)) {
             $sql.=' AND `e`.`group` = :group ';
         }
-        if(!is_null($year)){
+        if (!is_null($year)) {
             $sql.=' AND YEAR(`e`.`event_date`) = :year ';
         }
         $sql.= ' GROUP BY `year`
                 ORDER BY `year` DESC'; // was grouped by category too at some point
 
         try {
-          if(!is_null($group) && is_numeric($group) && is_null($year)){
-              return DB::select(DB::raw($sql), array('group' => $group));
-          } elseif(!is_null($year) && is_numeric($year) && is_null($group)){
-              return DB::select(DB::raw($sql), array('year' => $year));
-          } elseif(!is_null($year) && is_numeric($year) && !is_null($group) && is_numeric($group)) {
-              return DB::select(DB::raw($sql), array('year' => $year, 'group' => $group));
-          } else {
-              return DB::select(DB::raw($sql));
-          }
+            if (!is_null($group) && is_numeric($group) && is_null($year)) {
+                return DB::select(DB::raw($sql), array('group' => $group));
+            } elseif (!is_null($year) && is_numeric($year) && is_null($group)) {
+                return DB::select(DB::raw($sql), array('year' => $year));
+            } elseif (!is_null($year) && is_numeric($year) && !is_null($group) && is_numeric($group)) {
+                return DB::select(DB::raw($sql), array('year' => $year, 'group' => $group));
+            } else {
+                return DB::select(DB::raw($sql));
+            }
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
-
     }
 
-    public function countWasteByYear($group = null, $year = null) {
+    public function countWasteByYear($group = null, $year = null)
+    {
         $sql = 'SELECT
                     ROUND(SUM(`c`.`weight`), 0) + IFNULL( ROUND(SUM(`d`.`estimate`), 0), 0) AS `waste`,
                     YEAR(`e`.`event_date`) AS `year`
@@ -308,32 +319,32 @@ AND devices.event = events.idevents ';
                     ON `d`.`category` = `c`.`idcategories`
                 WHERE `d`.`repair_status` = 1 ';
 
-        if(!is_null($group)){
+        if (!is_null($group)) {
             $sql.=' AND `e`.`group` = :group ';
         }
-        if(!is_null($year)){
+        if (!is_null($year)) {
             $sql.=' AND YEAR(`e`.`event_date`) = :year ';
         }
         $sql.= ' GROUP BY `year`
                 ORDER BY `year` DESC';
 
         try {
-          if(!is_null($group) && is_numeric($group) && is_null($year)){
-              return DB::select(DB::raw($sql), array('group' => $group));
-          } elseif(!is_null($year) && is_numeric($year) && is_null($group)){
-              return DB::select(DB::raw($sql), array('year' => $year));
-          } elseif(!is_null($year) && is_numeric($year) && !is_null($group) && is_numeric($group)) {
-              return DB::select(DB::raw($sql), array('year' => $year, 'group' => $group));
-          } else {
-              return DB::select(DB::raw($sql));
-          }
+            if (!is_null($group) && is_numeric($group) && is_null($year)) {
+                return DB::select(DB::raw($sql), array('group' => $group));
+            } elseif (!is_null($year) && is_numeric($year) && is_null($group)) {
+                return DB::select(DB::raw($sql), array('year' => $year));
+            } elseif (!is_null($year) && is_numeric($year) && !is_null($group) && is_numeric($group)) {
+                return DB::select(DB::raw($sql), array('year' => $year, 'group' => $group));
+            } else {
+                return DB::select(DB::raw($sql));
+            }
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
-
     }
 
-    public function findMostSeen($status = null, $cluster = null, $group = null){
+    public function findMostSeen($status = null, $cluster = null, $group = null)
+    {
         $sql = 'SELECT COUNT(`d`.`category`) AS `counter`, `c`.`name` FROM `' . $this->table . '` AS `d`
                 INNER JOIN `events` AS `e`
                     ON `d`.`event` = `e`.`idevents`
@@ -341,13 +352,13 @@ AND devices.event = events.idevents ';
                     ON `d`.`category` = `c`.`idcategories`
                 WHERE 1=1 and `c`.`idcategories` <> ' . env('MISC_CATEGORY_ID');
 
-        if(!is_null($status) && is_numeric($status)){
+        if (!is_null($status) && is_numeric($status)) {
             $sql .= ' AND `d`.`repair_status` = :status ';
         }
-        if(!is_null($cluster) && is_numeric($cluster)){
+        if (!is_null($cluster) && is_numeric($cluster)) {
             $sql .= ' AND `c`.`cluster` = :cluster ';
         }
-        if(!is_null($group) && is_numeric($group)){
+        if (!is_null($group) && is_numeric($group)) {
             $sql .= ' AND `e`.`group` = :group ';
         }
 
@@ -356,46 +367,48 @@ AND devices.event = events.idevents ';
 
         $sql .= (!is_null($cluster) ? '  LIMIT 1' : '');
 
-        if(!is_null($cluster) && is_numeric($cluster)){
+        if (!is_null($cluster) && is_numeric($cluster)) {
             try {
-              if(!is_null($group) && is_numeric($group) && is_null($status)){
-                  return DB::select(DB::raw($sql), array('group' => $group, 'cluster' => $cluster));
-              } elseif(!is_null($status) && is_numeric($status) && is_null($group)){
-                  return DB::select(DB::raw($sql), array('status' => $status, 'cluster' => $cluster));
-              } elseif(!is_null($status) && is_numeric($status) && !is_null($group) && is_numeric($group)) {
-                  return DB::select(DB::raw($sql), array('status' => $status, 'group' => $group, 'cluster' => $cluster));
-              } else {
-                  return DB::select(DB::raw($sql), array('cluster' => $cluster));
-              }
+                if (!is_null($group) && is_numeric($group) && is_null($status)) {
+                    return DB::select(DB::raw($sql), array('group' => $group, 'cluster' => $cluster));
+                } elseif (!is_null($status) && is_numeric($status) && is_null($group)) {
+                    return DB::select(DB::raw($sql), array('status' => $status, 'cluster' => $cluster));
+                } elseif (!is_null($status) && is_numeric($status) && !is_null($group) && is_numeric($group)) {
+                    return DB::select(DB::raw($sql), array('status' => $status, 'group' => $group, 'cluster' => $cluster));
+                } else {
+                    return DB::select(DB::raw($sql), array('cluster' => $cluster));
+                }
             } catch (\Illuminate\Database\QueryException $e) {
                 dd($e);
             }
         } else {
             try {
-              if(!is_null($group) && is_numeric($group) && is_null($status)){
-                  return DB::select(DB::raw($sql), array('group' => $group));
-              } elseif(!is_null($status) && is_numeric($status) && is_null($group)){
-                  return DB::select(DB::raw($sql), array('status' => $status));
-              } elseif(!is_null($status) && is_numeric($status) && !is_null($group) && is_numeric($group)) {
-                  return DB::select(DB::raw($sql), array('status' => $status, 'group' => $group));
-              } else {
-                  return DB::select(DB::raw($sql));
-              }
+                if (!is_null($group) && is_numeric($group) && is_null($status)) {
+                    return DB::select(DB::raw($sql), array('group' => $group));
+                } elseif (!is_null($status) && is_numeric($status) && is_null($group)) {
+                    return DB::select(DB::raw($sql), array('status' => $status));
+                } elseif (!is_null($status) && is_numeric($status) && !is_null($group) && is_numeric($group)) {
+                    return DB::select(DB::raw($sql), array('status' => $status, 'group' => $group));
+                } else {
+                    return DB::select(DB::raw($sql));
+                }
             } catch (\Illuminate\Database\QueryException $e) {
                 dd($e);
             }
         }
-
     }
 
-    public function successRates($cluster = null, $direction = 'DESC', $threshold = 10){
+    public function successRates($cluster = null, $direction = 'DESC', $threshold = 10)
+    {
         $sql =     'SELECT
                         COUNT(repair_status) AS fixed,
                         total_devices,
                         categories.name AS category_name,
                         clusters.name AS cluster_name,
                         ROUND( (COUNT(repair_status) * 100 / total_devices), 1) AS success_rate ';
-        if(!is_null($cluster)){ $sql .= ', clusters.idclusters AS cluster '; }
+        if (!is_null($cluster)) {
+            $sql .= ', clusters.idclusters AS cluster ';
+        }
 
         $sql .=     ' FROM devices
                         INNER JOIN categories ON categories.idcategories = devices.category
@@ -412,22 +425,28 @@ AND devices.event = events.idevents ';
                         repair_status = 1 AND
                         total_devices > ' . $threshold . ' ';
 
-        if(!is_null($cluster)){ $sql .= ' AND cluster = :cluster '; }
+        if (!is_null($cluster)) {
+            $sql .= ' AND cluster = :cluster ';
+        }
         $sql .=     'GROUP BY devices.category
                     ORDER BY cluster ASC, success_rate ' . $direction . ' LIMIT 1';
 
-        if(!is_null($cluster)){
+        if (!is_null($cluster)) {
             return DB::select(DB::raw($sql), array('cluster' => $cluster));
         } else {
             return DB::select(DB::raw($sql));
         }
     }
 
-    public function guesstimates() {//Tested
+    public function guesstimates()
+    {
+//Tested
         return DB::select(DB::raw('SELECT COUNT(*) AS guesstimates FROM `' . $this->table . '` WHERE `category` = 46'));
     }
 
-    public function export() {//Tested
+    public function export()
+    {
+//Tested
         return DB::select(DB::raw('SELECT
                     `c`.`name` AS `category`,
                     `brand`,
@@ -445,30 +464,32 @@ AND devices.event = events.idevents ';
                 INNER JOIN `groups` AS `g` ON `g`.`idgroups` = `e`.`group`'));
     }
 
-    public function findOne($id) {
+    public function findOne($id)
+    {
         return $this->where('iddevices', $id)->first();
     }
 
-    public function howMany($params = null){
-        if(empty($params)){
+    public function howMany($params = null)
+    {
+        if (empty($params)) {
             return count(self::all());
-        }
-        else {
+        } else {
             return count(self::where($params));
-
         }
-
     }
 
-    public function deviceCategory(){
+    public function deviceCategory()
+    {
         return $this->hasOne('App\Category', 'idcategories', 'category');
     }
 
-    public function urls(){
+    public function urls()
+    {
         return $this->hasMany('App\DeviceUrl', 'device_id', 'iddevices');
     }
 
-    public function barriers(){
+    public function barriers()
+    {
         return $this->belongsToMany('App\Barrier', 'devices_barriers', 'device_id', 'barrier_id');
     }
 

@@ -18,17 +18,12 @@ class VerifyUserConsent
     public function handle($request, Closure $next)
     {
 
-      if( Auth::check() && Auth::user()->hasUserGivenConsent() ) {
-        
-        return $next($request);
-
-      } else {
+        if (Auth::check() && Auth::user()->hasUserGivenConsent()) {
+            return $next($request);
+        } else {
+            return redirect('/user/register');
+        }
 
         return redirect('/user/register');
-
-      }
-
-      return redirect('/user/register');
-
     }
 }

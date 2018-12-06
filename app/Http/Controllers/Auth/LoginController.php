@@ -109,6 +109,5 @@ class LoginController extends Controller
           'partiesCount' => count($stats['allparties']),
           'device_count_status' => $stats['device_count_status'],
         ]);
-
     }
 }

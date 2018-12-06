@@ -36,49 +36,52 @@ class DashboardController extends Controller
   // }
 
 
-  public function index() {
+    public function index()
+    {
 
-      $user = User::getProfile(Auth::id());
+        $user = User::getProfile(Auth::id());
 
-      // Update language every time you go to the dashboard
-      Auth::user()->update([
+        // Update language every time you go to the dashboard
+        Auth::user()->update([
         'language' => session('locale')
-      ]);
+        ]);
 
-      $in_group = !empty(UserGroups::where('user', Auth::id())->get()->toArray());
-      $has_skills = !empty(UsersSkills::where('user', Auth::id())->get()->toArray());
-      $in_event = !empty(EventsUsers::where('user', Auth::id())->get()->toArray());
+        $in_group = !empty(UserGroups::where('user', Auth::id())->get()->toArray());
+        $has_skills = !empty(UsersSkills::where('user', Auth::id())->get()->toArray());
+        $in_event = !empty(EventsUsers::where('user', Auth::id())->get()->toArray());
 
-      // TODO: move this to it's own class, which caches results (on success).
-      $userExistsInDiscourse = false;
-      try {
-        $discourseApiKey = env('DISCOURSE_APIKEY');
-        $discourseApiUser = env('DISCOURSE_APIUSER');
-        $emailToSearchFor = trim($user->email);
-        $discourseQuery = sprintf('%s/admin/users/list/all.json?email=%s&api_key=%s&api_username=%s', env('DISCOURSE_URL'), $emailToSearchFor, $discourseApiKey, $discourseApiUser);
-        $discourseResult = json_decode(file_get_contents($discourseQuery));
-        $userExistsInDiscourse = count($discourseResult) >= 1;
-      } catch (\Exception $ex) {
-          Log::error('Error occurred while searching for user in Discourse');
-      }
+        // TODO: move this to it's own class, which caches results (on success).
+        $userExistsInDiscourse = false;
+        try {
+            $discourseApiKey = env('DISCOURSE_APIKEY');
+            $discourseApiUser = env('DISCOURSE_APIUSER');
+            $emailToSearchFor = trim($user->email);
+            $discourseQuery = sprintf('%s/admin/users/list/all.json?email=%s&api_key=%s&api_username=%s', env('DISCOURSE_URL'), $emailToSearchFor, $discourseApiKey, $discourseApiUser);
+            $discourseResult = json_decode(file_get_contents($discourseQuery));
+            $userExistsInDiscourse = count($discourseResult) >= 1;
+        } catch (\Exception $ex) {
+            Log::error('Error occurred while searching for user in Discourse');
+        }
 
-      if (!is_null($user->idimages) && !is_null($user->path)) {
-        $has_profile_pic = true;
-      } else {
-        $has_profile_pic = false;
-      }
+        if (!is_null($user->idimages) && !is_null($user->path)) {
+            $has_profile_pic = true;
+        } else {
+            $has_profile_pic = false;
+        }
 
-      //See whether user has any events
-      if ($in_event)
-        $event_ids = EventsUsers::where('user', Auth::id())->pluck('event')->toArray();
+        //See whether user has any events
+        if ($in_event) {
+            $event_ids = EventsUsers::where('user', Auth::id())->pluck('event')->toArray();
+        }
 
-      //See whether user has any groups
-      if ($in_group)
-        $group_ids = UserGroups::where('user', Auth::id())->pluck('group')->toArray();
+        //See whether user has any groups
+        if ($in_group) {
+            $group_ids = UserGroups::where('user', Auth::id())->pluck('group')->toArray();
+        }
 
-      //If users has events, let's see whether they have any past events
-      if ($in_event) {
-        $past_events = Party::whereIn('idevents', $event_ids)
+        //If users has events, let's see whether they have any past events
+        if ($in_event) {
+            $past_events = Party::whereIn('idevents', $event_ids)
                      ->whereDate('event_date', '<', date('Y-m-d'))
                      ->join('groups', 'events.group', '=', 'idGroups')
                      ->select('events.*', 'groups.name')
@@ -86,62 +89,58 @@ class DashboardController extends Controller
                      ->take(3)
                      ->get();
 
-          if (empty($past_events->toArray())) {
+            if (empty($past_events->toArray())) {
+                $past_events = null;
+            }
+        } else {
             $past_events = null;
-          }
+        }
 
-      } else {
-        $past_events = null;
-      }
-
-      //Host specific queries
-      if (FixometerHelper::hasRole($user, 'Host') && $in_group) {
-
-        $outdated_groups = Group::join('users_groups', 'groups.idgroups', '=', 'users_groups.group')
+        //Host specific queries
+        if (FixometerHelper::hasRole($user, 'Host') && $in_group) {
+            $outdated_groups = Group::join('users_groups', 'groups.idgroups', '=', 'users_groups.group')
                                 ->where('users_groups.user', Auth::user()->id)
                                   ->where('users_groups.role', 3)
-                                    ->whereDate('updated_at', '<=', date('Y-m-d', strtotime("-3 Months")) )
+                                    ->whereDate('updated_at', '<=', date('Y-m-d', strtotime("-3 Months")))
                                       ->select('groups.*')
                                         ->take(3)
                                           ->get();
 
-        if (empty($outdated_groups->toArray())) {
-          $outdated_groups = null;
-        }
+            if (empty($outdated_groups->toArray())) {
+                $outdated_groups = null;
+            }
 
-        if ($in_event) {
-          $active_group_ids = Party::whereIn('idevents', $event_ids)
+            if ($in_event) {
+                $active_group_ids = Party::whereIn('idevents', $event_ids)
                                     ->whereDate('event_date', '>', date('Y-m-d'))
                                         ->pluck('events.group')
                                           ->toArray();
 
-          $non_active_group_ids = array_diff($group_ids, $active_group_ids);
-          $inactive_groups = Group::whereIn('idgroups', $non_active_group_ids)
+                $non_active_group_ids = array_diff($group_ids, $active_group_ids);
+                $inactive_groups = Group::whereIn('idgroups', $non_active_group_ids)
                                         ->take(3)
                                           ->get();
+            }
+
+            if (!isset($inactive_groups) || empty($inactive_groups->toArray())) {
+                $inactive_groups = null;
+            }
+        } else {
+            $outdated_groups = null;
+            $inactive_groups = null;
         }
 
-        if (!isset($inactive_groups) || empty($inactive_groups->toArray())) {
-          $inactive_groups = null;
+        if ($in_group) {
+            $all_groups = Group::whereIn('idgroups', $group_ids)->get();
         }
 
-      } else {
-        $outdated_groups = null;
-        $inactive_groups = null;
-      }
+        if (!isset($all_groups) || empty($all_groups->toArray())) {
+            $all_groups = null;
+        }
 
-      if ( $in_group ) {
-        $all_groups = Group::whereIn('idgroups', $group_ids)->get();
-      }
-
-      if (!isset($all_groups) || empty($all_groups->toArray())) {
-        $all_groups = null;
-      }
-
-      //Get events nearest (or not) to you
-      if (!is_null($user->latitude) && !is_null($user->longitude) ) { //Should the user have location info
-
-        $upcoming_events = Party::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
+        //Get events nearest (or not) to you
+        if (!is_null($user->latitude) && !is_null($user->longitude)) { //Should the user have location info
+            $upcoming_events = Party::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
             ->having("distance", "<=", 40)
               ->whereDate('event_date', '>=', date('Y-m-d'))
                 ->orderBy('event_date', 'ASC')
@@ -149,34 +148,31 @@ class DashboardController extends Controller
                     ->orderBy('distance', 'ASC')
                       ->take(3)
                         ->get();
-
-      } else { //Else show them the latest three
-
-        $upcoming_events = Party::whereDate('event_date', '>=', date('Y-m-d'))
+        } else { //Else show them the latest three
+            $upcoming_events = Party::whereDate('event_date', '>=', date('Y-m-d'))
                                   ->select('events.*')
                                     ->orderBy('event_date', 'ASC')
                                       ->take(3)
                                         ->get();
+        }
 
-      }
+        $rssRetriever = new CachingRssRetriever('https://therestartproject.org/feed');
+        $news_feed = $rssRetriever->getRSSFeed(3);
 
-      $rssRetriever = new CachingRssRetriever('https://therestartproject.org/feed');
-      $news_feed = $rssRetriever->getRSSFeed(3);
+        $wikiPagesRetriever = new CachingWikiPageRetriever(env('WIKI_URL') . '/api.php');
+        $wiki_pages = $wikiPagesRetriever->getRandomWikiPages(5);
 
-      $wikiPagesRetriever = new CachingWikiPageRetriever(env('WIKI_URL') . '/api.php');
-      $wiki_pages = $wikiPagesRetriever->getRandomWikiPages(5);
+        //Show onboarding modals on first login
+        if ($user->number_of_logins == 1) {
+            $onboarding = true;
+        } else {
+            $onboarding = false;
+        }
 
-      //Show onboarding modals on first login
-      if ($user->number_of_logins == 1) {
-        $onboarding = true;
-      } else {
-        $onboarding = false;
-      }
+        $devices_gateway = new Device;
+        $impact_stats = $devices_gateway->getWeights();
 
-      $devices_gateway = new Device;
-      $impact_stats = $devices_gateway->getWeights();
-
-      return view('dashboard.index', [
+        return view('dashboard.index', [
           'show_getting_started' => !$userExistsInDiscourse || !$has_profile_pic || !$has_skills || !$in_group || !$in_event,
         'gmaps' => true,
         'user' => $user,
@@ -195,21 +191,21 @@ class DashboardController extends Controller
         'onboarding' => $onboarding,
         'impact_stats' => $impact_stats,
           'wiki_pages' => $wiki_pages,
-      ]);
+        ]);
 
-      /*
-      $this->set('title', 'Dashboard');
-      $this->set('charts', true);
+        /*
+        $this->set('title', 'Dashboard');
+        $this->set('charts', true);
 
-      $Parties    = new Party;
-      $Devices    = new Device;
-      $Groups     = new Group;
+        $Parties    = new Party;
+        $Devices    = new Device;
+        $Groups     = new Group;
 
 
-      $this->set('upcomingParties', $Parties->findNextParties());
+        $this->set('upcomingParties', $Parties->findNextParties());
 
-      $devicesByYear = array();
-      for( $i = 1; $i < 4; $i++ ){
+        $devicesByYear = array();
+        for( $i = 1; $i < 4; $i++ ){
 
           $devices = $Devices->getByYears($i);
           $deviceList = array();
@@ -218,13 +214,14 @@ class DashboardController extends Controller
           }
           $devicesByYear[$i] = $deviceList;
 
-      }
-      $this->set('devicesByYear', $devicesByYear);
-      */
-  }
+        }
+        $this->set('devicesByYear', $devicesByYear);
+        */
+    }
 
 
-  public function getHostDash(){
-    return view('dashboard.host');
-  }
+    public function getHostDash()
+    {
+        return view('dashboard.host');
+    }
 }

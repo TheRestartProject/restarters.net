@@ -39,21 +39,21 @@ class UserGroups extends Model
      * @ array $groups (group ids)
      * return boolean
      * */
-    public function createUsersGroups($iduser, $groups){
-        if(!self::deleteUsersGroups($iduser)){
+    public function createUsersGroups($iduser, $groups)
+    {
+        if (!self::deleteUsersGroups($iduser)) {
             return false;
-        }
-        else {
+        } else {
             $sql = 'INSERT INTO `users_groups` (`user`, `group`) VALUES (:user, :group)';
 
-            foreach($groups as $k => &$group){
+            foreach ($groups as $k => &$group) {
                 try {
-                  DB::insert(DB::raw($sql), array('user' => $iduser, 'group' => $group));
+                    DB::insert(DB::raw($sql), array('user' => $iduser, 'group' => $group));
                 } catch (\Illuminate\Database\QueryException $e) {
-                  if (env('APP_ENV') == "local" || env('APP_ENV') == "development") {
-                    dd($e);
-                  }
-                  return false;
+                    if (env('APP_ENV') == "local" || env('APP_ENV') == "development") {
+                        dd($e);
+                    }
+                    return false;
                 }
             }
 
@@ -68,21 +68,23 @@ class UserGroups extends Model
      * @ int $iduser
      * return boolean
      * */
-    public function deleteUsersGroups($iduser){
+    public function deleteUsersGroups($iduser)
+    {
         $sql = 'DELETE FROM `users_groups` WHERE `user` = :id';
         try {
-          DB::delete(DB::raw($sql), array('id' => $iduser));
-          return true;
+            DB::delete(DB::raw($sql), array('id' => $iduser));
+            return true;
         } catch (\Illuminate\Database\QueryException $e) {
-          if (env('APP_ENV') == "local" || env('APP_ENV') == "development") {
-            dd($e);
-          }
-          return false;
+            if (env('APP_ENV') == "local" || env('APP_ENV') == "development") {
+                dd($e);
+            }
+            return false;
         }
     }
 
     //Table Relations
-    public function volunteer() {
-      return $this->hasOne('App\User', 'id', 'user');
+    public function volunteer()
+    {
+        return $this->hasOne('App\User', 'id', 'user');
     }
 }

@@ -16,11 +16,11 @@ class NotifyAdminNoDevices extends Notification
      *
      * @return void
      */
-     public function __construct($arr, $user = null)
-     {
-         $this->arr = $arr;
-         $this->user = $user;
-     }
+    public function __construct($arr, $user = null)
+    {
+        $this->arr = $arr;
+        $this->user = $user;
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -28,15 +28,15 @@ class NotifyAdminNoDevices extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-     public function via($notifiable)
-     {
+    public function via($notifiable)
+    {
 
-       if( $notifiable->invites == 1 )
-         return ['mail', 'database'];
+        if ($notifiable->invites == 1) {
+            return ['mail', 'database'];
+        }
 
-       return ['database'];
-
-     }
+        return ['database'];
+    }
 
     /**
      * Get the mail representation of the notification.
@@ -44,16 +44,16 @@ class NotifyAdminNoDevices extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-     public function toMail($notifiable)
-     {
-         return (new MailMessage)
-                     ->subject('Recent event with no devices added')
-                     ->greeting('Hello!')
-                     ->line('Your moderation is needed for \'' . $this->arr['event_venue'] . '\'.')
-                     ->line('No devices have been added against this event.')
-                     ->action('View event', $this->arr['event_url'])
-                     ->line('If you think this invitation was not intended for you, please discard this email.');
-     }
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+                    ->subject('Recent event with no devices added')
+                    ->greeting('Hello!')
+                    ->line('Your moderation is needed for \'' . $this->arr['event_venue'] . '\'.')
+                    ->line('No devices have been added against this event.')
+                    ->action('View event', $this->arr['event_url'])
+                    ->line('If you think this invitation was not intended for you, please discard this email.');
+    }
 
     /**
      * Get the array representation of the notification.
@@ -61,12 +61,12 @@ class NotifyAdminNoDevices extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-     public function toArray($notifiable)
-     {
-       return [
-           'title' => 'Moderation needed on event with no devices:',
-           'name' => $this->arr['event_venue'],
-           'url' => $this->arr['event_url'],
-       ];
-     }
+    public function toArray($notifiable)
+    {
+        return [
+          'title' => 'Moderation needed on event with no devices:',
+          'name' => $this->arr['event_venue'],
+          'url' => $this->arr['event_url'],
+        ];
+    }
 }

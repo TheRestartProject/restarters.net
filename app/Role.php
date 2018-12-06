@@ -35,8 +35,9 @@ class Role extends Model
      * Extended to include connected permissions
      * and display all data (users too)
      * */
-    public function findAll() {
-       return DB::select(DB::raw('SELECT
+    public function findAll()
+    {
+        return DB::select(DB::raw('SELECT
                         `r`.`idroles` AS `id`,
                         `r`.`role` AS `role`,
                         GROUP_CONCAT(`p`.`permission` ORDER BY `p`.`permission` ASC SEPARATOR ", "  )  as `permissions_list`
@@ -47,35 +48,39 @@ class Role extends Model
                     ORDER BY `r`.`idroles` ASC'));
     }
 
-    public function permissions(){//Tested!
+    public function permissions()
+    {
+//Tested!
         return DB::select(DB::raw('SELECT * FROM `permissions` ORDER BY `idpermissions` ASC'));
     }
 
-    public function rolePermissions($role){//Tested!
+    public function rolePermissions($role)
+    {
+//Tested!
         return DB::select(DB::raw('SELECT * FROM `permissions`
                     INNER JOIN `roles_permissions` ON `roles_permissions`.`permission` = `permissions`.`idpermissions`
                     WHERE `roles_permissions`.`role` = :role
                     ORDER BY `idpermissions` ASC'), array('role' => $role));
     }
 
-    public function edit($id, $data) {//Tested!
+    public function edit($id, $data)
+    {
+//Tested!
 
       // delete permissions before updating references
-      DB::delete(DB::raw('DELETE FROM roles_permissions WHERE role = :role'), array('role' => $id));
+        DB::delete(DB::raw('DELETE FROM roles_permissions WHERE role = :role'), array('role' => $id));
 
       // insert data here
-      $sql = 'INSERT INTO roles_permissions(role, permission) VALUES (:role, :permission)';
+        $sql = 'INSERT INTO roles_permissions(role, permission) VALUES (:role, :permission)';
 
-      foreach ($data as &$p) {
-        try {
-          DB::insert(DB::raw($sql), array('role' => $id, 'permission' => $p));
-        } catch (\Illuminate\Database\QueryException $e) {
-          return false;
+        foreach ($data as &$p) {
+            try {
+                DB::insert(DB::raw($sql), array('role' => $id, 'permission' => $p));
+            } catch (\Illuminate\Database\QueryException $e) {
+                return false;
+            }
         }
-      }
 
-      return true;
-
+        return true;
     }
-
 }

@@ -33,11 +33,11 @@ class AdminAbnormalDevices extends Notification
     public function via($notifiable)
     {
 
-      if( $notifiable->invites == 1 )
-        return ['mail', 'database'];
+        if ($notifiable->invites == 1) {
+            return ['mail', 'database'];
+        }
 
-      return ['database'];
-
+        return ['database'];
     }
 
     /**
@@ -48,7 +48,7 @@ class AdminAbnormalDevices extends Notification
      */
     public function toMail($notifiable)
     {
-      return (new MailMessage)
+        return (new MailMessage)
                   ->subject('Abnormal number of miscellaneous devices')
                   ->greeting('Hello!')
                   ->line('The event \'' . $this->arr['event_venue'] . '\' has an abnormal number of miscellaneous devices.')
@@ -64,10 +64,10 @@ class AdminAbnormalDevices extends Notification
      */
     public function toArray($notifiable)
     {
-      return [
+        return [
           'title' => 'Event has abnormal number of miscellaneous devices:',
           'name' => $this->arr['event_venue'],
           'url' => $this->arr['event_url'],
-      ];
+        ];
     }
 }

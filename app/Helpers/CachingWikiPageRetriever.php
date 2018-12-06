@@ -17,8 +17,7 @@ class CachingWikiPageRetriever
 
     public function getRandomWikiPages($numPages = 5)
     {
-        if (Cache::has($this->cacheKey))
-        {
+        if (Cache::has($this->cacheKey)) {
             return Cache::get($this->cacheKey);
         }
 
@@ -32,8 +31,7 @@ class CachingWikiPageRetriever
             $pages_json = $decoded_json->query->random;
 
             Cache::put($this->cacheKey, $pages_json, 60);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
         }
 
         return $pages_json;

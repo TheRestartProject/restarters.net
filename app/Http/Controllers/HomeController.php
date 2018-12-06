@@ -31,17 +31,14 @@ class HomeController extends Controller
     //     return view('home');
     // }
 
-    public function index(){
+    public function index()
+    {
 
 
-        if( Auth::check() ) {
-
-          return redirect('/dashboard');
-
+        if (Auth::check()) {
+            return redirect('/dashboard');
         } else {
-
-          return redirect('/user/register');
-
+            return redirect('/user/register');
         }
 
         // $this->set('charts', true);

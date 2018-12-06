@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Preferences extends Model {
+class Preferences extends Model
+{
 
 }

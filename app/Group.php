@@ -28,17 +28,19 @@ class Group extends Model implements Auditable
     protected $hidden = [];
 
     //Table Relations
-    public function group_tags() {
-      return $this->belongsToMany('App\GroupTags', 'grouptags_groups', 'group', 'group_tag');
+    public function group_tags()
+    {
+        return $this->belongsToMany('App\GroupTags', 'grouptags_groups', 'group', 'group_tag');
     }
 
     // Setters
 
 
     //Getters
-    public function findAll() {
-      try {
-        return DB::select(DB::raw('SELECT
+    public function findAll()
+    {
+        try {
+            return DB::select(DB::raw('SELECT
                     `g`.`idgroups` AS `id`,
                     `g`.`name` AS `name`,
                     `g`.`location` AS `location`,
@@ -53,14 +55,15 @@ class Group extends Model implements Auditable
                 LEFT JOIN `users` AS `u` ON `ug`.`user` = `u`.`id`
                 GROUP BY `g`.`idgroups`
                 ORDER BY `g`.`name` ASC'));
-      } catch (\Illuminate\Database\QueryException $e) {
-          dd($e);
-      }
+        } catch (\Illuminate\Database\QueryException $e) {
+            dd($e);
+        }
     }
 
-    public function findList() {
-      try {
-        return DB::select(DB::raw('SELECT
+    public function findList()
+    {
+        try {
+            return DB::select(DB::raw('SELECT
                 `g`.`idgroups` AS `id`,
                 `g`.`name` AS `name`,
                 `g`.`location` AS `location`,
@@ -81,14 +84,16 @@ class Group extends Model implements Auditable
             GROUP BY `g`.`idgroups`
 
             ORDER BY `g`.`name` ASC'));
-      } catch (\Illuminate\Database\QueryException $e) {
-          dd($e);
-      }
+        } catch (\Illuminate\Database\QueryException $e) {
+            dd($e);
+        }
     }
 
-    public function findOne($id){//Took out GROUP BY `images`.`path` NB:Error message -> 'fixometer_laravel.images.idimages' isn't in GROUP BY
-      try {
-        $group = DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `g`
+    public function findOne($id)
+    {
+//Took out GROUP BY `images`.`path` NB:Error message -> 'fixometer_laravel.images.idimages' isn't in GROUP BY
+        try {
+            $group = DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `g`
                 LEFT JOIN (
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
@@ -98,17 +103,17 @@ class Group extends Model implements Auditable
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
                 WHERE `id' . $this->table . '` = :id'), array('id' => $id));
-      } catch (\Illuminate\Database\QueryException $e) {
-          dd($e);
-      }
+        } catch (\Illuminate\Database\QueryException $e) {
+            dd($e);
+        }
 
-      if (!empty($group)) {
-        return $group[0];
-      }
-
+        if (!empty($group)) {
+            return $group[0];
+        }
     }
 
-    public function findHost($id){
+    public function findHost($id)
+    {
         return DB::select(DB::raw('SELECT *,
                     `g`.`name` AS `groupname`,
                     `u`.`name` AS `hostname`
@@ -130,7 +135,8 @@ class Group extends Model implements Auditable
                 AND `u`.`role` = 3'), array('id' => $id));
     }
 
-    public function ofThisUser($id){
+    public function ofThisUser($id)
+    {
         return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `g`
                 INNER JOIN `users_groups` AS `ug`
                     ON `ug`.`group` = `g`.`idgroups`
@@ -148,20 +154,24 @@ class Group extends Model implements Auditable
                 ORDER BY `g`.`name` ASC'), array('id' => $id));
     }
 
-    public function groupImage(){
+    public function groupImage()
+    {
         return $this->hasOne('App\Xref', 'reference', 'idgroups')->where('reference_type', env('TBL_GROUPS'))->where('object_type', 5);
     }
 
-    public function allHosts(){
+    public function allHosts()
+    {
         return $this->hasMany('App\UserGroups', 'group', 'idgroups')->where('role', 3);
     }
 
-    public function allRestarters(){
+    public function allRestarters()
+    {
         return $this->hasMany('App\UserGroups', 'group', 'idgroups')->where('role', 4);
     }
 
-    public function allVolunteers(){
-        return $this->hasMany('App\UserGroups', 'group', 'idgroups')->orderBy('role','ASC');
+    public function allVolunteers()
+    {
+        return $this->hasMany('App\UserGroups', 'group', 'idgroups')->orderBy('role', 'ASC');
     }
 
     public function allConfirmedVolunteers()
@@ -173,7 +183,8 @@ class Group extends Model implements Auditable
             });
     }
 
-    public function getLocation(){
+    public function getLocation()
+    {
         return rtrim($this->location);
     }
 
@@ -201,7 +212,6 @@ class Group extends Model implements Auditable
                     $partyco2 += $device->co2Diverted($emissionRatio, $Device->displacement);
                     $waste += $device->ewasteDiverted();
                 }
-
             }
             $co2 += $partyco2;
         }

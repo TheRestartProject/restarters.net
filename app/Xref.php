@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 use DB;
 
-class Xref extends Model {
+class Xref extends Model
+{
 
     protected $table = 'xref';
 
@@ -63,77 +64,75 @@ class Xref extends Model {
      * @ $index can be 'object' || 'reference'
      *   this selects in which direction to look
      * */
-    public function findXref(){
-        if($this->index !== false){
+    public function findXref()
+    {
+        if ($this->index !== false) {
             $sql = 'SELECT * FROM `' . $this->table . '`
                     WHERE `' . $this->index . '` = :id
                     AND `' . $this->index . '_type` = :type';
 
             try {
-              return DB::select(DB::raw($sql), array('id' => $this->search_id, 'type' => $this->search_type));
+                return DB::select(DB::raw($sql), array('id' => $this->search_id, 'type' => $this->search_type));
             } catch (\Illuminate\Database\QueryException $e) {
-              return false;
+                return false;
             }
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    public function findFullXref() {
+    public function findFullXref()
+    {
         //switch ($table
-
-
     }
 
-    public function createXref($clear = true){
-        if($this->index !== false){
-            if($clear == true){
+    public function createXref($clear = true)
+    {
+        if ($this->index !== false) {
+            if ($clear == true) {
                 self::deleteXref();
             }
             $sql = 'INSERT INTO `' . $this->table . '`(`object`, `object_type`, `reference`, `reference_type`) VALUES (:obj, :objType, :ref, :refType)';
 
             try {
-              return DB::insert(DB::raw($sql), array('obj' => $this->obj, 'objType' => $this->objType, 'ref' => $this->ref, 'refType' => $this->refType));
+                return DB::insert(DB::raw($sql), array('obj' => $this->obj, 'objType' => $this->objType, 'ref' => $this->ref, 'refType' => $this->refType));
             } catch (\Illuminate\Database\QueryException $e) {
-              return false;
+                return false;
             }
-        }
-        else {
+        } else {
             return false;
         }
-
     }
 
-    public function deleteXref() {
+    public function deleteXref()
+    {
 
-        if($this->index !== false){
+        if ($this->index !== false) {
             $sql = 'DELETE FROM `' . $this->table . '` WHERE `reference` = :id AND `reference_type` = :type AND `object_type` = :objectType';
 
             try {
-              return DB::delete(DB::raw($sql), array('id' => $this->ref, 'type' => $this->refType, 'objectType' => $this->objType));
+                return DB::delete(DB::raw($sql), array('id' => $this->ref, 'type' => $this->refType, 'objectType' => $this->objType));
             } catch (\Illuminate\Database\QueryException $e) {
-              return false;
+                return false;
             }
-        }
-        else {
+        } else {
             return false;
         }
-
     }
 
-    public function deleteObjectXref(){
+    public function deleteObjectXref()
+    {
             $sql = 'DELETE FROM `' . $this->table . '` WHERE `object` = :id AND `object_type` = :type';
 
-            try {
-              return DB::delete(DB::raw($sql), array('id' => $this->obj, 'type' => $this->objType));
-            } catch (\Illuminate\Database\QueryException $e) {
-              return false;
-            }
+        try {
+            return DB::delete(DB::raw($sql), array('id' => $this->obj, 'type' => $this->objType));
+        } catch (\Illuminate\Database\QueryException $e) {
+            return false;
+        }
     }
 
-    public function image(){
+    public function image()
+    {
         return $this->hasOne('App\Images', 'idimages', 'object');
     }
-
 }

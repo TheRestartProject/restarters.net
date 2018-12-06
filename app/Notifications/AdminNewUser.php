@@ -30,11 +30,11 @@ class AdminNewUser extends Notification
     public function via($notifiable)
     {
 
-        if( $notifiable->invites == 1 )
-          return ['mail', 'database'];
+        if ($notifiable->invites == 1) {
+            return ['mail', 'database'];
+        }
 
         return ['database'];
-
     }
 
     /**
@@ -49,7 +49,7 @@ class AdminNewUser extends Notification
                       ->subject('New User Registration')
                       ->greeting('Hello!')
                       ->line('A new user "' . $this->arr['name'] . '" has joined the Restarters community.')
-                      ->action('View profile', url('/profile/'.$this->arr['id']) )
+                      ->action('View profile', url('/profile/'.$this->arr['id']))
                       ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
     }
 
@@ -61,10 +61,10 @@ class AdminNewUser extends Notification
      */
     public function toArray($notifiable)
     {
-      return [
+        return [
           'title' => 'New user has joined the community:',
           'name' => $this->arr['name'],
           'url' => url('/profile/'.$this->arr['id']),
-      ];
+        ];
     }
 }

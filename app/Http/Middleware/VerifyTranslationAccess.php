@@ -26,11 +26,10 @@ class VerifyTranslationAccess
                                         ->select('users.*')
                                           ->first();
 
-        if( !empty($has_permission) ){
-          return $next($request);
+        if (!empty($has_permission)) {
+            return $next($request);
         } else {
-          abort(404);
+            abort(404);
         }
-
     }
 }
