@@ -158,6 +158,7 @@
 
                   <label class="groups-tags-label" for="area">@lang('groups.area')</label>
                   <input type="text" name="area" class="form-control field" value="{{ $formdata->area }}" />
+                  <small id="locationHelpBlock" class="form-text text-muted">@lang('groups.helptext_area')</small>
 
                   @if( is_null($formdata->wordpress_post_id) )
                     <br>

@@ -81,6 +81,8 @@ return [
 
     'groups_location_small' => 'Where do you keep your fixing tools and supplies?',
 
+    'helptext_area' => 'For display on The Restart Project homepage',
+
     'field_group_images' => 'Add group image here',
     'field_group_images_2' => 'Choose an image for your group',
 
