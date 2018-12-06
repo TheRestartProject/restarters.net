@@ -4,6 +4,8 @@ function toggleRead(event) {
     $button = $(this);
     $counter = $('button.badge.badge-pill.badge-info span');
 
+    $notificationsBadge = $('#notifications-badge');
+
     $.ajax({
       type: 'get',
       url: $button.attr('href'),
@@ -11,6 +13,11 @@ function toggleRead(event) {
         $button.parents('.card').addClass('status-is-read');
         $button.parents('.card').toggleClass('status-read');
         $counter.text( parseInt($counter.text()) - 1 );
+        
+        if(parseInt($counter.text()) == 0){
+          $notificationsBadge.addClass('badge-no-notifications');
+        }
+        
       },
       error: function(error) {
         alert('Cannot mark as read, please report')
