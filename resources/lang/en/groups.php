@@ -79,7 +79,7 @@ return [
     'edit_group_text'  => 'Go ahead and change or improve your group\'s profile.',
     'approve_group' => 'Approve group',
 
-    'groups_location_small' => 'I.e the place where the fixing happens!',
+    'groups_location_small' => 'Where do you keep your fixing tools and supplies?',
 
     'field_group_images' => 'Add group image here',
     'field_group_images_2' => 'Choose an image for your group',

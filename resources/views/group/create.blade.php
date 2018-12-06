@@ -75,7 +75,7 @@
                                 <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock"  />
 
                                 <small id="locationHelpBlock" class="form-text text-muted">
-                                  @lang('events.field_venue_helper')
+                                  @lang('groups.groups_location_small')
                                 </small>
 
                               </div>
