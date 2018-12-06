@@ -185,7 +185,7 @@ class Group extends Model implements Auditable
 
     public function getLocation()
     {
-        return rtrim($this->location . ', ' . $this->area, ', ');
+        return rtrim($this->location);
     }
 
     public function getGroupStats($emissionRatio)
