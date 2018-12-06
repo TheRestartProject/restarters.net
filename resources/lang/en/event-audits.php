@@ -38,7 +38,7 @@ return [
             'pax' => '<strong>pax</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
             'volunteers'   => '<strong>Quantity of Volunteers</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
             'hours' => '<strong>Event Hours</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
-            'wordpress_post_id' => '<strong>Wordpress post ID</strong> was modified to "<strong>:new</strong>"',
+            'wordpress_post_id' => '<strong>Wordpress post ID</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
 
         ],
     ],

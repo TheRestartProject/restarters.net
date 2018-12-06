@@ -37,7 +37,7 @@ return [
             'latitude' => '<strong>Latitude</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
             'longitude'   => '<strong>Longitude</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
             'free_text' => '<strong>Free Text</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
-            'wordpress_post_id' => '<strong>Wordpress post ID</strong> was modified to "<strong>:new</strong>"',
+            'wordpress_post_id' => '<strong>Wordpress post ID</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
         ],
     ],
 
