@@ -53,6 +53,7 @@ return [
         'admin_device' => 'Let administrators know that above solution is suitable for Restart Wiki',
         'devices_description' => 'Description of problem/solution',
         'useful_repair_urls' => 'URL of useful repair information used',
+        'useful_repair_info' => 'Source of information',
         'useful_repair_urls_explanation' => 'Useful repair URL',
         'useful_repair_urls_helper' => 'Enter URL here',
         'upload_photos' => 'Upload photos',

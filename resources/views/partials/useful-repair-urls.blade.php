@@ -1,5 +1,8 @@
 <div class="form-group useful-repair-urls">
+  <div class="d-flex">
     <label>@lang('devices.useful_repair_urls'):</label>
+    <label>@lang('devices.useful_repair_info'):</label>
+  </div>
     @foreach( $urls as $url )
     <div class="input-group save-url" data-device_id="{{{ $device->iddevices }}}" data-id="{{{ $url->id }}}">
       <input value="{{{ $url->url }}}" type="url" class="form-control mr-1" placeholder="@lang('devices.useful_repair_urls_helper')" aria-label="@lang('devices.useful_repair_urls_explanation')">
