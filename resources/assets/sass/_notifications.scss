@@ -110,4 +110,15 @@
             background-image: url('../images/devices.svg');
         }
     }
-}
+
+    }
+
+    .navbar-laravel .badge-no-notifications {
+         background-color : #ccc; 
+    }
+
+    .navbar-laravel .badge-no-notifications:hover,
+    .navbar-laravel .badge-no-notifications:focus,
+    .navbar-laravel .badge-no-notifications:active {
+       background-color : #7e7e7e;
+    }
