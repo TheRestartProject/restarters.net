@@ -13,7 +13,7 @@
           <option value="2" @if ($url->source == 2) selected @endif>@lang('devices.from_third_party')</option>
         </select>
       </div>
-      @if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) )
+      @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) )
       <div class="input-group-append">
         <button class="btn btn-link" type="button"><span>-</span></button>
       </div>
