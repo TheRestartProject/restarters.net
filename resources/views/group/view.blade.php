@@ -346,7 +346,7 @@
 
                     <?php
                     /** find size of needed SVGs **/
-                    if($sum > 6000) {
+                    if($sum >= 3000) {
                         $consume_svg = 'svg-car1';
                         $consume_label = 'Equal to driving';
                         $consume_eql_to = (1 / 0.12) * $groupCo2;
