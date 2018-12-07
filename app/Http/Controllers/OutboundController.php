@@ -155,11 +155,11 @@ class OutboundController extends Controller
                 }
             } else {
                 // Consume: driving vs. watching TV
-                if ($format == 'consume' && $co2 >= 6000) { // Driving graphic
+                if ($format == 'consume' && $co2 >= 3000) { // Driving graphic
                     $title = 'Equal to driving';
                     $measure = 'km';
                     $equal_to = number_format(round((1 / 0.12) * $co2), 0, '.', ',');
-                } elseif ($format == 'consume' && $co2 < 6000) { // Watching TV
+                } elseif ($format == 'consume' && $co2 < 3000) { // Watching TV
                     $title = 'Watching TV for';
                     $measure = 'day';
                     $equal_to = number_format(((1 / 0.024) * $co2 ) / 24, 0, '.', ',');
