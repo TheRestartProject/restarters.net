@@ -45,7 +45,7 @@
 
         <div class="row row-compressed-xs nested-fields d-lg-table col-lg-12">
 
-          <div class="col-6 col-device-auto">
+          <div class="col-12 col-sm-6 col-device-auto">
 
             <label for="category-{{ $device->iddevices }}">@lang('partials.category'):</label>
             <div class="form-control form-control__select">
@@ -91,7 +91,7 @@
 
           </div>
 
-          <div class="col-6 col-device-auto">
+          <div class="col-12 col-sm-6 form-group col-device-auto">
             <label for="brand-{{ $device->iddevices }}" class="flex-0">@lang('devices.brand'):</label>
             <div class="form-control form-control__select">
                 <select name="brand-{{ $device->iddevices }}" class="select2-with-input" id="brand-{{ $device->iddevices }}">
@@ -116,21 +116,21 @@
             </div>
           </div>
 
-          <div class="col-6 col-device-auto">
+          <div class="col-7 col-sm-6 col-device-auto">
             <label for="nested-6">@lang('partials.model'):</label>
             <div class="form-group">
                 <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}" placeholder="@lang('partials.model')" autocomplete="off">
             </div>
           </div>
 
-          <div class="col-4 col-device-auto">
+          <div class="col-5 col-device-auto">
             <label for="age-{{ $device->iddevices }}">@lang('partials.age'):</label>
             <div class="form-group">
               <input type="number" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" min="0" step="0.5" value="{{ $device->age }}" placeholder="@lang('partials.age_placeholder')" autocomplete="off">
             </div>
           </div>
 
-          <div class="col-4 col-device-auto">
+          <div class="col-12 col-sm-4 form-group col-device-auto">
             <label for="status-{{ $device->iddevices }}">@lang('partials.status'):</label>
             <div class="form-control form-control__select">
                 <select class="select2 repair-status" name="repair_status" id="status-{{ $device->iddevices }}" data-device="{{ $device->iddevices }}" placeholder="Description of problem">
@@ -152,7 +152,7 @@
             </div>
           </div>
 
-          <div class="col-4 col-device <?php echo ($device->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
+          <div class="col-12 col-sm-4 form-group col-device <?php echo ($device->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
             <label for="repair-info-{{ $device->iddevices }}">@lang('partials.repair_details'):</label>
             <div class="form-control form-control__select">
                 <select class="repair_details select2 repair-details-edit" name="repair-info" id="repair-info-{{ $device->iddevices }}">
@@ -178,7 +178,7 @@
             </div>
           </div>
 
-          <div class="col-4 col-device <?php echo ($device->repair_status == 1 || $device->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
+          <div class="col-12 col-sm-4 form-group col-device <?php echo ($device->repair_status == 1 || $device->repair_status == 2 ? 'col-device-auto' : 'd-none'); ?>">
             <label for="spare-parts-{{ $device->iddevices }}">@lang('devices.spare_parts_required'):</label>
             <div class="form-control form-control__select">
                 <select class="select2 spare-parts" name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
@@ -190,7 +190,7 @@
             </div>
           </div>
 
-          <div class="col-4 col-device <?php echo ($device->repair_status == 3 ? 'col-device-auto' : 'd-none'); ?>">
+          <div class="col-12 col-sm-12 col-md-4 form-group col-device <?php echo ($device->repair_status == 3 ? 'col-device-auto' : 'd-none'); ?>">
             <label for="repair_barrier">@lang('devices.repair_barrier'):</label>
             <div class="form-control form-control__select form-control__select_placeholder">
               <select name="barrier-{{ $device->iddevices }}[]" multiple id="barrier-{{ $device->iddevices }}" class="form-control field select2-repair-barrier repair-barrier">
