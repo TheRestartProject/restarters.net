@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class EventConfirmed extends Notification
+class EventConfirmed extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -43,9 +43,9 @@ class EventConfirmed extends Notification
         return (new MailMessage)
                     ->subject('Event Confirmed')
                     ->greeting('Hello!')
-                    ->line('Your event has been confirmed by an admin. This is now publicly available on <a href="' . $this->arr[0] . '">' . $this->arr[0] . '</a>')
+                    ->line('Your event has been confirmed by an admin. This is now publicly available on <a href="'.$this->arr[0].'">'.$this->arr[0].'</a>')
                     ->action('View event', url('/'))
-                    ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr[1] . '">your preferences</a> on your account.');
+                    ->line('If you would like to stop receiving these emails, please visit <a href="'.$this->arr[1].'">your preferences</a> on your account.');
     }
 
     /**
@@ -57,7 +57,7 @@ class EventConfirmed extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+
         ];
     }
 }

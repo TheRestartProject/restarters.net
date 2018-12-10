@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class AdminModerationGroup extends Notification
+class AdminModerationGroup extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -32,7 +32,6 @@ class AdminModerationGroup extends Notification
      */
     public function via($notifiable)
     {
-      
         if ($notifiable->invites == 1) {
             return ['mail', 'database'];
         }
@@ -49,12 +48,12 @@ class AdminModerationGroup extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                  ->subject('New group created: ' . $this->arr['group_name'])
+                  ->subject('New group created: '.$this->arr['group_name'])
                   ->greeting('Hello!')
-                  ->line('A new group has been created: \'' . $this->arr['group_name'] . '\'.')
+                  ->line('A new group has been created: \''.$this->arr['group_name'].'\'.')
                   ->action('View group', $this->arr['group_url'])
                   ->line('This group might need your moderation, if it hasn\'t yet been moderated by another administrator.')
-                  ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
+                  ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
     }
 
     /**
@@ -66,9 +65,9 @@ class AdminModerationGroup extends Notification
     public function toArray($notifiable)
     {
         return [
-          'title' => 'New group created:',
-          'name' => $this->arr['group_name'],
-          'url' => $this->arr['group_url'],
+            'title' => 'New group created:',
+            'name' => $this->arr['group_name'],
+            'url' => $this->arr['group_url'],
         ];
     }
 }

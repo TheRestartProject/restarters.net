@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class AdminWordPressCreateGroupFailure extends Notification
+class AdminWordPressCreateGroupFailure extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -30,7 +30,6 @@ class AdminWordPressCreateGroupFailure extends Notification
      */
     public function via($notifiable)
     {
-
         if ($notifiable->invites == 1) {
             return ['mail', 'database'];
         }
@@ -49,9 +48,9 @@ class AdminWordPressCreateGroupFailure extends Notification
         return (new MailMessage)
                   ->subject('Group WordPress failure')
                   ->greeting('Hello!')
-                  ->line('Group \'' . $this->arr['group_name'] . '\' failed to create a WordPress post during admin approval.')
+                  ->line('Group \''.$this->arr['group_name'].'\' failed to create a WordPress post during admin approval.')
                   ->action('View group', $this->arr['group_url'])
-                  ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
+                  ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
     }
 
     /**
@@ -63,9 +62,9 @@ class AdminWordPressCreateGroupFailure extends Notification
     public function toArray($notifiable)
     {
         return [
-          'title' => 'Group failed to create a new WordPress post:',
-          'name' => $this->arr['group_name'],
-          'url' => $this->arr['group_url'],
+            'title' => 'Group failed to create a new WordPress post:',
+            'name' => $this->arr['group_name'],
+            'url' => $this->arr['group_url'],
         ];
     }
 }

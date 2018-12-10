@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class NotifyRestartersOfNewEvent extends Notification
+class NotifyRestartersOfNewEvent extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -32,7 +32,6 @@ class NotifyRestartersOfNewEvent extends Notification
      */
     public function via($notifiable)
     {
-
         if ($notifiable->invites == 1) {
             return ['mail', 'database'];
         }
@@ -49,11 +48,11 @@ class NotifyRestartersOfNewEvent extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('New event for ' . $this->arr['event_group'])
+                    ->subject('New event for '.$this->arr['event_group'])
                     ->greeting('Hello!')
-                    ->line('There has been a new event added to your group: \'' . $this->arr['event_venue'] . '\'.')
+                    ->line('There has been a new event added to your group: \''.$this->arr['event_venue'].'\'.')
                     ->action('View event', $this->arr['event_url'])
-                    ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
+                    ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
     }
 
     /**
@@ -65,9 +64,9 @@ class NotifyRestartersOfNewEvent extends Notification
     public function toArray($notifiable)
     {
         return [
-          'title' => 'A new event has been created for group ' . $this->arr['event_group'] . ':',
-          'name' => $this->arr['event_venue'],
-          'url' => $this->arr['event_url'],
+            'title' => 'A new event has been created for group '.$this->arr['event_group'].':',
+            'name' => $this->arr['event_venue'],
+            'url' => $this->arr['event_url'],
         ];
     }
 }

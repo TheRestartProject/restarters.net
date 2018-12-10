@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class JoinEvent extends Notification
+class JoinEvent extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -60,9 +60,9 @@ class JoinEvent extends Notification
      */
     public function toMail($notifiable)
     {
-        $subject = 'You\'ve been invited to an upcoming ' . $this->arr['group'] . ' event';
+        $subject = 'You\'ve been invited to an upcoming '.$this->arr['group'].' event';
         $greeting = 'Hello!';
-        $introLine = 'You have received this email because you have been invited by ' . $this->arr['name'] . ' to join ' . $this->arr['group'] . ' at an upcoming event:';
+        $introLine = 'You have received this email because you have been invited by '.$this->arr['name'].' to join '.$this->arr['group'].' at an upcoming event:';
         $eventDetailsTable = '<table style="margin-left:120px; color:black">
                                     <tr>
                                       <td>Group:</td>
@@ -70,11 +70,11 @@ class JoinEvent extends Notification
                                     </tr>
                                     <tr>
                                     <td>Date:</td>
-                                    <td>'.$this->arr['event']->getEventDate('D jS M Y') . '</td>
+                                    <td>'.$this->arr['event']->getEventDate('D jS M Y').'</td>
                                   </tr>
                                   <tr>
-                                    <td>Time:</td>' .
-                                    '<td>' . $this->arr['event']->getEventStartEnd().'</td>
+                                    <td>Time:</td>'.
+                                    '<td>'.$this->arr['event']->getEventStartEnd().'</td>
                                   </tr>
                                     <tr>
                                     <td>Location:</td>
@@ -94,10 +94,10 @@ class JoinEvent extends Notification
                       ->line('<br>');
 
                 // Add message from sender if they left one
-                if (!is_null($this->arr['message'])) {
-                    $mail->line($this->arr['name'] . ' attached this message with the invite:')
+                if ( ! is_null($this->arr['message'])) {
+                    $mail->line($this->arr['name'].' attached this message with the invite:')
                          ->line('')
-                         ->line('"' . $this->arr['message'] . '"')
+                         ->line('"'.$this->arr['message'].'"')
                          ->line('');
                 }
                 $mail->action('RSVP now', $this->arr['url'])
@@ -116,11 +116,11 @@ class JoinEvent extends Notification
                   ->line('You can turn up on the day, or if you would prefer you can also create an account with us and RSVP online now.');
 
             // Add message from sender if they left one
-            if (!is_null($this->arr['message'])) {
+            if ( ! is_null($this->arr['message'])) {
                 $mail->line('')
-                     ->line($this->arr['name'] . ' attached this message with the invite:')
+                     ->line($this->arr['name'].' attached this message with the invite:')
                      ->line('')
-                     ->line('"' . $this->arr['message'] . '"');
+                     ->line('"'.$this->arr['message'].'"');
             }
 
             $mail->action('RSVP now', $this->arr['url'])
@@ -139,7 +139,7 @@ class JoinEvent extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+
         ];
     }
 }

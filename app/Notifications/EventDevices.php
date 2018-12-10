@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class EventDevices extends Notification
+class EventDevices extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -45,9 +45,9 @@ class EventDevices extends Notification
                 return (new MailMessage)
                       ->subject('Contribute Devices')
                       ->greeting('Hello!')
-                      ->line('Thank you for hosting the event \'' . $this->arr['event_venue'] . '\', please help us outline what devices were bought to the event and the status of their repair. This will help us improve the quality of our data.')
+                      ->line('Thank you for hosting the event \''.$this->arr['event_venue'].'\', please help us outline what devices were bought to the event and the status of their repair. This will help us improve the quality of our data.')
                       ->action('Contribute data', $this->arr['event_url'])
-                      ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'].'/'.$notifiable->id . '">your preferences</a> on your account.');
+                      ->line('If you would like to stop receiving these emails, please visit <a href="'.$this->arr['preferences'].'/'.$notifiable->id.'">your preferences</a> on your account.');
             }
         }
     }
@@ -61,7 +61,7 @@ class EventDevices extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+
         ];
     }
 }

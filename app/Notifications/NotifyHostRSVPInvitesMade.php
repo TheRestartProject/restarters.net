@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class NotifyHostRSVPInvitesMade extends Notification
+class NotifyHostRSVPInvitesMade extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -29,7 +29,6 @@ class NotifyHostRSVPInvitesMade extends Notification
      */
     public function via($notifiable)
     {
-
         if ($notifiable->invites == 1) {
             return ['mail', 'database'];
         }
@@ -45,10 +44,10 @@ class NotifyHostRSVPInvitesMade extends Notification
      */
     public function toMail($notifiable)
     {
-          return (new MailMessage)
+        return (new MailMessage)
                       ->subject('Invites have been sent to your event')
                       ->greeting('Hello!')
-                      ->line('There have been invites sent out to your event: \'' . $this->event_details['event_venue'] . '\'. URL for reference: \'' . $this->event_details['event_url'] . '\'.')
+                      ->line('There have been invites sent out to your event: \''.$this->event_details['event_venue'].'\'. URL for reference: \''.$this->event_details['event_url'].'\'.')
                       ->line('If you think this email was not intended for you, please discard.')
                       ->line('Thank you.');
     }
@@ -62,9 +61,9 @@ class NotifyHostRSVPInvitesMade extends Notification
     public function toArray($notifiable)
     {
         return [
-          'title' => 'Invites have been sent to your event:',
-          'name' => $this->event_details['event_venue'],
-          'url' => $this->event_details['event_url'],
+            'title' => 'Invites have been sent to your event:',
+            'name' => $this->event_details['event_venue'],
+            'url' => $this->event_details['event_url'],
         ];
     }
 }

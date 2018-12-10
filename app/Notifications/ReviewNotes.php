@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class ReviewNotes extends Notification
+class ReviewNotes extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -54,9 +54,9 @@ class ReviewNotes extends Notification
                 return (new MailMessage)
                       ->subject('A repair has been marked as suitable for the wiki')
                       ->greeting('Hello!')
-                      ->line($this->arr['current_user_name'] . ' has marked a repair as suitable for the wiki.')
+                      ->line($this->arr['current_user_name'].' has marked a repair as suitable for the wiki.')
                       ->action('View device', $this->arr['device_url'])
-                      ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'].'/'.$notifiable->id . '">your preferences</a> on your account.');
+                      ->line('If you would like to stop receiving these emails, please visit <a href="'.$this->arr['preferences'].'/'.$notifiable->id.'">your preferences</a> on your account.');
             }
         }
     }
@@ -70,7 +70,7 @@ class ReviewNotes extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+
         ];
     }
 }
