@@ -14,6 +14,7 @@ use App\Helpers\CachingWikiPageRetriever;
 use App\Device;
 
 use Auth;
+use Cache;
 use DB;
 use Illuminate\Support\Facades\Log;
 
@@ -191,6 +192,7 @@ class DashboardController extends Controller
         'onboarding' => $onboarding,
         'impact_stats' => $impact_stats,
           'wiki_pages' => $wiki_pages,
+          'hot_topics' => $this->getDiscourseHotTopics(),
         ]);
 
         /*
@@ -219,6 +221,47 @@ class DashboardController extends Controller
         */
     }
 
+    public function getDiscourseHotTopics()
+    {
+
+        /**
+         * Query Discourse API for current logged in user
+         * This retrieves all categories from Discourse
+         */
+        if (Cache::has('talk_categories')) {
+            $talk_categories = Cache::get('talk_categories');
+        } else {
+            $talk_categories_json = json_decode(env('DISCOURSE_URL').'/categories.json');
+            if (is_object($talk_categories_json) && isset($talk_categories_json->categories)) {
+                $talk_categories = $talk_categories_json->categories;
+                Cache::put('talk_categories', $talk_categories, 60*24);
+            } else {
+                $talk_categories = [];
+            }
+        }
+
+        /**
+         * Query Discourse API for current logged in user
+         * This retrieves all hot topics from Discourse
+         */
+        if (Cache::has('talk_hot_topics_'.Auth::user()->username)) {
+           $talk_hot_topics = Cache::get('talk_hot_topics_'.Auth::user()->username);
+        } else {
+           $talk_hot_topics_json = json_decode(env('DISCOURSE_URL').'/notifications.json');
+           if (is_object($talk_hot_topics_json) && isset($talk_hot_topics_json->topic_list->topics)) {
+               $talk_hot_topics = $talk_hot_topics_json->topic_list->topics;
+               Cache::put('talk_hot_topics_'.Auth::user()->username, $talk_hot_topics, 60);
+           } else {
+               $talk_hot_topics = [];
+           }
+        }
+
+        return [
+            'talk_categories' => $talk_categories,
+            'talk_hot_topics' => $talk_hot_topics,
+        ];
+
+    }
 
     public function getHostDash()
     {
