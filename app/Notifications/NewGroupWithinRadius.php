@@ -11,15 +11,16 @@ class NewGroupWithinRadius extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    protected $arr;
+
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($arr, $user = null)
+    public function __construct($arr)
     {
         $this->arr = $arr;
-        $this->user = $user;
     }
 
     /**

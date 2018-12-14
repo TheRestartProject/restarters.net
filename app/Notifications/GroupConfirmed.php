@@ -11,13 +11,14 @@ class GroupConfirmed extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    protected $arr;
+    protected $user;
+
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    protected $arr;
-    protected $user;
     public function __construct($arr, $user = null)
     {
         $this->arr = $arr;

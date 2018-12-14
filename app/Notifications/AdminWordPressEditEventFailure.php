@@ -11,6 +11,9 @@ class AdminWordPressEditEventFailure extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    protected $arr;
+    protected $user;
+
     /**
      * Create a new notification instance.
      *

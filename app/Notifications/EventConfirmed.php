@@ -11,6 +11,8 @@ class EventConfirmed extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    protected $arr;
+
     /**
      * Create a new notification instance.
      *

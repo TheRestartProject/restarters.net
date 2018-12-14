@@ -692,18 +692,18 @@ class GroupController extends Controller
                     event(new ApproveGroup($group, $data));
 
                 // Notify nearest users - disabled for now until Laravel Queue is implemented
-                  // if( !is_null($latitude) && !is_null($longitude) ){
-                  //
-                  //   $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
-                  //                               ->orderBy('name', 'ASC')
-                  //                                 ->get();
-                  //
-                  //   Notification::send($restarters_nearby, new NewGroupWithinRadius([
-                  //     'group_name' => $group->name,
-                  //     'group_url' => url('/group/view/'.$id),
-                  //   ]));
-                  //
-                  // }
+                  if( !is_null($latitude) && !is_null($longitude) ){
+
+                    $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
+                                                ->orderBy('name', 'ASC')
+                                                  ->get();
+                  
+                    Notification::send($restarters_nearby, new NewGroupWithinRadius([
+                      'group_name' => $group->name,
+                      'group_url' => url('/group/view/'.$id),
+                    ]));
+
+                  }
                 } elseif ( ! empty($group->wordpress_post_id)) {
                     event(new EditGroup($group, $data));
                 }

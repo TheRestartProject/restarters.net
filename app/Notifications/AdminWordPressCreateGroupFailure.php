@@ -11,6 +11,9 @@ class AdminWordPressCreateGroupFailure extends Notification implements ShouldQue
 {
     use Queueable;
 
+    protected $arr;
+    protected $user;
+
     /**
      * Create a new notification instance.
      *

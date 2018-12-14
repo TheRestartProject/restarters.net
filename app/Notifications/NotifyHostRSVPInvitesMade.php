@@ -11,6 +11,8 @@ class NotifyHostRSVPInvitesMade extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    protected $event_details;
+
     /**
      * Create a new notification instance.
      *
