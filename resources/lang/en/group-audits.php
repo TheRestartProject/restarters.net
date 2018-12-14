@@ -22,6 +22,7 @@ return [
             'longitude'   => '<strong>Longitude</strong> set as "<strong>:new</strong>"',
             'free_text' => '<strong>Free Text</strong> set as "<strong>:new</strong>"',
             'idgroups' => '<strong>Group ID</strong> set as "<strong>:new</strong>"',
+            'wordpress_post_id' => '<strong>Wordpress post ID</strong> set as "<strong>:new</strong>"',
         ],
     ],
     'updated'            => [
@@ -36,6 +37,7 @@ return [
             'latitude' => '<strong>Latitude</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
             'longitude'   => '<strong>Longitude</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
             'free_text' => '<strong>Free Text</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
+            'wordpress_post_id' => '<strong>Wordpress post ID</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
         ],
     ],
 
