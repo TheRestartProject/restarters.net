@@ -45,6 +45,10 @@ See Installation Guidelines in the wiki.
 We've documented our method for estimating CO2 emissions prevented through
 electronic repairs. Please read more at http://rstrt.org/FAQ
 
+## Specifications
+
+Compiled version of the specs is available at: https://therestartproject.github.io/restarters.net/Index.html
+
 ## Funding and future development
 
 The first version of the tool (2015) was the core Fixometer engine. This was
