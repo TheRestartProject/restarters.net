@@ -158,7 +158,7 @@
     <div class="col">
       <div class="row row-compressed">
         @if (FixometerHelper::hasRole($user, 'Administrator'))
-          @include('dashboard.restarter')
+          @include('dashboard.host')
         @endif
         @if (FixometerHelper::hasRole($user, 'Host'))
           @include('dashboard.host')

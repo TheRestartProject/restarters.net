@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\Party;
-use App\Group;
-use App\UserGroups;
-use App\UsersSkills;
+use App\Device;
 use App\EventsUsers;
-use App\Helpers\FixometerHelper;
+use App\Group;
 use App\Helpers\CachingRssRetriever;
 use App\Helpers\CachingWikiPageRetriever;
-use App\Device;
+use App\Helpers\FixometerHelper;
+use App\Party;
+use App\User;
+use App\UserGroups;
+use App\UsersSkills;
 
 use Auth;
 use Cache;
@@ -20,39 +20,38 @@ use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
-  // public function __construct($model, $controller, $action){
-  //     parent::__construct($model, $controller, $action);
-  //
-  //     $Auth = new Auth($url);
-  //     if(!$Auth->isLoggedIn()){
-  //         header('Location: /user/login');
-  //     }
-  //     else {
-  //
-  //         $user = $Auth->getProfile();
-  //         $this->user = $user;
-  //         $this->set('user', $user);
-  //         $this->set('header', true);
-  //     }
-  // }
-
+    // public function __construct($model, $controller, $action){
+    //     parent::__construct($model, $controller, $action);
+    //
+    //     $Auth = new Auth($url);
+    //     if(!$Auth->isLoggedIn()){
+    //         header('Location: /user/login');
+    //     }
+    //     else {
+    //
+    //         $user = $Auth->getProfile();
+    //         $this->user = $user;
+    //         $this->set('user', $user);
+    //         $this->set('header', true);
+    //     }
+    // }
 
     public function index()
     {
-
         $user = User::getProfile(Auth::id());
 
         // Update language every time you go to the dashboard
         Auth::user()->update([
-        'language' => session('locale')
+            'language' => session('locale'),
         ]);
 
-        $in_group = !empty(UserGroups::where('user', Auth::id())->get()->toArray());
-        $has_skills = !empty(UsersSkills::where('user', Auth::id())->get()->toArray());
-        $in_event = !empty(EventsUsers::where('user', Auth::id())->get()->toArray());
+        $in_group = ! empty(UserGroups::where('user', Auth::id())->get()->toArray());
+        $has_skills = ! empty(UsersSkills::where('user', Auth::id())->get()->toArray());
+        $in_event = ! empty(EventsUsers::where('user', Auth::id())->get()->toArray());
 
         // TODO: move this to it's own class, which caches results (on success).
         $userExistsInDiscourse = false;
+
         try {
             $discourseApiKey = env('DISCOURSE_APIKEY');
             $discourseApiUser = env('DISCOURSE_APIUSER');
@@ -64,7 +63,7 @@ class DashboardController extends Controller
             Log::error('Error occurred while searching for user in Discourse');
         }
 
-        if (!is_null($user->idimages) && !is_null($user->path)) {
+        if ( ! is_null($user->idimages) && ! is_null($user->path)) {
             $has_profile_pic = true;
         } else {
             $has_profile_pic = false;
@@ -102,7 +101,7 @@ class DashboardController extends Controller
             $outdated_groups = Group::join('users_groups', 'groups.idgroups', '=', 'users_groups.group')
                                 ->where('users_groups.user', Auth::user()->id)
                                   ->where('users_groups.role', 3)
-                                    ->whereDate('updated_at', '<=', date('Y-m-d', strtotime("-3 Months")))
+                                    ->whereDate('updated_at', '<=', date('Y-m-d', strtotime('-3 Months')))
                                       ->select('groups.*')
                                         ->take(3)
                                           ->get();
@@ -123,7 +122,7 @@ class DashboardController extends Controller
                                           ->get();
             }
 
-            if (!isset($inactive_groups) || empty($inactive_groups->toArray())) {
+            if ( ! isset($inactive_groups) || empty($inactive_groups->toArray())) {
                 $inactive_groups = null;
             }
         } else {
@@ -135,14 +134,14 @@ class DashboardController extends Controller
             $all_groups = Group::whereIn('idgroups', $group_ids)->get();
         }
 
-        if (!isset($all_groups) || empty($all_groups->toArray())) {
+        if ( ! isset($all_groups) || empty($all_groups->toArray())) {
             $all_groups = null;
         }
 
         //Get events nearest (or not) to you
-        if (!is_null($user->latitude) && !is_null($user->longitude)) { //Should the user have location info
+        if ( ! is_null($user->latitude) && ! is_null($user->longitude)) { //Should the user have location info
             $upcoming_events = Party::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
-            ->having("distance", "<=", 40)
+            ->having('distance', '<=', 40)
               ->whereDate('event_date', '>=', date('Y-m-d'))
                 ->orderBy('event_date', 'ASC')
                   ->orderBy('start', 'ASC')
@@ -160,7 +159,7 @@ class DashboardController extends Controller
         $rssRetriever = new CachingRssRetriever('https://therestartproject.org/feed');
         $news_feed = $rssRetriever->getRSSFeed(3);
 
-        $wikiPagesRetriever = new CachingWikiPageRetriever(env('WIKI_URL') . '/api.php');
+        $wikiPagesRetriever = new CachingWikiPageRetriever(env('WIKI_URL').'/api.php');
         $wiki_pages = $wikiPagesRetriever->getRandomWikiPages(5);
 
         //Show onboarding modals on first login
@@ -174,25 +173,25 @@ class DashboardController extends Controller
         $impact_stats = $devices_gateway->getWeights();
 
         return view('dashboard.index', [
-          'show_getting_started' => !$userExistsInDiscourse || !$has_profile_pic || !$has_skills || !$in_group || !$in_event,
-        'gmaps' => true,
-        'user' => $user,
-        'header' => true,
-          'user_exists_in_discourse' => $userExistsInDiscourse,
-        'in_group' => $in_group,
-        'has_skills' => $has_skills,
-        'in_event' => $in_event,
-        'has_profile_pic' => $has_profile_pic,
-        'past_events' => $past_events,
-        'upcoming_events' => $upcoming_events,
-        'outdated_groups' => $outdated_groups,
-        'inactive_groups' => $inactive_groups,
-        'news_feed' => $news_feed,
-        'all_groups' => $all_groups,
-        'onboarding' => $onboarding,
-        'impact_stats' => $impact_stats,
-          'wiki_pages' => $wiki_pages,
-          'hot_topics' => $this->getDiscourseHotTopics(),
+            'show_getting_started' => ! $userExistsInDiscourse || ! $has_profile_pic || ! $has_skills || ! $in_group || ! $in_event,
+            'gmaps' => true,
+            'user' => $user,
+            'header' => true,
+            'user_exists_in_discourse' => $userExistsInDiscourse,
+            'in_group' => $in_group,
+            'has_skills' => $has_skills,
+            'in_event' => $in_event,
+            'has_profile_pic' => $has_profile_pic,
+            'past_events' => $past_events,
+            'upcoming_events' => $upcoming_events,
+            'outdated_groups' => $outdated_groups,
+            'inactive_groups' => $inactive_groups,
+            'news_feed' => $news_feed,
+            'all_groups' => $all_groups,
+            'onboarding' => $onboarding,
+            'impact_stats' => $impact_stats,
+            'wiki_pages' => $wiki_pages,
+            'hot_topics' => $this->getDiscourseHotTopics(),
         ]);
 
         /*
@@ -234,7 +233,7 @@ class DashboardController extends Controller
             $talk_categories_json = json_decode(env('DISCOURSE_URL').'/categories.json');
             if (is_object($talk_categories_json) && isset($talk_categories_json->categories)) {
                 $talk_categories = $talk_categories_json->categories;
-                Cache::put('talk_categories', $talk_categories, 60*24);
+                Cache::put('talk_categories', $talk_categories, 60 * 24);
             } else {
                 $talk_categories = [];
             }
@@ -245,22 +244,21 @@ class DashboardController extends Controller
          * This retrieves all hot topics from Discourse
          */
         if (Cache::has('talk_hot_topics_'.Auth::user()->username)) {
-           $talk_hot_topics = Cache::get('talk_hot_topics_'.Auth::user()->username);
+            $talk_hot_topics = Cache::get('talk_hot_topics_'.Auth::user()->username);
         } else {
-           $talk_hot_topics_json = json_decode(env('DISCOURSE_URL').'/notifications.json');
-           if (is_object($talk_hot_topics_json) && isset($talk_hot_topics_json->topic_list->topics)) {
-               $talk_hot_topics = $talk_hot_topics_json->topic_list->topics;
-               Cache::put('talk_hot_topics_'.Auth::user()->username, $talk_hot_topics, 60);
-           } else {
-               $talk_hot_topics = [];
-           }
+            $talk_hot_topics_json = json_decode(env('DISCOURSE_URL').'/notifications.json');
+            if (is_object($talk_hot_topics_json) && isset($talk_hot_topics_json->topic_list->topics)) {
+                $talk_hot_topics = $talk_hot_topics_json->topic_list->topics;
+                Cache::put('talk_hot_topics_'.Auth::user()->username, $talk_hot_topics, 60);
+            } else {
+                $talk_hot_topics = [];
+            }
         }
 
         return [
             'talk_categories' => $talk_categories,
             'talk_hot_topics' => $talk_hot_topics,
         ];
-
     }
 
     public function getHostDash()
