@@ -2,6 +2,7 @@
   <div class="col-lg-4 col-dashboard">@include('partials.welcome-materials-host')</div>
   <div class="col-lg-4 col-dashboard">@include('partials.how-to')</div>
   <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.discussion')</div>
+  <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.hot-topics')</div>
   <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.wiki')</div>
   <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.community-news')</div>
 @else
@@ -17,6 +18,7 @@
         <div class="col-lg-4 col-dashboard">@include('partials.up-to-date')</div>
     @endif
     <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.discussion')</div>
+    <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.hot-topics')</div>
     <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.wiki')</div>
     <div class="col-lg-4 col-dashboard">@include('dashboard.blocks.community-news')</div>
 @endif

@@ -66,6 +66,12 @@
                 height: 73px;
             }
 
+            &--hottopics {
+                background-image: url(/images/dashboard/hottopic-header.png);
+                background-size: auto 73px;
+                height: 73px;
+            }
+
             h4 {
                 font-family: Asap;
                 font-size: 24px;
@@ -191,6 +197,88 @@
             content:url('/images/dashboard/small_arrow.png');
             margin-right: 5px;
         }
+    }
+
+    &__list-topics {
+        li {
+
+            a {
+                padding: 30px 20px 30px 65px;
+                color: #000;
+                text-decoration: none;
+                background-color: #FFFFFF;
+                display: block;
+                position: relative;
+                z-index: 1;
+
+                &:before {
+                    width: 7px;
+                    height: 100%;
+                    z-index: 2;
+                    left: 0;
+                    top: 0;
+                    content: "";
+                    display: block;
+                    position: absolute;
+                }
+
+                .topic-label { 
+                    text-decoration: underline;
+
+                    &:hover,
+                    &:focus {
+                        text-decoration: none;
+                        
+                    }
+
+                }
+
+                .badge {
+                    font-size: 12px;
+                    padding: 5px 10px;
+                    margin: 0 5px 0 0;
+                }
+
+                .digit, .badge {
+                    text-decoration: none;
+                }
+            }
+
+            &.category1 a:before {
+                background: #EE424A;
+            }
+            &.category2 a:before {
+                background: #F49292;
+            }
+            &.category3 a:before {
+                background: #FEBD67;
+            }
+            &.category4 a:before {
+                background: #F49292;
+            }
+            &.category5 a:before {
+                background: #6F8CBA;
+            }
+
+        }
+
+        .digit {
+            background-color: $brand;
+            border-radius: 50%;
+            font-family: $font-family-third;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            color: #fff;
+            width: 27px;
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            margin-top: -16px;
+            z-index: 1;
+            line-height: 28px;
+        }
+        
     }
 
     .col-dashboard {
