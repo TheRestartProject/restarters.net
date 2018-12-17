@@ -36,6 +36,22 @@
     &-very-good {
         background-color: #26781C;
     }
-
-
+    &-left {
+        border-radius: 10rem 0 0 10rem;
+    }
+    &-right {
+        border-radius: 0 10rem 10rem 0;
+    }
+    &-lg-text {
+        @include media-breakpoint-down(md) {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+    }
 }

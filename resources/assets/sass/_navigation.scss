@@ -71,10 +71,15 @@
         z-index: 2;
     }
 
+    .badge-group {
+        display: flex;
+        margin: auto;
+    }
+
     .badge {
         display: inline-block;
         float: left;
-        margin: 17px 10px 0 10px;
+        //margin: 17px 10px 0 10px;
         font-size: 16px;
         border: 0;
         background-color: #EC7F00;
@@ -88,7 +93,7 @@
             outline-color:rgba(3, 148, 166, 0.5);
         }
 
-        span {
+        span.count {
             position:relative;
             z-index:1;
             top: 2px;
