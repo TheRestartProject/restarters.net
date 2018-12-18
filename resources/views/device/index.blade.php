@@ -95,7 +95,13 @@
 
                     <div class="form-group">
                         <label for="status">Repair Status:</label>
-                        <input type="text" class="form-control field" id="status" name="status" placeholder="Device status..."  value="{{ $status }}">
+                        <div class="form-control form-control__select">
+                            <select id="status" name="status[]" class="form-control select2-tags" multiple title="Device status...">
+                              <option value="1">Fixed</option>
+                              <option value="2">Repairable</option>
+                              <option value="3">End</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -210,34 +216,37 @@
                 <table class="table table-hover table-responsive table-striped bootg table-devices sortable" id="devices-table">
                     <thead>
                         <tr>
-                            <th scope="col"></th> <!-- <th scope="col" data-column-id="comment">Comment</th> -->
+                          @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
                             <th scope="col"></th>
-                            <th scope="col" class="deviceID" data-header-css-class="comm-cell" data-identifier="true" data-type="numeric">#</th> <!-- <th scope="col" data-column-id="edit" data-header-css-class="comm-cell" data-formatter="editLink" data-sortable="false">edit</th> -->
-                            <th scope="col" class="state" data-header-css-class="mid-cell" data-formatter="statusBox">@lang('devices.state')</th>
+                            <th scope="col"></th>
+                            <th scope="col" class="deviceID" data-header-css-class="comm-cell" data-identifier="true" data-type="numeric">#</th>
+                          @endif
+
                             <th scope="col" class="category">@lang('devices.category')</th>
                             <th scope="col" class="brand">@lang('devices.brand')</th>
                             <th scope="col" class="model">@lang('devices.model')</th>
                             <th scope="col" class="comment">@lang('devices.comment')</th>
                             <th scope="col" class="eventGroup">@lang('devices.eventgroup')</th>
                             <th scope="col" class="eventDate" data-header-css-class="mid-cell">@lang('devices.eventdate')</th>
-                            <th scope="col" class="location">@lang('devices.location')</th> <!-- <th scope="col" data-column-id="groupName">Event (Group)</th> -->
-
+                            <th scope="col" class="state" data-header-css-class="mid-cell" data-formatter="statusBox">@lang('devices.state')</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if(isset($list))
                             @foreach($list as $device)
                               <tr>
-                                @include('partials/device-comment-photo', ['comment' => $device->problem ])
-                                <td class="deviceID"><a href="/device/page-edit/<?php echo $device->id; ?>"><?php echo $device->id; ?></a></td>
-                                @include('partials/device-status', ['status' => $device->repair_status])
-                                <td class="category"><?php echo $device->category_name; ?></td>
-                                <td class="brand"><?php echo $device->brand; ?></td>
-                                <td class="model"><?php echo $device->model; ?></td>
-                                <td class="comment"><?php echo $device->problem; ?></td>
-                                <td class="eventGroup"><?php echo $device->group_name; ?></td>
-                                <td class="eventDate"><?php echo strftime('%Y-%m-%d', $device->event_date); ?></td>
-                                <td class="location"><?php echo $device->event_location; ?></td>
+                                @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+                                  @include('partials/device-comment-photo', ['comment' => $device->problem ])
+                                  <td class="deviceID"><a href="/device/page-edit/<?php echo $device->id; ?>"><?php echo $device->id; ?></a></td>
+                                @endif
+
+                                  <td class="category"><?php echo $device->category_name; ?></td>
+                                  <td class="brand"><?php echo $device->brand; ?></td>
+                                  <td class="model"><?php echo $device->model; ?></td>
+                                  <td class="comment"><?php echo $device->problem; ?></td>
+                                  <td class="eventGroup"><?php echo $device->group_name; ?></td>
+                                  <td class="eventDate"><?php echo strftime('%Y-%m-%d', $device->event_date); ?></td>
+                                  @include('partials/device-status', ['status' => $device->repair_status])
                               </tr>
                             @endforeach
                         @endif

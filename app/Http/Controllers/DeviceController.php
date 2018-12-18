@@ -158,7 +158,7 @@ class DeviceController extends Controller
         $all_devices = DeviceList::orderBy('sorter', 'DSC');
 
         if ($request->input('categories') !== null) {
-            $all_devices = $all_devices->whereIn('idcategory', $request->input('categories'));
+            $all_devices = $all_devices->whereIn('idcategory', [$request->input('categories')]);
         }
 
         if ($request->input('groups') !== null) {
@@ -178,12 +178,8 @@ class DeviceController extends Controller
             $all_devices = $all_devices->where('id', 'like', $request->input('device_id').'%');
         }
 
-        if ($request->input('status') !== null && strpos($request->input('status'), 'end') !== false) {
-            $all_devices = $all_devices->where('repair_status', 3);
-        } elseif ($request->input('status') !== null && strpos($request->input('status'), 'repairable') !== false) {
-            $all_devices = $all_devices->where('repair_status', 2);
-        } elseif ($request->input('status') !== null && strpos($request->input('status'), 'fixed') !== false) {
-            $all_devices = $all_devices->where('repair_status', 1);
+        if ($request->input('status') !== null) {
+            $all_devices = $all_devices->whereIn('repair_status', $request->input('status'));
         }
 
         if ($request->input('brand') !== null) {
