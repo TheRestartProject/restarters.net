@@ -3,13 +3,15 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class AdminNewUser extends Notification
+class AdminNewUser extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    protected $arr;
 
     /**
      * Create a new notification instance.
@@ -29,7 +31,6 @@ class AdminNewUser extends Notification
      */
     public function via($notifiable)
     {
-
         if ($notifiable->invites == 1) {
             return ['mail', 'database'];
         }
@@ -45,12 +46,12 @@ class AdminNewUser extends Notification
      */
     public function toMail($notifiable)
     {
-          return (new MailMessage)
+        return (new MailMessage)
                       ->subject('New User Registration')
                       ->greeting('Hello!')
-                      ->line('A new user "' . $this->arr['name'] . '" has joined the Restarters community.')
+                      ->line('A new user "'.$this->arr['name'].'" has joined the Restarters community.')
                       ->action('View profile', url('/profile/'.$this->arr['id']))
-                      ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
+                      ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
     }
 
     /**
@@ -62,9 +63,9 @@ class AdminNewUser extends Notification
     public function toArray($notifiable)
     {
         return [
-          'title' => 'New user has joined the community:',
-          'name' => $this->arr['name'],
-          'url' => url('/profile/'.$this->arr['id']),
+            'title' => 'New user has joined the community:',
+            'name' => $this->arr['name'],
+            'url' => url('/profile/'.$this->arr['id']),
         ];
     }
 }

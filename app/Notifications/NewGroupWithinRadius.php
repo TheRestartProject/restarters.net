@@ -3,23 +3,24 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class NewGroupWithinRadius extends Notification
+class NewGroupWithinRadius extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    protected $arr;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($arr, $user = null)
+    public function __construct($arr)
     {
         $this->arr = $arr;
-        $this->user = $user;
     }
 
     /**
@@ -30,7 +31,6 @@ class NewGroupWithinRadius extends Notification
      */
     public function via($notifiable)
     {
-
         if ($notifiable->invites == 1) {
             return ['mail', 'database'];
         }
@@ -49,9 +49,9 @@ class NewGroupWithinRadius extends Notification
         return (new MailMessage)
                     ->subject('A new Restart Group near to you')
                     ->greeting('Hello!')
-                    ->line('A new group \'' . $this->arr['group_name'] . '\' has appeared near your location.')
-                    ->action('View group', $this->arr['group_url'])
-                    ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
+                    ->line('A new group near to you, '.$this->arr['group_name'].', has just become active on Restarters.net.')
+                    ->action('Find out more about ' . $this->arr['group_name'], $this->arr['group_url'])
+                    ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
     }
 
     /**
@@ -63,9 +63,9 @@ class NewGroupWithinRadius extends Notification
     public function toArray($notifiable)
     {
         return [
-          'title' => 'A new Restart Group available near you:',
-          'name' => $this->arr['group_name'],
-          'url' => $this->arr['group_url'],
+            'title' => 'A new Restart Group available near you:',
+            'name' => $this->arr['group_name'],
+            'url' => $this->arr['group_url'],
         ];
     }
 }

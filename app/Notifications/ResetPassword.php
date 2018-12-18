@@ -3,13 +3,15 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class ResetPassword extends Notification
+class ResetPassword extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    protected $arr;
 
     /**
      * Create a new notification instance.
@@ -59,7 +61,7 @@ class ResetPassword extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+
         ];
     }
 }

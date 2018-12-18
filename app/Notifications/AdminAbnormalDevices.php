@@ -3,21 +3,22 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class AdminAbnormalDevices extends Notification
+class AdminAbnormalDevices extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    protected $arr;
+    protected $user;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    protected $arr;
-    protected $user;
     public function __construct($arr, $user = null)
     {
         $this->arr = $arr;
@@ -32,7 +33,6 @@ class AdminAbnormalDevices extends Notification
      */
     public function via($notifiable)
     {
-
         if ($notifiable->invites == 1) {
             return ['mail', 'database'];
         }
@@ -51,9 +51,9 @@ class AdminAbnormalDevices extends Notification
         return (new MailMessage)
                   ->subject('Abnormal number of miscellaneous devices')
                   ->greeting('Hello!')
-                  ->line('The event \'' . $this->arr['event_venue'] . '\' has an abnormal number of miscellaneous devices.')
+                  ->line('The event \''.$this->arr['event_venue'].'\' has an abnormal number of miscellaneous devices.')
                   ->action('View event', $this->arr['event_url'])
-                  ->line('If you would like to stop receiving these emails, please visit <a href="' . url('/user/edit/'.$notifiable->id) . '">your preferences</a> on your account.');
+                  ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
     }
 
     /**
@@ -65,9 +65,9 @@ class AdminAbnormalDevices extends Notification
     public function toArray($notifiable)
     {
         return [
-          'title' => 'Event has abnormal number of miscellaneous devices:',
-          'name' => $this->arr['event_venue'],
-          'url' => $this->arr['event_url'],
+            'title' => 'Event has abnormal number of miscellaneous devices:',
+            'name' => $this->arr['event_venue'],
+            'url' => $this->arr['event_url'],
         ];
     }
 }

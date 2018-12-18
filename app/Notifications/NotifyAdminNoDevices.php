@@ -3,13 +3,16 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class NotifyAdminNoDevices extends Notification
+class NotifyAdminNoDevices extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    protected $arr;
+    protected $user;
 
     /**
      * Create a new notification instance.
@@ -30,7 +33,6 @@ class NotifyAdminNoDevices extends Notification
      */
     public function via($notifiable)
     {
-
         if ($notifiable->invites == 1) {
             return ['mail', 'database'];
         }
@@ -49,7 +51,7 @@ class NotifyAdminNoDevices extends Notification
         return (new MailMessage)
                     ->subject('Recent event with no devices added')
                     ->greeting('Hello!')
-                    ->line('Your moderation is needed for \'' . $this->arr['event_venue'] . '\'.')
+                    ->line('Your moderation is needed for \''.$this->arr['event_venue'].'\'.')
                     ->line('No devices have been added against this event.')
                     ->action('View event', $this->arr['event_url'])
                     ->line('If you think this invitation was not intended for you, please discard this email.');
@@ -64,9 +66,9 @@ class NotifyAdminNoDevices extends Notification
     public function toArray($notifiable)
     {
         return [
-          'title' => 'Moderation needed on event with no devices:',
-          'name' => $this->arr['event_venue'],
-          'url' => $this->arr['event_url'],
+            'title' => 'Moderation needed on event with no devices:',
+            'name' => $this->arr['event_venue'],
+            'url' => $this->arr['event_url'],
         ];
     }
 }

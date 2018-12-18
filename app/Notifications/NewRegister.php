@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class NewRegister extends Notification
+class NewRegister extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -18,7 +18,6 @@ class NewRegister extends Notification
      */
     public function __construct()
     {
-        //
     }
 
     /**
@@ -57,7 +56,7 @@ class NewRegister extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+
         ];
     }
 }

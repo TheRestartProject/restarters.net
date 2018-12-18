@@ -3,21 +3,22 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class GroupConfirmed extends Notification
+class GroupConfirmed extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    protected $arr;
+    protected $user;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    protected $arr;
-    protected $user;
     public function __construct($arr, $user = null)
     {
         $this->arr = $arr;
@@ -48,9 +49,9 @@ class GroupConfirmed extends Notification
                 return (new MailMessage)
                       ->subject('Group Confirmed')
                       ->greeting('Hello!')
-                      ->line('Your group \'' . $this->arr['group_name']. '\' has been confirmed by an admin.')
+                      ->line('Your group \''.$this->arr['group_name'].'\' has been confirmed by an admin.')
                       ->action('View Group', $this->arr['group_url'])
-                      ->line('If you would like to stop receiving these emails, please visit <a href="' . $this->arr['preferences'] . '">your preferences</a> on your account.');
+                      ->line('If you would like to stop receiving these emails, please visit <a href="'.$this->arr['preferences'].'">your preferences</a> on your account.');
             }
         }
     }
@@ -64,7 +65,7 @@ class GroupConfirmed extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+
         ];
     }
 }
