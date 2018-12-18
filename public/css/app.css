@@ -2311,6 +2311,11 @@ pre code {
   opacity: 1;
 }
 
+.form-control:-ms-input-placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
 .form-control::-ms-input-placeholder {
   color: #6c757d;
   opacity: 1;
@@ -10947,8 +10952,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   font-family: "summernote";
   font-style: normal;
   font-weight: normal;
-  src: url(/fonts/vendor/summernote/dist/summernote.eot?a52b483f848b87d49a85f0c58ca28699);
-  src: url(/fonts/vendor/summernote/dist/summernote.eot?a52b483f848b87d49a85f0c58ca28699) format("embedded-opentype"), url(/fonts/vendor/summernote/dist/summernote.woff?f9b5d834b2fea5a2b440074e662c2281) format("woff"), url(/fonts/vendor/summernote/dist/summernote.ttf?ad2ecd48a495cc67b3b33764bee90f14) format("truetype");
+  src: url(/fonts/vendor/summernote/dist/summernote.eot?222d2ab5b4d9d55703b1c4614e988290);
+  src: url(/fonts/vendor/summernote/dist/summernote.eot?222d2ab5b4d9d55703b1c4614e988290) format("embedded-opentype"), url(/fonts/vendor/summernote/dist/summernote.woff?621a2895d134f396b572b97d33e66b2b) format("woff"), url(/fonts/vendor/summernote/dist/summernote.ttf?1785db880428d8ab334f906a35f109e9) format("truetype");
 }
 
 [class^="note-icon-"]:before,
@@ -11558,15 +11563,15 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   margin: 0;
 }
 
+.note-popover .popover-content .note-color-all .dropdown-menu,
+.panel-heading.note-toolbar .note-color-all .dropdown-menu {
+  min-width: 337px;
+}
+
 .note-popover .popover-content .note-color .dropdown-toggle,
 .panel-heading.note-toolbar .note-color .dropdown-toggle {
   width: 20px;
   padding-left: 5px;
-}
-
-.note-popover .popover-content .note-color .dropdown-menu,
-.panel-heading.note-toolbar .note-color .dropdown-menu {
-  min-width: 337px;
 }
 
 .note-popover .popover-content .note-color .dropdown-menu .note-palette,
@@ -11590,7 +11595,9 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset,
-.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset {
+.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset,
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-select,
+.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-select {
   width: 100%;
   padding: 0 3px;
   margin: 3px;
@@ -11607,6 +11614,16 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset:hover,
 .panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset:hover {
   background: #eee;
+}
+
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-select-btn,
+.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-select-btn {
+  display: none;
+}
+
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-holder-custom .note-color-btn,
+.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-holder-custom .note-color-btn {
+  border: 1px solid #eee;
 }
 
 .note-popover .popover-content .note-para .dropdown-menu,
@@ -11838,8 +11855,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   font-family: "summernote";
   font-style: normal;
   font-weight: normal;
-  src: url(/fonts/vendor/summernote/dist/summernote.eot?a52b483f848b87d49a85f0c58ca28699);
-  src: url(/fonts/vendor/summernote/dist/summernote.eot?a52b483f848b87d49a85f0c58ca28699) format("embedded-opentype"), url(/fonts/vendor/summernote/dist/summernote.woff?f9b5d834b2fea5a2b440074e662c2281) format("woff"), url(/fonts/vendor/summernote/dist/summernote.ttf?ad2ecd48a495cc67b3b33764bee90f14) format("truetype");
+  src: url(/fonts/vendor/summernote/dist/summernote.eot?222d2ab5b4d9d55703b1c4614e988290);
+  src: url(/fonts/vendor/summernote/dist/summernote.eot?222d2ab5b4d9d55703b1c4614e988290) format("embedded-opentype"), url(/fonts/vendor/summernote/dist/summernote.woff?621a2895d134f396b572b97d33e66b2b) format("woff"), url(/fonts/vendor/summernote/dist/summernote.ttf?1785db880428d8ab334f906a35f109e9) format("truetype");
 }
 
 [class^="note-icon-"]:before,
@@ -12375,6 +12392,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .card-header.note-toolbar {
   padding: 0 0 5px 5px;
   margin: 0;
+  background: #f5f5f5;
 }
 
 .note-popover .popover-content > .btn-group,
@@ -12450,15 +12468,15 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   margin: 0;
 }
 
+.note-popover .popover-content .note-color-all .dropdown-menu,
+.card-header.note-toolbar .note-color-all .dropdown-menu {
+  min-width: 337px;
+}
+
 .note-popover .popover-content .note-color .dropdown-toggle,
 .card-header.note-toolbar .note-color .dropdown-toggle {
   width: 20px;
   padding-left: 5px;
-}
-
-.note-popover .popover-content .note-color .dropdown-menu,
-.card-header.note-toolbar .note-color .dropdown-menu {
-  min-width: 337px;
 }
 
 .note-popover .popover-content .note-color .dropdown-menu .note-palette,
@@ -12482,7 +12500,9 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset,
-.card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset {
+.card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset,
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-select,
+.card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-color-select {
   width: 100%;
   padding: 0 3px;
   margin: 3px;
@@ -12499,6 +12519,16 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset:hover,
 .card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset:hover {
   background: #eee;
+}
+
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-select-btn,
+.card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-color-select-btn {
+  display: none;
+}
+
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-holder-custom .note-color-btn,
+.card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-holder-custom .note-color-btn {
+  border: 1px solid #eee;
 }
 
 .note-popover .popover-content .note-para .dropdown-menu,
@@ -13343,14 +13373,12 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .select2-hidden-accessible {
   border: 0 !important;
   clip: rect(0 0 0 0) !important;
-  -webkit-clip-path: inset(50%) !important;
-  clip-path: inset(50%) !important;
   height: 1px !important;
+  margin: -1px !important;
   overflow: hidden !important;
   padding: 0 !important;
   position: absolute !important;
   width: 1px !important;
-  white-space: nowrap !important;
 }
 
 .select2-container--default .select2-selection--single {
@@ -13747,6 +13775,9 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .select2-container--classic[dir="rtl"] .select2-selection--multiple .select2-selection__choice {
   float: right;
+}
+
+.select2-container--classic[dir="rtl"] .select2-selection--multiple .select2-selection__choice {
   margin-left: 5px;
   margin-right: auto;
 }
@@ -14693,6 +14724,14 @@ table.sortable > thead th div.mozilla {
   text-decoration: underline;
 }
 
+.btn-secondary:disabled,
+.btn-secondary:disabled:hover,
+.btn-secondary:disabled:focus {
+  background-color: #FE9F54;
+  border-color: #FE9F54;
+  color: #fff;
+}
+
 .btn-danger {
   background-color: #D23714;
   border: 0;
@@ -14947,7 +14986,8 @@ table.sortable > thead th div.mozilla {
 }
 
 .status-read .btn-marked,
-.status-read .marked-as-read {
+.status-read
+.marked-as-read {
   text-decoration: underline;
 }
 
