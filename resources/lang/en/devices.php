@@ -69,4 +69,8 @@ return [
 
         'from_manufacturer' => 'From manufacturer',
         'from_third_party' => 'From third party',
+
+        'label_url' => 'URL of useful repair information used',
+        'label_info' => 'Source of information',
+        'uploaded_photos' => 'Uploaded photos'
     ];

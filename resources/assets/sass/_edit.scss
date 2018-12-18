@@ -3,9 +3,11 @@
     border: 1px solid #D9D9D9;
     border-radius: 3px;
     padding: 20px 20px 20px;
+
     @include media-breakpoint-up(lg) {
         padding: 50px 45px 40px;
     }
+
     margin: 0 0 30px 0;
 
     &__side {
@@ -17,6 +19,7 @@
         @include media-breakpoint-up(lg) {
             padding: 60px;
         }
+
         margin: 10px auto;
     }
 
@@ -40,7 +43,7 @@
         line-height: 19px;
 
         a {
-            color:#000;
+            color: #000;
             text-decoration: underline;
 
             &:hover {
@@ -50,7 +53,7 @@
     }
 
     .btn-preferences {
-        color:#000;
+        color: #000;
         text-decoration: underline;
 
         &:hover {
@@ -75,7 +78,8 @@
                 line-height: 1.4;
             }
 
-            label, input {
+            label,
+            input {
                 margin-top: auto;
                 margin-bottom: auto;
             }
@@ -103,7 +107,7 @@
             margin-right: -60px;
         }
 
-        > div {
+        >div {
             @include media-breakpoint-up(lg) {
                 padding-left: 60px;
                 padding-right: 60px;
@@ -119,7 +123,7 @@
         text-decoration: underline;
         color: #000;
         background-color: transparent;
-        border:0;
+        border: 0;
         padding: 0;
         width: 100%;
 
@@ -129,10 +133,64 @@
 
     }
 
+    .side-collapse {
+
+        legend {
+            border-top: 1px solid #BEC0C0;
+            margin: 0;
+        }
+
+        .form-group:last-child {
+            padding-bottom: 20px;
+        }
+
+        &:first-of-type legend {
+            border-top: 0;
+        }
+
+        &:last-of-type {
+            border-bottom: 1px solid #BEC0C0;
+        }
+
+        button {
+            padding: 15px 20px 15px 0px;
+            color: $brand;
+            font-size: 20px;
+            display: block;
+            width: 100%;
+            text-align: left;
+            display: block;
+            position: relative;
+            z-index: 1;
+
+            &:after {
+                content: "−";
+                position: absolute;
+                right: 0;
+                top: 11px;
+                z-index: 1;
+                display: block;
+                font-size: 28px;
+                font-family: Arial,
+                    Helvetica Neue,
+                    Helvetica,
+                    sans-serif;
+                font-weight: 600;
+            }
+
+            &.collapsed {
+                &:after {
+                    content: "+";
+                }
+            }
+        }
+    }
+
+
 }
 
 .row-end {
-    > div {
+    >div {
         flex-direction: column;
     }
 }
@@ -141,7 +199,8 @@
     margin-bottom: 30px;
 }
 
-.form-control, .tokenfield {
+.form-control,
+.tokenfield {
     font-size: 15px;
     font-family: $font-family-second;
     border-width: 2px;
@@ -152,7 +211,7 @@
     margin-bottom: 15px;
     padding: 3px 2px;
     min-height: 41px;
-    height:auto;
+    height: auto;
 
     .token-input {
         background-color: transparent;
@@ -163,6 +222,7 @@
         display: inline-block;
         border: 0 none;
     }
+
     //
     // .tokenfield-set {
     //      > ul {
@@ -171,31 +231,33 @@
     //         z-index: 1;
     //         top: 6px;
 
-             .token {
-                background-color: $brand;
-                color: #FFF;
-                font-size: 14px;
-                padding: 4px 10px;
-                border-bottom: 3px solid #155E67;
-                margin-left: 3px;
-                margin-right: 3px;
-                border-radius: 3px;
-                white-space: nowrap;
-                display: inline-block;
-                padding-right: 30px;
-                position: relative;
-                z-index: 1;
-                margin: 0 1px 1px 0;
-                .close {
-                    position: absolute;
-                    right: 6px;
-                    top: 3px;
-                    z-index: 1;
-                    color: #FFF;
-                    font-size: 22px;
-                    font-weight: 400;
-                }
-             }
+    .token {
+        background-color: $brand;
+        color: #FFF;
+        font-size: 14px;
+        padding: 4px 10px;
+        border-bottom: 3px solid #155E67;
+        margin-left: 3px;
+        margin-right: 3px;
+        border-radius: 3px;
+        white-space: nowrap;
+        display: inline-block;
+        padding-right: 30px;
+        position: relative;
+        z-index: 1;
+        margin: 0 1px 1px 0;
+
+        .close {
+            position: absolute;
+            right: 6px;
+            top: 3px;
+            z-index: 1;
+            color: #FFF;
+            font-size: 22px;
+            font-weight: 400;
+        }
+    }
+
     //      }
     // }
 }

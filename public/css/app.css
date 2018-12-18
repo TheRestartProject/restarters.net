@@ -15057,6 +15057,22 @@ table.sortable > thead th div.mozilla {
   }
 }
 
+.btn-state-1 {
+  display: none;
+}
+
+.btn-state-2 {
+  display: block;
+}
+
+.btn.collapsed .btn-state-1 {
+  display: block;
+}
+
+.btn.collapsed .btn-state-2 {
+  display: none;
+}
+
 .badge {
   font-family: "Patua One", sans-serif;
 }
@@ -17279,6 +17295,51 @@ td.col-device-auto {
 
 .edit-panel__reset:hover {
   text-decoration: none;
+}
+
+.edit-panel .side-collapse legend {
+  border-top: 1px solid #BEC0C0;
+  margin: 0;
+}
+
+.edit-panel .side-collapse .form-group:last-child {
+  padding-bottom: 20px;
+}
+
+.edit-panel .side-collapse:first-of-type legend {
+  border-top: 0;
+}
+
+.edit-panel .side-collapse:last-of-type {
+  border-bottom: 1px solid #BEC0C0;
+}
+
+.edit-panel .side-collapse button {
+  padding: 15px 20px 15px 0px;
+  color: #0394A6;
+  font-size: 20px;
+  display: block;
+  width: 100%;
+  text-align: left;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+.edit-panel .side-collapse button:after {
+  content: "\2212";
+  position: absolute;
+  right: 0;
+  top: 11px;
+  z-index: 1;
+  display: block;
+  font-size: 28px;
+  font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-weight: 600;
+}
+
+.edit-panel .side-collapse button.collapsed:after {
+  content: "+";
 }
 
 .row-end > div {
