@@ -16,9 +16,11 @@
         }
     }
 }
+
 .profile-picture {
     border: none;
     background: none;
+
     img {
         border-radius: 20px;
         -moz-border-radius: 20px;
@@ -35,30 +37,34 @@
     max-width: 170px;
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow:hidden;
+    overflow: hidden;
     padding-left: 1px;
     margin: auto auto auto 9px;
+
     @include media-breakpoint-up(lg) {
         display: inline-block;
     }
 }
 
-.nav-link:focus,  {
+.nav-link:focus,
+    {
     .user-name {
         text-decoration: none;
         color: #000;
     }
 }
 
-.nav-link:hover,  {
+.nav-link:hover,
+    {
     .user-name {
         text-decoration: underline;
         color: $brand;
     }
 }
+
 .navbar-laravel {
     background-color: #FFF;
-    border-bottom:2px solid #D9D9D9;
+    border-bottom: 2px solid #D9D9D9;
     box-shadow: none;
     padding: 0;
     position: relative;
@@ -74,6 +80,15 @@
     .badge-group {
         display: flex;
         margin: auto;
+        align-self: center;
+    }
+
+    .chat-count {
+        font-size: 14px;
+
+        @include media-breakpoint-up(lg) {
+            padding-right: 5px;
+        }
     }
 
     .badge {
@@ -83,19 +98,22 @@
         font-size: 16px;
         border: 0;
         background-color: #EC7F00;
-        font-weight:400;
+        font-weight: 400;
 
-        &:hover, &:focus, &:active {
+        &:hover,
+        &:focus,
+        &:active {
             background-color: #AF6713;
         }
 
-        &:active, &:focus {
-            outline-color:rgba(3, 148, 166, 0.5);
+        &:active,
+        &:focus {
+            outline-color: rgba(3, 148, 166, 0.5);
         }
 
         span.count {
-            position:relative;
-            z-index:1;
+            position: relative;
+            z-index: 1;
             top: 2px;
         }
     }
@@ -120,32 +138,33 @@
 
     .container {
         display: flex;
-        flex-flow:row wrap;
+        flex-flow: row wrap;
         align-items: center;
+
         @include media-breakpoint-up(sm) {
-            max-width:100%;
+            max-width: 100%;
             padding: 0;
         }
     }
 
     .navbar-brand {
-        margin:auto 0;
+        margin: auto 0;
         padding: 11px 15px;
         padding-right: 25px;
 
 
-        margin:auto 0;
-        
+        margin: auto 0;
+
         @include media-breakpoint-up(sm) {
             padding: 11px 32px 11px 30px;
 
             // Equalise padding to right
             padding-right: 45px;
 
-            border:1px solid #D9D9D9;
-            border-top:0;
-            border-left:0;
-            border-bottom:0;
+            border: 1px solid #D9D9D9;
+            border-top: 0;
+            border-left: 0;
+            border-bottom: 0;
 
         }
 
@@ -160,6 +179,7 @@
         .caret {
             font-size: 18px;
             top: -6px;
+
             &:after {
                 display: inline-block;
                 width: 0;
@@ -179,13 +199,14 @@
             outline: 0;
         }
 
-        &:hover, &:active {
+        &:hover,
+        &:active {
             background-color: #0394A6;
             color: #FFF;
 
             svg {
                 path {
-                    fill:#FFF !important;
+                    fill: #FFF !important;
                 }
             }
         }
@@ -202,11 +223,11 @@
             z-index: 1;
             font-family: $font-family-sans-serif;
             //@include media-breakpoint-up(sm) {
-                padding: 11px 15px;
-                border:1px solid #D9D9D9;
-                border-top:0;
-                border-right:0;
-                border-bottom:0;
+            padding: 11px 15px;
+            border: 1px solid #D9D9D9;
+            border-top: 0;
+            border-right: 0;
+            border-bottom: 0;
             //}
 
             // iPhone 5
@@ -214,7 +235,9 @@
                 padding-left: 6px;
                 padding-right: 6px;
             }
-            &:hover, &:focus {
+
+            &:hover,
+            &:focus {
                 background-color: #fff;
                 text-decoration: none;
             }
@@ -231,7 +254,7 @@
                 flex-flow: row wrap;
                 z-index: 1500;
                 background-color: #fff;
-                border-top:2px solid #D9D9D9;
+                border-top: 2px solid #D9D9D9;
 
                 li {
                     flex: 1 0 33.333%;
@@ -245,17 +268,19 @@
 
             .nav-link {
                 //@include media-breakpoint-up(sm) {
-                    border-right:1px solid #D9D9D9;
-                    border-left: 0;
-                    padding-top: 18px;
-                    padding-bottom: 18px;
-                    padding-left: 50px;
-                    padding-right: 35px;
-                    @include media-breakpoint-down(md) {
-                        padding-left: 10px;
-                        padding-right: 10px;
-                        height: 100%;
-                    }
+                border-right: 1px solid #D9D9D9;
+                border-left: 0;
+                padding-top: 18px;
+                padding-bottom: 18px;
+                padding-left: 50px;
+                padding-right: 35px;
+
+                @include media-breakpoint-down(md) {
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    height: 100%;
+                }
+
                 //}
 
                 //padding-left: 40px;
@@ -284,13 +309,14 @@
                     outline: 0;
                 }
 
-                &:hover, &:active {
+                &:hover,
+                &:active {
                     background-color: #0394A6;
                     color: #FFF;
 
                     svg {
                         path {
-                            fill:#FFF !important;
+                            fill: #FFF !important;
                         }
                     }
                 }
@@ -300,7 +326,7 @@
 
         &:last-child {
 
-            @include media-breakpoint-down(md) {                
+            @include media-breakpoint-down(md) {
                 margin: 0;
                 flex: 1 0 100%;
                 justify-content: flex-end;
@@ -318,7 +344,7 @@
             width: 260px;
             // border:1px solid #D9D9D9;
             // border-top:0;
-            padding:0;
+            padding: 0;
             margin: 3px 0 0 0;
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.17);
         }
@@ -331,11 +357,13 @@
             //text-decoration: underline;
             text-decoration: none;
             //width: 230px;
-            border:0;
+            border: 0;
             display: flex;
             align-content: center;
             flex-flow: row wrap;
-            &:hover, &:focus {
+
+            &:hover,
+            &:focus {
                 background-color: #fff;
                 text-decoration: none;
             }
@@ -355,25 +383,25 @@
     z-index: 2;
     background: #FFF;
     margin: 2px 0 0 0;
-    box-shadow:2px 5px 5px rgba(0, 0, 0, 0.17);
-    width:210px;
+    box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.17);
+    width: 210px;
     transition: none;
 }
 
 .navbar-dropdown {
 
-    > ul {
+    >ul {
         margin: 0;
         padding: 0;
 
-        > li {
+        >li {
             text-transform: uppercase;
             list-style: none;
             font-size: 12px;
             display: block;
             padding-bottom: 10px;
             padding: 15px 20px 15px 20px;
-            border-bottom:1px solid #D9D9D9;
+            border-bottom: 1px solid #D9D9D9;
 
 
             svg {
@@ -384,11 +412,11 @@
                 top: 0;
             }
 
-            > ul {
+            >ul {
                 margin: 5px 0 0 0;
                 padding: 0;
 
-                > li {
+                >li {
                     font-size: 17px;
                     list-style: none;
                     margin-bottom: 5px;
