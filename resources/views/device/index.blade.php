@@ -17,10 +17,12 @@
             </ol>
           </nav>
 
+          @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
           <div class="btn-group button-group-filters">
             <button class="reveal-filters btn btn-secondary d-lg-none d-xl-none" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal filters</button>
             <a href="/export/devices/?{{{ Request::getQueryString() }}}" class="btn btn-primary btn-save"><i class="fa fa-download"></i>@lang('devices.export_device_data')</a>
           </div>
+          @endif
 
         </div>
       </div>
@@ -34,15 +36,23 @@
             <div class="collapse d-lg-block d-xl-block fixed-overlay-md" id="collapseFilter">
 
               <form action="/device/search/" method="get">
+
                 <div class="form-row">
                     <div class="form-group col mobile-search-bar-md">
                         <button class="btn btn-primary btn-groups" type="submit">@lang('devices.search_all_devices')</button>
+                        <button class="btn btn-primary btn-groups" type="submit" disabled>Number of search results: {{ $list->total() }}</button>
+
                         <button type="button" class="d-lg-none mobile-search-bar-md__close" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><svg width="21" height="21" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></svg></button>
                     </div>
                 </div>
 
+
+
+
+
                 <aside class="edit-panel edit-panel__side">
                     <legend>@lang('devices.by_taxonomy')</legend>
+
                     <div class="form-group">
                         <label for="items_cat">@lang('devices.category'):</label>
                         <div class="form-control form-control__select">
@@ -64,6 +74,43 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label for="brand">@lang('devices.device_brand'):</label>
+                        <input type="text" class="form-control field" id="brand" name="brand" placeholder="Brand..." value="{{ $brand }}" >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="model">@lang('devices.device_model'):</label>
+                        <input type="text" class="form-control field" id="model" name="model" placeholder="Model..." value="{{ $model }}" >
+                    </div>
+                </aside>
+
+
+
+
+
+                <aside class="edit-panel edit-panel__side">
+                    <legend>@lang('devices.by_date')</legend>
+
+                    <div class="form-group">
+                        <label for="status">Repair Status:</label>
+                        <input type="text" class="form-control field" id="status" name="status" placeholder="Device status..."  value="{{ $status }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="problem">@lang('devices.search_comments'):</label>
+                        <input type="text" class="form-control field" id="problem" name="problem" placeholder="Search in the comment..."  value="{{ $problem }}" >
+                    </div>
+                </aside>
+
+
+
+
+
+                <aside class="edit-panel edit-panel__side">
+                    <legend>@lang('devices.various')</legend>
+
                     <div class="form-group">
                         <label for="items_group">@lang('devices.group'):</label>
                         <div class="form-control form-control__select">
@@ -81,47 +128,23 @@
                         </div>
                     </div>
 
-                </aside>
-
-                <aside class="edit-panel edit-panel__side">
-                    <legend>@lang('devices.by_date')</legend>
                     <div class="form-group">
-                        <!-- <div class="input-group date from-date"> -->
                         <label for="from-date">@lang('devices.from_date'):</label>
                         <input type="date" class="field form-control" id="search-from-date" name="from-date" value="{{ $from_date }}" >
                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                        <!-- </div> -->
                     </div>
+
                     <div class="form-group">
-                        <!-- <div class="input-group date to-date"> -->
                         <label for="to-date">@lang('devices.to_date'):</label>
                         <input type="date" class="field form-control" id="search-to-date" name="to-date" value="{{ $to_date }}" >
                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                        <!-- </div> -->
                     </div>
-
                 </aside>
 
-                <aside class="edit-panel edit-panel__side">
-                    <legend>@lang('devices.various')</legend>
-                    <div class="form-group">
-                        <label for="device_id">@lang('devices.device_id'):</label>
-                        <input type="text" class="form-control field" id="device_id" name="device_id" placeholder="Device Id..."  value="{{ $device_id }}" >
-                    </div>
-                    <div class="form-group">
-                        <label for="brand">@lang('devices.device_brand'):</label>
-                        <input type="text" class="form-control field" id="brand" name="brand" placeholder="Brand..." value="{{ $brand }}" >
-                    </div>
-                    <div class="form-group">
-                        <label for="model">@lang('devices.device_model'):</label>
-                        <input type="text" class="form-control field" id="model" name="model" placeholder="Model..." value="{{ $model }}" >
-                    </div>
-                    <div class="form-group">
-                        <label for="problem">@lang('devices.search_comments'):</label>
-                        <input type="text" class="form-control field" id="problem" name="problem" placeholder="Search in the comment..."  value="{{ $problem }}" >
-                    </div>
 
-                </aside>
+
+
+
               </form>
             </div><!-- /collapseFilter -->
         </div>
@@ -228,7 +251,7 @@
                 <nav aria-label="Page navigation example">
                 <ul class="pagination">
                   @if (!empty($_GET))
-                    {!! $list->appends(['categories' => $selected_categories, 'groups' => $selected_groups, 'from_date' => $from_date, 'to-date' => $to_date, 'device_id' => $device_id, 'brand' => $brand, 'model' => $model, 'problem' => $problem])->links() !!}
+                    {!! $list->appends(['categories' => $selected_categories, 'groups' => $selected_groups, 'from_date' => $from_date, 'to-date' => $to_date, 'device_id' => $device_id, 'brand' => $brand, 'model' => $model, 'problem' => $problem, 'status' => $status])->links() !!}
                   @else
                     {!! $list->links() !!}
                   @endif
