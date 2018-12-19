@@ -638,11 +638,14 @@ class GroupController extends Controller
                 'website' => $data['website'],
                 'free_text' => $data['free_text'],
                 'location' => $data['location'],
-                'area' => $data['area'],
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'country' => $country,
             );
+
+            if ( ! empty($data['area'])) {
+                $update['area'] = $data['area'];
+            }
 
             // $u = $Group->where('idgroups', $id)->update($update);
             $u = Group::findOrFail($id)->update($update);
