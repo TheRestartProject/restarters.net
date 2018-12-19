@@ -70,7 +70,7 @@ Devices
                                 <legend id="heading-1"><button type="button" class="btn btn-link" data-toggle="collapse"
                                         data-target="#collapse-side-1" aria-expanded="true" aria-controls="collapse-side-1">@lang('devices.by_taxonomy')</button></legend>
 
-                                <div id="collapse-side-1" class="collapse show" aria-labelledby="heading-1" data-parent="#side-collapse">
+                                <div id="collapse-side-1" class="collapse show" aria-labelledby="heading-1">
 
                                     <div class="form-group">
                                         <label for="items_cat">@lang('devices.category'):</label>
@@ -120,7 +120,7 @@ Devices
                                 <legend id="heading-2"><button type="button" class="btn btn-link collapsed" data-toggle="collapse"
                                         data-target="#collapse-side-2" aria-expanded="false" aria-controls="collapse-side-2">@lang('devices.by_date')</button></legend>
 
-                                <div id="collapse-side-2" class="collapse" aria-labelledby="heading-2" data-parent="#side-collapse">
+                                <div id="collapse-side-2" class="collapse" aria-labelledby="heading-2">
                                     <div class="form-group">
                                         <label for="status">Repair Status:</label>
                                         <div class="form-control form-control__select">
@@ -147,7 +147,7 @@ Devices
                                 <legend id="heading-3"><button type="button" class="btn btn-link collapsed" data-toggle="collapse"
                                         data-target="#collapse-side-3" aria-expanded="false" aria-controls="collapse-side-3">@lang('devices.various')</button></legend>
 
-                                <div id="collapse-side-3" class="collapse" aria-labelledby="heading-3" data-parent="#side-collapse">
+                                <div id="collapse-side-3" class="collapse" aria-labelledby="heading-3">
 
                                     <div class="form-group">
                                         <label for="items_group">@lang('devices.group'):</label>
@@ -272,16 +272,10 @@ Devices
                         <br>
 
                         <div class="table-responsive" id="sort-table">
-                            <table class="table table-hover table-striped bootg table-devices sortable" id="devices-table">
+                            <table class="table table-hover bootg table-devices sortable" id="devices-table">
                                 <thead>
                                     <tr>
-                                        <th width="160"></th>
-                                        @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
-                                        <th scope="col"></th>
-                                        <th scope="col"></th>
-                                        <th scope="col" class="deviceID" data-header-css-class="comm-cell"
-                                            data-identifier="true" data-type="numeric">#</th>
-                                        @endif
+                                        <th width="120" colspan="3"></th>
                                         <th scope="col" class="category">@lang('devices.category')</th>
                                         <th scope="col" class="brand">@lang('devices.brand')</th>
                                         <th scope="col" class="model">@lang('devices.model')</th>
@@ -292,41 +286,13 @@ Devices
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if(isset($list))
                                     @foreach($list as $device)
-                                    <tr>
-                                        @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
-                                        @include('partials/device-comment-photo', ['comment' => $device->problem ])
-                                        <td class="deviceID"><a href="/device/page-edit/<?php echo $device->id; ?>">
-                                                <?php echo $device->id; ?></a></td>
+                                        @if (FixometerHelper::hasRole(Auth::user(), 'Administrator') || $device->repaired_by == Auth::user()->id )
+                                            @include('partials.device-row-with-edit')
+                                        @else
+                                            @include('partials.device-row-collapse')
                                         @endif
-
-                                        <td class="category">
-                                            <?php echo $device->category_name; ?>
-                                        </td>
-                                        <td class="brand">
-                                            <?php echo $device->brand; ?>
-                                        </td>
-                                        <td class="model">
-                                            <?php echo $device->model; ?>
-                                        </td>
-                                        <td class="comment">
-                                            <?php echo $device->problem; ?>
-                                        </td>
-                                        <td class="eventGroup">
-                                            <?php echo $device->group_name; ?>
-                                        </td>
-                                        <td class="eventDate">
-                                            <?php echo strftime('%Y-%m-%d', $device->event_date); ?>
-                                        </td>
-                                        @include('partials/device-status', ['status' => $device->repair_status])
-                                    </tr>
                                     @endforeach
-                                    @endif
-
-                                    <!-- Static for testing only -->
-                                    @include('partials.device-row-collapse')
-
                                 </tbody>
                             </table>
                         </div>

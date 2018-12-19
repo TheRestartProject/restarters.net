@@ -118,21 +118,21 @@ class DeviceController extends Controller
 
         $user = Auth::user();
 
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
-            $all_groups = Group::all();
+        // if (FixometerHelper::hasRole($user, 'Administrator')) {
+        $all_groups = Group::all();
 
-            $all_devices = DeviceList::orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
-        } else {
-            $groups_user_ids = UserGroups::where('user', $user->id)
-            ->pluck('group')
-            ->toArray();
-
-            $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
-
-            $all_devices = DeviceList::whereIn('id', $device_ids)->orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
-
-            $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
-        }
+        $all_devices = DeviceList::orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
+        // } else {
+        //     $groups_user_ids = UserGroups::where('user', $user->id)
+        //     ->pluck('group')
+        //     ->toArray();
+        //
+        //     $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
+        //
+        //     $all_devices = DeviceList::whereIn('id', $device_ids)->orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
+        //
+        //     $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
+        // }
 
         return view('device.index', [
             'title' => 'Devices',

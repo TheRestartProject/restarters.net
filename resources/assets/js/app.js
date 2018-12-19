@@ -953,13 +953,13 @@ function initAutocomplete() {
     }
 
 
-    jQuery('#collapseFilter').on('show.bs.collapse', function () {
-      jQuery('html').addClass('overflow-hidden');
-    });
-
-    jQuery('#collapseFilter').on('hidden.bs.collapse', function () {
-      jQuery('html').removeClass('overflow-hidden');
-    });
+    // jQuery('#collapseFilter').on('show.bs.collapse', function () {
+    //   jQuery('html').addClass('overflow-hidden');
+    // });
+    //
+    // jQuery('#collapseFilter').on('hidden.bs.collapse', function () {
+    //   jQuery('html').removeClass('overflow-hidden');
+    // });
 
   })
 

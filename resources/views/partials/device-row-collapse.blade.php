@@ -1,46 +1,41 @@
 <tr>
-
-    <td class="deviceID"><button type="button" class="btn btn-device-toggle btn-primary collapsed"
+    <td colspan="3" class="deviceID">
+        <button type="button" class="btn btn-device-toggle btn-primary collapsed"
             data-toggle="collapse" aria-controls="row-1" aria-expanded="false"
             data-target="#row-1">
             <span class="btn-state-1">View</span>
             <span class="btn-state-2">Close</span>
-        </button></td>
-
+        </button>
+    </td>
     <td class="category">
-        <span class="badge badge-warning">Repairable</span>
+        {{{ $device->category_name }}}
     </td>
     <td class="brand">
-        Headphones
+        {{{ $device->brand }}}
     </td>
     <td class="model">
-        1T3
+        {{{ $device->model }}}
     </td>
     <td class="comment">
-        not working
+        {{{ $device->problem }}}
     </td>
     <td class="eventGroup">
-        Repair cafe Malmö
+        {{{ $device->group_name }}}
     </td>
     <td class="eventDate">
-        2018-12-09
+        {{{ strftime('%Y-%m-%d', $device->event_date) }}}
     </td>
+    @include('partials/device-status', ['status' => $device->repair_status])
 
 </tr>
 
 <tr id="row-1" class="collapse">
-    <td colspan="8" class="p-0">
+    <td colspan="10" class="p-0">
         <div class="table-device-details">
             <div class="form-group">
                 <div class="dummy-label">@lang('devices.devices_description'):</div>
                 <div class="dummy-field">
-                    Etiam dictum sodales aliquam. Curabitur libero sapien, sagittis a
-                    venenatis id, vehicula sit amet enim. Integer
-                    vitae imperdiet urna. Integer rutrum id ante nec fermentum. Morbi
-                    est justo, fringilla eget consectetur eu, congue
-                    posuere felis. In lacinia libero et scelerisque euismod. In vel
-                    ultrices sapien. Donec ut purus ac nisl rhoncus
-                    dapibus vel ut massa.
+                    {{{ $device->problem }}}
                 </div>
             </div>
             <div class="row">
@@ -85,18 +80,18 @@
             <div class="dummy-label">@lang('devices.uploaded_photos'):</div>
                 <ul class="photo-list photo-list__devices">
                     <li>
-                        <a href="http://lorempixel.com/500/500/" data-toggle="lightbox">
-                        <img src="http://lorempixel.com/120/120/" alt="placeholder" width="120" class="img-fluid">
+                        <a href="" data-toggle="lightbox">
+                        <img src="" alt="placeholder" width="120" class="img-fluid">
                         </a>
                     </li>
                     <li>
-                        <a href="http://lorempixel.com/500/500/" data-toggle="lightbox">
-                        <img src="http://lorempixel.com/120/120/" alt="placeholder" width="120" class="img-fluid">
+                        <a href="" data-toggle="lightbox">
+                        <img src="" alt="placeholder" width="120" class="img-fluid">
                         </a>
                     </li>
                     <li>
-                        <a href="http://lorempixel.com/500/500/" data-toggle="lightbox">
-                        <img src="http://lorempixel.com/120/120/" alt="placeholder" width="120" class="img-fluid">
+                        <a href="" data-toggle="lightbox">
+                        <img src="" alt="placeholder" width="120" class="img-fluid">
                         </a>
                     </li>
               </ul>
