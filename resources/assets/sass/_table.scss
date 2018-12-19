@@ -52,9 +52,10 @@
 
     }
 
-    td, th {
+    td,
+    th {
         &:first-child {
-          padding-left: 20px;
+            padding-left: 20px;
         }
     }
 
@@ -66,7 +67,7 @@
     &-repair {
 
         .arrow {
-            transform:rotate(0deg);
+            transform: rotate(0deg);
             display: inline-block;
             position: relative;
             z-index: 1;
@@ -74,7 +75,7 @@
 
         .collapsed {
             .arrow {
-                transform:rotate(180deg);
+                transform: rotate(180deg);
                 top: 4px;
             }
         }
@@ -86,13 +87,16 @@
 
         tr {
             border-bottom: 1px solid #D9D9D9;
-            th, td {
+
+            th,
+            td {
                 background-color: #F9F9F9;
 
                 &:first-child {
                     padding-left: 10px;
                 }
             }
+
             td {
                 padding-top: 10px;
                 padding-bottom: 10px;
@@ -168,7 +172,9 @@
     }
 
     tr.active-row {
-        td, th {
+
+        td,
+        th {
             background-color: #F9F9F9;
         }
     }
@@ -181,6 +187,7 @@
         @include media-breakpoint-up(md) {
             padding-left: 15px;
         }
+
         @extend .clear;
 
         .form-group {
@@ -196,7 +203,7 @@
     }
 
     &-add {
-        border:0;
+        border: 0;
 
         .form-group {
             margin: 0;
@@ -241,27 +248,36 @@
             margin: auto;
             display: block;
         }
-        svg, button, a {
+
+        svg,
+        button,
+        a {
             margin: auto 0;
             display: block;
         }
+
         a {
             text-decoration: underline;
         }
+
         td {
             vertical-align: middle;
         }
     }
 
     &-events {
-        th, td {
+
+        th,
+        td {
             padding-left: 15px;
             padding-right: 15px;
         }
 
         th {
             vertical-align: middle !important;
-            svg, .btn-skills {
+
+            svg,
+            .btn-skills {
                 display: block;
                 margin: auto;
             }
@@ -287,7 +303,7 @@
             border-left: 1px solid #D9D9D9;
         }
 
-        tr > td {
+        tr>td {
             &:first-child {
                 border-left: 0;
             }
@@ -321,7 +337,8 @@
 
     }
 
-    th.last-login div, td.last-login div {
+    th.last-login div,
+    td.last-login div {
         width: 165px;
     }
 
@@ -335,6 +352,7 @@
     @include media-breakpoint-down(md) {
         padding: 0 10px;
     }
+
     label {
         font-family: $font-family-sans-serif;
         font-size: 16px;
@@ -346,7 +364,18 @@
             font-family: $font-family-second;
         }
     }
-    > .form-control {
+
+    >.form-control {
         margin-bottom: 15px;
+    }
+}
+
+.table-device-details {
+    background-color: #F9F9F9;
+    border-top: 2px solid #dee2e6;
+    padding: 30px 20px;
+
+    .form-group {
+        margin-bottom: 30px;
     }
 }

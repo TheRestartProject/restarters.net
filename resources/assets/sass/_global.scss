@@ -1,11 +1,14 @@
-html, body {
+html,
+body {
   height: 100%;
   background-color: #FFF;
   color: #000000;
   font-family: $font-family-second;
-  & > .container {
+
+  &>.container {
     padding-top: 20px;
     min-height: 1200px;
+
     @include media-breakpoint-up(md) {
       padding-top: 50px;
     }
@@ -17,6 +20,7 @@ html, body {
 }
 
 footer {
+
   // Fixed nav
   @include media-breakpoint-down(md) {
     min-height: 65px;
@@ -41,18 +45,27 @@ footer {
   border: 1px solid #D9D9D9;
   padding: 22px 20px 28px 20px;
   border-radius: 3px;
-  h1, h2, h3, h4, h5, h6{
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: $brand;
     margin-bottom: 18px;
   }
+
   &__profile {
     margin-bottom: 15px;
+
     h4 {
       color: #000;
     }
+
     ul {
       li {
-        list-style:none;
+        list-style: none;
         padding-left: 25px;
         background-image: url('../images/star-colored.svg');
         background-repeat: no-repeat;
@@ -68,20 +81,22 @@ footer {
 
 .row-expanded {
   @include media-breakpoint-up(xl) {
-  margin-left: -35px;
-  margin-right: -35px;
-    > div {
+    margin-left: -35px;
+    margin-right: -35px;
 
-        padding-left: 35px;
-        padding-right: 35px;
-      }
+    >div {
+
+      padding-left: 35px;
+      padding-right: 35px;
+    }
   }
 }
 
 .row-compressed {
   margin-left: -10px;
   margin-right: -10px;
-  > div {
+
+  >div {
     padding-left: 10px;
     padding-right: 10px;
   }
@@ -90,13 +105,15 @@ footer {
 .row-compressed-xs {
   margin-left: -2px;
   margin-right: -2px;
-  > div {
+
+  >div {
     padding-left: 2px;
     padding-right: 2px;
   }
 }
 
-.body-plain, .body-plain body {
+.body-plain,
+.body-plain body {
   background-color: #fff;
 }
 
@@ -121,23 +138,24 @@ footer {
 }
 
 .form-check-input {
-    margin-top: 0.45rem;
+  margin-top: 0.45rem;
 }
 
 .form-check {
-    padding-left: 0;
-    .form-check-input {
-        margin: auto 0;
-        position: relative;
-        margin-right: 10px;
-        z-index: 1;
-    }
+  padding-left: 0;
+
+  .form-check-input {
+    margin: auto 0;
+    position: relative;
+    margin-right: 10px;
+    z-index: 1;
+  }
 }
 
 label.form-check-label {
-    font-weight: 400;
-    font-family: $font-family-second;
-    font-size: 15px;
+  font-weight: 400;
+  font-family: $font-family-second;
+  font-size: 15px;
 }
 
 
@@ -156,25 +174,25 @@ label.form-check-label {
     border: 0;
   }
 
-  .select2-container{
+  .select2-container {
     width: 100% !important;
   }
 
-  .select2-selection{
+  .select2-selection {
     margin-top: 3px;
     margin-bottom: 3px;
   }
 
-  .select2-selection__arrow{
+  .select2-selection__arrow {
     top: 4px !important;
   }
 
-  .select2-selection--multiple{
+  .select2-selection--multiple {
     margin-top: 0;
     margin-bottom: 0;
     border: 0 none !important;
 
-    .select2-selection__choice{
+    .select2-selection__choice {
 
       background-color: $brand;
       color: #FFF;
@@ -199,7 +217,7 @@ label.form-check-label {
 }
 
 .form-control {
-  min-height:40px;
+  min-height: 40px;
 }
 
 .form-control__nolabel {
@@ -218,37 +236,59 @@ label.form-check-label {
   display: block;
 }
 
-h1, h2, h3, h4, h5, table th {
+h1,
+h2,
+h3,
+h4,
+h5,
+table th {
   font-family: $font-family-sans-serif;
   font-weight: 500;
 }
 
 .photo-list {
-    margin: 15px -2px;
-    padding: 0;
-    display: flex;
-    flex-flow: row wrap;
+  margin: 15px -2px;
+  padding: 0;
+  display: flex;
+  flex-flow: row wrap;
+
+  li {
+    list-style: none;
+    padding: 0 2px;
+    margin: 0;
+    flex: 1 0 25%;
+    max-width: 25%;
+
+    a {
+      display: block;
+    }
+
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 3px;
+      background: #BEC0C0;
+      border: 2px solid #BEC0C0;
+    }
+  }
+
+  &__devices {
+    margin: 15px -10px;
 
     li {
-        list-style:none;
-        padding: 0 2px;
-        margin: 0;
-        flex: 1 0 25%;
-        max-width: 25%;
+      flex: auto;
+      max-width: 120px;
+      padding: 0 10px;
+      margin: 5px 0;
 
-        a {
-            display: block;
-        }
-
-        img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 3px;
-            background:#BEC0C0;
-            border: 2px solid #BEC0C0;
-        }
+      img {
+        border-radius: 3px;
+        border: 0;
+      }
     }
+
+  }
 }
 
 .input-group-qty {
@@ -269,7 +309,8 @@ h1, h2, h3, h4, h5, table th {
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
-    margin: 0; /* Removes leftover margin */
+    margin: 0;
+    /* Removes leftover margin */
   }
 
   input[type=number] {
@@ -298,6 +339,7 @@ h1, h2, h3, h4, h5, table th {
 
   li {
     margin-bottom: 10px;
+
     svg {
       margin-right: 3px;
       position: relative;
@@ -331,21 +373,25 @@ h1, h2, h3, h4, h5, table th {
     width: 40px;
     border-radius: 0;
     position: absolute;
-    border:0;
+    border: 0;
     z-index: 2;
 
     &:focus {
-        background-color: #00B0C6;
+      background-color: #00B0C6;
 
-        svg path { fill : #fff }
+      svg path {
+        fill: #fff
+      }
     }
 
     &:hover {
-        background-color: #00B0C6;
-        border-color: #00B0C6;
-        text-decoration: underline;
+      background-color: #00B0C6;
+      border-color: #00B0C6;
+      text-decoration: underline;
 
-        svg path { fill : #fff }
+      svg path {
+        fill: #fff
+      }
     }
 
     svg {
@@ -368,34 +414,36 @@ h1, h2, h3, h4, h5, table th {
 .table-heading {
   font-size: 18px;
   line-height: 1;
-  margin:30px 0;
+  margin: 30px 0;
   text-align: center;
   color: $brand;
 }
 
 h2 {
-    font-size: 18px;
-    margin: 0 0 10px 0;
+  font-size: 18px;
+  margin: 0 0 10px 0;
 
-    sup {
-        font-size: 14px;
-        font-family: $font-family-second;
-        font-weight: 400;
-        left: 5px;
-        top: -3px;
-        a {
-            color: #000;
-            text-decoration: underline;
+  sup {
+    font-size: 14px;
+    font-family: $font-family-second;
+    font-weight: 400;
+    left: 5px;
+    top: -3px;
 
-            &:hover {
-                text-decoration: none;
-            }
-        }
+    a {
+      color: #000;
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
     }
+  }
 }
 
 .collapse-header {
   margin: 0;
+
   @include media-breakpoint-up(lg) {
     display: none;
   }
@@ -426,7 +474,19 @@ h2 {
 }
 
 .input-group-append {
-    > div {
-        margin: 7px 0 0 0;
-    }
+  >div {
+    margin: 7px 0 0 0;
+  }
+}
+
+.dummy-field {
+  background-color: #EEF0EF;
+  padding: 15px;
+}
+
+.dummy-label {
+  font-size: 16px;
+  font-weight: 600;
+  font-family: $font-family-sans-serif;
+  margin: 0 0 10px 0;
 }

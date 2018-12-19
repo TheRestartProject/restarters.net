@@ -10,6 +10,7 @@ return [
     |
     */
         'devices' => 'Devices',
+        'devices_date' => 'Date',
         'edit_devices' => 'Edit device',
         'edit_devices_details' => 'Edit device details',
         'edit_devices_details_content' => 'Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.',

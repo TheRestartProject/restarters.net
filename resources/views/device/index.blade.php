@@ -275,19 +275,19 @@ Devices
                             <table class="table table-hover table-striped bootg table-devices sortable" id="devices-table">
                                 <thead>
                                     <tr>
+                                        <th width="160"></th>
                                         @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
                                         <th scope="col"></th>
                                         <th scope="col"></th>
                                         <th scope="col" class="deviceID" data-header-css-class="comm-cell"
                                             data-identifier="true" data-type="numeric">#</th>
                                         @endif
-
                                         <th scope="col" class="category">@lang('devices.category')</th>
                                         <th scope="col" class="brand">@lang('devices.brand')</th>
                                         <th scope="col" class="model">@lang('devices.model')</th>
                                         <th scope="col" class="comment">@lang('devices.comment')</th>
-                                        <th scope="col" class="eventGroup">@lang('devices.eventgroup')</th>
-                                        <th scope="col" class="eventDate" data-header-css-class="mid-cell">@lang('devices.eventdate')</th>
+                                        <th scope="col" class="eventGroup">@lang('devices.group')</th>
+                                        <th scope="col" class="eventDate" data-header-css-class="mid-cell">@lang('devices.devices_date')</th>
                                         <th scope="col" class="state" data-header-css-class="mid-cell" data-formatter="statusBox">@lang('devices.state')</th>
                                     </tr>
                                 </thead>
@@ -325,71 +325,7 @@ Devices
                                     @endif
 
                                     <!-- Static for testing only -->
-                                    <tr>
-
-                                        <td class="deviceID"><button type="button" class="btn btn-primary collapsed"
-                                                data-toggle="collapse" aria-controls="row-1" aria-expanded="false"
-                                                data-target="#row-1">
-                                                <span class="btn-state-1">Open</span>
-                                                <span class="btn-state-2">Close</span>
-                                            </button></td>
-
-                                        <td class="category">
-                                            <span class="badge badge-warning">Repairable</span>
-                                        </td>
-                                        <td class="brand">
-                                            Headphones
-                                        </td>
-                                        <td class="model">
-                                            1T3
-                                        </td>
-                                        <td class="comment">
-                                            not working
-                                        </td>
-                                        <td class="eventGroup">
-                                            Repair cafe Malmö
-                                        </td>
-                                        <td class="eventDate">
-                                            2018-12-09
-                                        </td>
-
-                                    </tr>
-
-                                    <tr id="row-1" class="collapse">
-                                        <td colspan="8">
-                                            <div class="dummy-label">@lang('devices.devices_description')</div>
-                                            <div class="dummy-field">
-                                                Etiam dictum sodales aliquam. Curabitur libero sapien, sagittis a
-                                                venenatis id, vehicula sit amet enim. Integer
-                                                vitae imperdiet urna. Integer rutrum id ante nec fermentum. Morbi
-                                                est justo, fringilla eget consectetur eu, congue
-                                                posuere felis. In lacinia libero et scelerisque euismod. In vel
-                                                ultrices sapien. Donec ut purus ac nisl rhoncus
-                                                dapibus vel ut massa.
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-5">
-                                                    <div class="form-group">
-                                                        <div class="dummy-label">@lang('devices.label_url'):</div>
-                                                        <div class="dummy-field">http://fixo.meter:8888</div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-5">
-                                                    <div class="form-group">
-                                                        <div class="dummy-label">@lang('devices.label_info'):</div>
-                                                        <div class="dummy-field">Donec ut purus ac nisl</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="dummy-label">@lang('devices.uploaded_photos'):</div>
-                                            <ul class="d-flex list-unstyled mb-4">
-                                                <li><img src="" alt=""></li>
-                                                <li><img src="" alt=""></li>
-                                                <li><img src="" alt=""></li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-
+                                    @include('partials.device-row-collapse')
 
                                 </tbody>
                             </table>

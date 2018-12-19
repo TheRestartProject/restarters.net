@@ -15057,6 +15057,12 @@ table.sortable > thead th div.mozilla {
   }
 }
 
+.btn-device-toggle {
+  margin: auto;
+  padding: 10px 40px;
+  font-size: 12px;
+}
+
 .btn-state-1 {
   display: none;
 }
@@ -17740,6 +17746,16 @@ td.col-device-auto {
   margin-bottom: 15px;
 }
 
+.table-device-details {
+  background-color: #F9F9F9;
+  border-top: 2px solid #dee2e6;
+  padding: 30px 20px;
+}
+
+.table-device-details .form-group {
+  margin-bottom: 30px;
+}
+
 .groups {
   padding: 70px 0;
 }
@@ -19086,6 +19102,24 @@ table th {
   border: 2px solid #BEC0C0;
 }
 
+.photo-list__devices {
+  margin: 15px -10px;
+}
+
+.photo-list__devices li {
+  -webkit-box-flex: 1;
+      -ms-flex: auto;
+          flex: auto;
+  max-width: 120px;
+  padding: 0 10px;
+  margin: 5px 0;
+}
+
+.photo-list__devices li img {
+  border-radius: 3px;
+  border: 0;
+}
+
 .input-group-qty {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -19281,6 +19315,18 @@ h2 sup a:hover {
 
 .input-group-append > div {
   margin: 7px 0 0 0;
+}
+
+.dummy-field {
+  background-color: #EEF0EF;
+  padding: 15px;
+}
+
+.dummy-label {
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Patua One", sans-serif;
+  margin: 0 0 10px 0;
 }
 
 .errors {
