@@ -3,7 +3,7 @@
     <td class="deviceID"><button type="button" class="btn btn-device-toggle btn-primary collapsed"
             data-toggle="collapse" aria-controls="row-1" aria-expanded="false"
             data-target="#row-1">
-            <span class="btn-state-1">Open</span>
+            <span class="btn-state-1">View</span>
             <span class="btn-state-2">Close</span>
         </button></td>
 
