@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\EditEvent;
+use App\Group;
 use App\Party;
 use App\Notifications\AdminWordPressEditEventFailure;
 use FixometerHelper;
@@ -47,6 +48,8 @@ class CreateWordPressEditEventPost
                     $startTimestamp = strtotime($data['event_date'] . ' ' . $data['start']);
                     $endTimestamp = strtotime($data['event_date'] . ' ' . $data['end']);
 
+                    $group = Group::where('idgroups', $theParty->group)->first();
+
                     /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                     // $theParty = $Party->findThis($id);
                     //$Host = $Groups->findHost($data['group']);
@@ -54,6 +57,7 @@ class CreateWordPressEditEventPost
                     //array('key' => 'party_host',            'value' => $Host->hostname),
                     //array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
                     array('key' => 'party_grouphash',       'value' => $data['group']),
+                    array('key' => 'party_groupcountry',    'value' => $group->country),
                     array('key' => 'party_venue',           'value' => $data['venue']),
                     array('key' => 'party_location',        'value' => $data['location']),
                     array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),

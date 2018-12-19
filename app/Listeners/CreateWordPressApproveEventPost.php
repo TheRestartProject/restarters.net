@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Notification;
 use App\Notifications\AdminWordPressCreateEventFailure;
 use App\Party;
+use App\Group;
 use Illuminate\Support\Facades\Log;
 use FixometerHelper;
 
@@ -47,6 +48,8 @@ class CreateWordPressApproveEventPost
                     $startTimestamp = strtotime($data['event_date'] . ' ' . $data['start']);
                     $endTimestamp = strtotime($data['event_date'] . ' ' . $data['end']);
 
+                    $group = Group::where('idgroups', $data['group'])->first();
+
                   // if(env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
                   /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
                   //$Host = $Groups->findHost($group);
@@ -57,6 +60,7 @@ class CreateWordPressApproveEventPost
                     array('key' => 'party_venue',           'value' => $data['venue']),
                     array('key' => 'party_location',        'value' => $data['location']),
                     array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
+                    array('key' => 'party_groupcountry',    'value' => $group->country),
                     array('key' => 'party_date',            'value' => $data['event_date']),
                     array('key' => 'party_timestamp',       'value' => $startTimestamp),
                     array('key' => 'party_timestamp_end',   'value' => $endTimestamp),
