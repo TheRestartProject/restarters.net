@@ -45,6 +45,7 @@ class CreateWordPressEditGroupPost
                     $custom_fields = array(
                     array('key' => 'group_city',            'value' => $group->area),
                     //                                    array('key' => 'group_host',            'value' => $Host->hostname),
+                    array('key' => 'group_country',            'value' => $group->country),
                     array('key' => 'group_website',         'value' => $data['website']),
                     //array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
                     array('key' => 'group_hash',            'value' => $id),

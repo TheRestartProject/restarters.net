@@ -49,6 +49,7 @@ class CreateWordPressApproveGroupPost
 
                     $custom_fields = array(
                     array('key' => 'group_city',            'value' => $group->area),
+                    array('key' => 'group_country',            'value' => $group->country),
                     array('key' => 'group_website',         'value' => $group->website),
                     array('key' => 'group_hash',            'value' => $id),
                     array('key' => 'group_avatar_url',      'value' => $data['group_avatar']),
