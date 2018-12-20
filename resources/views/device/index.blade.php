@@ -297,37 +297,37 @@ Devices
                                         <tr>
                                             <th width="120" colspan="3"></th>
                                             <th scope="col" class="category" @if( !FixometerHelper::checkColumn('category', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-category" class="sort-column">
+                                                <label for="label-category" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
                                                     @lang('devices.category')
                                                 </label>
                                             </th>
                                             <th scope="col" class="brand" @if( !FixometerHelper::checkColumn('brand', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-brand" class="sort-column">
+                                                <label for="label-brand" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
                                                     @lang('devices.brand')
                                                 </label>
                                             </th>
                                             <th scope="col" class="model" @if( !FixometerHelper::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-model" class="sort-column">
+                                                <label for="label-model" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
                                                     @lang('devices.model')
                                                 </label>
                                             </th>
                                             <th scope="col" class="problem" @if( !FixometerHelper::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-problem" class="sort-column">
+                                                <label for="label-problem" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
                                                     @lang('devices.comment')
                                                 </label>
                                             </th>
                                             <th scope="col" class="group_name" @if( !FixometerHelper::checkColumn('group_name', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-group_name" class="sort-column">
+                                                <label for="label-group_name" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
                                                     @lang('devices.group')
                                                 </label>
                                             </th>
                                             <th scope="col" class="event_date" @if( !FixometerHelper::checkColumn('event_date', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-event_date" class="sort-column">
+                                                <label for="label-event_date" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
                                                     @lang('devices.devices_date')
                                                 </label>
                                             </th>
                                             <th scope="col" class="repair_status" @if( !FixometerHelper::checkColumn('repair_status', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-repair_status" class="sort-column">
+                                                <label for="label-repair_status" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
                                                     @lang('devices.state')
                                                 </label>
                                             </th>
