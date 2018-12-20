@@ -31072,12 +31072,48 @@ $(".select2-dropdown").select2({
 $(document).ready(function () {
   $('.tokenfield').tokenfield();
 
+  $current_column = $('input[name=sort_column]:checked').val();
+
+  $('input[name=sort_column]').on('click', function (e) {
+
+    $form = $('#device-search');
+    $sort_direction = $form.find('input[name=sort_direction]');
+
+    if ($current_column === $(this).val()) {
+      if ($sort_direction.val() === 'DSC') {
+        $sort_direction.val('ASC');
+      } else {
+        $sort_direction.val('DSC');
+      }
+    }
+
+    $form.submit();
+  });
+
   $('.filter-columns').on('click', function (e) {
 
     $table = $('#sort-table');
 
     var hide_columns = $table.find('.' + $(this).data('id'));
     $(hide_columns).toggle();
+
+    var preferences = [];
+    $.each($('.filter-columns:checked'), function () {
+      preferences.push($(this).val());
+    });
+
+    $('.device-colspan').attr('colspan', preferences.length + 3);
+
+    $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      type: 'post',
+      url: '/device/column-preferences',
+      data: {
+        column_preferences: preferences
+      }
+    });
   });
 
   $("#invites_to_volunteers").on("click", function () {

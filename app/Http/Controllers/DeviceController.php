@@ -73,55 +73,60 @@ class DeviceController extends Controller
 
         $categories = $Category->listed();
 
-        if (isset($_GET['fltr']) && ! empty($_GET['fltr'])) {
-            // Get params and clean them up
-            // DATES...
-            if (isset($_GET['from-date']) && ! empty($_GET['from-date'])) {
-                if ( ! DateTime::createFromFormat('d/m/Y', $_GET['from-date'])) {
-                    $response['danger'] = 'Invalid "from date"';
-                    $fromTimeStamp = null;
-                } else {
-                    $fromDate = DateTime::createFromFormat('d/m/Y', $_GET['from-date']);
-                    $fromTimeStamp = strtotime($fromDate->format('Y-m-d'));
-                }
-            } else {
-                $fromTimeStamp = 1;
-            }
-
-            if (isset($_GET['to-date']) && ! empty($_GET['to-date'])) {
-                if ( ! DateTime::createFromFormat('d/m/Y', $_GET['to-date'])) {
-                    $response['danger'] = 'Invalid "to date"';
-                } else {
-                    $toDate = DateTime::createFromFormat('d/m/Y', $_GET['to-date']);
-                    $toTimeStamp = strtotime($toDate->format('Y-m-d'));
-                }
-            } else {
-                $toTimeStamp = time();
-            }
-
-            $params = array(
-                'brand' => filter_var($_GET['brand'], FILTER_SANITIZE_STRING),
-                'model' => filter_var($_GET['model'], FILTER_SANITIZE_STRING),
-                'problem' => filter_var($_GET['free-text'], FILTER_SANITIZE_STRING),
-
-                'category' => isset($_GET['categories']) ? filter_var($_GET['categories'], FILTER_SANITIZE_STRING) : null, //isset($_GET['categories']) ? implode(', ', filter_var_array($_GET['categories'], FILTER_SANITIZE_NUMBER_INT)) : null,
-                'group' => isset($_GET['groups']) ? filter_var($_GET['groups'], FILTER_SANITIZE_STRING) : null, //isset($_GET['groups']) ? implode(', ', filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT)) : null,
-
-                'event_date' => array($fromTimeStamp,  $toTimeStamp),
-
-            );
-
-            $list = $Device->getList($params);
-        } else {
-            $list = $Device->getList();
-        }
+        // if (isset($_GET['fltr']) && ! empty($_GET['fltr'])) {
+        //     // Get params and clean them up
+        //     // DATES...
+        //     if (isset($_GET['from-date']) && ! empty($_GET['from-date'])) {
+        //         if ( ! DateTime::createFromFormat('d/m/Y', $_GET['from-date'])) {
+        //             $response['danger'] = 'Invalid "from date"';
+        //             $fromTimeStamp = null;
+        //         } else {
+        //             $fromDate = DateTime::createFromFormat('d/m/Y', $_GET['from-date']);
+        //             $fromTimeStamp = strtotime($fromDate->format('Y-m-d'));
+        //         }
+        //     } else {
+        //         $fromTimeStamp = 1;
+        //     }
+        //
+        //     if (isset($_GET['to-date']) && ! empty($_GET['to-date'])) {
+        //         if ( ! DateTime::createFromFormat('d/m/Y', $_GET['to-date'])) {
+        //             $response['danger'] = 'Invalid "to date"';
+        //         } else {
+        //             $toDate = DateTime::createFromFormat('d/m/Y', $_GET['to-date']);
+        //             $toTimeStamp = strtotime($toDate->format('Y-m-d'));
+        //         }
+        //     } else {
+        //         $toTimeStamp = time();
+        //     }
+        //
+        //     $params = array(
+        //         'brand' => filter_var($_GET['brand'], FILTER_SANITIZE_STRING),
+        //         'model' => filter_var($_GET['model'], FILTER_SANITIZE_STRING),
+        //         'problem' => filter_var($_GET['free-text'], FILTER_SANITIZE_STRING),
+        //
+        //         'category' => isset($_GET['categories']) ? filter_var($_GET['categories'], FILTER_SANITIZE_STRING) : null, //isset($_GET['categories']) ? implode(', ', filter_var_array($_GET['categories'], FILTER_SANITIZE_NUMBER_INT)) : null,
+        //         'group' => isset($_GET['groups']) ? filter_var($_GET['groups'], FILTER_SANITIZE_STRING) : null, //isset($_GET['groups']) ? implode(', ', filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT)) : null,
+        //
+        //         'event_date' => array($fromTimeStamp,  $toTimeStamp),
+        //
+        //     );
+        //
+        //     $list = $Device->getList($params);
+        // } else {
+        //     $list = $Device->getList();
+        // }
 
         $user = Auth::user();
 
         // if (FixometerHelper::hasRole($user, 'Administrator')) {
         $all_groups = Group::all();
 
-        $all_devices = DeviceList::orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
+        // $all_devices = DeviceList::orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
+        $all_devices = Device::with('deviceCategory')
+                                ->with('deviceEvent')
+                                    ->with('barriers')
+                                        ->orderBy('iddevices', 'DSC')
+                                            ->paginate(env('PAGINATE'));
         // } else {
         //     $groups_user_ids = UserGroups::where('user', $user->id)
         //     ->pluck('group')
@@ -147,6 +152,9 @@ class DeviceController extends Controller
             'brand' => null,
             'model' => null,
             'problem' => null,
+            'status' => null,
+            'sort_direction' => 'DSC',
+            'sort_column' => 'event_date',
         ]);
     }
 
@@ -155,7 +163,16 @@ class DeviceController extends Controller
         $Category = new Category;
         $categories = $Category->listed();
 
-        $all_devices = DeviceList::orderBy('sorter', 'DSC');
+        $sort_direction = $request->input('sort_direction');
+        $sort_column = $request->input('sort_column');
+
+        $all_devices = Device::with('deviceCategory')
+                                ->with('deviceEvent')
+                                    ->with('barriers')
+                                        ->join('events', 'events.idevents', '=', 'devices.event')
+                                            ->join('groups', 'groups.idgroups', '=', 'events.group')
+                                                ->select('devices.*', 'groups.name AS group_name')
+                                                ->orderBy($sort_column, $sort_direction);
 
         if ($request->input('categories') !== null) {
             $all_devices = $all_devices->whereIn('idcategory', [$request->input('categories')]);
@@ -196,19 +213,19 @@ class DeviceController extends Controller
 
         $user = Auth::user();
 
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
-            $all_groups = Group::all();
-        } else {
-            $groups_user_ids = UserGroups::where('user', $user->id)
-            ->pluck('group')
-            ->toArray();
-
-            $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
-
-            $all_devices = $all_devices->whereIn('id', $device_ids);
-
-            $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
-        }
+        // if (FixometerHelper::hasRole($user, 'Administrator')) {
+        $all_groups = Group::all();
+        // } else {
+        //     $groups_user_ids = UserGroups::where('user', $user->id)
+        //     ->pluck('group')
+        //     ->toArray();
+        //
+        //     $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
+        //
+        //     $all_devices = $all_devices->whereIn('id', $device_ids);
+        //
+        //     $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
+        // }
 
         $all_devices = $all_devices->paginate(env('PAGINATE'));
 
@@ -226,6 +243,8 @@ class DeviceController extends Controller
             'model' => $request->input('model'),
             'problem' => $request->input('problem'),
             'status' => $request->input('status'),
+            'sort_direction' => $sort_direction,
+            'sort_column' => $sort_column,
         ]);
     }
 
@@ -996,6 +1015,11 @@ class DeviceController extends Controller
         }
 
         return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
+    }
+
+    public function columnPreferences(Request $request)
+    {
+        $request->session()->put('column_preferences', $request->input('column_preferences'));
     }
 
     // public function test() {

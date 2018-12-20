@@ -15355,6 +15355,11 @@ td.col-device-auto {
   width: 250px !important;
 }
 
+#side-collapse {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
 .registration {
   padding: 10px 0;
 }
@@ -17284,15 +17289,11 @@ td.col-device-auto {
 }
 
 .edit-panel .side-collapse .form-group:last-child {
-  padding-bottom: 20px;
+  padding-bottom: 5px;
 }
 
 .edit-panel .side-collapse:first-of-type legend {
   border-top: 0;
-}
-
-.edit-panel .side-collapse:last-of-type {
-  border-bottom: 1px solid #BEC0C0;
 }
 
 .edit-panel .side-collapse button {

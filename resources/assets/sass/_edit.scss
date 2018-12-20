@@ -141,16 +141,16 @@
         }
 
         .form-group:last-child {
-            padding-bottom: 20px;
+            padding-bottom: 5px;
         }
 
         &:first-of-type legend {
             border-top: 0;
         }
 
-        &:last-of-type {
-            border-bottom: 1px solid #BEC0C0;
-        }
+        // &:last-of-type {
+        //     border-bottom: 1px solid #BEC0C0;
+        // }
 
         button {
             padding: 15px 20px 15px 0px;
