@@ -1,0 +1,108 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Group;
+use App\Party;
+use Illuminate\Console\Command;
+
+class SyncEvents extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'sync:events';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Performs a bulk sync of event details from restarters application to Wordpress front-end site.  Not designed to be run on a regular basis - sometimes needed for one-off bulk syncs if new fields are introduced to events in restarters that need uploading to wordpress.';
+
+    /**
+     * The name and signature of the console command.
+     *
+     * @var WordpressClient
+     */
+    protected $wordpressClient;
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->wordpressClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
+        $this->wordpressClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        $events = Party::whereNotNull('wordpress_post_id')->where('wordpress_post_id', '<>', 99999)->get();
+        $numberOfEvents = count($events);
+
+        $currentEventNumber = 1;
+
+        foreach ($events as $event)
+        {
+            try {
+                $startTimestamp = strtotime($event->event_date . ' ' . $event->start);
+                $endTimestamp = strtotime($event->event_date . ' ' . $event->end);
+
+                $group = Group::where('idgroups', $event->group)->first();
+
+                $custom_fields = array(
+                    array('key' => 'party_grouphash', 'value' => $event->group),
+                    array('key' => 'party_groupcountry', 'value' => $group->country),
+                    array('key' => 'party_venue', 'value' => $event->venue),
+                    array('key' => 'party_location', 'value' => $event->location),
+                    array('key' => 'party_time', 'value' => $event->start . ' - ' . $event->end),
+                    array('key' => 'party_date', 'value' => $event->event_date),
+                    array('key' => 'party_timestamp', 'value' => $startTimestamp),
+                    array('key' => 'party_timestamp_end', 'value' => $endTimestamp),
+                    array('key' => 'party_stats', 'value' => $event->idevents),
+                    array('key' => 'party_lat', 'value' => $event->latitude),
+                    array('key' => 'party_lon', 'value' => $event->longitude)
+                );
+
+                $content = array(
+                    'post_type' => 'party',
+                    'post_title' => !empty($event->venue) ? $event->venue : $event->location,
+                    'post_content' => $event->free_text,
+                    'custom_fields' => $custom_fields
+                );
+
+                // We need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
+                $thePost = $this->wordpressClient->getPost($event->wordpress_post_id);
+
+                foreach ($thePost['custom_fields'] as $i => $field) {
+                    foreach ($custom_fields as $k => $set_field) {
+                        if ($field['key'] == $set_field['key']) {
+                            $custom_fields[$k]['id'] = $field['id'];
+                        }
+                    }
+                }
+
+                $content['custom_fields'] = $custom_fields;
+                $this->wordpressClient->editPost($event->wordpress_post_id, $content);
+
+                $this->info('['.$currentEventNumber.'/'.$numberOfEvents.'] Synced '.$event->venue.' (idevents = '.$event->idevents.', wordpress_post_id = ' . $event->wordpress_post_id . ')');
+            } catch (\Exception $e) {
+                $this->error('Error: '.$event->venue.': ' . $e->getMessage());
+            }
+
+            $currentEventNumber++;
+        }
+    }
+}

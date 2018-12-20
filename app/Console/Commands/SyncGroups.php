@@ -24,7 +24,7 @@ class SyncGroups extends Command
     /**
      * The name and signature of the console command.
      *
-     * @var string
+     * @var WordpressClient
      */
     protected $wordpressClient;
 
@@ -39,7 +39,6 @@ class SyncGroups extends Command
 
         $this->wordpressClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
         $this->wordpressClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
-
     }
 
     /**
