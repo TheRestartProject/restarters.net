@@ -50,14 +50,14 @@
     }
 
     &-left {
-        border-radius: 10rem 0 0 10rem;
+        // border-radius: 10rem 0 0 10rem;
 
-        @include media-breakpoint-up(lg) {
-            border-radius: 10rem;
-            margin-right: 20px;
-            padding-left: 15px;
-            padding-right: 15px;
-        }
+        // @include media-breakpoint-up(lg) {
+        border-radius: 10rem;
+        margin-right: 10px;
+        padding-left: 15px;
+        padding-right: 15px;
+        //}
 
         svg {
             margin: 0 5px 0 0;
@@ -65,15 +65,15 @@
     }
 
     &-right {
-        border-radius: 0 10rem 10rem 0;
+        // border-radius: 0 10rem 10rem 0;
 
-        @include media-breakpoint-up(lg) {
-            border-radius: 10rem;
-        }
+        // @include media-breakpoint-up(lg) {
+        border-radius: 10rem;
+        //}
     }
 
     &-lg-text {
-        font-size: 13px;
+        font-size: 16px;
 
         @include media-breakpoint-down(md) {
             position: absolute;
