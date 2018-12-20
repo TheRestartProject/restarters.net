@@ -70,7 +70,7 @@
 
             &--hottopics {
                 background-image: url(/images/dashboard/restarters-hot-topic-header.svg);
-                background-size: auto 73px;
+                background-size: auto 83px;
                 height: 73px;
             }
 
@@ -206,7 +206,8 @@
 
     &__list-topics {
         li {
-
+            border-left-width: 7px;
+            border-left-style: solid;
             a {
                 padding: 30px 20px 30px 65px;
                 color: #000;
@@ -216,16 +217,16 @@
                 position: relative;
                 z-index: 1;
 
-                &:before {
-                    width: 7px;
-                    height: 100%;
-                    z-index: 2;
-                    left: 0;
-                    top: 0;
-                    content: "";
-                    display: block;
-                    position: absolute;
-                }
+                // &:before {
+                //     width: 7px;
+                //     height: 100%;
+                //     z-index: 2;
+                //     left: 0;
+                //     top: 0;
+                //     content: "";
+                //     display: block;
+                //     position: absolute;
+                // }
 
                 .topic-label {
                     text-decoration: underline;
