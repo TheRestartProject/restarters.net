@@ -10629,7 +10629,7 @@ a.text-dark:focus {
 /* Slider */
 
 .slick-loading .slick-list {
-  background: #fff url(/images/vendor/slick-carousel/slick/ajax-loader.gif?68b0c4fcb84d239f261c1a5e65818142) center center no-repeat;
+  background: #fff url(/images/vendor/slick-carousel/slick/ajax-loader.gif?c5cd7f5300576ab4c88202b42f6ded62) center center no-repeat;
 }
 
 /* Icons */
@@ -10952,8 +10952,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   font-family: "summernote";
   font-style: normal;
   font-weight: normal;
-  src: url(/fonts/vendor/summernote/dist/summernote.eot?a52b483f848b87d49a85f0c58ca28699);
-  src: url(/fonts/vendor/summernote/dist/summernote.eot?a52b483f848b87d49a85f0c58ca28699) format("embedded-opentype"), url(/fonts/vendor/summernote/dist/summernote.woff?f9b5d834b2fea5a2b440074e662c2281) format("woff"), url(/fonts/vendor/summernote/dist/summernote.ttf?ad2ecd48a495cc67b3b33764bee90f14) format("truetype");
+  src: url(/fonts/vendor/summernote/dist/summernote.eot?222d2ab5b4d9d55703b1c4614e988290);
+  src: url(/fonts/vendor/summernote/dist/summernote.eot?222d2ab5b4d9d55703b1c4614e988290) format("embedded-opentype"), url(/fonts/vendor/summernote/dist/summernote.woff?621a2895d134f396b572b97d33e66b2b) format("woff"), url(/fonts/vendor/summernote/dist/summernote.ttf?1785db880428d8ab334f906a35f109e9) format("truetype");
 }
 
 [class^="note-icon-"]:before,
@@ -11563,15 +11563,15 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   margin: 0;
 }
 
+.note-popover .popover-content .note-color-all .dropdown-menu,
+.panel-heading.note-toolbar .note-color-all .dropdown-menu {
+  min-width: 337px;
+}
+
 .note-popover .popover-content .note-color .dropdown-toggle,
 .panel-heading.note-toolbar .note-color .dropdown-toggle {
   width: 20px;
   padding-left: 5px;
-}
-
-.note-popover .popover-content .note-color .dropdown-menu,
-.panel-heading.note-toolbar .note-color .dropdown-menu {
-  min-width: 337px;
 }
 
 .note-popover .popover-content .note-color .dropdown-menu .note-palette,
@@ -11595,7 +11595,9 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset,
-.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset {
+.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset,
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-select,
+.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-select {
   width: 100%;
   padding: 0 3px;
   margin: 3px;
@@ -11612,6 +11614,16 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset:hover,
 .panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset:hover {
   background: #eee;
+}
+
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-select-btn,
+.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-select-btn {
+  display: none;
+}
+
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-holder-custom .note-color-btn,
+.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-holder-custom .note-color-btn {
+  border: 1px solid #eee;
 }
 
 .note-popover .popover-content .note-para .dropdown-menu,
@@ -11843,8 +11855,8 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   font-family: "summernote";
   font-style: normal;
   font-weight: normal;
-  src: url(/fonts/vendor/summernote/dist/summernote.eot?a52b483f848b87d49a85f0c58ca28699);
-  src: url(/fonts/vendor/summernote/dist/summernote.eot?a52b483f848b87d49a85f0c58ca28699) format("embedded-opentype"), url(/fonts/vendor/summernote/dist/summernote.woff?f9b5d834b2fea5a2b440074e662c2281) format("woff"), url(/fonts/vendor/summernote/dist/summernote.ttf?ad2ecd48a495cc67b3b33764bee90f14) format("truetype");
+  src: url(/fonts/vendor/summernote/dist/summernote.eot?222d2ab5b4d9d55703b1c4614e988290);
+  src: url(/fonts/vendor/summernote/dist/summernote.eot?222d2ab5b4d9d55703b1c4614e988290) format("embedded-opentype"), url(/fonts/vendor/summernote/dist/summernote.woff?621a2895d134f396b572b97d33e66b2b) format("woff"), url(/fonts/vendor/summernote/dist/summernote.ttf?1785db880428d8ab334f906a35f109e9) format("truetype");
 }
 
 [class^="note-icon-"]:before,
@@ -12380,6 +12392,7 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .card-header.note-toolbar {
   padding: 0 0 5px 5px;
   margin: 0;
+  background: #f5f5f5;
 }
 
 .note-popover .popover-content > .btn-group,
@@ -12455,15 +12468,15 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
   margin: 0;
 }
 
+.note-popover .popover-content .note-color-all .dropdown-menu,
+.card-header.note-toolbar .note-color-all .dropdown-menu {
+  min-width: 337px;
+}
+
 .note-popover .popover-content .note-color .dropdown-toggle,
 .card-header.note-toolbar .note-color .dropdown-toggle {
   width: 20px;
   padding-left: 5px;
-}
-
-.note-popover .popover-content .note-color .dropdown-menu,
-.card-header.note-toolbar .note-color .dropdown-menu {
-  min-width: 337px;
 }
 
 .note-popover .popover-content .note-color .dropdown-menu .note-palette,
@@ -12487,7 +12500,9 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 }
 
 .note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset,
-.card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset {
+.card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset,
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-select,
+.card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-color-select {
   width: 100%;
   padding: 0 3px;
   margin: 3px;
@@ -12504,6 +12519,16 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset:hover,
 .card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset:hover {
   background: #eee;
+}
+
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-select-btn,
+.card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-color-select-btn {
+  display: none;
+}
+
+.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-holder-custom .note-color-btn,
+.card-header.note-toolbar .note-color .dropdown-menu .note-palette .note-holder-custom .note-color-btn {
+  border: 1px solid #eee;
 }
 
 .note-popover .popover-content .note-para .dropdown-menu,
@@ -13348,14 +13373,12 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 .select2-hidden-accessible {
   border: 0 !important;
   clip: rect(0 0 0 0) !important;
-  -webkit-clip-path: inset(50%) !important;
-  clip-path: inset(50%) !important;
   height: 1px !important;
+  margin: -1px !important;
   overflow: hidden !important;
   padding: 0 !important;
   position: absolute !important;
   width: 1px !important;
-  white-space: nowrap !important;
 }
 
 .select2-container--default .select2-selection--single {
@@ -13752,6 +13775,9 @@ fieldset[disabled] .tokenfield.tokenfield-mode-tokens {
 
 .select2-container--classic[dir="rtl"] .select2-selection--multiple .select2-selection__choice {
   float: right;
+}
+
+.select2-container--classic[dir="rtl"] .select2-selection--multiple .select2-selection__choice {
   margin-left: 5px;
   margin-right: auto;
 }
@@ -15121,7 +15147,7 @@ table.sortable > thead th div.mozilla {
   font-family: "Patua One", sans-serif;
   background-repeat: no-repeat;
   background-position: 50% 0;
-  background-image: url(/images/camera-upload.svg?afa6938e7540ada77e2e312c44e25b9f);
+  background-image: url(/images/camera-upload.svg?32b3f302657d4cf918397baf25a791f0);
   padding-top: 22px;
 }
 
@@ -15204,7 +15230,7 @@ table.sortable > thead th div.mozilla {
 
 .previews .dz-remove {
   text-indent: -9999px;
-  background-image: url(/images/remove.svg?72c6e0d6d6d8f7dadf0e10e8315fb61a);
+  background-image: url(/images/remove.svg?5d5f14370591cd5e599af70f1c03cff6);
   background-repeat: no-repeat;
   background-position: 50% 50%;
   width: 19px;
@@ -16037,7 +16063,7 @@ td.col-device-auto {
 }
 
 .notifications .card__parties {
-  background-image: url(/images/parties.svg?a513925ecb8bbc7e73af8bcd7914cf81);
+  background-image: url(/images/parties.svg?7e699b9e57b58c249fd5d25940a3b473);
 }
 
 .notifications .card__groups {
@@ -16137,7 +16163,7 @@ td.col-device-auto {
 }
 
 .dashboard__block__header--hottopics {
-  background-image: url(/images/dashboard/hottopic-header.png);
+  background-image: url(/images/dashboard/restarters-hot-topic-header.svg);
   background-size: auto 73px;
   height: 73px;
 }
@@ -18875,7 +18901,7 @@ body > .container {
 .block__profile ul li {
   list-style: none;
   padding-left: 25px;
-  background-image: url(/images/star-colored.svg?eca0f92cdb3b62e9f5fc22baf8b12c11);
+  background-image: url(/images/star-colored.svg?bd7c15f8ae75e49d9503762ae7fee039);
   background-repeat: no-repeat;
   background-position: 0 50%;
   min-height: 11px;
@@ -19247,7 +19273,7 @@ h2 sup a:hover {
   border-bottom: 2px solid #D9D9D9;
   padding: 10px 0;
   display: block;
-  background: url(/images/trapese-up.svg?3b5c979d5806c9b925d54543b5fd45b8) no-repeat 100% 50%;
+  background: url(/images/trapese-up.svg?437660f57d002af226b6de2ddd7c50b9) no-repeat 100% 50%;
 }
 
 .collapse-header a.collapsed {
