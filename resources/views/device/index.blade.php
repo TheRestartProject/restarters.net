@@ -302,32 +302,32 @@ Devices
                                                 </label>
                                             </th>
                                             <th scope="col" class="brand" @if( !FixometerHelper::checkColumn('brand', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-brand" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
+                                                <label for="label-brand" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'brand' ) sort-column-asc @endif">
                                                     @lang('devices.brand')
                                                 </label>
                                             </th>
                                             <th scope="col" class="model" @if( !FixometerHelper::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-model" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
+                                                <label for="label-model" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'model' ) sort-column-asc @endif">
                                                     @lang('devices.model')
                                                 </label>
                                             </th>
                                             <th scope="col" class="problem" @if( !FixometerHelper::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-problem" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
+                                                <label for="label-problem" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'problem' ) sort-column-asc @endif">
                                                     @lang('devices.comment')
                                                 </label>
                                             </th>
                                             <th scope="col" class="group_name" @if( !FixometerHelper::checkColumn('group_name', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-group_name" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
+                                                <label for="label-group_name" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'group_name' ) sort-column-asc @endif">
                                                     @lang('devices.group')
                                                 </label>
                                             </th>
                                             <th scope="col" class="event_date" @if( !FixometerHelper::checkColumn('event_date', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-event_date" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
+                                                <label for="label-event_date" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'event_date' ) sort-column-asc @endif">
                                                     @lang('devices.devices_date')
                                                 </label>
                                             </th>
                                             <th scope="col" class="repair_status" @if( !FixometerHelper::checkColumn('repair_status', $user_preferences) ) style="display: none;" @endif>
-                                                <label for="label-repair_status" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
+                                                <label for="label-repair_status" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'repair_status' ) sort-column-asc @endif">
                                                     @lang('devices.state')
                                                 </label>
                                             </th>
