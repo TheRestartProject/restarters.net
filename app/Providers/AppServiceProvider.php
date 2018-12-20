@@ -44,9 +44,17 @@ class AppServiceProvider extends ServiceProvider
                 if (Cache::has('talk_notification_'.Auth::user()->username)) {
                     $total_talk_notifications = Cache::get('talk_notification_'.Auth::user()->username);
                 } else {
-                    $talk_notifications = json_decode(env('DISCOURSE_URL').'/notifications.json');
+                    $talk_notifications = FixometerHelper::discourseAPICall('notifications.json', [
+                        // 'offset' => '60',
+                        'api_username' => Auth::user()->username,
+                    ]);
                     if (is_object($talk_notifications)) {
-                        $total_talk_notifications = $talk_notifications->total_rows_notifications;
+                        $total_talk_notifications = 0;
+                        foreach ($talk_notifications->notifications as $notification) {
+                            if ($notification->read !== true) {
+                                $total_talk_notifications++;
+                            }
+                        }
                         Cache::put('talk_notification_'.Auth::user()->username, $total_talk_notifications, 10);
                     } else {
                         $total_talk_notifications = null;
