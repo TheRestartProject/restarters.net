@@ -28,3 +28,5 @@ Scenario: To check the restarters and hosts
    When a host wants to check who are the hosts and restarters 
     And clicks on the number link under their respective category
     Then host can view the details on a pop up screen.
+    
+![](./images/invitation-email-not-on-platform.png)

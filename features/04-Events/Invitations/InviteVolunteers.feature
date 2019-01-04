@@ -1,14 +1,16 @@
-Feature: Send Invite's to restarters    
-   As a User (All roles)  
-   In order to send invite's to restarters   
-   I should be able to click on invite button on events pages.
+Feature: Send event invites to volunteers    
+   As a host
+   In order to help boost volunteer attendance at events 
+   I should be able to invite volunteers to events
+   
+Hosts can send invitations to volunteers inviting them to come to their event.
 
 Background:    
-   Given the following account have been created as an host        
-   | Email                      | Password |        
-   | dean@wecreatedigital.co.uk | dean     | 
+   Given the following accounts:
+   | Email                 | Password |
+   | fry@planetexpress.com | fry!     |
 
-Scenario: Inviting restarters to the event 
+Scenario: Inviting volunteers to an event 
    When a user clicks on invite button, invite restarters a pop up screen is displayed
    And user can check the checkbox so that all the restarters associated in that group will get the invite or host can send invites manually by entering the email address of the restarter as follows
    | Email address              |     
@@ -20,10 +22,7 @@ Scenario: Inviting restarters to the event
    Then host will land on event page with number of invites in the attendace section also a message saying the invites have been sent successfully.
 
 Scenario: Invalid email address 
-   When a user gives invalid email id 
+   When a user gives invalid email address
    And clicks on send invite button
-   Then an error message will display.
+   Then an error message will display
 
-Scenario: User triggers invitation to an event email
-   When the user clicks the send invite button
-   Then the volunteer that the user has sent sent invite to an event would receive an email about information on that event.
