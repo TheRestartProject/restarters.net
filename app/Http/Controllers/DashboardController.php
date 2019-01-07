@@ -230,6 +230,7 @@ class DashboardController extends Controller
         if (Cache::has('talk_categories_'.Auth::user()->username)) {
             $talk_categories = Cache::get('talk_categories_'.Auth::user()->username);
         } else {
+            $talk_categories = [];
             $talk_categories_json = FixometerHelper::discourseAPICall('categories.json', [
                 // 'offset' => '60',
                 'api_username' => Auth::user()->username,
@@ -239,8 +240,6 @@ class DashboardController extends Controller
                     $talk_categories[$category->id] = $category;
                 }
                 Cache::put('talk_categories_'.Auth::user()->username, $talk_categories, 60 * 24);
-            } else {
-                $talk_categories = [];
             }
         }
 
@@ -251,6 +250,7 @@ class DashboardController extends Controller
         if (Cache::has('talk_hot_topics_'.Auth::user()->username)) {
             $talk_hot_topics = Cache::get('talk_hot_topics_'.Auth::user()->username);
         } else {
+            $talk_hot_topics = [];
             $talk_hot_topics_json = FixometerHelper::discourseAPICall('top.json', [
                 // 'offset' => '60',
                 'api_username' => Auth::user()->username,
@@ -258,8 +258,6 @@ class DashboardController extends Controller
             if (is_object($talk_hot_topics_json) && isset($talk_hot_topics_json->topic_list->topics)) {
                 $talk_hot_topics = $talk_hot_topics_json->topic_list->topics;
                 Cache::put('talk_hot_topics_'.Auth::user()->username, $talk_hot_topics, 60);
-            } else {
-                $talk_hot_topics = [];
             }
         }
 
