@@ -359,10 +359,6 @@ class GroupController extends Controller
             $wstats[$year->year] = $year->waste;
         }
 
-        $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
-
-        $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
-
         $clusters = array();
 
         for ($i = 1; $i <= 4; $i++) {
@@ -457,9 +453,7 @@ class GroupController extends Controller
             'waste_year_data' => $waste_years,
             'waste_bar_chart_stats' => array_reverse($wstats, true),
             'co2Total' => $Party->TotalEmission,
-            'co2ThisYear' => $co2ThisYear[0]->co2,
             'wasteTotal' => $this->TotalWeight,
-            'wasteThisYear' => $wasteThisYear[0]->waste,
             'clusters' => $clusters,
             'mostleast' => $mostleast,
             'top' => $Device->findMostSeen(1, null, $group->idgroups),
