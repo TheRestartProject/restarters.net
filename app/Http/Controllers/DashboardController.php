@@ -227,22 +227,22 @@ class DashboardController extends Controller
          * Query Discourse API for current logged in user
          * This retrieves all categories from Discourse
          */
-        // if (Cache::has('talk_categories')) {
-        //     $talk_categories = Cache::get('talk_categories');
-        // } else {
-        $talk_categories_json = FixometerHelper::discourseAPICall('categories.json', [
-            // 'offset' => '60',
-            'api_username' => env('DISCOURSE_APIUSER'),
-        ]);
-        if (is_object($talk_categories_json) && isset($talk_categories_json->category_list->categories)) {
-            foreach ($talk_categories_json->category_list->categories as $category) {
-                $talk_categories[$category->id] = $category;
-            }
-            // Cache::put('talk_categories', $talk_categories, 60 * 24);
+        if (Cache::has('talk_categories_'.Auth::user()->username)) {
+            $talk_categories = Cache::get('talk_categories_'.Auth::user()->username);
         } else {
-            $talk_categories = [];
+            $talk_categories_json = FixometerHelper::discourseAPICall('categories.json', [
+                // 'offset' => '60',
+                'api_username' => Auth::user()->username,
+            ]);
+            if (is_object($talk_categories_json) && isset($talk_categories_json->category_list->categories)) {
+                foreach ($talk_categories_json->category_list->categories as $category) {
+                    $talk_categories[$category->id] = $category;
+                }
+                Cache::put('talk_categories_'.Auth::user()->username, $talk_categories, 60 * 24);
+            } else {
+                $talk_categories = [];
+            }
         }
-        // }
 
         /**
          * Query Discourse API for current logged in user
@@ -253,7 +253,7 @@ class DashboardController extends Controller
         } else {
             $talk_hot_topics_json = FixometerHelper::discourseAPICall('top.json', [
                 // 'offset' => '60',
-                'api_username' => env('DISCOURSE_APIUSER'),
+                'api_username' => Auth::user()->username,
             ]);
             if (is_object($talk_hot_topics_json) && isset($talk_hot_topics_json->topic_list->topics)) {
                 $talk_hot_topics = $talk_hot_topics_json->topic_list->topics;

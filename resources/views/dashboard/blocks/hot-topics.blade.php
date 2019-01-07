@@ -12,7 +12,7 @@
                 @php( $count = 1 )
                 @foreach( $hot_topics['talk_hot_topics'] as $hot_topic )
                     <li class="category1" style="border-color: #{{{ $hot_topics['talk_categories'][$hot_topic->category_id]->color }}};">
-                        <a href="{{{ env('DISCOURSE_URL') }}}/t/{{{ $hot_topic->slug }}}/{{{ $hot_topic->id }}}" target="_blank">
+                        <a title="From category '{{{ $hot_topics['talk_categories'][$hot_topic->category_id]->name }}}'" href="{{{ env('DISCOURSE_URL') }}}/t/{{{ $hot_topic->slug }}}/{{{ $hot_topic->id }}}" target="_blank">
                             <span class="digit">{{{ $count }}}</span>
                             @if( strtotime($hot_topic->created_at) > strtotime('-5 days') )
                                 <span class="badge badge-danger">New !</span>
