@@ -920,10 +920,12 @@ class FixometerHelper
             // 'api_username' => env('DISCOURSE_APIUSER'),
         );
 
-        return json_decode(
-            file_get_contents(
-                env('DISCOURSE_URL').'/'.$call.'?'.http_build_query(array_merge($data, $parameters))
-            )
-        );
+        try {
+            return json_decode(
+                file_get_contents(env('DISCOURSE_URL').'/'.$call.'?'.http_build_query(array_merge($data, $parameters)))
+            );
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }
