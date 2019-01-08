@@ -591,6 +591,11 @@ AND devices.event = events.idevents ';
         return '-';
     }
 
+    public function getShortProblem($length = 60)
+    {
+        return str_limit($this->problem, $length);
+    }
+
     public function getImages()
     {
         $File = new \FixometerFile;

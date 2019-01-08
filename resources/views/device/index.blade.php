@@ -18,17 +18,6 @@ Devices
                                 <li class="breadcrumb-item active" aria-current="page">@lang('devices.devices')</li>
                             </ol>
                         </nav>
-
-                        @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
-                        <div class="btn-group button-group-filters">
-                            <button class="reveal-filters btn btn-secondary d-lg-none d-xl-none" type="button" data-toggle="collapse"
-                                data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal
-                                filters</button>
-                            <a href="/export/devices/?{{{ Request::getQueryString() }}}" class="btn btn-primary btn-save"><i
-                                    class="fa fa-download"></i>@lang('devices.export_device_data')</a>
-                        </div>
-                        @endif
-
                     </div>
                 </div>
             </div>
@@ -40,13 +29,10 @@ Devices
 
                     <div class="collapse d-lg-block d-xl-block fixed-overlay-md" id="collapseFilter">
 
-
-
                             <div class="form-row">
-                                <div class="form-group col mobile-search-bar-md">
-                                    <button class="btn btn-primary btn-groups" type="submit">@lang('devices.search_all_devices')</button>
-                                    <button class="btn btn-secondary btn-groups my-1" type="submit" disabled>Number of
-                                        search results: {{ $list->total() }}</button>
+                                <div class="form-group col mobile-search-bar-md my-0">
+
+                                    <button class="btn btn-primary btn-groups m-0 mb-1" type="submit">@lang('devices.search_all_devices')</button>
 
                                     <button type="button" class="d-lg-none mobile-search-bar-md__close" data-toggle="collapse"
                                         data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><svg
@@ -58,11 +44,23 @@ Devices
                                                 <path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z" />
                                                 <path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z" />
                                             </g>
-                                        </svg></button>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col">
+                                    <button class="btn btn-secondary btn-groups my-1" type="submit" disabled>
+                                        Number of search results: {{ $list->total() }}
+                                    </button>
+
                                 </div>
                             </div>
 
                             <input type="hidden" name="sort_direction" value="{{{ $sort_direction }}}">
+
+                            @php( $active_filter = false )
 
                             @foreach( FixometerHelper::filterColumns() as $column => $label )
                                 <input @if( $sort_column == $column ) checked @endif type="radio" name="sort_column" value="{{{ $column }}}" id="label-{{{ $column }}}" class="sr-only">
@@ -73,6 +71,9 @@ Devices
                                 <fieldset class="side-collapse">
 
                                     @if( empty($_GET) || !empty($selected_categories) || !empty($brand) || !empty($model) )
+
+                                        @php( $active_filter = true )
+
                                         <legend id="heading-1">
                                             <button type="button" class="btn btn-link" data-toggle="collapse"
                                                 data-target="#collapse-side-1" aria-expanded="true" aria-controls="collapse-side-1">
@@ -137,6 +138,9 @@ Devices
                                 <fieldset class="side-collapse">
 
                                     @if( !empty($status) || !empty($problem) )
+
+                                        @php( $active_filter = true )
+
                                         <legend id="heading-2">
                                             <button type="button" class="btn btn-link" data-toggle="collapse"
                                                 data-target="#collapse-side-2" aria-expanded="true" aria-controls="collapse-side-2">
@@ -180,6 +184,9 @@ Devices
                                 <fieldset class="side-collapse">
 
                                     @if( !empty($selected_groups) || !empty($from_date) || !empty($to_date) )
+
+                                        @php( $active_filter = true )
+
                                         <legend id="heading-3">
                                             <button type="button" class="btn btn-link" data-toggle="collapse"
                                                 data-target="#collapse-side-3" aria-expanded="true" aria-controls="collapse-side-3">
@@ -239,14 +246,17 @@ Devices
                                     </div><!-- collapse-side-3-->
 
                                 </fieldset>
+
                             </aside>
+
+                            @if ( $active_filter == true )
+                                <button class="btn btn-primary btn-groups" type="submit">@lang('devices.search_all_devices')</button>
+                            @endif
 
                     </div><!-- /collapseFilter -->
                 </div>
 
                 <div class="col-lg-9">
-
-                    <br>
 
                     <div class="row">
                         <div class="col-12">
@@ -280,13 +290,15 @@ Devices
                                         </div>
                                     </div>
 
-
                                 </div>
 
+                                @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+                                    <a href="/export/devices/?{{{ Request::getQueryString() }}}" class="btn btn-primary btn-save ml-2">
+                                        <i class="fa fa-download"></i>
+                                        @lang('devices.export_device_data')
+                                    </a>
+                                @endif
 
-                                <div>
-
-                                </div>
                             </div>
 
                             <br>

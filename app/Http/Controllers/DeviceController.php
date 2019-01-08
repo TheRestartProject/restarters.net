@@ -175,20 +175,33 @@ class DeviceController extends Controller
                                                 ->orderBy($sort_column, $sort_direction);
 
         if ($request->input('categories') !== null) {
-            $all_devices = $all_devices->whereIn('idcategory', [$request->input('categories')]);
+            $all_devices = $all_devices->whereIn('devices.category', $request->input('categories'));
         }
 
         if ($request->input('groups') !== null) {
-            $all_devices = $all_devices->whereIn('idgroup', $request->input('groups'));
+            $all_devices = $all_devices->whereIn('groups.idgroups', $request->input('groups'));
         }
 
-        if ($request->input('from-date') !== null && $request->input('to-date') == null) {
-            $all_devices = $all_devices->where('event_date', '>', strtotime($request->input('from-date')));
-        } elseif ($request->input('to-date') !== null && $request->input('from-date') == null) {
-            $all_devices = $all_devices->where('event_date', '<', strtotime($request->input('to-date')));
-        } elseif ($request->input('to-date') !== null && $request->input('from-date') !== null) {
-            $all_devices = $all_devices->whereBetween('event_date', array(strtotime($request->input('from-date')),
-                strtotime($request->input('to-date')), ));
+        $date_from = $request->get('from-date');
+        $date_to = $request->get('to-date');
+
+        if ( ! empty($date_from)) {
+            $d_from = \DateTime::createFromFormat('Y-m-d', $date_from);
+            $from = $d_from->format('Y-m-d').' 00:00:00';
+        }
+
+        if ( ! empty($date_to)) {
+            $d_to = \DateTime::createFromFormat('Y-m-d', $date_to);
+            $to = $d_to->format('Y-m-d').' 23:59:59';
+        }
+
+        if ( ! empty($date_from) && ! empty($date_to)) {
+            $all_devices = $all_devices->whereBetween('event_date', [$from, $to]);
+        } elseif ( ! empty($date_from)) {
+            $all_devices = $all_devices->whereDate('event_date', '>=', $from);
+        } elseif ( ! empty($date_to)) {
+            $to = $d_to->format('Y-m-d').' 23:59:59';
+            $all_devices = $all_devices->whereDate('event_date', '<=', $to);
         }
 
         if ($request->input('device_id') !== null) {

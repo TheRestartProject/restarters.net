@@ -11,7 +11,7 @@
     <td class="d-none d-md-table-cell"><div class="brand">{{ $device->brand }}</div></td>
     <td class="d-none d-md-table-cell"><div class="model">{{ $device->model }}</div></td>
     <td class="d-none d-md-table-cell"><div class="age">{{ $device->age }}</div></td>
-    <td width="300"><div class="problem">{!! str_limit($device->problem, 60, '...') !!}</div></td>
+    <td width="300"><div class="problem">{!! $device->getShortProblem() !!}</div></td>
     @if ( $device->repair_status == 1 )
       <td><div class="repair_status"><span class="badge badge-success">@lang('partials.fixed')</span></div></td>
     @elseif ( $device->repair_status == 2 )

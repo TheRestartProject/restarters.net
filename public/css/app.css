@@ -14982,7 +14982,13 @@ table.sortable > thead th div.mozilla {
 }
 
 .btn-group__duo .dropdown:last-child .btn {
-  border-radius: 0 3px 3px 0;
+  border-radius: 3px;
+}
+
+@media (max-width: 991.98px) {
+  .btn-group__duo .dropdown:last-child .btn {
+    border-radius: 0 3px 3px 0;
+  }
 }
 
 .btn-group__duo .dropdown-menu {
@@ -17133,7 +17139,6 @@ td.col-device-auto {
     display: flex;
     -ms-flex-line-pack: center;
         align-content: center;
-    padding: 0 0 30px 0 !important;
   }
 
   .mobile-search-bar__close {
@@ -17156,7 +17161,6 @@ td.col-device-auto {
     display: flex;
     -ms-flex-line-pack: center;
         align-content: center;
-    padding: 0 0 30px 0 !important;
   }
 
   .mobile-search-bar-md__close {

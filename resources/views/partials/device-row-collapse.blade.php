@@ -18,7 +18,7 @@
         {{{ $device->model }}}
     </td>
     <td class="problem" @if( !FixometerHelper::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
-        {{{ $device->problem }}}
+        {{{ $device->getShortProblem() }}}
     </td>
     <td class="group_name" @if( !FixometerHelper::checkColumn('group_name', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->deviceEvent->theGroup->name }}}
