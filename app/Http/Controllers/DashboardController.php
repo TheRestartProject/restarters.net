@@ -231,12 +231,12 @@ class DashboardController extends Controller
             $talk_categories = Cache::get('talk_categories_'.Auth::user()->username);
         } else {
             $talk_categories = [];
-            $talk_categories_json = FixometerHelper::discourseAPICall('categories.json', [
+            $talk_categories_json = FixometerHelper::discourseAPICall('site.json', [
                 // 'offset' => '60',
                 'api_username' => Auth::user()->username,
             ]);
-            if (is_object($talk_categories_json) && isset($talk_categories_json->category_list->categories)) {
-                foreach ($talk_categories_json->category_list->categories as $category) {
+            if (is_object($talk_categories_json) && isset($talk_categories_json->categories)) {
+                foreach ($talk_categories_json->categories as $category) {
                     $talk_categories[$category->id] = $category;
                 }
                 Cache::put('talk_categories_'.Auth::user()->username, $talk_categories, 60 * 24);
