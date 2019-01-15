@@ -1,8 +1,10 @@
 @php( $user_preferences = session('column_preferences') )
 <tr>
-    @include('partials/device-comment-photo', ['comment' => $device->problem ])
+    @if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+        @include('partials/device-comment-photo', ['comment' => $device->problem ])
+    @endif
     <td class="deviceID">
-        <a href="/device/page-edit/<?php echo $device->id; ?>">
+        <a href="/device/page-edit/{{{ $device->iddevices }}}">
             {{{ $device->iddevices }}}
         </a>
     </td>

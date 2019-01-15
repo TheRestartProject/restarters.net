@@ -307,7 +307,13 @@ Devices
                                 <table class="table table-hover bootg table-devices" id="devices-table">
                                     <thead>
                                         <tr>
-                                            <th width="120" colspan="3"></th>
+
+                                            @if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+                                                <th width="120" colspan="3"></th>
+                                            @else
+                                                <th width="120"></th>
+                                            @endif
+
                                             <th scope="col" class="category" @if( !FixometerHelper::checkColumn('category', $user_preferences) ) style="display: none;" @endif>
                                                 <label for="label-category" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'category' ) sort-column-asc @endif">
                                                     @lang('devices.category')
