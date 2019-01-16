@@ -234,7 +234,7 @@ class DashboardController extends Controller
             $talk_categories_json = FixometerHelper::discourseAPICall('site.json', [
                 // 'offset' => '60',
                 'api_username' => Auth::user()->username,
-            ]);
+            ], true);
             if (is_object($talk_categories_json) && isset($talk_categories_json->categories)) {
                 foreach ($talk_categories_json->categories as $category) {
                     $talk_categories[$category->id] = $category;
@@ -251,10 +251,10 @@ class DashboardController extends Controller
             $talk_hot_topics = Cache::get('talk_hot_topics_'.Auth::user()->username);
         } else {
             $talk_hot_topics = [];
-            $talk_hot_topics_json = FixometerHelper::discourseAPICall('top.json', [
+            $talk_hot_topics_json = FixometerHelper::discourseAPICall('top/weekly.json', [
                 // 'offset' => '60',
                 'api_username' => Auth::user()->username,
-            ]);
+            ], true);
             if (is_object($talk_hot_topics_json) && isset($talk_hot_topics_json->topic_list->topics)) {
                 $talk_hot_topics = $talk_hot_topics_json->topic_list->topics;
                 Cache::put('talk_hot_topics_'.Auth::user()->username, $talk_hot_topics, 60);
