@@ -6,8 +6,9 @@ use App\Events\ApproveGroup;
 use App\Group;
 use App\Notifications\AdminWordPressCreateGroupFailure;
 use FixometerHelper;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 use Notification;
 
 class CreateWordPressApproveGroupPost
@@ -62,27 +63,19 @@ class CreateWordPressApproveGroupPost
                     $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
                     $content = array(
-                    'post_type' => 'group',
-                    'post_title' => $group->name,
-                    'post_content' => $group->free_text,
-                    'custom_fields' => $custom_fields
+                        'post_type' => 'group',
+                        'post_title' => $group->name,
+                        'post_content' => $group->free_text,
+                        'custom_fields' => $custom_fields
                     );
 
-                    // We need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
-                    $existingPost = $wpClient->getPost($group->wordpress_post_id);
+                    $wpid = $wpClient->newPost($group->name, $data['free_text'], $content);
 
-                    foreach ($existingPost['custom_fields'] as $i => $field) {
-                        foreach ($custom_fields as $k => $set_field) {
-                            if ($field['key'] == $set_field['key']) {
-                                $custom_fields[$k]['id'] = $field['id'];
-                            }
-                        }
-                    }
-
-                    $content['custom_fields'] = $custom_fields;
-                    $wpClient->editPost($group->wordpress_post_id, $content);
+                    $group->update(['wordpress_post_id' => $wpid]);
                 }
             } catch (\Exception $e) {
+                Log::error("An error occurred during Wordpress group creation: " . $e->getMessage());
+
                 $notify_users = FixometerHelper::usersWhoHavePreference('admin-approve-wordpress-group-failure');
                 Notification::send($notify_users, new AdminWordPressCreateGroupFailure([
                 'group_name' => $group->name,
