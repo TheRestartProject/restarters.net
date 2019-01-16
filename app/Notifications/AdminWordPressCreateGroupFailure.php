@@ -51,7 +51,7 @@ class AdminWordPressCreateGroupFailure extends Notification implements ShouldQue
         return (new MailMessage)
                   ->subject('Group WordPress failure')
                   ->greeting('Hello!')
-                  ->line('Group \''.$this->arr['group_name'].'\' failed to create a WordPress post during admin approval.')
+                  ->line('Error creating group page for \''.$this->arr['group_name'].'\' on WordPress.')
                   ->action('View group', $this->arr['group_url'])
                   ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
     }
