@@ -36,7 +36,7 @@ return [
     'eventgroup' => 'Event (Group)',
     'location' => 'Location',
     'eventdate' => 'Event Date',
-    'comment' => 'Comment',
+    'comment' => 'Problem/solution',
     'repair' => 'Repair date',
     'repair_status' => 'Repair status',
     'repair_details' => 'Next steps',

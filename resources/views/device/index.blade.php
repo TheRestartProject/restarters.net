@@ -32,7 +32,9 @@ Devices
                             <div class="form-row">
                                 <div class="form-group col mobile-search-bar-md my-0">
 
-                                    <button class="btn btn-primary btn-groups m-0 mb-1" type="submit">@lang('devices.search_all_devices')</button>
+                            <button class="btn btn-secondary btn-groups my-1" type="submit" disabled>
+                                Number of repairs: {{ $list->total() }}
+                            </button>
 
                                     <button type="button" class="d-lg-none mobile-search-bar-md__close" data-toggle="collapse"
                                         data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><svg
@@ -46,15 +48,6 @@ Devices
                                             </g>
                                         </svg>
                                     </button>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group col">
-                                    <button class="btn btn-secondary btn-groups my-1" type="submit" disabled>
-                                        Number of search results: {{ $list->total() }}
-                                    </button>
-
                                 </div>
                             </div>
 
@@ -249,9 +242,7 @@ Devices
 
                             </aside>
 
-                            @if ( $active_filter == true )
-                                <button class="btn btn-primary btn-groups" type="submit">@lang('devices.search_all_devices')</button>
-                            @endif
+                            <button class="btn btn-primary btn-groups" type="submit">@lang('devices.search_all_devices')</button>
 
                     </div><!-- /collapseFilter -->
                 </div>
@@ -268,7 +259,7 @@ Devices
 
                                     <button class="reveal-filters btn btn-secondary d-lg-none d-xl-none" type="button"
                                         data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false"
-                                        aria-controls="collapseFilter">Reveal filters</button>
+                                        aria-controls="collapseFilter">Show filters</button>
 
                                     <div class="dropdown">
                                         <button class="btn btn-primary dropdown-toggle" id="dropdownMenu2" data-toggle="dropdown"
