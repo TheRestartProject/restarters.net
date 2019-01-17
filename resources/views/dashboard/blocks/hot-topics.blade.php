@@ -11,8 +11,8 @@
 
                 @php( $count = 1 )
                 @foreach( $hot_topics['talk_hot_topics'] as $hot_topic )
-                    <li class="category1" style="border-color: #{{{ $hot_topics['talk_categories'][$hot_topic->category_id]->color }}};">
-                        <a title="From category '{{{ $hot_topics['talk_categories'][$hot_topic->category_id]->name }}}'" href="{{{ env('DISCOURSE_URL') }}}/t/{{{ $hot_topic->slug }}}/{{{ $hot_topic->id }}}" target="_blank">
+                    <li class="category1" @if( isset($hot_topics['talk_categories'][$hot_topic->category_id]) ) style="border-color: #{{{ $hot_topics['talk_categories'][$hot_topic->category_id]->color }}};" @endif>
+                        <a @if( isset($hot_topics['talk_categories'][$hot_topic->category_id]) ) title="From category '{{{ $hot_topics['talk_categories'][$hot_topic->category_id]->name }}}'" @endif href="{{{ env('DISCOURSE_URL') }}}/t/{{{ $hot_topic->slug }}}/{{{ $hot_topic->id }}}" target="_blank">
                             <span class="digit">{{{ $count }}}</span>
                             @if( strtotime($hot_topic->created_at) > strtotime('-5 days') )
                                 <span class="badge badge-danger">New !</span>
