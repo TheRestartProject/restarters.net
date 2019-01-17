@@ -4,11 +4,12 @@
     padding: 13px 25px 14px 25px;
     font-size: 16px;
     line-height: 1;
+
     &.disabled {
-      color: #666B6C;
-      background-color: #D3D9DC;
-      border-color: #B0BBC0;
-      opacity: 1;
+        color: #666B6C;
+        background-color: #D3D9DC;
+        border-color: #B0BBC0;
+        opacity: 1;
     }
 
     &:disabled {
@@ -18,7 +19,8 @@
         border-bottom: 3px solid #B0BBC0;
         opacity: 1;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
             background-color: #D3D9DC;
             color: #666B6C;
             border-bottom: 3px solid #B0BBC0;
@@ -36,12 +38,15 @@
     font-size: 16px;
     border-radius: 3px;
 
-    &:focus, &.dropdown-toggle:focus, &.dropdown-toggle:active {
+    &:focus,
+    &.dropdown-toggle:focus,
+    &.dropdown-toggle:active {
         background-color: #00B0C6;
         color: #FFF;
     }
 
-    &:hover, &.dropdown-toggle:hover {
+    &:hover,
+    &.dropdown-toggle:hover {
         color: #FFF;
         background-color: #00B0C6;
         border-color: #00B0C6;
@@ -51,37 +56,51 @@
 
 .btn-secondary {
     background-color: #EC7F00;
-    border:0;
+    border: 0;
     border-bottom: 3px solid #BC6500;
 
-    &:focus, &.dropdown-toggle:focus, &.dropdown-toggle:active {
+    &:focus,
+    &.dropdown-toggle:focus,
+    &.dropdown-toggle:active {
         background-color: #AF6713;
     }
 
-    &:hover, &.dropdown-toggle:hover {
+    &:hover,
+    &.dropdown-toggle:hover {
         background-color: #AF6713;
         border-color: #AF6713;
         text-decoration: underline;
+    }
+
+    &:disabled,
+    &:disabled:hover,
+    &:disabled:focus {
+        background-color: #FE9F54;
+        border-color: #FE9F54;
+        color: #fff;
     }
 
 }
 
 .btn-danger {
     background-color: #D23714;
-    border:0;
+    border: 0;
     border-bottom: 3px solid #872009;
     color: #FFF;
 
-    &:focus, &.dropdown-toggle:focus, &.dropdown-toggle:active {
+    &:focus,
+    &.dropdown-toggle:focus,
+    &.dropdown-toggle:active {
         background-color: #F24C26;
-         color: #FFF;
+        color: #FFF;
     }
 
-    &:hover, &.dropdown-toggle:hover {
+    &:hover,
+    &.dropdown-toggle:hover {
         background-color: #F24C26;
         border-color: #F24C26;
         text-decoration: underline;
-         color: #FFF;
+        color: #FFF;
     }
 }
 
@@ -95,16 +114,16 @@
     color: #000;
 }
 
-[type="checkbox"]:focus + label.btn-checkbox {
+[type="checkbox"]:focus+label.btn-checkbox {
     //background-color:  #155E67;
     background-color: #E4E4E4;
     border-bottom-color: #B6B6B6;
-    color:#000;
+    color: #000;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
     //color: #fff;
 }
 
-[type="checkbox"]:checked + label.btn-checkbox {
+[type="checkbox"]:checked+label.btn-checkbox {
     background-color: $brand;
     border: 0;
     border-bottom: 3px solid #155E67;
@@ -155,19 +174,20 @@
 .btn-groups {
     width: 100%;
     display: block;
-    margin:auto 0;
+    margin: auto 0;
+
     @include media-breakpoint-up(lg) {
         margin: 20px 0 10px 0;
     }
 }
 
 .btn-filter {
-    margin:10px 0;
+    margin: 10px 0;
     width: 100%;
 }
 
 .btn-volunteered {
-    margin:0 0 10px 0;
+    margin: 0 0 10px 0;
     width: 100%;
 }
 
@@ -183,7 +203,7 @@
 
 .btn-skills,
 .btn-title {
-    background-color:transparent;
+    background-color: transparent;
     padding: 0;
     border: 0;
     border-radius: 0;
@@ -197,14 +217,15 @@
 .btn-column {
     font-size: 15px;
     font-family: $font-family-second;
-    background-color:transparent;
+    background-color: transparent;
     padding: 0;
     border: 0;
     border-radius: 0;
     color: #000;
     text-decoration: underline;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
         text-decoration: none;
     }
 }
@@ -213,7 +234,9 @@
     @extend h1;
     text-decoration: none;
 
-    &:focus, &:hover, &[aria-expanded="true"] {
+    &:focus,
+    &:hover,
+    &[aria-expanded="true"] {
         text-decoration: underline;
     }
 }
@@ -228,6 +251,7 @@
         display: block;
         margin: auto 0;
     }
+
     &__r {
         float: right;
 
@@ -259,8 +283,9 @@
         font-family: $font-family-sans-serif;
         font-size: 16px;
 
-        &:hover, &:focus {
-            background-color:$focus1;
+        &:hover,
+        &:focus {
+            background-color: $focus1;
         }
     }
 
@@ -284,7 +309,9 @@
         align-content: center;
         flex-direction: row;
 
-        img, svg, span {
+        img,
+        svg,
+        span {
             margin: auto 0;
         }
 
@@ -302,8 +329,9 @@
     diplay: none;
 }
 
-.btn-marked, .marked-as-read {
-    background-color:transparent;
+.btn-marked,
+.marked-as-read {
+    background-color: transparent;
     border: 0;
     color: #000;
     padding: 0;
@@ -323,7 +351,8 @@
     }
 }
 
-.status-read .btn-marked, .status-is-read .marked-as-read {
+.status-read .btn-marked,
+.status-is-read .marked-as-read {
     display: block;
 }
 
@@ -335,13 +364,19 @@
             padding-right: 10px;
             padding-left: 14px;
         }
+
         .dropdown:first-child .btn {
             border-radius: 3px 0 0 3px;
             border-right: 1px solid #155E67;
         }
+
         .dropdown:last-child .btn {
-            border-radius: 0 3px 3px 0;
+            border-radius: 3px;
+            @include media-breakpoint-down(md) {
+                border-radius: 0 3px 3px 0;
+            }
         }
+
         .dropdown-menu {
             padding: 5px 0;
             min-width: 100%;
@@ -353,6 +388,7 @@
             //     left: auto !important;
             // }
         }
+
         .dropdown-item {
             padding: 5px 10px;
             background-color: $brand;
@@ -360,8 +396,9 @@
             font-family: $font-family-sans-serif;
             font-size: 16px;
 
-            &:hover, &:focus {
-                background-color:$focus1;
+            &:hover,
+            &:focus {
+                background-color: $focus1;
             }
         }
 
@@ -379,11 +416,35 @@
         .btn {
             margin: auto 0;
             margin-top: 5px;
-            border-radius:3px !important;
+            border-radius: 3px !important;
 
             &:first-child {
                 margin-right: 10px;
             }
         }
+    }
+}
+
+.btn-device-toggle {
+    margin: auto;
+    padding: 10px 40px;
+    font-size: 12px;
+}
+
+.btn-state-1 {
+    display: none;
+}
+
+.btn-state-2 {
+    display: block;
+}
+
+.btn.collapsed {
+    .btn-state-1 {
+        display: block;
+    }
+
+    .btn-state-2 {
+        display: none;
     }
 }

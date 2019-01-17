@@ -254,4 +254,8 @@ jQuery(function () {
 
   });
 
+  $('#devices-table').on('show.bs.collapse', function () {
+      $(this).find('.table-device-details').width($(this).parent().width() - 40); 
+  });
+
 });

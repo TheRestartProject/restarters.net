@@ -1,14 +1,13 @@
 <?php
 
-use App\Xref;
 use App\Images;
+use App\Xref;
 
 use Illuminate\Database\Eloquent\Model;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class FixometerFile extends Model
 {
-
     public $path;
     public $file;
     public $ext;
@@ -25,7 +24,6 @@ class FixometerFile extends Model
 
     public function upload($file, $type, $reference = null, $referenceType = null, $multiple = false, $profile = false, $ajax = false)
     {
-
         $clear = true; // purge pre-existing images from db - this is the default behaviour
 
         if (is_string($file) && isset($_FILES[$file])) {
@@ -57,135 +55,130 @@ class FixometerFile extends Model
         if ($error == UPLOAD_ERR_OK) {
             $filename = $this->filename($tmp_name);
             $this->file = $filename;
-            $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/'. $filename;
-            if (!move_uploaded_file($tmp_name, $path)) {
+            $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
+            if ( ! move_uploaded_file($tmp_name, $path)) {
                 return false;
-            } else {
-                $data = array();
-                $this->path = $path;
-                $data['path'] = $this->file;
+            }
+            $data = array();
+            $this->path = $path;
+            $data['path'] = $this->file;
 
-                // Fix orientation
-                $image = Image::make($path)->orientate()->save($path);
+            // Fix orientation
+            $image = Image::make($path)->orientate()->save($path);
 
+            if ($type === 'image') {
+                $size = getimagesize($this->path);
+                $data['width'] = $size[0];
+                $data['height'] = $size[1];
 
-                if ($type === 'image') {
-                    $size = getimagesize($this->path);
-                    $data['width']  = $size[0];
-                    $data['height'] = $size[1];
+                if ($profile == true) {
+                    $data['alt_text'] = 'Profile Picture';
+                }
 
-                    if ($profile == true) {
-                        $data['alt_text'] = "Profile Picture";
-                    }
+                if ($this->ext == 'jpg') {
+                    $profile_pic = imagecreatefromjpeg($this->path);
+                } elseif ($this->ext == 'png') {
+                    $profile_pic = imagecreatefrompng($this->path);
+                }
 
-                    if ($this->ext == 'jpg') {
-                        $profile_pic = imagecreatefromjpeg($this->path);
-                    } elseif ($this->ext == 'png') {
-                        $profile_pic = imagecreatefrompng($this->path);
-                    }
+                if ($data['width'] > $data['height']) {
+                    $biggestSide = $data['width'];
+                    $resize_height = true;
+                } else {
+                    $biggestSide = $data['height'];
+                    $resize_height = false;
+                }
 
+                $cropPercent = 1;
+                $cropWidth = $biggestSide * $cropPercent;
+                $cropHeight = $biggestSide * $cropPercent;
 
-                    if ($data['width'] > $data['height']) {
-                        $biggestSide = $data['width'];
-                        $resize_height = true;
-                    } else {
-                        $biggestSide = $data['height'];
-                        $resize_height = false;
-                    }
+                //getting the top left coordinate
+                $c1 = array('x' => ($data['width'] - $cropWidth) / 2, 'y' => ($data['height'] - $cropHeight) / 2);
 
+                $thumbSize = 80;
+                $midSize = 260;
 
-                    $cropPercent = 1;
-                    $cropWidth   = $biggestSide*$cropPercent;
-                    $cropHeight  = $biggestSide*$cropPercent;
+                // // Create image
+                // $thumb = imagecreatetruecolor($thumbSize, $thumbSize);
+                // $mid = imagecreatetruecolor($midSize, $midSize);
+                //
+                // // Set alphablending to off picking default color as black
+                // imagealphablending($thumb, false);
+                // imagealphablending($mid, false);
+                //
+                // // Preserve transparency
+                // imagesavealpha($thumb, true);
+                // imagesavealpha($mid, true);
+                //
+                // // Transparent color only contains one parameter, no color is specified which means the identifier will be -1
+                // imagecolortransparent($thumb);
+                // imagecolortransparent($mid);
 
-                    //getting the top left coordinate
-                    $c1 = array("x"=>( $data['width']-$cropWidth)/2, "y"=>( $data['height']-$cropHeight)/2);
+                // View result in browser as array
+                // imagepng($thumb);
+                // imagepng($mid);
 
-                    $thumbSize = 80;
-                    $midSize = 260;
+                // imagecopyresized($thumb, $profile_pic, 0, 0, $c1['x'], $c1['y'], $thumbSize, $thumbSize, $cropWidth, $cropHeight);
+                // imagecopyresized($mid, $profile_pic, 0, 0, $c1['x'], $c1['y'], $midSize, $midSize, $cropWidth, $cropHeight);
 
-                    // // Create image
-                    // $thumb = imagecreatetruecolor($thumbSize, $thumbSize);
-                    // $mid = imagecreatetruecolor($midSize, $midSize);
-                    //
-                    // // Set alphablending to off picking default color as black
-                    // imagealphablending($thumb, false);
-                    // imagealphablending($mid, false);
-                    //
-                    // // Preserve transparency
-                    // imagesavealpha($thumb, true);
-                    // imagesavealpha($mid, true);
-                    //
-                    // // Transparent color only contains one parameter, no color is specified which means the identifier will be -1
-                    // imagecolortransparent($thumb);
-                    // imagecolortransparent($mid);
+                // open file a image resource
 
-                    // View result in browser as array
-                    // imagepng($thumb);
-                    // imagepng($mid);
+                // Let's make images, which we will resize or crop
+                $thumb = Image::make($path);
+                $mid = Image::make($path);
 
-                    // imagecopyresized($thumb, $profile_pic, 0, 0, $c1['x'], $c1['y'], $thumbSize, $thumbSize, $cropWidth, $cropHeight);
-                    // imagecopyresized($mid, $profile_pic, 0, 0, $c1['x'], $c1['y'], $midSize, $midSize, $cropWidth, $cropHeight);
+                if ($resize_height) { // Resize before crop
+                    $thumb->resize(null, $thumbSize, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
 
-                    // open file a image resource
+                    $mid->resize(null, $midSize, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
+                } else {
+                    $thumb->resize($thumbSize, null, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
 
-                    // Let's make images, which we will resize or crop
-                    $thumb = Image::make($path);
-                    $mid = Image::make($path);
+                    $mid->resize($midSize, null, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
+                }
 
-                    if ($resize_height) { // Resize before crop
-                        $thumb->resize(null, $thumbSize, function ($constraint) {
-                            $constraint->aspectRatio();
-                        });
+                $thumb->crop($thumbSize, $thumbSize)
+                      ->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename, 85);
 
-                        $mid->resize(null, $midSize, function ($constraint) {
-                            $constraint->aspectRatio();
-                        });
-                    } else {
-                        $thumb->resize($thumbSize, null, function ($constraint) {
-                            $constraint->aspectRatio();
-                        });
+                $mid->crop($midSize, $midSize)
+                      ->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename, 85);
 
-                        $mid->resize($midSize, null, function ($constraint) {
-                            $constraint->aspectRatio();
-                        });
-                    }
+                // if($this->ext == 'jpg'){
+                //     imagejpeg($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename, 85);
+                //     imagejpeg($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename, 85);
+                // }
+                // elseif($this->ext == 'png') {
+                //     imagepng($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename );
+                //     imagepng($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename );
+                // }
 
-                    $thumb->crop($thumbSize, $thumbSize)
-                      ->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename, 85);
+                $this->table = 'images';
+                $Images = new Images;
 
-                    $mid->crop($midSize, $midSize)
-                      ->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename, 85);
-
-                    // if($this->ext == 'jpg'){
-                    //     imagejpeg($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename, 85);
-                    //     imagejpeg($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename, 85);
-                    // }
-                    // elseif($this->ext == 'png') {
-                    //     imagepng($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename );
-                    //     imagepng($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename );
-                    // }
-
-                    $this->table = 'images';
-                    $Images = new Images;
-
-                    $image = $Images->create($data)->id;
-                    //echo "REF: " . $reference. " - REF TYPE: ".$referenceType." - IMAGE: ".$image;
-                    if (is_numeric($image) && !is_null($reference) && !is_null($referenceType)) {
-                        $xref = Xref::create([
-                          'object' => $image,
-                          'object_type' => env('TBL_IMAGES'),
-                          'reference' => $reference,
-                          'reference_type' => $referenceType,
-                        ]);
-                    }
+                $image = $Images->create($data)->id;
+                //echo "REF: " . $reference. " - REF TYPE: ".$referenceType." - IMAGE: ".$image;
+                if (is_numeric($image) && ! is_null($reference) && ! is_null($referenceType)) {
+                    $xref = Xref::create([
+                        'object' => $image,
+                        'object_type' => env('TBL_IMAGES'),
+                        'reference' => $reference,
+                        'reference_type' => $referenceType,
+                    ]);
                 }
             }
+
             return $filename;
         }
         /** else, we raise exceptions and errors! **/
-        else {
-        }
     }
 
     /**
@@ -199,30 +192,30 @@ class FixometerFile extends Model
         $ext = array_search(
             $finfo->file($tmp_name),
             array(
-                    'jpg' => 'image/jpeg',
-                    'png' => 'image/png',
-                    'gif' => 'image/gif',
-                ),
+                'jpg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+            ),
             true
         );
 
-        if (empty($ext) || !$ext || is_null($ext)) {
+        if (empty($ext) || ! $ext || is_null($ext)) {
             return false;
-        } else {
-            $this->ext = $ext;
-            $filename = time() . sha1_file($tmp_name) . rand(1, 15000) . '.' . $ext;
-            return $filename;
         }
+        $this->ext = $ext;
+        $filename = time().sha1_file($tmp_name).rand(1, 15000).'.'.$ext;
+
+        return $filename;
     }
 
     public function findImages($of_ref_type, $ref_id)
     {
-
         $sql = 'SELECT * FROM `images` AS `i`
                     INNER JOIN `xref` AS `x` ON `x`.`object` = `i`.`idimages`
-                    WHERE `x`.`object_type` = ' . env('TBL_IMAGES') . ' AND
+                    WHERE `x`.`object_type` = '.env('TBL_IMAGES').' AND
                     `x`.`reference_type` = :refType AND
                     `x`.`reference` = :refId';
+
         try {
             return DB::select(DB::raw($sql), array('refType' => $of_ref_type, 'refId' => $ref_id));
         } catch (\Illuminate\Database\QueryException $e) {
@@ -232,7 +225,7 @@ class FixometerFile extends Model
 
     public function deleteImage($id, $path)
     {
-        $del = unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/' . $path);
+        $del = unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.$path);
 
         $sql = 'DELETE FROM `images` WHERE `idimages` = :id';
 
@@ -253,30 +246,27 @@ class FixometerFile extends Model
 
     public function simpleUpload($file, $object = 'device', $object_id, $title = null)
     {
-
         if ($file['error'] == 0) {
             $filename = $this->filename($file);
-            $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/'. $filename;
+            $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
 
-
-            if (!move_uploaded_file($file['tmp_name'], $path)) {
+            if ( ! move_uploaded_file($file['tmp_name'], $path)) {
                 return false;
-            } else {
-                $size = getimagesize($path);
+            }
+            $size = getimagesize($path);
 
-                $data['path']     = $filename;
-                $data['width']    = $size[0];
-                $data['height']   = $size[1];
-                $data['alt_text'] = $title;
+            $data['path'] = $filename;
+            $data['width'] = $size[0];
+            $data['height'] = $size[1];
+            $data['alt_text'] = $title;
 
-                $Images = new Images;
+            $Images = new Images;
 
-                $image = $Images->create($data);
+            $image = $Images->create($data);
 
-                if (is_numeric($image)  && !is_null($object_id)) {
-                    $xref = new Xref('object', $image, env('TBL_IMAGES'), $object_id, env('TBL_DEVICES'));
-                    $xref->createXref(true);
-                }
+            if (is_numeric($image) && ! is_null($object_id)) {
+                $xref = new Xref('object', $image, env('TBL_IMAGES'), $object_id, env('TBL_DEVICES'));
+                $xref->createXref(true);
             }
         }
     }

@@ -22,4 +22,6 @@
     endswitch;
 @endphp
 
-<td class="state"><span class="badge badge-{{ $state }}">@lang('devices.' . $device)</span></td>
+<td class="repair_status" @if( !is_null($user_preferences) && !in_array('repair_status', $user_preferences) ) style="display: none;" @endif>
+    <span class="badge badge-{{ $state }}">@lang('devices.' . $device)</span>
+</td>

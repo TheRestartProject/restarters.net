@@ -10,7 +10,7 @@ return [
     |
     */
     'top_item1' => 'Events',
-    'top_item2' => 'Devices',
+    'top_item2' => 'Repairs',
     'top_item3' => 'Groups',
     'login' => 'Login',
     'register' => 'Register',
