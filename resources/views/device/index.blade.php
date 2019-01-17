@@ -123,13 +123,13 @@ Devices
                                         <div class="form-group">
                                             <label for="brand">@lang('devices.device_brand'):</label>
                                             <input type="text" class="form-control field" id="brand" name="brand"
-                                                placeholder="Brand..." value="{{ $brand }}">
+                                                placeholder="e.g. Apple..." value="{{ $brand }}">
                                         </div>
 
                                         <div class="form-group">
                                             <label for="model">@lang('devices.device_model'):</label>
                                             <input type="text" class="form-control field" id="model" name="model"
-                                                placeholder="Model..." value="{{ $model }}">
+                                                placeholder="e.g. iPhone..." value="{{ $model }}">
                                         </div>
 
                                     </div><!-- collapse-side-1-->
@@ -175,7 +175,7 @@ Devices
                                         <div class="form-group">
                                             <label for="problem">@lang('devices.search_comments'):</label>
                                             <input type="text" class="form-control field" id="problem" name="problem"
-                                                placeholder="Search in the comment..." value="{{ $problem }}">
+                                                placeholder="e.g. screen..." value="{{ $problem }}">
                                         </div>
                                     </div><!-- collapse-side-2-->
 
