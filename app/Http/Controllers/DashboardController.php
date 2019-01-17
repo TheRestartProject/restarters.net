@@ -233,7 +233,7 @@ class DashboardController extends Controller
             $talk_categories = [];
             $talk_categories_json = FixometerHelper::discourseAPICall('site.json', [
                 // 'offset' => '60',
-                'api_username' => Auth::user()->username,
+                'api_username' => env('DISCOURSE_APIUSER'), // Uses default API user to retrieve all categories
             ], true);
             if (is_object($talk_categories_json) && isset($talk_categories_json->categories)) {
                 foreach ($talk_categories_json->categories as $category) {
