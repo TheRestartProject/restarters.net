@@ -65,6 +65,7 @@ class SyncEvents extends Command
                 $custom_fields = array(
                     array('key' => 'party_grouphash', 'value' => $event->group),
                     array('key' => 'party_groupcountry', 'value' => $group->country),
+                    array('key' => 'party_groupcity', 'value' => $group->area),
                     array('key' => 'party_venue', 'value' => $event->venue),
                     array('key' => 'party_location', 'value' => $event->location),
                     array('key' => 'party_time', 'value' => $event->start . ' - ' . $event->end),
