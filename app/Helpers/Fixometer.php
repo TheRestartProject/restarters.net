@@ -952,4 +952,38 @@ class FixometerHelper
 
         return true;
     }
+
+    /*
+     * Function to perform API call
+     * @author Dean Appleton-Claydon
+     * @param  string  $call       Required, specifies exact API call
+     * @param  array   $parameters Any additional parameters to pass to the API call, to be merged with API key
+     * @param  boolean $fallback   Where an API call fails, try again but without the API key and parameters, this retrieves the public version of that call - is this useful for situations where the authenicated user does not yet have a Discourse username
+     * @return mixed  return       Either return JSON from Discourse or null when the API fails
+     */
+    public static function discourseAPICall($call, $parameters = [], $fallback = false)
+    {
+        $data = array(
+            'api_key' => env('DISCOURSE_APIKEY'),
+            // 'api_username' => env('DISCOURSE_APIUSER'),
+        );
+
+        try {
+            return json_decode(
+                file_get_contents(env('DISCOURSE_URL').'/'.$call.'?'.http_build_query(array_merge($data, $parameters)))
+            );
+        } catch (\Exception $e) {
+            if ($fallback !== false) {
+                try {
+                    return json_decode(
+                        file_get_contents(env('DISCOURSE_URL').'/'.$call)
+                    );
+                } catch (\Exception $e) {
+                    return null;
+                }
+            }
+
+            return null;
+        }
+    }
 }

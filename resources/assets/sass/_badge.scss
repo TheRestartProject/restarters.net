@@ -1,41 +1,89 @@
 .badge {
     font-family: $font-family-sans-serif;
+
     &-primary {
         background-color: $brand;
         border-radius: 3px;
         margin-left: 8px;
         font-weight: 400;
     }
-    &-success, &-danger, &-warning {
+
+    &-success,
+    &-danger,
+    &-warning {
         font-size: 11px;
         font-weight: 400;
         padding: 4px 1px;
         color: #FFF;
     }
+
     &-success {
         background-color: #7BC743;
     }
+
     &-danger {
         background-color: #F05D4C;
     }
+
     &-warning {
         background-color: #F9A33F;
     }
+
     &-very-poor {
         background-color: #AD2C1C;
     }
+
     &-poor {
         background-color: #FF1B00;
     }
+
     &-fair {
         background-color: #FFBA00;
     }
+
     &-good {
         background-color: #43B136;
     }
+
     &-very-good {
         background-color: #26781C;
     }
 
+    &-left {
+        // border-radius: 10rem 0 0 10rem;
 
+        // @include media-breakpoint-up(lg) {
+        border-radius: 10rem;
+        margin-right: 10px;
+        padding-left: 15px;
+        padding-right: 15px;
+        //}
+
+        svg {
+            margin: 0 5px 0 0;
+        }
+    }
+
+    &-right {
+        // border-radius: 0 10rem 10rem 0;
+
+        // @include media-breakpoint-up(lg) {
+        border-radius: 10rem;
+        //}
+    }
+
+    &-lg-text {
+        font-size: 16px;
+
+        @include media-breakpoint-down(md) {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+    }
 }
