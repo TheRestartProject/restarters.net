@@ -85,10 +85,8 @@
 
     .chat-count {
         font-size: 16px;
-
-        @include media-breakpoint-up(lg) {
-            padding-right: 5px;
-        }
+        position: relative;
+        top: 2px;
     }
 
     .badge {

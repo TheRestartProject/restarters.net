@@ -113,8 +113,12 @@
 
     }
 
+    .navbar-laravel .badge-talk-notifications {
+        background-color : #ffbe5f;
+    }
+
     .navbar-laravel .badge-no-notifications {
-         background-color : #ccc; 
+         background-color : #ccc;
     }
 
     .navbar-laravel .badge-no-notifications:hover,
