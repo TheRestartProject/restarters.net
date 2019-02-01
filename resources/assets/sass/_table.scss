@@ -22,7 +22,6 @@
         border-bottom: 2px solid #E9E9E9;
         font-size: 16px;
         padding: 10px 5px;
-        min-width: 100px;
     }
 
 
@@ -39,13 +38,6 @@
             display: block;
         }
 
-        &.table-cell-icon {
-            padding: 0;
-            padding-right: 10px;
-            padding-left: 0 !important;
-            width: 42px;
-        }
-
         a {
             text-decoration: underline;
             color: #000;
@@ -57,6 +49,12 @@
     th {
         &:first-child {
             padding-left: 20px;
+        }
+        &.table-cell-icon {
+            text-align:center;
+            padding: 0;
+            padding-left: 0 !important;
+            width: 42px;
         }
     }
 
@@ -286,12 +284,12 @@
 
         th.cell-locations,
         td.cell-locations {
-            width: 250px;
+            width: 220px;
         }
 
         th.cell-date,
         td.cell-date {
-            width: 130px;
+            width: 140px;
         }
 
         td.cell-name {

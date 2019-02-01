@@ -1,7 +1,7 @@
 <thead>
     <tr>
         @if( !isset($group_view) )
-          <th></th>
+          <th class="table-cell-icon"></th>
         @endif
         <th scope="col">@lang('events.event_name')</th>
         <th scope="col" class="cell-date">@lang('events.event_date')</th>
