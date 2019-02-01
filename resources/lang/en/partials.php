@@ -24,7 +24,7 @@ return [
     'read_more' => 'Read more',
     'how_to_host_an_event' => 'How to host an event',
     'how_to_host_an_event_text' => 'We have years of experience hosting community repair events, and we offer materials on how to organise events them. We also offer peer to peer support on our forum.',
-    'view_the_materials' => 'view_the_materials',
+    'view_the_materials' => 'View_the_materials',
     'our_global_environmental_impact' => 'Our Global Environmental Impact',
     'the_impact_of_restarters' => 'The impact of Restarters\' fixing around the world.',
     'waste_prevented' => 'waste prevented',
@@ -35,7 +35,7 @@ return [
     'information_up_to_date_text' => 'A fresh profile helps recruit more volunteers. Make sure to link to your website or social media channels.',
     'your_recent_events' => 'Your recent events',
     'your_recent_events_txt1' => 'These are events you RSVP\'ed to, or where a host logged your participation.',
-    'your_recent_events_txt2' => 'Here\'s a list of recent events you have been a part of - all important contributions to your community and the environment.',
+    'your_recent_events_txt2' => 'Recent events that you have been a part of.  Help us record repair details and view your community\'s impact.',
     'no_past_events' => 'No Past Events',
     'none_of_the_above' => 'No of the above',
     'area_text_1' => 'Through this community, potential volunteers self-register and share their location. The platform is designed to connect organisers and fixers.',
@@ -93,7 +93,7 @@ return [
     'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
     'save' => 'Save device',
     'hot_topics' => 'Hot Topics',
-    'hot_topics_text' => 'Join in the discussion on the latest hot topics on Restarters Talk.',
-    'hot_topics_link' => 'Visit the discussion'
+    'hot_topics_text' => 'Join in on the latest hot topics on repair at Restarters Talk.',
+    'hot_topics_link' => 'All weekly hot topics'
 
 ];
