@@ -15,7 +15,7 @@
                             @if( strtotime($hot_topic->created_at) > strtotime('-4 days') )
                                 <span class="badge badge-danger">NEW!</span>
                             @endif
-                            <span class="topic-label"><a href="{{{ env('DISCOURSE_URL') }}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}/t/{{{ $hot_topic->slug }}}/{{{ $hot_topic->id }}}" target="_blank">{{{ $hot_topic->title }}}</a></span>
+                            <span class="topic-label"><a href="{{{ env('DISCOURSE_URL') }}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}/t/{{{ $hot_topic->slug }}}/{{{ $hot_topic->id }}}">{{{ $hot_topic->title }}}</a></span>
                             @if( isset($hot_topics['talk_categories'][$hot_topic->category_id]) ) 
                             <div><span style="display:inline-block; width:9px; height:9px; margin-right:5px; background-color: #{{{ $hot_topics['talk_categories'][$hot_topic->category_id]->color }}};"></span><span style="font-size:.8706em; font-weight:bold" >{{{ $hot_topics['talk_categories'][$hot_topic->category_id]->name }}}</span></div>
                             @endif
