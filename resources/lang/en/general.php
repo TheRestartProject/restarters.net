@@ -58,7 +58,7 @@ return [
     'email_alerts_pref2' => 'I would like to receive email notifications about events or groups near me',
     'filter-results' => 'Filter results',
     'menu_tools' => 'Community Tools',
-    'menu_discourse' => 'Discussion',
+    'menu_discourse' => 'Restarters Talk',
     'menu_wiki' => 'Restarters Wiki',
     'menu_other' => 'Other Links',
     'menu_help_feedback' => 'Help & Feedback',
