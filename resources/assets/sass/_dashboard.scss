@@ -6,6 +6,9 @@
     //         padding: 0 7px;
     //     }
     // }
+    .container-fluid {
+        max-width: 1270px;
+    }
 
     &__aside {
         margin-bottom: 15px;
@@ -79,8 +82,8 @@
 
             &--hottopics {
                 background-image: url(/images/dashboard/restarters-hot-topic-header.svg);
-                background-size: auto 83px;
-                height: 73px;
+                background-size: auto 90px;
+                height: 74px;
             }
 
             h4 {

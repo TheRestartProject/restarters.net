@@ -26,6 +26,6 @@
     <div class="col-md-6 col-lg-4 col-xl-3 col-dashboard">
         @include('dashboard.blocks.welcome-materials-restarter')
     </div>
-    <div class="col-md-6 col-lg-6 col-xl-3 col-dashboard">@include('dashboard.blocks.wiki')</div>
-    <div class="col-md-6 col-lg-6 col-xl-3 col-dashboard">@include('dashboard.blocks.community-news')</div>
+    <div class="col-md-6 col-lg-6 col-xl-4 col-dashboard">@include('dashboard.blocks.wiki')</div>
+    <div class="col-md-6 col-lg-6 col-xl-4 col-dashboard">@include('dashboard.blocks.community-news')</div>
 {{-- @endif --}}
