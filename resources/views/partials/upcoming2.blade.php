@@ -9,9 +9,9 @@
             <thead>
                 <tr>
                     <th scope="col" class="table-cell-icon"></th>
-                    <th scope="col">@lang('events.event_name')</th>
-                    <th scope="col" class="cell-date">@lang('events.event_date')/@lang('events.event_time')</th>
-                    <th scope="col" class="cell-locations d-none d-sm-block">@lang('events.event_location')</th>
+                    <th style="font-family:Asap;font-weight:bold" scope="col">@lang('events.event_name')</th>
+                    <th style="font-family:Asap;font-weight:bold" scope="col" class="cell-date">@lang('events.event_date')/@lang('events.event_time')</th>
+                    <th style="font-family:Asap;font-weight:bold" scope="col" class="cell-locations d-none d-sm-block">@lang('events.event_location')</th>
                 </tr>
             </thead>
             <tbody>
