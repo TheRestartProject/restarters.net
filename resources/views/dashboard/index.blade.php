@@ -8,6 +8,14 @@
 <section class="dashboard">
   <div class="container-fluid">
   <div class="row row-compressed">
+      <div class="col">
+          <div style="padding-left:10px">
+      <h1 id="dashboard__header">Dashboard</h1>
+      <p>Keep up to date with the latest in the Restarters community.</p>
+          </div>
+      </div>
+  </div>
+  <div class="row row-compressed">
       @if ($show_getting_started)
           <div class="col-sm-3">
       <aside class="dashboard__aside">
