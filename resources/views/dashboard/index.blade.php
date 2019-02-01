@@ -10,8 +10,8 @@
   <div class="row row-compressed">
       <div class="col">
           <div style="padding-left:10px">
-      <h1 id="dashboard__header">Dashboard</h1>
-      <p>Keep up to date with the latest in the Restarters community.</p>
+            <h1 id="dashboard__header">@lang('dashboard.title')</h1>
+            <p>@lang('dashboard.subtitle')</p>
           </div>
       </div>
   </div>
