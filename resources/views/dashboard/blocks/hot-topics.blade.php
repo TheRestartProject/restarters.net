@@ -10,7 +10,7 @@
             <ol class="list-unstyled dashboard__list-topics">
                 @php( $count = 1 )
                 @foreach( $hot_topics['talk_hot_topics'] as $hot_topic )
-                    <li @if( isset($hot_topics['talk_categories'][$hot_topic->category_id]) ) style="border-color: #{{{ $hot_topics['talk_categories'][$hot_topic->category_id]->color }}};" @endif>
+                    <li @if( isset($hot_topics['talk_categories'][$hot_topic->category_id]) ) style="border-color: #{{{ $hot_topics['talk_categories'][$hot_topic->category_id]->color }}}; border-bottom:1px solid #eee" @endif>
                         <span class="hottopic" >
                             @if( strtotime($hot_topic->created_at) > strtotime('-4 days') )
                                 <span class="badge badge-danger">NEW!</span>
