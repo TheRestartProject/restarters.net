@@ -43,7 +43,7 @@ return [
     'upcoming_events' => 'Upcoming events',
     'no_upcoming_events' => 'No Upcoming Events',
     'upcoming_events_text' => 'If possible, the best way to get involved is to go to an event, see how it works, and participate',
-    'upcoming_events_text_2' => 'Find and attend events.  If you have entered your town/city in your profile, you will see the events nearest to you.',
+    'upcoming_events_text_2' => 'Join us at an upcoming repair event.  If you have entered your town/city in your profile, you will see the events nearest to you.',
     'host_getting_started_title' => 'Getting started in community repair',
     'host_getting_started_text' => 'We offer materials on how to help organise repair events in your community.',
     'getting_started_link' => 'View the materials',
