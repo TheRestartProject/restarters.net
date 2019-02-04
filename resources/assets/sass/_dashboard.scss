@@ -78,6 +78,7 @@
                 background-image: url(/images/dashboard/discussion_header@2x.png);
                 background-size: auto 73px;
                 height: 73px;
+                padding-right: 65px;
             }
 
             &--hottopics {
@@ -92,7 +93,7 @@
                 font-weight: bold;
                 font-style: normal;
                 font-stretch: normal;
-                line-height: 1;
+                line-height: 0.9;
                 letter-spacing: 0.1px;
                 text-align: left;
                 color: #ffffff;
