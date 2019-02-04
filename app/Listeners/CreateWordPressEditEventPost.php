@@ -51,24 +51,20 @@ class CreateWordPressEditEventPost
                     $group = Group::where('idgroups', $theParty->group)->first();
 
                     /** Prepare Custom Fields for WP XML-RPC - get all needed data **/
-                    // $theParty = $Party->findThis($id);
-                    //$Host = $Groups->findHost($data['group']);
                     $custom_fields = array(
-                    //array('key' => 'party_host',            'value' => $Host->hostname),
-                    //array('key' => 'party_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
-                    array('key' => 'party_grouphash',       'value' => $data['group']),
-                    array('key' => 'party_groupcountry',    'value' => $group->country),
-                    array('key' => 'party_venue',           'value' => $data['venue']),
-                    array('key' => 'party_location',        'value' => $data['location']),
-                    array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
-                    array('key' => 'party_date',            'value' => $data['event_date']),
-                    array('key' => 'party_timestamp',       'value' => $startTimestamp),
-                    array('key' => 'party_timestamp_end',   'value' => $endTimestamp),
-                    array('key' => 'party_stats',           'value' => $id),
-                    array('key' => 'party_lat',             'value' => $data['latitude']),
-                    array('key' => 'party_lon',             'value' => $data['longitude'])
+                        array('key' => 'party_grouphash', 'value' => $data['group']),
+                        array('key' => 'party_groupcountry', 'value' => $group->country),
+                        array('key' => 'party_groupcity', 'value' => $group->area),
+                        array('key' => 'party_venue', 'value' => $data['venue']),
+                        array('key' => 'party_location', 'value' => $data['location']),
+                        array('key' => 'party_time', 'value' => $data['start'] . ' - ' . $data['end']),
+                        array('key' => 'party_date', 'value' => $data['event_date']),
+                        array('key' => 'party_timestamp', 'value' => $startTimestamp),
+                        array('key' => 'party_timestamp_end', 'value' => $endTimestamp),
+                        array('key' => 'party_stats', 'value' => $id),
+                        array('key' => 'party_lat', 'value' => $data['latitude']),
+                        array('key' => 'party_lon', 'value' => $data['longitude'])
                     );
-
 
                     $content = array(
                       'post_type' => 'party',
@@ -76,7 +72,6 @@ class CreateWordPressEditEventPost
                       'post_content' => $data['free_text'],
                       'custom_fields' => $custom_fields
                     );
-
 
                     // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
                     $thePost = $wpClient->getPost($theParty->wordpress_post_id);
@@ -96,8 +91,8 @@ class CreateWordPressEditEventPost
                 Log::error("An error occurred during Wordpress event update: " . $e->getMessage());
                 $notify_users = FixometerHelper::usersWhoHavePreference('admin-edit-wordpress-event-failure');
                 Notification::send($notify_users, new AdminWordPressEditEventFailure([
-                'event_venue' => $theParty->venue,
-                'event_url' => url('/party/edit/'.$theParty->idevents),
+                    'event_venue' => $theParty->venue,
+                    'event_url' => url('/party/edit/'.$theParty->idevents),
                 ]));
             }
         }
