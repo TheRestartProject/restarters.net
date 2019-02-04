@@ -61,6 +61,7 @@ class CreateWordPressApproveEventPost
                     array('key' => 'party_location',        'value' => $data['location']),
                     array('key' => 'party_time',            'value' => $data['start'] . ' - ' . $data['end']),
                     array('key' => 'party_groupcountry',    'value' => $group->country),
+                    array('key' => 'party_groupcity', 'value' => $group->area),
                     array('key' => 'party_date',            'value' => $data['event_date']),
                     array('key' => 'party_timestamp',       'value' => $startTimestamp),
                     array('key' => 'party_timestamp_end',   'value' => $endTimestamp),
