@@ -6,6 +6,8 @@ use App\Group;
 use App\Party;
 use Illuminate\Console\Command;
 
+use DateTime;
+
 class SyncEvents extends Command
 {
     /**
@@ -13,7 +15,7 @@ class SyncEvents extends Command
      *
      * @var string
      */
-    protected $signature = 'sync:events';
+    protected $signature = 'sync:events {--datefrom=}';
 
     /**
      * The console command description.
@@ -49,7 +51,19 @@ class SyncEvents extends Command
      */
     public function handle()
     {
-        $events = Party::whereNotNull('wordpress_post_id')->where('wordpress_post_id', '<>', 99999)->get();
+        $eventsQuery = Party::whereNotNull('wordpress_post_id')->where('wordpress_post_id', '<>', 99999);
+        if (!is_null($this->option('datefrom'))) {
+            $dateFrom = $this->option('datefrom');
+            if (!$this->validateDate($dateFrom)) {
+                $this->error('Date from does not seem to be valid');
+                return;
+            }
+            $eventsQuery->where('event_date', '>=', $this->option('datefrom'));
+            $this->info('Starting from date: ' . $dateFrom);
+        }
+
+        $events = $eventsQuery->get();
+
         $numberOfEvents = count($events);
 
         $currentEventNumber = 1;
@@ -105,5 +119,12 @@ class SyncEvents extends Command
 
             $currentEventNumber++;
         }
+    }
+
+    protected function validateDate($date, $format = 'Y-m-d')
+    {
+        $d = DateTime::createFromFormat($format, $date);
+        // The Y ( 4 digits year ) returns TRUE for any integer with any number of digits so changing the comparison from == to === fixes the issue.
+        return $d && $d->format($format) === $date;
     }
 }
