@@ -92,7 +92,7 @@ return [
     'this_event_hasnt_started' => 'This event hasn\'t started',
     'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
     'save' => 'Save device',
-    'hot_topics' => 'Hot Topics',
+    'hot_topics' => 'Hot topics',
     'hot_topics_text' => 'Join in on the latest hot topics on repair at Restarters Talk.',
     'hot_topics_link' => 'All weekly hot topics'
 

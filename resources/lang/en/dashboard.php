@@ -2,7 +2,7 @@
 
 return array (
   'devices_logged' => 'devices logged',
-  'getting_started_header' => 'Getting Started',
+  'getting_started_header' => 'Getting started',
   'getting_started_text' => 'Welcome to the Restarters community space!  Here are a few actions to get you started:',
   'add_avatar' => 'Add an avatar',
   'add_skills' => 'Add your skills',
