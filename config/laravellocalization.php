@@ -131,6 +131,7 @@ return [
         //'mua'         => ['name' => 'Mundang',                'script' => 'Latn', 'native' => 'Mundang', 'regional' => ''],
         //'mi'          => ['name' => 'Māori',                  'script' => 'Latn', 'native' => 'Māori', 'regional' => 'mi_NZ'],
         //'nl'          => ['name' => 'Dutch',                  'script' => 'Latn', 'native' => 'Nederlands', 'regional' => 'nl_NL'],
+        'nl-BE'          => ['name' => 'Dutch (Belgium)',                  'script' => 'Latn', 'native' => 'Nederlands (België)', 'regional' => 'nl_BE'],
         //'nmg'         => ['name' => 'Kwasio',                 'script' => 'Latn', 'native' => 'ngumba', 'regional' => ''],
         //'yav'         => ['name' => 'Yangben',                'script' => 'Latn', 'native' => 'nuasue', 'regional' => ''],
         //'nn'          => ['name' => 'Norwegian Nynorsk',      'script' => 'Latn', 'native' => 'nynorsk', 'regional' => 'nn_NO'],
