@@ -13,14 +13,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        // TODO: NGM: why was this commented out in commit 7865617?
-        // Attempt to authenticate user in to the wiki
-        //'Illuminate\Auth\Events\Login' => [
-        //    'App\Listeners\LogSuccessfulLogin',
-        //],
-
         'Illuminate\Auth\Events\Login' => [
             'App\Listeners\LogInToWiki',
+            'App\Listeners\LogSuccessfulLogin',
         ],
 
         // Notify When Approve Event Occurs
