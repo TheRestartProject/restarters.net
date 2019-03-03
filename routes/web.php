@@ -29,6 +29,10 @@ Route::get('/user/forbidden', function () {
 });
 
 Auth::routes();
+// NGM: We are not using Laravel's default registration methods.
+// So we redirect /register to /user/register.
+// TODO: are we actually using anything out of Auth::routes()?  Do we need it?
+Route::redirect('register', '/user/register', 301);
 Route::get('/logout', 'UserController@logout');
 
 Route::get('/about', 'AboutController@index')->name('features');
