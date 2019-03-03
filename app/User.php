@@ -224,15 +224,11 @@ class User extends Authenticatable
     }
 
     /**
-     * TODO: updated_at acting as a proxy for last login time for now.  We amend the
-     * user row on every login so it'll do for now.  However, we should probably add
-     * a dedicated column.
-     *
      * @return Date when the user last logged in
      */
     public function lastLogin()
     {
-        return $this->updated_at;
+        return new \Carbon\Carbon($this->last_login_at);
     }
 
     /**

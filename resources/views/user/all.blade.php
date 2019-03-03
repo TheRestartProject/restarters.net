@@ -189,7 +189,7 @@
                           0
                         @endif
                       </td>
-                      <td><span title="{{ $u->lastLogin }}">{{ $u->lastLogin->diffForHumans() }}</span></td>
+                      <td><span title="{{ $u->lastLogin }}">{{ !is_null($u->lastLogin) ? $u->lastLogin->diffForHumans() : 'Never' }}</span></td>
                   </tr>
                 @endif
               @endforeach
