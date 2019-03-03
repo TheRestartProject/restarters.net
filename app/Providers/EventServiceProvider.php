@@ -13,27 +13,35 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
+        // TODO: NGM: why was this commented out in commit 7865617?
+        // Attempt to authenticate user in to the wiki
+        //'Illuminate\Auth\Events\Login' => [
+        //    'App\Listeners\LogSuccessfulLogin',
+        //],
 
-      // Notify When Approve Event Occurs
-      'App\Events\ApproveEvent' => [
-        'App\Listeners\CreateWordPressApproveEventPost',
-      ],
+        'Illuminate\Auth\Events\Login' => [
+            'App\Listeners\LogInToWiki',
+        ],
 
-      // Notify When Edit Event Occurs
-      'App\Events\EditEvent' => [
-        'App\Listeners\CreateWordPressEditEventPost',
-      ],
+        // Notify When Approve Event Occurs
+        'App\Events\ApproveEvent' => [
+            'App\Listeners\CreateWordPressApproveEventPost',
+        ],
 
-      // Notify When Approve Group Occurs
-      'App\Events\ApproveGroup' => [
-        'App\Listeners\CreateWordPressApproveGroupPost',
-      ],
+        // Notify When Edit Event Occurs
+        'App\Events\EditEvent' => [
+            'App\Listeners\CreateWordPressEditEventPost',
+        ],
 
-      // Notify When Edit Group Occurs
-      'App\Events\EditGroup' => [
-        'App\Listeners\CreateWordPressEditGroupPost',
-      ],
+        // Notify When Approve Group Occurs
+        'App\Events\ApproveGroup' => [
+            'App\Listeners\CreateWordPressApproveGroupPost',
+        ],
 
+        // Notify When Edit Group Occurs
+        'App\Events\EditGroup' => [
+            'App\Listeners\CreateWordPressEditGroupPost',
+        ],
     ];
 
     /**
