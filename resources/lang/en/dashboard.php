@@ -13,5 +13,5 @@ return array (
   'join_discussion' => 'Join the discussion',
   'log_devices' => 'Log devices',
   'title' => 'Dashboard',
-  'subtitle' => 'Keep up to date with the latest activity in the Restarters community.'
+  'subtitle' => 'Keep up to date with the latest activity in the Restarters community.',
 );
