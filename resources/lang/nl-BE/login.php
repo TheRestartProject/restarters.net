@@ -5,9 +5,9 @@ return array (
   'login_title' => 'Inloggen',
   'more' => 'Meer weten',
   'stat_1' => 'Herstelde toestellen',
-  'stat_2' => 'Vermeden CO<sub>2</sub> uitstoot',
-  'stat_3' => 'Vermeden afval',
-  'stat_4' => 'georganiseerde activiteiten',
+  'stat_2' => 'CO<sub>2</sub>-uitstoot vermeden',
+  'stat_3' => 'afval vermeden',
+  'stat_4' => 'herstelactiviteiten',
   'whatis' => 'Welkom in de Restart gemeenschap',
   'whatis_content' => '<p>Hier groeit en bloeit de repareerbeweging. En we kunnen nog heel wat herstelwerk en herstellers  gebruiken! </p><p>Wil je</p><ul>
                                 <li>Toestellen leren herstellen samen met anderen</li>

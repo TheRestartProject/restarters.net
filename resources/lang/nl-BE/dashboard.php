@@ -1,7 +1,8 @@
 <?php
 
 return array (
-  'getting_started_text' => 'Repair&Share gebruikt het Restarters platform voor gegevensuitwisseling tussen Repair Café\'s. Ga onmiddellijk naar:',
+  'getting_started_text' => 'Repair&Share gebruikt het Restarters platform voor gegevensuitwisseling tussen en over Repair Café\'s.<br/> 
+Ga onmiddellijk naar:',
   'getting_started_header' => 'Welkom!',
   'join_discussion' => 'Neem deel aan een gesprek',
   'join_group' => 'Sluit je aan bij een groep',
@@ -10,5 +11,8 @@ return array (
   'add_avatar' => 'Voeg een avatar toe',
   'add_skills' => 'Voeg je competenties toe',
   'discussion_header' => 'Discussieforum',
-  'devices_logged' => 'Bijgehouden toestellen',
+  'devices_logged' => 'Ingegeven toestellen',
+  'title' => 'Dashboard',
+  'log_devices' => 'Herstellingen bijhouden',
+  'subtitle' => 'Blijf op de hoogte van de nieuwste activiteiten in de Restarters gemeenschap.',
 );

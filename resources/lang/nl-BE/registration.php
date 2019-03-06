@@ -4,7 +4,7 @@ return array (
   'age' => 'Geboortejaar',
   'age_help' => 'Om de repair gemeenschap verder te ontwikkelen, hebben we meer inzicht nodig in intergenerationele dynamieken.',
   'age_validation' => 'Geef aub je geboortejaar in.',
-  'complete-profile' => 'Mijn profiel voltooien.',
+  'complete-profile' => 'Mijn profiel voltooien',
   'country' => 'Land',
   'country_help' => 'Door te weten waar de vrijwilligers wonen kunnen we de wereldwijde repair gemeenschap doen groeien.',
   'country_validation' => 'Vul aub je land in.',

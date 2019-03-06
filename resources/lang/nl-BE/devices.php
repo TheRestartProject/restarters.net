@@ -56,4 +56,10 @@ return array (
   'useful_repair_urls_explanation' => 'Nuttige URL',
   'useful_repair_urls_helper' => 'Geef de URL hier in',
   'various' => 'Verschillende',
+  'device_info' => 'Info over het toestel',
+  'devices_date' => 'Datum',
+  'event_info' => 'Info over de activiteit',
+  'repair_info' => 'Herstel info',
+  'uploaded_photos' => 'Upgeloade foto\'s',
+  'useful_repair_info' => 'Informatiebron',
 );
