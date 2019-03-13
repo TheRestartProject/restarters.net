@@ -688,19 +688,17 @@ class GroupController extends Controller
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
                     event(new ApproveGroup($group, $data));
 
-                // Notify nearest users - disabled for now until Laravel Queue is implemented
-                  if( !is_null($latitude) && !is_null($longitude) ){
-
-                    $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
+                    // Notify nearest users - disabled for now until Laravel Queue is implemented
+                    if ( ! is_null($latitude) && ! is_null($longitude)) {
+                        $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
                                                 ->orderBy('name', 'ASC')
                                                   ->get();
-                  
-                    Notification::send($restarters_nearby, new NewGroupWithinRadius([
-                      'group_name' => $group->name,
-                      'group_url' => url('/group/view/'.$id),
-                    ]));
 
-                  }
+                        Notification::send($restarters_nearby, new NewGroupWithinRadius([
+                            'group_name' => $group->name,
+                            'group_url' => url('/group/view/'.$id),
+                        ]));
+                    }
                 } elseif ( ! empty($group->wordpress_post_id)) {
                     event(new EditGroup($group, $data));
                 }
@@ -1276,5 +1274,34 @@ class GroupController extends Controller
         }
 
         return redirect('/group/nearby/'.$groupId)->with('success', $user->name.' has been invited');
+    }
+
+    /**
+     * [getGroupsByapi_key description]
+     * Write Description here...
+     *
+     * @author  Christopher Kelker
+     * @version 1.0.0
+     * @date    2019-03-13
+     * @param   [type]     $api_key
+     * @return  [type]
+     */
+    public function getGroupsByapi_key($api_key)
+    {
+    }
+
+    /**
+     * [getGroupByapi_keyAndId description]
+     * Write Description here...
+     *
+     * @author  Christopher Kelker
+     * @version 1.0.0
+     * @date    2019-03-13
+     * @param   [type]     $api_key
+     * @param   [type]     $id
+     * @return  [type]
+     */
+    public function getGroupByapi_keyAndId($api_key, $id)
+    {
     }
 }

@@ -53,15 +53,15 @@ Route::group(['middleware' => 'checkAPIAccess'], function () {
         return App\Http\Controllers\GroupController::getGroupsByapi_key($api_key);
     });
     Route::get('/{api_key}/events/event-tag/', function ($api_key) {
-        return App\Http\Controllers\EventController::getEventsByapi_key($api_key);
+        return App\Http\Controllers\PartyController::getEventsByapi_key($api_key);
     });
     Route::get('/{api_key}/group/{id}', function ($api_key, $id) {
         return App\Http\Controllers\GroupController::getGroupByapi_keyAndId($api_key, $id);
     });
     Route::get('/{api_key}/event/upcoming/{id}', function ($api_key, $id) {
-        return App\Http\Controllers\EventController::getUpcomingEventByapi_keyAndId($api_key, $id);
+        return App\Http\Controllers\PartyController::getUpcomingEventByapi_keyAndId($api_key, $id);
     });
     Route::get('/{api_key}/event/past/{id}', function ($api_key, $id) {
-        return App\Http\Controllers\EventController::getPastEventByapi_keyAndId($api_key, $id);
+        return App\Http\Controllers\PartyController::getPastEventByapi_keyAndId($api_key, $id);
     });
 });
