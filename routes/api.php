@@ -52,7 +52,7 @@ Route::group(['middleware' => 'checkAPIAccess'], function () {
     Route::get('/{api_key}/groups/group-tag/', function ($api_key) {
         return App\Http\Controllers\GroupController::getGroupsByapi_key($api_key);
     });
-    Route::get('/{api_key}/events/group-tag/', function ($api_key) {
+    Route::get('/{api_key}/events/event-tag/', function ($api_key) {
         return App\Http\Controllers\EventController::getEventsByapi_key($api_key);
     });
     Route::get('/{api_key}/group/{id}', function ($api_key, $id) {
