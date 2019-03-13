@@ -62,6 +62,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
             'Symfony\\Component\\CssSelector\\' => 30,
             'Symfony\\Component\\Console\\' => 26,
             'Spinen\\Discourse\\' => 17,
+            'Spatie\\CalendarLinks\\' => 21,
         ),
         'R' => 
         array (
@@ -242,6 +243,10 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'Spinen\\Discourse\\' => 
         array (
             0 => __DIR__ . '/..' . '/spinen/laravel-discourse-sso/src',
+        ),
+        'Spatie\\CalendarLinks\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/spatie/calendar-links/src',
         ),
         'Ramsey\\Uuid\\' => 
         array (
@@ -480,6 +485,8 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Console\\Commands\\AnonymiseUsersForTest' => __DIR__ . '/../..' . '/app/Console/Commands/AnonymiseUsersForTest.php',
         'App\\Console\\Commands\\FixViews' => __DIR__ . '/../..' . '/app/Console/Commands/FixViews.php',
         'App\\Console\\Commands\\SyncDiscourseUsernames' => __DIR__ . '/../..' . '/app/Console/Commands/SyncDiscourseUsernames.php',
+        'App\\Console\\Commands\\SyncEvents' => __DIR__ . '/../..' . '/app/Console/Commands/SyncEvents.php',
+        'App\\Console\\Commands\\SyncGroups' => __DIR__ . '/../..' . '/app/Console/Commands/SyncGroups.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Dashboard' => __DIR__ . '/../..' . '/app/Dashboard.php',
         'App\\Device' => __DIR__ . '/../..' . '/app/Device.php',
@@ -545,6 +552,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Listeners\\CreateWordPressApproveGroupPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressApproveGroupPost.php',
         'App\\Listeners\\CreateWordPressEditEventPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressEditEventPost.php',
         'App\\Listeners\\CreateWordPressEditGroupPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressEditGroupPost.php',
+        'App\\Listeners\\LogInToWiki' => __DIR__ . '/../..' . '/app/Listeners/LogInToWiki.php',
         'App\\Listeners\\LogSuccessfulLogin' => __DIR__ . '/../..' . '/app/Listeners/LogSuccessfulLogin.php',
         'App\\Mail\\RegistrationWelcome' => __DIR__ . '/../..' . '/app/Mail/RegistrationWelcome.php',
         'App\\Notifications\\AccountCreated' => __DIR__ . '/../..' . '/app/Notifications/AccountCreated.php',
@@ -3983,6 +3991,13 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'SebastianBergmann\\Timer\\RuntimeException' => __DIR__ . '/..' . '/phpunit/php-timer/src/RuntimeException.php',
         'SebastianBergmann\\Timer\\Timer' => __DIR__ . '/..' . '/phpunit/php-timer/src/Timer.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'Spatie\\CalendarLinks\\Exceptions\\InvalidLink' => __DIR__ . '/..' . '/spatie/calendar-links/src/Exceptions/InvalidLink.php',
+        'Spatie\\CalendarLinks\\Generator' => __DIR__ . '/..' . '/spatie/calendar-links/src/Generator.php',
+        'Spatie\\CalendarLinks\\Generators\\Google' => __DIR__ . '/..' . '/spatie/calendar-links/src/Generators/Google.php',
+        'Spatie\\CalendarLinks\\Generators\\Ics' => __DIR__ . '/..' . '/spatie/calendar-links/src/Generators/Ics.php',
+        'Spatie\\CalendarLinks\\Generators\\WebOutlook' => __DIR__ . '/..' . '/spatie/calendar-links/src/Generators/WebOutlook.php',
+        'Spatie\\CalendarLinks\\Generators\\Yahoo' => __DIR__ . '/..' . '/spatie/calendar-links/src/Generators/Yahoo.php',
+        'Spatie\\CalendarLinks\\Link' => __DIR__ . '/..' . '/spatie/calendar-links/src/Link.php',
         'Spinen\\Discourse\\Controllers\\SsoController' => __DIR__ . '/..' . '/spinen/laravel-discourse-sso/src/Controllers/SsoController.php',
         'Spinen\\Discourse\\SsoServiceProvider' => __DIR__ . '/..' . '/spinen/laravel-discourse-sso/src/SsoServiceProvider.php',
         'Symfony\\Component\\Console\\Application' => __DIR__ . '/..' . '/symfony/console/Application.php',

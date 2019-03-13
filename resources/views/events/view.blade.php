@@ -127,11 +127,32 @@
 
                 <div class="row flex-row d-flex">
 
-                  <div class="col-4 d-flex flex-column"><strong>Date: </strong></div>
-                  <div class="col-8 d-flex flex-column">{{ date('D jS M Y', $formdata->event_date) }}</div>
+                  <div class="col-4 d-flex flex-column"><strong>Date/time: </strong></div>
+                  <div class="col-8 d-flex flex-column">
+                      {{ date('D jS M Y', $formdata->event_date) }}<br>
+                      {{ $event->getEventStartEnd() }}
+                      @if( $event->isUpcoming() && ! empty($calendar_links) )
+                          <div class="dropdown">
+                              <a
+                                class="btn btn-link dropdown-toggle"
+                                href="#"
+                                role="button"
+                                id="addToCalendar"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false">
+                                Add to calendar
+                              </a>
 
-                  <div class="col-4 d-flex flex-column"><strong>Time: </strong></div>
-                  <div class="col-8 d-flex flex-column">{{ $event->getEventStartEnd() }}</div>
+                              <div class="dropdown-menu" aria-labelledby="addToCalendar">
+                                <a class="dropdown-item" href="{{{ $calendar_links['google'] }}}">Google Calendar</a>
+                                <a class="dropdown-item" href="{{{ $calendar_links['webOutlook'] }}}">Outlook</a>
+                                <a class="dropdown-item" href="{{{ $calendar_links['ics'] }}}">iCal</a>
+                                <a class="dropdown-item" href="{{{ $calendar_links['yahoo'] }}}">Yahoo Calendar</a>
+                              </div>
+                          </div>
+                      @endif
+                  </div>
 
                   <div class="col-4 d-flex flex-column"><strong>Address: </strong></div>
                   <div class="col-8 d-flex flex-column"><address>{{ $formdata->location }}</address></div>
