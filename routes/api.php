@@ -49,19 +49,9 @@ Route::get('/group-tag/stats/{group_tag_id}/{format?}', function ($group_tag_id,
 
 // API calls to get Group(s)/Event(s) Info relevant
 Route::group(['middleware' => 'checkAPIAccess'], function () {
-    Route::get('/{api_key}/groups/group-tag/', function ($api_key) {
-        return App\Http\Controllers\GroupController::getGroupsByapi_key($api_key);
-    });
-    Route::get('/{api_key}/events/event-tag/', function ($api_key) {
-        return App\Http\Controllers\PartyController::getEventsByapi_key($api_key);
-    });
-    Route::get('/{api_key}/group/{id}', function ($api_key, $id) {
-        return App\Http\Controllers\GroupController::getGroupByapi_keyAndId($api_key, $id);
-    });
-    Route::get('/{api_key}/event/upcoming/{id}', function ($api_key, $id) {
-        return App\Http\Controllers\PartyController::getUpcomingEventByapi_keyAndId($api_key, $id);
-    });
-    Route::get('/{api_key}/event/past/{id}', function ($api_key, $id) {
-        return App\Http\Controllers\PartyController::getPastEventByapi_keyAndId($api_key, $id);
-    });
+    Route::get('/{api_key}/groups/group-tag/', 'GroupController@getGroupsByKey');
+    Route::get('/{api_key}/events/event-tag/', 'PartyController@getEventsByKey');
+    Route::get('/{api_key}/group/{id}', 'GroupController@getGroupByKeyAndId');
+    Route::get('/{api_key}/event/upcoming/{id}', 'PartyController@getUpcomingEventByKeyAndId');
+    Route::get('/{api_key}/event/past/{id}', 'PartyController@getPastEventByKeyAndId');
 });

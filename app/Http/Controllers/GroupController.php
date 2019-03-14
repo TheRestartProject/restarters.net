@@ -1277,7 +1277,7 @@ class GroupController extends Controller
     }
 
     /**
-     * [getGroupsByapi_key description]
+     * [getGroupsByKey description]
      * Write Description here...
      *
      * @author  Christopher Kelker
@@ -1286,12 +1286,13 @@ class GroupController extends Controller
      * @param   [type]     $api_key
      * @return  [type]
      */
-    public function getGroupsByapi_key($api_key)
+    public function getGroupsByKey($api_key)
     {
+        return 'true';
     }
 
     /**
-     * [getGroupByapi_keyAndId description]
+     * [getGroupByKeyAndId description]
      * Write Description here...
      *
      * @author  Christopher Kelker
@@ -1301,7 +1302,8 @@ class GroupController extends Controller
      * @param   [type]     $id
      * @return  [type]
      */
-    public function getGroupByapi_keyAndId($api_key, $id)
+    public function getGroupByKeyAndId($api_key, $id)
     {
+        return 'true';
     }
 }

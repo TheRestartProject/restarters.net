@@ -1479,7 +1479,7 @@ class PartyController extends Controller
     }
 
     /**
-     * [getEventsByapi_key description]
+     * [getEventsByKey description]
      * Write Description here...
      *
      * @author  Christopher Kelker
@@ -1488,12 +1488,13 @@ class PartyController extends Controller
      * @param   [type]     $api_key
      * @return  [type]
      */
-    public function getEventsByapi_key($api_key)
+    public function getEventsByKey($api_key)
     {
+        return 'true';
     }
 
     /**
-     * [getUpcomingEventByapi_keyAndId description]
+     * [getUpcomingEventByKeyAndId description]
      * Write Description here...
      *
      * @author  Christopher Kelker
@@ -1503,12 +1504,13 @@ class PartyController extends Controller
      * @param   [type]     $id
      * @return  [type]
      */
-    public function getUpcomingEventByapi_keyAndId($api_key, $id)
+    public function getUpcomingEventByKeyAndId($api_key, $id)
     {
+        return 'true';
     }
 
     /**
-     * [getPastEventByapi_keyAndId description]
+     * [getPastEventByKeyAndId description]
      * Write Description here...
      *
      * @author  Christopher Kelker
@@ -1518,7 +1520,8 @@ class PartyController extends Controller
      * @param   [type]     $id
      * @return  [type]
      */
-    public function getPastEventByapi_keyAndId($api_key, $id)
+    public function getPastEventByKeyAndId($api_key, $id)
     {
+        return 'true';
     }
 }
