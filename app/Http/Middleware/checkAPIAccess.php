@@ -26,14 +26,14 @@ class checkAPIAccess
     public function handle(Request $request, Closure $next)
     {
         if ($request->api_key == '') {
-            return response('Requires access key');
+            return abort(404, 'Requires access key.');
         }
 
         $check_apikey_exists = User::where('access_key', $request->api_key)
         ->exists();
 
         if ( ! $check_apikey_exists) {
-            return response('Invalid access key');
+            return abort(404, 'Invalid access key.');
         }
 
         return $next($request);
