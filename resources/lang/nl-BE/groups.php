@@ -64,7 +64,7 @@ return array (
   'search_name' => 'Naam zoeken',
   'send_invite_button' => 'Uitnodigingen versturen',
   'share_stats_header' => 'Je statistieken delen',
-  'share_stats_message' => 'Door kapotte toestellen te repareren :group heel wat CO<sub>2</sub> uitstoot en afval vermeden. Help ons om dit goede nieuws te verspreiden en deel het op je website.',
+  'share_stats_message' => 'Door kapotte toestellen te repareren heeft :group heel wat CO<sub>2</sub> uitstoot en afval vermeden. Help ons om dit goede nieuws te verspreiden en deel het op je website.',
   'skills_column_table' => 'Competenties',
   'tag-1' => 'Label 1',
   'tag-2' => 'Label 2',
@@ -76,4 +76,5 @@ return array (
   'tag-8' => 'Label 8',
   'town-city-placeholder' => 'Bv Parijs, Londen, Brussel',
   'type_email_addresses_message' => 'Typ hier de e-mailadressen van de mensen die je wilt uitnodigen om lid te worden van je groep. Zet een tab of komma achter elk e-mailadres.',
+  'helptext_area' => 'Tonen op de homepagina van Restart Project',
 );
