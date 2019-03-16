@@ -224,4 +224,41 @@ class Group extends Model implements Auditable
             'waste' => $waste,
         ];
     }
+
+
+    /**
+     * Adds a volunteer to the group.
+     *
+     * @param App\User $volunteer A registered user.
+     */
+    public function addVolunteer($volunteer)
+    {
+        $user_group = UserGroups::updateOrCreate([
+            'user' => $volunteer->id,
+            'group' => $this->idgroups,
+        ], [
+            'status' => 1,
+            'role' => Role::RESTARTER,
+        ]);
+    }
+
+    /**
+     * Convert an existing volunteer of a group into a host of the group.
+     *
+     * This also converts the volunteer's overall role into that of a host when applicable.
+     *
+     * @param App\User $groupVolunteer A user who is already a member of the group.
+     */
+    public function makeMemberAHost($groupMember)
+    {
+        if (!$this->allVolunteers()->pluck('user')->contains($groupMember->id))
+            throw new \Exception('Volunteer is not currently in this group.  Only existing group members can be made hosts.');
+
+        UserGroups::where('user', $groupMember->id)
+            ->where('group', $this->idgroups)
+            ->update(['role' => Role::HOST]);
+
+        // Update user's role (only if currently Restarter role)
+        $groupMember->convertToHost();
+    }
 }
