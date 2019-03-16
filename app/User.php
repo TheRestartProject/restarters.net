@@ -272,4 +272,18 @@ class User extends Authenticatable
             return false;
         }
     }
+
+
+    /**
+     * Convert the user's role to be a Host.
+     *
+     * Currently, the only role that should be convertible to a Host is a Restarter.
+     */
+    public function convertToHost()
+    {
+        if ($this->role == Role::RESTARTER) {
+            $this->role = Role::HOST;
+            $this->save();
+        }
+    }
 }

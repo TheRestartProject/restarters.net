@@ -8,6 +8,11 @@ use DB;
 
 class Role extends Model
 {
+    const ROOT = 1;
+    const ADMIN = 2;
+    const HOST = 3;
+    const RESTARTER = 4;
+    const GUSET = 5;
 
     protected $table = 'roles';
     /**

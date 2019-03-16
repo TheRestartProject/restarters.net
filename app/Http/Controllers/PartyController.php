@@ -164,12 +164,20 @@ class PartyController extends Controller
             $error = array();
 
             if ($request->has('location')) {
-                $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($request->input('location').',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
-                $json = json_decode($json);
+                // TODO: NGM: we should inject a geocoding class for use here.
+                // (will aid with testing, and allow for swapping to a non-Google geocoder)
+                try {
+                    $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($request->input('location').',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
+                    $json = json_decode($json);
 
-                if (is_object($json) && !empty($json->{'results'})) {
-                    $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
-                    $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
+                    if (is_object($json) && !empty($json->{'results'})) {
+                        $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
+                        $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
+                    }
+                } catch (\Exception $ex) {
+                    $latitude = 0;
+                    $longitude = 0;
+                    Log::error('An error occurred during geocoding: ' . $ex->getMessage());
                 }
             } else {
                 $latitude = null;

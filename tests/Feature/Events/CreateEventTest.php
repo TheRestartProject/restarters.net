@@ -2,9 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\User;
+use App\EventsUsers;
 use App\Group;
 use App\Party;
+use App\User;
 
 use DB;
 use Carbon\Carbon;
@@ -18,26 +19,51 @@ class CreateEventTest extends TestCase
     {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
+        User::truncate();
         Group::truncate();
         Party::truncate();
+        EventsUsers::truncate();
         DB::statement("SET foreign_key_checks=1");
-
-
-        // Given we're logged in as an admin
-        $admin = factory(User::class)->states('Administrator')->create();
-        $this->actingAs($admin);
     }
 
     /** @test */
-    public function a_host_can_create_an_event()
+    public function a_host_without_a_group_cant_create_an_event()
     {
-        // When we create an event
-        $event = factory(Party::class)->raw();
-        $response = $this->post('/party/create/', $event);
+        $this->withoutExceptionHandling();
 
-        // Then it should be...
-        $this->assertDatabaseHas('events', $event);
+        $host = factory(User::class)->states('Host')->create();
+        $this->actingAs($host);
+
+        $response = $this->get('/party/create');
+        $this->get('/party/create')->assertRedirect('/user/forbidden');
     }
+
+
+    /** @test */
+    public function a_host_with_a_group_can_create_an_event()
+    {
+        $this->withoutExceptionHandling();
+
+        // arrange
+        $host = factory(User::class)->states('Host')->create();
+        $this->actingAs($host);
+
+        $group = factory(Group::class)->create();
+        $group->addVolunteer($host);
+        $group->makeGroupMemberAHost($host);
+
+        // act
+        $response = $this->get('/party/create');
+        $this->get('/party/create')->assertStatus(200);
+
+        $eventAttributes = factory(Party::class)->raw();
+        $response = $this->post('/party/create/', $eventAttributes);
+
+        // assert
+        $this->get('/party/view/1')->assertSee($eventAttributes['venue']);
+        $this->assertDatabaseHas('events', $eventAttributes);
+    }
+
 
     /** @test */
     public function emails_sent_when_created()
