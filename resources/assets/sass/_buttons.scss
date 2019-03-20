@@ -448,3 +448,76 @@
         display: none;
     }
 }
+
+.card .dropdown-calendar {
+    .btn-link {
+        font-size: 14px;
+        font-family: $font-family-second;
+        font-weight: normal;
+        padding: 0;
+        min-width: auto;
+        color: $brand;
+        text-decoration: underline;
+
+        &:hover {
+            text-decoration: none;
+        }
+
+        &[aria-expanded="true"]::after {
+            transform: rotate(-180deg);
+        }
+    }
+
+    .dropdown-menu {
+        margin-left: -22px;
+        margin-top: 12px;
+        padding: 0;
+
+        .dropdown-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            &:hover {
+                text-decoration: underline;
+                background-color: transparent;
+            }
+        }
+    }
+
+    .dropdown-menu-arrow {
+        top: -17px;
+        left: 50%;
+        width: 0;
+        height: 0;
+        position: relative;
+    }
+
+    .dropdown-menu-arrow:before,
+    .dropdown-menu-arrow:after {
+        content: "";
+        position: absolute;
+        display: block;
+        width: 0;
+        height: 0;
+        border-width: 12px 8px;
+        border-style: solid;
+        border-color: transparent;
+        z-index: 1001;
+    }
+
+    .dropdown-menu-arrow:after {
+        bottom: -18px;
+        right: -8px;
+        border-bottom-color: #fff;
+    }
+
+    .dropdown-menu-arrow:before {
+        bottom: -17px;
+        right: -8px;
+        border-bottom-color: rgba(0,0,0,.15);
+    }
+}

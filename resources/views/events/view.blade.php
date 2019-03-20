@@ -132,7 +132,7 @@
                       {{ date('D jS M Y', $formdata->event_date) }}<br>
                       {{ $event->getEventStartEnd() }}
                       @if( $event->isUpcoming() && ! empty($calendar_links) )
-                          <div class="dropdown">
+                          <div class="dropdown dropdown-calendar">
                               <a
                                 class="btn btn-link dropdown-toggle"
                                 href="#"
@@ -140,11 +140,10 @@
                                 id="addToCalendar"
                                 data-toggle="dropdown"
                                 aria-haspopup="true"
-                                aria-expanded="false">
-                                Add to calendar
-                              </a>
+                                aria-expanded="false">Add to calendar</a>
 
                               <div class="dropdown-menu" aria-labelledby="addToCalendar">
+                                <span class="dropdown-menu-arrow"></span>
                                 <a class="dropdown-item" href="{{{ $calendar_links['google'] }}}">Google Calendar</a>
                                 <a class="dropdown-item" href="{{{ $calendar_links['webOutlook'] }}}">Outlook</a>
                                 <a class="dropdown-item" href="{{{ $calendar_links['ics'] }}}">iCal</a>
