@@ -1278,7 +1278,9 @@ class GroupController extends Controller
 
     /**
      * [getGroupsByKey description]
-     * Write Description here...
+     * Find Groups from User Access Key,
+     * If the Groups are not found, through 404 error,
+     * Else return the Groups JSON data
      *
      * @author  Christopher Kelker
      * @version 1.0.0
@@ -1372,7 +1374,9 @@ class GroupController extends Controller
 
     /**
      * [getGroupByKeyAndId description]
-     * Write Description here...
+     * Find Group from User Access Key and Group ID,
+     * If the Group is not found, through 404 error,
+     * Else return the Group JSON data
      *
      * @author  Christopher Kelker
      * @version 1.0.0

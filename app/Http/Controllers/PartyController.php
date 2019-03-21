@@ -1539,7 +1539,10 @@ class PartyController extends Controller
 
     /**
      * [getUpcomingEventByKeyAndId description]
-     * Write Description here...
+     * Get Past Event using Route Model Binding,
+     * If Event is not found, throw 404 error,
+     * If Event is Found but is not Upcoming, throw 404 error,
+     * Else return the Event's JSON data
      *
      * @author  Christopher Kelker
      * @version 1.0.0
@@ -1619,7 +1622,10 @@ class PartyController extends Controller
 
     /**
      * [getPastEventByKeyAndId description]
-     * Write Description here...
+     * Get Past Event using Route Model Binding,
+     * If Event is not found, throw 404 error,
+     * If Event is Found but is not in the Past, throw 404 error,
+     * Else return the Event's JSON data
      *
      * @author  Christopher Kelker
      * @version 1.0.0
