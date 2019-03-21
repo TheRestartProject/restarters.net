@@ -17,6 +17,9 @@ class Party extends Model implements Auditable
     protected $fillable = ['group', 'event_date', 'start', 'end', 'venue', 'location', 'latitude', 'longitude', 'free_text', 'pax', 'volunteers', 'hours', 'wordpress_post_id', 'created_at', 'updated_at'];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'idevents', 'user_id', 'wordpress_post_id'];
 
+    // Append data to Model
+    protected $appends = ['participants'];
+
     //Getters
     public function findAll()
     {
@@ -588,5 +591,24 @@ class Party extends Model implements Auditable
     public function users()
     {
         return $this->hasMany(EventsUsers::class, 'event', 'idevents');
+    }
+
+    /**
+     * [owner description]
+     * Party Owner/Creator
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function getParticipantsAttribute()
+    {
+        return $this->pax;
     }
 }
