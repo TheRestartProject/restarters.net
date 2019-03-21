@@ -4,11 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-use DB;
-
 class GroupTags extends Model
 {
-
     protected $table = 'group_tags';
     /**
      * The attributes that are mass assignable.
@@ -30,8 +27,13 @@ class GroupTags extends Model
         return $this->belongsToMany('App\GrouptagsGroups');
     }
 
-    // Setters
+    //Table Relations
+    public function groupTagGroups()
+    {
+        return $this->hasMany(GrouptagsGroups::class, 'group_tag', 'id');
+    }
 
+    // Setters
 
     //Getters
 }

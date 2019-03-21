@@ -1286,9 +1286,88 @@ class GroupController extends Controller
      * @param   [type]     $api_key
      * @return  [type]
      */
-    public function getGroupsByKey($api_key)
+    public function getGroupsByKey(Request $request, $api_key)
     {
-        return 'true';
+        // Find User by Access Key
+        $user = User::where('access_key', $api_key)->first();
+
+        // Get Emission Ratio
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $group_tags_groups = $user->groupTag->groupTagGroups;
+
+        // If Group is not found, through 404 error
+        if (empty($group_tags_groups)) {
+            return abort(404, 'No User Groups found.');
+        }
+
+        // New Collection Instance
+        $collection = collect([]);
+
+        foreach ($group_tags_groups as $key => $group) {
+            $collection->push([
+                'id' => $group->hasOneGroup->idgroups,
+                'name' => $group->hasOneGroup->name,
+                'location' => [
+                    'value' => $group->hasOneGroup->location,
+                    'country' => $group->hasOneGroup->country,
+                    'latitude' => $group->hasOneGroup->latitude,
+                    'longitude' => $group->hasOneGroup->longitude,
+                ],
+                'website' => $group->hasOneGroup->website,
+                // 'description' => $group->hasOneGroup->free_text,
+                // 'image_url' => 'https://restarters.net/mighty-restarters.jpg',
+
+                'upcoming_parties' => $upcoming_parties_collection = collect([]),
+
+                'past_parties' => $past_parties_collection = collect([]),
+
+                'impact' => [
+                    'participants' => $group->hasOneGroup->totalPartiesParticipants(),
+                    'hours_volunteered' => $group->hasOneGroup->getGroupStats($emissionRatio)['hours'],
+                    'parties_thrown' => $group->hasOneGroup->parties->count(),
+                    'waste_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['waste'],
+                    'co2_emissions_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['co2'],
+                ],
+                'widgets' => [
+                    'headline_stats' => "https://restarters.net/group/stats/{$group->hasOneGroup->idgroups}",
+                    'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/group/{$group->hasOneGroup->idgroups}/manufacture",
+                ],
+            ]);
+
+            foreach ($group->hasOneGroup->upcomingParties as $key => $event) {
+                $upcoming_parties_collection->push([
+                    'event_id' => $event->idevents,
+                    'event_date' => $event->event_date,
+                    'start_time' => $event->start,
+                    'end_time' => $event->end,
+                    'name' => $event->venue,
+                    'location' => [
+                        'value' => $event->location,
+                        'latitude' => $event->latitude,
+                        'longitude' => $event->longitude,
+                    ],
+                ]);
+            }
+
+            foreach ($group->hasOneGroup->pastParties as $key => $event) {
+                $past_parties_collection->push([
+                    'event_id' => $event->idevents,
+                    'event_date' => $event->event_date,
+                    'start_time' => $event->start,
+                    'end_time' => $event->end,
+                    'name' => $event->venue,
+                    'location' => [
+                        'value' => $event->location,
+                        'latitude' => $event->latitude,
+                        'longitude' => $event->longitude,
+                    ],
+                ]);
+            }
+        }
+
+        return $collection;
     }
 
     /**
@@ -1302,8 +1381,84 @@ class GroupController extends Controller
      * @param   [type]     $id
      * @return  [type]
      */
-    public function getGroupByKeyAndId($api_key, $id)
+    public function getGroupByKeyAndId(Request $request, $api_key, $id)
     {
-        return 'true';
+        // Get Group from Access Key and Group ID
+        $group = User::where('access_key', $api_key)->first()
+      ->groupTag->groupTagGroups->where('group', $id)->first();
+
+        // If Group is not found, through 404 error
+        if (empty($group)) {
+            return abort(404, 'Invalid Group ID.');
+        }
+
+        // Get Emission Ratio
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        // New Collection Instance
+        $collection = collect();
+
+        $collection->push([
+            'id' => $group->hasOneGroup->idgroups,
+            'name' => $group->hasOneGroup->name,
+            'location' => [
+                'value' => $group->hasOneGroup->location,
+                'country' => $group->hasOneGroup->country,
+                'latitude' => $group->hasOneGroup->latitude,
+                'longitude' => $group->hasOneGroup->longitude,
+            ],
+            'website' => $group->hasOneGroup->website,
+            // 'description' => $group->hasOneGroup->free_text,
+            // 'image_url' => 'https://restarters.net/mighty-restarters.jpg',
+
+            'upcoming_parties' => $upcoming_parties_collection = collect([]),
+
+            'past_parties' => $past_parties_collection = collect([]),
+
+            'impact' => [
+                'participants' => $group->hasOneGroup->totalPartiesParticipants(),
+                'hours_volunteered' => $group->hasOneGroup->getGroupStats($emissionRatio)['hours'],
+                'parties_thrown' => $group->hasOneGroup->parties->count(),
+                'waste_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['waste'],
+                'co2_emissions_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['co2'],
+            ],
+            'widgets' => [
+                'headline_stats' => "https://restarters.net/group/stats/{$group->hasOneGroup->idgroups}",
+                'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/group/{$group->hasOneGroup->idgroups}/manufacture",
+            ],
+        ]);
+
+        foreach ($group->hasOneGroup->upcomingParties as $key => $event) {
+            $upcoming_parties_collection->push([
+                'event_id' => $event->idevents,
+                'event_date' => $event->event_date,
+                'start_time' => $event->start,
+                'end_time' => $event->end,
+                'name' => $event->venue,
+                'location' => [
+                    'value' => $event->location,
+                    'latitude' => $event->latitude,
+                    'longitude' => $event->longitude,
+                ],
+            ]);
+        }
+
+        foreach ($group->hasOneGroup->pastParties as $key => $event) {
+            $past_parties_collection->push([
+                'event_id' => $event->idevents,
+                'event_date' => $event->event_date,
+                'start_time' => $event->start,
+                'end_time' => $event->end,
+                'name' => $event->venue,
+                'location' => [
+                    'value' => $event->location,
+                    'latitude' => $event->latitude,
+                    'longitude' => $event->longitude,
+                ],
+            ]);
+        }
+
+        return $collection;
     }
 }

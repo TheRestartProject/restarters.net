@@ -2,10 +2,10 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-use OwenIt\Auditing\Contracts\Auditable;
-
 use DB;
+use Illuminate\Database\Eloquent\Model;
+
+use OwenIt\Auditing\Contracts\Auditable;
 
 class Group extends Model implements Auditable
 {
@@ -35,7 +35,6 @@ class Group extends Model implements Auditable
 
     // Setters
 
-
     //Getters
     public function findAll()
     {
@@ -50,7 +49,7 @@ class Group extends Model implements Auditable
                     `g`.`area` AS `area`,
                     `g`.`frequency` AS `frequency`,
                     GROUP_CONCAT(`u`.`name` ORDER BY `u`.`name` ASC SEPARATOR ", "  )  AS `user_list`
-                FROM `' . $this->table . '` AS `g`
+                FROM `'.$this->table.'` AS `g`
                 LEFT JOIN `users_groups` AS `ug` ON `g`.`idgroups` = `ug`.`group`
                 LEFT JOIN `users` AS `u` ON `ug`.`user` = `u`.`id`
                 GROUP BY `g`.`idgroups`
@@ -70,7 +69,7 @@ class Group extends Model implements Auditable
                 `g`.`area` AS `area`,
                 `xi`.`path` AS `path`
 
-            FROM `' . $this->table . '` AS `g`
+            FROM `'.$this->table.'` AS `g`
 
             LEFT JOIN (
                 SELECT * FROM `images`
@@ -91,23 +90,23 @@ class Group extends Model implements Auditable
 
     public function findOne($id)
     {
-//Took out GROUP BY `images`.`path` NB:Error message -> 'fixometer_laravel.images.idimages' isn't in GROUP BY
+        //Took out GROUP BY `images`.`path` NB:Error message -> 'fixometer_laravel.images.idimages' isn't in GROUP BY
         try {
-            $group = DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `g`
+            $group = DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `g`
                 LEFT JOIN (
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = ' . env('TBL_GROUPS') . '
+                        AND `xref`.`reference_type` = '.env('TBL_GROUPS').'
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
-                WHERE `id' . $this->table . '` = :id'), array('id' => $id));
+                WHERE `id'.$this->table.'` = :id'), array('id' => $id));
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
 
-        if (!empty($group)) {
+        if ( ! empty($group)) {
             return $group[0];
         }
     }
@@ -117,7 +116,7 @@ class Group extends Model implements Auditable
         return DB::select(DB::raw('SELECT *,
                     `g`.`name` AS `groupname`,
                     `u`.`name` AS `hostname`
-                FROM `' . $this->table . '` AS `g`
+                FROM `'.$this->table.'` AS `g`
                 INNER JOIN `users_groups` AS `ug`
                     ON `ug`.`group` = `g`.`idgroups`
                 INNER JOIN `users` AS `u`
@@ -126,7 +125,7 @@ class Group extends Model implements Auditable
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = ' . env('TBL_USERS') . '
+                        AND `xref`.`reference_type` = '.env('TBL_USERS').'
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `u`.`id`
@@ -137,7 +136,7 @@ class Group extends Model implements Auditable
 
     public function ofThisUser($id)
     {
-        return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `g`
+        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `g`
                 INNER JOIN `users_groups` AS `ug`
                     ON `ug`.`group` = `g`.`idgroups`
 
@@ -145,7 +144,7 @@ class Group extends Model implements Auditable
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = ' . env('TBL_GROUPS') . '
+                        AND `xref`.`reference_type` = '.env('TBL_GROUPS').'
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
@@ -223,5 +222,83 @@ class Group extends Model implements Auditable
             'co2' => $co2,
             'waste' => $waste,
         ];
+    }
+
+    /**
+     * [upcomingParties description]
+     * All Upcoming Parties where between the Start Parties Date
+     * is today or a week later
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function upcomingParties()
+    {
+        $from = date('Y-m-d');
+        $to = date('Y-m-d', strtotime('+1 week'));
+
+        return $this->hasMany(Party::class, 'group', 'idgroups')->whereBetween('event_date', [$from, $to]);
+    }
+
+    /**
+     * [pastParties description]
+     * All Past Parties where between the Start Parties Date
+     * is yesterday or a month earlier
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function pastParties()
+    {
+        return $this->hasMany(Party::class, 'group', 'idgroups')->where('event_date', '<', date('Y-m-d'));
+    }
+
+    public function parties()
+    {
+        return $this->hasMany(Party::class, 'group', 'idgroups')->withTrashed();
+    }
+
+    /**
+     * [totalPartiesParticipants description]
+     * Total Group Parties Participants
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function totalPartiesParticipants()
+    {
+        foreach ($this->parties as $key => $party) {
+            $new_array = $party->users->pluck('user')->toArray();
+            $new_array = array_unique($new_array);
+            $total = array_push($new_array, $new_array);
+        }
+
+        return $total;
+    }
+
+    /**
+     * [totalPartiesHours description]
+     * Total Group Parties Hours
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function totalPartiesHours()
+    {
+        $sum = 0;
+
+        foreach ($this->parties as $key => $party) {
+            $sum += $party->hours;
+        }
+
+        return $sum;
     }
 }

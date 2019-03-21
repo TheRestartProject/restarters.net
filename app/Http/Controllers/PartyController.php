@@ -1490,7 +1490,51 @@ class PartyController extends Controller
      */
     public function getEventsByKey($api_key)
     {
-        return 'true';
+        $collection = collect([
+            'id' => 1,
+            'group' => [
+                'id' => 1,
+                'name' => 'Mighty Restarters',
+                'description' => 'Come join us at our March repair event, there will be pizza for all!',
+                'image_url' => 'https://restarters.net/mighty-restarters.jpg',
+                'volunteers' => 15,
+                'participants' => 948,
+                'hours_volunteered' => 1218,
+                'parties_thrown' => 35,
+                'waste_prevented' => 1177,
+                'co2_emissions_prevented' => 17238,
+            ],
+            'event_date' => '2019-03-13',
+            'start_time' => '14:00:00',
+            'end_time' => '16:00:00',
+            'name' => 'Restart at The Old Chapel',
+            'location' => [
+                'value' => '33 Church Street, Coggeshall, Essex, CO6 1TX',
+                'latitude' => '51.87221',
+                'longitude' => '0.68815',
+            ],
+            'description' => 'Come join us at our March repair event, there will be pizza for all!',
+            'user' => [
+                'id' => 1,
+                'name' => 'Dean Appleton-Claydon',
+            ],
+            'impact' => [
+                'participants' => 35,
+                'volunteers' => 12,
+                'waste_prevented' => 65,
+                'co2_emissions_prevented' => 512,
+                'devices_fixed' => 18,
+                'devices_repairable' => 15,
+                'devices_dead' => 2,
+            ],
+            'widgets' => [
+                'headline_stats' => 'https://restarters.net/party/stats/616/wide',
+                'co2_equivalence_visualisation' => 'https://restarters.net/outbound/info/party/616/manufacture',
+            ],
+            'hours_volunteered' => 20.3,
+        ]);
+
+        return $collection;
     }
 
     /**
@@ -1506,7 +1550,51 @@ class PartyController extends Controller
      */
     public function getUpcomingEventByKeyAndId($api_key, $id)
     {
-        return 'true';
+        $collection = collect([
+            'id' => 1,
+            'group' => [
+                'id' => 1,
+                'name' => 'Mighty Restarters',
+                'description' => 'Come join us at our March repair event, there will be pizza for all!',
+                'image_url' => 'https://restarters.net/mighty-restarters.jpg',
+                'volunteers' => 15,
+                'participants' => 948,
+                'hours_volunteered' => 1218,
+                'parties_thrown' => 35,
+                'waste_prevented' => 1177,
+                'co2_emissions_prevented' => 17238,
+            ],
+            'event_date' => '2019-03-13',
+            'start_time' => '14:00:00',
+            'end_time' => '16:00:00',
+            'name' => 'Restart at The Old Chapel',
+            'location' => [
+                'value' => '33 Church Street, Coggeshall, Essex, CO6 1TX',
+                'latitude' => '51.87221',
+                'longitude' => '0.68815',
+            ],
+            'description' => 'Come join us at our March repair event, there will be pizza for all!',
+            'user' => [
+                'id' => 1,
+                'name' => 'Dean Appleton-Claydon',
+            ],
+            'impact' => [
+                'participants' => 35,
+                'volunteers' => 12,
+                'waste_prevented' => 65,
+                'co2_emissions_prevented' => 512,
+                'devices_fixed' => 18,
+                'devices_repairable' => 15,
+                'devices_dead' => 2,
+            ],
+            'widgets' => [
+                'headline_stats' => 'https://restarters.net/party/stats/616/wide',
+                'co2_equivalence_visualisation' => 'https://restarters.net/outbound/info/party/616/manufacture',
+            ],
+            'hours_volunteered' => 20.3,
+        ]);
+
+        return $collection;
     }
 
     /**
@@ -1522,6 +1610,53 @@ class PartyController extends Controller
      */
     public function getPastEventByKeyAndId($api_key, $id)
     {
-        return 'true';
+        $collection = collect([
+            [
+                'id' => 1,
+                'group' => [
+                    'id' => 1,
+                    'name' => 'Mighty Restarters',
+                    'description' => 'Come join us at our March repair event, there will be pizza for all!',
+                    'image_url' => 'https://restarters.net/mighty-restarters.jpg',
+                    'volunteers' => 15,
+                    'participants' => 948,
+                    'hours_volunteered' => 1218,
+                    'parties_thrown' => 35,
+                    'waste_prevented' => 1177,
+                    'co2_emissions_prevented' => 17238,
+                ],
+                'event_date' => '2019-03-13',
+                'start_time' => '14:00:00',
+                'end_time' => '16:00:00',
+                'name' => 'Restart at The Old Chapel',
+                'location' => [
+                    'value' => '33 Church Street, Coggeshall, Essex, CO6 1TX',
+                    'latitude' => '51.87221',
+                    'longitude' => '0.68815',
+                ],
+                'description' => 'Come join us at our March repair event, there will be pizza for all!',
+                'user' => [
+                    'id' => 1,
+                    'name' => 'Dean Appleton-Claydon',
+                ],
+                'impact' => [
+                    'participants' => 35,
+                    'volunteers' => 12,
+                    'waste_prevented' => 65,
+                    'co2_emissions_prevented' => 512,
+                    'devices_fixed' => 18,
+                    'devices_repairable' => 15,
+                    'devices_dead' => 2,
+                ],
+                'widgets' => [
+                    'headline_stats' => 'https://restarters.net/party/stats/616/wide',
+                    'co2_equivalence_visualisation' => 'https://restarters.net/outbound/info/party/616/manufacture',
+                ],
+                'hours_volunteered' => 20.3,
+            ],
+            [],
+        ]);
+
+        return $collection;
     }
 }
