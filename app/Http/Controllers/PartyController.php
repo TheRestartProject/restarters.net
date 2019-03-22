@@ -1490,49 +1490,83 @@ class PartyController extends Controller
      */
     public function getEventsByKey($api_key)
     {
-        $collection = collect([
-            'id' => 1,
-            'group' => [
-                'id' => 1,
-                'name' => 'Mighty Restarters',
-                'description' => 'Come join us at our March repair event, there will be pizza for all!',
-                'image_url' => 'https://restarters.net/mighty-restarters.jpg',
-                'volunteers' => 15,
-                'participants' => 948,
-                'hours_volunteered' => 1218,
-                'parties_thrown' => 35,
-                'waste_prevented' => 1177,
-                'co2_emissions_prevented' => 17238,
-            ],
-            'event_date' => '2019-03-13',
-            'start_time' => '14:00:00',
-            'end_time' => '16:00:00',
-            'name' => 'Restart at The Old Chapel',
-            'location' => [
-                'value' => '33 Church Street, Coggeshall, Essex, CO6 1TX',
-                'latitude' => '51.87221',
-                'longitude' => '0.68815',
-            ],
-            'description' => 'Come join us at our March repair event, there will be pizza for all!',
-            'user' => [
-                'id' => 1,
-                'name' => 'Dean Appleton-Claydon',
-            ],
-            'impact' => [
-                'participants' => 35,
-                'volunteers' => 12,
-                'waste_prevented' => 65,
-                'co2_emissions_prevented' => 512,
-                'devices_fixed' => 18,
-                'devices_repairable' => 15,
-                'devices_dead' => 2,
-            ],
-            'widgets' => [
-                'headline_stats' => 'https://restarters.net/party/stats/616/wide',
-                'co2_equivalence_visualisation' => 'https://restarters.net/outbound/info/party/616/manufacture',
-            ],
-            'hours_volunteered' => 20.3,
-        ]);
+        // Find User by Access Key
+        $user = User::where('access_key', $api_key)->first();
+
+        // Get Emission Ratio
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $group_tags_groups = $user->groupTag->groupTagGroups;
+
+        // If Group is not found, through 404 error
+        if (empty($group_tags_groups)) {
+            return abort(404, 'No User Groups found.');
+        }
+
+        // New Collection Instance
+        $collection = collect([]);
+
+        // Foreach Group
+        foreach ($group_tags_groups as $key => $group) {
+
+            // Group Parties
+            $group_parties = $group->hasOneGroup->parties;
+            if ( ! empty($group_parties)) {
+
+                // Loop through each Group Parties
+                foreach ($group_parties as $key => $party) {
+
+                    // Push Party to Collection
+                    $collection->push([
+                        'id' => $party->idevents,
+                        'group' => [
+                            'id' => $party->theGroup->idgroups,
+                            'name' => $party->theGroup->name,
+                            // 'description' => $party->theGroup->free_text,
+                            // 'image_url' => 'https://restarters.net/mighty-restarters.jpg',
+                            // 'volunteers' => $party->theGroup->getGroupStats($emissionRatio),
+                            'participants' => $party->theGroup->totalPartiesParticipants(),
+                            'hours_volunteered' => $party->theGroup->getGroupStats($emissionRatio)['hours'],
+                            'parties_thrown' => $party->theGroup->getGroupStats($emissionRatio)['parties'],
+                            'waste_prevented' => $party->theGroup->getGroupStats($emissionRatio)['waste'],
+                            'co2_emissions_prevented' => $party->theGroup->getGroupStats($emissionRatio)['co2'],
+                        ],
+                        'event_date' => $party->event_date,
+                        'start_time' => $party->start,
+                        'end_time' => $party->end,
+                        'name' => $party->venue,
+                        'location' => [
+                            'value' => $party->location,
+                            'latitude' => $party->latitude,
+                            'longitude' => $party->longitude,
+                        ],
+                        // 'description' => $party->free_text,
+                        'user' => $party_user = collect(),
+
+                        'impact' => [
+                            'participants' => $party->getEventStats($emissionRatio)['participants'],
+                            'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
+                            'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
+                            'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
+                            'devices_fixed' => $party->getEventStats($emissionRatio)['fixed_devices'],
+                            'devices_repairable' => $party->getEventStats($emissionRatio)['repairable_devices'],
+                            'devices_dead' => $party->getEventStats($emissionRatio)['dead_devices'],
+                        ],
+                        'widgets' => [
+                            'headline_stats' => "https://restarters.net/party/stats/{$party->idevents}/wide",
+                            'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/party/{$party->idevents}/manufacture",
+                        ],
+                        'hours_volunteered' => $party->hours,
+                    ]);
+
+                    if ( ! empty($party->owner)) {
+                        $party_user->put('id', $party->owner->id);
+                        $party_user->put('name', $party->owner->name);
+                    }
+                }
+            }
+        }
 
         return $collection;
     }
