@@ -198,54 +198,58 @@ class GroupController extends Controller
             'sort_column' => 'distance',
         ]);
     }
+
+    /**
+     * [searchAllColumn description]
+     * Filter Groups by Column Conditions
+     *
+     * @author Christopher Kelker - @date 2019-03-22
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @param   Request     $request
+     * @return  [type]
+     */
     public function searchAllColumn(Request $request)
     {
+        // variables
         $all = true;
+        $groups = null;
         $sort_direction = $request->input('sort_direction');
         $sort_column = $request->input('sort_column');
 
-        //All groups only
-        $your_groups = null;
-        //Get current logged in user
+        // Current User
         $user = Auth::user();
 
-        $groups_near_you = null;
-        $groups = Group::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'));
-
-        /**
-         * $hosts and $restarters get the total amounts of hosts and restarters for each group in the $groups variable
-         * we just need to find a way to add this two attributes to the main select. This could possible be done by adding
-         * the two "DB:raw()"" selects to the select above"
-         * @var [type]
-         */
-        $hosts = UserGroups::select('group', DB::raw('count(`group`) as hosts'))->where('role', '=', 3)
-        ->groupBy('group');
-
-        $restarters = UserGroups::select('group', DB::raw('count(`group`) as hosts'))->where('role', '=', 4)
-        ->groupBy('group');
-
-        $groups = $groups->join('users_groups', 'groups.idgroups', '=', 'users_groups.group')->select();
-
-        if ($sort_column == 'hosts') {
-            $groups->groupBy('hosts')->orderByRaw('SUM() '.$sort_direction);
-        } elseif ($sort_column == 'restarters') {
-        } else {
-            $groups = $groups->orderBy($sort_column, $sort_direction);
-        }
-
-        $groups = $groups->paginate(env('PAGINATE'));
-
-        $your_area = null;
-
-        //Get all group tags
+        // Get all group tags
         $all_group_tags = GroupTags::all();
 
+        // Filter Conditions
+        if ($sort_column == 'name') {
+            $groups = Group::orderBy('name', $sort_direction)->paginate(env('PAGINATE'));
+        } elseif ($sort_column == 'distance') {
+            $groups = Group::orderBy('location', $sort_direction)->paginate(env('PAGINATE'));
+        } elseif ($sort_column == 'hosts') {
+            $groups = Group::with('allHosts')
+            ->has('allHosts')
+            ->withCount('allHosts')
+            ->orderBy('all_hosts_count', $sort_direction)
+            ->paginate(env('PAGINATE'));
+        } elseif ($sort_column == 'restarters') {
+            $groups = Group::with('allHosts')
+            ->has('allRestarters')
+            ->withCount('allRestarters')
+            ->orderBy('all_restarters_count', $sort_direction)
+            ->paginate(env('PAGINATE'));
+        } elseif ($sort_column == 'created_at') {
+            $groups = Group::orderBy('created_at', $sort_direction)->whereNotNull('created_at')->paginate(env('PAGINATE'));
+        } else {
+            $groups = Group::orderBy('name', 'ASC')->paginate(env('PAGINATE'));
+        }
+
         return view('group.index', [
-            'your_groups' => $your_groups,
-            'groups_near_you' => $groups_near_you,
             'groups' => $groups,
-            'your_area' => $your_area,
             'all' => $all,
+            'your_groups' => null,
             'all_group_tags' => $all_group_tags,
             'sort_direction' => $sort_direction,
             'sort_column' => $sort_column,

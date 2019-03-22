@@ -41,7 +41,7 @@
   </td>
   @if(  !is_null($groups) && FixometerHelper::hasRole(Auth::user(), 'Administrator'))
       <td>
-          {{$group->created_at}}
+          {{ \Carbon\Carbon::parse($group->created_at)->diffForHumans() }}
       </td>
   @endif
 </tr>
