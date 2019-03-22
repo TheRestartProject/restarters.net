@@ -113,49 +113,67 @@
           <div class="col-lg-12">
         @endif
 
+        @php( $user_preferences = session('column_preferences') )
+
         @if( !is_null($your_groups) )
-          <section class="table-section" id="your-groups">
 
-            <h2>@lang('groups.groups_title1')</h2>
+              <section class="table-section" id="your-groups">
 
-            <div class="table-responsive">
+                <h2>@lang('groups.groups_title1')</h2>
 
-            <table role="table" class="table table-striped table-hover">
-              @include('partials.tables.head-groups')
-              <tbody>
-                @if( !$your_groups->isEmpty() )
-                  @foreach ($your_groups as $group)
+                <div class="table-responsive">
 
-                    @include('partials.tables.row-groups')
+                <table role="table" class="table table-striped table-hover">
+                  @include('partials.tables.head-groups')
+                  <tbody>
+                    @if( !$your_groups->isEmpty() )
+                      @foreach ($your_groups as $group)
 
-                  @endforeach
-                @else
-                  <tr>
-                    <td colspan="13" align="center" class="p-3">
-                      You are not associated with any groups, take a look and see if there's one you would like to join
-                      @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host') )
-                        <br><a href="/group/all">See all groups</a>
-                      @endif
-                    </td>
-                  </tr>
-                @endif
-              </tbody>
-            </table>
+                        @include('partials.tables.row-groups')
 
-            </div>
+                      @endforeach
+                    @else
+                      <tr>
+                        <td colspan="13" align="center" class="p-3">
+                          You are not associated with any groups, take a look and see if there's one you would like to join
+                          @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host') )
+                            <br><a href="/group/all">See all groups</a>
+                          @endif
+                        </td>
+                      </tr>
+                    @endif
+                  </tbody>
+                </table>
 
-          </section>
+                </div>
+
+              </section>
+
         @endif
 
         @if( is_null($groups) )
+          <form id="device-search" action="/group/search/column" method="get">
+          <input type="hidden" name="sort_direction"  value="{{$sort_direction}} " class="sr-only">
+          <input type="radio" name="sort_column"   value="name" id="label-name" class="sr-only">
+          <input type="radio" name="sort_column"  value="distance" id="label-location" class="sr-only">
+          <input type="radio" name="sort_column"   value="hosts" id="label-hosts" class="sr-only">
+          <input type="radio" name="sort_column"   value="restarters" id="label-restarters" class="sr-only">
+
           <section class="table-section" id="your-groups">
 
             <h2>@lang('groups.groups_title2') <sup>(<a href="/group/all">See all groups</a>)</sup></h2>
 
             <div class="table-responsive">
-
-            <table role="table" class="table table-striped table-hover">
-              @include('partials.tables.head-groups')
+            <table role="table" class="table table-striped table-hover" id="sort-table">
+                <thead>
+                <tr>
+                <th width="42"></th>
+                <th width="200" scope="col"><label for="label-name" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'name' ) sort-column-asc @endif" >@lang('groups.groups_name')</label></th>
+                <th width="200" scope="col"><label for="label-location" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'distance' ) sort-column-asc @endif">@lang('groups.groups_location')</label></th>
+                <th width="75" scope="col" class="text-center"><label for="label-hosts" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'hosts' ) sort-column-asc @endif">@lang('groups.groups_hosts')</label></th>
+                <th width="75" scope="col" class="text-center"><label for="label-restarters" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'restarters' ) sort-column-asc @endif">@lang('groups.groups_restarters')</label></th>
+                </tr>
+                </thead>
               <tbody>
                 @if( !is_null($groups_near_you) && count($groups_near_you) > 0 )
                   @foreach ($groups_near_you as $group)
@@ -181,9 +199,17 @@
             </div>
 
           </section>
+      </form>
         @endif
 
         @if( !is_null($groups) )
+            <form id="device-search" action="/group/all/sort_column/column" method="get">
+            <input type="hidden" name="sort_direction" value="{{$sort_direction}}" class="sr-only">
+            <input type="radio" name="sort_column"   value="name" id="label-name" class="sr-only">
+            <input type="radio" name="sort_column"  value="distance" id="label-location" class="sr-only">
+            <input type="radio" name="sort_column"   value="hosts" id="label-hosts" class="sr-only">
+            <input type="radio" name="sort_column"   value="restarters" id="label-restarters" class="sr-only">
+            <input type="radio" name="sort_column"   value="created_at" id="label-created" class="sr-only">
           <section class="table-section" id="your-groups">
 
             <h2>@lang('groups.groups_title3')</h2>
@@ -191,7 +217,18 @@
             <div class="table-responsive">
 
             <table role="table" class="table table-striped table-hover">
-              @include('partials.tables.head-groups')
+                <thead>
+                <tr>
+                <th width="42"></th>
+                <th width="200" scope="col"><label for="label-name"  class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'name' ) sort-column-asc @endif" >@lang('groups.groups_name')</label></th>
+                <th width="200" scope="col"><label for="label-location" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'distance' ) sort-column-asc @endif">@lang('groups.groups_location')</label></th>
+                <th width="75" scope="col" class="text-center"><label for="label-hosts" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'hosts' ) sort-column-asc @endif">@lang('groups.groups_hosts')</label></th>
+                <th width="100" scope="col" class="text-center"><label for="label-restarters" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'restarters' ) sort-column-asc @endif">@lang('groups.groups_restarters')</label></th>
+                @if( FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+                    <th width="75" scope="col" class="text-center"><label for="label-created" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'created_at' ) sort-column-asc @endif">Created At</label></th>
+                @endif
+                </tr>
+                </thead>
               <tbody>
                 @if( !$groups->isEmpty() )
                   @foreach ($groups as $group)
@@ -210,17 +247,19 @@
             </div>
 
           </section>
-
+      </form>
           <div class="d-flex justify-content-center">
             <nav aria-label="Page navigation example">
-              {!! $groups->appends($_GET)->links() !!}
+                @if (!empty($_GET))
+                    {!! $groups->appends(request()->input())->links() !!}
+                @else
+                    {!! $groups->links() !!}
+                @endif
             </nav>
           </div>
         @endif
-
       </div>
     </div>
-
   </div>
 </section>
 @endsection

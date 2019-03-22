@@ -1047,15 +1047,14 @@ function initAutocomplete() {
 
         $form = $('#device-search');
         $sort_direction = $form.find('input[name=sort_direction]');
-
-        if( $current_column === $(this).val() ) {
+        // if( $current_column === $(this).val() ) {
             if( $sort_direction.val() === 'DSC' ){
                 $sort_direction.val('ASC');
             } else {
                 $sort_direction.val('DSC');
             }
 
-        }
+        // }
 
         $form.submit();
 

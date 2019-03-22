@@ -57,6 +57,8 @@ class GroupController extends Controller
                 'your_area' => $your_area,
                 'all' => $all,
                 'all_group_tags' => $all_group_tags,
+                'sort_direction' => 'ASC',
+                'sort_column' => 'distance',
             ]);
         }
         $groups = null;
@@ -94,9 +96,63 @@ class GroupController extends Controller
             'groups' => $groups,
             'your_area' => $your_area,
             'all' => $all,
+            'sort_direction' => 'ASC',
+            'sort_column' => 'distance',
         ]);
     }
+    public function searchColumn(Request $request)
+    {
+        $all = false;
+        $groups = null;
 
+        $sort_direction = $request->input('sort_direction');
+        $sort_column = $request->input('sort_column');
+
+        //Get current logged in user
+        $user = Auth::user();
+
+        $your_area = $user->location;
+
+        //Look for groups where user ID exists in pivot table
+        $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->where('users_groups.user', $user->id)
+            ->orderBy('name', 'ASC')
+            ->select('groups.*', 'users_groups.user')
+            ->get();
+
+        //Make sure we don't show the same groups in nearest to you
+        $your_groups_uniques = $your_groups->pluck('idgroups')->toArray();
+
+        //Assuming we have valid lat and long values, let's see what is nearest
+        if ( ! is_null($user->latitude) && ! is_null($user->longitude)) {
+            $groups_near_you = Group::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
+                ->having('distance', '<=', 150)
+                ->whereNotIn('idgroups', $your_groups_uniques)
+                ->take(10)
+                ->get();
+        } else {
+            $groups_near_you = null;
+        }
+        foreach ($groups_near_you as $group) {
+            $group['hosts'] = $group->allHosts->count();
+            $group['restarters'] = $group->allRestarters->count();
+        }
+        if ($sort_direction == 'ASC') {
+            $groups_near_you = $groups_near_you->sortBy($sort_column);
+        } elseif ($sort_direction == 'DSC') {
+            $groups_near_you = $groups_near_you->sortByDesc($sort_column);
+        }
+
+        return view('group.index', [
+            'your_groups' => $your_groups,
+            'groups_near_you' => $groups_near_you,
+            'groups' => $groups,
+            'your_area' => $your_area,
+            'all' => $all,
+            'sort_direction' => $sort_direction,
+            'sort_column' => $sort_column,
+        ]);
+    }
     public function search(Request $request)
     {
         //All groups only
@@ -137,6 +193,62 @@ class GroupController extends Controller
             'location' => $request->input('location'),
             'selected_country' => $request->input('country'),
             'selected_tags' => $request->input('tags'),
+            'sort',
+            'sort_direction' => 'ASC',
+            'sort_column' => 'distance',
+        ]);
+    }
+    public function searchAllColumn(Request $request)
+    {
+        $all = true;
+        $sort_direction = $request->input('sort_direction');
+        $sort_column = $request->input('sort_column');
+
+        //All groups only
+        $your_groups = null;
+        //Get current logged in user
+        $user = Auth::user();
+
+        $groups_near_you = null;
+        $groups = Group::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'));
+
+        /**
+         * $hosts and $restarters get the total amounts of hosts and restarters for each group in the $groups variable
+         * we just need to find a way to add this two attributes to the main select. This could possible be done by adding
+         * the two "DB:raw()"" selects to the select above"
+         * @var [type]
+         */
+        $hosts = UserGroups::select('group', DB::raw('count(`group`) as hosts'))->where('role', '=', 3)
+        ->groupBy('group');
+
+        $restarters = UserGroups::select('group', DB::raw('count(`group`) as hosts'))->where('role', '=', 4)
+        ->groupBy('group');
+
+        $groups = $groups->join('users_groups', 'groups.idgroups', '=', 'users_groups.group')->select();
+
+        if ($sort_column == 'hosts') {
+            $groups->groupBy('hosts')->orderByRaw('SUM() '.$sort_direction);
+        } elseif ($sort_column == 'restarters') {
+        } else {
+            $groups = $groups->orderBy($sort_column, $sort_direction);
+        }
+
+        $groups = $groups->paginate(env('PAGINATE'));
+
+        $your_area = null;
+
+        //Get all group tags
+        $all_group_tags = GroupTags::all();
+
+        return view('group.index', [
+            'your_groups' => $your_groups,
+            'groups_near_you' => $groups_near_you,
+            'groups' => $groups,
+            'your_area' => $your_area,
+            'all' => $all,
+            'all_group_tags' => $all_group_tags,
+            'sort_direction' => $sort_direction,
+            'sort_column' => $sort_column,
         ]);
     }
 
@@ -688,19 +800,17 @@ class GroupController extends Controller
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
                     event(new ApproveGroup($group, $data));
 
-                // Notify nearest users - disabled for now until Laravel Queue is implemented
-                  if( !is_null($latitude) && !is_null($longitude) ){
-
-                    $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
+                    // Notify nearest users - disabled for now until Laravel Queue is implemented
+                    if ( ! is_null($latitude) && ! is_null($longitude)) {
+                        $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
                                                 ->orderBy('name', 'ASC')
                                                   ->get();
-                  
-                    Notification::send($restarters_nearby, new NewGroupWithinRadius([
-                      'group_name' => $group->name,
-                      'group_url' => url('/group/view/'.$id),
-                    ]));
 
-                  }
+                        Notification::send($restarters_nearby, new NewGroupWithinRadius([
+                            'group_name' => $group->name,
+                            'group_url' => url('/group/view/'.$id),
+                        ]));
+                    }
                 } elseif ( ! empty($group->wordpress_post_id)) {
                     event(new EditGroup($group, $data));
                 }

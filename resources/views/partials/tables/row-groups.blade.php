@@ -39,4 +39,9 @@
       {{{ $group->allRestarters->count() }}}
     </span>
   </td>
+  @if(  !is_null($groups) && FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+      <td>
+          {{$group->created_at}}
+      </td>
+  @endif
 </tr>
