@@ -1523,9 +1523,9 @@ class PartyController extends Controller
                         'group' => [
                             'id' => $party->theGroup->idgroups,
                             'name' => $party->theGroup->name,
-                            // 'description' => $party->theGroup->free_text,
+                            'description' => $party->theGroup->free_text,
                             // 'image_url' => 'https://restarters.net/mighty-restarters.jpg',
-                            // 'volunteers' => $party->theGroup->getGroupStats($emissionRatio),
+                            'volunteers' => $party->theGroup->getGroupStats($emissionRatio)['pax'],
                             'participants' => $party->theGroup->totalPartiesParticipants(),
                             'hours_volunteered' => $party->theGroup->getGroupStats($emissionRatio)['hours'],
                             'parties_thrown' => $party->theGroup->getGroupStats($emissionRatio)['parties'],
@@ -1541,11 +1541,10 @@ class PartyController extends Controller
                             'latitude' => $party->latitude,
                             'longitude' => $party->longitude,
                         ],
-                        // 'description' => $party->free_text,
+                        'description' => $party->free_text,
                         'user' => $party_user = collect(),
-
                         'impact' => [
-                            'participants' => $party->getEventStats($emissionRatio)['participants'],
+                            'participants' => $party->pax,
                             'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
                             'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
                             'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
@@ -1608,9 +1607,9 @@ class PartyController extends Controller
             'group' => [
                 'id' => $party->theGroup->idgroups,
                 'name' => $party->theGroup->name,
-                // 'description' => $party->theGroup->free_text,
+                'description' => $party->theGroup->free_text,
                 // 'image_url' => 'https://restarters.net/mighty-restarters.jpg',
-                // 'volunteers' => $party->theGroup->getGroupStats($emissionRatio),
+                'volunteers' => $party->theGroup->getGroupStats($emissionRatio)['pax'],
                 'participants' => $party->theGroup->totalPartiesParticipants(),
                 'hours_volunteered' => $party->theGroup->getGroupStats($emissionRatio)['hours'],
                 'parties_thrown' => $party->theGroup->getGroupStats($emissionRatio)['parties'],
@@ -1626,11 +1625,10 @@ class PartyController extends Controller
                 'latitude' => $party->latitude,
                 'longitude' => $party->longitude,
             ],
-            // 'description' => $party->free_text,
+            'description' => $party->free_text,
             'user' => $party_user = collect(),
-
             'impact' => [
-                'participants' => $party->getEventStats($emissionRatio)['participants'],
+                'participants' => $party->pax,
                 'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
                 'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
                 'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
@@ -1643,7 +1641,6 @@ class PartyController extends Controller
                 'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/party/{$party->idevents}/manufacture",
             ],
             'hours_volunteered' => $party->hours,
-
         ]);
 
         if ( ! empty($party->owner)) {
@@ -1691,9 +1688,9 @@ class PartyController extends Controller
             'group' => [
                 'id' => $party->theGroup->idgroups,
                 'name' => $party->theGroup->name,
-                // 'description' => $party->theGroup->free_text,
+                'description' => $party->theGroup->free_text,
                 // 'image_url' => 'https://restarters.net/mighty-restarters.jpg',
-                // 'volunteers' => $party->theGroup->getGroupStats($emissionRatio),
+                'volunteers' => $party->theGroup->getGroupStats($emissionRatio)['pax'],
                 'participants' => $party->theGroup->totalPartiesParticipants(),
                 'hours_volunteered' => $party->theGroup->getGroupStats($emissionRatio)['hours'],
                 'parties_thrown' => $party->theGroup->getGroupStats($emissionRatio)['parties'],
@@ -1709,11 +1706,10 @@ class PartyController extends Controller
                 'latitude' => $party->latitude,
                 'longitude' => $party->longitude,
             ],
-            // 'description' => $party->free_text,
+            'description' => $party->free_text,
             'user' => $party_user = collect(),
-
             'impact' => [
-                'participants' => $party->getEventStats($emissionRatio)['participants'],
+                'participants' => $party->pax,
                 'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
                 'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
                 'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
@@ -1726,7 +1722,6 @@ class PartyController extends Controller
                 'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/party/{$party->idevents}/manufacture",
             ],
             'hours_volunteered' => $party->hours,
-
         ]);
 
         if ( ! empty($party->owner)) {

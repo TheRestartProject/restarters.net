@@ -1318,17 +1318,14 @@ class GroupController extends Controller
                     'longitude' => $group->hasOneGroup->longitude,
                 ],
                 'website' => $group->hasOneGroup->website,
-                // 'description' => $group->hasOneGroup->free_text,
+                'description' => $group->hasOneGroup->free_text,
                 // 'image_url' => 'https://restarters.net/mighty-restarters.jpg',
-
                 'upcoming_parties' => $upcoming_parties_collection = collect([]),
-
                 'past_parties' => $past_parties_collection = collect([]),
-
                 'impact' => [
-                    'participants' => $group->hasOneGroup->totalPartiesParticipants(),
+                    'volunteers' => $group->hasOneGroup->getGroupStats($emissionRatio)['pax'],
                     'hours_volunteered' => $group->hasOneGroup->getGroupStats($emissionRatio)['hours'],
-                    'parties_thrown' => $group->hasOneGroup->parties->count(),
+                    'parties_thrown' => $group->hasOneGroup->getGroupStats($emissionRatio)['parties'],
                     'waste_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['waste'],
                     'co2_emissions_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['co2'],
                 ],
@@ -1413,17 +1410,14 @@ class GroupController extends Controller
                 'longitude' => $group->hasOneGroup->longitude,
             ],
             'website' => $group->hasOneGroup->website,
-            // 'description' => $group->hasOneGroup->free_text,
+            'description' => $group->hasOneGroup->free_text,
             // 'image_url' => 'https://restarters.net/mighty-restarters.jpg',
-
             'upcoming_parties' => $upcoming_parties_collection = collect([]),
-
             'past_parties' => $past_parties_collection = collect([]),
-
             'impact' => [
-                'participants' => $group->hasOneGroup->totalPartiesParticipants(),
+                'volunteers' => $group->hasOneGroup->getGroupStats($emissionRatio)['pax'],
                 'hours_volunteered' => $group->hasOneGroup->getGroupStats($emissionRatio)['hours'],
-                'parties_thrown' => $group->hasOneGroup->parties->count(),
+                'parties_thrown' => $group->hasOneGroup->getGroupStats($emissionRatio)['parties'],
                 'waste_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['waste'],
                 'co2_emissions_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['co2'],
             ],
