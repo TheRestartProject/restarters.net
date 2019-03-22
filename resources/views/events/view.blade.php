@@ -400,6 +400,7 @@
   </section>
 
   @include('includes.modals.event-invite-to')
+  @include('includes.modals.event-shareable-modal')
   @include('includes.modals.event-description')
   @include('includes.modals.event-share-stats')
   @include('includes.modals.event-all-volunteers')

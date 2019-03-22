@@ -483,6 +483,7 @@
 </section>
 
 @include('includes/modals/group-invite-to')
+@include('includes/modals/group-shareable-modal')
 @include('includes/modals/group-description')
 @include('includes/modals/group-volunteers')
 @include('includes/modals/group-share-stats')
