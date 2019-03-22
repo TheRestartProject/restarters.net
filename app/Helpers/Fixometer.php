@@ -14,6 +14,7 @@ use App\UsersPermissions;
 use App\UsersPreferences;
 use Auth;
 use DB;
+use Illuminate\Support\Str;
 
 use Request;
 
@@ -985,5 +986,26 @@ class FixometerHelper
 
             return null;
         }
+    }
+
+    /**
+     * [generateUniqueShareableCode description]
+     * Generate a unique Shareable Code from a random string,
+     * If the Code already exists then loop again!
+     *
+     * @author Christopher Kelker - @date 2019-03-22
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @param   [type]      $row
+     * @param   [type]      $model
+     * @return  [type]
+     */
+    public static function generateUniqueShareableCode($model, $column)
+    {
+        do {
+            $random = Str::random(30);
+        } while ($model::where($column, $random)->exists());
+
+        return $random;
     }
 }

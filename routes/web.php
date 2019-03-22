@@ -11,6 +11,25 @@
 |
 */
 
+// Temp
+Route::get('/testing123', function () {
+    $groups = DB::table('groups')
+              ->whereNull('shareable_code')
+                  ->get();
+
+    foreach ($groups as $group) {
+        $unique_shareable_code = FixometerHelper::generateUniqueShareableCode('App\Group', 'shareable_code');
+
+        if (isset($unique_shareable_code) && ! empty($unique_shareable_code)) {
+            $update = DB::table('groups')->where('idgroups', $group->idgroups)->update([
+                'shareable_code' => $unique_shareable_code,
+            ]);
+
+            usleep(250000);
+        }
+    }
+});
+
 Route::prefix('user')->group(function () {
     Route::get('/', 'HomeController@index');
     Route::get('reset', 'UserController@reset');
