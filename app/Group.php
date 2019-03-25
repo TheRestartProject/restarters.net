@@ -18,7 +18,18 @@ class Group extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = ['name', 'website', 'area', 'location', 'latitude', 'longitude', 'country', 'free_text', 'wordpress_post_id'];
+    protected $fillable = [
+        'name',
+        'website',
+        'area',
+        'location',
+        'latitude',
+        'longitude',
+        'country',
+        'free_text',
+        'wordpress_post_id',
+        'shareable_code',
+    ];
 
     protected $appends = ['ShareableLink'];
 

@@ -226,6 +226,8 @@ class PartyController extends Controller
                     // 'volunteers'    => $volunteers,
                     'user_id' => $user_id,
                     'created_at' => date('Y-m-d H:i:s'),
+                    'shareable_code' => FixometerHelper::generateUniqueShareableCode('App\Party', 'shareable_code'),
+
                 );
 
                 $party = Party::create($data);

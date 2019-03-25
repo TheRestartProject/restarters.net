@@ -195,6 +195,7 @@ class GroupController extends Controller
                     'longitude' => $longitude,
                     'country' => $country,
                     'free_text' => $text,
+                    'shareable_code' => FixometerHelper::generateUniqueShareableCode('App\Group', 'shareable_code'),
                 );
 
                 $idGroup = $Group->create($data)->idgroups;

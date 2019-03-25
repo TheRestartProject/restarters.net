@@ -14,7 +14,24 @@ class Party extends Model implements Auditable
 
     protected $table = 'events';
     protected $primaryKey = 'idevents';
-    protected $fillable = ['group', 'event_date', 'start', 'end', 'venue', 'location', 'latitude', 'longitude', 'free_text', 'pax', 'volunteers', 'hours', 'wordpress_post_id', 'created_at', 'updated_at'];
+    protected $fillable = [
+        'group',
+        'event_date',
+        'start',
+        'end',
+        'venue',
+        'location',
+        'latitude',
+        'longitude',
+        'free_text',
+        'pax',
+        'volunteers',
+        'hours',
+        'wordpress_post_id',
+        'created_at',
+        'updated_at',
+        'shareable_code',
+    ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'idevents', 'user_id', 'wordpress_post_id'];
     protected $appends = ['ShareableLink'];
 
