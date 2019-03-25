@@ -688,19 +688,17 @@ class GroupController extends Controller
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
                     event(new ApproveGroup($group, $data));
 
-                // Notify nearest users - disabled for now until Laravel Queue is implemented
-                  if( !is_null($latitude) && !is_null($longitude) ){
-
-                    $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
+                    // Notify nearest users - disabled for now until Laravel Queue is implemented
+                    if ( ! is_null($latitude) && ! is_null($longitude)) {
+                        $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
                                                 ->orderBy('name', 'ASC')
                                                   ->get();
-                  
-                    Notification::send($restarters_nearby, new NewGroupWithinRadius([
-                      'group_name' => $group->name,
-                      'group_url' => url('/group/view/'.$id),
-                    ]));
 
-                  }
+                        Notification::send($restarters_nearby, new NewGroupWithinRadius([
+                            'group_name' => $group->name,
+                            'group_url' => url('/group/view/'.$id),
+                        ]));
+                    }
                 } elseif ( ! empty($group->wordpress_post_id)) {
                     event(new EditGroup($group, $data));
                 }
@@ -1276,5 +1274,40 @@ class GroupController extends Controller
         }
 
         return redirect('/group/nearby/'.$groupId)->with('success', $user->name.' has been invited');
+    }
+
+    /**
+     * [confirmCodeInvite description]
+     *
+     * @author Christopher Kelker - @date 2019-03-25
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @param   Request     $request
+     * @param   [type]      $code
+     * @return  [type]
+     */
+    public function confirmCodeInvite(Request $request, $code)
+    {
+        // Variables
+        $group = Group::where('shareable_code', $code)->first();
+        $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+
+        // Validate a record exists with the Group code
+        if (empty($group)) {
+            abort(404);
+        }
+
+        // Else create a new Invite record
+        $invite = Invite::create([
+            'record_id' => $group->idgroups,
+            'email' => '',
+            'hash' => $hash,
+            'type' => 'group',
+        ]);
+
+        // Push this into a session variable to find by the Group prefix
+        $request->session()->push('groups.'.$code, $hash);
+
+        return redirect('/dashboard');
     }
 }

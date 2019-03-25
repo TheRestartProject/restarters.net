@@ -35,7 +35,7 @@
 
           <div id="shareable_link_div" class="form-group">
             <label for="shareable_link_box">@lang('groups.shareable_link_field'):</label>
-            <input type="text" id="shareable_link_box" name="shareable_link_box" class="form-control" autocomplete="off" value="https://restarters.com/invite/group/eSp96mqX2">
+            <input type="text" id="shareable_link_box" name="shareable_link_box" class="form-control" autocomplete="off" value="{{ $group->shareable_link }}">
           </div>
           <small class="after-offset">@lang('groups.type_shareable_link_message')</small>
 

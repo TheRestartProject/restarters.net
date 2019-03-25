@@ -2,10 +2,10 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-use OwenIt\Auditing\Contracts\Auditable;
-
 use DB;
+use Illuminate\Database\Eloquent\Model;
+
+use OwenIt\Auditing\Contracts\Auditable;
 
 class Group extends Model implements Auditable
 {
@@ -19,6 +19,8 @@ class Group extends Model implements Auditable
      * @var array
      */
     protected $fillable = ['name', 'website', 'area', 'location', 'latitude', 'longitude', 'country', 'free_text', 'wordpress_post_id'];
+
+    protected $appends = ['ShareableLink'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -35,7 +37,6 @@ class Group extends Model implements Auditable
 
     // Setters
 
-
     //Getters
     public function findAll()
     {
@@ -50,7 +51,7 @@ class Group extends Model implements Auditable
                     `g`.`area` AS `area`,
                     `g`.`frequency` AS `frequency`,
                     GROUP_CONCAT(`u`.`name` ORDER BY `u`.`name` ASC SEPARATOR ", "  )  AS `user_list`
-                FROM `' . $this->table . '` AS `g`
+                FROM `'.$this->table.'` AS `g`
                 LEFT JOIN `users_groups` AS `ug` ON `g`.`idgroups` = `ug`.`group`
                 LEFT JOIN `users` AS `u` ON `ug`.`user` = `u`.`id`
                 GROUP BY `g`.`idgroups`
@@ -70,7 +71,7 @@ class Group extends Model implements Auditable
                 `g`.`area` AS `area`,
                 `xi`.`path` AS `path`
 
-            FROM `' . $this->table . '` AS `g`
+            FROM `'.$this->table.'` AS `g`
 
             LEFT JOIN (
                 SELECT * FROM `images`
@@ -91,23 +92,23 @@ class Group extends Model implements Auditable
 
     public function findOne($id)
     {
-//Took out GROUP BY `images`.`path` NB:Error message -> 'fixometer_laravel.images.idimages' isn't in GROUP BY
+        //Took out GROUP BY `images`.`path` NB:Error message -> 'fixometer_laravel.images.idimages' isn't in GROUP BY
         try {
-            $group = DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `g`
+            $group = DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `g`
                 LEFT JOIN (
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = ' . env('TBL_GROUPS') . '
+                        AND `xref`.`reference_type` = '.env('TBL_GROUPS').'
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
-                WHERE `id' . $this->table . '` = :id'), array('id' => $id));
+                WHERE `id'.$this->table.'` = :id'), array('id' => $id));
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
 
-        if (!empty($group)) {
+        if ( ! empty($group)) {
             return $group[0];
         }
     }
@@ -117,7 +118,7 @@ class Group extends Model implements Auditable
         return DB::select(DB::raw('SELECT *,
                     `g`.`name` AS `groupname`,
                     `u`.`name` AS `hostname`
-                FROM `' . $this->table . '` AS `g`
+                FROM `'.$this->table.'` AS `g`
                 INNER JOIN `users_groups` AS `ug`
                     ON `ug`.`group` = `g`.`idgroups`
                 INNER JOIN `users` AS `u`
@@ -126,7 +127,7 @@ class Group extends Model implements Auditable
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = ' . env('TBL_USERS') . '
+                        AND `xref`.`reference_type` = '.env('TBL_USERS').'
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `u`.`id`
@@ -137,7 +138,7 @@ class Group extends Model implements Auditable
 
     public function ofThisUser($id)
     {
-        return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `g`
+        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `g`
                 INNER JOIN `users_groups` AS `ug`
                     ON `ug`.`group` = `g`.`idgroups`
 
@@ -145,7 +146,7 @@ class Group extends Model implements Auditable
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = ' . env('TBL_GROUPS') . '
+                        AND `xref`.`reference_type` = '.env('TBL_GROUPS').'
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
@@ -223,5 +224,14 @@ class Group extends Model implements Auditable
             'co2' => $co2,
             'waste' => $waste,
         ];
+    }
+
+    public function getShareableLinkAttribute()
+    {
+        if ( ! empty($this->shareable_code)) {
+            return url("group/invite/{$this->shareable_code}");
+        }
+
+        return '';
     }
 }

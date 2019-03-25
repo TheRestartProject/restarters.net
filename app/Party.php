@@ -2,17 +2,13 @@
 
 namespace App;
 
-use App\Device;
-use App\Helpers\FootprintRatioCalculator;
-
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
-use DB;
 
 class Party extends Model implements Auditable
 {
-
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
@@ -20,11 +16,12 @@ class Party extends Model implements Auditable
     protected $primaryKey = 'idevents';
     protected $fillable = ['group', 'event_date', 'start', 'end', 'venue', 'location', 'latitude', 'longitude', 'free_text', 'pax', 'volunteers', 'hours', 'wordpress_post_id', 'created_at', 'updated_at'];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'idevents', 'user_id', 'wordpress_post_id'];
+    protected $appends = ['ShareableLink'];
 
     //Getters
     public function findAll()
     {
-//Tested
+        //Tested
         return DB::select(DB::raw('SELECT
                     `e`.`idevents` AS `id`,
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
@@ -49,7 +46,7 @@ class Party extends Model implements Auditable
 
     public function findAllSearchable()
     {
-//Tested
+        //Tested
         return DB::select(DB::raw('SELECT
                     `e`.`idevents` AS `id`,
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
@@ -73,7 +70,7 @@ class Party extends Model implements Auditable
 
     public function findThis($id, $devices = false)
     {
-//Tested however with devices = true doesn't work
+        //Tested however with devices = true doesn't work
         $sql = 'SELECT
                     `e`.`idevents` AS `id`,
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_date` ,
@@ -100,7 +97,7 @@ class Party extends Model implements Auditable
                 WHERE `e`.`idevents` = :id
                 ORDER BY `e`.`start` DESC';
 
-        $party =  DB::select(DB::raw($sql), array('id' => $id));
+        $party = DB::select(DB::raw($sql), array('id' => $id));
 
         if ($devices) {
             $devices = new Device;
@@ -113,7 +110,7 @@ class Party extends Model implements Auditable
     public function createUserList($party, $users)
     {
         /** reset user list **/
-        if (!self::deleteUserList($party)) {
+        if ( ! self::deleteUserList($party)) {
             return false;
         }
         $sql = 'INSERT INTO `events_users`(`event`, `user`) VALUES (:party, :user)';
@@ -133,9 +130,9 @@ class Party extends Model implements Auditable
 
     public function ofThisUser($id, $only_past = false, $devices = false)
     {
-//Tested
+        //Tested
         $sql = 'SELECT *, `e`.`venue` AS `venue`, `e`.`location` as `location`, UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
-                FROM `' . $this->table . '` AS `e`
+                FROM `'.$this->table.'` AS `e`
                 INNER JOIN `events_users` AS `eu` ON `eu`.`event` = `e`.`idevents`
                 INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
                 LEFT JOIN (
@@ -167,7 +164,7 @@ class Party extends Model implements Auditable
 
     public function ofThisGroup2($group = 'admin', $only_past = false, $devices = false)
     {
-//Tested
+        //Tested
         $sql = 'SELECT
                     *,
 	`e`.`venue` AS `venue`, `e`.`location` as `location`,
@@ -176,7 +173,7 @@ class Party extends Model implements Auditable
 
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
 
-                FROM `' . $this->table . '` AS `e`
+                FROM `'.$this->table.'` AS `e`
 
                     INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
 
@@ -222,7 +219,7 @@ class Party extends Model implements Auditable
 
     public function ofTheseGroups($groups = 'admin', $only_past = false, $devices = false)
     {
-//Tested
+        //Tested
         $sql = 'SELECT
                     *,
 	`e`.`venue` AS `venue`, `e`.`location` as `location`,
@@ -231,7 +228,7 @@ class Party extends Model implements Auditable
 
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
 
-                FROM `' . $this->table . '` AS `e`
+                FROM `'.$this->table.'` AS `e`
 
                     INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
 
@@ -242,7 +239,7 @@ class Party extends Model implements Auditable
                     ) AS `d` ON `d`.`event` = `e`.`idevents` ';
         //UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) )
         if (is_array($groups) && $groups != 'admin') {
-            $sql .= ' WHERE `e`.`group` IN (' . implode(', ', $groups) . ') ';
+            $sql .= ' WHERE `e`.`group` IN ('.implode(', ', $groups).') ';
         }
 
         if ($only_past == true) {
@@ -269,7 +266,7 @@ class Party extends Model implements Auditable
 
     public function ofThisGroup($group = 'admin', $only_past = false, $devices = false)
     {
-//Tested
+        //Tested
         $sql = 'SELECT
                     *,
 	`e`.`venue` AS `venue`, `e`.`location` as `location`,
@@ -277,7 +274,7 @@ class Party extends Model implements Auditable
 
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
 
-                FROM `' . $this->table . '` AS `e`
+                FROM `'.$this->table.'` AS `e`
 
                     INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
 
@@ -327,7 +324,7 @@ class Party extends Model implements Auditable
 
     public function findNextParties($group = null)
     {
-//Tested
+        //Tested
         $sql = 'SELECT
                     `e`.`idevents`,
                     `e`.`venue`,
@@ -339,18 +336,18 @@ class Party extends Model implements Auditable
                     `e`.`end`,
                     `e`.`latitude`,
                     `e`.`longitude`
-                FROM `' . $this->table . '` AS `e`
+                FROM `'.$this->table.'` AS `e`
 
                 WHERE TIMESTAMP(`e`.`event_date`, `e`.`start`) >= NOW() '; // added one day to make sure it only gets moved to the past the next day
 
-        if (!is_null($group)) {
+        if ( ! is_null($group)) {
             $sql .= ' AND `e`.`group` = :group ';
         }
 
         $sql .= ' ORDER BY `e`.`event_date` ASC
                 LIMIT 10';
 
-        if (!is_null($group)) {
+        if ( ! is_null($group)) {
             try {
                 return DB::select(DB::raw($sql), array('group' => $group));
             } catch (\Illuminate\Database\QueryException $e) {
@@ -376,15 +373,15 @@ class Party extends Model implements Auditable
                     `e`.`end`,
                     `e`.`latitude`,
                     `e`.`longitude`
-                FROM `' . $this->table . '` AS `e`
+                FROM `'.$this->table.'` AS `e`
                 ORDER BY `e`.`event_date` DESC
                 LIMIT :limit'), array('limit' => $limit));
     }
 
     public function attendees()
     {
-//Tested
-        return DB::select(DB::raw('SELECT SUM(pax) AS pax FROM ' . $this->table));
+        //Tested
+        return DB::select(DB::raw('SELECT SUM(pax) AS pax FROM '.$this->table));
     }
 
     /**
@@ -444,76 +441,68 @@ class Party extends Model implements Auditable
 
     public function getEventDate($format = 'd/m/Y')
     {
-
         return date($format, strtotime($this->event_date));
     }
 
     public function getEventStart()
     {
-
         return date('H:i', strtotime($this->start));
     }
 
     public function getEventEnd()
     {
-
         return date('H:i', strtotime($this->end));
     }
 
     public function getEventStartEnd()
     {
-
-        return $this->getEventStart() . '-' . $this->getEventEnd();
+        return $this->getEventStart().'-'.$this->getEventEnd();
     }
 
     public function getEventName()
     {
-
-        if (!empty($this->venue)) {
+        if ( ! empty($this->venue)) {
             return $this->venue;
-        } else {
-            return $this->location;
         }
+
+        return $this->location;
     }
 
     public function isUpcoming()
     {
-
-        $date_now     = new \DateTime();
-        $event_start  = new \DateTime($this->event_date.' '.$this->start);
+        $date_now = new \DateTime();
+        $event_start = new \DateTime($this->event_date.' '.$this->start);
 
         if ($date_now < $event_start) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public function isInProgress()
     {
-
-        $date_now     = new \DateTime();
-        $event_start  = new \DateTime($this->event_date.' '.$this->start);
-        $event_end    = new \DateTime($this->event_date.' '.$this->end);
+        $date_now = new \DateTime();
+        $event_start = new \DateTime($this->event_date.' '.$this->start);
+        $event_end = new \DateTime($this->event_date.' '.$this->end);
 
         if ($date_now >= $event_start && $date_now <= $event_end) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public function hasFinished()
     {
-
-        $date_now     = new \DateTime();
-        $event_end    = new \DateTime($this->event_date.' '.$this->end);
+        $date_now = new \DateTime();
+        $event_end = new \DateTime($this->event_date.' '.$this->end);
 
         if ($date_now > $event_end) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public function getEventStats($emissionRatio)
@@ -526,7 +515,7 @@ class Party extends Model implements Auditable
         $repairable_devices = 0;
         $dead_devices = 0;
 
-        if (!empty($this->allDevices)) {
+        if ( ! empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
                 if ($device->isFixed()) {
                     $co2Diverted += $device->co2Diverted($emissionRatio, $Device->displacement);
@@ -536,24 +525,27 @@ class Party extends Model implements Auditable
                 switch ($device->repair_status) {
                     case 1:
                         $fixed_devices++;
+
                         break;
                     case 2:
                         $repairable_devices++;
+
                         break;
                     case 3:
                         $dead_devices++;
+
                         break;
                 }
             }
 
             return [
-                'co2'                 => $co2Diverted,
-                'ewaste'              => $ewasteDiverted,
-                'fixed_devices'       => $fixed_devices,
-                'repairable_devices'  => $repairable_devices,
-                'dead_devices'        => $dead_devices,
-                'participants'        => $this->pax,
-                'volunteers'          => $this->volunteers
+                'co2' => $co2Diverted,
+                'ewaste' => $ewasteDiverted,
+                'fixed_devices' => $fixed_devices,
+                'repairable_devices' => $repairable_devices,
+                'dead_devices' => $dead_devices,
+                'participants' => $this->pax,
+                'volunteers' => $this->volunteers,
             ];
         }
     }
@@ -582,6 +574,15 @@ class Party extends Model implements Auditable
 
     public function getEventStartTimestampAttribute()
     {
-        return strtotime($this->event_date . ' ' . $this->start);
+        return strtotime($this->event_date.' '.$this->start);
+    }
+
+    public function getShareableLinkAttribute()
+    {
+        if ( ! empty($this->shareable_code)) {
+            return url("party/invite/{$this->shareable_code}");
+        }
+
+        return '';
     }
 }

@@ -95,7 +95,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     //Dashboard Controller
     Route::prefix('dashboard')->group(function () {
-        Route::get('/', 'DashboardController@index')->name('dashboard');
+        Route::get('/', 'DashboardController@index')->name('dashboard')->middleware('AcceptUserInvites');
         Route::get('/host', 'DashboardController@getHostDash');
     });
 
@@ -122,6 +122,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::post('/edit/{id}', 'GroupController@edit');
         Route::get('/view/{id}', 'GroupController@view');
         Route::post('/invite', 'GroupController@postSendInvite');
+        Route::get('/invite/{code}', 'GroupController@confirmCodeInvite');
         Route::get('/accept-invite/{id}/{hash}', 'GroupController@confirmInvite');
         Route::get('/join/{id}', 'GroupController@getJoinGroup');
         Route::post('/image-upload/{id}', 'GroupController@imageUpload');
@@ -152,6 +153,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/deleteimage', 'PartyController@deleteimage');
         Route::get('/join/{id}', 'PartyController@getJoinEvent');
         Route::post('/invite', 'PartyController@postSendInvite');
+        Route::get('/invite/{code}', 'PartyController@confirmCodeInvite');
         Route::get('/accept-invite/{id}/{hash}', 'PartyController@confirmInvite');
         Route::get('/cancel-invite/{id}', 'PartyController@cancelInvite');
         Route::post('/remove-volunteer', 'PartyController@removeVolunteer');
