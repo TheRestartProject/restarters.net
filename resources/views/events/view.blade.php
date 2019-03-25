@@ -144,10 +144,10 @@
 
                               <div class="dropdown-menu" aria-labelledby="addToCalendar">
                                 <span class="dropdown-menu-arrow"></span>
-                                <a class="dropdown-item" href="{{{ $calendar_links['google'] }}}">Google Calendar</a>
-                                <a class="dropdown-item" href="{{{ $calendar_links['webOutlook'] }}}">Outlook</a>
-                                <a class="dropdown-item" href="{{{ $calendar_links['ics'] }}}">iCal</a>
-                                <a class="dropdown-item" href="{{{ $calendar_links['yahoo'] }}}">Yahoo Calendar</a>
+                                <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['google'] }}}">Google Calendar</a>
+                                <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['webOutlook'] }}}">Outlook</a>
+                                <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['ics'] }}}">iCal</a>
+                                <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['yahoo'] }}}">Yahoo Calendar</a>
                               </div>
                           </div>
                       @endif
