@@ -26,7 +26,7 @@ class CheckForRepairNetwork
         // Assumed Restart Project
         switch ($host) {
             case 'repairshare.restarters':
-                $locale = 'en';
+                $locale = 'fr';
                 $repair_network = 2;
 
                 break;
@@ -42,7 +42,7 @@ class CheckForRepairNetwork
             $update_user['language'] = $locale;
         }
 
-        if (isset($repair_network) && Auth::check()) {
+        if (isset($repair_network)) {
             session()->put('repair_network', $repair_network);
 
             $update_user['repair_network'] = $repair_network;
