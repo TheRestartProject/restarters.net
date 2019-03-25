@@ -1297,7 +1297,7 @@ class GroupController extends Controller
             abort(404);
         }
 
-        // Else create a new Invite record
+        // Create a new Invite record
         $invite = Invite::create([
             'record_id' => $group->idgroups,
             'email' => '',
@@ -1306,7 +1306,7 @@ class GroupController extends Controller
         ]);
 
         // Push this into a session variable to find by the Group prefix
-        $request->session()->push('groups.'.$code, $hash);
+        session()->push('groups.'.$code, $hash);
 
         return redirect('/dashboard');
     }

@@ -1500,7 +1500,7 @@ class PartyController extends Controller
             abort(404);
         }
 
-        // Else create a new Invite record
+        // Create a new Invite record
         $invite = Invite::create([
             'record_id' => $party->idevents,
             'email' => '',
@@ -1509,7 +1509,7 @@ class PartyController extends Controller
         ]);
 
         // Push this into a session variable to find by the Event prefix
-        $request->session()->push('events.'.$code, $hash);
+        session()->push('events.'.$code, $hash);
 
         return redirect('/dashboard');
     }

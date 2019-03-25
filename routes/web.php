@@ -122,7 +122,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::post('/edit/{id}', 'GroupController@edit');
         Route::get('/view/{id}', 'GroupController@view');
         Route::post('/invite', 'GroupController@postSendInvite');
-        Route::get('/invite/{code}', 'GroupController@confirmCodeInvite');
         Route::get('/accept-invite/{id}/{hash}', 'GroupController@confirmInvite');
         Route::get('/join/{id}', 'GroupController@getJoinGroup');
         Route::post('/image-upload/{id}', 'GroupController@imageUpload');
@@ -153,7 +152,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/deleteimage', 'PartyController@deleteimage');
         Route::get('/join/{id}', 'PartyController@getJoinEvent');
         Route::post('/invite', 'PartyController@postSendInvite');
-        Route::get('/invite/{code}', 'PartyController@confirmCodeInvite');
         Route::get('/accept-invite/{id}/{hash}', 'PartyController@confirmInvite');
         Route::get('/cancel-invite/{id}', 'PartyController@cancelInvite');
         Route::post('/remove-volunteer', 'PartyController@removeVolunteer');
@@ -217,6 +215,9 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/reporting/time-volunteered', 'ExportController@getTimeVolunteered');
     Route::get('/reporting/time-volunteered/{search}', 'ExportController@getTimeVolunteered');
 });
+
+Route::get('/party/invite/{code}', 'PartyController@confirmCodeInvite');
+Route::get('/group/invite/{code}', 'GroupController@confirmCodeInvite');
 
 Route::get('/media-wiki', function () {
     if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
