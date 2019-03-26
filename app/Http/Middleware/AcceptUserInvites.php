@@ -43,7 +43,8 @@ class AcceptUserInvites
                 }
             }
 
-            $request->session()->push('invites-feedback', 'Added to '.str_plural('group', count($hashs)));
+            $count = count($hashs);
+            $request->session()->push('invites-feedback', 'You have accepted '.$count.' group '.str_plural('invite', $count));
             $request->session()->forget('groups');
         }
 
@@ -65,7 +66,8 @@ class AcceptUserInvites
                 }
             }
 
-            $request->session()->push('invites-feedback', 'Added to '.str_plural('event', count($hashs)));
+            $count = count($hashs);
+            $request->session()->push('invites-feedback', 'You have accepted '.$count.' event '.str_plural('invite', $count));
             $request->session()->forget('events');
         }
 
