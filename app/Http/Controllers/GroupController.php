@@ -1282,10 +1282,11 @@ class GroupController extends Controller
      * If the Groups are not found, through 404 error,
      * Else return the Groups JSON data
      *
-     * @author  Christopher Kelker
+     * @author Christopher Kelker - @date 2019-03-26
+     * @editor  Christopher Kelker
      * @version 1.0.0
-     * @date    2019-03-13
-     * @param   [type]     $api_key
+     * @param   Request     $request
+     * @param   [type]      $api_key
      * @return  [type]
      */
     public function getGroupsByKey(Request $request, $api_key)
@@ -1301,7 +1302,7 @@ class GroupController extends Controller
 
         // If Group is not found, through 404 error
         if (empty($group_tags_groups)) {
-            return abort(404, 'No User Groups found.');
+            return abort(404, 'No groups found.');
         }
 
         // New Collection Instance
@@ -1375,22 +1376,23 @@ class GroupController extends Controller
      * If the Group is not found, through 404 error,
      * Else return the Group JSON data
      *
-     * @author  Christopher Kelker
+     * @author Christopher Kelker - @date 2019-03-26
+     * @editor  Christopher Kelker
      * @version 1.0.0
-     * @date    2019-03-13
-     * @param   [type]     $api_key
-     * @param   [type]     $id
+     * @param   Request     $request
+     * @param   [type]      $api_key
+     * @param   Group       $group
      * @return  [type]
      */
-    public function getGroupByKeyAndId(Request $request, $api_key, $id)
+    public function getGroupByKeyAndId(Request $request, $api_key, Group $group)
     {
         // Get Group from Access Key and Group ID
         $group = User::where('access_key', $api_key)->first()
-      ->groupTag->groupTagGroups->where('group', $id)->first();
+        ->groupTag->groupTagGroups->where('group', $group->idgroups)->first();
 
         // If Group is not found, through 404 error
         if (empty($group)) {
-            return abort(404, 'Invalid Group ID.');
+            return abort(404, 'No groups found.');
         }
 
         // Get Emission Ratio

@@ -1571,87 +1571,6 @@ class PartyController extends Controller
     }
 
     /**
-     * [getUpcomingEventByKeyAndId description]
-     * Get Past Event using Route Model Binding,
-     * If Event is not found, throw 404 error,
-     * If Event is Found but is not Upcoming, throw 404 error,
-     * Else return the Event's JSON data
-     *
-     * @author  Christopher Kelker
-     * @version 1.0.0
-     * @date    2019-03-13
-     * @param   [type]     $api_key
-     * @param   [type]     $id
-     * @return  [type]
-     */
-    public function getUpcomingEventByKeyAndId($api_key, $id)
-    {
-        // If Event is not found, through 404 error
-        if (empty($party)) {
-            return abort(404, 'Invalid Event ID.');
-        }
-
-        // If Event is found but is not Upcoming
-        if ($party->event_date < date('Y-m-d')) {
-            return abort(404, 'Invalid Upcoming Event.');
-        }
-
-        // Get Emission Ratio
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
-        $emissionRatio = ApiController::getEmissionRatio();
-
-        // New Collection Instance
-        $collection = collect([
-            'id' => $party->idevents,
-            'group' => [
-                'id' => $party->theGroup->idgroups,
-                'name' => $party->theGroup->name,
-                'description' => $party->theGroup->free_text,
-                // 'image_url' => 'https://restarters.net/mighty-restarters.jpg',
-                'volunteers' => $party->theGroup->getGroupStats($emissionRatio)['pax'],
-                'participants' => $party->theGroup->totalPartiesParticipants(),
-                'hours_volunteered' => $party->theGroup->getGroupStats($emissionRatio)['hours'],
-                'parties_thrown' => $party->theGroup->getGroupStats($emissionRatio)['parties'],
-                'waste_prevented' => $party->theGroup->getGroupStats($emissionRatio)['waste'],
-                'co2_emissions_prevented' => $party->theGroup->getGroupStats($emissionRatio)['co2'],
-            ],
-            'event_date' => $party->event_date,
-            'start_time' => $party->start,
-            'end_time' => $party->end,
-            'name' => $party->venue,
-            'location' => [
-                'value' => $party->location,
-                'latitude' => $party->latitude,
-                'longitude' => $party->longitude,
-            ],
-            'description' => $party->free_text,
-            'user' => $party_user = collect(),
-            'impact' => [
-                'participants' => $party->pax,
-                'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
-                'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
-                'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
-                'devices_fixed' => $party->getEventStats($emissionRatio)['fixed_devices'],
-                'devices_repairable' => $party->getEventStats($emissionRatio)['repairable_devices'],
-                'devices_dead' => $party->getEventStats($emissionRatio)['dead_devices'],
-            ],
-            'widgets' => [
-                'headline_stats' => "https://restarters.net/party/stats/{$party->idevents}/wide",
-                'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/party/{$party->idevents}/manufacture",
-            ],
-            'hours_volunteered' => $party->hours,
-        ]);
-
-        if ( ! empty($party->owner)) {
-            $party_user->put('id', $party->owner->id);
-            $party_user->put('name', $party->owner->name);
-        }
-
-        return $collection;
-    }
-
-    /**
      * [getPastEventByKeyAndId description]
      * Get Past Event using Route Model Binding,
      * If Event is not found, throw 404 error,
@@ -1665,7 +1584,7 @@ class PartyController extends Controller
      * @param   [type]     $id
      * @return  [type]
      */
-    public function getPastEventByKeyAndId(Request $request, $api_key, Party $party)
+    public function getEventByKeyAndId(Request $request, $api_key, Party $party)
     {
         // If Event is not found, through 404 error
         if (empty($party)) {
@@ -1673,9 +1592,9 @@ class PartyController extends Controller
         }
 
         // If Event is found but is not in the Past
-        if ($party->event_date > date('Y-m-d')) {
-            return abort(404, 'Invalid Past Event.');
-        }
+        // if ($party->event_date > date('Y-m-d')) {
+        //     return abort(404, 'Invalid Past Event.');
+        // }
 
         // Get Emission Ratio
         $footprintRatioCalculator = new FootprintRatioCalculator();
