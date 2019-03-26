@@ -130,7 +130,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/{all?}', 'GroupController@index')->name('groups');
         Route::get('/all/search', 'GroupController@search');
         Route::get('/search', 'GroupController@searchColumn');
-        Route::get('/all/sort_column/column', 'GroupController@searchAllColumn');
         Route::get('/make-host/{group_id}/{user_id}', 'GroupController@getMakeHost');
         Route::get('/remove-volunteer/{group_id}/{user_id}', 'GroupController@getRemoveVolunteer');
         Route::get('/nearby/{id}', 'GroupController@volunteersNearby');

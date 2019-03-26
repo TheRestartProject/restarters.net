@@ -40,33 +40,30 @@ class GroupController extends Controller
 
     public function index($all = false)
     {
+        //Get current logged in user
+        $user = Auth::user();
+
+        $groups = null;
+
         if ($all) {
-            //All groups only
-            $your_groups = null;
-            $groups_near_you = null;
+
+            // All groups only
             $groups = Group::orderBy('name', 'ASC')->paginate(env('PAGINATE'));
-            $your_area = null;
 
             //Get all group tags
             $all_group_tags = GroupTags::all();
 
             return view('group.index', [
-                'your_groups' => $your_groups,
-                'groups_near_you' => $groups_near_you,
+                'your_groups' => null,
+                'groups_near_you' => null,
                 'groups' => $groups,
-                'your_area' => $your_area,
+                'your_area' => null,
                 'all' => $all,
                 'all_group_tags' => $all_group_tags,
                 'sort_direction' => 'ASC',
                 'sort_column' => 'distance',
             ]);
         }
-        $groups = null;
-
-        //Get current logged in user
-        $user = Auth::user();
-
-        $your_area = $user->location;
 
         //Look for groups where user ID exists in pivot table
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
@@ -94,7 +91,7 @@ class GroupController extends Controller
             'your_groups' => $your_groups,
             'groups_near_you' => $groups_near_you,
             'groups' => $groups,
-            'your_area' => $your_area,
+            'your_area' => $user->location,
             'all' => $all,
             'sort_direction' => 'ASC',
             'sort_column' => 'distance',
@@ -153,13 +150,27 @@ class GroupController extends Controller
             'sort_column' => $sort_column,
         ]);
     }
+
+    /**
+     * [search description]
+     * All groups only
+     *
+     * @author Christopher Kelker - @date 2019-03-26
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @param   Request     $request
+     * @return  [type]
+     */
     public function search(Request $request)
     {
-        //All groups only
-        $your_groups = null;
-        $groups_near_you = null;
-        $groups = Group::orderBy('name', 'ASC');
-        $your_area = null;
+        // variables
+        $groups = Group::with('allHosts')->withCount('allHosts');
+
+        //Get all group tags
+        $all_group_tags = GroupTags::all();
+
+        $sort_direction = $request->input('sort_direction');
+        $sort_column = $request->input('sort_column');
 
         if ($request->input('name') !== null) {
             $groups = $groups->where('name', 'like', '%'.$request->input('name').'%');
@@ -177,16 +188,36 @@ class GroupController extends Controller
             $groups = $groups->whereIn('idgroups', GrouptagsGroups::whereIn('group_tag', $request->input('tags'))->pluck('group'));
         }
 
+        if ( ! empty($sort_column) && $sort_column == 'name') {
+            $groups = $groups->orderBy('name', $sort_direction);
+        }
+
+        if ( ! empty($sort_column) && $sort_column == 'distance') {
+            $groups = $groups->orderBy('location', $sort_direction);
+        }
+
+        if ( ! empty($sort_column) && $sort_column == 'hosts') {
+            $groups = $groups->has('allHosts')->orderBy('all_hosts_count', $sort_direction);
+        }
+
+        if ( ! empty($sort_column) && $sort_column == 'restarters') {
+            $groups = $groups->has('allRestarters')
+          ->withCount('allRestarters')
+          ->orderBy('all_restarters_count', $sort_direction);
+        }
+
+        if ( ! empty($sort_column) && $sort_column == 'created_at') {
+            $groups = $groups->orderBy('created_at', $sort_direction)
+          ->whereNotNull('created_at');
+        }
+
         $groups = $groups->paginate(env('PAGINATE'));
 
-        //Get all group tags
-        $all_group_tags = GroupTags::all();
-
         return view('group.index', [
-            'your_groups' => $your_groups,
-            'groups_near_you' => $groups_near_you,
+            'your_groups' => null,
+            'groups_near_you' => null,
             'groups' => $groups,
-            'your_area' => $your_area,
+            'your_area' => null,
             'all' => true,
             'all_group_tags' => $all_group_tags,
             'name' => $request->input('name'),
@@ -194,63 +225,6 @@ class GroupController extends Controller
             'selected_country' => $request->input('country'),
             'selected_tags' => $request->input('tags'),
             'sort',
-            'sort_direction' => 'ASC',
-            'sort_column' => 'distance',
-        ]);
-    }
-
-    /**
-     * [searchAllColumn description]
-     * Filter Groups by Column Conditions
-     *
-     * @author Christopher Kelker - @date 2019-03-22
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @param   Request     $request
-     * @return  [type]
-     */
-    public function searchAllColumn(Request $request)
-    {
-        // variables
-        $all = true;
-        $groups = null;
-        $sort_direction = $request->input('sort_direction');
-        $sort_column = $request->input('sort_column');
-
-        // Current User
-        $user = Auth::user();
-
-        // Get all group tags
-        $all_group_tags = GroupTags::all();
-
-        // Filter Conditions
-        if ($sort_column == 'name') {
-            $groups = Group::orderBy('name', $sort_direction)->paginate(env('PAGINATE'));
-        } elseif ($sort_column == 'distance') {
-            $groups = Group::orderBy('location', $sort_direction)->paginate(env('PAGINATE'));
-        } elseif ($sort_column == 'hosts') {
-            $groups = Group::with('allHosts')
-            ->has('allHosts')
-            ->withCount('allHosts')
-            ->orderBy('all_hosts_count', $sort_direction)
-            ->paginate(env('PAGINATE'));
-        } elseif ($sort_column == 'restarters') {
-            $groups = Group::with('allHosts')
-            ->has('allRestarters')
-            ->withCount('allRestarters')
-            ->orderBy('all_restarters_count', $sort_direction)
-            ->paginate(env('PAGINATE'));
-        } elseif ($sort_column == 'created_at') {
-            $groups = Group::orderBy('created_at', $sort_direction)->whereNotNull('created_at')->paginate(env('PAGINATE'));
-        } else {
-            $groups = Group::orderBy('name', 'ASC')->paginate(env('PAGINATE'));
-        }
-
-        return view('group.index', [
-            'groups' => $groups,
-            'all' => $all,
-            'your_groups' => null,
-            'all_group_tags' => $all_group_tags,
             'sort_direction' => $sort_direction,
             'sort_column' => $sort_column,
         ]);
