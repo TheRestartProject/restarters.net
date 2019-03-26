@@ -1,6 +1,6 @@
 <!-- Modal -->
 <div class="modal modal__invite fade" id="invite-to-group" tabindex="-1" role="dialog" aria-labelledby="inviteToGroupLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header d-flex justify-content-between">
         <h5 id="inviteToGroupLabel">@lang('groups.invite_group_header_link')</h5>
@@ -14,7 +14,6 @@
       </div>
 
       <div class="modal-body">
-        <p>@lang('groups.invite_group_name_message')</p>
         <form action="/group/invite" method="post">
           @csrf
           <input type="hidden" name="group_name" value="{{ $group->name }}">
@@ -28,13 +27,13 @@
 
           <div class="form-group">
             <label for="message_to_restarters">@lang('groups.message_header'):</label>
-            <textarea name="message_to_restarters" id="message_to_restarters" class="form-control field" placeholder="@lang('groups.message_example_text')"></textarea>
+            <textarea name="message_to_restarters" id="message_to_restarters" class="form-control field" placeholder="@lang('groups.message_example_text')" rows="3"></textarea>
             <small class="form-text text-muted">@lang('groups.message_explainer')</small>
           </div>
 
           <div class="d-flex flex-row justify-content-between align-items-center">
-            <a href="#" class="mb-0" data-dismiss="modal">@lang('groups.cancel_invites_link')</a>
-            <button disabled type="submit" class="btn btn-primary m-0">@lang('groups.send_invite_button')</button>
+            <a href="#" class="close-invite-modal  mb-0" data-dismiss="modal">@lang('groups.cancel_invites_link')</a>
+            <button disabled type="submit" class="btn btn-primarym-0">@lang('groups.send_invite_button')</button>
           </div>
         </form>
       </div>

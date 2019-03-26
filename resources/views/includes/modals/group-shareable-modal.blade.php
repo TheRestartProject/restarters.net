@@ -1,6 +1,6 @@
 <!-- Modal -->
 <div class="modal modal__invite fade" id="shareable-modal" tabindex="-1" role="dialog" aria-labelledby="inviteToGroupShareableLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header d-flex justify-content-between">
         <h5 id="inviteToGroupShareableLabel">@lang('groups.invite_group_header_email')</h5>
@@ -40,8 +40,8 @@
           <small class="after-offset">@lang('groups.type_shareable_link_message')</small>
 
           <div class="d-flex flex-row justify-content-between align-items-center">
-            <a href="#" class="mb-0" data-dismiss="modal">@lang('groups.cancel_invites_link')</a>
-            <button disabled type="submit" class="btn btn-primary m-0">@lang('groups.done_button')</button>
+            <a href="#" class="close-invite-modal mb-0" data-dismiss="modal">@lang('groups.cancel_invites_link')</a>
+            <button type="submit" class="btn btn-primary m-0" data-dismiss="modal">@lang('groups.done_button')</button>
           </div>
         </form>
       </div>

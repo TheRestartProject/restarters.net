@@ -1,7 +1,7 @@
 @if( Auth::check() )
   <!-- Modal -->
   <div class="modal modal__invite fade" id="event-invite-to" tabindex="-1" role="dialog" aria-labelledby="inviteToEventLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header d-flex justify-content-between">
           <h5 id="inviteToEventLabel">@lang('events.invite_restarters_modal_heading')</h5>
@@ -15,8 +15,6 @@
         </div>
 
         <div class="modal-body">
-          <p>@lang('events.invite_restarters_modal_description')</p>
-          <hr/>
           <form action="/party/invite" method="post" onkeypress="return event.keyCode != 13;">
             @csrf
             <input type="hidden" name="group_name" value="{{ $formdata->group_name }}">
@@ -42,13 +40,13 @@
 
             <div class="form-group">
               <label for="message_to_restarters">@lang('events.message_to_restarters'):</label>
-              <textarea name="message_to_restarters" id="message_to_restarters" class="form-control field" placeholder="@lang('events.sample_text_message_to_restarters')"></textarea>
+              <textarea name="message_to_restarters" id="message_to_restarters" class="form-control field" placeholder="@lang('events.sample_text_message_to_restarters')" rows="3"></textarea>
               <small class="form-text text-muted">@lang('events.message_explainer')</small>
             </div>
 
             <div class="d-flex flex-row justify-content-between align-items-center">
-              <a href="#" class="mb-0" data-dismiss="modal">@lang('events.cancel_invites_link')</a>
-              <button disabled type="submit" class="btn btn-primary m-0">@lang('events.send_invite_button')</button>
+              <a href="#" class="close-invite-modal  mb-0" data-dismiss="modal">@lang('events.cancel_invites_link')</a>
+              <button disabled type="submit" class="btn btn-primarym-0">@lang('events.send_invite_button')</button>
             </div>
           </form>
         </div>
