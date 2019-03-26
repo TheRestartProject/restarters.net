@@ -208,16 +208,16 @@
 
             <table role="table" class="table table-striped table-hover">
                 <thead>
-                <tr>
-                <th width="42"></th>
-                <th width="200" scope="col"><label for="label-name">@lang('groups.groups_name')</label></th>
-                <th width="200" scope="col"><label for="label-location">@lang('groups.groups_location')</label></th>
-                <th width="75" scope="col" class="text-center"><label for="label-hosts">@lang('groups.groups_hosts')</label></th>
-                <th width="100" scope="col" class="text-center"><label for="label-restarters">@lang('groups.groups_restarters')</label></th>
-                @if( FixometerHelper::hasRole(Auth::user(), 'Administrator'))
-                    <th width="75" scope="col" class="text-center"><label for="label-created">Created At</label></th>
-                @endif
-                </tr>
+                  <tr>
+                  <th width="42"></th>
+                  <th width="200" scope="col"><label for="label-name"  class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'name' ) sort-column-asc @endif" >@lang('groups.groups_name')</label></th>
+                  <th width="200" scope="col"><label for="label-location" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'distance' ) sort-column-asc @endif">@lang('groups.groups_location')</label></th>
+                  <th width="75" scope="col" class="text-center"><label for="label-hosts" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'hosts' ) sort-column-asc @endif">@lang('groups.groups_hosts')</label></th>
+                  <th width="100" scope="col" class="text-center"><label for="label-restarters" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'restarters' ) sort-column-asc @endif">@lang('groups.groups_restarters')</label></th>
+                  @if( FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+                      <th width="75" scope="col" class="text-center"><label for="label-created" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'created_at' ) sort-column-asc @endif">Created At</label></th>
+                  @endif
+                  </tr>
                 </thead>
               <tbody>
                 @if( !$groups->isEmpty() )
