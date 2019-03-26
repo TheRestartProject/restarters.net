@@ -1480,7 +1480,8 @@ class PartyController extends Controller
 
     /**
      * [getEventsByKey description]
-     * Write Description here...
+     * Get all Events where a User has an API KEY that exists,
+     * and that User has Group Tags associated with it
      *
      * @author  Christopher Kelker
      * @version 1.0.0
@@ -1571,10 +1572,9 @@ class PartyController extends Controller
     }
 
     /**
-     * [getPastEventByKeyAndId description]
+     * [getEventByKeyAndId description]
      * Get Past Event using Route Model Binding,
      * If Event is not found, throw 404 error,
-     * If Event is Found but is not in the Past, throw 404 error,
      * Else return the Event's JSON data
      *
      * @author  Christopher Kelker
