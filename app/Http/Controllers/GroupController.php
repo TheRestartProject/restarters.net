@@ -172,19 +172,19 @@ class GroupController extends Controller
         $sort_direction = $request->input('sort_direction');
         $sort_column = $request->input('sort_column');
 
-        if ($request->input('name') !== null) {
+        if ( ! empty($request->input('name'))) {
             $groups = $groups->where('name', 'like', '%'.$request->input('name').'%');
         }
 
-        if ($request->input('location') !== null) {
+        if ( ! empty($request->input('location'))) {
             $groups = $groups->where('location', 'like', '%'.$request->input('location').'%');
         }
 
-        if ($request->input('country') !== null) {
+        if ( ! empty($request->input('country'))) {
             $groups = $groups->where('country', $request->input('country'));
         }
 
-        if ($request->input('tags') !== null) {
+        if ( ! empty($request->input('tags'))) {
             $groups = $groups->whereIn('idgroups', GrouptagsGroups::whereIn('group_tag', $request->input('tags'))->pluck('group'));
         }
 
