@@ -164,7 +164,7 @@
             <h2>@lang('groups.groups_title2') <sup>(<a href="/group/all">See all groups</a>)</sup></h2>
 
             <div class="table-responsive">
-            <table role="table" class="table table-striped table-hover" id="sort-table">
+            <table role="table" class="table table-striped table-hover">
                 <thead>
                 <tr>
                 <th width="42"></th>
@@ -220,12 +220,12 @@
                 <thead>
                 <tr>
                 <th width="42"></th>
-                <th width="200" scope="col"><label for="label-name"  class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'name' ) sort-column-asc @endif" >@lang('groups.groups_name')</label></th>
-                <th width="200" scope="col"><label for="label-location" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'distance' ) sort-column-asc @endif">@lang('groups.groups_location')</label></th>
-                <th width="75" scope="col" class="text-center"><label for="label-hosts" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'hosts' ) sort-column-asc @endif">@lang('groups.groups_hosts')</label></th>
-                <th width="100" scope="col" class="text-center"><label for="label-restarters" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'restarters' ) sort-column-asc @endif">@lang('groups.groups_restarters')</label></th>
+                <th width="200" scope="col"><label for="label-name">@lang('groups.groups_name')</label></th>
+                <th width="200" scope="col"><label for="label-location">@lang('groups.groups_location')</label></th>
+                <th width="75" scope="col" class="text-center"><label for="label-hosts">@lang('groups.groups_hosts')</label></th>
+                <th width="100" scope="col" class="text-center"><label for="label-restarters">@lang('groups.groups_restarters')</label></th>
                 @if( FixometerHelper::hasRole(Auth::user(), 'Administrator'))
-                    <th width="75" scope="col" class="text-center"><label for="label-created" class="sort-column  @if( $sort_direction == 'ASC' && $sort_column == 'created_at' ) sort-column-asc @endif">Created At</label></th>
+                    <th width="75" scope="col" class="text-center"><label for="label-created">Created At</label></th>
                 @endif
                 </tr>
                 </thead>
