@@ -19,6 +19,12 @@ class AcceptUserInvites
      */
     public function handle($request, Closure $next)
     {
+        if ( ! empty($request->session()->get('groups') || ! empty($request->session()->get('events')))) {
+            $request->session()->put('invites-feedback');
+        } else {
+            $request->session()->forget('invites-feedback');
+        }
+
         if ( ! empty($request->session()->get('groups'))) {
             foreach ($request->session()->get('groups') as $group_code => $hashs) {
                 foreach ($hashs as $hash) {
@@ -37,6 +43,7 @@ class AcceptUserInvites
                 }
             }
 
+            $request->session()->push('invites-feedback', 'Added to '.str_plural('group', count($hashs)));
             $request->session()->forget('groups');
         }
 
@@ -58,6 +65,7 @@ class AcceptUserInvites
                 }
             }
 
+            $request->session()->push('invites-feedback', 'Added to '.str_plural('event', count($hashs)));
             $request->session()->forget('events');
         }
 
