@@ -17,32 +17,32 @@
             </th>
 
             <th width="200" scope="col">
-              <label for="label-name"  class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'name' ) sort-column-asc @endif">
+              <label for="label-name"  class="sort-column @if( $sort_column == 'name' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
                 @lang('groups.groups_name')
               </label>
             </th>
 
             <th width="200" scope="col">
-              <label for="label-location" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'distance' ) sort-column-asc @endif">
+              <label for="label-location" class="sort-column @if( $sort_column == 'distance' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
                 @lang('groups.groups_location')
               </label>
             </th>
 
             <th width="75" scope="col" class="text-center">
-              <label for="label-hosts" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'hosts' ) sort-column-asc @endif">
+              <label for="label-hosts" class="sort-column @if( $sort_column == 'hosts' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
                 @lang('groups.groups_hosts')
               </label>
             </th>
 
             <th width="100" scope="col" class="text-center">
-              <label for="label-restarters" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'restarters' ) sort-column-asc @endif">
+              <label for="label-restarters" class="sort-column @if( $sort_column == 'restarters' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
                 @lang('groups.groups_restarters')
               </label>
             </th>
 
             @if( FixometerHelper::hasRole(Auth::user(), 'Administrator'))
               <th width="75" scope="col" class="text-center">
-                <label for="label-created" class="sort-column @if( $sort_direction == 'ASC' && $sort_column == 'created_at' ) sort-column-asc @endif">
+                <label for="label-created" class="sort-column @if( $sort_column == 'created_at' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
                   {{ __('Created At') }}
                 </label>
               </th>

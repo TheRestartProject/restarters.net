@@ -61,7 +61,7 @@ class GroupController extends Controller
                 'all' => $all,
                 'all_group_tags' => $all_group_tags,
                 'sort_direction' => 'ASC',
-                'sort_column' => 'distance',
+                'sort_column' => 'name',
             ]);
         }
 
@@ -197,18 +197,18 @@ class GroupController extends Controller
         }
 
         if ( ! empty($sort_column) && $sort_column == 'hosts') {
-            $groups = $groups->has('allHosts')->orderBy('all_hosts_count', $sort_direction);
+            $groups = $groups->withCount('allRestarters')
+                                ->orderBy('all_hosts_count', $sort_direction); //->has('allHosts')
         }
 
         if ( ! empty($sort_column) && $sort_column == 'restarters') {
-            $groups = $groups->has('allRestarters')
-          ->withCount('allRestarters')
-          ->orderBy('all_restarters_count', $sort_direction);
+            $groups = $groups->withCount('allRestarters') //->has('allRestarters')
+                                ->orderBy('all_restarters_count', $sort_direction);
         }
 
         if ( ! empty($sort_column) && $sort_column == 'created_at') {
             $groups = $groups->orderBy('created_at', $sort_direction)
-          ->whereNotNull('created_at');
+                                ->whereNotNull('created_at');
         }
 
         $groups = $groups->paginate(env('PAGINATE'));
