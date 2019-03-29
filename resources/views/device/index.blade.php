@@ -336,11 +336,7 @@ Devices
                                                 </label>
                                             </th>
                                             <th scope="col" class="repair_status" @if( !FixometerHelper::checkColumn('repair_status', $user_preferences) ) style="display: none;" @endif>
-<<<<<<< HEAD
                                                 <label for="label-repair_status" class="sort-column @if( $sort_column == 'repair_status' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
-=======
-                                                <label for="label-repair_status" class="sort-column @if( $sort_column == 'repair_status' )  @endif">
->>>>>>> 2962b0434430ac9437b6a1f5cb4d2ce519cdff6c
                                                     @lang('devices.state')
                                                 </label>
                                             </th>
