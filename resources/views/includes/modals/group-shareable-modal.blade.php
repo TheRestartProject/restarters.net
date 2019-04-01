@@ -4,7 +4,7 @@
     <div class="modal-content">
       <div class="modal-header d-flex justify-content-between">
         <h5 id="inviteToGroupShareableLabel">@lang('groups.invite_group_header_email')</h5>
-        <a href="#" class="align-items-center toggle-invite-modals"><svg width="22" height="13" viewBox="0 0 580 680" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+        <a href="#invite-to-group" data-toggle="modal" data-dismiss="modal" class="align-items-center"><svg width="22" height="13" viewBox="0 0 580 680" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
             <g transform="matrix(1.47821,0,0,1.39922,-170.205,256.927)">
                 <g transform="matrix(1,0,0,1,0,-233.234)">
                     <g transform="matrix(1,0,0,1,-5.32682,12.0794)">
@@ -34,7 +34,7 @@
           <input type="hidden" id="group_id" name="group_id" value="{{ $group->idgroups }}">
 
           <div id="shareable_link_div" class="form-group">
-            <label for="shareable_link_box">@lang('groups.shareable_link_field'):</label>
+            <label for="shareable_link_box">@lang('groups.shareable_link_box'):</label>
             <input type="text" id="shareable_link_box" name="shareable_link_box" class="form-control" autocomplete="off" value="{{ $group->shareable_link }}">
           </div>
           <small class="after-offset">@lang('groups.type_shareable_link_message')</small>
