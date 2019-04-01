@@ -17176,17 +17176,6 @@ td.col-device-auto {
   font-size: 90%;
 }
 
-.toggle-invite-modals,
-.close-invite-modal {
-  color: #000000;
-}
-
-.toggle-invite-modals:hover,
-.close-invite-modal:hover {
-  color: #000000;
-  text-decoration: underline;
-}
-
 .modal__description p:last-child {
   margin-bottom: 0;
 }
