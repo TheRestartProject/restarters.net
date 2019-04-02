@@ -51,7 +51,7 @@ Route::get('/party/view/{id}', 'PartyController@view');
 // so we allow anonymous access.
 Route::get('/export/devices', 'ExportController@devices');
 
-Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
+Route::group(['middleware' => ['auth', 'verifyUserConsent', 'AcceptUserInvites']], function () {
     Route::get('/', 'HomeController@index')->name('home');
 
     //User Controller
@@ -95,7 +95,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     //Dashboard Controller
     Route::prefix('dashboard')->group(function () {
-        Route::get('/', 'DashboardController@index')->name('dashboard')->middleware('AcceptUserInvites');
+        Route::get('/', 'DashboardController@index')->name('dashboard');
         Route::get('/host', 'DashboardController@getHostDash');
     });
 

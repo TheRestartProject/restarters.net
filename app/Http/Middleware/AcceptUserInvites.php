@@ -30,6 +30,7 @@ class AcceptUserInvites
                 foreach ($hashs as $hash) {
                     if ( ! is_null($hash)) {
                         $acceptance = Invite::where('hash', $hash)->first();
+                        $group = $acceptance->group;
                         if ( ! empty($acceptance) && $acceptance->type == 'group') {
                             UserGroups::updateOrCreate([
                                 'user' => auth()->id(),
@@ -40,12 +41,11 @@ class AcceptUserInvites
                             $acceptance->delete();
                         }
                     }
+
+                    $request->session()->push('invites-feedback', 'You have joined <a href='.url("/group/view/{$group->idgroups}").">{$group->name}</a>");
+                    $request->session()->forget('groups');
                 }
             }
-
-            $count = count($hashs);
-            $request->session()->push('invites-feedback', 'You have accepted '.$count.' group '.str_plural('invite', $count));
-            $request->session()->forget('groups');
         }
 
         if ( ! empty($request->session()->get('events'))) {
@@ -53,6 +53,8 @@ class AcceptUserInvites
                 foreach ($hashs as $hash) {
                     if ( ! is_null($hash)) {
                         $acceptance = Invite::where('hash', $hash)->first();
+                        $event = $acceptance->event;
+
                         if ( ! empty($acceptance) && $acceptance->type == 'event') {
                             EventsUsers::updateOrCreate([
                                 'user' => auth()->id(),
@@ -63,12 +65,11 @@ class AcceptUserInvites
                             $acceptance->delete();
                         }
                     }
+
+                    $request->session()->push('invites-feedback', 'You have joined <a href='.url("/party/view/{$event->idevents}").">{$event->venue}</a>");
+                    $request->session()->forget('events');
                 }
             }
-
-            $count = count($hashs);
-            $request->session()->push('invites-feedback', 'You have accepted '.$count.' event '.str_plural('invite', $count));
-            $request->session()->forget('events');
         }
 
         return $next($request);

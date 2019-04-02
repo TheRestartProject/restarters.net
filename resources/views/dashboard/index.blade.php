@@ -169,7 +169,7 @@
           <div class="col">
             <ul class="alert alert-success list-unstyled">
               @foreach (session('invites-feedback') as $key => $message)
-                   <li>{{ $message }}</li>
+                   <li>{!! $message !!}</li>
                @endforeach
             </ul>
           </div>
