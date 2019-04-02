@@ -19,6 +19,8 @@ class AcceptUserInvites
      */
     public function handle($request, Closure $next)
     {
+        // Check if there are existing Groups/Events Shareable Invites for the
+        // Current User
         if ( ! empty($request->session()->get('groups') || ! empty($request->session()->get('events')))) {
             $request->session()->put('invites-feedback');
         } else {
@@ -28,22 +30,30 @@ class AcceptUserInvites
         if ( ! empty($request->session()->get('groups'))) {
             foreach ($request->session()->get('groups') as $group_code => $hashs) {
                 foreach ($hashs as $hash) {
-                    if ( ! is_null($hash)) {
-                        $acceptance = Invite::where('hash', $hash)->first();
-                        $group = $acceptance->group;
-                        if ( ! empty($acceptance) && $acceptance->type == 'group') {
-                            UserGroups::updateOrCreate([
-                                'user' => auth()->id(),
-                                'group' => $acceptance->record_id,
-                                'status' => 1,
-                                'role' => 4,
-                            ]);
-                            $acceptance->delete();
-                        }
-                    }
+                    $acceptance = Invite::where('hash', $hash)->firstOrFail();
+                    $group = $acceptance->group;
 
-                    $request->session()->push('invites-feedback', 'You have joined <a href='.url("/group/view/{$group->idgroups}").">{$group->name}</a>");
-                    $request->session()->forget('groups');
+                    // If the $acceptance type is a Group
+                    // and the User has not already joined.
+                    // Accept or Update a record and
+                    // delete the Invite and create a new session
+                    if ($acceptance->type == 'group' && ! $group->isVolunteer()) {
+                        UserGroups::updateOrCreate([
+                            'user' => auth()->id(),
+                            'group' => $acceptance->record_id,
+                            'status' => 1,
+                            'role' => 4,
+                        ]);
+                        $acceptance->delete();
+                        $request->session()->push('invites-feedback', 'You have joined <a href='.url("/group/view/{$group->idgroups}").">{$group->name}</a>");
+                        $request->session()->forget('groups');
+
+                    // Else that must mean the User is already part of the Group.
+                        // We can then delete the Invite and create a new session
+                    } else {
+                        $request->session()->push('invites-feedback', 'You are already a member of <a href='.url("/group/view/{$group->idgroups}").">{$group->name}</a>");
+                        $request->session()->forget('groups');
+                    }
                 }
             }
         }
@@ -51,23 +61,30 @@ class AcceptUserInvites
         if ( ! empty($request->session()->get('events'))) {
             foreach ($request->session()->get('events') as $event_code => $hashs) {
                 foreach ($hashs as $hash) {
-                    if ( ! is_null($hash)) {
-                        $acceptance = Invite::where('hash', $hash)->first();
-                        $event = $acceptance->event;
+                    $acceptance = Invite::where('hash', $hash)->firstOrFail();
+                    $event = $acceptance->event;
 
-                        if ( ! empty($acceptance) && $acceptance->type == 'event') {
-                            EventsUsers::updateOrCreate([
-                                'user' => auth()->id(),
-                                'event' => $acceptance->record_id,
-                                'status' => 1,
-                                'role' => 4,
-                            ]);
-                            $acceptance->delete();
-                        }
+                    // If the $acceptance type is a Event
+                    // and the User has not already joined.
+                    // Accept or Update a record and
+                    // delete the Invite and create a new session
+                    if ($acceptance->type == 'event' && ! $event->isVolunteer()) {
+                        EventsUsers::updateOrCreate([
+                            'user' => auth()->id(),
+                            'event' => $acceptance->record_id,
+                            'status' => 1,
+                            'role' => 4,
+                        ]);
+                        $acceptance->delete();
+                        $request->session()->push('invites-feedback', 'You have joined <a href='.url("/party/view/{$event->idevents}").">{$event->venue}</a>");
+                        $request->session()->forget('events');
+
+                    // Else that must mean the User is already part of the Event.
+                        // We can then delete the Invite and create a new session
+                    } else {
+                        $request->session()->push('invites-feedback', 'You are already a member of <a href='.url("/party/view/{$event->idevents}").">{$event->venue}</a>");
+                        $request->session()->forget('events');
                     }
-
-                    $request->session()->push('invites-feedback', 'You have joined <a href='.url("/party/view/{$event->idevents}").">{$event->venue}</a>");
-                    $request->session()->forget('events');
                 }
             }
         }

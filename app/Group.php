@@ -245,4 +245,11 @@ class Group extends Model implements Auditable
 
         return '';
     }
+
+    public function isVolunteer()
+    {
+        $attributes = ['user' => auth()->id()];
+
+        return $this->allConfirmedVolunteers()->where($attributes)->exists();
+    }
 }

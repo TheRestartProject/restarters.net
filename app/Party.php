@@ -445,6 +445,15 @@ class Party extends Model implements Auditable
         return $this->hasMany('App\EventsUsers', 'event', 'idevents')->where('status', '!=', 1);
     }
 
+    public function allConfirmedVolunteers()
+    {
+        return $this->hasMany(EventsUsers::class, 'event', 'idevents')
+          ->where(function ($query) {
+              $query->where('status', 1)
+                  ->orWhereNull('status');
+          });
+    }
+
     public function host()
     {
         return $this->hasOne('App\Host', 'idgroups', 'group');
@@ -601,5 +610,12 @@ class Party extends Model implements Auditable
         }
 
         return '';
+    }
+
+    public function isVolunteer()
+    {
+        $attributes = ['user' => auth()->id()];
+
+        return $this->allConfirmedVolunteers()->where($attributes)->exists();
     }
 }
