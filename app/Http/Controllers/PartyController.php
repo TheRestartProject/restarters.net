@@ -1513,6 +1513,6 @@ class PartyController extends Controller
         // Push this into a session variable to find by the Event prefix
         session()->push('events.'.$code, $hash);
 
-        return redirect('/dashboard');
+        return redirect('/user/register');
     }
 }

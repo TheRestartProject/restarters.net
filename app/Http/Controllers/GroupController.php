@@ -1309,6 +1309,6 @@ class GroupController extends Controller
         // Push this into a session variable to find by the Group prefix
         session()->push('groups.'.$code, $hash);
 
-        return redirect('/dashboard');
+        return redirect('/user/register');
     }
 }
