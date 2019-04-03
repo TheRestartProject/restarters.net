@@ -1309,6 +1309,6 @@ class GroupController extends Controller
         // Push this into a session variable to find by the Group prefix
         session()->push('groups.'.$code, $hash);
 
-        return redirect('/user/register');
+        return redirect('/user/register')->withErrors('To accept this invitiation please create an account or <a class="plain-link" href='.url('/login').'>login here</a>');
     }
 }

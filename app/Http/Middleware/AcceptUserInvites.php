@@ -45,16 +45,15 @@ class AcceptUserInvites
                             'role' => 4,
                         ]);
                         $acceptance->delete();
-                        $request->session()->push('invites-feedback', 'You have joined <a href='.url("/group/view/{$group->idgroups}").">{$group->name}</a>");
-                        $request->session()->forget('groups');
+                        $request->session()->push('invites-feedback', 'You have joined <a class="plain-link" href='.url("/group/view/{$group->idgroups}").">{$group->name}</a>");
 
                     // Else that must mean the User is already part of the Group.
                         // We can then delete the Invite and create a new session
                     } else {
-                        $request->session()->push('invites-feedback', 'You are already a member of <a href='.url("/group/view/{$group->idgroups}").">{$group->name}</a>");
-                        $request->session()->forget('groups');
+                        $request->session()->push('invites-feedback', 'You are already a member of <a class="plain-link" href='.url("/group/view/{$group->idgroups}").">{$group->name}</a>");
                     }
                 }
+                $request->session()->forget('groups');
             }
         }
 
@@ -76,16 +75,15 @@ class AcceptUserInvites
                             'role' => 4,
                         ]);
                         $acceptance->delete();
-                        $request->session()->push('invites-feedback', 'You have joined <a href='.url("/party/view/{$event->idevents}").">{$event->venue}</a>");
-                        $request->session()->forget('events');
+                        $request->session()->push('invites-feedback', 'You have joined <a class="plain-link" href='.url("/party/view/{$event->idevents}").">{$event->venue}</a>");
 
                     // Else that must mean the User is already part of the Event.
                         // We can then delete the Invite and create a new session
                     } else {
-                        $request->session()->push('invites-feedback', 'You are already a member of <a href='.url("/party/view/{$event->idevents}").">{$event->venue}</a>");
-                        $request->session()->forget('events');
+                        $request->session()->push('invites-feedback', 'You are already a member of <a class="plain-link" href='.url("/party/view/{$event->idevents}").">{$event->venue}</a>");
                     }
                 }
+                $request->session()->forget('events');
             }
         }
 

@@ -14555,6 +14555,16 @@ table.sortable > thead th div.mozilla {
   border-color: #A65800;
 }
 
+.alert .plain-link {
+  text-decoration: underline;
+  color: #fff;
+}
+
+.alert .plain-link:hover,
+.alert .plain-link:focus {
+  text-decoration: none;
+}
+
 .entry-panel {
   margin: 20px auto;
   max-width: 450px;
@@ -15052,6 +15062,11 @@ table.sortable > thead th div.mozilla {
 
 .btn.collapsed .btn-state-2 {
   display: none;
+}
+
+a.text-dark:hover,
+a.text-dark:focus {
+  text-decoration: underline !important;
 }
 
 .badge {
@@ -17174,6 +17189,10 @@ td.col-device-auto {
 .after-offset {
   color: #5A5A5A;
   font-size: 90%;
+}
+
+.modal__invite textarea {
+  min-height: 140px;
 }
 
 .modal__description p:last-child {
@@ -20088,3 +20107,4 @@ h2 sup a:hover {
   height: auto;
   margin: 0 2px;
 }
+
