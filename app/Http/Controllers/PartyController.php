@@ -1489,21 +1489,33 @@ class PartyController extends Controller
      * @param   [type]     $api_key
      * @return  [type]
      */
-    public function getEventsByKey($api_key)
+    public function getEventsByKey(Request $request, $api_key, $date = null)
     {
+        // If there is a $date parameter
+        if ( ! empty($date)) {
+            $user = User::where('access_key', $api_key)->whereHas('groupTag.groupTagGroups.hasOneGroup.parties', function ($query) use ($date) {
+                $query->where('event_date', date('Y-m-d', strtotime($date)));
+            })->first();
+        }
+
+        // If there is a $date parameter
+        // and Events are not found by the User's $api_key
+        if ( ! empty($date) && is_null($user)) {
+            return abort(404, 'Invalid Event date.');
+        }
+
         // Find User by Access Key
         $user = User::where('access_key', $api_key)->first();
-
-        // Get Emission Ratio
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
-
         $group_tags_groups = $user->groupTag->groupTagGroups;
 
         // If Group is not found, through 404 error
         if (empty($group_tags_groups)) {
             return abort(404, 'No User Groups found.');
         }
+
+        // Get Emission Ratio
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
         // New Collection Instance
         $collection = collect([]);
@@ -1584,17 +1596,17 @@ class PartyController extends Controller
      * @param   [type]     $id
      * @return  [type]
      */
-    public function getEventByKeyAndId(Request $request, $api_key, Party $party)
+    public function getEventByKeyAndId(Request $request, $api_key, Party $party, $date = null)
     {
         // If Event is not found, through 404 error
-        if (empty($party)) {
+        if (empty($party) && ! $party->exists) {
             return abort(404, 'Invalid Event ID.');
         }
 
-        // If Event is found but is not in the Past
-        // if ($party->event_date > date('Y-m-d')) {
-        //     return abort(404, 'Invalid Past Event.');
-        // }
+        // If Event is found but is not the of the date specified
+        if ( ! empty($date) && $party->event_date != date('Y-m-d', strtotime($date))) {
+            return abort(404, 'Invalid Event date.');
+        }
 
         // Get Emission Ratio
         $footprintRatioCalculator = new FootprintRatioCalculator();
