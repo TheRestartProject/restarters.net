@@ -16,7 +16,7 @@
 
     @if( is_object($is_attending) && !$event->hasFinished() )
     @if( $is_attending->status == 1 )
-    <div class="alert alert-success" style="min-height: 88px;">
+    <div class="alert alert-success">
 
       <div class="row">
         <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.rsvp_message')</div>
@@ -63,6 +63,7 @@
         <header>
           <h1>{{ $event->getEventName() }}</h1>
           <p>Hosted by <a href="/group/view/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a></p>
+          {{--
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
@@ -71,6 +72,7 @@
               <li class="breadcrumb-item active" aria-current="page">{{ $event->getEventName() }}</li>
             </ol>
           </nav>
+          --}}
           @php( $group_image = $event->theGroup->groupImage )
           @if( is_object($group_image) && is_object($group_image->image) )
           <img src="{{ asset('/uploads/mid_' . $group_image->image->path) }}" alt="{{{ $event->theGroup->name }}}" class="event-icon">
