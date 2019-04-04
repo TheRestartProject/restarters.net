@@ -76,4 +76,7 @@ return array (
   'tag-7' => 'Tag 7',
   'tag-8' => 'Tag 8',
   'helptext_area' => 'For display on The Restart Project homepage',
+  'not_joined_a_group' => 'You are not currently following any repair groups! Groups nearest to you are shown below.',
+  'no_groups_near_you' => 'We can\'t find any repair groups in our database near to your area (:area).',
+  'consider_starting_a_group' => 'Would you like to start or add a group?  Read our resources on <a href=":resources_url">how to start a group</a>.',
 );
