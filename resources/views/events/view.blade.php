@@ -21,7 +21,7 @@
       <div class="row">
         <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.rsvp_message')</div>
         <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
-          <a href="/party/cancel-invite/{{{ $is_attending->event }}}" class="btn btn-success">@lang('events.rsvp_button')</a>
+          <a href="/party/cancel-invite/{{{ $is_attending->event }}}" class="btn btn-info">@lang('events.rsvp_button')</a>
         </div>
       </div>
 
@@ -38,6 +38,23 @@
 
     </div>
     @endif
+    @endif
+    @if (\Session::has('prompt-follow-group'))
+    <div class="alert alert-info" style="min-height: 88px;">
+        <div class="row">
+            <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.follow_hosting_group', ['group' => $event->theGroup->name])</div>
+            <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
+                <a href="/group/join/{{ $event->theGroup->idgroups }}" class="btn btn-info">@lang('groups.join_group_button')</a>
+            </div>
+        </div>
+    </div>
+    @endif
+    @if (\Session::has('now-following-group'))
+        <div class="alert alert-success">
+            <div class="row">
+                <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">{{ \Session::get('now-following-group') }}</div>
+            </div>
+        </div>
     @endif
 
     <div class="events__header row align-content-top">

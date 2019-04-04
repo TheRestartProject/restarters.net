@@ -914,7 +914,11 @@ class GroupController extends Controller
 
             $response['success'] = 'You are now following '.$group->name.'!';
 
-            return redirect()->back()->with('response', $response);
+            return redirect()->back()
+                ->with([
+                    'response' => $response,
+                    'now-following-group' => 'You are now following '.$group->name.'!',
+                ]);
         } catch (\Exception $e) {
             $response['danger'] = 'Failed to follow this group';
 

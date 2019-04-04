@@ -689,19 +689,25 @@ class PartyController extends Controller
                   'role' => 4,
                 ]);
 
-                    Party::find($event_id)->increment('volunteers');
+                $event = Party::find($event_id);
 
-                    $response['success'] = 'Thank you for your RSVP, we look forward to seeing you at the event';
-                    $this->notifyHostsOfRsvp($user_event, $event_id);
+                $event->increment('volunteers');
 
-                    return redirect()->back()->with('response', $response);
+                $flashData = [];
+                if (! Auth::user()->isInGroup($event->theGroup->idgroups)) {
+                    $flashData['prompt-follow-group'] = true;
+                }
+
+                $this->notifyHostsOfRsvp($user_event, $event_id);
+
+                return redirect()->back()->with($flashData);
             } catch (\Exception $e) {
-                $response['danger'] = 'Failed to join this event';
-                return redirect()->back()->with('response', $response);
+                $flashData['danger'] = 'Failed to join this event';
+                return redirect()->back()->with($flashData);
             }
         } else {
-            $response['warning'] = 'You are already part of this event';
-            return redirect()->back()->with('response', $response);
+            $flashData['warning'] = 'You are already part of this event';
+            return redirect()->back()->with($flashData);
         }
     }
 

@@ -27,8 +27,8 @@ return array (
   'stat-3' => 'Repairable devices',
   'stat-4' => 'End-of-life devices',
   'about_event_name_header' => 'About :event',
-  'rsvp_message' => 'Excellent! You are joining us at this event',
-  'rsvp_button' => 'Sorry, I can no longer attend',
+  'rsvp_message' => 'Excellent! You are joining us at this event.',
+  'rsvp_button' => 'I can no longer attend',
   'pending_rsvp_message' => 'You have an invite pending for this event',
   'pending_rsvp_button' => 'I am attending',
   'share_stats_header' => 'Share your stats',
@@ -92,4 +92,5 @@ return array (
   'reporting' => 'Reporting',
   'events-filter' => 'Events filter',
   'download-results' => 'Download Results (CSV)',
+  'follow_hosting_group' => 'This event is being hosted by :group.  Would you like to follow them?',
 );

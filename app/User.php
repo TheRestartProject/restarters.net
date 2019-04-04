@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\UserGroups;
+
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -204,6 +206,14 @@ class User extends Authenticatable
                     AND users.id IN
                         (SELECT `user` FROM users_groups WHERE `group` = :group)
                 ORDER BY users.name ASC'), array('group' => $group));
+    }
+
+
+    public function isInGroup($groupId)
+    {
+        return UserGroups::where('user', $this->id)
+            ->where('group', $groupId)
+            ->exists();
     }
 
     //This create user function is already done by the RegisterController
