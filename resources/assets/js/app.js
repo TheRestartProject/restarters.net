@@ -989,6 +989,14 @@ function initAutocomplete() {
 
   });
 
+
+  // On toggling between multi collapable invite modal content
+  // Then also toggle the link to change the text (show a different link -
+  // that has the same functionality)
+  $('.multi-collapse-invite-modal').on('show.bs.collapse', function () {
+      $('.toggle-modal-link').toggleClass('d-none');
+  })
+
   // $('#step-4-form').submit(function(e) {
   //   e.preventDefault();
   //
