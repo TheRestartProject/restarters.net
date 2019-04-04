@@ -17,4 +17,12 @@ return array (
   'log_devices' => 'Log devices',
   'title' => 'Dashboard',
   'subtitle' => 'Keep up to date with the latest activity in the Restarters community.',
+  'groups_near_you_header' => 'Groups near you',
+  'groups_near_you_text' => 'Follow a repair group to find out more about community repair in your area.',
+  'groups_near_you_see_more' => 'See more groups',
+  'groups_near_you_follow_action' => 'Follow',
+  'groups_near_you_none_nearby' => 'There are currently no groups near you that have been added to Restarters.net.',
+  'groups_near_you_start_a_group' => 'Would you like to start or add a group?  <a href=":resources_url">Learn more</a>.',
+  'groups_near_you_set_location' => '<a href=":profile_url">Set your town/city</a> to help us find groups near you.',
+  'groups_near_you_your_location_is' => 'Your town/city is currently set to :location.',
 );

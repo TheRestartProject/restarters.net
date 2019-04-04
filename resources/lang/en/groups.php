@@ -56,7 +56,7 @@ return array (
   'all_volunteers_group_name_message' => 'Here\'s a list of all of the volunteers affiliated with your group and their skills.',
   'restarter_column_table' => 'Restarter',
   'skills_column_table' => 'Skills',
-  'join_group_button' => 'Join group',
+  'join_group_button' => 'Follow group',
   'share_stats_header' => 'Share your stats',
   'share_stats_message' => ':group have made a real impact fixing electronics and preventing waste. Help share this on your website and get other people involved:',
   'embed_code_header' => 'Embed code',

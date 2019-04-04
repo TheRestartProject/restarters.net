@@ -11,9 +11,15 @@
     <div class="col-lg-2 col-dashboard">@include('dashboard.blocks.wiki')</div>
     <div class="col-lg-2 col-dashboard">@include('dashboard.blocks.community-news')</div>
 @else --}}
+    @if ($in_group)
     <div class="col-md-12 col-lg-12 col-xl-6 col-dashboard">
         @include('partials.upcoming2')
     </div>
+    @else
+    <div class="col-md-12 col-lg-12 col-xl-6 col-dashboard">
+        @include('dashboard.blocks.groups-near-you')
+    </div>
+    @endif
     <div class="col-md-12 col-lg-12 col-xl-6 col-dashboard">
         @include('dashboard.blocks.hot-topics')
     </div>

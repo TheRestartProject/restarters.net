@@ -77,16 +77,7 @@ class GroupController extends Controller
         $your_groups_uniques = $your_groups->pluck('idgroups')->toArray();
 
         //Assuming we have valid lat and long values, let's see what is nearest
-        if ( ! is_null($user->latitude) && ! is_null($user->longitude)) {
-            $groups_near_you = Group::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
-                ->having('distance', '<=', 150)
-                ->whereNotIn('idgroups', $your_groups_uniques)
-                ->orderBy('distance', 'ASC')
-                ->take(10)
-                ->get();
-        } else {
-            $groups_near_you = null;
-        }
+        $groups_near_you = $user->groupsNearby(150, 10, $your_groups_uniques);
 
         return view('group.index', [
             'your_groups' => $your_groups,
@@ -921,11 +912,11 @@ class GroupController extends Controller
                 Notification::send($host, new NewGroupMember($arr, $host));
             }
 
-            $response['success'] = 'Thanks for joining, you are now part of this group!';
+            $response['success'] = 'You are now following '.$group->name.'!';
 
             return redirect()->back()->with('response', $response);
         } catch (\Exception $e) {
-            $response['danger'] = 'Failed to join this group';
+            $response['danger'] = 'Failed to follow this group';
 
             return redirect()->back()->with('response', $response);
         }

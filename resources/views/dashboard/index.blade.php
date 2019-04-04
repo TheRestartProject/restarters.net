@@ -20,6 +20,18 @@
           @include('dashboard.blocks.getting-started')
       @endif
     <div class="col">
+        @if (session('response'))
+            <div class="row row-compressed">
+                <div class="col">
+                    @foreach (session('response') as $key => $message)
+                        <div class="alert alert-{{ $key }}">
+                            {{ $message }}
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
       <div class="row row-compressed">
         @if (FixometerHelper::hasRole($user, 'Administrator'))
           @include('dashboard.restarter')

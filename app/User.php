@@ -52,6 +52,34 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Group', 'users_groups', 'user', 'group');
     }
 
+    /**
+     * Return a list of repair groups near the user.
+     *
+     * @param int $searchRadiusInMiles How far to search for groups
+     * @param int $numberOfGroups How many groups to return
+     * @param array $idsOfGroupsToIgnore Any groups that should be excluded from the result
+     */
+    public function groupsNearby($searchRadiusInMiles = 150, $numberOfGroups = 10, $idsOfGroupsToIgnore = null)
+    {
+        if (is_null($this->latitude) || is_null($this->longitude)) {
+            return null;
+        }
+
+        $groupsNearbyQuery = Group::select(
+            DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
+        )->having('distance', '<=', $searchRadiusInMiles);
+
+        if (! is_null($idsOfGroupsToIgnore)) {
+            $groupsNearbyQuery->whereNotIn('idgroups', $idsOfGroupsToIgnore);
+        }
+
+        $groupsNearby = $groupsNearbyQuery->orderBy('distance', 'ASC')
+            ->take($numberOfGroups)
+            ->get();
+
+        return $groupsNearby;
+    }
+
     public function preferences()
     {
         return $this->belongsToMany('App\User', 'users_preferences', 'user_id', 'preference_id');

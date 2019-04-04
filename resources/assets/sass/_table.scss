@@ -38,7 +38,7 @@
             display: block;
         }
 
-        a {
+        a:not(.btn) {
             text-decoration: underline;
             color: #000;
         }
