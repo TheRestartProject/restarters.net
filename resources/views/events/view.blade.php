@@ -58,11 +58,11 @@
     @endif
 
     <div class="events__header row align-content-top">
-      <div class="col-lg-9 d-flex flex-column">
+      <div class="col-lg-8 d-flex flex-column">
 
         <header>
           <h1>{{ $event->getEventName() }}</h1>
-          <p>Hosted by <a href="/group/view/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a></p>
+          <p>Organised by <a href="/group/view/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a></p>
           {{--
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -82,7 +82,7 @@
         </header>
 
       </div>
-      <div class="col-lg-3">
+      <div class="col-lg-4">
         <div class="button-group button-group__r">
           @if( Auth::check() )
             @if( FixometerHelper::userHasEditPartyPermission($formdata->id) || FixometerHelper::userIsHostOfGroup($formdata->group_id, Auth::user()->id) )
@@ -111,16 +111,19 @@
               </div>
             </div>
             @else
-            @if( $event->hasFinished() )
-            <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
-              @else
-              @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
-              <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite volunteers</button>
-              @else
-              <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
-              @endif
-              @endif
-              @endif
+                @if( $event->hasFinished() )
+                    <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
+                @else
+                    @if (! Auth::user()->isInGroup($event->theGroup->idgroups))
+                        <a class="btn btn-tertiary" href="/group/join/{{ $event->theGroup->idgroups }}">Follow group</a>
+                    @endif
+                    @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
+                        <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite volunteers</button>
+                    @else
+                        <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
+                    @endif
+                @endif
+            @endif
             @endif
           </div>
         </div>
