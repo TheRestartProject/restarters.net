@@ -185,10 +185,35 @@
                 font-size: 26px;
             }
         }
-        .table-events{
+        .table-events {
+            border: 1px solid #eee;
+            border-radius: 10px;
           td {
-              padding-top: 0;
-              padding-bottom: 0;
+              padding-top: 10px;
+              padding-bottom: 10px;
+              &.cell-date {
+                  width: 200px;
+              }
+              &.cell-name {
+                  width: 300px;
+
+                  & .group-name a {
+                      font-size: smaller;
+                      text-decoration: none;
+
+                      &:hover {
+                          text-decoration: underline;
+                      }
+                  }
+              }
+          }
+          th {
+              &.cell-name {
+                  width: 200px;
+              }
+              &.cell-date {
+                  width: 200px;
+              }
           }
         }
     }

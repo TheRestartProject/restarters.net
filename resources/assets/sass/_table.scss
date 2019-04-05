@@ -30,6 +30,7 @@
         border: none;
         vertical-align: middle;
         font-family: $font-family-second;
+        //padding: 7px 5px 9px;
         padding: 7px 5px 9px;
 
         img {
@@ -323,7 +324,7 @@
         }
 
         td.cell-rsvp {
-            background-color: #D0FBF0;
+            /*background-color: #D0FBF0;*/
         }
 
         td.cell-progress {

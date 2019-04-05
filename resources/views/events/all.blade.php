@@ -40,13 +40,13 @@
 
           <table class="table table-events table-striped" role="table">
 
-            @include('partials.tables.head-events')
+            @include('events.tables.head-events-upcoming')
 
             <tbody>
               @if( !$upcoming_events->isEmpty() )
                 @foreach ($upcoming_events as $event)
 
-                  @include('partials.tables.row-events', ['invite' => true])
+                  @include('events.tables.row-events-upcoming', ['invite' => true])
 
                 @endforeach
               @else
