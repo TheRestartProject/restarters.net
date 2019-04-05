@@ -146,7 +146,7 @@
 
             <h2>Event details</h2>
             <div class="card events-card">
-              <div id="map-plugin" class="map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
+              <div id="event-map" class="map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
 
               <div class="events-card__details">
 
