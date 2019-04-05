@@ -1489,19 +1489,23 @@ class PartyController extends Controller
      * @param   [type]     $api_key
      * @return  [type]
      */
-    public function getEventsByKey(Request $request, $api_key, $date = null)
+    public function getEventsByKey(Request $request, $api_key, $date_from = null, $date_to = null)
     {
-        // If there is a $date parameter
-        if ( ! empty($date)) {
-            $user = User::where('access_key', $api_key)->whereHas('groupTag.groupTagGroups.hasOneGroup.parties', function ($query) use ($date) {
-                $query->where('event_date', date('Y-m-d', strtotime($date)));
-            })->first();
+        // If there is are $date parameters
+        if ( ! empty($date_from) && ! empty($date_to)) {
+            $user = User::where('access_key', $api_key)
+            ->whereHas('groupTag.groupTagGroups.hasOneGroup.parties', function ($query) use ($date_from, $date_to) {
+                // $query->whereBetween('event_date', [date('Y-m-d', strtotime($date_from)), date('Y-m-d', strtotime($date_to))]);
+                $query->where('event_date', '>=', date('Y-m-d', strtotime($date_from)))
+                ->where('event_date', '<=', date('Y-m-d', strtotime($date_to)));
+            })
+            ->first();
         }
 
-        // If there is a $date parameter
+        // If there is are $date parameters
         // and Events are not found by the User's $api_key
-        if ( ! empty($date) && is_null($user)) {
-            return abort(404, 'Invalid Event date.');
+        if ( ! empty($date_from) && ! empty($date_to) && is_null($user)) {
+            return abort(404, 'No Events between dates.');
         }
 
         // Find User by Access Key
@@ -1596,7 +1600,7 @@ class PartyController extends Controller
      * @param   [type]     $id
      * @return  [type]
      */
-    public function getEventByKeyAndId(Request $request, $api_key, Party $party, $date = null)
+    public function getEventByKeyAndId(Request $request, $api_key, Party $party, $date_from = null, $date_to = null)
     {
         // If Event is not found, through 404 error
         if (empty($party) && ! $party->exists) {
@@ -1604,8 +1608,10 @@ class PartyController extends Controller
         }
 
         // If Event is found but is not the of the date specified
-        if ( ! empty($date) && $party->event_date != date('Y-m-d', strtotime($date))) {
-            return abort(404, 'Invalid Event date.');
+        if ( ! empty($date_from) && ! empty($date_to)) {
+            if ( ! FixometerHelper::validateBetweenDates($party->event_date, $date_from, $date_to)) {
+                return abort(404, 'Event not between dates.');
+            }
         }
 
         // Get Emission Ratio
