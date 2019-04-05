@@ -104,16 +104,17 @@ class PartyController extends Controller
 
             $past_events = Party::pastEvents()
             ->where('events.group', $group_id)
-            ->paginate(env('PAGINATE'));
+            ->paginate(10);
 
             $group = Group::find($group_id);
         } else {
             $upcoming_events = Party::upcomingEvents()
             ->where('users_groups.user', Auth::user()->id)
-            ->take(5)
+            ->take(10)
             ->get();
 
-            $past_events = Party::pastEvents()->paginate(env('PAGINATE'));
+            $past_events = Party::pastEvents()
+                         ->paginate(10);
 
             $group = null;
         }
