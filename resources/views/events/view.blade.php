@@ -108,6 +108,9 @@
                   <a class="btn dropdown-item" href="/party/join/{{ $formdata->id }}">RSVP</a>
                   @endif
                 @endif
+                @if (! Auth::user()->isInGroup($event->theGroup->idgroups))
+                    <a class="btn dropdown-item" href="/group/join/{{ $event->theGroup->idgroups }}">Follow group</a>
+                @endif
               </div>
             </div>
             @else
