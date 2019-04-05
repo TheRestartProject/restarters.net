@@ -12,7 +12,8 @@
         <a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a>
     </td>
     <td class="cell-date">
-        {{ $event->getEventDate('D jS M Y') }} {{ $event->getEventStartEnd() }}
+        <div>{{ $event->getEventDate('D jS M Y') }}</div>
+        <div>{{ $event->getEventStartEnd() }}</div>
     </td>
     @if( !isset($group_view) )
       <td class="cell-locations d-none d-sm-table-cell">
