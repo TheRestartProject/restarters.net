@@ -151,14 +151,14 @@ class ExportController extends Controller
         // Do not include model column
         if ($host == 'therestartproject.org') {
             $columns = array(
-                'Category',
+                'Product Category',
                 'Brand',
                 'Comments',
                 'Repair Status',
                 'Spare parts (needed/used)',
-                'Restart Party Location',
-                'Restart Group',
-                'Restart Party Date',
+                'Event',
+                'Group',
+                'Date',
             );
 
             fputcsv($file, $columns);
@@ -170,22 +170,22 @@ class ExportController extends Controller
                     $device->problem,
                     $device->getRepairStatus(),
                     $device->getSpareParts(),
-                    $device->location,
+                    $device->event_name,
                     $device->group_name,
-                    date('d/m/Y', $device->event_date),
+                    date('Y-m-d', $device->event_date),
                 ]);
             }
         } else {
             $columns = array(
-                'Category',
+                'Product Category',
                 'Brand',
                 'Model',
                 'Comments',
                 'Repair Status',
                 'Spare parts (needed/used)',
-                'Restart Party Location',
-                'Restart Group',
-                'Restart Party Date',
+                'Event',
+                'Group',
+                'Date',
             );
 
             fputcsv($file, $columns);
@@ -198,9 +198,9 @@ class ExportController extends Controller
                     $device->problem,
                     $device->getRepairStatus(),
                     $device->getSpareParts(),
-                    $device->location,
+                    $device->event_name,
                     $device->group_name,
-                    date('d/m/Y', $device->event_date),
+                    date('Y-m-d', $device->event_date),
                 ]);
             }
         }
