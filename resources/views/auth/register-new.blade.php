@@ -14,6 +14,11 @@
                 </ul>
             </div>
         @endif
+        @if (\Session::has('auth-for-invitation'))
+            <div class="alert alert-info">
+                {!! \Session::get('auth-for-invitation') !!}
+            </div>
+        @endif
 
         <form id="register-form" method="post">
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
