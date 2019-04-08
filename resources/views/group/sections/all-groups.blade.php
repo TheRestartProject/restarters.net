@@ -73,5 +73,8 @@
         @endif
       </nav>
     </div>
+    <div class="d-flex justify-content-center">
+        {{ $groups_count }} results
+    </div>
   </section>
 @endif

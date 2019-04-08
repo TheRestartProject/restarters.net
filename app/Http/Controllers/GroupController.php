@@ -48,7 +48,9 @@ class GroupController extends Controller
         if ($all) {
 
             // All groups only
-            $groups = Group::orderBy('name', 'ASC')->paginate(env('PAGINATE'));
+            $groupsQuery = Group::orderBy('name', 'ASC');
+            $groups = $groupsQuery->paginate(env('PAGINATE'));
+            $groups_count = $groupsQuery->count();
 
             //Get all group tags
             $all_group_tags = GroupTags::all();
@@ -62,6 +64,7 @@ class GroupController extends Controller
                 'all_group_tags' => $all_group_tags,
                 'sort_direction' => 'ASC',
                 'sort_column' => 'name',
+                'groups_count' => $groups_count,
             ]);
         }
 
@@ -211,6 +214,7 @@ class GroupController extends Controller
                                 ->whereNotNull('created_at');
         }
 
+        $groups_count = $groups->count();
         $groups = $groups->paginate(env('PAGINATE'));
 
         return view('group.index', [
@@ -227,6 +231,7 @@ class GroupController extends Controller
             'sort',
             'sort_direction' => $sort_direction,
             'sort_column' => $sort_column,
+            'groups_count' => $groups_count,
         ]);
     }
 
