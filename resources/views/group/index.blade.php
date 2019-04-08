@@ -132,7 +132,7 @@
                 @else
                   <tr>
                     <td colspan="13" align="center" class="p-3">
-                      You are not associated with any groups, take a look and see if there's one you would like to join
+                      @lang('groups.not_joined_a_group')
                       @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host') )
                         <br><a href="/group/all">See all groups</a>
                       @endif
@@ -165,10 +165,14 @@
                   @endforeach
                 @else
                   <tr>
-                    <td colspan="13" align="center" class="p-3">
-                        @if ($your_area)
-                      There are currently no groups near to your area ({{ $your_area }}). Would you consider starting a group?
-                      <br><a href="/group/create/">@lang('groups.create_groups')</a>
+                      <td colspan="13" align="center" class="p-3">
+                          @if ($your_area)
+                              <p>
+                              @lang('groups.no_groups_near_you', ['area' => $your_area])
+                              </p>
+                              <p>
+                              @lang('groups.consider_starting_a_group', ['resources_url' => env('DISCOURSE_URL').'/session/sso?return_path='.env('DISCOURSE_URL').'/t/how-to-power-up-community-repair-with-restarters-net/1228/'])
+                              </p>
                         @else
                       You do not currently have a town/city set.  You can set one in <a href="/profile/edit/{{ Auth::user()->id }}">your profile</a>.
                         @endif

@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Device;
+use App\EventUsers;
 use App\Helpers\FootprintRatioCalculator;
 
 use Illuminate\Database\Eloquent\Model;
@@ -583,5 +584,12 @@ class Party extends Model implements Auditable
     public function getEventStartTimestampAttribute()
     {
         return strtotime($this->event_date . ' ' . $this->start);
+    }
+
+    public function isBeingAttendedBy($userId)
+    {
+        return EventsUsers::where('event', $this->idevents)
+            ->where('user', $userId)
+            ->exists();
     }
 }

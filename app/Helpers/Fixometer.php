@@ -111,8 +111,6 @@ class FixometerHelper
             } elseif (empty(DB::table('events_users')->where('event', $partyId)->where('user', $userId)->first())) {
                 return false;
             }
-
-            return true;
         }
 
         return false;

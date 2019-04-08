@@ -82,6 +82,36 @@
 
 }
 
+.btn-tertiary {
+    background-color: #eee;
+    border: 0;
+    border-bottom: 3px solid #ddd;
+    color: #333;
+
+    &:focus,
+    &.dropdown-toggle:focus,
+    &.dropdown-toggle:active {
+        background-color: #ccc;
+    }
+
+    &:hover,
+    &.dropdown-toggle:hover {
+        color: #333;
+        background-color: #ddd;
+        border-color: #ccc;
+        text-decoration: underline;
+    }
+
+    &:disabled,
+    &:disabled:hover,
+    &:disabled:focus {
+        background-color: gray;
+        border-color: gray;
+        color: #333;
+    }
+
+}
+
 .btn-danger {
     background-color: #D23714;
     border: 0;
