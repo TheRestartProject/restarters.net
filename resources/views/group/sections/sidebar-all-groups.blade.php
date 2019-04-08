@@ -17,6 +17,7 @@
       @endif
     </div>
 
+    @if( FixometerHelper::hasRole(Auth::user(), 'Administrator'))
     <div class="form-group">
       <label for="tags">@lang('groups.group_tag'):</label>
       <div class="form-control form-control__select">
@@ -31,6 +32,7 @@
         </select>
       </div>
     </div>
+    @endif
 
     <div class="form-group">
       <label for="location">@lang('groups.group_town-city'):</label>
