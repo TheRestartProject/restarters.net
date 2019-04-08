@@ -18,8 +18,6 @@
           <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         @endif
 
-        @include('includes/gmap')
-
         <!-- Cookie banner with fine-grained opt-in -->
         <script src="{{ asset('js/gdpr-cookie-notice.js') }}"></script>
         <!-- Check to see if visitor has opted in to analytics cookies -->
