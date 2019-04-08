@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\UserGroups;
+
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -50,6 +52,34 @@ class User extends Authenticatable
     public function groups()
     {
         return $this->belongsToMany('App\Group', 'users_groups', 'user', 'group');
+    }
+
+    /**
+     * Return a list of repair groups near the user.
+     *
+     * @param int $searchRadiusInMiles How far to search for groups
+     * @param int $numberOfGroups How many groups to return
+     * @param array $idsOfGroupsToIgnore Any groups that should be excluded from the result
+     */
+    public function groupsNearby($searchRadiusInMiles = 150, $numberOfGroups = 10, $idsOfGroupsToIgnore = null)
+    {
+        if (is_null($this->latitude) || is_null($this->longitude)) {
+            return null;
+        }
+
+        $groupsNearbyQuery = Group::select(
+            DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
+        )->having('distance', '<=', $searchRadiusInMiles);
+
+        if (! is_null($idsOfGroupsToIgnore)) {
+            $groupsNearbyQuery->whereNotIn('idgroups', $idsOfGroupsToIgnore);
+        }
+
+        $groupsNearby = $groupsNearbyQuery->orderBy('distance', 'ASC')
+            ->take($numberOfGroups)
+            ->get();
+
+        return $groupsNearby;
     }
 
     public function preferences()
@@ -176,6 +206,14 @@ class User extends Authenticatable
                     AND users.id IN
                         (SELECT `user` FROM users_groups WHERE `group` = :group)
                 ORDER BY users.name ASC'), array('group' => $group));
+    }
+
+
+    public function isInGroup($groupId)
+    {
+        return UserGroups::where('user', $this->id)
+            ->where('group', $groupId)
+            ->exists();
     }
 
     //This create user function is already done by the RegisterController

@@ -16,12 +16,12 @@
 
     @if( is_object($is_attending) && !$event->hasFinished() )
     @if( $is_attending->status == 1 )
-    <div class="alert alert-success" style="min-height: 88px;">
+    <div class="alert alert-success">
 
       <div class="row">
         <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.rsvp_message')</div>
         <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
-          <a href="/party/cancel-invite/{{{ $is_attending->event }}}" class="btn btn-success">@lang('events.rsvp_button')</a>
+          <a href="/party/cancel-invite/{{{ $is_attending->event }}}" class="btn btn-info">@lang('events.rsvp_button')</a>
         </div>
       </div>
 
@@ -39,13 +39,31 @@
     </div>
     @endif
     @endif
+    @if (\Session::has('prompt-follow-group'))
+    <div class="alert alert-info" style="min-height: 88px;">
+        <div class="row">
+            <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.follow_hosting_group', ['group' => $event->theGroup->name])</div>
+            <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
+                <a href="/group/join/{{ $event->theGroup->idgroups }}" class="btn btn-info">@lang('groups.join_group_button')</a>
+            </div>
+        </div>
+    </div>
+    @endif
+    @if (\Session::has('now-following-group'))
+        <div class="alert alert-success">
+            <div class="row">
+                <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">{{ \Session::get('now-following-group') }}</div>
+            </div>
+        </div>
+    @endif
 
     <div class="events__header row align-content-top">
-      <div class="col-lg-9 d-flex flex-column">
+      <div class="col-lg-8 d-flex flex-column">
 
         <header>
           <h1>{{ $event->getEventName() }}</h1>
-          <p>Hosted by <a href="/group/view/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a></p>
+          <p>Organised by <a href="/group/view/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a></p>
+          {{--
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
@@ -54,6 +72,7 @@
               <li class="breadcrumb-item active" aria-current="page">{{ $event->getEventName() }}</li>
             </ol>
           </nav>
+          --}}
           @php( $group_image = $event->theGroup->groupImage )
           @if( is_object($group_image) && is_object($group_image->image) )
           <img src="{{ asset('/uploads/mid_' . $group_image->image->path) }}" alt="{{{ $event->theGroup->name }}}" class="event-icon">
@@ -63,7 +82,7 @@
         </header>
 
       </div>
-      <div class="col-lg-3">
+      <div class="col-lg-4">
         <div class="button-group button-group__r">
           @if( Auth::check() )
             @if( FixometerHelper::userHasEditPartyPermission($formdata->id) || FixometerHelper::userIsHostOfGroup($formdata->group_id, Auth::user()->id) )
@@ -89,19 +108,25 @@
                   <a class="btn dropdown-item" href="/party/join/{{ $formdata->id }}">RSVP</a>
                   @endif
                 @endif
+                @if (! Auth::user()->isInGroup($event->theGroup->idgroups))
+                    <a class="btn dropdown-item" href="/group/join/{{ $event->theGroup->idgroups }}">Follow group</a>
+                @endif
               </div>
             </div>
             @else
-            @if( $event->hasFinished() )
-            <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
-              @else
-              @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
-              <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite volunteers</button>
-              @else
-              <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
-              @endif
-              @endif
-              @endif
+                @if( $event->hasFinished() )
+                    <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
+                @else
+                    @if (! Auth::user()->isInGroup($event->theGroup->idgroups))
+                        <a class="btn btn-tertiary" href="/group/join/{{ $event->theGroup->idgroups }}">Follow group</a>
+                    @endif
+                    @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
+                        <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">Invite volunteers</button>
+                    @else
+                        <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
+                    @endif
+                @endif
+            @endif
             @endif
           </div>
         </div>
@@ -121,7 +146,7 @@
 
             <h2>Event details</h2>
             <div class="card events-card">
-              <div id="map-plugin" class="map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
+              <div id="event-map" class="map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
 
               <div class="events-card__details">
 

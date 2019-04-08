@@ -14,6 +14,7 @@ require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
 require('./misc/device');
+require('leaflet')
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
 
@@ -390,25 +391,24 @@ function initAutocomplete() {
 
   function eventsMap() {
 
-    const mapObject = document.querySelector('#map-plugin');
+    if ( jQuery('#event-map').length > 0 ) {
 
-    if ( jQuery('#map-plugin').length > 0 ) {
+      const mapObject = document.querySelector('#event-map');
 
-      let map;
       let latitude = parseFloat(mapObject.dataset.latitude);
       let longitude = parseFloat(mapObject.dataset.longitude);
       let zoom = parseFloat(mapObject.dataset.zoom);
 
       if( latitude && longitude ){
+          let map = L.map('event-map').setView([latitude, longitude], zoom);
 
-        map = new google.maps.Map(document.getElementById('map-plugin'), {
-          center: { lat: latitude, lng: longitude },
-          zoom: zoom
-        });
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
+              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+          }).addTo(map);
 
-        let uluru = { lat: latitude, lng: longitude };
-        let marker = new google.maps.Marker({ position: uluru, map: map });
-
+          var icon = new L.Icon.Default();
+          icon.options.shadowSize = [0,0];
+          L.marker([latitude, longitude], {icon:icon}).addTo(map);
       }
 
     }

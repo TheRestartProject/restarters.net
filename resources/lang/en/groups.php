@@ -56,7 +56,7 @@ return array (
   'all_volunteers_group_name_message' => 'Here\'s a list of all of the volunteers affiliated with your group and their skills.',
   'restarter_column_table' => 'Restarter',
   'skills_column_table' => 'Skills',
-  'join_group_button' => 'Join group',
+  'join_group_button' => 'Follow group',
   'share_stats_header' => 'Share your stats',
   'share_stats_message' => ':group have made a real impact fixing electronics and preventing waste. Help share this on your website and get other people involved:',
   'embed_code_header' => 'Embed code',
@@ -76,4 +76,7 @@ return array (
   'tag-7' => 'Tag 7',
   'tag-8' => 'Tag 8',
   'helptext_area' => 'For display on The Restart Project homepage',
+  'not_joined_a_group' => 'You are not currently following any repair groups! Groups nearest to you are shown below.',
+  'no_groups_near_you' => 'We can\'t find any repair groups in our database near to your area (:area).',
+  'consider_starting_a_group' => 'Would you like to start or add a group? Have a look at <a href=":resources_url">our resources</a>.',
 );
