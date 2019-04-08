@@ -8,7 +8,7 @@
     </td>
     @endif
     <td class="cell-name">
-        <div class="group-name"><a class="group-name" href="">{{ $event->theGroup->name }}</a></div>
+        <div class="group-name"><a class="group-name" href="/group/view/{{ $event->theGroup->idgroups }}">{{ $event->theGroup->name }}</a></div>
         <a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a>
     </td>
     <td class="cell-date">
