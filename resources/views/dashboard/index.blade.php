@@ -32,6 +32,18 @@
             </div>
         @endif
 
+      @if (session('invites-feedback'))
+        <div class="row row-compressed">
+          <div class="col">
+            <ul class="alert alert-success list-unstyled">
+              @foreach (session('invites-feedback') as $key => $message)
+                   <li>{!! $message !!}</li>
+               @endforeach
+            </ul>
+          </div>
+        </div>
+      @endif
+
       <div class="row row-compressed">
         @if (FixometerHelper::hasRole($user, 'Administrator'))
           @include('dashboard.restarter')

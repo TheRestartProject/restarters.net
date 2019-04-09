@@ -10,7 +10,7 @@
 
     &-danger, &-primary, &-warning, &-success, &-delete {
         border: 0;
-        
+
         position: relative;
         z-index: 1;
         color: #FFF;
@@ -60,7 +60,7 @@
         }
 
     }
-    
+
     &-danger {
         background-color: #D23714;
 
@@ -103,6 +103,15 @@
             }
         }
 
+    }
+
+    .plain-link {
+        text-decoration: underline;
+        color: #fff;
+        
+        &:hover, &:focus {
+          text-decoration: none;
+        }
     }
 
 }

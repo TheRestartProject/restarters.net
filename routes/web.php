@@ -95,7 +95,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     //Dashboard Controller
     Route::prefix('dashboard')->group(function () {
-        Route::get('/', 'DashboardController@index')->name('dashboard');
+        Route::get('/', 'DashboardController@index')->name('dashboard')->middleware('AcceptUserInvites');
         Route::get('/host', 'DashboardController@getHostDash');
     });
 
@@ -215,6 +215,9 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/reporting/time-volunteered', 'ExportController@getTimeVolunteered');
     Route::get('/reporting/time-volunteered/{search}', 'ExportController@getTimeVolunteered');
 });
+
+Route::get('/party/invite/{code}', 'PartyController@confirmCodeInvite');
+Route::get('/group/invite/{code}', 'GroupController@confirmCodeInvite');
 
 Route::get('/media-wiki', function () {
     if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
