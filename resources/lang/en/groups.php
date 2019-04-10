@@ -56,7 +56,7 @@ return array (
     'Shareable link' => 'Invite via shareable link',
     'shareable_link_box' => 'Shareable link',
     'email_invite' => 'Invite via email',
-    'type_shareable_link_message' => 'Use the above link to share this group. An account is needed to view the group; without one, an individual will see the registration screen.',
+    'type_shareable_link_message' => 'Share the above link to invite people to join this group.  If a person you share the link with does not have an account yet, they will be prompted to register.',
     'done_button' => 'Done',
     'message_header' => 'Invitation message',
     'message_explainer' => 'Type in the email addresses of the people you would like to invite to this group. Press the tab or comma key after each email address.',

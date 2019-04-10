@@ -48,7 +48,7 @@ return array (
     'shareable_link' => 'Invite via shareable link',
     'email_invite' => 'Invite via email',
     'shareable_link_box' => 'Shareable link',
-    'type_shareable_link_message' => 'Use the above link to share this event. An account is needed to view the event; without one, an individual will see the registration screen.',
+    'type_shareable_link_message' => 'Share the above link to invite people to join this event.  If a person you share the link with does not have an account yet, they will be prompted to register.',
     'cancel_invites_link' => 'Cancel',
     'invite_restarters_modal_description' => 'A repair event is nothing without volunteers. Invite them to your event here.',
     'manual_invite_box' => 'Send invites to',
