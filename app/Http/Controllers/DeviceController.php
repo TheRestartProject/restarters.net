@@ -171,8 +171,11 @@ class DeviceController extends Controller
                                     ->with('barriers')
                                         ->join('events', 'events.idevents', '=', 'devices.event')
                                             ->join('groups', 'groups.idgroups', '=', 'events.group')
-                                                ->select('devices.*', 'groups.name AS group_name')
-                                                ->orderBy($sort_column, $sort_direction);
+                     ->select('devices.*', 'groups.name AS group_name');
+
+        if ($request->input('sort_column') !== null) {
+            $all_devices = $all_devices->orderBy($sort_column, $sort_direction);
+        }
 
         if ($request->input('categories') !== null) {
             $all_devices = $all_devices->whereIn('devices.category', $request->input('categories'));
