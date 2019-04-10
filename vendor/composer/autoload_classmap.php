@@ -69,6 +69,7 @@ return array(
     'App\\Http\\Controllers\\SkillsController' => $baseDir . '/app/Http/Controllers/SkillsController.php',
     'App\\Http\\Controllers\\UserController' => $baseDir . '/app/Http/Controllers/UserController.php',
     'App\\Http\\Kernel' => $baseDir . '/app/Http/Kernel.php',
+    'App\\Http\\Middleware\\CheckForRepairNetwork' => $baseDir . '/app/Http/Middleware/CheckForRepairNetwork.php',
     'App\\Http\\Middleware\\EncryptCookies' => $baseDir . '/app/Http/Middleware/EncryptCookies.php',
     'App\\Http\\Middleware\\HttpsProtocol' => $baseDir . '/app/Http/Middleware/HttpsProtocol.php',
     'App\\Http\\Middleware\\LanguageSwitcher' => $baseDir . '/app/Http/Middleware/LanguageSwitcher.php',

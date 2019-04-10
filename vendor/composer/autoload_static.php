@@ -537,6 +537,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Http\\Controllers\\SkillsController' => __DIR__ . '/../..' . '/app/Http/Controllers/SkillsController.php',
         'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
+        'App\\Http\\Middleware\\CheckForRepairNetwork' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckForRepairNetwork.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
         'App\\Http\\Middleware\\HttpsProtocol' => __DIR__ . '/../..' . '/app/Http/Middleware/HttpsProtocol.php',
         'App\\Http\\Middleware\\LanguageSwitcher' => __DIR__ . '/../..' . '/app/Http/Middleware/LanguageSwitcher.php',
