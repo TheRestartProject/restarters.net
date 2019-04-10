@@ -25,11 +25,18 @@ class CheckForRepairNetwork
 
         // Assumed Restart Project
         switch ($host) {
-            case 'repairshare.restarters':
+            case 'repairshare.restarters.net':
                 $locale = 'fr';
                 $repair_network = 2;
 
                 break;
+        // For test only
+        case 'test-restarters.rstrt.org':
+        case 'restarters.test':
+            $locale = 'en';
+            $repair_network = 3;
+
+            break;
         }
 
         // We don't want to override locale if a session already exists
