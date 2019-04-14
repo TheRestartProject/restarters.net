@@ -64,6 +64,12 @@ This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a 
 
 - Generate an app key: `php artisan key:generate`
 
+- initialise the DB:
+
+```
+$ php artisan migrate
+```
+
 - create a first admin user
 
 ```
@@ -74,7 +80,7 @@ $ php artisan tinker
 - run the app: 
 
 ```
-$ php artisan serve --host=restarter.test
+$ php artisan serve --host=restarters.test
 ```
 
 * login!
