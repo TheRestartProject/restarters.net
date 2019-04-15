@@ -40,6 +40,51 @@ knowledgebase.
 
 See Installation Guidelines in the wiki.
 
+### Basic setup
+
+This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a different OS!
+
+#### Prerequisites
+
+- php
+  - php-curl
+  - php-mysql
+  - php-xml
+- mysql/mariadb
+  - and create a database
+- npm
+
+#### Install
+
+- clone this repository
+- copy .env.example -> .env
+- edit .env
+  - update DB settings to match your local DB
+- edit /etc/hosts -> 127.0.0.1 restarters.test
+
+- Generate an app key: `php artisan key:generate`
+
+- initialise the DB:
+
+```
+$ php artisan migrate
+```
+
+- create a first admin user
+
+```
+$ php artisan tinker
+> User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2]);
+```
+
+- run the app: 
+
+```
+$ php artisan serve --host=restarters.test
+```
+
+* login!
+
 ## Methodology
 
 We've documented our method for estimating CO2 emissions prevented through
