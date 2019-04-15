@@ -775,7 +775,7 @@ class DeviceController extends Controller
 
         $event = Party::find($event_id);
 
-        if (FixometerHelper::userHasEditPartyPermission($event_id) || FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id)) {
+        if (FixometerHelper::userHasEditEventsDevicesPermission($event_id)) {
             // if ($repair_status == 2) {
             //   switch ($repair_details) {
             //     case 1:
