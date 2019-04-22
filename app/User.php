@@ -2,15 +2,16 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\UserGroups;
 
 use DB;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
 
 class User extends Authenticatable
 {
-
     use Notifiable;
     use SoftDeletes;
     protected $table = 'users';
@@ -20,7 +21,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'location', 'age', 'gender', 'country', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at'
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at'
     ];
 
     /**
@@ -29,7 +30,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token'
+        'password', 'remember_token',
     ];
 
     public function role()
@@ -50,6 +51,34 @@ class User extends Authenticatable
     public function groups()
     {
         return $this->belongsToMany('App\Group', 'users_groups', 'user', 'group');
+    }
+
+    /**
+     * Return a list of repair groups near the user.
+     *
+     * @param int $searchRadiusInMiles How far to search for groups
+     * @param int $numberOfGroups How many groups to return
+     * @param array $idsOfGroupsToIgnore Any groups that should be excluded from the result
+     */
+    public function groupsNearby($searchRadiusInMiles = 150, $numberOfGroups = 10, $idsOfGroupsToIgnore = null)
+    {
+        if (is_null($this->latitude) || is_null($this->longitude)) {
+            return null;
+        }
+
+        $groupsNearbyQuery = Group::select(
+            DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
+        )->having('distance', '<=', $searchRadiusInMiles);
+
+        if (! is_null($idsOfGroupsToIgnore)) {
+            $groupsNearbyQuery->whereNotIn('idgroups', $idsOfGroupsToIgnore);
+        }
+
+        $groupsNearby = $groupsNearbyQuery->orderBy('distance', 'ASC')
+            ->take($numberOfGroups)
+            ->get();
+
+        return $groupsNearby;
     }
 
     public function preferences()
@@ -77,7 +106,7 @@ class User extends Authenticatable
 
     public function getUserGroups($user)
     {
-        return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `u`
+        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `u`
                 INNER JOIN `users_groups` AS `ug` ON `ug`.`user` = `u`.`id`
                 INNER JOIN `groups` AS `g` ON `ug`.`group` = `g`.`idgroups`
                 WHERE `u`.`id` = :id'), array('id' => $user));
@@ -92,7 +121,7 @@ class User extends Authenticatable
     //Getters
     public static function getProfile($id)
     {
-//Tested!
+        //Tested!
 
         try {
             return User::where('users.id', '=', $id)
@@ -128,9 +157,9 @@ class User extends Authenticatable
 
     public function getUserList($eloquent = false)
     {
-//Tested!
+        //Tested!
 
-        if (!$eloquent) {
+        if ( ! $eloquent) {
             $Users = DB::select(DB::raw('SELECT users.id AS id, users.name, users.email, roles.role FROM users
                   INNER JOIN roles ON roles.idroles = users.role WHERE users.deleted_at IS NULL
                   ORDER BY users.id ASC')); //INNER JOIN sessions ON sessions.user = users.id, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at
@@ -150,13 +179,13 @@ class User extends Authenticatable
 
     public function partyEligible()
     {
-//Tested!
+        //Tested!
         return DB::select(DB::raw('SELECT
                   users.id AS id,
                   users.name,
                   users.email,
                   roles.role
-              FROM ' . $this->table . '
+              FROM '.$this->table.'
               INNER JOIN roles ON roles.idroles = users.role
               WHERE users.role > 1
               ORDER BY users.name ASC'));
@@ -164,13 +193,13 @@ class User extends Authenticatable
 
     public function inGroup($group)
     {
-//Tested!
+        //Tested!
         return DB::select(DB::raw('SELECT
                     users.id AS id,
                     users.name,
                     users.email,
                     roles.role
-                FROM ' . $this->table . '
+                FROM '.$this->table.'
                 INNER JOIN roles ON roles.idroles = users.role
                 WHERE users.role > 1
                     AND users.id IN
@@ -178,25 +207,33 @@ class User extends Authenticatable
                 ORDER BY users.name ASC'), array('group' => $group));
     }
 
+
+    public function isInGroup($groupId)
+    {
+        return UserGroups::where('user', $this->id)
+            ->where('group', $groupId)
+            ->exists();
+    }
+
     //This create user function is already done by the RegisterController
 
     /** check if email is already in the database **/
     public function checkEmail($email)
     {
-//Tested!
+        //Tested!
 
-        $r = DB::select(DB::raw('SELECT COUNT(id) AS emails FROM ' . $this->table . ' WHERE email = :email'), array('email' => $email));
+        $r = DB::select(DB::raw('SELECT COUNT(id) AS emails FROM '.$this->table.' WHERE email = :email'), array('email' => $email));
+
         return ($r[0]->emails > 0) ? false : true;
     }
 
     public function scopeNearbyRestarters($query, $latitude, $longitude, $radius = 20)
     {
-
         return $query->select(DB::raw('*, ( 6371 * acos( cos( radians('.$latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
                         ->whereNotNull('location')
                           ->whereNotNull('latitude')
                             ->whereNotNull('longitude')
-                              ->having("distance", "<=", $radius);
+                              ->having('distance', '<=', $radius);
     }
 
     /*
@@ -206,12 +243,11 @@ class User extends Authenticatable
     */
     public function hasUserGivenConsent()
     {
-
         if (is_null($this->consent_future_data)) {
             return false;
         }
 
-      //Past data is only required for users who created their account prior to the Laravel app launch
+        //Past data is only required for users who created their account prior to the Laravel app launch
         if (is_null($this->consent_past_data) && strtotime($this->created_at) <= strtotime(date('2018-06-26'))) {
             return false;
         }
@@ -236,13 +272,12 @@ class User extends Authenticatable
      */
     public function anonymise()
     {
-        $this->name = "Deleted User";
-        $this->email = $this->id . "@deleted.com";
-        $this->username = $this->id . '-deleted';
+        $this->name = 'Deleted User';
+        $this->email = $this->id.'@deleted.com';
+        $this->username = $this->id.'-deleted';
 
         // TODO: country, city, gender, age, also required?
     }
-
 
     /**
      * Attempt to get first name from full name.
@@ -271,5 +306,37 @@ class User extends Authenticatable
         } catch (\Exception $ex) {
             return false;
         }
+    }
+
+    /**
+     * Getter to display the user's repair network with options to provide the network name/slug
+     *
+     * NOT IN USE, decided on a more straightforward approach could be useful in the future
+     * @author Dean Appleton-Claydon
+     * @date   2019-03-22
+     * @param  boolean $string
+     * @param  boolean $slug
+     * @return mixed either string or int
+     */
+    public function getRepairNetwork($string = false, $slug = false)
+    {
+        if ($string == true) {
+            switch ($this->repair_network) {
+                case 2:
+                    $network = 'Repair Share';
+
+                    break;
+                default:
+                    $network = 'Restarters';
+            }
+
+            if ($slug == true) {
+                return str_slug($network);
+            }
+
+            return $network;
+        }
+
+        return $this->repair_network;
     }
 }

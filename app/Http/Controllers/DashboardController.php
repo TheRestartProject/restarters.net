@@ -130,8 +130,11 @@ class DashboardController extends Controller
             $inactive_groups = null;
         }
 
+        $groupsNearYou = null;
         if ($in_group) {
             $all_groups = Group::whereIn('idgroups', $group_ids)->get();
+        } else {
+            $groupsNearYou = $user->groupsNearby(150, 3);
         }
 
         if ( ! isset($all_groups) || empty($all_groups->toArray())) {
@@ -179,6 +182,7 @@ class DashboardController extends Controller
             'header' => true,
             'user_exists_in_discourse' => $userExistsInDiscourse,
             'in_group' => $in_group,
+            'groupsNearYou' => $groupsNearYou,
             'has_skills' => $has_skills,
             'in_event' => $in_event,
             'has_profile_pic' => $has_profile_pic,

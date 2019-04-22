@@ -95,7 +95,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     //Dashboard Controller
     Route::prefix('dashboard')->group(function () {
-        Route::get('/', 'DashboardController@index')->name('dashboard');
+        Route::get('/', 'DashboardController@index')->name('dashboard')->middleware('AcceptUserInvites');
         Route::get('/host', 'DashboardController@getHostDash');
     });
 
@@ -126,8 +126,10 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/join/{id}', 'GroupController@getJoinGroup');
         Route::post('/image-upload/{id}', 'GroupController@imageUpload');
         Route::get('/image/delete/{idgroups}/{id}/{path}', 'GroupController@ajaxDeleteImage');
+        Route::get('/search/column', 'GroupController@searchColumn');
         Route::get('/{all?}', 'GroupController@index')->name('groups');
         Route::get('/all/search', 'GroupController@search');
+        Route::get('/search', 'GroupController@searchColumn');
         Route::get('/make-host/{group_id}/{user_id}', 'GroupController@getMakeHost');
         Route::get('/remove-volunteer/{group_id}/{user_id}', 'GroupController@getRemoveVolunteer');
         Route::get('/nearby/{id}', 'GroupController@volunteersNearby');
@@ -215,6 +217,9 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/reporting/time-volunteered', 'ExportController@getTimeVolunteered');
     Route::get('/reporting/time-volunteered/{search}', 'ExportController@getTimeVolunteered');
 });
+
+Route::get('/party/invite/{code}', 'PartyController@confirmCodeInvite');
+Route::get('/group/invite/{code}', 'GroupController@confirmCodeInvite');
 
 Route::get('/media-wiki', function () {
     if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {

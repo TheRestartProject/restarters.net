@@ -14,6 +14,7 @@ use App\UsersPermissions;
 use App\UsersPreferences;
 use Auth;
 use DB;
+use Illuminate\Support\Str;
 
 use Request;
 
@@ -111,12 +112,36 @@ class FixometerHelper
             } elseif (empty(DB::table('events_users')->where('event', $partyId)->where('user', $userId)->first())) {
                 return false;
             }
+        }
 
+        return false;
+    }
+
+    public static function userHasEditEventsDevicesPermission($partyId, $userId = null)
+    {
+        if (is_null($userId)) {
+            $userId = Auth::user()->id;
+        }
+
+        // Admins can do anything.
+        if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+            return true;
+        }
+
+        // Hosts of a group can do anything with events from that group.
+        $group_id_of_event = Party::where('idevents', $partyId)->value('group');
+        if (FixometerHelper::userIsHostOfGroup($group_id_of_event, $userId)) {
+            return true;
+        }
+
+        // If you attended an event, you can edit devices.
+        if (DB::table('events_users')->where('event', $partyId)->where('user', $userId)->where('status', 1)->exists()) {
             return true;
         }
 
         return false;
     }
+
 
     public static function userCanCreateEvents($user)
     {
@@ -985,5 +1010,26 @@ class FixometerHelper
 
             return null;
         }
+    }
+
+    /**
+     * [generateUniqueShareableCode description]
+     * Generate a unique Shareable Code from a random string,
+     * If the Code already exists then loop again!
+     *
+     * @author Christopher Kelker - @date 2019-03-22
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @param   [type]      $row
+     * @param   [type]      $model
+     * @return  [type]
+     */
+    public static function generateUniqueShareableCode($model, $column)
+    {
+        do {
+            $random = Str::random(30);
+        } while ($model::where($column, $random)->exists());
+
+        return $random;
     }
 }

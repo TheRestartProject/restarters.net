@@ -54,12 +54,14 @@ class AboutController extends Controller
             'text' => 'Bring down the barriers to repair'
         ];
 
+        $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
+
         return view('features.index', [
             'slides' => $slides,
             'co2Total' => $stats['co2Total'][0]->total_footprints,
             'wasteTotal' => $stats['co2Total'][0]->total_weights,
             'partiesCount' => count($stats['allparties']),
-            'device_count_status' => $stats['device_count_status'],
+            'deviceCount' => $deviceCount,
         ]);
     }
 }

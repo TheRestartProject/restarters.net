@@ -9,9 +9,14 @@
             <div class="alert alert-danger">
                 <ul>
                     @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
+                        <li>{!! $error !!}</li>
                     @endforeach
                 </ul>
+            </div>
+        @endif
+        @if (\Session::has('auth-for-invitation'))
+            <div class="alert alert-info">
+                {!! \Session::get('auth-for-invitation') !!}
             </div>
         @endif
 

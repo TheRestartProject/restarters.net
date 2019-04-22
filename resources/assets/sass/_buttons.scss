@@ -82,6 +82,36 @@
 
 }
 
+.btn-tertiary {
+    background-color: #eee;
+    border: 0;
+    border-bottom: 3px solid #ddd;
+    color: #333;
+
+    &:focus,
+    &.dropdown-toggle:focus,
+    &.dropdown-toggle:active {
+        background-color: #ccc;
+    }
+
+    &:hover,
+    &.dropdown-toggle:hover {
+        color: #333;
+        background-color: #ddd;
+        border-color: #ccc;
+        text-decoration: underline;
+    }
+
+    &:disabled,
+    &:disabled:hover,
+    &:disabled:focus {
+        background-color: gray;
+        border-color: gray;
+        color: #333;
+    }
+
+}
+
 .btn-danger {
     background-color: #D23714;
     border: 0;
@@ -446,5 +476,83 @@
 
     .btn-state-2 {
         display: none;
+    }
+}
+
+
+a.text-dark:hover, a.text-dark:focus {
+  text-decoration: underline !important;
+}
+
+.card .dropdown-calendar {
+    .btn-link {
+        font-size: 14px;
+        font-family: $font-family-second;
+        font-weight: normal;
+        padding: 0;
+        min-width: auto;
+        color: $brand;
+        text-decoration: underline;
+
+        &:hover {
+            text-decoration: none;
+        }
+
+        &[aria-expanded="true"]::after {
+            transform: rotate(-180deg);
+        }
+    }
+
+    .dropdown-menu {
+        margin-left: -22px;
+        margin-top: 12px;
+        padding: 0;
+
+        .dropdown-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            &:hover {
+                text-decoration: underline;
+                background-color: transparent;
+            }
+        }
+    }
+
+    .dropdown-menu-arrow {
+        top: -17px;
+        left: 50%;
+        width: 0;
+        height: 0;
+        position: relative;
+    }
+
+    .dropdown-menu-arrow:before,
+    .dropdown-menu-arrow:after {
+        content: "";
+        position: absolute;
+        display: block;
+        width: 0;
+        height: 0;
+        border-width: 12px 8px;
+        border-style: solid;
+        border-color: transparent;
+        z-index: 1001;
+    }
+
+    .dropdown-menu-arrow:after {
+        bottom: -18px;
+        right: -8px;
+        border-bottom-color: #fff;
+    }
+
+    .dropdown-menu-arrow:before {
+        bottom: -17px;
+        right: -8px;
+        border-bottom-color: rgba(0,0,0,.15);
     }
 }

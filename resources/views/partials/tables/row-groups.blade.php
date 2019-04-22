@@ -39,4 +39,9 @@
       {{{ $group->allRestarters->count() }}}
     </span>
   </td>
+  @if(  !is_null($groups) && FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+      <td>
+          {{ \Carbon\Carbon::parse($group->created_at)->diffForHumans() }}
+      </td>
+  @endif
 </tr>

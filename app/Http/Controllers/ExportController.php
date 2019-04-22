@@ -55,94 +55,7 @@ class ExportController extends Controller
         // To not display column if the referring URL is therestartproject.org
         $host = parse_url(\Request::server('HTTP_REFERER'), PHP_URL_HOST);
 
-        // $data = $Device->export();
-        // foreach($data as $i => $d){
-        //     /** Fix date **/
-        //     $data[$i]->event_date = date('d/m/Y', $d->event_timestamp);
-        //     unset($data[$i]->event_timestamp);
-        //     /** Readable status **/
-        //     switch($d->repair_status) {
-        //         case 1:
-        //             $data[$i]->repair_status = 'Fixed';
-        //             break;
-        //         case 2:
-        //             $data[$i]->repair_status = 'Repairable';
-        //             break;
-        //         case 3:
-        //             $data[$i]->repair_status = 'End of life';
-        //             break;
-        //         default:
-        //             $data[$i]->repair_status = 'Unknown';
-        //             break;
-        //     }
-        //
-        //     /** Spare parts parser **/
-        //     $data[$i]->spare_parts = ($d->spare_parts == 1 ? 'Yes' : 'No');
-        //
-        //     /** clean up linebreaks and commas **/
-        //     $data[$i]->brand = preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d->brand)));
-        //
-        //     // Do not include this column from therestartproject.org
-        //     if( $host == 'therestartproject.org' ){
-        //       unset($data[$i]->model);
-        //     } else {
-        //       $data[$i]->model = preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d->model)));
-        //     }
-        //
-        //     $data[$i]->problem = preg_replace( "/\r|\n/", "", str_replace('"', " ",  utf8_encode($d->problem)));
-        //     $data[$i]->location = preg_replace( "/\r|\n/", "", utf8_encode($d->location));
-        //     $data[$i]->category = utf8_encode($d->category);
-        //     /** empty group ? **/
-        //     $data[$i]->group_name = (empty($d->group_name) ? 'Unknown' : $d->group_name);
-        //
-        // }
-
-        // Retrieve all devices and filter down if necessary
-        $all_devices = DeviceList::orderBy('sorter', 'DSC');
-
-        if ($request->input('categories') !== null) {
-            $all_devices = $all_devices->whereIn('idcategory', $request->input('categories'));
-        }
-
-        if ($request->input('groups') !== null) {
-            $all_devices = $all_devices->whereIn('idgroup', $request->input('groups'));
-        }
-
-        if ($request->input('from-date') !== null && $request->input('to-date') == null) {
-            $all_devices = $all_devices->where('event_date', '>', strtotime($request->input('from-date')));
-        } elseif ($request->input('to-date') !== null && $request->input('from-date') == null) {
-            $all_devices = $all_devices->where('event_date', '<', strtotime($request->input('to-date')));
-        } elseif ($request->input('to-date') !== null && $request->input('from-date') !== null) {
-            $all_devices = $all_devices->whereBetween('event_date', array(strtotime($request->input('from-date')),
-                strtotime($request->input('to-date')), ));
-        }
-
-        if ($request->input('device_id') !== null) {
-            $all_devices = $all_devices->where('id', 'like', $request->input('device_id').'%');
-        }
-
-        if ($request->input('brand') !== null) {
-            $all_devices = $all_devices->where('brand', 'like', '%'.$request->input('brand').'%');
-        }
-
-        if ($request->input('model') !== null) {
-            $all_devices = $all_devices->where('model', 'like', '%'.$request->input('model').'%');
-        }
-
-        if ($request->input('problem') !== null) {
-            $all_devices = $all_devices->where('problem', 'like', '%'.$request->input('problem').'%');
-        }
-
-        // Filter down if authenicated
-        if ( ! Auth::guest() && ! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
-            $groups_user_ids = UserGroups::where('user', $user->id)->pluck('group')->toArray();
-
-            $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
-
-            $all_devices = $all_devices->whereIn('id', $device_ids);
-        }
-
-        $all_devices = $all_devices->get();
+        $all_devices = app('App\Http\Controllers\DeviceController')->search($request, true);
 
         // Create CSV
         $filename = 'devices.csv';
@@ -163,16 +76,16 @@ class ExportController extends Controller
 
             fputcsv($file, $columns);
 
-            foreach ($all_devices as $device) {
+            foreach ($all_devices->data as $device) {
                 fputcsv($file, [
-                    $device->category_name,
+                    $device->deviceCategory->name,
                     $device->brand,
-                    $device->problem,
+                    $device->getShortProblem(),
                     $device->getRepairStatus(),
                     $device->getSpareParts(),
-                    $device->event_name,
-                    $device->group_name,
-                    date('Y-m-d', $device->event_date),
+                    $device->deviceEvent->getEventName(),
+                    $device->deviceEvent->theGroup->name,
+                    $device->deviceEvent->getEventDate('Y-m-d'),
                 ]);
             }
         } else {
@@ -192,15 +105,15 @@ class ExportController extends Controller
 
             foreach ($all_devices as $device) {
                 fputcsv($file, [
-                    $device->category_name,
+                    $device->deviceCategory->name,
                     $device->brand,
                     $device->model,
-                    $device->problem,
+                    $device->getShortProblem(),
                     $device->getRepairStatus(),
                     $device->getSpareParts(),
-                    $device->event_name,
-                    $device->group_name,
-                    date('Y-m-d', $device->event_date),
+                    $device->deviceEvent->getEventName(),
+                    $device->deviceEvent->theGroup->name,
+                    $device->deviceEvent->getEventDate('Y-m-d'),
                 ]);
             }
         }
@@ -256,7 +169,7 @@ class ExportController extends Controller
             }
 
             if (isset($_GET['from-date']) && ! empty($_GET['from-date'])) {
-                if ( ! DateTime::createFromFormat('Y-m-d', $_GET['from-date'])) {
+                if (! DateTime::createFromFormat('Y-m-d', $_GET['from-date'])) {
                     $response['danger'] = 'Invalid "from date"';
                     $fromTimeStamp = null;
                 } else {
@@ -266,7 +179,7 @@ class ExportController extends Controller
             }
 
             if (isset($_GET['to-date']) && ! empty($_GET['to-date'])) {
-                if ( ! DateTime::createFromFormat('Y-m-d', $_GET['to-date'])) {
+                if (! DateTime::createFromFormat('Y-m-d', $_GET['to-date'])) {
                     $response['danger'] = 'Invalid "to date"';
                 } else {
                     $toDate = DateTime::createFromFormat('Y-m-d', $_GET['to-date']);
@@ -501,14 +414,14 @@ class ExportController extends Controller
         $average_age = $average_age->distinct('users.id')->pluck('users.age')->toArray();
 
         foreach ($average_age as $key => $value) {
-            if ( ! is_int(intval($value)) || intval($value) <= 0) {
+            if (! is_int(intval($value)) || intval($value) <= 0) {
                 unset($average_age[$key]);
             } else {
                 $average_age[$key] = intval($value);
             }
         }
 
-        if ( ! empty($average_age)) {
+        if (! empty($average_age)) {
             $average_age = array_sum($average_age) / count($average_age);
             $average_age = intval(date('Y')) - $average_age;
         } else {
@@ -547,13 +460,13 @@ class ExportController extends Controller
             'groups.name as groupname'
         );
 
-        if ( ! $export) {
+        if (! $export) {
             $user_events = $user_events->paginate(env('PAGINATE'));
         } else {
             $user_events = $user_events->get();
         }
 
-        if ( ! $export) {
+        if (! $export) {
             return view('reporting.time-volunteered', [
                 'user' => $user,
                 'user_events' => $user_events,
@@ -598,7 +511,7 @@ class ExportController extends Controller
 
     public function exportTimeVolunteered(Request $request)
     {
-        if ( ! empty($request->all())) {
+        if (! empty($request->all())) {
             $data = $this->getTimeVolunteered(true, true, $request);
         } else {
             $data = $this->getTimeVolunteered(null, true, $request);
@@ -623,7 +536,7 @@ class ExportController extends Controller
         fputcsv($file, array('Breakdown by country:'));
         fputcsv($file, $country_headers);
         foreach ($data['country_hours_completed'] as $country_hours) {
-            if ( ! is_null($country_hours->country)) {
+            if (! is_null($country_hours->country)) {
                 $country = $country_hours->country;
             } else {
                 $country = 'N/A';
@@ -637,7 +550,7 @@ class ExportController extends Controller
         fputcsv($file, array('Breakdown by city:'));
         fputcsv($file, $city_headers);
         foreach ($data['city_hours_completed'] as $city_hours) {
-            if ( ! is_null($city_hours->location)) {
+            if (! is_null($city_hours->location)) {
                 $city = $city_hours->location;
             } else {
                 $city = 'N/A';

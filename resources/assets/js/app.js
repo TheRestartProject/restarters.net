@@ -14,6 +14,7 @@ require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
 require('./misc/device');
+require('leaflet')
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
 
@@ -390,25 +391,24 @@ function initAutocomplete() {
 
   function eventsMap() {
 
-    const mapObject = document.querySelector('#map-plugin');
+    if ( jQuery('#event-map').length > 0 ) {
 
-    if ( jQuery('#map-plugin').length > 0 ) {
+      const mapObject = document.querySelector('#event-map');
 
-      let map;
       let latitude = parseFloat(mapObject.dataset.latitude);
       let longitude = parseFloat(mapObject.dataset.longitude);
       let zoom = parseFloat(mapObject.dataset.zoom);
 
       if( latitude && longitude ){
+          let map = L.map('event-map').setView([latitude, longitude], zoom);
 
-        map = new google.maps.Map(document.getElementById('map-plugin'), {
-          center: { lat: latitude, lng: longitude },
-          zoom: zoom
-        });
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
+              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+          }).addTo(map);
 
-        let uluru = { lat: latitude, lng: longitude };
-        let marker = new google.maps.Marker({ position: uluru, map: map });
-
+          var icon = new L.Icon.Default();
+          icon.options.shadowSize = [0,0];
+          L.marker([latitude, longitude], {icon:icon}).addTo(map);
       }
 
     }
@@ -989,6 +989,14 @@ function initAutocomplete() {
 
   });
 
+
+  // On toggling between multi collapable invite modal content
+  // Then also toggle the link to change the text (show a different link -
+  // that has the same functionality)
+  $('.multi-collapse-invite-modal').on('show.bs.collapse', function () {
+      $('.toggle-modal-link').toggleClass('d-none');
+  })
+
   // $('#step-4-form').submit(function(e) {
   //   e.preventDefault();
   //
@@ -1047,15 +1055,14 @@ function initAutocomplete() {
 
         $form = $('#device-search');
         $sort_direction = $form.find('input[name=sort_direction]');
-
-        if( $current_column === $(this).val() ) {
+        // if( $current_column === $(this).val() ) {
             if( $sort_direction.val() === 'DSC' ){
                 $sort_direction.val('ASC');
             } else {
                 $sort_direction.val('DSC');
             }
 
-        }
+        // }
 
         $form.submit();
 
@@ -1529,5 +1536,14 @@ function initAutocomplete() {
 
     // Set min height so the language menu sits just under the overall height of the browser window
     $('body > .container').css('min-height', ( $(window).height() - $('nav.navbar').height() ) +'px');
+
+    $(".toggle-invite-modals").click(function (e) {
+
+      $('#invite-to-group').modal('toggle');
+      $('#event-invite-to').modal('toggle');
+
+      $('#shareable-modal').modal('toggle');
+    });
+
 
   });

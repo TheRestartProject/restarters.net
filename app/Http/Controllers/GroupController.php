@@ -40,31 +40,33 @@ class GroupController extends Controller
 
     public function index($all = false)
     {
+        //Get current logged in user
+        $user = Auth::user();
+
+        $groups = null;
+
         if ($all) {
-            //All groups only
-            $your_groups = null;
-            $groups_near_you = null;
-            $groups = Group::orderBy('name', 'ASC')->paginate(env('PAGINATE'));
-            $your_area = null;
+
+            // All groups only
+            $groupsQuery = Group::orderBy('name', 'ASC');
+            $groups = $groupsQuery->paginate(env('PAGINATE'));
+            $groups_count = $groupsQuery->count();
 
             //Get all group tags
             $all_group_tags = GroupTags::all();
 
             return view('group.index', [
-                'your_groups' => $your_groups,
-                'groups_near_you' => $groups_near_you,
+                'your_groups' => null,
+                'groups_near_you' => null,
                 'groups' => $groups,
-                'your_area' => $your_area,
+                'your_area' => null,
                 'all' => $all,
                 'all_group_tags' => $all_group_tags,
+                'sort_direction' => 'ASC',
+                'sort_column' => 'name',
+                'groups_count' => $groups_count,
             ]);
         }
-        $groups = null;
-
-        //Get current logged in user
-        $user = Auth::user();
-
-        $your_area = $user->location;
 
         //Look for groups where user ID exists in pivot table
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
@@ -92,51 +94,127 @@ class GroupController extends Controller
             'your_groups' => $your_groups,
             'groups_near_you' => $groups_near_you,
             'groups' => $groups,
-            'your_area' => $your_area,
+            'your_area' => $user->location,
             'all' => $all,
+            'sort_direction' => 'ASC',
+            'sort_column' => 'distance',
         ]);
     }
-
-    public function search(Request $request)
+    public function searchColumn(Request $request)
     {
-        //All groups only
-        $your_groups = null;
-        $groups_near_you = null;
-        $groups = Group::orderBy('name', 'ASC');
-        $your_area = null;
+        $all = false;
+        $groups = null;
 
-        if ($request->input('name') !== null) {
-            $groups = $groups->where('name', 'like', '%'.$request->input('name').'%');
-        }
+        $sort_direction = $request->input('sort_direction');
+        $sort_column = $request->input('sort_column');
 
-        if ($request->input('location') !== null) {
-            $groups = $groups->where('location', 'like', '%'.$request->input('location').'%');
-        }
+        //Get current logged in user
+        $user = Auth::user();
 
-        if ($request->input('country') !== null) {
-            $groups = $groups->where('country', $request->input('country'));
-        }
+        $your_area = $user->location;
 
-        if ($request->input('tags') !== null) {
-            $groups = $groups->whereIn('idgroups', GrouptagsGroups::whereIn('group_tag', $request->input('tags'))->pluck('group'));
-        }
+        //Look for groups where user ID exists in pivot table
+        $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->where('users_groups.user', $user->id)
+            ->orderBy('name', 'ASC')
+            ->select('groups.*', 'users_groups.user')
+            ->get();
 
-        $groups = $groups->paginate(env('PAGINATE'));
+        //Make sure we don't show the same groups in nearest to you
+        $your_groups_uniques = $your_groups->pluck('idgroups')->toArray();
 
-        //Get all group tags
-        $all_group_tags = GroupTags::all();
+        //Assuming we have valid lat and long values, let's see what is nearest
+        $groups_near_you = $user->groupsNearby(150, 10, $your_groups_uniques);
 
         return view('group.index', [
             'your_groups' => $your_groups,
             'groups_near_you' => $groups_near_you,
             'groups' => $groups,
             'your_area' => $your_area,
+            'all' => $all,
+            'sort_direction' => $sort_direction,
+            'sort_column' => $sort_column,
+        ]);
+    }
+
+    /**
+     * [search description]
+     * All groups only
+     *
+     * @author Christopher Kelker - @date 2019-03-26
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @param   Request     $request
+     * @return  [type]
+     */
+    public function search(Request $request)
+    {
+        // variables
+        $groups = Group::with('allHosts')->withCount('allHosts');
+
+        //Get all group tags
+        $all_group_tags = GroupTags::all();
+
+        $sort_direction = $request->input('sort_direction');
+        $sort_column = $request->input('sort_column');
+
+        if ( ! empty($request->input('name'))) {
+            $groups = $groups->where('name', 'like', '%'.$request->input('name').'%');
+        }
+
+        if ( ! empty($request->input('location'))) {
+            $groups = $groups->where('location', 'like', '%'.$request->input('location').'%');
+        }
+
+        if ( ! empty($request->input('country'))) {
+            $groups = $groups->where('country', $request->input('country'));
+        }
+
+        if ( ! empty($request->input('tags'))) {
+            $groups = $groups->whereIn('idgroups', GrouptagsGroups::whereIn('group_tag', $request->input('tags'))->pluck('group'));
+        }
+
+        if ( ! empty($sort_column) && $sort_column == 'name') {
+            $groups = $groups->orderBy('name', $sort_direction);
+        }
+
+        if ( ! empty($sort_column) && $sort_column == 'distance') {
+            $groups = $groups->orderBy('location', $sort_direction);
+        }
+
+        if ( ! empty($sort_column) && $sort_column == 'hosts') {
+            $groups = $groups->withCount('allRestarters')
+                                ->orderBy('all_hosts_count', $sort_direction); //->has('allHosts')
+        }
+
+        if ( ! empty($sort_column) && $sort_column == 'restarters') {
+            $groups = $groups->withCount('allRestarters') //->has('allRestarters')
+                                ->orderBy('all_restarters_count', $sort_direction);
+        }
+
+        if ( ! empty($sort_column) && $sort_column == 'created_at') {
+            $groups = $groups->orderBy('created_at', $sort_direction)
+                                ->whereNotNull('created_at');
+        }
+
+        $groups_count = $groups->count();
+        $groups = $groups->paginate(env('PAGINATE'));
+
+        return view('group.index', [
+            'your_groups' => null,
+            'groups_near_you' => null,
+            'groups' => $groups,
+            'your_area' => null,
             'all' => true,
             'all_group_tags' => $all_group_tags,
             'name' => $request->input('name'),
             'location' => $request->input('location'),
             'selected_country' => $request->input('country'),
             'selected_tags' => $request->input('tags'),
+            'sort',
+            'sort_direction' => $sort_direction,
+            'sort_column' => $sort_column,
+            'groups_count' => $groups_count,
         ]);
     }
 
@@ -195,6 +273,7 @@ class GroupController extends Controller
                     'longitude' => $longitude,
                     'country' => $country,
                     'free_text' => $text,
+                    'shareable_code' => FixometerHelper::generateUniqueShareableCode('App\Group', 'shareable_code'),
                 );
 
                 $idGroup = $Group->create($data)->idgroups;
@@ -688,19 +767,17 @@ class GroupController extends Controller
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
                     event(new ApproveGroup($group, $data));
 
-                // Notify nearest users - disabled for now until Laravel Queue is implemented
-                  if( !is_null($latitude) && !is_null($longitude) ){
-
-                    $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
+                    // Notify nearest users - disabled for now until Laravel Queue is implemented
+                    if ( ! is_null($latitude) && ! is_null($longitude)) {
+                        $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
                                                 ->orderBy('name', 'ASC')
                                                   ->get();
-                  
-                    Notification::send($restarters_nearby, new NewGroupWithinRadius([
-                      'group_name' => $group->name,
-                      'group_url' => url('/group/view/'.$id),
-                    ]));
 
-                  }
+                        Notification::send($restarters_nearby, new NewGroupWithinRadius([
+                            'group_name' => $group->name,
+                            'group_url' => url('/group/view/'.$id),
+                        ]));
+                    }
                 } elseif ( ! empty($group->wordpress_post_id)) {
                     event(new EditGroup($group, $data));
                 }
@@ -921,11 +998,15 @@ class GroupController extends Controller
                 Notification::send($host, new NewGroupMember($arr, $host));
             }
 
-            $response['success'] = 'Thanks for joining, you are now part of this group!';
+            $response['success'] = 'You are now following '.$group->name.'!';
 
-            return redirect()->back()->with('response', $response);
+            return redirect()->back()
+                ->with([
+                    'response' => $response,
+                    'now-following-group' => 'You are now following '.$group->name.'!',
+                ]);
         } catch (\Exception $e) {
-            $response['danger'] = 'Failed to join this group';
+            $response['danger'] = 'Failed to follow this group';
 
             return redirect()->back()->with('response', $response);
         }
@@ -1276,5 +1357,40 @@ class GroupController extends Controller
         }
 
         return redirect('/group/nearby/'.$groupId)->with('success', $user->name.' has been invited');
+    }
+
+    /**
+     * [confirmCodeInvite description]
+     *
+     * @author Christopher Kelker - @date 2019-03-25
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @param   Request     $request
+     * @param   [type]      $code
+     * @return  [type]
+     */
+    public function confirmCodeInvite(Request $request, $code)
+    {
+        // Variables
+        $group = Group::where('shareable_code', $code)->first();
+        $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+
+        // Validate a record exists with the Group code
+        if (empty($group)) {
+            abort(404);
+        }
+
+        // Create a new Invite record
+        $invite = Invite::create([
+            'record_id' => $group->idgroups,
+            'email' => '',
+            'hash' => $hash,
+            'type' => 'group',
+        ]);
+
+        // Push this into a session variable to find by the Group prefix
+        session()->push('groups.'.$code, $hash);
+
+        return redirect('/user/register')->with('auth-for-invitation', __('auth.login_before_using_shareable_link', ['login_url' => url('/login')]));
     }
 }
