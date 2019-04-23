@@ -87,4 +87,10 @@ class UserGroups extends Model
     {
         return $this->hasOne('App\User', 'id', 'user');
     }
+
+
+    public function scopeConfirmedInvitation($query)
+    {
+        return $query->where('status', 1)->orWhereNull('status');
+    }
 }

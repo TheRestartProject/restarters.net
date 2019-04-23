@@ -171,6 +171,7 @@ class Group extends Model implements Auditable
         return $this->hasOne('App\Xref', 'reference', 'idgroups')->where('reference_type', env('TBL_GROUPS'))->where('object_type', 5);
     }
 
+
     public function allHosts()
     {
         return $this->hasMany('App\UserGroups', 'group', 'idgroups')->where('role', 3);
@@ -186,6 +187,18 @@ class Group extends Model implements Auditable
         return $this->hasMany('App\UserGroups', 'group', 'idgroups')->orderBy('role', 'ASC');
     }
 
+    public function allConfirmedHosts()
+    {
+        return $this->allHosts()->confirmedInvitation();
+    }
+
+    public function allConfirmedRestarters()
+    {
+        return $this->allRestarters()->confirmedInvitation();
+    }
+
+    // This could use confirmedInvitation scope, but not changing it until whatever is using
+    // it has a test around it.
     public function allConfirmedVolunteers()
     {
         return $this->allVolunteers()
