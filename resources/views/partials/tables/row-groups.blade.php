@@ -11,7 +11,7 @@
   <td>{{{ $group->getLocation() }}}</td>
   <td class="text-center">
     <?php
-      $hosts = $group->allConfirmedHosts();
+      $hosts = $group->allConfirmedHosts;
       $return = '';
 
       foreach( $hosts as $host ){
@@ -19,7 +19,7 @@
       }
     ?>
     <span data-toggle="popover" data-content="{{{ rtrim($return, ', ') }}}" data-trigger="hover">
-      {{{ $group->allConfirmedHosts()->count() }}}
+      {{{ $group->allConfirmedHosts->count() }}}
     </span>
   </td>
   <td class="text-center">
