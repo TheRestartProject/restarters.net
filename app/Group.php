@@ -301,4 +301,13 @@ class Group extends Model implements Auditable
 
         return $sum;
     }
+
+    public function groupImagePath()
+    {
+        if (is_object($this->groupImage) && is_object($this->groupImage->image)) {
+            return asset('/uploads/mid_'.$this->groupImage->image->path);
+        }
+
+        return url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg');
+    }
 }

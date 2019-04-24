@@ -1320,7 +1320,7 @@ class GroupController extends Controller
                 ],
                 'website' => $group->hasOneGroup->website,
                 'description' => $group->hasOneGroup->free_text,
-                // 'image_url' => 'https://restarters.net/mighty-restarters.jpg',
+                'image_url' => $group->hasOneGroup->groupImagePath(),
                 'upcoming_parties' => $upcoming_parties_collection = collect([]),
                 'past_parties' => $past_parties_collection = collect([]),
                 'impact' => [
@@ -1366,6 +1366,8 @@ class GroupController extends Controller
                 ]);
             }
         }
+
+        dd($collection);
 
         return $collection;
     }
@@ -1413,7 +1415,7 @@ class GroupController extends Controller
             ],
             'website' => $group->hasOneGroup->website,
             'description' => $group->hasOneGroup->free_text,
-            // 'image_url' => 'https://restarters.net/mighty-restarters.jpg',
+            'image_url' => $group->hasOneGroup->groupImagePath(),
             'upcoming_parties' => $upcoming_parties_collection = collect([]),
             'past_parties' => $past_parties_collection = collect([]),
             'impact' => [
