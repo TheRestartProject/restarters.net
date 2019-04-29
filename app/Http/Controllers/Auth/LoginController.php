@@ -89,7 +89,7 @@ class LoginController extends Controller
             $this->username() => 'required|email',
             'password' => 'required|string',
             'my_name'   => 'honeypot',
-            'my_time'   => 'required|honeytime:5'
+            'my_time'   => 'required|honeytime:1'
         ]);
     }
 
