@@ -1338,8 +1338,8 @@ class GroupController extends Controller
                         'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
                     ],
                     'widgets' => [
-                        'headline_stats' => "https://restarters.net/group/stats/{$group->idgroups}",
-                        'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/group/{$group->idgroups}/manufacture",
+                        'headline_stats' => url("/group/stats/{$group->idgroups}"),
+                        'co2_equivalence_visualisation' => url("/outbound/info/group/{$group->idgroups}/manufacture"),
                     ],
                 ]);
 
@@ -1440,8 +1440,8 @@ class GroupController extends Controller
                 'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
             ],
             'widgets' => [
-                'headline_stats' => "https://restarters.net/group/stats/{$group->idgroups}",
-                'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/group/{$group->idgroups}/manufacture",
+                'headline_stats' => url("/group/stats/{$group->idgroups}"),
+                'co2_equivalence_visualisation' => url("/{$group->idgroups}/manufacture"),
             ],
         ]);
 
