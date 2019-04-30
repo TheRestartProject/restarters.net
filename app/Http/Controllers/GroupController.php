@@ -1298,76 +1298,82 @@ class GroupController extends Controller
         $footprintRatioCalculator = new FootprintRatioCalculator();
         $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
+        if (empty($user->groupTag) || is_null($user->groupTag)) {
+            return abort(404, 'No groups tags found.');
+        }
+
         $group_tags_groups = $user->groupTag->groupTagGroups;
 
         // If Group is not found, through 404 error
-        if (empty($group_tags_groups)) {
+        if ($user->groupTag->groupTagGroups->isEmpty()
+        || $user->groupTag->groupTagGroups->count() <= 0) {
             return abort(404, 'No groups found.');
         }
 
         // New Collection Instance
         $collection = collect([]);
 
-        foreach ($group_tags_groups as $key => $group) {
-            $collection->push([
-                'id' => $group->hasOneGroup->idgroups,
-                'name' => $group->hasOneGroup->name,
-                'location' => [
-                    'value' => $group->hasOneGroup->location,
-                    'country' => $group->hasOneGroup->country,
-                    'latitude' => $group->hasOneGroup->latitude,
-                    'longitude' => $group->hasOneGroup->longitude,
-                ],
-                'website' => $group->hasOneGroup->website,
-                'description' => $group->hasOneGroup->free_text,
-                'image_url' => $group->hasOneGroup->groupImagePath(),
-                'upcoming_parties' => $upcoming_parties_collection = collect([]),
-                'past_parties' => $past_parties_collection = collect([]),
-                'impact' => [
-                    'volunteers' => $group->hasOneGroup->getGroupStats($emissionRatio)['pax'],
-                    'hours_volunteered' => $group->hasOneGroup->getGroupStats($emissionRatio)['hours'],
-                    'parties_thrown' => $group->hasOneGroup->getGroupStats($emissionRatio)['parties'],
-                    'waste_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['waste'],
-                    'co2_emissions_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['co2'],
-                ],
-                'widgets' => [
-                    'headline_stats' => "https://restarters.net/group/stats/{$group->hasOneGroup->idgroups}",
-                    'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/group/{$group->hasOneGroup->idgroups}/manufacture",
-                ],
-            ]);
-
-            foreach ($group->hasOneGroup->upcomingParties as $key => $event) {
-                $upcoming_parties_collection->push([
-                    'event_id' => $event->idevents,
-                    'event_date' => $event->event_date,
-                    'start_time' => $event->start,
-                    'end_time' => $event->end,
-                    'name' => $event->venue,
+        foreach ($group_tags_groups as $key => $group_tags_group) {
+            $group = $group_tags_group->theGroup;
+            if ( ! empty($group)) {
+                $collection->push([
+                    'id' => $group->idgroups,
+                    'name' => $group->name,
                     'location' => [
-                        'value' => $event->location,
-                        'latitude' => $event->latitude,
-                        'longitude' => $event->longitude,
+                        'value' => $group->location,
+                        'country' => $group->country,
+                        'latitude' => $group->latitude,
+                        'longitude' => $group->longitude,
+                    ],
+                    'website' => $group->website,
+                    'description' => $group->free_text,
+                    'image_url' => $group->groupImagePath(),
+                    'upcoming_parties' => $upcoming_parties_collection = collect([]),
+                    'past_parties' => $past_parties_collection = collect([]),
+                    'impact' => [
+                        'volunteers' => $group->getGroupStats($emissionRatio)['pax'],
+                        'hours_volunteered' => $group->getGroupStats($emissionRatio)['hours'],
+                        'parties_thrown' => $group->getGroupStats($emissionRatio)['parties'],
+                        'waste_prevented' => $group->getGroupStats($emissionRatio)['waste'],
+                        'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
+                    ],
+                    'widgets' => [
+                        'headline_stats' => "https://restarters.net/group/stats/{$group->idgroups}",
+                        'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/group/{$group->idgroups}/manufacture",
                     ],
                 ]);
-            }
 
-            foreach ($group->hasOneGroup->pastParties as $key => $event) {
-                $past_parties_collection->push([
-                    'event_id' => $event->idevents,
-                    'event_date' => $event->event_date,
-                    'start_time' => $event->start,
-                    'end_time' => $event->end,
-                    'name' => $event->venue,
-                    'location' => [
-                        'value' => $event->location,
-                        'latitude' => $event->latitude,
-                        'longitude' => $event->longitude,
-                    ],
-                ]);
+                foreach ($group->upcomingParties() as $key => $event) {
+                    $upcoming_parties_collection->push([
+                        'event_id' => $event->idevents,
+                        'event_date' => $event->event_date,
+                        'start_time' => $event->start,
+                        'end_time' => $event->end,
+                        'name' => $event->venue,
+                        'location' => [
+                            'value' => $event->location,
+                            'latitude' => $event->latitude,
+                            'longitude' => $event->longitude,
+                        ],
+                    ]);
+                }
+
+                foreach ($group->pastParties() as $key => $event) {
+                    $past_parties_collection->push([
+                        'event_id' => $event->idevents,
+                        'event_date' => $event->event_date,
+                        'start_time' => $event->start,
+                        'end_time' => $event->end,
+                        'name' => $event->venue,
+                        'location' => [
+                            'value' => $event->location,
+                            'latitude' => $event->latitude,
+                            'longitude' => $event->longitude,
+                        ],
+                    ]);
+                }
             }
         }
-
-        dd($collection);
 
         return $collection;
     }
@@ -1386,15 +1392,25 @@ class GroupController extends Controller
      * @param   Group       $group
      * @return  [type]
      */
-    public function getGroupByKeyAndId(Request $request, $api_key, Group $group)
+    public function getGroupByKeyAndId(Request $request, $api_key, Group $group, $date_from = null, $date_to = null)
     {
         // Get Group from Access Key and Group ID
-        $group = User::where('access_key', $api_key)->first()
+        $group_tags_group = User::where('access_key', $api_key)->first()
         ->groupTag->groupTagGroups->where('group', $group->idgroups)->first();
 
         // If Group is not found, through 404 error
-        if (empty($group)) {
+        if (empty($group_tags_group)) {
             return abort(404, 'No groups found.');
+        }
+
+        // If Event is found but is not the of the date specified
+        $exclude_parties = [];
+        if ( ! empty($date_from) && ! empty($date_to)) {
+            foreach ($group->parties as $key => $party) {
+                if ( ! FixometerHelper::validateBetweenDates($party->event_date, $date_from, $date_to)) {
+                    $exclude_parties[] = $party->idevents;
+                }
+            }
         }
 
         // Get Emission Ratio
@@ -1402,36 +1418,34 @@ class GroupController extends Controller
         $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
         // New Collection Instance
-        $collection = collect();
-
-        $collection->push([
-            'id' => $group->hasOneGroup->idgroups,
-            'name' => $group->hasOneGroup->name,
+        $collection = collect([
+            'id' => $group->idgroups,
+            'name' => $group->name,
             'location' => [
-                'value' => $group->hasOneGroup->location,
-                'country' => $group->hasOneGroup->country,
-                'latitude' => $group->hasOneGroup->latitude,
-                'longitude' => $group->hasOneGroup->longitude,
+                'value' => $group->location,
+                'country' => $group->country,
+                'latitude' => $group->latitude,
+                'longitude' => $group->longitude,
             ],
-            'website' => $group->hasOneGroup->website,
-            'description' => $group->hasOneGroup->free_text,
-            'image_url' => $group->hasOneGroup->groupImagePath(),
+            'website' => $group->website,
+            'description' => $group->free_text,
+            'image_url' => $group->groupImagePath(),
             'upcoming_parties' => $upcoming_parties_collection = collect([]),
             'past_parties' => $past_parties_collection = collect([]),
             'impact' => [
-                'volunteers' => $group->hasOneGroup->getGroupStats($emissionRatio)['pax'],
-                'hours_volunteered' => $group->hasOneGroup->getGroupStats($emissionRatio)['hours'],
-                'parties_thrown' => $group->hasOneGroup->getGroupStats($emissionRatio)['parties'],
-                'waste_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['waste'],
-                'co2_emissions_prevented' => $group->hasOneGroup->getGroupStats($emissionRatio)['co2'],
+                'volunteers' => $group->getGroupStats($emissionRatio)['pax'],
+                'hours_volunteered' => $group->getGroupStats($emissionRatio)['hours'],
+                'parties_thrown' => $group->getGroupStats($emissionRatio)['parties'],
+                'waste_prevented' => $group->getGroupStats($emissionRatio)['waste'],
+                'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
             ],
             'widgets' => [
-                'headline_stats' => "https://restarters.net/group/stats/{$group->hasOneGroup->idgroups}",
-                'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/group/{$group->hasOneGroup->idgroups}/manufacture",
+                'headline_stats' => "https://restarters.net/group/stats/{$group->idgroups}",
+                'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/group/{$group->idgroups}/manufacture",
             ],
         ]);
 
-        foreach ($group->hasOneGroup->upcomingParties as $key => $event) {
+        foreach ($group->upcomingParties($exclude_parties) as $key => $event) {
             $upcoming_parties_collection->push([
                 'event_id' => $event->idevents,
                 'event_date' => $event->event_date,
@@ -1446,7 +1460,7 @@ class GroupController extends Controller
             ]);
         }
 
-        foreach ($group->hasOneGroup->pastParties as $key => $event) {
+        foreach ($group->pastParties($exclude_parties) as $key => $event) {
             $past_parties_collection->push([
                 'event_id' => $event->idevents,
                 'event_date' => $event->event_date,

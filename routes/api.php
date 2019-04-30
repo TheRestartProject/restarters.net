@@ -51,6 +51,6 @@ Route::get('/group-tag/stats/{group_tag_id}/{format?}', function ($group_tag_id,
 Route::group(['middleware' => 'checkAPIAccess'], function () {
     Route::get('/{api_key}/groups/group-tag/', 'GroupController@getGroupsByKey');
     Route::get('/{api_key}/events/group-tag/{date_from?}/{date_to?}', 'PartyController@getEventsByKey');
-    Route::get('/{api_key}/group/{group}/', 'GroupController@getGroupByKeyAndId');
-    Route::get('/{api_key}/event/{party}/{date_from?}/{date_to?}', 'PartyController@getEventByKeyAndId');
+    Route::get('/{api_key}/group/{group}/{date_from?}/{date_to?}', 'GroupController@getGroupByKeyAndId');
+    Route::get('/{api_key}/event/{party}/', 'PartyController@getEventByKeyAndId');
 });

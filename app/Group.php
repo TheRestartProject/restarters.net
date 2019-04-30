@@ -224,6 +224,11 @@ class Group extends Model implements Auditable
         ];
     }
 
+    public function parties()
+    {
+        return $this->hasMany(Party::class, 'group', 'idgroups')->withTrashed();
+    }
+
     /**
      * [upcomingParties description]
      * All Upcoming Parties where between the Start Parties Date
@@ -234,12 +239,19 @@ class Group extends Model implements Auditable
      * @version 1.0.0
      * @return  [type]
      */
-    public function upcomingParties()
+    public function upcomingParties($exclude_parties = [])
     {
         $from = date('Y-m-d');
         $to = date('Y-m-d', strtotime('+1 week'));
 
-        return $this->hasMany(Party::class, 'group', 'idgroups')->whereBetween('event_date', [$from, $to]);
+        if ( ! empty($exclude_parties)) {
+            return $this->parties()
+                          ->whereBetween('event_date', [$from, $to])
+                            ->whereNotIn('idevents', $exclude_parties)
+                              ->get();
+        }
+
+        return $this->parties()->whereBetween('event_date', [$from, $to])->get();
     }
 
     /**
@@ -252,14 +264,16 @@ class Group extends Model implements Auditable
      * @version 1.0.0
      * @return  [type]
      */
-    public function pastParties()
+    public function pastParties($exclude_parties = [])
     {
-        return $this->hasMany(Party::class, 'group', 'idgroups')->where('event_date', '<', date('Y-m-d'));
-    }
+        if ( ! empty($exclude_parties)) {
+            return $this->parties()
+                          ->where('event_date', '<', date('Y-m-d'))
+                            ->whereNotIn('idevents', $exclude_parties)
+                              ->get();
+        }
 
-    public function parties()
-    {
-        return $this->hasMany(Party::class, 'group', 'idgroups')->withTrashed();
+        return $this->parties()->where('event_date', '<', date('Y-m-d'))->get();
     }
 
     /**

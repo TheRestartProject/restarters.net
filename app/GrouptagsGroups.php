@@ -25,7 +25,7 @@ class GrouptagsGroups extends Model
     public $timestamps = false;
 
     /**
-     * [hasOneGroup description]
+     * [theGroup description]
      * A Group Tag Group has One Group.
      *
      * @author Christopher Kelker - @date 2019-03-21
@@ -33,7 +33,7 @@ class GrouptagsGroups extends Model
      * @version 1.0.0
      * @return  [type]
      */
-    public function hasOneGroup()
+    public function theGroup()
     {
         return $this->hasOne(Group::class, 'idgroups', 'group');
     }

@@ -1494,8 +1494,7 @@ class PartyController extends Controller
         // If there is are $date parameters
         if ( ! empty($date_from) && ! empty($date_to)) {
             $user = User::where('access_key', $api_key)
-            ->whereHas('groupTag.groupTagGroups.hasOneGroup.parties', function ($query) use ($date_from, $date_to) {
-                // $query->whereBetween('event_date', [date('Y-m-d', strtotime($date_from)), date('Y-m-d', strtotime($date_to))]);
+            ->whereHas('groupTag.groupTagGroups.theGroup.parties', function ($query) use ($date_from, $date_to) {
                 $query->where('event_date', '>=', date('Y-m-d', strtotime($date_from)))
                 ->where('event_date', '<=', date('Y-m-d', strtotime($date_to)));
             })
@@ -1525,10 +1524,10 @@ class PartyController extends Controller
         $collection = collect([]);
 
         // Foreach Group
-        foreach ($group_tags_groups as $key => $group) {
+        foreach ($group_tags_groups as $key => $group_tags_group) {
 
             // Group Parties
-            $group_parties = $group->hasOneGroup->parties;
+            $group_parties = $group_tags_group->theGroup->parties;
             if ( ! empty($group_parties)) {
 
                 // Loop through each Group Parties
@@ -1573,7 +1572,7 @@ class PartyController extends Controller
                             'headline_stats' => "https://restarters.net/party/stats/{$party->idevents}/wide",
                             'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/party/{$party->idevents}/manufacture",
                         ],
-                        'hours_volunteered' => $party->hours,
+                        'hours_volunteered' => $party->hoursVolunteered(),
                     ]);
 
                     if ( ! empty($party->owner)) {
@@ -1600,18 +1599,11 @@ class PartyController extends Controller
      * @param   [type]     $id
      * @return  [type]
      */
-    public function getEventByKeyAndId(Request $request, $api_key, Party $party, $date_from = null, $date_to = null)
+    public function getEventByKeyAndId(Request $request, $api_key, Party $party)
     {
         // If Event is not found, through 404 error
         if (empty($party) && ! $party->exists) {
             return abort(404, 'Invalid Event ID.');
-        }
-
-        // If Event is found but is not the of the date specified
-        if ( ! empty($date_from) && ! empty($date_to)) {
-            if ( ! FixometerHelper::validateBetweenDates($party->event_date, $date_from, $date_to)) {
-                return abort(404, 'Event not between dates.');
-            }
         }
 
         // Get Emission Ratio
@@ -1658,7 +1650,7 @@ class PartyController extends Controller
                 'headline_stats' => "https://restarters.net/party/stats/{$party->idevents}/wide",
                 'co2_equivalence_visualisation' => "https://restarters.net/outbound/info/party/{$party->idevents}/manufacture",
             ],
-            'hours_volunteered' => $party->hours,
+            'hours_volunteered' => $party->hoursVolunteered(),
         ]);
 
         if ( ! empty($party->owner)) {
