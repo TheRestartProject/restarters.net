@@ -31,7 +31,7 @@ class CheckForRepairNetwork
 
             break;
         case 'repairtogether.restarters.net':
-            $locale = 'nl-BE';
+            $locale = 'fr';
             $repair_network = 3;
 
             break;
