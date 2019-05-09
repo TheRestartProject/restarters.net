@@ -68,6 +68,8 @@ class Kernel extends HttpKernel
         'verifyUserConsent' => \App\Http\Middleware\VerifyUserConsent::class,
         'AcceptUserInvites' => \App\Http\Middleware\AcceptUserInvites::class,
 
+        'checkAPIAccess' => \App\Http\Middleware\checkAPIAccess::class,
+
         /**** OTHER MIDDLEWARE ****/
         'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
         'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,

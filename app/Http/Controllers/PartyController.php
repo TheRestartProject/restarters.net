@@ -26,6 +26,7 @@ use App\Party;
 use App\Session;
 use App\User;
 use App\UserGroups;
+
 use Auth;
 use DateTime;
 use DB;
@@ -97,7 +98,7 @@ class PartyController extends Controller
         }
 
         //Use this view for showing group only upcoming and past events
-        if (! is_null($group_id)) {
+        if ( ! is_null($group_id)) {
             $upcoming_events = Party::upcomingEvents()
             ->where('events.group', $group_id)
             ->get();
@@ -196,10 +197,10 @@ class PartyController extends Controller
             // formatting dates for the DB
             $event_date = date('Y-m-d', strtotime($event_date));
 
-            if (! FixometerHelper::verify($event_date)) {
+            if ( ! FixometerHelper::verify($event_date)) {
                 $error['event_date'] = 'We must have a starting date and time.';
             }
-            if (! FixometerHelper::verify($start)) {
+            if ( ! FixometerHelper::verify($start)) {
                 $error['name'] = 'We must have a starting date and time.';
             }
 
@@ -229,7 +230,6 @@ class PartyController extends Controller
                     'user_id' => $user_id,
                     'created_at' => date('Y-m-d H:i:s'),
                     'shareable_code' => FixometerHelper::generateUniqueShareableCode('App\Party', 'shareable_code'),
-
                 );
 
                 $party = Party::create($data);
@@ -276,13 +276,13 @@ class PartyController extends Controller
                 $response['danger'] = 'Party could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.';
             }
 
-            if (! isset($response)) {
+            if ( ! isset($response)) {
                 $response = null;
             }
-            if (! isset($error)) {
+            if ( ! isset($error)) {
                 $error = null;
             }
-            if (! isset($_POST)) {
+            if ( ! isset($_POST)) {
                 $udata = null;
             } else {
                 $udata = $_POST;
@@ -384,7 +384,7 @@ class PartyController extends Controller
     {
         $user = Auth::user();
 
-        if (! FixometerHelper::userHasEditPartyPermission($id, $user->id)) {
+        if ( ! FixometerHelper::userHasEditPartyPermission($id, $user->id)) {
             return redirect('/user/forbidden');
         }
 
@@ -403,7 +403,7 @@ class PartyController extends Controller
 
         $images = $File->findImages(env('TBL_EVENTS'), $id);
 
-        if (! isset($images)) {
+        if ( ! isset($images)) {
             $images = null;
         }
 
@@ -428,7 +428,7 @@ class PartyController extends Controller
             $data['event_date'] = FixometerHelper::dbDateNoTime($data['event_date']);
             $timestamp = strtotime($data['event_date']);
 
-            if (! empty($data['location'])) {
+            if ( ! empty($data['location'])) {
                 $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($data['location'].',United Kingdom').'&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE');
                 $json = json_decode($json);
 
@@ -460,7 +460,7 @@ class PartyController extends Controller
             // $u = $Party->where('idevents', $id)->update($update);
             $u = Party::findOrFail($id)->update($update);
 
-            if (! $u) {
+            if ( ! $u) {
                 $response['danger'] = 'Something went wrong. Please check the data and try again.';
             } else {
                 $response['success'] = '<div class="row"><div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">Event details updated</div><div class="col-md-4 col-lg-3 d-flex flex-column align-content-center"><a href="/party/view/'.$id.'" class="btn btn-success">View event</a></div></div>';
@@ -481,7 +481,7 @@ class PartyController extends Controller
                                         ->get();
 
                     // If there are restarters against the group
-                    if (! $group_restarters->isEmpty()) {
+                    if ( ! $group_restarters->isEmpty()) {
                         // Send user a notification and email
                         Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
                             'event_venue' => $event->venue,
@@ -491,7 +491,7 @@ class PartyController extends Controller
                     }
 
                     event(new ApproveEvent($event, $data));
-                } elseif (! empty($theParty->wordpress_post_id)) {
+                } elseif ( ! empty($theParty->wordpress_post_id)) {
                     $event = Party::find($id);
                     event(new EditEvent($event, $data));
                 }
@@ -517,11 +517,11 @@ class PartyController extends Controller
             }
             // $this->set('response', $response);
 
-            if (! isset($images)) {
+            if ( ! isset($images)) {
                 $images = null;
             }
 
-            if (! isset($remotePost)) {
+            if ( ! isset($remotePost)) {
                 $remotePost = null;
             }
 
@@ -550,7 +550,7 @@ class PartyController extends Controller
 
         $images = $File->findImages(env('TBL_EVENTS'), $id);//NB: File facade can't find findImages may need to add
 
-        if (! isset($images)) {
+        if ( ! isset($images)) {
             $images = null;
         }
 
@@ -747,7 +747,7 @@ class PartyController extends Controller
             $hosts = null;
         }
 
-        if (! is_null($hosts)) {
+        if ( ! is_null($hosts)) {
             try {
                 // Get user information
                 $user = User::find($user_event->user);
@@ -768,7 +768,7 @@ class PartyController extends Controller
     {
         $user = User::find(Auth::id());
 
-        if (! FixometerHelper::hasRole($user, 'Host') && ! FixometerHelper::hasRole($user, 'Administrator')) {
+        if ( ! FixometerHelper::hasRole($user, 'Host') && ! FixometerHelper::hasRole($user, 'Administrator')) {
             return redirect('/user/forbidden');
         }
         // $this->set('js',
@@ -812,12 +812,12 @@ class PartyController extends Controller
                         unset($device['id']);
                     }
 
-                    if (! isset($device['category']) || empty($device['category'])) {
+                    if ( ! isset($device['category']) || empty($device['category'])) {
                         $response['danger'] = 'Category needed! (device # '.$i.')';
                         $error = true;
                     }
 
-                    if (! isset($device['repaired_by']) || empty($device['repaired_by'])) {
+                    if ( ! isset($device['repaired_by']) || empty($device['repaired_by'])) {
                         $device['repaired_by'] = 29;
                     }
 
@@ -881,7 +881,7 @@ class PartyController extends Controller
 
                 // Check for WP existence in DB
                 // $theParty = $this->Party->findOne($idparty);
-                if (! empty($party->wordpress_post_id)) {
+                if ( ! empty($party->wordpress_post_id)) {
                     // echo "WP id present (" . $party->wordpress_post_id . ")! Editing...<br />";
                     // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
                     $thePost = $wpClient->getPost($party->wordpress_post_id);
@@ -934,7 +934,7 @@ class PartyController extends Controller
         $party->repairable_devices = 0;
         $party->dead_devices = 0;
 
-        if (! empty($party->devices)) {
+        if ( ! empty($party->devices)) {
             foreach ($party->devices as $device) {
                 if ($device->isFixed()) {
                     $party->co2 += $device->co2Diverted($this->EmissionRatio, $Device->displacement);
@@ -965,7 +965,7 @@ class PartyController extends Controller
         // $this->set('categories', $categories);
         // $this->set('restarters', $restarters);
 
-        if (! isset($response)) {
+        if ( ! isset($response)) {
             $response = null;
         }
 
@@ -990,17 +990,17 @@ class PartyController extends Controller
             $usersDelete = $this->Party->deleteUserList($id);
             $r = $this->Party->delete($id);
 
-            if (! $r) {
+            if ( ! $r) {
                 $response = 'action=de&code=403';
             } else {
-                if (! is_null($wpId) && is_numeric($wpId)) {
+                if ( ! is_null($wpId) && is_numeric($wpId)) {
                     // delete from WordPress
                     /** Start WP XML-RPC **/
                     $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
                     $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
                     $deletion = $wpClient->deletePost($wpId);
-                    if (! $wpId) {
+                    if ( ! $wpId) {
                         $response = 'action=de&code=500';
                     } else {
                         $response = 'action=de&code=200';
@@ -1034,7 +1034,7 @@ class PartyController extends Controller
 
         $eventStats['co2'] = number_format(round($eventStats['co2']), 0, '.', ',');
         // $this->set('party', $party);
-        if (! is_null($class)) {
+        if ( ! is_null($class)) {
             return view('party.stats', [
                 'framed' => true,
                 'party' => $eventStats,
@@ -1210,7 +1210,7 @@ class PartyController extends Controller
         $emails = explode(',', str_replace(' ', '', $request->input('manual_invite_box')));
         $message = $request->input('message_to_restarters');
 
-        if (! empty($emails)) {
+        if ( ! empty($emails)) {
             $users = User::whereIn('email', $emails)->get();
 
             $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
@@ -1223,7 +1223,7 @@ class PartyController extends Controller
                     $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
                     $url = url('/party/accept-invite/'.$event_id.'/'.$hash);
 
-                    if (! is_null($user_event)) {
+                    if ( ! is_null($user_event)) {
                         $user_event->update([
                             'status' => $hash,
                         ]);
@@ -1247,7 +1247,7 @@ class PartyController extends Controller
                     );
 
                     // Get Creator of Event
-                    if (! empty($userCreator = User::find($event->user_id))) {
+                    if ( ! empty($userCreator = User::find($event->user_id))) {
                         $event_details = [
                             'event_venue' => $event->venue,
                             'event_url' => url('/party/edit/'.$event->idevents),
@@ -1264,7 +1264,7 @@ class PartyController extends Controller
                 }
             }
 
-            if (! empty($non_users)) {
+            if ( ! empty($non_users)) {
                 foreach ($non_users as $non_user) {
                     $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
                     $url = url('/user/register/'.$hash);
@@ -1290,7 +1290,7 @@ class PartyController extends Controller
                 }
             }
 
-            if (! isset($not_sent)) {
+            if ( ! isset($not_sent)) {
                 return redirect()->back()->with('success', 'Invites Sent!');
             }
 
@@ -1304,7 +1304,7 @@ class PartyController extends Controller
     {
         $user_event = EventsUsers::where('status', $hash)->where('event', $event_id)->first();
 
-        if (! empty($user_event)) {
+        if ( ! empty($user_event)) {
             // Update event invite
             EventsUsers::where('status', $hash)->where('event', $event_id)->update([
                 'status' => 1,
@@ -1375,7 +1375,7 @@ class PartyController extends Controller
         Party::find($event_id)->increment('volunteers');
 
         // Send email
-        if (! is_null($volunteer_email_address)) {
+        if ( ! is_null($volunteer_email_address)) {
             $event = Party::find($event_id);
             $from = User::find(Auth::user()->id);
 
@@ -1442,7 +1442,7 @@ class PartyController extends Controller
             foreach ($all_events as $event) {
                 $host_ids = $event_users->where('event', $event->idevents)->pluck('user')->toArray();
 
-                if (! empty($host_ids)) {
+                if ( ! empty($host_ids)) {
                     $hosts = User::whereIn('id', $host_ids)->get();
 
                     //Send Emails to Admins notifying event creation
@@ -1492,7 +1492,7 @@ class PartyController extends Controller
         $user = Auth::user();
         $event = Party::find($id);
 
-        if (! isset($id) || is_null($event)) {
+        if ( ! isset($id) || is_null($event)) {
             abort(404);
         }
 
@@ -1549,5 +1549,171 @@ class PartyController extends Controller
         session()->push('events.'.$code, $hash);
 
         return redirect('/user/register')->with('auth-for-invitation', __('auth.login_before_using_shareable_link', ['login_url' => url('/login')]));
+    }
+
+    /**
+     * [getEventsByKey description]
+     * Get all Events where a User has an API KEY that exists,
+     * and that User has Group Tags associated with it
+     *
+     * @author  Christopher Kelker
+     * @version 1.0.0
+     * @date    2019-03-13
+     * @param   [type]     $api_key
+     * @return  [type]
+     */
+    public function getEventsByKey(Request $request, $api_key, $date_from = null, $date_to = null)
+    {
+        $parties = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+        ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
+        ->join('group_tags', 'group_tags.id', '=', 'grouptags_groups.group_tag')
+        ->join('users', 'users.access_group_tag_id', '=', 'group_tags.id');
+
+        if ( ! empty($date_from) && ! empty($date_to)) {
+            $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
+          ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
+        }
+
+        $parties = $parties->where('users.access_key', $api_key)->select('events.*')->get();
+
+        // If no parties are found, through 404 error
+        if (empty($parties)) {
+            return abort(404, 'No Events found.');
+        }
+
+        // Get Emission Ratio
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        // New Collection Instance
+        $collection = collect([]);
+
+        // Loop through each Group Parties
+        foreach ($parties as $key => $party) {
+
+            // Push Party to Collection
+            $collection->push([
+                'id' => $party->idevents,
+                'group' => [
+                    'id' => $party->theGroup->idgroups,
+                    'name' => $party->theGroup->name,
+                    'description' => $party->theGroup->free_text,
+                    'image_url' => $party->theGroup->groupImagePath(),
+                    'volunteers' => $party->theGroup->getGroupStats($emissionRatio)['pax'],
+                    'participants' => $party->theGroup->totalPartiesParticipants(),
+                    'hours_volunteered' => $party->theGroup->getGroupStats($emissionRatio)['hours'],
+                    'parties_thrown' => $party->theGroup->getGroupStats($emissionRatio)['parties'],
+                    'waste_prevented' => $party->theGroup->getGroupStats($emissionRatio)['waste'],
+                    'co2_emissions_prevented' => $party->theGroup->getGroupStats($emissionRatio)['co2'],
+                ],
+                'event_date' => $party->event_date,
+                'start_time' => $party->start,
+                'end_time' => $party->end,
+                'name' => $party->venue,
+                'location' => [
+                    'value' => $party->location,
+                    'latitude' => $party->latitude,
+                    'longitude' => $party->longitude,
+                ],
+                'description' => $party->free_text,
+                'user' => $party_user = collect(),
+                'impact' => [
+                    'participants' => $party->pax,
+                    'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
+                    'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
+                    'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
+                    'devices_fixed' => $party->getEventStats($emissionRatio)['fixed_devices'],
+                    'devices_repairable' => $party->getEventStats($emissionRatio)['repairable_devices'],
+                    'devices_dead' => $party->getEventStats($emissionRatio)['dead_devices'],
+                ],
+                'widgets' => [
+                    'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
+                    'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
+                ],
+                'hours_volunteered' => $party->hoursVolunteered(),
+            ]);
+
+            if ( ! empty($party->owner)) {
+                $party_user->put('id', $party->owner->id);
+                $party_user->put('name', $party->owner->name);
+            }
+        }
+
+        return $collection;
+    }
+
+    /**
+     * [getEventByKeyAndId description]
+     * Get Past Event using Route Model Binding,
+     * If Event is not found, throw 404 error,
+     * Else return the Event's JSON data
+     *
+     * @author  Christopher Kelker
+     * @version 1.0.0
+     * @date    2019-03-13
+     * @param   [type]     $api_key
+     * @param   [type]     $id
+     * @return  [type]
+     */
+    public function getEventByKeyAndId(Request $request, $api_key, Party $party)
+    {
+        // If Event is not found, through 404 error
+        if (empty($party) && ! $party->exists) {
+            return abort(404, 'Invalid Event ID.');
+        }
+
+        // Get Emission Ratio
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+        $emissionRatio = ApiController::getEmissionRatio();
+
+        // New Collection Instance
+        $collection = collect([
+            'id' => $party->idevents,
+            'group' => [
+                'id' => $party->theGroup->idgroups,
+                'name' => $party->theGroup->name,
+                'description' => $party->theGroup->free_text,
+                'image_url' => $party->theGroup->groupImagePath(),
+                'volunteers' => $party->theGroup->getGroupStats($emissionRatio)['pax'],
+                'participants' => $party->theGroup->totalPartiesParticipants(),
+                'hours_volunteered' => $party->theGroup->getGroupStats($emissionRatio)['hours'],
+                'parties_thrown' => $party->theGroup->getGroupStats($emissionRatio)['parties'],
+                'waste_prevented' => $party->theGroup->getGroupStats($emissionRatio)['waste'],
+                'co2_emissions_prevented' => $party->theGroup->getGroupStats($emissionRatio)['co2'],
+            ],
+            'event_date' => $party->event_date,
+            'start_time' => $party->start,
+            'end_time' => $party->end,
+            'name' => $party->venue,
+            'location' => [
+                'value' => $party->location,
+                'latitude' => $party->latitude,
+                'longitude' => $party->longitude,
+            ],
+            'description' => $party->free_text,
+            'user' => $party_user = collect(),
+            'impact' => [
+                'participants' => $party->pax,
+                'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
+                'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
+                'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
+                'devices_fixed' => $party->getEventStats($emissionRatio)['fixed_devices'],
+                'devices_repairable' => $party->getEventStats($emissionRatio)['repairable_devices'],
+                'devices_dead' => $party->getEventStats($emissionRatio)['dead_devices'],
+            ],
+            'widgets' => [
+                'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
+                'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
+            ],
+            'hours_volunteered' => $party->hoursVolunteered(),
+        ]);
+
+        if ( ! empty($party->owner)) {
+            $party_user->put('id', $party->owner->id);
+            $party_user->put('name', $party->owner->name);
+        }
+
+        return $collection;
     }
 }

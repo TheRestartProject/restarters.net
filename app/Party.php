@@ -37,7 +37,9 @@ class Party extends Model implements Auditable
         'shareable_code',
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'idevents', 'user_id', 'wordpress_post_id'];
-    protected $appends = ['ShareableLink'];
+
+    // Append data to Model
+    protected $appends = ['participants', 'ShareableLink'];
 
     //Getters
     public function findAll()
@@ -628,5 +630,38 @@ class Party extends Model implements Auditable
         return EventsUsers::where('event', $this->idevents)
             ->where('user', $userId)
             ->exists();
+    }
+
+    /**
+     * [users description]
+     * All Event Users
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function users()
+    {
+        return $this->hasMany(EventsUsers::class, 'event', 'idevents');
+    }
+
+    /**
+     * [owner description]
+     * Party Owner/Creator
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function getParticipantsAttribute()
+    {
+        return $this->pax;
     }
 }

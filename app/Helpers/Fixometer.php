@@ -1032,4 +1032,27 @@ class FixometerHelper
 
         return $random;
     }
+
+    /**
+     * [validateBetweenDates description]
+     * Check if date is between two dates...
+     *
+     * @author Christopher Kelker - @date 2019-04-05
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @param   [type]      $date_to_check
+     * @param   [type]      $date_from
+     * @param   [type]      $date_to
+     * @return  [type]
+     */
+    public static function validateBetweenDates($date_to_check, $date_from, $date_to)
+    {
+        $date_to_check = date('Y-m-d', strtotime($date_to_check));
+        $date_from = date('Y-m-d', strtotime($date_from));
+        $date_to = date('Y-m-d', strtotime($date_to));
+
+        // If $date_to_check is equal to one of or in between the
+        // two dates then return true, else false
+        return ($date_to_check >= $date_from) && ($date_to_check <= $date_to);
+    }
 }

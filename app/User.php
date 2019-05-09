@@ -7,8 +7,8 @@ use App\UserGroups;
 use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
@@ -21,7 +21,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at'
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'access_key', 'access_group_tag_id'
     ];
 
     /**
@@ -308,6 +308,7 @@ class User extends Authenticatable
         }
     }
 
+
     /**
      * Getter to display the user's repair network with options to provide the network name/slug
      *
@@ -338,5 +339,11 @@ class User extends Authenticatable
         }
 
         return $this->repair_network;
+    }
+
+
+    public function groupTag()
+    {
+        return $this->hasOne(GroupTags::class, 'id', 'access_group_tag_id');
     }
 }

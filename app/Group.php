@@ -265,4 +265,105 @@ class Group extends Model implements Auditable
 
         return $this->allConfirmedVolunteers()->where($attributes)->exists();
     }
+
+    public function parties()
+    {
+        return $this->hasMany(Party::class, 'group', 'idgroups')->withTrashed();
+    }
+
+    /**
+     * [upcomingParties description]
+     * All Upcoming Parties where between the Start Parties Date
+     * is today or a week later
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function upcomingParties($exclude_parties = [])
+    {
+        $from = date('Y-m-d');
+        $to = date('Y-m-d', strtotime('+1 week'));
+
+        if ( ! empty($exclude_parties)) {
+            return $this->parties()
+                          ->whereBetween('event_date', [$from, $to])
+                            ->whereNotIn('idevents', $exclude_parties)
+                              ->get();
+        }
+
+        return $this->parties()->whereBetween('event_date', [$from, $to])->get();
+    }
+
+    /**
+     * [pastParties description]
+     * All Past Parties where between the Start Parties Date
+     * is yesterday or a month earlier
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function pastParties($exclude_parties = [])
+    {
+        if ( ! empty($exclude_parties)) {
+            return $this->parties()
+                          ->where('event_date', '<', date('Y-m-d'))
+                            ->whereNotIn('idevents', $exclude_parties)
+                              ->get();
+        }
+
+        return $this->parties()->where('event_date', '<', date('Y-m-d'))->get();
+    }
+
+    /**
+     * [totalPartiesParticipants description]
+     * Total Group Parties Participants
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function totalPartiesParticipants()
+    {
+        foreach ($this->parties as $key => $party) {
+            $new_array = $party->users->pluck('user')->toArray();
+            $new_array = array_unique($new_array);
+            $total = array_push($new_array, $new_array);
+        }
+
+        return $total;
+    }
+
+    /**
+     * [totalPartiesHours description]
+     * Total Group Parties Hours
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function totalPartiesHours()
+    {
+        $sum = 0;
+
+        foreach ($this->parties as $key => $party) {
+            $sum += $party->hours;
+        }
+
+        return $sum;
+    }
+
+    public function groupImagePath()
+    {
+        if (is_object($this->groupImage) && is_object($this->groupImage->image)) {
+            return asset('/uploads/mid_'.$this->groupImage->image->path);
+        }
+
+        return url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg');
+    }
 }
