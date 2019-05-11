@@ -1393,4 +1393,206 @@ class GroupController extends Controller
 
         return redirect('/user/register')->with('auth-for-invitation', __('auth.login_before_using_shareable_link', ['login_url' => url('/login')]));
     }
+
+    /**
+     * [getGroupsByKey description]
+     * Find Groups from User Access Key,
+     * If the Groups are not found, through 404 error,
+     * Else return the Groups JSON data
+     *
+     * @author Christopher Kelker - @date 2019-03-26
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @param   Request     $request
+     * @param   [type]      $api_key
+     * @return  [type]
+     */
+    public function getGroupsByKey(Request $request, $api_key)
+    {
+        // Find User by Access Key
+        $user = User::where('access_key', $api_key)->first();
+
+        // Get Emission Ratio
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        if (empty($user->groupTag) || is_null($user->groupTag)) {
+            return abort(404, 'No groups tags found.');
+        }
+
+        $group_tags_groups = $user->groupTag->groupTagGroups;
+
+        // If Group is not found, through 404 error
+        if ($user->groupTag->groupTagGroups->isEmpty()
+        || $user->groupTag->groupTagGroups->count() <= 0) {
+            return abort(404, 'No groups found.');
+        }
+
+        // New Collection Instance
+        $collection = collect([]);
+
+        foreach ($group_tags_groups as $key => $group_tags_group) {
+            $group = $group_tags_group->theGroup;
+            if ( ! empty($group)) {
+                $collection->push([
+                    'id' => $group->idgroups,
+                    'name' => $group->name,
+                    'location' => [
+                        'value' => $group->location,
+                        'country' => $group->country,
+                        'latitude' => $group->latitude,
+                        'longitude' => $group->longitude,
+                    ],
+                    'website' => $group->website,
+                    'description' => $group->free_text,
+                    'image_url' => $group->groupImagePath(),
+                    'upcoming_parties' => $upcoming_parties_collection = collect([]),
+                    'past_parties' => $past_parties_collection = collect([]),
+                    'impact' => [
+                        'volunteers' => $group->getGroupStats($emissionRatio)['pax'],
+                        'hours_volunteered' => $group->getGroupStats($emissionRatio)['hours'],
+                        'parties_thrown' => $group->getGroupStats($emissionRatio)['parties'],
+                        'waste_prevented' => $group->getGroupStats($emissionRatio)['waste'],
+                        'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
+                    ],
+                    'widgets' => [
+                        'headline_stats' => url("/group/stats/{$group->idgroups}"),
+                        'co2_equivalence_visualisation' => url("/outbound/info/group/{$group->idgroups}/manufacture"),
+                    ],
+                ]);
+
+                foreach ($group->upcomingParties() as $key => $event) {
+                    $upcoming_parties_collection->push([
+                        'event_id' => $event->idevents,
+                        'event_date' => $event->event_date,
+                        'start_time' => $event->start,
+                        'end_time' => $event->end,
+                        'name' => $event->venue,
+                        'location' => [
+                            'value' => $event->location,
+                            'latitude' => $event->latitude,
+                            'longitude' => $event->longitude,
+                        ],
+                    ]);
+                }
+
+                foreach ($group->pastParties() as $key => $event) {
+                    $past_parties_collection->push([
+                        'event_id' => $event->idevents,
+                        'event_date' => $event->event_date,
+                        'start_time' => $event->start,
+                        'end_time' => $event->end,
+                        'name' => $event->venue,
+                        'location' => [
+                            'value' => $event->location,
+                            'latitude' => $event->latitude,
+                            'longitude' => $event->longitude,
+                        ],
+                    ]);
+                }
+            }
+        }
+
+        return $collection;
+    }
+
+    /**
+     * [getGroupByKeyAndId description]
+     * Find Group from User Access Key and Group ID,
+     * If the Group is not found, through 404 error,
+     * Else return the Group JSON data
+     *
+     * @author Christopher Kelker - @date 2019-03-26
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @param   Request     $request
+     * @param   [type]      $api_key
+     * @param   Group       $group
+     * @return  [type]
+     */
+    public function getGroupByKeyAndId(Request $request, $api_key, Group $group, $date_from = null, $date_to = null)
+    {
+        // Get Group from Access Key and Group ID
+        $group_tags_group = User::where('access_key', $api_key)->first()
+        ->groupTag->groupTagGroups->where('group', $group->idgroups)->first();
+
+        // If Group is not found, through 404 error
+        if (empty($group_tags_group)) {
+            return abort(404, 'No groups found.');
+        }
+
+        // If Event is found but is not the of the date specified
+        $exclude_parties = [];
+        if ( ! empty($date_from) && ! empty($date_to)) {
+            foreach ($group->parties as $key => $party) {
+                if ( ! FixometerHelper::validateBetweenDates($party->event_date, $date_from, $date_to)) {
+                    $exclude_parties[] = $party->idevents;
+                }
+            }
+        }
+
+        // Get Emission Ratio
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        // New Collection Instance
+        $collection = collect([
+            'id' => $group->idgroups,
+            'name' => $group->name,
+            'location' => [
+                'value' => $group->location,
+                'country' => $group->country,
+                'latitude' => $group->latitude,
+                'longitude' => $group->longitude,
+            ],
+            'website' => $group->website,
+            'description' => $group->free_text,
+            'image_url' => $group->groupImagePath(),
+            'upcoming_parties' => $upcoming_parties_collection = collect([]),
+            'past_parties' => $past_parties_collection = collect([]),
+            'impact' => [
+                'volunteers' => $group->getGroupStats($emissionRatio)['pax'],
+                'hours_volunteered' => $group->getGroupStats($emissionRatio)['hours'],
+                'parties_thrown' => $group->getGroupStats($emissionRatio)['parties'],
+                'waste_prevented' => $group->getGroupStats($emissionRatio)['waste'],
+                'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
+            ],
+            'widgets' => [
+                'headline_stats' => url("/group/stats/{$group->idgroups}"),
+                'co2_equivalence_visualisation' => url("/{$group->idgroups}/manufacture"),
+            ],
+        ]);
+
+        foreach ($group->upcomingParties($exclude_parties) as $key => $event) {
+            $upcoming_parties_collection->push([
+                'event_id' => $event->idevents,
+                'event_date' => $event->event_date,
+                'start_time' => $event->start,
+                'end_time' => $event->end,
+                'name' => $event->venue,
+                'location' => [
+                    'value' => $event->location,
+                    'latitude' => $event->latitude,
+                    'longitude' => $event->longitude,
+                ],
+            ]);
+        }
+
+        foreach ($group->pastParties($exclude_parties) as $key => $event) {
+            $past_parties_collection->push([
+                'event_id' => $event->idevents,
+                'event_date' => $event->event_date,
+                'start_time' => $event->start,
+                'end_time' => $event->end,
+                'name' => $event->venue,
+                'location' => [
+                    'value' => $event->location,
+                    'latitude' => $event->latitude,
+                    'longitude' => $event->longitude,
+                ],
+            ]);
+        }
+
+        return $collection;
+    }
 }

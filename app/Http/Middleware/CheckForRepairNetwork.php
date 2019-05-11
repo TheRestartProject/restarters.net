@@ -25,16 +25,21 @@ class CheckForRepairNetwork
 
         // Assumed Restart Project
         switch ($host) {
-            case 'repairshare.restarters.net':
-                $locale = 'fr';
-                $repair_network = 2;
+        case 'repairshare.restarters.net':
+            $locale = 'nl-BE';
+            $repair_network = 2;
 
-                break;
+            break;
+        case 'repairtogether.restarters.net':
+            $locale = 'fr';
+            $repair_network = 3;
+
+            break;
         // For test only
         case 'test-restarters.rstrt.org':
         case 'restarters.test':
             $locale = 'en';
-            $repair_network = 3;
+            $repair_network = 1000;
 
             break;
         }

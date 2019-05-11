@@ -4,11 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-use DB;
-
 class GrouptagsGroups extends Model
 {
-
     protected $table = 'grouptags_groups';
 
     /**
@@ -26,4 +23,18 @@ class GrouptagsGroups extends Model
     protected $hidden = [];
 
     public $timestamps = false;
+
+    /**
+     * [theGroup description]
+     * A Group Tag Group has One Group.
+     *
+     * @author Christopher Kelker - @date 2019-03-21
+     * @editor  Christopher Kelker
+     * @version 1.0.0
+     * @return  [type]
+     */
+    public function theGroup()
+    {
+        return $this->hasOne(Group::class, 'idgroups', 'group');
+    }
 }

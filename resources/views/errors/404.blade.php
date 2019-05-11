@@ -15,9 +15,16 @@
 
                 <img class="rounded img-fluid" src="/images/broken-toaster.png" alt="Woman with broken toaster" />
 
-                <h2>
-                    Please let us know that you encountered this issue and we will look into it ASAP.
-                </h2>
+                @if (!empty($exception->getMessage()))
+                    <h2>
+                        {{ $exception->getMessage() }}
+                    </h2>
+                @else
+                    <h2>
+                        Please let us know that you encountered this issue and we will look into it ASAP.
+                    </h2>
+                @endif
+
                 <p>
                     You can report the issue by sending an email to <a href="mailto:community@therestartproject.org">community@therestartproject.org</a>, or by posting in the <a href="https://talk.restarters.net/c/restarters-dev">restarters.net development forum</a>.
                 </p>
@@ -28,7 +35,7 @@
                     @if (Auth::check())
                         <li><strong>User</strong>: {{ Auth::user()->name }}</li>
                     @endif
-                    <li><strong>Error</strong>:  404</li> 
+                    <li><strong>Error</strong>:  404</li>
                     <li><strong>Time</strong>: {{ now() }}</li>
                     <li><strong>URL</strong>: {{ Request::url() }}</li>
                     <li><strong>Previous URL</strong>: {{ URL::previous() }}</li>
