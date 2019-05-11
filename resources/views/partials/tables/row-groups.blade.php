@@ -11,23 +11,21 @@
   <td>{{{ $group->getLocation() }}}</td>
   <td class="text-center">
     <?php
-
-      $hosts = $group->allHosts;
+      $hosts = $group->allConfirmedHosts;
       $return = '';
 
       foreach( $hosts as $host ){
         $return .= trim($host->volunteer->name). ', ';
       }
-
     ?>
     <span data-toggle="popover" data-content="{{{ rtrim($return, ', ') }}}" data-trigger="hover">
-      {{{ $group->allHosts->count() }}}
+      {{{ $group->allConfirmedHosts->count() }}}
     </span>
   </td>
   <td class="text-center">
     <?php
 
-      $restarters = $group->allRestarters;
+      $restarters = $group->allConfirmedRestarters;
       $return = '';
 
       foreach( $restarters as $restarter ){
@@ -36,7 +34,12 @@
 
     ?>
     <span data-toggle="popover" data-content="{{{ rtrim($return, ', ') }}}" data-trigger="hover">
-      {{{ $group->allRestarters->count() }}}
+      {{{ $group->allConfirmedRestarters->count() }}}
     </span>
   </td>
+  @if(  !is_null($groups) && FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+      <td>
+          {{ \Carbon\Carbon::parse($group->created_at)->diffForHumans() }}
+      </td>
+  @endif
 </tr>

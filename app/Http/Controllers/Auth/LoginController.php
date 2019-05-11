@@ -89,7 +89,7 @@ class LoginController extends Controller
             $this->username() => 'required|email',
             'password' => 'required|string',
             'my_name'   => 'honeypot',
-            'my_time'   => 'required|honeytime:5'
+            'my_time'   => 'required|honeytime:1'
         ]);
     }
 
@@ -100,14 +100,15 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-
         $stats = FixometerHelper::loginRegisterStats();
+
+        $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
 
         return view('auth.login', [
           'co2Total' => $stats['co2Total'][0]->total_footprints,
           'wasteTotal' => $stats['co2Total'][0]->total_weights,
           'partiesCount' => count($stats['allparties']),
-          'device_count_status' => $stats['device_count_status'],
+          'deviceCount' => $deviceCount,
         ]);
     }
 }

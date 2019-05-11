@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 use App\User;
+use Illuminate\Console\Command;
 
 class SyncDiscourseUsernames extends Command
 {
@@ -65,7 +64,7 @@ class SyncDiscourseUsernames extends Command
         $resultsPage = 1;
         while (true) {
             $this->line('');
-            $this->info('Results page ' . $resultsPage);
+            $this->info('Results page '.$resultsPage);
             $this->line('');
 
             $rawJson = $this->retrieveDiscourseUsersJson($resultsPage);
@@ -77,20 +76,20 @@ class SyncDiscourseUsernames extends Command
             foreach ($usersFromDiscourse as $discourseUser) {
                 $user = User::where('email', $discourseUser->email)->first();
 
-                if (!is_null($user)) {
+                if ( ! is_null($user)) {
                     $usersFoundInRestarters++;
 
                     if ($user->username == $discourseUser->username) {
-                        $this::line('SKIPPING: ' . $user->username . ' (no username change required)');
+                        $this::line('SKIPPING: '.$user->username.' (no username change required)');
                     } else {
-                        $this::info('UPDATING: ' . $user->username . ': ' . $user->username . ' to ' . $discourseUser->username);
+                        $this::info('UPDATING: '.$user->username.': '.$user->username.' to '.$discourseUser->username);
                         $user->username = $discourseUser->username;
                         $user->save();
 
                         $updatedUsers++;
                     }
                 } else {
-                    $this->error($discourseUser->username . ' not found in Restarters DB');
+                    $this->error($discourseUser->username.' not found in Restarters DB');
                 }
             }
 
@@ -102,14 +101,14 @@ class SyncDiscourseUsernames extends Command
         }
 
         $this->info('');
-        $this->info('Users found in Discourse: ' . $discourseUserCount);
-        $this->info('Found user count: ' . $usersFoundInRestarters);
-        $this->info('Updated users: ' . $updatedUsers);
+        $this->info('Users found in Discourse: '.$discourseUserCount);
+        $this->info('Found user count: '.$usersFoundInRestarters);
+        $this->info('Updated users: '.$updatedUsers);
     }
 
     protected function retrieveDiscourseUsersJson($apiPage)
     {
-        $endpoint = "https://talk.restarters.net/admin/users/list/all.json?show_emails=true&page=" . $apiPage . "&api_key=" . $this->discourseApiKey . "&api_username=" . $this->discourseApiUser;
+        $endpoint = 'https://talk.restarters.net/admin/users/list/all.json?show_emails=true&page='.$apiPage.'&api_key='.$this->discourseApiKey.'&api_username='.$this->discourseApiUser;
 
         return file_get_contents($endpoint);
     }

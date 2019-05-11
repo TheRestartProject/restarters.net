@@ -11,19 +11,27 @@
         @endif
       </td>
     @endif
-    <td class="cell-name"><a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a></td>
-    <td class="cell-date">{{ $event->getEventDate() }}</td>
-    <td class="cell-date">{{ $event->getEventStartEnd() }}</td>
+    <td class="cell-name">
+        @if( !isset($group_view) )
+            <div class="group-name"><a class="group-name" href="/group/view/{{ $event->theGroup->idgroups }}">{{ $event->theGroup->name }}</a></div>
+        @endif
+        <a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a>
+    </td>
+    <td class="cell-date">
+        {{ $event->getEventDate('D jS M Y') }}
+        {{ $event->getEventStartEnd() }}
+    </td>
     @if( !isset($group_view) )
-      <td class="cell-locations">
-        @if( strlen($event->location) > 25 )
+      {{-- <td class="cell-locations">
+        @if( strlen($event->location) > 50 )
           <span data-toggle="popover" data-content="{{{ $event->location }}}" data-trigger="hover">
         @endif
-        {{ str_limit($event->location, 25, '...') }}
-        @if( strlen($event->location) > 25 )
+        {{ str_limit($event->location, 50, '...') }}
+        @if( strlen($event->location) > 50 )
           </span>
         @endif
       </td>
+        --}}
     @endif
     @if( is_null($event->wordpress_post_id) )
       @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') )

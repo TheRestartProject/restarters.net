@@ -10,7 +10,7 @@
         @if (!$agent->isPhone())
         <div class="row row-compressed stats float-right text-center">
             <div class="stats__stat">
-                <div class="stat-figure">{{ number_format($device_count_status[0]->counter, 0, '.', ',') }}</div>
+                <div class="stat-figure">{{ number_format($deviceCount, 0, '.', ',') }}</div>
                 <div class="stat-header">@lang('login.stat_1')</div>
             </div>
             <div class="stats__stat">

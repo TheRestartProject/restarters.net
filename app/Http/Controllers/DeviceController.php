@@ -68,8 +68,8 @@ class DeviceController extends Controller
     public function index($search = null)
     {
         $Category = new Category;
-        $Group = new Group;
-        $Device = new Device;
+        // $Group = new Group;
+        // $Device = new Device;
 
         $categories = $Category->listed();
 
@@ -158,7 +158,7 @@ class DeviceController extends Controller
         ]);
     }
 
-    public function search(Request $request)
+    public function search(Request $request, $raw = false)
     {
         $Category = new Category;
         $categories = $Category->listed();
@@ -171,8 +171,11 @@ class DeviceController extends Controller
                                     ->with('barriers')
                                         ->join('events', 'events.idevents', '=', 'devices.event')
                                             ->join('groups', 'groups.idgroups', '=', 'events.group')
-                                                ->select('devices.*', 'groups.name AS group_name')
-                                                ->orderBy($sort_column, $sort_direction);
+                     ->select('devices.*', 'groups.name AS group_name');
+
+        if ($request->input('sort_column') !== null) {
+            $all_devices = $all_devices->orderBy($sort_column, $sort_direction);
+        }
 
         if ($request->input('categories') !== null) {
             $all_devices = $all_devices->whereIn('devices.category', $request->input('categories'));
@@ -185,21 +188,21 @@ class DeviceController extends Controller
         $date_from = $request->get('from-date');
         $date_to = $request->get('to-date');
 
-        if ( ! empty($date_from)) {
+        if (! empty($date_from)) {
             $d_from = \DateTime::createFromFormat('Y-m-d', $date_from);
             $from = $d_from->format('Y-m-d').' 00:00:00';
         }
 
-        if ( ! empty($date_to)) {
+        if (! empty($date_to)) {
             $d_to = \DateTime::createFromFormat('Y-m-d', $date_to);
             $to = $d_to->format('Y-m-d').' 23:59:59';
         }
 
-        if ( ! empty($date_from) && ! empty($date_to)) {
+        if (! empty($date_from) && ! empty($date_to)) {
             $all_devices = $all_devices->whereBetween('event_date', [$from, $to]);
-        } elseif ( ! empty($date_from)) {
+        } elseif (! empty($date_from)) {
             $all_devices = $all_devices->whereDate('event_date', '>=', $from);
-        } elseif ( ! empty($date_to)) {
+        } elseif (! empty($date_to)) {
             $to = $d_to->format('Y-m-d').' 23:59:59';
             $all_devices = $all_devices->whereDate('event_date', '<=', $to);
         }
@@ -224,28 +227,15 @@ class DeviceController extends Controller
             $all_devices = $all_devices->where('problem', 'like', '%'.$request->input('problem').'%');
         }
 
-        $user = Auth::user();
-
-        // if (FixometerHelper::hasRole($user, 'Administrator')) {
-        $all_groups = Group::all();
-        // } else {
-        //     $groups_user_ids = UserGroups::where('user', $user->id)
-        //     ->pluck('group')
-        //     ->toArray();
-        //
-        //     $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
-        //
-        //     $all_devices = $all_devices->whereIn('id', $device_ids);
-        //
-        //     $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
-        // }
-
+        if ($raw == true) {
+            return $all_devices->get();
+        }
         $all_devices = $all_devices->paginate(env('PAGINATE'));
 
         return view('device.index', [
             'title' => 'Devices',
             'categories' => $categories,
-            'groups' => $all_groups,
+            'groups' => Group::all(),
             'list' => $all_devices,
             'selected_groups' => $request->input('groups'),
             'selected_categories' => $request->input('categories'),
@@ -305,7 +295,7 @@ class DeviceController extends Controller
                 // formatting dates for the DB
                 //$data['event_date'] = dbDateNoTime($data['event_date']);
 
-                if ( ! isset($data['repair_more']) || empty($data['repair_more'])) { //Override
+                if (! isset($data['repair_more']) || empty($data['repair_more'])) { //Override
                     $data['repair_more'] = 0;
                 }
 
@@ -354,7 +344,7 @@ class DeviceController extends Controller
                     $parts_provider = null;
                 }
 
-                if ( ! isset($data['barrier'])) {
+                if (! isset($data['barrier'])) {
                     $data['barrier'] = null;
                 } elseif (in_array(1, $data['barrier']) || in_array(2, $data['barrier'])) { // 'Spare parts not available' or 'spare parts too expensive' selected
                     $data['spare_parts'] = 1;
@@ -391,7 +381,7 @@ class DeviceController extends Controller
                     $device = Device::find($id)->barriers()->sync([]);
                 }
 
-                if ( ! $u) {
+                if (! $u) {
                     $response['danger'] = 'Something went wrong. Please check the data and try again.';
                 } else {
                     $response['success'] = 'Device updated!';
@@ -411,13 +401,13 @@ class DeviceController extends Controller
 
             $device = $Device->findOne($id);
 
-            if ( ! isset($response)) {
+            if (! isset($response)) {
                 $response = null;
             }
 
             $images = $File->findImages(env('TBL_DEVICES'), $id);
 
-            if ( ! isset($images)) {
+            if (! isset($images)) {
                 $images = null;
             }
 
@@ -468,7 +458,7 @@ class DeviceController extends Controller
             $data = $_POST;
             $u = $this->Device->update($data, $id);
 
-            if ( ! $u) {
+            if (! $u) {
                 $response['response_type'] = 'danger';
                 $response['message'] = 'Something went wrong. Please check the data and try again.';
             } else {
@@ -499,17 +489,17 @@ class DeviceController extends Controller
                 $data = array_filter($_POST);
                 $Device = new Device;
 
-                if ( ! FixometerHelper::verify($data['event'])) {
+                if (! FixometerHelper::verify($data['event'])) {
                     $error['event'] = 'Please select a Restart party.';
                 }
-                if ( ! FixometerHelper::verify($data['category'])) {
+                if (! FixometerHelper::verify($data['category'])) {
                     $error['category'] = 'Please select a category for this device';
                 }
-                if ( ! FixometerHelper::verify($data['repair_status'])) {
+                if (! FixometerHelper::verify($data['repair_status'])) {
                     $error['repair_status'] = 'Please select a repair status.';
                 }
 
-                if ( ! empty($error)) {
+                if (! empty($error)) {
                     $response['danger'] = 'The device repair has <strong>not</strong> been saved.';
                 } else {
                     // add user id
@@ -531,7 +521,7 @@ class DeviceController extends Controller
 
                     // save this!
                     $insert = $Device->create($insert);
-                    if ( ! $insert) {
+                    if (! $insert) {
                         $response['danger'] = 'Error while saving the device to the DB.';
                     } else {
                         $response['success'] = 'Device saved!';
@@ -539,15 +529,15 @@ class DeviceController extends Controller
                 }
             }
 
-            if ( ! isset($error)) {
+            if (! isset($error)) {
                 $error = null;
             }
 
-            if ( ! isset($response)) {
+            if (! isset($response)) {
                 $response = null;
             }
 
-            if ( ! isset($data)) {
+            if (! isset($data)) {
                 $data = null;
             }
 
@@ -634,7 +624,7 @@ class DeviceController extends Controller
                 $parts_provider = null;
             }
 
-            if ( ! isset($barrier)) {
+            if (! isset($barrier)) {
                 $barrier = null;
             } elseif (in_array(1, $barrier) || in_array(2, $barrier)) { // 'Spare parts not available' or 'spare parts too expensive' selected
                 $spare_parts = 1;
@@ -785,7 +775,7 @@ class DeviceController extends Controller
 
         $event = Party::find($event_id);
 
-        if (FixometerHelper::userHasEditPartyPermission($event_id) || FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id)) {
+        if (FixometerHelper::userHasEditEventsDevicesPermission($event_id)) {
             // if ($repair_status == 2) {
             //   switch ($repair_details) {
             //     case 1:
@@ -890,7 +880,7 @@ class DeviceController extends Controller
                 $parts_provider = null;
             }
 
-            if ( ! isset($barrier)) {
+            if (! isset($barrier)) {
                 $barrier = null;
             } elseif (in_array(1, $barrier) || in_array(2, $barrier)) { // 'Spare parts not available' or 'spare parts too expensive' selected
                 $spare_parts = 1;
