@@ -40,7 +40,14 @@ class Group extends Model implements Auditable
      */
     protected $hidden = [];
 
-    //Table Relations
+
+    public function addTag($tag)
+    {
+        $this->group_tags()->save($tag);
+    }
+
+    // NGM: when tests in place, this method name should be changed to just `tags`.
+    // It's on a group, the group_ prefix is superfluous.
     public function group_tags()
     {
         return $this->belongsToMany('App\GroupTags', 'grouptags_groups', 'group', 'group_tag');

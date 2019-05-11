@@ -666,7 +666,7 @@ class GroupController extends Controller
         return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
     }
 
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $user = Auth::user();
         $Group = new Group;
@@ -677,7 +677,7 @@ class GroupController extends Controller
             return redirect('/user/forbidden');
         }
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST)) {
+        if ($request->isMethod('post') && ! empty($_POST)) {
             $data = $_POST;
 
             // remove the extra "files" field that Summernote generates -
@@ -703,7 +703,7 @@ class GroupController extends Controller
             }
 
             if (is_null($latitude) || is_null($longitude)) {
-                return redirect()->back()->with('error', 'Invalid location - please try again!');
+                return redirect()->back()->with('error', 'Could not find group location - please try again!');
             }
 
             $update = array(
@@ -716,21 +716,18 @@ class GroupController extends Controller
                 'country' => $country,
             );
 
-            if ( ! empty($data['area'])) {
+            if (FixometerHelper::hasRole($user, 'Administrator')) {
                 $update['area'] = $data['area'];
             }
 
-            // $u = $Group->where('idgroups', $id)->update($update);
             $u = Group::findOrFail($id)->update($update);
 
-            // Yet to be used
-            // event(new ApproveGroup(Group::findOrFail($id)));
-            // event(new EditGroup(Group::findOrFail($id)));
-
-            if ( ! empty($_POST['group_tags'])) {
-                $Group->find($id)->group_tags()->sync($_POST['group_tags']);
-            } else {
-                $Group->find($id)->group_tags()->sync([]);
+            if (FixometerHelper::hasRole($user, 'Administrator')) {
+                if ( ! empty($_POST['group_tags'])) {
+                    $Group->find($id)->group_tags()->sync($_POST['group_tags']);
+                } else {
+                    $Group->find($id)->group_tags()->sync([]);
+                }
             }
 
             if ( ! $u) {
@@ -767,7 +764,7 @@ class GroupController extends Controller
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
                     event(new ApproveGroup($group, $data));
 
-                    // Notify nearest users - disabled for now until Laravel Queue is implemented
+                    // Notify nearest users.
                     if ( ! is_null($latitude) && ! is_null($longitude)) {
                         $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
                                                 ->orderBy('name', 'ASC')
@@ -781,16 +778,6 @@ class GroupController extends Controller
                 } elseif ( ! empty($group->wordpress_post_id)) {
                     event(new EditGroup($group, $data));
                 }
-
-                // $shouldUpdateWordpress = env('APP_ENV') != 'development' && env('APP_ENV') != 'local';
-              // if ($shouldUpdateWordpress) {
-              //   try {
-              //     $this->updateGroupInWordpress($id, $data, $group_avatar, $latitude, $longitude);
-              //   } catch (\Exception $ex) {
-              //     $reponse['success'] = 'error pushing to wp';
-              //     report($ex);
-              //   }
-              // }
             }
         }
 

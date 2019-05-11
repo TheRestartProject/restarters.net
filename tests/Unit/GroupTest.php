@@ -68,4 +68,19 @@ class GroupTest extends TestCase
 
         $this->assertEquals(Role::HOST, $restarter->role, 'Restarter was converted to a Host');
     }
+
+    /** @test */
+    public function it_can_have_a_tag_added()
+    {
+        $group = factory('App\Group')->create();
+        $tag1 = factory('App\GroupTags')->create();
+        $tag2 = factory('App\GroupTags')->create();
+
+        $group->addTag($tag1);
+        $group->addTag($tag2);
+
+        $retrievedTag = $group->group_tags()->first();
+
+        $this->assertTrue($tag1->tag_name == $retrievedTag->tag_name);
+    }
 }

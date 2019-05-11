@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <section class="groups">
+
   <div class="container">
     <div class="row">
       <div class="col">
@@ -22,6 +23,11 @@
 
         @if(isset($response))
         @php( FixometerHelper::printResponse($response) )
+        @endif
+        @if (\Session::has('error'))
+          <div class="alert alert-danger">
+              {!! \Session::get('error') !!}
+          </div>
         @endif
 
         <ul class="nav nav-tabs">
@@ -211,4 +217,8 @@
 </div>
 </div>
 </section>
+@endsection
+
+@section('scripts')
+@include('includes/gmap')
 @endsection
