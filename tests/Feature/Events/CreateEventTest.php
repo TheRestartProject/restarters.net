@@ -50,7 +50,7 @@ class CreateEventTest extends TestCase
 
         $group = factory(Group::class)->create();
         $group->addVolunteer($host);
-        $group->makeGroupMemberAHost($host);
+        $group->makeMemberAHost($host);
 
         // act
         $response = $this->get('/party/create');
@@ -74,7 +74,7 @@ class CreateEventTest extends TestCase
         // When we create an event
         $event = factory(Party::class)->raw();
         $response = $this->post('/party/create/', $event);
-        $response->assertSuccessful();
+        $response->assertStatus(302);
 
         //Notification::assertSentTo(
         //   [$admins], AdminModerationEvent::class
