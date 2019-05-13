@@ -7,6 +7,5 @@ set -o xtrace
 
 export COMPOSER_ALLOW_SUPERUSER=1
 composer install
-php artisan key:generate
 php artisan migrate -v
 php artisan serve --host=0.0.0.0 --port=8181

@@ -7,25 +7,31 @@ services:
   app:
     build:
       context: .
-      dockerfile: ./compose/local/Dockerfile # relative to build context
+      dockerfile: ./compose/local/Dockerfile
     ports:
-      - "8009:8000"
+      - "8000:8181"
     volumes:
       - .:/app
-    env_file: .env
+    env_file: ./compose/local/env
     working_dir: /app
     command: /start.sh
     depends_on:
       - db
-    links:
-      - db
   db:
     image: "mysql:5.7"
-    env_file: .env
+    env_file: ./compose/local/env
     volumes:
       - dbdata:/var/lib/mysql
     ports:
       - "3306:3306"
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
+    logging:
+      driver: none
+
   # phpmyadmin:
   #   depends_on:
   #     - db
