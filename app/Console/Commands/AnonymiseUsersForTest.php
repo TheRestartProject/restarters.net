@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\User;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Hash;
 
 class AnonymiseUsersForTest extends Command
 {
@@ -54,8 +55,14 @@ class AnonymiseUsersForTest extends Command
             $user->name = $faker->name;
             $user->email = $faker->unique()->safeEmail;
             $user->biography = $faker->text;
-            $user->username = $faker->userName;
+            $username = $faker->username;
+            $user->username = $username;
+            $user->mediawiki = $username;
+            $user->location = $faker->city;
+            $user->latitude = $faker->latitude();
+            $user->longitude = $faker->longitude();
             $user->age = $faker->year(2000);
+            $user->password = Hash::make('secret');
 
             $user->save();
 
