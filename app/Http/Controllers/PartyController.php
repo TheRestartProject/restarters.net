@@ -1570,85 +1570,102 @@ class PartyController extends Controller
      * @param   [type]     $api_key
      * @return  [type]
      */
-    public function getEventsByKey(Request $request, $api_key, $date_from = null, $date_to = null)
-    {
-        $parties = Party::join('groups', 'groups.idgroups', '=', 'events.group')
-        ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-        ->join('group_tags', 'group_tags.id', '=', 'grouptags_groups.group_tag')
-        ->join('users', 'users.access_group_tag_id', '=', 'group_tags.id');
+     public function getEventsByKey(Request $request, $api_key, $date_from = null, $date_to = null)
+     {
+         $user = User::where('access_key', $api_key)->first();
 
-        if ( ! empty($date_from) && ! empty($date_to)) {
-            $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
-          ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
-        }
+         $parties = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+         ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
+         ->join('group_tags', 'group_tags.id', '=', 'grouptags_groups.group_tag')
+         ->join('users', 'users.access_group_tag_id', '=', 'group_tags.id');
 
-        $parties = $parties->where('users.access_key', $api_key)->select('events.*')->get();
+         if ( ! empty($date_from) && ! empty($date_to)) {
+           $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
+           ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
+         }
 
-        // If no parties are found, through 404 error
-        if (empty($parties)) {
-            return abort(404, 'No Events found.');
-        }
+         $parties = $parties->where([
+             ['users.access_key', $user->access_key],
+             ['users.access_group_tag_id', $user->access_group_tag_id]
+         ])
+         ->select('events.*')
+         ->get();
 
-        // Get Emission Ratio
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+         // If no parties are found, through 404 error
+         if (empty($parties)) {
+           return abort(404, 'No Events found.');
+         }
 
-        // New Collection Instance
-        $collection = collect([]);
+         // Get Emission Ratio
+         $footprintRatioCalculator = new FootprintRatioCalculator();
+         $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-        // Loop through each Group Parties
-        foreach ($parties as $key => $party) {
 
-            // Push Party to Collection
-            $collection->push([
-                'id' => $party->idevents,
-                'group' => [
-                    'id' => $party->theGroup->idgroups,
-                    'name' => $party->theGroup->name,
-                    'description' => $party->theGroup->free_text,
-                    'image_url' => $party->theGroup->groupImagePath(),
-                    'volunteers' => $party->theGroup->getGroupStats($emissionRatio)['pax'],
-                    'participants' => $party->theGroup->totalPartiesParticipants(),
-                    'hours_volunteered' => $party->theGroup->getGroupStats($emissionRatio)['hours'],
-                    'parties_thrown' => $party->theGroup->getGroupStats($emissionRatio)['parties'],
-                    'waste_prevented' => $party->theGroup->getGroupStats($emissionRatio)['waste'],
-                    'co2_emissions_prevented' => $party->theGroup->getGroupStats($emissionRatio)['co2'],
-                ],
-                'event_date' => $party->event_date,
-                'start_time' => $party->start,
-                'end_time' => $party->end,
-                'name' => $party->venue,
-                'location' => [
-                    'value' => $party->location,
-                    'latitude' => $party->latitude,
-                    'longitude' => $party->longitude,
-                ],
-                'description' => $party->free_text,
-                'user' => $party_user = collect(),
-                'impact' => [
-                    'participants' => $party->pax,
-                    'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
-                    'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
-                    'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
-                    'devices_fixed' => $party->getEventStats($emissionRatio)['fixed_devices'],
-                    'devices_repairable' => $party->getEventStats($emissionRatio)['repairable_devices'],
-                    'devices_dead' => $party->getEventStats($emissionRatio)['dead_devices'],
-                ],
-                'widgets' => [
-                    'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
-                    'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
-                ],
-                'hours_volunteered' => $party->hoursVolunteered(),
-            ]);
+         $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
+         ->where('group_tag', $user->access_group_tag_id)->get();
 
-            if ( ! empty($party->owner)) {
-                $party_user->put('id', $party->owner->id);
-                $party_user->put('name', $party->owner->name);
-            }
-        }
+         $groups_array = collect([]);
+         foreach ($groups as $key => $group) {
+           $groups_array->push([
+               'id' => $group->idgroups,
+               'name' => $group->name,
+               'description' => $group->free_text,
+               'image_url' => $group->groupImagePath(),
+               'volunteers' => $group->volunteers,
+               'participants' => $group->getGroupStats($emissionRatio)['pax'],
+               'hours_volunteered' => $group->getGroupStats($emissionRatio)['hours'],
+               'parties_thrown' => $group->getGroupStats($emissionRatio)['parties'],
+               'waste_prevented' => $group->getGroupStats($emissionRatio)['waste'],
+               'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
+           ]);
+         }
 
-        return $collection;
-    }
+         $collection = collect([]);
+         foreach ($parties as $key => $party) {
+
+           $group = $groups_array->filter(function ($group) use($party) {
+             return $group['id'] == $party->group;
+           })->first();
+
+           // Push Party to Collection
+           $collection->push([
+             'id' => $party->idevents,
+             'group' => [$group],
+             'event_date' => $party->event_date,
+             'start_time' => $party->start,
+             'end_time' => $party->end,
+             'name' => $party->venue,
+             'location' => [
+                 'value' => $party->location,
+                 'latitude' => $party->latitude,
+                 'longitude' => $party->longitude,
+             ],
+             'description' => $party->free_text,
+             'user' => $party_user = collect(),
+             'impact' => [
+                 'participants' => $party->pax,
+                 'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
+                 'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
+                 'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
+                 'devices_fixed' => $party->getEventStats($emissionRatio)['fixed_devices'],
+                 'devices_repairable' => $party->getEventStats($emissionRatio)['repairable_devices'],
+                 'devices_dead' => $party->getEventStats($emissionRatio)['dead_devices'],
+             ],
+             'widgets' => [
+                 'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
+                 'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
+             ],
+             'hours_volunteered' => $party->hoursVolunteered(),
+           ]);
+
+           if ( ! empty($party->owner)) {
+             $party_user->put('id', $party->owner->id);
+             $party_user->put('name', $party->owner->name);
+           }
+         }
+
+         return $collection;
+     }
 
     /**
      * [getEventByKeyAndId description]
@@ -1683,8 +1700,8 @@ class PartyController extends Controller
                 'name' => $party->theGroup->name,
                 'description' => $party->theGroup->free_text,
                 'image_url' => $party->theGroup->groupImagePath(),
-                'volunteers' => $party->theGroup->getGroupStats($emissionRatio)['pax'],
-                'participants' => $party->theGroup->totalPartiesParticipants(),
+                'volunteers' => $party->theGroup->volunteers,
+                'participants' => $party->theGroup->getGroupStats($emissionRatio)['pax'],
                 'hours_volunteered' => $party->theGroup->getGroupStats($emissionRatio)['hours'],
                 'parties_thrown' => $party->theGroup->getGroupStats($emissionRatio)['parties'],
                 'waste_prevented' => $party->theGroup->getGroupStats($emissionRatio)['waste'],
