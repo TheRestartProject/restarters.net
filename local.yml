@@ -12,14 +12,14 @@ services:
       - "8000:8181"
     volumes:
       - .:/app
-    env_file: ./compose/local/env
+    env_file: .env
     working_dir: /app
     command: /start.sh
     depends_on:
       - db
   db:
     image: "mysql:5.7"
-    env_file: ./compose/local/env
+    env_file: .env
     volumes:
       - dbdata:/var/lib/mysql
     ports:
