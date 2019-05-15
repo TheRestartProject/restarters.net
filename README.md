@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/TheRestartProject/restarters.net/tree/dockerize.svg?style=svg)](https://circleci.com/gh/TheRestartProject/restarters.net/tree/dockerize)
+
 # restarters.net
 
 restarters.net is a suite of software for the repair community.
@@ -113,6 +115,16 @@ docker-compose -f local.yml up --build
 ```
 
 Login to restarters.net at http://restarters.test:8000
+
+## Testing using Docker / Docker Compose
+
+To run the unit / feature tests run:
+
+```
+docker-compose -f local.yml run --rm app vendor/bin/phpunit --code-coverage (Unit | Feature)
+```
+
+The tests will run and a coverage report will be generated in the root folder after the named tests.
 
 
 

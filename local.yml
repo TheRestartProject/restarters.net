@@ -1,8 +1,5 @@
 version: "3"
 
-volumes:
-  dbdata:
-
 services:
   app:
     build:
@@ -21,7 +18,7 @@ services:
     image: "mysql:5.7"
     env_file: .env
     volumes:
-      - dbdata:/var/lib/mysql
+      - "dbdata:/var/lib/mysql"
     ports:
       - "3306:3306"
 
@@ -32,13 +29,5 @@ services:
     logging:
       driver: none
 
-  # phpmyadmin:
-  #   depends_on:
-  #     - db
-  #   image: phpmyadmin/phpmyadmin
-  #   restart: always
-  #   ports:
-  #     - 8090:80
-  #   environment:
-  #     PMA_HOST: db
-  #     MYSQL_ROOT_PASSWORD: yourpassword
+volumes:
+  dbdata:
