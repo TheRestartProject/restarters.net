@@ -362,26 +362,6 @@ class Group extends Model implements Auditable
     }
 
     /**
-     * [totalPartiesParticipants description]
-     * Total Group Parties Participants
-     *
-     * @author Christopher Kelker - @date 2019-03-21
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @return  [type]
-     */
-    public function totalPartiesParticipants()
-    {
-        foreach ($this->parties as $key => $party) {
-            $new_array = $party->users->pluck('user')->toArray();
-            $new_array = array_unique($new_array);
-            $total = array_push($new_array, $new_array);
-        }
-
-        return $total;
-    }
-
-    /**
      * [totalPartiesHours description]
      * Total Group Parties Hours
      *
