@@ -69,6 +69,7 @@ jobs:
       - run:
           name: "Run Tests"
           command: ./vendor/bin/phpunit \
+                   --testsuite Unit
                    --log-junit test-results/tests/results.xml \
                    --coverage-html coverage-report
 
