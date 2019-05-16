@@ -65,6 +65,11 @@ jobs:
           name: Migrate Database
           command: php artisan migrate -v
 
+      # check code style
+      - run:
+          name: "Check Code Style"
+          command: ./vendor/bin/phpcs ./app
+
       # run tests
       - run:
           name: "Run Tests"
