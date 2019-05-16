@@ -1,5 +1,7 @@
 [![CircleCI](https://circleci.com/gh/TheRestartProject/restarters.net/tree/dockerize.svg?style=svg)](https://circleci.com/gh/TheRestartProject/restarters.net/tree/dockerize)
 
+[![Test Coverage](https://api.codeclimate.com/v1/badges/24d15dfa18099e13f62c/test_coverage)](https://codeclimate.com/github/TheRestartProject/restarters.net/test_coverage)
+
 # restarters.net
 
 restarters.net is a suite of software for the repair community.
@@ -10,10 +12,10 @@ events, to bring down the barriers to repair.
 
 It combines together three core modules:
 
-* The Fixometer - our engine for capturing the impact of our community repair
+- The Fixometer - our engine for capturing the impact of our community repair
   activities
-* Restarters Talk - a space for local and global discussion of community repair
-* Restarters Wiki - a collectively produced knowledge base of advice and support
+- Restarters Talk - a space for local and global discussion of community repair
+- Restarters Wiki - a collectively produced knowledge base of advice and support
   for community repair
 
 ## Roadmap
@@ -44,7 +46,7 @@ See Installation Guidelines in the wiki.
 
 ### Basic setup
 
-This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a different OS!
+This is currently assuming Debian / Ubuntu. Get in touch if you're trying on a different OS!
 
 #### Prerequisites
 
@@ -85,7 +87,7 @@ $ php artisan tinker
 $ php artisan serve --host=restarters.test
 ```
 
-* login!
+- login!
 
 ## Develop using Docker and Docker Compose
 
@@ -98,9 +100,10 @@ Once these prerequsites are installed you can build the applicaition by doing:
 ```
 docker-compose -f local.yml build
 ```
+
 This will build the stack for local development using an `env` file at `./compose/local/env`.
 
-The `local.yml` file defines the *restarters.net* laravel application and pulls in a mysql docker image. The mysql data directory is mounted using a docker volume. An instance of [MailHog](https://github.com/mailhog/MailHog) is used for SMTP testing.
+The `local.yml` file defines the _restarters.net_ laravel application and pulls in a mysql docker image. The mysql data directory is mounted using a docker volume. An instance of [MailHog](https://github.com/mailhog/MailHog) is used for SMTP testing.
 
 Once the application is built you can add a user by doing:
 
@@ -108,6 +111,7 @@ Once the application is built you can add a user by doing:
 docker-compose -f local.yml run --rm app php artisan tinker
 > User::create(['name'=>'Jane Bloggs' 'email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2]);
 ```
+
 To run the application stack do:
 
 ```
@@ -125,8 +129,6 @@ docker-compose -f local.yml run --rm app vendor/bin/phpunit --code-coverage (Uni
 ```
 
 The tests will run and a coverage report will be generated in the root folder after the named tests.
-
-
 
 ## Methodology
 
