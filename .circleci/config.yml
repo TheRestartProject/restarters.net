@@ -66,9 +66,9 @@ jobs:
           command: php artisan migrate -v
 
       # check code style
-      - run:
-          name: "Check Code Style"
-          command: ./vendor/bin/phpcs -s --report=summary ./app
+      # - run:
+      #     name: "Check Code Style"
+      #     command: ./vendor/bin/phpcs -s --report=summary ./app
 
       # run tests
       - run:
