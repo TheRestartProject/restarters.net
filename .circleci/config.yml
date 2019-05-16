@@ -68,15 +68,15 @@ jobs:
       # check code style
       - run:
           name: "Check Code Style"
-          command: ./vendor/bin/phpcs ./app
+          command: ./vendor/bin/phpcs -s --report=summary ./app
 
       # run tests
       - run:
           name: "Run Tests"
           command: ./vendor/bin/phpunit \
-                   --testsuite Unit
-                   --log-junit test-results/tests/results.xml \
-                   --coverage-html coverage-report
+            --testsuite Unit
+            --log-junit test-results/tests/results.xml \
+            --coverage-html coverage-report
 
       # store coverage artifacts
       - store_artifacts:
