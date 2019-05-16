@@ -10,20 +10,20 @@ jobs:
         - dockerize # temp
     docker:
       - image: circleci/php:7.1-node-browsers
-        environment:
-          - DB_CONNECTION: mysql
-          - DB_HOST: 127.0.0.1
-          - DB_PORT: 3306
-          - DB_DATABASE: restarters_db
-          - DB_USERNAME: restarters
-          - DB_PASSWORD: s3cr3t
+        # environment:
+        #   - DB_CONNECTION: mysql
+        #   - DB_HOST: 127.0.0.1
+        #   - DB_PORT: 3306
+        #   - DB_DATABASE: restarters_db
+        #   - DB_USERNAME: restarters
+        #   - DB_PASSWORD: s3cr3t
 
       - image: circleci/mysql:5.7-ram
-        environment:
-          - MYSQL_ROOT_PASSWORD: s3cr3t
-          - MYSQL_DATABASE: restarters_db
-          - MYSQL_USER: restarters
-          - MYSQL_PASSWORD: s3cr3t
+        # environment:
+        #   - MYSQL_ROOT_PASSWORD: s3cr3t
+        #   - MYSQL_DATABASE: restarters_db
+        #   - MYSQL_USER: restarters
+        #   - MYSQL_PASSWORD: s3cr3t
 
     steps:
       - checkout
@@ -57,8 +57,8 @@ jobs:
       #       - node_modules
 
       - run:
-          name: Setup local .env
-          command: cp ./compose/local/env .env
+          name: Setup testing .env
+          command: cp ./compose/testing/env .env
 
       # prepare the database
       - run:
