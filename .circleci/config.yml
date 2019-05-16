@@ -76,7 +76,7 @@ jobs:
           command: ./vendor/bin/phpunit \
             --testsuite Unit
             --log-junit test-results/tests/results.xml \
-            --coverage-html coverage-report
+            --coverage-clover coverage-report/clover.xml
 
       # store coverage artifacts
       - store_artifacts:
