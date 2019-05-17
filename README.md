@@ -1,6 +1,4 @@
-[![CircleCI](https://circleci.com/gh/TheRestartProject/restarters.net/tree/dockerize.svg?style=svg)](https://circleci.com/gh/TheRestartProject/restarters.net/tree/dockerize)
-
-[![Test Coverage](https://api.codeclimate.com/v1/badges/24d15dfa18099e13f62c/test_coverage)](https://codeclimate.com/github/TheRestartProject/restarters.net/test_coverage)
+[![CircleCI](https://circleci.com/gh/TheRestartProject/restarters.net/tree/dockerize.svg?style=svg)](https://circleci.com/gh/TheRestartProject/restarters.net/tree/dockerize) [![Test Coverage](https://api.codeclimate.com/v1/badges/24d15dfa18099e13f62c/test_coverage)](https://codeclimate.com/github/TheRestartProject/restarters.net/test_coverage)
 
 # restarters.net
 
