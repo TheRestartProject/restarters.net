@@ -58,7 +58,7 @@ jobs:
 
       - run:
           name: Setup testing .env
-          command: cp ./compose/local/env .env
+          command: cp ./compose/test/env .env
 
       # prepare the database
       - run:

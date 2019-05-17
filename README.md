@@ -89,11 +89,15 @@ $ php artisan serve --host=restarters.test
 
 ## Develop using Docker and Docker Compose
 
-**edit /etc/hosts -> 127.0.0.1 restarters.test**
+First do:
+
+edit `/etc/hosts -> 127.0.0.1 restarters.test`
 
 Make sure you have Docker and Docker Compose installed. See [here](https://linuxize.com/post/how-to-install-and-use-docker-on-ubuntu-18-04/) to install Docker and [here](https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-18-04) for Docker Compose installation on Ubuntu 18.04.
 
-Once these prerequsites are installed you can build the applicaition by doing:
+Copy `./compose/local/env` to `.env`
+
+Once these prerequsites are finished you can build the applicaition by doing:
 
 ```
 docker-compose -f local.yml build
@@ -120,13 +124,15 @@ Login to restarters.net at http://restarters.test:8000
 
 ## Testing using Docker / Docker Compose
 
-To run the unit / feature tests run:
+First copy `./compose/test/env.testing` to `.env.testing`
+
+Test cases can be run by using the `test.yml` compose file:
 
 ```
-docker-compose -f local.yml run --rm app vendor/bin/phpunit --code-coverage (Unit | Feature)
+docker-compose -f test.yml -p restarters_test run --rm app_test vendor/bin/phpunit --testsuite (Unit | Feature) --coverage-html htmlcov
 ```
 
-The tests will run and a coverage report will be generated in the root folder after the named tests.
+The tests will run and a coverage report will be generated in the `htmlcov` directory after the named tests.
 
 ## Methodology
 
