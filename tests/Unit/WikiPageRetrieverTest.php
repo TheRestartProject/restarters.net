@@ -23,6 +23,7 @@ class WikiPageRetrieverTest extends TestCase
     public function testFiveResults()
     {
         $apiEndpointBase = env('WIKI_URL') . '/api.php';
+
         $wikiPageRetriever = new CachingWikiPageRetriever($apiEndpointBase);
 
         $result = $wikiPageRetriever->getRandomWikiPages(5);
@@ -48,4 +49,3 @@ class WikiPageRetrieverTest extends TestCase
         $result = $wikiPageRetriever->getRandomWikiPages(5);
     }*/
 }
-

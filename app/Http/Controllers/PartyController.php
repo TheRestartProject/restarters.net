@@ -12,6 +12,7 @@ use App\Events\EditEvent;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\Geocoder;
 use App\Host;
 use App\Invite;
 use App\Notifications\AdminModerationEvent;
@@ -47,8 +48,11 @@ class PartyController extends Controller
     public $TotalEmission;
     public $EmissionRatio;
 
-    public function __construct()
+    protected $geocoder;
+
+    public function __construct(Geocoder $geocoder)
     {
+        $this->geocoder = $geocoder;
         //($model, $controller, $action)
 
         // parent::__construct($model, $controller, $action);
@@ -148,7 +152,7 @@ class PartyController extends Controller
     public function create(Request $request, $group_id = null)
     {
 
-      // Let's determine whether currently logged in user is associated with any groups
+        // Let's determine whether currently logged in user is associated with any groups
         $user_groups = UserGroups::join('groups', 'groups.idgroups', '=', 'users_groups.group')
                                 ->where('user', Auth::user()->id)
                                   ->where('role', 3)
@@ -166,21 +170,9 @@ class PartyController extends Controller
             $error = array();
 
             if ($request->has('location')) {
-                // TODO: NGM: we should inject a geocoding class for use here.
-                // (will aid with testing, and allow for swapping to a non-Google geocoder)
-                try {
-                    $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($request->input('location').',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
-                    $json = json_decode($json);
-
-                    if (is_object($json) && !empty($json->{'results'})) {
-                        $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
-                        $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
-                    }
-                } catch (\Exception $ex) {
-                    $latitude = 0;
-                    $longitude = 0;
-                    Log::error('An error occurred during geocoding: ' . $ex->getMessage());
-                }
+                $result = $this->geocoder->geocode($request->input('location'));
+                $latitude = $result['lat'];
+                $longitude = $result['lon'];
             } else {
                 $latitude = null;
                 $longitude = null;

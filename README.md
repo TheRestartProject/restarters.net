@@ -124,15 +124,24 @@ Login to restarters.net at http://restarters.test:8000
 
 ## Testing using Docker / Docker Compose
 
-First copy `./compose/test/env.testing` to `.env.testing`
+First copy `./compose/test/env` to `.env.testing`
 
-Test cases can be run by using the `test.yml` compose file:
+Test cases can be run by using the `test.yml` compose file. The tests run against an in-memory instance of mysql so the first step is to migrate the test database.
+
+```
+docker-compse -f test.yml -p restarters_test run --rm app_test php artisan migrate
+```
+
+Then you can run the tests.
 
 ```
 docker-compose -f test.yml -p restarters_test run --rm app_test vendor/bin/phpunit --testsuite (Unit | Feature) --coverage-html htmlcov
+
 ```
 
 The tests will run and a coverage report will be generated in the `htmlcov` directory after the named tests.
+
+An alternative setup could use a docker volume to persist the test database. This would save needing to run the migrate step after each reboot. This would make the tests run more slowly however.
 
 ## Methodology
 
@@ -150,3 +159,7 @@ made possible with modest funding from the Innovation in Waste Prevention Fund,
 Defra-funded and administered by WRAP. Subsequent development has been financed
 by the Shuttleworth Foundation, and by Nesta and the Department for Digital,
 Culture, Media & Sport.
+
+```
+
+```
