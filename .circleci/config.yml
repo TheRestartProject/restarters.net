@@ -82,7 +82,6 @@ jobs:
           command: |
             ./cc-test-reporter before-build
             ./vendor/bin/phpunit \
-            --testsuite Unit \
             --log-junit test-results/tests/results.xml \
             --coverage-html coverage-report \
             --coverage-clover clover.xml
