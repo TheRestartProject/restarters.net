@@ -2,7 +2,8 @@
 
 namespace App\Helpers;
 
-use Cache;
+// use Cache;
+use Illuminate\Support\Facades\Cache;
 
 class CachingWikiPageRetriever
 {
@@ -35,5 +36,10 @@ class CachingWikiPageRetriever
         }
 
         return $pages_json;
+    }
+
+    public function flushPages()
+    {
+        Cache::forget('wiki_pages');
     }
 }
