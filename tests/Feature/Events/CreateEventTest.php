@@ -13,6 +13,9 @@ use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
+
+use App\Helpers\Geocoder;
+
 class CreateEventTest extends TestCase
 {
     public function setUp()
@@ -24,6 +27,10 @@ class CreateEventTest extends TestCase
         Party::truncate();
         EventsUsers::truncate();
         DB::statement("SET foreign_key_checks=1");
+
+        $geocoder = $this->createMock(Geocoder::class);
+        $this->app->instance(Geocoder::class, $geocoder);
+        $geocoder->method('geocode')->willReturn(['lat' => 52, 'lon' => 0]);
     }
 
     /** @test */

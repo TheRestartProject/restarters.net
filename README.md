@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/TheRestartProject/restarters.net/tree/dockerize.svg?style=svg)](https://circleci.com/gh/TheRestartProject/restarters.net/tree/dockerize) [![Test Coverage](https://api.codeclimate.com/v1/badges/24d15dfa18099e13f62c/test_coverage)](https://codeclimate.com/github/TheRestartProject/restarters.net/test_coverage)
+
 # restarters.net
 
 restarters.net is a suite of software for the repair community.
@@ -6,12 +8,12 @@ Restarters brings together community repair enthusiasts and activists from
 around the world, to engage in discussion and to organise local community repair
 events, to bring down the barriers to repair.
 
-It combines together three core modules: 
+It combines together three core modules:
 
-* The Fixometer - our engine for capturing the impact of our community repair
+- The Fixometer - our engine for capturing the impact of our community repair
   activities
-* Restarters Talk - a space for local and global discussion of community repair
-* Restarters Wiki - a collectively produced knowledge base of advice and support
+- Restarters Talk - a space for local and global discussion of community repair
+- Restarters Wiki - a collectively produced knowledge base of advice and support
   for community repair
 
 ## Roadmap
@@ -42,7 +44,7 @@ See Installation Guidelines in the wiki.
 
 ### Basic setup
 
-This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a different OS!
+This is currently assuming Debian / Ubuntu. Get in touch if you're trying on a different OS!
 
 #### Prerequisites
 
@@ -77,13 +79,69 @@ $ php artisan tinker
 > User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2]);
 ```
 
-- run the app: 
+- run the app:
 
 ```
 $ php artisan serve --host=restarters.test
 ```
 
-* login!
+- login!
+
+## Develop using Docker and Docker Compose
+
+First do:
+
+edit `/etc/hosts -> 127.0.0.1 restarters.test`
+
+Make sure you have Docker and Docker Compose installed. See [here](https://linuxize.com/post/how-to-install-and-use-docker-on-ubuntu-18-04/) to install Docker and [here](https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-18-04) for Docker Compose installation on Ubuntu 18.04.
+
+Copy `./compose/local/env` to `.env`
+
+Once these prerequsites are finished you can build the applicaition by doing:
+
+```
+docker-compose -f local.yml build
+```
+
+This will build the stack for local development using an `env` file at `./compose/local/env`.
+
+The `local.yml` file defines the _restarters.net_ laravel application and pulls in a mysql docker image. The mysql data directory is mounted using a docker volume. An instance of [MailHog](https://github.com/mailhog/MailHog) is used for SMTP testing.
+
+Once the application is built you can add a user by doing:
+
+```
+docker-compose -f local.yml run --rm app php artisan tinker
+> User::create(['name'=>'Jane Bloggs' 'email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2]);
+```
+
+To run the application stack do:
+
+```
+docker-compose -f local.yml up --build
+```
+
+Login to restarters.net at http://restarters.test:8000
+
+## Testing using Docker / Docker Compose
+
+First copy `./compose/test/env` to `.env.testing`
+
+Test cases can be run by using the `test.yml` compose file. The tests run against an in-memory instance of mysql so the first step is to migrate the test database.
+
+```
+docker-compse -f test.yml -p restarters_test run --rm app_test php artisan migrate
+```
+
+Then you can run the tests.
+
+```
+docker-compose -f test.yml -p restarters_test run --rm app_test vendor/bin/phpunit --testsuite (Unit | Feature) --coverage-html htmlcov
+
+```
+
+The tests will run and a coverage report will be generated in the `htmlcov` directory after the named tests.
+
+An alternative setup could use a docker volume to persist the test database. This would save needing to run the migrate step after each reboot. This would make the tests run more slowly however.
 
 ## Methodology
 
@@ -101,3 +159,7 @@ made possible with modest funding from the Innovation in Waste Prevention Fund,
 Defra-funded and administered by WRAP. Subsequent development has been financed
 by the Shuttleworth Foundation, and by Nesta and the Department for Digital,
 Culture, Media & Sport.
+
+```
+
+```

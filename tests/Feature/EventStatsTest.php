@@ -51,7 +51,9 @@ class EventStatsTest extends TestCase
         $eventStats = $event->getEventStats($displacementRatio);
         $eventCo2 = $eventStats['co2'];
 
-        $expectedCo2 = round($device->deviceCategory->footprint) * $displacementRatio;
+        // $expectedCo2 = round($device->deviceCategory->footprint) * $displacementRatio;
+
+        $expectedCo2 = $device->deviceCategory->footprint * $displacementRatio;
 
         $this->assertEquals($expectedCo2, $eventCo2);
     }

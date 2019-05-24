@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./compose/local/Dockerfile
+    ports:
+      - "8000:8181"
+    volumes:
+      - .:/app
+    env_file: .env
+    working_dir: /app
+    command: /start.sh
+    depends_on:
+      - db
+  db:
+    image: "mysql:5.7"
+    env_file: .env
+    volumes:
+      - "dbdata:/var/lib/mysql"
+    ports:
+      - "3306:3306"
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
+    logging:
+      driver: none
+
+volumes:
+  dbdata:

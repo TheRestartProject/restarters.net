@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Group;
+use App\GroupTags;
 use App\Role;
 use App\User;
 use App\UserGroups;
@@ -20,6 +21,7 @@ class GroupTest extends TestCase
         DB::statement("SET foreign_key_checks=0");
         User::truncate();
         Group::truncate();
+        GroupTags::truncate();
         UserGroups::truncate();
         DB::statement("SET foreign_key_checks=1");
     }
@@ -73,8 +75,13 @@ class GroupTest extends TestCase
     public function it_can_have_a_tag_added()
     {
         $group = factory('App\Group')->create();
-        $tag1 = factory('App\GroupTags')->create();
-        $tag2 = factory('App\GroupTags')->create();
+        $tag1 = factory('App\GroupTags')->make([
+            'tag_name' => 'First'
+            ]
+        );
+        $tag2 = factory('App\GroupTags')->make([
+            'tag_name' => 'Second'
+        ]);
 
         $group->addTag($tag1);
         $group->addTag($tag2);

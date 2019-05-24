@@ -1,0 +1,102 @@
+# PHP CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-php/ for more details
+#
+version: 2
+jobs:
+  build:
+    branches:
+      only:
+        - dockerize # temp
+    docker:
+      - image: circleci/php:7.1-node-browsers
+        environment:
+          - DB_CONNECTION: mysql
+          - DB_HOST: 127.0.0.1
+          - DB_PORT: 3306
+          - DB_DATABASE: restarters_db
+          - DB_USERNAME: restarters
+          - DB_PASSWORD: s3cr3t
+
+      - image: circleci/mysql:5.7-ram
+        environment:
+          - MYSQL_ROOT_PASSWORD: s3cr3t
+          - MYSQL_DATABASE: restarters_db
+          - MYSQL_USER: restarters
+          - MYSQL_PASSWORD: s3cr3t
+
+    steps:
+      - checkout
+
+      - run: sudo apt update
+      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev
+      - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            # "composer.lock" can be used if it is committed to the repo
+            - v1-dependencies-{{ checksum "composer.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      # - run: composer install -n --prefer-dist
+
+      - save_cache:
+          key: v1-dependencies-{{ checksum "composer.json" }}
+          paths:
+            - ./vendor
+      # - restore_cache:
+      #     keys:
+      #       - node-v1-{{ checksum "package.json" }}
+      #       - node-v1-
+      # - run: yarn install
+      # - save_cache:
+      #     key: node-v1-{{ checksum "package.json" }}
+      #     paths:
+      #       - node_modules
+
+      - run:
+          name: Setup testing .env
+          command: cp ./compose/test/env .env
+
+      # prepare the database
+      - run:
+          name: Migrate Database
+          command: php artisan migrate -v
+
+      # check code style
+      # - run:
+      #     name: "Check Code Style"
+      #     command: ./vendor/bin/phpcs -s --report=summary ./app
+
+      - run:
+          name: Setup Code Climate test-reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+
+      # run tests
+      - run:
+          name: "Run Tests"
+          command: |
+            ./cc-test-reporter before-build
+            ./vendor/bin/phpunit \
+            --log-junit test-results/tests/results.xml \
+            --coverage-html coverage-report \
+            --coverage-clover clover.xml
+            ./cc-test-reporter after-build --coverage-input-type clover --exit-code $?
+
+      # store coverage artifacts
+      - store_artifacts:
+          path: coverage-report
+          destination: coverage
+
+      # store test artifacts
+      - store_artifacts:
+          path: test-results
+          destination: tests
+
+      # store test results for test summary
+      - store_test_results:
+          path: test-results

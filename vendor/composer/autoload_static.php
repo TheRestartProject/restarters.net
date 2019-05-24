@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
+class ComposerStaticInitbc9913f738f7426a6071c38d3da012ca
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -4738,7 +4738,11 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'Symfony\\Polyfill\\Ctype\\Ctype' => __DIR__ . '/..' . '/symfony/polyfill-ctype/Ctype.php',
         'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
         'Symfony\\Polyfill\\Php72\\Php72' => __DIR__ . '/..' . '/symfony/polyfill-php72/Php72.php',
+        'Tests\\Browser\\GroupEditTest' => __DIR__ . '/../..' . '/tests/Browser/GroupEditTest.php',
+        'Tests\\Browser\\Pages\\HomePage' => __DIR__ . '/../..' . '/tests/Browser/Pages/HomePage.php',
+        'Tests\\Browser\\Pages\\Page' => __DIR__ . '/../..' . '/tests/Browser/Pages/Page.php',
         'Tests\\CreatesApplication' => __DIR__ . '/../..' . '/tests/CreatesApplication.php',
+        'Tests\\DuskTestCase' => __DIR__ . '/../..' . '/tests/DuskTestCase.php',
         'Tests\\Feature\\CreateEventTest' => __DIR__ . '/../..' . '/tests/Feature/Events/CreateEventTest.php',
         'Tests\\Feature\\DeviceStatsTest' => __DIR__ . '/../..' . '/tests/Feature/DeviceStatsTest.php',
         'Tests\\Feature\\EventStatsTest' => __DIR__ . '/../..' . '/tests/Feature/EventStatsTest.php',
@@ -4858,10 +4862,10 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitbc9913f738f7426a6071c38d3da012ca::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitbc9913f738f7426a6071c38d3da012ca::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitbc9913f738f7426a6071c38d3da012ca::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitbc9913f738f7426a6071c38d3da012ca::$classMap;
 
         }, null, ClassLoader::class);
     }

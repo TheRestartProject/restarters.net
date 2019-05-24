@@ -34,5 +34,7 @@ class GroupEditTest extends TestCase
 
         $host = factory(User::class)->states('Host')->create();
         $this->actingAs($host);
+        // temporary
+        $this->assertTrue(true);
     }
 }

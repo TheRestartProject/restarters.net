@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  app_test:
+    build:
+      context: .
+      dockerfile: ./compose/test/Dockerfile
+    ports:
+      - "8001:8181"
+    volumes:
+      - .:/app
+    env_file: .env.testing
+    working_dir: /app
+    command: /start.sh
+    depends_on:
+      - db_test
+
+  db_test:
+    image: "mysql:5.7"
+    tmpfs: /var/lib/mysql
+    env_file: .env.testing
+
+  mailhog_test:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
+    logging:
+      driver: none
+
+volumes:
+  dbdata_test:
