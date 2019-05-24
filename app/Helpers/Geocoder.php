@@ -21,8 +21,7 @@ class Geocoder
     {
         $url = "https://maps.googleapis.com/maps/api/geocode/json?address=";
         $url .= urlencode($location.',United Kingdom');
-        $url .= "&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE";
-        print($url);
+        $url .= "&key=".$apikey;
         try {
             $json = file_get_contents($url);
             $json = json_decode($json);
