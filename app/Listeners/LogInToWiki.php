@@ -36,6 +36,20 @@ class LogInToWiki
     {
         $user = $event->user;
 
+        if (is_null($user->mediawiki)) {
+            try {
+                // they don't have an account, so create one
+                $api = new \Mediawiki\Api\MediawikiApi( 'http://wiki.test/wiki/api.php' );
+                $api->login(new \Mediawiki\Api\ApiUser( 'Neil', 'C1o9m8m2!' ));
+                $services = new \Mediawiki\Api\MediawikiFactory($api);
+                $services->newUserCreator()->create($user->username, $this->request->input('password'), $user->email);
+                $user->mediawiki = $user->username;
+                $user->save();
+            } catch (\Exception $ex) {
+                Log::error("Failed to create new account for user '" . $user->username . "' in mediawiki: " . $ex->getMessage());
+            }
+        }
+
         if (!is_null($user->mediawiki) && !empty($user->mediawiki)) {
             try {
                 $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
