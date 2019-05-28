@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a56eb368766b55ea54108e5956fe2a9d",
+    "content-hash": "35e6a0639c93f7dc3826830522848d3c",
     "packages": [
         {
             "name": "addwiki/mediawiki-api-base",
@@ -3844,6 +3844,58 @@
                 "environment"
             ],
             "time": "2018-07-29T20:33:41+00:00"
+        },
+        {
+            "name": "wouternl/laravel-drip",
+            "version": "1.1.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wouterNL/laravel-drip.git",
+                "reference": "a1f42fdd7bd275d349233da32b8e917c20e588ed"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wouterNL/laravel-drip/zipball/a1f42fdd7bd275d349233da32b8e917c20e588ed",
+                "reference": "a1f42fdd7bd275d349233da32b8e917c20e588ed",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "5.2.*|5.3.*|5.4.*|5.5.*|5.6.*|5.7.*|5.8.*",
+                "php": ">=5.5.0"
+            },
+            "type": "package",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "wouterNL\\Drip\\DripServiceProvider"
+                    ],
+                    "aliases": {
+                        "Drip": "wouterNL\\Drip\\Facades\\DripFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "wouterNL\\Drip\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Drip",
+                    "homepage": "https://github.com/DripEmail/drip-php"
+                },
+                {
+                    "name": "Wouter Steegers",
+                    "email": "wouter42@gmail.com"
+                }
+            ],
+            "description": "A Laravel wrapper for Drip's REST API v2.0",
+            "homepage": "https://bitbucket.org/wouterNL/laravel-drip-php",
+            "time": "2019-02-27T21:39:26+00:00"
         }
     ],
     "packages-dev": [

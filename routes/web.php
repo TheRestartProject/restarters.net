@@ -11,6 +11,13 @@
 |
 */
 
+Route::get('/testing123', function () {
+
+  $test = Drip::getAccounts();
+
+  return $test;
+});
+
 Route::prefix('user')->group(function () {
     Route::get('/', 'HomeController@index');
     Route::get('reset', 'UserController@reset');
