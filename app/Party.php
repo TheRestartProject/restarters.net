@@ -441,6 +441,43 @@ class Party extends Model implements Auditable
                         ->orderBy('event_date', 'DESC');
     }
 
+    /**
+     * [scopeUsersPastEvents description]
+     * Get all Past Events from the User or User's groups, or any Past Events
+     * in which the User(s) has attended but is NOT a part of the
+     * group associated.
+     * @author Christopher Kelker
+     * @date   2019-05-28T09:50:22+010
+     * @param  [type]                  $query
+     * @param  [type]                  $user_ids
+     * @return [type]
+     */
+    public function scopeUsersPastEvents($query, array $user_ids = null)
+    {
+      // if no $user_ids are supplied, the use the current Auth's ID
+      if (empty($user_ids)) {
+        $user_ids[] = auth()->id();
+      }
+
+      return $query->join('groups', 'groups.idgroups', '=', 'events.group')
+      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+      ->join('events_users', 'events_users.event', '=', 'events.idevents')
+      ->whereNotNull('events.wordpress_post_id')
+      ->whereDate('events.event_date', '<', date('Y-m-d'))
+
+      // (`users_groups`.`user` = ? or
+      // `events_users`.`user` = ? and `users_groups`.`user` != ?)
+      ->where(function ($query) use ($user_ids) {
+          $query->whereIn('users_groups.user', $user_ids)
+          ->orWhereIn('events_users.user', $user_ids)
+          ->whereNotIn('users_groups.user', $user_ids);
+      })
+
+      ->select('events.*')
+      ->groupBy('idevents')
+      ->orderBy('events.event_date', 'DESC');
+    }
+
     public function allDevices()
     {
         return $this->hasMany('App\Device', 'event', 'idevents')->join('categories', 'categories.idcategories', '=', 'devices.category');

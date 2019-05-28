@@ -97,7 +97,7 @@ class PartyController extends Controller
             $moderate_events = null;
         }
 
-        //Use this view for showing group only upcoming and past events
+        // Use this view for showing group only upcoming and past events
         if ( ! is_null($group_id)) {
             $upcoming_events = Party::upcomingEvents()
             ->where('events.group', $group_id)
@@ -114,8 +114,7 @@ class PartyController extends Controller
             ->take(10)
             ->get();
 
-            $past_events = Party::pastEvents()
-                         ->paginate(10);
+            $past_events = Party::UsersPastEvents([auth()->id()])->paginate(10);
 
             $group = null;
         }
