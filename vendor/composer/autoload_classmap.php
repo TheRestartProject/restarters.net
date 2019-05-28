@@ -26,7 +26,6 @@ return array(
     'App\\DeviceBarrier' => $baseDir . '/app/DeviceBarrier.php',
     'App\\DeviceList' => $baseDir . '/app/DeviceList.php',
     'App\\DeviceUrl' => $baseDir . '/app/DeviceUrl.php',
-    'App\\Drip' => $baseDir . '/app/Drip.php',
     'App\\EventsUsers' => $baseDir . '/app/EventsUsers.php',
     'App\\Events\\ApproveEvent' => $baseDir . '/app/Events/ApproveEvent.php',
     'App\\Events\\ApproveGroup' => $baseDir . '/app/Events/ApproveGroup.php',

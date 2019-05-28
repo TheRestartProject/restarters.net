@@ -512,7 +512,6 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\DeviceBarrier' => __DIR__ . '/../..' . '/app/DeviceBarrier.php',
         'App\\DeviceList' => __DIR__ . '/../..' . '/app/DeviceList.php',
         'App\\DeviceUrl' => __DIR__ . '/../..' . '/app/DeviceUrl.php',
-        'App\\Drip' => __DIR__ . '/../..' . '/app/Drip.php',
         'App\\EventsUsers' => __DIR__ . '/../..' . '/app/EventsUsers.php',
         'App\\Events\\ApproveEvent' => __DIR__ . '/../..' . '/app/Events/ApproveEvent.php',
         'App\\Events\\ApproveGroup' => __DIR__ . '/../..' . '/app/Events/ApproveGroup.php',

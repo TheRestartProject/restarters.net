@@ -13,8 +13,19 @@
 
 Route::get('/testing123', function () {
 
-  $test = Drip::getAccounts();
+  $drip_connection = Drip::getAccounts();
 
+  $subscriber = "subscribers": [{
+    "email": "john@acme.com",
+    "time_zone": "America/Los_Angeles",
+    "custom_fields": {
+      "name": "John Doe"
+    }
+  }];
+array_push($drip_connection, $subscriber);
+
+  $test = Drip::createOrUpdateSubscriber($drip_connection);
+  dd($drip_connection, $test);
   return $test;
 });
 
