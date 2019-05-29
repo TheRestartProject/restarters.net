@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Events\UserDeleted;
 use App\UserGroups;
 
 use DB;
@@ -14,7 +15,9 @@ class User extends Authenticatable
 {
     use Notifiable;
     use SoftDeletes;
+
     protected $table = 'users';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -31,6 +34,15 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password', 'remember_token',
+    ];
+
+    /**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+        'deleted' => UserDeleted::class,
     ];
 
     public function role()

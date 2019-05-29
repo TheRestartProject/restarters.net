@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\UserDeleted;
+use App\Listeners\RemoveSoftDeletedUserFromAllGroups;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
@@ -36,6 +38,10 @@ class EventServiceProvider extends ServiceProvider
         // Notify When Edit Group Occurs
         'App\Events\EditGroup' => [
             'App\Listeners\CreateWordPressEditGroupPost',
+        ],
+
+        UserDeleted::class => [
+            RemoveSoftDeletedUserFromAllGroups::class,
         ],
     ];
 
