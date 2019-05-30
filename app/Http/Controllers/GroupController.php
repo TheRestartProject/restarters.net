@@ -55,8 +55,12 @@ class GroupController extends Controller
             //Get all group tags
             $all_group_tags = GroupTags::all();
 
+            //Look for groups where user ID exists in pivot table
+            $your_groups_uniques = UserGroups::where('user', auth()->id())->pluck('group')->toArray();
+
             return view('group.index', [
                 'your_groups' => null,
+                'your_groups_uniques' => $your_groups_uniques,
                 'groups_near_you' => null,
                 'groups' => $groups,
                 'your_area' => null,
@@ -108,6 +112,7 @@ class GroupController extends Controller
             'sort_column' => 'distance',
         ]);
     }
+
     public function searchColumn(Request $request)
     {
         $all = false;
@@ -195,6 +200,12 @@ class GroupController extends Controller
                                 ->orderBy('all_hosts_count', $sort_direction); //->has('allHosts')
         }
 
+        if ( ! empty($sort_column) && $sort_column == 'upcoming_event') { //TODO
+            $groups = $groups->join('events', 'events.group', '=', 'groups.idgroups')
+                              ->whereDate('event_date', '>=', date('Y-m-d'))
+                                ->orderBy('event_date', $sort_direction);
+        }
+
         if ( ! empty($sort_column) && $sort_column == 'restarters') {
             $groups = $groups->withCount('allRestarters') //->has('allRestarters')
                                 ->orderBy('all_restarters_count', $sort_direction);
@@ -208,6 +219,9 @@ class GroupController extends Controller
         $groups_count = $groups->count();
         $groups = $groups->paginate(env('PAGINATE'));
 
+        //Look for groups where user ID exists in pivot table
+        $your_groups_uniques = UserGroups::where('user', auth()->id())->pluck('group')->toArray();
+
         return view('group.index', [
             'your_groups' => null,
             'groups_near_you' => null,
@@ -215,6 +229,7 @@ class GroupController extends Controller
             'your_area' => null,
             'all' => true,
             'all_group_tags' => $all_group_tags,
+            'your_groups_uniques' => $your_groups_uniques,
             'name' => $request->input('name'),
             'location' => $request->input('location'),
             'selected_country' => $request->input('country'),
