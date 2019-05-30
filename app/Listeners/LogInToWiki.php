@@ -36,11 +36,16 @@ class LogInToWiki
     {
         $user = $event->user;
 
+        // TODO: for all of this we need to move to restarters.net being the auth provider for Mediawiki.
+        // This is currently a workaround.
+
+        // TODO: introduce a DB column to determine if user should have account created in the wiki.
+        // TODO: for users that already had an account, they should have password synced to wiki.
         if (is_null($user->mediawiki)) {
             try {
                 // they don't have an account, so create one
-                $api = new \Mediawiki\Api\MediawikiApi( 'http://wiki.test/wiki/api.php' );
-                $api->login(new \Mediawiki\Api\ApiUser( 'Neil', 'C1o9m8m2!' ));
+                $api = new \Mediawiki\Api\MediawikiApi(env('WIKI_URL').'/api.php');
+                $api->login(new \Mediawiki\Api\ApiUser(env('WIKI_APIUSER'), env('WIKI_APIPASSWORD'));
                 $services = new \Mediawiki\Api\MediawikiFactory($api);
                 $services->newUserCreator()->create($user->username, $this->request->input('password'), $user->email);
                 $user->mediawiki = $user->username;
