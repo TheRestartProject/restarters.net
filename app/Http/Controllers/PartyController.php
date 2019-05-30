@@ -97,27 +97,37 @@ class PartyController extends Controller
             $moderate_events = null;
         }
 
-        //Use this view for showing group only upcoming and past events
+        // Use this view for showing group only upcoming and past events
         if ( ! is_null($group_id)) {
-            $upcoming_events = Party::upcomingEvents()
-            ->where('events.group', $group_id)
-            ->get();
+          $upcoming_events = Party::upcomingEvents()
+          ->where('events.group', $group_id)
+          ->get();
 
-            $past_events = Party::pastEvents()
-            ->where('events.group', $group_id)
-            ->paginate(10);
+          $past_events = Party::pastEvents()
+          ->where('events.group', $group_id)
+          ->paginate(10);
 
-            $group = Group::find($group_id);
+          $group = Group::find($group_id);
+
         } else {
+
+          if ( ! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
+            // All Events by User's Area, event which User is not a part of group
+            $upcoming_events = Party::upcomingEventsInArea(Auth::user())
+            ->take(10)
+            ->get();
+          } else {
+            // Filter events by User's Groups
             $upcoming_events = Party::upcomingEvents()
             ->where('users_groups.user', Auth::user()->id)
             ->take(10)
             ->get();
+          }
 
-            $past_events = Party::pastEvents()
-                         ->paginate(10);
+          $past_events = Party::pastEvents()
+          ->paginate(10);
 
-            $group = null;
+          $group = null;
         }
 
         //Looks to see whether user has a group already, if they do, they can create events

@@ -421,6 +421,28 @@ class Party extends Model implements Auditable
                      ->orderBy('event_date', 'ASC');
     }
 
+    /**
+     * [scopeUpcomingEventsInArea description]
+     * All upcoming events (greater than today) by a User's Location
+     * @author Christopher Kelker
+     * @date   2019-05-30T10:15:36+010
+     * @param  [type]                  $query
+     * @param  [type]                  $user
+     * @return [type]
+     */
+    public function scopeUpcomingEventsInArea($query, $user)
+    {
+      return $this->select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
+      ->having('distance', '<=', 75) // kilometers (km)
+      ->join('groups', 'groups.idgroups', '=', 'events.group')
+      ->whereDate('event_date', '>=', date('Y-m-d'))
+      ->groupBy('idevents')
+      ->orderBy('event_date', 'ASC')
+      ->orderBy('start', 'ASC')
+      ->orderBy('distance', 'ASC');
+    }
+
+
     public function scopeAllUpcomingEvents()
     {
         return $this->whereRaw('CONCAT(`event_date`, " ", `start`) > CURRENT_TIMESTAMP()')
