@@ -359,4 +359,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(GroupTags::class, 'id', 'access_group_tag_id');
     }
+
+    public function subscribedToNewsletter()
+    {
+      return $this->newsletter != 0 && ! is_null($this->drip_subscriber_id);
+    }
 }

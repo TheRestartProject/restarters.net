@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Support\Facades\Input;
+use App\DripEvent;
 
 class UserController extends Controller
 {
@@ -123,7 +124,6 @@ class UserController extends Controller
 
     public function postProfileInfoEdit(Request $request)
     {
-
         $rules = [
         'name'            => 'required|string|max:255',
         'email'           => 'required|string|email|max:255',
@@ -154,6 +154,10 @@ class UserController extends Controller
         ]);
 
         $user = User::find($id);
+
+        if ( $user->subscribedToNewsletter() ) {
+          DripEvent::createOrUpdateSubscriber($user, auth()->user()->email, request()->input('email'));
+        }
 
         if (!empty($user->location)) {
             $lat_long = FixometerHelper::getLatLongFromCityCountry($user->location, $user->country);
@@ -217,6 +221,12 @@ class UserController extends Controller
         $old_user_name = $user->name;
         $user_id = $user->id;
 
+        if ( ! empty($user->drip_subscriber_id) ) {
+          DripEvent::deleteSubscriber($user);
+          $user->newsletter = 0;
+          $user->drip_subscriber_id = null;
+        }
+
       // Anonymise user.
         $user->anonymise();
         $user->save();
@@ -240,11 +250,17 @@ class UserController extends Controller
 
         $user = User::find($id);
 
-        if ($request->input('newsletter') !== null) :
-            $user->newsletter = 1;
-        else :
-            $user->newsletter = 0;
-        endif;
+        if ( is_null(request()->input('newsletter')) ) {
+          $user->newsletter = 0;
+          $unsubscribe_user = DripEvent::unsubscribeSubscriberFromNewsletter($user);
+        } else {
+          $drip_subscribe_user = DripEvent::subscribeSubscriberToNewsletter($user);
+          if ( empty($drip_subscribe_user) ) {
+            break;
+          }
+          $user->newsletter = 1;
+          $user->drip_subscriber_id = $drip_subscribe_user->id;
+        }
 
         if ($request->input('invites') !== null) :
             $user->invites = 1;
@@ -714,7 +730,6 @@ class UserController extends Controller
 
     public function create()
     {
-
         $user = Auth::user();
 
       // Administrators can add users.
@@ -830,7 +845,6 @@ class UserController extends Controller
                 if (!isset($data)) {
                       $data = null;
                 }
-                dd("testing");
                 if (!isset($_POST['modal'])) {
                       return view('user.create', [
                         'title' => 'New User',
@@ -1115,7 +1129,6 @@ class UserController extends Controller
 
     public function postRegister(Request $request, $hash = null)
     {
-
         if (Auth::check()) { //Existing users don't need all the same rules
             $rules = [
             'age'                 => 'required',
@@ -1200,7 +1213,9 @@ class UserController extends Controller
   // }
 
         if (!is_null($request->input('newsletter')) && $request->input('newsletter') == 1) { //Subscribe to newsletter
+            $drip_subscribe_user = DripEvent::subscribeSubscriberToNewsletter($user);
             $user->newsletter = 1;
+            $user->drip_subscriber_id = $drip_subscribe_user->id;
         }
 
         if (!is_null($request->input('invites')) && $request->input('invites') == 1) { //Subscribe to invites

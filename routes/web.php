@@ -11,15 +11,6 @@
 |
 */
 
-use App\User;
-use App\DripEvent;
-
-Route::get('/testing123', function () {
-  dd(DripEvent::unsubscribeSubscriberFromNewsletter(User::find(780)));
-
-  return $test;
-});
-
 Route::prefix('user')->group(function () {
     Route::get('/', 'HomeController@index');
     Route::get('reset', 'UserController@reset');

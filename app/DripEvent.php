@@ -50,13 +50,13 @@ class DripEvent extends Model
    * @param  User                    $user
    * @return [type]
    */
-  public static function createOrUpdateSubscriber(User $user)
+  public static function createOrUpdateSubscriber(User $user, $old_email = false, $new_email = false)
   {
     $parameters = [
       "subscriber_id" => $user->drip_subscriber_id,
+      "email" => $user->email,
       "account_id" => env('DRIP_ACCOUNT_ID'),
       "status" => "active",
-      "email" => $user->email,
       "time_zone" => "",
       "custom_fields" => (object) [
         "name" => $user->name,
@@ -65,6 +65,13 @@ class DripEvent extends Model
         "Customer", $user->email, env('APP_URL'),
       ],
     ];
+
+    // Remove new email because it would've been set already
+    if ( ! empty($old_email) && ! empty($new_email) && $old_email != $new_email ) {
+      unset($parameters['email']);
+      $parameters['email'] = $old_email;
+      $parameters['new_email'] = $new_email;
+    }
 
     $subscriber = Drip::createOrUpdateSubscriber($parameters);
 
@@ -75,9 +82,8 @@ class DripEvent extends Model
   /**
    * [subscribeSubscriberToNewsletter description]
    * Subscribe an existing Subscriber or create a new one and Subscribe
-   * them to the Newsletter - DRIP_CAMPAIGN_ID: i.e.
+   * them to the Newsletter: i.e.
    * https://www.getdrip.com/{DRIP_ACCOUNT_ID}/campaigns/{DRIP_CAMPAIGN_ID}
-
    * @author Christopher Kelker
    * @date   2019-05-29T15:45:50+010
    * @param  User                    $user
@@ -101,9 +107,9 @@ class DripEvent extends Model
     ];
 
     // Returns Subscriber
-    $requested_subscription = Drip::subscribeSubscriber($parameters);
+    $requested_subscriber = Drip::subscribeSubscriber($parameters);
 
-    return is_array($requested_subscription) ? true : false;
+    return (object) $requested_subscriber;
   }
 
   /**
