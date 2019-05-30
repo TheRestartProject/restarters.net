@@ -5,6 +5,9 @@
 @endsection
 
 @section('content')
+
+{{-- {{ dd(true) }} --}}
+
 <section class="events events-page">
   <div class="container-fluid">
     <div class="row">
@@ -44,15 +47,11 @@
           <section class="table-section" id="events-1">
             <div class="table-responsive">
               <table class="table table-events table-striped" role="table">
-
                 @include('partials.tables.head-events', ['invite' => true])
-
                 <tbody>
                     @if( !$moderate_events->isEmpty() )
                       @foreach ($moderate_events as $event)
-
                         @include('partials.tables.row-events', ['invite' => true])
-
                       @endforeach
                     @else
                       <tr>
@@ -60,11 +59,9 @@
                       </tr>
                     @endif
                 </tbody>
-
               </table>
             </div>
           </section>
-
         @endif
 
         <section class="table-section" id="events-2">
@@ -75,34 +72,87 @@
               <h2>Upcoming events for your groups <sup>(<a href="{{{ route('all-upcoming-events') }}}">See all upcoming)</a></sup></h2>
             @endif
           </header>
-
           <div class="table-responsive">
-
             <table class="table table-events table-striped" role="table">
-
               @include('events.tables.head-events-upcoming')
-
               <tbody>
-                @if( !$upcoming_events->isEmpty() )
+                @if ($user_groups == 0){{-- Not a part of any groups --}}
+                  <tr>
+                    <td colspan="13" align="center" class="p-3">You are not currently following any groups.<br><a href="{{{ route('groups') }}}">Find groups near you.</a></td>
+                  </tr>
+                @elseif ( ! $upcoming_events->isEmpty() ){{-- Part of groups and events are upcoming --}}
                   @foreach ($upcoming_events as $event)
-
                     @include('events.tables.row-events-upcoming', ['invite' => true])
-
                   @endforeach
-                @else
+                @else{{-- Part of groups but no events --}}
                   <tr>
                     <td colspan="13" align="center" class="p-3">There are currently no upcoming events for any of your groups<br><a href="{{{ route('groups') }}}">Find more groups</a></td>
                   </tr>
                 @endif
               </tbody>
-
             </table>
-
           </div>
-
         </section>
 
-        <section class="table-section" id="events-3">
+
+
+
+
+
+
+
+
+
+        <section class="table-section upcoming_events_in_area" id="events-3">
+          <header>
+            @if( !is_null($group) )
+              <h2>Past {{{ $group->name }}} events</h2>
+            @else
+              <h2>Other events near you <sup>(<a href="{{{ route('all-upcoming-events') }}}">See all upcoming)</a></sup></h2>
+            @endif
+          </header>
+          <div class="table-responsive">
+            <table class="table table-events table-striped" role="table">
+              @include('partials.tables.head-events', ['hide_invite' => true])
+              <tbody>
+                @if ( is_null(auth()->user()->latitude) && is_null(auth()->user()->longitude) )
+                  <tr>
+                    <td colspan="13" align="center" class="p-3">Your location has not been set.<br><a href="{{{ route('edit-profile') }}}">Click here to set your location.</a></td>
+                  </tr>
+                @elseif( !$upcoming_events_in_area->isEmpty() )
+                  @foreach($upcoming_events_in_area as $event)
+                    @include('partials.tables.row-events', ['invite' => false, 'EmissionRatio' => $EmissionRatio])
+                  @endforeach
+                @else
+                  <tr>
+                    <td colspan="13" align="center" class="p-3">There are no upcoming events near you - get in touch with your <a href="/group">local groups</a> to see if any are planned, or would you like to start or add a group? Have a look at our resources.</td>
+                  </tr>
+                @endif
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <section class="table-section past_events" id="events-4">
           <header>
             @if( !is_null($group) )
               <h2>Past {{{ $group->name }}} events</h2>
@@ -110,19 +160,13 @@
               <h2>Past events</h2>
             @endif
           </header>
-
           <div class="table-responsive">
-
           <table class="table table-events table-striped" role="table">
-
               @include('partials.tables.head-events', ['hide_invite' => true])
-
               <tbody>
                 @if( !$past_events->isEmpty() )
                   @foreach($past_events as $event)
-
                     @include('partials.tables.row-events', ['invite' => false, 'EmissionRatio' => $EmissionRatio])
-
                   @endforeach
                 @else
                   <tr>
@@ -130,22 +174,20 @@
                   </tr>
                 @endif
               </tbody>
-
           </table>
-
           </div>
-
         </section>
+
 
         <div class="d-flex justify-content-center">
           <nav aria-label="Page navigation example">
             {!! $past_events->links() !!}
           </nav>
         </div>
-
       </div>
     </div>
 
   </div>
 </section>
+
 @endsection

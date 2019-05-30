@@ -422,7 +422,7 @@ class Party extends Model implements Auditable
     }
 
     /**
-     * [scopeUpcomingEventsInArea description]
+     * [scopeUpcomingEventsInUserArea description]
      * All upcoming events (greater than today) by a User's Location
      * @author Christopher Kelker
      * @date   2019-05-30T10:15:36+010
@@ -430,15 +430,23 @@ class Party extends Model implements Auditable
      * @param  [type]                  $user
      * @return [type]
      */
-    public function scopeUpcomingEventsInArea($query, $user)
+    public function scopeUpcomingEventsInUserArea($query, $user)
     {
-      return $this->select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
-      ->having('distance', '<=', 75) // kilometers (km)
+      //Look for groups where user ID exists in pivot table
+      $user_group_ids = UserGroups::where('user', $user->id)->pluck('group')->toArray();
+
+      return $this
+      ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
       ->join('groups', 'groups.idgroups', '=', 'events.group')
-      ->whereDate('event_date', '>=', date('Y-m-d'))
-      ->groupBy('idevents')
-      ->orderBy('event_date', 'ASC')
-      ->orderBy('start', 'ASC')
+      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+      ->where(function($query){
+        $query->having('distance', '<=', 150)
+        ->whereDate('event_date', '>=', date('Y-m-d')); // kilometers (km)
+      })
+      ->whereNotIn('events.group', $user_group_ids)
+      ->groupBy('events.idevents')
+      ->orderBy('events.event_date', 'ASC')
+      ->orderBy('events.start', 'ASC')
       ->orderBy('distance', 'ASC');
     }
 
