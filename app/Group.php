@@ -392,12 +392,14 @@ class Group extends Model implements Auditable
 
     public function getNextUpcomingEvent()
     {
-      $event = $this->parties()->whereDate('event_date', '>=', date('Y-m-d'));
+      $event = $this->parties->map(function ($event, $key) {
+          return $event >= date('Y-m-d');
+      })->first();
 
-      if ( ! $event->count() ) {
+      if ( ! is_object($event) ) {
         return null;
       }
 
-      return $event->first();
+      return $event;
     }
 }

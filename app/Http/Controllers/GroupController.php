@@ -78,7 +78,8 @@ class GroupController extends Controller
             ->where('users_groups.user', $user->id)
             ->orderBy('groups.name', 'ASC')
             ->orderBy('events.event_date', 'ASC')
-            ->select('groups.*', 'users_groups.user')
+            ->groupBy('groups.idgroups')
+            ->select('groups.*')
             ->get();
 
         //Make sure we don't show the same groups in nearest to you
@@ -202,7 +203,6 @@ class GroupController extends Controller
 
         if ( ! empty($sort_column) && $sort_column == 'upcoming_event') { //TODO
             $groups = $groups->join('events', 'events.group', '=', 'groups.idgroups')
-                              ->whereDate('event_date', '>=', date('Y-m-d'))
                                 ->orderBy('event_date', $sort_direction);
         }
 
