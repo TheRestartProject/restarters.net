@@ -70,8 +70,10 @@ class GroupController extends Controller
 
         //Look for groups where user ID exists in pivot table
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->join('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
-            ->orderBy('name', 'ASC')
+            ->orderBy('groups.name', 'ASC')
+            ->orderBy('events.event_date', 'ASC')
             ->select('groups.*', 'users_groups.user')
             ->get();
 
@@ -80,18 +82,24 @@ class GroupController extends Controller
 
         //Assuming we have valid lat and long values, let's see what is nearest
         if ( ! is_null($user->latitude) && ! is_null($user->longitude)) {
-            $groups_near_you = Group::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
-                ->having('distance', '<=', 150)
-                ->whereNotIn('idgroups', $your_groups_uniques)
-                ->orderBy('distance', 'ASC')
-                ->take(10)
-                ->get();
+          $groups_near_you = Group::select(DB::raw('`groups`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( groups.latitude ) ) * cos( radians( groups.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( groups.latitude ) ) ) ) AS distance'))
+              ->having('distance', '<=', 150)
+              ->join('events', 'events.group', '=', 'groups.idgroups')
+              ->whereNotIn('groups.idgroups', $your_groups_uniques)
+              ->groupBy('groups.idgroups')
+              ->orderBy('distance', 'ASC')
+              ->orderBy('distance', 'ASC')
+              ->orderBy('events.event_date', 'ASC')
+              ->take(10)
+              ->get();
+
         } else {
             $groups_near_you = null;
         }
 
         return view('group.index', [
             'your_groups' => $your_groups,
+            'your_groups_uniques' => $your_groups_uniques,
             'groups_near_you' => $groups_near_you,
             'groups' => $groups,
             'your_area' => $user->location,

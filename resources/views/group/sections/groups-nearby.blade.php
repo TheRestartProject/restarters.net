@@ -7,8 +7,8 @@
         <th width="42"></th>
         <th width="200" scope="col"><label for="label-name">@lang('groups.groups_name')</label></th>
         <th width="200" scope="col"><label for="label-location">@lang('groups.groups_location')</label></th>
-        <th width="75" scope="col" class="text-center"><label for="label-hosts">@lang('groups.groups_hosts')</label></th>
-        <th width="75" scope="col" class="text-center"><label for="label-restarters">@lang('groups.groups_restarters')</label></th>
+        <th width="75" scope="col" class="text-center"><label for="label-hosts">@lang('groups.groups_upcoming_event')</label></th>
+        <th width="75" scope="col" class="text-center">&nbsp;</th>
      </tr>
      </thead>
       <tbody>

@@ -389,4 +389,15 @@ class Group extends Model implements Auditable
 
         return url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg');
     }
+
+    public function getNextUpcomingEvent()
+    {
+      $event = $this->parties()->whereDate('event_date', '>=', date('Y-m-d'));
+
+      if ( ! $event->count() ) {
+        return null;
+      }
+
+      return $event->first();
+    }
 }

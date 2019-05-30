@@ -10,32 +10,17 @@
   <td><a href="/group/view/{{{ $group->idgroups }}}" title="edit group">{{{ $group->name }}}</a></td>
   <td>{{{ $group->getLocation() }}}</td>
   <td class="text-center">
-    <?php
-      $hosts = $group->allConfirmedHosts;
-      $return = '';
-
-      foreach( $hosts as $host ){
-        $return .= trim($host->volunteer->name). ', ';
-      }
-    ?>
-    <span data-toggle="popover" data-content="{{{ rtrim($return, ', ') }}}" data-trigger="hover">
-      {{{ $group->allConfirmedHosts->count() }}}
-    </span>
+    @php ($next_upcoming_event = $group->getNextUpcomingEvent())
+    @if (is_null($next_upcoming_event))
+      <p>None planned</p>
+    @else
+      <a href="/party/view/{{ $next_upcoming_event->idevents }}">{{ $next_upcoming_event->getEventName() }}</a>
+    @endif
   </td>
   <td class="text-center">
-    <?php
-
-      $restarters = $group->allConfirmedRestarters;
-      $return = '';
-
-      foreach( $restarters as $restarter ){
-        $return .= trim($restarter->volunteer->name). ', ';
-      }
-
-    ?>
-    <span data-toggle="popover" data-content="{{{ rtrim($return, ', ') }}}" data-trigger="hover">
-      {{{ $group->allConfirmedRestarters->count() }}}
-    </span>
+    @if ( ! in_array($group->idgroups, $your_groups_uniques) )
+      <a class="btn btn-primary" href="/group/join/{{ $group->idgroups }}" id="join-group">Follow</a>
+    @endif
   </td>
   @if(  !is_null($groups) && FixometerHelper::hasRole(Auth::user(), 'Administrator'))
       <td>
