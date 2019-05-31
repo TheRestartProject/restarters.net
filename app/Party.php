@@ -465,12 +465,9 @@ class Party extends Model implements Auditable
       ->whereNotNull('events.wordpress_post_id')
       ->whereDate('events.event_date', '<', date('Y-m-d'))
 
-      // (`users_groups`.`user` = ? or
-      // `events_users`.`user` = ? and `users_groups`.`user` != ?)
       ->where(function ($query) use ($user_ids) {
           $query->whereIn('users_groups.user', $user_ids)
-          ->orWhereIn('events_users.user', $user_ids)
-          ->whereNotIn('users_groups.user', $user_ids);
+          ->orWhereIn('events_users.user', $user_ids);
       })
 
       ->select('events.*')
