@@ -255,8 +255,10 @@ class UserController extends Controller
           $unsubscribe_user = DripEvent::unsubscribeSubscriberFromNewsletter($user);
         } else {
           $drip_subscribe_user = DripEvent::subscribeSubscriberToNewsletter($user);
-          $user->newsletter = 1;
-          $user->drip_subscriber_id = $drip_subscribe_user->id;
+          if (!empty((array) $drip_subscribe_user)) {
+            $user->newsletter = 1;
+            $user->drip_subscriber_id = $drip_subscribe_user->id;
+          }
         }
 
         if ($request->input('invites') !== null) :
