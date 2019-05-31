@@ -155,7 +155,7 @@ class UserController extends Controller
 
         $user = User::find($id);
 
-        if ( $user->subscribedToNewsletter() ) {
+        if ( $user->isDripSubscriber() ) {
           DripEvent::createOrUpdateSubscriber($user, auth()->user()->email, request()->input('email'));
         }
 
@@ -221,7 +221,7 @@ class UserController extends Controller
         $old_user_name = $user->name;
         $user_id = $user->id;
 
-        if ( ! empty($user->drip_subscriber_id) ) {
+        if ( $user->isDripSubscriber() ) {
           DripEvent::deleteSubscriber($user);
           $user->newsletter = 0;
           $user->drip_subscriber_id = null;
@@ -255,9 +255,6 @@ class UserController extends Controller
           $unsubscribe_user = DripEvent::unsubscribeSubscriberFromNewsletter($user);
         } else {
           $drip_subscribe_user = DripEvent::subscribeSubscriberToNewsletter($user);
-          if ( empty($drip_subscribe_user) ) {
-            break;
-          }
           $user->newsletter = 1;
           $user->drip_subscriber_id = $drip_subscribe_user->id;
         }
