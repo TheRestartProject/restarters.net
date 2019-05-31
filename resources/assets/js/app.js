@@ -14,7 +14,7 @@ require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
 require('./misc/device');
-require('leaflet')
+// require('leaflet')
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
 
