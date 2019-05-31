@@ -119,7 +119,7 @@
                       @endforeach
                     @else
                       <tr>
-                        <td colspan="13" align="center" class="p-3">There are no upcoming events near you - get in touch with your <a href="/group">local groups</a> to see if any are planned, or would you like to start or add a group? Have a look at our resources.</td>
+                        <td colspan="13" align="center" class="p-3">There are no upcoming events near you - get in touch with your <a href="/group">local groups</a> to see if any are planned, or would you like to start or add a group? Have a look at our <a href="{{ env('DISCOURSE_URL' )}}/session/sso?return_path={{ env('DISCOURSE_URL') }}/t/2-how-to-run-a-repair-event/28" target="_blank" rel="noopener noreferrer">resources</a>.</td>
                       </tr>
                     @endif
                   </tbody>
