@@ -134,10 +134,14 @@ class PartyController extends Controller
 
     public function allPast()
     {
-        $past_events = Party::UsersPastEvents([auth()->id()])->paginate(15);
+        $past_events = Party::pastEvents();
+        $past_events_count = $past_events->count();
+        $past_events = $past_events->paginate(env('PAGINATE'));
 
         return view('events.all-past', [
           'past_events' => $past_events,
+          'past_events_count' => $past_events_count,
+          'EmissionRatio' => $this->EmissionRatio,
         ]);
     }
 
