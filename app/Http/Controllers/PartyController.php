@@ -132,6 +132,15 @@ class PartyController extends Controller
         ]);
     }
 
+    public function allPast()
+    {
+        $past_events = Party::UsersPastEvents([auth()->id()])->paginate(15);
+
+        return view('events.all-past', [
+          'past_events' => $past_events,
+        ]);
+    }
+
     public function allUpcoming()
     {
         $allUpcomingEventsQuery = Party::allUpcomingEvents();
