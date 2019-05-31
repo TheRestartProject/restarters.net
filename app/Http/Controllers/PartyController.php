@@ -108,24 +108,27 @@ class PartyController extends Controller
             ->paginate(10);
 
           $group = Group::find($group_id);
+          $upcoming_events_in_area = null;
 
         } else {
           $upcoming_events = Party::upcomingEvents()
             ->where('users_groups.user', Auth::user()->id)
-            ->take(10)
+            ->take(3)
             ->get();
 
           $past_events = Party::pastEvents()
                        ->paginate(10);
 
+          if ( ! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
+           $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())->take(3)->get();
+          } else {
+           $upcoming_events_in_area = null;
+          }
+
           $group = null;
         }
 
-        if ( ! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
-          $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())->take(10)->get();
-        } else {
-          $upcoming_events_in_area = null;
-        }
+
 
         //Looks to see whether user has a group already, if they do, they can create events
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
