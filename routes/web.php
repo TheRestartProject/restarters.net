@@ -168,6 +168,14 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::post('/update-volunteerquantity', 'PartyController@updateVolunteerQuantity');
     });
 
+    // CalendarEvents Controller
+    Route::prefix('calendar')->group(function () {
+      Route::get('/user/{calendar_hash}', 'CalendarEventsController@allEventsByUser')->name('calendar-events-by-user');
+      Route::get('/group/{group}', 'CalendarEventsController@allEventsByGroup')->name('calendar-events-by-group');
+      Route::get('/group-tag/{grouptags_groups}', 'CalendarEventsController@allEventsByGroupTag')->name('calendar-events-by-group-tag');
+      Route::get('/all-events/{hash_env}', 'CalendarEventsController@allEvents')->name('calendar-events-all');
+    });
+
     //Role Controller
     Route::prefix('role')->group(function () {
         Route::get('/', 'RoleController@index')->name('roles');
