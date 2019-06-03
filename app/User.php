@@ -7,8 +7,13 @@ use App\UserGroups;
 use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
 use Illuminate\Notifications\Notifiable;
+
+class WikiSyncStatus {
+    const DoNotCreate = 0;
+    const CreateAtLogin = 1;
+    const Created = 2;
+}
 
 class User extends Authenticatable
 {
