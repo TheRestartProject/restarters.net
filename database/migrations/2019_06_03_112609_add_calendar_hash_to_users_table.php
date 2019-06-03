@@ -16,6 +16,18 @@ class AddCalendarHashToUsersTable extends Migration
         Schema::table('users', function (Blueprint $table) {
           $table->string('calendar_hash')->after('drip_subscriber_id')->unique()->nullable();
         });
+
+        $users = DB::table('users')
+        ->whereNull('calendar_hash')
+        ->select('id','calendar_hash')
+        ->get();
+
+        foreach($users as $user) {
+          $user = DB::table('users')
+          ->where('id', $user->id)
+          ->update(['calendar_hash' => str_random(15)]);
+          usleep(50000);
+        }
     }
 
     /**
