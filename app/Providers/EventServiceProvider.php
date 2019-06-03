@@ -37,6 +37,10 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\EditGroup' => [
             'App\Listeners\CreateWordPressEditGroupPost',
         ],
+
+        'App\Events\PasswordChanged' => [
+            'App\Listeners\ChangeWikiPassword',
+        ],
     ];
 
     /**

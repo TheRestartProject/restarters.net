@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Auth;
 use App\Device;
 use App\EventsUsers;
+use App\Events\PasswordChanged;
 use App\Group;
 use App\Mail\RegistrationWelcome;
 use App\Preferences;
@@ -197,6 +198,8 @@ class UserController extends Controller
             'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
             'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
             ]);
+
+            event(new PasswordChanged($user));
 
             return redirect()->back()->with('message', 'User Password Updated!');
         }

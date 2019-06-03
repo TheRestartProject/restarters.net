@@ -35,7 +35,6 @@ class MediawikiServiceProvider extends ServiceProvider
             return new MediawikiFactory($api);
         });
 
-        //dd(UserCreator::class);
         $this->app->bind(UserCreator::class, function ($app) {
             return $app->make(MediawikiFactory::class)->newUserCreator();
         });
