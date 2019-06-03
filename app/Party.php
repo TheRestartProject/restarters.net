@@ -664,4 +664,25 @@ class Party extends Model implements Auditable
     {
         return $this->pax;
     }
+
+    /**
+     * [hasStartedRSVP description]
+     * {description}
+     * @author Christopher Kelker
+     * @date   2019-06-03T10:12:20+010
+     * @return boolean
+     */
+    public function hasStartedRSVP()
+    {
+      $participants_count = $this->participants;  // no participants recorded
+      $volunteers_count = $this->allConfirmedVolunteers()->count(); // number of volunteers 1 or less
+      $devices_count = $this->allDevices()->count(); // no devices added
+
+      if ($participants_count != 0 && $volunteers_count >= 1 && $devices_count != 0) {
+        return false;
+      }
+
+      return true;
+
+    }
 }

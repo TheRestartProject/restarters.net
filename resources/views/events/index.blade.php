@@ -80,13 +80,13 @@
 
             <table class="table table-events table-striped" role="table">
 
-              @include('events.tables.head-events-upcoming')
+              @include('partials.tables.head-events', ['hide_invite' => false])
 
               <tbody>
                 @if( !$upcoming_events->isEmpty() )
                   @foreach ($upcoming_events as $event)
 
-                    @include('events.tables.row-events-upcoming', ['invite' => true])
+                    @include('partials.tables.row-events', ['invite' => true, 'EmissionRatio' => $EmissionRatio])
 
                   @endforeach
                 @else
