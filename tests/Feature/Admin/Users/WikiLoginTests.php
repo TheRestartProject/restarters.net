@@ -2,9 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Listeners\LogInToWiki;
+use App\Listeners\ChangeWikiPassword;
 use App\User;
 use App\WikiSyncStatus;
-use App\Listeners\LogInToWiki;
 
 use DB;
 use Carbon\Carbon;
@@ -13,7 +14,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Msurguy\Honeypot\HoneypotFacade as Honeypot;
 use Mockery;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
-use \Mediawiki\Api\Services\UserCreator;
+use Mediawiki\Api\Service\UserCreator;
 
 class WikiLoginTests extends TestCase
 {
@@ -103,12 +104,21 @@ class WikiLoginTests extends TestCase
     /** @test */
     public function if_wiki_user_changes_password()
     {
-        // if password is changed, sync password to wiki
-    }
+        $this->withoutExceptionHandling();
 
-    /** @test */
-    public function if_nonwiki_user_changes_password()
-    {
-        // don't sync password
+        $this->instance(ChangeWikiPassword::class, Mockery::mock(ChangeWikiPassword::class, function ($mock) {
+            $mock->shouldReceive('handle')->once();
+        }));
+
+        // Given we have a user who has already been created in the wiki
+        $user = factory(User::class)->create();
+        $user->wiki_sync_status = WikiSyncStatus::Created;
+        $user->save();
+        $this->actingAs($user);
+
+        // When user changes password
+        $response = $this->post('/profile/edit-password', ['current-password' => 'secret', 'new-password' => 'f00', 'new-password-repeat' => 'f00']);
+
+        // Then the user's wiki password should be changed to match
     }
 }

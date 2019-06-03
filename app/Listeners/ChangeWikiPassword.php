@@ -36,6 +36,11 @@ class ChangeWikiPassword
     {
         $user = $event->user;
 
+        if ($user->wiki_sync_status !== WikiSyncStatus::Created) {
+            Log::info("No wiki account for '". $user->username."' - not attempting to change password");
+            return;
+        }
+
         try{
             $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
             $api->login(new ApiUser($user->mediawiki, $this->request->input('current-password')));
