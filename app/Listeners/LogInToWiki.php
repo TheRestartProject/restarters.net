@@ -58,10 +58,12 @@ class LogInToWiki
     protected function createUserInWiki($user, $password)
     {
         try {
-            $this->wikiUserCreator->create($user->username, $password, $user->email);
+            // Mediawiki does strange things with underscores.
+            $mediawikiUsername = str_replace("_", "-", $user->username);
+            $this->wikiUserCreator->create($mediawikiUsername, $password, $user->email);
 
             $user->wiki_sync_status = WikiSyncStatus::Created;
-            $user->mediawiki = $user->username;
+            $user->mediawiki = $mediawikiUsername;
             $user->save();
         } catch (\Exception $ex) {
             Log::error("Failed to create new account for user '" . $user->username . "' in mediawiki: " . $ex->getMessage());
