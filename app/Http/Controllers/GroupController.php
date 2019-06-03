@@ -254,6 +254,16 @@ class GroupController extends Controller
             // }
             if ( ! empty($location)) {
                 $lat_long = FixometerHelper::getLatLongFromCityCountry($location);
+
+                if ( empty($lat_long) ) {
+                  $response['danger'] = 'Group could not be created. Address not found.';
+                  return view('group.create', [
+                      'title' => 'New Group',
+                      'gmaps' => true,
+                      'response' => $response,
+                  ]);
+                }
+
                 $latitude = $lat_long[0];
                 $longitude = $lat_long[1];
                 $country = $lat_long[2];
@@ -686,6 +696,31 @@ class GroupController extends Controller
 
             if ( ! empty($data['location'])) {
                 $lat_long = FixometerHelper::getLatLongFromCityCountry($data['location']);
+
+                if ( empty($lat_long) ) {
+                  $response['danger'] = 'Group could not be saved. Address not found.';
+                  $group = Group::find($id);
+                  $images = $File->findImages(env('TBL_GROUPS'), $id);
+                  $tags = GroupTags::all();
+                  $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
+
+                  if ( ! isset($images)) {
+                      $images = null;
+                  }
+
+                  return view('group.edit-group', [
+                      'response' => $response,
+                      'gmaps' => true,
+                      'title' => 'Edit Group '.$group->name,
+                      'formdata' => $group,
+                      'user' => $user,
+                      'images' => $images,
+                      'tags' => $tags,
+                      'group_tags' => $group_tags,
+                      'audits' => $group->audits,
+                  ]);
+                } // TODO
+
                 $latitude = $lat_long[0];
                 $longitude = $lat_long[1];
                 $country = $lat_long[2];
