@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\PasswordChanged;
+use App\WikiSyncStatus;
 
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
