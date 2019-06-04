@@ -50,7 +50,11 @@ class EventServiceProvider extends ServiceProvider
 
         EventImagesUploaded::class => [
             SendAdminModerateEventPhotosNotification::class,
-        ]
+        ],
+
+        'App\Events\PasswordChanged' => [
+            'App\Listeners\ChangeWikiPassword',
+        ],
     ];
 
     /**
