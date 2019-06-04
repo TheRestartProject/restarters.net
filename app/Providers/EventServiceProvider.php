@@ -43,6 +43,10 @@ class EventServiceProvider extends ServiceProvider
         UserDeleted::class => [
             RemoveSoftDeletedUserFromAllGroups::class,
         ],
+
+        'App\Events\PasswordChanged' => [
+            'App\Listeners\ChangeWikiPassword',
+        ],
     ];
 
     /**

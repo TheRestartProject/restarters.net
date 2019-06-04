@@ -1,0 +1,9 @@
+.idea
+vendor
+composer.lock
+test.php
+phpunit.xml
+nbproject
+docs/_build
+log
+

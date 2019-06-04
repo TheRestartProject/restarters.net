@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Auth;
 use App\Device;
 use App\EventsUsers;
+use App\Events\PasswordChanged;
 use App\Group;
 use App\Mail\RegistrationWelcome;
 use App\Preferences;
@@ -197,6 +198,8 @@ class UserController extends Controller
             'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
             'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
             ]);
+
+            event(new PasswordChanged($user));
 
             return redirect()->back()->with('message', 'User Password Updated!');
         }
@@ -1179,16 +1182,7 @@ class UserController extends Controller
             ]);
         }
 
-  //Create username for Discourse
-  // Desired username is their first name in all lowercase.  We also have make sure it fits within Discourse 20 char limit.
-        $name_parts = explode(' ', $user->name);
-        $desired_username = substr(strtolower($name_parts[0]), 0, 20);
-        if (!(User::where('username', '=', $desired_username)->exists())) {
-            $user->username = $desired_username;
-        } else { // someone already has the desired username, so we'll append user id to this user's first name (taking 20 char limit into account)
-            $offset = strlen($user->id) + 1;
-            $user->username = substr(strtolower(preg_replace('/[^a-zA-Z0-9]+/', '', $name_parts[0])), 0, 20 - $offset) . '-' . $user->id;
-        }
+        $user->generateAndSetUsername();
 
   //Save timestamps
         $user->consent_gdpr = $timestamp;

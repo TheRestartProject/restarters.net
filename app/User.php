@@ -8,8 +8,13 @@ use App\UserGroups;
 use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
 use Illuminate\Notifications\Notifiable;
+
+class WikiSyncStatus {
+    const DoNotCreate = 0;
+    const CreateAtLogin = 1;
+    const Created = 2;
+}
 
 class User extends Authenticatable
 {
@@ -370,5 +375,34 @@ class User extends Authenticatable
     public function groupTag()
     {
         return $this->hasOne(GroupTags::class, 'id', 'access_group_tag_id');
+    }
+
+
+    /**
+     * Generate a username based on the user's name, and set it against this user.
+     *
+     * Attempts to mimic the same logic as Discourse username generation.
+     */
+    public function generateAndSetUsername()
+    {
+        if (empty($this->name)) {
+            throw new \Exception("Name is empty");
+        }
+
+        $name = $this->name;
+        $name = trim($name);
+        $name = transliterator_transliterate('Any-Latin;Latin-ASCII;', $name);
+
+        $name_parts = explode(' ', $name);
+
+        $desired_username = implode("_", $name_parts);
+
+        if (!(User::where('username', '=', $desired_username)->exists())) {
+            $username = $desired_username;
+        } else { // someone already has the desired username
+            $username = $desired_username.'_'.$this->id;
+        }
+
+        $this->username = $username;
     }
 }
