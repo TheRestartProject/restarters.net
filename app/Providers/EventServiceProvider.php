@@ -2,10 +2,8 @@
 
 namespace App\Providers;
 
-use App\Events\EventImagesUploaded;
 use App\Events\UserDeleted;
 use App\Listeners\RemoveSoftDeletedUserFromAllGroups;
-use App\Listeners\SendAdminModerateEventPhotosNotification;
 use App\Listeners\SendAdminUserDeletedNotification;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -47,10 +45,6 @@ class EventServiceProvider extends ServiceProvider
             RemoveSoftDeletedUserFromAllGroups::class,
             SendAdminUserDeletedNotification::class,
         ],
-
-        EventImagesUploaded::class => [
-            SendAdminModerateEventPhotosNotification::class,
-        ]
     ];
 
     /**
