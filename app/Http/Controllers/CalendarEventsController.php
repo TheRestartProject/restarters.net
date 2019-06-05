@@ -112,6 +112,50 @@ class CalendarEventsController extends Controller
       echo $icalObject;
     }
 
+    public function allEventsByArea(Request $request, $area)
+    {
+      $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+      ->where(function ($query) use ($area) {
+        $query->where('groups.area', 'like', '%'.$area.'%');
+      })
+      ->select('events.*')
+      ->groupBy('events.idevents')
+      ->orderBy('events.event_date', 'ASC')
+      ->get();
+
+      if ( empty($events)) {
+        return abort(404, 'No events found.');
+      }
+
+      dd(3, $events);
+
+      $icalObject = "BEGIN:VCALENDAR
+      VERSION:2.0
+      METHOD:PUBLISH\n";
+
+      // loop over events
+      foreach ($events as $event) {
+        $icalObject .=
+        "BEGIN:VEVENT
+        SUMMARY:{$event->venue}
+        DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."
+        DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."
+        LOCATION:{$event->location}
+        STATUS:CONFIRMED
+        END:VEVENT\n";
+      }
+
+      // close calendar
+      $icalObject .= "END:VCALENDAR";
+
+      $icalObject = str_replace(' ', '', $icalObject);
+
+      header('Content-type: text/calendar; charset=utf-8');
+      header('Content-Disposition: attachment; filename="cal.ics"');
+
+      echo $icalObject;
+    }
+
     public function allEventsByGroupTag(Request $request, GrouptagsGroups $grouptags_groups)
     {
       $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
@@ -129,7 +173,7 @@ class CalendarEventsController extends Controller
         return abort(404, 'No events found.');
       }
 
-      dd(3, $events);
+      dd(4, $events);
 
       $icalObject = "BEGIN:VCALENDAR
       VERSION:2.0
@@ -170,7 +214,7 @@ class CalendarEventsController extends Controller
 
       $events = Party::whereNull('deleted_at')->get();
 
-      dd(4, $events);
+      dd(5, $events);
 
       $icalObject = "BEGIN:VCALENDAR
       VERSION:2.0

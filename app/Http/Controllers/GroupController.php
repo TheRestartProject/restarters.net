@@ -163,7 +163,10 @@ class GroupController extends Controller
         }
 
         if ( ! empty($request->input('location'))) {
-            $groups = $groups->where('location', 'like', '%'.$request->input('location').'%');
+            $groups = $groups->where(function ($query) use ($request){
+                  $query->where('groups.location', 'like', '%'.$request->input('location').'%')
+                        ->orWhere('groups.area', 'like', '%'.$request->input('location').'%');
+              });
         }
 
         if ( ! empty($request->input('country'))) {
