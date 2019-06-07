@@ -685,4 +685,31 @@ class Party extends Model implements Auditable
       return true;
 
     }
+
+    public function requiresModerationByAdmin()
+    {
+      if ( ! is_null($this->wordpress_post_id) ) {
+          return false;
+      }
+
+      return true;
+    }
+
+    public function VisuallyHighlight()
+    {
+      if ( $this->requiresModerationByAdmin() ) {
+        return 'event-requires-moderation-by-admin';
+      }
+
+      if ( $this->isUpcoming() || $this->isInProgress() ) {
+        return 'event-in-progress';
+      }
+
+      if ( $this->hasFinished() && $this->allDevices->isEmpty() ) {
+        return 'event-has-no-devices';
+      }
+
+      // Event has Finished, does not require moderation and has devices
+      return '';
+    }
 }

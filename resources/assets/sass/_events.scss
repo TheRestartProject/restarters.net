@@ -186,8 +186,6 @@
             }
         }
         .table-events {
-            border: 1px solid #eee;
-            border-radius: 10px;
           td {
               padding-top: 10px;
               padding-bottom: 10px;
@@ -214,6 +212,13 @@
               &.cell-date {
                   width: 200px;
               }
+          }
+
+          th.hightlighted, td.hightlighted {
+            padding-left: 10px !important;
+            padding-top: 0px;
+            padding-right: 0px;
+            padding-bottom: 0px;
           }
         }
     }
@@ -273,4 +278,28 @@
 
 .tab-panel {
     border-radius: 3px;
+}
+
+// VisuallyHighlight
+.event-requires-moderation-by-admin {
+  background-color: #F9BD68;
+}
+
+.event-in-progress {
+  background-color: #0394A6;
+}
+
+.event-in-progress-rsvp-cell,
+.event-requires-moderation-by-admin-cell {
+  background-color: #FDE5C4;
+}
+
+// Event Details
+.event-has-no-devices {
+  background-color: #F05D4C;
+}
+
+// Event Details
+.event-has-no-devices-cell {
+  background-color: #FACFCA;
 }

@@ -55,7 +55,9 @@
             text-align:center;
             padding: 0;
             padding-left: 0 !important;
-            width: 42px;
+            min-width: 85px;
+            min-height: 85px;
+            border-left: 10px;
         }
     }
 

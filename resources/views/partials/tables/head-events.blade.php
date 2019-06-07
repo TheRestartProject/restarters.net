@@ -1,5 +1,7 @@
 <thead>
     <tr>
+      <th class="hightlighted"></th>
+
         @if( !isset($group_view) )
           <th class="table-cell-icon"></th>
         @endif
