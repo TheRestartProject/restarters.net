@@ -45,11 +45,11 @@
           <section class="table-section" id="events-1">
             <div class="table-responsive">
               <table class="table table-events table-striped" role="table">
-                @include('events.tables.headers.head-events-admin-only', ['invite' => true])
+                @include('events.tables.headers.head-events-admin-only', ['hide_invite' => true])
                 <tbody>
-                    @if( !$moderate_events->isEmpty() )
+                    @if( ! $moderate_events->isEmpty() )
                       @foreach ($moderate_events as $event)
-                        @include('partials.tables.row-events', ['invite' => true])
+                        @include('partials.tables.row-events', ['show_invites_count' => false])
                       @endforeach
                     @else
                       <tr>
@@ -80,7 +80,7 @@
               <tbody>
                 @if( !$upcoming_events->isEmpty() )
                   @foreach ($upcoming_events as $event)
-                    @include('partials.tables.row-events', ['invite' => true, 'EmissionRatio' => $EmissionRatio])
+                    @include('partials.tables.row-events', ['show_invites_count' => true, 'EmissionRatio' => $EmissionRatio])
                   @endforeach
                 @else
                   <tr>
@@ -110,7 +110,7 @@
               <tbody>
                 @if( !$past_events->isEmpty() )
                   @foreach($past_events as $event)
-                    @include('partials.tables.row-events', ['invite' => false, 'EmissionRatio' => $EmissionRatio])
+                    @include('partials.tables.row-events', ['show_invites_count' => false, 'EmissionRatio' => $EmissionRatio])
                   @endforeach
                 @else
                   <tr>

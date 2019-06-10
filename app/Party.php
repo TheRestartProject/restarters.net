@@ -416,6 +416,7 @@ class Party extends Model implements Auditable
     {
         return $this->join('groups', 'groups.idgroups', '=', 'events.group')
                      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+                     ->whereNotNull('events.wordpress_post_id')
                      ->whereDate('event_date', '>=', date('Y-m-d'))
                      ->select('events.*')
                      ->groupBy('idevents')

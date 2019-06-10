@@ -26,7 +26,12 @@
         {{ $event->getEventStartEnd() }}
     </td>
 
-    <td class="cell-figure @if ( $event->checkForMissingData()['participants_count'] == 0 ) cell-danger @endif">{{ $event->pax }}</td>
+
+    @if ( isset($show_invites_count) )
+      <td class="cell-figure">{{{ $event->allInvited->count() }}}</td>
+    @else
+      <td class="cell-figure @if ( $event->checkForMissingData()['participants_count'] == 0 ) cell-danger @endif">{{ $event->pax }}</td>
+    @endif
 
     <td class="cell-figure @if ( $event->checkForMissingData()['volunteers_count'] <= 1 ) cell-danger @endif">{{ $event->volunteers }}</td>
 
@@ -34,20 +39,20 @@
     @if( $event->requiresModerationByAdmin() )
 
       @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-        <td class="cell-warning text-center" colspan="5">Event requires <a href="/party/edit/{{ $event->idevents }}">moderation</a> by an admin</td>
+        <td class="cell-warning text-center">Event requires <a href="/party/edit/{{ $event->idevents }}">moderation</a> by an admin</td>
       @else
-        <td class="cell-warning text-center" colspan="5">@lang('partials.event_requires_moderation_by_an_admin')</td>
+        <td class="cell-warning text-center">@lang('partials.event_requires_moderation_by_an_admin')</td>
       @endif
 
     {{-- Event is Upcoming or is in progress --}}
     @elseif ( $event->isUpcoming() || $event->isInProgress() )
 
       @if ( ! $event->isParticipant() )
-        <td class="cell-warning text-center" colspan="5">
+        <td class="cell-warning text-center">
           <a href="/party/join/{{ $event->idevents }}" class="btn btn-primary">RSVP</a>
         </td>
       @else
-        <td class="cell-info text-center" colspan="5">
+        <td class="cell-info text-center">
           <a href="/party/view/{{ $event->idevents }}" class="btn btn-primary">Add a device</a>
         </td>
       @endif
