@@ -833,7 +833,7 @@ class UserController extends Controller
                 if (!isset($data)) {
                       $data = null;
                 }
-                dd("testing");
+
                 if (!isset($_POST['modal'])) {
                       return view('user.create', [
                         'title' => 'New User',

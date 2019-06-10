@@ -260,7 +260,7 @@ class Group extends Model implements Auditable
     /**
      * Adds a volunteer to the group.
      *
-     * @param App\User $volunteer A registered user.
+     * @param \App\User $volunteer A registered user.
      */
     public function addVolunteer($volunteer)
     {
@@ -302,9 +302,13 @@ class Group extends Model implements Auditable
         return '';
     }
 
-    public function isVolunteer()
+    /**
+     * @param int|null $user_id
+     * @return bool
+     */
+    public function isVolunteer($user_id = NULL)
     {
-        $attributes = ['user' => auth()->id()];
+        $attributes = ['user' => $user_id ?: auth()->id()];
 
         return $this->allConfirmedVolunteers()->where($attributes)->exists();
     }

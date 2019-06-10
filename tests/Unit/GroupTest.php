@@ -34,9 +34,22 @@ class GroupTest extends TestCase
         $group->addVolunteer($volunteer);
 
         $groupVolunteer = $group->allVolunteers()->first()->volunteer()->first();
-        $this->assertTrue($volunteer->id == $volunteer->id);
+        $this->assertTrue($groupVolunteer->id == $volunteer->id);
     }
 
+    /** @test */
+    public function ensure_user_is_removed_from_group_when_deleted()
+    {
+        /** @var Group $group */
+        $group = factory(Group::class)->create();
+        /** @var User $volunteer */
+        $volunteer = factory(User::class)->create();
+
+        $group->addVolunteer($volunteer);
+        $volunteer->delete();
+
+        $this->assertFalse($group->isVolunteer($volunteer->id));
+    }
 
     /** @test */
     public function it_can_set_a_host_group_member_as_host()

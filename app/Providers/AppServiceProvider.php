@@ -20,6 +20,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // The admin area is unusable without this
+        if (app()->isLocal()) {
+            error_reporting(E_ALL ^ E_NOTICE);
+        }
+
         Schema::defaultStringLength(191);
 
         view()->composer('*', function ($view) {
