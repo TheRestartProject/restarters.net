@@ -10,6 +10,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
+use FixometerHelper;
 
 class Party extends Model implements Auditable
 {
@@ -665,25 +666,22 @@ class Party extends Model implements Auditable
         return $this->pax;
     }
 
-    /**
-     * [hasStartedRSVP description]
-     * {description}
-     * @author Christopher Kelker
-     * @date   2019-06-03T10:12:20+010
-     * @return boolean
-     */
-    public function hasStartedRSVP()
+    public function checkForMissingData()
     {
-      $participants_count = $this->participants;  // no participants recorded
-      $volunteers_count = $this->allConfirmedVolunteers()->count(); // number of volunteers 1 or less
-      $devices_count = $this->allDevices()->count(); // no devices added
+      $participants_count = $this->participants;
+      $volunteers_count = $this->allConfirmedVolunteers()->count();
+      $devices_count = $this->allDevices()->count();
 
-      if ($participants_count != 0 && $volunteers_count >= 1 && $devices_count != 0) {
-        return false;
-      }
+      return [
+        'participants_count' => $participants_count,
+        'volunteers_count' => $volunteers_count,
+        'devices_count' => $devices_count,
+      ];
+    }
 
-      return true;
-
+    public function isParticipant()
+    {
+      return $this->allConfirmedVolunteers()->where('user', auth()->id())->exists();
     }
 
     public function requiresModerationByAdmin()
@@ -697,19 +695,22 @@ class Party extends Model implements Auditable
 
     public function VisuallyHighlight()
     {
-      if ( $this->requiresModerationByAdmin() ) {
-        return 'event-requires-moderation-by-admin';
+      if( $this->requiresModerationByAdmin() && FixometerHelper::hasRole(auth()->user(), 'Administrator') ) {
+        return 'cell-warning-heading';
+      } elseif ( $this->isUpcoming() || $this->isInProgress() ) {
+        if ( ! $this->isParticipant() ) {
+          return 'cell-warning-heading';
+        } else {
+          return 'cell-primary-heading';
+        }
+      } elseif( $this->hasFinished() ) {
+        if ( ($this->checkForMissingData()['participants_count'] == 0 ||
+        $this->checkForMissingData()['volunteers_count'] <= 1 ||
+        $this->checkForMissingData()['devices_count'] == 0) ) {
+          return 'cell-danger-heading';
+        }
+      } else {
+        return '';
       }
-
-      if ( $this->isUpcoming() || $this->isInProgress() ) {
-        return 'event-in-progress';
-      }
-
-      if ( $this->hasFinished() && $this->allDevices->isEmpty() ) {
-        return 'event-has-no-devices';
-      }
-
-      // Event has Finished, does not require moderation and has devices
-      return '';
     }
 }

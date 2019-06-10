@@ -281,25 +281,27 @@
 }
 
 // VisuallyHighlight
-.event-requires-moderation-by-admin {
-  background-color: #F9BD68;
+.cell-warning-heading  {
+  background-color: #F9BC67;
 }
 
-.event-in-progress {
+.cell-primary-heading {
   background-color: #0394A6;
 }
 
-.event-in-progress-rsvp-cell,
-.event-requires-moderation-by-admin-cell {
-  background-color: #FDE5C4;
+.cell-danger-heading {
+  background-color: #F05C4D;
 }
 
 // Event Details
-.event-has-no-devices {
-  background-color: #F05D4C;
+.cell-danger {
+  background-color: #F6E3DF;
 }
 
-// Event Details
-.event-has-no-devices-cell {
-  background-color: #FACFCA;
+.cell-warning {
+  background-color: #FDE5C3;
+}
+
+.cell-info {
+  background-color: #D1E5E6;
 }

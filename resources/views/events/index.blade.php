@@ -27,6 +27,7 @@
       </div>
     </div>
 
+    {{-- Events List --}}
     <div class="row justify-content-center">
       <div class="col-lg-12">
         @if (\Session::has('success'))
@@ -62,7 +63,9 @@
         @endif
         {{-- END Events to Moderate (Admin Only) --}}
 
-        <section class="table-section" id="events-2">
+
+        {{-- Upcoming events for your Groups --}}
+        <section class="table-section testing123" id="events-2">
           <header>
             @if( !is_null($group) )
               <h2>Upcoming {{{ $group->name }}} events</h2>
@@ -72,17 +75,12 @@
           </header>
 
           <div class="table-responsive">
-
             <table class="table table-events table-striped" role="table">
-
-              @include('partials.tables.head-events', ['hide_invite' => false])
-
+              @include('events.tables.headers.head-events-upcoming-only', ['hide_invite' => false])
               <tbody>
                 @if( !$upcoming_events->isEmpty() )
                   @foreach ($upcoming_events as $event)
-
                     @include('partials.tables.row-events', ['invite' => true, 'EmissionRatio' => $EmissionRatio])
-
                   @endforeach
                 @else
                   <tr>
@@ -90,13 +88,13 @@
                   </tr>
                 @endif
               </tbody>
-
             </table>
-
           </div>
-
         </section>
+        {{-- END Upcoming events for your Groups --}}
 
+
+        {{-- Past events --}}
         <section class="table-section" id="events-3">
           <header>
             @if( !is_null($group) )
@@ -107,17 +105,12 @@
           </header>
 
           <div class="table-responsive">
-
           <table class="table table-events table-striped" role="table">
-
               @include('partials.tables.head-events', ['hide_invite' => true])
-
               <tbody>
                 @if( !$past_events->isEmpty() )
                   @foreach($past_events as $event)
-
                     @include('partials.tables.row-events', ['invite' => false, 'EmissionRatio' => $EmissionRatio])
-
                   @endforeach
                 @else
                   <tr>
@@ -125,21 +118,22 @@
                   </tr>
                 @endif
               </tbody>
-
           </table>
-
           </div>
 
+          <div class="d-flex justify-content-center">
+            <nav aria-label="Page navigation example">
+              {!! $past_events->links() !!}
+            </nav>
+          </div>
         </section>
-
-        <div class="d-flex justify-content-center">
-          <nav aria-label="Page navigation example">
-            {!! $past_events->links() !!}
-          </nav>
-        </div>
+        {{-- END Past events --}}
 
       </div>
     </div>
+    {{-- END Events List --}}
+
+
 
   </div>
 </section>

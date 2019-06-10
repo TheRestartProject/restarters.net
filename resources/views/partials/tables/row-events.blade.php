@@ -1,9 +1,8 @@
 @php( $devices = $event->allDevices )
 <tr>
+  <td class="hightlighted {{ $event->VisuallyHighlight() }}"></td>
+
     @if( !isset($group_view) )
-
-      <td class="hightlighted {{ $event->VisuallyHighlight() }}"></td>
-
       <td class="table-cell-icon">
         @php( $group = $event->theGroup )
         @php( $group_image = $event->theGroup->groupImage )
@@ -27,47 +26,47 @@
         {{ $event->getEventStartEnd() }}
     </td>
 
-    <td class="cell-figure">{{ $event->pax }}</td>
-    <td class="cell-figure">{{ $event->volunteers }}</td>
+    <td class="cell-figure @if ( $event->checkForMissingData()['participants_count'] == 0 ) cell-danger @endif">{{ $event->pax }}</td>
 
+    <td class="cell-figure @if ( $event->checkForMissingData()['volunteers_count'] <= 1 ) cell-danger @endif">{{ $event->volunteers }}</td>
 
     {{-- Event requires moderation by an admin --}}
     @if( $event->requiresModerationByAdmin() )
+
       @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-        <td class="event-requires-moderation-by-admin-cell" colspan="5">Event requires <a href="/party/edit/{{ $event->idevents }}">moderation</a> by an admin</td>
+        <td class="cell-warning text-center" colspan="5">Event requires <a href="/party/edit/{{ $event->idevents }}">moderation</a> by an admin</td>
       @else
-        <td class="event-requires-moderation-by-admin-cell" colspan="5">@lang('partials.event_requires_moderation_by_an_admin')</td>
+        <td class="cell-warning text-center" colspan="5">@lang('partials.event_requires_moderation_by_an_admin')</td>
       @endif
-    @endif
 
-    {{-- Event is currently in-progress --}}
-    @if ( $event->isInProgress() )
-      <td class="bg-success text-center" colspan="5">
-        This event is in progress <a href="/party/view/{{ $event->idevents }}">Add a device</a>
-      </td>
-    @endif
+    {{-- Event is Upcoming or is in progress --}}
+    @elseif ( $event->isUpcoming() || $event->isInProgress() )
 
-    {{-- Event has not started RSVP --}}
-    @if ( $event->isUpcoming() || $event->isInProgress() && ! $event->hasStartedRSVP() )
-      <td class="event-in-progress-rsvp-cell text-center" colspan="5">
-        <a href="/party/join/{{ $event->idevents }}" class="btn btn-primary btn-save">RSVP</a>
-      </td>
-    @endif
+      @if ( ! $event->isParticipant() )
+        <td class="cell-warning text-center" colspan="5">
+          <a href="/party/join/{{ $event->idevents }}" class="btn btn-primary">RSVP</a>
+        </td>
+      @else
+        <td class="cell-info text-center" colspan="5">
+          <a href="/party/view/{{ $event->idevents }}" class="btn btn-primary">Add a device</a>
+        </td>
+      @endif
 
     {{-- Event has finished and does not have any devices --}}
-    @if ( $event->hasFinished() && $event->allDevices->isEmpty() )
-      <td class="event-has-no-devices-cell text-center" colspan="5">
-        No devices added <a href="/party/view/{{ $event->idevents }}">Add a device</a>
-      </td>
-    @endif
+    @elseif( $event->hasFinished() )
 
-    @if( $event->hasFinished() && ! $event->allDevices->isEmpty() )
+      @if ( $event->checkForMissingData()['devices_count'] != 0  )
       @php( $stats = $event->getEventStats($EmissionRatio) )
-      <td class="cell-figure">{{{ number_format(round($stats['ewaste']), 0) }}}<small>kg<small></td>
-      <td class="cell-figure">{{{ number_format(round($stats['co2']), 0) }}}<small>kg<small></td>
-      <td class="cell-figure">{{{ $stats['fixed_devices'] }}}</td>
-      <td class="cell-figure">{{{ $stats['repairable_devices'] }}}</td>
-      <td class="cell-figure">{{{ $stats['dead_devices'] }}}</td>
-    @endif
+        <td class="cell-figure">{{{ number_format(round($stats['ewaste']), 0) }}}<small>kg<small></td>
+        <td class="cell-figure">{{{ number_format(round($stats['co2']), 0) }}}<small>kg<small></td>
+        <td class="cell-figure">{{{ $stats['fixed_devices'] }}}</td>
+        <td class="cell-figure">{{{ $stats['repairable_devices'] }}}</td>
+        <td class="cell-figure">{{{ $stats['dead_devices'] }}}</td>
+      @else
+        <td class="cell-danger text-center" colspan="5">
+          No devices added <a href="/party/view/{{ $event->idevents }}">Add a device</a>
+        </td>
+      @endif
 
+    @endif
 </tr>
