@@ -1192,6 +1192,13 @@ function initAutocomplete() {
 
   $( document ).ready(function() {
 
+    $("textarea#message_to_restarters[name=message_to_restarters]").on("keydown", function(event){
+      if (event.which == 13) {
+        event.preventDefault();
+        this.value = this.value + "\n";
+      }
+    });
+    
     $('#participants_qty').on('change', function() {
       updateParticipants();
     });
