@@ -43,6 +43,10 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\CreateWordPressEditGroupPost',
         ],
 
+        'App\Events\PasswordChanged' => [
+            'App\Listeners\ChangeWikiPassword',
+        ],
+
         UserDeleted::class => [
             RemoveSoftDeletedUserFromAllGroups::class,
             SendAdminUserDeletedNotification::class,
@@ -50,11 +54,7 @@ class EventServiceProvider extends ServiceProvider
 
         EventImagesUploaded::class => [
             SendAdminModerateEventPhotosNotification::class,
-        ],
-
-        'App\Events\PasswordChanged' => [
-            'App\Listeners\ChangeWikiPassword',
-        ],
+        ]
     ];
 
     /**

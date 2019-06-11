@@ -1412,7 +1412,19 @@ class PartyController extends Controller
     public function imageUpload(Request $request, $id)
     {
         try {
-            if (isset($_FILES) && ! empty($_FILES)) {
+            if (empty($_FILES) && !empty($request->files)) {
+                // Shim to handle uploads from Tests
+                $file = $request->file('file');
+                $_FILES['file'] = [
+                    'name' => $file->getClientOriginalName(),
+                    'type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                    'tmp_name' => $file->getRealPath(),
+                    'error' => $file->getError(),
+                ];
+            }
+
+            if (!empty($_FILES)) {
                 $file = new FixometerFile;
                 $file->upload('file', 'image', $id, env('TBL_EVENTS'), true, false, true);
 
