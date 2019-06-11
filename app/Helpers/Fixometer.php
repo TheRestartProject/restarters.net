@@ -14,6 +14,7 @@ use App\UsersPermissions;
 use App\UsersPreferences;
 use Auth;
 use DB;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
 use Request;
@@ -872,7 +873,12 @@ class FixometerHelper
         return true;
     }
 
-    /** Returns users who have a particular preference by slug **/
+    /**
+     * Returns users who have a particular preference by slug
+     *
+     * @param $slug
+     * @return Collection
+     */
     public static function usersWhoHavePreference($slug)
     {
         return User::join('users_preferences', 'users_preferences.user_id', '=', 'users.id')
