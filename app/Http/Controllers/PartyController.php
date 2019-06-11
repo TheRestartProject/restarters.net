@@ -9,7 +9,6 @@ use App\Cluster;
 use App\Device;
 use App\Events\ApproveEvent;
 use App\Events\EditEvent;
-use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\FootprintRatioCalculator;
@@ -1427,8 +1426,6 @@ class PartyController extends Controller
             if (!empty($_FILES)) {
                 $file = new FixometerFile;
                 $file->upload('file', 'image', $id, env('TBL_EVENTS'), true, false, true);
-
-                event(new EventImagesUploaded(Party::find($id), auth()->id()));
             }
 
             return 'success - image uploaded';
