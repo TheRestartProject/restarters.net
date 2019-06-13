@@ -16882,6 +16882,10 @@ td.col-device-auto {
   width: 165px;
 }
 
+.table-layout-fixed {
+  table-layout: fixed;
+}
+
 .row-button {
   white-space: nowrap;
 }

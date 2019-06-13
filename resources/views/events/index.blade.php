@@ -44,7 +44,7 @@
 
           <section class="table-section" id="events-1">
             <div class="table-responsive">
-              <table class="table table-events table-striped" role="table">
+              <table class="table table-events table-striped table-layout-fixed" role="table">
                 @include('events.tables.headers.head-events-admin-only', ['hide_invite' => true])
                 <tbody>
                     @if( ! $moderate_events->isEmpty() )
@@ -75,7 +75,7 @@
           </header>
 
           <div class="table-responsive">
-            <table class="table table-events table-striped" role="table">
+            <table class="table table-events table-striped table-layout-fixed" role="table">
               @include('events.tables.headers.head-events-upcoming-only', ['hide_invite' => false])
               <tbody>
                 @if( !$upcoming_events->isEmpty() )
@@ -105,7 +105,7 @@
           </header>
 
           <div class="table-responsive">
-          <table class="table table-events table-striped" role="table">
+          <table class="table table-events table-striped table-layout-fixed" role="table">
               @include('partials.tables.head-events', ['hide_invite' => true])
               <tbody>
                 @if( !$past_events->isEmpty() )

@@ -6,11 +6,11 @@
       <td class="table-cell-icon">
         @php( $group = $event->theGroup )
         @php( $group_image = $event->theGroup->groupImage )
-        @if( is_object($group_image) && is_object($group_image->image) )
-            <a class="mx-auto" href="/group/view/{{ $group->idgroups }}"><img src="{{ asset('/uploads/thumbnail_' . $group_image->image->path) }}" alt="{{{ $group->name }}}" title="{{{ $group->name }}}"></a>
-        @else
+        {{-- @if( is_object($group_image) && is_object($group_image->image) ) --}}
+            {{-- <a class="mx-auto" href="/group/view/{{ $group->idgroups }}"><img src="{{ asset('/uploads/thumbnail_' . $group_image->image->path) }}" alt="{{{ $group->name }}}" title="{{{ $group->name }}}"></a> --}}
+        {{-- @else --}}
           <img class="mx-auto" src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}">
-        @endif
+        {{-- @endif --}}
       </td>
     @endif
 
@@ -40,8 +40,10 @@
     @endif
 
 
-    {{-- Event requires moderation by an admin --}}
+
     @if( $event->requiresModerationByAdmin() )
+
+
 
       @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') )
         <td class="cell-warning text-center">Event requires <a href="/party/edit/{{ $event->idevents }}">moderation</a> by an admin</td>
@@ -49,30 +51,60 @@
         <td class="cell-warning text-center">@lang('partials.event_requires_moderation_by_an_admin')</td>
       @endif
 
-    {{-- Event is Upcoming or is in progress --}}
-    @elseif ( $event->isUpcoming() || $event->isInProgress() )
 
-      {{-- isStartingSoon --}}
-      @if ( $event->isUpcoming() && $event->isVolunteer() )
+
+    @elseif ( $event->isUpcoming() && ! $event->isStartingSoon() )
+
+
+
+      @if ( $event->isVolunteer() )
         <td class="text-center">
           You're going!
         </td>
-      @elseif ( $event->isUpcoming() && $event->isVolunteer() )
-
       @else
         <td class="cell-warning text-center">
           <a href="/party/join/{{ $event->idevents }}" class="btn btn-primary">RSVP</a>
         </td>
-        {{-- <td class="cell-info text-center">
-          <a href="/party/view/{{ $event->idevents }}" class="btn btn-primary">Add a device</a>
-        </td> --}}
       @endif
 
-    {{-- Event has finished and does not have any devices --}}
+
+
+    @elseif( $event->isStartingSoon() )
+
+
+
+      @if ( $event->isVolunteer() )
+        <td class="cell-info text-center">
+          You're going!
+        </td>
+      @else
+        <td class="cell-info text-center">
+          <a href="/party/join/{{ $event->idevents }}" class="btn btn-primary">RSVP</a>
+        </td>
+      @endif
+
+
+
+    @elseif( $event->isInProgress() )
+
+
+
+      @if ( $event->isVolunteer() )
+        <td class="cell-info text-center">
+          <a href="/party/view/{{ $event->idevents }}" class="btn btn-primary">Add a device</a>
+        </td>
+      @else
+        <td class="cell-success text-center">
+          <a href="/party/join/{{ $event->idevents }}" class="btn btn-primary">RSVP</a>
+        </td>
+      @endif
+
+
+
     @elseif( $event->hasFinished() )
 
       @if ( $event->checkForMissingData()['devices_count'] != 0  )
-      @php( $stats = $event->getEventStats($EmissionRatio) )
+        @php( $stats = $event->getEventStats($EmissionRatio) )
         <td class="cell-figure">{{{ number_format(round($stats['ewaste']), 0) }}}<small>kg<small></td>
         <td class="cell-figure">{{{ number_format(round($stats['co2']), 0) }}}<small>kg<small></td>
         <td class="cell-figure">{{{ $stats['fixed_devices'] }}}</td>
@@ -83,6 +115,8 @@
           No devices added <a href="/party/view/{{ $event->idevents }}">Add a device</a>
         </td>
       @endif
+
+
 
     @endif
 </tr>

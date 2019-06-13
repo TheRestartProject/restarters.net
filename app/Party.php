@@ -504,8 +504,6 @@ class Party extends Model implements Auditable
 
     public function isUpcoming()
     {
-      $this->start = '14:00:00';
-
         $date_now = new \DateTime();
         $event_start = new \DateTime($this->event_date.' '.$this->start);
 
@@ -515,6 +513,7 @@ class Party extends Model implements Auditable
 
         return false;
     }
+
 
     /**
      * [isStartingSoon description]
@@ -726,6 +725,12 @@ class Party extends Model implements Auditable
 
     public function VisuallyHighlight()
     {
+      // $party = Party::find(154);
+      // dd($party->pax);
+      // dd($party, (int) $party->checkForMissingData()['participants_count'] == 0 ||
+      // $party->checkForMissingData()['volunteers_count'] < 1 ||
+      // $party->checkForMissingData()['devices_count'] == 0);
+
       if( $this->requiresModerationByAdmin() && FixometerHelper::hasRole(auth()->user(), 'Administrator') ) {
         return 'cell-warning-heading';
       } elseif ( $this->isUpcoming() || $this->isInProgress() ) {
@@ -735,9 +740,9 @@ class Party extends Model implements Auditable
           return 'cell-primary-heading';
         }
       } elseif( $this->hasFinished() ) {
-        if ( ($this->checkForMissingData()['participants_count'] == 0 ||
+        if ( $this->checkForMissingData()['participants_count'] == 0 ||
         $this->checkForMissingData()['volunteers_count'] < 1 ||
-        $this->checkForMissingData()['devices_count'] == 0) ) {
+        $this->checkForMissingData()['devices_count'] == 0 ) {
           return 'cell-danger-heading';
         }
       } else {
