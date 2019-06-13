@@ -111,7 +111,7 @@
                 </header>
                 <div class="table-responsive">
                   <table class="table table-events table-striped" role="table">
-                    @include('partials.tables.head-events', ['hide_invite' => true])
+                    @include('events.tables.head-events-upcoming')
                     <tbody>
                       @if ( is_null(auth()->user()->latitude) && is_null(auth()->user()->longitude) )
                         <tr>
@@ -119,7 +119,7 @@
                         </tr>
                       @elseif( !$upcoming_events_in_area->isEmpty() )
                         @foreach($upcoming_events_in_area as $event)
-                          @include('partials.tables.row-events', ['invite' => false, 'EmissionRatio' => $EmissionRatio])
+                          @include('events.tables.row-events-upcoming', ['invite' => true])
                         @endforeach
                       @else
                         <tr>
