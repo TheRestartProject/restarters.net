@@ -164,7 +164,7 @@ class GroupController extends Controller
     public function search(Request $request)
     {
         // variables
-        $groups = Group::with('allHosts')->withCount('allHosts');
+        $groups = new Group;
 
         //Get all group tags
         $all_group_tags = GroupTags::all();
@@ -197,18 +197,23 @@ class GroupController extends Controller
         }
 
         if ( ! empty($sort_column) && $sort_column == 'hosts') {
-            $groups = $groups->withCount('allRestarters')
-                                ->orderBy('all_hosts_count', $sort_direction); //->has('allHosts')
+            $groups = $groups->with('allHosts')
+                              ->with('allRestarters')
+                              ->orderBy('all_hosts_count', $sort_direction);
         }
 
-        if ( ! empty($sort_column) && $sort_column == 'upcoming_event') { //TODO
-            $groups = $groups->join('events', 'events.group', '=', 'groups.idgroups')
-                                ->orderBy('event_date', $sort_direction);
+        if ( ! empty($sort_column) && $sort_column == 'upcoming_event') {
+          $groups = $groups->leftJoin('events', 'events.group', '=', 'groups.idgroups')
+                            ->whereDate('events.event_date', '>=', date('Y-m-d'))
+                            ->orderBy('events.event_date', $sort_direction)
+                            ->select('groups.*')
+                            ->groupBy('groups.idgroups');
         }
 
         if ( ! empty($sort_column) && $sort_column == 'restarters') {
-            $groups = $groups->withCount('allRestarters') //->has('allRestarters')
-                                ->orderBy('all_restarters_count', $sort_direction);
+            $groups = $groups->with('allHosts')
+                              ->with('allRestarters')
+                              ->orderBy('all_restarters_count', $sort_direction);
         }
 
         if ( ! empty($sort_column) && $sort_column == 'created_at') {
@@ -216,8 +221,8 @@ class GroupController extends Controller
                                 ->whereNotNull('created_at');
         }
 
-        $groups_count = $groups->count();
         $groups = $groups->paginate(env('PAGINATE'));
+        $groups_count = $groups->total();
 
         //Look for groups where user ID exists in pivot table
         $your_groups_uniques = UserGroups::where('user', auth()->id())->pluck('group')->toArray();

@@ -40,6 +40,19 @@ class Group extends Model implements Auditable
      */
     protected $hidden = [];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('all_hosts_count', function ($builder) {
+            $builder->withCount('allHosts');
+        });
+
+        static::addGlobalScope('all_restarters_count', function ($builder) {
+            $builder->withCount('allRestarters');
+        });
+    }
+
 
     public function addTag($tag)
     {
