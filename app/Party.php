@@ -504,6 +504,8 @@ class Party extends Model implements Auditable
 
     public function isUpcoming()
     {
+      $this->start = '14:00:00';
+
         $date_now = new \DateTime();
         $event_start = new \DateTime($this->event_date.' '.$this->start);
 
@@ -512,6 +514,39 @@ class Party extends Model implements Auditable
         }
 
         return false;
+    }
+
+    /**
+     * [isStartingSoon description]
+     * If the event is not of today = false
+     * If the event is in progress = false
+     * If the event has finished = false
+     * If the event is of today, is not in progress and has not finished = true
+     * @author Christopher Kelker
+     * @date   2019-06-13T15:48:05+010
+     * @return boolean
+     */
+    public function isStartingSoon()
+    {
+      $current_date = date('Y-m-d');
+      $event_date = $this->event_date;
+
+      if ($current_date != $event_date) {
+        return false;
+      }
+
+      if ( $this->isInProgress()) {
+        return false;
+      }
+
+      $date_now = new \DateTime();
+      $event_end = new \DateTime($this->event_date.' '.$this->end);
+
+      if ( $date_now > $event_end) {
+        return false;
+      }
+
+      return true;
     }
 
     public function isInProgress()
@@ -680,11 +715,6 @@ class Party extends Model implements Auditable
       ];
     }
 
-    public function isParticipant()
-    {
-      return $this->allConfirmedVolunteers()->where('user', auth()->id())->exists();
-    }
-
     public function requiresModerationByAdmin()
     {
       if ( ! is_null($this->wordpress_post_id) ) {
@@ -699,14 +729,14 @@ class Party extends Model implements Auditable
       if( $this->requiresModerationByAdmin() && FixometerHelper::hasRole(auth()->user(), 'Administrator') ) {
         return 'cell-warning-heading';
       } elseif ( $this->isUpcoming() || $this->isInProgress() ) {
-        if ( ! $this->isParticipant() ) {
+        if ( ! $this->isVolunteer() ) {
           return 'cell-warning-heading';
         } else {
           return 'cell-primary-heading';
         }
       } elseif( $this->hasFinished() ) {
         if ( ($this->checkForMissingData()['participants_count'] == 0 ||
-        $this->checkForMissingData()['volunteers_count'] <= 1 ||
+        $this->checkForMissingData()['volunteers_count'] < 1 ||
         $this->checkForMissingData()['devices_count'] == 0) ) {
           return 'cell-danger-heading';
         }

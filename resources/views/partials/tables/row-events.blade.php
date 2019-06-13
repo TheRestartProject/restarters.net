@@ -28,12 +28,17 @@
 
 
     @if ( isset($show_invites_count) )
-      <td class="cell-figure">{{{ $event->allInvited->count() }}}</td>
+      <td class="cell-figure cell-no_of_invites">{{{ $event->allInvited->count() }}}</td>
     @else
-      <td class="cell-figure @if ( $event->checkForMissingData()['participants_count'] == 0 ) cell-danger @endif">{{ $event->pax }}</td>
+      <td class="cell-figure cell-no_of_participants @if ( $event->checkForMissingData()['participants_count'] == 0 ) cell-danger @endif">{{ $event->pax }}</td>
     @endif
 
-    <td class="cell-figure @if ( $event->checkForMissingData()['volunteers_count'] <= 1 ) cell-danger @endif">{{ $event->volunteers }}</td>
+    @if ( $event->isUpcoming() || $event->isInProgress() )
+      <td class="cell-figure cell-no_of_restarters">{{ $event->checkForMissingData()['volunteers_count'] }}</td>
+    @else
+      <td class="cell-figure cell-no_of_restarters @if ( $event->checkForMissingData()['volunteers_count'] < 1 ) cell-danger @endif">{{ $event->checkForMissingData()['volunteers_count'] }}</td>
+    @endif
+
 
     {{-- Event requires moderation by an admin --}}
     @if( $event->requiresModerationByAdmin() )
@@ -47,14 +52,20 @@
     {{-- Event is Upcoming or is in progress --}}
     @elseif ( $event->isUpcoming() || $event->isInProgress() )
 
-      @if ( ! $event->isParticipant() )
+      {{-- isStartingSoon --}}
+      @if ( $event->isUpcoming() && $event->isVolunteer() )
+        <td class="text-center">
+          You're going!
+        </td>
+      @elseif ( $event->isUpcoming() && $event->isVolunteer() )
+
+      @else
         <td class="cell-warning text-center">
           <a href="/party/join/{{ $event->idevents }}" class="btn btn-primary">RSVP</a>
         </td>
-      @else
-        <td class="cell-info text-center">
+        {{-- <td class="cell-info text-center">
           <a href="/party/view/{{ $event->idevents }}" class="btn btn-primary">Add a device</a>
-        </td>
+        </td> --}}
       @endif
 
     {{-- Event has finished and does not have any devices --}}
