@@ -72,12 +72,20 @@ class GroupController extends Controller
             ]);
         }
 
+        $sort_direction = request()->input('sort_direction');
+        $sort_column = request()->input('sort_column');
+
         //Look for groups where user ID exists in pivot table
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->join('events', 'events.group', '=', 'groups.idgroups')
-            ->where('users_groups.user', $user->id)
-            ->orderBy('groups.name', 'ASC')
-            ->orderBy('events.event_date', 'ASC')
+            ->where('users_groups.user', $user->id);
+
+            if ( ! empty($sort_direction) && ! empty($sort_column)) {
+              $your_groups = $your_groups->whereDate('events.event_date', '>=', date('Y-m-d'))
+                    ->orderBy('events.event_date', $sort_direction);
+            }
+
+            $your_groups = $your_groups->orderBy('groups.name', 'ASC')
             ->groupBy('groups.idgroups')
             ->select('groups.*')
             ->get();
@@ -90,11 +98,16 @@ class GroupController extends Controller
           $groups_near_you = Group::select(DB::raw('`groups`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( groups.latitude ) ) * cos( radians( groups.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( groups.latitude ) ) ) ) AS distance'))
               ->having('distance', '<=', 150)
               ->join('events', 'events.group', '=', 'groups.idgroups')
-              ->whereNotIn('groups.idgroups', $your_groups_uniques)
-              ->groupBy('groups.idgroups')
+              ->whereNotIn('groups.idgroups', $your_groups_uniques);
+
+          if ( ! empty($sort_direction) && ! empty($sort_column)) {
+            $groups_near_you = $groups_near_you->whereDate('events.event_date', '>=', date('Y-m-d'))
+                  ->orderBy('events.event_date', $sort_direction);
+          }
+
+          $groups_near_you = $groups_near_you->groupBy('groups.idgroups')
               ->orderBy('distance', 'ASC')
               ->orderBy('distance', 'ASC')
-              ->orderBy('events.event_date', 'ASC')
               ->take(10)
               ->get();
 
@@ -109,8 +122,8 @@ class GroupController extends Controller
             'groups' => $groups,
             'your_area' => $user->location,
             'all' => $all,
-            'sort_direction' => 'ASC',
-            'sort_column' => 'distance',
+            'sort_direction' => $sort_direction,
+            'sort_column' => $sort_column,
         ]);
     }
 

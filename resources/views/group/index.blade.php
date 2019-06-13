@@ -46,24 +46,27 @@
           </div>
         </form>
       @else
-        @if( !is_null($your_groups) )
-           <div class="row">
-             <div class="col">
-               @include('group.sections.user-groups')
-             </div>
-           </div>
-        @endif
+        <form action="/group/" method="get" id="device-search">
+          <input type="hidden" name="sort_direction" value="{{$sort_direction}}" class="sr-only">
+          <input type="radio" name="sort_column" value="upcoming_event" @if( $sort_column == 'upcoming_event' ) checked @endif id="label-upcoming_event" class="sr-only">
 
-        @if( is_null($groups) )
-          <div class="row">
-            <div class="col">
-              @include('group.sections.groups-nearby')
+          @if( !is_null($your_groups) )
+            <div class="row">
+              <div class="col">
+                @include('group.sections.user-groups')
+              </div>
             </div>
-          </div>
-        @endif
+          @endif
 
+          @if( is_null($groups) )
+            <div class="row">
+              <div class="col">
+                @include('group.sections.groups-nearby')
+              </div>
+            </div>
+          @endif
+        </form>
         @php( $user_preferences = session('column_preferences') )
-
       @endif
 
     </section>
