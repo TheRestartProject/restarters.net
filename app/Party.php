@@ -443,7 +443,7 @@ class Party extends Model implements Auditable
         $query->whereNotIn('events.group', $user_group_ids)
         ->whereDate('event_date', '>=', date('Y-m-d'));
       })
-      ->having('distance', '<=', 150) // kilometers (km)
+      ->having('distance', '<=', 35) // kilometers (km)
 
       ->groupBy('events.idevents')
       ->orderBy('events.event_date', 'ASC')
