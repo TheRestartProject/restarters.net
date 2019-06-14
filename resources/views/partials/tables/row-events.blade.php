@@ -3,18 +3,18 @@
   <td class="hightlighted {{ $event->VisuallyHighlight() }}"></td>
 
     @if( !isset($group_view) )
-      <td class="table-cell-icon">
+      <td class="table-cell-icon text-center">
         @php( $group = $event->theGroup )
         @php( $group_image = $event->theGroup->groupImage )
-        {{-- @if( is_object($group_image) && is_object($group_image->image) ) --}}
-            {{-- <a class="mx-auto" href="/group/view/{{ $group->idgroups }}"><img src="{{ asset('/uploads/thumbnail_' . $group_image->image->path) }}" alt="{{{ $group->name }}}" title="{{{ $group->name }}}"></a> --}}
-        {{-- @else --}}
-          <img class="mx-auto" src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}">
-        {{-- @endif --}}
+        @if( is_object($group_image) && is_object($group_image->image) )
+            <a class="mx-auto" href="/group/view/{{ $group->idgroups }}"><img src="{{ asset('/uploads/thumbnail_' . $group_image->image->path) }}" alt="{{{ $group->name }}}" title="{{{ $group->name }}}"></a>
+        @else
+          <img class="mx-auto text-center" src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}">
+        @endif
       </td>
     @endif
 
-    <td class="cell-name">
+    <td class="cell-name pl-0">
         <a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a>
         @if( !isset($group_view) )
             <div class="group-name"><a class="group-name" href="/group/view/{{ $event->theGroup->idgroups }}">{{ $event->theGroup->name }}</a></div>
@@ -23,6 +23,7 @@
 
     <td class="cell-date">
         {{ $event->getEventDate('D jS M Y') }}
+        <br>
         {{ $event->getEventStartEnd() }}
     </td>
 

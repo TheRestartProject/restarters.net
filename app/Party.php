@@ -725,12 +725,6 @@ class Party extends Model implements Auditable
 
     public function VisuallyHighlight()
     {
-      // $party = Party::find(154);
-      // dd($party->pax);
-      // dd($party, (int) $party->checkForMissingData()['participants_count'] == 0 ||
-      // $party->checkForMissingData()['volunteers_count'] < 1 ||
-      // $party->checkForMissingData()['devices_count'] == 0);
-
       if( $this->requiresModerationByAdmin() && FixometerHelper::hasRole(auth()->user(), 'Administrator') ) {
         return 'cell-warning-heading';
       } elseif ( $this->isUpcoming() || $this->isInProgress() ) {
