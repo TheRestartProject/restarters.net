@@ -233,25 +233,13 @@ class GroupController extends Controller
             // We got data! Elaborate. //NB:: Taken out frequency as it doesn't appear in the post data might be gmaps
             $name = $_POST['name'];
             $website = $_POST['website'];
-            // $freq       =       $_POST['frequency'];
             $location = $_POST['location'];
-            // $latitude   =       $_POST['latitude'];
-            // $longitude  =       $_POST['longitude'];
             $text = $_POST['free_text'];
 
             if (empty($name)) {
                 $error['name'] = 'Please input a name.';
             }
-            // if(!empty($latitude) || !empty($longitude)) {
-            //     // check that these values are floats.
-            //     $check_lat = filter_var($latitude, FILTER_VALIDATE_FLOAT);
-            //     $check_lon = filter_var($longitude, FILTER_VALIDATE_FLOAT);
-            //
-            //     if(!$check_lat || !$check_lon){
-            //         $error['location'] = 'Coordinates must be in the correct format.';
-            //     }
-            //
-            // }
+            
             if ( ! empty($location)) {
                 $lat_long = FixometerHelper::getLatLongFromCityCountry($location);
 
