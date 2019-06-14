@@ -60,9 +60,12 @@ class DripEvent extends Model
       "time_zone" => "",
       "custom_fields" => (object) [
         "name" => $user->name,
+        "gdpr_consent_granted_date" => date('Y-m-d'),
+        "gdpr_content_granted_context" => "",
+        "signup_source" => "https://restarters.net/user/register",
       ],
       "tags" => [
-        "Customer", $user->email, env('APP_URL'),
+        "Customer", $user->email, env('APP_URL'), "subscriber unconfirmed",
       ],
     ];
 
