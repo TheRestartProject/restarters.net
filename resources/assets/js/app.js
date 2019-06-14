@@ -14,7 +14,7 @@ require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
 require('./misc/device');
-require('leaflet')
+// require('leaflet')
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
 
@@ -1047,6 +1047,13 @@ function initAutocomplete() {
   });
 
   $( document ).ready(function() {
+
+    $(function () {
+      $('[data-toggle="popover"]').popover({
+        template: '<div class="popover" role="tooltip" style="min-width: 370px; height: 190px;"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body" style="color: #000 !important;"></div></div>'
+      });
+    });
+
     $('.tokenfield').tokenfield();
 
     $current_column = $('input[name=sort_column]:checked').val();

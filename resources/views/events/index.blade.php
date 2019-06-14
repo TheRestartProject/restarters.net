@@ -74,6 +74,10 @@
             @else
               <h2>Upcoming events for your groups <sup>(<a href="{{{ route('all-upcoming-events') }}}">See all upcoming)</a></sup></h2>
             @endif
+
+            <h3>For your groups
+              @include('partials.calendar-feed-button', ['link' => ''])
+            </h3>
           </header>
 
           <div class="table-responsive">
