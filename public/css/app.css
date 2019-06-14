@@ -17831,6 +17831,10 @@ span.popover-usergroups {
   text-decoration: underline;
 }
 
+.hover-pointer {
+  cursor: pointer;
+}
+
 .btn-group-volunteers button {
   text-decoration: underline;
   color: #000;

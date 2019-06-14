@@ -163,7 +163,6 @@
 
                 @if ($display)
                   <tr>
-                      <!-- <td><?php //echo $u->id; ?></td> -->
                       <td>
 
                           @if(FixometerHelper::hasRole($user, 'Administrator'))
@@ -174,10 +173,9 @@
 
                       </td>
                       <td>
-                        <a href="" class="btn-copy js-tooltip js-copy" data-toggle="tooltip" data-placement="top" data-html="true" data-copy="{{ $u->email }}"  title="{{ $u->email }} </br> <b>Copy to clipboard</b>">
+                        <span class="js-copy hover-pointer popover-usergroups" data-toggle="popover" data-trigger="hover" data-placement="top" data-html="true" data-original-email="{{ $u->email }}" data-copy="{{ $u->email }}" data-content="{{ $u->email }} </br> <b>Click/press to copy</b>">
                           {{ str_limit($u->email, 15) }}
-                          {{-- <svg fill="#fff" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M17,9H7V7H17M17,13H7V11H17M14,17H7V15H14M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z"></path></svg> --}}
-                        </a>
+                        </span>
                       </td>
                       <td>
                         @if ($u->role == 'Administrator')
