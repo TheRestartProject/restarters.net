@@ -304,6 +304,7 @@ class User extends Authenticatable
         $this->username = $this->id.'-deleted';
 
         // TODO: country, city, gender, age, also required?
+        return $this;
     }
 
     /**
