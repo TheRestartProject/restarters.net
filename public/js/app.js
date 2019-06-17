@@ -78695,7 +78695,7 @@ $(".select2-dropdown").select2({
 $(document).ready(function () {
   $(function () {
     $('[data-toggle="popover"]').popover({
-      template: '<div class="popover" role="tooltip" style="min-width: 370px; height: 190px;"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body" style="color: #000 !important;"></div></div>'
+      template: '<div class="popover popover-calendar-feed" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
     });
   });
   $('.tokenfield').tokenfield();
@@ -79116,6 +79116,11 @@ $(document).ready(function () {
     $('#event-invite-to').modal('toggle');
     $('#shareable-modal').modal('toggle');
   });
+});
+$(document).on("click", "#btn-copy", function () {
+  $link = $(this).parents('div').parents('div').find('input[type=text]').val();
+  window.open($link, '_blank');
+  console.log($link);
 });
 
 /***/ }),

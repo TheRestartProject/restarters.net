@@ -17106,8 +17106,34 @@ td.col-device-auto {
   border-top-color: #0394A6;
 }
 
-.testing123 {
+.popover-calendar-feed {
+  font-family: "Open Sans", sans-serif;
   min-width: 370px;
+  border: 0px;
+}
+
+.popover-calendar-feed .arrow {
+  top: calc((0.5rem) * -1);
+  color: rgba(0, 0, 0, 0.125);
+  z-index: 1;
+}
+
+.popover-calendar-feed .popover-body {
+  padding: 0px;
+}
+
+.popover-calendar-feed .card {
+  font-size: 13px;
+}
+
+.popover-calendar-feed .card .btn {
+  min-width: 0px;
+  font-size: 0px;
+}
+
+.popover-calendar-feed p,
+.popover-calendar-feed a {
+  color: #000;
 }
 
 .pagination {
