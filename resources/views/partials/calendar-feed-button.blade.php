@@ -2,8 +2,9 @@
   @php
     $copy_icon = view('partials.svg-icons.copy-icon');
     $auth = auth()->user();
+    $env_hash = env('CALENDAR_HASH');
     $auth_id = $auth->id;
-    $read_only_all_events_link = "https://restarters.net/calendar/all-events/{$auth->calendar_hash}/";
+    $read_only_all_events_link = url("/calendar/all-events/{$env_hash}/");
     $content = "<div class='card'>
       <div class='card-body font-family-normal'>
         <p class='font-weight-bold mb-2'>Access all events in your personal calendar</p>

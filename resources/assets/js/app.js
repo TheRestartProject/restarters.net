@@ -787,6 +787,11 @@ function initAutocomplete() {
       jQuery('.select2-repair-barrier').select2(repair_barrier_options);
       jQuery('.select2-tags').select2(tag_options);
       jQuery(".select2-with-input").select2(tag_options_with_input);
+      jQuery(".select2-with-input-group").select2({
+        width: 'auto',
+    		dropdownAutoWidth: true,
+    		allowClear: true,
+      });
 
     } else {
 
@@ -794,6 +799,11 @@ function initAutocomplete() {
       $target.find('.select2-repair-barrier').select2(repair_barrier_options);
       $target.find('.select2-tags').select2(tag_options);
       $target.find(".select2-with-input").select2(tag_options_with_input);
+      $target.find(".select2-with-input-group").select2({
+        width: 'auto',
+    		dropdownAutoWidth: true,
+    		allowClear: true,
+      });
 
     }
 
@@ -1552,10 +1562,21 @@ function initAutocomplete() {
       $('#shareable-modal').modal('toggle');
     });
 
+    $('.select2-with-input-group').on("select2:select", function(e) {
+      $input_field = $(this).parents('.input-group-select2').find('input[type=text]');
+
+      $current_url = $input_field.val();
+
+      $remove_current_area = $current_url.lastIndexOf('/') + 1;
+      $creating_new_url =  $current_url.substring( 0, $remove_current_area );
+      $new_url = $creating_new_url.concat( $(this).val() );
+
+      $input_field.val($new_url);
+    });
   });
 
 $(document).on("click", "#btn-copy", function() {
   $link = $(this).parents('div').parents('div').find('input[type=text]').val();
-  window.open($link, '_blank');
   console.log($link);
+  window.open($link, '_blank');
 });

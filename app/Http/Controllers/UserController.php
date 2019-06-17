@@ -108,6 +108,21 @@ class UserController extends Controller
         $all_preferences = Preferences::all();
         $all_permissions = Permissions::all();
 
+        $groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+        ->join('events', 'events.group', '=', 'groups.idgroups')
+        ->where('users_groups.user', auth()->id())
+        ->where('events.idevents', 1104)
+        ->select('groups.*')
+        ->groupBy('groups.idgroups')
+        ->orderBy('groups.idgroups', 'ASC')
+        ->get();
+
+        $all_group_areas = Group::whereNotNull('area')
+        ->groupBy('area')
+        ->get(['area'])
+        ->pluck('area')
+        ->toArray();
+
         return view('user.profile-edit', [
         'user' => $user,
         'skills' => FixometerHelper::allSkills(),
@@ -117,7 +132,9 @@ class UserController extends Controller
         'user_permissions' => $user_permissions,
         'all_groups' => $all_groups,
         'all_preferences' => $all_preferences,
-        'all_permissions' => $all_permissions
+        'all_permissions' => $all_permissions,
+        'groups' => $groups,
+        'all_group_areas' => $all_group_areas,
         ]);
     }
 

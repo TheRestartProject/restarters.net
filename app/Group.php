@@ -389,4 +389,18 @@ class Group extends Model implements Auditable
 
         return url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg');
     }
+
+    public function userEvents()
+    {
+      return $this->parties()
+      ->join('events_users', 'events.idevents', '=', 'events_users.event')
+      ->where(function($query) {
+        $query->where('events.group', $this->idgroups)
+        ->where('events_users.user', auth()->id());
+      })
+      ->select('events.*')
+      ->groupBy('events.idevents')
+      ->orderBy('events.idevents', 'ASC')
+      ->get();
+    }
 }
