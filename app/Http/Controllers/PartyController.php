@@ -1433,7 +1433,8 @@ class PartyController extends Controller
 
             return 'success - image uploaded';
         } catch (\Exception $e) {
-            return 'fail - image could not be uploaded';
+            Log::info('An exception occurred when uploading image: ' . $e->getMessage());
+            return Response::json('An error occurred', 400);
         }
     }
 
