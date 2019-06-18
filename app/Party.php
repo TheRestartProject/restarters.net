@@ -735,7 +735,7 @@ class Party extends Model implements Auditable
         }
       } elseif( $this->hasFinished() ) {
         if ( $this->checkForMissingData()['participants_count'] == 0 ||
-        $this->checkForMissingData()['volunteers_count'] < 1 ||
+        $this->checkForMissingData()['volunteers_count'] <= 1 ||
         $this->checkForMissingData()['devices_count'] == 0 ) {
           return 'cell-danger-heading';
         }

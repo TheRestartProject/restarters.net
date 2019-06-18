@@ -65,7 +65,7 @@
 
 
         {{-- Upcoming events for your Groups --}}
-        <section class="table-section testing123" id="events-2">
+        <section class="table-section" id="events-2">
           <header>
             @if( !is_null($group) )
               <h2>Upcoming {{{ $group->name }}} events</h2>

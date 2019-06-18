@@ -28,7 +28,7 @@
     </td>
 
 
-    @if ( isset($show_invites_count) )
+    @if ( isset($show_invites_count) && $show_invites_count == true )
       <td class="cell-figure cell-no_of_invites">{{{ $event->allInvited->count() }}}</td>
     @else
       <td class="cell-figure cell-no_of_participants @if ( $event->checkForMissingData()['participants_count'] == 0 ) cell-danger @endif">{{ $event->pax }}</td>
@@ -37,7 +37,7 @@
     @if ( $event->isUpcoming() || $event->isInProgress() )
       <td class="cell-figure cell-no_of_restarters">{{ $event->checkForMissingData()['volunteers_count'] }}</td>
     @else
-      <td class="cell-figure cell-no_of_restarters @if ( $event->checkForMissingData()['volunteers_count'] < 1 ) cell-danger @endif">{{ $event->checkForMissingData()['volunteers_count'] }}</td>
+      <td class="cell-figure cell-no_of_restarters @if ( $event->checkForMissingData()['volunteers_count'] <= 1 ) cell-danger @endif">{{ $event->checkForMissingData()['volunteers_count'] }}</td>
     @endif
 
 

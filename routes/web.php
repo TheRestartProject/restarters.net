@@ -11,11 +11,6 @@
 |
 */
 
-Route::get('/testing123', function(){
-  dd(\App\Party::find(1027), \App\Party::find(1027)->isUpcoming());
-});
-
-
 Route::prefix('user')->group(function () {
     Route::get('/', 'HomeController@index');
     Route::get('reset', 'UserController@reset');
