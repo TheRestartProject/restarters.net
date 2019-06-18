@@ -31488,8 +31488,19 @@ $(document).ready(function () {
 
   $(function () {
     $('[data-toggle="popover"]').popover({
-      template: '<div class="popover popover-calendar-feed" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+      template: '<div class="popover popover-calendar-feed" role="tooltip"><div class="arrow"></div><div class="popover-body testing12345"></div></div>',
+      html: true,
+      trigger: 'click',
+      placement: 'bottom',
+      container: 'body',
+      content: function content() {
+        return $('#popover_content_wrapper');
+      }
     });
+  });
+
+  $(document).on('click', '.testing123', function (e) {
+    $(this).popover('show');
   });
 
   $('.tokenfield').tokenfield();
