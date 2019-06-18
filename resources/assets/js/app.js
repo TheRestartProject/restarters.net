@@ -1179,23 +1179,39 @@ function initAutocomplete() {
   // After show append original email again
   // Fallback if browser doesn't support .execCommand('copy')
   // ---------------------------------------------------------------------
-  function copyToClipboard(text, el) {
+  function copyToClipboard(content_to_copy, element) {
+
     var copyTest = document.queryCommandSupported('copy');
-    var elOriginalText = el.attr('data-original-email');
 
     if (copyTest === true) {
+
+      // Create Textarea and Copy Content
+      var copyTextArea = document.createElement("textarea");
+      copyTextArea.value = content_to_copy;
+      document.body.appendChild(copyTextArea);
+      copyTextArea.select();
+
+      $original_popover_text = element.attr('data-content');
+
       try {
         var successful = document.execCommand('copy');
-        var msg = successful ? 'Copied!' : 'Whoops, not copied!';
-        el.attr('data-content', msg).popover('show');
-        el.attr('data-content', elOriginalText);
+        var message = successful ? 'Copied!' : 'Whoops, not copied!';
+        $set_success_message_in_popover = element.attr('data-content', message);
+        $show_popover = element.popover('show');
+
       } catch (err) {
         console.log('Oops, unable to copy');
       }
+
+      document.body.removeChild(copyTextArea);
+      $set_original_popover_message = element.attr('data-content', $original_popover_text);
+
     } else {
-      window.prompt("Copy to clipboard: Ctrl+C or Command+C, Enter", text);
+      // Fallback if browser doesn't support .execCommand('copy')
+      window.prompt("Copy to clipboard: Ctrl+C or Command+C, Enter", content_to_copy);
     }
   }
+
 
   function tokenFieldCheck(){
     setTimeout(function(){

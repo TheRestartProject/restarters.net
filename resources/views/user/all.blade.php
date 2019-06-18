@@ -173,7 +173,14 @@
 
                       </td>
                       <td>
-                        <span class="js-copy hover-pointer popover-usergroups" data-toggle="popover" data-trigger="hover" data-placement="top" data-html="true" data-original-email="{{ $u->email }}" data-copy="{{ $u->email }}" data-content="{{ $u->email }} </br> <b>Click/press to copy</b>">
+                        <span class="js-copy hover-pointer popover-usergroups"
+                        data-toggle="popover"
+                        data-trigger="hover"
+                        data-placement="top"
+                        data-html="true"
+                        data-original-email="{{ $u->email }}"
+                        data-copy="{{ $u->email }}"
+                        data-content="{{ $u->email }} </br> <b>Click/press to copy</b>">
                           {{ str_limit($u->email, 15) }}
                         </span>
                       </td>
