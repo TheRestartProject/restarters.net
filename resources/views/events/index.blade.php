@@ -9,6 +9,9 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col">
+
+        @include('partials.information-alert', [])
+        
         <div class="d-flex justify-content-between align-content-center">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">

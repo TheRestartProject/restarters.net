@@ -108,10 +108,44 @@
     .plain-link {
         text-decoration: underline;
         color: #fff;
-        
+
         &:hover, &:focus {
           text-decoration: none;
         }
     }
 
+}
+
+.information-alert {
+  background-color: #F9F9F9;
+  border-radius: unset;
+  border: 1px solid #D6D6D6;
+  padding: 20px 45px;
+  font-size: 16px;
+
+  .action-text-left {
+    span {
+      margin-right: 30px;
+    }
+
+    .action-text {
+      line-height: 22px;
+    }
+  }
+
+  .btn-action {
+    min-width: 175px;
+    min-height: 40px;
+  }
+
+  button.close {
+    position: absolute;
+    right: 15px;
+    top: 0;
+    bottom: 0;
+
+    span {
+      color: #adadad;
+    }
+  }
 }
