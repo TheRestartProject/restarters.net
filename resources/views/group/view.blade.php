@@ -90,6 +90,8 @@
                     </ol>
                 </nav>
 
+                @include('partials.information-alert', ['dismissable_id' => "group-{$group->idgroups}"])
+
                 @php( $groupImage = $group->groupImage )
                 @if( is_object($groupImage) && is_object($groupImage->image) )
                   <img src="{{ asset('/uploads/mid_'. $groupImage->image->path) }}" alt="{{{ $group->name }}} group image" class="event-icon">

@@ -270,3 +270,7 @@ Route::get('markAsRead/{id}', function ($id) {
 })->name('markAsRead');
 
 Route::get('/set-lang/{locale}', 'LocaleController@setLang');
+
+Route::get('/set-lang/{locale}', 'LocaleController@setLang');
+
+Route::post('/set-cookie', 'InformationAlertCookieController');

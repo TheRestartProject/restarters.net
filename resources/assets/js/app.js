@@ -1075,6 +1075,24 @@ function initAutocomplete() {
       $(this).popover('show');
     });
 
+    $('.information-alert').on('closed.bs.alert', function () {
+      $dismissable_id = $(this).attr('id');
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: '/set-cookie',
+        datatype: 'json',
+        data: {
+          'dismissable_id': $dismissable_id,
+        },
+        success: function(data) {
+          console.log(true);
+        }
+      });
+    });
+
     $('.tokenfield').tokenfield();
 
     $current_column = $('input[name=sort_column]:checked').val();
