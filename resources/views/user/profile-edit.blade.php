@@ -466,7 +466,7 @@
                 <div class="input-group mb-4">
                   <input type="text" class="form-control" value="{{ url('/calendar/user/'.auth()->user()->calendar_hash) }}" readonly>
                   <div class="input-group-append">
-                    <button class="btn btn-normal-padding btn-primary" type="button">Copy link</button>
+                    <button class="btn btn-normal-padding btn-primary btn-copy-input-text" type="button">Copy link</button>
                   </div>
                 </div>
 
@@ -477,7 +477,7 @@
                   <div class="input-group mb-4">
                     <input type="text" class="form-control" value="{{ url("/calendar/group/{$group->idgroups}") }}" readonly>
                     <div class="input-group-append">
-                      <button class="btn btn-normal-padding btn-primary" type="button">Copy link</button>
+                      <button class="btn btn-normal-padding btn-primary btn-copy-input-text" type="button">Copy link</button>
                     </div>
                   </div>
                 @endforeach
@@ -489,7 +489,7 @@
                     @php( $env_hash = env('CALENDAR_HASH') )
                     <input type="text" class="form-control" value="{{ url("/calendar/all-events/{$env_hash}/") }}" readonly>
                     <div class="input-group-append">
-                      <button class="btn btn-normal-padding btn-primary" type="button">Copy link</button>
+                      <button class="btn btn-normal-padding btn-primary btn-copy-input-text" type="button">Copy link</button>
                     </div>
                   </div>
                 @endif
@@ -507,7 +507,7 @@
                   </select>
                   <input type="text" class="form-control" value="{{ url("/calendar/group-area/{$first_option}") }}" readonly>
                   <div class="input-group-append">
-                    <button class="btn btn-normal-padding btn-copy btn-primary" type="button">Copy link</button>
+                    <button class="btn btn-normal-padding btn-primary btn-copy-input-text" type="button">Copy link</button>
                   </div>
                 </div>
 

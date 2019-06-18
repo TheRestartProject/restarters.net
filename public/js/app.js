@@ -31503,6 +31503,14 @@ $(document).ready(function () {
     $(this).popover('show');
   });
 
+  // TODO
+  $(document).on('click', '.btn-copy-input-text', function (e) {
+    $link = $(this).parent('div').parent('div').find('input[type=text]');
+    $link.select();
+    document.execCommand("copy");
+    alert("Copied the link: " + $link.val());
+  });
+
   $('.information-alert').on('closed.bs.alert', function () {
     $dismissable_id = $(this).attr('id');
     $.ajax({
