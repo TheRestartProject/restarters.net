@@ -21,6 +21,7 @@ return array (
   'reg-step-2-1' => 'This information is useful for us to serve the community better. Of your personal data, only your skills, town/city and name will be visible to other community members.',
   'reg-step-2-2' => 'To create an account, you must set a password',
   'reg-step-3-1a' => 'We can send you email updates about events and groups related to you, and about Restart Project activities in general.',
+  'reg-step-3-2b' => 'Following registration, you will receive a short series of welcome emails. You can also opt-in to other communications below.',
   'reg-step-4' => 'Please give your consent to our uses of the data that you enter.',
   'reg-step-3-1b' => ' (optional)',
   'reg-step-3-label1' => 'I would like to receive The Restart Project monthly newsletter',

@@ -50,23 +50,48 @@ class DripEvent extends Model
    * @param  User                    $user
    * @return [type]
    */
-  public static function createOrUpdateSubscriber(User $user, $old_email = false, $new_email = false)
+  public static function createOrUpdateSubscriber(User $user, $opted_in = false, $old_email = false, $new_email = false)
   {
+    if ($opted_in) {
+      $tags = (array) [
+        url('/'),
+        "subscriber unconfirmed",
+      ];
+
+      $remove_tags = (array) [
+        "unsubscribed",
+      ];
+
+      $custom_fields = (array) [
+        "gdpr_consent_granted_date" => date('Y-m-d'),
+        "gdpr_content_granted_context" => "restarters__registration",
+        "signup_source" => url("/user/register"),
+      ];
+    }
+
+    if ( ! $opted_in) {
+      $tags = (array) [
+        url('/'),
+        "subscriber unconfirmed",
+      ];
+
+      $remove_tags = (array) [
+      ];
+
+      $custom_fields = (array) [
+        "signup_source" => url("/user/register"),
+      ];
+    }
+
     $parameters = [
       "subscriber_id" => $user->drip_subscriber_id,
       "email" => $user->email,
       "account_id" => env('DRIP_ACCOUNT_ID'),
       "status" => "active",
       "time_zone" => "",
-      "custom_fields" => (object) [
-        "name" => $user->name,
-        "gdpr_consent_granted_date" => date('Y-m-d'),
-        "gdpr_content_granted_context" => "",
-        "signup_source" => "https://restarters.net/user/register",
-      ],
-      "tags" => [
-        "Customer", $user->email, env('APP_URL'), "subscriber unconfirmed",
-      ],
+      "tags" => (array) $tags,
+      "remove_tags" => (array) $remove_tags,
+      "custom_fields" => (object) $custom_fields,
     ];
 
     // Remove new email because it would've been set already
@@ -105,7 +130,7 @@ class DripEvent extends Model
         "name" => $user->name,
       ],
       "tags" => [
-        "Customer", $user->email, env('APP_URL'),
+        "Customer", $user->email, url('/'),
       ],
     ];
 
@@ -136,7 +161,7 @@ class DripEvent extends Model
         "name" => $user->name,
       ],
       "tags" => [
-        "Customer", $user->email, env('APP_URL'),
+        "Customer", $user->email, url('/'),
       ],
     ];
 

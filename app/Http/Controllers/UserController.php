@@ -156,7 +156,7 @@ class UserController extends Controller
         $user = User::find($id);
 
         if ( $user->isDripSubscriber() ) {
-          DripEvent::createOrUpdateSubscriber($user, auth()->user()->email, request()->input('email'));
+          DripEvent::createOrUpdateSubscriber($user, true, auth()->user()->email, request()->input('email'));
         }
 
         if (!empty($user->location)) {
@@ -1206,16 +1206,14 @@ class UserController extends Controller
         $user->consent_gdpr = $timestamp;
         $user->consent_future_data = $timestamp;
 
-  // // } catch (\Exception $e) {
-  //   $error['message'] = 'Failed to create user';
-  //   return redirect()->back()->withErrors('message', 'User already exists');
-  // }
-
-        if (!is_null($request->input('newsletter')) && $request->input('newsletter') == 1) { //Subscribe to newsletter
-            $drip_subscribe_user = DripEvent::subscribeSubscriberToNewsletter($user);
-            $user->newsletter = 1;
-            $user->drip_subscriber_id = $drip_subscribe_user->id;
+        // Opted-in to Subscribe to newsletter
+        if ( ! is_null($request->input('newsletter')) && $request->input('newsletter') == 1) {
+          $subscribed = true;
+          $user->newsletter = 1;
         }
+
+        $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
+        $user->drip_subscriber_id = $drip_subscribe_user->id;
 
         if (!is_null($request->input('invites')) && $request->input('invites') == 1) { //Subscribe to invites
             $user->invites = 1;
