@@ -9,19 +9,27 @@
   </td>
   <td colspan="1"><a href="/group/view/{{{ $group->idgroups }}}" title="edit group">{{{ $group->name }}}</a></td>
   <td colspan="1">{{{ $group->getLocation() }}}</td>
-  <td class="text-center" colspan="1">
-    @php ($next_upcoming_event = $group->getNextUpcomingEvent())
-    @if (is_null($next_upcoming_event))
+
+  @php ($next_upcoming_event = $group->getNextUpcomingEvent())
+  @if ( is_null($next_upcoming_event) )
+    <td colspan="1" class="text-center">
       <p>None planned</p>
-    @else
+    </td>
+    <td colspan="1">
+      &nbsp;
+    </td>
+  @else
+    <td colspan="1" class="text-center">
       <a href="/party/view/{{ $next_upcoming_event->idevents }}">
         {{ $next_upcoming_event->getEventName() }}
       </a>
-
+    </td>
+    <td colspan="1">
       <div>{{ $next_upcoming_event->getEventDate('D jS M Y') }}</div>
       <div>{{ $next_upcoming_event->getEventStartEnd() }}</div>
-    @endif
-  </td>
+    </td>
+  @endif
+
   <td class="text-center" colspan="1">
     @if ( ! in_array($group->idgroups, $your_groups_uniques) )
       <a class="btn btn-primary" href="/group/join/{{ $group->idgroups }}" id="join-group">Follow</a>
