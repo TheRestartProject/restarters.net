@@ -31499,17 +31499,39 @@ $(document).ready(function () {
     });
   });
 
-  $(document).on('click', '.testing123', function (e) {
+  // Dismissable Alert copy link action
+  $('.btn-action').on('click', function () {
+    $copy_link = $(this).attr('data-copy-link');
+    copyLink($copy_link);
+  });
+
+  // Show Calendar Feed popover
+  $('.testing123').on('click', function () {
     $(this).popover('show');
   });
 
-  // TODO
-  $(document).on('click', '.btn-copy-input-text', function (e) {
-    $link = $(this).parent('div').parent('div').find('input[type=text]');
-    $link.select();
-    document.execCommand("copy");
-    alert("Copied the link: " + $link.val());
+  // Copy Calendar Feed link
+  $('#btn-copy').on('click', function () {
+    $link = $(this).parents('div').parents('div').find('input[type=text]');
+    copyLink($link.val());
   });
+
+  // User Profile Settings - Calendar copy links
+  $('.btn-copy-input-text').on('click', function () {
+    $link = $(this).parent('div').parent('div').find('input[type=text]');
+    copyLink($link.val());
+  });
+
+  function copyLink($copy_link) {
+    var $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val($copy_link).select();
+
+    document.execCommand("copy");
+    $temp.remove();
+
+    alert("Copied the link: " + $copy_link);
+  }
 
   $('.information-alert').on('closed.bs.alert', function () {
     $dismissable_id = $(this).attr('id');
@@ -32017,10 +32039,18 @@ $(document).ready(function () {
   });
 });
 
+// Copy Calendar Feed link
 $(document).on("click", "#btn-copy", function () {
-  $link = $(this).parents('div').parents('div').find('input[type=text]').val();
-  console.log($link);
-  window.open($link, '_blank');
+  $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
+
+  var $temp = $("<input>");
+  $("body").append($temp);
+  $temp.val($copy_link).select();
+
+  document.execCommand("copy");
+  $temp.remove();
+
+  alert("Copied the link: " + $copy_link);
 });
 
 /***/ }),

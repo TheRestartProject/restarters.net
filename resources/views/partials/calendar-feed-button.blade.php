@@ -2,7 +2,7 @@
   @php
     $user = auth()->user();
     $user_id = $user->id;
-    $read_only_all_events_link = url("/calendar//user/{$user->calendar_hash}");
+    $read_only_all_events_link = url("/calendar/user/{$user->calendar_hash}");
     $content = "
                   <div class='card'>
                     <div class='card-body font-family-normal'>
