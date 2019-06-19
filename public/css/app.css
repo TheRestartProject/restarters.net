@@ -15748,8 +15748,9 @@ table.sortable > thead th div.mozilla {
   background-color: #F9F9F9;
   border-radius: unset;
   border: 1px solid #D6D6D6;
-  padding: 20px 45px;
+  padding: 20px 45px 20px 35px;
   font-size: 16px;
+  overflow: hidden;
 }
 
 .information-alert .action-text-left span {
@@ -15758,11 +15759,19 @@ table.sortable > thead th div.mozilla {
 
 .information-alert .action-text-left .action-text {
   line-height: 22px;
+  padding-right: 30px;
 }
 
 .information-alert .btn-action {
-  min-width: 175px;
-  min-height: 40px;
+  min-width: 155px;
+}
+
+@media (max-width: 767.98px) {
+  .information-alert .float-right,
+  .information-alert .btn-action {
+    width: 100%;
+    display: block;
+  }
 }
 
 .information-alert button.close {
@@ -15770,6 +15779,9 @@ table.sortable > thead th div.mozilla {
   right: 0;
   top: 0;
   bottom: 0;
+  margin: auto 1.25rem;
+  height: 20px;
+  padding: 0px;
 }
 
 .information-alert button.close span {

@@ -27,7 +27,7 @@ class InformationAlertCookieController extends Controller
 
       if ( Cookie::get('information-alert-dismissed-'.$request->input('dismissable_id')) ) {
         $cookie = Cookie::queue(
-            Cookie::forget(1)
+            Cookie::forget('information-alert-dismissed-'.$request->input('dismissable_id'))
         );
       }
 
