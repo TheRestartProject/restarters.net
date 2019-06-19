@@ -464,7 +464,7 @@
                 <h5 class="mb-3">My events</h5>
 
                 <div class="input-group mb-4">
-                  <input type="text" class="form-control" value="{{ url('/calendar/user/'.auth()->user()->calendar_hash) }}" readonly>
+                  <input type="text" class="form-control" value="{{ url('/calendar/user/'.auth()->user()->calendar_hash) }}">
                   <div class="input-group-append">
                     <button class="btn btn-normal-padding btn-primary btn-copy-input-text" type="button">Copy link</button>
                   </div>
@@ -475,7 +475,7 @@
                 @foreach ($groups as $group)
                   <p class="mb-2">{{ $group->name }}</p>
                   <div class="input-group mb-4">
-                    <input type="text" class="form-control" value="{{ url("/calendar/group/{$group->idgroups}") }}" readonly>
+                    <input type="text" class="form-control" value="{{ url("/calendar/group/{$group->idgroups}") }}">
                     <div class="input-group-append">
                       <button class="btn btn-normal-padding btn-primary btn-copy-input-text" type="button">Copy link</button>
                     </div>
@@ -487,7 +487,7 @@
 
                   <div class="input-group mb-4">
                     @php( $env_hash = env('CALENDAR_HASH') )
-                    <input type="text" class="form-control" value="{{ url("/calendar/all-events/{$env_hash}/") }}" readonly>
+                    <input type="text" class="form-control" value="{{ url("/calendar/all-events/{$env_hash}/") }}">
                     <div class="input-group-append">
                       <button class="btn btn-normal-padding btn-primary btn-copy-input-text" type="button">Copy link</button>
                     </div>
@@ -505,7 +505,7 @@
                       <option value="{{ $area }}">{{ $area }}</option>
                     @endforeach
                   </select>
-                  <input type="text" class="form-control" value="{{ url("/calendar/group-area/{$first_option}") }}" readonly>
+                  <input type="text" class="form-control" value="{{ url("/calendar/group-area/{$first_option}") }}">
                   <div class="input-group-append">
                     <button class="btn btn-normal-padding btn-primary btn-copy-input-text" type="button">Copy link</button>
                   </div>

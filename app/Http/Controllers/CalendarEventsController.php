@@ -38,8 +38,6 @@ class CalendarEventsController extends Controller
       ->orderBy('event_date', 'ASC')
       ->get();
 
-      dd(1, $events);
-
       $icalObject = "BEGIN:VCALENDAR
       VERSION:2.0
       METHOD:PUBLISH\n";
@@ -83,8 +81,6 @@ class CalendarEventsController extends Controller
         return abort(404, 'No events found.');
       }
 
-      dd(2, $events);
-
       $icalObject = "BEGIN:VCALENDAR
       VERSION:2.0
       METHOD:PUBLISH\n";
@@ -126,8 +122,6 @@ class CalendarEventsController extends Controller
       if ( empty($events)) {
         return abort(404, 'No events found.');
       }
-
-      dd(3, $events);
 
       $icalObject = "BEGIN:VCALENDAR
       VERSION:2.0
@@ -173,8 +167,6 @@ class CalendarEventsController extends Controller
         return abort(404, 'No events found.');
       }
 
-      dd(4, $events);
-
       $icalObject = "BEGIN:VCALENDAR
       VERSION:2.0
       METHOD:PUBLISH\n";
@@ -213,8 +205,6 @@ class CalendarEventsController extends Controller
       }
 
       $events = Party::whereNull('deleted_at')->get();
-
-      dd(5, $events);
 
       $icalObject = "BEGIN:VCALENDAR
       VERSION:2.0

@@ -31487,15 +31487,16 @@ $(".select2-dropdown").select2({
 $(document).ready(function () {
 
   $(function () {
-    $('[data-toggle="popover"]').popover({
-      template: '<div class="popover popover-calendar-feed" role="tooltip"><div class="arrow"></div><div class="popover-body testing12345"></div></div>',
+    $('.btn-calendar-feed').popover({
       html: true,
+      title: '',
+      container: '.table-section',
       trigger: 'click',
       placement: 'bottom',
-      container: 'body',
-      content: function content() {
-        return $('#popover_content_wrapper');
-      }
+      sanitize: false,
+      delay: { "show": 0, "hide": 0 },
+      template: '<div class="popover popover-calendar-feed" role="tooltip"><div class="arrow"></div><div class="popover-body"></div></div>',
+      content: $('#calendar-feed').html()
     });
   });
 
@@ -31503,11 +31504,6 @@ $(document).ready(function () {
   $('.btn-action').on('click', function () {
     $copy_link = $(this).attr('data-copy-link');
     copyLink($copy_link);
-  });
-
-  // Show Calendar Feed popover
-  $('.testing123').on('click', function () {
-    $(this).popover('show');
   });
 
   // Copy Calendar Feed link
