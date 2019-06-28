@@ -90,7 +90,10 @@
                     </ol>
                 </nav>
 
-                @include('partials.information-alert', ['dismissable_id' => "group-{$group->idgroups}"])
+                @include('partials.information-alert', [
+                  'html_text' => "<strong class='mb-2'>Did you know </strong> <br> You can now access all events using your personal calendar via an iCal feed? Find out more.",
+                  'dismissable_id' => "group-{$group->idgroups}"
+                ])
 
                 @php( $groupImage = $group->groupImage )
                 @if( is_object($groupImage) && is_object($groupImage->image) )

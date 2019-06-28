@@ -790,8 +790,10 @@ class UserController extends Controller
                     'email'    => $email,
                     'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
                     'role'     => $role,
+                    'calendar_hash' => str_random(15),
                     //'group'    => $group
                       );
+
 
                       // add password recovery data
                       $bytes = 32;

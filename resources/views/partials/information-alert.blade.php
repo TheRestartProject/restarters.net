@@ -4,7 +4,7 @@
     <div class="d-sm-flex flex-row justify-content-between align-items-center">
       <div class="action-text-left float-left d-flex flex-row">
         <span class="my-auto">@include('partials.svg-icons.calendar-icon-lg')</span>
-        <p class="action-text mb-0"><strong class="mb-2">Did you know </strong> <br> You can now access all events using your personal calendar via an iCal feed? Find out more.</p>
+        <p class="action-text mb-0">{!! $html_text !!}</p>
       </div>
 
       <div class="float-right">

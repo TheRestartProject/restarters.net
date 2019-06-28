@@ -10,7 +10,10 @@
     <div class="row">
       <div class="col">
 
-        @include('partials.information-alert', ['dismissable_id' => 'party'])
+        @include('partials.information-alert', [
+          'html_text' => "<strong class='mb-2'>Did you know </strong> <br> You can now access all events using your personal calendar via an iCal feed? Find out more.",
+          'dismissable_id' => 'party'
+        ])
 
         <div class="d-flex justify-content-between align-content-center">
           <nav aria-label="breadcrumb">

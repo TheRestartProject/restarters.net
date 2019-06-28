@@ -7,12 +7,19 @@ use Cookie;
 
 class InformationAlertCookieController extends Controller
 {
-  private $minutes;
+    protected $minute;
 
-  public function __construct()
-  {
-    $this->minutes = 10080; // 7 days
-  }
+    protected $minutes;
+
+    public function __construct()
+    {
+      $this->minute = 1440; // 1 day
+
+      $this->minutes = $this->minute * 7; // 7 days
+
+      // $this->minutes = $this->minute * 365; // 1 year
+    }
+
     /**
      * Show the profile for the given user.
      *
