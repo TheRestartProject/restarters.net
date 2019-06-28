@@ -13,6 +13,8 @@ class CalendarEventsController extends Controller
 {
     public $ical_format;
 
+    private $icalObject = [];
+
     public function __construct()
     {
       $this->middleware('auth')->except('allEvents');
@@ -38,31 +40,7 @@ class CalendarEventsController extends Controller
       ->orderBy('event_date', 'ASC')
       ->get();
 
-      $icalObject = "BEGIN:VCALENDAR
-      VERSION:2.0
-      METHOD:PUBLISH\n";
-
-      // loop over events
-      foreach ($events as $event) {
-        $icalObject .=
-        "BEGIN:VEVENT
-        SUMMARY:{$event->venue}
-        DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."
-        DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."
-        LOCATION:{$event->location}
-        STATUS:CONFIRMED
-        END:VEVENT\n";
-      }
-
-      // close calendar
-      $icalObject .= "END:VCALENDAR";
-
-      $icalObject = str_replace(' ', '', $icalObject);
-
-      header('Content-type: text/calendar; charset=utf-8');
-      header('Content-Disposition: attachment; filename="cal.ics"');
-
-      echo $icalObject;
+      $this->exportCalendar($events);
     }
 
     public function allEventsByGroup(Request $request, Group $group)
@@ -81,31 +59,7 @@ class CalendarEventsController extends Controller
         return abort(404, 'No events found.');
       }
 
-      $icalObject = "BEGIN:VCALENDAR
-      VERSION:2.0
-      METHOD:PUBLISH\n";
-
-      // loop over events
-      foreach ($events as $event) {
-        $icalObject .=
-        "BEGIN:VEVENT
-        SUMMARY:{$event->venue}
-        DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."
-        DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."
-        LOCATION:{$event->location}
-        STATUS:CONFIRMED
-        END:VEVENT\n";
-      }
-
-      // close calendar
-      $icalObject .= "END:VCALENDAR";
-
-      $icalObject = str_replace(' ', '', $icalObject);
-
-      header('Content-type: text/calendar; charset=utf-8');
-      header('Content-Disposition: attachment; filename="cal.ics"');
-
-      echo $icalObject;
+      $this->exportCalendar($events);
     }
 
     public function allEventsByArea(Request $request, $area)
@@ -123,31 +77,7 @@ class CalendarEventsController extends Controller
         return abort(404, 'No events found.');
       }
 
-      $icalObject = "BEGIN:VCALENDAR
-      VERSION:2.0
-      METHOD:PUBLISH\n";
-
-      // loop over events
-      foreach ($events as $event) {
-        $icalObject .=
-        "BEGIN:VEVENT
-        SUMMARY:{$event->venue}
-        DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."
-        DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."
-        LOCATION:{$event->location}
-        STATUS:CONFIRMED
-        END:VEVENT\n";
-      }
-
-      // close calendar
-      $icalObject .= "END:VCALENDAR";
-
-      $icalObject = str_replace(' ', '', $icalObject);
-
-      header('Content-type: text/calendar; charset=utf-8');
-      header('Content-Disposition: attachment; filename="cal.ics"');
-
-      echo $icalObject;
+      $this->exportCalendar($events);
     }
 
     public function allEventsByGroupTag(Request $request, GrouptagsGroups $grouptags_groups)
@@ -167,31 +97,7 @@ class CalendarEventsController extends Controller
         return abort(404, 'No events found.');
       }
 
-      $icalObject = "BEGIN:VCALENDAR
-      VERSION:2.0
-      METHOD:PUBLISH\n";
-
-      // loop over events
-      foreach ($events as $event) {
-        $icalObject .=
-        "BEGIN:VEVENT
-        SUMMARY:{$event->venue}
-        DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."
-        DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."
-        LOCATION:{$event->location}
-        STATUS:CONFIRMED
-        END:VEVENT\n";
-      }
-
-      // close calendar
-      $icalObject .= "END:VCALENDAR";
-
-      $icalObject = str_replace(' ', '', $icalObject);
-
-      header('Content-type: text/calendar; charset=utf-8');
-      header('Content-Disposition: attachment; filename="cal.ics"');
-
-      echo $icalObject;
+      $this->exportCalendar($events);
     }
 
     public function allEvents(Request $request, $env_hash)
@@ -206,26 +112,30 @@ class CalendarEventsController extends Controller
 
       $events = Party::whereNull('deleted_at')->get();
 
-      $icalObject = "BEGIN:VCALENDAR
-      VERSION:2.0
-      METHOD:PUBLISH\n";
+      $this->exportCalendar($events);
+    }
+
+    public function exportCalendar($events)
+    {
+      $icalObject[] =  "BEGIN:VCALENDAR";
+      $icalObject[] =  "VERSION:2.0";
+      $icalObject[] =  "METHOD:PUBLISH";
 
       // loop over events
       foreach ($events as $event) {
-        $icalObject .=
-        "BEGIN:VEVENT
-        SUMMARY:{$event->venue}
-        DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."
-        DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."
-        LOCATION:{$event->location}
-        STATUS:CONFIRMED
-        END:VEVENT\n";
+        $icalObject[] =  "BEGIN:VEVENT";
+        $icalObject[] =  "SUMMARY:{$event->venue}";
+        $icalObject[] =  "DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."";
+        $icalObject[] =  "DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."";
+        $icalObject[] =  "LOCATION:{$event->location}";
+        $icalObject[] =  "STATUS:CONFIRMED";
+        $icalObject[] =  "END:VEVENT";
       }
 
       // close calendar
-      $icalObject .= "END:VCALENDAR";
+      $icalObject[] =  "END:VCALENDAR";
 
-      $icalObject = str_replace(' ', '', $icalObject);
+      $icalObject = implode("\n",$icalObject);
 
       header('Content-type: text/calendar; charset=utf-8');
       header('Content-Disposition: attachment; filename="cal.ics"');
