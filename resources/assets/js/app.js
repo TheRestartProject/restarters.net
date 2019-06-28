@@ -1278,8 +1278,8 @@ function initAutocomplete() {
             }, 1000);
 
             loadDropzones();
-            $(".select2-with-input").select2("destroy");
-            $(".select2-with-input").select2();
+            $(".select2-with-input").select2("destroy"); //TODO
+            $(".select2-with-input").select2(tag_options_with_input); //TODO
 
           } else if( json ) {
 
