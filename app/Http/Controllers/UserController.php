@@ -111,7 +111,6 @@ class UserController extends Controller
         $groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
         ->join('events', 'events.group', '=', 'groups.idgroups')
         ->where('users_groups.user', auth()->id())
-        ->where('events.idevents', 1104)
         ->select('groups.*')
         ->groupBy('groups.idgroups')
         ->orderBy('groups.idgroups', 'ASC')
