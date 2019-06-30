@@ -40,6 +40,19 @@ class Group extends Model implements Auditable
      */
     protected $hidden = [];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('all_hosts_count', function ($builder) {
+            $builder->withCount('allHosts');
+        });
+
+        static::addGlobalScope('all_restarters_count', function ($builder) {
+            $builder->withCount('allRestarters');
+        });
+    }
+
 
     public function addTag($tag)
     {
@@ -392,5 +405,17 @@ class Group extends Model implements Auditable
         }
 
         return url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg');
+    }
+
+    public function getNextUpcomingEvent()
+    {
+      $event = $this->parties()->whereDate('event_date', '>=', date('Y-m-d'));
+
+      if ( ! $event->count() ) {
+        return null;
+      }
+
+      return $event->first();
+
     }
 }

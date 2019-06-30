@@ -31,8 +31,9 @@ return array (
     'location' => 'Group location',
     'area' => 'Area',
     'groups_frequency' => 'Frequency',
-    'groups_hosts' => 'No. Hosts',
-    'groups_restarters' => 'No. Restarters',
+    'groups_hosts' => 'Hosts',
+    'groups_restarters' => 'Restarters',
+    'groups_upcoming_event' => 'Next event',
     'groups_approval_text' => 'Group submissions need to be approved by an administrator',
     'group_tag' => 'Tag',
     'group_tag2' => 'Group tag',
@@ -45,10 +46,8 @@ return array (
     'groups_modal_title' => 'Would you like to start a community repair group?',
     'groups_modal_content' => 'We can help you get started, scheduling and announcing events, logging data and getting reports on their impact.',
     'invite_group_name_header' => 'Invite volunteers to :group',
-  
     'invite_group_header_email' => 'Invite volunteers',
     'invite_group_header_link' => 'Invite volunteers',
-  
     'shareable_link' => 'Invite via shareable link',
     'invite_group_name_message' => 'Invite volunteers to affiliate themselves with your group, so that you can invite them more easily to your upcoming events.',
     'email_addresses_field' => 'Email addresses',
@@ -90,4 +89,5 @@ return array (
     'not_joined_a_group' => 'You are not currently following any repair groups! Groups nearest to you are shown below.',
     'no_groups_near_you' => 'We can\'t find any repair groups in our database near to your area (:area).',
     'consider_starting_a_group' => 'Would you like to start or add a group? Have a look at <a href=":resources_url">our resources</a>.',
+    'upcoming_none_planned' => 'None planned',
 );

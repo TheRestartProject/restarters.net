@@ -1,7 +1,7 @@
 <section class="table-section" id="user-groups">
   <h2>@lang('groups.groups_title1')</h2>
   <div class="table-responsive">
-    <table role="table" class="table table-striped table-hover">
+    <table role="table" class="table table-striped table-hover table-layout-fixed">
       @include('partials.tables.head-groups')
       <tbody>
         @if( !$your_groups->isEmpty() )
