@@ -186,8 +186,6 @@
             }
         }
         .table-events {
-            border: 1px solid #eee;
-            border-radius: 10px;
           td {
               padding-top: 10px;
               padding-bottom: 10px;
@@ -214,6 +212,14 @@
               &.cell-date {
                   width: 200px;
               }
+          }
+
+          th.hightlighted, td.hightlighted {
+            padding-left: 10px !important;
+            padding-top: 0px;
+            padding-right: 0px;
+            padding-bottom: 0px;
+            width: 10px;
           }
         }
     }
@@ -273,4 +279,30 @@
 
 .tab-panel {
     border-radius: 3px;
+}
+
+// VisuallyHighlight
+.cell-warning-heading  {
+  background-color: #F9BC67;
+}
+
+.cell-primary-heading {
+  background-color: #0394A6;
+}
+
+.cell-danger-heading {
+  background-color: #F05C4D;
+}
+
+// Event Details
+.cell-danger {
+  background-color: #F6E3DF;
+}
+
+.cell-warning {
+  background-color: #FDE5C3;
+}
+
+.cell-info {
+  background-color: #D1E5E6;
 }
