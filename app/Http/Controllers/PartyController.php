@@ -166,7 +166,7 @@ class PartyController extends Controller
             $error = array();
 
             if ($request->has('location')) {
-              $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($request->input('location').',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
+              $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($request->input('location'))."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
               $json = json_decode($json);
 
               if ( empty($json->results) ) {
@@ -444,7 +444,7 @@ class PartyController extends Controller
             $timestamp = strtotime($data['event_date']);
 
             if ( ! empty($data['location'])) {
-                $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($data['location'].',United Kingdom').'&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE');
+                $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($data['location']).'&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE');
                 $json = json_decode($json);
 
                 if ( empty($json->results) ) {
