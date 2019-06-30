@@ -1018,6 +1018,7 @@ function initAutocomplete() {
   });
 
   $( document ).ready(function() {
+
     $('.tokenfield').tokenfield();
 
     $current_column = $('input[name=sort_column]:checked').val();
@@ -1130,7 +1131,57 @@ function initAutocomplete() {
 
     });
 
+    // Copy to clipboard
+    // Grab any text in the attribute 'data-copy' and pass it to the
+    // copy function
+    // ---------------------------------------------------------------------
+    $('.js-copy').click(function() {
+      var text = $(this).attr('data-copy');
+      var el = $(this);
+      copyToClipboard(text, el);
+    });
+
   });
+
+  // COPY TO CLIPBOARD
+  // Attempts to use .execCommand('copy') on a created text field
+  // Copy command
+  // boolen if successful then show message
+  // After show append original email again
+  // Fallback if browser doesn't support .execCommand('copy')
+  // ---------------------------------------------------------------------
+  function copyToClipboard(content_to_copy, element) {
+
+    var copyTest = document.queryCommandSupported('copy');
+
+    if (copyTest === true) {
+
+      // Create Textarea and Copy Content
+      var copyTextArea = document.createElement("textarea");
+      copyTextArea.value = content_to_copy;
+      document.body.appendChild(copyTextArea);
+      copyTextArea.select();
+
+      $original_popover_text = element.attr('data-content');
+
+      try {
+        var successful = document.execCommand('copy');
+        var message = successful ? 'Copied!' : 'Whoops, not copied!';
+        $set_success_message_in_popover = element.attr('data-content', message);
+        $show_popover = element.popover('show');
+
+      } catch (err) {
+        console.log('Oops, unable to copy');
+      }
+
+      document.body.removeChild(copyTextArea);
+      $set_original_popover_message = element.attr('data-content', $original_popover_text);
+
+    } else {
+      // Fallback if browser doesn't support .execCommand('copy')
+      window.prompt("Copy to clipboard: Ctrl+C or Command+C, Enter", content_to_copy);
+    }
+  }
 
 
   function tokenFieldCheck(){
