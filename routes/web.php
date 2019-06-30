@@ -143,6 +143,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::prefix('party')->group(function () {
         Route::get('/', 'PartyController@index')->name('events');
         Route::get('/all', 'PartyController@allUpcoming')->name('all-upcoming-events');
+        Route::get('/all-past', 'PartyController@allPast')->name('all-past-events');
         Route::get('/group/{group_id?}', 'PartyController@index')->name('group-events');
         Route::get('/create/{group_id?}', 'PartyController@create');
         Route::post('/create', 'PartyController@create');
@@ -164,7 +165,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::post('/image-upload/{id}', 'PartyController@imageUpload');
         Route::get('/image/delete/{idevents}/{id}/{path}', 'PartyController@deleteImage');
         Route::get('/contribution/{id}', 'PartyController@getContributions');
-
         Route::post('/update-volunteerquantity', 'PartyController@updateVolunteerQuantity');
     });
 
