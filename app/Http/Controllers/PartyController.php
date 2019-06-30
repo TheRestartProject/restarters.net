@@ -166,21 +166,28 @@ class PartyController extends Controller
             $error = array();
 
             if ($request->has('location')) {
-                // TODO: NGM: we should inject a geocoding class for use here.
-                // (will aid with testing, and allow for swapping to a non-Google geocoder)
-                try {
-                    $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($request->input('location').',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
-                    $json = json_decode($json);
+              $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($request->input('location').',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
+              $json = json_decode($json);
 
-                    if (is_object($json) && !empty($json->{'results'})) {
-                        $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
-                        $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
-                    }
-                } catch (\Exception $ex) {
-                    $latitude = 0;
-                    $longitude = 0;
-                    Log::error('An error occurred during geocoding: ' . $ex->getMessage());
-                }
+              if ( empty($json->results) ) {
+                $response['danger'] = 'Party could not be created. Address not found.';
+                Log::error('An error occurred during geocoding: ' . $ex->getMessage());
+                return view('events.create', [ //party.create
+                  'response' => $response,
+                  'title' => 'New Party',
+                  'grouplist' => $Groups->findList(),
+                  'gmaps' => true,
+                  'group_list' => $Groups->findAll(),
+                  'user' => Auth::user(),
+                  'user_groups' => $user_groups,
+                  'selected_group_id' => $group_id,
+                ]);
+              }
+
+              if (is_object($json) && !empty($json->{'results'})) {
+                  $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
+                  $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
+              }
             } else {
                 $latitude = null;
                 $longitude = null;
@@ -439,6 +446,29 @@ class PartyController extends Controller
             if ( ! empty($data['location'])) {
                 $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($data['location'].',United Kingdom').'&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE');
                 $json = json_decode($json);
+
+                if ( empty($json->results) ) {
+                  $response['danger'] = 'Party could not be saved. Address not found.';
+                  $party = $Party->findThis($id)[0];
+                  $audits = Party::findOrFail($id)->audits;
+
+                  return view('events.edit', [ //party.edit
+                      'gmaps' => true,
+                      'images' => $images,
+                      'title' => 'Edit Party',
+                      'group_list' => $Groups->findAll(),
+                      'formdata' => $party,
+                      'remotePost' => null,
+                      'grouplist' => $Groups->findList(),
+                      'user' => Auth::user(),
+                      'co2Total' => $co2Total[0]->total_footprints,
+                      'wasteTotal' => $co2Total[0]->total_weights,
+                      'device_count_status' => $device_count_status,
+                      'user_groups' => $groups_user_is_host_of,
+                      'audits' => $audits,
+                      'response' => $response,
+                  ]);
+                }
 
                 if (is_object($json) && ! empty($json->{'results'})) {
                     $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
