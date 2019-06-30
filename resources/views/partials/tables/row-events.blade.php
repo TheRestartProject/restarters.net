@@ -1,6 +1,6 @@
 @php( $devices = $event->allDevices )
 <tr>
-  <td class="hightlighted {{ $event->VisuallyHighlight() }}"></td>
+    <td class="hightlighted {{ $event->VisuallyHighlight() }}"></td>
 
     @if( !isset($group_view) )
       <td class="table-cell-icon text-center">

@@ -3,7 +3,9 @@
   <tr>
     <th class="hightlighted" width="10"></th>
 
-    <th class="table-cell-icon" width="70"></th>
+    @if( !isset($group_view) )
+        <th class="table-cell-icon" width="70"></th>
+    @endif
 
     <th scope="col" width="330" class="pl-0">@lang('events.event_name')</th>
 
