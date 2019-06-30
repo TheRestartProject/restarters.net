@@ -14,7 +14,7 @@ require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
 require('./misc/device');
-require('leaflet')
+// require('leaflet')
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
 
@@ -391,27 +391,27 @@ function initAutocomplete() {
 
   function eventsMap() {
 
-    if ( jQuery('#event-map').length > 0 ) {
-
-      const mapObject = document.querySelector('#event-map');
-
-      let latitude = parseFloat(mapObject.dataset.latitude);
-      let longitude = parseFloat(mapObject.dataset.longitude);
-      let zoom = parseFloat(mapObject.dataset.zoom);
-
-      if( latitude && longitude ){
-          let map = L.map('event-map').setView([latitude, longitude], zoom);
-
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
-              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
-          }).addTo(map);
-
-          var icon = new L.Icon.Default();
-          icon.options.shadowSize = [0,0];
-          L.marker([latitude, longitude], {icon:icon}).addTo(map);
-      }
-
-    }
+    // if ( jQuery('#event-map').length > 0 ) {
+    //
+    //   const mapObject = document.querySelector('#event-map');
+    //
+    //   let latitude = parseFloat(mapObject.dataset.latitude);
+    //   let longitude = parseFloat(mapObject.dataset.longitude);
+    //   let zoom = parseFloat(mapObject.dataset.zoom);
+    //
+    //   if( latitude && longitude ){
+    //       let map = L.map('event-map').setView([latitude, longitude], zoom);
+    //
+    //       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
+    //           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+    //       }).addTo(map);
+    //
+    //       var icon = new L.Icon.Default();
+    //       icon.options.shadowSize = [0,0];
+    //       L.marker([latitude, longitude], {icon:icon}).addTo(map);
+    //   }
+    //
+    // }
   }
 
   function textEditor() {
@@ -1251,6 +1251,8 @@ function initAutocomplete() {
             }, 1000);
 
             loadDropzones();
+            $(".select2-with-input").select2("destroy"); //TODO
+            $(".select2-with-input").select2(tag_options_with_input); //TODO
 
           } else if( json ) {
 
