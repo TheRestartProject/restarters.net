@@ -183,6 +183,7 @@
             <div class="registration__offset">
                 <fieldset>
                     <legend>@lang('registration.reg-step-3-1a')</legend>
+                    <legend>@lang('registration.reg-step-3-2b')</legend>
                     <div class="form-check d-flex align-items-center justify-content-start">
                         <input class="form-check-input" type="checkbox" name="newsletter" id="newsletter" value="1" @if( old('newsletter') == 1 ) checked @endif>
                         <label class="form-check-label" for="newsletter">
