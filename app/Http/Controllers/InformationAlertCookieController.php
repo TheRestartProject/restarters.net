@@ -15,7 +15,9 @@ class InformationAlertCookieController extends Controller
     {
       $this->minute = 1440; // 1 day
 
-      $this->minutes = $this->minute * 7; // 7 days
+      // $this->minutes = $this->minute * 7; // 7 days
+
+      $this->minutes = $this->minute * 30; // 30 days
 
       // $this->minutes = $this->minute * 365; // 1 year
     }
