@@ -54,8 +54,7 @@ class DripEvent extends Model
   {
     if ($opted_in) {
       $tags = (array) [
-        url('/'),
-        "subscriber unconfirmed",
+        "subscriber confirmed",
       ];
 
       $remove_tags = (array) [
@@ -64,14 +63,13 @@ class DripEvent extends Model
 
       $custom_fields = (array) [
         "gdpr_consent_granted_date" => date('Y-m-d'),
-        "gdpr_content_granted_context" => "restarters__registration",
+        "gdpr_consent_granted_context" => "restarters__registration",
         "signup_source" => url("/user/register"),
       ];
     }
 
     if ( ! $opted_in) {
       $tags = (array) [
-        url('/'),
         "subscriber unconfirmed",
       ];
 
