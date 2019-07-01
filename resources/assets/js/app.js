@@ -1062,7 +1062,6 @@ function initAutocomplete() {
       $('.btn-calendar-feed').popover({
         html: true,
         title: '',
-        container: '.table-section',
         trigger: 'click',
         placement: 'bottom',
         sanitize: false,
