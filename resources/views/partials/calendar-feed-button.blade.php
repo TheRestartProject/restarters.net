@@ -26,7 +26,7 @@
     </div>
   </div>
 
-  <button type="button" class="btn btn-normal-padding btn-sm btn-primary btn-calendar-feed">
+  <button type="button" class="btn btn-normal-padding btn-sm btn-primary mx-2 btn-calendar-feed">
     @include('partials.svg-icons.calendar-icon') <span class="span-vertically-align-middle">Calendar feed</span>
   </button>
 

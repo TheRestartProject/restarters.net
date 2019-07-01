@@ -1,6 +1,6 @@
 @if ( is_null(Cookie::get("information-alert-dismissed-{$dismissable_id}")) && Auth::check() )
 
-  <div class="alert alert-secondary information-alert alert-dismissible fade show" role="alert" id="{{ $dismissable_id }}">
+  <div class="alert alert-secondary information-alert alert-dismissible fade show @isset($classes) @foreach ($classes as $class) {{ $class }} @endforeach @endisset" role="alert" id="{{ $dismissable_id }}">
     <div class="d-sm-flex flex-row justify-content-between align-items-center">
       <div class="action-text-left float-left d-flex flex-row">
         <span class="my-auto">@include('partials.svg-icons.calendar-icon-lg')</span>

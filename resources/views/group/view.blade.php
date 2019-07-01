@@ -90,11 +90,6 @@
                     </ol>
                 </nav>
 
-                @include('partials.information-alert', [
-                  'html_text' => "<strong class='mb-2'>Did you know </strong> <br> You can now access all events using your personal calendar via an iCal feed? Find out more.",
-                  'dismissable_id' => "group-{$group->idgroups}"
-                ])
-
                 @php( $groupImage = $group->groupImage )
                 @if( is_object($groupImage) && is_object($groupImage->image) )
                   <img src="{{ asset('/uploads/mid_'. $groupImage->image->path) }}" alt="{{{ $group->name }}} group image" class="event-icon">
@@ -103,6 +98,8 @@
                 @endif
 
             </header>
+
+
 
           </div>
           <div class="col-lg-5">
@@ -137,6 +134,12 @@
 
           </div>
       </div>
+
+      @include('partials.information-alert', [
+        'html_text' => "<strong class='mb-2'>Did you know </strong> <br> You can now access all events using your personal calendar via an iCal feed? Find out more.",
+        'dismissable_id' => "group-{$group->idgroups}",
+        'classes' => ['set-information-box-margin'],
+      ])
 
         <div class="row">
             <div class="col-lg-3">
@@ -251,7 +254,7 @@
                     </li>
                 </ul>
 
-                <h2 id="upcoming-grp">Group events @if( FixometerHelper::hasRole( $user, 'Administrator' ) || FixometerHelper::hasRole( $user, 'Host' ) )<sup>(<a href="{{ url('/party/create') }}">Add event</a>)</sup>@endif</h2>
+                <h2 id="upcoming-grp">Group events @include('partials.calendar-feed-button') @if( FixometerHelper::hasRole( $user, 'Administrator' ) || FixometerHelper::hasRole( $user, 'Host' ) )<sup>(<a href="{{ url('/party/create') }}">Add event</a>)</sup>@endif</h2>
 
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                   <li class="nav-item">

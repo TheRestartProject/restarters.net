@@ -82,7 +82,7 @@
             @endif
 
             <h3>For your groups
-              @include('partials.calendar-feed-button', ['link' => ''])
+              @include('partials.calendar-feed-button')
             </h3>
           </header>
 
