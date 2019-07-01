@@ -61,7 +61,7 @@
             <div class="edit-panel">
 
               <div class="form-row">
-                <div class="col-lg-6">
+                <div class="col-lg-12">
                   @if (Auth::id() == $user->id)
                     <h4>@lang('general.profile')</h4>
                     <p>@lang('general.profile_content')</p>
