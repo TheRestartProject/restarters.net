@@ -15788,6 +15788,11 @@ table.sortable > thead th div.mozilla {
   color: #adadad;
 }
 
+.information-alert.set-information-box-margin {
+  margin-top: -25px;
+  margin-bottom: 50px;
+}
+
 .entry-panel {
   margin: 20px auto;
   max-width: 450px;
