@@ -71,13 +71,13 @@
 
 
 
-          <div class="@if( is_null($group) ) col-lg-6 @else col-lg-12 @endif">
+          <div class="col-lg-12">
             <section class="table-section" id="events-2">
               <header>
                 @if( !is_null($group) )
                   <h2>Upcoming {{{ $group->name }}} events</h2>
                 @else
-                  <h2>Upcoming events for your groups <sup><a href="{{{ route('all-upcoming-events') }}}">(See all upcoming)</a></sup></h2>
+                  <h2>Upcoming events for your groups</h2>
                 @endif
               </header>
               <div class="table-responsive">
@@ -104,10 +104,10 @@
           </div>
 
           @if( is_null($group) )
-            <div class="col-lg-6">
+            <div class="col-lg-12">
               <section class="table-section upcoming_events_in_area" id="events-3">
                 <header>
-                    <h2>Other events near you <sup><a href="{{{ route('all-upcoming-events') }}}">(See all upcoming)</a></sup></h2>
+                    <h2>Other events near you <sup><a href="{{{ route('all-upcoming-events') }}}">(See all upcoming events)</a></sup></h2>
                 </header>
                 <div class="table-responsive">
                   <table class="table table-events table-striped" role="table">
