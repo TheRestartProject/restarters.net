@@ -82,7 +82,15 @@
             @endif
 
             <h3>For your groups
-              @include('partials.calendar-feed-button')
+              @if ( Auth::check() )
+                @php( $user = auth()->user() )
+                @php( $copy_link = url("/calendar/user/{$user->calendar_hash}") )
+                @php( $user_edit_link = url("/profile/edit/{$user->id}") )
+                @include('partials.calendar-feed-button', [
+                  'copy_link' => $copy_link,
+                  'user_edit_link' => $user_edit_link,
+                ])
+              @endif
             </h3>
           </header>
 

@@ -254,7 +254,16 @@
                     </li>
                 </ul>
 
-                <h2 id="upcoming-grp">Group events @include('partials.calendar-feed-button') @if( FixometerHelper::hasRole( $user, 'Administrator' ) || FixometerHelper::hasRole( $user, 'Host' ) )<sup>(<a href="{{ url('/party/create') }}">Add event</a>)</sup>@endif</h2>
+                <h2 id="upcoming-grp">Group events
+                  @if ( Auth::check() )
+                    @php( $copy_link = url("/calendar/group/{$group->idgroups}") )
+                    @php( $user_edit_link = url("/profile/edit/{$user->id}") )
+                    @include('partials.calendar-feed-button', [
+                      'copy_link' => $copy_link,
+                      'user_edit_link' => $user_edit_link,
+                    ])
+                  @endif
+                @if( FixometerHelper::hasRole( $user, 'Administrator' ) || FixometerHelper::hasRole( $user, 'Host' ) )<sup>(<a href="{{ url('/party/create') }}">Add event</a>)</sup>@endif</h2>
 
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                   <li class="nav-item">
