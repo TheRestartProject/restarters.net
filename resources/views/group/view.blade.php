@@ -255,7 +255,7 @@
                 </ul>
 
                 <h2 id="upcoming-grp">Group events
-                  @if ( Auth::check() )
+                  @if ( Auth::check() && $group->isVolunteer() )
                     @php( $copy_link = url("/calendar/group/{$group->idgroups}") )
                     @php( $user_edit_link = url("/profile/edit/{$user->id}") )
                     @include('partials.calendar-feed-button', [
