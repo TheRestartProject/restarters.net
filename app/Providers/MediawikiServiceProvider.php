@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 use Mediawiki\Api\ApiUser;
@@ -28,11 +29,19 @@ class MediawikiServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(MediawikiFactory::class, function ($app) {
-            $api = new MediawikiApi(env('WIKI_URL').'/api.php');
-            $api->login(new ApiUser(env('WIKI_APIUSER'), env('WIKI_APIPASSWORD')));
+        if (empty(env('WIKI_URL'))) {
+            return;
+        }
 
-            return new MediawikiFactory($api);
+        $this->app->singleton(MediawikiFactory::class, function ($app) {
+            try {
+                $api = new MediawikiApi(env('WIKI_URL').'/api.php');
+                $api->login(new ApiUser(env('WIKI_APIUSER'), env('WIKI_APIPASSWORD')));
+
+                return new MediawikiFactory($api);
+            } catch (\Exception $ex) {
+                Log::error("Failed to instantiation Wiki API classes: " . $ex->getMessage());
+            }
         });
 
         $this->app->bind(UserCreator::class, function ($app) {

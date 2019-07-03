@@ -16,7 +16,6 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         'Illuminate\Auth\Events\Login' => [
-            'App\Listeners\LogInToWiki',
             'App\Listeners\LogSuccessfulLogin',
         ],
 
@@ -58,6 +57,8 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        //
+        if (!empty(env('WIKI_URL'))) {
+            Event::listen('Illuminate\Auth\Events\Login', 'App\Listeners\LogInToWiki');
+        }
     }
 }
