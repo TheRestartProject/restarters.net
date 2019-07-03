@@ -1280,11 +1280,13 @@ class UserController extends Controller
         }
 
       // Send post-registration welcome email.
-        try {
-            $firstName = $user->getFirstName();
-            Mail::to($user)->send(new RegistrationWelcome($firstName));
-        } catch (\Exception $ex) {
-            Log::error('Failed to send post-registration welcome email: ' . $ex->getMessage());
+        if (env('FEATURE__REGISTRATION_WELCOME_EMAIL') === true) {
+            try {
+                $firstName = $user->getFirstName();
+                Mail::to($user)->send(new RegistrationWelcome($firstName));
+            } catch (\Exception $ex) {
+                Log::error('Failed to send post-registration welcome email: ' . $ex->getMessage());
+            }
         }
 
   //Session::createSession($user->id);
