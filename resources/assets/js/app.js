@@ -758,6 +758,11 @@ function initAutocomplete() {
       jQuery('.select2-repair-barrier').select2(repair_barrier_options);
       jQuery('.select2-tags').select2(tag_options);
       jQuery(".select2-with-input").select2(tag_options_with_input);
+      jQuery(".select2-with-input-group").select2({
+        width: 'auto',
+    		dropdownAutoWidth: true,
+    		allowClear: true,
+      });
 
     } else {
 
@@ -765,6 +770,11 @@ function initAutocomplete() {
       $target.find('.select2-repair-barrier').select2(repair_barrier_options);
       $target.find('.select2-tags').select2(tag_options);
       $target.find(".select2-with-input").select2(tag_options_with_input);
+      $target.find(".select2-with-input-group").select2({
+        width: 'auto',
+    		dropdownAutoWidth: true,
+    		allowClear: true,
+      });
 
     }
 
@@ -1018,6 +1028,67 @@ function initAutocomplete() {
   });
 
   $( document ).ready(function() {
+
+    $(function () {
+      $('.btn-calendar-feed').popover({
+        html: true,
+        title: '',
+        trigger: 'click',
+        placement: 'bottom',
+        sanitize: false,
+        delay: { "show": 0, "hide": 0 },
+        template: '<div class="popover popover-calendar-feed" role="tooltip"><div class="arrow"></div><div class="popover-body"></div></div>',
+        content: $('#calendar-feed').html()
+      });
+    });
+
+    // Dismissable Alert copy link action
+    $('.btn-action').on('click', function () {
+      $copy_link = $(this).attr('data-copy-link');
+      copyLink($copy_link);
+    });
+
+    // Copy Calendar Feed link
+    $('#btn-copy').on('click', function () {
+      $link = $(this).parents('div').parents('div').find('input[type=text]');
+      copyLink($link.val());
+    });
+
+    // User Profile Settings - Calendar copy links
+    $('.btn-copy-input-text').on('click', function () {
+      $link = $(this).parent('div').parent('div').find('input[type=text]');
+      copyLink($link.val());
+    });
+
+    function copyLink($copy_link) {
+      var $temp = $("<input>");
+      $("body").append($temp);
+      $temp.val($copy_link).select();
+
+      document.execCommand("copy");
+      $temp.remove();
+
+      alert("Copied the link: " + $copy_link);
+    }
+
+
+    $('.information-alert').on('closed.bs.alert', function () {
+      $dismissable_id = $(this).attr('id');
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: '/set-cookie',
+        datatype: 'json',
+        data: {
+          'dismissable_id': $dismissable_id,
+        },
+        success: function(data) {
+          console.log(true);
+        }
+      });
+    });
 
     $('.tokenfield').tokenfield();
 
@@ -1570,5 +1641,30 @@ function initAutocomplete() {
       $('#shareable-modal').modal('toggle');
     });
 
+    $('.select2-with-input-group').on("select2:select", function(e) {
+      $input_field = $(this).parents('.input-group-select2').find('input[type=text]');
 
+      $current_url = $input_field.val();
+
+      $remove_current_area = $current_url.lastIndexOf('/') + 1;
+      $creating_new_url =  $current_url.substring( 0, $remove_current_area );
+      $new_url = $creating_new_url.concat( $(this).val() );
+
+      $input_field.val($new_url);
+    });
+
+  });
+
+  // Copy Calendar Feed link
+  $(document).on("click", "#btn-copy", function () {
+    $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
+
+    var $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val($copy_link).select();
+
+    document.execCommand("copy");
+    $temp.remove();
+
+    alert("Copied the link: " + $copy_link);
   });

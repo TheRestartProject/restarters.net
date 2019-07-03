@@ -99,6 +99,8 @@
 
             </header>
 
+
+
           </div>
           <div class="col-lg-5">
 
@@ -132,6 +134,12 @@
 
           </div>
       </div>
+
+      @include('partials.information-alert', [
+        'html_text' => "<strong class='mb-2'>Did you know </strong> <br> You can now access all events using your personal calendar via an iCal feed? Find out more.",
+        'dismissable_id' => "group-{$group->idgroups}",
+        'classes' => ['set-information-box-margin'],
+      ])
 
         <div class="row">
             <div class="col-lg-3">
@@ -246,7 +254,16 @@
                     </li>
                 </ul>
 
-                <h2 id="upcoming-grp">Group events @if( FixometerHelper::hasRole( $user, 'Administrator' ) || FixometerHelper::hasRole( $user, 'Host' ) )<sup>(<a href="{{ url('/party/create') }}">Add event</a>)</sup>@endif</h2>
+                <h2 id="upcoming-grp">Group events
+                  @if ( Auth::check() && $group->isVolunteer() )
+                    @php( $copy_link = url("/calendar/group/{$group->idgroups}") )
+                    @php( $user_edit_link = url("/profile/edit/{$user->id}") )
+                    @include('partials.calendar-feed-button', [
+                      'copy_link' => $copy_link,
+                      'user_edit_link' => $user_edit_link,
+                    ])
+                  @endif
+                @if( FixometerHelper::hasRole( $user, 'Administrator' ) || FixometerHelper::hasRole( $user, 'Host' ) )<sup>(<a href="{{ url('/party/create') }}">Add event</a>)</sup>@endif</h2>
 
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                   <li class="nav-item">

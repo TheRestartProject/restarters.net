@@ -9,6 +9,12 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col">
+
+        @include('partials.information-alert', [
+          'html_text' => "<strong class='mb-2'>Did you know </strong> <br> You can now access all events using your personal calendar via an iCal feed? Find out more.",
+          'dismissable_id' => 'party'
+        ])
+
         <div class="d-flex justify-content-between align-content-center">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -72,6 +78,18 @@
             @else
               <h2>Upcoming events for your groups <sup>(<a href="{{{ route('all-upcoming-events') }}}">See all upcoming)</a></sup></h2>
             @endif
+
+            <h3>For your groups
+              @if ( Auth::check() )
+                @php( $user = auth()->user() )
+                @php( $copy_link = url("/calendar/user/{$user->calendar_hash}") )
+                @php( $user_edit_link = url("/profile/edit/{$user->id}") )
+                @include('partials.calendar-feed-button', [
+                  'copy_link' => $copy_link,
+                  'user_edit_link' => $user_edit_link,
+                ])
+              @endif
+            </h3>
           </header>
 
           <div class="table-responsive">

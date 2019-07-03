@@ -108,10 +108,61 @@
     .plain-link {
         text-decoration: underline;
         color: #fff;
-        
+
         &:hover, &:focus {
           text-decoration: none;
         }
     }
 
+}
+
+.information-alert {
+  background-color: #F9F9F9;
+  border-radius: unset;
+  border: 1px solid #D6D6D6;
+  padding: 20px 45px 20px 35px;
+  font-size: 16px;
+  overflow: hidden;
+
+  .action-text-left {
+    span {
+      margin-right: 30px;
+    }
+
+    .action-text {
+      line-height: 22px;
+      padding-right: 30px;
+    }
+  }
+
+  .btn-action {
+    min-width: 155px;
+  }
+
+  @include media-breakpoint-down(sm) {
+    .float-right,
+    .btn-action {
+      width: 100%;
+      display: block;
+    }
+  }
+
+  button.close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto 1.25rem;
+    height: 20px;
+    padding: 0px;
+
+    span {
+      color: #adadad;
+    }
+  }
+
+  &.set-information-box-margin {
+    margin-top: -25px;
+    margin-bottom: 50px;
+  }
 }

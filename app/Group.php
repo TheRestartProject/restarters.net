@@ -416,6 +416,19 @@ class Group extends Model implements Auditable
       }
 
       return $event->first();
+    }
 
+    public function userEvents()
+    {
+      return $this->parties()
+      ->join('events_users', 'events.idevents', '=', 'events_users.event')
+      ->where(function($query) {
+        $query->where('events.group', $this->idgroups)
+        ->where('events_users.user', auth()->id());
+      })
+      ->select('events.*')
+      ->groupBy('events.idevents')
+      ->orderBy('events.idevents', 'ASC')
+      ->get();
     }
 }

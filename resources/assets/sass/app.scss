@@ -34,7 +34,7 @@
 // BS4 Sortable
 @import 'bootstrap-sortable';
 
-@import '~leaflet/dist/leaflet';
+// @import '~leaflet/dist/leaflet';
 
 .navbar-laravel {
   background-color: #fff;
@@ -81,4 +81,6 @@
 @import "gdpr-cookie-notice";
 @import 'languages';
 @import 'widget';
+@import 'fonts';
+@import 'select2-input-group';
 // @import "warning";
