@@ -8,11 +8,16 @@
 <section class="events events-page">
   <div class="container-fluid">
     <div class="row">
-      <div class="col">
+        <div class="col">
 
-        @include('partials.information-alert', [
-          'html_text' => "<strong class='mb-2'>Did you know </strong> <br> You can now access all events using your personal calendar via an iCal feed? Find out more.",
-          'dismissable_id' => 'party'
+            @include('partials.information-alert', [
+            'html_text' => "<strong class='mb-2'>Do you use Google / Outlook / Yahoo calendars?</strong> <br> You can now add all your upcoming events to your personal calendar with the <button disabled type='button' class='btn btn-normal-padding btn-sm btn-primary' data-original-title='' title=''><svg width='12' height='12' viewBox='0 0 50 50' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' xml:space='preserve' xmlns:serif='http://www.serif.com/' style='fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;'>
+                <g transform='matrix(2.77778,0,0,2.77778,-2169.96,-58.3333)'>
+                    <path d='M797.801,39L782.57,39C782.195,39 781.871,38.859 781.597,38.576C781.322,38.293 781.185,37.958 781.185,37.572L781.185,25.286C781.185,24.899 781.322,24.564 781.597,24.281C781.871,23.999 782.195,23.857 782.57,23.857L783.955,23.857L783.955,22.786C783.955,22.295 784.124,21.874 784.463,21.525C784.802,21.175 785.21,21 785.686,21L786.378,21C786.854,21 787.261,21.175 787.6,21.525C787.939,21.874 788.109,22.295 788.109,22.786L788.109,23.857L792.262,23.857L792.262,22.786C792.262,22.295 792.432,21.874 792.771,21.525C793.11,21.175 793.517,21 793.993,21L794.686,21C795.162,21 795.569,21.175 795.908,21.525C796.247,21.874 796.417,22.295 796.417,22.786L796.417,23.857L797.801,23.857C798.176,23.857 798.501,23.999 798.775,24.281C799.048,24.564 799.185,24.899 799.185,25.286L799.185,37.572C799.185,37.958 799.048,38.293 798.774,38.576C798.501,38.859 798.176,39 797.801,39ZM797.685,33.927L794.685,33.927L794.685,36.472L797.685,36.472L797.685,33.927ZM789.685,33.927L786.685,33.927L786.685,36.472L789.685,36.472L789.685,33.927ZM785.685,33.927L782.685,33.927L782.685,36.472L785.685,36.472L785.685,33.927ZM793.685,33.927L790.685,33.927L790.685,36.472L793.685,36.472L793.685,33.927ZM797.685,30.383L794.685,30.383L794.685,32.927L797.685,32.927L797.685,30.383ZM789.685,30.383L786.685,30.383L786.685,32.927L789.685,32.927L789.685,30.383ZM785.685,30.383L782.685,30.383L782.685,32.927L785.685,32.927L785.685,30.383ZM793.685,30.383L790.685,30.383L790.685,32.927L793.685,32.927L793.685,30.383ZM797.685,26.838L794.685,26.838L794.685,29.383L797.685,29.383L797.685,26.838ZM789.685,26.838L786.685,26.838L786.685,29.383L789.685,29.383L789.685,26.838ZM785.685,26.838L782.685,26.838L782.685,29.383L785.685,29.383L785.685,26.838ZM793.685,26.838L790.685,26.838L790.685,29.383L793.685,29.383L793.685,26.838ZM786.378,22.429L785.686,22.429C785.592,22.429 785.511,22.464 785.442,22.535C785.374,22.605 785.339,22.689 785.339,22.786L785.339,25C785.339,25.097 785.374,25.18 785.442,25.251C785.511,25.322 785.592,25.357 785.686,25.357L786.378,25.357C786.472,25.357 786.553,25.322 786.621,25.251C786.69,25.18 786.724,25.097 786.724,25L786.724,22.786C786.724,22.689 786.69,22.605 786.621,22.535C786.553,22.464 786.472,22.429 786.378,22.429ZM794.686,22.429L793.993,22.429C793.899,22.429 793.818,22.464 793.75,22.535C793.681,22.605 793.647,22.689 793.647,22.786L793.647,25C793.647,25.097 793.681,25.18 793.75,25.251C793.818,25.322 793.9,25.357 793.993,25.357L794.686,25.357C794.779,25.357 794.861,25.322 794.929,25.251C794.997,25.18 795.032,25.097 795.032,25L795.032,22.786C795.032,22.689 794.998,22.605 794.929,22.535C794.861,22.464 794.779,22.429 794.686,22.429Z' style='fill:white;fill-rule:nonzero;'></path>
+                </g>
+            </svg>
+            <div class='span-vertically-align-middle'>Add to calendar</div></button> button below.",
+          'dismissable_id' => 'partycalendar'
         ])
 
         <div class="d-flex justify-content-between align-content-center">
@@ -87,6 +92,8 @@
                 @include('partials.calendar-feed-button', [
                   'copy_link' => $copy_link,
                   'user_edit_link' => $user_edit_link,
+                  'modal_title' => 'Access all events in your personal calendar',
+                  'modal_text' => 'Add all your upcoming events to your google/Outlook/Yahoo/Apple calendar with the link below.',
                 ])
               @endif
             </h3>

@@ -9,7 +9,6 @@
 
       <div class="float-right">
         @php( $user = Auth::user() )
-        <button type="button" name="button" class="btn btn-action btn-primary mt-sm-0 mt-3" data-copy-link="{{ url("/calendar/user/{$user->calendar_hash}") }}">Copy iCal link </button>
         <button type="button" class="close set-dismissed-cookie float-none ml-2" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>

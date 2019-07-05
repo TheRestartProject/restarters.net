@@ -1,8 +1,8 @@
 <div id="calendar-feed" class="d-none">
   <div class="card">
     <div class="card-body font-family-normal">
-      <p class="font-weight-bold mb-2">Access all events in your personal calendar</p>
-      <p class="mb-2">Add all your upcoming events to your Google/ Outlook/Yahoo/Apple calendar with the link below:</p>
+      <p class="font-weight-bold mb-2">{{ $modal_title }}</p>
+      <p class="mb-2">{{ $modal_text }}</p>
       <div class="input-group mb-3">
         <input type="text" class="form-control" value="{{ $copy_link }}">
         <div class="input-group-append">
@@ -20,5 +20,5 @@
 </div>
 
 <button type="button" class="btn btn-normal-padding btn-sm btn-primary mx-2 btn-calendar-feed">
-  @include('partials.svg-icons.calendar-icon') <span class="span-vertically-align-middle">Calendar feed</span>
+  @include('partials.svg-icons.calendar-icon') <span class="span-vertically-align-middle">Add to calendar</span>
 </button>
