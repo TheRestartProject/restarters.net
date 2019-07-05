@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class UsersPreferences extends Model
 {
-
+    public $timestamps = false;
     protected $table = 'users_preferences';
+
   /**
    * The attributes that are mass assignable.
    *

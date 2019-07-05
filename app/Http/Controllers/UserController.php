@@ -241,15 +241,12 @@ class UserController extends Controller
         $user_id = $user->id;
 
         if ( $user->isDripSubscriber() ) {
-          DripEvent::deleteSubscriber($user);
-          $user->newsletter = 0;
+          //DripEvent::deleteSubscriber($user);
+          //$user->newsletter = 0;
           $user->drip_subscriber_id = null;
         }
 
-      // Anonymise user.
-        $user->anonymise();
-        $user->save();
-        $user->delete();
+        $user->delete(); // Will be anonymised automatically by event handlers
 
         if (Auth::id() !== $user_id) {
             return redirect('user/all')->with('danger', $old_user_name.'\'s account has been soft deleted');

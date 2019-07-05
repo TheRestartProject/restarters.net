@@ -688,9 +688,13 @@ class Party extends Model implements Auditable
         return '';
     }
 
-    public function isVolunteer()
+    /**
+     * @param int|null $user_id
+     * @return bool
+     */
+    public function isVolunteer($user_id = NULL)
     {
-        $attributes = ['user' => auth()->id()];
+        $attributes = ['user' => $user_id ?: auth()->id()];
 
         return $this->allConfirmedVolunteers()->where($attributes)->exists();
     }

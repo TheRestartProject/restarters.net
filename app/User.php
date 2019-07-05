@@ -108,6 +108,16 @@ class User extends Authenticatable
         return $this->belongsToMany('App\User', 'users_permissions', 'user_id', 'permission_id');
     }
 
+    public function addPreference($slug)
+    {
+        /** @var Preferences $preference */
+        $preference = Preferences::where(['slug' => $slug])->first();
+        UsersPreferences::create([
+            'user_id' => $this->getKey(),
+            'preference_id' => $preference->getKey()
+        ]);
+    }
+
     //
     // public function sessions() {
     //   return $this->hasMany('App\Session', 'user', 'id');
@@ -294,6 +304,7 @@ class User extends Authenticatable
         $this->username = $this->id.'-deleted';
 
         // TODO: country, city, gender, age, also required?
+        return $this;
     }
 
     /**

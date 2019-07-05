@@ -204,7 +204,15 @@
                     @foreach ($user->unReadNotifications as $notification)
                     <div class="card status-read {{{ FixometerHelper::notificationClasses($notification->type) }}}">
                         <div class="card-body">
-                            <h5 class="card-title mb-1">{{{ $notification->data['title'] }}} <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a></h5>
+                            <h5 class="card-title mb-1">
+                                {{{ $notification->data['title'] }}}
+
+                                @if (!empty($notification->data['url']))
+                                    <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a>
+                                @else
+                                    {{{ $notification->data['name'] }}}
+                                @endif
+                            </h5>
                             <time title="{{{ $notification->created_at->toDayDateTimeString() }}}">{{{ $notification->created_at->diffForHumans() }}}</time>
                             <div class="d-flex flex-row justify-content-end mt-1">
                               <a href="{{ route('markAsRead', ['id' => $notification->id]) }}" class="btn-marked">Mark as read</a>
