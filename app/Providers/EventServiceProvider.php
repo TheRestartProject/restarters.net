@@ -57,7 +57,7 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        if (!empty(env('WIKI_URL'))) {
+        if (env('FEATURE__WIKI_INTEGRATION') === true) {
             Event::listen('Illuminate\Auth\Events\Login', 'App\Listeners\LogInToWiki');
         }
     }

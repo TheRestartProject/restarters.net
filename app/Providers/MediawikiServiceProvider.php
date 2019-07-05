@@ -29,7 +29,7 @@ class MediawikiServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if (empty(env('WIKI_URL'))) {
+        if (env('FEATURE__WIKI_INTEGRATION') === false) {
             return;
         }
 
