@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use App\Party;
 use App\Group;
 use App\GrouptagsGroups;
@@ -125,7 +126,9 @@ class CalendarEventsController extends Controller
               $icalObject[] =  "SUMMARY:{$event->venue}";
               $icalObject[] =  "DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."";
               $icalObject[] =  "DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."";
+              $icalObject[] =  "DESCRIPTION:".Str::limit($event->free_text, 75);
               $icalObject[] =  "LOCATION:{$event->location}";
+              $icalObject[] =  "URL:".url("/party/view/").$event->idevents;
               $icalObject[] =  "STATUS:CONFIRMED";
               $icalObject[] =  "END:VEVENT";
           }
