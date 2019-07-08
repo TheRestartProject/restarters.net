@@ -423,6 +423,37 @@ class Party extends Model implements Auditable
                      ->orderBy('event_date', 'ASC');
     }
 
+    /**
+     * [scopeUpcomingEventsInUserArea description]
+     * All upcoming events (greater than today) by a User's Location
+     * @author Christopher Kelker
+     * @date   2019-05-30T10:15:36+010
+     * @param  [type]                  $query
+     * @param  [type]                  $user
+     * @return [type]
+     */
+    public function scopeUpcomingEventsInUserArea($query, $user)
+    {
+      //Look for groups where user ID exists in pivot table
+      $user_group_ids = UserGroups::where('user', $user->id)->pluck('group')->toArray();
+
+      return $this
+      ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
+      ->join('groups', 'groups.idgroups', '=', 'events.group')
+      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+      ->where( function ($query) use ($user_group_ids) {
+        $query->whereNotIn('events.group', $user_group_ids)
+        ->whereDate('event_date', '>=', date('Y-m-d'));
+      })
+      ->having('distance', '<=', 35) // kilometers (km)
+
+      ->groupBy('events.idevents')
+      ->orderBy('events.event_date', 'ASC')
+      ->orderBy('events.start', 'ASC')
+      ->orderBy('distance', 'ASC');
+    }
+
+
     public function scopeAllUpcomingEvents()
     {
         return $this->whereRaw('CONCAT(`event_date`, " ", `start`) > CURRENT_TIMESTAMP()')
