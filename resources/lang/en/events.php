@@ -83,7 +83,7 @@ return array (
     'add_event_content' => 'Announce your event on The Restart Project website and to fixers near you.',
     'field_event_name' => 'Venue name',
     'field_event_group' => 'Event group',
-    'field_event_desc' => 'Description',
+    'field_event_desc' => 'Event description',
     'field_event_date' => 'Date of event',
     'field_event_time' => 'Start/end time',
     'field_event_venue' => 'Venue address',
