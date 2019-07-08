@@ -35,7 +35,7 @@ class CalendarEventsController extends Controller
         $query->where('events_users.user', auth()->id())
         ->orWhere('users_groups.user', auth()->id());
       })
-      ->select('events.*')
+      ->select('events.*', 'groups.name')
       ->groupBy('idevents')
       ->orderBy('event_date', 'ASC')
       ->get();
@@ -50,7 +50,7 @@ class CalendarEventsController extends Controller
         $query->where('groups.idgroups', $group->idgroups)
               ->whereNull('events.deleted_at');
       })
-      ->select('events.*')
+      ->select('events.*', 'groups.name')
       ->groupBy('events.idevents')
       ->orderBy('events.event_date', 'ASC')
       ->get();
@@ -68,7 +68,7 @@ class CalendarEventsController extends Controller
       ->where(function ($query) use ($area) {
         $query->where('groups.area', 'like', '%'.$area.'%');
       })
-      ->select('events.*')
+      ->select('events.*', 'groups.name')
       ->groupBy('events.idevents')
       ->orderBy('events.event_date', 'ASC')
       ->get();
@@ -88,7 +88,7 @@ class CalendarEventsController extends Controller
         $query->where('grouptags_groups.id', $grouptags_groups->id)
               ->whereNull('events.deleted_at');
       })
-      ->select('events.*')
+      ->select('events.*', 'groups.name')
       ->groupBy('events.idevents')
       ->orderBy('events.event_date', 'ASC')
       ->get();
@@ -106,7 +106,10 @@ class CalendarEventsController extends Controller
         return abort(404);
       }
 
-      $events = Party::whereNull('deleted_at')->get();
+      $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+              ->whereNull('deleted_at')
+              ->select('events.*', 'groups.name')
+              ->get();
 
       $this->exportCalendar($events);
     }
@@ -127,11 +130,11 @@ class CalendarEventsController extends Controller
               $icalObject[] =  "BEGIN:VEVENT";
               $icalObject[] =  "UID:{$event->idevents}";
               $icalObject[] =  "DTSTAMP:".date($this->ical_format)."";
-              $icalObject[] =  "SUMMARY:{$event->venue}";
+              $icalObject[] =  "SUMMARY:{$event->venue} ({$event->name})";
               $icalObject[] =  "DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."";
               $icalObject[] =  "DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."";
-              $description = \Soundasleep\Html2Text::convert($event->free_text, $html2text_options);
-              $icalObject[] =  "DESCRIPTION:".Str::limit($this->ical_split("DESCRIPTION:",$description), 60);
+              //$description = \Soundasleep\Html2Text::convert($event->free_text, $html2text_options);
+              //$icalObject[] =  "DESCRIPTION:".Str::limit($this->ical_split("DESCRIPTION:",$description), 60);
               $icalObject[] =  "LOCATION:{$event->location}";
               $icalObject[] =  "URL:".url("/party/view")."/".$event->idevents;
               $icalObject[] =  "STATUS:CONFIRMED";
