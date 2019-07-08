@@ -1,7 +1,7 @@
 <?php
 
 return array (
-    'field_event_name_helper' => 'Please enter a neighbourhood or the name of the venue - please no \'Restart Party\' or \'Repair Cafe\'.',
+    'field_event_name_helper' => 'Name of the venue or neighbourhood',
     'field_venue_helper' => 'I.e. the place where the fixing happens!',
     'create_event' => 'Create event',
     'warning_volunteers_message' => 'Please note that the number of volunteers does not match the attendance record.  Do you need to add or remove volunteers?',
@@ -70,7 +70,7 @@ return array (
     'by_group' => 'By group',
     'create_new_event' => 'Create new event',
     'edit_event' => 'Edit event',
-    'edit_event_content' => 'Go ahead and change or improve your event information.',
+    'edit_event_content' => 'You can keep your event details up-to-date here.',
     'past_events' => 'Past events',
     'upcoming_events' => 'Upcoming events',
     'event_datetime' => 'Date/time',
@@ -81,7 +81,7 @@ return array (
     'add_event' => 'Add event',
     'add_an_event' => 'Add an event',
     'add_event_content' => 'Announce your event on The Restart Project website and to fixers near you.',
-    'field_event_name' => 'Name of event',
+    'field_event_name' => 'Venue name',
     'field_event_group' => 'Event group',
     'field_event_desc' => 'Description',
     'field_event_date' => 'Date of event',
