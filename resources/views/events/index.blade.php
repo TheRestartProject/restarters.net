@@ -160,7 +160,7 @@
               <h2>Past {{{ $group->name }}} events</h2>
             @else
               <h2 class="mb-1">Past events <sup><a href="{{{ route('all-past-events') }}}">(See all past)</a></sup></h2>
-              <p class="mb-2">These are past events from groups you a member of, and events that you RSVPed to.</p>
+              <p class="mb-2">These are past events from groups you are a member of, and events that you RSVPed to.</p>
             @endif
           </header>
           <div class="table-responsive">
