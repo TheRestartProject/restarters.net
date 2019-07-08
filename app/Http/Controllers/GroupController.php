@@ -1052,12 +1052,9 @@ class GroupController extends Controller
                 Notification::send($host, new NewGroupMember($arr, $host));
             }
 
-            $response['success'] = 'You are now following '.$group->name.'!';
-
             return redirect()
                     ->back()
-                    ->with('response', $response)
-                    ->with('warning', "You are now following {$group->name}!");
+                    ->with('success', "You are now following {$group->name}!");
 
         } catch (\Exception $e) {
             $response['danger'] = 'Failed to follow this group';
