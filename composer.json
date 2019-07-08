@@ -24,6 +24,7 @@
         "mcamara/laravel-localization": "^1.3",
         "msurguy/honeypot": "^1.0",
         "owen-it/laravel-auditing": "^8.0",
+        "soundasleep/html2text": "^1.1",
         "spatie/calendar-links": "^1.2",
         "spinen/laravel-discourse-sso": "^1.3",
         "twbs/bootstrap": "4.1.0",

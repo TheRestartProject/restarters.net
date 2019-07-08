@@ -117,6 +117,10 @@ class CalendarEventsController extends Controller
       $icalObject[] =  "VERSION:2.0";
       $icalObject[] =  "PRODID:-//Restarters//NONSGML Events Calendar/EN";
 
+      $html2text_options = [
+          'ignore_errors' => true,
+      ];
+
       // loop over events
       foreach ($events as $event) {
           if ( ! is_null($event->event_date) && $event->event_date != '0000-00-00') {
@@ -126,9 +130,10 @@ class CalendarEventsController extends Controller
               $icalObject[] =  "SUMMARY:{$event->venue}";
               $icalObject[] =  "DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."";
               $icalObject[] =  "DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."";
-              $icalObject[] =  "DESCRIPTION:".Str::limit($event->free_text, 75);
+              $description = \Soundasleep\Html2Text::convert($event->free_text, $html2text_options);
+              $icalObject[] =  "DESCRIPTION:".Str::limit($this->ical_split("DESCRIPTION:",$description), 60);
               $icalObject[] =  "LOCATION:{$event->location}";
-              $icalObject[] =  "URL:".url("/party/view/").$event->idevents;
+              $icalObject[] =  "URL:".url("/party/view")."/".$event->idevents;
               $icalObject[] =  "STATUS:CONFIRMED";
               $icalObject[] =  "END:VEVENT";
           }
@@ -143,5 +148,36 @@ class CalendarEventsController extends Controller
       header('Content-Disposition: attachment; filename="cal.ics"');
 
       echo $icalObject;
+    }
+
+    protected function ical_split($preamble, $value)
+    {
+        $value = trim($value);
+        $value = strip_tags($value);
+        $value = preg_replace('/\n+/', ' ', $value);
+        $value = preg_replace('/\s{2,}/', ' ', $value);
+        $preamble_len = strlen($preamble);
+        $lines = array();
+        while (strlen($value)>(75-$preamble_len)) {
+            $space = (75-$preamble_len);
+            $mbcc = $space;
+            while ($mbcc) {
+                $line = mb_substr($value, 0, $mbcc);
+                $oct = strlen($line);
+                if ($oct > $space) {
+                    $mbcc -= $oct-$space;
+                }
+                else {
+                    $lines[] = $line;
+                    $preamble_len = 1; // Still take the tab into account
+                    $value = mb_substr($value, $mbcc);
+                    break;
+                }
+            }
+        }
+        if (!empty($value)) {
+            $lines[] = $value;
+        }
+        return join($lines, "\n\t");
     }
 }
