@@ -135,6 +135,7 @@ class CalendarEventsController extends Controller
               $icalObject[] =  "DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."";
               //$description = \Soundasleep\Html2Text::convert($event->free_text, $html2text_options);
               //$icalObject[] =  "DESCRIPTION:".Str::limit($this->ical_split("DESCRIPTION:",$description), 60);
+              $icalObject[] =  "DESCRIPTION:".url("/party/view")."/".$event->idevents;
               $icalObject[] =  "LOCATION:{$event->location}";
               $icalObject[] =  "URL:".url("/party/view")."/".$event->idevents;
               $icalObject[] =  "STATUS:CONFIRMED";
