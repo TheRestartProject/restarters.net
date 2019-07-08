@@ -17,7 +17,6 @@ class CalendarEventsController extends Controller
 
     public function __construct()
     {
-      $this->middleware('auth')->except('allEvents');
       $this->ical_format = 'Ymd\THis\Z';
     }
 
@@ -104,10 +103,6 @@ class CalendarEventsController extends Controller
     {
       if ($env_hash != env('CALENDAR_HASH')) {
         return abort(404);
-      }
-
-      if ( ! FixometerHelper::hasRole(\Auth::user(), 'Administrator')) {
-        return abort(404, 'Not Administrator.');
       }
 
       $events = Party::whereNull('deleted_at')->get();

@@ -51,6 +51,18 @@ Route::get('/party/view/{id}', 'PartyController@view');
 // so we allow anonymous access.
 Route::get('/export/devices', 'ExportController@devices');
 
+
+// Calendar routes do not require authentication.
+// (You would not be able to subscribe from a calendar application if they did.)
+Route::prefix('calendar')->group(function () {
+    Route::get('/user/{calendar_hash}', 'CalendarEventsController@allEventsByUser')->name('calendar-events-by-user');
+    Route::get('/group/{group}', 'CalendarEventsController@allEventsByGroup')->name('calendar-events-by-group');
+    Route::get('/group-area/{area}', 'CalendarEventsController@allEventsByArea')->name('calendar-events-by-area');
+    Route::get('/group-tag/{grouptags_groups}', 'CalendarEventsController@allEventsByGroupTag')->name('calendar-events-by-group-tag');
+    Route::get('/all-events/{hash_env}', 'CalendarEventsController@allEvents')->name('calendar-events-all');
+});
+
+
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/', 'HomeController@index')->name('home');
 
@@ -166,15 +178,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/image/delete/{idevents}/{id}/{path}', 'PartyController@deleteImage');
         Route::get('/contribution/{id}', 'PartyController@getContributions');
         Route::post('/update-volunteerquantity', 'PartyController@updateVolunteerQuantity');
-    });
-
-    // CalendarEvents Controller
-    Route::prefix('calendar')->group(function () {
-      Route::get('/user/{calendar_hash}', 'CalendarEventsController@allEventsByUser')->name('calendar-events-by-user');
-      Route::get('/group/{group}', 'CalendarEventsController@allEventsByGroup')->name('calendar-events-by-group');
-      Route::get('/group-area/{area}', 'CalendarEventsController@allEventsByArea')->name('calendar-events-by-area');
-      Route::get('/group-tag/{grouptags_groups}', 'CalendarEventsController@allEventsByGroupTag')->name('calendar-events-by-group-tag');
-      Route::get('/all-events/{hash_env}', 'CalendarEventsController@allEvents')->name('calendar-events-all');
     });
 
     //Role Controller
