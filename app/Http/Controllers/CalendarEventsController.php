@@ -119,23 +119,27 @@ class CalendarEventsController extends Controller
     {
       $icalObject[] =  "BEGIN:VCALENDAR";
       $icalObject[] =  "VERSION:2.0";
-      $icalObject[] =  "METHOD:PUBLISH";
+      $icalObject[] =  "PRODID:-//Restarters//NONSGML Events Calendar/EN";
 
       // loop over events
       foreach ($events as $event) {
-        $icalObject[] =  "BEGIN:VEVENT";
-        $icalObject[] =  "SUMMARY:{$event->venue}";
-        $icalObject[] =  "DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."";
-        $icalObject[] =  "DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."";
-        $icalObject[] =  "LOCATION:{$event->location}";
-        $icalObject[] =  "STATUS:CONFIRMED";
-        $icalObject[] =  "END:VEVENT";
+          if ( ! is_null($event->event_date) && $event->event_date != '0000-00-00') {
+              $icalObject[] =  "BEGIN:VEVENT";
+              $icalObject[] =  "UID:{$event->idevents}";
+              $icalObject[] =  "DTSTAMP:".date($this->ical_format)."";
+              $icalObject[] =  "SUMMARY:{$event->venue}";
+              $icalObject[] =  "DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."";
+              $icalObject[] =  "DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."";
+              $icalObject[] =  "LOCATION:{$event->location}";
+              $icalObject[] =  "STATUS:CONFIRMED";
+              $icalObject[] =  "END:VEVENT";
+          }
       }
 
       // close calendar
       $icalObject[] =  "END:VCALENDAR";
 
-      $icalObject = implode("\n",$icalObject);
+      $icalObject = implode("\r\n",$icalObject);
 
       header('Content-type: text/calendar; charset=utf-8');
       header('Content-Disposition: attachment; filename="cal.ics"');
