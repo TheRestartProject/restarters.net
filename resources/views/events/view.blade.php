@@ -99,8 +99,8 @@
                 </form>
                 @endif
                 @if( $event->hasFinished() )
-                  <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>
                   <a href="#" class="btn dropdown-item" data-toggle="modal" data-target="#event-request-review">Request review</a>
+                  <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>
                 @else
                   @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
                   <button data-toggle="modal" data-target="#event-invite-to" class="btn dropdown-item">Invite volunteers</button>

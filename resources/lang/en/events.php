@@ -99,8 +99,8 @@ return array (
     'events-filter' => 'Events filter',
     'download-results' => 'Download Results (CSV)',
     'follow_hosting_group' => 'This event is being hosted by :group.  Would you like to follow them?',
-    'request_review_message' => 'This will notify volunteers who attend this event that repair data has been added and that it could benefit from additional contributions. It will also remind that photos (including of visitor book feedback) may have been posted. Do you wish to continue?',
+    'request_review_message' => '<p>This will notify volunteers who attended this event that repair data has been added and that it could benefit from additional contributions and review.</p><p>It will also let volunteers know that photos (including of visitor book feedback) may have been posted.</p><p>Do you wish to send these notifications?</p>',
     'request_review_modal_heading' => 'Request review',
-    'send_requests' => 'Send requests',
+    'send_requests' => 'Send',
     'cancel_requests' => 'Cancel',
 );
