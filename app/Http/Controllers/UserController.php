@@ -1194,27 +1194,26 @@ class UserController extends Controller
             $user->age = $request->input('age');
             $user->consent_past_data = $timestamp;
         } else {
-      // Let's decide whether what role to give
             $role = FixometerHelper::skillsDetermineRole($skills);
 
-      // Then create that user
             $user = User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
-            'role' => $role,
-            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
-            'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
-            'country' => $request->input('country'),
-            'location' => $request->input('city'),
-            'gender' => $request->input('gender'),
-            'age' => $request->input('age'),
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => Hash::make($request->input('password')),
+                'role' => $role,
+                'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
+                'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
+                'country' => $request->input('country'),
+                'location' => $request->input('city'),
+                'gender' => $request->input('gender'),
+                'age' => $request->input('age'),
+                'calendar_hash' => str_random(15),
             ]);
         }
 
         $user->generateAndSetUsername();
 
-  //Save timestamps
+        // Save timestamps
         $user->consent_gdpr = $timestamp;
         $user->consent_future_data = $timestamp;
 
@@ -1276,7 +1275,7 @@ class UserController extends Controller
             }
         }
 
-      // Send post-registration welcome email.
+        // Send post-registration welcome email.
         if (env('FEATURE__REGISTRATION_WELCOME_EMAIL') === true) {
             try {
                 $firstName = $user->getFirstName();
@@ -1285,8 +1284,6 @@ class UserController extends Controller
                 Log::error('Failed to send post-registration welcome email: ' . $ex->getMessage());
             }
         }
-
-  //Session::createSession($user->id);
 
         if (Auth::check()) { //Existing users are to update
             return redirect('dashboard');
