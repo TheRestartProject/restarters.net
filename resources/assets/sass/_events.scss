@@ -213,15 +213,15 @@
                   width: 200px;
               }
           }
-
-          th.hightlighted, td.hightlighted {
-            padding-left: 10px !important;
-            padding-top: 0px;
-            padding-right: 0px;
-            padding-bottom: 0px;
-            width: 10px;
-          }
         }
+    }
+
+    th.hightlighted, td.hightlighted {
+        padding-left: 10px !important;
+        padding-top: 0px;
+        padding-right: 0px;
+        padding-bottom: 0px;
+        width: 10px;
     }
 
     &__map {

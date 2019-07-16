@@ -7,7 +7,7 @@
         <th class="table-cell-icon" width="70"></th>
     @endif
 
-    <th scope="col" width="330" class="pl-0">@lang('events.event_name')</th>
+    <th scope="col" width="330">@lang('events.event_name')</th>
 
     <th scope="col" width="240" class="cell-date">@lang('events.event_date') / @lang('events.event_time')</th>
 

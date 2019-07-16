@@ -3,9 +3,11 @@
   <tr>
     <th class="hightlighted" width="10"></th>
 
-    <th class="table-cell-icon" width="70"></th>
+    @if( !isset($group_view) )
+        <th class="table-cell-icon"></th>
+    @endif
 
-    <th scope="col" width="450" class="pl-0">@lang('events.event_name')</th>
+    <th scope="col" width="450">@lang('events.event_name')</th>
 
     <th scope="col" width="250" class="cell-date" >@lang('events.event_date') / @lang('events.event_time')</th>
 

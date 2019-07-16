@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@section('title')
+    {{ $group->name }}
+@endsection
 @section('content')
 <section class="events group-view">
   <div class="container-fluid">
@@ -294,13 +297,13 @@
                       <div class="table-responsive">
                           <table class="table table-events table-striped" role="table">
 
-                              @include('partials.tables.head-events', ['invite' => true, 'group_view' => true])
+                              @include('events.tables.headers.head-events-upcoming-only', ['hide-invite' => false, 'group_view' => true])
 
                               <tbody>
 
                                 @if( !$upcoming_events->isEmpty() )
                                   @foreach ($upcoming_events as $event)
-                                    @include('partials.tables.row-events', ['invite' => true, 'group_view' => true])
+                                    @include('partials.tables.row-events', ['show_invites_count' => true, 'group_view' => true])
                                   @endforeach
                                 @else
                                   <tr>
