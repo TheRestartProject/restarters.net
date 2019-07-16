@@ -957,6 +957,11 @@ function initAutocomplete() {
       analytics: ['_ga','_gat', '_gid'], //Cookies in the analytics category.
       marketing: [] //Cookies in the marketing category.
     });
+
+      let hash = document.location.hash;
+      if (hash) {
+          $('a[href=\"'+hash).tab('show');
+      }
   });
 
   $('#register-form-submit').on('click', function(e) {

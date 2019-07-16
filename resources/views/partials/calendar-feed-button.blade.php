@@ -13,7 +13,7 @@
       </div>
       <div class="cleafix">
         <a href="https://talk.restarters.net/t/ical-calendar-feeds/170" class="float-left" target="_blank">Find out more</a>
-        <a href="{{ $user_edit_link }}" class="float-right">See all my calendars</a>
+        <a href="{{ $user_edit_link }}#list-calendar-links" class="float-right">See all my calendars</a>
       </div>
     </div>
   </div>
