@@ -50,6 +50,7 @@ This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a 
   - php-curl
   - php-mysql
   - php-xml
+  - php-intl
 - mysql/mariadb
   - and create a database
 - npm
