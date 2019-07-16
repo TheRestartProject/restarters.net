@@ -61,4 +61,5 @@ return array (
   'therestartproject' => 'The Restart Project',
   'discourse_url' => 'https://talk.restarters.net',
   'please_select' => 'Please select',
+  'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
 );

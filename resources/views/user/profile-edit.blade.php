@@ -455,9 +455,9 @@
           <div class="tab-pane fade" id="list-calendar-links" role="tabpanel" aria-labelledby="list-calendar-links-list">
             <div class="edit-panel">
               <div class="form-row">
-                <div class="col-lg-6">
+                <div class="col-lg-12">
                   <h4>Calendars</h4>
-                  <p>You can now access all events using your personal calendar via an iCal feed. You can subscribe to as many calendars as you like. Find out more.</p>
+                  <p>You can now keep track of events using your personal calendar application by subscribing to the calendar feeds below. You can subscribe to as many calendars as you like. <a href="{{ env('DISCOURSE_URL' )}}/session/sso?return_path={{ env('DISCOURSE_URL') }}@lang('general.calendar_feed_help_url')">Find out more</a>.</p>
                 </div>
               </div>
               <fieldset class="listed-calendar-links">
