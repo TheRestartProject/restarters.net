@@ -135,7 +135,7 @@
                     <tbody>
                         @if ( is_null(auth()->user()->latitude) && is_null(auth()->user()->longitude) )
                             <tr>
-                                <td colspan="13" align="center" class="p-3">Your location has not been set.<br><a href="{{{ route('edit-profile', ['id' => auth()->id()]) }}}">Click here to set your location.</a></td>
+                                <td colspan="13" align="center" class="p-3">Your town/city has not been set.<br><a href="{{{ route('edit-profile', ['id' => auth()->id()]) }}}">Click here to set it and find events near you.</a></td>
                             </tr>
                         @elseif( !$upcoming_events_in_area->isEmpty() )
                             @foreach($upcoming_events_in_area as $event)
