@@ -1221,6 +1221,8 @@ class UserController extends Controller
         if ( ! is_null($request->input('newsletter')) && $request->input('newsletter') == 1) {
           $subscribed = true;
           $user->newsletter = 1;
+        } else {
+            $subscribed = false;
         }
 
         $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
