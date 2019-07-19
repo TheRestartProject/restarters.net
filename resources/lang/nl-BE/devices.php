@@ -52,7 +52,7 @@ return array (
   'suitable' => 'Geschikt voor de community',
   'to_date' => 'Tot',
   'upload_photos' => 'Foto\'s opladen',
-  'useful_repair_urls' => 'URL met nuttige herstelinfo gebruikt',
+  'useful_repair_urls' => 'URL met nuttige herstelinfo',
   'useful_repair_urls_explanation' => 'Nuttige URL',
   'useful_repair_urls_helper' => 'Geef de URL hier in',
   'various' => 'Verschillende',
@@ -61,5 +61,5 @@ return array (
   'event_info' => 'Info over de activiteit',
   'repair_info' => 'Herstel info',
   'uploaded_photos' => 'Upgeloade foto\'s',
-  'useful_repair_info' => 'Informatiebron',
+  'useful_repair_info' => 'Informatie gevonden bij',
 );
