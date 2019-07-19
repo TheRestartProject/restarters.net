@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Support\Facades\Input;
+use App\DripEvent;
 
 class UserController extends Controller
 {
@@ -109,6 +110,20 @@ class UserController extends Controller
         $all_preferences = Preferences::all();
         $all_permissions = Permissions::all();
 
+        $groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+        ->join('events', 'events.group', '=', 'groups.idgroups')
+        ->where('users_groups.user', auth()->id())
+        ->select('groups.*')
+        ->groupBy('groups.idgroups')
+        ->orderBy('groups.idgroups', 'ASC')
+        ->get();
+
+        $all_group_areas = Group::whereNotNull('area')
+        ->groupBy('area')
+        ->get(['area'])
+        ->pluck('area')
+        ->toArray();
+
         return view('user.profile-edit', [
         'user' => $user,
         'skills' => FixometerHelper::allSkills(),
@@ -118,13 +133,14 @@ class UserController extends Controller
         'user_permissions' => $user_permissions,
         'all_groups' => $all_groups,
         'all_preferences' => $all_preferences,
-        'all_permissions' => $all_permissions
+        'all_permissions' => $all_permissions,
+        'groups' => $groups,
+        'all_group_areas' => $all_group_areas,
         ]);
     }
 
     public function postProfileInfoEdit(Request $request)
     {
-
         $rules = [
         'name'            => 'required|string|max:255',
         'email'           => 'required|string|email|max:255',
@@ -155,6 +171,10 @@ class UserController extends Controller
         ]);
 
         $user = User::find($id);
+
+        if ( $user->isDripSubscriber() ) {
+          DripEvent::createOrUpdateSubscriber($user, true, auth()->user()->email, request()->input('email'));
+        }
 
         if (!empty($user->location)) {
             $lat_long = FixometerHelper::getLatLongFromCityCountry($user->location, $user->country);
@@ -220,10 +240,13 @@ class UserController extends Controller
         $old_user_name = $user->name;
         $user_id = $user->id;
 
-      // Anonymise user.
-        $user->anonymise();
-        $user->save();
-        $user->delete();
+        if ( $user->isDripSubscriber() ) {
+          //DripEvent::deleteSubscriber($user);
+          //$user->newsletter = 0;
+          $user->drip_subscriber_id = null;
+        }
+
+        $user->delete(); // Will be anonymised automatically by event handlers
 
         if (Auth::id() !== $user_id) {
             return redirect('user/all')->with('danger', $old_user_name.'\'s account has been soft deleted');
@@ -243,11 +266,18 @@ class UserController extends Controller
 
         $user = User::find($id);
 
-        if ($request->input('newsletter') !== null) :
+        // Subscriptions only happen at registration.
+        // Unsubscriptions only happen via links in newsletter.
+        /*if ( is_null(request()->input('newsletter')) ) {
+          $user->newsletter = 0;
+          $unsubscribe_user = DripEvent::unsubscribeSubscriberFromNewsletter($user);
+        } else {
+          $drip_subscribe_user = DripEvent::subscribeSubscriberToNewsletter($user);
+          if (!empty((array) $drip_subscribe_user)) {
             $user->newsletter = 1;
-        else :
-            $user->newsletter = 0;
-        endif;
+            $user->drip_subscriber_id = $drip_subscribe_user->id;
+          }
+        }*/
 
         if ($request->input('invites') !== null) :
             $user->invites = 1;
@@ -717,7 +747,6 @@ class UserController extends Controller
 
     public function create()
     {
-
         $user = Auth::user();
 
       // Administrators can add users.
@@ -777,8 +806,10 @@ class UserController extends Controller
                     'email'    => $email,
                     'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
                     'role'     => $role,
+                    'calendar_hash' => str_random(15),
                     //'group'    => $group
                       );
+
 
                       // add password recovery data
                       $bytes = 32;
@@ -833,7 +864,7 @@ class UserController extends Controller
                 if (!isset($data)) {
                       $data = null;
                 }
-                dd("testing");
+
                 if (!isset($_POST['modal'])) {
                       return view('user.create', [
                         'title' => 'New User',
@@ -1118,7 +1149,6 @@ class UserController extends Controller
 
     public function postRegister(Request $request, $hash = null)
     {
-
         if (Auth::check()) { //Existing users don't need all the same rules
             $rules = [
             'age'                 => 'required',
@@ -1164,38 +1194,37 @@ class UserController extends Controller
             $user->age = $request->input('age');
             $user->consent_past_data = $timestamp;
         } else {
-      // Let's decide whether what role to give
             $role = FixometerHelper::skillsDetermineRole($skills);
 
-      // Then create that user
             $user = User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
-            'role' => $role,
-            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
-            'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
-            'country' => $request->input('country'),
-            'location' => $request->input('city'),
-            'gender' => $request->input('gender'),
-            'age' => $request->input('age'),
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => Hash::make($request->input('password')),
+                'role' => $role,
+                'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
+                'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
+                'country' => $request->input('country'),
+                'location' => $request->input('city'),
+                'gender' => $request->input('gender'),
+                'age' => $request->input('age'),
+                'calendar_hash' => str_random(15),
             ]);
         }
 
         $user->generateAndSetUsername();
 
-  //Save timestamps
+        // Save timestamps
         $user->consent_gdpr = $timestamp;
         $user->consent_future_data = $timestamp;
 
-  // // } catch (\Exception $e) {
-  //   $error['message'] = 'Failed to create user';
-  //   return redirect()->back()->withErrors('message', 'User already exists');
-  // }
-
-        if (!is_null($request->input('newsletter')) && $request->input('newsletter') == 1) { //Subscribe to newsletter
-            $user->newsletter = 1;
+        // Opted-in to Subscribe to newsletter
+        if ( ! is_null($request->input('newsletter')) && $request->input('newsletter') == 1) {
+          $subscribed = true;
+          $user->newsletter = 1;
         }
+
+        $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
+        $user->drip_subscriber_id = $drip_subscribe_user->id;
 
         if (!is_null($request->input('invites')) && $request->input('invites') == 1) { //Subscribe to invites
             $user->invites = 1;
@@ -1246,15 +1275,15 @@ class UserController extends Controller
             }
         }
 
-      // Send post-registration welcome email.
-        try {
-            $firstName = $user->getFirstName();
-            Mail::to($user)->send(new RegistrationWelcome($firstName));
-        } catch (\Exception $ex) {
-            Log::error('Failed to send post-registration welcome email: ' . $ex->getMessage());
+        // Send post-registration welcome email.
+        if (env('FEATURE__REGISTRATION_WELCOME_EMAIL') === true) {
+            try {
+                $firstName = $user->getFirstName();
+                Mail::to($user)->send(new RegistrationWelcome($firstName));
+            } catch (\Exception $ex) {
+                Log::error('Failed to send post-registration welcome email: ' . $ex->getMessage());
+            }
         }
-
-  //Session::createSession($user->id);
 
         if (Auth::check()) { //Existing users are to update
             return redirect('dashboard');

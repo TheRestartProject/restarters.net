@@ -40,6 +40,19 @@ class Group extends Model implements Auditable
      */
     protected $hidden = [];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('all_hosts_count', function ($builder) {
+            $builder->withCount('allHosts');
+        });
+
+        static::addGlobalScope('all_restarters_count', function ($builder) {
+            $builder->withCount('allRestarters');
+        });
+    }
+
 
     public function addTag($tag)
     {
@@ -260,7 +273,7 @@ class Group extends Model implements Auditable
     /**
      * Adds a volunteer to the group.
      *
-     * @param App\User $volunteer A registered user.
+     * @param \App\User $volunteer A registered user.
      */
     public function addVolunteer($volunteer)
     {
@@ -302,9 +315,13 @@ class Group extends Model implements Auditable
         return '';
     }
 
-    public function isVolunteer()
+    /**
+     * @param int|null $user_id
+     * @return bool
+     */
+    public function isVolunteer($user_id = NULL)
     {
-        $attributes = ['user' => auth()->id()];
+        $attributes = ['user' => $user_id ?: auth()->id()];
 
         return $this->allConfirmedVolunteers()->where($attributes)->exists();
     }
@@ -388,5 +405,30 @@ class Group extends Model implements Auditable
         }
 
         return url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg');
+    }
+
+    public function getNextUpcomingEvent()
+    {
+      $event = $this->parties()->whereDate('event_date', '>=', date('Y-m-d'));
+
+      if ( ! $event->count() ) {
+        return null;
+      }
+
+      return $event->first();
+    }
+
+    public function userEvents()
+    {
+      return $this->parties()
+      ->join('events_users', 'events.idevents', '=', 'events_users.event')
+      ->where(function($query) {
+        $query->where('events.group', $this->idgroups)
+        ->where('events_users.user', auth()->id());
+      })
+      ->select('events.*')
+      ->groupBy('events.idevents')
+      ->orderBy('events.idevents', 'ASC')
+      ->get();
     }
 }

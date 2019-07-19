@@ -44,10 +44,10 @@
             <div class="tab-pane active" id="details">
 
               <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-12">
                   <div class="form-group__offset">
                   <h4>@lang('events.edit_event')</h4>
-                  <p>@lang('events.edit_event_content')</p>
+                  <!-- <p>@lang('events.edit_event_content')</p>-->
                   </div>
                 </div>
               </div>
@@ -60,10 +60,7 @@
                   <div class="col-lg-6">
                     <div class="form-group form-group__offset">
                       <label for="event_name">@lang('events.field_event_name'):</label>
-                      <input type="text" class="form-control field" id="event_name" name="venue" value="{{ $formdata->venue }}">
-                      <small id="nameHelpBlock" class="form-text text-muted">
-                          @lang('events.field_event_name_helper')
-                      </small>
+                      <input type="text" class="form-control field" id="event_name" name="venue" value="{{ $formdata->venue }}" placeholder="@lang('events.field_event_name_helper')">
                     </div>
 
                   @if ( ( FixometerHelper::hasRole($user, 'Host') && count($user_groups) > 1 ) || FixometerHelper::hasRole($user, 'Administrator') )

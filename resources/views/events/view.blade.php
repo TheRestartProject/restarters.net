@@ -99,8 +99,8 @@
                 </form>
                 @endif
                 @if( $event->hasFinished() )
+                  <a href="#" class="btn dropdown-item" data-toggle="modal" data-target="#event-request-review">Request review</a>
                   <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">Share event stats</button>
-                  <a href="/party/contribution/{{ $formdata->id }}" class="btn dropdown-item">Request contributions</a>
                 @else
                   @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
                   <button data-toggle="modal" data-target="#event-invite-to" class="btn dropdown-item">Invite volunteers</button>
@@ -450,5 +450,6 @@
   @include('includes.modals.event-all-volunteers')
   @include('includes.modals.event-all-attended')
   @include('includes.modals.event-add-volunteer')
+  @include('includes.modals.event-request-review')
 
   @endsection

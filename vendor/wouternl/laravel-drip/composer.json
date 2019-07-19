@@ -1,0 +1,37 @@
+{
+	"name": "wouternl/laravel-drip",
+	"description": "A Laravel wrapper for Drip's REST API v2.0",
+    "type": "package",
+    "version": "1.1.9",
+    "license": "MIT",
+	"homepage": "https://bitbucket.org/wouterNL/laravel-drip-php",
+	"authors": [
+		{
+            "name": "Drip",
+            "homepage": "https://github.com/DripEmail/drip-php"
+        },
+        {
+            "name": "Wouter Steegers",
+            "email": "wouter42@gmail.com"
+        }
+    ],
+    "require": {
+        "php" : ">=5.5.0",
+        "laravel/framework": "5.2.*|5.3.*|5.4.*|5.5.*|5.6.*|5.7.*|5.8.*"
+    },
+    "autoload": {
+		"psr-4": {
+			"wouterNL\\Drip\\": "src"
+		}
+	},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "wouterNL\\Drip\\DripServiceProvider"
+            ],
+            "aliases": {
+                "Drip": "wouterNL\\Drip\\Facades\\DripFacade"
+            }
+        }
+    }
+}

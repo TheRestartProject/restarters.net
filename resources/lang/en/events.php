@@ -1,7 +1,7 @@
 <?php
 
 return array (
-    'field_event_name_helper' => 'Please enter a neighbourhood or the name of the venue - please no \'Restart Party\' or \'Repair Cafe\'.',
+    'field_event_name_helper' => 'Name of the venue or neighbourhood',
     'field_venue_helper' => 'I.e. the place where the fixing happens!',
     'create_event' => 'Create event',
     'warning_volunteers_message' => 'Please note that the number of volunteers does not match the attendance record.  Do you need to add or remove volunteers?',
@@ -70,7 +70,7 @@ return array (
     'by_group' => 'By group',
     'create_new_event' => 'Create new event',
     'edit_event' => 'Edit event',
-    'edit_event_content' => 'Go ahead and change or improve your event information.',
+    'edit_event_content' => 'You can keep your event details up-to-date here.',
     'past_events' => 'Past events',
     'upcoming_events' => 'Upcoming events',
     'event_datetime' => 'Date/time',
@@ -81,9 +81,9 @@ return array (
     'add_event' => 'Add event',
     'add_an_event' => 'Add an event',
     'add_event_content' => 'Announce your event on The Restart Project website and to fixers near you.',
-    'field_event_name' => 'Name of event',
+    'field_event_name' => 'Venue name',
     'field_event_group' => 'Event group',
-    'field_event_desc' => 'Description',
+    'field_event_desc' => 'Event description',
     'field_event_date' => 'Date of event',
     'field_event_time' => 'Start/end time',
     'field_event_venue' => 'Venue address',
@@ -99,4 +99,14 @@ return array (
     'events-filter' => 'Events filter',
     'download-results' => 'Download Results (CSV)',
     'follow_hosting_group' => 'This event is being hosted by :group.  Would you like to follow them?',
+    'request_review_message' => '<p>This will notify volunteers who attended this event that repair data has been added and that it could benefit from additional contributions and review.</p><p>It will also let volunteers know that photos (including of visitor book feedback) may have been posted.</p><p>Do you wish to send these notifications?</p>',
+    'request_review_modal_heading' => 'Request review',
+    'send_requests' => 'Send',
+    'cancel_requests' => 'Cancel',
+    'moderation_none' => 'There are currently no events to moderate',
+    'upcoming_for_your_groups' => 'Upcoming events for your groups',
+    'see_all_upcoming' => 'See all upcoming',
+    'other_events_near_you' => 'Other events near you',
+    'no_upcoming_near_you' => 'There are no upcoming events near you - get in touch with your <a href="/group">local groups</a> to see if any are planned, or would you like to start or add a group? Have a look at our <a href=":resources_link">resources</a>.',
+
 );

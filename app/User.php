@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Events\UserDeleted;
 use App\UserGroups;
 
 use DB;
@@ -19,14 +20,16 @@ class User extends Authenticatable
 {
     use Notifiable;
     use SoftDeletes;
+
     protected $table = 'users';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'access_key', 'access_group_tag_id'
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'access_key', 'access_group_tag_id', 'calendar_hash'
     ];
 
     /**
@@ -36,6 +39,15 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password', 'remember_token',
+    ];
+
+    /**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+        'deleted' => UserDeleted::class,
     ];
 
     public function role()
@@ -94,6 +106,16 @@ class User extends Authenticatable
     public function permissions()
     {
         return $this->belongsToMany('App\User', 'users_permissions', 'user_id', 'permission_id');
+    }
+
+    public function addPreference($slug)
+    {
+        /** @var Preferences $preference */
+        $preference = Preferences::where(['slug' => $slug])->first();
+        UsersPreferences::create([
+            'user_id' => $this->getKey(),
+            'preference_id' => $preference->getKey()
+        ]);
     }
 
     //
@@ -282,6 +304,7 @@ class User extends Authenticatable
         $this->username = $this->id.'-deleted';
 
         // TODO: country, city, gender, age, also required?
+        return $this;
     }
 
     /**
@@ -392,5 +415,10 @@ class User extends Authenticatable
         }
 
         $this->username = $username;
+    }
+
+    public function isDripSubscriber()
+    {
+      return ! is_null($this->drip_subscriber_id);
     }
 }

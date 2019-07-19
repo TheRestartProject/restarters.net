@@ -13,9 +13,9 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
-        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
+        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
@@ -27,6 +27,10 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
     );
 
     public static $prefixLengthsPsr4 = array (
+        'w' => 
+        array (
+            'wouterNL\\Drip\\' => 14,
+        ),
         'p' => 
         array (
             'phpDocumentor\\Reflection\\' => 25,
@@ -63,6 +67,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
             'Symfony\\Component\\Console\\' => 26,
             'Spinen\\Discourse\\' => 17,
             'Spatie\\CalendarLinks\\' => 21,
+            'Soundasleep\\' => 12,
         ),
         'R' => 
         array (
@@ -161,6 +166,10 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
     );
 
     public static $prefixDirsPsr4 = array (
+        'wouterNL\\Drip\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/wouternl/laravel-drip/src',
+        ),
         'phpDocumentor\\Reflection\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
@@ -250,6 +259,10 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'Spatie\\CalendarLinks\\' => 
         array (
             0 => __DIR__ . '/..' . '/spatie/calendar-links/src',
+        ),
+        'Soundasleep\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/soundasleep/html2text/src',
         ),
         'Ramsey\\Uuid\\' => 
         array (
@@ -510,11 +523,15 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\DeviceBarrier' => __DIR__ . '/../..' . '/app/DeviceBarrier.php',
         'App\\DeviceList' => __DIR__ . '/../..' . '/app/DeviceList.php',
         'App\\DeviceUrl' => __DIR__ . '/../..' . '/app/DeviceUrl.php',
+        'App\\DripEvent' => __DIR__ . '/../..' . '/app/DripEvent.php',
         'App\\EventsUsers' => __DIR__ . '/../..' . '/app/EventsUsers.php',
         'App\\Events\\ApproveEvent' => __DIR__ . '/../..' . '/app/Events/ApproveEvent.php',
         'App\\Events\\ApproveGroup' => __DIR__ . '/../..' . '/app/Events/ApproveGroup.php',
         'App\\Events\\EditEvent' => __DIR__ . '/../..' . '/app/Events/EditEvent.php',
         'App\\Events\\EditGroup' => __DIR__ . '/../..' . '/app/Events/EditGroup.php',
+        'App\\Events\\EventImagesUploaded' => __DIR__ . '/../..' . '/app/Events/EventImagesUploaded.php',
+        'App\\Events\\PasswordChanged' => __DIR__ . '/../..' . '/app/Events/PasswordChanged.php',
+        'App\\Events\\UserDeleted' => __DIR__ . '/../..' . '/app/Events/UserDeleted.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Export' => __DIR__ . '/../..' . '/app/Export.php',
         'App\\Group' => __DIR__ . '/../..' . '/app/Group.php',
@@ -535,6 +552,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Http\\Controllers\\Auth\\RegisterController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/RegisterController.php',
         'App\\Http\\Controllers\\Auth\\ResetPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ResetPasswordController.php',
         'App\\Http\\Controllers\\BrandsController' => __DIR__ . '/../..' . '/app/Http/Controllers/BrandsController.php',
+        'App\\Http\\Controllers\\CalendarEventsController' => __DIR__ . '/../..' . '/app/Http/Controllers/CalendarEventsController.php',
         'App\\Http\\Controllers\\CategoryController' => __DIR__ . '/../..' . '/app/Http/Controllers/CategoryController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
@@ -545,6 +563,7 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Http\\Controllers\\GroupTagsController' => __DIR__ . '/../..' . '/app/Http/Controllers/GroupTagsController.php',
         'App\\Http\\Controllers\\HomeController' => __DIR__ . '/../..' . '/app/Http/Controllers/HomeController.php',
         'App\\Http\\Controllers\\HostController' => __DIR__ . '/../..' . '/app/Http/Controllers/HostController.php',
+        'App\\Http\\Controllers\\InformationAlertCookieController' => __DIR__ . '/../..' . '/app/Http/Controllers/InformationAlertCookieController.php',
         'App\\Http\\Controllers\\LocaleController' => __DIR__ . '/../..' . '/app/Http/Controllers/LocaleController.php',
         'App\\Http\\Controllers\\OutboundController' => __DIR__ . '/../..' . '/app/Http/Controllers/OutboundController.php',
         'App\\Http\\Controllers\\PartyController' => __DIR__ . '/../..' . '/app/Http/Controllers/PartyController.php',
@@ -568,18 +587,25 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Http\\Middleware\\checkAPIAccess' => __DIR__ . '/../..' . '/app/Http/Middleware/checkAPIAccess.php',
         'App\\Images' => __DIR__ . '/../..' . '/app/Images.php',
         'App\\Invite' => __DIR__ . '/../..' . '/app/Invite.php',
+        'App\\Listeners\\AnonymiseSoftDeletedUser' => __DIR__ . '/../..' . '/app/Listeners/AnonymiseSoftDeletedUser.php',
+        'App\\Listeners\\ChangeWikiPassword' => __DIR__ . '/../..' . '/app/Listeners/ChangeWikiPassword.php',
         'App\\Listeners\\CreateWordPressApproveEventPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressApproveEventPost.php',
         'App\\Listeners\\CreateWordPressApproveGroupPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressApproveGroupPost.php',
         'App\\Listeners\\CreateWordPressEditEventPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressEditEventPost.php',
         'App\\Listeners\\CreateWordPressEditGroupPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressEditGroupPost.php',
         'App\\Listeners\\LogInToWiki' => __DIR__ . '/../..' . '/app/Listeners/LogInToWiki.php',
         'App\\Listeners\\LogSuccessfulLogin' => __DIR__ . '/../..' . '/app/Listeners/LogSuccessfulLogin.php',
+        'App\\Listeners\\RemoveSoftDeletedUserFromAllGroups' => __DIR__ . '/../..' . '/app/Listeners/RemoveSoftDeletedUserFromAllGroups.php',
+        'App\\Listeners\\SendAdminModerateEventPhotosNotification' => __DIR__ . '/../..' . '/app/Listeners/SendAdminModerateEventPhotosNotification.php',
+        'App\\Listeners\\SendAdminUserDeletedNotification' => __DIR__ . '/../..' . '/app/Listeners/SendAdminUserDeletedNotification.php',
         'App\\Mail\\RegistrationWelcome' => __DIR__ . '/../..' . '/app/Mail/RegistrationWelcome.php',
         'App\\Notifications\\AccountCreated' => __DIR__ . '/../..' . '/app/Notifications/AccountCreated.php',
         'App\\Notifications\\AdminAbnormalDevices' => __DIR__ . '/../..' . '/app/Notifications/AdminAbnormalDevices.php',
         'App\\Notifications\\AdminModerationEvent' => __DIR__ . '/../..' . '/app/Notifications/AdminModerationEvent.php',
+        'App\\Notifications\\AdminModerationEventPhotos' => __DIR__ . '/../..' . '/app/Notifications/AdminModerationEventPhotos.php',
         'App\\Notifications\\AdminModerationGroup' => __DIR__ . '/../..' . '/app/Notifications/AdminModerationGroup.php',
         'App\\Notifications\\AdminNewUser' => __DIR__ . '/../..' . '/app/Notifications/AdminNewUser.php',
+        'App\\Notifications\\AdminUserDeleted' => __DIR__ . '/../..' . '/app/Notifications/AdminUserDeleted.php',
         'App\\Notifications\\AdminWordPressCreateEventFailure' => __DIR__ . '/../..' . '/app/Notifications/AdminWordPressCreateEventFailure.php',
         'App\\Notifications\\AdminWordPressCreateGroupFailure' => __DIR__ . '/../..' . '/app/Notifications/AdminWordPressCreateGroupFailure.php',
         'App\\Notifications\\AdminWordPressEditEventFailure' => __DIR__ . '/../..' . '/app/Notifications/AdminWordPressEditEventFailure.php',
@@ -4213,6 +4239,8 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'SebastianBergmann\\Timer\\RuntimeException' => __DIR__ . '/..' . '/phpunit/php-timer/src/RuntimeException.php',
         'SebastianBergmann\\Timer\\Timer' => __DIR__ . '/..' . '/phpunit/php-timer/src/Timer.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'Soundasleep\\Html2Text' => __DIR__ . '/..' . '/soundasleep/html2text/src/Html2Text.php',
+        'Soundasleep\\Html2TextException' => __DIR__ . '/..' . '/soundasleep/html2text/src/Html2TextException.php',
         'Spatie\\CalendarLinks\\Exceptions\\InvalidLink' => __DIR__ . '/..' . '/spatie/calendar-links/src/Exceptions/InvalidLink.php',
         'Spatie\\CalendarLinks\\Generator' => __DIR__ . '/..' . '/spatie/calendar-links/src/Generator.php',
         'Spatie\\CalendarLinks\\Generators\\Google' => __DIR__ . '/..' . '/spatie/calendar-links/src/Generators/Google.php',
@@ -4800,15 +4828,19 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'Tests\\DuskTestCase' => __DIR__ . '/../..' . '/tests/DuskTestCase.php',
         'Tests\\Feature\\CreateEventTest' => __DIR__ . '/../..' . '/tests/Feature/Events/CreateEventTest.php',
         'Tests\\Feature\\DeviceStatsTest' => __DIR__ . '/../..' . '/tests/Feature/DeviceStatsTest.php',
+        'Tests\\Feature\\EventRequestReviewEmailTest' => __DIR__ . '/../..' . '/tests/Feature/Events/EventRequestReviewEmailTest.php',
         'Tests\\Feature\\EventStatsTest' => __DIR__ . '/../..' . '/tests/Feature/EventStatsTest.php',
         'Tests\\Feature\\GroupEditTest' => __DIR__ . '/../..' . '/tests/Feature/Groups/GroupEditTest.php',
         'Tests\\Feature\\GroupStatsTest' => __DIR__ . '/../..' . '/tests/Feature/GroupStatsTest.php',
         'Tests\\Feature\\ModerateEventEmailTest' => __DIR__ . '/../..' . '/tests/Feature/Events/ModerationEventEmailTest.php',
+        'Tests\\Feature\\ModerateEventPhotosNotificationTest' => __DIR__ . '/../..' . '/tests/Feature/Events/ModerationEventPhotosNotificationTest.php',
+        'Tests\\Feature\\UserDeletedNotificationTest' => __DIR__ . '/../..' . '/tests/Feature/Admin/Users/UserDeletedNotificationTest.php',
         'Tests\\Feature\\ViewUsersTest' => __DIR__ . '/../..' . '/tests/Feature/Admin/Users/ViewUsersTest.php',
         'Tests\\Feature\\WikiLoginTests' => __DIR__ . '/../..' . '/tests/Feature/Admin/Users/WikiLoginTests.php',
         'Tests\\TestCase' => __DIR__ . '/../..' . '/tests/TestCase.php',
         'Tests\\Unit\\ExampleTest' => __DIR__ . '/../..' . '/tests/Unit/ExampleTest.php',
         'Tests\\Unit\\GroupTest' => __DIR__ . '/../..' . '/tests/Unit/GroupTest.php',
+        'Tests\\Unit\\UsernameGenerationTest' => __DIR__ . '/../..' . '/tests/Unit/UsernameGeneratorTest.php',
         'Tests\\Unit\\WikiPageRetrieverTest' => __DIR__ . '/../..' . '/tests/Unit/WikiPageRetrieverTest.php',
         'Text_Template' => __DIR__ . '/..' . '/phpunit/php-text-template/src/Template.php',
         'TheSeer\\Tokenizer\\Exception' => __DIR__ . '/..' . '/theseer/tokenizer/src/Exception.php',
@@ -4913,6 +4945,10 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'phpDocumentor\\Reflection\\Types\\String_' => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src/Types/String_.php',
         'phpDocumentor\\Reflection\\Types\\This' => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src/Types/This.php',
         'phpDocumentor\\Reflection\\Types\\Void_' => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src/Types/Void_.php',
+        'wouterNL\\Drip\\DripPhp' => __DIR__ . '/..' . '/wouternl/laravel-drip/src/DripPhp.php',
+        'wouterNL\\Drip\\DripServiceProvider' => __DIR__ . '/..' . '/wouternl/laravel-drip/src/DripServiceProvider.php',
+        'wouterNL\\Drip\\Facades\\DripFacade' => __DIR__ . '/..' . '/wouternl/laravel-drip/src/Facades/DripFacade.php',
+        'wouterNL\\Drip\\Interfaces\\DripInterface' => __DIR__ . '/..' . '/wouternl/laravel-drip/src/Interfaces/DripInterface.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

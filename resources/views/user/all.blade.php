@@ -140,7 +140,8 @@
                 <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.location') }}">Location</a></th>
                 <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.country') }}">Country</a></th>
                 <th>Groups</th>
-                <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.updated_at') }}">Last login</a></th>
+                <th width="90"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.created_at') }}">Joined</a></th>
+                <th width="90"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.updated_at') }}">Last login</a></th>
               </tr>
             </thead>
             <tbody>
@@ -162,7 +163,6 @@
 
                 @if ($display)
                   <tr>
-                      <!-- <td><?php //echo $u->id; ?></td> -->
                       <td>
 
                           @if(FixometerHelper::hasRole($user, 'Administrator'))
@@ -172,8 +172,25 @@
                           @endif
 
                       </td>
-                      <td><?php echo $u->email; ?></td>
-                      <td><?php echo $u->role; ?></td>
+                      <td>
+                        <span class="js-copy hover-pointer popover-usergroups"
+                        data-toggle="popover"
+                        data-trigger="hover"
+                        data-placement="top"
+                        data-html="true"
+                        data-original-email="{{ $u->email }}"
+                        data-copy="{{ $u->email }}"
+                        data-content="{{ $u->email }} </br> <b>Click/press to copy</b>">
+                          {{ str_limit($u->email, 15) }}
+                        </span>
+                      </td>
+                      <td>
+                        @if ($u->role == 'Administrator')
+                          Admin
+                        @else
+                          {{ $u->role }}
+                        @endif
+                      </td>
                       <td>
                         @if (!empty($u->location))
                           <?php echo $u->location; ?>
@@ -189,7 +206,14 @@
                           0
                         @endif
                       </td>
-                      <td><span title="{{ $u->lastLogin }}">{{ !is_null($u->lastLogin) ? $u->lastLogin->diffForHumans() : 'Never' }}</span></td>
+
+                      <td>
+                        <span title="{{ $u->created_at }}">{{ !is_null($u->created_at) ? $u->created_at->diffForHumans(null, true) : 'Never' }}</span>
+                      </td>
+
+                      <td>
+                        <span title="{{ $u->lastLogin }}">{{ !is_null($u->lastLogin) ? $u->lastLogin->diffForHumans(null, true) : 'Never' }}</span>
+                      </td>
                   </tr>
                 @endif
               @endforeach

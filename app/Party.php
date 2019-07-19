@@ -10,6 +10,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
+use FixometerHelper;
 
 class Party extends Model implements Auditable
 {
@@ -415,11 +416,43 @@ class Party extends Model implements Auditable
     {
         return $this->join('groups', 'groups.idgroups', '=', 'events.group')
                      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+                     ->whereNotNull('events.wordpress_post_id')
                      ->whereDate('event_date', '>=', date('Y-m-d'))
                      ->select('events.*')
                      ->groupBy('idevents')
                      ->orderBy('event_date', 'ASC');
     }
+
+    /**
+     * [scopeUpcomingEventsInUserArea description]
+     * All upcoming events (greater than today) by a User's Location
+     * @author Christopher Kelker
+     * @date   2019-05-30T10:15:36+010
+     * @param  [type]                  $query
+     * @param  [type]                  $user
+     * @return [type]
+     */
+    public function scopeUpcomingEventsInUserArea($query, $user)
+    {
+      //Look for groups where user ID exists in pivot table
+      $user_group_ids = UserGroups::where('user', $user->id)->pluck('group')->toArray();
+
+      return $this
+      ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
+      ->join('groups', 'groups.idgroups', '=', 'events.group')
+      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+      ->where( function ($query) use ($user_group_ids) {
+        $query->whereNotIn('events.group', $user_group_ids)
+        ->whereDate('event_date', '>=', date('Y-m-d'));
+      })
+      ->having('distance', '<=', 35) // kilometers (km)
+
+      ->groupBy('events.idevents')
+      ->orderBy('events.event_date', 'ASC')
+      ->orderBy('events.start', 'ASC')
+      ->orderBy('distance', 'ASC');
+    }
+
 
     public function scopeAllUpcomingEvents()
     {
@@ -439,6 +472,40 @@ class Party extends Model implements Auditable
         return $this->whereNotNull('wordpress_post_id')
                       ->whereDate('event_date', '<', date('Y-m-d'))
                         ->orderBy('event_date', 'DESC');
+    }
+
+    /**
+     * [scopeUsersPastEvents description]
+     * Get all Past Events from the User or User's groups, or any Past Events
+     * in which the User(s) has attended but is NOT a part of the
+     * group associated.
+     * @author Christopher Kelker
+     * @date   2019-05-28T09:50:22+010
+     * @param  [type]                  $query
+     * @param  [type]                  $user_ids
+     * @return [type]
+     */
+    public function scopeUsersPastEvents($query, array $user_ids = null)
+    {
+      // if no $user_ids are supplied, the use the current Auth's ID
+      if (empty($user_ids)) {
+        $user_ids[] = auth()->id();
+      }
+
+      return $query->join('groups', 'groups.idgroups', '=', 'events.group')
+      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+      ->join('events_users', 'events_users.event', '=', 'events.idevents')
+      ->whereNotNull('events.wordpress_post_id')
+      ->whereDate('events.event_date', '<', date('Y-m-d'))
+
+      ->where(function ($query) use ($user_ids) {
+          $query->whereIn('users_groups.user', $user_ids)
+          ->orWhereIn('events_users.user', $user_ids);
+      })
+
+      ->select('events.*')
+      ->groupBy('idevents')
+      ->orderBy('events.event_date', 'DESC');
     }
 
     public function allDevices()
@@ -510,6 +577,40 @@ class Party extends Model implements Auditable
         }
 
         return false;
+    }
+
+
+    /**
+     * [isStartingSoon description]
+     * If the event is not of today = false
+     * If the event is in progress = false
+     * If the event has finished = false
+     * If the event is of today, is not in progress and has not finished = true
+     * @author Christopher Kelker
+     * @date   2019-06-13T15:48:05+010
+     * @return boolean
+     */
+    public function isStartingSoon()
+    {
+      $current_date = date('Y-m-d');
+      $event_date = $this->event_date;
+
+      if ($current_date != $event_date) {
+        return false;
+      }
+
+      if ( $this->isInProgress()) {
+        return false;
+      }
+
+      $date_now = new \DateTime();
+      $event_end = new \DateTime($this->event_date.' '.$this->end);
+
+      if ( $date_now > $event_end) {
+        return false;
+      }
+
+      return true;
     }
 
     public function isInProgress()
@@ -618,9 +719,13 @@ class Party extends Model implements Auditable
         return '';
     }
 
-    public function isVolunteer()
+    /**
+     * @param int|null $user_id
+     * @return bool
+     */
+    public function isVolunteer($user_id = NULL)
     {
-        $attributes = ['user' => auth()->id()];
+        $attributes = ['user' => $user_id ?: auth()->id()];
 
         return $this->allConfirmedVolunteers()->where($attributes)->exists();
     }
@@ -663,5 +768,48 @@ class Party extends Model implements Auditable
     public function getParticipantsAttribute()
     {
         return $this->pax;
+    }
+
+    public function checkForMissingData()
+    {
+      $participants_count = $this->participants;
+      $volunteers_count = $this->allConfirmedVolunteers()->count();
+      $devices_count = $this->allDevices()->count();
+
+      return [
+        'participants_count' => $participants_count,
+        'volunteers_count' => $volunteers_count,
+        'devices_count' => $devices_count,
+      ];
+    }
+
+    public function requiresModerationByAdmin()
+    {
+      if ( ! is_null($this->wordpress_post_id) ) {
+          return false;
+      }
+
+      return true;
+    }
+
+    public function VisuallyHighlight()
+    {
+      if( $this->requiresModerationByAdmin() && FixometerHelper::hasRole(auth()->user(), 'Administrator') ) {
+        return 'cell-warning-heading';
+      } elseif ( $this->isUpcoming() || $this->isInProgress() ) {
+        if ( ! $this->isVolunteer() ) {
+          return 'cell-warning-heading';
+        } else {
+          return 'cell-primary-heading';
+        }
+      } elseif( $this->hasFinished() ) {
+        if ( $this->checkForMissingData()['participants_count'] == 0 ||
+        $this->checkForMissingData()['volunteers_count'] <= 1 ||
+        $this->checkForMissingData()['devices_count'] == 0 ) {
+          return 'cell-danger-heading';
+        }
+      } else {
+        return '';
+      }
     }
 }

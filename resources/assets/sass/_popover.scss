@@ -19,7 +19,7 @@
 .popover__table {
     border-color: $brand;
     border: 0;
-    
+
     .popover-body {
         font-size: 13px;
         background-color: $brand;
@@ -33,5 +33,33 @@
         border-bottom-color: $brand;
         border-top-color: $brand;
     }
+}
 
+.popover-calendar-feed {
+  font-family: $font-family-second;
+  min-width: 370px;
+  border: 0px;
+
+  .arrow {
+    top: calc((0.5rem) * -1);
+    color: rgba(0, 0, 0, 0.125);
+    z-index: 1;
+  }
+
+  .popover-body {
+    padding: 0px;
+  }
+
+  .card  {
+    font-size: 13px;
+    .btn {
+      min-width: 0px;
+      font-size: 0px;
+    }
+  }
+
+  p,
+  a {
+    color: #000;
+  }
 }

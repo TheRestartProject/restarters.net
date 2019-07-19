@@ -93,4 +93,13 @@ class UserGroups extends Model
     {
         return $query->where('status', 1)->orWhereNull('status');
     }
+
+    public function getFullName()
+    {
+        if ($this->volunteer) {
+            return $this->volunteer->getFullName();
+        }
+
+        return 'N/A';
+    }
 }

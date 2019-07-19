@@ -9,6 +9,7 @@ use App\Cluster;
 use App\Device;
 use App\Events\ApproveEvent;
 use App\Events\EditEvent;
+use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\FootprintRatioCalculator;
@@ -97,39 +98,62 @@ class PartyController extends Controller
             $moderate_events = null;
         }
 
-        //Use this view for showing group only upcoming and past events
+        // Use this view for showing group only upcoming and past events
         if ( ! is_null($group_id)) {
-            $upcoming_events = Party::upcomingEvents()
-            ->where('events.group', $group_id)
-            ->get();
+          $upcoming_events = Party::upcomingEvents()
+          ->where('events.group', $group_id)
+          ->get();
 
-            $past_events = Party::pastEvents()
+          $past_events = Party::pastEvents()
             ->where('events.group', $group_id)
             ->paginate(10);
 
-            $group = Group::find($group_id);
+          $group = Group::find($group_id);
+          $upcoming_events_in_area = null;
+
         } else {
-            $upcoming_events = Party::upcomingEvents()
+          $upcoming_events = Party::upcomingEvents()
             ->where('users_groups.user', Auth::user()->id)
-            ->take(10)
+            ->take(3)
             ->get();
 
-            $past_events = Party::pastEvents()
-                         ->paginate(10);
+        $past_events = Party::UsersPastEvents([auth()->id()])->paginate(10);
 
-            $group = null;
+        if ( ! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
+            $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())->take(3)->get();
+        } else {
+            $upcoming_events_in_area = null;
         }
+
+          $group = null;
+        }
+
+
 
         //Looks to see whether user has a group already, if they do, they can create events
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
 
         return view('events.index', [
+            'moderate_events' => $moderate_events,
             'upcoming_events' => $upcoming_events,
             'past_events' => $past_events,
-            'moderate_events' => $moderate_events,
+            'upcoming_events_in_area' => $upcoming_events_in_area,
             'user_groups' => $user_groups,
             'EmissionRatio' => $this->EmissionRatio,
             'group' => $group,
+        ]);
+    }
+
+    public function allPast()
+    {
+        $past_events = Party::pastEvents();
+        $past_events_count = $past_events->count();
+        $past_events = $past_events->paginate(env('PAGINATE'));
+
+        return view('events.all-past', [
+          'past_events' => $past_events,
+          'past_events_count' => $past_events_count,
+          'EmissionRatio' => $this->EmissionRatio,
         ]);
     }
 
@@ -166,21 +190,28 @@ class PartyController extends Controller
             $error = array();
 
             if ($request->has('location')) {
-                // TODO: NGM: we should inject a geocoding class for use here.
-                // (will aid with testing, and allow for swapping to a non-Google geocoder)
-                try {
-                    $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($request->input('location').',United Kingdom')."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
-                    $json = json_decode($json);
+              $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($request->input('location'))."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
+              $json = json_decode($json);
 
-                    if (is_object($json) && !empty($json->{'results'})) {
-                        $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
-                        $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
-                    }
-                } catch (\Exception $ex) {
-                    $latitude = 0;
-                    $longitude = 0;
-                    Log::error('An error occurred during geocoding: ' . $ex->getMessage());
-                }
+              if ( empty($json->results) ) {
+                $response['danger'] = 'Party could not be created. Address not found.';
+                Log::error('An error occurred during geocoding: ' . $ex->getMessage());
+                return view('events.create', [ //party.create
+                  'response' => $response,
+                  'title' => 'New Party',
+                  'grouplist' => $Groups->findList(),
+                  'gmaps' => true,
+                  'group_list' => $Groups->findAll(),
+                  'user' => Auth::user(),
+                  'user_groups' => $user_groups,
+                  'selected_group_id' => $group_id,
+                ]);
+              }
+
+              if (is_object($json) && !empty($json->{'results'})) {
+                  $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
+                  $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
+              }
             } else {
                 $latitude = null;
                 $longitude = null;
@@ -437,8 +468,31 @@ class PartyController extends Controller
             $timestamp = strtotime($data['event_date']);
 
             if ( ! empty($data['location'])) {
-                $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($data['location'].',United Kingdom').'&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE');
+                $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($data['location']).'&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE');
                 $json = json_decode($json);
+
+                if ( empty($json->results) ) {
+                  $response['danger'] = 'Party could not be saved. Address not found.';
+                  $party = $Party->findThis($id)[0];
+                  $audits = Party::findOrFail($id)->audits;
+
+                  return view('events.edit', [ //party.edit
+                      'gmaps' => true,
+                      'images' => $images,
+                      'title' => 'Edit Party',
+                      'group_list' => $Groups->findAll(),
+                      'formdata' => $party,
+                      'remotePost' => null,
+                      'grouplist' => $Groups->findList(),
+                      'user' => Auth::user(),
+                      'co2Total' => $co2Total[0]->total_footprints,
+                      'wasteTotal' => $co2Total[0]->total_weights,
+                      'device_count_status' => $device_count_status,
+                      'user_groups' => $groups_user_is_host_of,
+                      'audits' => $audits,
+                      'response' => $response,
+                  ]);
+                }
 
                 if (is_object($json) && ! empty($json->{'results'})) {
                     $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
@@ -1411,14 +1465,29 @@ class PartyController extends Controller
     public function imageUpload(Request $request, $id)
     {
         try {
-            if (isset($_FILES) && ! empty($_FILES)) {
+            if (empty($_FILES) && !empty($request->files)) {
+                // Shim to handle uploads from Tests
+                $file = $request->file('file');
+                $_FILES['file'] = [
+                    'name' => $file->getClientOriginalName(),
+                    'type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                    'tmp_name' => $file->getRealPath(),
+                    'error' => $file->getError(),
+                ];
+            }
+
+            if (!empty($_FILES)) {
                 $file = new FixometerFile;
                 $file->upload('file', 'image', $id, env('TBL_EVENTS'), true, false, true);
+
+                event(new EventImagesUploaded(Party::find($id), auth()->id()));
             }
 
             return 'success - image uploaded';
         } catch (\Exception $e) {
-            return 'fail - image could not be uploaded';
+            Log::info('An exception occurred when uploading image: ' . $e->getMessage());
+            return Response::json('An error occurred', 400);
         }
     }
 

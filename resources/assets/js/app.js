@@ -14,7 +14,7 @@ require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
 require('./misc/device');
-require('leaflet')
+require('leaflet');
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
 
@@ -390,7 +390,6 @@ function initAutocomplete() {
   }
 
   function eventsMap() {
-
     if ( jQuery('#event-map').length > 0 ) {
 
       const mapObject = document.querySelector('#event-map');
@@ -410,7 +409,6 @@ function initAutocomplete() {
           icon.options.shadowSize = [0,0];
           L.marker([latitude, longitude], {icon:icon}).addTo(map);
       }
-
     }
   }
 
@@ -635,52 +633,25 @@ function initAutocomplete() {
         } else {
 
           var instanceDropzone = new Dropzone('#dropzoneEl-' + $(this).data('deviceid'), {
-            // autoProcessQueue: false,
             paramName: "file", // The name that will be used to transfer the file
-            // maxFilesize: 2,
+            maxFilesize: 2,
             dictDefaultMessage: '',
             parallelUploads: 100,
             uploadMultiple: true,
             createImageThumbnails: true,
-            thumbnailWidth: 60,
-            thumbnailHeight: 60,
-            thumbnailMethod: "contain",
+            thumbnailWidth: 120,
+            thumbnailHeight: 120,
             addRemoveLinks: true,
             previewsContainer: ".uploads-" + $(this).data('deviceid'),
             init: function () {
-
-              //jQuery(".dropzone .dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
-              $dropzone.find(".dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
-              //
-              //     var myDropzone = this;
-              //
-              //     // First change the button to actually tell Dropzone to process the queue.
-              //     this.element.querySelector("input[type=submit]").addEventListener("click", function(e) {
-              //       // Make sure that the form isn't actually being sent.
-              //       e.preventDefault();
-              //       e.stopPropagation();
-              //       myDropzone.processQueue();
-              //     });
-              //
-              //     // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead
-              //     // of the sending event because uploadMultiple is set to true.
-              //     this.on("sendingmultiple", function() {
-              //       // Gets triggered when the form is actually being sent.
-              //       // Hide the success button or the complete form.
-              //     });
-              //     this.on("successmultiple", function(files, response) {
-              //       // Gets triggered when the files have successfully been sent.
-              //       // Redirect user or notify of success.
-              //
-              //     });
-              //     this.on("errormultiple", function(files, response) {
-              //       // Gets triggered when there was an error sending the files.
-              //       // Maybe show form again, and notify user of error
-              //     });
-              //
+                this.on("success", function(file) { alert("Image added!"); });
+                this.on("error", function(file, errorMessage) {
+                    this.removeFile(file);
+                    alert("Error: " + errorMessage);
+                });
+                $dropzone.find(".dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
             }
           });
-          // console.log($('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone);
         }
       });
 
@@ -787,6 +758,11 @@ function initAutocomplete() {
       jQuery('.select2-repair-barrier').select2(repair_barrier_options);
       jQuery('.select2-tags').select2(tag_options);
       jQuery(".select2-with-input").select2(tag_options_with_input);
+      jQuery(".select2-with-input-group").select2({
+        width: 'auto',
+    		dropdownAutoWidth: true,
+    		allowClear: true,
+      });
 
     } else {
 
@@ -794,6 +770,11 @@ function initAutocomplete() {
       $target.find('.select2-repair-barrier').select2(repair_barrier_options);
       $target.find('.select2-tags').select2(tag_options);
       $target.find(".select2-with-input").select2(tag_options_with_input);
+      $target.find(".select2-with-input-group").select2({
+        width: 'auto',
+    		dropdownAutoWidth: true,
+    		allowClear: true,
+      });
 
     }
 
@@ -976,6 +957,11 @@ function initAutocomplete() {
       analytics: ['_ga','_gat', '_gid'], //Cookies in the analytics category.
       marketing: [] //Cookies in the marketing category.
     });
+
+      let hash = document.location.hash;
+      if (hash) {
+          $('a[href=\"'+hash).tab('show');
+      }
   });
 
   $('#register-form-submit').on('click', function(e) {
@@ -1047,25 +1033,81 @@ function initAutocomplete() {
   });
 
   $( document ).ready(function() {
+
+    $(function () {
+      $('.btn-calendar-feed').popover({
+        html: true,
+        title: '',
+        trigger: 'click',
+        placement: 'bottom',
+        sanitize: false,
+        delay: { "show": 0, "hide": 0 },
+        template: '<div class="popover popover-calendar-feed" role="tooltip"><div class="arrow"></div><div class="popover-body"></div></div>',
+        content: $('#calendar-feed').html()
+      });
+    });
+
+    // Dismissable Alert copy link action
+    $('.btn-action').on('click', function () {
+      $copy_link = $(this).attr('data-copy-link');
+      copyLink($copy_link);
+    });
+
+    // Copy Calendar Feed link
+    $('#btn-copy').on('click', function () {
+      $link = $(this).parents('div').parents('div').find('input[type=text]');
+      copyLink($link.val());
+    });
+
+    // User Profile Settings - Calendar copy links
+    $('.btn-copy-input-text').on('click', function () {
+      $link = $(this).parent('div').parent('div').find('input[type=text]');
+      copyLink($link.val());
+    });
+
+    function copyLink($copy_link) {
+      var $temp = $("<input>");
+      $("body").append($temp);
+      $temp.val($copy_link).select();
+
+      document.execCommand("copy");
+      $temp.remove();
+
+      alert("Copied the link: " + $copy_link);
+    }
+
+
+    $('.information-alert').on('closed.bs.alert', function () {
+      $dismissable_id = $(this).attr('id');
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: '/set-cookie',
+        datatype: 'json',
+        data: {
+          'dismissable_id': $dismissable_id,
+        },
+        success: function(data) {
+          console.log(true);
+        }
+      });
+    });
+
     $('.tokenfield').tokenfield();
 
     $current_column = $('input[name=sort_column]:checked').val();
 
     $('input[name=sort_column]').on('click', function(e) {
-
         $form = $('#device-search');
         $sort_direction = $form.find('input[name=sort_direction]');
-        // if( $current_column === $(this).val() ) {
             if( $sort_direction.val() === 'DSC' ){
                 $sort_direction.val('ASC');
             } else {
                 $sort_direction.val('DSC');
             }
-
-        // }
-
         $form.submit();
-
     });
 
     $('.filter-columns').on('click', function(e) {
@@ -1159,7 +1201,57 @@ function initAutocomplete() {
 
     });
 
+    // Copy to clipboard
+    // Grab any text in the attribute 'data-copy' and pass it to the
+    // copy function
+    // ---------------------------------------------------------------------
+    $('.js-copy').click(function() {
+      var text = $(this).attr('data-copy');
+      var el = $(this);
+      copyToClipboard(text, el);
+    });
+
   });
+
+  // COPY TO CLIPBOARD
+  // Attempts to use .execCommand('copy') on a created text field
+  // Copy command
+  // boolen if successful then show message
+  // After show append original email again
+  // Fallback if browser doesn't support .execCommand('copy')
+  // ---------------------------------------------------------------------
+  function copyToClipboard(content_to_copy, element) {
+
+    var copyTest = document.queryCommandSupported('copy');
+
+    if (copyTest === true) {
+
+      // Create Textarea and Copy Content
+      var copyTextArea = document.createElement("textarea");
+      copyTextArea.value = content_to_copy;
+      document.body.appendChild(copyTextArea);
+      copyTextArea.select();
+
+      $original_popover_text = element.attr('data-content');
+
+      try {
+        var successful = document.execCommand('copy');
+        var message = successful ? 'Copied!' : 'Whoops, not copied!';
+        $set_success_message_in_popover = element.attr('data-content', message);
+        $show_popover = element.popover('show');
+
+      } catch (err) {
+        console.log('Oops, unable to copy');
+      }
+
+      document.body.removeChild(copyTextArea);
+      $set_original_popover_message = element.attr('data-content', $original_popover_text);
+
+    } else {
+      // Fallback if browser doesn't support .execCommand('copy')
+      window.prompt("Copy to clipboard: Ctrl+C or Command+C, Enter", content_to_copy);
+    }
+  }
 
 
   function tokenFieldCheck(){
@@ -1192,6 +1284,13 @@ function initAutocomplete() {
 
   $( document ).ready(function() {
 
+    $("textarea#message_to_restarters[name=message_to_restarters]").on("keydown", function(event){
+      if (event.which == 13) {
+        event.preventDefault();
+        this.value = this.value + "\n";
+      }
+    });
+    
     $('#participants_qty').on('change', function() {
       updateParticipants();
     });
@@ -1278,6 +1377,8 @@ function initAutocomplete() {
             }, 1000);
 
             loadDropzones();
+            $(".select2-with-input").select2("destroy"); //TODO
+            $(".select2-with-input").select2(tag_options_with_input); //TODO
 
           } else if( json ) {
 
@@ -1545,5 +1646,30 @@ function initAutocomplete() {
       $('#shareable-modal').modal('toggle');
     });
 
+    $('.select2-with-input-group').on("select2:select", function(e) {
+      $input_field = $(this).parents('.input-group-select2').find('input[type=text]');
 
+      $current_url = $input_field.val();
+
+      $remove_current_area = $current_url.lastIndexOf('/') + 1;
+      $creating_new_url =  $current_url.substring( 0, $remove_current_area );
+      $new_url = $creating_new_url.concat( $(this).val() );
+
+      $input_field.val($new_url);
+    });
+
+  });
+
+  // Copy Calendar Feed link
+  $(document).on("click", "#btn-copy", function () {
+    $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
+
+    var $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val($copy_link).select();
+
+    document.execCommand("copy");
+    $temp.remove();
+
+    alert("Copied the link: " + $copy_link);
   });

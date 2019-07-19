@@ -55,7 +55,13 @@
             text-align:center;
             padding: 0;
             padding-left: 0 !important;
-            width: 42px;
+            min-width: 55px;
+            min-height: 55px;
+            border-left: 10px;
+
+            a {
+                display: inline-block;
+            }
         }
     }
 
@@ -342,6 +348,10 @@
         width: 165px;
     }
 
+}
+
+.table-layout-fixed {
+  table-layout: fixed;
 }
 
 .row-button {

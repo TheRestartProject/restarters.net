@@ -98,7 +98,7 @@ class JoinEvent extends Notification implements ShouldQueue
                 if ( ! is_null($this->arr['message'])) {
                     $mail->line($this->arr['name'].' attached this message with the invite:')
                          ->line('')
-                         ->line('"'.$this->arr['message'].'"')
+                         ->line('"'.nl2br($this->arr['message']).'"')
                          ->line('');
                 }
                 $mail->action('RSVP now', $this->arr['url'])
@@ -121,7 +121,7 @@ class JoinEvent extends Notification implements ShouldQueue
                 $mail->line('')
                      ->line($this->arr['name'].' attached this message with the invite:')
                      ->line('')
-                     ->line('"'.$this->arr['message'].'"');
+                     ->line('"'.nl2br($this->arr['message']).'"');
             }
 
             $mail->action('RSVP now', $this->arr['url'])
