@@ -19,7 +19,7 @@ class CalendarEventsController extends Controller
 
     public function __construct()
     {
-      $this->ical_format = 'Ymd\THis\Z';
+      $this->ical_format = 'Ymd\THis';
     }
 
     public function allEventsByUser(Request $request, $calendar_hash)
