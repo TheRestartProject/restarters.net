@@ -128,11 +128,15 @@ class CalendarEventsController extends Controller
       foreach ($events as $event) {
           if ( ! is_null($event->event_date) && $event->event_date != '0000-00-00') {
               $icalObject[] =  "BEGIN:VEVENT";
+
+              // Timezone currently fixed to Europe/London, but in future when we 
+              // have better timezone support in the app this will need amending.
+              $icalObject[] =  "TZID:Europe/London";
               $icalObject[] =  "UID:{$event->idevents}";
               $icalObject[] =  "DTSTAMP:".date($this->ical_format)."";
               $icalObject[] =  "SUMMARY:{$event->venue} ({$event->name})";
-              $icalObject[] =  "DTSTART:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."";
-              $icalObject[] =  "DTEND:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."";
+              $icalObject[] =  "DTSTART;TZID=Europe/London:".date($this->ical_format, strtotime($event->event_date.' '.$event->start))."";
+              $icalObject[] =  "DTEND;TZID=Europe/London:".date($this->ical_format, strtotime($event->event_date.' '.$event->end))."";
               //$description = \Soundasleep\Html2Text::convert($event->free_text, $html2text_options);
               //$icalObject[] =  "DESCRIPTION:".Str::limit($this->ical_split("DESCRIPTION:",$description), 60);
               $icalObject[] =  "DESCRIPTION:".url("/party/view")."/".$event->idevents;
