@@ -12,7 +12,7 @@
         </div>
       </div>
       <div class="cleafix">
-       <a href="https://talk.restarters.net/t/ical-calendar-feeds/170" class="float-left" target="_blank">@lang('calendars.find_out_more')</a>
+          <a href="https://talk.restarters.net/t/fixometer-how-to-add-repair-events-to-your-calendar-application/1770" class="float-left" target="_blank">@lang('calendars.find_out_more')</a>
         <a href="{{ $user_edit_link }}#list-calendar-links" class="float-right">@lang('calendars.see_all_calendars')</a>
       </div>
     </div>
