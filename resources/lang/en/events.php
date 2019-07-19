@@ -103,4 +103,10 @@ return array (
     'request_review_modal_heading' => 'Request review',
     'send_requests' => 'Send',
     'cancel_requests' => 'Cancel',
+    'moderation_none' => 'There are currently no events to moderate',
+    'upcoming_for_your_groups' => 'Upcoming events for your groups',
+    'see_all_upcoming' => 'See all upcoming',
+    'other_events_near_you' => 'Other events near you',
+    'no_upcoming_near_you' => 'There are no upcoming events near you - get in touch with your <a href="/group">local groups</a> to see if any are planned, or would you like to start or add a group? Have a look at our <a href=":resources_link">resources</a>.',
+
 );
