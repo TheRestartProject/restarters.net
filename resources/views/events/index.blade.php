@@ -71,7 +71,7 @@
                       @endforeach
                     @else
                       <tr>
-                        <td colspan="13" align="center" class="p-3">There are currently no events to moderate</td>
+                        <td colspan="13" align="center" class="p-3">@lang('events.moderation_none')</td>
                       </tr>
                     @endif
                 </tbody>
@@ -87,7 +87,7 @@
             @if( !is_null($group) )
               <h2>Upcoming {{{ $group->name }}} events</h2>
             @else
-              <h2>Upcoming events for your groups
+              <h2>@lang('events.upcoming_for_your_groups')
                   @if ( Auth::check() )
                       @php( $user = auth()->user() )
                       @php( $copy_link = url("/calendar/user/{$user->calendar_hash}") )
@@ -95,12 +95,12 @@
                       @include('partials.calendar-feed-button', [
                                      'copy_link' => $copy_link,
                                      'user_edit_link' => $user_edit_link,
-                                     'modal_title' => 'Access all events in your personal calendar',
-                                     'modal_text' => 'Add all your upcoming events to your google/Outlook/Yahoo/Apple calendar with the link below.',
+                                     'modal_title' => __('calendars.events_modal_title'),
+                                     'modal_text' => __('calendars.events_modal_text'),
                                      ])
                   @endif
                   @if ( FixometerHelper::hasRole(Auth::user(), 'Administrator') && is_null($group) )
-                      <sup>(<a href="{{{ route('all-upcoming-events') }}}">See all upcoming)</a></sup></h2>
+                      <sup>(<a href="{{{ route('all-upcoming-events') }}}">@lang('events.see_all_upcoming'))</a></sup></h2>
                   @endif
             @endif
 
@@ -115,7 +115,7 @@
                     @include('partials.tables.row-events', ['show_invites_count' => true, 'EmissionRatio' => $EmissionRatio])
                   @endforeach
                 @else
-                  <h2>Upcoming events for your groups</h2>
+                  <h2>@lang('events.upcoming_for_your_groups')</h2>
                 @endif
               </tbody>
             </table>
@@ -127,7 +127,7 @@
         @if( is_null($group) )
         <section class="table-section upcoming_events_in_area" id="events-3">
             <header>
-                <h2>Other events near you</h2>
+                <h2>@lang('events.other_events_near_you')</h2>
             </header>
             <div class="table-responsive">
                 <table class="table table-events table-striped" role="table">
@@ -143,7 +143,7 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="13" align="center" class="p-3">There are no upcoming events near you - get in touch with your <a href="/group">local groups</a> to see if any are planned, or would you like to start or add a group? Have a look at our <a href="{{ env('DISCOURSE_URL' )}}/session/sso?return_path={{ env('DISCOURSE_URL') }}/t/2-how-to-run-a-repair-event/28" target="_blank" rel="noopener noreferrer">resources</a>.</td>
+                                <td colspan="13" align="center" class="p-3">@lang('events.no_upcoming_near_you', ['resources_link' => env('DISCOURSE_URL' ).'/session/sso?return_path='.env('DISCOURSE_URL').'/t/how-to-power-up-community-repair-with-restarters-net/1228/'])</td>
                             </tr>
                         @endif
                     </tbody>

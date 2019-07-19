@@ -12,13 +12,13 @@
         </div>
       </div>
       <div class="cleafix">
-        <a href="https://talk.restarters.net/t/ical-calendar-feeds/170" class="float-left" target="_blank">Find out more</a>
-        <a href="{{ $user_edit_link }}#list-calendar-links" class="float-right">See all my calendars</a>
+       <a href="https://talk.restarters.net/t/ical-calendar-feeds/170" class="float-left" target="_blank">@lang('calendars.find_out_more')</a>
+        <a href="{{ $user_edit_link }}#list-calendar-links" class="float-right">@lang('calendars.see_all_calendars')</a>
       </div>
     </div>
   </div>
 </div>
 
 <button type="button" class="btn btn-normal-padding btn-sm btn-primary mx-2 btn-calendar-feed">
-  @include('partials.svg-icons.calendar-icon') <span class="span-vertically-align-middle">Add to calendar</span>
+  @include('partials.svg-icons.calendar-icon') <span class="span-vertically-align-middle">@lang('calendars.add_to_calendar')</span>
 </button>
