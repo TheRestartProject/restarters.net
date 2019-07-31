@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Party;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -11,6 +12,11 @@ class AdminModerationEventPhotos extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    /**
+     * @var Party
+     */
+    protected $party;
+
     protected $arr;
 
     /**
@@ -18,8 +24,9 @@ class AdminModerationEventPhotos extends Notification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($arr)
+    public function __construct($party, $arr)
     {
+        $this->party = $party;
         $this->arr = $arr;
     }
 
@@ -49,10 +56,24 @@ class AdminModerationEventPhotos extends Notification implements ShouldQueue
         return (new MailMessage)
                       ->subject('New event photos uploaded to event: '.$this->arr['event_venue'])
                       ->greeting('Hello!')
-                      ->line('Photos have been uploaded to an event: \''.$this->arr['event_venue'].'\'.')
+                      ->line('Photos have been uploaded to an event, <b>'.$this->arr['event_venue'].'</b>, held by <b>'
+                          . $this->party->group_name . '</b> on ' . $this->party->getEventDateVerbose() . ' at ' . $this->party->getEventStartEnd())
                       ->action('View event', $this->arr['event_url'])
+                      ->line($this->listImageThumbnails() . '<br /><br />')
                       ->line('These photos might need your moderation, if they haven\'t yet been moderated by another administrator.')
                       ->line('If you would like to stop receiving these notifications, please edit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+    }
+
+    protected function listImageThumbnails()
+    {
+        $images = [end($this->party->images)]; // Trying to make it easy to list multiple images later if we want to
+        $html = '';
+
+        foreach ($images as $image) {
+            $html .= '<a href="' . $this->arr['event_url'] . '#event-photo-' . $image->idimages . '"><img src="' . url('/uploads/thumbnail_' . $image->path) . '" width="100"></a>';
+        }
+
+        return $html;
     }
 
     /**

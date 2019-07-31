@@ -154,7 +154,7 @@
 
                   <div class="col-4 d-flex flex-column"><strong>Date/time: </strong></div>
                   <div class="col-8 d-flex flex-column">
-                      {{ date('D jS M Y', $formdata->event_date) }}<br>
+                      {{ $event->getEventDateVerbose() }}<br>
                       {{ $event->getEventStartEnd() }}
                       @if( $event->isUpcoming() && ! empty($calendar_links) )
                           <div class="dropdown dropdown-calendar">
@@ -255,7 +255,7 @@
               <ul class="photo-list">
                 @foreach($images as $image)
                 <li>
-                  <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
+                  <a href="/uploads/{{ $image->path }}" data-toggle="lightbox" id="event-photo-{{ $image->idimages }}">
                     <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder" width="100">
                   </a>
                 </li>
