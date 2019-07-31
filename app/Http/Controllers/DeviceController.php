@@ -185,6 +185,10 @@ class DeviceController extends Controller
             $all_devices = $all_devices->whereIn('groups.idgroups', $request->input('groups'));
         }
 
+        if ($request->input('wiki')) {
+            $all_devices = $all_devices->where('devices.wiki', true);
+        }
+
         $date_from = $request->get('from-date');
         $date_to = $request->get('to-date');
 
@@ -246,6 +250,7 @@ class DeviceController extends Controller
             'model' => $request->input('model'),
             'problem' => $request->input('problem'),
             'status' => $request->input('status'),
+            'wiki' => $request->input('wiki'),
             'sort_direction' => $sort_direction,
             'sort_column' => $sort_column,
         ]);
