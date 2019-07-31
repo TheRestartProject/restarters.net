@@ -7,6 +7,7 @@ use App\EventUsers;
 use App\Helpers\FootprintRatioCalculator;
 
 use DB;
+use FixometerFile;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -538,9 +539,19 @@ class Party extends Model implements Auditable
         return $this->hasOne('App\Group', 'idgroups', 'group');
     }
 
+    public function getGroupNameAttribute()
+    {
+        return $this->theGroup->name;
+    }
+
     public function getEventDate($format = 'd/m/Y')
     {
         return date($format, strtotime($this->event_date));
+    }
+
+    public function getEventDateVerbose()
+    {
+        return $this->getEventDate('D jS M Y');
     }
 
     public function getEventStart()
@@ -811,5 +822,10 @@ class Party extends Model implements Auditable
       } else {
         return '';
       }
+    }
+
+    public function getImagesAttribute()
+    {
+        return (new FixometerFile)->findImages(env('TBL_EVENTS'), $this->idevents);
     }
 }

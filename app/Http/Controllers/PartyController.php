@@ -35,6 +35,7 @@ use FixometerFile;
 use FixometerHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 use Notification;
 use Spatie\CalendarLinks\Link;
 
@@ -660,7 +661,7 @@ class PartyController extends Controller
         }
 
         //Event details
-        $images = $File->findImages(env('TBL_EVENTS'), $id);
+        $images = $event->images;
         $party = $Party->findThis($id, true)[0];
         $hosts = EventsUsers::where('event', $id)->where('role', 3)->where('status', 1)->get();
 

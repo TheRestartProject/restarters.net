@@ -933,6 +933,13 @@ function initAutocomplete() {
       jQuery('#list-account-list').tab('show');
     }
 
+    $('[data-toggle="lightbox"]').each(function() {
+      var id = $(this).attr('id');
+
+      if (id && window.location.hash === '#' + id) {
+        $(this).click();
+      }
+    });
 
     // jQuery('#collapseFilter').on('show.bs.collapse', function () {
     //   jQuery('html').addClass('overflow-hidden');
