@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-Devices
+Repairs
 @endsection
 
 @section('content')
@@ -33,7 +33,7 @@ Devices
                                 <div class="form-group col mobile-search-bar-md my-0">
 
                             <button class="btn btn-secondary btn-groups my-1" type="submit" disabled>
-                                Number of repairs: {{ $list->total() }}
+                                @lang('devices.number_of_repairs'): {{ $list->total() }}
                             </button>
 
                                     <button type="button" class="d-lg-none mobile-search-bar-md__close" data-toggle="collapse"
@@ -130,7 +130,7 @@ Devices
 
                                 <fieldset class="side-collapse">
 
-                                    @if( !empty($status) || !empty($problem) )
+                                    @if( !empty($status) || !empty($problem) || !empty($wiki) )
 
                                         @php( $active_filter = true )
 
@@ -169,6 +169,12 @@ Devices
                                             <label for="problem">@lang('devices.search_comments'):</label>
                                             <input type="text" class="form-control field" id="problem" name="problem"
                                                 placeholder="e.g. screen..." value="{{ $problem }}">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="suitable-for-wiki">@lang('devices.suitable'):</label>
+                                            <input type="checkbox" id="suitable-for-wiki" name="wiki" value="1" {{ $wiki ? 'checked' : '' }} />
+                                            <small class="form-text text-muted">@lang('devices.suitable_help')</small>
                                         </div>
                                     </div><!-- collapse-side-2-->
 
