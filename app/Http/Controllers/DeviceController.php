@@ -152,6 +152,7 @@ class DeviceController extends Controller
             'brand' => null,
             'model' => null,
             'problem' => null,
+            'wiki' => null,
             'status' => null,
             'sort_direction' => 'DSC',
             'sort_column' => 'event_date',
