@@ -406,10 +406,13 @@ class Group extends Model implements Auditable
 
     public function getNextUpcomingEvent()
     {
-      $event = $this->parties()->whereDate('event_date', '>=', date('Y-m-d'));
+      $event = $this->parties()
+             ->whereNotNull('wordpress_post_id')
+             ->whereDate('event_date', '>=', date('Y-m-d'))
+             ->orderBy('event_date', 'asc');
 
       if ( ! $event->count() ) {
-        return null;
+          return null;
       }
 
       return $event->first();
