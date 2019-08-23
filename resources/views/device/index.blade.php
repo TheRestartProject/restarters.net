@@ -130,7 +130,7 @@ Devices
 
                                 <fieldset class="side-collapse">
 
-                                    @if( !empty($status) || !empty($problem) )
+                                    @if( !empty($status) || !empty($problem) || !empty($wiki) )
 
                                         @php( $active_filter = true )
 
@@ -169,6 +169,11 @@ Devices
                                             <label for="problem">@lang('devices.search_comments'):</label>
                                             <input type="text" class="form-control field" id="problem" name="problem"
                                                 placeholder="e.g. screen..." value="{{ $problem }}">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="suitable-for-wiki">@lang('devices.suitable'):</label>
+                                            <input type="checkbox" id="suitable-for-wiki" name="wiki" value="1" {{ $wiki ? 'checked' : '' }} />
                                         </div>
                                     </div><!-- collapse-side-2-->
 
