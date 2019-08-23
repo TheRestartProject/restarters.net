@@ -198,10 +198,6 @@
                               <textarea class="form-control rte" name="problem" id="problem"><?php echo $formdata->problem; ?></textarea>
                           </div>
 
-                          @include('partials.useful-repair-urls', ['urls' => $formdata->urls, 'device' => $formdata])
-
-                          <h6>@lang('devices.suitable')</h6>
-
                           <div class="form-check d-flex align-items-center justify-content-start">
                               @if ($formdata->wiki == 1)
                                 <input class="form-check-input" type="checkbox" name="wiki" id="opt" value="1" checked>
@@ -210,6 +206,8 @@
                               @endif
                               <label class="form-check-label" for="opt">@lang('devices.admin_device')</label>
                           </div>
+
+                          @include('partials.useful-repair-urls', ['urls' => $formdata->urls, 'device' => $formdata])
 
                           <div class="button-group row">
                               <div class="col-lg-12 d-flex align-items-center justify-content-end">
