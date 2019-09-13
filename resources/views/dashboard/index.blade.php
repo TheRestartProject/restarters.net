@@ -15,6 +15,37 @@
           </div>
       </div>
   </div>
+
+  {{-- temporary banner for user survey --}}
+  <div class="row row-compressed">
+      <div class="col">
+          @if ( is_null(Cookie::get("information-alert-dismissed-usersurvey")) && Auth::check() )
+
+              <div class="alert alert-secondary information-alert alert-dismissible fade show " role="alert" id="usersurvey">
+                <div class="d-sm-flex flex-row justify-content-between align-items-center">
+                  <div class="action-text-left float-left d-flex flex-row">
+                      <span class="icon my-auto d-none">@include('partials.svg-icons.calendar-icon-lg')</span>
+                      <p class="action-text mb-0">
+                          <span class='badge badge-success'>NEW!</span> <strong class='mb-2'>We're improving Restarters.net!</strong> <br>Take our <a target="_blank" style="text-decoration:underline;color:black" href="https://therestartproject.typeform.com/to/MGfPFw">short survey</a> to give us your thoughts on how we can make it better.
+                      </p>
+                  </div>
+
+                  <div class="float-right mt-3 mt-0-sm">
+                      @php( $user = Auth::user() )
+                      <a href='https://therestartproject.typeform.com/to/MGfPFw' target="_blank" class='btn btn-md btn-primary btn-block' title=''>Take Survey</a>
+                      <button type="button" class="close set-dismissed-cookie float-none ml-2" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                </div>
+              </div>
+
+          @endif
+
+      </div>
+  </div>
+  {{-- end temporary banner for user survey --}}
+
   <div class="row row-compressed">
       @if ($show_getting_started)
           @include('dashboard.blocks.getting-started')
