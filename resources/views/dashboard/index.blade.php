@@ -30,7 +30,7 @@
                       </p>
                   </div>
 
-                  <div class="float-right mt-3 mt-0-sm">
+                  <div class="float-right mt-3 mt-sm-0">
                       @php( $user = Auth::user() )
                       <a href='https://therestartproject.typeform.com/to/MGfPFw' target="_blank" class='btn btn-md btn-primary btn-block' title=''>Take Survey</a>
                       <button type="button" class="close set-dismissed-cookie float-none ml-2" data-dismiss="alert" aria-label="Close">
