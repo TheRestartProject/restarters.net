@@ -76,7 +76,7 @@ class ExportController extends Controller
 
             fputcsv($file, $columns);
 
-            foreach ($all_devices->data as $device) {
+            foreach ($all_devices as $device) {
                 fputcsv($file, [
                     $device->deviceCategory->name,
                     $device->brand,
