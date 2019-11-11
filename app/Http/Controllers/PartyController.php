@@ -1641,7 +1641,7 @@ class PartyController extends Controller
      */
      public function getEventsByKey(Request $request, $api_key, $date_from = null, $date_to = null)
      {
-         $user = User::where('access_key', $api_key)->first();
+         $user = User::where('api_key', $api_key)->first();
 
          $parties = Party::join('groups', 'groups.idgroups', '=', 'events.group')
          ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
@@ -1654,7 +1654,7 @@ class PartyController extends Controller
          }
 
          $parties = $parties->where([
-             ['users.access_key', $user->access_key],
+             ['users.api_key', $user->api_key],
              ['users.access_group_tag_id', $user->access_group_tag_id]
          ])
          ->select('events.*')

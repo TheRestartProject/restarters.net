@@ -1461,7 +1461,7 @@ class GroupController extends Controller
     public function getGroupsByKey(Request $request, $api_key)
     {
         // Find User by Access Key
-        $user = User::where('access_key', $api_key)->first();
+        $user = User::where('api_key', $api_key)->first();
 
         // Get Emission Ratio
         $footprintRatioCalculator = new FootprintRatioCalculator();
@@ -1564,7 +1564,7 @@ class GroupController extends Controller
     public function getGroupByKeyAndId(Request $request, $api_key, Group $group, $date_from = null, $date_to = null)
     {
         // Get Group from Access Key and Group ID
-        $group_tags_group = User::where('access_key', $api_key)->first()
+        $group_tags_group = User::where('api_key', $api_key)->first()
         ->groupTag->groupTagGroups->where('group', $group->idgroups)->first();
 
         // If Group is not found, through 404 error
