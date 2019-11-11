@@ -113,4 +113,15 @@ class ApiController extends Controller
                ->get();
         return response()->json($users);
     }
+
+    public static function getGroupList()
+    {
+        $groups = Group::orderBy('created_at', 'desc');
+
+        $groups = $groups->get();
+        foreach ($groups as $group) {
+            mb_convert_encoding($group, 'UTF-8', 'UTF-8');
+        }
+        return response()->json($groups);
+    }
 }

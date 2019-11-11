@@ -59,4 +59,6 @@ Route::group(['middleware' => 'checkAPIAccess'], function () {
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/users/me', 'ApiController@getUserInfo');
     Route::get('/users', 'ApiController@getUserList');
+
+    Route::get('/groups', 'ApiController@getGroupList');
 });
