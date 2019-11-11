@@ -55,3 +55,8 @@ Route::group(['middleware' => 'checkAPIAccess'], function () {
     Route::get('/{api_key}/event/{party}/', 'PartyController@getEventByKeyAndId');
     Route::get('/{api_key}/events/group-tag/{date_from?}/{date_to?}', 'PartyController@getEventsByKey');
 });
+
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::get('/users/me', 'ApiController@getUserInfo');
+    Route::get('/users', 'ApiController@getUserList');
+});
