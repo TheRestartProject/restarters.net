@@ -136,7 +136,10 @@ class ApiController extends Controller
                 // Zapier makes use of this unique hash for deduplication.
                 // Unfortunately it is just called 'id' - so also keep a reference to
                 // the actual group id.
-                $group->id = md5($group->idgroups . $group->updated_at);
+                if ($audit->event == 'created')
+                    $group->id = md5($group->idgroups . $group->created_at);
+                else 
+                    $group->id = md5($group->idgroups . $group->updated_at);
                 $group->group_id = $group->idgroups;
                 $group->change_type = $audit->event;
                 $groupChanges[] = $group;
