@@ -133,7 +133,11 @@ class ApiController extends Controller
         foreach ($groupAudits as $audit) {
             $group = Group::find($audit->auditable_id);
             if (! is_null($group) ) {
-                $group->zapier_hash = md5($group->idgroups . $group->updated_at);
+                // Zapier makes use of this unique hash for deduplication.
+                // Unfortunately it is just called 'id' - so also keep a reference to
+                // the actual group id.
+                $group->id = md5($group->idgroups . $group->updated_at);
+                $group->group_id = $group->idgroups;
                 $group->change_type = $audit->event;
                 $groupChanges[] = $group;
             }
