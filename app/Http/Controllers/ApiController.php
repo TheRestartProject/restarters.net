@@ -124,4 +124,21 @@ class ApiController extends Controller
         }
         return response()->json($groups);
     }
+
+    public static function getGroupChanges()
+    {
+        $groupAudits = \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\Group')->orderBy('updated_at', 'desc')->get();
+
+        $groupChanges = [];
+        foreach ($groupAudits as $audit) {
+            $group = Group::find($audit->auditable_id);
+            if (! is_null($group) ) {
+                $group->zapier_hash = md5($group->idgroups . $group->updated_at);
+                $group->change_type = $audit->event;
+                $groupChanges[] = $group;
+            }
+        }
+
+        return response()->json($groupChanges);
+    }
 }
