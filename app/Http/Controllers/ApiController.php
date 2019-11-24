@@ -127,7 +127,7 @@ class ApiController extends Controller
 
     public static function getGroupChanges()
     {
-        $groupAudits = \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\Group')->orderBy('updated_at', 'desc')->get();
+        $groupAudits = \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\Group')->groupBy('created_at')->orderBy('created_at', 'desc')->get();
 
         $groupChanges = [];
         foreach ($groupAudits as $audit) {
