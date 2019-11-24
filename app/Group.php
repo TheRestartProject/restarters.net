@@ -31,7 +31,7 @@ class Group extends Model implements Auditable
         'shareable_code',
     ];
 
-    protected $appends = ['ShareableLink'];
+    protected $appends = ['ShareableLink', 'approved'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -430,5 +430,10 @@ class Group extends Model implements Auditable
       ->groupBy('events.idevents')
       ->orderBy('events.idevents', 'ASC')
       ->get();
+    }
+
+    public function getApprovedAttribute()
+    {
+        return !is_null($this->wordpress_post_id);
     }
 }
