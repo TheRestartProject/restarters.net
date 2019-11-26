@@ -100,9 +100,10 @@ class ApiController extends Controller
 
     public static function getUserInfo()
     {
-        $user = Auth::user()->first();
+        $user = Auth::user();
 
         $user->makeHidden('api_token');
+
         return response()->json($user->toArray());
     }
 
