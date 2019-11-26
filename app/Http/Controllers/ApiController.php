@@ -128,6 +128,11 @@ class ApiController extends Controller
 
     public static function getGroupChanges()
     {
+        $user = Auth::user();
+        if ( ! $user->hasRole('Administrator')) {
+            return abort(403, 'The authenticated user is not authorized to access this resource');
+        }
+
         $groupAudits = \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\Group')->groupBy('created_at')->orderBy('created_at', 'desc')->get();
 
         $groupChanges = [];

@@ -421,4 +421,20 @@ class User extends Authenticatable
     {
       return ! is_null($this->drip_subscriber_id);
     }
+
+    public function hasRole($roleName)
+    {
+        $usersRole = $this->role()->first()->role;
+
+        // Root assumed to have all available roles.
+        if ($usersRole == 'Root') {
+            return true;
+        }
+
+        if ($usersRole == $roleName) {
+            return true;
+        }
+
+        return false;
+    }
 }
