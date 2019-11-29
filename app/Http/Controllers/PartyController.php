@@ -181,7 +181,7 @@ class PartyController extends Controller
 
         // Then let's redirect users away if they are a restarter or a host with no groups
         if (FixometerHelper::hasRole(Auth::user(), 'Restarter') || (count($user_groups) == 0 && FixometerHelper::hasRole(Auth::user(), 'Host'))) {
-            return redirect('/user/forbidden');
+            return view('events.cantcreate');
         }
 
         $Groups = new Group;
