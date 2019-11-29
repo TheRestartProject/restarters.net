@@ -117,9 +117,9 @@
 }
 
 .information-alert {
-  background-color: #F9F9F9;
-  border-radius: unset;
-  border: 1px solid #D6D6D6;
+    background-color: #fff2df;
+    border: 2px dashed #ffbe5f;
+    border-radius: 15px;
   padding: 20px 45px 20px 35px;
   font-size: 16px;
   overflow: hidden;
@@ -139,14 +139,6 @@
     min-width: 155px;
   }
 
-  @include media-breakpoint-down(sm) {
-    .float-right,
-    .btn-action {
-      width: 100%;
-      display: block;
-    }
-  }
-
   button.close {
     position: absolute;
     right: 0;
@@ -164,5 +156,17 @@
   &.set-information-box-margin {
     margin-top: -25px;
     margin-bottom: 50px;
+  }
+
+  @include media-breakpoint-down(sm) {
+      .float-right,
+      .btn-action {
+          width: 100%;
+          display: block;
+      }
+
+      button.close {
+          margin: 1.25rem;
+      }
   }
 }
