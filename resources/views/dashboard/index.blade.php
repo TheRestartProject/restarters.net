@@ -21,7 +21,7 @@
       <div class="col">
           @if ( is_null(Cookie::get("information-alert-dismissed-createevents2020")) && Auth::check() )
 
-              <div class="alert alert-secondary information-alert alert-dismissible fade show " role="alert" id="usersurvey">
+              <div class="alert alert-secondary information-alert alert-dismissible fade show " role="alert" id="createevents2020">
                 <div class="d-sm-flex flex-row justify-content-between align-items-center">
                   <div class="action-text-left float-left d-flex flex-row">
                       <span class="icon my-auto d-none">@include('partials.svg-icons.calendar-icon-lg')</span>
