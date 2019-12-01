@@ -45,6 +45,17 @@ class User extends Authenticatable implements Auditable
     ];
 
     /**
+     * Attributes to exclude from the Audit.
+     *
+     * @var array
+     */
+    protected $auditExclude = [
+        'number_of_logins',
+        'last_login_at',
+        'remember_token',
+    ];
+
+    /**
      * The event map for the model.
      *
      * @var array
