@@ -10,16 +10,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use OwenIt\Auditing\Contracts\Auditable;
+
 class WikiSyncStatus {
     const DoNotCreate = 0;
     const CreateAtLogin = 1;
     const Created = 2;
 }
 
-class User extends Authenticatable
+class User extends Authenticatable implements Auditable
 {
     use Notifiable;
     use SoftDeletes;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'users';
 
@@ -300,7 +303,7 @@ class User extends Authenticatable
     public function anonymise()
     {
         $this->name = 'Deleted User';
-        $this->email = $this->id.'@deleted.com';
+        $this->email = $this->id.'@deleted.invalid';
         $this->username = $this->id.'-deleted';
 
         // TODO: country, city, gender, age, also required?
