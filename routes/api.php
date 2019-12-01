@@ -63,4 +63,6 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::get('/groups', 'ApiController@getGroupList');
     Route::get('/groups/changes', 'ApiController@getGroupChanges');
+
+    Route::get('/usersgroups/changes', 'API\UserGroupsController@changes');
 });

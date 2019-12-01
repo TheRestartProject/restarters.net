@@ -3,12 +3,15 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
 use DB;
 
 class UserGroups extends Model implements Auditable
 {
+    use SoftDeletes;
+
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'users_groups';
@@ -90,6 +93,10 @@ class UserGroups extends Model implements Auditable
         return $this->hasOne('App\User', 'id', 'user');
     }
 
+    public function isConfirmed()
+    {
+        return $this->status == "1";
+    }
 
     public function scopeConfirmedInvitation($query)
     {
