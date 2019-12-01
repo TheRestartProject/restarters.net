@@ -298,9 +298,10 @@ class Group extends Model implements Auditable
         if (!$this->allVolunteers()->pluck('user')->contains($groupMember->id))
             throw new \Exception('Volunteer is not currently in this group.  Only existing group members can be made hosts.');
 
-        UserGroups::where('user', $groupMember->id)
-            ->where('group', $this->idgroups)
-            ->update(['role' => Role::HOST]);
+        $userGroupAssociation = UserGroups::where('user', $groupMember->id)
+                                ->where('group', $this->idgroups)->first();
+        $userGroupAssociation->role = Role::HOST;
+        $userGroupAssociation->save();
 
         // Update user's role (only if currently Restarter role)
         $groupMember->convertToHost();

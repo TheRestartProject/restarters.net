@@ -1100,22 +1100,10 @@ class GroupController extends Controller
     {
         //Has current logged in user got permission to add host
         if ((FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id())) || FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
-            // Retrieve user
+            $group = Group::find($group_id);
             $user = User::find($user_id);
 
-            // Let's make the user a host
-            $volunteer = UserGroups::where('user', $user_id)
-            ->where('group', $group_id)
-            ->update([
-                'role' => 3,
-            ]);
-
-            // Update user's role as well, but don't demote admins!
-            $update_role = User::where('id', $user_id)
-            ->where('role', '>', 3)
-            ->update([
-                'role' => 3,
-            ]);
+            $group->makeMemberAHost($user);
 
             return redirect()->back()->with('success', 'We have made '.$user->name.' a host for this group');
         }
@@ -1131,8 +1119,10 @@ class GroupController extends Controller
             $user = User::find($user_id);
 
             //Let's delete the user
-            $delete_user = UserGroups::where('user', $user_id)->where('group', $group_id)->delete();
-            if ($delete_user == 1) {
+            $userGroupAssociation = UserGroups::where('user', $user_id)->where('group', $group_id)->first();
+
+            if ( !is_null($userGroupAssociation)) {
+                $userGroupAssociation->delete();
                 return redirect()->back()->with('success', 'We have removed '.$user->name.' from this group');
             }
 
