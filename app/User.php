@@ -451,4 +451,9 @@ class User extends Authenticatable implements Auditable
 
         return false;
     }
+
+    public function getTalkProfileUrl()
+    {
+        return env('DISCOURSE_URL').'/u/'.$this->username;
+    }
 }
