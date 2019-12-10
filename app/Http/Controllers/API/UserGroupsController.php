@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
+use App\Role;
 use App\User;
 use App\UserGroups;
 use App\Http\Controllers\Controller;
@@ -54,6 +55,12 @@ class UserGroupsController extends Controller
         $userGroupAssociation->makeHidden(['role', 'status','user','group','deleted_at']);
         $userGroupChange = $userGroupAssociation->toArray();
 
+        $role = Role::find($userGroupAssociation->role);
+        if ( ! is_null($role)) {
+            $userGroupChange['role'] = $role->role;
+        } else {
+            $userGroupChange['role'] = 'Unknown';
+        }
         $userGroupChange['user_id'] = $userGroupAssociation->user;
         $userGroupChange['user_email'] = User::find($userGroupAssociation->user)->email;
         $userGroupChange['group_id'] = $userGroupAssociation->group;
