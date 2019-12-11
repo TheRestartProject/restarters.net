@@ -110,5 +110,8 @@ class UserController extends Controller
         if ($changesMade) {
             $user->save();
         }
+
+        // Zapier seems to require some response body.
+        return response()->json(['success' => 'success'], 200);
     }
 }
