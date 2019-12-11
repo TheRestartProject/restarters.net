@@ -72,6 +72,7 @@ class UserGroupsController extends Controller
         $group = Group::find($userGroupAssociation->group);
         $userGroupChange['group_name'] = $group->name;
         $userGroupChange['group_area'] = $group->area;
+        $userGroupChange['group_country'] = $group->country;
 
         return $userGroupChange;
     }
