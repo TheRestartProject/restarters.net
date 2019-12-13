@@ -69,7 +69,7 @@
 
                 document.querySelector('.dropdown-trigger').addEventListener('click', function (e) {
                     e.preventDefault();
-                    document.getElementById('user').classList.add('is-active');
+                    document.getElementById('user').classList.toggle('is-active');
                 });
 
                 document.getElementById('user').addEventListener('mouseleave', e => {
