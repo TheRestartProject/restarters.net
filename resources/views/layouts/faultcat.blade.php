@@ -14,13 +14,11 @@
             .underline {text-decoration: underline;}
             .options {margin-top: 15px;}
             .problem {border: 5px solid #FFDD57; }
-            .btn-info {padding-top: 25px;}
-            .hero-head .container {padding: 5px 0 5px 0;}
             .hero-head {margin-bottom: 1%;}
             .tag {margin-bottom: 2px;}
             #Y, #N, #fetch, #change {margin-bottom: 2px;}
             .btn-translate {padding: 10px 0;}
-            /*.column {border:1px solid black;}*/
+            .fc-center { align-items: center;}
         </style>
     </head>
     <body>
@@ -55,7 +53,7 @@
         <div class="hero is-centered">
             <div class="hero-head has-background-warning">
                 <div class="container content">
-                    <div class="columns is-flex-mobile is-flex-tablet">
+                    <div class="columns is-flex-mobile is-flex-tablet fc-center">
                         @yield('hero-head')
                     </div>
                 </div>
