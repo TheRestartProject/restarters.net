@@ -5,7 +5,7 @@ namespace App;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
-class Foo extends Model {
+class Faultcat extends Model {
 
     protected $table = 'devices_faults_opinions';
     protected $dateFormat = 'Y-m-d H:i';
@@ -17,7 +17,7 @@ class Foo extends Model {
      *
      * @var array
      */
-    protected $fillable = ['iddevices', 'fault_type', 'user_id', 'ip_address', 'session_id']; //, 'created_at', 'updated_at'];
+    protected $fillable = ['iddevices', 'fault_type', 'user_id', 'ip_address', 'session_id']; 
 
     /**
      * Fetch a single random computer device record that has less than 5
