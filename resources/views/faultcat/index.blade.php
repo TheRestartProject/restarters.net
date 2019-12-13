@@ -25,12 +25,10 @@
                 </svg>
             </button>
         </div>
-        <div class="column is-10">
+        <div class="column is-9">
             <span class="title is-size-5-mobile">FaultCat</span>
         </div>
-        <div class="column is-1">
-                <div class="columns is-flex-mobile is-flex-tablet fc-center">
-        <div class="column is-two-thirds cat-icon">
+        <div class="column is-1 cat-icon">
             <!--
             These images are licensed under the Creative Commons Attribution 4.0 International license.
             Attribution: Vincent Le Moign
@@ -59,7 +57,7 @@
             ?>
             <img class="image is-48x48" src="{{ asset('/images/faultcat/'.$img) }}" alt="{{ $alt }}"/>
         </div>
-        <div class="column is-one-third btn-info">
+        <div class="column is-1 btn-info">
             <div id="user" class="dropdown is-right">
                 <div class="dropdown-trigger">
                     <button class="button  is-primary" aria-haspopup="true" aria-controls="dropdown-menu">
@@ -96,8 +94,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-                </div>
         </div>
     @endsection
     
