@@ -62,9 +62,9 @@ Route::prefix('calendar')->group(function () {
     Route::get('/all-events/{hash_env}', 'CalendarEventsController@allEvents')->name('calendar-events-all');
 });
 
-Route::prefix('foo')->group(function () {
-    Route::get('/', 'FooController@index');
-    Route::post('/', 'FooController@index');
+Route::prefix('faultcat')->group(function () {
+    Route::get('/', 'FaultcatController@index');
+    Route::post('/', 'FaultcatController@index');
 });
 
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
