@@ -142,7 +142,7 @@
             <form id="log-task" action="faultcat" method="POST">
                 @csrf
                 <div class="container fault-type">
-                    <div class="container">
+                    <div class="container">                        
                         <input type="hidden" id="iddevices" name="iddevices" value="<?php echo $fault->iddevices; ?>">
                         <input type="hidden" id="fault_type" name="fault_type" value="<?php echo $fault->fault_type; ?>">
                         <p class="title is-size-6-mobile is-size-6-tablet">Is the fault type <span id="fault-type-cur" class="tag is-large has-background-grey-lighter is-size-6-mobile is-size-6-tablet"><?php echo $fault->fault_type; ?></span> ?</p>
@@ -184,7 +184,42 @@
                             <button class="button is-size-6 is-size-7-mobile is-size-7-tablet has-text-white-bis is-rounded <?php echo ($fault->fault_type == 'Unknown' ? 'has-background-grey-light' : 'has-background-grey-dark'); ?>">Unknown</button>
                             <button class="button is-size-6 is-size-7-mobile is-size-7-tablet has-text-white-bis is-rounded <?php echo ($fault->fault_type == 'Virus/malware' ? 'has-background-grey-light' : 'has-background-grey-dark'); ?>">Virus/malware</button>
                         </div>
+                    </div>            
+                    <?php if (!$user->id && $user->clicks > 3 && !$user->country && !$user->age) { ?>
+                    <div class="container">
+                        <br><p class="is-size-6-mobile is-size-6-tablet">I am...</p>
+                        <div class="field is-grouped is-grouped-centered is-grouped-multiline">
+                        <div class="control is-size-6-mobile is-size-6-tablet">
+                            <label class="radio">
+                              <input type="radio" name="age" value="young" checked="">
+                              young
+                            </label>
+                            <label class="radio">
+                              <input type="radio" name="age" value="old">                              
+                              old
+                            </label>
+                            <label class="radio">
+                              <input type="radio" name="age" value="declined">
+                              immortal
+                            </label>
+                        </div>
+                        <div class="control is-size-6-mobile is-size-6-tablet">
+                            <label class="radio">
+                              <input type="radio" name="country" value="GBR" checked="">
+                              in the UK
+                            </label>
+                            <label class="radio">
+                              <input type="radio" name="country" value="other">                              
+                              not in the UK
+                            </label>
+                            <label class="radio">
+                              <input type="radio" name="country" value="declined">
+                              everywhere
+                            </label>
+                        </div>
+                        </div>
                     </div>
+                    <?php } ?>                    
                 </div>
             </form>
         <?php } ?>
@@ -193,7 +228,8 @@
     @section('script')
         <script>
             document.addEventListener(`DOMContentLoaded`, async () => {
-
+                
+                
                 document.getElementById('Y').addEventListener('click', function (e) {
                     e.preventDefault();
                     doYes();
