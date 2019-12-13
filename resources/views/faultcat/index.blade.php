@@ -26,7 +26,6 @@
             </button>
         </div>
         <div class="column is-9">
-            <a class="subtitle has-text-grey-dark has-text-weight-bold" href="https://therestartproject.org/" target="_blank"><span class="is-size-7-mobile">The Restart Project</span></a>
             <br><span class="title is-size-5-mobile">FaultCat</span>
         </div>                        
         <div class="column is-1 cat-icon">
