@@ -80,7 +80,7 @@ class ExportController extends Controller
                 fputcsv($file, [
                     $device->deviceCategory->name,
                     $device->brand,
-                    $device->getShortProblem(),
+                    $device->problem,
                     $device->getRepairStatus(),
                     $device->getSpareParts(),
                     $device->deviceEvent->getEventName(),
@@ -108,7 +108,7 @@ class ExportController extends Controller
                     $device->deviceCategory->name,
                     $device->brand,
                     $device->model,
-                    $device->getShortProblem(),
+                    $device->problem,
                     $device->getRepairStatus(),
                     $device->getSpareParts(),
                     $device->deviceEvent->getEventName(),
