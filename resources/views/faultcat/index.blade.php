@@ -306,14 +306,14 @@
          <script>
             document.addEventListener(`DOMContentLoaded`, async () => {
 
-                document.querySelector('.dropdown-trigger').addEventListener('click', function (e) {
+                /*document.querySelector('.dropdown-trigger').addEventListener('click', function (e) {
                     e.preventDefault();
                     document.getElementById('user').classList.toggle('is-active');
                 });
 
                 document.getElementById('user').addEventListener('mouseleave', e => {
                     document.getElementById('user').classList.remove('is-active');
-                });
+                });*/
 
                 document.getElementById('btn-info-open').addEventListener('click', function (e) {
                     e.preventDefault();
