@@ -172,7 +172,7 @@
                                 <li><a href="{{ env('DISCOURSE_URL') }}/login" target="_blank" rel="noopener noreferrer">@lang('general.menu_discourse')</a></li>
                                 <li><a href="@lang('general.wiki_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_wiki')</a></li>
                                 @if ( FixometerHelper::hasPermission('repair-directory') )
-                                  <li><a href="https://map.restarters.net/admin" target="_blank" rel="noopener noreferrer">Repair Directory</a></li>
+                                  <li><a href="{{ config('restarters.repairdirectory.base_url') }}/admin" target="_blank" rel="noopener noreferrer">Repair Directory</a></li>
                                 @endif
                             </ul>
                         </li>
