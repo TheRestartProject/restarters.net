@@ -1,11 +1,9 @@
 .btn {
+    @include button-size(13px, 25px, 16px, 1, 10px);
     font-family: $font-family-sans-serif;
     white-space: normal;
-    padding: 13px 25px 14px 25px;
-    font-size: 16px;
-    line-height: 1;
 
-    &.disabled {
+    /*&.disabled {
         color: #666B6C;
         background-color: #D3D9DC;
         border-color: #B0BBC0;
@@ -27,7 +25,15 @@
             text-decoration: none;
             opacity: 1;
         }
-    }
+    }*/
+}
+
+.btn-sm {
+    @include button-size(0.8em, 0.8em, .75rem, 1, 10px);
+}
+
+.btn-md {
+    @include button-size(0.9em, 0.9em, 0.9rem, 1, 10px);
 }
 
 .btn-primary {
@@ -52,6 +58,10 @@
         border-color: #00B0C6;
         text-decoration: underline;
     }
+}
+
+.btn-rounded {
+    border-radius: 100px;
 }
 
 .btn-secondary {
@@ -115,7 +125,6 @@
 .btn-danger {
     background-color: #D23714;
     border: 0;
-    border-bottom: 3px solid #872009;
     color: #FFF;
 
     &:focus,
@@ -132,6 +141,17 @@
         text-decoration: underline;
         color: #FFF;
     }
+}
+
+.btn-fault-info {
+    @include button-variant(lightgray, white, gray);
+    color: #4a4a4a;
+    font-weight:normal;
+    font-family: 'Open Sans';
+}
+
+.btn-fault-option {
+    @include button-variant(#4a4a4a, white, #4a4a4a);
 }
 
 .btn-checkbox {

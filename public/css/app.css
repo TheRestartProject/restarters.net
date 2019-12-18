@@ -16610,35 +16610,50 @@ table.sortable > thead th div.mozilla {
 }
 
 .btn {
+  padding: 13px 25px;
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 10px;
   font-family: "Patua One", sans-serif;
   white-space: normal;
-  padding: 13px 25px 14px 25px;
-  font-size: 16px;
+  /*&.disabled {
+        color: #666B6C;
+        background-color: #D3D9DC;
+        border-color: #B0BBC0;
+        opacity: 1;
+    }
+
+    &:disabled {
+        background-color: #D3D9DC;
+        color: #666B6C;
+        border: 0;
+        border-bottom: 3px solid #B0BBC0;
+        opacity: 1;
+
+        &:hover,
+        &:focus {
+            background-color: #D3D9DC;
+            color: #666B6C;
+            border-bottom: 3px solid #B0BBC0;
+            text-decoration: none;
+            opacity: 1;
+        }
+    }*/
+}
+
+.btn-sm,
+.btn-group-sm > .btn {
+  padding: 0.8em 0.8em;
+  font-size: 0.75rem;
   line-height: 1;
+  border-radius: 10px;
 }
 
-.btn.disabled {
-  color: #666B6C;
-  background-color: #D3D9DC;
-  border-color: #B0BBC0;
-  opacity: 1;
-}
-
-.btn:disabled {
-  background-color: #D3D9DC;
-  color: #666B6C;
-  border: 0;
-  border-bottom: 3px solid #B0BBC0;
-  opacity: 1;
-}
-
-.btn:disabled:hover,
-.btn:disabled:focus {
-  background-color: #D3D9DC;
-  color: #666B6C;
-  border-bottom: 3px solid #B0BBC0;
-  text-decoration: none;
-  opacity: 1;
+.btn-md {
+  padding: 0.9em 0.9em;
+  font-size: 0.9rem;
+  line-height: 1;
+  border-radius: 10px;
 }
 
 .btn-primary {
@@ -16663,6 +16678,10 @@ table.sortable > thead th div.mozilla {
   background-color: #00B0C6;
   border-color: #00B0C6;
   text-decoration: underline;
+}
+
+.btn-rounded {
+  border-radius: 100px;
 }
 
 .btn-secondary {
@@ -16724,7 +16743,6 @@ table.sortable > thead th div.mozilla {
 .btn-danger {
   background-color: #D23714;
   border: 0;
-  border-bottom: 3px solid #872009;
   color: #FFF;
 }
 
@@ -16741,6 +16759,89 @@ table.sortable > thead th div.mozilla {
   border-color: #F24C26;
   text-decoration: underline;
   color: #FFF;
+}
+
+.btn-fault-info {
+  color: #212529;
+  background-color: lightgray;
+  border-color: white;
+  color: #4a4a4a;
+  font-weight: normal;
+  font-family: 'Open Sans';
+}
+
+.btn-fault-info:hover {
+  color: #fff;
+  background-color: gray;
+  border-color: #e6e5e5;
+}
+
+.btn-fault-info:focus,
+.btn-fault-info.focus {
+  -webkit-box-shadow: 0 0 0 0.2rem rgba(222, 222, 223, 0.5);
+          box-shadow: 0 0 0 0.2rem rgba(222, 222, 223, 0.5);
+}
+
+.btn-fault-info.disabled,
+.btn-fault-info:disabled {
+  color: #212529;
+  background-color: lightgray;
+  border-color: white;
+}
+
+.btn-fault-info:not(:disabled):not(.disabled):active,
+.btn-fault-info:not(:disabled):not(.disabled).active,
+.show > .btn-fault-info.dropdown-toggle {
+  color: #212529;
+  background-color: #bab9b9;
+  border-color: #dfdfdf;
+}
+
+.btn-fault-info:not(:disabled):not(.disabled):active:focus,
+.btn-fault-info:not(:disabled):not(.disabled).active:focus,
+.show > .btn-fault-info.dropdown-toggle:focus {
+  -webkit-box-shadow: 0 0 0 0.2rem rgba(222, 222, 223, 0.5);
+          box-shadow: 0 0 0 0.2rem rgba(222, 222, 223, 0.5);
+}
+
+.btn-fault-option {
+  color: #fff;
+  background-color: #4a4a4a;
+  border-color: white;
+}
+
+.btn-fault-option:hover {
+  color: #fff;
+  background-color: #4a4a4a;
+  border-color: #e6e5e5;
+}
+
+.btn-fault-option:focus,
+.btn-fault-option.focus {
+  -webkit-box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.5);
+          box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.5);
+}
+
+.btn-fault-option.disabled,
+.btn-fault-option:disabled {
+  color: #fff;
+  background-color: #4a4a4a;
+  border-color: white;
+}
+
+.btn-fault-option:not(:disabled):not(.disabled):active,
+.btn-fault-option:not(:disabled):not(.disabled).active,
+.show > .btn-fault-option.dropdown-toggle {
+  color: #fff;
+  background-color: #313030;
+  border-color: #dfdfdf;
+}
+
+.btn-fault-option:not(:disabled):not(.disabled):active:focus,
+.btn-fault-option:not(:disabled):not(.disabled).active:focus,
+.show > .btn-fault-option.dropdown-toggle:focus {
+  -webkit-box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.5);
+          box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.5);
 }
 
 .btn-checkbox {
