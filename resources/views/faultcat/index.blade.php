@@ -1,22 +1,46 @@
-@extends('layouts.faultcat')
+@extends('layouts.app')
 
-    @section('content-modal')
-         <p>We'd like to group repairs into streams that can be reported and visualised. We don't need to pinpoint the exact cause of each fault.</p>
-         <p>Read more about
-             <a href="https://therestartproject.org/fixometer/why-we-collect-repair-data/" target="_blank">why we collect data</a>
-             and
-             <a href="https://openrepair.org/data-dives/open-repair-data-fixfest-2019-why-computers-fail/" target="_blank">why computers fail</a>
-         </p>
-         <p>A variety of languages are present in the database, if your browser does not prompt to translate you can use the <a href="https://translate.google.com/" target="_blank">Google Translate button</a></p>
-         <!-- https://translate.google.com/intl/en/about/website/
-         We no longer provide new access to Google Translate's Website Translator. This change does not affect existing use of the Website Translator.
-         We encourage users looking to translate webpages to use browsers that support translation natively.
-         -->
-         <p><a href="https://talk.restarters.net/t/faultcat-repair-data-for-the-many-not-the-few-feedback-please/2213" target="_blank">Tell us what you think of this app</a></p>
-         <p>** Version 3.0-beta **</p>
-    @endsection
-    
-    @section('hero-head')
+@section('extra-css')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css" integrity="sha256-vK3UTo/8wHbaUn+dTQD0X6dzidqc5l7gczvH+Bnowwk=" crossorigin="anonymous" />
+
+    <style>
+     body {text-align : center !important;}
+     .is-horizontal-center {justify-content: center;}
+     .hide {display: none;}
+     .show {display: block;}
+     .underline {text-decoration: underline;}
+     .options {margin-top: 15px;}
+     .problem {border: 5px solid #FFDD57; }
+     /*.hero-head {margin-bottom: 1%;}*/
+     .tag {margin-bottom: 2px;}
+     #Y, #N, #fetch, #change {margin-bottom: 2px;}
+     .btn-translate {padding: 10px 0;}
+     .fc-center { align-items: center;}
+     .fc-margin-bottom {margin-bottom: 1%;}
+     .fc-margin-top {margin-top: 1%;}
+    </style>
+
+@endsection
+
+@section('content')
+
+        <div class="modal" id="modal-info">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head has-background-warning">
+                    <p class="modal-card-title">About FaultCat</p>
+                    <button id="btn-info-close" class="delete" aria-label="close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="container  notification">
+                        <p class="is-size-6 is-size-7-mobile is-size-7-tablet">“We had a kettle; we let it leak:<br>
+                            Our not repairing made it worse.<br>
+                            We haven't had any tea for a week...<br>
+                            The bottom is out of the Universe.”<br>
+                            ― Rudyard Kipling
+                        </p>
+                    </div>
+    <div class="container-fluid content">
         <div class="column is-1 btn-info">
             <button id="btn-info-open" class="button is-primary">
                 <svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -25,10 +49,25 @@
                 </svg>
             </button>
         </div>
-        <div class="column is-9">
-            <span class="title is-size-5-mobile">FaultCat</span>
+                    </div>
+                </section>
+                <footer class="modal-card-foot has-background-warning has-text-weight-bold">
+                    <div class="container">
+                        <p><a href="https://therestartproject.org/" target="_blank">The Restart Project</a></p>
+                        <p>A member of the <a href="https://openrepair.org/" target="_blank">Open Repair Alliance</a></p>
+                    </div>
+                </footer>
+            </div>
         </div>
-        <div class="column is-1 cat-icon">
+        <div class="hero is-centered" style="margin-bottom:180px">
+            <div class="hero-foot">
+                <div class="container">
+                    <header class="columns is-flex-mobile is-flex-tablet" style="text-align:left">
+                    <div class="column is-half">
+                <h1 style="font-size:2.25rem; font-weight: bold; font-family:'Asap'">FaultCat</h1>
+                    </div>
+                    <div class="column is-half">
+                        <div  class="is-pulled-right">
             <!--
             These images are licensed under the Creative Commons Attribution 4.0 International license.
             Attribution: Vincent Le Moign
@@ -57,47 +96,9 @@
             ?>
             <img class="image is-48x48" src="{{ asset('/images/faultcat/'.$img) }}" alt="{{ $alt }}"/>
         </div>
-        <div class="column is-1 btn-info">
-            <div id="user" class="dropdown is-right">
-                <div class="dropdown-trigger">
-                    <button class="button  is-primary" aria-haspopup="true" aria-controls="dropdown-menu">
-                        <span class=""><?php echo $user->name; ?></span>
-                        <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                        <path fill="#000000" d="M7,10L12,15L17,10H7Z" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="dropdown-menu" id="dropdown-menu" role="menu">
-                    <div class="dropdown-content">
-                        <?php
-                        if ($user->id) {
-                            ?>
-                            <a href="/user/profile/<?php echo $user->id; ?>" class="dropdown-item">
-                                My Profile
-                            </a>
-                            <a href="/logout" class="dropdown-item">
-                                Logout
-                            </a>
-                            <hr class="dropdown-divider">                                        
-                            <?php
-                        } else {
-                            ?>
-                            <a href="/login" class="dropdown-item">
-                                Sign in/Register
-                            </a>
-                            <?php
-                        }
-                        ?>                                        
-                        <a href="https://talk.restarters.net/" class="dropdown-item">
-                            Forums
-                        </a>
                     </div>
+                </header>
                 </div>
-            </div>
-        </div>
-    @endsection
-    
-    @section('hero-foot')
         <?php if ($fault) { ?>
             <div class="container content problem notification">
                 <div class="columns is-flex-mobile is-flex-tablet">
@@ -223,13 +224,14 @@
                 </div>
             </form>
         <?php } ?>
+            </div>
+        </div>
     @endsection
-    
-    @section('script')
+
+    @section('scripts')
         <script>
             document.addEventListener(`DOMContentLoaded`, async () => {
-                
-                
+
                 document.getElementById('Y').addEventListener('click', function (e) {
                     e.preventDefault();
                     doYes();
@@ -301,4 +303,39 @@
 
             }, false);
         </script>
-    @endsection
+         <script>
+            document.addEventListener(`DOMContentLoaded`, async () => {
+
+                document.querySelector('.dropdown-trigger').addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.getElementById('user').classList.toggle('is-active');
+                });
+
+                document.getElementById('user').addEventListener('mouseleave', e => {
+                    document.getElementById('user').classList.remove('is-active');
+                });
+
+                document.getElementById('btn-info-open').addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.getElementById('modal-info').classList.add('is-active');
+                }, false);
+
+                document.getElementById('btn-info-close').addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.getElementById('modal-info').classList.remove('is-active');
+                }, false);
+
+                document.addEventListener("keypress", function (e) {
+                    if (e.code == 'KeyI') {
+                        e.preventDefault();
+                        document.getElementById('btn-info-open').click();
+                    } else if (e.code == 'KeyU') {
+                        e.preventDefault();
+                        document.querySelector('.dropdown-trigger').click();
+                    }
+                }, false);
+                
+            }, false);
+        </script>
+
+        @endsection

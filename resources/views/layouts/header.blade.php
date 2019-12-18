@@ -15,6 +15,8 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
+    @yield('extra-css')
+
     <!-- Cookie banner with fine-grained opt-in -->
     <script src="{{ asset('js/gdpr-cookie-notice.js') }}"></script>
     <!-- Check to see if visitor has opted in to analytics cookies -->
@@ -58,7 +60,7 @@
 
    <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
             <div class="container">
-                <a class="navbar-brand" role="button" data-toggle="collapse" aria-expanded="false" href="#startMenu" aria-controls="startMenu" aria-label="Toggle start menu">
+                <a class="navbar-brand d-none d-sm-block" role="button" data-toggle="collapse" aria-expanded="false" href="#startMenu" aria-controls="startMenu" aria-label="Toggle start menu">
                     @include('includes/logo')
                     <span class="caret"></span>
                 </a>

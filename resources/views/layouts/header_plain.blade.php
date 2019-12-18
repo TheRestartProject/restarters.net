@@ -10,6 +10,8 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        @yield('extra-css')
+
         <!-- Styles -->
         @if( isset($iframe) )
           <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -59,3 +61,15 @@
         <!-- Google Tag Manager (noscript) -->
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ env('GOOGLE_TAG_MANAGER_ID') }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
+
+            <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
+                <a class="d-none d-sm-block navbar-brand" role="button" data-toggle="collapse" aria-expanded="false" href="#startMenu" aria-controls="startMenu" aria-label="Toggle start menu">
+                    @include('includes/logo')
+                </a>
+
+            <ul class="navbar-nav ml-auto">
+                <li><a class="nav-link" href="/login">Sign in</a></li>
+                <li><a class="nav-link" href="/about">Join Restarters</a></li>
+            </ul>
+
+            </nav>

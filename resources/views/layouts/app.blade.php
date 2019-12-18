@@ -48,5 +48,8 @@
   </div>
 </div>
 
+{{-- @if( Auth::check() )
 @include('partials.languages')
+@endif
+--}}
 @include('layouts/footer')
