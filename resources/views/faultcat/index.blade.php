@@ -8,8 +8,8 @@
      }
 
      h1 {
-         font-family: 'Asap';
-         font-weight: bold;
+         font-family: 'Asap' !important;
+         font-weight: bold !important;
          float: left; /* bootstrap pull-left class working locally but not on server!  falling back on this. */
      }
 
