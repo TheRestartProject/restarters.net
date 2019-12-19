@@ -9,9 +9,21 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p>We ask for age and location information as some of our work is based on encouraging volunteer activity amongst the over 50s in England.</p>
-                <p>The recorded information is collected purely for demographic analysis.</p>
-                <p>Thank you for completing this information!</p>
+                <p>
+                    We’re asking for some basic information about your age and where you’re based to help us understand the social impact of our work.
+                </p>
+                <p>
+                The community events that produced the repair data you’re seeing are not only great for the environment, but can also help bring people together and build stronger communities.
+                </p>
+                <p>
+                As part of this, we’re trying to encourage volunteer activity among people who are 50 or over and based in England.
+                </p>
+                <p>
+                The recorded information is collected purely for demographic analysis and we won’t share it with anyone.
+                </p>
+                <p>
+                Thank you for helping us better understand this important part of our work!
+                </p>
             </div>
         </div>
     </div>
