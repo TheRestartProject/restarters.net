@@ -14,19 +14,23 @@ class FaultcatController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request) {
-
+    public function index(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
             $user = new \stdClass();
             $user->id = 0;
             $user->name = 'Guest';
-        }        
-        
+        }
+
         $user->clicks = $request->session()->get('faultcat.counter', 0);
         $request->session()->put('faultcat.counter', ++$user->clicks);
-        
+
+        if (!$user->id && ($user->clicks % 4 == 0) && (!$user->country || !$user->age)) {
+            return redirect('/faultcat/demographics');
+        }
+
         if ($request->isMethod('post') && !empty($_POST)) {
             if (isset($_POST['iddevices']) && !isset($_POST['fetch'])) {
                 $data = array_filter($_POST);
@@ -75,4 +79,25 @@ class FaultcatController extends Controller {
         ]);
     }
 
+    public function demographics(Request $request)
+    {
+        if (Auth::check()) {
+            $user = Auth::user();
+        } else {
+            $user = new \stdClass();
+            $user->id = 0;
+            $user->name = 'Guest';
+        }
+
+        return view('faultcat.demographics', [
+            'user' => $user,
+        ]);
+    }
+
+    public function storeDemographics(Request $request)
+    {
+        // store
+
+        return redirect('/faultcat');
+    }
 }

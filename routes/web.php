@@ -65,6 +65,8 @@ Route::prefix('calendar')->group(function () {
 Route::prefix('faultcat')->group(function () {
     Route::get('/', 'FaultcatController@index');
     Route::post('/', 'FaultcatController@index');
+    Route::get('/demographics', 'FaultcatController@demographics');
+    Route::post('/demographics', 'FaultcatController@storeDemographics');
 });
 
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {

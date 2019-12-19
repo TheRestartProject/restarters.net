@@ -206,47 +206,12 @@
                         <button class="btn btn-sm btn-fault-option btn-rounded <?php echo ($fault->fault_type == 'Virus/malware' ? 'btn-fault-option-current' : ''); ?>">Virus/malware</button>
                     </div>
                 </div>
-                <?php if (!$user->id && $user->clicks > 3 && !$user->country && !$user->age) { ?>
-                <div class="container">
-                    <br>
-                    <p class="is-size-6-mobile is-size-6-tablet">I am...</p>
-                    <div class="field is-grouped is-grouped-centered is-grouped-multiline">
-                        <div class="control is-size-6-mobile is-size-6-tablet">
-                            <label class="radio">
-                                <input type="radio" name="age" value="young" checked="">
-                                young
-                            </label>
-                            <label class="radio">
-                                <input type="radio" name="age" value="old">
-                                old
-                            </label>
-                            <label class="radio">
-                                <input type="radio" name="age" value="declined">
-                                immortal
-                            </label>
-                        </div>
-                        <div class="control is-size-6-mobile is-size-6-tablet">
-                            <label class="radio">
-                                <input type="radio" name="country" value="GBR" checked="">
-                                in the UK
-                            </label>
-                            <label class="radio">
-                                <input type="radio" name="country" value="other">
-                                not in the UK
-                            </label>
-                            <label class="radio">
-                                <input type="radio" name="country" value="declined">
-                                everywhere
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <?php } ?>
             </div>
         </form>
         <?php } ?>
-</section>
 
+        @include('faultcat/info-modal')
+</section>
 
 @endsection
 
