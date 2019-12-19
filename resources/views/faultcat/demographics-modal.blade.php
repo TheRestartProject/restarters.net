@@ -21,6 +21,7 @@
                 <p>
                 The recorded information is collected purely for demographic analysis and we won’t share it with anyone.
                 </p>
+                <img src="{{ asset('/images/faultcat/099-smiling-cat-face-with-heart-eyes-64px.svg.png') }}" alt="smiling cat" width="48" height="48" />
                 <p>
                 Thank you for helping us better understand this important part of our work!
                 </p>
