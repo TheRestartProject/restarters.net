@@ -10,7 +10,15 @@
      h1 {
          font-family: 'Asap';
          font-weight: bold;
+         float: left; /* bootstrap pull-left class working locally but not on server!  falling back on this. */
      }
+
+     img#faultcat {
+         width: 48px;
+         height: 48px;
+         float: right; /* bootstrap pull-right class working locally but not on server!  falling back on this. */
+     }
+
 
      .title {
          font-weight: bold;
@@ -106,7 +114,7 @@
                 $alt = 'MehCat';
             }
             ?>
-                <img class="pull-right" src="{{ asset('/images/faultcat/'.$img) }}" alt="{{ $alt }}" width="48" height="48" />
+                <img id="faultcat" class="pull-right" src="{{ asset('/images/faultcat/'.$img) }}" alt="{{ $alt }}" width="48" height="48" />
             </div>
         </div>
         <?php if ($fault) { ?>
