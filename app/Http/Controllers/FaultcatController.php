@@ -104,8 +104,13 @@ class FaultcatController extends Controller {
      */
     public function storeDemographics(Request $request)
     {
-        $age = $request->input('age');
-        $country = $request->input('country');
+        $validatedData = $request->validate([
+            'age' => 'required',
+            'country' => 'required',
+        ]);
+
+        $age = $validatedData['age'];
+        $country = $validatedData['country'];
 
         $details = [
             'session_id' => session()->getId(),
@@ -118,10 +123,12 @@ class FaultcatController extends Controller {
         $success = MicrotaskDemographics::create($details);
 
         // Store details in session, so as to not ask this same user again.
-        $request->session()->put('faultcat.age', $age);
-        $request->session()->put('faultcat.country', $country);
+        if ($success) {
+            $request->session()->put('faultcat.age', $age);
+            $request->session()->put('faultcat.country', $country);
+        }
 
-
+        // Success or failure, let them carry on.
         return redirect()->action('FaultcatController@index');
     }
 }

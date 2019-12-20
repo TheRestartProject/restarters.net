@@ -107,32 +107,47 @@
             @csrf
         <div class="row problem p-2 mb-2 mx-1 mx-sm-0 notification">
             <div class="col">
-                    <p class="">I am aged...</p>
-                    <div class="">
-                        <div class="control">
-                            <label class="radio mr-3">
-                                <input type="radio" name="age" value="under50">
-                                under 50
-                            </label>
-                            <label class="radio">
-                                <input type="radio" name="age" value="50orover">
-                                50 or over
-                            </label>
-                        </div>
-                        <br/>
-                        <p>...and living...</p>
-                        <div class="control">
-                            <label class="radio mr-3">
-                                <input type="radio" name="country" value="EN">
-                                in England
-                            </label>
-                            <label class="radio">
-                                <input type="radio" name="country" value="other">
-                                not in England
-                            </label>
-                        </div>
+                <p style="font-weight:bold">I am aged...</p>
+                <div style="margin-bottom:20px">
+                    <div class="control">
+                        <label class="radio mr-3">
+                            <input type="radio" name="age" value="under50"
+                                {{ old('age') == "under50" ? 'checked' : '' }}
+                            >
+                            under 50
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="age" value="50orover"
+                                {{ old('age') == "50orover" ? 'checked' : '' }}
+                            >
+                            50 or over
+                        </label>
                     </div>
+                    @if ($errors->has('age'))
+                        <p class="text-danger">please select an age group</p>
+                    @endif
                 </div>
+                <div>
+                    <p style="font-weight:bold">...and living...</p>
+                    <div class="control">
+                        <label class="radio mr-3">
+                            <input type="radio" name="country" value="england"
+                                {{ old('country') == "england" ? 'checked' : '' }}
+                            >
+                            in England
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="country" value="other"
+                                {{ old('country') == "other" ? 'checked' : '' }}
+                            >
+                            not in England
+                        </label>
+                    </div>
+                    @if ($errors->has('country'))
+                        <p class="text-danger">please select a location</p>
+                    @endif
+                </div>
+            </div>
         </div>
             <div class="container fault-type">
                 <div class="container">
