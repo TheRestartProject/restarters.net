@@ -63,7 +63,7 @@
          background-color: #bdbdbd !important;
      }
 
-     .btn-info-open {
+     #btn-info-open {
          float:right;
          cursor:pointer;
      }
