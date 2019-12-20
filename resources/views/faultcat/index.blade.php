@@ -65,6 +65,7 @@
 
      .btn-info-open {
          float:right;
+         cursor:pointer;
      }
 
      #btn-translate a {
@@ -118,7 +119,7 @@
                 $alt = 'MehCat';
             }
             ?>
-                <a id="btn-info-open" style="float:right"
+                <a id="btn-info-open"
                    data-toggle="modal" data-target="#faultcatInfoModal"
                    class="btn btn-info btn-sm btn-rounded p-2">
                     <svg style="width:24px;height:24px;" viewBox="0 0 24 24">
