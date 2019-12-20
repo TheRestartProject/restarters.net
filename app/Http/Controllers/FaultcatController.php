@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
 use App\Faultcat;
+use App\MicrotaskDemographics;
 use Session;
 
 class FaultcatController extends Controller {
@@ -27,8 +28,11 @@ class FaultcatController extends Controller {
         $user->clicks = $request->session()->get('faultcat.counter', 0);
         $request->session()->put('faultcat.counter', ++$user->clicks);
 
+        $user->country = $request->session()->get('faultcat.country', null);
+        $user->age = $request->session()->get('faultcat.age', null);
+
         if (!$user->id && ($user->clicks % 4 == 0) && (!$user->country || !$user->age)) {
-            return redirect('/faultcat/demographics');
+            return redirect()->action('FaultcatController@demographics');
         }
 
         if ($request->isMethod('post') && !empty($_POST)) {
@@ -94,10 +98,30 @@ class FaultcatController extends Controller {
         ]);
     }
 
+
+    /**
+     * Store demographic information from anonymous users.
+     */
     public function storeDemographics(Request $request)
     {
-        // store
+        $age = $request->input('age');
+        $country = $request->input('country');
 
-        return redirect('/faultcat');
+        $details = [
+            'session_id' => session()->getId(),
+            'ip_address' => $_SERVER['REMOTE_ADDR'],
+            'country' => $country,
+            'age' => $age,
+            'task' => 'FaultCat',
+        ];
+
+        $success = MicrotaskDemographics::create($details);
+
+        // Store details in session, so as to not ask this same user again.
+        $request->session()->put('faultcat.age', $age);
+        $request->session()->put('faultcat.country', $country);
+
+
+        return redirect()->action('FaultcatController@index');
     }
 }

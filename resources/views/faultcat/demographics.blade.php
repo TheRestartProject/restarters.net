@@ -103,6 +103,8 @@
                 <img id="faultcat" class="pull-right" src="{{ asset('/images/faultcat/099-smiling-cat-face-with-heart-eyes-64px.svg.png') }}" alt="smiling cat" width="48" height="48" />
             </div>
         </div>
+        <form id="save-demographics" action="{{ action('FaultcatController@storeDemographics') }}" method="POST">
+            @csrf
         <div class="row problem p-2 mb-2 mx-1 mx-sm-0 notification">
             <div class="col">
                     <p class="">I am aged...</p>
@@ -113,7 +115,7 @@
                                 under 50
                             </label>
                             <label class="radio">
-                                <input type="radio" name="age" value="over50">
+                                <input type="radio" name="age" value="50orover">
                                 50 or over
                             </label>
                         </div>
@@ -132,8 +134,6 @@
                     </div>
                 </div>
         </div>
-        <form id="save-demographics" action="faultcat/demographics" method="POST">
-            @csrf
             <div class="container fault-type">
                 <div class="container">
                     <p class="buttons">
