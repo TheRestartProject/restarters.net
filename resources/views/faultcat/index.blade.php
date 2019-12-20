@@ -106,10 +106,10 @@
                             <span class="underline">Y</span>es / possibly
                         </button>
                         <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded">
-                            <span class="">I don't know,&nbsp;<span class="underline">F</span>etch another one</span>
+                            <span class="">I don't know,&nbsp;<span class="underline">F</span>etch another repair</span>
                         </button>
                         <button type="submit" name="fetch" id="N" class="btn btn-md btn-danger btn-rounded">
-                            <span class=""><span class="underline">N</span>ope, let me pick something else</span>
+                            <span class=""><span class="underline">N</span>ope, let me pick another fault</span>
                         </button>
                     </p>
                 </div>
