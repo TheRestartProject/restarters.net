@@ -62,6 +62,12 @@ Route::prefix('calendar')->group(function () {
     Route::get('/all-events/{hash_env}', 'CalendarEventsController@allEvents')->name('calendar-events-all');
 });
 
+Route::prefix('faultcat')->group(function () {
+    Route::get('/', 'FaultcatController@index');
+    Route::post('/', 'FaultcatController@index');
+    Route::get('/demographics', 'FaultcatController@demographics');
+    Route::post('/demographics', 'FaultcatController@storeDemographics');
+});
 
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/', 'HomeController@index')->name('home');
@@ -228,6 +234,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/export/time-volunteered', 'ExportController@exportTimeVolunteered');
     Route::get('/reporting/time-volunteered', 'ExportController@getTimeVolunteered');
     Route::get('/reporting/time-volunteered/{search}', 'ExportController@getTimeVolunteered');
+    
 });
 
 Route::get('/party/invite/{code}', 'PartyController@confirmCodeInvite');
