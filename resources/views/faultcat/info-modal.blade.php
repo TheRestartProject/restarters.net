@@ -27,7 +27,7 @@
 
                 <img src="{{ asset('/images/faultcat/099-smiling-cat-face-with-heart-eyes-64px.svg.png') }}" alt="smiling cat" width="48" height="48" />
 
-                <p>Learn how to play, and give us your feedback, in the <a target="_blank" href="https://talk.restarters.net/t/get-involved-in-repair-data-with-faultcat/2313">FaultCat discussion</a>.
+                <p>Find out more, and give us your feedback, in the <a target="_blank" href="https://talk.restarters.net/t/get-involved-in-repair-data-with-faultcat/2313">FaultCat discussion</a>.
                 </p>
 
 
