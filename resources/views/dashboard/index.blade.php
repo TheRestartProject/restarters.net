@@ -30,7 +30,7 @@
                             <span class='badge badge-success'>NEW!</span>
                             <strong>Get involved with community repair data with FaultCat! 😺</strong>
                           </div>
-                          <p>Help categorise the faults we've seen in computers with a simple online task.  <a href="/faultcat">Play here</a> or <a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}/t/get-involved-in-repair-data-with-faultcat/2313">learn more</a>.
+                          <p>Help categorise the faults we've seen in computers with a simple online task.  <a href="/faultcat">Play here</a> or <a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}/t/get-involved-in-repair-data-with-faultcat/2315">learn more</a>.
                           </p>
                       </div>
                   </div>
