@@ -14,10 +14,10 @@
                 </p>
                 <hr/>
                 <p>
-                    At repair events volunteers collect data from the repairs they attempt. The data is uploaded on Restarters.net and shared as <a target="_blank" href="https://openrepair.org/open-data/downloads">open data</a>.
+                    Volunteers collect data about the devices that are brought into our repair events. The data is uploaded to Restarters.net and shared as <a target="_blank" href="https://openrepair.org/open-data/downloads">open data</a>.
                 </p>
                 <p>
-                    Starting with two <a target="_blank" href="https://openrepair.org/data-dives/open-repair-data-fixfest-2019-why-computers-fail/">data dives in 2019</a>, volunteers have contributed to an initial categorisation of the data. We now want to confirm it, to group repairs into streams that can be reported and visualised.
+                    We held <a target="_blank" href="https://openrepair.org/data-dives/open-repair-data-fixfest-2019-why-computers-fail/">two data dives</a> this year where other volunteers sorted repair records into types of faults. This helps us to report and visualise our data. We'd now like to review and improve the categorisations.
                 </p>
                 <p>
                     This is where you can help, by playing FaultCat!
