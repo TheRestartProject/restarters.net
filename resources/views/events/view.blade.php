@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app', ['show_login_join_to_anons' => true])
 @section('content')
 <section class="events">
   <div class="container-fluid">
