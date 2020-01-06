@@ -17,7 +17,7 @@
                     Volunteers collect data about the devices that are brought into our repair events. The data is uploaded to Restarters.net and shared as <a target="_blank" href="https://openrepair.org/open-data/downloads">open data</a>.
                 </p>
                 <p>
-                    We held <a target="_blank" href="https://openrepair.org/data-dives/open-repair-data-fixfest-2019-why-computers-fail/">two data dives</a> this year where other volunteers sorted repair records into types of faults. This helps us to report and visualise our data. We'd now like to review and improve the categorisations.
+                    We held <a target="_blank" href="https://openrepair.org/data-dives/open-repair-data-fixfest-2019-why-computers-fail/">two data dives</a> in 2019 where other volunteers sorted repair records into types of faults. This helps us to report and visualise our data. We'd now like to review and improve the categorisations.
                 </p>
                 <p>
                     This is where you can help, by playing FaultCat!
