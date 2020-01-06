@@ -62,7 +62,7 @@
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ env('GOOGLE_TAG_MANAGER_ID') }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
 
-        @if ($show_login_join)
+        @if (isset($show_login_join) && $show_login_join)
             <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
                 <a class="d-none d-sm-block navbar-brand" role="button" data-toggle="collapse" aria-expanded="false" href="#startMenu" aria-controls="startMenu" aria-label="Toggle start menu">
                     @include('includes/logo')
