@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app', ['show_login_join' => true])
 
 @section('extra-css')
 
