@@ -543,6 +543,8 @@ class ComposerStaticInitb3a141d18cfa1fb7914d3d8756132230
         'App\\Helpers\\FootprintRatioCalculator' => __DIR__ . '/../..' . '/app/Helpers/FootprintRatioCalculator.php',
         'App\\Home' => __DIR__ . '/../..' . '/app/Home.php',
         'App\\Host' => __DIR__ . '/../..' . '/app/Host.php',
+        'App\\Http\\Controllers\\API\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/UserController.php',
+        'App\\Http\\Controllers\\API\\UserGroupsController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/UserGroupsController.php',
         'App\\Http\\Controllers\\AboutController' => __DIR__ . '/../..' . '/app/Http/Controllers/AboutController.php',
         'App\\Http\\Controllers\\AdminController' => __DIR__ . '/../..' . '/app/Http/Controllers/AdminController.php',
         'App\\Http\\Controllers\\AjaxController' => __DIR__ . '/../..' . '/app/Http/Controllers/AjaxController.php',

@@ -10,16 +10,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use OwenIt\Auditing\Contracts\Auditable;
+
 class WikiSyncStatus {
     const DoNotCreate = 0;
     const CreateAtLogin = 1;
     const Created = 2;
 }
 
-class User extends Authenticatable
+class User extends Authenticatable implements Auditable
 {
     use Notifiable;
     use SoftDeletes;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'users';
 
@@ -29,7 +32,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'access_key', 'access_group_tag_id', 'calendar_hash'
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_key', 'access_group_tag_id', 'calendar_hash'
     ];
 
     /**
@@ -39,6 +42,17 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password', 'remember_token',
+    ];
+
+    /**
+     * Attributes to exclude from the Audit.
+     *
+     * @var array
+     */
+    protected $auditExclude = [
+        'number_of_logins',
+        'last_login_at',
+        'remember_token',
     ];
 
     /**
@@ -300,7 +314,7 @@ class User extends Authenticatable
     public function anonymise()
     {
         $this->name = 'Deleted User';
-        $this->email = $this->id.'@deleted.com';
+        $this->email = $this->id.'@deleted.invalid';
         $this->username = $this->id.'-deleted';
 
         // TODO: country, city, gender, age, also required?
@@ -420,5 +434,26 @@ class User extends Authenticatable
     public function isDripSubscriber()
     {
       return ! is_null($this->drip_subscriber_id);
+    }
+
+    public function hasRole($roleName)
+    {
+        $usersRole = $this->role()->first()->role;
+
+        // Root assumed to have all available roles.
+        if ($usersRole == 'Root') {
+            return true;
+        }
+
+        if ($usersRole == $roleName) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getTalkProfileUrl()
+    {
+        return env('DISCOURSE_URL').'/u/'.$this->username;
     }
 }
