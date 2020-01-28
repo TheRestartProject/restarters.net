@@ -25,7 +25,7 @@ return array (
   'read_more' => 'Read more',
   'how_to_host_an_event' => 'How to host an event',
   'how_to_host_an_event_text' => 'We have years of experience hosting community repair events, and we offer materials on how to organise events them. We also offer peer to peer support on our forum.',
-  'view_the_materials' => 'view_the_materials',
+  'view_the_materials' => 'View the materials',
   'our_global_environmental_impact' => 'Our Global Environmental Impact',
   'the_impact_of_restarters' => 'The impact of Restarters\' fixing around the world.',
   'waste_prevented' => 'waste prevented',
