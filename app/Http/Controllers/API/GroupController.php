@@ -10,14 +10,22 @@ use Illuminate\Http\Request;
 
 class GroupController extends Controller
 {
-    public static function getGroupChanges()
+    /**
+     * Return a list of changes related to groups.
+     *
+     * This is currently primarily for Zapier.
+     */
+    public static function getGroupChanges(Request $request)
     {
         $authenticatedUser = Auth::user();
         if ( ! $authenticatedUser->hasRole('Administrator')) {
             return abort(403, 'The authenticated user is not authorized to access this resource');
         }
 
-        $groupAudits = self::getGroupAudits();
+        $dateFrom = $request->input('date_from', null);
+
+        $groupAudits = self::getGroupAudits($dateFrom);
+
 
         $groupChanges = [];
         foreach ($groupAudits as $groupAudit) {
@@ -30,14 +38,30 @@ class GroupController extends Controller
         return response()->json($groupChanges);
     }
 
-    public static function getGroupAudits()
+
+    /**
+     * Get all of the audits related to groups from the audits table.
+     *
+     */
+    public static function getGroupAudits($dateFrom = null)
     {
-        return \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\Group')
-            ->groupBy('created_at')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\Group');
+
+        if (!is_null($dateFrom)) {
+            $query->where('created_at', '>=', $dateFrom);
+        }
+
+        $query->groupBy('created_at')
+              ->orderBy('created_at', 'desc');
+
+        return $query->get();
     }
 
+
+    /**
+     * Map from the group and audit information as recorded by the audits library,
+     * into the format needed for Zapier.
+     */
     public static function mapDetailsAndAuditToChange($group, $groupAudit)
     {
         $group->makeHidden(['updated_at', 'wordpress_post_id', 'ShareableLink', 'shareable_code']);
@@ -52,6 +76,7 @@ class GroupController extends Controller
 
         return $groupChange;
     }
+
 
     public static function getGroupList()
     {
