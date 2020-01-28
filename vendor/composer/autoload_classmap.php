@@ -46,6 +46,8 @@ return array(
     'App\\Helpers\\FootprintRatioCalculator' => $baseDir . '/app/Helpers/FootprintRatioCalculator.php',
     'App\\Home' => $baseDir . '/app/Home.php',
     'App\\Host' => $baseDir . '/app/Host.php',
+    'App\\Http\\Controllers\\API\\UserController' => $baseDir . '/app/Http/Controllers/API/UserController.php',
+    'App\\Http\\Controllers\\API\\UserGroupsController' => $baseDir . '/app/Http/Controllers/API/UserGroupsController.php',
     'App\\Http\\Controllers\\AboutController' => $baseDir . '/app/Http/Controllers/AboutController.php',
     'App\\Http\\Controllers\\AdminController' => $baseDir . '/app/Http/Controllers/AdminController.php',
     'App\\Http\\Controllers\\AjaxController' => $baseDir . '/app/Http/Controllers/AjaxController.php',

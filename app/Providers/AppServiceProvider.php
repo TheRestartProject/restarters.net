@@ -10,6 +10,7 @@ use Cache;
 use FixometerHelper;
 use Illuminate\Support\ServiceProvider;
 use Schema;
+use \OwenIt\Auditing\Models\Audit;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,14 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Schema::defaultStringLength(191);
+
+        // Don't create Audit entries when nothing that we want to audit has changed.
+        // see: https://github.com/owen-it/laravel-auditing/issues/263#issuecomment-330695869
+        Audit::creating(function (Audit $model) {
+            if (empty($model->old_values) && empty($model->new_values)) {
+                return false;
+            }
+        });
 
         view()->composer('*', function ($view) {
             if (Auth::check()) {

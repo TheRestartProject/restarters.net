@@ -31,7 +31,7 @@ class Group extends Model implements Auditable
         'shareable_code',
     ];
 
-    protected $appends = ['ShareableLink'];
+    protected $appends = ['ShareableLink', 'approved'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -298,9 +298,10 @@ class Group extends Model implements Auditable
         if (!$this->allVolunteers()->pluck('user')->contains($groupMember->id))
             throw new \Exception('Volunteer is not currently in this group.  Only existing group members can be made hosts.');
 
-        UserGroups::where('user', $groupMember->id)
-            ->where('group', $this->idgroups)
-            ->update(['role' => Role::HOST]);
+        $userGroupAssociation = UserGroups::where('user', $groupMember->id)
+                                ->where('group', $this->idgroups)->first();
+        $userGroupAssociation->role = Role::HOST;
+        $userGroupAssociation->save();
 
         // Update user's role (only if currently Restarter role)
         $groupMember->convertToHost();
@@ -430,5 +431,10 @@ class Group extends Model implements Auditable
       ->groupBy('events.idevents')
       ->orderBy('events.idevents', 'ASC')
       ->get();
+    }
+
+    public function getApprovedAttribute()
+    {
+        return !is_null($this->wordpress_post_id);
     }
 }

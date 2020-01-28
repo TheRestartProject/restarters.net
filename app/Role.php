@@ -15,6 +15,8 @@ class Role extends Model
     const GUSET = 5;
 
     protected $table = 'roles';
+    protected $primaryKey = 'idroles';
+
     /**
      * The attributes that are mass assignable.
      *
