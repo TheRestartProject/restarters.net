@@ -20,14 +20,16 @@ class UserGroupsController extends Controller
      *
      * Only Administrators allowed to access this endpoint.
      */
-    public static function changes()
+    public static function changes(Request $request)
     {
         $authenticatedUser = Auth::user();
         if ( ! $authenticatedUser->hasRole('Administrator')) {
             return abort(403, 'The authenticated user is not authorized to access this resource');
         }
 
-        $userGroupAudits = self::getUserGroupAudits();
+        $dateFrom = $request->input('date_from', null);
+
+        $userGroupAudits = self::getUserGroupAudits($dateFrom);
 
         $userGroupChanges = [];
         foreach ($userGroupAudits as $audit) {
@@ -40,12 +42,18 @@ class UserGroupsController extends Controller
         return response()->json($userGroupChanges);
     }
 
-    protected static function getUserGroupAudits()
+    protected static function getUserGroupAudits($dateFrom = null)
     {
-        return \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\UserGroups')
-            ->groupBy('event', 'created_at')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\UserGroups');
+
+        if (!is_null($dateFrom)) {
+            $query->where('created_at', '>=', $dateFrom);
+        }
+
+        $query->groupBy('event', 'created_at')
+              ->orderBy('created_at', 'desc');
+
+        return $query->get();
     }
 
     protected static function mapDetailsAndAuditToChange($userGroupAssociation, $audit)
