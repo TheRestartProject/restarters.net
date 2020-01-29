@@ -11,9 +11,12 @@ use Illuminate\Http\Request;
 class GroupController extends Controller
 {
     /**
-     * Return a list of changes related to groups.
+     * List changes made to groups.
+     * Makes use of the audits produced by Laravel audits.
      *
-     * This is currently primarily for Zapier.
+     * Created specifically for use as a Zapier trigger.
+     *
+     * Only Administrators can access this API call.
      */
     public static function getGroupChanges(Request $request)
     {

@@ -18,14 +18,16 @@ class UserController extends Controller
      *
      * Only Administrators can access this API call.
      */
-    public static function changes()
+    public static function changes(Request $request)
     {
         $authenticatedUser = Auth::user();
         if ( ! $authenticatedUser->hasRole('Administrator')) {
             return abort(403, 'The authenticated user is not authorized to access this resource');
         }
 
-        $userAudits = self::getUserAudits();
+        $dateFrom = $request->input('date_from', null);
+
+        $userAudits = self::getUserAudits($dateFrom);
 
         $userChanges = [];
         foreach ($userAudits as $userAudit) {
@@ -38,12 +40,18 @@ class UserController extends Controller
         return response()->json($userChanges);
     }
 
-    protected static function getUserAudits()
+    protected static function getUserAudits($dateFrom = null)
     {
-        return \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\User')
-            ->groupBy('event', 'created_at')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\User');
+
+        if (!is_null($dateFrom)) {
+            $query->where('created_at', '>=', $dateFrom);
+        }
+
+        $query->groupBy('event', 'created_at')
+              ->orderBy('created_at', 'desc');
+
+        return $query->get();
     }
 
     protected static function mapUserAndAuditToUserChange($user, $audit)
