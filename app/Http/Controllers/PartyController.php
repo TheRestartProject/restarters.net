@@ -1636,12 +1636,12 @@ class PartyController extends Controller
      * @author  Christopher Kelker
      * @version 1.0.0
      * @date    2019-03-13
-     * @param   [type]     $api_key
+     * @param   [type]     $api_token
      * @return  [type]
      */
-     public function getEventsByKey(Request $request, $api_key, $date_from = null, $date_to = null)
+     public function getEventsByKey(Request $request, $api_token, $date_from = null, $date_to = null)
      {
-         $user = User::where('api_key', $api_key)->first();
+         $user = User::where('api_token', $api_token)->first();
 
          $parties = Party::join('groups', 'groups.idgroups', '=', 'events.group')
          ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
@@ -1654,7 +1654,7 @@ class PartyController extends Controller
          }
 
          $parties = $parties->where([
-             ['users.api_key', $user->api_key],
+             ['users.api_token', $user->api_token],
              ['users.access_group_tag_id', $user->access_group_tag_id]
          ])
          ->select('events.*')
@@ -1745,11 +1745,11 @@ class PartyController extends Controller
      * @author  Christopher Kelker
      * @version 1.0.0
      * @date    2019-03-13
-     * @param   [type]     $api_key
+     * @param   [type]     $api_token
      * @param   [type]     $id
      * @return  [type]
      */
-    public function getEventByKeyAndId(Request $request, $api_key, Party $party)
+    public function getEventByKeyAndId(Request $request, $api_token, Party $party)
     {
         // If Event is not found, through 404 error
         if (empty($party) && ! $party->exists) {
