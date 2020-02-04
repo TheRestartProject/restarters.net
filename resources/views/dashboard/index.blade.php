@@ -17,7 +17,7 @@
   </div>
 
   {{-- temporary banner --}}
-  <div class="row row-compressed">
+  {{-- <div class="row row-compressed">
       <div class="col">
           @if ( is_null(Cookie::get("information-alert-dismissed-faultcat")) && Auth::check() )
 
@@ -49,6 +49,7 @@
 
       </div>
   </div>
+  --}}
   {{-- temporary banner --}}
 
   <div class="row row-compressed">
