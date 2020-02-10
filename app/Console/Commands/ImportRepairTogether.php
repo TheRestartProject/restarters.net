@@ -62,6 +62,7 @@ class ImportRepairTogether extends Command
         foreach ($records as $index => $row) {
             $name = trim($row['Group Name - Nom du Repair Café']);
             $website = trim($row['Website']);
+            $facebook = trim($row['Facebook URL']);
             $location = trim($row['Name of the place (optional)'].', '.$row['Street']);
             $area = trim($row['City']);
             $latitude = $row['Latitude'];
@@ -75,6 +76,7 @@ class ImportRepairTogether extends Command
             $data = [
                 'name' => $name,
                 'website' => $website,
+                'facebook' => $facebook,
                 'location' => $location,
                 'area' => $area,
                 'latitude' => $latitude,
