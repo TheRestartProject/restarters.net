@@ -5,6 +5,9 @@ namespace App\Console\Commands;
 use App\Group;
 use App\GroupTags;
 use App\Helpers\FixometerHelper;
+use App\Role;
+use App\User;
+use App\UserGroups;
 
 use Illuminate\Console\Command;
 use League\Csv\Reader;
@@ -43,7 +46,7 @@ class ImportRepairTogether extends Command
     public function handle()
     {
         $this->importGroups();
-        $this->importUsers();
+        $this->importHosts();
     }
 
 
@@ -87,6 +90,63 @@ class ImportRepairTogether extends Command
                 $this->info('Creating group: '.$name);
                 $group = Group::create($data);
                 $group->addTag($repairTogetherTag);
+            } catch (\Exception $ex) {
+                // Show message, but carry on with other groups.
+                $this->error($ex->getMessage());
+            }
+        }
+    }
+
+    public function importHosts()
+    {
+        $jonathan = User::find(1);
+        $luc = User::find(2);
+
+        $csv = Reader::createFromPath('./repairtogether-hosts.csv', 'r');
+        $csv->setHeaderOffset(0);
+        $records = $csv->getRecords();
+
+        $repairTogetherTag = GroupTags::find(12);
+        $repairTogetherNetworkId = 3;
+
+        foreach ($records as $index => $row) {
+            $name = $row['Host name'];
+            $email = $row['Host email'];
+            $groupId = $row['Group ID'];
+            $yearOfBirth = $row['Year of Birth'];
+            $townOrCity = $row['Host Location'];
+            $country = 'BE';
+            // TODO: add in facebook?
+            // TODO: which one should really map to area?  province?  city?
+
+            $data = [
+                'name' => $name,
+                'role' => Role::HOST,
+                'email' => $email,
+                'location' => $townOrCity,
+                'age' => $yearOfBirth,
+                'language' => 'fr',
+                'country' => $country,
+                'repair_network' => $repairTogetherNetworkId,
+            ];
+
+            try {
+                if (User::where('email', $email)->exists()) {
+                    $this->info('User '.$email.' already exists.  Not creating.');
+                } else {
+                    $this->info('Creating user: '.$name);
+                    $user = User::create($data);
+                    $user->generateAndSetUsername();
+                }
+
+                $this->info('Adding to group');
+                $group = Group::where('external_id', $groupId)->first();
+                UserGroups::create([
+                    'user' => $user->id,
+                    'group' => $group->idgroups,
+                    'status' => 1,
+                    'role' => Role::HOST,
+                ]);
             } catch (\Exception $ex) {
                 // Show message, but carry on with other groups.
                 $this->error($ex->getMessage());
