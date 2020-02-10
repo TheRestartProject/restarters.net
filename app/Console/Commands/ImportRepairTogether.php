@@ -60,14 +60,14 @@ class ImportRepairTogether extends Command
         $repairTogetherNetworkId = 3;
 
         foreach ($records as $index => $row) {
-            $name = $row['Group Name - Nom du Repair Café'];
-            $website = $row['Website'];
-            $location = $row['Name of the place (optional)'].', '.$row['Street'];
-            $area = $row['City'];
+            $name = trim($row['Group Name - Nom du Repair Café']);
+            $website = trim($row['Website']);
+            $location = trim($row['Name of the place (optional)'].', '.$row['Street']);
+            $area = trim($row['City']);
             $latitude = $row['Latitude'];
             $longitude = $row['Longitude'];
             $country = 'Belgium';
-            $free_text = nl2br($row['Description']);
+            $free_text = trim(nl2br($row['Description']));
             $external_id = $row['Group ID'];
             // TODO: add in facebook?
             // TODO: which one should really map to area?  province?  city?
@@ -110,11 +110,11 @@ class ImportRepairTogether extends Command
         $repairTogetherNetworkId = 3;
 
         foreach ($records as $index => $row) {
-            $name = $row['Host name'];
-            $email = $row['Host email'];
+            $name = trim($row['Host name']);
+            $email = trim($row['Host email']);
             $groupId = $row['Group ID'];
             $yearOfBirth = $row['Year of Birth'];
-            $townOrCity = $row['Host Location'];
+            $townOrCity = trim($row['Host Location']);
             $country = 'BE';
             // TODO: add in facebook?
             // TODO: which one should really map to area?  province?  city?
