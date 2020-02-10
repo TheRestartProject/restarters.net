@@ -15,7 +15,8 @@ class AddExternalIdToGroups extends Migration
     {
         Schema::table('groups', function (Blueprint $table) {
             $table->smallInteger('external_id')
-                  ->nullable(true);
+                  ->nullable(true)
+                  ->after('network_id');
         });
     }
 

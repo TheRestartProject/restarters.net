@@ -16,7 +16,8 @@ class AddNetworkIdToGroups extends Migration
         Schema::table('groups', function (Blueprint $table) {
             $table->smallInteger('network_id')
                   ->nullable(false)
-                  ->default(1);
+                  ->default(1)
+                  ->after('wordpress_post_id');
         });
     }
 
