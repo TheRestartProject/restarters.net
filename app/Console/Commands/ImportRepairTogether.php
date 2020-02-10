@@ -90,6 +90,7 @@ class ImportRepairTogether extends Command
                 $this->info('Creating group: '.$name);
                 $group = Group::create($data);
                 $group->addTag($repairTogetherTag);
+                $this->addNetworkHosts($group->idgroups);
             } catch (\Exception $ex) {
                 // Show message, but carry on with other groups.
                 $this->error($ex->getMessage());
@@ -97,11 +98,34 @@ class ImportRepairTogether extends Command
         }
     }
 
+    public function addNetworkHosts($groupId)
+    {
+        $jonathan = User::where('email', 'jonathan.vigne@repairtogether.be')->first();
+        if (is_null($jonathan)) {
+            throw \Exception('Couldn\'t find Jonathan');
+        }
+        $luc = User::where('email', 'luc.deriez@repairtogether.be')->first();
+        if (is_null($luc)) {
+            throw \Exception('Couldn\'t find Luc');
+        }
+
+        UserGroups::create([
+            'user' => $jonathan->id,
+            'group' => $groupId,
+            'status' => 1,
+            'role' => Role::HOST,
+        ]);
+
+        UserGroups::create([
+            'user' => $luc->id,
+            'group' => $groupId,
+            'status' => 1,
+            'role' => Role::HOST,
+        ]);
+    }
+
     public function importHosts()
     {
-        $jonathan = User::find(1);
-        $luc = User::find(2);
-
         $csv = Reader::createFromPath('./repairtogether-hosts.csv', 'r');
         $csv->setHeaderOffset(0);
         $records = $csv->getRecords();
