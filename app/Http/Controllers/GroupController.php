@@ -1485,6 +1485,7 @@ class GroupController extends Controller
                         'longitude' => $group->longitude,
                     ],
                     'website' => $group->website,
+                    'facebook' => $group->facebook,
                     'description' => $group->free_text,
                     'image_url' => $group->groupImagePath(),
                     'upcoming_parties' => $upcoming_parties_collection = collect([]),
