@@ -70,8 +70,6 @@ class ImportRepairTogether extends Command
             $country = 'Belgium';
             $free_text = trim(nl2br($row['Description']));
             $external_id = $row['Group ID'];
-            // TODO: add in facebook?
-            // TODO: which one should really map to area?  province?  city?
 
             $data = [
                 'name' => $name,
