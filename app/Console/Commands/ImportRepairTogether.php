@@ -26,7 +26,7 @@ class ImportRepairTogether extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Imports groups and hosts from Repair Together\'s spreadsheet';
 
     /**
      * Create a new command instance.
@@ -63,8 +63,8 @@ class ImportRepairTogether extends Command
             $name = trim($row['Group Name - Nom du Repair Café']);
             $website = trim($row['Website']);
             $facebook = trim($row['Facebook URL']);
-            $location = trim($row['Name of the place (optional)'].', '.$row['Street']);
-            $area = trim($row['City']);
+            $location = trim($row['Name of the place (optional)'].', '.$row['Street'].', '.$row['City']);
+            $area = trim($row['Province']);
             $latitude = $row['Latitude'];
             $longitude = $row['Longitude'];
             $country = 'Belgium';
