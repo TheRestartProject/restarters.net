@@ -56,7 +56,7 @@ class FixometerFile extends Model
             $filename = $this->filename($tmp_name);
             $this->file = $filename;
             $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
-            if ( ! move_uploaded_file($tmp_name, $path)) {
+            if ( ! @move_uploaded_file($tmp_name, $path)) {
                 return false;
             }
             $data = array();
