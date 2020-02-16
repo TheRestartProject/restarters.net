@@ -77,7 +77,7 @@ class GroupController extends Controller
 
         //Look for groups where user ID exists in pivot table
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-            ->join('events', 'events.group', '=', 'groups.idgroups')
+            ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id);
 
             if ( ! empty($sort_direction) && ! empty($sort_column)) {
@@ -329,11 +329,6 @@ class GroupController extends Controller
 
                     $response['success'] = 'Group created correctly.';
 
-                    if (isset($_FILES) && ! empty($_FILES)) {
-                        $file = new FixometerFile;
-                        $group_avatar = $file->upload('file', 'image', $idGroup, env('TBL_GROUPS'), false, true);
-                    }
-
                     //Associate current logged in user as a host
                     UserGroups::create([
                         'user' => Auth::user()->id,
@@ -348,6 +343,11 @@ class GroupController extends Controller
                         'group_name' => $name,
                         'group_url' => url('/group/edit/'.$idGroup),
                     ]));
+
+                    if (isset($_FILES) && ! empty($_FILES)) {
+                        $file = new FixometerFile;
+                        $file->upload('file', 'image', $idGroup, env('TBL_GROUPS'), false, true);
+                    }
                 } else {
                     $response['danger'] = 'Group could <strong>not</strong> be created. Something went wrong with the database.';
                 }
