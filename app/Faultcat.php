@@ -39,7 +39,7 @@ class Faultcat extends Model {
             TRIM(d.`problem`) as problem,
             COUNT(o.`iddevices`) as opinions_count
             FROM `devices` d
-            LEFT OUTER JOIN `devices_faults` f ON f.`iddevices` = d.iddevices
+            LEFT OUTER JOIN `devices_faults_events` f ON f.`iddevices` = d.iddevices
             LEFT JOIN `categories` c ON c.`idcategories` = d.`category`
             LEFT JOIN `devices_faults_opinions` o ON o.`iddevices` = d.`iddevices`
             WHERE d.`category` IN (11,15,16,17,26)
