@@ -1534,6 +1534,8 @@ class GroupController extends Controller
                             'latitude' => $event->latitude,
                             'longitude' => $event->longitude,
                         ],
+                        'created_at' => $event->created_at,
+                        'updated_at' => $event->updated_at,
                     ]);
                 }
             }
