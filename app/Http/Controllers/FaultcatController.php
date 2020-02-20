@@ -56,8 +56,8 @@ class FaultcatController extends Controller {
                     'user_id' => $user->id,
                     'ip_address' => $_SERVER['REMOTE_ADDR'],
                     'session_id' => session()->getId(),
-                    'country' => $data['country'],
-                    'age' => $data['age'],
+//                    'country' => $data['country'],
+//                    'age' => $data['age'],
                 ];
                 $success = $Faultcat->create($insert);
                 if (!$success) {

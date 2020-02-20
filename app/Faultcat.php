@@ -17,7 +17,7 @@ class Faultcat extends Model {
      *
      * @var array
      */
-    protected $fillable = ['iddevices', 'fault_type', 'user_id', 'ip_address', 'session_id', 'country', 'age']; 
+    protected $fillable = ['iddevices', 'fault_type', 'user_id', 'ip_address', 'session_id']; 
 
     /**
      * Fetch a single random computer device record that has less than 5
