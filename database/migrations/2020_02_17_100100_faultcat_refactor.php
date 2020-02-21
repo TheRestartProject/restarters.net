@@ -73,7 +73,7 @@ class FaultcatRefactor extends Migration {
         });
 
         Schema::table('devices', function (Blueprint $table) {
-            $table->string('fault_type', 64)->index();
+            $table->string('fault_type', 64)->index()->nullable();
         });
     }
 
