@@ -152,6 +152,10 @@ footer {
   }
 }
 
+.d-flex .form-check-input {
+  flex: none;
+}
+
 label.form-check-label {
   font-weight: 400;
   font-family: $font-family-second;
