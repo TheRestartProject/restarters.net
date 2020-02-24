@@ -38,7 +38,6 @@ class FaultcatController extends Controller {
         if ($request->isMethod('post') && !empty($_POST)) {
             if (isset($_POST['iddevices']) && !isset($_POST['fetch'])) {
                 $data = array_filter($_POST);
-//                logger(print_r($data, 1));
                 if (isset($_POST['country'])) {
                     $request->session()->put('faultcat.country', $data['country']);
                 } else {
@@ -56,19 +55,14 @@ class FaultcatController extends Controller {
                     'user_id' => $user->id,
                     'ip_address' => $_SERVER['REMOTE_ADDR'],
                     'session_id' => session()->getId(),
-                    'country' => $data['country'],
-                    'age' => $data['age'],
                 ];
                 $success = $Faultcat->create($insert);
                 if (!$success) {
                     logger(print_r($insert, 1));
                     logger('FaultCat error on insert.');
-//                } else {
-//                    logger(print_r($insert, 1));
                 }
             }
         }
-//        logger(print_r($request->session()->get('faultcat'), 1));
         $user->country = $request->session()->get('faultcat.country', null);
         $user->age = $request->session()->get('faultcat.age', null);        
 
