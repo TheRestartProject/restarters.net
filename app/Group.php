@@ -27,8 +27,11 @@ class Group extends Model implements Auditable
         'longitude',
         'country',
         'free_text',
+        'facebook',
         'wordpress_post_id',
         'shareable_code',
+        'network_id',
+        'external_id',
     ];
 
     protected $appends = ['ShareableLink', 'approved'];

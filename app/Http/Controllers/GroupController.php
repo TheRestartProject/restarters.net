@@ -1485,6 +1485,7 @@ class GroupController extends Controller
                         'longitude' => $group->longitude,
                     ],
                     'website' => $group->website,
+                    'facebook' => $group->facebook,
                     'description' => $group->free_text,
                     'image_url' => $group->groupImagePath(),
                     'upcoming_parties' => $upcoming_parties_collection = collect([]),
@@ -1500,6 +1501,8 @@ class GroupController extends Controller
                         'headline_stats' => url("/group/stats/{$group->idgroups}"),
                         'co2_equivalence_visualisation' => url("/outbound/info/group/{$group->idgroups}/manufacture"),
                     ],
+                    'created_at' => $group->created_at,
+                    'updated_at' => $group->updated_at,
                 ]);
 
                 foreach ($group->upcomingParties() as $key => $event) {
@@ -1514,6 +1517,8 @@ class GroupController extends Controller
                             'latitude' => $event->latitude,
                             'longitude' => $event->longitude,
                         ],
+                        'created_at' => $event->created_at,
+                        'updated_at' => $event->updated_at,
                     ]);
                 }
 
@@ -1529,6 +1534,8 @@ class GroupController extends Controller
                             'latitude' => $event->latitude,
                             'longitude' => $event->longitude,
                         ],
+                        'created_at' => $event->created_at,
+                        'updated_at' => $event->updated_at,
                     ]);
                 }
             }
