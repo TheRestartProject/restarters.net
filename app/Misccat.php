@@ -22,7 +22,7 @@ protected $table = 'devices_misc_opinions';
     protected $fillable = ['iddevices', 'category', 'eee', 'user_id'];//, 'ip_address', 'session_id']; 
 
     /**
-     * Fetch a single random computer device record that has less than 5
+     * Fetch a single random computer device record that has less than 3
      * existing opinions and a "Misc" category.
      * 
      * Not the most efficient query
@@ -44,7 +44,7 @@ LEFT JOIN `devices_misc_opinions` o ON o.`iddevices` = d.`iddevices`
 WHERE d.`category` = 46
 AND LENGTH(d.`problem`) > 0
 GROUP BY d.`iddevices`
-HAVING opinions_count < 5
+HAVING opinions_count < 3
 ORDER BY rand()
 LIMIT 1;"
         );
@@ -68,15 +68,11 @@ COUNT(o.category) AS all_crowd_opinions_count
 FROM devices d
 LEFT OUTER JOIN devices_misc_opinions o ON o.iddevices = d.iddevices
 LEFT OUTER JOIN devices_misc_adjudicated a ON a.iddevices = d.iddevices
-WHERE d.category IN (11,15,16,17,26)
+WHERE d.category IN (46)
 AND LENGTH(d.problem) > 0
 GROUP BY d.iddevices
 HAVING
-(all_crowd_opinions_count > 2 AND top_crowd_opinion_percentage = 100)
-OR
-(all_crowd_opinions_count > 3 AND top_crowd_opinion_percentage >= 75)
-OR
-(all_crowd_opinions_count > 4 AND top_crowd_opinion_percentage >= 60)
+(all_crowd_opinions_count >= 2 AND top_crowd_opinion_percentage >= 60)
 OR adjudicated_opinion IS NOT NULL
 ORDER BY NULL);");
 
