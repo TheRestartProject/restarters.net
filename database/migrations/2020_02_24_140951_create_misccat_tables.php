@@ -18,9 +18,9 @@ class CreateMisccatTables extends Migration {
             $table->integer('iddevices')->index();
             $table->string('category', 64)->index();
             $table->boolean('eee');
-//            $table->string('session_id', 191);
-//            $table->ipAddress('ip_address');
             $table->unsignedInteger('user_id')->nullable();
+            $table->string('session_id', 191);
+            $table->ipAddress('ip_address');
             $table->timestamps();
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';

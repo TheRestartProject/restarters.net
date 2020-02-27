@@ -10,11 +10,11 @@
             </div>
             <div class="modal-body">
                 <p>
-                    MiscCat is a web app to help <strong>collaboratively categorise the type of faults in computers brought to community events</strong> such as Restart Parties and Repair Cafes.
+                    MiscCat is a web app to help categorise the type of items brought to community events</strong> such as Restart Parties and Repair Cafes.
                 </p>
                 <hr/>
                 <p>
-                    Volunteers collect data about the devices that are brought into our repair events. The data is uploaded to Restarters.net and shared as <a target="_blank" href="https://openrepair.org/open-data/downloads">open data</a>.
+                    Volunteers collect data about the items that are brought into our repair events. The data is uploaded to Restarters.net and shared as <a target="_blank" href="https://openrepair.org/open-data/downloads">open data</a>.
                 </p>
                 <p>
                     This is where you can help, by playing MiscCat!

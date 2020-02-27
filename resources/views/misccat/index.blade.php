@@ -31,6 +31,7 @@
             </div>
         </div>
         <?php if ($misc) { ?>
+            <div><span class="statement">WE SAW THIS AT A REPAIR EVENT</span></div>
             <div class="row problem p-2 mb-2 mx-1 mx-sm-0 notification">
                 <div class="col">
                     <div class="row">
@@ -58,96 +59,99 @@
                 </div>
             </div>
             <form id="log-task" action="misccat" method="POST">
+                <input type="hidden" id="iddevices" name="iddevices" value="<?php echo $misc->iddevices; ?>">
+                <input type="hidden" id="eee" name="eee" value="1">
+                <input type="hidden" id="category" name="category" value="Misc">
                 @csrf
-                <div class="container misccat">
-                    <div class="container">
-                        <input type="hidden" id="iddevices" name="iddevices" value="<?php echo $misc->iddevices; ?>">
-                        <input type="hidden" id="category" name="category" value="<?php echo $misc->category; ?>">
-                        <input type="hidden" id="eee" name="category" value="1">
-                        <p class="buttons is-centered">
-                            <button class="btn btn-md btn-success btn-rounded" id="Y">
-                                <span class="underline">Y</span>es, leave it as Miscellaneous
-                            </button>
-                            <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded">
-                                <span class="">I don't know,&nbsp;<span class="underline">F</span>etch another repair</span>
-                            </button>
-                            <button type="submit" name="fetch" id="N" class="btn btn-md btn-danger btn-rounded">
-                                <span class=""><span class="underline">N</span>ope, let me pick another category</span>
-                            </button>
-                        </p>
-                    </div>
-                    <div class="container options hide">
-                        <p class="confirm hide">
-                            <button class="btn-md btn-info btn-rounded" id="change"><span class="underline">G</span>o with "<span id="category-new"></span>"</button>
-                        </p>
-                        <div id="eee-radios" class="container">
-                            <div>It uses
-                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 64 64"><path fill="#fbb11c" d="M43.4.159L12.06 28.492l24.31 7.538L18.12 64l35.26-33.426l-18.978-8.464z"/></svg>
-                                <span class="electricity">electricity</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 64 64"><path fill="#fbb11c" d="M43.4.159L12.06 28.492l24.31 7.538L18.12 64l35.26-33.426l-18.978-8.464z"/></svg>
-                                <span>(mains/battery/solar)</span>
-                            </div>
-                            <label class="radio"><input type="radio" name="eee" value="1" checked><strong class="eee-opt has-text-yellow">YES</strong></label>
-                            <label class="radio"><input type="radio" name="eee" value="0"><strong class="eee-opt has-text-grey">NO</strong></label>
+            </form>
+            <div class="container misccat">
+                <div class="container options">
+                    <div class="question">WHAT KIND OF ITEM IS IT?</div>
+                    <div id="eee-radios" class="container">
+                        <span id="q1">1. Does it use
+                            <span>electricity?</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 64 64"><path fill="#fbb11c" d="M43.4.159L12.06 28.492l24.31 7.538L18.12 64l35.26-33.426l-18.978-8.464z"/></svg>
+                            <small>(mains/battery/solar)</small>
+                        </span>
+                        <br>
+                        <label class="radio"><input type="radio" name="eee-opt" value="1" checked><strong class="has-text-yellow">Yes</strong></label>
+                        <label class="radio"><input type="radio" name="eee-opt" value="0"><strong class="has-text-grey">No</strong></label>
+                        <label class="radio"><input type="radio" name="eee-opt" value="2"><strong class="has-text-grey">I'm not sure</strong></label>
+                    </div>   
+                    <div id="q2"><span>2. Which category does it belong to?</span></div>
+                    <div id="cat-buttons" class="container">
+                        <div id="non-eee-buttons" class="hide">
+                            <button class="btn btn-sm is-rounded cat-is-selected btn-misc">Miscellaneous</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Clothing/Textile</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Bicycle</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Furniture</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Jewellery</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Tool</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Toy</button>
                         </div>
-                        <div class="cat-is">... and the category IS</div>                        
-                        <div class="buttons">
-                            <div class="cat-eee hide">
+                        <div id="eee-buttons">
+                            <div class="cat-eee buttons">
                                 <button class="btn btn-sm is-rounded cat-is-selected btn-misc">Miscellaneous</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Clothing/Textile</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Bicycle</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Furniture</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Jewellery</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Tool</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Toy</button>
                             </div>
-                            <div class="cat-eee">
-                                <button class="btn btn-sm is-rounded cat-is-selected btn-misc">Miscellaneous</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Aircon/Dehumidifier</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Clock/Watch</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Decorative or safety lights</button>
+                            <div class="cluster">Computers and Home Office</div>
+                            <div class="buttons">
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Desktop computer</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Digital Compact Camera</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">DLSR / Video Camera</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Fan</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 15-17"</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 19-20"</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 22-24"</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 26-30"</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 32-37"</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Hair & Beauty item</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Laptop large</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Laptop medium</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Laptop small</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Paper shredder</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">PC Accessory</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Printer/scanner</button>
+                            </div>
+                            <div class="cluster">Electronic Gadgets</div>
+                            <div class="buttons">
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Digital Compact Camera</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">DLSR / Video Camera</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Handheld entertainment device</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Headphones</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Heater</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Mobile</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Tablet</button>
+                            </div>
+                            <div class="cluster">Home Entertainment</div>
+                            <div class="buttons">
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 26-30"</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 32-37"</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Hi-Fi integrated</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Hi-Fi separates</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Musical instrument</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Portable radio</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Projector</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">TV and gaming-related accessories</button>
+                            </div>
+                            <div class="cluster">Kitchen and Household Items</div>
+                            <div class="buttons">
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Aircon/Dehumidifier</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Clock/Watch</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Decorative or safety lights</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Fan</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Hair & Beauty item</button>
+                                <button class="btn btn-sm is-rounded cat-is-unselected">Heater</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Iron</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Kettle</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Lamp</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Landline phone</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Laptop large</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Laptop medium</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Laptop small</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Mobile</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Musical instrument</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Paper shredder</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">PC Accessory</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Portable radio</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Power tool</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Printer/scanner</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Projector</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Sewing machine</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Small kitchen item</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Tablet</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Toaster</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Toy</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">TV and gaming-related accessories</button>
                                 <button class="btn btn-sm is-rounded cat-is-unselected">Vacuum</button>
                             </div>
                         </div>
                     </div>
+                    <p>
+                        <button class="btn-md btn-info btn-rounded" id="btn-send"><span class="underline">G</span>o with "<span id="category-new">Misc</span>"</button>
+                    </p>
                 </div>
-            </form>
+            </div>
         <?php } ?>
 
         @include('misccat/info-modal')
@@ -159,45 +163,26 @@
 <script>
     document.addEventListener(`DOMContentLoaded`, async () => {
 
-        document.getElementById('Y').addEventListener('click', function (e) {
-            e.preventDefault();
-            doYes();
-        }, false);
-
-        document.getElementById('N').addEventListener('click', function (e) {
-            e.preventDefault();
-            doNo();
-        }, false);
-
-        document.getElementById('change').addEventListener('click', function (e) {
+        document.getElementById('btn-send').addEventListener('click', function (e) {
             e.preventDefault();
             doChange();
         }, false);
 
-        [...document.querySelectorAll('.cat-eee .btn')].forEach(elem => {
+        [...document.getElementById('eee-radios').querySelectorAll('input[name=eee-opt]')].forEach(elem => {
+            elem.addEventListener('click', function (e) {
+                doEEE(e);
+            });
+        });
+
+        [...document.getElementById('cat-buttons').querySelectorAll('button')].forEach(elem => {
             elem.addEventListener('click', function (e) {
                 e.preventDefault();
                 doOption(e);
             });
         });
 
-        [...document.querySelectorAll('input[name=eee]')].forEach(elem => {
-            elem.addEventListener('click', function (e) {
-                doEEE(e);
-            });
-        });
-
-        document.addEventListener("keypress", function (e) {
-            if (e.code == 'KeyF') {
-                e.preventDefault();
-                document.getElementById('fetch').click();
-            } else if (e.code == 'KeyY') {
-                e.preventDefault();
-                doYes();
-            } else if (e.code == 'KeyN') {
-                e.preventDefault();
-                doNo();
-            } else if (e.code == 'KeyG') {
+        document.addEventListener('keypress', function (e) {
+            if (e.code == 'KeyG') {
                 e.preventDefault();
                 doChange();
             } else if (e.code == 'KeyI') {
@@ -206,13 +191,51 @@
             }
         }, false);
 
-        function doYes(e) {
+        function doEEE(e) {
+            document.getElementById('eee').value = e.target.value;
+
+            [...document.getElementById('eee-radios').querySelectorAll('input[name=eee-opt]')].forEach(elem => {
+                elem.classList.remove('has-text-yellow');
+                elem.classList.add('has-text-grey');
+            });
+
+            [...document.getElementById('cat-buttons').querySelectorAll('.btn')].forEach(elem => {
+                elem.classList.replace('cat-is-selected', 'cat-is-unselected');
+            });
+            [...document.getElementById('cat-buttons').querySelectorAll('.btn-misc')].forEach(elem => {
+                elem.classList.replace('cat-is-unselected', 'cat-is-selected');
+            });
             document.getElementById('category').value = document.getElementById('category-new').innerText = 'Misc';
-            submitForm();
+            switch (e.target.value) {
+                case '2': // don't know
+                    document.getElementById('category').value = document.getElementById('category-new').innerText = 'Misc';
+                    document.getElementById('non-eee-buttons').classList.add('hide');
+                    document.getElementById('eee-buttons').classList.add('hide');
+                    document.getElementById('q2').classList.add('hide');
+                    e.target.nextSibling.classList.replace('has-text-grey', 'has-text-yellow');
+                    break;
+                case '0': // non-eee
+                    document.getElementById('non-eee-buttons').classList.remove('hide');
+                    document.getElementById('eee-buttons').classList.add('hide');
+                    document.getElementById('q2').classList.remove('hide');
+                    e.target.nextSibling.classList.replace('has-text-grey', 'has-text-yellow');
+                    break;
+                case '1': // eee
+                    document.getElementById('non-eee-buttons').classList.add('hide');
+                    document.getElementById('eee-buttons').classList.remove('hide');
+                    document.getElementById('q2').classList.remove('hide');
+                    e.target.nextSibling.classList.replace('has-text-grey', 'has-text-yellow');
+            }
         }
 
-        function doNo(e) {
-            document.querySelector('.options').classList.replace('hide', 'show');
+        function doOption(e) {
+            document.getElementById('category-new').innerText = e.target.innerText;
+            [...document.getElementById('cat-buttons').querySelectorAll('.btn')].forEach(elem => {
+                elem.classList.replace('cat-is-selected', 'cat-is-unselected');
+                if (elem.innerText == e.target.innerText) {
+                    elem.classList.replace('cat-is-unselected', 'cat-is-selected');
+                }
+            });
         }
 
         function doChange(e) {
@@ -221,40 +244,6 @@
                 document.getElementById('category').value = 'Misc';
             }
             submitForm();
-        }
-
-        function doEEE(e) {
-            [...document.getElementById('eee-radios').querySelectorAll('.eee-opt')].forEach(elem => {
-                if (elem.classList.contains('has-text-yellow')) {
-                    elem.classList.replace('has-text-yellow', 'has-text-grey');
-                } else if (elem.classList.contains('has-text-grey')) {
-                    elem.classList.replace('has-text-grey', 'has-text-yellow');
-                }
-            });
-
-            [...document.querySelectorAll('.cat-eee .btn')].forEach(elem => {
-                elem.classList.replace('cat-is-selected', 'cat-is-unselected');
-            });
-            [...document.querySelectorAll('.cat-eee .btn-misc')].forEach(elem => {
-                elem.classList.replace('cat-is-unselected', 'cat-is-selected');
-            });
-
-            [...document.querySelectorAll('.cat-eee')].forEach(elem => {
-                elem.classList.toggle('hide');
-            });
-            document.getElementById('eee').value = e.target.value;
-        }
-
-        function doOption(e) {
-            var cat = e.target.innerText;
-            [...document.querySelectorAll('.cat-eee .btn')].forEach(elem => {
-                elem.classList.replace('cat-is-selected', 'cat-is-unselected');
-                if (elem.innerText == cat) {
-                    elem.classList.replace('cat-is-unselected', 'cat-is-selected');
-                }
-            });
-            document.querySelector('.confirm').classList.replace('hide', 'show');
-            document.getElementById('category-new').innerText = e.target.innerText;
         }
 
         function submitForm() {

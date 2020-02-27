@@ -57,10 +57,6 @@
         border-radius: 5px;
     }
 
-    .tag {
-        margin-bottom: 2px;
-    }
-
     .misccat .btn {
         font-family: 'Open Sans';
     }
@@ -75,21 +71,11 @@
         color: white;        
         text-decoration: underline;
     }
-    
+
     #btn-translate {
         background-color: #000 !important;
     }
 
-    #Y,
-    #N,
-    #fetch,
-    #change {
-        margin-bottom: 2px;
-    }
-
-    .cat-is {
-        margin: 12px 0;
-    }
     .cat-is-unselected {
         background-color: #fff4cc; 
         color: black;
@@ -102,20 +88,23 @@
         font-weight: 500;
         margin: 3px 0;
     }
-    .electricity {
-        color: #FFDD57;
-        font-variant: small-caps;
-        font-weight: bolder; 
-        font-style: italic;
-        font-size: larger;
-    }
-    
+
     .has-text-yellow {
         color: #FFDD57;
     }
-    
+
     .has-text-grey-light {
         color: #333;
+    }
+
+    .question, .statement {
+        font-weight: bolder;font-style: italic;
+    }      
+    .question {
+        color: #96ffef;
+    }
+    .statement {
+        color: #00aa91;
     }
 
 
