@@ -14,7 +14,8 @@
             <div class="col-6">
                 <h1 class="pull-left">MiscCat </h1>
             </div>
-            <div class="col-6">
+            <div>
+                <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>
                 <!--
             These images are licensed under the Creative Commons Attribution 4.0 International license.
             Attribution: Vincent Le Moign
@@ -155,6 +156,7 @@
         <?php } ?>
 
         @include('misccat/info-modal')
+        @include('partials/task-cta-modal')
 </section>
 
 @endsection
@@ -188,6 +190,9 @@
             } else if (e.code == 'KeyI') {
                 e.preventDefault();
                 document.getElementById('btn-info-open').click();
+            } else if (e.code == 'KeyC') {
+                e.preventDefault();
+                document.getElementById('btn-cta-open').click();
             }
         }, false);
 
@@ -254,6 +259,10 @@
                     + ' / category: '
                     + document.getElementById('category').value);
             document.forms['log-task'].submit();
+        }
+
+        if (window.location.href.indexOf('cta') != -1) {
+            document.getElementById('btn-cta-open').click();
         }
 
     }, false);

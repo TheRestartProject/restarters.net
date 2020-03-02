@@ -72,8 +72,7 @@ Route::prefix('faultcat')->group(function () {
 Route::prefix('misccat')->group(function () {
     Route::get('/', 'MisccatController@index');
     Route::post('/', 'MisccatController@index');
-    Route::get('/demographics', 'MisccatController@demographics');
-    Route::post('/demographics', 'MisccatController@storeDemographics');
+    Route::get('/cta', 'MisccatController@cta');
 });
 
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
