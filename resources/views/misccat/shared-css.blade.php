@@ -52,7 +52,7 @@
 
     .problem {
         font-size: 1rem;
-        background-color: #f5f5f5;
+        background-color: #F5F5F5;
         border: 5px solid #FFDD57;
         border-radius: 5px;
     }
@@ -68,7 +68,7 @@
 
 
     #btn-translate a {
-        color: white;        
+        color: #FFF;        
         text-decoration: underline;
     }
 
@@ -77,14 +77,14 @@
     }
 
     .cat-is-unselected {
-        background-color: #fff4cc; 
-        color: black;
+        background-color: #FFF4CC !important; 
+        color: #000;
         font-weight: 500;
         margin: 3px 0;
     }
     .cat-is-selected {
-        background-color: #bdbdbd !important;
-        color: white;
+        background-color: #FFDD57 !important;
+        color: #FFF;
         font-weight: 500;
         margin: 3px 0;
     }
@@ -93,18 +93,18 @@
         color: #FFDD57;
     }
 
-    .has-text-grey-light {
-        color: #333;
+    .has-text-grey {
+        color: #BBB;
     }
 
     .question, .statement {
         font-weight: bolder;font-style: italic;
     }      
     .question {
-        color: #96ffef;
+        color: #96FFEF;
     }
     .statement {
-        color: #00aa91;
+        color: #00AA91;
     }
 
 

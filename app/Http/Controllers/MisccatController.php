@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
 use App\Misccat;
-use Session;
-use Carbon\Carbon;
+use App\Helpers\Microtask;
 
 class MisccatController extends Controller {
 
@@ -19,38 +18,9 @@ class MisccatController extends Controller {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
-            $user = new \stdClass();
-            $user->id = 0;
-            $user->name = 'Guest';
-//            $request->session()->flush();        
-            $user->clicks = $request->session()->get('misccat.counter', 0);
-            $user->cta = $request->session()->get('misccat.cta', 0);
-            $user->sesh = $request->session()->get('misccat.sesh', 0);
-            if (!$user->sesh) {
-                $request->session()->put('misccat.sesh', Carbon::now()->timestamp);
-                $user->sesh = $request->session()->get('misccat.sesh', 0);
-            }
-            logger(print_r($request->session()->all(), 1));
-            logger(print_r($_SESSION, 1));
-            if (!$user->cta) {
-                logger('no cta');
-                $request->session()->put('misccat.counter', ++$user->clicks);
-                if ($user->clicks % 4 == 0) {
-                    logger('time for cta');
-                    $request->session()->put('misccat.cta', 1);
-                    $request->session()->put('misccat.sesh', Carbon::now()->timestamp);
-                    return redirect()->action('MisccatController@cta');
-                }
-            } else {
-                logger('did cta: elapsed = ');
-                logger(Carbon::now()->timestamp);
-                logger(Carbon::now()->timestamp - $user->sesh);
-                if ((Carbon::now()->timestamp - $user->sesh) > 60) {
-                    logger('cta expired');
-                    $request->session()->put('misccat.cta', 0);
-                    $request->session()->put('misccat.counter', 0);
-                    $request->session()->put('misccat.sesh', Carbon::now()->timestamp);
-                }
+            $user = Microtask::getAnonUserCta($request);
+            if ($user->action) {
+                return redirect()->action('MisccatController@cta');
             }
         }
 
@@ -87,49 +57,5 @@ class MisccatController extends Controller {
     public function cta(Request $request) {
         return $this->index($request);
     }
-
-    protected function getAnonUser(Request $request) {
-        $user = new \stdClass();
-        $user->id = 0;
-        $user->name = 'Guest';
-//            $request->session()->flush();
-        $user->clicks = $request->session()->get('misccat.clicks', 0);
-        if (!$user->clicks) {
-            $request->session()->put('misccat.clicks', $user->clicks);
-        }
-        $user->cta = $request->session()->get('misccat.cta', 0);
-        if (!$user->cta) {
-            $request->session()->put('misccat.cta', $user->cta);
-        }
-        $user->sesh = $request->session()->get('misccat.sesh', 0);
-        if (!$user->sesh) {            
-            $user->sesh = Carbon::now()->timestamp;
-            $request->session()->put('misccat.sesh', $user->sesh);
-        }
-//        logger(print_r($request->session()->all(), 1));
-        if (!$user->cta) {
-//            logger('no cta');
-            $request->session()->put('misccat.clicks', ++$user->clicks);
-            if ($user->clicks % 4 == 0) {
-//                logger('time for cta');
-                $request->session()->put('misccat.cta', 1);
-                $request->session()->put('misccat.sesh', Carbon::now()->timestamp);
-                return redirect()->action('MisccatController@cta');
-            }
-        } else {
-//            logger('cta done: elapsed = ');
-//            logger(Carbon::now()->timestamp - $user->sesh);
-            if ((Carbon::now()->timestamp - $user->sesh) > 60) {
-//                logger('cta expired');
-                $request->session()->put('misccat.cta', 0);
-                $request->session()->put('misccat.clicks', 0);
-                $request->session()->put('misccat.sesh', Carbon::now()->timestamp);
-            }
-        }
-        $user->clicks = $request->session()->get('misccat.clicks', 0);
-        $user->cta = $request->session()->get('misccat.cta', 0);
-        $user->sesh = $request->session()->get('misccat.sesh', 0);
-        return $user;
-    }
-
+    
 }
