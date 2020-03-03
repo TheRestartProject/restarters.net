@@ -9,35 +9,35 @@ use Carbon\Carbon;
 
 class Microtask {
     
-    public static $wait = 900; // 15 minutes
-    
-    public static $clicks = 5;
-
     /**
      * Creates a user object for a guest user and enables session-based monitoring
      * of user clicks and duration to provide callbacks to controllers so 
-     * they can execute custom actions, e.g. "UI call to action".
+     * they can execute custom actions, e.g. "UI call to action". 
      * 
      * Example: 
      * 1. Every x clicks, return action = 1
      * 2. Stop counting clicks
      * 3. Once the wait period has elapsed start counting clicks again
      * 
+     * @see App\Http\Controllers\MisscatController
+     * 
      * @param Request $request
+     * @param int $clicks Number of clicks before action
+     * @param int $wait Seconds to wait between actions
      * @return stdClass $user
      */
-    public static function getAnonUserCta(Request $request) {
+    public static function getAnonUserCta(Request $request, $clicks = 5, $wait = 900) {
         $user = new \stdClass();
         $user->id = 0;
         $user->name = 'Guest';
         $user->action = 0;
 //        $request->session()->flush();
-        logger(print_r($request->session()->all(), 1));
+//        logger(print_r($request->session()->all(), 1));
         $user = Microtask::initTaskSession($request, $user);
         if (!$user->cta) {
 //            logger('no cta');
             $request->session()->put('microtask.clicks', ++$user->clicks);
-            if ($user->clicks % Microtask::$clicks == 0) {
+            if ($user->clicks % $clicks == 0) {
 //                logger('time for cta');
                 $request->session()->put('microtask.cta', 1);
                 $request->session()->put('microtask.sesh', Carbon::now()->timestamp);
@@ -45,7 +45,7 @@ class Microtask {
             }
         } else {
 //            logger('time elapsed since cta = ' . (Carbon::now()->timestamp - $user->sesh));
-            if ((Carbon::now()->timestamp - $user->sesh) > Microtask::$wait) {
+            if ((Carbon::now()->timestamp - $user->sesh) > $wait) {
 //                logger('cta expired');
                 Microtask::resetTaskSession($request, $user);
             }
