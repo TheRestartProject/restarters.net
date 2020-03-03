@@ -1,3 +1,4 @@
+<!-- Modal -->
 <style>
     .has-background-gold {background-color: #F69B05;}
     .has-background-teal {background-color: #21ACA7;}
@@ -6,15 +7,14 @@
     .has-text-white {color: #FFF;}
     .has-text-bold {font-weight: bold;}
     .is-horizontal-center {justify-content: center;}
-    ul, li {list-style-type: none;}
+    .microtask ul, li {list-style-type: none;}
     .text-is-left {text-align: left;}
     .text-is-center {text-align: left;}
-    div.col p {padding-top: 5px;}
+    .microtask div.col p {padding-top: 5px;}
 </style>
-<!-- Modal -->
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="taskctaModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
+        <div class="modal-content microtask">
             <div class="modal-header">
                 <h5 class="modal-title" id="taskctaModalLabel">We collect data at repair events</h5>
             </div>
@@ -82,11 +82,22 @@
             </div>
             <div class="modal-footer is-horizontal-center">
                 <p class="buttons">                        
-                    <a href="/about" id="join" class="btn btn-md btn-success btn-rounded">Join Restarters</a>
-                    <a href="/misccat" id="skip" class="btn btn-md btn-warning btn-rounded">Skip for now</a>
+                    <a href="/about" id="btn-join" class="btn btn-md btn-success btn-rounded">Join Restarters</a>
+                    <a href="/misccat" id="btn-skip" class="btn btn-md btn-warning btn-rounded">Skip for now</a>
                 </p>
             </div>
         </div>
     </div>
 </div>
-</div>
+<script>
+    document.addEventListener(`DOMContentLoaded`, async () => {
+        
+        document.getElementById('btn-join').addEventListener('click', function (e) {
+            e.preventDefault();
+            window.open("/about", '_blank');
+            document.getElementById('btn-skip').click();            
+        }, true);
+        
+    }, false);
+</script>
+
