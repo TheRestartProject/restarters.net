@@ -69,6 +69,12 @@ Route::prefix('faultcat')->group(function () {
     Route::post('/demographics', 'FaultcatController@storeDemographics');
 });
 
+Route::prefix('misccat')->group(function () {
+    Route::get('/', 'MisccatController@index');
+    Route::post('/', 'MisccatController@index');
+    Route::get('/cta', 'MisccatController@cta');
+});
+
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/', 'HomeController@index')->name('home');
 
