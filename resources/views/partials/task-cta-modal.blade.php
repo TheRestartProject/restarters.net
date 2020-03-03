@@ -9,7 +9,6 @@
     .is-horizontal-center {justify-content: center;}
     .microtask ul, li {list-style-type: none;}
     .text-is-left {text-align: left;}
-    .text-is-center {text-align: left;}
     .microtask div.col p {padding-top: 5px;}
 </style>
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="taskctaModal" tabindex="-1" role="dialog" aria-hidden="true">
