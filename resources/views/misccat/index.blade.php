@@ -205,8 +205,7 @@
             document.getElementById('eee').value = e.target.value;
 
             [...document.getElementById('eee-radios').querySelectorAll('input[name=eee-opt]')].forEach(elem => {
-                elem.classList.remove('has-text-yellow');
-                elem.classList.add('has-text-grey');
+                elem.nextSibling.classList.replace('has-text-yellow','has-text-grey');
             });
 
             [...document.getElementById('cat-buttons').querySelectorAll('.btn')].forEach(elem => {
@@ -218,7 +217,6 @@
             document.getElementById('category').value = document.getElementById('category-new').innerText = 'Misc';
             switch (e.target.value) {
                 case '2': // don't know
-                    document.getElementById('category').value = document.getElementById('category-new').innerText = 'Misc';
                     document.getElementById('non-eee-buttons').classList.add('hide');
                     document.getElementById('eee-buttons').classList.add('hide');
                     document.getElementById('q2').classList.add('hide');
