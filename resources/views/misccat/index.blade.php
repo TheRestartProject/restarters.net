@@ -14,8 +14,8 @@
             <div class="col-6">
                 <h1 class="pull-left">MiscCat </h1>
             </div>
-            <div>
-                <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>
+            <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>
+            <div>                
                 <!--
             These images are licensed under the Creative Commons Attribution 4.0 International license.
             Attribution: Vincent Le Moign
@@ -31,15 +31,22 @@
                 <img id="misccat" class="pull-right" src="{{ asset('/images/misccat/100-cat-face-with-wry-smile.svg.png') }}" alt="MiscCat" width="48" height="48" />
             </div>
         </div>
-        <?php if ($misc) { ?>
-            <div><span class="statement">WE SAW THIS AT A REPAIR EVENT</span></div>
-            <div class="row problem p-2 mb-2 mx-1 mx-sm-0 notification">
+        <?php if ($misc) { ?>            
+            <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
                 <div class="col">
                     <div class="row">
                         <div class="col">
+                            <p><span class="statement">WE SAW THIS AT A REPAIR EVENT</span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
                             <p>
-                                <span class="btn btn-md py-1 py-sm-2 btn-misc-info"><?php echo $misc->brand; ?></span>
-                                <span class="btn btn-md py-1 py-sm-2 btn-misc-info"><?php echo $misc->model; ?></span>
+                                <span class="btn btn-md py-1 py-sm-2 btn-misc-info">
+                                    <?php echo $misc->brand; ?>
+                                    &nbsp;
+                                    <?php echo $misc->model; ?>
+                                </span>
                             </p>
                         </div>
                     </div>
@@ -65,98 +72,96 @@
                 <input type="hidden" id="category" name="category" value="Misc">
                 @csrf
             </form>
-            <div class="container misccat">
-                <div class="container options">
-                    <div class="question">WHAT KIND OF ITEM IS IT?</div>
-                    <div id="eee-radios" class="container">
-                        <span id="q1">1. Does it use
-                            <span>electricity?</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 64 64"><path fill="#fbb11c" d="M43.4.159L12.06 28.492l24.31 7.538L18.12 64l35.26-33.426l-18.978-8.464z"/></svg>
-                            <small>(mains/battery/solar)</small>
-                        </span>
-                        <br>
-                        <label class="radio"><input type="radio" name="eee-opt" value="1" checked><strong class="has-text-yellow">Yes</strong></label>
-                        <label class="radio"><input type="radio" name="eee-opt" value="0"><strong class="has-text-grey">No</strong></label>
-                        <label class="radio"><input type="radio" name="eee-opt" value="2"><strong class="has-text-grey">I'm not sure</strong></label>
-                    </div>   
-                    <div id="q2"><span>2. Which category does it belong to?</span></div>
-                    <div id="cat-buttons" class="container">
-                        <div id="non-eee-buttons" class="hide">
+            <div class="row p-2 mb-2 mx-1 mx-sm-0 justify-content-center misccat options">
+                <div class="question">WHAT KIND OF ITEM IS IT?</div>
+                <div id="eee-radios" class="container">
+                    <span id="q1">1. Does it use
+                        <span>electricity?</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 64 64"><path fill="#fbb11c" d="M43.4.159L12.06 28.492l24.31 7.538L18.12 64l35.26-33.426l-18.978-8.464z"/></svg>
+                        <small>(mains/battery/solar)</small>
+                    </span>
+                    <br>
+                    <label class="radio"><input type="radio" name="eee-opt" value="1" checked><strong class="has-text-yellow">Yes</strong></label>
+                    <label class="radio"><input type="radio" name="eee-opt" value="0"><strong class="has-text-grey">No</strong></label>
+                    <label class="radio"><input type="radio" name="eee-opt" value="2"><strong class="has-text-grey">I'm not sure</strong></label>
+                </div>   
+                <div id="q2"><span>2. Which category does it belong to?</span></div>
+                <div id="cat-buttons" class="container">
+                    <div id="non-eee-buttons" class="hide">
+                        <button class="btn btn-sm is-rounded cat-is-selected btn-misc">Miscellaneous</button>
+                        <button class="btn btn-sm is-rounded cat-is-unselected">Clothing/Textile</button>
+                        <button class="btn btn-sm is-rounded cat-is-unselected">Bicycle</button>
+                        <button class="btn btn-sm is-rounded cat-is-unselected">Furniture</button>
+                        <button class="btn btn-sm is-rounded cat-is-unselected">Jewellery</button>
+                        <button class="btn btn-sm is-rounded cat-is-unselected">Tool</button>
+                        <button class="btn btn-sm is-rounded cat-is-unselected">Toy</button>
+                    </div>
+                    <div id="eee-buttons">
+                        <div class="cat-eee buttons">
                             <button class="btn btn-sm is-rounded cat-is-selected btn-misc">Miscellaneous</button>
-                            <button class="btn btn-sm is-rounded cat-is-unselected">Clothing/Textile</button>
-                            <button class="btn btn-sm is-rounded cat-is-unselected">Bicycle</button>
-                            <button class="btn btn-sm is-rounded cat-is-unselected">Furniture</button>
-                            <button class="btn btn-sm is-rounded cat-is-unselected">Jewellery</button>
-                            <button class="btn btn-sm is-rounded cat-is-unselected">Tool</button>
-                            <button class="btn btn-sm is-rounded cat-is-unselected">Toy</button>
                         </div>
-                        <div id="eee-buttons">
-                            <div class="cat-eee buttons">
-                                <button class="btn btn-sm is-rounded cat-is-selected btn-misc">Miscellaneous</button>
-                            </div>
-                            <div class="cluster">Computers and Home Office</div>
-                            <div class="buttons">
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Desktop computer</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 15-17"</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 19-20"</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 22-24"</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Laptop large</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Laptop medium</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Laptop small</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Paper shredder</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">PC Accessory</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Printer/scanner</button>
-                            </div>
-                            <div class="cluster">Electronic Gadgets</div>
-                            <div class="buttons">
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Digital Compact Camera</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">DLSR / Video Camera</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Handheld entertainment device</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Headphones</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Mobile</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Tablet</button>
-                            </div>
-                            <div class="cluster">Home Entertainment</div>
-                            <div class="buttons">
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 26-30"</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 32-37"</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Hi-Fi integrated</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Hi-Fi separates</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Musical instrument</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Portable radio</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Projector</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">TV and gaming-related accessories</button>
-                            </div>
-                            <div class="cluster">Kitchen and Household Items</div>
-                            <div class="buttons">
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Aircon/Dehumidifier</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Clock/Watch</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Decorative or safety lights</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Fan</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Hair & Beauty item</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Heater</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Iron</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Kettle</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Lamp</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Landline phone</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Power tool</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Sewing machine</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Small kitchen item</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Toaster</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Toy</button>
-                                <button class="btn btn-sm is-rounded cat-is-unselected">Vacuum</button>
-                            </div>
+                        <div class="cluster">Computers and Home Office</div>
+                        <div class="buttons">
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Desktop computer</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 15-17"</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 19-20"</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 22-24"</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Laptop large</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Laptop medium</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Laptop small</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Paper shredder</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">PC Accessory</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Printer/scanner</button>
+                        </div>
+                        <div class="cluster">Electronic Gadgets</div>
+                        <div class="buttons">
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Digital Compact Camera</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">DLSR / Video Camera</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Handheld entertainment device</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Headphones</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Mobile</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Tablet</button>
+                        </div>
+                        <div class="cluster">Home Entertainment</div>
+                        <div class="buttons">
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 26-30"</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Flat screen 32-37"</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Hi-Fi integrated</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Hi-Fi separates</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Musical instrument</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Portable radio</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Projector</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">TV and gaming-related accessories</button>
+                        </div>
+                        <div class="cluster">Kitchen and Household Items</div>
+                        <div class="buttons">
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Aircon/Dehumidifier</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Clock/Watch</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Decorative or safety lights</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Fan</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Hair & Beauty item</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Heater</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Iron</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Kettle</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Lamp</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Landline phone</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Power tool</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Sewing machine</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Small kitchen item</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Toaster</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Toy</button>
+                            <button class="btn btn-sm is-rounded cat-is-unselected">Vacuum</button>
                         </div>
                     </div>
-                    <p>
-                        <button class="btn-md btn-info btn-rounded" id="btn-send"><span class="underline">G</span>o with "<span id="category-new">Misc</span>"</button>
-                    </p>
                 </div>
+                <p>
+                    <button class="btn-md btn-info btn-rounded" id="btn-send"><span class="underline">G</span>o with "<span id="category-new">Misc</span>"</button>
+                </p>
             </div>
         <?php } ?>
-
-        @include('misccat/info-modal')
-        @include('partials/task-cta-modal')
+    </div>
+    @include('misccat/info-modal')
+    @include('partials/task-cta-modal')
 </section>
 
 @endsection

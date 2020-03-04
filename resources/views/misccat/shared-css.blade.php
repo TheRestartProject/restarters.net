@@ -1,10 +1,5 @@
 <style>
-    /*
-       this is css shared between the main misccat view,
-    and the demographics view.  should be moved to a shared layout,
-    or into sass.  just putting it here for now to remove duplication
-    between the files.
-    */
+    
     body {
         text-align: center !important;
     }
@@ -21,21 +16,8 @@
         float: right; /* bootstrap pull-right class working locally but not on server!  falling back on this. */
     }
 
-
-    .title {
-        font-weight: bold;
-    }
-
-    .is-horizontal-center {
-        justify-content: center;
-    }
-
     .hide {
         display: none;
-    }
-
-    .show {
-        display: block;
     }
 
     .underline {
@@ -44,9 +26,10 @@
 
     .options {
         margin-top: 15px;
-        background-color: black;
-        color: white;
+        background-color: #333;
+        color: #FFF;
         border: 5px solid #FFDD57;
+        border-radius: 5px;
         padding: 15px;
     }
 
@@ -65,15 +48,15 @@
         float:right;
         cursor:pointer;
     }
-
-
     #btn-translate a {
         color: #FFF;        
         text-decoration: underline;
     }
-
     #btn-translate {
         background-color: #000 !important;
+    }    
+    #btn-send {
+        margin-top:5px;
     }
 
     .cat-is-unselected {
@@ -92,13 +75,13 @@
     .has-text-yellow {
         color: #FFDD57;
     }
-
     .has-text-grey {
         color: #BBB;
     }
 
     .question, .statement {
-        font-weight: bolder;font-style: italic;
+        font-weight: bolder;
+        font-style: italic;
     }      
     .question {
         color: #96FFEF;
@@ -106,6 +89,5 @@
     .statement {
         color: #00AA91;
     }
-
 
 </style>

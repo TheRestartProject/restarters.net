@@ -6,9 +6,8 @@
     .has-background-green {background-color: #16A765;}
     .has-text-white {color: #FFF;}
     .has-text-bold {font-weight: bold;}
-    .is-horizontal-center {justify-content: center;}
-    .microtask ul, li {list-style-type: none;}
     .text-is-left {text-align: left;}
+    .microtask ul, li {list-style-type: none;}
     .microtask div.col p {padding-top: 5px;}
 </style>
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="taskctaModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -17,8 +16,8 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="taskctaModalLabel">We collect data at repair events</h5>
             </div>
-            <div class="modal-body text-is-left">
-                <div class="row problem">
+            <div class="modal-body">
+                <div class="row problem text-is-left">
                     <div class="col">
                         <div class="row">
                             <div class="col">
@@ -79,7 +78,7 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer is-horizontal-center">
+            <div class="modal-footer justify-content-center">
                 <p class="buttons">                        
                     <a href="/about" id="btn-join" class="btn btn-md btn-success btn-rounded">Join Restarters</a>
                     <a href="/misccat" id="btn-skip" class="btn btn-md btn-warning btn-rounded">Skip for now</a>
