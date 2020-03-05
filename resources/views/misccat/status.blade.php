@@ -37,7 +37,7 @@
             <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
                 <div class="col">
                     <div class="row justify-content-center">
-                        <p><strong>Devices categorised "Miscellaneous"</strong></p>
+                        <p><strong>Items categorised "Miscellaneous"</strong></p>
                     </div>
                     <div class="row justify-content-center">
                         <div class="col">
