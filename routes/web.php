@@ -73,6 +73,7 @@ Route::prefix('misccat')->group(function () {
     Route::get('/', 'MisccatController@index');
     Route::post('/', 'MisccatController@index');
     Route::get('/cta', 'MisccatController@cta');
+    Route::get('/status', 'MisccatController@status');
 });
 
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {

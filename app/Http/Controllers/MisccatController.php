@@ -59,4 +59,14 @@ class MisccatController extends Controller {
         return $this->index($request);
     }
     
+    public function status(Request $request) {
+        $Misccat = new Misccat;
+        $data = $Misccat->fetchStatus();
+        logger(print_r($data,1));
+        return view('misccat.status', [
+            'status' => $data,
+            'user' => $user,
+        ]);
+    }
+    
 }
