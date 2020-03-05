@@ -23,19 +23,26 @@
     .underline {
         text-decoration: underline;
     }
+    
+    .radio {
+        padding: 0 5px;
+    }
 
     .options {
-        margin-top: 15px;
-        background-color: #333;
-        color: #FFF;
+        background-color: #FFF;
+        color: #000;        
         border: 5px solid #FFDD57;
         border-radius: 5px;
-        padding: 15px;
+        padding: 5px;
+    }
+    
+    .options div {
+        padding: 3px 0;
     }
 
     .problem {
         font-size: 1rem;
-        background-color: #F5F5F5;
+        background-color: #FFF;
         border: 5px solid #FFDD57;
         border-radius: 5px;
     }
@@ -55,39 +62,22 @@
     #btn-translate {
         background-color: #000 !important;
     }    
-    #btn-send {
-        margin-top:5px;
-    }
-
     .cat-is-unselected {
-        background-color: #FFF4CC !important; 
-        color: #000;
+        background-color: #FFDD57 !important;
+        color: #000 !important;
         font-weight: 500;
         margin: 3px 0;
     }
     .cat-is-selected {
-        background-color: #FFDD57 !important;
-        color: #FFF;
+        background-color: #17A2B8 !important;
+        color: #FFF !important;
         font-weight: 500;
         margin: 3px 0;
     }
 
-    .has-text-yellow {
-        color: #FFDD57;
-    }
-    .has-text-grey {
-        color: #BBB;
-    }
-
     .question, .statement {
-        font-weight: bolder;
-        font-style: italic;
+        font-size: 1rem;
+        font-weight: bold;
     }      
-    .question {
-        color: #96FFEF;
-    }
-    .statement {
-        color: #00AA91;
-    }
 
 </style>

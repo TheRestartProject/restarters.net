@@ -75,7 +75,8 @@ LIMIT 1;"
 //HAVING
 //(all_crowd_opinions_count >= 2 AND top_crowd_opinion_percentage >= 60)
 //OR adjudicated_opinion IS NOT NULL
-//ORDER BY NULL);");
+//ORDER BY NULL
+//        );");
 //
 //        DB::statement("ALTER TABLE `devices_misc_temporary` ADD PRIMARY KEY(`iddevices`);");
 //

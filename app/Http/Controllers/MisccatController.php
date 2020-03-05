@@ -17,9 +17,10 @@ class MisccatController extends Controller {
     public function index(Request $request) {
         if (Auth::check()) {
             $user = Auth::user();
-        } else {
+        } else {            
             $user = Microtask::getAnonUserCta($request);
-            if ($user->action) {
+//            logger(print_r($user,1));
+            if ($user->action) {                
                 return redirect()->action('MisccatController@cta');
             }
         }
