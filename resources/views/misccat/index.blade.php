@@ -33,25 +33,25 @@
                 </a>
             </div>
         </div>
-        <?php if ($misc) { ?>            
+        @if (isset($misc))
             <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
                 <div class="col">
                     <p><span class="statement">WE SAW THIS AT A REPAIR EVENT</span></p>
                     <p>
-                        <?php echo $misc->brand; ?>
+                        @php( print($misc->brand))
                         &nbsp;
-                        <?php echo $misc->model; ?>
+                        @php( print($misc->model))
                     </p>
                     <div class="row">
                         <div class="col-8 offset-sm-2">
                             <p class="subtitle">
-                                <?php echo $misc->problem; ?>
+                                @php( print($misc->problem))
                             </p>
                         </div>
                         <div class="col-4 col-sm-2">
                             <!--<button id="btn-translate" class="pull-right btn btn-md px-3 py-1">-->
                             <button id="btn-translate" class="btn btn-md px-3 py-1">
-                                <a href="https://translate.google.com/#view=home&op=translate&sl=auto&tl=en&text=<?php echo $misc->translate; ?>" target="_blank">
+                                <a href="https://translate.google.com/#view=home&op=translate&sl=auto&tl=en&text=@php( print($misc->translate))" target="_blank">
                                     Translate
                                 </a>
                             </button>
@@ -60,7 +60,7 @@
                 </div>
             </div>
             <form id="log-task" action="misccat" method="POST">
-                <input type="hidden" id="iddevices" name="iddevices" value="<?php echo $misc->iddevices; ?>">
+                <input type="hidden" id="iddevices" name="iddevices" value="@php( print($misc->iddevices))">
                 <input type="hidden" id="eee" name="eee" value="1">
                 <input type="hidden" id="category" name="category" value="Misc">
                 @csrf
@@ -154,7 +154,7 @@
                     </p>
                 </div>
             </div>
-        <?php } ?>
+        @endif
     </div>
     @include('misccat/info-modal')
     @include('partials/task-cta-modal')
