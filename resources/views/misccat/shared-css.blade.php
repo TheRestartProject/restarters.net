@@ -78,6 +78,14 @@
     .question, .statement {
         font-size: 1rem;
         font-weight: bold;
-    }      
+    }
+    
+    .text-is-italic {
+        font-style: italic;
+    }
+    
+    .border-grey {        
+        border: 1px solid #EEE;
+    }
 
 </style>

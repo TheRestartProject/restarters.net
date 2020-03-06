@@ -28,11 +28,8 @@
                 <p>
                     <a href="/misccat/status">Click here to see the current status of MiscCat</a>
                 </p>
-
                 <p>Find out more, and give us your feedback, in the <a target="_blank" href="https://talk.restarters.net/t/get-involved-in-repair-data-with-faultcat/2315">MiscCat discussion</a>.
                 </p>
-
-
             </div>
         </div>
     </div>
