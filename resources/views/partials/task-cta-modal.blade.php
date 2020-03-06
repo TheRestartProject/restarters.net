@@ -7,10 +7,9 @@
     .has-text-white {color: #FFF;}
     .has-text-bold {font-weight: bold;}
     .microtask ul, li {list-style-type: none;}
-    .microtask div.col p {padding-top: 5px;}
  .use-case {
      background-color: #f7f5ed;
-     border: 1px solid #ccc;
+     border: 1px solid #ddd;
      padding: 10px;
      border-radius: 10px;
      height: 100%;
@@ -37,36 +36,36 @@
                         <div class="row">
                             <div class="col">
                                 <p>Each item you're seeing was brought to a repair event to be fixed rather than thrown away.</p>
-                                <p>What do we do with this data?  It helps us do some important work:</p>
+                                <p><strong>What do we do with this data?</strong></p>
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <div class="col-12 col-sm-4 mb-2 mb-sm-0">
+                            <div class="col-12 col-lg-4 mb-2 mb-lg-0">
                                 <div class="use-case">
                                     <h5>Share repair skills</h5>
                                     <p>By learning why items break and how to fix them, we can share this knowledge with the world.</p>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-4 mb-2 mb-sm-0">
+                            <div class="col-12 col-lg-4 mb-2 mb-lg-0">
                                 <div class="use-case">
                                 <h5>Showcase the benefits of repair</h5>
                                 <p>We help groups understand their impact, motivate their community, and support funding bids.</p>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-4 mb-2 mb-sm-0">
+                            <div class="col-12 col-lg-4 mb-2 mb-lg-0">
                                 <div class="use-case">
                                 <h5>Campaign for change</h5>
                                 <p>Repair data supports policy on the Right to Repair, making products more repairable, and reducing the environmental impact of electronics.</p>
                                 </div>
                             </div>
                         </div>
+                        <hr/>
                         <div class="row">
                             <div class="col">
                                 <h5>Want to get more involved?</h5>
                                 <p>You can join us as a <a target="_blank" href="https://talk.restarters.net/t/our-work-on-repair-data/1150">data volunteer</a>.</p>
-                                    <p>📊 Help us improve our data collection and help us tell stories through data journalism.</p>
+                                    <p class="mb-sm-0">📊 Help us improve our data collection and help us tell stories through data journalism.</p>
                                     <p>💡 Learn about data collection, crowdsourcing, standards, aggregation, and open data.</p>
-                                <p>Join the community and get involved!</p>
                         </div>
                     </div>
                 </div>
