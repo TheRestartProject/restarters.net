@@ -60,6 +60,12 @@ class MisccatController extends Controller {
     }
     
     public function status(Request $request) {
+        if (Auth::check()) {
+            $user = Auth::user();
+        } else {
+            $user = null;
+        }
+
         $Misccat = new Misccat;
         $data = $Misccat->fetchStatus();
         logger(print_r($data,1));
