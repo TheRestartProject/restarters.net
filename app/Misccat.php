@@ -27,6 +27,10 @@ class Misccat extends Model {
      * 
      * Not the most efficient query
      * 
+     * The list of excluded iddevices is because those records have 
+     * useless problem text:
+     * "Like all data in Y1, this data is an estimate based on participation"
+     * 
      * @return array
      */
     public function fetchMisc() {
@@ -43,6 +47,7 @@ LEFT JOIN `categories` c ON c.`idcategories` = d.`category`
 LEFT JOIN `devices_misc_opinions` o ON o.`iddevices` = d.`iddevices`
 WHERE d.`category` = 46
 AND LENGTH(TRIM(d.`problem`)) > 0
+AND d.iddevices NOT IN (1850,1851,1852,1854,1855,1856,1857,1858,1859,1862,1863,1864,1866,1867,1868,1869,1870,1871,1872,1873,1874,1875,1876,1877,1878,1879)
 GROUP BY d.`iddevices`
 HAVING opinions_count < 3
 ORDER BY rand()
