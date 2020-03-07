@@ -128,7 +128,7 @@ GROUP BY d.iddevices
 HAVING
 (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 50)
 AND (top_crowd_opinion != 'Misc')
-ORDER BY all_crowd_opinions_count DESC, d.iddevices DESC
+ORDER BY top_crowd_opinion ASC, all_crowd_opinions_count DESC, d.iddevices DESC
 ");
   
                 $result['total_splits'] = DB::select("
