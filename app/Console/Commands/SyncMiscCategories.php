@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Misccat;
 
 class SyncMiscCategories extends Command
 {
