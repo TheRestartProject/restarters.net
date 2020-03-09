@@ -1225,8 +1225,10 @@ class UserController extends Controller
             $subscribed = false;
         }
 
-        $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
-        $user->drip_subscriber_id = $drip_subscribe_user->id;
+        if (env('DRIP_API_TOKEN') !== null && env('DRIP_API_TOKEN') !== '') {
+            $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
+            $user->drip_subscriber_id = $drip_subscribe_user->id;
+        }
 
         if (!is_null($request->input('invites')) && $request->input('invites') == 1) { //Subscribe to invites
             $user->invites = 1;

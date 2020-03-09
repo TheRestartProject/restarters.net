@@ -43,6 +43,25 @@ class GroupController extends Controller
 
 
     /**
+     * To provide a more uniform API, this is just a wrapper around
+     * the method in the GroupController for now.
+     *
+     * That method should be moved out of the controller.
+     *
+     */
+    public static function getGroupsByUserGroupTag(Request $request)
+    {
+        $authenticatedUser = Auth::user();
+
+        $groupController = new \App\Http\Controllers\GroupController();
+
+        $groups = $groupController->getGroupsByKey($request, $authenticatedUser->api_token);
+
+        return response()->json($groups);
+    }
+
+
+    /**
      * Get all of the audits related to groups from the audits table.
      *
      */
