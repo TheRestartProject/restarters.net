@@ -144,11 +144,10 @@ HAVING
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 40)
 ) AS results
 ");
-
+//(SELECT o1.category FROM devices_misc_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.category ORDER BY COUNT(o1.category) DESC LIMIT 1) AS top_crowd_opinion,
         $result['list_splits'] = DB::select("
 SELECT
 d.iddevices,
-(SELECT o1.category FROM devices_misc_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.category ORDER BY COUNT(o1.category) DESC LIMIT 1) AS top_crowd_opinion,
 ROUND((SELECT COUNT(o2.category) as top_crowd_opinion_count FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.category ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
 (SELECT COUNT(o2.category) as all_votes FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
 COUNT(o.category) AS all_crowd_opinions_count,
@@ -192,8 +191,6 @@ WHERE o.eee = 2
      */
     public function updateDevices() {
 
-        return 0;
-        
         DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_misc_temporary` AS (
 SELECT
 d.iddevices,
@@ -215,22 +212,19 @@ OR (
 (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 50)
 AND (winning_opinion != 'Misc')
 )
-ORDER BY NULL
-        );");
+ORDER BY NULL);");
 
         DB::statement("ALTER TABLE `devices_misc_temporary` ADD PRIMARY KEY(`iddevices`);");
 
         DB::update("UPDATE devices_misc_temporary t, categories c 
 SET t.idcategories = c.idcategories
-WHERE t.winning_opinion = c.`name`;
-");
+WHERE t.winning_opinion = c.`name`;");
 
         $result = DB::update("UPDATE devices d, devices_misc_temporary t 
 SET d.category = t.idcategories
-WHERE d.iddevices = t.iddevices;
-");
+WHERE d.iddevices = t.iddevices AND t.idcategories > 0;");
 
-        DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_misc_temporary`");
+        DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_misc_temporary`;");
 
         return $result;
     }
