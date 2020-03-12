@@ -3,14 +3,16 @@
 namespace App\Listeners;
 
 use App\Events\ApproveEvent;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Notification;
+use App\Group;
 use App\Notifications\AdminWordPressCreateEventFailure;
 use App\Party;
-use App\Group;
-use Illuminate\Support\Facades\Log;
 use FixometerHelper;
+use Notification;
+
+use HieuLe\WordpressXmlrpcClient\WordpressClient;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class CreateWordPressApproveEventPost
 {
@@ -21,10 +23,9 @@ class CreateWordPressApproveEventPost
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(WordpressClient $wpClient)
     {
-        $this->wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-        $this->wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+        $this->wpClient = $wpClient;
     }
 
     /**
@@ -35,10 +36,10 @@ class CreateWordPressApproveEventPost
      */
     public function handle(ApproveEvent $event)
     {
-        $id = $event->party->idevents;
+        $partyId = $event->party->idevents;
         $data = $event->data;
 
-        $theParty = Party::find($id);
+        $theParty = Party::find($partyId);
 
         if (!empty($theParty)) {
             try {
@@ -61,7 +62,7 @@ class CreateWordPressApproveEventPost
                         ['key' => 'party_date', 'value' => $data['event_date']],
                         ['key' => 'party_timestamp', 'value' => $startTimestamp],
                         ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
-                        ['key' => 'party_stats', 'value' => $id],
+                        ['key' => 'party_stats', 'value' => $partyId],
                         ['key' => 'party_lat', 'value' => $data['latitude']],
                         ['key' => 'party_lon', 'value' => $data['longitude']]
                     ];
