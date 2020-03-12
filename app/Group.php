@@ -2,8 +2,11 @@
 
 namespace App;
 
+use App\Network;
+
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -439,5 +442,15 @@ class Group extends Model implements Auditable
     public function getApprovedAttribute()
     {
         return !is_null($this->wordpress_post_id);
+    }
+
+    public function networks()
+    {
+        return $this->belongsToMany(Network::class, 'group_network', 'group_id', 'network_id');
+    }
+
+    public function isMemberOf($network)
+    {
+        return $this->networks->contains($network);
     }
 }
