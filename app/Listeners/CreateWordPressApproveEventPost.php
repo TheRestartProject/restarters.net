@@ -43,10 +43,7 @@ class CreateWordPressApproveEventPost
 
         if (!empty($theParty)) {
             try {
-                // For testing purposes
-                if (( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve') {
-                    $theParty->update(['wordpress_post_id' => 99999]);
-                } elseif (isset($data['moderate']) && $data['moderate'] == 'approve') {
+                if (isset($data['moderate']) && $data['moderate'] == 'approve') {
                     $startTimestamp = strtotime($data['event_date'] . ' ' . $data['start']);
                     $endTimestamp = strtotime($data['event_date'] . ' ' . $data['end']);
 
