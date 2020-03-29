@@ -37,7 +37,10 @@ class WordpressPushTest extends TestCase
             $mock->shouldReceive('newPost')->once();
         }));
 
-        $restart = factory(Network::class)->create(['name' => 'Restart']);
+        $restart = factory(Network::class)->create([
+            'name' => 'Restart',
+            'events_push_to_wordpress' => true
+        ]);
         $group = factory(Group::class)->create();
         $restart->addGroup($group);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);
@@ -58,7 +61,9 @@ class WordpressPushTest extends TestCase
             $mock->shouldNotReceive('newPost');
         }));
 
-        $repairTogether = factory(Network::class)->create(['name' => 'Repair Together']);
+        $repairTogether = factory(Network::class)->create([
+            'name' => 'Repair Together'
+        ]);
         $group = factory(Group::class)->create();
         $repairTogether->addGroup($group);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);
@@ -79,7 +84,10 @@ class WordpressPushTest extends TestCase
             $mock->shouldReceive('editPost')->once();
         }));
 
-        $restart = factory(Network::class)->create(['name' => 'Restart']);
+        $restart = factory(Network::class)->create([
+            'name' => 'Restart',
+            'events_push_to_wordpress' => true
+        ]);
         $group = factory(Group::class)->create();
         $restart->addGroup($group);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);
@@ -102,7 +110,10 @@ class WordpressPushTest extends TestCase
             $mock->shouldNotReceive('editPost');
         }));
 
-        $repairTogether = factory(Network::class)->create(['name' => 'Repair Together']);
+        $repairTogether = factory(Network::class)->create([
+            'name' => 'Repair Together',
+            'events_push_to_wordpress' => false
+        ]);
         $group = factory(Group::class)->create();
         $repairTogether->addGroup($group);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);

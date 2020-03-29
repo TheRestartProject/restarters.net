@@ -812,4 +812,9 @@ class Party extends Model implements Auditable
         return '';
       }
     }
+
+    public function shouldPushToWordpress()
+    {
+        return $this->theGroup->eventsShouldPushToWordpress();
+    }
 }

@@ -453,4 +453,17 @@ class Group extends Model implements Auditable
     {
         return $this->networks->contains($network);
     }
+
+    // If just one of the networks that the group is a member of
+    // should push to Wordpress, then we should push.
+    public function eventsShouldPushToWordpress()
+    {
+        foreach ($this->networks as $network) {
+            if ($network->events_push_to_wordpress == true) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

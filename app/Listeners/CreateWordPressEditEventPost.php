@@ -42,8 +42,7 @@ class CreateWordPressEditEventPost
 
         $theParty = Party::find($id);
 
-        $restartNetwork = Network::where('name', 'Restart')->first();
-        if ( ! $theParty->theGroup->isMemberOf($restartNetwork)) {
+        if ( ! $theParty->shouldPushToWordpress()) {
             Log::error("Events for groups in this network are not published");
             return;
         }
