@@ -3,9 +3,11 @@
 namespace App\Http\Middleware;
 
 use App;
+use App\Network;
 use Auth;
 use Closure;
 use LaravelLocalization;
+use Illuminate\Support\Str;
 
 class CheckForRepairNetwork
 {
@@ -23,28 +25,23 @@ class CheckForRepairNetwork
         $host = $request->getHost();
         $update_user = [];
 
-        // Assumed Restart Project
-        switch ($host) {
-        case 'repairshare.restarters.net':
-        case 'repairshare.restarters.dev':
-            $locale = 'nl-BE';
-            $repair_network = 2;
-
-            break;
-        case 'repairtogether.restarters.net':
-        case 'repairtogether.restarters.dev':
-            $locale = 'fr';
-            $repair_network = 3;
-
-            break;
-        // For test only
-        case 'test-restarters.rstrt.org':
-        case 'restarters.test':
-            $locale = 'en';
-            $repair_network = 1000;
-
-            break;
+        // Restart network is the default.
+        if (Str::contains($host, 'repairshare')) {
+            $networkQuery = Network::where('shortname', 'repairshare');
+        } elseif (Str::contains($host, 'repairtogether')) {
+            $networkQuery = Network::where('shortname', 'repairtogether');
+        } elseif (Str::contains($host, 'test-restarters')) {
+            $networkQuery = Network::where('shortname', 'test');
+        } else {
+            $networkQuery = Network::where('shortname', 'restart');
         }
+
+        $network = $networkQuery->first();
+        if (empty($network)) {
+            throw new \Exception('Could not determine repair network from domain');
+        }
+        $locale = $network->default_language;
+        $repair_network = $network->id;
 
         // We don't want to override locale if a session already exists
         if (isset($locale) && ! session('locale')) {

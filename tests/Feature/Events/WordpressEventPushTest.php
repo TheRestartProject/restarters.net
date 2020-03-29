@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Events\ApproveEvent;
 use App\Events\EditEvent;
 use App\Group;
+use App\GroupNetwork;
 use App\Network;
 use App\Party;
 use App\User;
@@ -27,6 +28,7 @@ class WordpressPushTest extends TestCase
         Group::truncate();
         Party::truncate();
         Network::truncate();
+        GroupNetwork::truncate();
         DB::statement("SET foreign_key_checks=1");
     }
 

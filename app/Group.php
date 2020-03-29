@@ -466,4 +466,17 @@ class Group extends Model implements Auditable
 
         return false;
     }
+
+    // If just one of the networks that the group is a member of
+    // should push to Wordpress, then we should push.
+    public function changesShouldPushToZapier()
+    {
+        foreach ($this->networks as $network) {
+            if ($network->include_in_zapier == true) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

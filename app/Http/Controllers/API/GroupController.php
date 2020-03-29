@@ -34,7 +34,9 @@ class GroupController extends Controller
         foreach ($groupAudits as $groupAudit) {
             $group = Group::find($groupAudit->auditable_id);
             if (! is_null($group) ) {
-                $groupChanges[] = self::mapDetailsAndAuditToChange($group, $groupAudit);
+                if ($group->changesShouldPushToZapier()) {
+                    $groupChanges[] = self::mapDetailsAndAuditToChange($group, $groupAudit);
+                }
             }
         }
 

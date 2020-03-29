@@ -14,9 +14,11 @@ class CreateGroupNetworkTable extends Migration
     public function up()
     {
         Schema::create('group_network', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('group_id')->unsigned()->nullable(false);
-            $table->integer('network_id')->unsigned()->nullable(false);
+            $table->primary(['group_id', 'network_id']);
+            $table->unsignedInteger('group_id')->unsigned()->nullable(false);
+            $table->unsignedInteger('network_id')->unsigned()->nullable(false);
+            //$table->foreign('group_id')->references('idgroups')->on('groups');
+            //$table->foreign('network_id')->references('id')->on('networks');
             $table->timestamps();
         });
     }

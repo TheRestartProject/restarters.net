@@ -16,9 +16,9 @@ class CreateNetworksTable extends Migration
         Schema::create('networks', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 255)->nullable(false);
-            $table->text('description');
-            $table->string('website', 255);
-            $table->string('default_language', 8);
+            $table->text('description')->nullable();
+            $table->string('website', 255)->nullable();
+            $table->string('default_language', 8)->nullable()->default('en');
             $table->string('timezone', 8);
             $table->timestamps();
         });
