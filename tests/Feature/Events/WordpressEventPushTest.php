@@ -72,14 +72,40 @@ class WordpressPushTest extends TestCase
     }
 
     /** @test */
-    public function events_pushed_to_wordpress_when_edited()
+    public function given_restart_network_when_event_edited_then_pushed_to_wordpress()
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
             $mock->shouldReceive('getPost')->andReturn(100);
             $mock->shouldReceive('editPost')->once();
         }));
 
-        $event = factory(Party::class)->create();
+        $restart = factory(Network::class)->create(['name' => 'Restart']);
+        $group = factory(Group::class)->create();
+        $restart->addGroup($group);
+        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event->wordpress_post_id = 100;
+        $event->save();
+
+        $eventData = factory(Party::class)->raw();
+        $eventData['free_text'] = 'Some change';
+        $eventData['latitude'] = '1';
+        $eventData['longitude'] = '1';
+
+        event(new EditEvent($event, $eventData));
+    }
+
+    /** @test */
+    public function given_nonrestart_network_when_event_edited_then_not_pushed_to_wordpress()
+    {
+        $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
+            $mock->shouldNotReceive('getPost');
+            $mock->shouldNotReceive('editPost');
+        }));
+
+        $repairTogether = factory(Network::class)->create(['name' => 'Repair Together']);
+        $group = factory(Group::class)->create();
+        $repairTogether->addGroup($group);
+        $event = factory(Party::class)->create(['group' => $group->idgroups]);
         $event->wordpress_post_id = 100;
         $event->save();
 

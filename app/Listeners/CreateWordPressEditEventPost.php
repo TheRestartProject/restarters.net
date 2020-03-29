@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\EditEvent;
 use App\Group;
+use App\Network;
 use App\Party;
 use App\Notifications\AdminWordPressEditEventFailure;
 use FixometerHelper;
@@ -36,13 +37,16 @@ class CreateWordPressEditEventPost
      */
     public function handle(EditEvent $event)
     {
-
-      // Set event variable
         $id = $event->party->idevents;
         $data = $event->data;
 
-      // Define model
         $theParty = Party::find($id);
+
+        $restartNetwork = Network::where('name', 'Restart')->first();
+        if ( ! $theParty->theGroup->isMemberOf($restartNetwork)) {
+            Log::error("Events for groups in this network are not published");
+            return;
+        }
 
         try {
             if (is_numeric($theParty->wordpress_post_id)) {
