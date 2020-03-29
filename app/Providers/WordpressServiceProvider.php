@@ -33,7 +33,7 @@ class WordpressServiceProvider extends ServiceProvider
 
                 return $wpClient;
             } catch (\Exception $ex) {
-                Log::error("Failed to instantiation Wordpress API classes: " . $ex->getMessage());
+                Log::error("Failed to instantiate Wordpress API classes: " . $ex->getMessage());
             }
         });
     }

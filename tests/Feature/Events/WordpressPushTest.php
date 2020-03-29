@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\ApproveEvent;
+use App\Events\EditEvent;
 use App\Group;
 use App\Party;
 use App\User;
@@ -28,7 +29,7 @@ class WordpressPushTest extends TestCase
     }
 
     /** @test */
-    public function events_pushed_to_wordpress()
+    public function events_pushed_to_wordpress_when_approved()
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
             $mock->shouldReceive('newPost')->once();
@@ -42,5 +43,25 @@ class WordpressPushTest extends TestCase
         $eventData['longitude'] = '1';
 
         event(new ApproveEvent($event, $eventData));
+    }
+
+    /** @test */
+    public function events_pushed_to_wordpress_when_edited()
+    {
+        $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
+            $mock->shouldReceive('getPost')->andReturn(100);
+            $mock->shouldReceive('editPost')->once();
+        }));
+
+        $event = factory(Party::class)->create();
+        $event->wordpress_post_id = 100;
+        $event->save();
+
+        $eventData = factory(Party::class)->raw();
+        $eventData['free_text'] = 'Some change';
+        $eventData['latitude'] = '1';
+        $eventData['longitude'] = '1';
+
+        event(new EditEvent($event, $eventData));
     }
 }
