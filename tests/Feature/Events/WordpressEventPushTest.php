@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Events\ApproveEvent;
 use App\Events\EditEvent;
 use App\Group;
+use App\Network;
 use App\Party;
 use App\User;
 
@@ -25,17 +26,42 @@ class WordpressPushTest extends TestCase
         User::truncate();
         Group::truncate();
         Party::truncate();
+        Network::truncate();
         DB::statement("SET foreign_key_checks=1");
     }
 
     /** @test */
-    public function events_pushed_to_wordpress_when_approved()
+    public function given_restart_network_when_event_approved_then_pushed_to_wordpress()
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
             $mock->shouldReceive('newPost')->once();
         }));
 
-        $event = factory(Party::class)->create();
+        $restart = factory(Network::class)->create(['name' => 'Restart']);
+        $group = factory(Group::class)->create();
+        $restart->addGroup($group);
+        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+
+        $eventData = factory(Party::class)->raw();
+        $eventData['moderate'] = 'approve';
+        $eventData['latitude'] = '1';
+        $eventData['longitude'] = '1';
+
+        event(new ApproveEvent($event, $eventData));
+    }
+
+
+    /** @test */
+    public function given_nonrestart_network_when_event_approved_then_not_pushed_to_wordpress()
+    {
+        $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
+            $mock->shouldNotReceive('newPost');
+        }));
+
+        $repairTogether = factory(Network::class)->create(['name' => 'Repair Together']);
+        $group = factory(Group::class)->create();
+        $repairTogether->addGroup($group);
+        $event = factory(Party::class)->create(['group' => $group->idgroups]);
 
         $eventData = factory(Party::class)->raw();
         $eventData['moderate'] = 'approve';

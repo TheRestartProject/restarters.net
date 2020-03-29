@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\ApproveEvent;
 use App\Group;
+use App\Network;
 use App\Notifications\AdminWordPressCreateEventFailure;
 use App\Party;
 use FixometerHelper;
@@ -41,47 +42,56 @@ class CreateWordPressApproveEventPost
 
         $theParty = Party::find($partyId);
 
-        if (!empty($theParty)) {
-            try {
-                if (isset($data['moderate']) && $data['moderate'] == 'approve') {
-                    $startTimestamp = strtotime($data['event_date'] . ' ' . $data['start']);
-                    $endTimestamp = strtotime($data['event_date'] . ' ' . $data['end']);
+        if (empty($theParty)) {
+            Log::error("Event not found");
+            return;
+        }
 
-                    $group = Group::where('idgroups', $data['group'])->first();
+        $restartNetwork = Network::where('name', 'Restart')->first();
+        if ( ! $theParty->theGroup->isMemberOf($restartNetwork)) {
+            Log::error("Events for groups in this network are not published");
+            return;
+        }
 
-                    $custom_fields = [
-                        ['key' => 'party_grouphash', 'value' => $data['group']],
-                        ['key' => 'party_venue', 'value' => $data['venue']],
-                        ['key' => 'party_location', 'value' => $data['location']],
-                        ['key' => 'party_time', 'value' => $data['start'] . ' - ' . $data['end']],
-                        ['key' => 'party_groupcountry', 'value' => $group->country],
-                        ['key' => 'party_groupcity', 'value' => $group->area],
-                        ['key' => 'party_date', 'value' => $data['event_date']],
-                        ['key' => 'party_timestamp', 'value' => $startTimestamp],
-                        ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
-                        ['key' => 'party_stats', 'value' => $partyId],
-                        ['key' => 'party_lat', 'value' => $data['latitude']],
-                        ['key' => 'party_lon', 'value' => $data['longitude']]
-                    ];
+        try {
+            if (isset($data['moderate']) && $data['moderate'] == 'approve') {
+                $startTimestamp = strtotime($data['event_date'] . ' ' . $data['start']);
+                $endTimestamp = strtotime($data['event_date'] . ' ' . $data['end']);
 
-                    $content = [
-                        'post_type' => 'party',
-                        'custom_fields' => $custom_fields
-                    ];
+                $group = Group::where('idgroups', $data['group'])->first();
 
-                    $party_name = !empty($data['venue']) ? $data['venue'] : $data['location'];
-                    $wpid = $this->wpClient->newPost($party_name, $data['free_text'], $content);
+                $custom_fields = [
+                    ['key' => 'party_grouphash', 'value' => $data['group']],
+                    ['key' => 'party_venue', 'value' => $data['venue']],
+                    ['key' => 'party_location', 'value' => $data['location']],
+                    ['key' => 'party_time', 'value' => $data['start'] . ' - ' . $data['end']],
+                    ['key' => 'party_groupcountry', 'value' => $group->country],
+                    ['key' => 'party_groupcity', 'value' => $group->area],
+                    ['key' => 'party_date', 'value' => $data['event_date']],
+                    ['key' => 'party_timestamp', 'value' => $startTimestamp],
+                    ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
+                    ['key' => 'party_stats', 'value' => $partyId],
+                    ['key' => 'party_lat', 'value' => $data['latitude']],
+                    ['key' => 'party_lon', 'value' => $data['longitude']]
+                ];
 
-                    $theParty->update(['wordpress_post_id' => $wpid]);
-                }
-            } catch (\Exception $e) {
-                 Log::error("An error occurred during Wordpress event creation: " . $e->getMessage());
-                 $notify_users = FixometerHelper::usersWhoHavePreference('admin-approve-wordpress-event-failure');
-                 Notification::send($notify_users, new AdminWordPressCreateEventFailure([
-                    'event_venue' => $theParty->venue,
-                    'event_url' => url('/party/edit/'.$theParty->idevents),
-                 ]));
+                $content = [
+                    'post_type' => 'party',
+                    'custom_fields' => $custom_fields
+                ];
+
+                $party_name = !empty($data['venue']) ? $data['venue'] : $data['location'];
+                $wpid = $this->wpClient->newPost($party_name, $data['free_text'], $content);
+
+                $theParty->update(['wordpress_post_id' => $wpid]);
             }
+        } catch (\Exception $e) {
+                Log::error("An error occurred during Wordpress event creation: " . $e->getMessage());
+                $notify_users = FixometerHelper::usersWhoHavePreference('admin-approve-wordpress-event-failure');
+                Notification::send($notify_users, new AdminWordPressCreateEventFailure([
+                'event_venue' => $theParty->venue,
+                'event_url' => url('/party/edit/'.$theParty->idevents),
+                ]));
         }
     }
 }
