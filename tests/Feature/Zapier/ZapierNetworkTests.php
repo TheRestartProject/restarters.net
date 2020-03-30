@@ -70,6 +70,34 @@ class ZapierNetworkTests extends TestCase
 
 
     //     When a new group is created that is in Repair Together network, it is not included in the Restart Zapier trigger
+    /** @test */
+    public function given_nonrestart_network_when_new_group_created_not_included_in_trigger()
+    {
+        $this->withoutExceptionHandling();
+
+        // arrange
+        $admin = factory(User::class)->states('Administrator')->create([
+            'api_token' => '1234',
+        ]);
+        $this->actingAs($admin);
+
+        $network = factory(Network::class)->create([
+            'shortname' => 'restart',
+            'include_in_zapier' => false,
+        ]);
+
+        $groupAttributes = factory(Group::class)->raw();
+        $groupAttributes['name'] = 'Ghent Fixers';
+
+        // act
+        $response = $this->post('/group/create/', $groupAttributes);
+        $group = Group::all()->shift();
+
+        // assert
+        $response = $this->get('/api/groups/changes?api_token=1234');
+        $response->assertDontSee($group->name);
+    }
+
 //         When a new user is created that is in the Repair Together network, it is not included in the Restart Zapier trigger
 //         When a new user is created that is in the Restart network, it IS included in the Restart Zapier trigger
 //         When a new user/group association is created and either the user or the group is not in the Restart network, it isn't included in the Restart Zapier trigger
