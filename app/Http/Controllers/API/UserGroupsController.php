@@ -35,7 +35,11 @@ class UserGroupsController extends Controller
         foreach ($userGroupAudits as $audit) {
             $userGroupAssociation = UserGroups::withTrashed()->find($audit->auditable_id);
             if ( ! is_null($userGroupAssociation) && $userGroupAssociation->isConfirmed()) {
-                $userGroupChanges[] = self::mapDetailsAndAuditToChange($userGroupAssociation, $audit);
+                $user = $userGroupAssociation->volunteer;
+                $group = Group::find($userGroupAssociation->group);
+                if ($user->changesShouldPushToZapier() && $group->changesShouldPushToZapier()) {
+                    $userGroupChanges[] = self::mapDetailsAndAuditToChange($userGroupAssociation, $audit);
+                }
             }
         }
 
