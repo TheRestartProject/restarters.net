@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Events\UserDeleted;
+use App\Network;
 use App\UserGroups;
 
 use DB;
@@ -455,5 +456,14 @@ class User extends Authenticatable implements Auditable
     public function getTalkProfileUrl()
     {
         return env('DISCOURSE_URL').'/u/'.$this->username;
+    }
+
+    // If just one of the networks that the group is a member of
+    // should push to Wordpress, then we should push.
+    public function changesShouldPushToZapier()
+    {
+        $network = Network::find($this->repair_network);
+
+        return ($network->include_in_zapier == true);
     }
 }
