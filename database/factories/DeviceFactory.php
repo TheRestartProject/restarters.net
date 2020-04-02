@@ -44,3 +44,11 @@ $factory->state(App\Device::class, 'end', function (Faker $faker) {
         'repair_status' => 2,
     ];
 });
+
+$factory->state(App\Device::class, 'misccat', function (Faker $faker) {
+    return [
+        'category' => 46,
+        'category_creation' => 46,
+        'problem' => $faker->sentence(6, TRUE)
+    ];
+});
