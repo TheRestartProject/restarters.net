@@ -49,7 +49,8 @@ class CreateWordPressApproveEventPost
 
         $restartNetwork = Network::where('name', 'Restart')->first();
         if ( ! $theParty->shouldPushToWordpress()) {
-            Log::error("Events for groups in this network are not published");
+            $theParty->update(['wordpress_post_id' => '99999']);
+            Log::info("Events for groups in this network are not published");
             return;
         }
 
