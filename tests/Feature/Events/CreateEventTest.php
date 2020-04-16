@@ -6,6 +6,8 @@ use App\EventsUsers;
 use App\Group;
 use App\Party;
 use App\User;
+use App\UserGroups;
+use App\Notifications\NotifyRestartersOfNewEvent;
 
 use DB;
 use Carbon\Carbon;
@@ -23,6 +25,7 @@ class CreateEventTest extends TestCase
         Group::truncate();
         Party::truncate();
         EventsUsers::truncate();
+        UserGroups::truncate();
         DB::statement("SET foreign_key_checks=1");
     }
 
@@ -68,7 +71,7 @@ class CreateEventTest extends TestCase
     /** @test */
     public function emails_sent_when_created()
     {
-        //Notification::fake();
+        Notification::fake();
         $admins = factory(User::class, 5)->states('Administrator')->create();
 
         // When we create an event
@@ -76,8 +79,73 @@ class CreateEventTest extends TestCase
         $response = $this->post('/party/create/', $event);
         $response->assertStatus(302);
 
-        //Notification::assertSentTo(
-        //   [$admins], AdminModerationEvent::class
-        //        );
+        Notification::assertSentTo(
+           [$admins], AdminModerationEvent::class
+        );
+    }
+
+    /** @test */
+    public function emails_sent_to_restarters_when_upcoming_event_approved()
+    {
+        $this->withoutExceptionHandling();
+        $admin = factory(User::class)->state('Administrator')->create();
+        $this->actingAs($admin);
+        // arrange
+        Notification::fake();
+
+        $group = factory(Group::class)->create();
+        $host = factory(User::class)->state('Host')->create();
+        $restarter = factory(User::class)->state('Restarter')->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $group->addVolunteer($restarter);
+
+        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1']);
+
+        // act
+        $response = $this->post('/party/create/', $eventData);
+        $event = Party::where('event_date', '2030-01-01')->first();
+        $eventData['wordpress_post_id'] = 100;
+        $eventData['id'] = $event->idevents;
+        $eventData['moderate'] = 'approve';
+        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+
+        // assert
+        Notification::assertSentTo(
+            [$restarter], NotifyRestartersOfNewEvent::class
+        );
+        Notification::assertNotSentTo(
+            [$host], NotifyRestartersOfNewEvent::class
+        );
+    }
+
+    /** @test */
+    public function emails_not_sent_when_past_event_approved()
+    {
+        $this->withoutExceptionHandling();
+        $admin = factory(User::class)->state('Administrator')->create();
+        $this->actingAs($admin);
+        // arrange
+        Notification::fake();
+
+        $group = factory(Group::class)->create();
+        $host = factory(User::class)->state('Host')->create();
+        $restarter = factory(User::class)->state('Restarter')->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $group->addVolunteer($restarter);
+
+        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '1930-01-01', 'latitude'=>'1', 'longitude'=>'1']);
+
+        // act
+        $response = $this->post('/party/create/', $eventData);
+        $event = Party::where('event_date', '1930-01-01')->first();
+        $eventData['wordpress_post_id'] = 100;
+        $eventData['id'] = $event->idevents;
+        $eventData['moderate'] = 'approve';
+        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+
+        // assert
+        Notification::assertNothingSent();
     }
 }
