@@ -29,7 +29,8 @@ $factory->define(User::class, function (Faker $faker) {
         'number_of_logins' => 1,
         'age' => $faker->year(),
         'country' => $faker->countryCode,
-        'role' => Role::RESTARTER
+        'role' => Role::RESTARTER,
+        'invites' => 1,
     ];
 });
 
@@ -47,6 +48,6 @@ $factory->state(User::class, 'Host', function (Faker $faker) {
 
 $factory->state(User::class, 'Administrator', function (Faker $faker) {
     return [
-        'role' => Role::ADMIN,
+        'role' => Role::ADMINISTRATOR,
     ];
 });
