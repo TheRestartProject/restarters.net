@@ -32,4 +32,16 @@ class Network extends Model
     {
         $this->coordinators()->attach($coordinator->id);
     }
+
+    public function eventsRequiringModeration()
+    {
+        $groups = $this->groups;
+        $events = collect([]);
+
+        foreach ($groups as $group) {
+            $events->push($group->parties()->whereNull('wordpress_post_id')->get());
+        }
+
+        return $events->flatten(1);
+    }
 }

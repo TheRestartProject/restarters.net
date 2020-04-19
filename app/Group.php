@@ -333,6 +333,11 @@ class Group extends Model implements Auditable
         return $this->allConfirmedVolunteers()->where($attributes)->exists();
     }
 
+    public function addEvent($event)
+    {
+        $event->theGroup()->associate($this);
+    }
+
     public function parties()
     {
         return $this->hasMany(Party::class, 'group', 'idgroups')->withTrashed();

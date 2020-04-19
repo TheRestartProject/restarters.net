@@ -535,7 +535,7 @@ class Party extends Model implements Auditable
     // Doesn't work if called 'group' - I guess because a reserved SQL keyword.
     public function theGroup()
     {
-        return $this->hasOne('App\Group', 'idgroups', 'group');
+        return $this->belongsTo(Group::class, 'group', 'idgroups');
     }
 
     public function getEventDate($format = 'd/m/Y')

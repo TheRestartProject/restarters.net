@@ -476,4 +476,24 @@ class User extends Authenticatable implements Auditable
     {
         return $this->networks->contains($network);
     }
+
+    public function groupsInChargeOf()
+    {
+        $groupsUserIsInChargeOf = [];
+
+        if ($this->hasRole('Host')) {
+            $groupsUserIsInChargeOf = UserGroups::where('user', $this->id)
+                                    ->where('role', 3)
+                                    ->pluck('group')
+                                    ->toArray();
+        } else if ($this->hasRole('NetworkCoordinator')) {
+            foreach ($this->networks as $network) {
+                foreach ($network->groups as $group) {
+                    $groupsUserIsInChargeOf[] = $group->idgroups;
+                }
+            }
+        }
+
+        return $groupsUserIsInChargeOf;
+    }
 }

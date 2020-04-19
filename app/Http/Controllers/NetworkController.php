@@ -48,7 +48,9 @@ class NetworkController extends Controller
      */
     public function show(Network $network)
     {
-        return view('networks.show', ['network' => $network]);
+        return view('networks.show', [
+            'network' => $network
+        ]);
     }
 
     /**

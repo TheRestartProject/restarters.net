@@ -63,14 +63,15 @@
                       <input type="text" class="form-control field" id="event_name" name="venue" value="{{ $formdata->venue }}" placeholder="@lang('events.field_event_name_helper')">
                     </div>
 
-                  @if ( ( FixometerHelper::hasRole($user, 'Host') && count($user_groups) > 1 ) || FixometerHelper::hasRole($user, 'Administrator') )
+                    @if ( $userInChargeOfMultipleGroups )
                   <div class="form-group form-group__offset">
                       <label for="event_group">@lang('events.field_event_group'):</label>
                       <div class="form-control form-control__select">
                         <select name="group" id="event_group" class="field field select2" required>
                           <option></option>
+                          <?php $isAdmin = FixometerHelper::hasRole($user, 'Administrator'); ?>
                           @foreach($group_list as $group)
-                            @if( FixometerHelper::hasRole($user, 'Administrator') || in_array($group->id, $user_groups) )
+                            @if( $isAdmin || in_array($group->id, $user_groups) )
                               <option value="<?php echo $group->id; ?>" <?php echo($group->id == $formdata->group ? 'selected' : ''); ?>><?php echo $group->name; ?></option>
                             @endif
                           @endforeach
@@ -145,7 +146,7 @@
                       </div>
                     </div>
 
-                    @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') && is_null($formdata->wordpress_post_id) )
+                    @if( FixometerHelper::userCanApproveEvent($formdata->id) && is_null($formdata->wordpress_post_id) )
                     <div class="form-group">
                       <div class="row">
                         <div class="col-lg-7">

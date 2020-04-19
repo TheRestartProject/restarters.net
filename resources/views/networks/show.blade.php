@@ -25,6 +25,23 @@
                         </tbody>
                     </table>
 
+                    <h2>Events requiring moderation</h2>
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($network->eventsRequiringModeration() as $event)
+                                <tr>
+                                    <td><a href="/party/edit/{{ $event->idevents }}">{{ $event->venue }}</a></td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
                     <h2>Groups</h2>
 
                     <p>There are currently {{ $network->groups->count() }} groups in the {{ $network->name }} network.

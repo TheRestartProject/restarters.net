@@ -100,32 +100,30 @@ class PartyController extends Controller
 
         // Use this view for showing group only upcoming and past events
         if ( ! is_null($group_id)) {
-          $upcoming_events = Party::upcomingEvents()
-          ->where('events.group', $group_id)
-          ->get();
+            $upcoming_events = Party::upcomingEvents()
+                ->where('events.group', $group_id)
+                ->get();
 
-          $past_events = Party::pastEvents()
-            ->where('events.group', $group_id)
-            ->paginate(10);
+            $past_events = Party::pastEvents()
+                ->where('events.group', $group_id)
+                ->paginate(10);
 
-          $group = Group::find($group_id);
-          $upcoming_events_in_area = null;
-
-        } else {
-          $upcoming_events = Party::upcomingEvents()
-            ->where('users_groups.user', Auth::user()->id)
-            ->take(3)
-            ->get();
-
-        $past_events = Party::UsersPastEvents([auth()->id()])->paginate(10);
-
-        if ( ! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
-            $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())->take(3)->get();
-        } else {
+            $group = Group::find($group_id);
             $upcoming_events_in_area = null;
-        }
+        } else {
+            $upcoming_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
+                ->take(3)
+                ->get();
 
-          $group = null;
+            $past_events = Party::UsersPastEvents([auth()->id()])->paginate(10);
+
+            if ( ! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
+                $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())->take(3)->get();
+            } else {
+                $upcoming_events_in_area = null;
+            }
+
+            $group = null;
         }
 
 
@@ -435,10 +433,8 @@ class PartyController extends Controller
         $co2Total = $Device->getWeights();
         $device_count_status = $Device->statusCount();
 
-        $groups_user_is_host_of = UserGroups::where('user', Auth::user()->id)
-        ->where('role', 3)
-        ->pluck('group')
-        ->toArray();
+        $groupsUserIsInChargeOf = $user->groupsInChargeOf();
+        $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || $groupsUserIsInChargeOf > 1;
 
         $images = $File->findImages(env('TBL_EVENTS'), $id);
 
@@ -488,7 +484,8 @@ class PartyController extends Controller
                       'co2Total' => $co2Total[0]->total_footprints,
                       'wasteTotal' => $co2Total[0]->total_weights,
                       'device_count_status' => $device_count_status,
-                      'user_groups' => $groups_user_is_host_of,
+                      'user_groups' => $groupsUserIsInChargeOf,
+                      'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
                       'audits' => $audits,
                       'response' => $response,
                   ]);
@@ -604,7 +601,8 @@ class PartyController extends Controller
                 'co2Total' => $co2Total[0]->total_footprints,
                 'wasteTotal' => $co2Total[0]->total_weights,
                 'device_count_status' => $device_count_status,
-                'user_groups' => $groups_user_is_host_of,
+                'user_groups' => $groupsUserIsInChargeOf,
+                'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
                 'images' => $images,
                 'audits' => $audits,
             ]);
@@ -643,7 +641,8 @@ class PartyController extends Controller
             'co2Total' => $co2Total[0]->total_footprints,
             'wasteTotal' => $co2Total[0]->total_weights,
             'device_count_status' => $device_count_status,
-            'user_groups' => $groups_user_is_host_of,
+            'user_groups' => $groupsUserIsInChargeOf,
+            'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
             'audits' => $audits,
         ]);
     }
