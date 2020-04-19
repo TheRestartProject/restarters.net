@@ -5,11 +5,13 @@ namespace App\Console\Commands;
 use App\Group;
 use App\GroupTags;
 use App\Helpers\FixometerHelper;
+use App\Network;
 use App\Role;
 use App\User;
 use App\UserGroups;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use League\Csv\Reader;
 
 class ImportRepairTogether extends Command
@@ -28,6 +30,9 @@ class ImportRepairTogether extends Command
      */
     protected $description = 'Imports groups and hosts from Repair Together\'s spreadsheet';
 
+    protected $restartNetworkId;
+    protected $repairTogetherNetworkId;
+
     /**
      * Create a new command instance.
      *
@@ -36,6 +41,9 @@ class ImportRepairTogether extends Command
     public function __construct()
     {
         parent::__construct();
+
+        $this->restartNetworkId = 1;
+        $this->repairTogetherNetworkId = 3;
     }
 
     /**
@@ -45,8 +53,44 @@ class ImportRepairTogether extends Command
      */
     public function handle()
     {
+        //$this->assignExistingGroupsToRestartNetwork();
+        //$this->setupNetworkHosts();
         $this->importGroups();
         $this->importHosts();
+        //$this->pushUsersToDiscourseNetworkGroup();
+    }
+
+    public function assignExistingGroupsToRestartNetwork()
+    {
+        $groupIds = Group::all()->pluck('idgroups');
+        foreach ($groupIds as $groupId)
+        {
+            DB::table('group_network')->insert([
+                ['group_id' => $groupId, 'network_id' => $this->restartNetworkId]
+            ]);
+        }
+    }
+
+    public function setupNetworkHosts()
+    {
+        $jonathan = User::where('email', 'jonathan.vigne@repairtogether.be')->first();
+        if (is_null($jonathan)) {
+            throw \Exception('Couldn\'t find Jonathan');
+        }
+        $luc = User::where('email', 'luc.deriez@repairtogether.be')->first();
+        if (is_null($luc)) {
+            throw \Exception('Couldn\'t find Luc');
+        }
+
+        $jonathan->role = Role::NETWORK_COORDINATOR;
+        $jonathan->save();
+        $luc->role = Role::NETWORK_COORDINATOR;
+        $luc->save();
+
+        $network = Network::find($this->repairTogetherNetworkId);
+
+        $network->addCoordinator($jonathan);
+        $network->addCoordinator($luc);
     }
 
 
@@ -56,8 +100,7 @@ class ImportRepairTogether extends Command
         $csv->setHeaderOffset(0);
         $records = $csv->getRecords();
 
-        $repairTogetherTag = GroupTags::find(12);
-        $repairTogetherNetworkId = 3;
+        $network = Network::find($this->repairTogetherNetworkId);
 
         foreach ($records as $index => $row) {
             $name = trim($row['Group Name - Nom du Repair Café']);
@@ -82,15 +125,14 @@ class ImportRepairTogether extends Command
                 'country' => $country,
                 'free_text' => $free_text,
                 'shareable_code' => FixometerHelper::generateUniqueShareableCode('App\Group', 'shareable_code'),
-                'network_id' => $repairTogetherNetworkId,
+                //'network_id' => $repairTogetherNetworkId,
                 'external_id' => $external_id,
             ];
 
             try {
                 $this->info('Creating group: '.$name);
                 $group = Group::create($data);
-                $group->addTag($repairTogetherTag);
-                $this->addNetworkHosts($group->idgroups);
+                $network->addGroup($group);
             } catch (\Exception $ex) {
                 // Show message, but carry on with other groups.
                 $this->error($ex->getMessage());
@@ -98,40 +140,11 @@ class ImportRepairTogether extends Command
         }
     }
 
-    public function addNetworkHosts($groupId)
-    {
-        $jonathan = User::where('email', 'jonathan.vigne@repairtogether.be')->first();
-        if (is_null($jonathan)) {
-            throw \Exception('Couldn\'t find Jonathan');
-        }
-        $luc = User::where('email', 'luc.deriez@repairtogether.be')->first();
-        if (is_null($luc)) {
-            throw \Exception('Couldn\'t find Luc');
-        }
-
-        UserGroups::create([
-            'user' => $jonathan->id,
-            'group' => $groupId,
-            'status' => 1,
-            'role' => Role::HOST,
-        ]);
-
-        UserGroups::create([
-            'user' => $luc->id,
-            'group' => $groupId,
-            'status' => 1,
-            'role' => Role::HOST,
-        ]);
-    }
-
     public function importHosts()
     {
         $csv = Reader::createFromPath('./repairtogether-hosts.csv', 'r');
         $csv->setHeaderOffset(0);
         $records = $csv->getRecords();
-
-        $repairTogetherTag = GroupTags::find(12);
-        $repairTogetherNetworkId = 3;
 
         foreach ($records as $index => $row) {
             $name = trim($row['Host name']);
@@ -151,7 +164,7 @@ class ImportRepairTogether extends Command
                 'age' => $yearOfBirth,
                 'language' => 'fr',
                 'country' => $country,
-                'repair_network' => $repairTogetherNetworkId,
+                'repair_network' => $this->repairTogetherNetworkId,
             ];
 
             try {
