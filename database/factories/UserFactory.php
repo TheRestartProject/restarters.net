@@ -50,3 +50,9 @@ $factory->state(User::class, 'Administrator', function (Faker $faker) {
         'role' => Role::ADMIN,
     ];
 });
+
+$factory->state(User::class, 'NetworkCoordinator', function (Faker $faker) {
+    return [
+        'role' => Role::NETWORK_COORDINATOR,
+    ];
+});

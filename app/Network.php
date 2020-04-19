@@ -8,18 +8,28 @@ use Illuminate\Database\Eloquent\Model;
 
 class Network extends Model
 {
-    public function addGroup($group)
-    {
-        $this->groups()->attach($group->idgroups);
-    }
-
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'group_network', 'network_id', 'group_id');
     }
 
+    public function addGroup($group)
+    {
+        $this->groups()->attach($group->idgroups);
+    }
+
     public function containsGroup($group)
     {
         return $this->groups->contains($group);
+    }
+
+    public function coordinators()
+    {
+        return $this->belongsToMany(User::class, 'user_network', 'network_id', 'user_id');
+    }
+
+    public function addCoordinator($coordinator)
+    {
+        $this->coordinators()->attach($coordinator->id);
     }
 }

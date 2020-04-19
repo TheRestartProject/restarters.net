@@ -466,4 +466,14 @@ class User extends Authenticatable implements Auditable
 
         return ($network->include_in_zapier == true);
     }
+
+    public function networks()
+    {
+        return $this->belongsToMany(Network::class, 'user_network', 'user_id', 'network_id');
+    }
+
+    public function isCoordinatorOf($network)
+    {
+        return $this->networks->contains($network);
+    }
 }

@@ -20,7 +20,7 @@ class NetworkTest extends TestCase
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
         Network::truncate();
-        Group::truncate();
+        DB::delete('delete from user_network');
         DB::statement("SET foreign_key_checks=1");
 
         $this->networkService = new RepairNetworkService();
@@ -108,7 +108,6 @@ class NetworkTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        // Given we're logged in as an admin
         $host = factory(User::class)->states('Host')->create();
         $this->actingAs($host);
 
@@ -120,5 +119,24 @@ class NetworkTest extends TestCase
 
         $this->assertFalse($network->containsGroup($group));
         $this->assertFalse($group->isMemberOf($network));
+    }
+
+    /** @test */
+    public function user_can_be_set_as_coordinator_of_network()
+    {
+        $this->withoutExceptionHandling();
+
+        // Given we're logged in as an admin
+        $admin = factory(User::class)->states('Administrator')->create();
+        $this->actingAs($admin);
+
+        $network = factory(Network::class)->create();
+        $coordinator = factory(User::class)->states('NetworkCoordinator')->create();
+
+        // act
+        $network->addCoordinator($coordinator);
+
+        // assert
+        $this->assertTrue($coordinator->isCoordinatorOf($network));
     }
 }
