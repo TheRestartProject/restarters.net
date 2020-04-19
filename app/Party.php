@@ -817,4 +817,19 @@ class Party extends Model implements Auditable
     {
         return $this->theGroup->eventsShouldPushToWordpress();
     }
+
+    public function associatedNetworkCoordinators()
+    {
+        $group = $this->theGroup;
+
+        $coordinators = collect([]);
+
+        foreach ($group->networks as $network) {
+            foreach ($network->coordinators as $coordinator) {
+                $coordinators->push($coordinator);
+            }
+        }
+
+        return $coordinators;
+    }
 }

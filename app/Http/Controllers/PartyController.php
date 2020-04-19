@@ -13,6 +13,7 @@ use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\Geocoder;
 use App\Host;
 use App\Invite;
 use App\Notifications\AdminModerationEvent;
@@ -42,13 +43,13 @@ class PartyController extends Controller
 {
 
   // protected $hostParties = array();
-    // protected $permissionsChecker;
+    protected $geocoder;
 
     public $TotalWeight;
     public $TotalEmission;
     public $EmissionRatio;
 
-    public function __construct()
+    public function __construct(Geocoder $geocoder)
     {
         //($model, $controller, $action)
 
@@ -85,6 +86,8 @@ class PartyController extends Controller
 
         $footprintRatioCalculator = new FootprintRatioCalculator();
         $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $this->geocoder = $geocoder;
         // }
       //
       // $this->permissionsChecker = new PermissionsChecker($this->user, $this->hostParties);
@@ -188,28 +191,28 @@ class PartyController extends Controller
             $error = array();
 
             if ($request->has('location')) {
-              $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($request->input('location'))."&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE");
-              $json = json_decode($json);
+                try {
+                    $results = $this->geocoder->geocode($request->get('location'));
 
-              if ( empty($json->results) ) {
-                $response['danger'] = 'Party could not be created. Address not found.';
-                Log::error('An error occurred during geocoding: ' . $ex->getMessage());
-                return view('events.create', [ //party.create
-                  'response' => $response,
-                  'title' => 'New Party',
-                  'grouplist' => $Groups->findList(),
-                  'gmaps' => true,
-                  'group_list' => $Groups->findAll(),
-                  'user' => Auth::user(),
-                  'user_groups' => $user_groups,
-                  'selected_group_id' => $group_id,
-                ]);
-              }
+                    if ( empty($results) ) {
+                        $response['danger'] = 'Party could not be created. Address not found.';
+                        return view('events.create', [
+                            'response' => $response,
+                            'title' => 'New Party',
+                            'grouplist' => $Groups->findList(),
+                            'gmaps' => true,
+                            'group_list' => $Groups->findAll(),
+                            'user' => Auth::user(),
+                            'user_groups' => $user_groups,
+                            'selected_group_id' => $group_id,
+                        ]);
+                    }
 
-              if (is_object($json) && !empty($json->{'results'})) {
-                  $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
-                  $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
-              }
+                    $latitude = $results['latitude'];
+                    $longitude = $results['longitude'];
+                } catch (\Exception $ex) {
+                    Log::error('An error occurred during geocoding: ' . $ex->getMessage());
+                }
             } else {
                 $latitude = null;
                 $longitude = null;
@@ -290,8 +293,11 @@ class PartyController extends Controller
                     Party::find($idParty)->increment('volunteers');
 
                     // Notify relevant users
-                    $notify_users = FixometerHelper::usersWhoHavePreference('admin-moderate-event');
-                    Notification::send($notify_users, new AdminModerationEvent([
+                    $usersToNotify = FixometerHelper::usersWhoHavePreference('admin-moderate-event');
+                    foreach ($party->associatedNetworkCoordinators() as $coordinator) {
+                        $usersToNotify->push($coordinator);
+                    }
+                    Notification::send($usersToNotify, new AdminModerationEvent([
                         'event_venue' => Party::find($idParty)->venue,
                         'event_url' => url('/party/edit/'.$idParty),
                     ]));

@@ -4,9 +4,11 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
+use App\Network;
 use App\Party;
 use App\User;
 use App\UserGroups;
+use App\Helpers\Geocoder;
 use App\Notifications\NotifyRestartersOfNewEvent;
 
 use DB;
@@ -14,6 +16,21 @@ use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class GeocoderMock extends Geocoder
+{
+    public function __construct()
+    {
+    }
+
+    public function geocode($location)
+    {
+        return [
+            'latitude' => '1',
+            'longitude' => '1',
+        ];
+    }
+}
 
 class CreateEventTest extends TestCase
 {
@@ -26,7 +43,13 @@ class CreateEventTest extends TestCase
         Party::truncate();
         EventsUsers::truncate();
         UserGroups::truncate();
+        DB::delete('delete from group_network');
+        DB::delete('delete from user_network');
         DB::statement("SET foreign_key_checks=1");
+
+        $this->app->bind(Geocoder::class, function () {
+            return new GeocoderMock();
+        });
     }
 
     /** @test */
@@ -71,7 +94,9 @@ class CreateEventTest extends TestCase
     /** @test */
     public function emails_sent_when_created()
     {
+        $this->withoutExceptionHandling();
         Notification::fake();
+
         $admins = factory(User::class, 5)->states('Administrator')->create();
 
         // When we create an event
@@ -123,6 +148,7 @@ class CreateEventTest extends TestCase
     public function emails_not_sent_when_past_event_approved()
     {
         $this->withoutExceptionHandling();
+
         $admin = factory(User::class)->state('Administrator')->create();
         $this->actingAs($admin);
         // arrange
@@ -147,5 +173,32 @@ class CreateEventTest extends TestCase
 
         // assert
         Notification::assertNothingSent();
+    }
+
+    /** @test */
+    public function emails_sent_to_coordinators_when_event_created()
+    {
+        $this->withoutExceptionHandling();
+
+        $admin = factory(User::class)->state('Administrator')->create();
+        $this->actingAs($admin);
+        // arrange
+        Notification::fake();
+
+        $network = factory(Network::class)->create();
+        $group = factory(Group::class)->create();
+        $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
+        $network->addGroup($group);
+        $network->addCoordinator($coordinator);
+
+        $eventData = factory(Party::class)->raw(['group' => $group->idgroups]);
+
+        // act
+        $response = $this->post('/party/create/', $eventData);
+
+        // assert
+        Notification::assertSentTo(
+            [$coordinator], AdminModerationEvent::class
+        );
     }
 }
