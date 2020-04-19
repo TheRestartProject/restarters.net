@@ -184,11 +184,11 @@
                 <fieldset>
                     <legend>@lang('registration.reg-step-3-2b')</legend>
                     <legend>@lang('registration.reg-step-3-1a')</legend>
-                    <div class="form-check d-flex align-items-center justify-content-start">
+                    <div class="form-check align-items-center justify-content-start @if($showNewsletterSignup) d-flex @else d-none @endif">
                         <input class="form-check-input" type="checkbox" name="newsletter" id="newsletter" value="1" @if( old('newsletter') == 1 ) checked @endif>
                         <label class="form-check-label" for="newsletter">
-                        @lang('registration.reg-step-3-label1')
-                    </label>
+                            @lang('registration.reg-step-3-label1')
+                        </label>
                     </div>
                     <div class="form-check d-flex align-items-center justify-content-start">
                         <input class="form-check-input" type="checkbox" name="invites" id="invites" value="1" @if( old('invites') == 1 ) checked @endif>
