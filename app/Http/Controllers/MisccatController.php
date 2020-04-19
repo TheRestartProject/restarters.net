@@ -27,7 +27,6 @@ class MisccatController extends Controller {
 
         if ($request->isMethod('post') && !empty($_POST)) {
             if (isset($_POST['iddevices'])) {
-                logger(print_r($_POST, 1));
                 $data = $_POST;
                 $Misccat = new Misccat;
                 $insert = [
@@ -68,7 +67,6 @@ class MisccatController extends Controller {
 
         $Misccat = new Misccat;
         $data = $Misccat->fetchStatus();
-        logger(print_r($data,1));
         return view('misccat.status', [
             'status' => $data,
             'user' => $user,

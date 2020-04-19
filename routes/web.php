@@ -65,6 +65,7 @@ Route::prefix('calendar')->group(function () {
 Route::prefix('faultcat')->group(function () {
     Route::get('/', 'FaultcatController@index');
     Route::post('/', 'FaultcatController@index');
+    Route::get('/status', 'FaultcatController@status');
     Route::get('/demographics', 'FaultcatController@demographics');
     Route::post('/demographics', 'FaultcatController@storeDemographics');
 });

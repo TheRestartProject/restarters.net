@@ -48,9 +48,9 @@
 
     .problem {
         font-size: 1rem;
-        background-color: #f5f5f5;
+        background-color: #FFF;
         border: 5px solid #FFDD57;
-        border-radius: 5px;
+        border-radius: 5px;        
     }
 
     .tag {
@@ -81,6 +81,14 @@
     #fetch,
     #change {
         margin-bottom: 2px;
+    }
+    
+    .text-is-italic {
+        font-style: italic;
+    }
+    
+    .border-grey {        
+        border: 1px solid #EEE;
     }
 
 </style>

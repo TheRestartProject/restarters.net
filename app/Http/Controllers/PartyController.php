@@ -442,9 +442,9 @@ class PartyController extends Controller
             $images = null;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST)) {
-            $id = $_POST['id'];
-            $data = $_POST;
+        if ($request->isMethod('post') && ! empty($request->post())) {
+            $id = $request->post('id');
+            $data = $request->post();
             unset($data['files']);
             unset($data['file']);
             unset($data['users']);
@@ -532,21 +532,25 @@ class PartyController extends Controller
                     $event = Party::find($id);
                     $group = Group::find($event->group);
 
-                    // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
-                    $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
-                                    ->where('users_groups.group', $event->group)
-                                    ->where('users_groups.role', 4)
-                                        ->select('users.*')
-                                        ->get();
+                    // Only send notifications if the event is in the future.
+                    // We don't want to send emails to Restarters about past events being added.
+                    if ($event->isUpcoming()) {
+                        // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
+                        $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
+                                        ->where('users_groups.group', $event->group)
+                                        ->where('users_groups.role', 4)
+                                            ->select('users.*')
+                                            ->get();
 
-                    // If there are restarters against the group
-                    if ( ! $group_restarters->isEmpty()) {
-                        // Send user a notification and email
-                        Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
-                            'event_venue' => $event->venue,
-                            'event_url' => url('/party/view/'.$event->idevents),
-                            'event_group' => $group->name,
-                        ]));
+                        // If there are restarters against the group
+                        if ( ! $group_restarters->isEmpty()) {
+                            // Send user a notification and email
+                            Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
+                                'event_venue' => $event->venue,
+                                'event_url' => url('/party/view/'.$event->idevents),
+                                'event_group' => $group->name,
+                            ]));
+                        }
                     }
 
                     event(new ApproveEvent($event, $data));

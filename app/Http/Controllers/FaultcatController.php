@@ -15,8 +15,7 @@ class FaultcatController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
@@ -64,7 +63,7 @@ class FaultcatController extends Controller {
             }
         }
         $user->country = $request->session()->get('faultcat.country', null);
-        $user->age = $request->session()->get('faultcat.age', null);        
+        $user->age = $request->session()->get('faultcat.age', null);
 
         $Faultcat = new Faultcat;
         $fault = $Faultcat->fetchFault()[0];
@@ -77,8 +76,7 @@ class FaultcatController extends Controller {
         ]);
     }
 
-    public function demographics(Request $request)
-    {
+    public function demographics(Request $request) {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
@@ -92,12 +90,10 @@ class FaultcatController extends Controller {
         ]);
     }
 
-
     /**
      * Store demographic information from anonymous users.
      */
-    public function storeDemographics(Request $request)
-    {
+    public function storeDemographics(Request $request) {
         $validatedData = $request->validate([
             'age' => 'required',
             'country' => 'required',
@@ -125,4 +121,21 @@ class FaultcatController extends Controller {
         // Success or failure, let them carry on.
         return redirect()->action('FaultcatController@index');
     }
+
+    public function status(Request $request) {
+        if (Auth::check()) {
+            $user = Auth::user();
+        } else {
+            $user = null;
+        }
+
+        $Faultcat = new Faultcat;
+        $data = $Faultcat->fetchStatus();
+        logger(print_r($data, 1));
+        return view('faultcat.status', [
+            'status' => $data,
+            'user' => $user,
+        ]);
+    }
+
 }
