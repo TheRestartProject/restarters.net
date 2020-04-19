@@ -14,7 +14,9 @@ class NetworkController extends Controller
      */
     public function index()
     {
-        //
+        $networks = Network::all();
+
+        return view('networks.index', ['networks' => $networks]);
     }
 
     /**
@@ -46,7 +48,7 @@ class NetworkController extends Controller
      */
     public function show(Network $network)
     {
-        //
+        return view('networks.show', ['network' => $network]);
     }
 
     /**
