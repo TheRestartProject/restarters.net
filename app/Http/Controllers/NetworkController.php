@@ -48,6 +48,8 @@ class NetworkController extends Controller
      */
     public function show(Network $network)
     {
+        $this->authorize('view', $network);
+
         return view('networks.show', [
             'network' => $network
         ]);
