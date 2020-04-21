@@ -6,6 +6,7 @@ use App\Device;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Group;
+use App\GroupNetwork;
 use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\FootprintRatioCalculator;
@@ -55,6 +56,7 @@ class GroupController extends Controller
 
             //Get all group tags
             $all_group_tags = GroupTags::all();
+            $networks = Network::all();
 
             //Look for groups where user ID exists in pivot table
             $your_groups_uniques = UserGroups::where('user', auth()->id())->pluck('group')->toArray();
@@ -67,6 +69,7 @@ class GroupController extends Controller
                 'your_area' => null,
                 'all' => $all,
                 'all_group_tags' => $all_group_tags,
+                'networks' => $networks,
                 'sort_direction' => 'ASC',
                 'sort_column' => 'name',
                 'groups_count' => $groups_count,
@@ -182,6 +185,7 @@ class GroupController extends Controller
 
         //Get all group tags
         $all_group_tags = GroupTags::all();
+        $networks = Network::all();
 
         $sort_direction = $request->input('sort_direction');
         $sort_column = $request->input('sort_column');
@@ -203,6 +207,10 @@ class GroupController extends Controller
 
         if ( ! empty($request->input('tags'))) {
             $groups = $groups->whereIn('idgroups', GrouptagsGroups::whereIn('group_tag', $request->input('tags'))->pluck('group'));
+        }
+
+        if ( ! empty($request->input('network'))) {
+            $groups = $groups->whereIn('idgroups', GroupNetwork::where('network_id', $request->input('network'))->pluck('group_id'));
         }
 
         if ( ! empty($sort_column) && $sort_column == 'name') {
@@ -248,6 +256,7 @@ class GroupController extends Controller
             'your_groups' => null,
             'groups_near_you' => null,
             'groups' => $groups,
+            'networks' => $networks,
             'your_area' => null,
             'all' => true,
             'all_group_tags' => $all_group_tags,
@@ -255,6 +264,7 @@ class GroupController extends Controller
             'name' => $request->input('name'),
             'location' => $request->input('location'),
             'selected_country' => $request->input('country'),
+            'selected_network' => $request->input('network'),
             'selected_tags' => $request->input('tags'),
             'sort',
             'sort_direction' => $sort_direction,

@@ -44,6 +44,22 @@
     </div>
 
     <div class="form-group">
+        <label for="network">Network:</label>
+        <div class="form-control form-control__select">
+            <select id="network" name="network" class="field select2">
+                <option value=""></option>
+                @foreach ($networks as $network)
+                    @if( isset($selected_network) && $network->id == $selected_network )
+                        <option selected value="{{ $network->id }}">{{ $network->name }}</option>
+                    @else
+                        <option value="{{ $network->id }}">{{ $network->name }}</option>
+                    @endif
+                @endforeach
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
       <label for="country">@lang('groups.group_country'):</label>
       <div class="form-control form-control__select">
         <select id="country" name="country" class="field select2">

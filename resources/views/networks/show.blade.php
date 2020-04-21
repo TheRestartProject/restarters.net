@@ -67,42 +67,36 @@
             </div>
             <div class="col-lg-9">
 
-                    <h2>Events requiring moderation</h2>
-
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Event</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($network->eventsRequiringModeration() as $event)
-                                <tr>
-                                    <td><a href="/party/edit/{{ $event->idevents }}">{{ $event->venue }}</a></td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-
+                <section style="margin-bottom:40px">
                     <h2>Groups</h2>
 
-                    <p>There are currently {{ $network->groups->count() }} groups in the {{ $network->name }} network.
+                    <p>
+                        There are currently {{ $network->groups->count() }} groups in the {{ $network->name }} network. <a href="/group/all/search?network={{ $network->id }}">View these groups</a>.
                     </p>
+                </section>
 
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                    @foreach ($network->groups->sortBy('name') as $group)
-                        <tr>
-                            <td><a href="/group/view/{{ $group->idgroups }}">{{ $group->name }}</a></td>
-                        </tr>
-                    @endforeach
-                        </tbody>
-                    </table>
+
+        {{-- Events to Moderate (Admin Only) --}}
+            <h2>@lang('events.events_title_admin')</h2>
+
+            <div class="table-responsive">
+              <table class="table table-events table-striped" role="table">
+                @include('events.tables.headers.head-events-admin-only', ['hide_invite' => true])
+                <tbody>
+                    @if( true )
+                      @foreach ($network->eventsRequiringModeration() as $event)
+                        @include('partials.tables.row-events', ['show_invites_count' => false])
+                      @endforeach
+                    @else
+                      <tr>
+                        <td colspan="13" align="center" class="p-3">@lang('events.moderation_none')</td>
+                      </tr>
+                    @endif
+                </tbody>
+              </table>
+            </div>
+        {{-- END Events to Moderate (Admin Only) --}}
+
             </div>
         </div>
 
