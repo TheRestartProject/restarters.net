@@ -1,29 +1,71 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="admin">
-        <div class="container">
-            <div class="row">
-                <div class="col">
+<section class="events networks">
+    <div class="container-fluid">
+      <div class="events__header row align-content-top">
+          <div class="col d-flex flex-column">
 
-                    <h1>Network: {{ $network->name }}</h1>
+            <header>
+                <div class="row">
+                <div class="col col-md-3 network-icon" style="text-align:center">
+                    <img style="max-height:50px" src="{{ asset('images/logos/'.$network->shortname.'.png') }}">
+                </div>
 
-                    <h2>Coordinators</h2>
+                <div class="col col-md-9">
+                <h1>{{{ $network->name }}}</h1>
 
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                @if( !empty($network->website) )
+                    <a class="events__header__url" href="{{{ $network->website }}}" target="_blank" rel="noopener noreferrer">{{{ $network->website }}}</a>
+                @endif
+
+                     {{-- @php( $groupImage = $group->groupImage )
+                     @if( is_object($groupImage) && is_object($groupImage->image) )
+                  <img src="{{ asset('/uploads/mid_'. $groupImage->image->path) }}" alt="{{{ $group->name }}} group image" class="event-icon">
+                @else
+
+                  <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="{{{ $group->name }}} group image" class="event-icon">
+                @endif
+                --}}
+                </div>
+                </div>
+
+            </header>
+          </div>
+      </div>
+
+
+        <div class="row">
+            <div class="col-lg-3">
+
+                <h2 id="about-grp">About</h2>
+
+                <div class="events__description">
+                    <p>{!! str_limit(strip_tags($network->description), 160, '...') !!}</p>
+                    @if( strlen($network->description) > 160 )
+                      <button data-toggle="modal" data-target="#group-description"><span>Read more</span></button>
+                    @endif
+                </div><!-- /events__description -->
+
+
+                <h2 id="volunteers">Coordinators</h2>
+
+                <div class="tab">
+
+                    <div class="users-list-wrap users-list__single">
+                        <ul class="users-list">
+
                             @foreach ($network->coordinators as $coordinator)
-                                <tr>
-                                    <td><a href="/profile/edit/{{ $coordinator->id}}">{{ $coordinator->name }}</a></td>
-                                </tr>
+                                @include('networks.partials.coordinator')
                             @endforeach
-                        </tbody>
-                    </table>
+
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-lg-9">
 
                     <h2>Events requiring moderation</h2>
 
@@ -45,6 +87,7 @@
                     <h2>Groups</h2>
 
                     <p>There are currently {{ $network->groups->count() }} groups in the {{ $network->name }} network.
+                    </p>
 
                     <table class="table table-bordered">
                         <thead>
@@ -53,16 +96,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                    @foreach ($network->groups as $group)
+                    @foreach ($network->groups->sortBy('name') as $group)
                         <tr>
                             <td><a href="/group/view/{{ $group->idgroups }}">{{ $group->name }}</a></td>
                         </tr>
                     @endforeach
                         </tbody>
                     </table>
-                </div>
             </div>
         </div>
-    </section>
+
+    </div>
+</section>
+@include('includes/modals/group-description')
 
 @endsection
+
