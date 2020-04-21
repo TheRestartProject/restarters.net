@@ -187,7 +187,7 @@ class FixometerHelper
         }
 
         $usersRole = $user->role()->first()->role;
-        $superusers = ['Root', 'Administrator'];
+        $superusers = ['Root', 'Administrator', 'NetworkCoordinator'];
 
         if (in_array($usersRole, $superusers)) {
             return true;

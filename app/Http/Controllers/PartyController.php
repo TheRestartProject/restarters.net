@@ -172,20 +172,17 @@ class PartyController extends Controller
 
     public function create(Request $request, $group_id = null)
     {
+        $user = Auth::user();
 
-      // Let's determine whether currently logged in user is associated with any groups
-        $user_groups = UserGroups::join('groups', 'groups.idgroups', '=', 'users_groups.group')
-                                ->where('user', Auth::user()->id)
-                                  ->where('role', 3)
-                                    ->select('groups.idgroups AS id', 'groups.name')
-                                      ->get();
+        $groupsUserIsInChargeOf = $user->groupsInChargeOf();
+        $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
 
         // Then let's redirect users away if they are a restarter or a host with no groups
-        if (FixometerHelper::hasRole(Auth::user(), 'Restarter') || (count($user_groups) == 0 && FixometerHelper::hasRole(Auth::user(), 'Host'))) {
+        if (FixometerHelper::hasRole(Auth::user(), 'Restarter') || (count($groupsUserIsInChargeOf) == 0 && FixometerHelper::hasRole(Auth::user(), 'Host'))) {
             return view('events.cantcreate');
         }
 
-        $Groups = new Group;
+        $allGroups = Group::orderBy('name')->get();
 
         if ($request->isMethod('post')) {
             $error = array();
@@ -199,11 +196,10 @@ class PartyController extends Controller
                         return view('events.create', [
                             'response' => $response,
                             'title' => 'New Party',
-                            'grouplist' => $Groups->findList(),
                             'gmaps' => true,
-                            'group_list' => $Groups->findAll(),
+                            'allGroups' => $allGroups,
                             'user' => Auth::user(),
-                            'user_groups' => $user_groups,
+                            'user_groups' => $groupsUserIsInChargeOf,
                             'selected_group_id' => $group_id,
                         ]);
                     }
@@ -335,28 +331,28 @@ class PartyController extends Controller
                 return redirect('/party/edit/'.$idParty)->with('response', $response);
             }
 
-            return view('events.create', [ //party.create
+            return view('events.create', [
                 'title' => 'New Party',
-                'grouplist' => $Groups->findList(),
                 'gmaps' => true,
-                'group_list' => $Groups->findAll(),
+                'allGroups' => $allGroups,
                 'response' => $response,
                 'error' => $error,
                 'udata' => $_POST,
                 'user' => Auth::user(),
-                'user_groups' => $user_groups,
+                'user_groups' => $groupsUserIsInChargeOf,
                 'selected_group_id' => $group_id,
+                'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
             ]);
         }
 
-        return view('events.create', [ //party.create
+        return view('events.create', [
             'title' => 'New Party',
-            'grouplist' => $Groups->findList(),
             'gmaps' => true,
-            'group_list' => $Groups->findAll(),
+            'allGroups' => $allGroups,
             'user' => Auth::user(),
-            'user_groups' => $user_groups,
+            'user_groups' => $groupsUserIsInChargeOf,
             'selected_group_id' => $group_id,
+            'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
         ]);
     }
 
@@ -386,43 +382,6 @@ class PartyController extends Controller
         $sender = mail($email, $subject, $message, $headers);
     }
 
-    /** sync all parties to wordpress - CREATES PARTIES! **/
-    public function sync()
-    {
-        /* $parties = $this->Party->findAll();
-        $Groups = new Group;
-        foreach($parties as $i => $party) {
-        $Host = $Groups->findHost($party->group_id);
-        $custom_fields = array(
-        array('key' => 'party_host',            'value' => $Host->hostname),
-        array('key' => 'party_hostavatarurl',   'value' => UPLOADS_URL . 'mid_' .$Host->path),
-        array('key' => 'party_grouphash',       'value' => $party->group_id),
-        array('key' => 'party_location',        'value' => $party->location),
-        array('key' => 'party_time',            'value' => $party->start . ' - ' . $party->end),
-        array('key' => 'party_date',            'value' => $party->event_date),
-        array('key' => 'party_timestamp',       'value' => $party->event_timestamp),
-        array('key' => 'party_stats',           'value' => $party->id),
-        array('key' => 'party_lat',             'value' => $party->latitude),
-        array('key' => 'party_lon',             'value' => $party->longitude)
-    );
-    echo "Connecting ... ";
-    $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-    $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
-
-
-    $content = array(
-    'post_type' => 'party',
-    'custom_fields' => $custom_fields
-  );
-
-  $wpid = $wpClient->newPost($party->location, $party->free_text, $content);
-  echo "<strong>Posted to WP</strong> ... ";
-  $this->Party->update(array('wordpress_post_id' => $wpid), $party->id);
-  echo "Updated Fixometer recordset with WPID: " . $wpid . "<br />";
-  }
-  */
-    }
-
     public function edit($id, Request $request)
     {
         $user = Auth::user();
@@ -440,13 +399,15 @@ class PartyController extends Controller
         $device_count_status = $Device->statusCount();
 
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
-        $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || $groupsUserIsInChargeOf > 1;
+        $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
 
         $images = $File->findImages(env('TBL_EVENTS'), $id);
 
         if ( ! isset($images)) {
             $images = null;
         }
+
+        $allGroups = Group::orderBy('name')->get();
 
         if ($request->isMethod('post') && ! empty($request->post())) {
             $id = $request->post('id');
@@ -455,12 +416,6 @@ class PartyController extends Controller
             unset($data['file']);
             unset($data['users']);
             unset($data['id']);
-
-            // Add SuperHero Restarter!
-            // $_POST['users'][] = 29;
-            // if(empty($data['volunteers'])) {
-            //     $data['volunteers'] = count($_POST['users']);
-            // }
 
             // saving this for WP
             $wp_date = $data['event_date'];
@@ -482,7 +437,7 @@ class PartyController extends Controller
                       'gmaps' => true,
                       'images' => $images,
                       'title' => 'Edit Party',
-                      'group_list' => $Groups->findAll(),
+                      'allGroups' => $allGroups,
                       'formdata' => $party,
                       'remotePost' => null,
                       'grouplist' => $Groups->findList(),
@@ -603,7 +558,7 @@ class PartyController extends Controller
                 'gmaps' => true,
                 'images' => $images,
                 'title' => 'Edit Party',
-                'group_list' => $Groups->findAll(),
+                'allGroups' => $allGroups,
                 'formdata' => $party,
                 'remotePost' => $remotePost,
                 'grouplist' => $Groups->findList(),
@@ -643,7 +598,7 @@ class PartyController extends Controller
             'gmaps' => true,
             'images' => $images,
             'title' => 'Edit Party',
-            'group_list' => $Groups->findAll(),
+            'allGroups' => $allGroups,
             'formdata' => $party,
             'remotePost' => $remotePost,
             'grouplist' => $Groups->findList(),

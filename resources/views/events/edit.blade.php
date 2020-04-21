@@ -70,16 +70,16 @@
                         <select name="group" id="event_group" class="field field select2" required>
                           <option></option>
                           <?php $isAdmin = FixometerHelper::hasRole($user, 'Administrator'); ?>
-                          @foreach($group_list as $group)
-                            @if( $isAdmin || in_array($group->id, $user_groups) )
-                              <option value="<?php echo $group->id; ?>" <?php echo($group->id == $formdata->group ? 'selected' : ''); ?>><?php echo $group->name; ?></option>
+                          @foreach($allGroups as $group)
+                              @if( $isAdmin || $user_groups->pluck('idgroups')->contains($group->idgroups) )
+                              <option value="<?php echo $group->idgroups; ?>" <?php echo($group->idgroups == $formdata->group ? 'selected' : ''); ?>><?php echo $group->name; ?></option>
                             @endif
                           @endforeach
                         </select>
                       </div>
                   </div>
                   @else
-                    <input type="hidden" name="group" value="{{ $user_groups[0] }}">
+                    <input type="hidden" name="group" value="{{ $user_groups[0]->idgroups }}">
                   @endif
 
                   <div class="form-group">

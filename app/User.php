@@ -479,19 +479,21 @@ class User extends Authenticatable implements Auditable
 
     public function groupsInChargeOf()
     {
-        $groupsUserIsInChargeOf = [];
+        $groupsUserIsInChargeOf = collect([]);
 
         if ($this->hasRole('Host')) {
-            $groupsUserIsInChargeOf = UserGroups::where('user', $this->id)
+            $groupsUserIsInChargeOf = Group::join('users_groups', 'groups.idgroups', '=', 'users_groups.group')
+                                    ->where('user', $this->id)
                                     ->where('role', 3)
-                                    ->pluck('group')
-                                    ->toArray();
+                                    ->get();
         } else if ($this->hasRole('NetworkCoordinator')) {
             foreach ($this->networks as $network) {
                 foreach ($network->groups as $group) {
-                    $groupsUserIsInChargeOf[] = $group->idgroups;
+                    $groupsUserIsInChargeOf->push($group);
                 }
             }
+        } else if ($this->hasRole('Administrator')) {
+            $groupsUserIsInChargeOf = Group::all();
         }
 
         return $groupsUserIsInChargeOf;
