@@ -38,12 +38,12 @@
             <legend id="step-1-form-label">@lang('registration.reg-step-1-1')</legend>
             @foreach( FixometerHelper::skillCategories() as $key => $skill_category )
               <br>
-              <h5>{{{ $skill_category }}}</h5>
+              <h5>@lang($skill_category)</h5>
               <div class="row row-compressed">
                   @foreach ($skills[$key] as $skill)
                     <div class="col-6 col-lg-3">
                         <input @if( is_array(old('skills')) && in_array($skill->id, old('skills')) ) checked @endif type="checkbox" name="skills[]" id="skill-{{ $skill->id }}" class="styled-checkbox" value="{{ $skill->id }}">
-                        <label for="skill-{{ $skill->id }}" class="btn btn-checkbox"><span>{{ $skill->skill_name }}</span></label>
+                        <label for="skill-{{ $skill->id }}" class="btn btn-checkbox"><span>@lang($skill->skill_name)</span></label>
                     </div>
                   @endforeach
               </div>
