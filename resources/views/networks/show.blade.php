@@ -83,7 +83,7 @@
               <table class="table table-events table-striped" role="table">
                 @include('events.tables.headers.head-events-admin-only', ['hide_invite' => true])
                 <tbody>
-                    @if( true )
+                    @if( count($network->eventsRequiringModeration()) > 0 )
                       @foreach ($network->eventsRequiringModeration() as $event)
                         @include('partials.tables.row-events', ['show_invites_count' => false])
                       @endforeach
