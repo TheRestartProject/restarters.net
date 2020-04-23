@@ -6,6 +6,6 @@
     @include('dashboard.blocks.hot-topics')
 </div>
 
-<div class="col-md-6 col-lg-6 col-xl-4 col-dashboard">@include('partials.create-event')</div>
+<div class="col-md-6 col-lg-6 col-xl-6 col-dashboard">@include('partials.create-event')</div>
 
-<div class="col-md-6 col-lg-6 col-xl-4 col-dashboard">@include('dashboard.blocks.wiki')</div>
+<div class="col-md-6 col-lg-6 col-xl-6 col-dashboard">@include('dashboard.blocks.wiki')</div>
