@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    {{ $network->name }}
+@endsection
+
 @section('content')
 <section class="events networks">
     <div class="container-fluid">

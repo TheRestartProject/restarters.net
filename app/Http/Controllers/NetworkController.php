@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Network;
 use Illuminate\Http\Request;
 
+use Auth;
+
 class NetworkController extends Controller
 {
     /**
@@ -14,9 +16,24 @@ class NetworkController extends Controller
      */
     public function index()
     {
-        $networks = Network::all();
+        $user = Auth::user();
 
-        return view('networks.index', ['networks' => $networks]);
+        if (! $user->hasRole('NetworkCoordinator') && ! $user->hasRole('Administrator')) {
+            abort(403);
+        }
+
+        $yourNetworks = $user->networks->sortBy('name');
+
+        if ($user->hasRole('Administrator')) {
+            $showAllNetworks = true;
+            $allNetworks = Network::orderBy('name')->get();
+        }
+
+        return view('networks.index', [
+            'yourNetworks' => $yourNetworks,
+            'allNetworks' => $allNetworks,
+            'showAllNetworks' => $showAllNetworks,
+        ]);
     }
 
     /**
