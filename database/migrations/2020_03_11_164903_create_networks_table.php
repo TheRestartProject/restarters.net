@@ -19,7 +19,7 @@ class CreateNetworksTable extends Migration
             $table->text('description')->nullable();
             $table->string('website', 255)->nullable();
             $table->string('default_language', 8)->nullable()->default('en');
-            $table->string('timezone', 8);
+            $table->string('timezone', 64)->comment('TZ database name')->nullable()->default('Europe/London');
             $table->timestamps();
         });
     }
