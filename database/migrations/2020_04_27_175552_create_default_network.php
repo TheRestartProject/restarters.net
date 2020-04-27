@@ -40,6 +40,6 @@ class CreateDefaultNetwork extends Migration
      */
     public function down()
     {
-        //
+        DB::table('networks')->where('id', 1)->delete();
     }
 }
