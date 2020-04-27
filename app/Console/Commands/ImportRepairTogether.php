@@ -53,7 +53,7 @@ class ImportRepairTogether extends Command
      */
     public function handle()
     {
-        //$this->assignExistingGroupsToRestartNetwork();
+        $this->assignExistingGroupsToRestartNetwork();
         $this->setupNetworkCoordinators();
         $this->importGroups();
         $this->importHosts();
