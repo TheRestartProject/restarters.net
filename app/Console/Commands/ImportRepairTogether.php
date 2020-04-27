@@ -54,7 +54,7 @@ class ImportRepairTogether extends Command
     public function handle()
     {
         //$this->assignExistingGroupsToRestartNetwork();
-        //$this->setupNetworkHosts();
+        $this->setupNetworkCoordinators();
         $this->importGroups();
         $this->importHosts();
         //$this->pushUsersToDiscourseNetworkGroup();
@@ -71,28 +71,28 @@ class ImportRepairTogether extends Command
         }
     }
 
-    public function setupNetworkHosts()
+    public function setupNetworkCoordinators()
     {
-        $jonathan = User::where('email', 'jonathan.vigne@repairtogether.be')->first();
-        if (is_null($jonathan)) {
-            throw \Exception('Couldn\'t find Jonathan');
-        }
-        $luc = User::where('email', 'luc.deriez@repairtogether.be')->first();
-        if (is_null($luc)) {
-            throw \Exception('Couldn\'t find Luc');
-        }
-
-        $jonathan->role = Role::NETWORK_COORDINATOR;
-        $jonathan->save();
-        $luc->role = Role::NETWORK_COORDINATOR;
-        $luc->save();
-
         $network = Network::find($this->repairTogetherNetworkId);
 
-        $network->addCoordinator($jonathan);
-        $network->addCoordinator($luc);
-    }
+        $coordinatorEmails = [
+            'jonathan.vigne@repairtogether.be',
+            'luc.deriez@repairtogether.be',
+            'emmanuel@repairtogether.be',
+            'florine.paquay@repairtogether.be',
+        ];
 
+        foreach ($coordinatorEmails as $coordinatorEmail) {
+            $coordinator = User::where('email', $coordinatorEmail)->first();
+            if (is_null($coordinator)) {
+                $this->error("Couldn't find user with email: ".$coordinatorEmail);
+                break;
+            }
+            $coordinator->role = Role::NETWORK_COORDINATOR;
+            $coordinator->save();
+            $network->addCoordinator($coordinator);
+        }
+    }
 
     public function importGroups()
     {
