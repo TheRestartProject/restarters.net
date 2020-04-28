@@ -1231,8 +1231,10 @@ class UserController extends Controller
         }
 
         if (env('DRIP_API_TOKEN') !== null && env('DRIP_API_TOKEN') !== '') {
-            $network = Network::find($user->repair_network);
-            if (! is_null($network) && $network->users_push_to_drip === true) {
+            $activeRepairNetworkId = session()->get('repair_network');
+            $network = Network::find($activeRepairNetworkId);
+            if (! is_null($network) && $network->users_push_to_drip == true) {
+
                 $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
                 $user->drip_subscriber_id = $drip_subscribe_user->id;
             }
