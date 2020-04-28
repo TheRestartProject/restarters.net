@@ -88,7 +88,7 @@
                 @include('events.tables.headers.head-events-admin-only', ['hide_invite' => true])
                 <tbody>
                     @if( count($network->eventsRequiringModeration()) > 0 )
-                      @foreach ($network->eventsRequiringModeration() as $event)
+                      @foreach ($network->eventsRequiringModeration()->sortBy('event_date') as $event)
                         @include('partials.tables.row-events', ['show_invites_count' => false])
                       @endforeach
                     @else
