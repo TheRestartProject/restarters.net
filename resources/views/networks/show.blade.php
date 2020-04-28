@@ -106,7 +106,30 @@
 
     </div>
 </section>
-@include('includes/modals/group-description')
+
+<!-- Modal -->
+<div class="modal modal__description fade" id="group-description" tabindex="-1" role="dialog" aria-labelledby="groupDescriptionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 id="groupDescriptionLabel">@lang('networks.aboutNetworkHeader', ['name' => $network->name])</h5>
+                @include('partials.cross')
+
+            </div>
+
+            <div class="modal-body">
+
+                {!! $network->description !!}
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
 
 @endsection
 
