@@ -30,8 +30,8 @@ class ImportRepairTogether extends Command
      */
     protected $description = 'Imports groups and hosts from Repair Together\'s spreadsheet';
 
-    protected $restartNetworkId;
-    protected $repairTogetherNetworkId;
+    protected $restartersNetwork;
+    protected $repairTogetherNetwork;
 
     /**
      * Create a new command instance.
@@ -41,9 +41,6 @@ class ImportRepairTogether extends Command
     public function __construct()
     {
         parent::__construct();
-
-        $this->restartNetworkId = 1;
-        $this->repairTogetherNetworkId = 3;
     }
 
     /**
@@ -53,6 +50,19 @@ class ImportRepairTogether extends Command
      */
     public function handle()
     {
+        $restartersNetworkId = 1;
+        $repairTogetherNetworkId = 3;
+
+        $this->restartersNetwork = Network::find($restartersNetworkId);
+        if (is_null($this->restartersNetwork)) {
+            throw new \Exception("Could not find Restarters network in the database.");
+        }
+
+        $this->repairTogetherNetwork = Network::find($repairTogetherNetworkId);
+        if (is_null($this->repairTogetherNetwork)) {
+            throw new \Exception("Could not find Repair Together network in the database.");
+        }
+
         $this->assignExistingGroupsToRestartNetwork();
         $this->setupNetworkCoordinators();
         $this->importGroups();
@@ -66,15 +76,13 @@ class ImportRepairTogether extends Command
         foreach ($groupIds as $groupId)
         {
             DB::table('group_network')->insert([
-                ['group_id' => $groupId, 'network_id' => $this->restartNetworkId]
+                ['group_id' => $groupId, 'network_id' => $this->restartersNetwork->id]
             ]);
         }
     }
 
     public function setupNetworkCoordinators()
     {
-        $network = Network::find($this->repairTogetherNetworkId);
-
         $coordinatorEmails = [
             'jonathan.vigne@repairtogether.be',
             'luc.deriez@repairtogether.be',
@@ -90,7 +98,7 @@ class ImportRepairTogether extends Command
             }
             $coordinator->role = Role::NETWORK_COORDINATOR;
             $coordinator->save();
-            $network->addCoordinator($coordinator);
+            $this->repairTogetherNetwork->addCoordinator($coordinator);
         }
     }
 
@@ -99,8 +107,6 @@ class ImportRepairTogether extends Command
         $csv = Reader::createFromPath('./repairtogether-groups.csv', 'r');
         $csv->setHeaderOffset(0);
         $records = $csv->getRecords();
-
-        $network = Network::find($this->repairTogetherNetworkId);
 
         foreach ($records as $index => $row) {
             $name = trim($row['Group Name - Nom du Repair Café']);
@@ -132,7 +138,7 @@ class ImportRepairTogether extends Command
             try {
                 $this->info('Creating group: '.$name);
                 $group = Group::create($data);
-                $network->addGroup($group);
+                $this->repairTogetherNetwork->addGroup($group);
             } catch (\Exception $ex) {
                 // Show message, but carry on with other groups.
                 $this->error($ex->getMessage());
@@ -164,7 +170,7 @@ class ImportRepairTogether extends Command
                 'age' => $yearOfBirth,
                 'language' => 'fr',
                 'country' => $country,
-                'repair_network' => $this->repairTogetherNetworkId,
+                'repair_network' => $this->repairTogetherNetwork->id,
             ];
 
             try {
