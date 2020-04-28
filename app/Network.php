@@ -39,7 +39,7 @@ class Network extends Model
         $events = collect([]);
 
         foreach ($groups as $group) {
-            $events->push($group->parties()->whereNull('wordpress_post_id')->get());
+            $events->push($group->parties()->whereNull('wordpress_post_id')->whereNull('deleted_at')->get());
         }
 
         return $events->flatten(1);
