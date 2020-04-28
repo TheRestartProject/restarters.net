@@ -10,4 +10,5 @@ return [
     'allNetworks' => 'All networks',
     'allNetworksExplainer' => 'All networks in the system (admin-only).',
     'allNetworksNoNetworks' => 'There are no networks in the system.',
+    'aboutNetworkHeader' => 'About :name',
 ];
