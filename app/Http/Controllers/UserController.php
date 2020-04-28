@@ -1231,10 +1231,14 @@ class UserController extends Controller
         }
 
         if (env('DRIP_API_TOKEN') !== null && env('DRIP_API_TOKEN') !== '') {
-            $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
-            $user->drip_subscriber_id = $drip_subscribe_user->id;
+            $network = Network::find($user->repair_network);
+            if (! is_null($network) && $network->users_push_to_drip === true) {
+                $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
+                $user->drip_subscriber_id = $drip_subscribe_user->id;
+            }
         }
 
+        // 'invites' refers to receiving notifications about groups or events near the user.
         if (!is_null($request->input('invites')) && $request->input('invites') == 1) { //Subscribe to invites
             $user->invites = 1;
         }
