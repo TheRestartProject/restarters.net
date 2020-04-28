@@ -3,6 +3,8 @@
 namespace Tests\Unit;
 
 use App\Group;
+use App\GrouptagsGroups;
+use App\Network;
 use App\Role;
 use App\User;
 use App\UserGroups;
@@ -20,6 +22,8 @@ class GroupTest extends TestCase
         DB::statement("SET foreign_key_checks=0");
         User::truncate();
         Group::truncate();
+        GrouptagsGroups::truncate();
+        Network::truncate();
         UserGroups::truncate();
         DB::statement("SET foreign_key_checks=1");
     }
@@ -87,13 +91,49 @@ class GroupTest extends TestCase
     {
         $group = factory('App\Group')->create();
         $tag1 = factory('App\GroupTags')->create();
-        $tag2 = factory('App\GroupTags')->create();
 
         $group->addTag($tag1);
-        $group->addTag($tag2);
 
         $retrievedTag = $group->group_tags()->first();
 
         $this->assertTrue($tag1->tag_name == $retrievedTag->tag_name);
+    }
+
+    /** @test */
+    public function given_a_network_that_should_push_then_group_should_push()
+    {
+        $network1 = factory(Network::class)->create([
+            'events_push_to_wordpress' => true
+        ]);
+        $network2 = factory(Network::class)->create([
+            'events_push_to_wordpress' => false
+        ]);
+
+        $group = factory(Group::class)->create();
+        $network1->addGroup($group);
+        $network2->addGroup($group);
+
+        $shouldPush = $group->eventsShouldPushToWordpress();
+
+        $this->assertTrue($shouldPush);
+    }
+
+    /** @test */
+    public function given_no_network_that_should_push_then_group_should_not_push()
+    {
+        $network1 = factory(Network::class)->create([
+            'events_push_to_wordpress' => false
+        ]);
+        $network2 = factory(Network::class)->create([
+            'events_push_to_wordpress' => false
+        ]);
+
+        $group = factory(Group::class)->create();
+        $network1->addGroup($group);
+        $network2->addGroup($group);
+
+        $shouldPush = $group->eventsShouldPushToWordpress();
+
+        $this->assertFalse($shouldPush);
     }
 }

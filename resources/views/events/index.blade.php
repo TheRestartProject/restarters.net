@@ -6,8 +6,6 @@
 
 @section('content')
 
-{{-- {{ dd(true) }} --}}
-
 <section class="events events-page">
   <div class="container-fluid">
     <div class="row">

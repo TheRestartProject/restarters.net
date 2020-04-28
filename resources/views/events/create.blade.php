@@ -46,7 +46,7 @@
                   <input type="text" class="form-control field" id="event_name" name="venue" required placeholder="@lang('events.field_event_name_helper')">
               </div>
 
-              @if ( count($user_groups) > 1 || FixometerHelper::hasRole($user, 'Administrator') )
+              @if ( $userInChargeOfMultipleGroups )
                 <div class="form-group form-group__offset">
                   <label for="event_group">@lang('events.field_event_group'):</label>
                   <div class="form-control form-control__select">
@@ -55,21 +55,21 @@
 
                       @if( FixometerHelper::hasRole($user, 'Administrator') )
 
-                        @foreach($group_list as $group)
-                          @if( $group->id == $selected_group_id )
-                            <option selected value="{{{ $group->id }}}">{{{ $group->name }}}</option>
+                        @foreach($allGroups as $group)
+                          @if( $group->idgroups == $selected_group_id )
+                            <option selected value="{{{ $group->idgroups }}}">{{{ $group->name }}}</option>
                           @else
-                            <option value="{{{ $group->id }}}">{{{ $group->name }}}</option>
+                            <option value="{{{ $group->idgroups }}}">{{{ $group->name }}}</option>
                           @endif
                         @endforeach
 
                       @else
 
                         @foreach($user_groups as $group)
-                          @if( $group->id == $selected_group_id )
-                            <option selected value="{{{ $group->id }}}">{{{ $group->name }}}</option>
+                          @if( $group->idgroups == $selected_group_id )
+                            <option selected value="{{{ $group->idgroups }}}">{{{ $group->name }}}</option>
                           @else
-                            <option value="{{{ $group->id }}}">{{{ $group->name }}}</option>
+                            <option value="{{{ $group->idgroups }}}">{{{ $group->name }}}</option>
                           @endif
                         @endforeach
 
@@ -79,7 +79,7 @@
                   </div>
                 </div>
               @else
-                <input type="hidden" name="group" value="{{ $user_groups[0]->id }}">
+                <input type="hidden" name="group" value="{{ $user_groups[0]->idgroups }}">
               @endif
 
               <div class="form-group">

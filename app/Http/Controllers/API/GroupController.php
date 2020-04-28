@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
+use App\Helpers\FootprintRatioCalculator;
 use App\Http\Controllers\Controller;
 
 use Auth;
@@ -34,7 +35,9 @@ class GroupController extends Controller
         foreach ($groupAudits as $groupAudit) {
             $group = Group::find($groupAudit->auditable_id);
             if (! is_null($group) ) {
-                $groupChanges[] = self::mapDetailsAndAuditToChange($group, $groupAudit);
+                if ($group->changesShouldPushToZapier()) {
+                    $groupChanges[] = self::mapDetailsAndAuditToChange($group, $groupAudit);
+                }
             }
         }
 
@@ -58,6 +61,95 @@ class GroupController extends Controller
         $groups = $groupController->getGroupsByKey($request, $authenticatedUser->api_token);
 
         return response()->json($groups);
+    }
+
+
+    public static function getGroupsByUsersNetworks(Request $request)
+    {
+        $authenticatedUser = Auth::user();
+
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $groups = [];
+
+        foreach ($authenticatedUser->networks as $network) {
+            foreach ($network->groups as $group) {
+                $groups[] = $group;
+            }
+        }
+
+        // New Collection Instance
+        $collection = collect([]);
+
+        foreach ($groups as $group) {
+            $groupStats = $group->getGroupStats($emissionRatio);
+            $collection->push([
+                'id' => $group->idgroups,
+                'name' => $group->name,
+                'location' => [
+                    'value' => $group->location,
+                    'country' => $group->country,
+                    'latitude' => $group->latitude,
+                    'longitude' => $group->longitude,
+                ],
+                'website' => $group->website,
+                'facebook' => $group->facebook,
+                'description' => $group->free_text,
+                'image_url' => $group->groupImagePath(),
+                'upcoming_parties' => $upcoming_parties_collection = collect([]),
+                'past_parties' => $past_parties_collection = collect([]),
+                'impact' => [
+                    'volunteers' => $groupStats['pax'],
+                    'hours_volunteered' => $groupStats['hours'],
+                    'parties_thrown' => $groupStats['parties'],
+                    'waste_prevented' => $groupStats['waste'],
+                    'co2_emissions_prevented' => $groupStats['co2'],
+                ],
+                'widgets' => [
+                    'headline_stats' => url("/group/stats/{$group->idgroups}"),
+                    'co2_equivalence_visualisation' => url("/outbound/info/group/{$group->idgroups}/manufacture"),
+                ],
+                'created_at' => $group->created_at,
+                'updated_at' => $group->updated_at,
+            ]);
+
+            foreach ($group->upcomingParties() as $key => $event) {
+                $upcoming_parties_collection->push([
+                    'event_id' => $event->idevents,
+                    'event_date' => $event->event_date,
+                    'start_time' => $event->start,
+                    'end_time' => $event->end,
+                    'name' => $event->venue,
+                    'location' => [
+                        'value' => $event->location,
+                        'latitude' => $event->latitude,
+                        'longitude' => $event->longitude,
+                    ],
+                    'created_at' => $event->created_at,
+                    'updated_at' => $event->updated_at,
+                ]);
+            }
+
+            foreach ($group->pastParties() as $key => $event) {
+                $past_parties_collection->push([
+                    'event_id' => $event->idevents,
+                    'event_date' => $event->event_date,
+                    'start_time' => $event->start,
+                    'end_time' => $event->end,
+                    'name' => $event->venue,
+                    'location' => [
+                        'value' => $event->location,
+                        'latitude' => $event->latitude,
+                        'longitude' => $event->longitude,
+                    ],
+                    'created_at' => $event->created_at,
+                    'updated_at' => $event->updated_at,
+                ]);
+            }
+        }
+
+        return response()->json($collection);
     }
 
 

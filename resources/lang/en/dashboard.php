@@ -25,4 +25,6 @@ return array (
   'groups_near_you_start_a_group' => 'Would you like to start or add a group?  <a href=":resources_url">Learn more</a>.',
   'groups_near_you_set_location' => '<a href=":profile_url">Set your town/city</a> to help us find groups near you.',
   'groups_near_you_your_location_is' => 'Your town/city is currently set to :location.',
+  'your_networks' => 'Your networks',
+  'networks_you_coordinate' => 'View the networks that you coordinate.',
 );

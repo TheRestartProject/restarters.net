@@ -6,6 +6,8 @@ use App\Events\ApproveGroup;
 use App\Group;
 use App\Notifications\AdminWordPressCreateGroupFailure;
 use FixometerHelper;
+
+use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -18,9 +20,9 @@ class CreateWordPressApproveGroupPost
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(WordpressClient $wpClient)
     {
-        //
+        $this->wpClient = $wpClient;
     }
 
     /**
@@ -31,36 +33,27 @@ class CreateWordPressApproveGroupPost
      */
     public function handle(ApproveGroup $event)
     {
-
-      // Set event variable
         $id = $event->group->idgroups;
         $data = $event->data;
 
-      // Define model
         $group = Group::find($id);
 
         if (!empty($group)) {
             try {
-                if (( env('APP_ENV') == 'development' || env('APP_ENV') == 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve') { // For testing purposes
-                    $group->update(['wordpress_post_id' => 99999]);
-                } elseif (( env('APP_ENV') != 'development' && env('APP_ENV') != 'local' ) && isset($data['moderate']) && $data['moderate'] == 'approve') {
+                if (isset($data['moderate']) && $data['moderate'] == 'approve') {
                     // TODO: host.  Groups don't just have one host.  Is host
                     // displayed on the front-end anywhere?
                     // TODO: receiving area field from posted data.  It's currently not in the interface.
 
-                    $custom_fields = array(
-                    array('key' => 'group_city',            'value' => $group->area),
-                    array('key' => 'group_country',            'value' => $group->country),
-                    array('key' => 'group_website',         'value' => $group->website),
-                    array('key' => 'group_hash',            'value' => $id),
-                    array('key' => 'group_avatar_url',      'value' => $data['group_avatar']),
-                    array('key' => 'group_latitude',        'value' => $group->latitude),
-                    array('key' => 'group_longitude',       'value' => $group->longitude),
-                    );
-
-                    /** Start WP XML-RPC **/
-                    $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-                    $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
+                    $custom_fields = [
+                        ['key' => 'group_city', 'value' => $group->area],
+                        ['key' => 'group_country', 'value' => $group->country],
+                        ['key' => 'group_website', 'value' => $group->website],
+                        ['key' => 'group_hash', 'value' => $id],
+                        ['key' => 'group_avatar_url', 'value' => $data['group_avatar']],
+                        ['key' => 'group_latitude', 'value' => $group->latitude],
+                        ['key' => 'group_longitude', 'value' => $group->longitude],
+                    ];
 
                     $content = array(
                         'post_type' => 'group',
@@ -69,7 +62,7 @@ class CreateWordPressApproveGroupPost
                         'custom_fields' => $custom_fields
                     );
 
-                    $wpid = $wpClient->newPost($group->name, $data['free_text'], $content);
+                    $wpid = $this->wpClient->newPost($group->name, $data['free_text'], $content);
 
                     $group->update(['wordpress_post_id' => $wpid]);
                 }

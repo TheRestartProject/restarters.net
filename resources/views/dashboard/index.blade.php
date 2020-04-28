@@ -91,6 +91,9 @@
         @if (FixometerHelper::hasRole($user, 'Restarter'))
           @include('dashboard.restarter')
         @endif
+        @if (FixometerHelper::hasRole($user, 'NetworkCoordinator'))
+            @include('dashboard.coordinator')
+        @endif
         <div class="col-12">
             @include('dashboard.blocks.impact')
         </div>

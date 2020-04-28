@@ -140,6 +140,8 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::post('/column-preferences', 'DeviceController@columnPreferences');
     });
 
+    Route::resource('networks', 'NetworkController');
+
     //Group Controller
     Route::prefix('group')->group(function () {
         Route::get('/create', 'GroupController@create')->name('create-group');

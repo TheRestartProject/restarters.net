@@ -46,8 +46,8 @@
 
 
 
-      @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-        <td class="cell-warning text-center">Event requires <a href="/party/edit/{{ $event->idevents }}">moderation</a> by an admin</td>
+      @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator') )
+        <td class="cell-warning text-center">Event requires <a href="/party/edit/{{ $event->idevents }}">moderation</a></td>
       @else
         <td class="cell-warning text-center">@lang('partials.event_requires_moderation_by_an_admin')</td>
       @endif

@@ -102,16 +102,48 @@ class FixometerHelper
         if (is_null($userId)) {
             $userId = Auth::user()->id;
         }
+        $user = User::find($userId);
 
-        if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (FixometerHelper::hasRole($user, 'Administrator')) {
             return true;
         }
-        if (FixometerHelper::hasRole(Auth::user(), 'Host')) {
+        if (FixometerHelper::hasRole($user, 'NetworkCoordinator')) {
+            $group = Party::find($partyId)->theGroup;
+            foreach ($group->networks as $network) {
+                if ($network->coordinators->contains($user)) {
+                    return true;
+                }
+            }
+        }
+        if (FixometerHelper::hasRole($user, 'Host')) {
             $group_id_of_event = Party::where('idevents', $partyId)->value('group');
             if (FixometerHelper::userIsHostOfGroup($group_id_of_event, $userId)) {
                 return true;
-            } elseif (empty(DB::table('events_users')->where('event', $partyId)->where('user', $userId)->first())) {
+            } elseif (empty(DB::table('events_users')->where('event', $partyId)->where('user', $user->id)->first())) {
                 return false;
+            }
+        }
+
+        return false;
+    }
+
+
+    public static function userCanApproveEvent($eventId, $userId = null)
+    {
+        if (is_null($userId)) {
+            $userId = Auth::user()->id;
+        }
+        $user = User::find($userId);
+
+        if (FixometerHelper::hasRole($user, 'Administrator')) {
+            return true;
+        }
+        if (FixometerHelper::hasRole($user, 'NetworkCoordinator')) {
+            $group = Party::find($eventId)->theGroup;
+            foreach ($group->networks as $network) {
+                if ($network->coordinators->contains($user)) {
+                    return true;
+                }
             }
         }
 
@@ -155,7 +187,7 @@ class FixometerHelper
         }
 
         $usersRole = $user->role()->first()->role;
-        $superusers = ['Root', 'Administrator'];
+        $superusers = ['Root', 'Administrator', 'NetworkCoordinator'];
 
         if (in_array($usersRole, $superusers)) {
             return true;

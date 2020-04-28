@@ -13,6 +13,7 @@ class Role extends Model
     const HOST = 3;
     const RESTARTER = 4;
     const GUSET = 5;
+    const NETWORK_COORDINATOR = 6;
 
     protected $table = 'roles';
     protected $primaryKey = 'idroles';

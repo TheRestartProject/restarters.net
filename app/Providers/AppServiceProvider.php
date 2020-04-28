@@ -7,6 +7,7 @@ use App\EventsUsers;
 use App\Party;
 use Auth;
 use Cache;
+use App\Helpers\Geocoder;
 use FixometerHelper;
 use Illuminate\Support\ServiceProvider;
 use Schema;
@@ -90,5 +91,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton(Geocoder::class, function ($app) {
+            return new Geocoder();
+        });
     }
 }

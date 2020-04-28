@@ -33,7 +33,9 @@ class UserController extends Controller
         foreach ($userAudits as $userAudit) {
             $user = User::withTrashed()->find($userAudit->auditable_id);
             if ( ! is_null($user)) {
-                $userChanges[] = self::mapUserAndAuditToUserChange($user, $userAudit);
+                if ($user->changesShouldPushToZapier()) {
+                    $userChanges[] = self::mapUserAndAuditToUserChange($user, $userAudit);
+                }
             }
         }
 
@@ -48,7 +50,7 @@ class UserController extends Controller
             $query->where('created_at', '>=', $dateFrom);
         }
 
-        $query->groupBy('event', 'created_at')
+        $query->groupBy('event', 'created_at', 'auditable_id')
               ->orderBy('created_at', 'desc');
 
         return $query->get();

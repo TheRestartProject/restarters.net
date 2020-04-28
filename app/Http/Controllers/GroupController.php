@@ -6,10 +6,12 @@ use App\Device;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Group;
+use App\GroupNetwork;
 use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\FootprintRatioCalculator;
 use App\Invite;
+use App\Network;
 use App\Notifications\AdminModerationGroup;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
@@ -54,6 +56,7 @@ class GroupController extends Controller
 
             //Get all group tags
             $all_group_tags = GroupTags::all();
+            $networks = Network::all();
 
             //Look for groups where user ID exists in pivot table
             $your_groups_uniques = UserGroups::where('user', auth()->id())->pluck('group')->toArray();
@@ -66,6 +69,7 @@ class GroupController extends Controller
                 'your_area' => null,
                 'all' => $all,
                 'all_group_tags' => $all_group_tags,
+                'networks' => $networks,
                 'sort_direction' => 'ASC',
                 'sort_column' => 'name',
                 'groups_count' => $groups_count,
@@ -181,6 +185,7 @@ class GroupController extends Controller
 
         //Get all group tags
         $all_group_tags = GroupTags::all();
+        $networks = Network::all();
 
         $sort_direction = $request->input('sort_direction');
         $sort_column = $request->input('sort_column');
@@ -202,6 +207,10 @@ class GroupController extends Controller
 
         if ( ! empty($request->input('tags'))) {
             $groups = $groups->whereIn('idgroups', GrouptagsGroups::whereIn('group_tag', $request->input('tags'))->pluck('group'));
+        }
+
+        if ( ! empty($request->input('network'))) {
+            $groups = $groups->whereIn('idgroups', GroupNetwork::where('network_id', $request->input('network'))->pluck('group_id'));
         }
 
         if ( ! empty($sort_column) && $sort_column == 'name') {
@@ -247,6 +256,7 @@ class GroupController extends Controller
             'your_groups' => null,
             'groups_near_you' => null,
             'groups' => $groups,
+            'networks' => $networks,
             'your_area' => null,
             'all' => true,
             'all_group_tags' => $all_group_tags,
@@ -254,6 +264,7 @@ class GroupController extends Controller
             'name' => $request->input('name'),
             'location' => $request->input('location'),
             'selected_country' => $request->input('country'),
+            'selected_network' => $request->input('network'),
             'selected_tags' => $request->input('tags'),
             'sort',
             'sort_direction' => $sort_direction,
@@ -262,7 +273,7 @@ class GroupController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $user = User::find(Auth::id());
 
@@ -270,15 +281,16 @@ class GroupController extends Controller
         if (FixometerHelper::hasRole($user, 'Restarter')) {
             return redirect('/user/forbidden');
         }
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST)) {
+
+        if ($request->isMethod('post') && ! empty($request->post())) {
             $error = array();
             $Group = new Group;
 
             // We got data! Elaborate. //NB:: Taken out frequency as it doesn't appear in the post data might be gmaps
-            $name = $_POST['name'];
-            $website = $_POST['website'];
-            $location = $_POST['location'];
-            $text = $_POST['free_text'];
+            $name = $request->input('name');
+            $website = $request->input('website');
+            $location = $request->input('location');
+            $text = $request->input('free_text');
 
             if (empty($name)) {
                 $error['name'] = 'Please input a name.';
@@ -306,7 +318,6 @@ class GroupController extends Controller
             }
 
             if (empty($error)) {
-                // No errors. We can proceed and create the User.
                 $data = array('name' => $name,
                     'website' => $website,
                     // 'frequency'     => $freq,
@@ -318,7 +329,11 @@ class GroupController extends Controller
                     'shareable_code' => FixometerHelper::generateUniqueShareableCode('App\Group', 'shareable_code'),
                 );
 
-                $idGroup = $Group->create($data)->idgroups;
+                $group = $Group->create($data);
+                $idGroup = $group->idgroups;
+
+                $network = Network::find(session()->get('repair_network'));
+                $network->addGroup($group);
 
                 if (is_numeric($idGroup) && $idGroup !== false) {
                     $idGroup = Group::find($idGroup);
@@ -719,8 +734,8 @@ class GroupController extends Controller
             return redirect('/user/forbidden');
         }
 
-        if ($request->isMethod('post') && ! empty($_POST)) {
-            $data = $_POST;
+        if ($request->isMethod('post') && ! empty($request->post())) {
+            $data = $request->post();
 
             // remove the extra "files" field that Summernote generates -
             unset($data['files']);
@@ -770,7 +785,7 @@ class GroupController extends Controller
             }
 
             if (is_null($latitude) || is_null($longitude)) {
-                return redirect()->back()->with('error', 'Could not find group location - please try again!');
+                //return redirect()->back()->with('error', 'Could not find group location - please try again!');
             }
 
             $update = array(

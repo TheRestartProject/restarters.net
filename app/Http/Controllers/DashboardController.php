@@ -20,22 +20,6 @@ use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
-    // public function __construct($model, $controller, $action){
-    //     parent::__construct($model, $controller, $action);
-    //
-    //     $Auth = new Auth($url);
-    //     if(!$Auth->isLoggedIn()){
-    //         header('Location: /user/login');
-    //     }
-    //     else {
-    //
-    //         $user = $Auth->getProfile();
-    //         $this->user = $user;
-    //         $this->set('user', $user);
-    //         $this->set('header', true);
-    //     }
-    // }
-
     public function index()
     {
         $user = User::getProfile(Auth::id());
@@ -174,6 +158,10 @@ class DashboardController extends Controller
 
         $devices_gateway = new Device;
         $impact_stats = $devices_gateway->getWeights();
+
+        if ($user->hasRole('NetworkCoordinator')) {
+            $network = $user->networks;
+        }
 
         return view('dashboard.index', [
             'show_getting_started' => ! $userExistsInDiscourse || ! $has_profile_pic || ! $has_skills || ! $in_group || ! $in_event,

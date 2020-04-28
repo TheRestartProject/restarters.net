@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Events\UserDeleted;
+use App\Network;
 use App\UserGroups;
 
 use DB;
@@ -455,5 +456,46 @@ class User extends Authenticatable implements Auditable
     public function getTalkProfileUrl()
     {
         return env('DISCOURSE_URL').'/u/'.$this->username;
+    }
+
+    // If just one of the networks that the group is a member of
+    // should push to Wordpress, then we should push.
+    public function changesShouldPushToZapier()
+    {
+        $network = Network::find($this->repair_network);
+
+        return ($network->include_in_zapier == true);
+    }
+
+    public function networks()
+    {
+        return $this->belongsToMany(Network::class, 'user_network', 'user_id', 'network_id');
+    }
+
+    public function isCoordinatorOf($network)
+    {
+        return $this->networks->contains($network);
+    }
+
+    public function groupsInChargeOf()
+    {
+        $groupsUserIsInChargeOf = collect([]);
+
+        if ($this->hasRole('Host')) {
+            $groupsUserIsInChargeOf = Group::join('users_groups', 'groups.idgroups', '=', 'users_groups.group')
+                                    ->where('user', $this->id)
+                                    ->where('role', 3)
+                                    ->get();
+        } else if ($this->hasRole('NetworkCoordinator')) {
+            foreach ($this->networks as $network) {
+                foreach ($network->groups as $group) {
+                    $groupsUserIsInChargeOf->push($group);
+                }
+            }
+        } else if ($this->hasRole('Administrator')) {
+            $groupsUserIsInChargeOf = Group::all();
+        }
+
+        return $groupsUserIsInChargeOf;
     }
 }

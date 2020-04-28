@@ -8,6 +8,7 @@ use App\EventsUsers;
 use App\Events\PasswordChanged;
 use App\Group;
 use App\Mail\RegistrationWelcome;
+use App\Network;
 use App\Preferences;
 use App\Permissions;
 use App\UsersPreferences;
@@ -1130,7 +1131,6 @@ class UserController extends Controller
 
     public function getRegister($hash = null)
     {
-
         if (Auth::check() && Auth::user()->hasUserGivenConsent()) {
             return redirect('dashboard');
         }
@@ -1138,12 +1138,17 @@ class UserController extends Controller
         $stats = FixometerHelper::loginRegisterStats();
         $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
 
+        $activeRepairNetworkId = session()->get('repair_network');
+        $network = Network::find($activeRepairNetworkId);
+        $showNewsletterSignup = $network->shortname == 'restarters';
+
         return view('auth.register-new', [
-        'skills' => FixometerHelper::allSkills(),
-        'co2Total' => $stats['co2Total'][0]->total_footprints,
-        'wasteTotal' => $stats['co2Total'][0]->total_weights,
-        'partiesCount' => count($stats['allparties']),
-        'deviceCount' => $deviceCount,
+            'skills' => FixometerHelper::allSkills(),
+            'co2Total' => $stats['co2Total'][0]->total_footprints,
+            'wasteTotal' => $stats['co2Total'][0]->total_weights,
+            'partiesCount' => count($stats['allparties']),
+            'deviceCount' => $deviceCount,
+            'showNewsletterSignup' => $showNewsletterSignup,
         ]);
     }
 
@@ -1226,10 +1231,14 @@ class UserController extends Controller
         }
 
         if (env('DRIP_API_TOKEN') !== null && env('DRIP_API_TOKEN') !== '') {
-            $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
-            $user->drip_subscriber_id = $drip_subscribe_user->id;
+            $network = Network::find($user->repair_network);
+            if (! is_null($network) && $network->users_push_to_drip === true) {
+                $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
+                $user->drip_subscriber_id = $drip_subscribe_user->id;
+            }
         }
 
+        // 'invites' refers to receiving notifications about groups or events near the user.
         if (!is_null($request->input('invites')) && $request->input('invites') == 1) { //Subscribe to invites
             $user->invites = 1;
         }

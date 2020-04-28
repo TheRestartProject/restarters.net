@@ -160,6 +160,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\MediawikiServiceProvider::class,
+        App\Providers\WordpressServiceProvider::class,
         Msurguy\Honeypot\HoneypotServiceProvider::class,
         App\Providers\AgentServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
