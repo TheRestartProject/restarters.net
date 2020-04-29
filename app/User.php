@@ -477,6 +477,19 @@ class User extends Authenticatable implements Auditable
         return $this->networks->contains($network);
     }
 
+    public function isCoordinatorForGroup($group)
+    {
+        foreach ($group->networks as $groupNetwork) {
+            foreach ($this->networks as $userNetwork) {
+                if ($groupNetwork->name == $userNetwork->name) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public function groupsInChargeOf()
     {
         $groupsUserIsInChargeOf = collect([]);

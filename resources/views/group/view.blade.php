@@ -107,7 +107,7 @@
           </div>
           <div class="col-lg-5">
 
-            @if( FixometerHelper::hasRole( $user, 'Administrator' ) || $is_host_of_group )
+            @if( FixometerHelper::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group )
               <div class="button-group button-group__r">
 
                   <div class="dropdown">

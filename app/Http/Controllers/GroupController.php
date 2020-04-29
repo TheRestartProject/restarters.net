@@ -553,6 +553,7 @@ class GroupController extends Controller
         })->first());
 
         $is_host_of_group = FixometerHelper::userHasEditGroupPermission($groupid, $user->id);
+        $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
 
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
         $view_group = Group::find($groupid);
@@ -599,6 +600,7 @@ class GroupController extends Controller
             'EmissionRatio' => $this->EmissionRatio,
             'in_group' => $in_group,
             'is_host_of_group' => $is_host_of_group,
+            'isCoordinatorForGroup' => $isCoordinatorForGroup,
             'user_groups' => $user_groups,
             'view_group' => $view_group,
             'group_id' => $groupid,
