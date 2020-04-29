@@ -732,8 +732,9 @@ class GroupController extends Controller
         $File = new FixometerFile;
 
         $is_host_of_group = FixometerHelper::userHasEditGroupPermission($id, $user->id);
-        if ( ! FixometerHelper::hasRole($user, 'Administrator') && ! $is_host_of_group) {
-            return redirect('/user/forbidden');
+        $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
+        if ( ! FixometerHelper::hasRole($user, 'Administrator') && ! $is_host_of_group && ! $isCoordinatorForGroup) {
+            abort(403);
         }
 
         if ($request->isMethod('post') && ! empty($request->post())) {
