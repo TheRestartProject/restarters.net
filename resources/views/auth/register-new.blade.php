@@ -182,7 +182,9 @@
 
             <div class="registration__offset">
                 <fieldset>
-                    <legend>@lang('registration.reg-step-3-2b')</legend>
+                    <legend @if(! $showNewsletterSignup) class="d-none" @endif>
+                        @lang('registration.reg-step-3-2b')
+                    </legend>
                     <legend>@lang('registration.reg-step-3-1a')</legend>
                     <div class="form-check align-items-center justify-content-start @if($showNewsletterSignup) d-flex @else d-none @endif">
                         <input class="form-check-input" type="checkbox" name="newsletter" id="newsletter" value="1" @if( old('newsletter') == 1 ) checked @endif>
