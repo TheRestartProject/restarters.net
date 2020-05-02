@@ -160,7 +160,7 @@
                         <div class="col">
                             <div class="row badge-pill badge-light">
                                 <div class="col col-2">
-                                    ID
+                                    Total
                                 </div>
                                 <div class="col col-2">
                                     Top opinion
@@ -182,7 +182,7 @@
                             @foreach($status['list_recats'] as $row)
                             <div class="row border-grey">
                                 <div class="col col-2">
-                                    @php( print($row->iddevices) )
+                                    @php( print($row->items) )
                                 </div>
                                 <div class="col col-2">
                                     @php( print($row->top_crowd_opinion) )
@@ -212,7 +212,7 @@
                         <div class="col">
                             <div class="row badge-pill badge-light">
                                 <div class="col col-2">
-                                    ID
+                                    Total
                                 </div>
                                 <div class="col col-2">
                                     Top opinion
@@ -234,7 +234,7 @@
                             @foreach($status['list_recats_misc'] as $row)
                             <div class="row border-grey">
                                 <div class="col col-2">
-                                    @php( print($row->iddevices) )
+                                    @php( print($row->items) )
                                 </div>
                                 <div class="col col-2">
                                     @php( print($row->top_crowd_opinion) )
