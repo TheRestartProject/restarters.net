@@ -13,7 +13,12 @@
             <header>
                 <div class="row">
                 <div class="col col-md-3 network-icon" style="text-align:center">
-                    <img style="max-height:50px" src="{{ asset('images/logos/'.$network->shortname.'.png') }}">
+                    @php( $logo = $network->logo )
+                    @if( is_object($logo) && is_object($logo->image) )
+                        <img style="max-height:50px" src="{{ asset('/uploads/mid_'. $logo->image->path) }}" alt="{{{ $network->name }}} logo">
+                    @else
+                        <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="generic network logo">
+                    @endif
                 </div>
 
                 <div class="col col-md-9">

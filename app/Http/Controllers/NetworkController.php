@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Network;
+use FixometerFile;
+
 use Illuminate\Http\Request;
 
 use Auth;
@@ -80,7 +82,9 @@ class NetworkController extends Controller
      */
     public function edit(Network $network)
     {
-        //
+        return view('networks.edit', [
+            'network' => $network
+        ]);
     }
 
     /**
@@ -92,7 +96,13 @@ class NetworkController extends Controller
      */
     public function update(Request $request, Network $network)
     {
-        //
+        if ($request->hasFile('network_logo')) {
+            $fileHelper = new FixometerFile;
+            $networkLogoFilename = $fileHelper->upload('network_logo', 'image', $network->id, env('TBL_NETWORKS'), false, false, false, false);
+            $networkLogoPath = env('UPLOADS_URL').'mid_'.$networkLogoFilename;
+        }
+
+        return redirect()->route('networks.edit', [$network]);
     }
 
     /**

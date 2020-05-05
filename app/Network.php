@@ -44,4 +44,11 @@ class Network extends Model
 
         return $events->flatten(1);
     }
+
+
+    public function logo()
+    {
+        return $this->hasOne('App\Xref', 'reference', 'id')->where('reference_type', env('TBL_NETWORKS'))->where('object_type', 5);
+    }
+
 }
