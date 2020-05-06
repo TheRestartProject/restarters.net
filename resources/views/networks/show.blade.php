@@ -12,8 +12,15 @@
 
             <header>
                 <div class="row">
-                <div class="col col-md-3 network-icon" style="text-align:center">
-                    <img style="max-height:50px" src="{{ asset('images/logos/'.$network->shortname.'.png') }}">
+                <div class="col col-md-3 align-self-center" style="text-align:center">
+                    <div class="network-icon">
+                    @php( $logo = $network->logo )
+                    @if( is_object($logo) && is_object($logo->image) )
+                        <img style="max-height:50px" src="{{ asset('/uploads/mid_'. $logo->image->path) }}" alt="{{{ $network->name }}} logo">
+                    @else
+                        <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="generic network logo">
+                    @endif
+                    </div>
                 </div>
 
                 <div class="col col-md-9">
@@ -115,7 +122,7 @@
 
             <div class="modal-header">
 
-                <h5 id="groupDescriptionLabel">@lang('networks.aboutNetworkHeader', ['name' => $network->name])</h5>
+                <h5 id="groupDescriptionLabel">@lang('networks.show.about_modal_header', ['name' => $network->name])</h5>
                 @include('partials.cross')
 
             </div>
