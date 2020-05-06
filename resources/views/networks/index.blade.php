@@ -54,7 +54,7 @@
     <div class="table-responsive">
         <table role="table" class="table table-striped table-hover table-layout-fixed">
             <thead>
-                <tr><th>@lang('networks.network')</th></tr>
+                <tr><th>@lang('networks.general.network')</th></tr>
             </thead>
             <tbody>
                 @if( !$allNetworks->isEmpty() )
