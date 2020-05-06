@@ -22,12 +22,24 @@
     <div class="table-responsive">
         <table role="table" class="table table-striped table-hover table-layout-fixed">
             <thead>
-                <tr><th>@lang('networks.general.network')</th></tr>
+                <tr>
+                    <th scope="col" width="20%"></th>
+                    <th scope="col">@lang('networks.general.network')</th>
+                </tr>
             </thead>
             <tbody>
                 @if( !$yourNetworks->isEmpty() )
                     @foreach($yourNetworks as $network)
                         <tr>
+                            <td>
+                                @php( $logo = $network->logo )
+                                @if( is_object($logo) && is_object($logo->image) )
+                                    <img style="width: auto; height:50px" src="{{ asset('/uploads/mid_'. $logo->image->path) }}" alt="{{{ $network->name }}} logo">
+                                @else
+                                    <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="generic network logo">
+                                @endif
+    </div>
+                            </td>
                             <td>
                                 <a href="/networks/{{$network->id}}">{{ $network->name }}</a>
                             </td>
@@ -54,12 +66,24 @@
     <div class="table-responsive">
         <table role="table" class="table table-striped table-hover table-layout-fixed">
             <thead>
-                <tr><th>@lang('networks.general.network')</th></tr>
+                <tr>
+                    <th scope="col" width="20%"></th>
+                    <th scope="col">@lang('networks.general.network')</th>
+                </tr>
             </thead>
             <tbody>
                 @if( !$allNetworks->isEmpty() )
                     @foreach($allNetworks as $network)
                         <tr>
+                            <td>
+                                @php( $logo = $network->logo )
+                                @if( is_object($logo) && is_object($logo->image) )
+                                    <img style="width: auto; height:50px" src="{{ asset('/uploads/mid_'. $logo->image->path) }}" alt="{{{ $network->name }}} logo">
+                                @else
+                                    <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="generic network logo">
+                                @endif
+    </div>
+                            </td>
                             <td>
                                 <a href="/networks/{{$network->id}}">{{ $network->name }}</a>
                             </td>
