@@ -11,6 +11,13 @@ use Auth;
 
 class NetworkController extends Controller
 {
+    protected $crossReferenceTableId;
+
+    public function __construct()
+    {
+        $this->crossReferenceTableId = config('restarters.xref_types.networks');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -98,7 +105,7 @@ class NetworkController extends Controller
     {
         if ($request->hasFile('network_logo')) {
             $fileHelper = new FixometerFile;
-            $networkLogoFilename = $fileHelper->upload('network_logo', 'image', $network->id, env('TBL_NETWORKS'), false, false, false, false);
+            $networkLogoFilename = $fileHelper->upload('network_logo', 'image', $network->id, $this->crossReferenceTableId, false, false, false, false);
             $networkLogoPath = env('UPLOADS_URL').'mid_'.$networkLogoFilename;
         }
 

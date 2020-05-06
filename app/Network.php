@@ -48,7 +48,9 @@ class Network extends Model
 
     public function logo()
     {
-        return $this->hasOne('App\Xref', 'reference', 'id')->where('reference_type', env('TBL_NETWORKS'))->where('object_type', 5);
+        return $this->hasOne('App\Xref', 'reference', 'id')
+                    ->where('reference_type', config('restarters.xref_types.networks'))
+                    ->where('object_type', 5);
     }
 
 }
