@@ -135,9 +135,9 @@
                                                   @if ( FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator') )
                                                       @if (count(Auth::user()->networks) == 1)
                                                           @php( $network = Auth::user()->networks->first() )
-                                                        <li><a href="{{ route('networks.show', $network->id) }}">@lang('networks.single-network', ['networkName' => $network->name])</a></li>
+                                                        <li><a href="{{ route('networks.show', $network->id) }}">@lang('networks.general.particular_network', ['networkName' => $network->name])</a></li>
                                                       @else
-                                                        <li><a href="{{ route('networks.index') }}">@lang('networks.networks')</a></li>
+                                                        <li><a href="{{ route('networks.index') }}">@lang('networks.general.networks')</a></li>
                                                       @endif
                                                   @endif
                                               </ul>

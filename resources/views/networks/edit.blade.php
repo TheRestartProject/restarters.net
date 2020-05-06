@@ -27,14 +27,14 @@
                 @csrf
                     <div class="form-group row">
                         <div class="col">
-                            <label for="network_logo">@lang('networks.network_logo'):</label><br/>
+                            <label for="network_logo">@lang('networks.edit.label_logo'):</label><br/>
                             <input id="network_logo" name="network_logo" type="file" />
                         </div>
                     </div>
 
                     <div class="button-group row row-compressed-xs">
                         <div class="col-lg-12 d-flex align-items-center justify-content-end">
-                            <button type="submit" class="btn btn-primary btn-create">@lang('networks.edit_network_save_changes')</button>
+                            <button type="submit" class="btn btn-primary btn-create">@lang('networks.edit.button_save')</button>
                         </div>
                     </div>
             </form>

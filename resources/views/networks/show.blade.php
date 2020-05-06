@@ -120,7 +120,7 @@
 
             <div class="modal-header">
 
-                <h5 id="groupDescriptionLabel">@lang('networks.aboutNetworkHeader', ['name' => $network->name])</h5>
+                <h5 id="groupDescriptionLabel">@lang('networks.show.about_modal_header', ['name' => $network->name])</h5>
                 @include('partials.cross')
 
             </div>
