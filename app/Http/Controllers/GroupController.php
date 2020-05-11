@@ -739,6 +739,8 @@ class GroupController extends Controller
             abort(403);
         }
 
+        $networks = Network::all();
+
         if ($request->isMethod('post') && ! empty($request->post())) {
             $data = $request->post();
 
@@ -755,6 +757,7 @@ class GroupController extends Controller
                   $images = $File->findImages(env('TBL_GROUPS'), $id);
                   $tags = GroupTags::all();
                   $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
+                  $group_networks = $group->networks->pluck('id')->toArray();
 
                   if ( ! isset($images)) {
                       $images = null;
@@ -769,9 +772,11 @@ class GroupController extends Controller
                       'images' => $images,
                       'tags' => $tags,
                       'group_tags' => $group_tags,
+                      'networks' => $networks,
+                      'group_networks' => $group_networks,
                       'audits' => $group->audits,
                   ]);
-                } // TODO
+                }
 
                 $latitude = $lat_long[0];
                 $longitude = $lat_long[1];
@@ -814,6 +819,12 @@ class GroupController extends Controller
                     $Group->find($id)->group_tags()->sync($_POST['group_tags']);
                 } else {
                     $Group->find($id)->group_tags()->sync([]);
+                }
+
+                if ( ! empty($request->input('group_networks'))) {
+                    Group::find($id)->networks()->sync($request->input('group_networks'));
+                } else {
+                    Group::find($id)->networks()->sync([]);
                 }
             }
 
@@ -882,6 +893,7 @@ class GroupController extends Controller
 
         $tags = GroupTags::all();
         $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
+        $group_networks = Group::find($id)->networks->pluck('id')->toArray();
 
         compact($audits = $Group->findOrFail($id)->audits);
 
@@ -894,58 +906,10 @@ class GroupController extends Controller
             'images' => $images,
             'tags' => $tags,
             'group_tags' => $group_tags,
+            'networks' => $networks,
+            'group_networks' => $group_networks,
             'audits' => $audits,
         ]);
-    }
-
-    public function updateGroupInWordpress($id, $data, $group_avatar, $latitude, $longitude)
-    {
-        // TODO: host.  Groups don't just have one host.  Is host
-        // displayed on the front-end anywhere?
-        // TODO: receiving area field from posted data.  It's currently not in the interface.
-        $group = Group::where('idgroups', $id)->first();
-
-        $custom_fields = array(
-            array('key' => 'group_city',            'value' => $group->area),
-            //                                    array('key' => 'group_host',            'value' => $Host->hostname),
-            array('key' => 'group_website',         'value' => $data['website']),
-            //array('key' => 'group_hostavatarurl',   'value' => env('UPLOADS_URL') . 'mid_' . $Host->path),
-            array('key' => 'group_hash',            'value' => $id),
-            array('key' => 'group_avatar_url',      'value' => $group_avatar),
-            array('key' => 'group_latitude',        'value' => $latitude),
-            array('key' => 'group_longitude',       'value' => $longitude),
-        );
-
-        /** Start WP XML-RPC **/
-        $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-        $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
-
-        $content = array(
-            'post_type' => 'group',
-            'post_title' => $data['name'],
-            'post_content' => $data['free_text'],
-            'custom_fields' => $custom_fields,
-        );
-
-        if ( ! empty($group->wordpress_post_id)) {
-            // We need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
-            $existingPost = $wpClient->getPost($group->wordpress_post_id);
-
-            foreach ($existingPost['custom_fields'] as $i => $field) {
-                foreach ($custom_fields as $k => $set_field) {
-                    if ($field['key'] == $set_field['key']) {
-                        $custom_fields[$k]['id'] = $field['id'];
-                    }
-                }
-            }
-
-            $content['custom_fields'] = $custom_fields;
-            $wpClient->editPost($group->wordpress_post_id, $content);
-        } else {
-            $wpid = $wpClient->newPost($data['name'], $data['free_text'], $content);
-            $group->wordpress_post_id = $wpid;
-            $group->save();
-        }
     }
 
     public function delete($id)
