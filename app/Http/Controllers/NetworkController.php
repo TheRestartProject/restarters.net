@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Group;
 use App\Network;
 use FixometerFile;
 
@@ -67,7 +68,7 @@ class NetworkController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified network.
      *
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
@@ -76,8 +77,14 @@ class NetworkController extends Controller
     {
         $this->authorize('view', $network);
 
+        $groupsForAssociating = [];
+        if (Auth::user()->can('associateGroups', $network)) {
+            $groupsForAssociating = $network->groupsNotIn()->sortBy('name');
+        }
+
         return view('networks.show', [
-            'network' => $network
+            'network' => $network,
+            'groupsForAssociating' => $groupsForAssociating,
         ]);
     }
 
@@ -89,6 +96,8 @@ class NetworkController extends Controller
      */
     public function edit(Network $network)
     {
+        // TODO: authorisation?
+
         return view('networks.edit', [
             'network' => $network
         ]);
@@ -103,6 +112,9 @@ class NetworkController extends Controller
      */
     public function update(Request $request, Network $network)
     {
+        // TODO: authorisation?
+
+
         if ($request->hasFile('network_logo')) {
             $fileHelper = new FixometerFile;
             $networkLogoFilename = $fileHelper->upload('network_logo', 'image', $network->id, $this->crossReferenceTableId, false, false, false, false);
@@ -111,6 +123,29 @@ class NetworkController extends Controller
 
         return redirect()->route('networks.edit', [$network]);
     }
+
+    /**
+     * Associate a group to the specified network.
+     *
+     * @param  \App\Network  $network
+     * @return \Illuminate\Http\Response
+     */
+    public function associateGroup(Request $request, Network $network)
+    {
+        // TODO: authorisation?
+
+        $groupId = $request->input('group');
+
+        $group = Group::find($groupId);
+
+        // TODO: validation of group
+        if ( ! is_null($group)) {
+            $network->addGroup($group);
+        }
+
+        return redirect()->route('networks.show', [$network])->withSuccess($group->name.' added');
+    }
+
 
     /**
      * Remove the specified resource from storage.

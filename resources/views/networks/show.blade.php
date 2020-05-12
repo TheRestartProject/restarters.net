@@ -7,6 +7,12 @@
 @section('content')
 <section class="events networks">
     <div class="container-fluid">
+        @if (\Session::has('success'))
+            <div class="alert alert-success">
+                {!! \Session::get('success') !!}
+            </div>
+        @endif
+
       <div class="events__header row align-content-top">
           <div class="col d-flex flex-column">
 
@@ -30,14 +36,6 @@
                     <a class="events__header__url" href="{{{ $network->website }}}" target="_blank" rel="noopener noreferrer">{{{ $network->website }}}</a>
                 @endif
 
-                     {{-- @php( $groupImage = $group->groupImage )
-                     @if( is_object($groupImage) && is_object($groupImage->image) )
-                  <img src="{{ asset('/uploads/mid_'. $groupImage->image->path) }}" alt="{{{ $group->name }}} group image" class="event-icon">
-                @else
-
-                  <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="{{{ $group->name }}} group image" class="event-icon">
-                @endif
-                --}}
                 </div>
                 </div>
 
@@ -84,10 +82,30 @@
                     <p>
                         There are currently {{ $network->groups->count() }} groups in the {{ $network->name }} network. <a href="/group/all/search?network={{ $network->id }}">View these groups</a>.
                     </p>
+
+
+                    @can('associateGroups', $network)
+
+                <form action="/networks/{{ $network->id }}/groups/" method="post">
+
+                        @csrf
+                <div class="form-group form-group__offset">
+                  <label for="group">@lang('networks.show.addGroup'):</label>
+                  <div class="form-control form-control__select">
+                    <select name="group" id="group" class="select2" required>
+                      <option></option>
+                        @foreach($groupsForAssociating as $group)
+                            <option value="{{{ $group->idgroups }}}">{{{ $group->name }}}</option>
+                        @endforeach
+                    </select>
+                  </div>
+                  <input type="submit" class="btn btn-primary" id="create-event" value="@lang('networks.show.addGroupButton')">
+                </div>
+                </form>
+                    @endcan
                 </section>
 
 
-        {{-- Events to Moderate (Admin Only) --}}
             <h2>@lang('events.events_title_admin')</h2>
 
             <div class="table-responsive">
@@ -106,7 +124,6 @@
                 </tbody>
               </table>
             </div>
-        {{-- END Events to Moderate (Admin Only) --}}
 
             </div>
         </div>

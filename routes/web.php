@@ -141,6 +141,9 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     });
 
     Route::resource('networks', 'NetworkController');
+    Route::prefix('networks')->group(function () {
+        Route::post('/{network}/groups', 'NetworkController@associateGroup');
+    });
 
     //Group Controller
     Route::prefix('group')->group(function () {
