@@ -12,8 +12,13 @@
                 {!! \Session::get('success') !!}
             </div>
         @endif
+        @if (\Session::has('warning'))
+            <div class="alert alert-warning">
+                {!! \Session::get('warning') !!}
+            </div>
+        @endif
 
-      <div class="events__header row align-content-top">
+        <div class="events__header row  no-gutters">
           <div class="col d-flex flex-column">
 
             <header>
@@ -29,7 +34,7 @@
                     </div>
                 </div>
 
-                <div class="col col-md-9">
+                <div class="col col-md-5">
                 <h1>{{{ $network->name }}}</h1>
 
                 @if( !empty($network->website) )
@@ -37,10 +42,25 @@
                 @endif
 
                 </div>
+        <div class="col-lg-4">
+            <div class="button-group button-group__r">
+            @if( Auth::check() )
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Network actions
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="/group/all/search?network={{ $network->id }}">@lang('networks.show.view_groups_menuitem')</a>
+                        @can('associateGroups', $network)
+                        <button data-toggle="modal" data-target="#network-add-group" class="dropdown-item">@lang('networks.show.add_groups_menuitem')</button>
+                        @endcan
+                    </div>
                 </div>
+            @endif
+            </div>
+        </div>
 
             </header>
-          </div>
       </div>
 
 
@@ -84,25 +104,6 @@
                     </p>
 
 
-                    @can('associateGroups', $network)
-
-                <form action="/networks/{{ $network->id }}/groups/" method="post">
-
-                        @csrf
-                <div class="form-group form-group__offset">
-                  <label for="group">@lang('networks.show.addGroup'):</label>
-                  <div class="form-control form-control__select">
-                    <select name="group" id="group" class="select2" required>
-                      <option></option>
-                        @foreach($groupsForAssociating as $group)
-                            <option value="{{{ $group->idgroups }}}">{{{ $group->name }}}</option>
-                        @endforeach
-                    </select>
-                  </div>
-                  <input type="submit" class="btn btn-primary" id="create-event" value="@lang('networks.show.addGroupButton')">
-                </div>
-                </form>
-                    @endcan
                 </section>
 
 
@@ -155,5 +156,9 @@
     </div>
 </div>
 
-@endsection
 
+@can('associateGroups', $network)
+@include('networks.partials.add-group-modal')
+@endcan('associateGroups', $network)
+
+@endsection

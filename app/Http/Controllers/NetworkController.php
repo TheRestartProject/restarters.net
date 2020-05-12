@@ -9,6 +9,7 @@ use FixometerFile;
 use Illuminate\Http\Request;
 
 use Auth;
+use Lang;
 
 class NetworkController extends Controller
 {
@@ -125,7 +126,7 @@ class NetworkController extends Controller
     }
 
     /**
-     * Associate a group to the specified network.
+     * Associate groups to the specified network.
      *
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
@@ -134,16 +135,20 @@ class NetworkController extends Controller
     {
         // TODO: authorisation?
 
-        $groupId = $request->input('group');
+        $groupIds = $request->input('groups');
 
-        $group = Group::find($groupId);
+        if (is_null($groupIds)) {
+            return redirect()->route('networks.show', [$network])->withWarning(Lang::get('networks.show.add_groups_none_selected'));
+        }
 
-        // TODO: validation of group
-        if ( ! is_null($group)) {
+        foreach ($groupIds as $groupId) {
+            $group = Group::find($groupId);
             $network->addGroup($group);
         }
 
-        return redirect()->route('networks.show', [$network])->withSuccess($group->name.' added');
+        $numberOfGroups = count($groupIds);
+
+        return redirect()->route('networks.show', [$network])->withSuccess(Lang::get('networks.show.add_groups_success', ['number' => $numberOfGroups]));
     }
 
 
