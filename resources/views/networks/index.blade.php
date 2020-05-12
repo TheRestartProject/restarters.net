@@ -12,22 +12,34 @@
 <div class="row">
 <div class="col">
 
-<h1>@lang('networks.networks')</h1>
+<h1>@lang('networks.general.networks')</h1>
 
 <section class="table-section" id="user-groups">
-    <h2>@lang('networks.yourNetworks')</h2>
+    <h2>@lang('networks.index.your_networks')</h2>
     <p>
-        @lang('networks.yourNetworksExplainer')
+        @lang('networks.index.your_networks_explainer')
     </p>
     <div class="table-responsive">
         <table role="table" class="table table-striped table-hover table-layout-fixed">
             <thead>
-                <tr><th>@lang('networks.network')</th></tr>
+                <tr>
+                    <th scope="col" width="20%"></th>
+                    <th scope="col">@lang('networks.general.network')</th>
+                </tr>
             </thead>
             <tbody>
                 @if( !$yourNetworks->isEmpty() )
                     @foreach($yourNetworks as $network)
                         <tr>
+                            <td>
+                                @php( $logo = $network->logo )
+                                @if( is_object($logo) && is_object($logo->image) )
+                                    <img style="width: auto; height:50px" src="{{ asset('/uploads/mid_'. $logo->image->path) }}" alt="{{{ $network->name }}} logo">
+                                @else
+                                    <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="generic network logo">
+                                @endif
+    </div>
+                            </td>
                             <td>
                                 <a href="/networks/{{$network->id}}">{{ $network->name }}</a>
                             </td>
@@ -36,7 +48,7 @@
                 @else
                     <tr>
                         <td colspan="13" align="center" class="p-3">
-                            @lang('networks.yourNetworksNoNetworks')
+                            @lang('networks.index.your_networks_no_networks')
                         </td>
                     </tr>
                 @endif
@@ -47,19 +59,31 @@
 
 @if ($showAllNetworks)
 <section class="table-section" id="user-groups">
-    <h2>@lang('networks.allNetworks')</h2>
+    <h2>@lang('networks.index.all_networks')</h2>
     <p>
-        @lang('networks.allNetworksExplainer')
+        @lang('networks.index.all_networks_explainer')
     </p>
     <div class="table-responsive">
         <table role="table" class="table table-striped table-hover table-layout-fixed">
             <thead>
-                <tr><th>@lang('networks.network')</th></tr>
+                <tr>
+                    <th scope="col" width="20%"></th>
+                    <th scope="col">@lang('networks.general.network')</th>
+                </tr>
             </thead>
             <tbody>
                 @if( !$allNetworks->isEmpty() )
                     @foreach($allNetworks as $network)
                         <tr>
+                            <td>
+                                @php( $logo = $network->logo )
+                                @if( is_object($logo) && is_object($logo->image) )
+                                    <img style="width: auto; height:50px" src="{{ asset('/uploads/mid_'. $logo->image->path) }}" alt="{{{ $network->name }}} logo">
+                                @else
+                                    <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="generic network logo">
+                                @endif
+    </div>
+                            </td>
                             <td>
                                 <a href="/networks/{{$network->id}}">{{ $network->name }}</a>
                             </td>
@@ -68,7 +92,7 @@
                 @else
                     <tr>
                         <td colspan="13" align="center" class="p-3">
-                            @lang('networks.allNetworksNoNetworks')
+                            @lang('networks.index.all_networks_no_networks')
                         </td>
                     </tr>
                 @endif

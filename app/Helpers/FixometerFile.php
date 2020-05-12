@@ -22,7 +22,7 @@ class FixometerFile extends Model
      * to database, depending on filetype
      * */
 
-    public function upload($file, $type, $reference = null, $referenceType = null, $multiple = false, $profile = false, $ajax = false)
+    public function upload($file, $type, $reference = null, $referenceType = null, $multiple = false, $profile = false, $ajax = false, $crop = true)
     {
         $clear = true; // purge pre-existing images from db - this is the default behaviour
 
@@ -99,31 +99,6 @@ class FixometerFile extends Model
                 $thumbSize = 80;
                 $midSize = 260;
 
-                // // Create image
-                // $thumb = imagecreatetruecolor($thumbSize, $thumbSize);
-                // $mid = imagecreatetruecolor($midSize, $midSize);
-                //
-                // // Set alphablending to off picking default color as black
-                // imagealphablending($thumb, false);
-                // imagealphablending($mid, false);
-                //
-                // // Preserve transparency
-                // imagesavealpha($thumb, true);
-                // imagesavealpha($mid, true);
-                //
-                // // Transparent color only contains one parameter, no color is specified which means the identifier will be -1
-                // imagecolortransparent($thumb);
-                // imagecolortransparent($mid);
-
-                // View result in browser as array
-                // imagepng($thumb);
-                // imagepng($mid);
-
-                // imagecopyresized($thumb, $profile_pic, 0, 0, $c1['x'], $c1['y'], $thumbSize, $thumbSize, $cropWidth, $cropHeight);
-                // imagecopyresized($mid, $profile_pic, 0, 0, $c1['x'], $c1['y'], $midSize, $midSize, $cropWidth, $cropHeight);
-
-                // open file a image resource
-
                 // Let's make images, which we will resize or crop
                 $thumb = Image::make($path);
                 $mid = Image::make($path);
@@ -146,26 +121,19 @@ class FixometerFile extends Model
                     });
                 }
 
-                $thumb->crop($thumbSize, $thumbSize)
-                      ->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename, 85);
+                if ($crop) {
+                    $thumb->crop($thumbSize, $thumbSize);
+                    $mid->crop($midSize, $midSize);
+                }
 
-                $mid->crop($midSize, $midSize)
-                      ->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename, 85);
-
-                // if($this->ext == 'jpg'){
-                //     imagejpeg($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename, 85);
-                //     imagejpeg($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename, 85);
-                // }
-                // elseif($this->ext == 'png') {
-                //     imagepng($thumb, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'thumbnail_' . $filename );
-                //     imagepng($mid, $_SERVER['DOCUMENT_ROOT'].'/uploads/'. 'mid_' . $filename );
-                // }
+                $thumb->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename, 85);
+                $mid->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename, 85);
 
                 $this->table = 'images';
                 $Images = new Images;
 
                 $image = $Images->create($data)->id;
-                //echo "REF: " . $reference. " - REF TYPE: ".$referenceType." - IMAGE: ".$image;
+
                 if (is_numeric($image) && ! is_null($reference) && ! is_null($referenceType)) {
                     $xref = Xref::create([
                         'object' => $image,
@@ -178,7 +146,6 @@ class FixometerFile extends Model
 
             return $filename;
         }
-        /** else, we raise exceptions and errors! **/
     }
 
     /**

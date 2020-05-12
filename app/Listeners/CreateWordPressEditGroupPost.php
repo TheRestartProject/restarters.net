@@ -38,6 +38,11 @@ class CreateWordPressEditGroupPost
 
         $group = Group::find($id);
 
+        if ( ! $group->eventsShouldPushToWordpress()) {
+            Log::error("Groups in this network are not published to WordPress");
+            return;
+        }
+
         try {
             if (is_numeric($group->wordpress_post_id)) {
                 $custom_fields = [

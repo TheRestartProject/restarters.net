@@ -127,7 +127,7 @@
                                                     <li><a href="{{ route('category') }}">Categories</a></li>
                                                     <li><a href="{{ route('users') }}">Users</a></li>
                                                     <li><a href="{{ route('roles') }}">Roles</a></li>
-                                                    <li><a href="{{ route('networks.index') }}">@lang('networks.networks')</a></li>
+                                                    <li><a href="{{ route('networks.index') }}">@lang('networks.general.networks')</a></li>
                                                   @endif
                                                   @if ( FixometerHelper::hasPermission('verify-translation-access') )
                                                     <li><a href="/translations">Translations</a></li>
@@ -135,9 +135,9 @@
                                                   @if ( FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator') )
                                                       @if (count(Auth::user()->networks) == 1)
                                                           @php( $network = Auth::user()->networks->first() )
-                                                        <li><a href="{{ route('networks.show', $network->id) }}">@lang('networks.single-network', ['networkName' => $network->name])</a></li>
+                                                        <li><a href="{{ route('networks.show', $network->id) }}">@lang('networks.general.particular_network', ['networkName' => $network->name])</a></li>
                                                       @else
-                                                        <li><a href="{{ route('networks.index') }}">@lang('networks.networks')</a></li>
+                                                        <li><a href="{{ route('networks.index') }}">@lang('networks.general.networks')</a></li>
                                                       @endif
                                                   @endif
                                               </ul>

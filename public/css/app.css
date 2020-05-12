@@ -21228,7 +21228,9 @@ td.col-device-auto {
 
 .networks .network-icon {
   width: 100%;
-  top: 10px;
+  padding: 5px 0;
+  -webkit-box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+          box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .reporting {
