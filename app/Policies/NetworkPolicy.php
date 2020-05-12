@@ -60,6 +60,20 @@ class NetworkPolicy
     }
 
     /**
+     * Determine whether the user can associate groups to networks.
+     *
+     * @param  \App\User  $user
+     * @return mixed
+     */
+    public function associateGroups(User $user, Network $network)
+    {
+        if ($user->hasRole('Administrator')) {
+            return true;
+        }
+    }
+
+
+    /**
      * Determine whether the user can delete the network.
      *
      * @param  \App\User  $user

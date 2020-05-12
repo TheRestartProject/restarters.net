@@ -53,4 +53,14 @@ class Network extends Model
                     ->where('object_type', 5);
     }
 
+    public function groupsNotIn()
+    {
+        $networkGroupsIds = $this->groups->pluck('idgroups')->toArray();
+
+        $groupsNotIn = Group::all()->filter(function ($group, $key) use($networkGroupsIds) {
+            return !in_array($group->idgroups, $networkGroupsIds);
+        });
+
+        return $groupsNotIn;
+    }
 }
