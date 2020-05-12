@@ -11,7 +11,7 @@
     </div>
 
     <div class="modal-body">
-        <form class="form" action="/networks/{{ $network->id }}/groups/" method="post">
+        <form class="form" action="{{ route('networks.associate-group', ['network' => $network->id]) }}" method="post">
 
             @csrf
             <label for="groups[]">@lang('networks.show.add_groups_select_label'):</label>

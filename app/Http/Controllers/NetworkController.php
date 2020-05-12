@@ -138,7 +138,7 @@ class NetworkController extends Controller
         $groupIds = $request->input('groups');
 
         if (is_null($groupIds)) {
-            return redirect()->route('networks.show', [$network])->withWarning(Lang::get('networks.show.add_groups_none_selected'));
+            return redirect()->route('networks.show', [$network])->withWarning(Lang::get('networks.show.add_groups_warning_none_selected'));
         }
 
         foreach ($groupIds as $groupId) {
