@@ -26,7 +26,7 @@ class MisccatTest extends TestCase {
     public function fetch_misccat_record() {
 
         $devices = 5;
-        $this->insert_misccat_devices($devices);
+        $this->_insert_misccat_devices($devices);
         
         $iddevices = array_fill(1, $devices, 0);
         $Misccat = new Misccat;
@@ -60,8 +60,8 @@ class MisccatTest extends TestCase {
     /** @test */
     public function fetch_misccat_status() {
 
-        $devices = 5;
-        $this->insert_misccat_devices($devices);
+        $devices = 7;
+        $this->_insert_misccat_devices($devices);
 
         // 3 opinions with consensus for cat1
         $misccat = factory(Misccat::class, 3)->states('cat1')->create([
@@ -88,15 +88,29 @@ class MisccatTest extends TestCase {
         $misccat = factory(Misccat::class, 1)->states('cat3')->create([
             'iddevices' => 4,
         ]);
+        
+        // "Misc" category opinions - consensus
+        $misccat = factory(Misccat::class, 3)->states('misc')->create([
+            'iddevices' => 5,
+        ]);
+        
+        // "Misc" category opinions - majority
+        $misccat = factory(Misccat::class, 2)->states('misc')->create([
+            'iddevices' => 6,
+        ]);
+        $misccat = factory(Misccat::class, 1)->states('cat1')->create([
+            'iddevices' => 6,
+        ]);
+
 
         $Misccat = new Misccat;
         $result = $Misccat->fetchStatus();
 
         $this->assertTrue(is_array($result));
         $this->assertTrue(array_key_exists('total_devices', $result), 'fetch_misccat_status: missing key - total_devices');
-        $this->assertEquals($result['total_devices'][0]->total, 5);
+        $this->assertEquals($result['total_devices'][0]->total, 7);
         $this->assertTrue(array_key_exists('total_opinions_3', $result), 'fetch_misccat_status: missing key - total_opinions_3');
-        $this->assertEquals($result['total_opinions_3'][0]->total, 2);
+        $this->assertEquals($result['total_opinions_3'][0]->total, 4);
         $this->assertTrue(array_key_exists('total_opinions_2', $result), 'fetch_misccat_status: missing key - total_opinions_2');
         $this->assertEquals($result['total_opinions_2'][0]->total, 1);
         $this->assertTrue(array_key_exists('total_opinions_1', $result), 'fetch_misccat_status: missing key - total_opinions_1');
@@ -105,20 +119,37 @@ class MisccatTest extends TestCase {
         $this->assertEquals($result['total_opinions_0'][0]->total, 1);
         $this->assertTrue(array_key_exists('total_recats', $result), 'fetch_misccat_status: missing key - total_recats');
         $this->assertEquals($result['total_recats'][0]->total, 2);
+        $this->assertTrue(array_key_exists('total_recats_misc', $result), 'fetch_misccat_status: missing key - total_recats');
+        $this->assertEquals($result['total_recats_misc'][0]->total, 2);
+
 
         $this->assertEquals(count($result['list_recats']), 2, 'fetch_misccat_status: wrong count for list_recats');
 
-        $this->assertEquals($result['list_recats'][0]->iddevices, 1, 'fetch_misccat_status: wrong iddevices for list_recats[0]');
+        $this->assertEquals($result['list_recats'][0]->items, 1, 'fetch_misccat_status: wrong iddevices for list_recats[0]');
         $this->assertEquals($result['list_recats'][0]->top_crowd_opinion, 'cat1', 'fetch_misccat_status: wrong top_crowd_opinion for list_recats[0]');
         $this->assertEquals($result['list_recats'][0]->top_crowd_opinion_percentage, 100, 'fetch_misccat_status: wrong top_crowd_opinion_percentage for list_recats[0]');
         $this->assertEquals($result['list_recats'][0]->all_crowd_opinions_count, 3, 'fetch_misccat_status: wrong all_crowd_opinions_count for list_recats[0]');
         $this->assertEquals($result['list_recats'][0]->opinions, 'cat1,cat1,cat1', 'fetch_misccat_status: wrong opinions for list_recats[0]');
 
-        $this->assertEquals($result['list_recats'][1]->iddevices, 2, 'fetch_misccat_status: wrong iddevices for list_recats[1]');
+        $this->assertEquals($result['list_recats'][1]->items, 1, 'fetch_misccat_status: wrong iddevices for list_recats[1]');
         $this->assertEquals($result['list_recats'][1]->top_crowd_opinion, 'cat2', 'fetch_misccat_status: wrong top_crowd_opinion for list_recats[1]');
         $this->assertEquals($result['list_recats'][1]->top_crowd_opinion_percentage, 100, 'fetch_misccat_status: wrong top_crowd_opinion_percentage for list_recats[1]');
         $this->assertEquals($result['list_recats'][1]->all_crowd_opinions_count, 2, 'fetch_misccat_status: wrong all_crowd_opinions_count for list_recats[1]');
         $this->assertEquals($result['list_recats'][1]->opinions, 'cat2,cat2', 'fetch_misccat_status: wrong opinions for list_recats[1]');
+        
+        $this->assertEquals(count($result['list_recats_misc']), 2, 'fetch_misccat_status: wrong count for list_recats');
+
+        $this->assertEquals($result['list_recats_misc'][0]->items, 1, 'fetch_misccat_status: wrong iddevices for list_recats_misc[0]');
+        $this->assertEquals($result['list_recats_misc'][0]->top_crowd_opinion, 'Misc', 'fetch_misccat_status: wrong top_crowd_opinion for list_recats_misc[0]');
+        $this->assertEquals($result['list_recats_misc'][0]->top_crowd_opinion_percentage, 67, 'fetch_misccat_status: wrong top_crowd_opinion_percentage for list_recats_misc[0]');
+        $this->assertEquals($result['list_recats_misc'][0]->all_crowd_opinions_count, 3, 'fetch_misccat_status: wrong all_crowd_opinions_count for list_recats_misc[0]');
+        $this->assertEquals($result['list_recats_misc'][0]->opinions, 'cat1,Misc,Misc', 'fetch_misccat_status: wrong opinions for list_recats_misc[0]');
+
+        $this->assertEquals($result['list_recats_misc'][1]->items, 1, 'fetch_misccat_status: wrong iddevices for list_recats_misc[1]');
+        $this->assertEquals($result['list_recats_misc'][1]->top_crowd_opinion, 'Misc', 'fetch_misccat_status: wrong top_crowd_opinion for list_recats_misc[1]');
+        $this->assertEquals($result['list_recats_misc'][1]->top_crowd_opinion_percentage, 100, 'fetch_misccat_status: wrong top_crowd_opinion_percentage for list_recats_misc[1]');
+        $this->assertEquals($result['list_recats_misc'][1]->all_crowd_opinions_count, 3, 'fetch_misccat_status: wrong all_crowd_opinions_count for list_recats_misc[1]');
+        $this->assertEquals($result['list_recats_misc'][1]->opinions, 'Misc,Misc,Misc', 'fetch_misccat_status: wrong opinions for list_recats_misc[1]');        
 
         $this->assertTrue(array_key_exists('total_splits', $result), 'fetch_misccat_status: missing key - total_splits');
         $this->assertEquals($result['total_splits'][0]->total, 1);
@@ -135,7 +166,7 @@ class MisccatTest extends TestCase {
     public function update_misccat_devices() {
 
         $devices = 5;
-        $this->insert_misccat_devices($devices);
+        $this->_insert_misccat_devices($devices);
 
         factory(Category::class, 1)->states('misc')->create();
         factory(Category::class, 1)->states('cat1')->create();
@@ -177,7 +208,7 @@ class MisccatTest extends TestCase {
             'iddevices' => 5,
             'category' => 'bar',
         ]);
-
+        
         $Misccat = new Misccat;
         $result = $Misccat->updateDevices();
         $this->assertDatabaseHas('devices', [
@@ -207,7 +238,7 @@ class MisccatTest extends TestCase {
         ]);
     }
 
-    protected function insert_misccat_devices($num) {
+    protected function _insert_misccat_devices($num) {
 
         $device = factory(Device::class, $num)->states('misccat')->create();
 

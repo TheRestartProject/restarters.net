@@ -107,7 +107,7 @@ ROUND((SELECT COUNT(o2.category) as top_crowd_opinion_count FROM devices_misc_op
 (SELECT COUNT(o2.category) as all_votes FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
 COUNT(o.category) AS all_crowd_opinions_count
 FROM devices_misc_opinions o
-GROUP BY o.iddevices
+GROUP BY top_crowd_opinion, o.iddevices
 HAVING
 (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 50)
 AND (top_crowd_opinion != 'Misc')
@@ -116,7 +116,7 @@ AND (top_crowd_opinion != 'Misc')
 
         $result['list_recats'] = DB::select("
 SELECT
-d.iddevices,
+COUNT(DISTINCT d.iddevices) AS items,
 (SELECT o1.category FROM devices_misc_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.category ORDER BY COUNT(o1.category) DESC LIMIT 1) AS top_crowd_opinion,
 ROUND((SELECT COUNT(o2.category) as top_crowd_opinion_count FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.category ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
 (SELECT COUNT(o2.category) as all_votes FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
@@ -124,7 +124,7 @@ COUNT(o.category) AS all_crowd_opinions_count,
 GROUP_CONCAT(o.category ORDER BY o.category) as opinions
 FROM devices_misc_opinions o
 JOIN devices d ON o.iddevices = d.iddevices
-GROUP BY d.iddevices
+GROUP BY top_crowd_opinion, d.iddevices
 HAVING
 (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 50)
 AND (top_crowd_opinion != 'Misc')
@@ -161,6 +161,39 @@ GROUP BY d.iddevices
 HAVING
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 40)
 ORDER BY all_crowd_opinions_count DESC, d.iddevices DESC
+");
+        
+                $result['total_recats_misc'] = DB::select("
+SELECT COUNT(DISTINCT items) as total FROM
+(SELECT
+o.iddevices AS items,
+(SELECT o1.category FROM devices_misc_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.category ORDER BY COUNT(o1.category) DESC LIMIT 1) AS top_crowd_opinion,
+ROUND((SELECT COUNT(o2.category) as top_crowd_opinion_count FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.category ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
+(SELECT COUNT(o2.category) as all_votes FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
+COUNT(o.category) AS all_crowd_opinions_count
+FROM devices_misc_opinions o
+GROUP BY top_crowd_opinion, o.iddevices
+HAVING
+(all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 50)
+AND (top_crowd_opinion = 'Misc')
+) AS results
+");
+
+        $result['list_recats_misc'] = DB::select("
+SELECT
+COUNT(DISTINCT d.iddevices) AS items,
+(SELECT o1.category FROM devices_misc_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.category ORDER BY COUNT(o1.category) DESC LIMIT 1) AS top_crowd_opinion,
+ROUND((SELECT COUNT(o2.category) as top_crowd_opinion_count FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.category ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
+(SELECT COUNT(o2.category) as all_votes FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
+COUNT(o.category) AS all_crowd_opinions_count,
+GROUP_CONCAT(o.category ORDER BY o.category) as opinions
+FROM devices_misc_opinions o
+JOIN devices d ON o.iddevices = d.iddevices
+GROUP BY top_crowd_opinion, d.iddevices
+HAVING
+(all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 50)
+AND (top_crowd_opinion = 'Misc')
+ORDER BY top_crowd_opinion ASC, all_crowd_opinions_count DESC, d.iddevices DESC
 ");
 
         $result['total_eee'] = DB::select("

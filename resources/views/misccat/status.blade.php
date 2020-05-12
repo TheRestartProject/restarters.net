@@ -154,13 +154,13 @@
             <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
                 <div class="col">
                     <div class="row justify-content-center">
-                        <p><strong>Items with majority opinions : @php( print($status['total_recats'][0]->total)) </strong></p>
+                        <p><strong>Items with majority opinions != "Misc" : @php( print($status['total_recats'][0]->total)) </strong></p>
                     </div>
                     <div class="row justify-content-center">
                         <div class="col">
                             <div class="row badge-pill badge-light">
                                 <div class="col col-2">
-                                    ID
+                                    Total
                                 </div>
                                 <div class="col col-2">
                                     Top opinion
@@ -182,7 +182,59 @@
                             @foreach($status['list_recats'] as $row)
                             <div class="row border-grey">
                                 <div class="col col-2">
-                                    @php( print($row->iddevices) )
+                                    @php( print($row->items) )
+                                </div>
+                                <div class="col col-2">
+                                    @php( print($row->top_crowd_opinion) )
+                                </div>
+                                <div class="col col-2">
+                                    @php( print($row->top_crowd_opinion_percentage) )
+                                </div>
+                                <div class="col col-2">
+                                    @php( print($row->all_crowd_opinions_count) )
+                                </div>
+                                <div class="col">
+                                    @php( print($row->opinions) )
+                                </div>
+                            </div>
+                          @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+                <div class="col">
+                    <div class="row justify-content-center">
+                        <p><strong>Items with majority opinion == "Misc" : @php( print($status['total_recats_misc'][0]->total)) </strong></p>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col">
+                            <div class="row badge-pill badge-light">
+                                <div class="col col-2">
+                                    Total
+                                </div>
+                                <div class="col col-2">
+                                    Top opinion
+                                </div>
+                                <div class="col col-2">
+                                    %
+                                </div>
+                                <div class="col col-2">
+                                    Number of opinions
+                                </div>
+                                <div class="col">
+                                    Opinions
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center small">
+                        <div class="col">
+                            @foreach($status['list_recats_misc'] as $row)
+                            <div class="row border-grey">
+                                <div class="col col-2">
+                                    @php( print($row->items) )
                                 </div>
                                 <div class="col col-2">
                                     @php( print($row->top_crowd_opinion) )
