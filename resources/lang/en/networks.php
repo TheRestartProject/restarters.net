@@ -16,6 +16,13 @@ return [
     ],
     'show' => [
         'about_modal_header' => 'About :name',
+        'add_groups_menuitem' => 'Add groups',
+        'add_groups_modal_header' => 'Add groups to :name',
+        'add_groups_select_label' => 'Choose groups to add',
+        'add_groups_save_button' => 'Add',
+        'add_groups_warning_none_selected' => 'No groups selected.',
+        'add_groups_success' => ':number group(s) added.',
+        'view_groups_menuitem' => 'View groups',
     ],
     'edit' => [
         'label_logo' => 'Network logo',

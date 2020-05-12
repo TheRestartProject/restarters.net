@@ -273,7 +273,7 @@ class GroupController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function create(Request $request, $networkId = null)
     {
         $user = User::find(Auth::id());
 
@@ -394,12 +394,14 @@ class GroupController extends Controller
                 'response' => $response,
                 'error' => $error,
                 'udata' => $udata,
+                'selectedNetworkId' => $networkId,
             ]);
         }
 
         return view('group.create', [
             'title' => 'New Group',
             'gmaps' => true,
+            'selectedNetworkId' => $networkId,
         ]);
     }
 

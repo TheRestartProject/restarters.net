@@ -1,0 +1,31 @@
+<div class="modal fade" id="network-add-group" tabindex="-1" role="dialog" aria-labelledby="addVolunteerEventLabel" aria-hidden="true">
+<div class="modal-dialog" role="document">
+
+    <div class="modal-content">
+
+    <div class="modal-header">
+
+        <h5 id="addVolunteerEventLabel">@lang('networks.show.add_groups_modal_header', ['name' => $network->name])</h5>
+        @include('partials.cross')
+
+    </div>
+
+    <div class="modal-body">
+        <form class="form" action="/networks/{{ $network->id }}/groups/" method="post">
+
+            @csrf
+            <label for="groups[]">@lang('networks.show.add_groups_select_label'):</label>
+            <div class="form-control form-control__select">
+                <select name="groups[]" id="groups[]" class="select2-tags" multiple required>
+                    <option></option>
+                    @foreach($groupsForAssociating as $group)
+                        <option value="{{{ $group->idgroups }}}">{{{ $group->name }}}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary float-right">@lang('networks.show.add_groups_save_button')</button>
+        </form>
+    </div>
+    </div>
+</div>
+</div>

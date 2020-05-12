@@ -7,7 +7,18 @@
 @section('content')
 <section class="events networks">
     <div class="container-fluid">
-      <div class="events__header row align-content-top">
+        @if (\Session::has('success'))
+            <div class="alert alert-success">
+                {!! \Session::get('success') !!}
+            </div>
+        @endif
+        @if (\Session::has('warning'))
+            <div class="alert alert-warning">
+                {!! \Session::get('warning') !!}
+            </div>
+        @endif
+
+        <div class="events__header row  no-gutters">
           <div class="col d-flex flex-column">
 
             <header>
@@ -23,26 +34,33 @@
                     </div>
                 </div>
 
-                <div class="col col-md-9">
+                <div class="col col-md-5">
                 <h1>{{{ $network->name }}}</h1>
 
                 @if( !empty($network->website) )
                     <a class="events__header__url" href="{{{ $network->website }}}" target="_blank" rel="noopener noreferrer">{{{ $network->website }}}</a>
                 @endif
 
-                     {{-- @php( $groupImage = $group->groupImage )
-                     @if( is_object($groupImage) && is_object($groupImage->image) )
-                  <img src="{{ asset('/uploads/mid_'. $groupImage->image->path) }}" alt="{{{ $group->name }}} group image" class="event-icon">
-                @else
-
-                  <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="{{{ $group->name }}} group image" class="event-icon">
-                @endif
-                --}}
                 </div>
+        <div class="col-lg-4">
+            <div class="button-group button-group__r">
+            @if( Auth::check() )
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Network actions
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="/group/all/search?network={{ $network->id }}">@lang('networks.show.view_groups_menuitem')</a>
+                        @can('associateGroups', $network)
+                        <button data-toggle="modal" data-target="#network-add-group" class="dropdown-item">@lang('networks.show.add_groups_menuitem')</button>
+                        @endcan
+                    </div>
                 </div>
+            @endif
+            </div>
+        </div>
 
             </header>
-          </div>
       </div>
 
 
@@ -84,10 +102,11 @@
                     <p>
                         There are currently {{ $network->groups->count() }} groups in the {{ $network->name }} network. <a href="/group/all/search?network={{ $network->id }}">View these groups</a>.
                     </p>
+
+
                 </section>
 
 
-        {{-- Events to Moderate (Admin Only) --}}
             <h2>@lang('events.events_title_admin')</h2>
 
             <div class="table-responsive">
@@ -106,7 +125,6 @@
                 </tbody>
               </table>
             </div>
-        {{-- END Events to Moderate (Admin Only) --}}
 
             </div>
         </div>
@@ -138,5 +156,9 @@
     </div>
 </div>
 
-@endsection
 
+@can('associateGroups', $network)
+@include('networks.partials.add-group-modal')
+@endcan('associateGroups', $network)
+
+@endsection
