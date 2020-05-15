@@ -130,7 +130,7 @@
                                                     <li><a href="{{ route('networks.index') }}">@lang('networks.general.networks')</a></li>
                                                   @endif
                                                   @if ( FixometerHelper::hasPermission('verify-translation-access') )
-                                                    <li><a href="/translations">Translations</a></li>
+                                                    <li><a href="/translations/view/admin">Translations</a></li>
                                                   @endif
                                                   @if ( FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator') )
                                                       @if (count(Auth::user()->networks) == 1)
