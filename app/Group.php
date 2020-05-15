@@ -340,7 +340,7 @@ class Group extends Model implements Auditable
 
     public function parties()
     {
-        return $this->hasMany(Party::class, 'group', 'idgroups')->withTrashed();
+        return $this->hasMany(Party::class, 'group', 'idgroups');
     }
 
     /**

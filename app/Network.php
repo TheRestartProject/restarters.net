@@ -63,4 +63,25 @@ class Network extends Model
 
         return $groupsNotIn;
     }
+
+    public function stats($emissionRatio)
+    {
+        $stats = [
+            'pax' => 0,
+            'hours' => 0,
+            'parties' => 0,
+            'co2' => 0,
+            'waste' => 0,
+        ];
+
+        foreach ($this->groups as $group) {
+            $singleGroupStats = $group->getGroupStats($emissionRatio);
+
+            foreach ($singleGroupStats as $key => $value) {
+                $stats[$key] = $stats[$key] + $value;
+            }
+        }
+
+        return $stats;
+    }
 }
