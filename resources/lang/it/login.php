@@ -1,19 +1,19 @@
 <?php
 
 return array (
-  'whatis' => 'Italian Welcome to the Restarters community',
-  'whatis_content' => '<p>This is a place to grow the community electronics repair movement. The world needs more fixing and more fixing skills to be shared.</p><p>Join in if you would like to:</p><ul>
-                                <li>Learn electronics repair with others</li>
-                                <li>Share your repair skills with others</li>
-                                <li>Organise electronics repair events</li>
-                                <li>View and share the impact of repair events</li>
-                                <li>Document and bring down the barriers to repair</li>
+  'whatis' => 'Benvenuto alla comunita\' dei Restarters',
+  'whatis_content' => '<p> Questo è un posto dove far crescere il movimento comunitario di riparazione elettronica. Il mondo ha bisogno di più capacità di riparazione e più abilità di riparazione da condividere.</p><p>Unisciti a noi se ti va:</p><ul>
+                                <li>Impara a riparare elettronica con altri</li>
+                                <li>Condividi le tue abilita\' di riparazione</li>
+                                <li>Organizza eventi di riparazione elettronica</li>
+                                <li>Visualizza e condividi l\'impatto dei nostri eventi</li>
+                                <li>Documenta e abbatti le barriere alla riparazione</li>
                             </ul>',
-  'more' => 'Find out more',
-  'stat_1' => 'Devices fixed',
-  'stat_2' => 'CO<sub>2</sub> emissions prevented',
-  'stat_3' => 'Waste prevented',
-  'stat_4' => 'Events held',
-  'lead' => 'Welcome to our Restarter community',
-  'login_title' => 'Sign in',
+  'more' => 'Scopri altro',
+  'stat_1' => 'Dispositivi riparati',
+  'stat_2' => 'Emissioni di CO<sub>2</sub> prevenute',
+  'stat_3' => 'Rifiuti evitati',
+  'stat_4' => 'Eventi realizzati',
+  'lead' => 'Benvenuto nella nostra comunita\' di Restarter',
+  'login_title' => 'Entra',
 );
