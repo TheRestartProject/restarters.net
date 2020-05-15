@@ -103,6 +103,8 @@ class EventController extends Controller
                  'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
              ],
              'hours_volunteered' => $party->hoursVolunteered(),
+             'created_at' => $party->created_at,
+             'updated_at' => $party->updated_at,
            ]);
 
            if ( ! empty($party->owner)) {
