@@ -218,9 +218,6 @@
                                     Top opinion
                                 </div>
                                 <div class="col col-2">
-                                    %
-                                </div>
-                                <div class="col col-2">
                                     Number of opinions
                                 </div>
                                 <div class="col">
@@ -238,9 +235,6 @@
                                 </div>
                                 <div class="col col-2">
                                     @php( print($row->top_crowd_opinion) )
-                                </div>
-                                <div class="col col-2">
-                                    @php( print($row->top_crowd_opinion_percentage) )
                                 </div>
                                 <div class="col col-2">
                                     @php( print($row->all_crowd_opinions_count) )
