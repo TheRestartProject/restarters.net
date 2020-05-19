@@ -22,5 +22,5 @@ return [
 
     'api_username' => env('DISCOURSE_APIUSER', ''),
 
-    'sso_secret' => env('DISCOURSE_SSO_SECRET', ''),
+    'sso_secret' => env('DISCOURSE_SECRET', ''),
 ];
