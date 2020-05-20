@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Events\UserDeleted;
+use App\Events\UserUpdated;
 use App\Network;
 use App\UserGroups;
 
@@ -62,6 +63,7 @@ class User extends Authenticatable implements Auditable
      * @var array
      */
     protected $dispatchesEvents = [
+        'updated' => UserUpdated::class,
         'deleted' => UserDeleted::class,
     ];
 

@@ -168,6 +168,7 @@ return [
         Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class,
         Barryvdh\TranslationManager\ManagerServiceProvider::class,
         wouterNL\Drip\DripServiceProvider::class,
+        App\Providers\DiscourseServiceProvider::class,
     ],
 
     /*

@@ -214,12 +214,12 @@
         "version_normalized": "0.11.2.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/barryvdh/laravel-cors.git",
+            "url": "https://github.com/fruitcake/laravel-cors.git",
             "reference": "7969a52f52d0d9a04b42565d25ac9994b8c83332"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/barryvdh/laravel-cors/zipball/7969a52f52d0d9a04b42565d25ac9994b8c83332",
+            "url": "https://api.github.com/repos/fruitcake/laravel-cors/zipball/7969a52f52d0d9a04b42565d25ac9994b8c83332",
             "reference": "7969a52f52d0d9a04b42565d25ac9994b8c83332",
             "shasum": ""
         },
@@ -1339,7 +1339,8 @@
                 "name": "Jakub Onderka",
                 "email": "jakub.onderka@gmail.com"
             }
-        ]
+        ],
+        "abandoned": "php-parallel-lint/php-console-color"
     },
     {
         "name": "jakub-onderka/php-console-highlighter",
@@ -1385,7 +1386,8 @@
                 "email": "acci@acci.cz",
                 "homepage": "http://www.acci.cz/"
             }
-        ]
+        ],
+        "abandoned": "php-parallel-lint/php-console-highlighter"
     },
     {
         "name": "jaybizzle/crawler-detect",
@@ -1828,8 +1830,7 @@
             "lumen",
             "publish",
             "vendor"
-        ],
-        "abandoned": true
+        ]
     },
     {
         "name": "league/csv",
