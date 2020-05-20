@@ -41,4 +41,25 @@ class NetworkTest extends TestCase
         // assert
         Event::assertDispatched(UserUpdated::class);
     }
+
+    /** @test */
+    // The assertion just tells us that the event is dispatched, not much else.
+    // In order to actually check it worked, we need to look at Discourse.
+    public function other_updates_dont_trigger_discourse_sync()
+    {
+        $this->withoutExceptionHandling();
+        Event::fake();
+
+        // arrange
+        config(['restarters.features.discourse_integration' => true]);
+
+        $user = factory(User::class)->create();
+
+        // act
+        $user->name = 'Joe Bloggs';
+        $user->save();
+
+        // assert
+        // tested manually, need a mock to test this automatically...
+    }
 }
