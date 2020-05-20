@@ -41,7 +41,7 @@
         "js-cookie": "^2.2.0",
         "leaflet": "^1.4.0",
         "moment": "^2.22.2",
-        "npm": "^6.9.0",
+        "npm": "^6.13.4",
         "perfect-scrollbar": "^1.4.0",
         "select2": "~4.0",
         "slick-carousel": "^1.8.1",
