@@ -19,6 +19,7 @@
         "laravel-mix": "^2.0",
         "lodash": "^4.17.11",
         "lodash.mergewith": "^4.6.2",
+        "lodash.template": "^4.5.0",
         "popper.js": "^1.14.4",
         "vue": "^2.5.17"
     },
