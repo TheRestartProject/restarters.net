@@ -58,9 +58,17 @@
 
                 <div class="row">
                   <div class="col-lg-6">
-                    <div class="form-group form-group__offset">
-                      <label for="event_name">@lang('events.field_event_name'):</label>
-                      <input type="text" class="form-control field" id="event_name" name="venue" value="{{ $formdata->venue }}" placeholder="@lang('events.field_event_name_helper')">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-7">
+                                <label for="event_name">@lang('events.field_event_name'):</label>
+                                <input type="text" class="form-control field" id="event_name" name="venue" value="{{ $formdata->venue }}" placeholder="@lang('events.field_event_name_helper')">
+                            </div>
+                            <div class="col-lg-5">
+                                <label>Online event?</label>
+                                <input type="checkbox" value="1" name="online" @if ( $formdata->online == 1) checked @endif>
+                            </div>
+                        </div>
                     </div>
 
                     @if ( $userInChargeOfMultipleGroups )

@@ -216,7 +216,7 @@ class PartyController extends Controller
             $data['latitude'] = $latitude;
             $data['longitude'] = $longitude;
 
-            // We got data! Elaborate.
+            $online = $request->has('online');
             $event_date = $request->input('event_date');
             $start = $request->input('start');
             $end = $request->input('end');
@@ -266,6 +266,7 @@ class PartyController extends Controller
                     'user_id' => $user_id,
                     'created_at' => date('Y-m-d H:i:s'),
                     'shareable_code' => FixometerHelper::generateUniqueShareableCode('App\Party', 'shareable_code'),
+                    'online' => $online,
                 );
 
                 $party = Party::create($data);
@@ -468,8 +469,7 @@ class PartyController extends Controller
                 'start' => $data['start'],
                 'end' => $data['end'],
                 'free_text' => $data['free_text'],
-                // 'pax'         => $data['pax'],
-                // 'volunteers'  => $data['volunteers'],
+                'online' => $request->has('online'),
                 'group' => $data['group'],
                 'venue' => $data['venue'],
                 'location' => $data['location'],
@@ -524,17 +524,6 @@ class PartyController extends Controller
                     $users = $_POST['users'];
                     $Party->createUserList($id, $users);
                 }
-
-                /** let's create the image attachment! **/
-          // if(isset($_FILES) && !empty($_FILES)){
-          //     if(is_array($_FILES['file']['name'])) {
-          //         $files = FixometerHelper::rearrange($_FILES['file']);
-          //         foreach($files as $upload){
-          //             $File->upload($upload, 'image', $id, env('TBL_EVENTS'));
-          //         }
-          //     }
-          //     else { }
-          // }
             }
             if (FixometerHelper::hasRole($user, 'Host')) {
                 header('Location: /host?action=pe&code=200');
