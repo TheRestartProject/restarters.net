@@ -158,15 +158,34 @@ class PartyController extends Controller
         ]);
     }
 
-    public function allUpcoming()
+    public function allUpcoming(Request $request)
     {
         $allUpcomingEventsQuery = Party::allUpcomingEvents();
+
+        $hasSearched = false;
+        if ($request->input('from-date') !== null) {
+            $allUpcomingEventsQuery->whereDate('event_date', '>=', $request->input('from-date'));
+            $hasSearched = true;
+        }
+        if ($request->input('to-date') !== null) {
+            $allUpcomingEventsQuery->whereDate('event_date', '<=', $request->input('to-date'));
+            $hasSearched = true;
+        }
+        if ($request->has('online')) {
+            $allUpcomingEventsQuery->where('online', true);
+            $hasSearched = true;
+        }
+
         $allUpcomingEventsCount = $allUpcomingEventsQuery->count();
         $allUpcomingEvents = $allUpcomingEventsQuery->paginate(env('PAGINATE'));
 
         return view('events.all', [
-            'upcoming_events_count' => $allUpcomingEventsCount,
             'upcoming_events' => $allUpcomingEvents,
+            'upcoming_events_count' => $allUpcomingEventsCount,
+            'fromDate' => $request->input('from-date'),
+            'toDate' => $request->input('to-date'),
+            'online' => $request->input('online'),
+            'hasSearched' => $hasSearched,
         ]);
     }
 

@@ -8,8 +8,8 @@
     </td>
     @endif
     <td class="cell-name">
+        <a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a> @if ($event->online) <span class="badge badge-info">@lang('events.online_event')</span>@endif
         <div class="group-name"><a class="group-name" href="/group/view/{{ $event->theGroup->idgroups }}">{{ $event->theGroup->name }}</a></div>
-        <a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a>
     </td>
     <td class="cell-date">
         <div>{{ $event->getEventDate('D jS M Y') }}</div>

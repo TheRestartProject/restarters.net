@@ -1,6 +1,5 @@
 <thead>
     <tr>
-        <th scope="col"></th>
         @if( !isset($group_view) )
           <th class="table-cell-icon"></th>
         @endif
