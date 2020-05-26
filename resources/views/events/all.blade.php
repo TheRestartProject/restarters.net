@@ -28,42 +28,44 @@
         </div>
         @endif
 
-        <div class="row justify-content-center">
+        <div class="row">
             <div class="col-lg-3">
 
                 <form id="filter-result" action="{{ route('all-upcoming-events') }}" method="GET">
 
-                    <button class="btn btn-primary btn-filter" type="submit">Search</button>
                     <div class="edit-panel edit-panel__side">
 
                         <div class="form-group">
-                            <label for="from_date">@lang('devices.from_date'):</label>
+                            <label for="from_date">@lang('events.upcoming_search_from'):</label>
                             <input type="date" name="from-date" id="from_date" class="field form-control" @if(isset($fromDate) && !empty($fromDate)) value="{{$fromDate}}" @endif>
                         </div>
 
                         <div class="form-group">
-                            <label for="to_date">@lang('devices.to_date'):</label>
+                            <label for="to_date">@lang('events.upcoming_search_to'):</label>
                             <input type="date" name="to-date" id="to_date" class="field form-control" @if(isset($toDate) && !empty($toDate)) value="{{$toDate}}" @endif>
                         </div>
 
                         <div class="form-group">
-                            <label for="online">@lang('events.online_event_search'):</label>
-                            <input type="checkbox" id="online" name="online" value="1" {{ $online ? 'checked' : '' }} />
+                            <label class="" style="font-weight:bold" for="online">
+                                @lang('events.online_event_search'):
+                                <input type="checkbox" id="online" style="margin: 0 0 0 5px; position: relative; top: 2px;" name="online" value="1" {{ $online ? 'checked' : '' }} />
+                            </label>
                         </div>
+                        <button class="btn btn-primary btn-filter" type="submit">Search</button>
                     </div>
                 </form>
 
             </div>
 
-            <div class="col-lg-9">
+            <div class="col-lg-9 mt-4 mt-lg-0">
                 <header>
                     <h2>Upcoming events</h2>
                 </header>
 
                 @if ($hasSearched)
-                <p>There are {{ $upcoming_events_count }} upcoming events that meet your search criteria.</p>
+                <p>@lang('events.upcoming_search_match', ['count' => $upcoming_events_count])</p>
                 @else
-                <p>There are {{ $upcoming_events_count }} upcoming events.</p>
+                <p>@lang('events.upcoming_search_count', ['count' => $upcoming_events_count])</p>
                 @endif
 
                 <div class="table-responsive">

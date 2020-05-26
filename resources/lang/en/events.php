@@ -109,6 +109,9 @@ return array (
     'other_events_near_you' => 'Other events near you',
     'no_upcoming_near_you' => 'There are no upcoming events near you - get in touch with your <a href="/group">local groups</a> to see if any are planned, or would you like to start or add a group? Have a look at our <a href=":resources_link">resources</a>.',
     'online_event' => 'ONLINE EVENT',
-    'online_event_search' => 'Online',
-
+    'online_event_search' => 'Online?',
+    'upcoming_search_from' => 'From',
+    'upcoming_search_to' => 'To',
+    'upcoming_search_count' => 'There are :count upcoming events in total.',
+    'upcoming_search_match' => 'There are :count upcoming events that match your search.',
 );

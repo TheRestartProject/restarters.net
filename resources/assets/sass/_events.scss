@@ -235,7 +235,6 @@
           padding-left: 0;
       }
     }
-
 }
 
 .card .table-events .btn {
@@ -305,4 +304,11 @@
 
 .cell-info {
   background-color: #D1E5E6;
+}
+
+
+@media (min-width: 992px) {
+    #online-checkbox-group {
+        margin-top: 40px;
+    }
 }

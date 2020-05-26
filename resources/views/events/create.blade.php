@@ -41,25 +41,32 @@
 
           <div class="row">
             <div class="col-lg-6">
-              <div class="form-group">
                   <div class="row">
                     <div class="col-lg-7">
+                        <div class="form-group">
                         <label for="event_name">@lang('events.field_event_name'):</label>
                         <input type="text" class="form-control field" id="event_name" name="venue" required placeholder="@lang('events.field_event_name_helper')">
+                        </div>
                     </div>
                     <div class="col-lg-5">
-                        <label>Online event?</label>
-                        <input type="checkbox" value="1" name="online">
+                        <div class="form-check" id="online-checkbox-group">
+                            <label class="form-check-label">
+                                Online event?
+                                <input id="online" type="checkbox" value="1" name="online" class="form-check-input" style="position:relative;top:2px">
+                            </label>
+                        </div>
                     </div>
-                  </div>
-              </div>
+                </div>
+
+                <div class="row">
+                </div>
 
               @if ( $userInChargeOfMultipleGroups )
-                <div class="form-group">
                     <div class="row">
                         <div class="col-lg-7">
+                            <div class="form-group">
                   <label for="event_group">@lang('events.field_event_group'):</label>
-                  <div class="form-control__select">
+                  <div class="form-control form-control__select">
                     <select name="group" id="event_group" class="field field select2" required>
                       <option></option>
 
