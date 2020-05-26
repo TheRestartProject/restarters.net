@@ -1,1 +1,0 @@
-Feature: Displaying online events
