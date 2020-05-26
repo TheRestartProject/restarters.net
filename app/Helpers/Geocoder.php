@@ -16,7 +16,7 @@ class Geocoder
         $decoded = json_decode($json)->results[0];
 
         $latitude = $decoded->{'geometry'}->{'location'}->lat;
-        $longitude = $decoded->{'geometry'}->{'location'}->lat;
+        $longitude = $decoded->{'geometry'}->{'location'}->lng;
 
         return [
             'latitude' => $latitude,
