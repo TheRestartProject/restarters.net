@@ -34,226 +34,232 @@
             </div>
         </div>
         @if (isset($status))
-            <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
-                <div class="col">
-                    <div class="row justify-content-center">
-                        <p><strong>Items categorised "Miscellaneous"</strong></p>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col">
-                            <p class="badge-pill badge-light"><span>Total</span></p>
-                            <p>
-                                @php( print($status['total_devices'][0]->total))
-                            </p>
-                        </div>
-                        <div class="col">
-                            <p class="badge-pill badge-light"><span>with 3 opinions</span></p>
-                            <p>
-                                @php( print($status['total_opinions_3'][0]->total))
-                            </p>
-                        </div>
-                        <div class="col">
-                            <p class="badge-pill badge-light"><span>with 2 opinions</span></p>
-                            <p>
-                                @php( print($status['total_opinions_2'][0]->total))
-                            </p>
-                        </div>
-                        <div class="col">
-                            <p class="badge-pill badge-light"><span>with 1 opinion</span></p>
-                            <p>
-                                @php( print($status['total_opinions_1'][0]->total))
-                            </p>
-                        </div>
-                        <div class="col">
-                            <p class="badge-pill badge-light"><span>with 0 opinions</span></p>
-                            <p>
-                                @php( print($status['total_opinions_0'][0]->total))
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
-                <div class="col">
-                    <div class="row justify-content-center">
-                        <p><strong>Items by EEE Status</strong></p>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col">
-                            <p class="badge-pill badge-light"><span>EEE</span></p>
-                            <p>
-                                @php( print($status['total_eee'][0]->total))
-                            </p>
-                        </div>
-                        <div class="col">
-                            <p class="badge-pill badge-light"><span>Non-EEE</span></p>
-                            <p>
-                                @php( print($status['total_non_eee'][0]->total))
-                            </p>
-                        </div>
-                        <div class="col">
-                            <p class="badge-pill badge-light"><span>Not sure</span></p>
-                            <p>
-                                @php( print($status['total_not_sure'][0]->total))
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
-                <div class="col">
-                    <div class="row justify-content-center">
-                        <p><strong>Items with split opinions : @php( print($status['total_splits'][0]->total))</strong></p>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col">
-                            <div class="row badge-pill badge-light">
-                                <div class="col col-1">
-                                    ID
-                                </div>
-                                <div class="col col-3">
-                                    Opinions
-                                </div>
-                                <div class="col col-2">
-                                    Brand
-                                </div>
-                                <div class="col col-2">
-                                    Model
-                                </div>
-                                <div class="col">
-                                    Problem
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row justify-content-center small">
-                        <div class="col">
-                            @foreach($status['list_splits'] as $row)
-                            <div class="row border-grey">
-                                <div class="col col-1">
-                                    @php( print($row->iddevices) )
-                                </div>
-                                <div class="col col-3">
-                                    @php( print($row->opinions) )
-                                </div>
-                                <div class="col col-2">
-                                    @php( print($row->brand) )
-                                </div>
-                                <div class="col col-2">
-                                    @php( print($row->model) )
-                                </div>
-                                <div class="col">
-                                    @php( print($row->problem) )
-                                </div>
-                            </div>
-                          @endforeach
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
-                <div class="col">
-                    <div class="row justify-content-center">
-                        <p><strong>Items with majority opinions != "Misc" : @php( print($status['total_recats'][0]->total)) </strong></p>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col">
-                            <div class="row badge-pill badge-light">
-                                <div class="col col-2">
-                                    Total
-                                </div>
-                                <div class="col col-2">
-                                    Top opinion
-                                </div>
-                                <div class="col col-2">
-                                    %
-                                </div>
-                                <div class="col col-2">
-                                    Number of opinions
-                                </div>
-                                <div class="col">
-                                    Opinions
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row justify-content-center small">
-                        <div class="col">
-                            @foreach($status['list_recats'] as $row)
-                            <div class="row border-grey">
-                                <div class="col col-2">
-                                    @php( print($row->items) )
-                                </div>
-                                <div class="col col-2">
-                                    @php( print($row->top_crowd_opinion) )
-                                </div>
-                                <div class="col col-2">
-                                    @php( print($row->top_crowd_opinion_percentage) )
-                                </div>
-                                <div class="col col-2">
-                                    @php( print($row->all_crowd_opinions_count) )
-                                </div>
-                                <div class="col">
-                                    @php( print($row->opinions) )
-                                </div>
-                            </div>
-                          @endforeach
-                        </div>
-                    </div>
-                </div>
-            </div>
-        
         <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
-                <div class="col">
-                    <div class="row justify-content-center">
-                        <p><strong>Items with majority opinion == "Misc" : @php( print($status['total_recats_misc'][0]->total)) </strong></p>
+            <div class="col">
+                <div class="row justify-content-center">
+                    <p><strong>Items categorised "Miscellaneous"</strong></p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <p class="badge-pill badge-light"><span>Total</span></p>
+                        <p>
+                            @php( print($status['total_devices'][0]->total))
+                        </p>
                     </div>
-                    <div class="row justify-content-center">
-                        <div class="col">
-                            <div class="row badge-pill badge-light">
-                                <div class="col col-2">
-                                    Total
-                                </div>
-                                <div class="col col-2">
-                                    Top opinion
-                                </div>
-                                <div class="col col-2">
-                                    %
-                                </div>
-                                <div class="col col-2">
-                                    Number of opinions
-                                </div>
-                                <div class="col">
-                                    Opinions
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col">
+                        <p class="badge-pill badge-light"><span>with 3 opinions</span></p>
+                        <p>
+                            @php( print($status['total_opinions_3'][0]->total))
+                        </p>
                     </div>
-                    <div class="row justify-content-center small">
-                        <div class="col">
-                            @foreach($status['list_recats_misc'] as $row)
-                            <div class="row border-grey">
-                                <div class="col col-2">
-                                    @php( print($row->items) )
-                                </div>
-                                <div class="col col-2">
-                                    @php( print($row->top_crowd_opinion) )
-                                </div>
-                                <div class="col col-2">
-                                    @php( print($row->top_crowd_opinion_percentage) )
-                                </div>
-                                <div class="col col-2">
-                                    @php( print($row->all_crowd_opinions_count) )
-                                </div>
-                                <div class="col">
-                                    @php( print($row->opinions) )
-                                </div>
-                            </div>
-                          @endforeach
-                        </div>
+                    <div class="col">
+                        <p class="badge-pill badge-light"><span>with 2 opinions</span></p>
+                        <p>
+                            @php( print($status['total_opinions_2'][0]->total))
+                        </p>
+                    </div>
+                    <div class="col">
+                        <p class="badge-pill badge-light"><span>with 1 opinion</span></p>
+                        <p>
+                            @php( print($status['total_opinions_1'][0]->total))
+                        </p>
+                    </div>
+                    <div class="col">
+                        <p class="badge-pill badge-light"><span>with 0 opinions</span></p>
+                        <p>
+                            @php( print($status['total_opinions_0'][0]->total))
+                        </p>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+            <div class="col">
+                <div class="row justify-content-center">
+                    <p><strong>Items by EEE Status</strong></p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <p class="badge-pill badge-light"><span>EEE</span></p>
+                        <p>
+                            @php( print($status['total_eee'][0]->total))
+                        </p>
+                    </div>
+                    <div class="col">
+                        <p class="badge-pill badge-light"><span>Non-EEE</span></p>
+                        <p>
+                            @php( print($status['total_non_eee'][0]->total))
+                        </p>
+                    </div>
+                    <div class="col">
+                        <p class="badge-pill badge-light"><span>Not sure</span></p>
+                        <p>
+                            @php( print($status['total_not_sure'][0]->total))
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+            <div class="col">
+                <div class="row justify-content-center">
+                    <p><strong>Items with split opinions : @php( print($status['total_splits'][0]->total))</strong></p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <div class="row badge-pill badge-light">
+                            <div class="col col-1">
+                                ID
+                            </div>
+                            <div class="col col-3">
+                                Opinions
+                            </div>
+                            <div class="col col-2">
+                                Brand
+                            </div>
+                            <div class="col col-2">
+                                Model
+                            </div>
+                            <div class="col">
+                                Problem
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center small">
+                    <div class="col">
+                        @foreach($status['list_splits'] as $row)
+                        <div class="row border-grey">
+                            <div class="col col-1">
+                                @php( print($row->iddevices) )
+                            </div>
+                            <div class="col col-3">
+                                @php( print($row->opinions) )
+                            </div>
+                            <div class="col col-2">
+                                @php( print($row->brand) )
+                            </div>
+                            <div class="col col-2">
+                                @php( print($row->model) )
+                            </div>
+                            <div class="col">
+                                @php( print($row->problem) )
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+            <div class="col">
+                <div class="row justify-content-center">
+                    <p><strong>Adjudications : @php( print($status['total_adjudicated'][0]->total))</strong></p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <div class="row badge-pill badge-light">
+                            <div class="col col-1">
+                                ID
+                            </div>
+                            <div class="col col-3">
+                                Category
+                            </div>
+                            <div class="col col-2">
+                                Brand
+                            </div>
+                            <div class="col col-2">
+                                Model
+                            </div>
+                            <div class="col">
+                                Problem
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center small">
+                    <div class="col">
+                        @foreach($status['list_adjudicated'] as $row)
+                        <div class="row border-grey">
+                            <div class="col col-1">
+                                @php( print($row->iddevices) )
+                            </div>
+                            <div class="col col-3">
+                                @php( print($row->category) )
+                            </div>
+                            <div class="col col-2">
+                                @php( print($row->brand) )
+                            </div>
+                            <div class="col col-2">
+                                @php( print($row->model) )
+                            </div>
+                            <div class="col">
+                                @php( print($row->problem) )
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+            <div class="col">
+                <div class="row justify-content-center">
+                    <p><strong>Items with majority opinion == "Misc" : @php( print($status['total_recats_misc'][0]->total)) </strong></p>
+                </div>                                        
+            </div>
+        </div>        
+        <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+            <div class="col">
+                <div class="row justify-content-center">
+                    <p><strong>Items with majority opinions != "Misc" : @php( print($status['total_recats'][0]->total)) </strong></p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <div class="row badge-pill badge-light">
+                            <div class="col col-2">
+                                Total
+                            </div>
+                            <div class="col col-2">
+                                Top opinion
+                            </div>
+                            <div class="col col-2">
+                                %
+                            </div>
+                            <div class="col col-2">
+                                Number of opinions
+                            </div>
+                            <div class="col">
+                                Opinions
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center small">
+                    <div class="col">
+                        @foreach($status['list_recats'] as $row)
+                        <div class="row border-grey">
+                            <div class="col col-2">
+                                @php( print($row->items) )
+                            </div>
+                            <div class="col col-2">
+                                @php( print($row->top_crowd_opinion) )
+                            </div>
+                            <div class="col col-2">
+                                @php( print($row->top_crowd_opinion_percentage) )
+                            </div>
+                            <div class="col col-2">
+                                @php( print($row->all_crowd_opinions_count) )
+                            </div>
+                            <div class="col">
+                                @php( print($row->opinions) )
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
         @endif
     </div>
     @include('misccat/info-modal')

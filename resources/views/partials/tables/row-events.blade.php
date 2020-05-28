@@ -15,7 +15,7 @@
     @endif
 
     <td class="cell-name">
-        <a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a>
+        <a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a>  @if ($event->online) <span class="badge badge-info">@lang('events.online_event')</span>@endif
         @if( !isset($group_view) )
             <div class="group-name"><a class="group-name" href="/group/view/{{ $event->theGroup->idgroups }}">{{ $event->theGroup->name }}</a></div>
         @endif

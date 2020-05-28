@@ -36,6 +36,7 @@ class Party extends Model implements Auditable
         'created_at',
         'updated_at',
         'shareable_code',
+        'online',
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'idevents', 'user_id', 'wordpress_post_id'];
 
@@ -112,6 +113,7 @@ class Party extends Model implements Auditable
                     `e`.`hours`,
                     `e`.`free_text`,
                     `e`.`wordpress_post_id`,
+                    `e`.`online`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
 

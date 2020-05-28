@@ -61,7 +61,7 @@
       <div class="col-lg-8 d-flex flex-column">
 
         <header>
-          <h1>{{ $event->getEventName() }}</h1>
+            <h1>{{ $event->getEventName() }}@if ($event->online) <span class="badge badge-info">@lang('events.online_event')</span>@endif</h1>
           <p>Organised by <a href="/group/view/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a></p>
           {{--
           <nav aria-label="breadcrumb">
@@ -146,7 +146,9 @@
 
             <h2>Event details</h2>
             <div class="card events-card">
+                @if ( ! $event->online )
               <div id="event-map" class="map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
+              @endif
 
               <div class="events-card__details">
 
@@ -178,8 +180,11 @@
                       @endif
                   </div>
 
+                  @if ( ! $event->online )
                   <div class="col-4 d-flex flex-column"><strong>Address: </strong></div>
+
                   <div class="col-8 d-flex flex-column"><address>{{ $formdata->location }}</address></div>
+                  @endif
 
                   @if( count($hosts) > 0 )
                   <div class="col-4 d-flex flex-column"><strong>{{{ str_plural('Host', count($hosts) ) }}}: </strong></div>

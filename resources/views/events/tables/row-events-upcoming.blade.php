@@ -1,15 +1,15 @@
 @php( $devices = $event->allDevices )
 <tr>
     @if( !isset($group_view) )
-    <td class="table-cell-icon">
+        <td class="table-cell-icon d-none d-sm-table-cell">
         @php( $group = $event->theGroup ) @php( $group_image = $event->theGroup->groupImage ) @if( is_object($group_image) && is_object($group_image->image) )
         <a href="/group/view/{{ $group->idgroups }}"><img src="{{ asset('/uploads/thumbnail_' . $group_image->image->path) }}" alt="{{{ $group->name }}}" title="{{{ $group->name }}}"></a> @else
         <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}"> @endif
     </td>
     @endif
     <td class="cell-name">
+        <a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a> @if ($event->online) <span class="badge badge-info">@lang('events.online_event')</span>@endif
         <div class="group-name"><a class="group-name" href="/group/view/{{ $event->theGroup->idgroups }}">{{ $event->theGroup->name }}</a></div>
-        <a href="/party/view/{{ $event->idevents }}">{{ $event->getEventName() }}</a>
     </td>
     <td class="cell-date">
         <div>{{ $event->getEventDate('D jS M Y') }}</div>
@@ -33,7 +33,7 @@
     @endif @elseif( $event->isUpcoming() )
     <td class="cell-figure d-none d-sm-table-cell">{{{ $event->allInvited->count() }}}</td>
     <td class="cell-figure d-none d-sm-table-cell">{{ $event->volunteers }}</td>
-    <td class="cell-rsvp d-none d-sm-table-cell">
+    <td class="cell-rsvp">
         @if ($event->isBeingAttendedBy(Auth::user()->id))
             <div>You're going!</div>
         @else
