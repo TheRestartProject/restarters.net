@@ -841,8 +841,6 @@ class FixometerHelper
      */
     public static function skillsDetermineRole($skills = null)
     {
-
-      // If is null
         if (is_null($skills)) {
             $has_host_skills = 0;
         } else {

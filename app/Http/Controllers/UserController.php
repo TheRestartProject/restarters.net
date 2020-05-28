@@ -28,6 +28,7 @@ use Cache;
 use FixometerHelper;
 use FixometerFile;
 use Notification;
+use Lang;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -293,31 +294,24 @@ class UserController extends Controller
 
     public function postProfileTagsEdit(Request $request)
     {
-
         if ($request->input('id') !== null) {
             $id = $request->input('id');
         } else {
             $id = Auth::id();
         }
 
-      // Get user
         $user = User::find($id);
 
-      // Update skills
         $skills = $request->input('tags');
         $user->skills()->sync($skills);
 
-      // Look at role based on skills
-        $role = FixometerHelper::skillsDetermineRole($skills);
+        $roleBasedOnSkills = FixometerHelper::skillsDetermineRole($skills);
 
-      // Update existing user, if new role is greater than the old
-        if ($user->role > $role) {
-            $update_user = User::find($id)->update([
-            'role' => $role
-            ]);
+        if ($roleBasedOnSkills == Role::HOST) {
+            $user->convertToHost();
         }
 
-        return redirect()->back()->with('message', 'User Skills Updated!');
+        return redirect()->back()->with('message', Lang::get('profile.skills_updated'));
     }
 
     public function postProfilePictureEdit(Request $request)
@@ -372,7 +366,6 @@ class UserController extends Controller
 
     public function postEdit(Request $request)
     {
-
         $user = User::find($request->input('id'));
 
         $check_password = Hash::check($request->input('password'), $user->password);

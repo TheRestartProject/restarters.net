@@ -3,6 +3,7 @@
 return array (
   'skills' => 'Skills',
   'my_skills' => 'My skills',
+  'skills_updated' => 'Skills updated!',
   'biography' => 'Biography',
   'no_bio' => ':name has not yet entered a biography.',
   'edit_profile' => 'Edit profile',

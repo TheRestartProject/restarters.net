@@ -357,7 +357,7 @@ class User extends Authenticatable implements Auditable
     /**
      * Convert the user's role to be a Host.
      *
-     * Currently, the only role that should be convertible to a Host is a Restarter.
+     * Currently, the only role that should be convertible to a Host is a Restarter.  Admins and NetworkCoordinators should not be downgraded, and if already a Host, no need to change it.
      */
     public function convertToHost()
     {
