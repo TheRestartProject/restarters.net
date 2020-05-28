@@ -113,5 +113,6 @@ return array (
     'upcoming_search_from' => 'From',
     'upcoming_search_to' => 'To',
     'upcoming_search_count' => 'There are :count upcoming events in total.',
-    'upcoming_search_match' => 'There are :count upcoming events that match your search.',
+    //'upcoming_search_match' => 'There are :count upcoming events that match your search.',
+    'upcoming_search_match' => '{0}There are no events that match your search.|{1}There is 1 event that matches your search.|[2,*]There are :count events that match your search.',
 );
