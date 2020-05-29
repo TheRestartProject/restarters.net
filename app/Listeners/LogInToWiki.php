@@ -76,6 +76,10 @@ class LogInToWiki
             $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
             $api->login(new ApiUser($wikiUsername, $password));
 
+            // NGM: it appears that right from the beginning MediawikiApi->getClient access modifier was changed
+            // in our vendor folder from private to public in order to access the underlying client for the cookies.
+            // This is really bad, as obviously when we update the package via composer the method changes back to private.
+            // Stuck with that until we can figure out an alternative way to access the client.
             $cookieJar = $api->getClient()->getConfig('cookies');
             $cookieJarArray = $cookieJar->toArray();
 

@@ -147,7 +147,7 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 	/**
 	 * @return ClientInterface
 	 */
-	private function getClient() {
+	public function getClient() {
 		if ( $this->client === null ) {
 			$clientFactory = new ClientFactory();
 			$clientFactory->setLogger( $this->logger );
