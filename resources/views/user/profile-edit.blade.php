@@ -38,8 +38,13 @@
         <div class="list-group" id="list-tab" role="tablist">
           <a class="list-group-item list-group-item-action active" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Profile</a>
           <a class="list-group-item list-group-item-action" id="list-account-list" data-toggle="list" href="#list-account" role="tab" aria-controls="account">Account</a>
+
           <a class="list-group-item list-group-item-action" id="list-email-preferences-list" data-toggle="list" href="#list-email-preferences" role="tab" aria-controls="email-preferences">Email preferences</a>
           <a class="list-group-item list-group-item-action" id="list-calendar-links-list" data-toggle="list" href="#list-calendar-links" role="tab" aria-controls="calendar-links">Calendars</a>
+          @if (Auth::id() == $user->id)
+              <a class="list-group-item list-group-item-action" id="list-notifications-list" href="{{ route('notifications') }}" role="tab">Notifications</a>
+          @endif
+
         </div>
       </div>
       <div class="col-lg-8" aria-labelledby="list-profile-list">
@@ -514,25 +519,7 @@
               </fieldset>
             </div>
           </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         </div>
-
-      </div>
-      <div class="col-6">
-
 
       </div>
     </div>

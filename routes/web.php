@@ -83,8 +83,9 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     //User Controller
     Route::prefix('profile')->group(function () {
         Route::get('/', 'UserController@index')->name('profile');
-        Route::get('/{id}', 'UserController@index');
+        Route::get('/notifications', 'UserController@getNotifications')->name('notifications');
         Route::get('/edit/{id?}', 'UserController@getProfileEdit')->name('edit-profile');
+        Route::get('/{id}', 'UserController@index');
         Route::post('/edit-info', 'UserController@postProfileInfoEdit');
         Route::post('/edit-password', 'UserController@postProfilePasswordEdit');
         Route::post('/edit-preferences', 'UserController@postProfilePreferencesEdit');
@@ -286,10 +287,16 @@ Route::get('/party/stats/{id}/wide', function ($id) {
     return App\Http\Controllers\PartyController::stats($id);
 });
 
-Route::get('markAsRead/{id}', function ($id) {
-    auth()->user()->unReadNotifications->where('id', $id)->markAsRead();
+Route::get('markAsRead/{id?}', function ($id = NULL) {
+    $notifications = auth()->user()->unReadNotifications;
 
-    return  redirect()->back();
+    if ($id) {
+        $notifications = $notifications->where('id', $id);
+    }
+
+    $notifications->markAsRead();
+
+    return redirect()->back();
 })->name('markAsRead');
 
 Route::get('/set-lang/{locale}', 'LocaleController@setLang');

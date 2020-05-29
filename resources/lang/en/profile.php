@@ -6,6 +6,7 @@ return array (
   'skills_updated' => 'Skills updated!',
   'biography' => 'Biography',
   'no_bio' => ':name has not yet entered a biography.',
+  'notifications' => 'Notifications',
   'edit_profile' => 'Edit profile',
   'edit_user' => 'Edit user',
   'panel_title_1' => 'Basic profile',

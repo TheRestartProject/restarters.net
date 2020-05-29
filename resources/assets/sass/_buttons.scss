@@ -374,10 +374,7 @@
     }
 }
 
-.btn-marked {
-    diplay: none;
-}
-
+.btn-mark-all,
 .btn-marked,
 .marked-as-read {
     background-color: transparent;
@@ -398,6 +395,10 @@
     .status-read & {
         text-decoration: underline;
     }
+}
+
+.btn-mark-all {
+    display: block;
 }
 
 .status-read .btn-marked,
