@@ -194,7 +194,6 @@
                                 <li><a href="@lang('general.help_feedback_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_help_feedback')</a></li>
                                 <li><a href="@lang('general.faq_url')" target="_blank" rel="noopener noreferrer">@lang('general.menu_faq')</a></li>
                                 <li><a href="@lang('general.restartproject_url')" target="_blank" rel="noopener noreferrer">@lang('general.therestartproject')</a></li>
-                                <!--<li><a role="button" data-toggle="modal" href="#onboarding" data-target="#onboarding">Welcome</a></li>-->
                             </ul>
                         </li>
 
@@ -223,7 +222,7 @@
                       <p>@lang('general.alert_uptodate_text')</p>
                   </div>
                 @endif
-                <a href="{{ route('notifications') }}" class="notifications__older js-load">View all notifications</a>
+                <a href="{{ route('notifications') }}" class="notifications__older">@lang('notifications.view_all')</a>
             </div>
         </div>
     </aside>
