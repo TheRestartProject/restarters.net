@@ -17053,10 +17053,7 @@ table.sortable > thead th div.mozilla {
           box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
 }
 
-.btn-marked {
-  diplay: none;
-}
-
+.btn-mark-all,
 .btn-marked,
 .marked-as-read {
   background-color: transparent;
@@ -17068,6 +17065,7 @@ table.sortable > thead th div.mozilla {
   display: none;
 }
 
+.btn-mark-all svg,
 .btn-marked svg,
 .marked-as-read svg {
   margin-right: 2px;
@@ -17076,10 +17074,16 @@ table.sortable > thead th div.mozilla {
   margin-top: -3px;
 }
 
-.status-read .btn-marked,
+.status-read .btn-mark-all,
+.status-read
+.btn-marked,
 .status-read
 .marked-as-read {
   text-decoration: underline;
+}
+
+.btn-mark-all {
+  display: block;
 }
 
 .status-read .btn-marked,
@@ -18272,24 +18276,28 @@ td.col-device-auto {
           box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.17);
 }
 
-.notifications__scroll {
+.notifications__scroll,
+.notifications-page__scroll {
   overflow-y: auto;
   height: 100%;
   width: 100%;
 }
 
-.notifications__inner {
+.notifications__inner,
+.notifications-page__inner {
   border-top: 1px solid #D9D9D9;
   padding: 20px 15px;
 }
 
 @media (max-width: 991.98px) {
-  .notifications__inner {
+  .notifications__inner,
+  .notifications-page__inner {
     padding-bottom: 65px;
   }
 }
 
-.notifications__older {
+.notifications__older,
+.notifications-page__older {
   padding: 15px 20px;
   text-transform: uppercase;
   font-size: 12px;
@@ -18303,30 +18311,37 @@ td.col-device-auto {
 }
 
 .notifications__older:hover,
-.notifications__older:focus {
+.notifications__older:focus,
+.notifications-page__older:hover,
+.notifications-page__older:focus {
   text-decoration: underline;
 }
 
-.notifications .alert-secondary {
+.notifications .alert-secondary,
+.notifications-page .alert-secondary {
   background-color: #BEC0C0;
   background-color: #F8F8F8;
   border: 2px solid #BEC0C0;
   margin-bottom: 10px;
 }
 
-.notifications .alert-secondary h3 {
+.notifications .alert-secondary h3,
+.notifications-page .alert-secondary h3 {
   font-size: 16px;
 }
 
-.notifications .alert-secondary p {
+.notifications .alert-secondary p,
+.notifications-page .alert-secondary p {
   font-size: 13px;
 }
 
-.notifications .alert-secondary p:last-child {
+.notifications .alert-secondary p:last-child,
+.notifications-page .alert-secondary p:last-child {
   margin-bottom: 0;
 }
 
-.notifications .card {
+.notifications .card,
+.notifications-page .card {
   margin-bottom: 10px;
   padding: 15px;
   padding-left: 55px;
@@ -18336,45 +18351,54 @@ td.col-device-auto {
   border-radius: 3px;
 }
 
-.notifications .card.status-read {
+.notifications .card.status-read,
+.notifications-page .card.status-read {
   background-color: #FFEED7;
 }
 
-.notifications .card-body {
+.notifications .card-body,
+.notifications-page .card-body {
   padding: 0;
 }
 
-.notifications .card h5 {
+.notifications .card h5,
+.notifications-page .card h5 {
   font-size: 15px;
   font-weight: normal;
   font-family: "Open Sans", sans-serif;
   margin-bottom: 5px;
 }
 
-.notifications .card h5 a {
+.notifications .card h5 a,
+.notifications-page .card h5 a {
   text-decoration: underline;
   color: #000;
 }
 
-.notifications .card time {
+.notifications .card time,
+.notifications-page .card time {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-.notifications .card__restart {
+.notifications .card__restart,
+.notifications-page .card__restart {
   background-image: url(/images/restart.svg?d22bd15f0950d15e0343cbd4fb99b088);
 }
 
-.notifications .card__parties {
+.notifications .card__parties,
+.notifications-page .card__parties {
   background-image: url(/images/parties.svg?7e699b9e57b58c249fd5d25940a3b473);
 }
 
-.notifications .card__groups {
+.notifications .card__groups,
+.notifications-page .card__groups {
   background-image: url(/images/groups.svg?b0ca311d66661f51cb545845d43e5042);
 }
 
-.notifications .card__devices {
+.notifications .card__devices,
+.notifications-page .card__devices {
   background-image: url(/images/devices.svg?454ad9e8436e5a4f95a8f274d6ef9bb3);
 }
 

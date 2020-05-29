@@ -141,6 +141,17 @@ class UserController extends Controller
         ]);
     }
 
+    public function getNotifications()
+    {
+        $user = Auth::user();
+        $notifications = $user->notifications()->paginate(10);
+
+        return view('user.notifications', [
+            'user' => $user,
+            'notifications' => $notifications
+        ]);
+    }
+
     public function postProfileInfoEdit(Request $request)
     {
         $rules = [
