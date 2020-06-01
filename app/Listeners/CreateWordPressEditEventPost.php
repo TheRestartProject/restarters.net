@@ -66,7 +66,8 @@ class CreateWordPressEditEventPost
                     array('key' => 'party_timestamp_end', 'value' => $endTimestamp),
                     array('key' => 'party_stats', 'value' => $id),
                     array('key' => 'party_lat', 'value' => $data['latitude']),
-                    array('key' => 'party_lon', 'value' => $data['longitude'])
+                    array('key' => 'party_lon', 'value' => $data['longitude']),
+                    array('key' => 'party_online', 'value' => $data['online']),
                 );
 
                 $content = array(
