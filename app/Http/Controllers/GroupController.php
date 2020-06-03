@@ -765,7 +765,7 @@ class GroupController extends Controller
                       $images = null;
                   }
 
-                  return view('group.edit-group', [
+                  return view('group.edit', [
                       'response' => $response,
                       'gmaps' => true,
                       'title' => 'Edit Group '.$group->name,
@@ -810,7 +810,7 @@ class GroupController extends Controller
                 'country' => $country,
             );
 
-            if (FixometerHelper::hasRole($user, 'Administrator')) {
+            if ($user->hasRole('Administrator') || $user->hasRole('NetworkCoordinator')) {
                 $update['area'] = $data['area'];
             }
 
@@ -899,7 +899,7 @@ class GroupController extends Controller
 
         compact($audits = $Group->findOrFail($id)->audits);
 
-        return view('group.edit-group', [
+        return view('group.edit', [
             'response' => $response,
             'gmaps' => true,
             'title' => 'Edit Group '.$group->name,
