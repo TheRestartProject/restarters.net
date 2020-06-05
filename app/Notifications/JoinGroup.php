@@ -55,12 +55,18 @@ class JoinGroup extends Notification implements ShouldQueue
                       ->subject($subject)
                       ->greeting('Hello!')
                       ->line($introLine)
-                      ->action($actionText, $this->arr['url']);
+                      ->line('');
+
                 if ( ! is_null($this->arr['message'])) { // host has added a message
                     $mail->line($this->arr['name'].' attached this message with the invite:')
-                        ->line('')
-                        ->line('"'.$this->arr['message'].'"');
+                         ->line('')
+                         ->line('"'.$this->arr['message'].'"')
+                         ->line('');
                 }
+
+                $mail->action($actionText, $this->arr['url']);
+
+                $mail->line('');
                 $mail->line($ignoreLine);
 
                 return $mail;
@@ -70,15 +76,19 @@ class JoinGroup extends Notification implements ShouldQueue
                     ->subject($subject)
                     ->greeting('Hello!')
                     ->line($introLine)
-                    ->action($actionText, $this->arr['url'])
-                  ->line('You can find out more about restarters.net <a href="'.env('APP_URL').'/about">here</a>.');
+                    ->line('');
 
             if ( ! is_null($this->arr['message'])) { // host has added a message
                 $mail->line($this->arr['name'].' attached this message with the invite:')
                      ->line('')
-                     ->line('"'.$this->arr['message'].'"');
+                     ->line('"'.$this->arr['message'].'"')
+                     ->line('');
             }
 
+            $mail->action($actionText, $this->arr['url'])
+                  ->line('You can find out more about restarters.net <a href="'.env('APP_URL').'/about">here</a>.');
+
+            $mail->line('');
             $mail->line($ignoreLine);
 
             return $mail;
