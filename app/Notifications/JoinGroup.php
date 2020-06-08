@@ -44,9 +44,9 @@ class JoinGroup extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $subject = 'Invitation from '.$this->arr['name'].' to join '.$this->arr['group'];
-        $introLine = 'You have received this email because you have been invited by '.$this->arr['name'].' to join the community repair group <b>'.$this->arr['group'].'</b> on restarters.net.';
-        $actionText = 'Click to join group';
+        $subject = 'Invitation from '.$this->arr['name'].' to follow '.$this->arr['group'];
+        $introLine = 'You have received this email because you have been invited by '.$this->arr['name'].' to follow the community repair group <b>'.$this->arr['group'].'</b> on restarters.net.';
+        $actionText = 'Click to follow group';
         $ignoreLine = 'If you think this invitation was not intended for you, please disregard this email.';
 
         if ( ! is_null($this->user)) { // user is already on the platform
@@ -55,12 +55,18 @@ class JoinGroup extends Notification implements ShouldQueue
                       ->subject($subject)
                       ->greeting('Hello!')
                       ->line($introLine)
-                      ->action($actionText, $this->arr['url']);
+                      ->line('');
+
                 if ( ! is_null($this->arr['message'])) { // host has added a message
                     $mail->line($this->arr['name'].' attached this message with the invite:')
-                        ->line('')
-                        ->line('"'.$this->arr['message'].'"');
+                         ->line('')
+                         ->line('"'.$this->arr['message'].'"')
+                         ->line('');
                 }
+
+                $mail->action($actionText, $this->arr['url']);
+
+                $mail->line('');
                 $mail->line($ignoreLine);
 
                 return $mail;
@@ -70,15 +76,19 @@ class JoinGroup extends Notification implements ShouldQueue
                     ->subject($subject)
                     ->greeting('Hello!')
                     ->line($introLine)
-                    ->action($actionText, $this->arr['url'])
-                  ->line('You can find out more about restarters.net <a href="'.env('APP_URL').'/about">here</a>.');
+                    ->line('');
 
             if ( ! is_null($this->arr['message'])) { // host has added a message
                 $mail->line($this->arr['name'].' attached this message with the invite:')
                      ->line('')
-                     ->line('"'.$this->arr['message'].'"');
+                     ->line('"'.$this->arr['message'].'"')
+                     ->line('');
             }
 
+            $mail->action($actionText, $this->arr['url'])
+                  ->line('You can find out more about restarters.net <a href="'.env('APP_URL').'/about">here</a>.');
+
+            $mail->line('');
             $mail->line($ignoreLine);
 
             return $mail;
