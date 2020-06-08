@@ -1023,6 +1023,8 @@ class GroupController extends Controller
                 'role' => 4,
             ]);
 
+            event(new UserFollowedGroup($user_id, $group_id));
+
             // A new User has joined your group
             $group = Group::find($group_id);
             $groupHostLinks = UserGroups::where('group', $group->idgroups)->where('role', 3)->get();
