@@ -1024,13 +1024,7 @@ class GroupController extends Controller
                 'role' => 4,
             ]);
 
-<<<<<<< HEAD
-            event(new UserFollowedGroup($user_id, $group_id));
-
-            // A new User has joined your group
-=======
             $user = Auth::user();
->>>>>>> feature/add-network-members-to-talk-group
             $group = Group::find($group_id);
 
             event(new UserFollowedGroup($user, $group));
