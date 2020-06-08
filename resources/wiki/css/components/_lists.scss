@@ -1,0 +1,29 @@
+@each $breakpoint, $value in map-keys(map-remove($grid-breakpoints, xs)) {
+  .list-#{$breakpoint}-inline {
+    @extend .d-flex;
+    @extend .flex-#{$breakpoint}-row;
+
+    @include media-breakpoint-up($breakpoint) {
+      div {
+        display: inline-block;
+
+        &:not(:last-of-type) {
+          margin-right: 16px;
+          position: relative;
+
+          &::after {
+            content: '';
+            display: inline-block;
+            height: 15px;
+            width: 2px;
+            background: black;
+            top: 50%;
+            right: -10px;
+            position: absolute;
+            transform: translateY(-50%);
+          }
+        }
+      }
+    }
+  }
+}

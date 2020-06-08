@@ -1,0 +1,31 @@
+
+// Edit Link
+.navbar-tool-link {
+  position: relative;
+  width: 50px;
+  height: 50px;
+
+  &::before {
+    content: '';
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-image: url('../../global/svgs/edit_icon.svg');
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &:hover,
+  &:active {
+    background: #000 !important;
+
+    &::before {
+      background-image: url('../../global/svgs/edit_icon_hover.svg');
+    }
+  }
+}

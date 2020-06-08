@@ -1,0 +1,8 @@
+.select2-search__field {
+
+  // NOTE: Does not initally show when element is not already visible on load
+  width: 100% !important;
+
+  // NOTE: Match all other Bootstrap 4 input fields
+  padding-left: 7px !important;
+}

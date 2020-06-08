@@ -1,0 +1,175 @@
+.card-summary {
+  @extend .rounded-0;
+  @extend .h-100;
+  @extend .box-shadow-offset;
+
+  border: 1px solid $black;
+
+  .card-body {
+    @extend .d-flex;
+    @extend .align-items-center;
+    @extend .flex-column;
+    @extend .p-10;
+
+    .svg-wrapper {
+      @extend .d-flex;
+      @extend .align-items-center;
+
+      min-height: 100px;
+      max-height: 100px;
+
+      svg {
+
+        width: 80px;
+      }
+    }
+
+    h3 {
+      @extend .mb-10;
+
+      font-family: Asap;
+      font-size: 36px;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.13;
+      letter-spacing: normal;
+      text-align: center;
+      color: #0392a6;
+    }
+
+    p {
+      @extend .mb-0;
+
+      font-family: Asap;
+      font-size: 18px;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.17;
+      letter-spacing: normal;
+      text-align: center;
+      color: $black;
+    }
+  }
+}
+
+.card-info-box {
+  @extend .box-shadow-offset;
+  @extend .rounded-0;
+
+  border: 1px solid $black;
+
+  &.card-padding-sm {
+    .card-body {
+      padding-top: 20px;
+      padding-bottom: 20px;
+
+    }
+  }
+
+  .card-img-top {
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid $black;
+  }
+
+  .card-body {
+    padding: 30px;
+
+    a {
+      text-decoration: underline;
+    }
+
+    .call_to_action {
+      @extend .py-20;
+      @extend .px-30;
+
+      &-sticky-right {
+        right: 0;
+        position: absolute;
+
+        @include media-breakpoint-down(md) {
+          display: none !important;
+        }
+      }
+
+      .doodle-icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 0;
+      }
+    }
+  }
+}
+
+.slick-container {
+  overflow: hidden;
+
+  @include media-breakpoint-up(lg) {
+    position: absolute;
+    width: 100%;
+    left: -16px;
+  }
+}
+
+.slick-your-groups {
+  @extend .mb-0;
+
+  .card-group-slick {
+    overflow: hidden;
+
+    .card-img {
+      opacity: 0.75;
+    }
+
+    .card-img-overlay {
+      padding: 25px 30px;
+
+      p {
+        font-family: Asap;
+        font-size: 16px;
+        font-weight: normal;
+        font-stretch: normal;
+        font-style: normal;
+        line-height: 1.44;
+        letter-spacing: normal;
+        text-align: left;
+        color: $white;
+        margin-bottom: 0;
+
+        a {
+          color: $white !important;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  .slick-dots {
+    bottom: 15px !important;
+
+    li {
+      button {
+        &::before {
+          content: '' !important;
+          border: 1px solid white !important;
+          opacity: 1 !important;
+          height: 15px !important;
+          width: 15px !important;
+        }
+      }
+
+      &.slick-active {
+        button {
+          &::before {
+            background: $white;
+            color: $white;
+            line-height: 0;
+          }
+        }
+      }
+    }
+  }
+}

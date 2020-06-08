@@ -1,0 +1,23 @@
+// Resolve random body padding issue
+.mw-body {
+  padding: 0;
+}
+
+// Hide Glossary
+.toc,
+#toc {
+  display: none;
+}
+
+// Resolve random padding issue
+:target {
+  padding-top: 0 !important;
+
+  &::before {
+    content: none !important;
+  }
+}
+
+.mw-parser-output .mw-collapsible div:first-of-type h2 span:first-child::before {
+  min-width: 50px
+}

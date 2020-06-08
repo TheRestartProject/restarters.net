@@ -1,0 +1,54 @@
+.alert {
+  &-success {
+    @extend .border-0;
+    @extend .rounded-0;
+
+    background-color: map-get($theme-colors, 'success') !important;
+
+    p {
+      font-size: 18px;
+      font-family: $font-family-third;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+      color: $white;
+    }
+  }
+
+  &-custom {
+    @extend .border-0;
+    @extend .rounded-0;
+
+    p {
+      font-size: 18px;
+      font-family: $font-family-third;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+    }
+
+    a {
+      @extend .text-white;
+
+      text-decoration: underline;
+    }
+
+    .close {
+      opacity: 1;
+
+      span {
+        @extend .text-dark;
+
+        text-shadow: none;
+      }
+    }
+  }
+
+  &-danger {
+    background-color: #f45b69 !important;
+
+    p {
+      @extend .text-white;
+    }
+  }
+}

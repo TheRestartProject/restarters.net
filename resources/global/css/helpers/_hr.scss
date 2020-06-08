@@ -1,0 +1,25 @@
+.hr {
+  &-sm {
+    height: 2px;
+    border-top: 2px
+    solid $black;
+  }
+
+  &-lg {
+    height: 5px;
+    border-top: 5px solid #000;
+    margin-top: 50px;
+    margin-bottom: 50px;
+  }
+
+  &-dashed {
+    @extend .border-0;
+
+    background-image: url('../../svgs/rectangle.svg');
+    background-color: transparent;
+    background-repeat: repeat;
+    background-position: left;
+    height: 3px;
+    background-size: 20px 35px;
+  }
+}

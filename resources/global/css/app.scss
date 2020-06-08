@@ -1,0 +1,51 @@
+// Variables
+@import 'variables';
+
+// global
+@import 'global';
+
+// Bootstrap
+@import "bootstrap/bootstrap";
+
+// Fonts
+@import url("https://fonts.googleapis.com/css2?family=Asap:wght@400;500;600;700&display=swap");
+// @import url("https://fonts.googleapis.com/css?family=Asap&display=swap");
+
+// Navigation
+@import "components/navigation-bar";
+
+// FIX: Extend file within original assets folder
+@import "../../assets/sass/helpers/box-shadows";
+
+// Components
+@import "components/alerts";
+@import "components/buttons";
+@import "components/forms";
+@import "components/modal";
+@import "components/card-talk";
+@import "components/tables";
+@import "components/events-tables";
+@import "components/custom-check-tick";
+@import "components/lists";
+@import "components/tabs";
+@import "components/tabs-no-space-mobile";
+@import "components/pagination";
+@import "components/row-columns";
+@import "components/cards";
+
+// Helpers
+@import "helpers/hr";
+
+// Plugins
+@import "plugins/select2";
+
+.btn-checkbox {
+  @extend .btn-primary;
+}
+
+[type="checkbox"]:checked + label.btn-checkbox {
+  background-color: $black !important;
+  border-radius: 0;
+  border: 0 !important;
+  color: $white !important;
+}

@@ -1,0 +1,46 @@
+.row-heading {
+  h2 {
+    margin-bottom: 25px !important;
+    position: relative;
+
+    span:first-child {
+      &::before {
+        content: none !important;
+      }
+    }
+
+    &::after {
+      content: '';
+      background-image: url('../../../assets/svgs/rectangle.svg');
+      background-repeat: repeat;
+      background-position: left;
+      height: 3px;
+      background-size: 20px 35px;
+      display: inherit;
+      width: 100%;
+      margin-top: 25px;
+    }
+  }
+
+  p {
+    margin-bottom: 25px;
+  }
+}
+
+.row-arrows {
+  p {
+    &::before {
+      content: '';
+      margin-right: 5px;
+      font-size: 14px;
+      height: 14px;
+      width: 23px;
+      color: white;
+      font-weight: bold;
+      background-image: url('../../global/svgs/arrow-right-doodle.svg');
+      background-repeat: no-repeat;
+      background-position: center;
+      display: inline-block;
+    }
+  }
+}

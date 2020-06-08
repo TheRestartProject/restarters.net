@@ -1,0 +1,246 @@
+// Variables
+@import '../../global/css/variables';
+
+// Bootstrap
+@import "../../global/css/bootstrap/bootstrap";
+
+// Extending classes from global
+@import "../../global/css/components/lists";
+
+// Files
+@import 'miscellaneous';
+
+// Layout
+@import 'layout/fonts';
+@import 'layout/footer';
+
+// Components
+@import 'components/lists';
+@import 'components/search-button';
+@import 'components/edit-page-button';
+@import 'components/row-arrows';
+@import 'components/alerts';
+
+html,
+body {
+  font-family: "Asap", sans-serif;
+}
+
+.mw-parser-output {
+  counter-reset: chapter 0 section 0;
+
+  h2 {
+    padding: 0;
+    margin: 0;
+    border-bottom: 0;
+
+    span {
+      font-family: Asap;
+      font-size: 28px;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.14;
+      letter-spacing: normal;
+      text-align: left;
+      color: $black;
+    }
+  }
+
+  h3 {
+    line-height: 0;
+    padding: 0;
+    margin-bottom: 5px;
+
+    span {
+      font-family: Asap;
+      font-size: 18px;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.44;
+      letter-spacing: normal;
+      text-align: left;
+      color: $black;
+    }
+  }
+
+  .mw-collapsible {
+    position: relative;
+    padding: 0;
+    min-height: 70px;
+    border: 0;
+    border-top: 1px solid $black;
+    border-bottom: 1px solid $black;
+    background-color: transparent;
+    counter-reset: section;
+
+    &:first-child {
+      border-top: 2px solid $black !important;
+    }
+
+    &:last-child {
+      border-bottom: 2px solid $black !important;
+    }
+
+    h2 {
+      counter-reset: section 0;
+      counter-increment: chapter;
+    }
+
+    h3 {
+      counter-increment: section;
+    }
+
+    .mw-collapsible-toggle {
+      position: absolute;
+      width: 100%;
+      height: 70px;
+      cursor: pointer;
+
+      &::before {
+        content: none !important;
+      }
+
+      &::after {
+        content: '';
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        width: 15px;
+        height: 8px;
+        background-image: url('../../global/svgs/dropdown-arrow-up.svg') !important;
+        border: 0;
+        margin-left: 8px;
+        transform: rotate(0deg) translateY(-50%);
+        display: inline-block;
+        vertical-align: middle;
+        position: absolute;
+        right: 0;
+        top: 35px;
+      }
+
+      &-collapsed {
+        &::after {
+          transform: rotate(181deg) translateY(50%);
+        }
+      }
+
+      a {
+        line-height: 0;
+        font-size: 0;
+        color: transparent;
+      }
+    }
+
+    div:first-of-type {
+      @extend .d-flex;
+      @extend .align-items-center;
+
+      min-height: 70px;
+
+      h2 {
+        @extend .d-flex;
+        @extend .flex-row;
+        @extend .align-items-center;
+
+        span:first-child {
+          &::before {
+            content: counter(chapter);
+
+            width: 50px;
+            height: 50px;
+            background: $black;
+            color: $white;
+            text-align: center;
+            font-size: 36px;
+            display: inline-block;
+            padding: 4px;
+            margin-right: 12px;
+          }
+        }
+
+        .mw-headline {
+          @extend .d-flex;
+          @extend .align-items-center;
+
+          @include media-breakpoint-down(md) {
+            font-size: 18px;
+            font-weight: bold;
+            font-stretch: normal;
+            font-style: normal;
+            line-height: 1.17;
+            letter-spacing: normal;
+            text-align: left;
+          }
+        }
+
+        .mw-editsection-bracket {
+          display: none;
+        }
+      }
+    }
+
+    .mw-collapsible-content {
+      h3 {
+        > span:first-child {
+          &::before {
+            content: counter(chapter)"." counter(section)" ";
+            margin: 0;
+            display: inline-block;
+            margin-right: 40px;
+          }
+        }
+      }
+
+      ul {
+        @extend .list-doodle;
+
+        margin-left: 100px; // Override
+        margin-bottom: 25px;
+        list-style: none;
+
+        li {
+          a {
+            text-decoration: underline !important;
+            color: $black !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+.firstHeading {
+  padding: 0;
+  margin: 0;
+  border: 0 !important;
+}
+
+.no-space-mobile {
+  .nav-tabs-block {
+    .nav-item {
+      // FIX: Tab Controls do not span across entire width properly
+      @include media-breakpoint-down(md) {
+        // NOTE: Resolve dynamic width for mobile (important).
+        flex-basis: auto;
+      }
+    }
+  }
+}
+
+.responsive-image {
+  margin-bottom: 10px;
+}
+
+.tab-pane-content {
+  padding-top: 60px;
+  padding-bottom: 90px;
+  padding-left: 30px;
+  padding-right: 30px;
+
+  @include media-breakpoint-down(md) {
+    padding-top: 30px;
+    padding-bottom: 30px;
+  }
+}

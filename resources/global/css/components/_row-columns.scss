@@ -1,0 +1,35 @@
+.border-between > [class*='col-'] {
+  &::before {
+    content: "";
+    position: absolute;
+    background-image: url('../../svgs/rectangle.svg');
+    left: -3px;
+    top: 0;
+    background-position: top;
+    width: 3px;
+    background-size: 3px 20px;
+    height: 100%;
+    background-repeat: repeat;
+  }
+
+  @each $breakpoint, $value in map-keys(map-remove($grid-breakpoints, xs)) {
+    &[class*='col-#{$breakpoint}-'] {
+      @include media-breakpoint-down(map-previous-key($grid-breakpoints, $breakpoint)) {
+        padding-top: 15px;
+        padding-bottom: 15px;
+
+        &::before {
+          left: 0;
+          background-position: center;
+          height: 3px;
+          width: 100%;
+          background-size: 20px 35px;
+        }
+      }
+    }
+  }
+
+  &:first-child::before {
+    display: none;
+  }
+}
