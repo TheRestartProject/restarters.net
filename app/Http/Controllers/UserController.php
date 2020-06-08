@@ -1334,4 +1334,11 @@ class UserController extends Controller
             return response()->json(['message' =>  __('auth.email_address_validation')]);
         }
     }
+
+    public static function getThumbnail(Request $request)
+    {
+        $user = User::where('email', $request->input('email'))->first();
+
+        return response()->json(config('app.url') . '/uploads/thumbnail_' . $user->getProfile($user->id)->path);
+    }
 }

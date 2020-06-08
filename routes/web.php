@@ -20,6 +20,7 @@ Route::prefix('user')->group(function () {
     Route::get('register/{hash?}', 'UserController@getRegister')->name('registration');
     Route::post('register/check-valid-email', 'UserController@postEmail');
     Route::post('register/{hash?}', 'UserController@postRegister');
+    Route::get('/thumbnail/', 'UserController@getThumbnail');
 });
 
 Route::get('/user/forbidden', function () {
