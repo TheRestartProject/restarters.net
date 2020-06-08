@@ -22,5 +22,13 @@ class EncryptCookies extends Middleware
         'wiki_testToken',
         'wiki_testUserID',
         'wiki_testUserName',
+        'wiki_devToken',
+        'wiki_devUserID',
+        'wiki_devUserName',
+        'wiki_dev_mw__session',
+        'wiki_dev_mw_Token',
+        'wiki_dev_mw_UserID',
+        'wiki_dev_mw_UserName',
+        'authenticated',
     ];
 }
