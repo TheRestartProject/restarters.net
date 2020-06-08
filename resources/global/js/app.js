@@ -55,7 +55,7 @@ window.onload = function() {
       }
     }
 
-    if (window.location.origin == 'https://test-wiki.rstrt.org') {
+    if (window.location.origin == 'https://wiki.restarters.dev') {
       $('.wiki-nav-item').addClass('active');
 
       $('.nav-tabs-block li a').removeClass('active');
