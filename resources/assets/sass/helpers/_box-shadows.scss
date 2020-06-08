@@ -1,0 +1,13 @@
+.box-shadow-offset {
+  -webkit-box-shadow: 6px 6px 0 0 $black;
+  box-shadow: 6px 6px 0 0 $black;
+}
+
+@each $breakpoint in map-keys(map-remove($grid-breakpoints, xs)) {
+  @include media-breakpoint-up($breakpoint) {
+    .offset-#{$breakpoint}-box-shadow {
+      -webkit-box-shadow: 6px 6px 0 0 $black;
+      box-shadow: 6px 6px 0 0 $black;
+    }
+  }
+}
