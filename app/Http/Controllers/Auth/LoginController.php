@@ -66,6 +66,8 @@ class LoginController extends Controller
         }
 
         if ($this->attemptLogin($request)) {
+            \Cookie::queue(\Cookie::make('authenticated', $request->email, config('session.lifetime'), null, config('session.domain')));
+
             return $this->sendLoginResponse($request);
         }
 

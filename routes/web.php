@@ -304,3 +304,7 @@ Route::get('/set-lang/{locale}', 'LocaleController@setLang');
 Route::get('/set-lang/{locale}', 'LocaleController@setLang');
 
 Route::post('/set-cookie', 'InformationAlertCookieController');
+
+Route::get('/test/check-auth', function () {
+    return new \App\Services\CheckAuthService;
+});
