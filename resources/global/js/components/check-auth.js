@@ -1,6 +1,6 @@
 // API call to current site - check for user authenticated
 function checkAuth() {
-  $url = 'https://test-restarters.rstrt.org' + '/test/check-auth';
+  $url = 'https://restarters.dev' + '/test/check-auth';
 
   $notifications_list_item = $('.notifications-list-item').hide();
   $auth_menu_items = $('.auth-menu-items').hide();
@@ -81,7 +81,7 @@ function checkAuth() {
           $auth_menu_items.css('display','');
         }
       } else {
-        $auth_list_item.find('a').attr('href', 'https://test-restarters.rstrt.org');
+        $auth_list_item.find('a').attr('href', 'https://restarters.dev');
       }
 
       // Amend Main navigation dropdown links
