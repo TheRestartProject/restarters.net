@@ -1,0 +1,300 @@
+@function map-get-next($map, $key, $fallback: false, $return: value) {
+  // Check if map is valid
+  @if type-of($map) == map {
+    // Check if key exists in map
+    @if map-has-key($map, $key) {
+      // Init index counter variable
+      $i: 0;
+      // Init key index
+      $key-index: false;
+      // Traverse map for key
+      @each $map-key, $map-value in $map {
+        // Update index
+        $i: $i + 1;
+        // If map key found, set key index
+        @if $map-key == $key {
+          $key-index: $i;
+        }
+        // If next index return next value or key based on $return
+        @if $i == $key-index + 1 {
+          @if $return == key {
+            @return $map-key;
+          }
+
+          @else {
+            @return $map-value;
+          }
+        }
+        // If last entry return false
+        @if $i == length($map) {
+          @return $fallback;
+        }
+      }
+
+      @warn 'No next map item for key #{$key}';
+
+      @return $fallback;
+    }
+
+    @warn 'No valid key #{$key} in map';
+
+    @return $fallback;
+  }
+
+  @warn 'No valid map';
+
+  @return $fallback;
+}
+
+@function map-previous-key($map, $retrieve_key) {
+
+  // Current value from map's key
+  $retrieve_value: map-get($map, $retrieve_key);
+
+  // Iterate through map
+  @for $i from 1 through length($map) {
+
+    // Get current key from index
+    $current_key : nth(map-keys($map), $i);
+
+    // See if values match and is not the first iteration
+    @if map-get($map, $current_key) == $retrieve_value and $i != 1 {
+      @return nth(map-keys($map), $i - 1);
+    }
+  }
+
+  @warn 'No previous value found for "#{$retrieve_key}"';
+
+  @return false;
+}
+
+@each $breakpoint, $value in map-keys(map-remove($grid-breakpoints, xs)) {
+  .nav-#{$breakpoint}-tabs {
+    .nav-tabs {
+      display: none;
+    }
+
+    .accordion-tab-header.white {
+      background-color: $white;
+    }
+
+    .accordion-tab-header {
+      button {
+        @extend .btn;
+        @extend .rounded-0;
+        @extend .w-100;
+        @extend .text-left;
+        @extend .position-relative;
+        @extend .text-dark;
+
+        padding-top: 15px;
+        padding-bottom: 15px;
+        background-color: theme-color('primary');
+        border: 1px solid #000 !important;
+
+        h5 {
+          @extend .mb-0;
+          @extend .position-relative;
+          @extend .text-center;
+
+          font-family: Asap;
+          font-size: 16px;
+          font-weight: bold;
+          font-stretch: normal;
+          font-style: normal;
+          line-height: 1.13;
+          letter-spacing: 1.2px;
+          text-align: center;
+          color: $black;
+          text-transform: uppercase;
+        }
+      }
+    }
+
+    // @media (min-width: 768px)
+    // @debug map-get-next($grid-breakpoints, $breakpoint);
+
+    @include media-breakpoint-up($breakpoint) {
+      .nav-tabs {
+        display: flex;
+      }
+
+      .accordion-tab-header {
+        display: none;
+      }
+
+      .collapse-wrapper {
+        display: block;
+      }
+    }
+
+    // @include media-breakpoint-down($breakpoint) {
+    @include media-breakpoint-down(map-previous-key($grid-breakpoints, $breakpoint)) {
+      .tab-content > .tab-pane {
+        display: block !important;
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.nav-tabs-block {
+  @extend .rounded-0;
+  @extend .border-0;
+
+  .nav-item {
+    @extend .text-white;
+    @extend .bg-transparent;
+    @extend .border-0;
+    @extend .rounded-0;
+    @extend .position-relative;
+    @extend .m-0;
+
+    .nav-link {
+      @extend .rounded-0;
+
+      border: 1px solid $black;
+      background-color: theme-color('primary');
+      font-family: Asap;
+      font-size: 16px;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.13;
+      letter-spacing: 1.2px;
+      text-align: center;
+      color: $black;
+      text-transform: uppercase;
+      padding-top: 18px;
+      padding-bottom: 18px;
+      padding-left: 0;
+      padding-right: 0;
+
+      &.active {
+        border-bottom: 1px solid theme-color('primary');
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 5px;
+          background: black;
+        }
+      }
+    }
+
+    .nav-link {
+      &.active {
+        border-bottom: 1px solid $black;
+      }
+    }
+
+    // NOTE: Same width (important).
+    flex: 1;
+
+    text-align: center;
+
+    &:not(:last-child) {
+      .nav-link {
+        border-right: 0;
+      }
+    }
+
+    &.dropdown {
+      .nav-link {
+        background-color: $white !important;
+        border: 1px solid $black !important;
+
+        &::after {
+          content: '';
+          background-repeat: no-repeat;
+          background-size: cover;
+          background-position: center;
+          width: 15px;
+          height: 8px;
+          background-image: url('../svgs/dropdown-arrow-up.svg') !important;
+          border: 0;
+          margin-left: 8px;
+          transform: rotate(181deg) translateY(50%);
+          display: inline-block;
+          vertical-align: middle;
+          margin-top: 5px;
+          right: 0;
+        }
+      }
+
+      &.show {
+        .nav-link {
+          &::after {
+            transform: rotate(0deg) translateY(-50%);
+          }
+        }
+      }
+    }
+  }
+}
+
+.tab-content {
+  @extend .rounded-0;
+  @extend .border-0;
+
+  .collapse-wrapper {
+    .collapse-content {
+      padding: 30px;
+      border: 1px solid $black;
+      background-color: theme-color('primary');
+      border-top: 1px solid theme-color('primary');
+    }
+
+    .collapse-content.white {
+      background-color: $white;
+      border-top: 1px solid $black;
+    }
+  }
+
+  .tab-pane {
+    .tab-pane-content {
+      background-color: $white;
+
+      &:not(:last-child) {
+        .accordion-tab-header {
+          button {
+            border-bottom: 0 !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+.nav-tab-summary-section {
+  @extend .d-flex;
+  @extend .flex-row;
+  @extend .align-items-center;
+  @extend .p-30;
+
+  border: 1px solid $black;
+  border-top: 1px solid theme-color('primary');
+  background-color: theme-color('primary');
+}
+
+.call_to_action {
+  @extend .text-white;
+  @extend .px-15;
+  @extend .d-flex;
+  @extend .flex-row;
+  @extend .align-items-center;
+
+  background-color: $black;
+  font-family: Asap;
+  font-size: 18px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.17;
+  letter-spacing: normal;
+  text-align: left;
+  color: $white;
+}

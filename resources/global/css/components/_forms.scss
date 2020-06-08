@@ -1,0 +1,200 @@
+.form-group {
+  &__offset {
+    @include media-breakpoint-up(lg) {
+      padding-right: 140px;
+    }
+  }
+}
+
+.form-check {
+  margin-bottom: 8px;
+}
+
+.form-check-input {
+  margin-top: 0.45rem;
+}
+
+.form-check {
+  padding-left: 0;
+
+  .form-check-input {
+    margin: auto 0;
+    position: relative;
+    margin-right: 10px;
+    z-index: 1;
+  }
+}
+
+label.form-check-label {
+  font-weight: 400;
+  font-family: $font-family-second;
+  font-size: 15px;
+}
+
+.input-group-select2 .select2-selection {
+  border-radius: 0;
+  height: 94%;
+  width: 140px;
+  border: 2px solid $black;
+  border-right: none !important;
+
+  .select2-selection__arrow b {
+    background-image: url('../svgs/dropdown-arrow.svg') !important;
+    background-repeat: no-repeat !important;
+    border-width: 0 0 0 0 !important;
+    left: -50%;
+    margin-left: 0;
+    margin-top: 0;
+    position: absolute;
+    top: 40%;
+    border-color: transparent;
+    width: 50px !important;
+    height: 50px !important;
+  }
+}
+
+.select2-container--open {
+  .select2-selection__arrow b {
+    background-image: url('../svgs/dropdown-arrow-up.svg') !important;
+  }
+}
+
+.select2-container--default {
+  text-transform: none;
+  border-radius: 0;
+
+  .select2-results__option--highlighted[aria-selected] {
+    background-color: #f5f7fa !important;
+    color: $black;
+  }
+}
+
+.form-control__select {
+  padding: 0 !important;
+  height: auto;
+
+  select {
+    border: 0;
+    background-color: transparent;
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .select2-container--default .select2-selection--single {
+    border: 0;
+  }
+
+  .select2-container {
+    width: 100% !important;
+  }
+
+  .select2-selection {
+    margin-top: 3px;
+    margin-bottom: 3px;
+  }
+
+  .select2-selection__arrow {
+    top: 4px !important;
+
+    b {
+      border: 0;
+      border-color: unset !important;
+      border-style: unset !important;
+      background-image: url('../svgs/dropdown-arrow.svg');
+      width: 14px !important;
+      height: 8px !important;
+      left: 10% !important;
+      background-repeat: no-repeat;
+    }
+  }
+
+  .select2-selection--multiple {
+    margin-top: 0;
+    margin-bottom: 0;
+    text-transform: uppercase;
+    min-height: 46px;
+
+    .select2-search--inline {
+      width: 100%;
+    }
+
+    .select2-selection__choice {
+      background-color: $white;
+      color: $black;
+      font-size: 14px;
+      padding: 0 12px 0 10px;
+      border: 2px solid black;
+      border-radius: 0;
+      line-height: 35px;
+      box-shadow: 6px 6px 0 0 $black;
+      margin-bottom: 5px;
+      text-transform: none;
+
+      // FIX: Resolved text wrapping ellipsis
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      .select2-selection__choice__remove {
+        float: left;
+        color: $black;
+        font-size: 19px;
+        font-weight: 400;
+        margin: 0 9px 0 0;
+      }
+    }
+  }
+}
+
+.card {
+  .form-control {
+    border-radius: 0;
+    border: 1px solid $black !important;
+
+    &:focus {
+      border: 3px solid $black !important;
+      -webkit-box-shadow: none;
+      box-shadow: none;
+      font-weight: 700;
+    }
+  }
+}
+
+.form-control {
+  border-radius: 0;
+  border: 1px solid $black;
+
+  &:focus {
+    border: 3px solid $black !important;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    font-weight: 700;
+  }
+
+  &[type="file"] {
+    height: 50px;
+  }
+}
+
+// Resolving non-select2 styling for .form-control elements
+select.form-control:not([class*="select2"]) {
+  border-radius: unset !important;
+  border-radius: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-position: 96% 50%;
+  background-repeat: no-repeat;
+  background-image: url('../svgs/dropdown-arrow.svg') !important;
+}
+
+.custom-file-input ~ .custom-file-label::after {
+    content: "Button Text";
+}
+
+.form-text-corrected {
+  @extend .form-text;
+  @extend .text-dark;
+  @extend .mt-0;
+
+  font-size: 14px !important;
+}

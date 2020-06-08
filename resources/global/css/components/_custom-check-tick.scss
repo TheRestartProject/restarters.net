@@ -1,0 +1,45 @@
+.custom-check-tick {
+  padding-left: 0;
+
+  .form-check-input {
+    opacity: 0;
+    position: absolute;
+  }
+
+  .form-check-input:checked + .form-check-label::before {
+    background-image: url('../../svgs/check-tick.svg');
+    background-color: $white;
+    color: $white;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 75%;
+  }
+
+  .form-check-label {
+    margin-left: 45px;
+    line-height: 35px;
+
+    &::before {
+      content: '';
+      background: $white;
+      border: 1px solid $black;
+      display: inline-block;
+      vertical-align: middle;
+      width: 30px;
+      height: 30px;
+      padding: 2px;
+      margin-right: 5px;
+      text-align: center;
+
+      // FIX for content collapsing underneath
+      position: absolute;
+      left: 0;
+      top: 3px;
+      bottom: 0;
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}

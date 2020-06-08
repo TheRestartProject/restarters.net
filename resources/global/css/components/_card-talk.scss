@@ -1,0 +1,152 @@
+.card-talk {
+  @extend .border-0;
+  @extend .rounded-0;
+
+  &:hover {
+    @extend .box-shadow-offset;
+  }
+
+  .card-body {
+    @extend .border-0;
+    @extend .bg-white;
+
+    padding-top: 18px;
+    padding-bottom: 18px;
+
+    padding-left: 30px;
+    padding-right: 30px;
+
+    @include media-breakpoint-down(md) {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    h5 {
+      font-family: Asap;
+      font-size: 16px;
+      font-weight: normal;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.13;
+      letter-spacing: normal;
+      text-align: left;
+      color: $black;
+      margin-bottom: 20px;
+
+      a {
+        color: $black;
+      }
+    }
+
+    .card-summary {
+      @extend .p-0;
+      @extend .bg-transparent;
+      @extend .border-0;
+    }
+
+    &.created-recently {
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        height: 15px;
+        width: 15px;
+        border-radius: 50%;
+        background-color: theme-color('danger');
+        top: 7px;
+        left: -7px;
+        transform: translateY(-100%);
+      }
+    }
+
+    .card-talk-summary {
+      .rectangle-tag {
+        font-family: Asap;
+        font-size: 12px;
+        font-weight: bold;
+        font-stretch: normal;
+        font-style: normal;
+        line-height: 1.17;
+        letter-spacing: 0.9px;
+        text-align: left;
+        color: $black;
+        text-transform: uppercase;
+        margin-right: 30px;
+
+        span {
+          content: '';
+          display: inline-block;
+          width: 10px;
+          height: 10px;
+        }
+
+        @include media-breakpoint-down(md) {
+          margin-right: 20px;
+        }
+      }
+
+      .tag {
+        font-family: Asap;
+        font-size: 10px;
+        font-weight: normal;
+        font-stretch: normal;
+        font-style: normal;
+        line-height: 1.1;
+        letter-spacing: 0.75px;
+        text-align: left;
+        color: $black;
+        background-color: #f5f7fa;
+        text-transform: uppercase;
+        padding: 3px 4px;
+        margin-right: 15px;
+      }
+    }
+
+    .replies {
+      font-family: Asap;
+      font-size: 16px;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.13;
+      letter-spacing: normal;
+      color: $black;
+      text-align: center;
+      vertical-align: middle;
+      position: relative;
+      padding-right: 30px;
+
+      &::after {
+        content: "";
+        top: 0;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        background-image: url('../../svgs/reply_icon.svg');
+        background-repeat: no-repeat;
+        background-position: center center;
+        display: inline-block;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 5px;
+      }
+    }
+
+    .avatar-images-list {
+      @extend .d-flex;
+      @extend .flex-row;
+      @extend .justify-content-end;
+
+      img {
+        max-height: 35px;
+        max-width: 35px;
+
+        &:not(:last-child) {
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+}

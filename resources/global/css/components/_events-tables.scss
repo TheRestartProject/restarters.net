@@ -1,0 +1,40 @@
+.td-event-date {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+
+  span {
+    font-family: Asap;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: 0;
+    text-align: center;
+    color: $black;
+    text-transform: uppercase;
+
+    &.td-event-day {
+      font-size: 24px;
+
+      @include media-breakpoint-down(md) {
+        font-size: 20px;
+      }
+    }
+
+    &.td-event-month {
+      font-size: 18px;
+
+      @include media-breakpoint-down(md) {
+        font-size: 16px;
+      }
+    }
+  }
+
+  &.td-event-in-progress {
+    background-color: $black;
+
+    span {
+      @extend .text-white;
+    }
+  }
+}

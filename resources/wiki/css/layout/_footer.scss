@@ -1,0 +1,54 @@
+.footer-links {
+  @extend .d-flex;
+  @extend .flex-column;
+
+  div {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+
+    a {
+      font-family: Asap;
+      font-size: 14px;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.14;
+      letter-spacing: 1.05px;
+      color: $black;
+      text-transform: uppercase;
+
+      &::before {
+        content: none !important;
+      }
+    }
+  }
+}
+
+.footer-links-border-top {
+  position: relative;
+  margin-top: 70px;
+
+  &::before {
+    content: '';
+    background-image: url('../../global/svgs/rectangle.svg');
+    background-color: transparent;
+    background-repeat: repeat;
+    background-position: left;
+    height: 3px;
+    background-size: 20px 35px;
+    width: 100%;
+    position: absolute;
+    top: -20px;
+  }
+}
+
+.footer-description {
+  font-family: Asap;
+  font-size: 16px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.44;
+  letter-spacing: normal;
+  color: $black;
+}

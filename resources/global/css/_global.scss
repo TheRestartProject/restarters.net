@@ -1,0 +1,49 @@
+body,
+html {
+  background-color: #f5f7fa !important;
+  font-family: $font-family-third !important;
+  font-size: 18px;
+}
+
+body {
+  padding-bottom: 80px;
+}
+
+@mixin font-default {
+  font-family: $font-family-third;
+  font-weight: 700 !important;
+  font-stretch: normal;
+  font-style: normal;
+  letter-spacing: normal;
+  color: $black;
+}
+
+h1 {
+  @include font-default;
+
+  font-size: 40px !important;
+  line-height: 45px;
+}
+
+h2 {
+  @include font-default;
+
+  font-size: 28px !important;
+  line-height: 32px;
+}
+
+.link-text {
+  text-decoration: none !important;
+  border-bottom: 1px solid $black;
+  color: $black;
+
+  &:hover {
+    border-bottom: 2px solid $black;
+    color: $black;
+  }
+
+  &:focus {
+    border-bottom: 3px solid $black;
+    color: $black;
+  }
+}

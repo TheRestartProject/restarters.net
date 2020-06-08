@@ -1,0 +1,64 @@
+.flex-dynamic-row {
+  @extend .d-flex;
+  @extend .align-content-between;
+  @extend .flex-wrap;
+
+  .flex-dynamic {
+    @extend .form-group;
+
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-right: 9px;
+
+    .form-control {
+      min-height: 50px;
+    }
+
+    .select2-selection--multiple {
+      background-image: none;
+
+      .select2-search {
+        input {
+          height: 35px;
+        }
+      }
+
+      &::after {
+        content: '';
+        height: 26px;
+        margin-top: 0;
+        margin-bottom: 0;
+        background-image: url('../svgs/dropdown-arrow.svg');
+        background-repeat: no-repeat;
+        position: absolute;
+        top: 20px;
+        right: 3px;
+        width: 20px;
+      }
+    }
+
+    .select2-selection--single {
+      .select2-selection__rendered {
+        line-height: 40px;
+      }
+
+      .select2-selection__arrow {
+        height: 35px;
+      }
+    }
+
+    @include media-breakpoint-down(lg) {
+      flex-basis: auto;
+    }
+
+    @include media-breakpoint-down(md) {
+      margin-right: 0;
+      width: 100%;
+    }
+  }
+
+  .btn.btn-primary {
+    height: 50px;
+    line-height: 1;
+  }
+}
