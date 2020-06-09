@@ -4,17 +4,22 @@ Feature: Add a group
     I should be able to do by navigating to add group page
 
 Background:
-    Given the following account have been created as a host or an admin
-        | Email                      | Password | Role  |
-        | dean@wecreatedigital.co.uk | dean     | Host  |
-        | hello@howareyou.com        | hello    | Admin |
+  Given the following account have been created as a host or an admin
+    | Email                    | Password | Role               |
+    | hubert@planetexpress.com | hubert!  | Admin              |
+    | hermes@planetexpress.com | b3nd3r   | Host               |
+    | leela@planetexpress.com  | l33l4    | NetworkCoordinator |
 
 Scenario: Create a new group
-    When a host clicks on add a group page and fills the data as follows
-    | Name of group     | Your website                     | Tell us about your group      | Group location | Group image  |
-    | Mighty Restarters | https://mightyrestarters.co.uk   | expert group in fixing things | Southwark      | :)           |
-    And clicks on create group button to create a new group
-    Then he lands on group page with the newly created group in the list of gropus in that page.
+  When a host clicks on add a group page and fills the data as follows
+    | Name of group     | Your website                   | Tell us about your group      | Group location | Group image |
+    | Mighty Restarters | https://mightyrestarters.co.uk | expert group in fixing things | Southwark      | :)          |
+  And clicks on create group button to create a new group
+  Then he lands on group page with the newly created group in the list of gropus in that page.
+    
+Scenario: Amending the Area details of a group
+  When Leela or Hubert is adding an group
+  Then they see the section for adding the Area details of the group
     
 Scenario: Text cleaned in the description
     When a host copies and paste into the description box
