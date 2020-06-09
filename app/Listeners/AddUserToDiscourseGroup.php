@@ -3,8 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\UserFollowedGroup;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
+
 
 class AddUserToDiscourseGroup
 {
@@ -63,6 +65,7 @@ class AddUserToDiscourseGroup
 
             $endpoint = '/admin/users/sync_sso';
 
+            Log::info('Syncing: ' . json_encode($sso_params));
             $response = $client->request(
                 'POST',
                 $endpoint,
@@ -73,6 +76,9 @@ class AddUserToDiscourseGroup
                     ],
                 ]
             );
+
+            Log::info('Response status: ' . $response->getStatusCode());
+            Log::info('Response body: ' . $response->getBody());
 
             if ( ! $response->getStatusCode() === 200) {
                 Log::error('Could not sync user\'s ('.$user->id.') groups to Discourse: '.$response->getReasonPhrase());
