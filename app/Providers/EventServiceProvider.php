@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Events\EventImagesUploaded;
+use App\Events\UserFollowedGroup;
 use App\Events\UserUpdated;
 use App\Events\UserDeleted;
+use App\Listeners\AddUserToDiscourseGroup;
 use App\Listeners\AnonymiseSoftDeletedUser;
 use App\Listeners\RemoveSoftDeletedUserFromAllGroups;
 use App\Listeners\SendAdminModerateEventPhotosNotification;
@@ -51,6 +53,10 @@ class EventServiceProvider extends ServiceProvider
 
         UserUpdated::class => [
             SyncUserToDiscourse::class,
+        ],
+
+        UserFollowedGroup::class => [
+            AddUserToDiscourseGroup::class,
         ],
 
         UserDeleted::class => [

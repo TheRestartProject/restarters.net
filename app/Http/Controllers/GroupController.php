@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Device;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
+use App\Events\UserFollowedGroup;
 use App\Group;
 use App\GroupNetwork;
 use App\GroupTags;
@@ -1023,8 +1024,12 @@ class GroupController extends Controller
                 'role' => 4,
             ]);
 
-            // A new User has joined your group
+            $user = Auth::user();
             $group = Group::find($group_id);
+
+            event(new UserFollowedGroup($user, $group));
+
+            // A new User has joined your group
             $groupHostLinks = UserGroups::where('group', $group->idgroups)->where('role', 3)->get();
 
             foreach ($groupHostLinks as $groupHostLink) {
