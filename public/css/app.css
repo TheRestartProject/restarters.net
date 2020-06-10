@@ -81,7 +81,7 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 992px;
   --breakpoint-xl: 1200px;
-  --font-family-sans-serif: "Patua One", sans-serif;
+  --font-family-sans-serif: Asap, sans-serif;
   --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
@@ -114,7 +114,7 @@ section {
 
 body {
   margin: 0;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-size: 0.9rem;
   font-weight: 400;
   line-height: 1.6;
@@ -6860,7 +6860,7 @@ a.close.disabled {
   z-index: 1070;
   display: block;
   margin: 0;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-style: normal;
   font-weight: 400;
   line-height: 1.6;
@@ -6985,7 +6985,7 @@ a.close.disabled {
   z-index: 1060;
   display: block;
   max-width: 276px;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-style: normal;
   font-weight: 400;
   line-height: 1.6;
@@ -16245,7 +16245,7 @@ table.sortable > thead th div.mozilla {
 }
 
 .accordion__share .card-header {
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
 }
 
 .accordion__share .card-header .btn {
@@ -16379,7 +16379,7 @@ table.sortable > thead th div.mozilla {
 .alert-warning .btn,
 .alert-success .btn,
 .alert-delete .btn {
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   padding: 7px 15px;
   line-height: 1.2;
   color: #FFF;
@@ -16451,7 +16451,7 @@ table.sortable > thead th div.mozilla {
 }
 
 .alert-primary {
-  background-color: #0394A6;
+  background-color: #222;
 }
 
 .alert-primary .btn {
@@ -16616,7 +16616,7 @@ table.sortable > thead th div.mozilla {
   font-size: 1rem;
   line-height: 1;
   border-radius: 10px;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   white-space: normal;
   /*&.disabled {
         color: #666B6C;
@@ -16659,7 +16659,7 @@ table.sortable > thead th div.mozilla {
 }
 
 .btn-primary {
-  background-color: #0394A6;
+  background-color: #222;
   border: 0;
   border-bottom: 3px solid #155E67;
   color: #FFF;
@@ -16864,7 +16864,7 @@ table.sortable > thead th div.mozilla {
 }
 
 [type="checkbox"]:checked + label.btn-checkbox {
-  background-color: #0394A6;
+  background-color: #222;
   border: 0;
   border-bottom: 3px solid #155E67;
   color: #FFF;
@@ -16916,7 +16916,7 @@ table.sortable > thead th div.mozilla {
 }
 
 .btn-token {
-  background-color: #0394A6;
+  background-color: #222;
   border-radius: 2px;
   border: 0;
   font-size: 10px;
@@ -16993,15 +16993,15 @@ table.sortable > thead th div.mozilla {
   padding: 0;
   min-width: 100%;
   top: -1px !important;
-  background-color: #0394A6;
+  background-color: #222;
   border-bottom: 3px solid #155E67;
 }
 
 .button-group .dropdown-item {
   padding: 5px 10px;
-  background-color: #0394A6;
+  background-color: #222;
   color: #FFF;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-size: 16px;
 }
 
@@ -17115,15 +17115,15 @@ table.sortable > thead th div.mozilla {
   padding: 5px 0;
   min-width: 100%;
   top: -1px !important;
-  background-color: #0394A6;
+  background-color: #222;
   border-bottom: 3px solid #155E67;
 }
 
 .btn-group__duo .dropdown-item {
   padding: 5px 10px;
-  background-color: #0394A6;
+  background-color: #222;
   color: #FFF;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-size: 16px;
 }
 
@@ -17191,7 +17191,7 @@ a.text-dark:focus {
   font-weight: normal;
   padding: 0;
   min-width: auto;
-  color: #0394A6;
+  color: #222;
   text-decoration: underline;
 }
 
@@ -17276,7 +17276,7 @@ a.text-dark:focus {
 }
 
 .badge-primary {
-  background-color: #0394A6;
+  background-color: #222;
   border-radius: 3px;
   margin-left: 8px;
   font-weight: bold;
@@ -17399,7 +17399,7 @@ a.text-dark:focus {
 .dz-clickable.dropzone .dz-message {
   font-size: 16px;
   color: #000;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   background-repeat: no-repeat;
   background-position: 50% 0;
   background-image: url(/images/camera-upload.svg?32b3f302657d4cf918397baf25a791f0);
@@ -17428,7 +17428,7 @@ a.text-dark:focus {
   font-size: 13px;
   z-index: 2;
   font-weight: 600;
-  color: #0394A6;
+  color: #222;
   text-decoration: underline;
 }
 
@@ -17539,9 +17539,9 @@ a.text-dark:focus {
 }
 
 .devices legend {
-  color: #0394A6;
+  color: #222;
   font-size: 20px;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
 }
 
 #device-table tr.active-row td {
@@ -17634,7 +17634,7 @@ td.col-device-auto {
 
 .sort-column.sort-column-asc,
 .sort-column.sort-column-dsc {
-  color: #0394A6;
+  color: #222;
 }
 
 #device-search #suitable-for-wiki {
@@ -17757,7 +17757,7 @@ td.col-device-auto {
 .registration__step h3 {
   font-size: 20px;
   margin: 0 0 10px 0;
-  color: #0394A6;
+  color: #222;
   padding-right: 100px;
 }
 
@@ -17829,7 +17829,7 @@ td.col-device-auto {
 .user-name {
   display: none;
   font-size: 16px;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   text-decoration: underline;
   max-width: 170px;
   text-overflow: ellipsis;
@@ -17852,7 +17852,7 @@ td.col-device-auto {
 
 .nav-link:hover .user-name {
   text-decoration: underline;
-  color: #0394A6;
+  color: #222;
 }
 
 .navbar-laravel {
@@ -17925,7 +17925,7 @@ td.col-device-auto {
   float: right;
   margin: -25px 0 0 0;
   font-size: 10px;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   position: relative;
   left: 16px;
   z-index: 1;
@@ -18017,7 +18017,7 @@ td.col-device-auto {
   color: #000;
   position: relative;
   z-index: 1;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   padding: 11px 15px;
   border: 1px solid #D9D9D9;
   border-top: 0;
@@ -18233,7 +18233,7 @@ td.col-device-auto {
   margin-bottom: 5px;
   display: block;
   text-transform: none;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
 }
 
 .navbar-dropdown > ul > li > ul > li a {
@@ -18348,7 +18348,8 @@ td.col-device-auto {
   padding-bottom: 10px;
   background-repeat: no-repeat;
   background-position: 20px 20px;
-  border-radius: 3px;
+  border-radius: 0;
+  border-color: #222;
 }
 
 .notifications .card.status-read,
@@ -18712,7 +18713,7 @@ td.col-device-auto {
 }
 
 .dashboard__list-topics .digit {
-  background-color: #0394A6;
+  background-color: #222;
   border-radius: 50%;
   font-family: "Asap", sans-serif;
   font-size: 20px;
@@ -18953,7 +18954,7 @@ td.col-device-auto {
 }
 
 .card__content {
-  background-color: #0394A6;
+  background-color: #222;
   color: #FFF;
   padding: 40px 35px;
   display: -webkit-box;
@@ -19260,17 +19261,18 @@ td.col-device-auto {
 }
 
 .list-group {
+  font-family: Asap;
   margin-bottom: 20px;
 }
 
 .list-group .list-group-item {
   font-size: 20px;
-  color: #0394A6;
+  color: #222;
   border: 1px solid #D9D9D9;
   border-top: 0;
   border-radius: 0;
   margin: 0;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
 }
 
 .list-group .list-group-item:hover {
@@ -19281,7 +19283,7 @@ td.col-device-auto {
 .list-group .list-group-item:focus,
 .list-group .list-group-item:active {
   text-decoration: none;
-  outline: 2px solid rgba(3, 148, 166, 0.5);
+  outline: 2px solid #222;
   background-color: #fff;
 }
 
@@ -19290,9 +19292,10 @@ td.col-device-auto {
 }
 
 .list-group .list-group-item.active {
-  color: #FFF;
-  background-color: #0394A6;
-  border-color: #0394A6;
+  color: #222;
+  outline: 2px solid #222;
+  background-color: #ffbe5f;
+  border-color: #ffbe5f;
   border-radius: 2px;
 }
 
@@ -19349,7 +19352,7 @@ td.col-device-auto {
 }
 
 .login-page legend {
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-size: 20px;
 }
 
@@ -19364,7 +19367,7 @@ td.col-device-auto {
 .stats .stat-text {
   font-family: 'Open Sans';
   margin: 0 0 20px;
-  color: #0394A6;
+  color: #222;
   font-size: 14px;
   line-height: 1;
 }
@@ -19409,7 +19412,7 @@ td.col-device-auto {
 }
 
 .form-control:focus {
-  border-color: #0394A6;
+  border-color: #222;
 }
 
 .input-group .input-group-append .input-group-text {
@@ -19418,7 +19421,7 @@ td.col-device-auto {
 }
 
 .form-group label {
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-size: 17px;
 }
 
@@ -19438,7 +19441,7 @@ td.col-device-auto {
 .modal-form legend {
   margin: 0 0 30px 0;
   font-size: 20px;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
 }
 
 .modal-form .modal-dialog {
@@ -19576,16 +19579,15 @@ td.col-device-auto {
 }
 
 .edit-panel {
-  background-color: #F9F9F9;
-  border: 1px solid #D9D9D9;
-  border-radius: 3px;
+  background-color: #fff;
+  border: 1px solid #222;
   padding: 20px 20px 20px;
   margin: 0 0 30px 0;
 }
 
 @media (min-width: 992px) {
   .edit-panel {
-    padding: 50px 45px 40px;
+    padding: 30px;
   }
 }
 
@@ -19618,7 +19620,7 @@ td.col-device-auto {
 
 .edit-panel h6 {
   font-size: 16px;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
 }
 
 .edit-panel p {
@@ -19723,7 +19725,7 @@ td.col-device-auto {
 
 .edit-panel .side-collapse button {
   padding: 15px 20px 15px 0px;
-  color: #0394A6;
+  color: #222;
   font-size: 20px;
   display: block;
   width: 100%;
@@ -19786,7 +19788,7 @@ td.col-device-auto {
 }
 
 .tokenfield .token {
-  background-color: #0394A6;
+  background-color: #222;
   color: #FFF;
   font-size: 14px;
   padding: 4px 10px;
@@ -19924,7 +19926,7 @@ td.col-device-auto {
 }
 
 .table-row-details td .table label {
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-size: 16px;
 }
 
@@ -20019,7 +20021,7 @@ td.col-device-auto {
 
 .table-add tr th {
   padding-left: 10px !important;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-size: 16px;
   border: 0;
 }
@@ -20142,7 +20144,7 @@ td.col-device-auto {
 }
 
 .nested-fields label {
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-size: 16px;
   margin-bottom: 7px;
   -webkit-box-flex: 1;
@@ -20192,7 +20194,7 @@ td.col-device-auto {
 }
 
 .groups aside.edit-panel legend {
-  color: #0394A6;
+  color: #222;
   font-size: 20px;
 }
 
@@ -20209,7 +20211,7 @@ td.col-device-auto {
   font-family: "Open Sans", sans-serif;
   font-size: 13px;
   font-weight: normal;
-  color: #0394A6;
+  color: #222;
   text-decoration: underline;
   border: 0;
   background-color: transparent;
@@ -20306,7 +20308,7 @@ td.col-device-auto {
 }
 
 .group-view .nav-item {
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
 }
 
 #headlineStats {
@@ -20332,13 +20334,13 @@ td.col-device-auto {
 }
 
 .popover__table {
-  border-color: #0394A6;
+  border-color: #222;
   border: 0;
 }
 
 .popover__table .popover-body {
   font-size: 13px;
-  background-color: #0394A6;
+  background-color: #222;
   border-radius: 3px;
   color: #FFF;
   padding: 5px 10px;
@@ -20346,8 +20348,8 @@ td.col-device-auto {
 
 .popover__table .arrow::after,
 .popover__table .arrow::before {
-  border-bottom-color: #0394A6;
-  border-top-color: #0394A6;
+  border-bottom-color: #222;
+  border-top-color: #222;
 }
 
 .popover-calendar-feed {
@@ -20412,7 +20414,7 @@ td.col-device-auto {
 
 .pagination .active a.page-link {
   border: 0;
-  background-color: #0394A6;
+  background-color: #222;
   text-decoration: none;
   color: #FFF;
   border-radius: 3px;
@@ -20548,7 +20550,7 @@ td.col-device-auto {
   font-size: 18px;
   font-weight: 400;
   padding: 0 0 15px 28px;
-  color: #0394A6;
+  color: #222;
   -webkit-box-flex: 1;
       -ms-flex: 1 0 auto;
           flex: 1 0 auto;
@@ -20720,7 +20722,7 @@ td.col-device-auto {
 }
 
 .events__header__url {
-  color: #0394A6;
+  color: #222;
   display: block;
   margin-top: 0;
   margin-bottom: 5px;
@@ -20880,7 +20882,7 @@ td.col-device-auto {
 
 .nav-tabs .nav-item {
   margin-right: 3px;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
 }
 
 .nav-tabs .nav-link {
@@ -20972,7 +20974,7 @@ td.col-device-auto {
 }
 
 .reporting h2 {
-  color: #0394A6;
+  color: #222;
   font-size: 18px;
 }
 
@@ -20995,9 +20997,9 @@ td.col-device-auto {
 }
 
 .reporting legend {
-  color: #0394A6;
+  color: #222;
   font-size: 20px;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
 }
 
 .reporting .breadcrumb {
@@ -21070,7 +21072,7 @@ td.col-device-auto {
 .users-list__add button,
 .users-list__invite a,
 .users-list__invite button {
-  background-color: #0394A6 !important;
+  background-color: #222 !important;
   color: #FFF !important;
   text-align: center;
   display: -webkit-box;
@@ -21331,7 +21333,7 @@ span.popover-usergroups {
   text-align: center;
   margin: 0 0 20px 0;
   font-size: 18px;
-  color: #0394A6;
+  color: #222;
 }
 
 .stat p {
@@ -21419,7 +21421,7 @@ body > .container {
 .block h4,
 .block h5,
 .block h6 {
-  color: #0394A6;
+  color: #222;
   margin-bottom: 18px;
 }
 
@@ -21440,7 +21442,7 @@ body > .container {
   min-height: 11px;
   margin-bottom: 10px;
   font-size: 16px;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
 }
 
 @media (min-width: 1200px) {
@@ -21556,7 +21558,7 @@ label.form-check-label {
 }
 
 .form-control__select .select2-selection--multiple .select2-selection__choice {
-  background-color: #0394A6;
+  background-color: #222;
   color: #FFF;
   font-size: 14px;
   padding: 5px 12px 5px 10px;
@@ -21600,7 +21602,7 @@ h3,
 h4,
 h5,
 table th {
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-weight: 500;
 }
 
@@ -21720,7 +21722,7 @@ table th {
 }
 
 .skills-list li svg path {
-  fill: #0394A6;
+  fill: #222;
 }
 
 .field-form-input {
@@ -21790,7 +21792,7 @@ table th {
   line-height: 1;
   margin: 30px 0;
   text-align: center;
-  color: #0394A6;
+  color: #222;
 }
 
 h2 {
@@ -21862,7 +21864,7 @@ h2 sup a:hover {
 .dummy-label {
   font-size: 16px;
   font-weight: 600;
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   margin: 0 0 10px 0;
 }
 
@@ -22324,7 +22326,7 @@ h2 sup a:hover {
 }
 
 .language-bar .dropdown-item {
-  font-family: "Patua One", sans-serif;
+  font-family: Asap, sans-serif;
   font-weight: 600;
   padding: 5px 30px;
   display: block;
@@ -22424,7 +22426,7 @@ h2 sup a:hover {
 }
 
 .widget h2 {
-  color: #0394A6;
+  color: #222;
   font-size: 35px;
   margin: 0;
 }
@@ -22469,7 +22471,7 @@ h2 sup a:hover {
 .widget__summary p {
   font-size: 16px;
   font-weight: 400;
-  color: #0394A6;
+  color: #222;
 }
 
 .widget__summary svg {

@@ -1,18 +1,19 @@
 @extends('layouts.app')
 @section('content')
+<section>
     <div class="container">
         <div class="row">
-            <div class="col">
-                <div class="d-flex justify-content-between">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">@lang('profile.notifications')</li>
-                        </ol>
-                    </nav>
-                    <div class="">
-                        <a href="/profile" class="btn btn-primary btn-view">View profile</a>
-                    </div>
+            <div class="col-12 col-md-12 mb-50">
+                <div class="d-flex align-items-center">
+                    <h1 class="mb-0 mr-30">
+                        Profile & Preferences
+                    </h1>
+
+                    @if (Auth::id() == $user->id)
+                        <a href="/profile" class="btn btn-primary ml-auto">View profile</a>
+                    @else
+                        <a href="/profile/{{ $user->id }}" class="btn btn-primary ml-auto">View user profile</a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -39,7 +40,7 @@
                         <div class="edit-panel notifications-page">
                             <div class="form-row">
                                 <div class="col-lg-12">
-                                    <h4 class="pull-left">@lang('notifications.notifications')</h4>
+                                    <h3 class="pull-left">@lang('notifications.notifications')</h3>
                                     <a href="{{ route('markAsRead') }}" class="btn-mark-all pull-right" style="float:right">@lang('notifications.mark_all_as_read')</a>
                                 </div>
                             </div>
@@ -59,4 +60,5 @@
             </div>
         </div>
     </div>
+</section>
 @endsection

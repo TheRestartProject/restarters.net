@@ -1,24 +1,21 @@
 @extends('layouts.app')
 @section('content')
+<section>
   <div class="container">
     <div class="row">
-      <div class="col">
-        <div class="d-flex justify-content-between">
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
-              <li class="breadcrumb-item active" aria-current="page">@lang('profile.edit_profile')</li>
-            </ol>
-          </nav>
-          <div class="">
+          <div class="col-12 col-md-12 mb-50">
+              <div class="d-flex align-items-center">
+                  <h1 class="mb-0 mr-30">
+                      Profile & Preferences
+                  </h1>
+
             @if (Auth::id() == $user->id)
-              <a href="/profile" class="btn btn-primary btn-view">View profile</a>
+              <a href="/profile" class="btn btn-primary ml-auto">View profile</a>
             @else
-              <a href="/profile/{{ $user->id }}" class="btn btn-primary btn-view">View user profile</a>
+              <a href="/profile/{{ $user->id }}" class="btn btn-primary ml-auto">View user profile</a>
             @endif
-          </div>
-        </div>
       </div>
+    </div>
     </div>
 
     @if(session()->has('message'))
@@ -50,12 +47,12 @@
       <div class="col-lg-8" aria-labelledby="list-profile-list">
 
         <!-- <aside id="basic-profile" class="edit-panel">
-          <h4>@lang('profile.panel_title_1')</h4>
+          <h3>@lang('profile.panel_title_1')</h3>
           <p>@lang('profile.panel_content_1')</p>
         </aside> -->
 
         <!-- <aside id="email-alerts" class="edit-panel">
-          <h4>@lang('profile.panel_title_2')</h4>
+          <h3>@lang('profile.panel_title_2')</h3>
           <p>@lang('profile.panel_content_2')</p>
         </aside> -->
 
@@ -69,7 +66,7 @@
               <div class="form-row">
                 <div class="col-lg-12">
                   @if (Auth::id() == $user->id)
-                    <h4>@lang('general.profile')</h4>
+                    <h3>@lang('general.profile')</h3>
                     <p>@lang('general.profile_content')</p>
                   @else
                     <h4>{{ $user->name }}'s @lang('general.other_profile')</h4>
@@ -461,7 +458,7 @@
             <div class="edit-panel">
               <div class="form-row">
                 <div class="col-lg-12">
-                  <h4>Calendars</h4>
+                  <h3>Calendars</h3>
                   <p>You can now keep track of events using your personal calendar application by subscribing to the calendar feeds below. You can subscribe to as many calendars as you like. <a href="{{ env('DISCOURSE_URL' )}}/session/sso?return_path={{ env('DISCOURSE_URL') }}@lang('general.calendar_feed_help_url')">Find out more</a>.</p>
                 </div>
               </div>
@@ -524,4 +521,5 @@
       </div>
     </div>
   </div>
+</section>
 @endsection
