@@ -6,31 +6,38 @@ $factory->define(App\Category::class, function (Faker $faker) {
     return [];
 });
 
-$factory->state(App\Category::class, 'misc', function (Faker $faker) {
+$factory->state(App\Category::class, 'Misc', function (Faker $faker) {
     return [
         'idcategories' => 46,
         'name' => 'Misc',
     ];
 });
 
-$factory->state(App\Category::class, 'cat1', function (Faker $faker) {
+$factory->state(App\Category::class, 'Mobile', function (Faker $faker) {
     return [
-        'idcategories' => 1,
-        'name' => 'cat1',
+        'idcategories' => 25,
+        'name' => 'Mobile',
     ];
 });
 
-$factory->state(App\Category::class, 'cat2', function (Faker $faker) {
+$factory->state(App\Category::class, 'Cat1', function (Faker $faker) {
     return [
-        'idcategories' => 2,
-        'name' => 'cat2',
+        'idcategories' => 111,
+        'name' => 'Cat1',
     ];
 });
 
-$factory->state(App\Category::class, 'cat3', function (Faker $faker) {
+$factory->state(App\Category::class, 'Cat2', function (Faker $faker) {
     return [
-        'idcategories' => 3,
-        'name' => 'cat3',
+        'idcategories' => 222,
+        'name' => 'Cat2',
+    ];
+});
+
+$factory->state(App\Category::class, 'Cat3', function (Faker $faker) {
+    return [
+        'idcategories' => 333,
+        'name' => 'Cat3',
     ];
 });
 
