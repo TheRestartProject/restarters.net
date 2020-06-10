@@ -22,7 +22,6 @@
   border: solid 1px $black;
   padding: 10px;
   background-color: $white;
-  background: $white;
   border-radius: 0;
   font-size: 16px;
   font-weight: bold;
@@ -36,7 +35,7 @@
   transition: none;
 
   svg {
-    text {
+    path, text {
       fill: $black !important;
     }
   }

@@ -14795,7 +14795,6 @@ a.form-text-corrected:focus {
   border: solid 1px #222;
   padding: 10px;
   background-color: #fff;
-  background: #fff;
   border-radius: 0;
   font-size: 16px;
   font-weight: bold;
@@ -14810,6 +14809,9 @@ a.form-text-corrected:focus {
   transition: none;
 }
 
+.btn-primary svg path,
+.btn-outline-primary svg path,
+.btn-checkbox svg path,
 .btn-primary svg text,
 .btn-outline-primary svg text,
 .btn-checkbox svg text {
