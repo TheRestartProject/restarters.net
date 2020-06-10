@@ -6,30 +6,6 @@
   font-family: $font-family-third;
   white-space: normal;
   text-decoration: none !important;
-
-  /* &.disabled {
-        color: #666B6C;
-        background-color: #D3D9DC;
-        border-color: #B0BBC0;
-        opacity: 1;
-    }
-
-    &:disabled {
-        background-color: #D3D9DC;
-        color: #666B6C;
-        border: 0;
-        border-bottom: 3px solid #B0BBC0;
-        opacity: 1;
-
-        &:hover,
-        &:focus {
-            background-color: #D3D9DC;
-            color: #666B6C;
-            border-bottom: 3px solid #B0BBC0;
-            text-decoration: none;
-            opacity: 1;
-        }
-    } */
 }
 
 .btn-sm {
@@ -42,10 +18,10 @@
 
 .btn-primary {
   width: auto;
-  box-shadow: 6px 6px 0 0 $black;
+  box-shadow: 5px 5px 0 0 $black;
   border: solid 1px $black;
+  padding: 10px;
   background-color: $white;
-  background: $white;
   border-radius: 0;
   font-size: 16px;
   font-weight: bold;
@@ -59,7 +35,7 @@
   transition: none;
 
   svg {
-    text {
+    path, text {
       fill: $black !important;
     }
   }
@@ -136,8 +112,9 @@
   &:hover,
   &.dropdown-toggle:hover {
     -webkit-box-shadow: 5px 5px 0 0 $black;
-    box-shadow: 6px 6px 0 0 $black;
-    outline: 2px solid $black;
+    box-shadow: 5px 5px 0 0 $black;
+    border: 2px solid $black;
+    padding: 9px;
     background-color: $white;
     color: $black;
     border-color: $black;

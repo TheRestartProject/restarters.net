@@ -14765,29 +14765,6 @@ a.form-text-corrected:focus {
   font-family: "Asap", sans-serif;
   white-space: normal;
   text-decoration: none !important;
-  /* &.disabled {
-        color: #666B6C;
-        background-color: #D3D9DC;
-        border-color: #B0BBC0;
-        opacity: 1;
-    }
-
-    &:disabled {
-        background-color: #D3D9DC;
-        color: #666B6C;
-        border: 0;
-        border-bottom: 3px solid #B0BBC0;
-        opacity: 1;
-
-        &:hover,
-        &:focus {
-            background-color: #D3D9DC;
-            color: #666B6C;
-            border-bottom: 3px solid #B0BBC0;
-            text-decoration: none;
-            opacity: 1;
-        }
-    } */
 }
 
 .btn-sm,
@@ -14813,11 +14790,11 @@ a.form-text-corrected:focus {
 .btn-outline-primary,
 .btn-checkbox {
   width: auto;
-  -webkit-box-shadow: 6px 6px 0 0 #222;
-          box-shadow: 6px 6px 0 0 #222;
+  -webkit-box-shadow: 5px 5px 0 0 #222;
+          box-shadow: 5px 5px 0 0 #222;
   border: solid 1px #222;
+  padding: 10px;
   background-color: #fff;
-  background: #fff;
   border-radius: 0;
   font-size: 16px;
   font-weight: bold;
@@ -14832,6 +14809,9 @@ a.form-text-corrected:focus {
   transition: none;
 }
 
+.btn-primary svg path,
+.btn-outline-primary svg path,
+.btn-checkbox svg path,
 .btn-primary svg text,
 .btn-outline-primary svg text,
 .btn-checkbox svg text {
@@ -14937,8 +14917,9 @@ a.form-text-corrected:focus {
 .dropdown-toggle.btn-outline-primary:hover,
 .dropdown-toggle.btn-checkbox:hover {
   -webkit-box-shadow: 5px 5px 0 0 #222;
-  box-shadow: 6px 6px 0 0 #222;
-  outline: 2px solid #222;
+  box-shadow: 5px 5px 0 0 #222;
+  border: 2px solid #222;
+  padding: 9px;
   background-color: #fff;
   color: #222;
   border-color: #222;
@@ -15924,7 +15905,7 @@ select.form-control:not([class*="select2"]) {
 }
 
 .table-events td.cell-figure {
-  font-size: 22px;
+  font-size: 16px;
   text-align: center;
   padding-top: 5px;
   padding-bottom: 5px;

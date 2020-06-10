@@ -4,12 +4,12 @@
     <th class="hightlighted" width="10"></th>
 
     @if( !isset($group_view) )
-        <th class="table-cell-icon"></th>
+        <th class="table-cell-icon d-none d-sm-table-cell" width="70"> </th>
     @endif
 
-    <th scope="col" width="450">@lang('events.event_name')</th>
+    <th scope="col" width="240">@lang('events.event_name')</th>
 
-    <th scope="col" width="250" class="cell-date" >@lang('events.event_date') / @lang('events.event_time')</th>
+    <th scope="col" width="240" class="cell-date" >@lang('events.event_date') / @lang('events.event_time')</th>
 
     <th scope="col" width="85" class="">
       <button type="button" class="btn btn-skills" data-container="body" data-toggle="popover" data-placement="top" data-content="Invited" data-original-title="" title="">

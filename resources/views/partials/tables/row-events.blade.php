@@ -3,7 +3,7 @@
     <td class="hightlighted {{ $event->VisuallyHighlight() }}"></td>
 
     @if( !isset($group_view) )
-      <td class="table-cell-icon text-center">
+      <td class="table-cell-icon d-none d-sm-table-cell text-center">
         @php( $group = $event->theGroup )
         @php( $group_image = $event->theGroup->groupImage )
         @if( is_object($group_image) && is_object($group_image->image) )
