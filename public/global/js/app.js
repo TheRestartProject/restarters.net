@@ -1,1 +1,315 @@
-!function(t){var e={};function n(i){if(e[i])return e[i].exports;var a=e[i]={i:i,l:!1,exports:{}};return t[i].call(a.exports,a,a.exports,n),a.l=!0,a.exports}n.m=t,n.c=e,n.d=function(t,e,i){n.o(t,e)||Object.defineProperty(t,e,{configurable:!1,enumerable:!0,get:i})},n.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return n.d(e,"a",e),e},n.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},n.p="/",n(n.s=178)}({178:function(t,e,n){t.exports=n(179)},179:function(t,e,n){window.onload=function(){!function(t,e,i){"use strict";t(i).ready(function(){n(180),n(181),n(182),console.log("Global js ready!"),t('a[data-toggle="tab"]').on("shown.bs.tab",function(e){history.pushState?history.pushState(null,null,t(this).attr("href")):location.hash=t(this).attr("href")}),t("form[id$='-search']").submit(function(n){t("#formHash").length?t("#formHash").val(e.location.hash):t(this).append(t("<input>",{type:"hidden",id:"formHash",name:"formHash",val:e.location.hash}))})});var a=e.location.hash;if(t("#formHash").length)a=t("#formHash").val();if(""!=a||void 0!=a){var o=t('a[href="'+a+'"]');1==o.length&&o.tab("show")}"https://wiki.restarters.dev"==e.location.origin&&(t(".wiki-nav-item").addClass("active"),t(".nav-tabs-block li a").removeClass("active"),t('.nav-tabs-block li a[href*="'+e.location.pathname+'"]').each(function(){t(this).addClass("active")}))}(jQuery,window,document)}},180:function(t,e){$(".toggle-dropdown-menu").click(function(){if($(this).hasClass("dropdown-active"))return $(".toggle-dropdown-menu").each(function(){$(this).removeClass("dropdown-active"),$(this).parents().children(".dropdown-menu-items").hide()}),!1;$(".toggle-dropdown-menu").not(this).each(function(){$(this).removeClass("dropdown-active"),$(this).parents().children(".dropdown-menu-items").hide()}),$(this).toggleClass("dropdown-active"),$(this).parents().children(".dropdown-menu-items").show()})},181:function(t,e){$notification_menu_items=$(".notification-menu-items"),$notification_menu_items.hide(),$(".toggle-notifications-menu .bell-icon-active").hide(),$url="https://restarters.dev/test/discourse/notifications",$.ajax({headers:{"Content-Type":"application/x-www-form-urlencoded"},xhrFields:{withCredentials:!0},type:"GET",url:$url,datatype:"json",success:function(t){if(console.log("Success: connected to Discourse."),"failed"==t.message)return console.log("Success: failed to find any new notifications."),!1;var e=t.notifications;Object.keys(e).length>0&&(console.log("Success: notifications found on Discourse."),$notification_menu_items.css("display",""),$notification_menu_items.empty(),$(".toggle-notifications-menu .bell-icon-active").css("display",""),$.each(e,function(t,e){$notification_menu_items.append($("<li>").append($("<a>").attr("href","https://restarters.dev/notifications/"+e.id).text(e.data.title)).attr("class","notifcation-text"))}))}})},182:function(t,e){$url="https://restarters.dev/test/check-auth",$notifications_list_item=$(".notifications-list-item").hide(),$auth_menu_items=$(".auth-menu-items").hide(),$auth_menu_items.removeClass("dropdown-menu-items"),$.ajax({headers:{"Content-Type":"application/x-www-form-urlencoded"},xhrFields:{withCredentials:!0},type:"GET",url:$url,datatype:"json",success:function(t){$auth_list_item=$(".auth-list-item"),t=t.data,$main_navigation_dropdown=$(".main-nav-dropdown"),null!==t.authenticated&&void 0!==t.authenticated?($.each(t.menu.reporting,function(t,e){var n=t.includes("spacer");t.includes("header")?$main_navigation_dropdown.append($("<li>").attr("class","dropdown-menu-header").text(e)):n?$main_navigation_dropdown.append($("<li>").attr("class","dropdown-spacer")):$main_navigation_dropdown.append($("<li>").append($("<a>").attr("href",e).text(t)))}),$(".regular-user-svg").addClass("d-none"),$(".authenticated-user-svg").removeClass("d-none"),$.each(t.menu.user,function(t,e){var n=t.includes("spacer");t.includes("header")?$auth_menu_items.append($("<li>").attr("class","dropdown-menu-header").text(e)):n?$auth_menu_items.append($("<li>").attr("class","dropdown-spacer")):$auth_menu_items.append($("<li>").append($("<a>").attr("href",e).text(t)))}),$notifications_list_item.length&&$notifications_list_item.css("display",""),$auth_list_item.length&&($auth_menu_items.addClass("dropdown-menu-items"),$auth_menu_items.css("display",""))):$auth_list_item.find("a").attr("href","https://restarters.dev"),$.each(t.menu.general,function(t,e){$main_navigation_dropdown.append($("<li>").append($("<a>").attr("href",e).text(t)))})}})}});
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "/";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 178);
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ 178:
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(179);
+
+
+/***/ }),
+
+/***/ 179:
+/***/ (function(module, exports, __webpack_require__) {
+
+// import jquery from 'jquery';
+// window.$ = window.jQuery=jquery;
+
+// window.bootstrap = require('bootstrap');
+
+window.onload = function () {
+
+  (function ($, window, document) {
+    // Use strict mode to reduce development errors.
+    "use strict";
+
+    $(document).ready(function () {
+      __webpack_require__(180);
+      __webpack_require__(181);
+      __webpack_require__(182);
+
+      console.log('Global js ready!');
+
+      // Keep hash within URL when toggling between Bootstrap Panes/Tabs
+      $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        if (history.pushState) {
+          history.pushState(null, null, $(this).attr('href'));
+        } else {
+          location.hash = $(this).attr('href');
+        }
+      });
+
+      $("form[id$='-search']").submit(function (e) {
+        if ($('#formHash').length) {
+          $('#formHash').val(window.location.hash);
+        } else {
+          $(this).append($('<input>', {
+            type: 'hidden',
+            id: 'formHash',
+            name: 'formHash',
+            val: window.location.hash
+          }));
+        }
+      });
+    });
+
+    // Change Bootstrap Pane/Tab view onload where hash is within URL
+    var hash = window.location.hash;
+
+    if ($('#formHash').length) {
+      var hash = $('#formHash').val();
+    }
+
+    if (hash != '' || hash != undefined) {
+      var $element = $('a[href="' + hash + '"]');
+      if ($element.length == 1) {
+        $element.tab('show');
+      }
+    }
+
+    if (window.location.origin == 'https://wiki.restarters.dev') {
+      $('.wiki-nav-item').addClass('active');
+
+      $('.nav-tabs-block li a').removeClass('active');
+
+      $('.nav-tabs-block li a[href*="' + window.location.pathname + '"]').each(function () {
+        $(this).addClass('active');
+      });
+    }
+  })(jQuery, window, document);
+};
+
+/***/ }),
+
+/***/ 180:
+/***/ (function(module, exports) {
+
+$('.toggle-dropdown-menu').click(function () {
+
+  // If item is already active then close all.
+  if ($(this).hasClass('dropdown-active')) {
+    $('.toggle-dropdown-menu').each(function () {
+      $(this).removeClass('dropdown-active');
+      $(this).parents().children('.dropdown-menu-items').hide();
+    });
+
+    return false;
+  }
+
+  // Close all existing items except current.
+  $('.toggle-dropdown-menu').not(this).each(function () {
+    $(this).removeClass('dropdown-active');
+    $(this).parents().children('.dropdown-menu-items').hide();
+  });
+
+  // Show items.
+  $(this).toggleClass('dropdown-active');
+  $(this).parents().children('.dropdown-menu-items').show();
+});
+
+/***/ }),
+
+/***/ 181:
+/***/ (function(module, exports) {
+
+// API call to current site - check for notifications
+function ajaxSearchNotifications() {
+  // $base_url = window.location.host;
+  $notification_menu_items = $('.notification-menu-items');
+  $notification_menu_items.hide();
+  $('.toggle-notifications-menu .bell-icon-active').hide();
+
+  $url = 'https://restarters.dev' + '/test/discourse/notifications';
+
+  $.ajax({
+    headers: {
+      // 'X-CSRF-TOKEN': $("input[name='_token']").val(),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    xhrFields: {
+      withCredentials: true
+    },
+    type: 'GET',
+    url: $url,
+    datatype: 'json',
+    success: function success(response) {
+      console.log('Success: connected to Discourse.');
+
+      // Response failed
+      if (response.message == 'failed') {
+        console.log('Success: failed to find any new notifications.');
+        return false;
+      }
+
+      // If notifications exist then we can create a cookie
+      var $notifications = response.notifications;
+
+      if (Object.keys($notifications).length > 0) {
+        console.log('Success: notifications found on Discourse.');
+
+        $notification_menu_items.css('display', '');
+        $notification_menu_items.empty();
+        $('.toggle-notifications-menu .bell-icon-active').css('display', '');
+
+        $.each($notifications, function (index, $notification) {
+          $notification_menu_items.append($('<li>').append($('<a>').attr('href', 'https://restarters.dev/notifications/' + $notification.id).text($notification.data.title)).attr('class', 'notifcation-text'));
+        });
+      }
+    }
+  });
+}
+
+ajaxSearchNotifications();
+
+/***/ }),
+
+/***/ 182:
+/***/ (function(module, exports) {
+
+// API call to current site - check for user authenticated
+function checkAuth() {
+  $url = 'https://restarters.dev' + '/test/check-auth';
+
+  $notifications_list_item = $('.notifications-list-item').hide();
+  $auth_menu_items = $('.auth-menu-items').hide();
+  $auth_menu_items.removeClass('dropdown-menu-items');
+
+  $.ajax({
+    headers: {
+      // 'X-CSRF-TOKEN': $("input[name='_token']").val(),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    xhrFields: {
+      withCredentials: true
+    },
+    type: 'GET',
+    url: $url,
+    datatype: 'json',
+    success: function success(response) {
+      $auth_list_item = $('.auth-list-item');
+
+      var response = response.data;
+
+      $main_navigation_dropdown = $('.main-nav-dropdown');
+
+      if (response.authenticated !== null && response.authenticated !== undefined) {
+        $.each(response.menu.reporting, function (key, value) {
+          var spacer_condition = key.includes('spacer');
+
+          var header_condition = key.includes('header');
+
+          if (header_condition) {
+            $main_navigation_dropdown.append($('<li>').attr('class', 'dropdown-menu-header').text(value));
+          } else if (spacer_condition) {
+            $main_navigation_dropdown.append($('<li>').attr('class', 'dropdown-spacer'));
+          } else {
+            $main_navigation_dropdown.append($('<li>').append($('<a>').attr('href', value).text(key)));
+          }
+        });
+
+        $('.regular-user-svg').addClass('d-none');
+        $('.authenticated-user-svg').removeClass('d-none');
+
+        $.each(response.menu.user, function (key, value) {
+          var spacer_condition = key.includes('spacer');
+
+          var header_condition = key.includes('header');
+
+          if (header_condition) {
+            $auth_menu_items.append($('<li>').attr('class', 'dropdown-menu-header').text(value));
+          } else if (spacer_condition) {
+            $auth_menu_items.append($('<li>').attr('class', 'dropdown-spacer'));
+          } else {
+            $auth_menu_items.append($('<li>').append($('<a>').attr('href', value).text(key)));
+          }
+        });
+
+        if ($notifications_list_item.length) {
+          $notifications_list_item.css('display', '');
+        }
+
+        if ($auth_list_item.length) {
+          $auth_menu_items.addClass('dropdown-menu-items');
+          $auth_menu_items.css('display', '');
+        }
+      } else {
+        $auth_list_item.find('a').attr('href', 'https://restarters.dev');
+      }
+
+      // Amend Main navigation dropdown links
+      $.each(response.menu.general, function (key, value) {
+        $main_navigation_dropdown.append($('<li>').append($('<a>').attr('href', value).text(key)));
+      });
+    }
+  });
+}
+
+checkAuth();
+
+/***/ })
+
+/******/ });

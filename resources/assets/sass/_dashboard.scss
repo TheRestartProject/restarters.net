@@ -1,5 +1,5 @@
 .dashboard {
-    padding: 20px 0 0;
+    padding: 0 0 20px 0;
 
     // .container-fluid {
     //     @include media-breakpoint-up(sm) {
@@ -12,11 +12,12 @@
 
     &__aside {
         margin-bottom: 15px;
+        background-color: #fff;
     }
 
     &__block {
         border: 1px solid #D9D9D9;
-        background-color: #F9F9F9;
+        background-color: #fff;
         display: flex;
         flex-direction: column;
         //flex: 1 0 100%;
@@ -102,7 +103,7 @@
         }
 
         &__content {
-            background-color: #F9F9F9;
+            background-color: #fff;
             padding: 20px;
             border-top: 0;
             display: flex;
@@ -352,5 +353,6 @@
 
 #dashboard__header {
     font-family:Asap;
-    font-weight:bold;
+    font-weight: 700;
+    color: #333;
 }
