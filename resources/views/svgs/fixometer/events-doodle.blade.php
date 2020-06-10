@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="47.435" height="58.784" viewBox="0 0 47.435 58.784">
+<svg xmlns="http://www.w3.org/2000/svg" height="76" viewBox="0 0 52 76">
     <defs>
         <style>
             .cls-1{fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-width:2px}

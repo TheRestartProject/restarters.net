@@ -21,29 +21,24 @@
       @endif
 
       <div class="row">
-        <div class="col">
-          <div class="d-flex justify-content-between align-content-center">
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                @if( !is_null($your_groups) )
-                  <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">@lang('groups.groups')</li>
-                @else
-                  <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
-                  <li class="breadcrumb-item"><a href="{{ route('groups') }}">@lang('groups.groups')</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">All groups</li>
-                @endif
-              </ol>
-            </nav>
-            <div class="btn-group button-group-filters">
-              <button class="reveal-filters btn btn-secondary d-lg-none d-xl-none" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal filters</button>
-              @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host') )
-                <a href="{{{ route('create-group') }}}" class="btn btn-primary btn-save">@lang('groups.create_groups')</a>
-              @endif
-            </div>
-          </div>
+          <div class="col-12 col-md-12 mb-50">
+              <div class="d-flex align-items-center">
+                  <h1 class="mb-0 mr-30">
+                      Groups
+                  </h1>
 
-        </div>
+                  <div class="mr-auto d-none d-md-block">
+                      @include('svgs.group.group-doodle')
+                  </div>
+
+                  @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host') )
+                      <a href="{{{ route('create-group') }}}" class="btn btn-primary ml-auto">
+                          <span class="d-none d-lg-block">@lang('groups.create_groups')</span>
+                          <span class="d-block d-lg-none">@lang('groups.create_groups_mobile')</span>
+                      </a>
+                  @endif
+              </div>
+          </div>
       </div>
 
       @if ($all)

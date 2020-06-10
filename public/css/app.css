@@ -17522,7 +17522,7 @@ a.text-dark:focus {
 }
 
 .devices {
-  padding: 70px 0;
+  padding: 0 0 50px 0;
 }
 
 .devices .breadcrumb {
@@ -18417,7 +18417,7 @@ td.col-device-auto {
 }
 
 .dashboard {
-  padding: 20px 0 0;
+  padding: 0 0 20px 0;
 }
 
 .dashboard .container-fluid {
@@ -18426,11 +18426,12 @@ td.col-device-auto {
 
 .dashboard__aside {
   margin-bottom: 15px;
+  background-color: #fff;
 }
 
 .dashboard__block {
   border: 1px solid #D9D9D9;
-  background-color: #F9F9F9;
+  background-color: #fff;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -18527,7 +18528,7 @@ td.col-device-auto {
 }
 
 .dashboard__block__content {
-  background-color: #F9F9F9;
+  background-color: #fff;
   padding: 20px;
   border-top: 0;
   display: -webkit-box;
@@ -18766,7 +18767,8 @@ td.col-device-auto {
 
 #dashboard__header {
   font-family: Asap;
-  font-weight: bold;
+  font-weight: 700;
+  color: #333;
 }
 
 .onboarding .modal {
@@ -20168,7 +20170,7 @@ td.col-device-auto {
 }
 
 .groups {
-  padding: 70px 0;
+  padding: 0 0 50px 0;
 }
 
 .groups .breadcrumb {
@@ -20629,7 +20631,7 @@ td.col-device-auto {
 }
 
 .events {
-  padding: 50px 0;
+  padding: 0 0 50px 0;
   min-height: 100%;
 }
 

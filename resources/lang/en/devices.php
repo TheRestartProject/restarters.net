@@ -5,7 +5,7 @@ return array (
   'field_device_images_2' => 'Choose compelling images that show off your work',
   'useful_repair_urls_helper' => 'Enter URL here',
   'useful_repair_urls_explanation' => 'Useful repair URL',
-  'devices' => 'Repairs',
+  'devices' => 'Fixometer',
   'edit_devices' => 'Edit device',
   'edit_devices_details' => 'Edit device details',
   'edit_devices_details_content' => 'Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.',

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-Repairs
+@lang('devices.devices')
 @endsection
 
 @section('content')
@@ -10,15 +10,21 @@ Repairs
     <section class="devices">
         <div class="container">
             <div class="row">
-                <div class="col">
-                    <div class="d-md-flex justify-content-between align-content-center">
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">@lang('devices.devices')</li>
-                            </ol>
-                        </nav>
+                <div class="col-12 col-md-12">
+                    <div class="d-flex align-items-center">
+                        <h1 id="dashboard__header" class="mb-0 mr-30">
+                            @lang('devices.devices')
+                        </h1>
+                        <div class="mr-auto d-none d-md-block">
+                            @include('svgs.fixometer.fixometer-doodle')
+                        </div>
+
+                        <button data-target="#add-device-modal" data-toggle="modal" aria-expanded="true" aria-controls="add-device-modal" class="btn btn-sm btn-primary ml-auto">
+                            Add Data
+                        </button>
                     </div>
+
+                    <hr class="hr-lg">
                 </div>
             </div>
 
