@@ -14,8 +14,8 @@
     }
 
     &__login {
-        background-color: #F9F9F9;
-        border: 1px solid #E9E9E9;
+        background-color: $brand-white;
+        border: 1px solid $brand;
         padding: 40px 20px 50px 20px;
         display: flex;
         flex: 1 0 auto;
@@ -38,13 +38,15 @@
     }
 
     &__content {
-        background-color: $brand;
-        color: #FFF;
+        background-color: $brand-blue;
+        color: $brand;
         padding: 40px 35px;
         display: flex;
         flex: 1 0 auto;
+        border-color: $brand;
 
         h3 {
+            color: $brand-white;
             font-size: 23px;
             margin: 0 0 15px;
         }
