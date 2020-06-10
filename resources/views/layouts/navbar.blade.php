@@ -15,7 +15,8 @@
 {{-- Left side of the Navigation --}}
 <ul class="nav-left">
     <li>
-    <a href="{{ env('DISCOURSE_URL')."/login" }}" rel="noopener noreferrer">
+
+        <a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}" rel="noopener noreferrer">
         @include('svgs/navigation/talk-icon')
         <span>@lang('general.menu_discourse')</span>
     </a>
@@ -43,7 +44,7 @@
     </li>
 
     <li>
-    <a href="@lang('general.wiki_url')" rel="noopener noreferrer">
+        <a href="{{config('restarters.wiki.base_url') }}" rel="noopener noreferrer">
         @include('svgs/navigation/wiki-icon')
         <span>@lang('general.menu_wiki')</span>
     </a>
