@@ -18923,8 +18923,8 @@ td.col-device-auto {
 }
 
 .card__login {
-  background-color: #F9F9F9;
-  border: 1px solid #E9E9E9;
+  background-color: #fff;
+  border: 1px solid #222;
   padding: 40px 20px 50px 20px;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -18954,8 +18954,8 @@ td.col-device-auto {
 }
 
 .card__content {
-  background-color: #222;
-  color: #FFF;
+  background-color: #0faca8;
+  color: #222;
   padding: 40px 35px;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -18963,9 +18963,11 @@ td.col-device-auto {
   -webkit-box-flex: 1;
       -ms-flex: 1 0 auto;
           flex: 1 0 auto;
+  border-color: #222;
 }
 
 .card__content h3 {
+  color: #fff;
   font-size: 23px;
   margin: 0 0 15px;
 }
@@ -21479,7 +21481,7 @@ body > .container {
 
 .body-plain,
 .body-plain body {
-  background-color: #fff;
+  background-color: #f5f7fa;
 }
 
 .button-group {
