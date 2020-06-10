@@ -16496,8 +16496,8 @@ table.sortable > thead th div.mozilla {
 }
 
 .information-alert {
-  background-color: #fff2df;
-  border: 2px dashed #ffbe5f;
+  background-color: #fff4e4;
+  border: 3px dashed #222;
   border-radius: 15px;
   padding: 20px 45px 20px 35px;
   font-size: 16px;
