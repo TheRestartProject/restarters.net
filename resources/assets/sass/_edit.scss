@@ -1,11 +1,10 @@
 .edit-panel {
-    background-color: #F9F9F9;
-    border: 1px solid #D9D9D9;
-    border-radius: 3px;
+    background-color: #fff;
+    border: 1px solid $brand;
     padding: 20px 20px 20px;
 
     @include media-breakpoint-up(lg) {
-        padding: 50px 45px 40px;
+        padding: 30px;
     }
 
     margin: 0 0 30px 0;

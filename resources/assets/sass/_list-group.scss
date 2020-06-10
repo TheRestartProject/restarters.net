@@ -1,5 +1,6 @@
 
 .list-group {
+    font-family: Asap;
     margin-bottom: 20px;
     .list-group-item {
         font-size: 20px;
@@ -17,7 +18,7 @@
 
         &:focus, &:active {
             text-decoration: none;
-            outline: 2px solid rgba(3, 148, 166, 0.5);
+            outline: 2px solid #222;
             background-color: #fff;
         }
 
@@ -26,9 +27,10 @@
         }
 
         &.active {
-            color: #FFF;
-            background-color: $brand;
-            border-color: $brand;
+            color: $brand;
+            outline: 2px solid #222;
+            background-color: $brand-orange;
+            border-color: $brand-orange;
             border-radius: 2px;
         }
     }
