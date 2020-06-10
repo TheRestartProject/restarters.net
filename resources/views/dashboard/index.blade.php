@@ -25,7 +25,7 @@
                       <span class="icon my-auto d-none">@include('partials.svg-icons.calendar-icon-lg')</span>
                       <div class="action-text mb-0">
                           <div class='mb-2'>
-                            <span class='badge badge-success'>NEW!</span>
+                            <span class='badge badge-warning'>NEW!</span>
                             <strong>Online repair events</strong>
                           </div>
                           <p>Right now, community repair events are happening online. Check the list of <a href="{{ route('all-upcoming-events') }}?online=1">upcoming online events.</a>

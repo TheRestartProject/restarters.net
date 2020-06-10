@@ -14693,6 +14693,67 @@ a.form-text-corrected:focus {
   background-color: #f45b69 !important;
 }
 
+.information-alert {
+  color: #222;
+  background-color: #fff4e4;
+  border: 3px dashed #222;
+  border-radius: 0;
+  padding-left: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 16px;
+  overflow: hidden;
+}
+
+.information-alert a {
+  color: #222;
+  text-decoration: underline;
+}
+
+.information-alert .action-text-left .icon {
+  margin-right: 30px;
+}
+
+.information-alert .action-text-left .action-text {
+  line-height: 22px;
+  padding-right: 30px;
+}
+
+.information-alert .btn-action {
+  min-width: 155px;
+}
+
+.information-alert button.close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto 1.25rem;
+  height: 30px;
+  padding: 0px;
+}
+
+.information-alert button.close span {
+  color: #646464;
+}
+
+.information-alert.set-information-box-margin {
+  margin-top: -25px;
+  margin-bottom: 50px;
+}
+
+@media (max-width: 767.98px) {
+  .information-alert .float-right,
+  .information-alert .btn-action {
+    width: 100%;
+    display: block;
+  }
+
+  .information-alert button.close {
+    margin: 1.25rem;
+  }
+}
+
 .btn,
 .nav-sm-tabs .accordion-tab-header button,
 .nav-md-tabs .accordion-tab-header button,
