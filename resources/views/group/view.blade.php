@@ -4,7 +4,7 @@
 @endsection
 @section('content')
 <section class="events group-view">
-  <div class="container-fluid">
+  <div class="container">
 
       <?php if( isset($_GET['message']) && $_GET['message'] == 'invite' ): ?>
         <div class="alert alert-info" role="alert">
