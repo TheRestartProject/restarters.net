@@ -1,5 +1,5 @@
-<section class="dashboard__block dashboard__block--no-border">
-    <div class="dashboard__block__content dashboard__block__content--background-white dashboard__block__content--top-blue-border">
+<section class="dashboard__block dashboard__block mb-20">
+    <div class="dashboard__block__content dashboard__block__content--background-white">
 
         <div class="d-flex flex-column flex-sm-row justify-content-start">
             <div class="col-sm-3 col-xl-2 statborder">
