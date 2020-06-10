@@ -99,7 +99,7 @@
                     @include('partials.tables.row-events', ['show_invites_count' => true, 'EmissionRatio' => $EmissionRatio])
                   @endforeach
                 @else
-                  <h2>@lang('events.upcoming_for_your_groups')</h2>
+                  <p>@lang('events.no_upcoming_for_your_groups')</p>
                 @endif
               </tbody>
             </table>
