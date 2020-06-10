@@ -89,7 +89,11 @@
   }
 
   &-section {
-    padding: 20px 0;
+    padding: 20px;
+    background-color: $white;
+    margin-top: 30px;
+    border: 1px solid $black;
+    box-shadow: 6px 6px 0 0 $black;
 
     @extend .clear;
   }
