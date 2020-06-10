@@ -117,16 +117,16 @@
 
     }
 
-    .navbar-laravel .badge-talk-notifications {
+    .navbar-wrapper .badge-talk-notifications {
         background-color : #ffbe5f;
     }
 
-    .navbar-laravel .badge-no-notifications {
+    .navbar-wrapper .badge-no-notifications {
          background-color : #ccc;
     }
 
-    .navbar-laravel .badge-no-notifications:hover,
-    .navbar-laravel .badge-no-notifications:focus,
-    .navbar-laravel .badge-no-notifications:active {
+    .navbar-wrapper .badge-no-notifications:hover,
+    .navbar-wrapper .badge-no-notifications:focus,
+    .navbar-wrapper .badge-no-notifications:active {
        background-color : #7e7e7e;
     }

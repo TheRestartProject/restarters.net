@@ -62,14 +62,7 @@
     }
 }
 
-.navbar-laravel {
-    background-color: #FFF;
-    border-bottom: 2px solid #D9D9D9;
-    box-shadow: none;
-    padding: 0;
-    position: relative;
-    z-index: 1000;
-
+.nav-wrapper {
     .navbar-brand,
     .navbar-toggler,
     .navbar-collapse {
@@ -90,9 +83,9 @@
     }
 
     .badge {
+        color: white;
         display: inline-block;
         float: left;
-        //margin: 17px 10px 0 10px;
         font-size: 16px;
         border: 0;
         background-color: #EC7F00;
@@ -118,20 +111,11 @@
 
     .avatar {
         border-radius: 50%;
+        border: 1px solid #ccc;
         background-color: transparent;
         display: inline-block;
         width: 40px;
         height: 40px;
-    }
-
-    .caret {
-        float: right;
-        margin: -25px 0 0 0;
-        font-size: 10px;
-        font-family: $font-family-sans-serif;
-        position: relative;
-        left: 16px;
-        z-index: 1;
     }
 
     .container {
@@ -166,30 +150,10 @@
 
         }
 
-
-
         svg {
             display: block;
             height: 40px;
             width: auto;
-        }
-
-        .caret {
-            font-size: 18px;
-            top: -6px;
-
-            &:after {
-                display: inline-block;
-                width: 0;
-                height: 0;
-                margin-left: 0.255em;
-                vertical-align: 0.255em;
-                content: "";
-                border-top: 0.3em solid;
-                border-right: 0.3em solid transparent;
-                border-bottom: 0;
-                border-left: 0.3em solid transparent;
-            }
         }
 
         &:focus {
@@ -352,9 +316,7 @@
         }
 
         #navbarDropdown {
-            //text-decoration: underline;
             text-decoration: none;
-            //width: 230px;
             border: 0;
             display: flex;
             align-content: center;
