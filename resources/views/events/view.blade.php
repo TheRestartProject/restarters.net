@@ -142,7 +142,7 @@
       <div class="row">
         <div class="col-lg-4">
 
-          <aside class="sidebar-lg-offset">
+          <aside id="event-details" class="sidebar-lg-offset">
 
             <h2>Event details</h2>
             <div class="card events-card">

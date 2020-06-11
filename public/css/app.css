@@ -20155,6 +20155,8 @@ td.col-device-auto {
 
 #dropdownTitle {
   padding-left: 0;
+  font-size: 40px;
+  font-weight: 700;
 }
 
 .groups {
@@ -20771,11 +20773,13 @@ td.col-device-auto {
 
 .events-card {
   padding: 5px;
-  border-radius: 3px;
   margin-bottom: 30px;
-  background-color: #F9F9F9;
-  border: 1px solid #D9D9D9;
   font-size: 14px;
+  background-color: #fff !important;
+  border: 1px solid #222 !important;
+  border-radius: 0 !important;
+  -webkit-box-shadow: 5px 5px #222 !important;
+          box-shadow: 5px 5px #222 !important;
 }
 
 .events-card address {
@@ -20880,7 +20884,7 @@ td.col-device-auto {
   background-color: #F9F9F9;
   border-color: #f5f7fa;
   border-bottom: 1px solid #222;
-  border-radius: 3px 3px 0 0;
+  border-radius: 0;
   padding: 10px 15px;
 }
 
@@ -20893,12 +20897,13 @@ td.col-device-auto {
 .nav-tabs .nav-link.active {
   color: #222;
   border-color: #222;
-  border-bottom: 1px #fff solid;
+  border-bottom: 1px #222 solid;
   background-color: #fff;
 }
 
 .nav-tabs .nav-link:hover {
   text-decoration: underline;
+  border-bottom: 1px #222 solid;
 }
 
 .tab-content {
@@ -20938,6 +20943,10 @@ td.col-device-auto {
   #online-checkbox-group {
     margin-top: 40px;
   }
+}
+
+#events-attendance-tabs {
+  background-color: #fff !important;
 }
 
 .networks {

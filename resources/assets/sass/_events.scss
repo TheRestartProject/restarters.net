@@ -142,11 +142,13 @@
 
     &-card {
         padding: 5px;
-        border-radius: 3px;
         margin-bottom: 30px;
-        background-color: #F9F9F9;
-        border: 1px solid #D9D9D9;
         font-size: 14px;
+
+        background-color: $brand-white !important;
+        border: 1px solid $brand-black !important;
+        border-radius: 0 !important;
+        box-shadow: 5px 5px $brand-black !important;
 
         address {
             margin: 0;
@@ -255,7 +257,7 @@
         background-color: #F9F9F9;
         border-color: $brand-grey;
         border-bottom: 1px solid $brand-black;
-        border-radius: 3px 3px 0 0;
+        border-radius: 0;
         padding: 10px 15px;
 
         svg {
@@ -266,11 +268,12 @@
         &.active {
             color: $brand-black;
             border-color: $brand-black;
-            border-bottom: 1px $brand-white solid;
+            border-bottom: 1px $brand-black solid;
             background-color: $brand-white;
         }
         &:hover {
             text-decoration: underline;
+            border-bottom: 1px $brand-black solid;
         }
     }
 }
@@ -315,4 +318,8 @@
     #online-checkbox-group {
         margin-top: 40px;
     }
+}
+
+#events-attendance-tabs {
+    background-color: $brand-white !important;
 }
