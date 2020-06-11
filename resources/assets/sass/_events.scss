@@ -100,13 +100,14 @@
 
     &__description {
         padding: 15px;
-        border-radius: 3px;
         margin-bottom: 30px;
-        background-color: #F9F9F9;
-        border: 1px solid #D9D9D9;
+        background-color: $brand-white;
+        border: 1px solid $brand-black;
+        box-shadow: 5px 5px $brand-black;
         color: #5A5A5A;
         overflow: hidden;
         @extend .clear;
+        font-size:16px;
 
         button {
             border: 0;
@@ -250,9 +251,10 @@
         font-family: $font-family-sans-serif;
     }
     .nav-link {
-        color: #000;
+        color: #888;
         background-color: #F9F9F9;
-        border-color: #D9D9D9;
+        border-color: $brand-grey;
+        border-bottom: 1px solid $brand-black;
         border-radius: 3px 3px 0 0;
         padding: 10px 15px;
 
@@ -262,10 +264,12 @@
             margin-right: 5px;
         }
         &.active {
-            border-bottom: 1px #F9F9F9 solid;
-            background-color: #F9F9F9;
+            color: $brand-black;
+            border-color: $brand-black;
+            border-bottom: 1px $brand-white solid;
+            background-color: $brand-white;
         }
-        &:hover, &:focus {
+        &:hover {
             text-decoration: underline;
         }
     }

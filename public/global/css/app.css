@@ -14488,6 +14488,17 @@ a.form-text-corrected:focus {
 
 .nav-wrapper .icon-brand {
   margin-right: 50px;
+  /*&.active::before {
+        content: '';
+        width: 100%;
+        position: relative;
+        border-bottom: 7px solid #222;
+        left: 0;
+        right: 0;
+        top: -35px;
+        display: block;
+        margin-bottom: -7px;
+    }*/
 }
 
 .nav-wrapper .nav-left {

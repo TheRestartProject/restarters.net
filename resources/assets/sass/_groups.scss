@@ -1,3 +1,7 @@
+#dropdownTitle {
+    padding-left: 0;
+}
+
 .groups {
     padding: 0 0 50px 0;
 
@@ -106,20 +110,16 @@
 .group-view {
 
     .events-list-wrap, .events-link-wrap{
-      border: 1px #D9D9D9 solid;
+      border: 1px $brand-black solid;
     }
 
     .events-list-wrap {
-      border-top-left-radius: 3px;
-      border-top-right-radius: 3px;
       table {
         margin-bottom: 0;
       }
     }
 
     .events-link-wrap {
-      border-bottom-left-radius: 3px;
-      border-bottom-right-radius: 3px;
       padding-top: 12px;
       padding-bottom: 13px;
       a {
@@ -137,3 +137,9 @@
 }
 
 #headlineStats { min-height: 100px }
+
+#eventsTabContent {
+    background-color: $brand-white;
+    box-shadow: 5px 5px $brand-black;
+    border-color: black;
+}
