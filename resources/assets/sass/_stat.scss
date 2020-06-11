@@ -1,11 +1,9 @@
 .stat {
-    background-color: #F9F9F9;
-    border: 1px solid #D9D9D9;
+    background-color: $brand-white;
     padding: 15px;
     display: flex;
     flex-direction: column;
     flex: 1 0 100%;
-    border-radius: 3px;
     position: relative;
     z-index: 1;
     flex-basis: auto;

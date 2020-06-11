@@ -85,14 +85,6 @@
                   <a class="events__header__url" href="{{{ $group->website }}}" rel="noopener noreferrer">{{{ $group->website }}}</a>
                 @endif
 
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
-                        <li class="breadcrumb-item"><a href="{{ url('/group') }}">@lang('groups.groups')</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">{{{ $group->name }}}</li>
-                    </ol>
-                </nav>
-
                 @php( $groupImage = $group->groupImage )
                 @if( is_object($groupImage) && is_object($groupImage->image) )
                   <img src="{{ asset('/uploads/mid_'. $groupImage->image->path) }}" alt="{{{ $group->name }}} group image" class="event-icon">
@@ -159,14 +151,13 @@
         <div class="row">
             <div class="col-lg-3">
 
-                <h2 id="about-grp">About the group
+                <h2 id="about-grp">About
                   @if( FixometerHelper::hasRole( $user, 'Administrator' ) || $is_host_of_group )
                     <sup>(<a href="{{ url('/group/edit/'.$group->idgroups) }}">Edit group</a>)</sup>
                   @endif
                 </h2>
 
                 <div class="events__description">
-                    <h3 class="events__side__heading" id="description">Description:</h3>
                     <p>{!! str_limit(strip_tags($group->free_text), 160, '...') !!}</p>
                     @if( strlen($group->free_text) > 160 )
                       <button data-toggle="modal" data-target="#group-description"><span>Read more</span></button>
@@ -290,7 +281,7 @@
                     <a class="nav-link" id="past-tab" data-toggle="tab" href="#past" role="tab" aria-controls="past" aria-selected="false">Past</a>
                   </li>
                 </ul>
-                <div class="tab-content" id="myTabContent">
+                <div class="tab-content" id="eventsTabContent">
                   <div class="tab-pane fade show active" id="upcoming-past" role="tabpanel" aria-labelledby="upcoming-past-tab">
 
                     <div class="events-list-wrap">
@@ -351,7 +342,7 @@
 
                 <h2 id="environmental-impact">Environmental impact</h2>
 
-                <div class="row row-compressed-xs">
+                <div class="row row-compressed-xs no-gutters">
                     <div class="col-lg-3 d-flex flex-column">
                         <ul class="properties">
                             <li class="properties__item__full properties__item__half_xs">
@@ -407,7 +398,7 @@
                     ?>
 
                     <div class="col-lg-9 d-flex flex-column">
-                        <div class="row row-compressed-xs">
+                        <div class="row row-compressed-xs no-gutters properties">
                             <div class="col-lg-6 d-flex flex-column">
                                 <div class="stat">
                                     <h3>{{{ $consume_label }}}</h3>
@@ -430,7 +421,7 @@
 
                 <h2 id="device-breakdown">Device breakdown</h2>
 
-                <div class="row row-compressed-xs">
+                <div class="row row-compressed-xs no-gutters">
                     <div class="col-lg-5">
                         <ul class="properties properties__small">
                             <li>

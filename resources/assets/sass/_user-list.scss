@@ -1,9 +1,15 @@
 .users-list {
+
+    .btn-skills {
+        font-size: small;
+    }
+
     padding: 0;
     margin: 0;
     flex-flow: row wrap;
     display: flex;
-    border: 1px #D9D9D9 solid;
+    border: 1px solid $brand-black;
+    background-color: $brand-white;
     border-bottom:0;
 
 
@@ -14,12 +20,10 @@
     }
 
     &-wrap {
-        border-left: 1px #D9D9D9 solid;
-        border-right: 1px #D9D9D9 solid;
-        border-bottom: 1px #D9D9D9 solid;
-        border-radius: 3px;
+        border: 1px solid $brand-black;
         padding: 10px;
         margin-bottom: 15px;
+        box-shadow: 5px 5px $brand-black;
     }
 
     &__remove {
@@ -70,13 +74,12 @@
         padding-left: 60px;
         position: relative;
         font-size: 13px;
-        border-bottom: 1px #D9D9D9 solid;
+        border-bottom: 1px #aaa solid;
         flex: 1 0 100%;
         min-height: 70px;
         @include media-breakpoint-up(lg) {
             flex: 1 0 33.333%;
             max-width: 33.333%;
-            border-right: 1px #D9D9D9 solid;
 
             &:nth-child(3n) {
                 border-right: 0;
@@ -153,6 +156,7 @@
         }
 
         .users-list__more {
+            font-size: small;
             padding: 15px;
             margin: auto;
         }
