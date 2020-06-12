@@ -389,14 +389,21 @@
                 >li {
                     font-size: 15.75px;
                     list-style: none;
-                    margin-bottom: 5px;
+                    margin-bottom: 0;
                     display: block;
                     text-transform: none;
                     font-family: $font-family-sans-serif;
 
                     a {
+                        padding: 0.25em 0.25em;
                         display: block;
                         color: #000;
+
+                        &:hover {
+                            background-color: #ffcc81;
+                            color: #000;
+                            text-decoration: none;
+                        }
                     }
                 }
             }

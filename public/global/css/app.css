@@ -14461,8 +14461,8 @@ a.form-text-corrected:focus {
   }
 }
 
-.nav-wrapper .nav-left > li:hover > a:not(.toggle-dropdown-menu)::before,
-.nav-wrapper .nav-right > li:hover > a:not(.toggle-dropdown-menu)::before {
+.nav-wrapper .nav-left > li:hover > a ::before,
+.nav-wrapper .nav-right > li:hover > a ::before {
   content: '';
   width: 100%;
   position: absolute;
@@ -14473,8 +14473,8 @@ a.form-text-corrected:focus {
 }
 
 @media (max-width: 991.98px) {
-  .nav-wrapper .nav-left > li:hover > a:not(.toggle-dropdown-menu)::before,
-  .nav-wrapper .nav-right > li:hover > a:not(.toggle-dropdown-menu)::before {
+  .nav-wrapper .nav-left > li:hover > a ::before,
+  .nav-wrapper .nav-right > li:hover > a ::before {
     border-bottom: 4px solid #222;
     top: auto;
     bottom: 0;
