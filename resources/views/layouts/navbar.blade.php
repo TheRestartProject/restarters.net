@@ -73,7 +73,7 @@
                                 </div><!-- /badge-group -->
                             </li>
 
-                        <li class="nav-item dropdown">
+                        <li class="nav-item dropdown @if(str_contains(url()->current(), route('profile'))) active @endif">
                             @if (!is_null($user))
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-target="#account-nav" aria-controls="account-nav" data-toggle="collapse" aria-haspopup="true" aria-expanded="false" aria-label="Toggle account navigation" v-pre>
                                 @if ( isset( $user->getProfile($user->id)->path ) && !is_null( $user->getProfile($user->id)->path ) )

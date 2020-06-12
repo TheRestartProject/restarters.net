@@ -16390,17 +16390,10 @@ table.sortable > thead th div.mozilla {
 .alert-success .btn,
 .alert-delete .btn {
   font-family: Asap, sans-serif;
-  padding: 7px 15px;
   line-height: 1.2;
   color: #FFF;
   background-color: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(0, 0, 0, 0.7);
-  border-bottom-width: 3px;
-  font-size: 18px;
-  padding: 8px 28px;
-  display: block;
-  width: 100%;
-  margin-top: 15px;
 }
 
 @media (min-width: 768px) {
@@ -16435,13 +16428,12 @@ table.sortable > thead th div.mozilla {
 }
 
 .alert-success {
-  background-color: #4AC54B;
-}
-
-.alert-success .btn {
-  background-color: #009400;
-  border: 1px solid #007C00;
-  border-bottom-width: 2px;
+  background-color: #fff4e4;
+  border: 3px dashed #222;
+  border-radius: 15px;
+  padding: 20px 45px 20px 35px;
+  font-size: 16px;
+  overflow: hidden;
 }
 
 .alert-danger {
@@ -16671,7 +16663,6 @@ table.sortable > thead th div.mozilla {
 .btn-primary {
   background-color: #222;
   border: 0;
-  border-bottom: 3px solid #155E67;
   color: #FFF;
   font-size: 16px;
   border-radius: 3px;
@@ -16680,15 +16671,12 @@ table.sortable > thead th div.mozilla {
 .btn-primary:focus,
 .btn-primary.dropdown-toggle:focus,
 .btn-primary.dropdown-toggle:active {
-  background-color: #00B0C6;
   color: #FFF;
 }
 
 .btn-primary:hover,
 .btn-primary.dropdown-toggle:hover {
   color: #FFF;
-  background-color: #00B0C6;
-  border-color: #00B0C6;
   text-decoration: underline;
 }
 

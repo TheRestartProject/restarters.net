@@ -19,9 +19,9 @@
     <div class="alert alert-success">
 
       <div class="row">
-        <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.rsvp_message')</div>
-        <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
-          <a href="/party/cancel-invite/{{{ $is_attending->event }}}" class="btn btn-info">@lang('events.rsvp_button')</a>
+        <div class="col-md-8 col-lg-8 d-flex flex-column align-content-center">@lang('events.rsvp_message')</div>
+        <div class="col-md-4 col-lg-4 d-flex flex-column align-content-center">
+          <a href="/party/cancel-invite/{{{ $is_attending->event }}}" class="btn btn-primary">@lang('events.rsvp_button')</a>
         </div>
       </div>
 

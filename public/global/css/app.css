@@ -6556,7 +6556,6 @@ button.bg-dark:focus {
 }
 
 .border-0,
-.alert-success,
 .alert-custom,
 .card-talk,
 .card-talk .card-body,
@@ -6662,7 +6661,6 @@ button.bg-dark:focus {
 }
 
 .rounded-0,
-.alert-success,
 .alert-custom,
 .card-talk,
 .nav-sm-tabs .accordion-tab-header button,
@@ -14667,7 +14665,15 @@ a.form-text-corrected:focus {
 }
 
 .alert-success {
-  background-color: #3fce97 !important;
+  color: #222;
+  background-color: #fff4e4;
+  border: 3px dashed #222;
+  border-radius: 0;
+  padding-left: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  font-size: 16px;
+  overflow: hidden;
 }
 
 .alert-success p {

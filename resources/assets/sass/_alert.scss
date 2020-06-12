@@ -19,17 +19,10 @@
 
         .btn {
             font-family: $font-family-sans-serif;
-            padding: 7px 15px;
             line-height: 1.2;
             color: #FFF;
             background-color: rgba($color: #000000, $alpha: 0.5);
             border:1px solid rgba($color: #000000, $alpha: 0.7);
-            border-bottom-width:3px;
-            font-size: 18px;
-            padding: 8px 28px;
-            display: block;
-            width: 100%;
-            margin-top: 15px;
             @include media-breakpoint-up(md) {
                 margin: auto;
             }
@@ -50,13 +43,18 @@
     }
 
     &-success {
-        background-color: #4AC54B;
+        background-color: #fff4e4;
+        border: 3px dashed #222;
+        border-radius: 15px;
+        padding: 20px 45px 20px 35px;
+        font-size: 16px;
+        overflow: hidden;
 
 
         .btn {
-            background-color: #009400;
-            border:1px solid #007C00;
-            border-bottom-width: 2px;
+            //background-color: #009400;
+            //border:1px solid #007C00;
+            //border-bottom-width: 2px;
         }
 
     }
