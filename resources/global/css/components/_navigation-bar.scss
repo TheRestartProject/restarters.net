@@ -87,7 +87,7 @@
     }
 
     &:hover {
-      > a:not(.toggle-dropdown-menu) {
+      > a:not(.nav-item .dropdown) {
         &::before {
           content: '';
           width: 100%;

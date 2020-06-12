@@ -18218,15 +18218,22 @@ td.col-device-auto {
 .navbar-dropdown > ul > li > ul > li {
   font-size: 15.75px;
   list-style: none;
-  margin-bottom: 5px;
+  margin-bottom: 0;
   display: block;
   text-transform: none;
   font-family: Asap, sans-serif;
 }
 
 .navbar-dropdown > ul > li > ul > li a {
+  padding: 0.25em 0.25em;
   display: block;
   color: #000;
+}
+
+.navbar-dropdown > ul > li > ul > li a:hover {
+  background-color: #ffcc81;
+  color: #000;
+  text-decoration: none;
 }
 
 @media (max-width: 991.98px) {
