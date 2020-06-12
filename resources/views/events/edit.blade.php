@@ -2,18 +2,23 @@
 @section('content')
 <section class="groups">
   <div class="container">
+
+      @if (\Session::has('success'))
+          <div class="alert alert-success">
+              {!! \Session::get('success') !!}
+          </div>
+      @endif
+      @if (\Session::has('warning'))
+          <div class="alert alert-warning">
+              {!! \Session::get('warning') !!}
+          </div>
+      @endif
+
     <div class="row">
       <div class="col">
-        <div class="d-flex justify-content-between align-content-center">
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
-                <li class="breadcrumb-item"><a href="{{{ route('events') }}}">@lang('events.events')</a></li>
-                <li class="breadcrumb-item"><a href="/party/view/{{ $formdata->id }}">{{ str_limit($formdata->venue, 20, '...') }}</a></li>
-                <li class="breadcrumb-item active" aria-current="page">@lang('events.edit_event')</li>
-            </ol>
-          </nav>
-        </div>
+        <h1 class="mb-30 mr-30">
+            Editing <a style="color:black; text-decoration:underline" href="/party/view/{{ $formdata->id }}">{{ $formdata->venue }}</a>
+        </h1>
       </div>
     </div>
 
@@ -46,7 +51,6 @@
               <div class="row">
                 <div class="col-lg-12">
                   <div class="form-group__offset">
-                  <h4>@lang('events.edit_event')</h4>
                   <!-- <p>@lang('events.edit_event_content')</p>-->
                   </div>
                 </div>
@@ -77,7 +81,7 @@
                     @if ( $userInChargeOfMultipleGroups )
                         <div class="row">
                       <div class="col-lg-7">
-                          <div class="form-group">
+                        <div class="form-group">
                       <label for="event_group">@lang('events.field_event_group'):</label>
                       <div class="form-control form-control__select">
                         <select name="group" id="event_group" class="field field select2" required>
@@ -118,7 +122,7 @@
                       <div class="col-lg-7">
                            <div class="form-group">
                         <label for="field_event_time">@lang('events.field_event_time'):</label>
-                        <div class="row row-compressed">
+                        <div class="row">
 
                           <div class="col-6">
                             <input type="time" id="start-time" name="start" class="form-control field" value="{{ date('H:i', strtotime($formdata->start)) }}">
@@ -133,7 +137,7 @@
                       </div>
                       <div class="col-12">
 
-                          <div class="row row-compressed">
+                          <div class="row">
                               <div class="col-md-7">
                                 <div class="form-group">
                                   <label for="autocomplete">@lang('events.field_event_venue'):</label>
@@ -193,7 +197,7 @@
                       @endif
                   </div>
                   <div class="col-lg-2 d-flex align-items-center justify-content-end">
-                      <input type="submit" class="btn btn-primary btn-block btn-create" id="create-event" value="@lang('events.save_event')">
+                      <input type="submit" class="btn btn-primary" id="create-event" value="@lang('events.save_event')">
                   </div>
               </div>
 
