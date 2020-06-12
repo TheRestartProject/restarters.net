@@ -14850,13 +14850,32 @@ a.form-text-corrected:focus {
   fill: #222 !important;
 }
 
+.btn-primary.dropdown-toggle:hover,
+.dropdown-toggle.btn-outline-primary:hover,
+.dropdown-toggle.btn-checkbox:hover {
+  -webkit-box-shadow: 5px 5px 0 0 #222;
+  box-shadow: 5px 5px 0 0 #222;
+  border: 2px solid #222;
+  padding: 9px;
+  background-color: #fff;
+  color: #222;
+  border-color: #222;
+}
+
+.btn-primary.dropdown-toggle:hover:active,
+.dropdown-toggle.btn-outline-primary:hover:active,
+.dropdown-toggle.btn-checkbox:hover:active {
+  color: #fff;
+}
+
 .btn-primary.dropdown-toggle:focus,
 .dropdown-toggle.btn-outline-primary:focus,
 .dropdown-toggle.btn-checkbox:focus,
 .btn-primary.dropdown-toggle:active,
 .dropdown-toggle.btn-outline-primary:active,
 .dropdown-toggle.btn-checkbox:active {
-  border: solid 1px #222;
+  border: solid 2px #222;
+  padding: 9px;
   background-color: #222 !important;
   font-size: 16px;
   font-weight: bold;
@@ -14881,6 +14900,16 @@ a.form-text-corrected:focus {
 .dropdown-toggle.btn-outline-primary:active svg text,
 .dropdown-toggle.btn-checkbox:active svg text {
   fill: #fff !important;
+}
+
+.btn-primary.dropdown-toggle:focus:hover,
+.dropdown-toggle.btn-outline-primary:focus:hover,
+.dropdown-toggle.btn-checkbox:focus:hover,
+.btn-primary.dropdown-toggle:active:hover,
+.dropdown-toggle.btn-outline-primary:active:hover,
+.dropdown-toggle.btn-checkbox:active:hover {
+  padding: 9px;
+  color: #fff !important;
 }
 
 .btn-primary:focus,
@@ -14929,10 +14958,7 @@ a.form-text-corrected:focus {
 
 .btn-primary:hover,
 .btn-outline-primary:hover,
-.btn-checkbox:hover,
-.btn-primary.dropdown-toggle:hover,
-.dropdown-toggle.btn-outline-primary:hover,
-.dropdown-toggle.btn-checkbox:hover {
+.btn-checkbox:hover {
   -webkit-box-shadow: 5px 5px 0 0 #222;
   box-shadow: 5px 5px 0 0 #222;
   border: 2px solid #222;
@@ -14998,7 +15024,6 @@ a.form-text-corrected:focus {
 .btn-group__duo .dropdown:first-child .nav-xl-tabs .accordion-tab-header button,
 .nav-xl-tabs .accordion-tab-header .btn-group__duo .dropdown:first-child button {
   border-radius: 0;
-  border-right: 1px solid #155e67;
 }
 
 .btn-group__duo .dropdown:last-child .btn,
