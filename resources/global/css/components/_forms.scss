@@ -25,6 +25,15 @@
   }
 }
 
+.form-control {
+    font-size: 0.9rem;
+
+    &:focus {
+        background-color: lighten($brand-orange, 25%);
+        font-weight: normal;
+    }
+}
+
 label.form-check-label {
   font-weight: 400;
   font-family: $font-family-second;
@@ -121,7 +130,7 @@ label.form-check-label {
     .select2-selection__choice {
       background-color: $brand-orange;
       color: $black;
-      font-size: 14px;
+      font-size: 11px;
       padding: 0 12px 0 10px;
       border: 2px solid black;
       border-radius: 0;
@@ -155,7 +164,7 @@ label.form-check-label {
       border: 3px solid $black !important;
       -webkit-box-shadow: none;
       box-shadow: none;
-      font-weight: 700;
+      font-weight: normal;
     }
   }
 }
@@ -168,7 +177,7 @@ label.form-check-label {
     border: 3px solid $black !important;
     -webkit-box-shadow: none;
     box-shadow: none;
-    font-weight: 700;
+    font-weight: normal;
   }
 
   &[type="file"] {
