@@ -348,7 +348,7 @@ class PartyController extends Controller
             }
 
             if (is_numeric($idParty)) {
-                return redirect('/party/edit/'.$idParty)->with('response', $response);
+                return redirect('/party/edit/'.$idParty)->with('success', 'Event created!  It will be approved by a coordinator shortly.  You can continue to edit it in the meantime.');
             }
 
             return view('events.create', [

@@ -15737,44 +15737,6 @@ select.form-control:not([class*="select2"]) {
           box-shadow: 6px 6px 0 0 #222;
 }
 
-.table-repair .arrow {
-  -webkit-transform: rotate(0deg);
-          transform: rotate(0deg);
-  display: inline-block;
-  position: relative;
-  z-index: 1;
-}
-
-.table-repair .collapsed .arrow {
-  -webkit-transform: rotate(180deg);
-          transform: rotate(180deg);
-  top: 4px;
-}
-
-.table-repair .badge {
-  margin-right: 8px;
-  width: 60px;
-}
-
-.table-repair tr {
-  border-bottom: 1px solid #d9d9d9;
-}
-
-.table-repair tr th,
-.table-repair tr td {
-  background-color: #f9f9f9;
-}
-
-.table-repair tr th:first-child,
-.table-repair tr td:first-child {
-  padding-left: 10px;
-}
-
-.table-repair tr td {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
 .table-row-details td {
   background-color: #eef0f0 !important;
   padding: 10px;
