@@ -3,19 +3,26 @@
 <section class="groups">
 
   <div class="container">
-    <div class="row">
-      <div class="col">
-        <div class="d-flex justify-content-between align-content-center">
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/">FIXOMETER</a></li>
-              <li class="breadcrumb-item"><a href="/group">@lang('groups.groups')</a></li>
-              <li class="breadcrumb-item"><a href="/group/view/{{{ $formdata->idgroups }}}">{{{ $formdata->name }}}</a></li>
-              <li class="breadcrumb-item active" aria-current="page">@lang('groups.edit_group')</li>
-            </ol>
-          </nav>
+
+        @if (\Session::has('success'))
+            <div class="alert alert-success">
+                {!! \Session::get('success') !!}
+            </div>
+        @endif
+        @if (\Session::has('warning'))
+            <div class="alert alert-warning">
+                {!! \Session::get('warning') !!}
+            </div>
+        @endif
+
+    <div class="row mb-30">
+        <div class="col-12 col-md-12">
+            <div class="d-flex align-items-center">
+                <h1 class="mb-0 mr-30">
+                    Editing <a style="text-decoration:underline;color:black" href="/group/view/{{ $formdata->idgroups }}">{{{ $formdata->name }}}</a>
+                </h1>
+            </div>
         </div>
-      </div>
     </div>
 
     <div class="row justify-content-center">
@@ -52,7 +59,6 @@
 
                 <div class="row">
                   <div class="col-lg-6">
-                    <h4>@lang('groups.edit_group')</h4>
                     <p>@lang('groups.edit_group_text')</p>
                   </div>
                 </div>

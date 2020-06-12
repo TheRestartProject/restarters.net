@@ -119,15 +119,15 @@ label.form-check-label {
     }
 
     .select2-selection__choice {
-      background-color: $white;
+      background-color: $brand-orange;
       color: $black;
       font-size: 14px;
       padding: 0 12px 0 10px;
       border: 2px solid black;
       border-radius: 0;
       line-height: 35px;
-      box-shadow: 6px 6px 0 0 $black;
-      margin-bottom: 5px;
+      box-shadow: 2px 2px 0 0 $black;
+      margin-bottom: 2px;
       text-transform: none;
 
       // FIX: Resolved text wrapping ellipsis

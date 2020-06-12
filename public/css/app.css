@@ -19560,6 +19560,8 @@ td.col-device-auto {
   background-color: #fff;
   border: 1px solid #222;
   padding: 20px 20px 20px;
+  -webkit-box-shadow: 5px 5px #222;
+          box-shadow: 5px 5px #222;
   margin: 0 0 30px 0;
 }
 
@@ -19567,6 +19569,10 @@ td.col-device-auto {
   .edit-panel {
     padding: 30px;
   }
+}
+
+.edit-panel .after-offset {
+  font-size: 13px;
 }
 
 .edit-panel__side {
@@ -19626,6 +19632,7 @@ td.col-device-auto {
 
 .edit-panel label {
   font-size: 16px;
+  font-weight: 700;
 }
 
 .edit-panel .email-options {

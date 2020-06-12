@@ -15214,16 +15214,16 @@ label.form-check-label {
 }
 
 .form-control__select .select2-selection--multiple .select2-selection__choice {
-  background-color: #fff;
+  background-color: #ffbe5f;
   color: #222;
   font-size: 14px;
   padding: 0 12px 0 10px;
   border: 2px solid black;
   border-radius: 0;
   line-height: 35px;
-  -webkit-box-shadow: 6px 6px 0 0 #222;
-          box-shadow: 6px 6px 0 0 #222;
-  margin-bottom: 5px;
+  -webkit-box-shadow: 2px 2px 0 0 #222;
+          box-shadow: 2px 2px 0 0 #222;
+  margin-bottom: 2px;
   text-transform: none;
   white-space: nowrap;
   overflow: hidden;
