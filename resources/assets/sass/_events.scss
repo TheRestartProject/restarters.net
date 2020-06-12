@@ -256,7 +256,6 @@
         color: #888;
         background-color: #F9F9F9;
         border-color: $brand-grey;
-        border-bottom: 1px solid $brand-black;
         border-radius: 0;
         padding: 10px 15px;
 
@@ -268,12 +267,12 @@
         &.active {
             color: $brand-black;
             border-color: $brand-black;
-            border-bottom: 1px $brand-black solid;
+            border-top: 3px solid $brand-black;
+            border-bottom: 1px $brand-white solid;
             background-color: $brand-white;
         }
         &:hover {
             text-decoration: underline;
-            border-bottom: 1px $brand-black solid;
         }
     }
 }

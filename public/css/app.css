@@ -20886,7 +20886,6 @@ td.col-device-auto {
   color: #888;
   background-color: #F9F9F9;
   border-color: #f5f7fa;
-  border-bottom: 1px solid #222;
   border-radius: 0;
   padding: 10px 15px;
 }
@@ -20900,13 +20899,13 @@ td.col-device-auto {
 .nav-tabs .nav-link.active {
   color: #222;
   border-color: #222;
-  border-bottom: 1px #222 solid;
+  border-top: 3px solid #222;
+  border-bottom: 1px #fff solid;
   background-color: #fff;
 }
 
 .nav-tabs .nav-link:hover {
   text-decoration: underline;
-  border-bottom: 1px #222 solid;
 }
 
 .tab-content {
