@@ -2,20 +2,25 @@
 @section('content')
 <section class="groups">
   <div class="container">
-    <div class="row">
-      <div class="col">
-        <div class="d-flex justify-content-between align-content-center">
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">FIXOMETER</a></li>
-                <li class="breadcrumb-item"><a href="/party">@lang('events.event')</a></li>
-                <li class="breadcrumb-item active" aria-current="page">@lang('events.add_event')</li>
-            </ol>
-          </nav>
 
-        </div>
+      @if (\Session::has('success'))
+          <div class="alert alert-success">
+              {!! \Session::get('success') !!}
+          </div>
+      @endif
+      @if (\Session::has('warning'))
+          <div class="alert alert-warning">
+              {!! \Session::get('warning') !!}
+          </div>
+      @endif
+
+      <div class="row">
+          <div class="col">
+              <h1 class="mb-30 mr-30">
+                  Add new event
+              </h1>
+          </div>
       </div>
-    </div>
 
     <div class="row justify-content-center">
       <div class="col-lg-12">
@@ -33,8 +38,6 @@
           <div class="row">
             <div class="col-lg-6">
               <div class="form-group__offset">
-                <h4>@lang('events.add_an_event')</h4>
-                <p>@lang('events.add_event_content')</p>
               </div>
             </div>
           </div>
@@ -123,7 +126,7 @@
 
                       <label for="field_event_time">@lang('events.field_event_time'):</label>
 
-                      <div class="row row-compressed">
+                      <div class="row">
 
                         <div class="col-6">
                           <input type="time" id="start-time" name="start" class="form-control field" required>
@@ -140,7 +143,7 @@
                   </div>
                   <div class="col-12">
 
-                      <div class="row row-compressed">
+                      <div class="row">
                           <div class="col-lg-7">
                             <div class="form-group">
                               <label for="autocomplete">@lang('events.field_event_venue'):</label>
