@@ -15120,6 +15120,15 @@ a.form-text-corrected:focus {
   z-index: 1;
 }
 
+.form-control {
+  font-size: 0.9rem;
+}
+
+.form-control:focus {
+  background-color: #fff2df;
+  font-weight: normal;
+}
+
 label.form-check-label {
   font-weight: 400;
   font-family: "Open Sans", sans-serif;
@@ -15216,7 +15225,7 @@ label.form-check-label {
 .form-control__select .select2-selection--multiple .select2-selection__choice {
   background-color: #ffbe5f;
   color: #222;
-  font-size: 14px;
+  font-size: 11px;
   padding: 0 12px 0 10px;
   border: 2px solid black;
   border-radius: 0;
@@ -15247,7 +15256,7 @@ label.form-check-label {
   border: 3px solid #222 !important;
   -webkit-box-shadow: none;
   box-shadow: none;
-  font-weight: 700;
+  font-weight: normal;
 }
 
 .form-control {
@@ -15259,7 +15268,7 @@ label.form-check-label {
   border: 3px solid #222 !important;
   -webkit-box-shadow: none;
   box-shadow: none;
-  font-weight: 700;
+  font-weight: normal;
 }
 
 .form-control[type="file"] {
