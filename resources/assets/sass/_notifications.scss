@@ -1,14 +1,15 @@
 .notifications {
-    background-color: #FFF;
-    position: fixed;
-    right: 0;
+    position: absolute;
+    right: 200px;
     top: 0;
-    padding-top: 62px;
+    padding-top: 100px;
     width: 350px;
-    height: 100%;
     height: 100vh;
     z-index: 900;
-    box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.17);
+    background-color: #f5f7fa;
+    @include media-breakpoint-down(md) {
+        right: 0;
+    }
 }
 
 .notifications,
@@ -17,6 +18,8 @@
         overflow-y: auto;
         height: 100%;
         width: 100% ;
+        box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.17);
+        background-color: #f5f7fa;
     }
 
     &__inner {

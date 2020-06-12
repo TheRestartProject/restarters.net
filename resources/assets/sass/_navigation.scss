@@ -63,11 +63,14 @@
 }
 
 .nav-wrapper {
+    z-index: 1000;
+    position: relative;
+
     .navbar-brand,
     .navbar-toggler,
     .navbar-collapse {
-        position: relative;
-        z-index: 2;
+        //position: relative;
+        //z-index: 2;
     }
 
     .badge-group {
@@ -431,4 +434,11 @@
         z-index: 1001;
     }
 
+}
+
+
+.collapsing {
+    -webkit-transition: none;
+    transition: none;
+    display: none;
 }
