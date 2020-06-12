@@ -8,6 +8,18 @@
 
 <section class="events events-page">
   <div class="container">
+
+      @if (\Session::has('success'))
+          <div class="alert alert-success">
+              {!! \Session::get('success') !!}
+          </div>
+      @endif
+      @if (\Session::has('warning'))
+          <div class="alert alert-warning">
+              {!! \Session::get('warning') !!}
+          </div>
+      @endif
+
       <div class="row">
           <div class="col-12 col-md-12">
               <div class="d-flex align-items-center">

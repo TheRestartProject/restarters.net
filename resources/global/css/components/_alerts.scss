@@ -1,9 +1,18 @@
 .alert {
   &-success {
-    @extend .border-0;
-    @extend .rounded-0;
+    //@extend .border-0;
+    //@extend .rounded-0;
 
-    background-color: map-get($theme-colors, 'success') !important;
+    //background-color: map-get($theme-colors, 'success') !important;
+    color: #222;
+    background-color: #fff4e4;
+    border: 3px dashed #222;
+    border-radius: 0;
+    padding-left: 15px;
+    padding-top: 15px;
+    padding-bottom:15px;
+    font-size: 16px;
+    overflow: hidden;
 
     p {
       font-size: 18px;
