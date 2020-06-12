@@ -16996,7 +16996,6 @@ table.sortable > thead th div.mozilla {
   min-width: 100%;
   top: -1px !important;
   background-color: #222;
-  border-bottom: 3px solid #155E67;
 }
 
 .button-group .dropdown-item {
@@ -17005,11 +17004,7 @@ table.sortable > thead th div.mozilla {
   color: #FFF;
   font-family: Asap, sans-serif;
   font-size: 16px;
-}
-
-.button-group .dropdown-item:hover,
-.button-group .dropdown-item:focus {
-  background-color: #0062cc;
+  border-radius: 0 !important;
 }
 
 .dropdown-menu__titles {
@@ -17098,15 +17093,6 @@ table.sortable > thead th div.mozilla {
   padding-left: 14px;
 }
 
-.btn-group__duo .dropdown:first-child .btn {
-  border-radius: 3px 0 0 3px;
-  border-right: 1px solid #155E67;
-}
-
-.btn-group__duo .dropdown:last-child .btn {
-  border-radius: 3px;
-}
-
 @media (max-width: 991.98px) {
   .btn-group__duo .dropdown:last-child .btn {
     border-radius: 0 3px 3px 0;
@@ -17118,7 +17104,6 @@ table.sortable > thead th div.mozilla {
   min-width: 100%;
   top: -1px !important;
   background-color: #222;
-  border-bottom: 3px solid #155E67;
 }
 
 .btn-group__duo .dropdown-item {
@@ -17127,11 +17112,6 @@ table.sortable > thead th div.mozilla {
   color: #FFF;
   font-family: Asap, sans-serif;
   font-size: 16px;
-}
-
-.btn-group__duo .dropdown-item:hover,
-.btn-group__duo .dropdown-item:focus {
-  background-color: #0062cc;
 }
 
 @media (max-width: 1199.98px) {
@@ -18106,7 +18086,7 @@ td.col-device-auto {
   }
 }
 
-.dropdown-menu {
+.nav-wrapper .dropdown-menu {
   border-radius: 0;
   background-color: #FFF;
   border: 0;
@@ -18120,12 +18100,12 @@ td.col-device-auto {
 }
 
 @media (max-width: 991.98px) {
-  .dropdown-menu {
+  .nav-wrapper .dropdown-menu {
     left: auto !important;
   }
 }
 
-.dropdown-menu svg path {
+.nav-wrapper .dropdown-menu svg path {
   fill: #aaa;
 }
 
