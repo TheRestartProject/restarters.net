@@ -98,45 +98,6 @@
     @extend .clear;
   }
 
-  &-repair {
-    .arrow {
-      transform: rotate(0deg);
-      display: inline-block;
-      position: relative;
-      z-index: 1;
-    }
-
-    .collapsed {
-      .arrow {
-        transform: rotate(180deg);
-        top: 4px;
-      }
-    }
-
-    .badge {
-      margin-right: 8px;
-      width: 60px;
-    }
-
-    tr {
-      border-bottom: 1px solid #d9d9d9;
-
-      th,
-      td {
-        background-color: #f9f9f9;
-
-        &:first-child {
-          padding-left: 10px;
-        }
-      }
-
-      td {
-        padding-top: 10px;
-        padding-bottom: 10px;
-      }
-    }
-  }
-
   &-row-details {
     td {
       background-color: #eef0f0 !important;
