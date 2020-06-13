@@ -125,7 +125,7 @@ ORDER BY COUNT(o.category) DESC LIMIT 1)
 FROM devices d
 GROUP BY top_opinion
 HAVING top_opinion != '' AND top_opinion != 'Misc'
-ORDER BY items DESC
+ORDER BY items DESC, top_opinion ASC
 ");
         } catch (Exception $exc) {
             echo $exc->getMessage();
@@ -169,8 +169,7 @@ WHERE o.eee = 2
      */
     public function updateDevices() {
 
-//        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_misc_temporary` AS (
-        DB::statement("CREATE TABLE IF NOT EXISTS `devices_misc_temporary` AS (
+        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_misc_temporary` AS (
 SELECT
 d.iddevices,
 COALESCE(ANY_VALUE(a.category),(SELECT o1.category FROM devices_misc_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.category ORDER BY COUNT(o1.category) DESC LIMIT 1)) AS winning_opinion,
@@ -203,7 +202,7 @@ WHERE t.winning_opinion = c.`name`;");
 SET d.category = t.idcategories
 WHERE d.iddevices = t.iddevices AND t.idcategories > 0;");
 
-//        DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_misc_temporary`;");
+        DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_misc_temporary`;");
 
         return $result;
     }

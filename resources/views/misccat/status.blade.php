@@ -61,17 +61,49 @@
                     </div>
                 </div>
             </div>
-        </div>
-        @foreach($status['status'] as $row)
-        <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+        </div>        
+        <?php
+            $summary = [                
+                'todo' => [
+                    'status' => 'Items needing more opinions',
+                    'total' => 0,
+                    ],
+                'misc' => [
+                    'status' => 'Items agreed as Misc',
+                    'total' => 0,
+                    ],
+                'done' => [
+                    'status' => 'Items agreed as non-Misc',
+                    'total' => 0,
+                    ],
+            ];            
+        foreach ($status['status'] as $row) {
+            switch ($row->code) {
+                case -1 :
+                case 5 :
+                    $summary['done']['total'] += $row->total;
+                    break;
+                case 0 : 
+                case 1 : 
+                case 2 : 
+                    $summary['todo']['total'] += $row->total;
+                    break;
+                case 4 : 
+                    $summary['misc']['total'] += $row->total;
+                    break;
+            }
+        }
+        ?>
+        @foreach ($summary as $k => $row)
+        <div class="row problem p-2 mb-2 mx-1 mx-sm-0">
             <div class="col">
                 <div class="row justify-content-center">
-                    <p><strong>@php( print($row->status)) : @php( print($row->total)) </strong></p>
+                    <p><strong>@php( print($row['status']))  : @php( print($row['total'])) </strong></p>
                 </div>                                        
             </div>
-        </div>       
+        </div>        
         @endforeach
-
+        @if (count($status['list_splits']))
         <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
             <div class="col">
                 <div class="row justify-content-center">
@@ -122,7 +154,8 @@
                     </div>
                 </div>
             </div>
-        </div>        
+        </div>
+        @endif
         <div class="row problem p-2 mb-2 mx-1 mx-sm-0">
             <div class="col">
                 <div class="row justify-content-center">
@@ -143,7 +176,7 @@
                 <div class="row justify-content-center small">
                     <div class="col">
                         <?php $i = 0; ?>
-                        @foreach($status['list_recats'] as $row)
+                        @foreach ($status['list_recats'] as $row)
                         <?php $i = $i + $row->items; ?>
                         <div class="row border-grey">
                             <div class="col col-5 text-right">

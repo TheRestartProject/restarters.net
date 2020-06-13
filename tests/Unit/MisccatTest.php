@@ -77,7 +77,6 @@ class MisccatTest extends TestCase {
 
         $Misccat = new Misccat;
         $result = $Misccat->fetchStatus();
-        Log::info($result);                
 
         $this->assertTrue(is_array($result));
         $this->assertTrue(array_key_exists('status', $result), 'fetch_misccat_status: missing key - status');
@@ -106,8 +105,8 @@ class MisccatTest extends TestCase {
 
         $this->assertEquals($result['status'][7]->code, 5, 'fetch_misccat_status: wrong code');
         $this->assertEquals($result['status'][7]->total, 2, 'fetch_misccat_status: wrong total');
-
-
+        
+//        Log::info($result['list_recats']);
         $this->assertEquals(count($result['list_recats']), 3, 'fetch_misccat_status: wrong count for list_recats');
 
         $this->assertEquals($result['list_recats'][0]->items, 1, 'fetch_misccat_status: wrong total for list_recats[0]');
