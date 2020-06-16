@@ -1,18 +1,30 @@
 @extends('layouts.app')
 @section('content')
+<section>
   <div class="container">
-    <div class="row justify-content-end">
-      <div class="col">
-        <div class="d-md-flex justify-content-between">
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
-              <li class="breadcrumb-item active" aria-current="page">USERS</li>
-            </ol>
-          </nav>
-          <div class="button-group-filters">
-            <button class="reveal-filters btn btn-secondary d-md-none d-lg-none d-xl-none" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal filters</button>
-            <a href="#" data-toggle="modal" data-target="#add" class="btn btn-primary">Create new user</a>
+
+      @if (\Session::has('success'))
+          <div class="alert alert-success">
+              {!! \Session::get('success') !!}
+          </div>
+      @endif
+
+      @if (\Session::has('danger'))
+          <div class="alert alert-danger">
+              {!! \Session::get('danger') !!}
+          </div>
+      @endif
+
+
+      <div class="row mb-30">
+          <div class="col-12 col-md-12">
+              <div class="d-flex align-items-center">
+                  <h1 class="mb-0 mr-30">
+                      Users
+                  </h1>
+          <div class="button-group-filters ml-auto">
+            <button class="ml-auto reveal-filters btn btn-secondary d-md-none d-lg-none d-xl-none" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal filters</button>
+            <a href="#" data-toggle="modal" data-target="#add" class="btn btn-primary ml-auto">Create new user</a>
           </div>
         </div>
       </div>
@@ -22,30 +34,16 @@
       @php( FixometerHelper::printResponse($response) )
     @endif
 
-    @if (\Session::has('success'))
-        <div class="alert alert-success">
-            {!! \Session::get('success') !!}
-        </div>
-    @endif
-
-    @if (\Session::has('danger'))
-        <div class="alert alert-danger">
-            {!! \Session::get('danger') !!}
-        </div>
-    @endif
-
     <div class="row justify-content-center">
       <div class="col-md-4 col-lg-3">
         <aside class="collapse d-md-block d-lg-block d-xl-block fixed-overlay" id="collapseFilter">
         <form class="" action="/user/all/search" method="get">
-          <div class="form-row">
+          <div class="form-row d-sm-none">
             <div class="form-group col mobile-search-bar">
-              <button type="submit" class="btn btn-primary btn-block">Search all users</button>
               <button type="button" class="d--lg-none d-xl-none d-md-none mobile-search-bar__close" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><svg width="21" height="21" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Close</title><g><path d="M11.25,10.387l-10.387,-10.387l-0.863,0.863l10.387,10.387l0.863,-0.863Z"/><path d="M0.863,11.25l10.387,-10.387l-0.863,-0.863l-10.387,10.387l0.863,0.863Z"/></g></svg></button>
             </div>
           </div>
-          <div class="block">
-                <h4>By details</h4>
+          <div class="panel p-3">
             <div class="form-row">
               <div class="form-group col">
                 <label for="name">Name:</label>
@@ -124,24 +122,26 @@
                 </div>
               </div>
             </div>
+
+            <button type="submit" class="btn btn-secondary btn-block w-100">Search all users</button>
           </div>
         </form>
         </aside>
       </div>
 
       <div class="col-md-8 col-lg-9">
-        <div class="table-responsive">
+        <div class="table-responsive panel">
           <table class="table table-striped">
             <thead>
               <tr>
                 <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.name') }}">Name</a></th>
-                <th>Email address</th>
-                <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.role') }}">Role</a></th>
-                <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.location') }}">Location</a></th>
-                <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.country') }}">Country</a></th>
-                <th>Groups</th>
-                <th width="90"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.created_at') }}">Joined</a></th>
-                <th width="90"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.updated_at') }}">Last login</a></th>
+                <th class="d-none d-sm-table-cell">Email address</th>
+                <th class=""><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.role') }}">Role</a></th>
+                <th class="d-none d-sm-table-cell"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.location') }}">Location</a></th>
+                <th class="d-none d-sm-table-cell"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.country') }}">Country</a></th>
+                <th class="d-none d-sm-table-cell">Groups</th>
+                <th class="d-none d-sm-table-cell" width="90"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.created_at') }}">Joined</a></th>
+                <th class="d-none d-sm-table-cell" width="90"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.updated_at') }}">Last login</a></th>
               </tr>
             </thead>
             <tbody>
@@ -172,7 +172,7 @@
                           @endif
 
                       </td>
-                      <td>
+                      <td class="d-none d-sm-table-cell">
                         <span class="js-copy hover-pointer popover-usergroups"
                         data-toggle="popover"
                         data-trigger="hover"
@@ -191,15 +191,15 @@
                           {{ $u->role }}
                         @endif
                       </td>
-                      <td>
+                      <td class="d-none d-sm-table-cell">
                         @if (!empty($u->location))
                           <?php echo $u->location; ?>
                         @else
                           N/A
                         @endif
                       </td>
-                      <td>{{ $u->country }}</td>
-                      <td class="text-center">
+                      <td class="d-none d-sm-table-cell">{{ $u->country }}</td>
+                      <td class="d-none d-sm-table-cell text-center">
                         @if (isset($u->groups) && $u->groups->count() > 0)
                             <span class="popover-usergroups" data-toggle="popover" data-html="true" data-content="@include('partials.usergroups-popover')">{{ $u->groups->count() }}</span>
                         @else
@@ -207,11 +207,11 @@
                         @endif
                       </td>
 
-                      <td>
+                      <td  class="d-none d-sm-table-cell">
                         <span title="{{ $u->created_at }}">{{ !is_null($u->created_at) ? $u->created_at->diffForHumans(null, true) : 'Never' }}</span>
                       </td>
 
-                      <td>
+                      <td class="d-none d-sm-table-cell">
                         <span title="{{ $u->lastLogin }}">{{ !is_null($u->lastLogin) ? $u->lastLogin->diffForHumans(null, true) : 'Never' }}</span>
                       </td>
                   </tr>
@@ -219,21 +219,22 @@
               @endforeach
             </tbody>
           </table>
+
+          <div class="d-flex justify-content-center">
+              <nav aria-label="Pagination">
+                  @if (!empty($_GET) || isset($name))
+                      {!! $userlist->appends(Request::except('page'))->links() !!} <!-- 'selected_country' => $selected_country -->
+                  @else
+                      {!! $userlist->links() !!}
+                  @endif
+              </nav>
+          </div>
+
+          <div class="d-flex justify-content-center">
+              Showing {{ $userlist->firstItem() }} to {{ $userlist->lastItem() }} of {{ $userlist->total() }} results
+          </div>
         </div>
 
-        <div class="d-flex justify-content-center">
-          <nav aria-label="Pagination">
-            @if (!empty($_GET) || isset($name))
-              {!! $userlist->appends(Request::except('page'))->links() !!} <!-- 'selected_country' => $selected_country -->
-            @else
-              {!! $userlist->links() !!}
-            @endif
-          </nav>
-        </div>
-
-        <div class="d-flex justify-content-center">
-            Showing {{ $userlist->firstItem() }} to {{ $userlist->lastItem() }} of {{ $userlist->total() }} results
-        </div>
         <br>
         <br>
 
@@ -241,5 +242,6 @@
     </div>
   </div>
 
+</section>
 @include('includes/modals/create-user')
 @endsection
