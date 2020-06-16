@@ -192,7 +192,6 @@ jQuery('.useful-repair-urls').on('change', '.error', clearErrorClass);
 jQuery(function () {
 
   jQuery(document).on('change', 'select[name=repair_status]', function (e) {
-
     $status = $(this).val();
     $repair_details = $(this).parents('form').find('.repair-details-edit');
     $spare_parts = $(this).parents('form').find('.spare-parts');
@@ -205,7 +204,7 @@ jQuery(function () {
       $repair_details.val(0).trigger('change');
 
       // Show spare parts field
-      $spare_parts.parents('.col-device').addClass('col-device-auto');
+      $spare_parts.parents('.col-device').removeClass('d-none').addClass('col-device-auto');
 
       // Reset and hide end of life select
       $barrier.parents('.col-device').addClass('d-none').removeClass('col-device-auto');
@@ -214,10 +213,10 @@ jQuery(function () {
     } else if( $status == 2 ){ // Repairable
 
       // Show repair details field
-      $repair_details.parents('.col-device').addClass('col-device-auto');
+      $repair_details.parents('.col-device').removeClass('d-none').addClass('col-device-auto');
 
       // Show spare parts field
-      $spare_parts.parents('.col-device').addClass('col-device-auto');
+      $spare_parts.parents('.col-device').removeClass('d-none').addClass('col-device-auto');
 
       // Reset and hide end of life select
       $barrier.parents('.col-device').addClass('d-none').removeClass('col-device-auto');
@@ -234,7 +233,7 @@ jQuery(function () {
       $spare_parts.val(0).trigger('change');
 
       // Show end of life field
-      $barrier.parents('.col-device').addClass('col-device-auto');
+      $barrier.parents('.col-device').addClass('col-device-auto').removeClass('d-none');
 
     } else {
 
