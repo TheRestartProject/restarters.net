@@ -63,7 +63,7 @@
         <!-- End Google Tag Manager (noscript) -->
 
         @if (isset($show_login_join_to_anons) && $show_login_join_to_anons)
-            <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
+            <nav class="navbar navbar-expand-md navbar-light nav-laravel">
                 <a class="d-none d-sm-block navbar-brand" role="button" data-toggle="collapse" aria-expanded="false" href="#startMenu" aria-controls="startMenu" aria-label="Toggle start menu">
                     @include('includes/logo')
                 </a>

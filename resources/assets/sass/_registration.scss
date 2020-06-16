@@ -4,6 +4,7 @@
     }
 
     padding: 10px 0;
+    padding-bottom: 50px;
 
     label sup {
         color: #FF0000;
@@ -104,6 +105,7 @@
             margin: 0 0 10px 0;
             color: $brand;
             padding-right: 100px;
+            font-weight: 700;
         }
 
         legend {
@@ -138,6 +140,13 @@
 
         input.checkbox-top {
             margin-top: 5px;
+        }
+    }
+
+    .btn-next, #register-form-submit {
+        &:hover {
+            color: $brand-white;
+            background-color: $brand-black;
         }
     }
 }

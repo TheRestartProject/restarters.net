@@ -1,0 +1,16 @@
+.panel {
+    padding: 30px;
+    background-color: $white;
+    border: 1px solid $black;
+    box-shadow: 6px 6px 0 0 $black;
+
+    p a {
+        color: $brand-black;
+        text-decoration: underline;
+
+        &:hover {
+            color: $brand-black;
+            text-decoration: none;
+        }
+    }
+}
