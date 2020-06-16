@@ -16,7 +16,7 @@
   <td class="text-center" colspan="1">
     @php ($next_upcoming_event = $group->getNextUpcomingEvent())
     @if (is_null($next_upcoming_event))
-      <p>@lang('groups.upcoming_none_planned')</p>
+      @lang('groups.upcoming_none_planned')
     @else
       <a href="/party/view/{{ $next_upcoming_event->idevents }}">
           <div>{{ $next_upcoming_event->getEventDate('D jS M Y') }}</div>

@@ -1,6 +1,5 @@
 @if( !is_null($groups) )
   <section class="table-section" id="all-groups">
-    <h2>@lang('groups.groups_title3')</h2>
 
     <input type="hidden" name="sort_direction" value="{{$sort_direction}}" class="sr-only">
     <input type="radio" name="sort_column" value="name" @if( $sort_column == 'name' ) checked @endif id="label-name" class="sr-only">

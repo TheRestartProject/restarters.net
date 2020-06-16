@@ -40,6 +40,7 @@
     padding-left: 5px;
     padding-right: 5px;
     padding-bottom: 15px;
+    line-height: 1;
   }
 
   td {
@@ -91,7 +92,7 @@
   &-section {
     padding: 20px;
     background-color: $white;
-    margin-top: 30px;
+    margin-bottom: 30px;
     border: 1px solid $black;
     box-shadow: 6px 6px 0 0 $black;
 
@@ -380,7 +381,8 @@
   @extend .align-items-center;
   @extend .flex-row;
 
-  height: 30px;
+  //height: 30px;
+  margin-bottom: 0;
 
   svg {
     max-height: 30px;
