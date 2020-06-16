@@ -16019,7 +16019,7 @@ select.form-control:not([class*="select2"]) {
   height: 8px;
 }
 
-.table tbody tr td .badge {
+#device-table tbody tr td .badge {
   width: 90px;
   height: 30px;
   border-radius: 0;
@@ -16038,19 +16038,19 @@ select.form-control:not([class*="select2"]) {
   margin: 0 auto;
 }
 
-.table tbody tr td .badge-warning {
+#device-table tbody tr td .badge-warning {
   background-color: #ffbe5f;
 }
 
-.table tbody tr td .badge-primary {
+#device-table tbody tr td .badge-primary {
   background-color: #0394a6;
 }
 
-.table tbody tr td .badge-danger {
+#device-table tbody tr td .badge-danger {
   background-color: #f45b69;
 }
 
-.table tbody tr td .badge-secondary {
+#device-table tbody tr td .badge-secondary {
   background-color: #d0dae6;
 }
 

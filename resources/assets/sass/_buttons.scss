@@ -2,30 +2,6 @@
     @include button-size(13px, 25px, 16px, 1, 10px);
     font-family: $font-family-sans-serif;
     white-space: normal;
-
-    /*&.disabled {
-        color: #666B6C;
-        background-color: #D3D9DC;
-        border-color: #B0BBC0;
-        opacity: 1;
-    }
-
-    &:disabled {
-        background-color: #D3D9DC;
-        color: #666B6C;
-        border: 0;
-        border-bottom: 3px solid #B0BBC0;
-        opacity: 1;
-
-        &:hover,
-        &:focus {
-            background-color: #D3D9DC;
-            color: #666B6C;
-            border-bottom: 3px solid #B0BBC0;
-            text-decoration: none;
-            opacity: 1;
-        }
-    }*/
 }
 
 .btn-sm {
@@ -163,28 +139,30 @@
     width: 100%;
     font-size: 16px;
     padding: 16px;
+    padding-bottom: 13px;
     margin-bottom: 15px;
     background-color: #E4E4E4;
     border-bottom: 3px solid #B6B6B6;
     color: #000;
+    border-radius: 0;
 }
 
+// skills buttons
 [type="checkbox"]:focus+label.btn-checkbox {
-    //background-color:  #155E67;
     background-color: #E4E4E4;
-    border-bottom-color: #B6B6B6;
+    padding: 16px;
     color: #000;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
-    //color: #fff;
+    //box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+    border-radius: 0;
 }
 
 [type="checkbox"]:checked+label.btn-checkbox {
-    background-color: $brand;
+    background-color: $brand-orange;
+    padding: 16px;
     border: 0;
-    border-bottom: 3px solid #155E67;
-    color: #FFF;
+    color: $brand-black;
     font-size: 16px;
-    border-radius: 3px;
+    border-radius: 0;
 }
 
 .styled-checkbox {
@@ -328,7 +306,6 @@
         min-width: 100%;
         top: -1px !important;
         background-color: $brand;
-        //border-bottom: 3px solid #155E67;
     }
 
     .dropdown-item {
@@ -442,7 +419,6 @@
             min-width: 100%;
             top: -1px !important;
             background-color: $brand;
-            //border-bottom: 3px solid #155E67;
             // @include media-breakpoint-down(md) {
             //     right: -65px !important;
             //     left: auto !important;

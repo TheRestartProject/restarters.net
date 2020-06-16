@@ -14,7 +14,7 @@
       <div class="modal-body">
 
         <div class="row">
-          <div class="col-md-12 col-lg-7">
+          <div class="col-md-12">
             <p>@lang('events.all_invited_restarters_modal_description')</p>
           </div>
         </div>

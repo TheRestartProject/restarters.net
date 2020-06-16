@@ -1,4 +1,4 @@
-<tr class="volunteer-{{ $volunteer->user }}">
+<tr class="volunteer volunteer-{{ $volunteer->user }}">
 
   @php( $user = $volunteer->volunteer )
 
@@ -6,9 +6,9 @@
     <td class="table-cell-icon">
       @php( $path = $user->getProfile($user->id)->path )
       @if ( is_null($path) )
-        <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="Placeholder avatar" class="rounded">
+        <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="Placeholder avatar">
       @else
-        <img src="{{ asset('/uploads/thumbnail_' . $path) }}" alt="{{ $user->name }}'s avatar" class="rounded">
+        <img src="{{ asset('/uploads/thumbnail_' . $path) }}" alt="{{ $user->name }}'s avatar">
       @endif
     </td>
     <td>
@@ -20,7 +20,7 @@
     @php( $user_skills = $user->userSkills )
     <td>
       @foreach( $user_skills as $skill )
-         {{{ $skill->skillName->skill_name }}}<br>
+         {{{ $skill->skillName->skill_name }}}.
       @endforeach
     </td>
   @else

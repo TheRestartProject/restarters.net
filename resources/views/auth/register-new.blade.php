@@ -31,7 +31,7 @@
           <input name="invite" type="hidden" value="{{ $invite }}">
         @endif
 
-        <aside class="registration__step registration__step--active" id="step-1" aria-labelledby="step-1-form-label">
+        <aside class="panel registration__step registration__step--active" id="step-1" aria-labelledby="step-1-form-label">
             <h3 id="step-1-form-label"> @lang('registration.reg-step-1-heading')</h3>
             <p class="registration__status">@lang('registration.step-1')</p>
 
@@ -54,7 +54,7 @@
 
         </aside>
 
-        <aside class="registration__step" id="step-2" aria-labelledby="step-2-form-label">
+        <aside class="panel registration__step" id="step-2" aria-labelledby="step-2-form-label">
 
             <h3 id="step-2-form-label">@lang('registration.reg-step-2-heading')</h3>
             <p class="registration__status">@lang('registration.step-2')</p>
@@ -175,7 +175,7 @@
 
         </aside>
 
-        <aside class="registration__step" id="step-3" aria-labelledby="step-3-form-label">
+        <aside class="panel registration__step" id="step-3" aria-labelledby="step-3-form-label">
 
             <h3 id="step-3-form-label">@lang('registration.reg-step-3-heading')</h3>
             <p class="registration__status">@lang('registration.step-3')</p>
@@ -212,7 +212,7 @@
 
         </aside>
 
-        <aside class="registration__step" id="step-4" aria-labelledby="step-4-form-label">
+        <aside class="panel registration__step" id="step-4" aria-labelledby="step-4-form-label">
 
             <h3 id="step-4-form-label">@lang('registration.reg-step-4-heading')</h3>
             <p class="registration__status">@lang('registration.step-4')</p>

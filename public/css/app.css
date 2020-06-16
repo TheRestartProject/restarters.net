@@ -16620,29 +16620,6 @@ table.sortable > thead th div.mozilla {
   border-radius: 10px;
   font-family: Asap, sans-serif;
   white-space: normal;
-  /*&.disabled {
-        color: #666B6C;
-        background-color: #D3D9DC;
-        border-color: #B0BBC0;
-        opacity: 1;
-    }
-
-    &:disabled {
-        background-color: #D3D9DC;
-        color: #666B6C;
-        border: 0;
-        border-bottom: 3px solid #B0BBC0;
-        opacity: 1;
-
-        &:hover,
-        &:focus {
-            background-color: #D3D9DC;
-            color: #666B6C;
-            border-bottom: 3px solid #B0BBC0;
-            text-decoration: none;
-            opacity: 1;
-        }
-    }*/
 }
 
 .btn-sm,
@@ -16851,27 +16828,28 @@ table.sortable > thead th div.mozilla {
   width: 100%;
   font-size: 16px;
   padding: 16px;
+  padding-bottom: 13px;
   margin-bottom: 15px;
   background-color: #E4E4E4;
   border-bottom: 3px solid #B6B6B6;
   color: #000;
+  border-radius: 0;
 }
 
 [type="checkbox"]:focus + label.btn-checkbox {
   background-color: #E4E4E4;
-  border-bottom-color: #B6B6B6;
+  padding: 16px;
   color: #000;
-  -webkit-box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
-          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+  border-radius: 0;
 }
 
 [type="checkbox"]:checked + label.btn-checkbox {
-  background-color: #222;
+  background-color: #ffbe5f;
+  padding: 16px;
   border: 0;
-  border-bottom: 3px solid #155E67;
-  color: #FFF;
+  color: #222;
   font-size: 16px;
-  border-radius: 3px;
+  border-radius: 0;
 }
 
 .btn-view {
@@ -17633,6 +17611,7 @@ td.col-device-auto {
 
 .registration {
   padding: 10px 0;
+  padding-bottom: 50px;
 }
 
 @media (min-width: 992px) {
@@ -17747,6 +17726,7 @@ td.col-device-auto {
   margin: 0 0 10px 0;
   color: #222;
   padding-right: 100px;
+  font-weight: 700;
 }
 
 .registration__step legend {
@@ -17782,6 +17762,12 @@ td.col-device-auto {
 
 .registration .form-check input.checkbox-top {
   margin-top: 5px;
+}
+
+.registration .btn-next:hover,
+.registration #register-form-submit:hover {
+  color: #fff;
+  background-color: #222;
 }
 
 /** Main Navigation **/
@@ -22537,10 +22523,29 @@ h5 {
 }
 
 .panel {
-  padding: 20px;
+  padding: 30px;
   background-color: #fff;
   border: 1px solid #000;
   -webkit-box-shadow: 6px 6px 0 0 #000;
           box-shadow: 6px 6px 0 0 #000;
+}
+
+.panel p a {
+  color: #222;
+  text-decoration: underline;
+}
+
+.panel p a:hover {
+  color: #222;
+  text-decoration: none;
+}
+
+tr.volunteer td {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+tr.volunteer td img {
+  border-radius: 50%;
 }
 

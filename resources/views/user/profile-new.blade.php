@@ -8,7 +8,7 @@
             @if (!isset($user->path) || is_null($user->path))
               <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="Profile Picture" class="img-fluid rounded-circle">
             @else
-              <img src="/uploads/{{ $user->path }}" alt="Profile Picture" class="img-fluid rounded-circle">
+              <img src="/uploads/{{ $user->path }}" alt="Profile Picture" class="img-fluid rounded">
             @endif
           </div>
           <div class="col-9 d-flex">
@@ -39,13 +39,10 @@
     </div>
     <br>
     <div class="row justify-content-center">
-     
+
       <div class="col-sm-12 col-md-4 order-md-2">
         <div class="block block__profile">
           <h4>@lang('profile.my_skills')</h4>
-          <!-- <p>
-            Cras mattis consectetur purus sit amet fermentum. Nulla vitae elit libero, a pharetra augue.
-          </p>-->
           <ul class="nav flex-column">
             @if (isset($skills))
               @foreach ($skills as $skill)

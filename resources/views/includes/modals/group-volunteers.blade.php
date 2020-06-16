@@ -14,7 +14,7 @@
       <div class="modal-body">
 
         <div class="row">
-          <div class="col-md-12 col-lg-7">
+          <div class="col-md-12">
             <p>@lang('groups.all_volunteers_group_name_message')</p>
           </div>
         </div>
@@ -34,8 +34,6 @@
             @endforeach
           </tbody>
         </table>
-
-        <a href="/group/join/{{ $group->idgroups }}" class="btn btn-primary" id="join-group">@lang('groups.join_group_button')</a>
 
       </div>
 
