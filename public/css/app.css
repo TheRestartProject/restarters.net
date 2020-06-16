@@ -22530,3 +22530,11 @@ h5 {
   height: 94%;
 }
 
+.panel {
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #000;
+  -webkit-box-shadow: 6px 6px 0 0 #000;
+          box-shadow: 6px 6px 0 0 #000;
+}
+

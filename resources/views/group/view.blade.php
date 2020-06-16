@@ -28,7 +28,7 @@
       @endif
 
       @if ($has_pending_invite)
-          <div class="alert alert-info">
+          <div class="alert alert-success">
               You have an invitation to this group.  Please click 'Join Group' if you would like to join.
           </div>
       @endif

@@ -101,18 +101,17 @@
                 <section style="mt-40 mb-40">
                     <h2>Groups</h2>
 
+                    <div class="panel">
                     <p>
                         There are currently {{ $network->groups->count() }} groups in the {{ $network->name }} network. <a href="/group/all/search?network={{ $network->id }}">View these groups</a>.
                     </p>
-
+                    </div>
 
                 </section>
 
-
-                <h2>@lang('events.events_title_admin')</h2>
-
-                <section>
-                    <div class="table-responsive">
+                <section class="mt-40">
+                    <h2>@lang('events.events_title_admin')</h2>
+                    <div class="table-responsive panel">
                         <table class="table table-events table-striped" role="table">
                             @include('events.tables.headers.head-events-admin-only', ['hide_invite' => true])
                             <tbody>
