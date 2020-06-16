@@ -16,6 +16,36 @@
   @include button-size(0.9em, 0.9em, 0.9rem, 1, 10px);
 }
 
+.btn-secondary {
+    width: auto;
+    border: solid 1px $black;
+    padding: 10px;
+    background-color: $brand-orange;
+    border-radius: 0;
+    font-size: 16px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    text-transform: uppercase;
+    line-height: 1.13;
+    letter-spacing: 1.2px;
+    color: $black;
+    transition: none;
+
+    &:hover {
+        border: 2px solid $black;
+        padding: 9px;
+        background-color: $brand-orange;
+        color: $black;
+        border-color: $black;
+        text-decoration: underline;
+
+        &:active {
+            color: $white;
+        }
+    }
+}
+
 .btn-primary {
   width: auto;
   box-shadow: 5px 5px 0 0 $black;

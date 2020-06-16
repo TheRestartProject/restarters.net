@@ -14803,6 +14803,37 @@ a.form-text-corrected:focus {
   border-radius: 10px;
 }
 
+.btn-secondary {
+  width: auto;
+  border: solid 1px #222;
+  padding: 10px;
+  background-color: #ffbe5f;
+  border-radius: 0;
+  font-size: 16px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  text-transform: uppercase;
+  line-height: 1.13;
+  letter-spacing: 1.2px;
+  color: #222;
+  -webkit-transition: none;
+  transition: none;
+}
+
+.btn-secondary:hover {
+  border: 2px solid #222;
+  padding: 9px;
+  background-color: #ffbe5f;
+  color: #222;
+  border-color: #222;
+  text-decoration: underline;
+}
+
+.btn-secondary:hover:active {
+  color: #fff;
+}
+
 .btn-primary,
 .btn-outline-primary,
 .btn-checkbox {
@@ -15680,6 +15711,7 @@ select.form-control:not([class*="select2"]) {
   padding-left: 5px;
   padding-right: 5px;
   padding-bottom: 15px;
+  line-height: 1;
 }
 
 .table td {
@@ -15731,7 +15763,7 @@ select.form-control:not([class*="select2"]) {
 .table-section {
   padding: 20px;
   background-color: #fff;
-  margin-top: 30px;
+  margin-bottom: 30px;
   border: 1px solid #222;
   -webkit-box-shadow: 6px 6px 0 0 #222;
           box-shadow: 6px 6px 0 0 #222;
@@ -16000,7 +16032,7 @@ select.form-control:not([class*="select2"]) {
 }
 
 .sort-column {
-  height: 30px;
+  margin-bottom: 0;
 }
 
 .sort-column svg {

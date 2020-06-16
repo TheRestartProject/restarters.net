@@ -12,11 +12,11 @@
 
   @php ($next_upcoming_event = $group->getNextUpcomingEvent())
   @if ( is_null($next_upcoming_event) )
-    <td class="text-center">
-      <p>@lang('groups.upcoming_none_planned')</p>
+    <td class="">
+      @lang('groups.upcoming_none_planned')
     </td>
   @else
-    <td class="text-center">
+    <td class="">
         <a href="/party/view/{{ $next_upcoming_event->idevents }}">
             <div>{{ $next_upcoming_event->getEventDate('D jS M Y') }}</div>
         </a>

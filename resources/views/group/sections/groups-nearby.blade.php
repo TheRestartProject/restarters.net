@@ -10,7 +10,7 @@
           @endforeach
         @else
             <tr>
-                <td colspan="13" align="center" class="p-3">
+                <td colspan="5" align="center" class="p-3">
                     @if ($your_area)
                         <p>
                         @lang('groups.no_groups_near_you', ['area' => $your_area])
