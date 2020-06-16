@@ -455,15 +455,18 @@
             color: #FFF;
             font-family: $font-family-sans-serif;
             font-size: 16px;
-
-            &:hover,
-            &:focus {
-                //background-color: $focus1;
-            }
         }
 
     }
 
+}
+
+.dropdown-item {
+    &:active,
+    &.active {
+        background-color: $brand-white !important;
+        color: $brand-black !important;
+    }
 }
 
 .button-group-filters {

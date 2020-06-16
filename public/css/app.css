@@ -3904,9 +3904,9 @@ input[type="button"].btn-block {
 
 .dropdown-item.active,
 .dropdown-item:active {
-  color: #fff;
+  color: #222;
   text-decoration: none;
-  background-color: #007bff;
+  background-color: #fff;
 }
 
 .dropdown-item.disabled,
@@ -17112,6 +17112,12 @@ table.sortable > thead th div.mozilla {
   color: #FFF;
   font-family: Asap, sans-serif;
   font-size: 16px;
+}
+
+.dropdown-item:active,
+.dropdown-item.active {
+  background-color: #fff !important;
+  color: #222 !important;
 }
 
 @media (max-width: 1199.98px) {
