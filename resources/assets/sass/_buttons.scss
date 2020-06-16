@@ -18,20 +18,56 @@
     color: #FFF;
     font-size: 16px;
     border-radius: 3px;
+    width: auto;
+    box-shadow: 5px 5px 0 0 $black;
+    border: solid 1px $black;
+    padding: 10px;
+    background-color: $white;
+    border-radius: 0;
+    font-size: 16px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    text-transform: uppercase;
+    line-height: 1.13;
+    letter-spacing: 1.2px;
+    color: $black;
+    transition: none;
 
-    &:focus,
     &.dropdown-toggle:focus,
     &.dropdown-toggle:active {
         //background-color: #00B0C6;
         color: #FFF;
     }
 
-    &:hover,
     &.dropdown-toggle:hover {
         color: #FFF;
         //background-color: #00B0C6;
         //border-color: #00B0C6;
         text-decoration: underline;
+    }
+
+    &:hover {
+        -webkit-box-shadow: 5px 5px 0 0 $black;
+        box-shadow: 5px 5px 0 0 $black;
+        border: 2px solid $black;
+        padding: 9px;
+        background-color: $white;
+        color: $black;
+        border-color: $black;
+    }
+
+    &:active {
+        background-color: $black !important;
+        color: $white !important;
+        outline-color: black;
+    }
+
+    &:focus {
+        background-color: $black;
+        color: $white;
+        box-shadow: 0 0 0 0.2rem rgba($black, 0.5) !important;
+        border-color: $black !important;
     }
 }
 

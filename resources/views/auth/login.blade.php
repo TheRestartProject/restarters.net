@@ -8,7 +8,7 @@
         <div class="row row-expanded pb-3">
             <div class="col-lg-6 d-flex">
 
-                <form action="{{ route('login') }}" method="post" class="card card__login col-12">
+                <form action="{{ route('login') }}" method="post" class="card card__login col-12 panel">
 
                     @if (\Session::has('success'))
                         <div class="alert alert-success">
@@ -70,8 +70,8 @@
             </div>
             <div class="col-lg-6">
 
-                <div class="card card__content col-12">
-                    <h3>@lang('login.whatis')</h3>
+                <div class="card card__content col-12 panel panel__orange">
+                    <h3 style="font-weight:700">@lang('login.whatis')</h3>
                     @lang('login.whatis_content')
 
                     <a href="/about" class="card__link">@lang('login.more')</a>

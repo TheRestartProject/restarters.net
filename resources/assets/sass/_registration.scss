@@ -145,8 +145,8 @@
 
     .btn-next, #register-form-submit {
         &:hover {
-            color: $brand-white;
-            background-color: $brand-black;
+            color: $brand-black;
+            background-color: $brand-white;
         }
     }
 }
