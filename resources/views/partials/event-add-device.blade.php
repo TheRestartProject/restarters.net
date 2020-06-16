@@ -100,12 +100,12 @@
                                     </div>
                                 </td>
                                 <td class="d-table-cell d-sm-table-cell">
-                                    <input type="submit" class="btn btn-primary btn-add" value="Add">
+                                    <input type="submit" class="btn btn-secondary btn-add" value="Add">
                                 </td>
-                                <td class="d-none d-sm-table-cell">
+                                <td class="d-none">
                                     <div class="form-control form-control__select">
                                         <select name="quantity" class="quantity select2">
-                                            <option value="1">1</option>
+                                            <option selected value="1">1</option>
                                             <option value="2">2</option>
                                             <option value="3">3</option>
                                             <option value="4">4</option>

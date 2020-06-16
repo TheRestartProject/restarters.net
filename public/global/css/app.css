@@ -15202,6 +15202,10 @@ label.form-check-label {
   color: #222;
 }
 
+.select2-results__option {
+  font-size: 0.85rem;
+}
+
 .form-control__select {
   padding: 0 !important;
   height: auto;
@@ -15712,6 +15716,7 @@ select.form-control:not([class*="select2"]) {
   padding-right: 5px;
   padding-bottom: 15px;
   line-height: 1;
+  font-weight: 700;
 }
 
 .table td {
@@ -16056,11 +16061,11 @@ select.form-control:not([class*="select2"]) {
   height: 30px;
   border-radius: 0;
   font-family: Asap;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   font-stretch: normal;
   font-style: normal;
-  line-height: 1.3;
+  line-height: 1.8;
   letter-spacing: 1.2px;
   color: #fff;
   text-transform: uppercase;
