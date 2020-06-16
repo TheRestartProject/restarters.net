@@ -11,7 +11,9 @@
 
         <div class="row justify-content-center">
             <div class="col-12 align-self-center">
-                <h1>Unfortunately, that page could not be found.</h1>
+
+                <div class="panel">
+                    <h1>Unfortunately, that page could not be found.</h1>
 
                 <img class="rounded img-fluid" src="/images/broken-toaster.png" alt="Woman with broken toaster" />
 
@@ -26,7 +28,7 @@
                 @endif
 
                 <p>
-                    You can report the issue by sending an email to <a href="mailto:community@therestartproject.org">community@therestartproject.org</a>, or by posting in the <a href="https://talk.restarters.net/c/restarters-dev">restarters.net development forum</a>.
+                    You can report the issue by sending an email to <a href="mailto:community@therestartproject.org">community@therestartproject.org</a>, or by posting in the <a href="https://talk.restarters.net/c/help/17">restarters.net help forum</a>.
                 </p>
                 <p>
                     Please include the following details in your bug report:
@@ -51,6 +53,8 @@
                     If you continue to get an error, you could try <a href="/logout">logging out</a> and logging back in again.
                 </p>
                 @endif
+
+                </div>
 
             </div>
         </div>
