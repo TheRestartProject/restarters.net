@@ -37,11 +37,10 @@ class JoinEvent extends Notification implements ShouldQueue
             return [];
         }
 
-        $channels = [];
-
         // If we're sending to a registered user, only send by mail channel if opted in to emails.
         if ($this->user !== null) {
-            // Note: in future we will also add the 'database' channel here.
+            $channels[] = 'database';
+
             if ($notifiable->invites) {
                 $channels[] = 'mail';
             }
@@ -63,12 +62,8 @@ class JoinEvent extends Notification implements ShouldQueue
     {
         $subject = 'You\'ve been invited to an upcoming '.$this->arr['group'].' event';
         $greeting = 'Hello!';
-        $introLine = 'You have received this email because you have been invited by '.$this->arr['name'].' to join '.$this->arr['group'].' at an upcoming event:';
+        $introLine = $this->arr['name'].' has invited you to join '.$this->arr['group'].' at an upcoming repair event.';
         $eventDetailsTable = '<table style="margin-left:120px; color:black">
-                                    <tr>
-                                      <td>Group:</td>
-                                      <td>'.$this->arr['group'].'</td>
-                                    </tr>
                                     <tr>
                                     <td>Date:</td>
                                     <td>'.$this->arr['event']->getEventDate('D jS M Y').'</td>
@@ -90,19 +85,19 @@ class JoinEvent extends Notification implements ShouldQueue
                       ->subject($subject)
                       ->greeting($greeting)
                       ->line($introLine)
-                      ->line('')
-                      ->line($eventDetailsTable)
-                      ->line('<br>');
+                      ->line('');
 
                 // Add message from sender if they left one
                 if ( ! is_null($this->arr['message'])) {
-                    $mail->line($this->arr['name'].' attached this message with the invite:')
-                         ->line('')
-                         ->line('"'.nl2br($this->arr['message']).'"')
+                    $mail->line('"'.nl2br($this->arr['message']).'"')
                          ->line('');
                 }
-                $mail->action('RSVP now', $this->arr['url'])
-                     ->line($ignoreLine);
+
+                $mail->line($eventDetailsTable)
+                     ->action('RSVP now', $this->arr['url'])
+                     ->line('')
+                     ->line($ignoreLine)
+                     ->line('');
 
                 return $mail;
             }
@@ -111,20 +106,19 @@ class JoinEvent extends Notification implements ShouldQueue
                   ->subject($subject)
                   ->greeting($greeting)
                   ->line($introLine)
-                  ->line('')
-                  ->line($eventDetailsTable)
-                  ->line('<br>')
-                  ->line('You can turn up on the day, or if you would prefer you can also create an account with us and RSVP online now.');
+                  ->line('');
 
             // Add message from sender if they left one
             if ( ! is_null($this->arr['message'])) {
                 $mail->line('')
-                     ->line($this->arr['name'].' attached this message with the invite:')
-                     ->line('')
                      ->line('"'.nl2br($this->arr['message']).'"');
             }
 
-            $mail->action('RSVP now', $this->arr['url'])
+            $mail->line($eventDetailsTable)
+                 ->action('RSVP now', $this->arr['url'])
+                 ->line('')
+                 ->line('You can turn up on the day, or if you would prefer you can also create an account with us and RSVP online now.')
+                 ->line('')
                  ->line($ignoreLine);
 
             return $mail;
