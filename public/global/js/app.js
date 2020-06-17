@@ -134,9 +134,9 @@ window.onload = function () {
     if (window.location.origin == 'https://wiki.restarters.dev') {
       $('.wiki-nav-item').addClass('active');
 
-      $('.nav-tabs-block li a').removeClass('active');
+      $('.nav-tabs-block li.nav-item a').removeClass('active');
 
-      $('.nav-tabs-block li a[href*="' + window.location.pathname + '"]').each(function () {
+      $('.nav-tabs-block li.nav-item a[href*="' + window.location.pathname + '"]').each(function () {
         $(this).addClass('active');
       });
     }

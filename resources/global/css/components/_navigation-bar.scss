@@ -715,7 +715,7 @@
     display: none;
 }
 
-.dropdown-toggle {
+#navbarDropdown.dropdown-toggle {
     &::after {
         display: none !important;
     }

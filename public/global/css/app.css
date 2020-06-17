@@ -15081,7 +15081,7 @@ a.form-text-corrected:focus {
   display: none;
 }
 
-.dropdown-toggle::after {
+#navbarDropdown.dropdown-toggle::after {
   display: none !important;
 }
 
