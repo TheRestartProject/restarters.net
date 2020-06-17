@@ -44,12 +44,6 @@
     {{-- Events List --}}
     <div class="row justify-content-center">
       <div class="col-lg-12">
-        @if (\Session::has('success'))
-        <div class="alert alert-success" role="alert">
-          {!! \Session::get('success') !!}
-        </div>
-        @endif
-
         {{-- Events to Moderate (Admin Only) --}}
         @if ( FixometerHelper::hasRole(Auth::user(), 'Administrator') && is_null($group) )
             <section class="table-section" id="events-1">
@@ -67,7 +61,7 @@
                       @endforeach
                     @else
                       <tr>
-                        <td colspan="13" align="center" class="p-3">@lang('events.moderation_none')</td>
+                        <td colspan="7" align="center" class="p-3">@lang('events.moderation_none')</td>
                       </tr>
                     @endif
                 </tbody>
@@ -106,12 +100,12 @@
             <table class="table table-events table-striped table-layout-fixed" role="table">
               @include('events.tables.headers.head-events-upcoming-only', ['hide_invite' => false])
               <tbody>
-                @if( !$upcoming_events->isEmpty() )
+                @if( ! $upcoming_events->isEmpty() )
                   @foreach ($upcoming_events as $event)
                     @include('partials.tables.row-events', ['show_invites_count' => true, 'EmissionRatio' => $EmissionRatio])
                   @endforeach
                 @else
-                  <p>@lang('events.no_upcoming_for_your_groups')</p>
+                  <tr><td colspan="7" align="center" class="p-3"><p>@lang('events.no_upcoming_for_your_groups')</p></td></tr>
                 @endif
               </tbody>
             </table>
@@ -124,8 +118,8 @@
         <section class="table-section upcoming_events_in_area" id="events-3">
             <header>
                 <h2>@lang('events.other_events_near_you')</h2>
+                <p>No events near you right now?  See if you can join an <a href="{{ route('all-upcoming-events') }}?online=1">online event</a>.</p>
             </header>
-            <p>No events near you right now?  See if you can join an <a href="{{ route('all-upcoming-events') }}?online=1">online event</a>.</p>
             <div class="table-responsive">
                 <table class="table table-events table-striped" role="table">
                     @include('events.tables.headers.head-events-upcoming-only', ['hide_invite' => false])
