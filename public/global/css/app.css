@@ -15075,6 +15075,10 @@ a.form-text-corrected:focus {
   }
 }
 
+#account-nav ul li span {
+  font-weight: 700;
+}
+
 .collapsing {
   -webkit-transition: none;
   transition: none;
