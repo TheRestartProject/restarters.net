@@ -78,7 +78,7 @@ class CreateWordPressApproveEventPost
                     ['key' => 'party_stats', 'value' => $partyId],
                     ['key' => 'party_lat', 'value' => $data['latitude']],
                     ['key' => 'party_lon', 'value' => $data['longitude']],
-                    ['key' => 'party_online', 'value' => $data['online']],
+                    ['key' => 'party_online', 'value' => $data['online'] ?? 0],
                 ];
 
                 $content = [
