@@ -18254,6 +18254,10 @@ td.col-device-auto {
   }
 }
 
+#account-nav ul li span {
+  font-weight: 700;
+}
+
 .collapsing {
   -webkit-transition: none;
   transition: none;
