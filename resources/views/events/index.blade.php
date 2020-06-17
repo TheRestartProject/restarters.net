@@ -20,7 +20,7 @@
           </div>
       @endif
 
-      <div class="row page-header">
+      <div class="row mb-30">
           <div class="col-12 col-md-12">
               <div class="d-flex align-items-center">
                   <h1 class="mb-0 mr-30">
