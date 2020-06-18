@@ -118,18 +118,20 @@
         }
     }
 
-    }
+}
 
-    .navbar-wrapper .badge-talk-notifications {
-        background-color : #ffbe5f;
-    }
+.badge-group .badge-talk-notifications {
+    background-color : #ffbe5f;
+}
 
-    .navbar-wrapper .badge-no-notifications {
-         background-color : #ccc;
-    }
+.badge-group .badge-no-notifications {
+    background-color : #ccc;
+    color: white;
+}
 
-    .navbar-wrapper .badge-no-notifications:hover,
-    .navbar-wrapper .badge-no-notifications:focus,
-    .navbar-wrapper .badge-no-notifications:active {
-       background-color : #7e7e7e;
-    }
+.badge-group .badge-no-notifications:hover,
+.badge-group .badge-no-notifications:focus,
+.badge-group .badge-no-notifications:active {
+    background-color : #7e7e7e;
+    color: white;
+}

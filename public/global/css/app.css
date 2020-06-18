@@ -14690,6 +14690,32 @@ a.form-text-corrected:focus {
 .nav-wrapper {
   z-index: 1000;
   position: relative;
+  /*.badge {
+        color: white;
+        display: inline-block;
+        float: left;
+        font-size: 16px;
+        border: 0;
+        background-color: #EC7F00;
+        font-weight: 400;
+
+        &:hover,
+        &:focus,
+        &:active {
+            background-color: #AF6713;
+        }
+
+        &:active,
+        &:focus {
+            outline-color: rgba(3, 148, 166, 0.5);
+        }
+
+        span.count {
+            position: relative;
+            z-index: 1;
+            top: 2px;
+        }
+    }*/
 }
 
 .nav-wrapper .badge-group {
@@ -14704,33 +14730,6 @@ a.form-text-corrected:focus {
 .nav-wrapper .chat-count {
   font-size: 16px;
   position: relative;
-  top: 2px;
-}
-
-.nav-wrapper .badge {
-  color: white;
-  display: inline-block;
-  float: left;
-  font-size: 16px;
-  border: 0;
-  background-color: #EC7F00;
-  font-weight: 400;
-}
-
-.nav-wrapper .badge:hover,
-.nav-wrapper .badge:focus,
-.nav-wrapper .badge:active {
-  background-color: #AF6713;
-}
-
-.nav-wrapper .badge:active,
-.nav-wrapper .badge:focus {
-  outline-color: rgba(3, 148, 166, 0.5);
-}
-
-.nav-wrapper .badge span.count {
-  position: relative;
-  z-index: 1;
   top: 2px;
 }
 
