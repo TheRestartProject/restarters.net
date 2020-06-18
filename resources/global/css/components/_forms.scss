@@ -211,3 +211,7 @@ select.form-control:not([class*="select2"]) {
 
   font-size: 14px !important;
 }
+
+#participants_qty, #volunteer_qty {
+    border: none !important;
+}

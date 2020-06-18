@@ -203,9 +203,9 @@
                     <div>
                       <div class="input-group-qty">
                         <label for="participants_qty" class="sr-only">Quantity:</label>
-                        <button class="increase btn-value">+</button>
-                        <input name="participants_qty" id="participants_qty" maxlength="3" value="{{ $formdata->pax }}" title="Qty" class="input-text form-control qty" type="number">
                         <button class="decrease btn-value">–</button>
+                        <input name="participants_qty" id="participants_qty" maxlength="3" value="{{ $formdata->pax }}" title="Qty" class="input-text form-control qty" type="number">
+                        <button class="increase btn-value">+</button>
                       </div>
                     </div>
                     @else
@@ -228,9 +228,9 @@
                       <div>
                         <div class="input-group-qty">
                           <label for="volunteer_qty" class="sr-only">Quantity:</label>
-                          <button class="increaseVolunteers btn-value">+</button>
-                          <input name="volunteer_qty" id="volunteer_qty" maxlength="3" value="{{ $event->volunteers }}" title="Qty" class="input-text form-control qty" type="number">
                           <button class="decreaseVolunteers btn-value">–</button>
+                          <input name="volunteer_qty" id="volunteer_qty" maxlength="3" value="{{ $event->volunteers }}" title="Qty" class="input-text form-control qty" type="number">
+                          <button class="increaseVolunteers btn-value">+</button>
                         </div>
                       </div>
                       @else
