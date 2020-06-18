@@ -224,7 +224,7 @@ class FixometerHelper
      * uses it to format the alert
      * as wished
      * */
-    public static function printResponse($response)
+    public static function printResponse($response, $dismissible = true)
     {
         foreach ($response as $type => $text) {
             switch ($type) {
@@ -245,7 +245,9 @@ class FixometerHelper
 
                     break;
             }
-            echo '<div class="alert alert-'.$type.'  alert-dismissible" role="alert">
+            echo '<div class="alert alert-'.$type;
+            if ($dismissible) echo '  alert-dismissible';
+            echo '" role="alert">
                   <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
                   <i class="fa fa-'.$icon.'"></i> '.$text.'
 

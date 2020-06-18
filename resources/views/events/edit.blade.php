@@ -25,7 +25,7 @@
     <div class="row justify-content-center">
       <div class="col-lg-12">
         @if(isset($response))
-          @php( FixometerHelper::printResponse($response) )
+          @php( FixometerHelper::printResponse($response, false) )
         @endif
 
         <ul class="nav nav-tabs">

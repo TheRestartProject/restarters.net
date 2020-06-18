@@ -502,7 +502,7 @@ class PartyController extends Controller
             if ( ! $u) {
                 $response['danger'] = 'Something went wrong. Please check the data and try again.';
             } else {
-                $response['success'] = '<div class="row"><div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">Event details updated</div><div class="col-md-4 col-lg-3 d-flex flex-column align-content-center"><a href="/party/view/'.$id.'" class="btn btn-success">View event</a></div></div>';
+                $response['success'] = '<div class="row"><div class="col-md-8 col-lg-8 d-flex flex-column align-content-center">Event details updated.</div><div class="col-md-4 col-lg-4 text-right"><a href="/party/view/'.$id.'" class="btn btn-secondary">View event</a></div></div>';
 
                 $theParty = $Party->findThis($id)[0];
 
@@ -1359,7 +1359,7 @@ class PartyController extends Controller
     {
         $user_event = EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->delete();
 
-        return redirect('/party/view/'.$event_id)->with('success', 'You are no longer attending this event');
+        return redirect('/party/view/'.$event_id)->with('success', 'You are no longer attending this event.');
     }
 
     public function addVolunteer(Request $request)
