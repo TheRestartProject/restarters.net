@@ -3,39 +3,30 @@
 @section('content')
 <section class="admin">
   <div class="container">
-    <div class="row">
-      <div class="col">
-        <div class="d-flex justify-content-between align-content-center">
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">FIXOMETER</a></li>
-              <li class="breadcrumb-item"><a href="{{ route('tags') }}">@lang('admin.group-tags')</a></li>
-              <li class="breadcrumb-item active" aria-current="page">@lang('admin.edit-tag')</li>
-            </ol>
-          </nav>
-        </div>
+      @if (\Session::has('success'))
+          <div class="alert alert-success">
+              {!! \Session::get('success') !!}
+          </div>
+      @endif
+
+      @if (\Session::has('danger'))
+          <div class="alert alert-danger">
+              {!! \Session::get('danger') !!}
+          </div>
+      @endif
+
+
+      <div class="row mb-30">
+          <div class="col-12 col-md-12">
+              <div class="d-flex align-items-center">
+                  <h1 class="mb-0 mr-30">
+                      Editing {{ $tag->tag_name }} tag
+                  </h1>
+              </div>
+          </div>
       </div>
-    </div>
 
-    @if (\Session::has('success'))
-        <div class="alert alert-success">
-            {!! \Session::get('success') !!}
-        </div>
-    @endif
-    @if (\Session::has('warning'))
-        <div class="alert alert-warning">
-            {!! \Session::get('warning') !!}
-        </div>
-    @endif
-
-    <div class="edit-panel edit-panel__device">
-         <h2>@lang('admin.edit-group-tag')</h2>
-
-        <div class="row">
-            <div class="col-lg-4">
-                <p>@lang('admin.edit-group-tag-content')</p>
-            </div>
-        </div>
+    <div class="edit-panel">
 
         <form action="/tags/edit/{{ $tag->id }}" method="post">
           @csrf

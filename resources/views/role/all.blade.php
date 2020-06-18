@@ -1,39 +1,54 @@
 @extends('layouts.app')
 @section('content')
-  <div class="container">
-    <div class="row">
-      <div class="col">
-        <div class="d-flex justify-content-between">
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
-              <li class="breadcrumb-item active" aria-current="page">ROLES</li>
-            </ol>
-          </nav>
+<section class="admin">
+    <div class="container">
+        @if (\Session::has('success'))
+        <div class="alert alert-success">
+            {!! \Session::get('success') !!}
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-12">
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Permissions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach($roleList as $role)
-              <tr>
-                  <td><a href="/role/edit/<?php echo $role->id; ?>" title="edit role permissions"><?php echo $role->role; ?></a></td>
-                  <td><?php echo $role->permissions_list; ?></td>
-              </tr>
-              @endforeach
-            </tbody>
-          </table>
+        @endif
+
+        @if (\Session::has('danger'))
+        <div class="alert alert-danger">
+            {!! \Session::get('danger') !!}
         </div>
-      </div>
+        @endif
+
+
+        <div class="row mb-30">
+            <div class="col-12 col-md-12">
+                <div class="d-flex align-items-center">
+                    <h1 class="mb-0 mr-30">
+                        Roles
+                    </h1>
+
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <div class="row">
+            <div class="col-12">
+                <div class="table-responsive table-section">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Permissions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($roleList as $role)
+                            <tr>
+                                <td><a href="/role/edit/<?php echo $role->id; ?>" title="edit role permissions"><?php echo $role->role; ?></a></td>
+                                <td><?php echo $role->permissions_list; ?></td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+</section>
 @endsection

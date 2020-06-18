@@ -16336,7 +16336,7 @@ table.sortable > thead th div.mozilla {
 
 @media (min-width: 992px) {
   .admin {
-    padding: 70px 0;
+    padding: 0 0 50px 0;
   }
 }
 
@@ -16689,8 +16689,8 @@ table.sortable > thead th div.mozilla {
 }
 
 .btn-primary:focus {
-  background-color: #000;
-  color: #fff;
+  background-color: #000 !important;
+  color: #fff !important;
   -webkit-box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.5) !important;
           box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.5) !important;
   border-color: #000 !important;
@@ -18785,10 +18785,6 @@ td.col-device-auto {
   color: #333;
 }
 
-.onboarding .modal {
-  background-color: RGBA(3, 148, 166, 0.5);
-}
-
 .onboarding .modal .close {
   display: none;
   position: absolute;
@@ -20261,7 +20257,6 @@ td.col-device-auto {
 }
 
 .modal-intro {
-  background-color: RGBA(3, 148, 166, 0.5);
   overflow: hidden;
   border-radius: 3px;
 }
@@ -21756,10 +21751,6 @@ table th {
       -ms-flex: 1;
           flex: 1;
   background-color: #E6E6E6;
-}
-
-.ekko-lightbox {
-  background-color: RGBA(3, 148, 166, 0.5);
 }
 
 .text-muted {

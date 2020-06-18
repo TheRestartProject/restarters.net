@@ -64,8 +64,8 @@
     }
 
     &:focus {
-        background-color: $black;
-        color: $white;
+        background-color: $black !important;
+        color: $white !important;
         box-shadow: 0 0 0 0.2rem rgba($black, 0.5) !important;
         border-color: $black !important;
     }
