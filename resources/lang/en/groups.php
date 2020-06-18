@@ -17,6 +17,7 @@ return array (
     'add_groups' => 'Add a group',
     'add_groups_content' => 'Tell us more about your group, so we can create a page for you and help you publicise to potential volunteers and participants.',
     'create_groups' => 'Create new group',
+    'create_groups_mobile' => 'Create',
     'create_group' => 'Create group',
     'groups_title1' => 'Your groups',
     'groups_title2' => 'Groups nearest to you',
