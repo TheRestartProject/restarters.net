@@ -21,6 +21,7 @@ Route::prefix('user')->group(function () {
     Route::post('register/check-valid-email', 'UserController@postEmail');
     Route::post('register/{hash?}', 'UserController@postRegister');
     Route::get('/thumbnail/', 'UserController@getThumbnail');
+    Route::get('/menus/', 'UserController@getUserMenus');
 });
 
 Route::get('/user/forbidden', function () {
