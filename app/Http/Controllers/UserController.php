@@ -1342,10 +1342,18 @@ class UserController extends Controller
         }
     }
 
+
     public static function getThumbnail(Request $request)
     {
-        $user = User::where('email', $request->input('email'))->first();
+        $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
-        return response()->json(config('app.url') . '/uploads/thumbnail_' . $user->getProfile($user->id)->path);
+        if ( isset( $user->getProfile($user->id)->path ) && !is_null( $user->getProfile($user->id)->path ) ) {
+
+            $thumbnailPath = config('app.url') . '/uploads/thumbnail_' . $user->getProfile($user->id)->path;
+        } else {
+            $thumbnailPath = config('app.url') . '/images/placeholder-avatar.png';
+        }
+
+        return response()->json($thumbnailPath);
     }
 }
