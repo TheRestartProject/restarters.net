@@ -19,11 +19,12 @@ use App\Party;
 use App\Notifications\ResetPassword;
 use App\Notifications\AdminNewUser;
 use App\Role;
+use App\RolePermissions;
 use App\Skills;
 use App\User;
 use App\UserGroups;
 use App\UsersSkills;
-use App\RolePermissions;
+use App\WikiSyncStatus;
 use Cache;
 use FixometerHelper;
 use FixometerFile;
@@ -1257,6 +1258,12 @@ class UserController extends Controller
                 $user->longitude = $lat_long[1];
             }
         }
+
+        // Login will occur immediately after this registration has completed.
+        // So wiki account creation will be attempted.
+        // This could in future be made conditional on who the user is,
+        // but for now every single user is given a wiki account.
+        $user->wiki_sync_status = WikiSyncStatus::CreateAtLogin;
 
         $user->save();
 
