@@ -6,6 +6,7 @@ use App\Events\UserDeleted;
 use App\Events\UserUpdated;
 use App\Network;
 use App\UserGroups;
+use App\UsersPermissions;
 
 use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -454,6 +455,20 @@ class User extends Authenticatable implements Auditable
         }
 
         return false;
+    }
+
+    public function hasPermission($permissionName)
+    {
+        $has_permission = UsersPermissions::join('permissions', 'permissions.idpermissions', '=', 'users_permissions.permission_id')
+                        ->where('users_permissions.user_id', $this->id)
+                        ->where('permissions.slug', $permissionName)
+                        ->first();
+
+        if (empty($has_permission)) {
+            return false;
+        }
+
+        return true;
     }
 
     public function getTalkProfileUrl()

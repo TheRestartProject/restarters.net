@@ -1363,7 +1363,7 @@ class UserController extends Controller
 
         $menus = [];
 
-        if ( $user->hasRole('Administrator') || FixometerHelper::hasPermission('verify-translation-access') || $user->hasRole('NetworkCoordinator') ) {
+        if ($user->hasRole('Administrator') || $user->hasPermission('verify-translation-access') || $user->hasRole('NetworkCoordinator')) {
             $items = [];
 
             if ($user->hasRole('Administrator')) {
@@ -1375,8 +1375,8 @@ class UserController extends Controller
                 $items['Roles'] = route('roles');
                 $items[Lang::get('networks.general.networks')] = route('networks.index');
 
-                if (FixometerHelper::hasPermission('verfiy-translation-access')) {
-                    $items['Translations'] = "/translations/view/admin";
+                if ($user->hasPermission('verify-translation-access')) {
+                    $items['Translations'] = url("/translations/view/admin");
                 }
 
                 if ($user->hasRole('NetworkCoordinator')) {
@@ -1397,10 +1397,10 @@ class UserController extends Controller
         if ($user->hasRole('Administrator') || $user->hasRole('Host')) {
 
             $items = [];
-            if ( FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
-                $items[Lang::get('general.time_reporting')] = "/reporting/time-volunteered?a";
+            if ( $user->hasRole('Administrator')) {
+                $items[Lang::get('general.time_reporting')] = url("/reporting/time-volunteered?a");
             }
-            $items[Lang::get('general.party_reporting')] = "/search";
+            $items[Lang::get('general.party_reporting')] = url("/search");
 
             $reportingMenu = [
                 'name' => Lang::get('general.reporting'),
@@ -1414,9 +1414,9 @@ class UserController extends Controller
         $generalMenu = [
             'name' => Lang::get('general.general'),
             'items' => [
-                Lang::get('general.profile') => '/profile/edit/'.$user->id,
-                Lang::get('auth.change_password') => '/profile/edit/'.$user->id.'#change-password',
-                Lang::get('general.logout') => '/logout',
+                Lang::get('general.profile') => url('/profile/edit/'.$user->id),
+                Lang::get('auth.change_password') => url('/profile/edit/'.$user->id.'#change-password'),
+                Lang::get('general.logout') => url('/logout'),
             ],
             'svg' => UserController::generalMenuSvg,
         ];
