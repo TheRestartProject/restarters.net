@@ -8,6 +8,7 @@ return [
 
     'wiki' => [
         'base_url' => env('WIKI_URL'),
+        'cookie_prefix' => env('WIKI_COOKIE_PREFIX', 'wiki_db'),
     ],
 
     'repairdirectory' => [
