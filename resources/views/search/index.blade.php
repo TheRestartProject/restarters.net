@@ -3,39 +3,40 @@
 @section('content')
 
 <section class="events events__filter group-view">
-  <div class="container-fluid">
+  <div class="container">
 
-    <div class="row">
-      <div class="col">
-        <div class="d-flex justify-content-between align-content-center">
+      @if (\Session::has('success'))
+          <div class="alert alert-success">
+              {!! \Session::get('success') !!}
+          </div>
+      @endif
+      @if (\Session::has('warning'))
+          <div class="alert alert-warning">
+              {!! \Session::get('warning') !!}
+          </div>
+      @endif
 
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">FIXOMETER</a></li>
-                    <li class="breadcrumb-item">@lang('events.reporting')</li>
-                    <li class="breadcrumb-item active" aria-current="page">@lang('events.events-filter')</li>
-                </ol>
-            </nav>
+      <div class="row mb-30">
+          <div class="col-12 col-md-12">
+              <div class="d-flex align-items-center">
+                  <h1 class="mb-0 mr-30">
+                      @lang('events.reporting')
+                  </h1>
 
-          @if(isset($PartyList))
-            <div class="btn-group">
+                  @if(isset($PartyList))
+                          <?php
+                          $exportUrl = $_GET;
+                          unset($exportUrl['url']);
+                          $exportUrl = urldecode(http_build_query($exportUrl));
+                          ?>
 
-              <?php
-                $exportUrl = $_GET;
-                unset($exportUrl['url']);
-                $exportUrl = urldecode(http_build_query($exportUrl));
-              ?>
+                          <a class="btn btn-primary ml-auto" href="/export/parties/?<?php echo $exportUrl; ?>">@lang('events.download-results')</a>
 
-              <a class="btn btn-primary" href="/export/parties/?<?php echo $exportUrl; ?>">@lang('events.download-results')</a>
+                  @endif
 
-            </div>
-          @endif
-
-        </div>
+              </div>
+          </div>
       </div>
-    </div>
-
-    <br>
 
     <section class="row">
 
@@ -47,10 +48,8 @@
 
               <input type="hidden" name="fltr" value="<?php echo bin2hex(openssl_random_pseudo_bytes(8)); ?>">
 
-              <button class="btn btn-primary btn-filter" type="submit">@lang('general.filter-results')</button>
               <div class="edit-panel edit-panel__side">
 
-                  <button class="edit-panel__reset reset" data-form="filter-result">Reset</button>
 
                   <div class="form-group">
                       <label for="event_group">@lang('events.by_group'):</label>
@@ -121,6 +120,8 @@
                   </div>
                   @endif
 
+                  <button class="edit-panel__reset reset" data-form="filter-result">Reset</button>
+                  <button class="btn btn-secondary w-100 btn-filter" type="submit">@lang('general.filter-results')</button>
                 </div>
             </form>
 
@@ -190,7 +191,7 @@
                         <div class="table-responsive">
                             <table class="table table-events table-striped" role="table">
 
-                                @include('partials.tables.head-events', ['group_view' => true, 'hide_invite' => true, 'filter_view' => true])
+                                @include('partials.tables.head-events', ['group_view' => true, 'hide_invite' => true, 'filter_view' => true, 'noLogo' => true])
 
                                 <tbody>
 
@@ -226,7 +227,7 @@
                             <div class="table-responsive">
                                 <table class="table table-events table-striped" role="table">
 
-                                    @include('partials.tables.head-events', ['group_view' => true, 'hide_invite' => true, 'filter_view' => true])
+                                    @include('partials.tables.head-events', ['group_view' => true, 'hide_invite' => true, 'filter_view' => true, 'noLogo' => true])
 
                                     <tbody>
 
@@ -242,8 +243,7 @@
                                             {{ $party->getEventName() }}
                                         </a>
                                       </td>
-                                      <td class="cell-date"><?php print date('d/m/Y', strtotime($party->event_date)); ?></td>
-                                      <td class="cell-date"><?php print date('H:i', strtotime($party->start)) . '-' . date('H:i', strtotime($party->end)); ?></td>
+                                      <td class="cell-date"><?php print date('d/m/Y', strtotime($party->event_date)); ?> <?php print date('H:i', strtotime($party->start)) . '-' . date('H:i', strtotime($party->end)); ?></td>
                                       <td class="cell-figure">{{ $party->pax }}</td>
                                       <td class="cell-figure">{{ $party->volunteers }}</td>
                                       <td class="cell-figure">{{ round($party->ewaste) }}<small>kg<small></td>
@@ -269,7 +269,7 @@
 
               <h2 id="environmental-impact">Environmental impact</h2>
 
-              <div class="row row-compressed-xs">
+              <div class="row row-compressed-xs no-gutters">
                   <div class="col-lg-3 d-flex flex-column">
                       <ul class="properties">
                           <li class="properties__item__full properties__item__half_xs">
@@ -317,7 +317,7 @@
                   ?>
 
                   <div class="col-lg-9 d-flex flex-column">
-                      <div class="row row-compressed-xs">
+                      <div class="row row-compressed-xs no-gutters panel">
                           <div class="col-lg-6 d-flex flex-column">
                               <div class="stat">
                                   <h3>{{{ $consume_label }}}</h3>
@@ -340,7 +340,7 @@
 
               <h2 id="device-breakdown">Device breakdown</h2>
 
-              <div class="row row-compressed-xs">
+              <div class="row row-compressed-xs no-gutters">
                   <div class="col-lg-5">
                       <ul class="properties properties__small">
                           <li>

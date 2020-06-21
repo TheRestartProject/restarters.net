@@ -96,7 +96,7 @@ return array (
     'field_event_country' => 'Country',
     'field_add_image' => 'Add images',
     'before_submit_text' => 'Once confirmed by our community lead, your event will be made public on The Restart Project homepage.',
-    'reporting' => 'Reporting',
+    'reporting' => 'Event Reporting',
     'events-filter' => 'Events filter',
     'download-results' => 'Download Results (CSV)',
     'follow_hosting_group' => 'This event is being hosted by :group.  Would you like to follow them?',

@@ -1,7 +1,9 @@
 {{-- Main Events Table Heading --}}
 <thead>
   <tr>
+    @if( !isset($noLogo) )
     <th class="hightlighted" width="10"></th>
+    @endif
 
     @if( !isset($group_view) )
         <th class="table-cell-icon d-none d-sm-table-cell" width="70"> </th>
