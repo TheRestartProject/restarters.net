@@ -223,7 +223,7 @@ function ajaxSearchNotifications() {
   });
 }
 
-ajaxSearchNotifications();
+//ajaxSearchNotifications();
 
 /***/ }),
 
@@ -308,7 +308,7 @@ function checkAuth() {
   });
 }
 
-checkAuth();
+//checkAuth();
 
 /***/ })
 

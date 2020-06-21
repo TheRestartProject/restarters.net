@@ -55,7 +55,8 @@ window.onload = function() {
       }
     }
 
-    if (window.location.origin == 'https://wiki.restarters.dev') {
+      // TODO: how to get this from .env?
+      if (window.location.origin == 'https://wiki.restarters.dev' || window.location.origin == 'https://wiki.restarters.net') {
       $('.wiki-nav-item').addClass('active');
 
       $('.nav-tabs-block li.nav-item a.nav-link').removeClass('active');

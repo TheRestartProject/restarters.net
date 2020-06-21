@@ -96,4 +96,4 @@ function checkAuth() {
   });
 }
 
-checkAuth();
+//checkAuth();

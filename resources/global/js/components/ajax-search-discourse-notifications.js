@@ -49,4 +49,4 @@ function ajaxSearchNotifications() {
   });
 }
 
-ajaxSearchNotifications();
+//ajaxSearchNotifications();
