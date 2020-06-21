@@ -1,4 +1,8 @@
-Header always set Access-Control-Allow-Origin "https://therestartproject.org"
+<IfModule mod_headers.c>
+    SetEnvIf Origin "http(s)?://(www\.)?(therestartproject.org|wiki.restarters.net)$" AccessControlAllowOrigin=$0
+    Header add Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
+    Header set Access-Control-Allow-Credentials true
+</IfModule>
 
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
