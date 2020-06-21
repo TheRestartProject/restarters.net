@@ -12,8 +12,8 @@
             <thead>
                 <tr>
                     <th scope="col">@lang('events.event_name')</th>
-                    <th scope="col" class="cell-date d-none d-sm-block">@lang('events.event_date')</th>
-                    <th scope="col" class="cell-locations"></th>
+                    <th scope="col" class="cell-date d-none d-sm-table-cell">@lang('events.event_date')</th>
+                    <th scope="col" class=""></th>
                 </tr>
             </thead>
             <tbody>
@@ -21,7 +21,7 @@
                   @foreach($past_events as $past_event)
                     <tr>
                         <td class="cell-name"><a href="/party/view/{{ $past_event->idevents }}">{{ $past_event->getEventName() }}</a></td>
-                        <td class="d-none d-sm-block">{{ $past_event->getEventDate() }}</td>
+                        <td class="d-none d-sm-table-cell">{{ $past_event->getEventDate() }}</td>
                         @if( $past_event->allDevices->count() == 0 )
                           <td><a href="/party/view/{{{ $past_event->idevents }}}#devices">@lang('dashboard.log_devices')</a></td>
                         @else
