@@ -16,7 +16,7 @@
           break;
 
         default:
-          $state = 'warning';
+          $state = 'secondary';
           $device = 'n/a';
           break;
     endswitch;

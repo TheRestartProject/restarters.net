@@ -1030,9 +1030,4 @@ class DeviceController extends Controller
     {
         $request->session()->put('column_preferences', $request->input('column_preferences'));
     }
-
-    // public function test() {
-  //   $g = new Device;
-  //   dd($g->export());
-  // }
 }

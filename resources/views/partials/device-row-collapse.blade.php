@@ -1,7 +1,7 @@
 @php( $user_preferences = session('column_preferences') )
 <tr>
     <td colspan="3" class="deviceID">
-        <button type="button" class="btn btn-device-toggle btn-primary collapsed"
+        <button type="button" class="btn btn-device-toggle btn-secondary collapsed"
             data-toggle="collapse" aria-controls="row-{{{ $device->iddevices }}}" aria-expanded="false"
             data-target="#row-{{{ $device->iddevices }}}">
             <span class="btn-state-1">View</span>

@@ -9,7 +9,7 @@ return array (
   'edit_devices' => 'Edit device',
   'edit_devices_details' => 'Edit device details',
   'edit_devices_details_content' => 'Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.',
-  'search_all_devices' => 'Search all devices',
+  'search_all_devices' => 'Search devices',
   'export_device_data' => 'Export device data',
   'by_taxonomy' => 'By taxonomy',
   'by_date' => 'By date',
@@ -63,5 +63,5 @@ return array (
   'repair_info' => 'Repair info',
   'event_info' => 'Event info',
   'suitable_help' => 'Show repairs where the comments have been marked as helpful for future repair attempts.',
-  'number_of_repairs' => 'Number of results',
+  'number_of_repairs' => 'Number of items',
 );
