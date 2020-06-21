@@ -37,7 +37,7 @@ class LogOutOfWiki
         $user = $event->user;
 
         try {
-            foreach ($mediawikiCookieNames as $cookieName) {
+            foreach ($this->mediawikiCookieNames as $cookieName) {
                 $cookieFullName = config('restarters.wiki.cookie_prefix').'_'.$cookieName;
                 \Cookie::queue(\Cookie::forget($cookieFullName));
             }
