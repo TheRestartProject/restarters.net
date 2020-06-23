@@ -2,9 +2,9 @@
   <td class="table-cell-icon" colspan="1">
   @php( $group_image = $group->groupImage )
   @if( is_object($group_image) && is_object($group_image->image) )
-    <img src="{{ asset('/uploads/thumbnail_' . $group_image->image->path) }}" alt="{{{ $group->name }}}">
+    <img class="group-icon" src="{{ asset('/uploads/thumbnail_' . $group_image->image->path) }}" alt="{{{ $group->name }}}">
   @else
-    <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $group->name }}}">
+    <img class="group-icon" src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $group->name }}}">
   @endif
   </td>
   <td colspan="1"><a href="/group/view/{{{ $group->idgroups }}}" title="edit group">{{{ $group->name }}}</a></td>
@@ -13,7 +13,7 @@
   <td colspan="1" class="text-center">{{{ $group->all_hosts_count }}}</td>
   <td colspan="1" class="text-center">{{{ $group->all_restarters_count }}}</td>
 
-  <td class="text-center" colspan="1">
+  <td colspan="1">
     @php ($next_upcoming_event = $group->getNextUpcomingEvent())
     @if (is_null($next_upcoming_event))
       @lang('groups.upcoming_none_planned')

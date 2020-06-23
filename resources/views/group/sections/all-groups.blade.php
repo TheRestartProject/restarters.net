@@ -49,7 +49,7 @@
             @if( FixometerHelper::hasRole(Auth::user(), 'Administrator'))
               <th width="75" scope="col" class="text-center">
                 <label for="label-created" class="sort-column @if( $sort_column == 'created_at' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
-                  {{ __('Created At') }}
+                    @lang('groups.created_at')
                 </label>
               </th>
             @endif

@@ -32,8 +32,8 @@ return array (
     'location' => 'Group location',
     'area' => 'Area',
     'groups_frequency' => 'Frequency',
-    'groups_hosts' => '# Hosts',
-    'groups_restarters' => '# Repairers',
+    'groups_hosts' => 'Hosts',
+    'groups_restarters' => 'Repairers',
     'groups_upcoming_event' => 'Next event',
     'groups_approval_text' => 'Group submissions need to be approved by an administrator',
     'group_tag' => 'Tag',
@@ -91,4 +91,5 @@ return array (
     'no_groups_near_you' => 'We can\'t find any repair groups in our database near to your area (:area).',
     'consider_starting_a_group' => 'Would you like to start or add a group? Have a look at <a href=":resources_url">our resources</a>.',
     'upcoming_none_planned' => 'None planned',
+    'created_at' => 'Created'
 );
