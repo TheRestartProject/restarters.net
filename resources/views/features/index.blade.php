@@ -10,7 +10,7 @@
             @endforeach
         </div>
         <div class="features__end">
-            <a href="{{{ route('registration') }}}" class="btn btn-primary">@lang('general.signmeup')</a>
+            <a href="{{{ route('registration') }}}" style="box-shadow:none" class="btn btn-primary">@lang('general.signmeup')</a>
             <a href="{{{ route('login') }}}" class="btn btn-secondary">@lang('general.login')</a>
         </div>
     </div>
