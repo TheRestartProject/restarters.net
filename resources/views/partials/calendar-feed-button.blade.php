@@ -6,7 +6,7 @@
       <div class="input-group mb-3">
         <input type="text" class="form-control" value="{{ $copy_link }}">
         <div class="input-group-append">
-          <button class="btn btn-primary btn-normal-padding" id="btn-copy" type="button">
+          <button style="box-shadow:none" class="btn btn-primary btn-normal-padding" id="btn-copy" type="button">
             @include('partials.svg-icons.copy-icon')
           </button>
         </div>
