@@ -27,7 +27,7 @@
         </div>
         <form id="save-demographics" action="{{ action('FaultcatController@storeDemographics') }}" method="POST">
             @csrf
-        <div class="row problem p-2 mb-2 mx-1 mx-sm-0 notification">
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 notification">
             <div class="col">
                 <p style="font-weight:bold">I am aged...</p>
                 <div style="margin-bottom:20px">
@@ -70,13 +70,11 @@
                     @endif
                 </div>
             </div>
-        </div>
-            <div class="container fault-type">
-                <div class="container">
+                <div class="container mt-4">
                     <p class="buttons">
                         <button class="btn btn-md btn-success btn-rounded" id="save">
                             <span class="underline">S</span>ave and continue</button>
-                        <a href="/faultcat" id="skip" class="btn btn-md btn-warning btn-rounded">
+                        <a href="/faultcat" id="skip" style="text-decoration:none" class="btn btn-md btn-warning btn-rounded">
                             S<span class="underline">k</span>ip for now
                         </a>
                     </p>

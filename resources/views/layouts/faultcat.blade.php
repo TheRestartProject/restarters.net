@@ -13,7 +13,6 @@
             .show {display: block;}
             .underline {text-decoration: underline;}
             .options {margin-top: 15px;}
-            .problem {border: 5px solid #FFDD57; }
             /*.hero-head {margin-bottom: 1%;}*/
             .tag {margin-bottom: 2px;}
             #Y, #N, #fetch, #change {margin-bottom: 2px;}

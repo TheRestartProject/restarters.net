@@ -9,7 +9,7 @@
 @section('content')
 
 <section class="faultcat">
-    <div class="container mt-1 mt-sm-4">
+    <div class="container mt-1">
         <div class="row row-compressed">
             <div class="col-6">
                 <h1 class="pull-left">FaultCat </h1>
@@ -54,7 +54,7 @@
             </div>
         </div>
         <?php if ($fault) { ?>
-            <div class="row problem p-2 mb-2 mx-1 mx-sm-0 notification">
+            <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 notification">
                 <div class="col">
                     <div class="row">
                         <div class="col">
@@ -99,6 +99,8 @@
             <form id="log-task" action="faultcat" method="POST">
                 @csrf
                 <div class="container fault-type">
+                    <div class="row"> 
+                        <div class="col panel">
                     <div class="container">
                         <input type="hidden" id="iddevices" name="iddevices" value="<?php echo $fault->iddevices; ?>">
                         <input type="hidden" id="fault_type" name="fault_type" value="<?php echo $fault->fault_type; ?>">
@@ -143,6 +145,7 @@
                         </div>
                     </div>
                 </div>
+                    </div></div>
             </form>
         <?php } ?>
 

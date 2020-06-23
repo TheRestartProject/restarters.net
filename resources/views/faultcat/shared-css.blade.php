@@ -49,8 +49,6 @@
     .problem {
         font-size: 1rem;
         background-color: #FFF;
-        border: 5px solid #FFDD57;
-        border-radius: 5px;        
     }
 
     .tag {

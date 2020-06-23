@@ -9,12 +9,12 @@
 @section('content')
 
 <section class="misccat">
-    <div class="container mt-1 mt-sm-4">
+    <div class="container mt-1">
         <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>
         <div class="row row-compressed">
             <div class="col-6">
-                <h1 class="pull-left">MiscCat </h1>
-            </div>            
+                <h1 class="pull-left">MiscCat</h1>
+            </div>
             <div class="col-6 pull-right">
                 <!--
             These images are licensed under the Creative Commons Attribution 4.0 International license.
@@ -34,7 +34,7 @@
             </div>
         </div>
         @if (isset($misc))
-            <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+            <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
                 <div class="col">
                     <p><span class="statement">WE SAW THIS AT A REPAIR EVENT</span></p>
                     <p>
@@ -65,9 +65,8 @@
                 <input type="hidden" id="category" name="category" value="Misc">
                 @csrf
             </form>
-            <div class="row p-2 mb-2 mx-1 mx-sm-0 justify-content-center misccat options">
-                <div class="col">    
-                    <!--<span class="statement">WHAT KIND OF ITEM IS IT?</span><br>-->
+            <div class="row panel p-2 mb-2 mx-1 mx-sm-0 justify-content-center misccat options">
+                <div class="col">
                     <p><span class="question">WHAT KIND OF ITEM IS IT?</span></p>
                     <div id="eee-radios" class="container">
                         <span id="q1"><strong>1. Does it use
