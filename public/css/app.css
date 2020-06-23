@@ -20345,6 +20345,10 @@ td.col-device-auto {
   border-color: black;
 }
 
+.table-cell-icon .group-icon {
+  margin: 8px 0;
+}
+
 .popover-group {
   bottom: 2px;
   left: 5px;
