@@ -9,6 +9,7 @@ use DB;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 
 class MisccatTest extends TestCase {
 
@@ -27,7 +28,7 @@ class MisccatTest extends TestCase {
 
         $devices = 5;
         $this->_insert_misccat_devices($devices);
-        
+
         $iddevices = array_fill(1, $devices, 0);
         $Misccat = new Misccat;
         for ($i = 0; $i < 100; $i++) {
@@ -57,191 +58,9 @@ class MisccatTest extends TestCase {
         $this->assertEquals($iddevices[3], 0, 'fetch_misccat_record: records fetched for iddevices=3');
     }
 
-    /** @test */
-    public function fetch_misccat_status() {
-
-        $devices = 7;
-        $this->_insert_misccat_devices($devices);
-
-        // 3 opinions with consensus for cat1
-        $misccat = factory(Misccat::class, 3)->states('cat1')->create([
-            'iddevices' => 1,
-        ]);
-
-        // 2 opinions with majority for cat2
-        $misccat = factory(Misccat::class, 2)->states('cat2')->create([
-            'iddevices' => 2,
-        ]);
-
-        // 1 opinion
-        $misccat = factory(Misccat::class, 1)->states('cat3')->create([
-            'iddevices' => 3,
-        ]);
-
-        // 3 opinions split
-        $misccat = factory(Misccat::class, 1)->states('cat1')->create([
-            'iddevices' => 4,
-        ]);
-        $misccat = factory(Misccat::class, 1)->states('cat2')->create([
-            'iddevices' => 4,
-        ]);
-        $misccat = factory(Misccat::class, 1)->states('cat3')->create([
-            'iddevices' => 4,
-        ]);
-        
-        // "Misc" category opinions - consensus
-        $misccat = factory(Misccat::class, 3)->states('misc')->create([
-            'iddevices' => 5,
-        ]);
-        
-        // "Misc" category opinions - majority
-        $misccat = factory(Misccat::class, 2)->states('misc')->create([
-            'iddevices' => 6,
-        ]);
-        $misccat = factory(Misccat::class, 1)->states('cat1')->create([
-            'iddevices' => 6,
-        ]);
-
-
-        $Misccat = new Misccat;
-        $result = $Misccat->fetchStatus();
-
-        $this->assertTrue(is_array($result));
-        $this->assertTrue(array_key_exists('total_devices', $result), 'fetch_misccat_status: missing key - total_devices');
-        $this->assertEquals($result['total_devices'][0]->total, 7);
-        $this->assertTrue(array_key_exists('total_opinions_3', $result), 'fetch_misccat_status: missing key - total_opinions_3');
-        $this->assertEquals($result['total_opinions_3'][0]->total, 4);
-        $this->assertTrue(array_key_exists('total_opinions_2', $result), 'fetch_misccat_status: missing key - total_opinions_2');
-        $this->assertEquals($result['total_opinions_2'][0]->total, 1);
-        $this->assertTrue(array_key_exists('total_opinions_1', $result), 'fetch_misccat_status: missing key - total_opinions_1');
-        $this->assertEquals($result['total_opinions_1'][0]->total, 1);
-        $this->assertTrue(array_key_exists('total_opinions_0', $result), 'fetch_misccat_status: missing key - total_opinions_0');
-        $this->assertEquals($result['total_opinions_0'][0]->total, 1);
-        $this->assertTrue(array_key_exists('total_recats', $result), 'fetch_misccat_status: missing key - total_recats');
-        $this->assertEquals($result['total_recats'][0]->total, 2);
-        $this->assertTrue(array_key_exists('total_recats_misc', $result), 'fetch_misccat_status: missing key - total_recats');
-        $this->assertEquals($result['total_recats_misc'][0]->total, 2);
-
-
-        $this->assertEquals(count($result['list_recats']), 2, 'fetch_misccat_status: wrong count for list_recats');
-
-        $this->assertEquals($result['list_recats'][0]->items, 1, 'fetch_misccat_status: wrong iddevices for list_recats[0]');
-        $this->assertEquals($result['list_recats'][0]->top_crowd_opinion, 'cat1', 'fetch_misccat_status: wrong top_crowd_opinion for list_recats[0]');
-        $this->assertEquals($result['list_recats'][0]->top_crowd_opinion_percentage, 100, 'fetch_misccat_status: wrong top_crowd_opinion_percentage for list_recats[0]');
-        $this->assertEquals($result['list_recats'][0]->all_crowd_opinions_count, 3, 'fetch_misccat_status: wrong all_crowd_opinions_count for list_recats[0]');
-        $this->assertEquals($result['list_recats'][0]->opinions, 'cat1,cat1,cat1', 'fetch_misccat_status: wrong opinions for list_recats[0]');
-
-        $this->assertEquals($result['list_recats'][1]->items, 1, 'fetch_misccat_status: wrong iddevices for list_recats[1]');
-        $this->assertEquals($result['list_recats'][1]->top_crowd_opinion, 'cat2', 'fetch_misccat_status: wrong top_crowd_opinion for list_recats[1]');
-        $this->assertEquals($result['list_recats'][1]->top_crowd_opinion_percentage, 100, 'fetch_misccat_status: wrong top_crowd_opinion_percentage for list_recats[1]');
-        $this->assertEquals($result['list_recats'][1]->all_crowd_opinions_count, 2, 'fetch_misccat_status: wrong all_crowd_opinions_count for list_recats[1]');
-        $this->assertEquals($result['list_recats'][1]->opinions, 'cat2,cat2', 'fetch_misccat_status: wrong opinions for list_recats[1]');
-        
-        $this->assertEquals(count($result['list_recats_misc']), 2, 'fetch_misccat_status: wrong count for list_recats');
-
-        $this->assertEquals($result['list_recats_misc'][0]->items, 1, 'fetch_misccat_status: wrong iddevices for list_recats_misc[0]');
-        $this->assertEquals($result['list_recats_misc'][0]->top_crowd_opinion, 'Misc', 'fetch_misccat_status: wrong top_crowd_opinion for list_recats_misc[0]');
-        $this->assertEquals($result['list_recats_misc'][0]->top_crowd_opinion_percentage, 67, 'fetch_misccat_status: wrong top_crowd_opinion_percentage for list_recats_misc[0]');
-        $this->assertEquals($result['list_recats_misc'][0]->all_crowd_opinions_count, 3, 'fetch_misccat_status: wrong all_crowd_opinions_count for list_recats_misc[0]');
-        $this->assertEquals($result['list_recats_misc'][0]->opinions, 'cat1,Misc,Misc', 'fetch_misccat_status: wrong opinions for list_recats_misc[0]');
-
-        $this->assertEquals($result['list_recats_misc'][1]->items, 1, 'fetch_misccat_status: wrong iddevices for list_recats_misc[1]');
-        $this->assertEquals($result['list_recats_misc'][1]->top_crowd_opinion, 'Misc', 'fetch_misccat_status: wrong top_crowd_opinion for list_recats_misc[1]');
-        $this->assertEquals($result['list_recats_misc'][1]->top_crowd_opinion_percentage, 100, 'fetch_misccat_status: wrong top_crowd_opinion_percentage for list_recats_misc[1]');
-        $this->assertEquals($result['list_recats_misc'][1]->all_crowd_opinions_count, 3, 'fetch_misccat_status: wrong all_crowd_opinions_count for list_recats_misc[1]');
-        $this->assertEquals($result['list_recats_misc'][1]->opinions, 'Misc,Misc,Misc', 'fetch_misccat_status: wrong opinions for list_recats_misc[1]');        
-
-        $this->assertTrue(array_key_exists('total_splits', $result), 'fetch_misccat_status: missing key - total_splits');
-        $this->assertEquals($result['total_splits'][0]->total, 1);
-
-        $this->assertEquals(count($result['list_splits']), 1, 'fetch_misccat_status: wrong count for list_splits');
-
-        $this->assertEquals($result['list_splits'][0]->iddevices, 4, 'fetch_misccat_status: wrong iddevices for list_splits[0]');
-        $this->assertEquals($result['list_splits'][0]->top_crowd_opinion_percentage, 33, 'fetch_misccat_status: wrong top_crowd_opinion_percentage for list_splits[0]');
-        $this->assertEquals($result['list_splits'][0]->all_crowd_opinions_count, 3, 'fetch_misccat_status: wrong all_crowd_opinions_count for list_splits[0]');
-        $this->assertEquals($result['list_splits'][0]->opinions, 'cat1,cat2,cat3', 'fetch_misccat_status: wrong opinions for list_splits[0]');
-    }
-
-    /** @test */
-    public function update_misccat_devices() {
-
-        $devices = 5;
-        $this->_insert_misccat_devices($devices);
-
-        factory(Category::class, 1)->states('misc')->create();
-        factory(Category::class, 1)->states('cat1')->create();
-        factory(Category::class, 1)->states('cat2')->create();
-        factory(Category::class, 1)->states('cat3')->create();
-
-        // 3 opinions with consensus for cat1
-        $misccat = factory(Misccat::class, 3)->states('cat1')->create([
-            'iddevices' => 1,
-        ]);
-
-        // 2 opinions with majority for cat2
-        $misccat = factory(Misccat::class, 2)->states('cat2')->create([
-            'iddevices' => 2,
-        ]);
-
-        // 1 opinion
-        $misccat = factory(Misccat::class, 1)->states('cat3')->create([
-            'iddevices' => 3,
-        ]);
-
-        // 3 opinions split
-        $misccat = factory(Misccat::class, 1)->states('cat1')->create([
-            'iddevices' => 4,
-        ]);
-        $misccat = factory(Misccat::class, 1)->states('cat2')->create([
-            'iddevices' => 4,
-        ]);
-        $misccat = factory(Misccat::class, 1)->states('cat3')->create([
-            'iddevices' => 4,
-        ]);
-
-        // "new" category opinions
-        $misccat = factory(Misccat::class, 2)->create([
-            'iddevices' => 5,
-            'category' => 'foo',
-        ]);
-        $misccat = factory(Misccat::class, 1)->create([
-            'iddevices' => 5,
-            'category' => 'bar',
-        ]);
-        
-        $Misccat = new Misccat;
-        $result = $Misccat->updateDevices();
-        $this->assertDatabaseHas('devices', [
-            'iddevices' => 1,
-            'category' => 1,
-            'category_creation' => 46,
-        ]);
-        $this->assertDatabaseHas('devices', [
-            'iddevices' => 2,
-            'category' => 2,
-            'category_creation' => 46,
-        ]);
-        $this->assertDatabaseHas('devices', [
-            'iddevices' => 3,
-            'category' => 46,
-            'category_creation' => 46,
-        ]);
-        $this->assertDatabaseHas('devices', [
-            'iddevices' => 4,
-            'category' => 46,
-            'category_creation' => 46,
-        ]);
-        $this->assertDatabaseHas('devices', [
-            'iddevices' => 5,
-            'category' => 46,
-            'category_creation' => 46,
-        ]);
-    }
-
     protected function _insert_misccat_devices($num) {
 
         $device = factory(Device::class, $num)->states('misccat')->create();
-
         for ($i = 1; $i <= $num; $i++) {
             $this->assertDatabaseHas('devices', [
                 'iddevices' => $i,
@@ -249,6 +68,351 @@ class MisccatTest extends TestCase {
                 'category_creation' => 46,
             ]);
         }
+    }
+
+    /** @test */
+    public function fetch_misccat_status() {
+
+        $this->_setup_data();
+
+        $Misccat = new Misccat;
+        $result = $Misccat->fetchStatus();
+
+        $this->assertTrue(is_array($result));
+        $this->assertTrue(array_key_exists('status', $result), 'fetch_misccat_status: missing key - status');
+        $this->assertEquals(count($result['status']), 8, 'fetch_misccat_status: result array wrong number of elements');
+
+        $this->assertEquals($result['status'][0]->code, -2, 'fetch_misccat_status: wrong code');
+        $this->assertEquals($result['status'][0]->total, 1, 'fetch_misccat_status: wrong total');
+
+        $this->assertEquals($result['status'][1]->code, -1, 'fetch_misccat_status: wrong code');
+        $this->assertEquals($result['status'][1]->total, 1, 'fetch_misccat_status: wrong total');
+
+        $this->assertEquals($result['status'][2]->code, 0, 'fetch_misccat_status: wrong code');
+        $this->assertEquals($result['status'][2]->total, 1, 'fetch_misccat_status: wrong total');
+
+        $this->assertEquals($result['status'][3]->code, 1, 'fetch_misccat_status: wrong code');
+        $this->assertEquals($result['status'][3]->total, 1, 'fetch_misccat_status: wrong total');
+
+        $this->assertEquals($result['status'][4]->code, 2, 'fetch_misccat_status: wrong code');
+        $this->assertEquals($result['status'][4]->total, 1, 'fetch_misccat_status: wrong total');
+
+        $this->assertEquals($result['status'][5]->code, 3, 'fetch_misccat_status: wrong code');
+        $this->assertEquals($result['status'][5]->total, 1, 'fetch_misccat_status: wrong total');
+
+        $this->assertEquals($result['status'][6]->code, 4, 'fetch_misccat_status: wrong code');
+        $this->assertEquals($result['status'][6]->total, 3, 'fetch_misccat_status: wrong total');
+
+        $this->assertEquals($result['status'][7]->code, 5, 'fetch_misccat_status: wrong code');
+        $this->assertEquals($result['status'][7]->total, 2, 'fetch_misccat_status: wrong total');
+        
+//        Log::info($result['list_recats']);
+        $this->assertEquals(count($result['list_recats']), 3, 'fetch_misccat_status: wrong count for list_recats');
+
+        $this->assertEquals($result['list_recats'][0]->items, 1, 'fetch_misccat_status: wrong total for list_recats[0]');
+        $this->assertEquals($result['list_recats'][0]->top_opinion, 'Cat1', 'fetch_misccat_status: wrong top_opinion for list_recats[0]');
+        
+        $this->assertEquals($result['list_recats'][1]->items, 1, 'fetch_misccat_status: wrong total for list_recats[1]');
+        $this->assertEquals($result['list_recats'][1]->top_opinion, 'Cat2', 'fetch_misccat_status: wrong top_opinion for list_recats[1]');
+
+        $this->assertEquals($result['list_recats'][2]->items, 1, 'fetch_misccat_status: wrong total for list_recats[2]');
+        $this->assertEquals($result['list_recats'][2]->top_opinion, 'Mobile', 'fetch_misccat_status: wrong top_opinion for list_recats[2]');
+
+        $this->assertEquals(count($result['list_splits']), 1, 'fetch_misccat_status: wrong count for list_splits');
+
+        $this->assertEquals($result['list_splits'][0]->iddevices, 6, 'fetch_misccat_status: wrong iddevices for list_splits[0]');
+        $this->assertEquals($result['list_splits'][0]->code, '3', 'fetch_misccat_status: wrong code for list_splits[0]');
+        $this->assertEquals($result['list_splits'][0]->adjudication, NULL, 'fetch_misccat_status: wrong adjudication for list_splits[0]');
+        $this->assertEquals($result['list_splits'][0]->opinions, 'Cat1,Cat2,Cat3', 'fetch_misccat_status: wrong opinions for list_splits[0]');
+    }
+
+    /** @test */
+    public function update_misccat_devices() {
+
+        $this->_setup_data();
+
+        $Misccat = new Misccat;
+        $result = $Misccat->updateDevices();
+        $this->assertDatabaseHas('devices', [
+            'problem' => 'category should be Cat1',
+            'category' => 111,
+            'category_creation' => 46,
+        ]);
+        $this->assertDatabaseHas('devices', [
+            'problem' => 'category should be Cat2',
+            'category' => 222,
+            'category_creation' => 46,
+        ]);
+    }
+
+    protected function _setup_data() {
+        $data = $this->_get_setup_data();
+        foreach ($data as $case => $elems) {
+            foreach ($elems as $tablename => $records) {
+                foreach ($records as $record) {
+                    if ($tablename == 'devices') {
+                        factory(Device::class, 1)->create($record);
+                    } else if ($tablename == 'devices_misc_opinions') {
+                        factory(Misccat::class, 1)->create($record);
+                    } else if ($tablename == 'devices_misc_adjudicated') {
+                        DB::update("INSERT INTO devices_misc_adjudicated SET iddevices = " . $record['iddevices'] . ", category = '" . $record['category'] . "'");
+                    }
+                    $this->assertDatabaseHas($tablename, $record);
+                }
+            }
+        }
+    }
+
+    protected function _get_setup_data() {
+
+        factory(Category::class, 1)->states('Misc')->create();
+        factory(Category::class, 1)->states('Mobile')->create();
+        factory(Category::class, 1)->states('Cat1')->create();
+        factory(Category::class, 1)->states('Cat2')->create();
+        factory(Category::class, 1)->states('Cat3')->create();
+
+        $iddevices = 0;
+        $result = [];
+
+        $result['-2'] = [
+            'devices' =>
+            [
+                [
+                    'iddevices' => ++$iddevices,
+                    'category' => 25,
+                    'category_creation' => 25,
+                ],
+            ],
+            'devices_misc_opinions' => [],
+            'devices_misc_adjudicated' => [],
+        ];
+
+//WHEN -1 THEN 'Category has been updated from Misc, thanks!'
+// 1 device record = "Mobile", 2 misccat records = "Mobile"
+
+        $result['-1'] = [
+            'devices' => [
+                [
+                    'iddevices' => ++$iddevices,
+                    'category' => 25,
+                    'category_creation' => 46,
+                ]
+            ],
+            'devices_misc_opinions' => [
+                [
+                    'iddevices' => $iddevices,
+                    'category' => 'Mobile',
+                ],
+                [
+                    'iddevices' => $iddevices,
+                    'category' => 'Mobile',
+                ]
+            ],
+            'devices_misc_adjudicated' => [],
+        ];
+
+//WHEN 0 THEN 'Is Misc and has no opinions'        
+// 1 device record = "Misc", 0 misccat records
+        $result['0'] = [
+            'devices' => [
+                [
+                    'iddevices' => ++$iddevices,
+                    'category' => 46,
+                    'category_creation' => 46,
+                ],
+            ],
+            'devices_misc_opinions' => [],
+            'devices_misc_adjudicated' => [],
+        ];
+
+//WHEN 1 THEN 'Is Misc and has only one opinion'
+// 1 device record = "Misc", 1 misccat record = "Cat1"
+        $result['1'] = [
+            'devices' => [
+                [
+                    'iddevices' => ++$iddevices,
+                    'category' => 46,
+                    'category_creation' => 46,
+                ],
+            ],
+            'devices_misc_opinions' => [
+                [
+                    'iddevices' => $iddevices,
+                    'category' => 'Cat1',
+                ]
+            ],
+            'devices_misc_adjudicated' => [],
+        ];
+
+//WHEN 2 THEN 'Is Misc and needs just one more opinion'
+// 1 device record = "Misc", 2 misccat records = "Cat1"/"Cat2"
+        $result['2'] = [
+            'devices' => [
+                [
+                    'iddevices' => ++$iddevices,
+                    'category' => 46,
+                    'category_creation' => 46,
+                ],
+            ],
+            'devices_misc_opinions' => [
+                [
+                    'iddevices' => $iddevices,
+                    'category' => 'Cat1',
+                ],
+                [
+                    'iddevices' => $iddevices,
+                    'category' => 'Cat2',
+                ],
+            ],
+            'devices_misc_adjudicated' => [],
+        ];
+
+//WHEN 3 THEN 'Is Misc and opinions are split, adjudication needed'
+// 1 device record = "Misc", 3 misccat records = "Cat1"/"Cat2"/"Cat3"
+        $result['3'] = [
+            'devices' => [
+                [
+                    'iddevices' => ++$iddevices,
+                    'category' => 46,
+                    'category_creation' => 46,
+                ],
+            ],
+            'devices_misc_opinions' => [
+                [
+                    'iddevices' => $iddevices,
+                    'category' => 'Cat1',
+                ],
+                [
+                    'iddevices' => $iddevices,
+                    'category' => 'Cat2',
+                ],
+                [
+                    'iddevices' => $iddevices,
+                    'category' => 'Cat3',
+                ],
+            ],
+            'devices_misc_adjudicated' => [],
+        ];
+
+//WHEN 4 THEN 'Is Misc and majority opinions agree it should remain as Misc, thanks!'
+// 3 device records in total
+// 1 device record = "Misc", 3 misccat records = "Misc"
+// 1 device record = "Misc", 2 misccat records = "Misc", 1 misccat records = "Cat1"
+// 1 device record = "Misc", 3 misccat records = "Cat1"/"Cat2"/"Misc", 1 adjudication record = "Misc"
+        $result['4']['devices'] = [];
+        $result['4']['devices_misc_opinions'] = [];
+        $result['4']['devices_misc_adjudicated'] = [];
+
+        $result['4']['devices'][] = [
+            'iddevices' => ++$iddevices,
+            'category' => 46,
+            'category_creation' => 46,
+        ];
+        $result['4']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Misc',
+        ];
+        $result['4']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Misc',
+        ];
+        $result['4']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Misc',
+        ];
+
+        $result['4']['devices'][] = [
+            'iddevices' => ++$iddevices,
+            'category' => 46,
+            'category_creation' => 46,
+        ];
+        $result['4']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Misc',
+        ];
+        $result['4']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Misc',
+        ];
+        $result['4']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Cat1',
+        ];
+
+        $result['4']['devices'][] = [
+            'iddevices' => ++$iddevices,
+            'category' => 46,
+            'category_creation' => 46,
+        ];
+        $result['4']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Misc',
+        ];
+        $result['4']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Cat1',
+        ];
+        $result['4']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Cat2',
+        ];
+        $result['4']['devices_misc_adjudicated'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Misc',
+        ];
+
+//WHEN 5 THEN 'Is Misc and majority opinions say not Misc so it will be updated soon, thanks!'
+// 2 device records in total
+// 1 device record = "Misc", 3 misccat records = "Cat1"
+// 1 device record = "Misc", 3 misccat records = "Cat1"/"Cat2"/"Misc", 1 adjudication record = "Cat1"
+        $result['5']['devices'] = [];
+        $result['5']['devices_misc_opinions'] = [];
+        $result['5']['devices_misc_adjudicated'] = [];
+
+
+        $result['5']['devices'][] = [
+            'iddevices' => ++$iddevices,
+            'category' => 46,
+            'category_creation' => 46,
+            'problem' => 'category should be Cat1',
+        ];
+        $result['5']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Cat1',
+        ];
+        $result['5']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Cat1',
+        ];
+        $result['5']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Cat1',
+        ];
+
+        $result['5']['devices'][] = [
+            'iddevices' => ++$iddevices,
+            'category' => 46,
+            'category_creation' => 46,
+            'problem' => 'category should be Cat2',
+        ];
+        $result['5']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Misc',
+        ];
+        $result['5']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Cat1',
+        ];
+        $result['5']['devices_misc_opinions'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Cat2',
+        ];
+        $result['5']['devices_misc_adjudicated'][] = [
+            'iddevices' => $iddevices,
+            'category' => 'Cat2',
+        ];
+
+        return $result;
     }
 
 }

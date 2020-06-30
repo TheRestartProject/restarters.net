@@ -64,150 +64,80 @@ LIMIT 1;"
 
         $result = [];
 
-        $result['total_devices'] = DB::select("
-SELECT COUNT(DISTINCT d.iddevices) AS total
+        $status_query = "
+SELECT 
+d.iddevices as `iddevices`,
+TRIM(COALESCE(d.`brand`,'')) as brand,
+TRIM(COALESCE(d.`model`,'')) as model,
+TRIM(d.`problem`) as problem,
+GROUP_CONCAT(o.category ORDER BY o.category ASC) as opinions,
+ANY_VALUE(a.category) as adjudication,            
+CASE 
+WHEN (d.category <> 46 AND COUNT(ANY_VALUE(o.category)) = 0) THEN -2
+WHEN (d.category <> 46 AND COUNT(ANY_VALUE(o.category)) > 0) THEN -1
+WHEN (d.category = 46 AND COUNT(ANY_VALUE(o.category)) = 0) THEN 0
+WHEN (d.category = 46 AND COUNT(ANY_VALUE(o.category)) = 1) THEN 1
+WHEN (d.category = 46 AND COUNT(ANY_VALUE(o.category)) = 2 AND COUNT(DISTINCT ANY_VALUE(o.category)) = 2) THEN 2
+WHEN (d.category = 46 AND (COUNT(DISTINCT ANY_VALUE(o.category)) >= 3) AND ANY_VALUE(a.category) IS NULL) THEN 3
+WHEN (d.category = 46 AND (SUM(IF(ANY_VALUE(o.category) = 'Misc', 1, 0)) > 1 OR ANY_VALUE(a.category) = 'Misc')) THEN 4 
+WHEN (d.category = 46 AND (COUNT(DISTINCT ANY_VALUE(o.category)) >= 3) AND ANY_VALUE(a.category) IS NOT NULL AND ANY_VALUE(a.category) <> 'Misc') THEN 5
+WHEN (d.category = 46 AND (SUM(IF(ANY_VALUE(o.category) <> 'Misc', 1, 0)) > 1)) THEN 5
+ELSE 99
+END as `code`
 FROM devices d
-WHERE d.category IN (46)
-AND LENGTH(TRIM(d.problem)) > 0
-");
-
-        $result['total_opinions_3'] = DB::select("
-SELECT COUNT(DISTINCT o.iddevices) AS total
-FROM devices_misc_opinions o
-WHERE (SELECT COUNT(o2.iddevices) FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.iddevices) = 3
-");
-
-        $result['total_opinions_2'] = DB::select("
-SELECT COUNT(DISTINCT o.iddevices) AS total
-FROM devices_misc_opinions o
-WHERE (SELECT COUNT(o2.iddevices) FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.iddevices) = 2
-");
-
-        $result['total_opinions_1'] = DB::select("
-SELECT COUNT(DISTINCT o.iddevices) AS total
-FROM devices_misc_opinions o
-WHERE (SELECT COUNT(o2.iddevices) FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.iddevices) = 1
-");
-
-        $result['total_opinions_0'] = DB::select("
-SELECT COUNT(d.iddevices) AS total
-FROM devices d
-LEFT JOIN devices_misc_opinions o ON o.iddevices = d.iddevices
-WHERE d.category IN (46)
-AND LENGTH(TRIM(d.problem)) > 0
-AND o.iddevices IS NULL
-");
-
-        $result['total_recats'] = DB::select("
-SELECT COUNT(DISTINCT items) as total FROM
-(SELECT
-o.iddevices AS items,
-(SELECT o1.category FROM devices_misc_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.category ORDER BY COUNT(o1.category) DESC LIMIT 1) AS top_crowd_opinion,
-ANY_VALUE(a.category) AS adjudicated_opinion,
-ROUND((SELECT COUNT(o2.category) as top_crowd_opinion_count FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.category ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
-(SELECT COUNT(o2.category) as all_votes FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
-COUNT(o.category) AS all_crowd_opinions_count
-FROM devices_misc_opinions o
-LEFT OUTER JOIN devices_misc_adjudicated a ON a.iddevices = o.iddevices
-GROUP BY top_crowd_opinion, o.iddevices
-HAVING all_crowd_opinions_count > 1 
-AND top_crowd_opinion_percentage > 50
-AND top_crowd_opinion != 'Misc'
-) AS results
-");
-
-        $result['list_recats'] = DB::select("
-SELECT
-COUNT(DISTINCT d.iddevices) AS items,
-(SELECT o1.category FROM devices_misc_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.category ORDER BY COUNT(o1.category) DESC LIMIT 1) AS top_crowd_opinion,
-ANY_VALUE(a.category) AS adjudicated_opinion,
-ROUND((SELECT COUNT(o2.category) as top_crowd_opinion_count FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.category ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
-(SELECT COUNT(o2.category) as all_votes FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
-COUNT(o.category) AS all_crowd_opinions_count,
-GROUP_CONCAT(DISTINCT o.category ORDER BY o.category) as opinions
-FROM devices_misc_opinions o
-JOIN devices d ON o.iddevices = d.iddevices
+LEFT OUTER JOIN devices_misc_opinions o ON o.iddevices = d.iddevices
 LEFT OUTER JOIN devices_misc_adjudicated a ON a.iddevices = d.iddevices
-GROUP BY top_crowd_opinion
-HAVING all_crowd_opinions_count > 1 
-AND (top_crowd_opinion_percentage > 50 OR adjudicated_opinion IS NOT NULL)
-AND top_crowd_opinion != 'Misc'
-ORDER BY items DESC
-");
+GROUP BY d.iddevices";
 
-        $result['total_splits'] = DB::select("
-SELECT COUNT(DISTINCT items) as total FROM
-(SELECT
-o.iddevices AS items,
-ROUND((SELECT COUNT(o2.category) as top_crowd_opinion_count FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.category ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
-(SELECT COUNT(o2.category) as all_votes FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
-COUNT(o.category) AS all_crowd_opinions_count,
-ANY_VALUE(a.category) AS adjudicated_opinion
-FROM devices_misc_opinions o
-LEFT OUTER JOIN devices_misc_adjudicated a ON a.iddevices = o.iddevices
-GROUP BY o.iddevices
-HAVING all_crowd_opinions_count = 3 
-AND top_crowd_opinion_percentage < 40
-AND adjudicated_opinion IS NULL
-) AS results
-");
+        try {
 
-        $result['list_splits'] = DB::select("
+            $result['status'] = DB::select("
+SELECT COUNT(*) as total,
+`code`,
+CASE `code` 
+WHEN -2 THEN 'Original category was not Misc'
+WHEN -1 THEN 'Category has been updated from Misc, thanks!'
+WHEN 0 THEN 'Is Misc and has no opinions' 
+WHEN 1 THEN 'Is Misc and has only one opinion' 
+WHEN 2 THEN 'Is Misc and needs just one more opinion'
+WHEN 3 THEN 'Is Misc and opinions are split, adjudication needed'
+WHEN 4 THEN 'Is Misc and majority opinions agree it should remain as Misc, thanks!'
+WHEN 5 THEN 'Is Misc and majority opinions say not Misc so it will be updated soon, thanks!'
+ELSE '?'
+END as `status` FROM ($status_query) AS `status_query`
+GROUP BY `code`
+");
+        } catch (Exception $exc) {
+            echo $exc->getMessage();
+        }
+
+        try {
+
+            $result['list_recats'] = DB::select("
 SELECT
-d.iddevices,
-ROUND((SELECT COUNT(o2.category) as top_crowd_opinion_count FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.category ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
-(SELECT COUNT(o2.category) as all_votes FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
-COUNT(o.category) AS all_crowd_opinions_count,
-ANY_VALUE(a.category) AS adjudicated_opinion,
-GROUP_CONCAT(o.category ORDER BY o.category) as opinions,
-TRIM(COALESCE(d.`brand`,'')) as brand,
-TRIM(COALESCE(d.`model`,'')) as model,
-TRIM(d.`problem`) as problem
-FROM devices_misc_opinions o
-JOIN devices d ON o.iddevices = d.iddevices
-LEFT OUTER JOIN devices_misc_adjudicated a ON a.iddevices = o.iddevices
-GROUP BY d.iddevices
-HAVING all_crowd_opinions_count = 3 
-AND top_crowd_opinion_percentage < 40
-AND adjudicated_opinion IS NULL
-ORDER BY all_crowd_opinions_count DESC, d.iddevices DESC
+COUNT(d.iddevices) as items,
+COALESCE(
+(SELECT a.category FROM devices_misc_adjudicated a WHERE a.iddevices = d.iddevices),
+(SELECT o.category FROM devices_misc_opinions o WHERE o.iddevices = d.iddevices 
+GROUP BY o.category HAVING COUNT(o.category) > 1 
+ORDER BY COUNT(o.category) DESC LIMIT 1)
+) AS top_opinion
+FROM devices d
+GROUP BY top_opinion
+HAVING top_opinion != '' AND top_opinion != 'Misc'
+ORDER BY items DESC, top_opinion ASC
 ");
-        
-                $result['total_recats_misc'] = DB::select("
-SELECT COUNT(DISTINCT items) as total FROM
-(SELECT
-o.iddevices AS items,
-(SELECT o1.category FROM devices_misc_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.category ORDER BY COUNT(o1.category) DESC LIMIT 1) AS top_crowd_opinion,
-ANY_VALUE(a.category) AS adjudicated_opinion,
-ROUND((SELECT COUNT(o2.category) as top_crowd_opinion_count FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.category ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
-(SELECT COUNT(o2.category) as all_votes FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
-COUNT(o.category) AS all_crowd_opinions_count
-FROM devices_misc_opinions o
-LEFT OUTER JOIN devices_misc_adjudicated a ON a.iddevices = o.iddevices
-GROUP BY top_crowd_opinion, o.iddevices
-HAVING all_crowd_opinions_count > 1 
-AND (top_crowd_opinion_percentage > 50 OR adjudicated_opinion IS NOT NULL)
-AND top_crowd_opinion = 'Misc'
-) AS results
-");
+        } catch (Exception $exc) {
+            echo $exc->getMessage();
+        }
 
-        $result['total_adjudicated'] = DB::select("
-SELECT
-COUNT(*) AS total
-FROM devices_misc_adjudicated
-");
+        try {
 
-        $result['list_adjudicated'] = DB::select("
-SELECT
-d.iddevices,
-a.category,
-TRIM(COALESCE(d.`brand`,'')) as brand,
-TRIM(COALESCE(d.`model`,'')) as model,
-TRIM(d.`problem`) as problem
-FROM devices_misc_adjudicated a
-JOIN devices d ON a.iddevices = d.iddevices
-ORDER BY d.iddevices
-");
+            $result['list_splits'] = DB::select("$status_query HAVING `code` = 3");
+        } catch (Exception $exc) {
+            echo $exc->getMessage();
+        }
+
 
         $result['total_eee'] = DB::select("
 SELECT COUNT(DISTINCT o.iddevices) AS total
@@ -225,6 +155,8 @@ SELECT COUNT(DISTINCT o.iddevices) AS total
 FROM devices_misc_opinions o
 WHERE o.eee = 2
 ");
+
+
 
         return $result;
     }

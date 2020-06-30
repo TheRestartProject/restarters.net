@@ -12,6 +12,12 @@ $factory->state(App\Misccat::class, 'misc', function (Faker $faker) {
     ];
 });
 
+$factory->state(App\Misccat::class, 'mobile', function (Faker $faker) {
+    return [
+        'category' => 'Mobile',
+    ];
+});
+
 $factory->state(App\Misccat::class, 'cat1', function (Faker $faker) {
     return [
         'category' => 'cat1',
