@@ -7,22 +7,22 @@
     .has-text-white {color: #FFF;}
     .has-text-bold {font-weight: bold;}
     .microtask ul, li {list-style-type: none;}
- .use-case {
-     background-color: #f7f5ed;
-     border: 1px solid #ddd;
-     padding: 10px;
-     border-radius: 10px;
-     height: 100%;
- }
- #btn-join {
-     background-color: #0faca8;
-     color: white;
- }
- #btn-skip {
-     background-color: #white;
-     border: 2px solid #0faca9;
-     color: #0faca9;
- }
+    .use-case {
+        background-color: #f7f5ed;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 10px;
+        height: 100%;
+    }
+    #btn-join {
+        background-color: #0faca8;
+        color: white;
+    }
+    #btn-skip {
+        background-color: #white;
+        border: 2px solid #0faca9;
+        color: #0faca9;
+    }
 </style>
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="taskctaModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -48,14 +48,14 @@
                             </div>
                             <div class="col-12 col-lg-4 mb-2 mb-lg-0">
                                 <div class="use-case">
-                                <h5>Showcase the benefits of repair</h5>
-                                <p>We help groups understand their impact, motivate their community, and support funding bids.</p>
+                                    <h5>Showcase the benefits of repair</h5>
+                                    <p>We help groups understand their impact, motivate their community, and support funding bids.</p>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-4 mb-2 mb-lg-0">
                                 <div class="use-case">
-                                <h5>Campaign for change</h5>
-                                <p>Repair data supports policy on the Right to Repair, making products more repairable, and reducing the environmental impact of electronics.</p>
+                                    <h5>Campaign for change</h5>
+                                    <p>Repair data supports policy on the Right to Repair, making products more repairable, and reducing the environmental impact of electronics.</p>
                                 </div>
                             </div>
                         </div>
@@ -64,30 +64,38 @@
                             <div class="col">
                                 <h5>Want to get more involved?</h5>
                                 <p>You can join us as a <a target="_blank" href="https://talk.restarters.net/t/our-work-on-repair-data/1150">data volunteer</a>.</p>
-                                    <p class="mb-sm-0">📊 Help us improve our data collection and help us tell stories through data journalism.</p>
-                                    <p>💡 Learn about data collection, crowdsourcing, standards, aggregation, and open data.</p>
+                                <p class="mb-sm-0">📊 Help us improve our data collection and help us tell stories through data journalism.</p>
+                                <p>💡 Learn about data collection, crowdsourcing, standards, aggregation, and open data.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <p class="buttons">                        
-                    <a href="/about" id="btn-join" class="btn btn-md btn-rounded">Join the community</a>
-                    <a href="/misccat" id="btn-skip" class="btn btn-md btn-rounded">Not now</a>
-                </p>
+                <div class="modal-footer justify-content-center">
+                    <p class="buttons">                        
+                        <a href="/about" id="btn-join" class="btn btn-md btn-rounded">Join the community</a>
+                        <button id="btn-skip" type="button" class="btn btn-md btn-rounded">Not now</button>
+<!--                        <button id="btn-skip" type="button" class="btn btn-md btn-rounded" data-dismiss="modal" aria-label="Not now">
+                            <span aria-hidden="true">Not now</span>
+                        </button>-->
+                    </p>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script>
-    document.addEventListener(`DOMContentLoaded`, async () => {
-        
-        document.getElementById('btn-join').addEventListener('click', function (e) {
-            e.preventDefault();
-            window.open("/about", '_blank');
-            document.getElementById('btn-skip').click();            
-        }, true);
-        
-    }, false);
-</script>
+    <script>
+        document.addEventListener(`DOMContentLoaded`, async () => {
+
+            document.getElementById('btn-join').addEventListener('click', function (e) {
+                e.preventDefault();
+                window.open("/about", '_blank');
+                document.getElementById('btn-skip').click();
+            }, true);
+
+            document.getElementById('btn-skip').addEventListener('click', function (e) {
+                e.preventDefault();
+                window.location.replace(window.location.href.replace('/cta', '/'));
+            }, true);
+
+        }, false);
+    </script>
 

@@ -105,16 +105,11 @@ COUNT(o.fault_type) AS all_crowd_opinions_count
 FROM devices d
 LEFT OUTER JOIN devices_faults_mobiles_opinions o ON o.iddevices = d.iddevices
 LEFT OUTER JOIN devices_faults_mobiles_adjudicated a ON a.iddevices = d.iddevices
+WHERE d.category = 25
 GROUP BY o.iddevices
 HAVING
-(winning_opinion != 'Misc')
-AND (
-(all_crowd_opinions_count > 2 AND top_crowd_opinion_percentage = 100)
-OR
-(all_crowd_opinions_count > 3 AND top_crowd_opinion_percentage >= 75)
-OR
-(all_crowd_opinions_count > 4 AND top_crowd_opinion_percentage >= 60)
-OR adjudicated_opinion IS NOT NULL)
+(all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
+OR adjudicated_opinion IS NOT NULL
 ) AS results
 ");
         
@@ -131,16 +126,11 @@ COUNT(o.fault_type) AS all_crowd_opinions_count
 FROM devices d
 LEFT OUTER JOIN devices_faults_mobiles_opinions o ON o.iddevices = d.iddevices
 LEFT OUTER JOIN devices_faults_mobiles_adjudicated a ON a.iddevices = d.iddevices
+WHERE d.category = 25
 GROUP BY o.iddevices
 HAVING
-(winning_opinion != 'Misc')
-AND (
-(all_crowd_opinions_count > 2 AND top_crowd_opinion_percentage = 100)
-OR
-(all_crowd_opinions_count > 3 AND top_crowd_opinion_percentage >= 75)
-OR
-(all_crowd_opinions_count > 4 AND top_crowd_opinion_percentage >= 60)
-OR adjudicated_opinion IS NOT NULL)
+(all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
+OR adjudicated_opinion IS NOT NULL
 ) AS results
 GROUP BY winning_opinion
 ORDER BY total DESC
@@ -157,9 +147,10 @@ COUNT(o.fault_type) AS all_crowd_opinions_count
 FROM devices d
 LEFT OUTER JOIN devices_faults_mobiles_opinions o ON o.iddevices = d.iddevices
 LEFT OUTER JOIN devices_faults_mobiles_adjudicated a ON a.iddevices = d.iddevices
+WHERE d.category = 25
 GROUP BY o.iddevices
 HAVING
-(all_crowd_opinions_count = 5 AND top_crowd_opinion_percentage < 60)
+(all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
 AND adjudicated_opinion IS NULL
 ) AS results
 ");
@@ -179,9 +170,10 @@ TRIM(d.`problem`) as problem
 FROM devices d
 LEFT OUTER JOIN devices_faults_mobiles_opinions o ON o.iddevices = d.iddevices
 LEFT OUTER JOIN devices_faults_mobiles_adjudicated a ON a.iddevices = d.iddevices
+WHERE d.category = 25
 GROUP BY o.iddevices
 HAVING
-(all_crowd_opinions_count = 5 AND top_crowd_opinion_percentage < 60)
+(all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
 AND adjudicated_opinion IS NULL
 ");        
         return $result;

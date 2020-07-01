@@ -10,6 +10,7 @@
 
 <section class="mobifix">
     <div class="container mt-1">
+        <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>
         <div class="row row-compressed">
             <div class="col-6">
                 <h1 class="pull-left">MobiFix</h1>
@@ -66,7 +67,7 @@
                         </p>
                     </div>
                     <div class="col-4 col-sm-2">
-                        <button id="btn-translate" class="pull-right btn btn-fault-option btn-md px-3 py-1">
+                        <button id="btn-translate" class="pull-right btn btn-md btn-dark px-3 py-1">
                             <a href="https://translate.google.com/#view=home&op=translate&sl=auto&tl=en&text=@php( print($fault->translate))" target="_blank">
                                 Translate
                             </a>
@@ -75,6 +76,7 @@
                 </div>
             </div>
         </div>
+        <form id="get-task" action="" method="GET"></form>
         <form id="log-task" action="" method="POST">
             @csrf
             <div class="container fault-type">
@@ -88,7 +90,7 @@
                                 <p class="title is-size-6-mobile is-size-6-tablet">Suggestions</p>
                                 <p>
                                     @foreach($fault->suggestions as $fault_type)
-                                    <button class="btn btn-sm btn-fault-option btn-rounded"><span>@php( print($fault_type))</span></button>
+                                    <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded"><span>@php( print($fault_type))</span></button>
                                     @endforeach
                                 </p>
                             </div>
@@ -112,8 +114,9 @@
             </div>
         </form>
         @endif
-
-        @include('mobifix/info-modal')
+    </div>
+    @include('mobifix/info-modal')        
+    @include('partials/task-cta-modal')
 </section>
 
 @endsection
@@ -122,7 +125,7 @@
 <script>
     document.addEventListener(`DOMContentLoaded`, async () => {
 
-        [...document.querySelectorAll('.fault-type .buttons .btn-fault-option')].forEach(elem => {
+        [...document.querySelectorAll('.btn-fault-option, .btn-fault-suggestion')].forEach(elem => {
             elem.addEventListener('click', function (e) {
                 e.preventDefault();
                 doOption(e);
@@ -132,6 +135,11 @@
         document.getElementById('change').addEventListener('click', function (e) {
             e.preventDefault();
             doChange();
+        }, false);
+
+        document.getElementById('fetch').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.forms['get-task'].submit();
         }, false);
 
         document.addEventListener("keypress", function (e) {
@@ -144,6 +152,9 @@
             } else if (e.code == 'KeyI') {
                 e.preventDefault();
                 document.getElementById('btn-info-open').click();
+            } else if (e.code == 'KeyC') {
+                e.preventDefault();
+                document.getElementById('btn-cta-open').click();
             }
         }, false);
 
@@ -169,6 +180,10 @@
                     ' / fault_type: ' +
                     document.querySelector('#fault_type').value);
             document.forms['log-task'].submit();
+        }
+        
+        if (window.location.href.indexOf('cta') != -1) {
+            document.getElementById('btn-cta-open').click();
         }
 
     }, false);</script>

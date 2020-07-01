@@ -19,6 +19,8 @@ class MobifixController extends Controller {
             $user = Auth::user();
         } else {
             $user = Microtask::getAnonUserCta($request);
+//            logger('MobifixController@index');
+//            logger(print_r($user,1));
             if ($user->action) {
                 return redirect()->action('MobifixController@cta');
             }
@@ -168,12 +170,19 @@ class MobifixController extends Controller {
             'memory' => [
                 'Memory card slot',
                 'Stuck booting',
-                'Storage problem',
                 'Software update',
+            ],
+            'storage' => [
+                'Storage problem'
+            ],
+            'space' => [
+                'Storage problem'
+            ],
+            'full' => [
+                'Storage problem'
             ],
             'ram' => [
                 'Memory card slot',
-                'Storage problem',
                 'Stuck booting',
                 'Software update',
             ],

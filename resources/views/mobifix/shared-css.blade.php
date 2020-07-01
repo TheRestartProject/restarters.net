@@ -73,6 +73,10 @@
         margin-bottom: 2px;
     }
     
+    .btn-fault-suggestion {
+        background-colour: pink !important;
+    }
+    
     .text-is-italic {
         font-style: italic;
     }
