@@ -95,7 +95,7 @@ AND o.iddevices IS NULL
         $result['total_recats'] = DB::select("
 SELECT COUNT(DISTINCT items) as total FROM
 (SELECT
-o.iddevices AS items,
+d.iddevices AS items,
 COALESCE(ANY_VALUE(a.fault_type),(SELECT o1.fault_type FROM devices_faults_mobiles_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.fault_type ORDER BY COUNT(o1.fault_type) DESC LIMIT 1)) AS winning_opinion,
 ANY_VALUE(a.fault_type) AS adjudicated_opinion,
 (SELECT o1.fault_type FROM devices_faults_mobiles_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.fault_type ORDER BY COUNT(o1.fault_type) DESC LIMIT 1) AS top_crowd_opinion,
@@ -106,7 +106,7 @@ FROM devices d
 LEFT OUTER JOIN devices_faults_mobiles_opinions o ON o.iddevices = d.iddevices
 LEFT OUTER JOIN devices_faults_mobiles_adjudicated a ON a.iddevices = d.iddevices
 WHERE d.category = 25
-GROUP BY o.iddevices
+GROUP BY d.iddevices
 HAVING
 (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
 OR adjudicated_opinion IS NOT NULL
@@ -116,7 +116,7 @@ OR adjudicated_opinion IS NOT NULL
         $result['list_recats'] = DB::select("
 SELECT winning_opinion, COUNT(winning_opinion) AS total FROM
 (SELECT
-o.iddevices,
+d.iddevices,
 COALESCE(ANY_VALUE(a.fault_type),(SELECT o1.fault_type FROM devices_faults_mobiles_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.fault_type ORDER BY COUNT(o1.fault_type) DESC LIMIT 1)) AS winning_opinion,
 ANY_VALUE(a.fault_type) AS adjudicated_opinion,
 (SELECT o1.fault_type FROM devices_faults_mobiles_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.fault_type ORDER BY COUNT(o1.fault_type) DESC LIMIT 1) AS top_crowd_opinion,
@@ -127,7 +127,7 @@ FROM devices d
 LEFT OUTER JOIN devices_faults_mobiles_opinions o ON o.iddevices = d.iddevices
 LEFT OUTER JOIN devices_faults_mobiles_adjudicated a ON a.iddevices = d.iddevices
 WHERE d.category = 25
-GROUP BY o.iddevices
+GROUP BY d.iddevices
 HAVING
 (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
 OR adjudicated_opinion IS NOT NULL
@@ -139,7 +139,7 @@ ORDER BY total DESC
                 $result['total_splits'] = DB::select("
 SELECT COUNT(DISTINCT items) as total FROM
 (SELECT
-o.iddevices AS items,
+d.iddevices AS items,
 ANY_VALUE(a.fault_type) AS adjudicated_opinion,
 ROUND((SELECT COUNT(o2.fault_type) as top_crowd_opinion_count FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.fault_type ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
 (SELECT COUNT(o2.fault_type) as all_votes FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
@@ -148,7 +148,7 @@ FROM devices d
 LEFT OUTER JOIN devices_faults_mobiles_opinions o ON o.iddevices = d.iddevices
 LEFT OUTER JOIN devices_faults_mobiles_adjudicated a ON a.iddevices = d.iddevices
 WHERE d.category = 25
-GROUP BY o.iddevices
+GROUP BY d.iddevices
 HAVING
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
 AND adjudicated_opinion IS NULL
@@ -157,7 +157,7 @@ AND adjudicated_opinion IS NULL
         
                 $result['list_splits'] = DB::select("
 SELECT
-o.iddevices,
+d.iddevices,
 ANY_VALUE(a.fault_type) AS adjudicated_opinion,
 (SELECT o1.fault_type FROM devices_faults_mobiles_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.fault_type ORDER BY COUNT(o1.fault_type) DESC LIMIT 1) AS top_crowd_opinion,
 ROUND((SELECT COUNT(o2.fault_type) as top_crowd_opinion_count FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.fault_type ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
@@ -171,7 +171,7 @@ FROM devices d
 LEFT OUTER JOIN devices_faults_mobiles_opinions o ON o.iddevices = d.iddevices
 LEFT OUTER JOIN devices_faults_mobiles_adjudicated a ON a.iddevices = d.iddevices
 WHERE d.category = 25
-GROUP BY o.iddevices
+GROUP BY d.iddevices
 HAVING
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
 AND adjudicated_opinion IS NULL
@@ -201,19 +201,15 @@ WHERE d.category = 25
 AND LENGTH(d.problem) > 0
 GROUP BY d.iddevices
 HAVING
-(all_crowd_opinions_count > 2 AND top_crowd_opinion_percentage = 100)
-OR
-(all_crowd_opinions_count > 3 AND top_crowd_opinion_percentage >= 75)
-OR
-(all_crowd_opinions_count > 4 AND top_crowd_opinion_percentage >= 60)
+(all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
 OR adjudicated_opinion IS NOT NULL
 ORDER BY NULL);");
 
         DB::statement("ALTER TABLE `devices_faults_mobiles_temporary` ADD PRIMARY KEY(`iddevices`);");
 
-        $result = DB::update("UPDATE devices d, devices_faults_mobiles_opinions o 
-SET d.fault_type = o.fault_type
-WHERE d.iddevices = o.iddevices;");
+        $result = DB::update("UPDATE devices d, devices_faults_mobiles_temporary t 
+SET d.fault_type = t.winning_opinion
+WHERE d.iddevices = t.iddevices;");
 
         DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_faults_mobiles_temporary`");
 
