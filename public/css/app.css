@@ -16701,7 +16701,7 @@ table.sortable > thead th div.mozilla {
 }
 
 .btn-rounded {
-  border-radius: 100px;
+  border-radius: 100px !important;
 }
 
 .btn-secondary {
@@ -19403,6 +19403,7 @@ td.col-device-auto {
 .modal-header h5 {
   font-size: 20px;
   margin-bottom: 0;
+  font-weight: 700;
 }
 
 .modal-header .close {
