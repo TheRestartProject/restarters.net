@@ -35,7 +35,7 @@
         </div>
         @if (isset($status))
 
-        <div class="row problem p-2 mb-2 mx-1 mx-sm-0">
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0">
             <div class="col">
                 <div class="row justify-content-center">
                     <p><strong>Items by EEE Status</strong></p>
@@ -95,7 +95,7 @@
         }
         ?>
         @foreach ($summary as $k => $row)
-        <div class="row problem p-2 mb-2 mx-1 mx-sm-0">
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0">
             <div class="col">
                 <div class="row justify-content-center">
                     <p><strong>@php( print($row['status']))  : @php( print($row['total'])) </strong></p>
@@ -104,7 +104,7 @@
         </div>        
         @endforeach
         @if (count($status['list_splits']))
-        <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col">
                 <div class="row justify-content-center">
                     <p><strong>Items with split opinions : @php( print(count($status['list_splits'])))</strong></p>
@@ -156,7 +156,7 @@
             </div>
         </div>
         @endif
-        <div class="row problem p-2 mb-2 mx-1 mx-sm-0">
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0">
             <div class="col">
                 <div class="row justify-content-center">
                     <p><strong>Items with category changed or changing from "Misc"</strong></p>

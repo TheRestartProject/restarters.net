@@ -33,7 +33,7 @@
             </div>
         </div>
         @if (isset($status))
-            <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+            <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
                 <div class="col">
                     <div class="row justify-content-center">
                         <p><strong>Items / opinions</strong></p>
@@ -84,7 +84,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+            <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
                 <div class="col">
                     <div class="row justify-content-center">
                         <p><strong>Items with split opinions : @php( print($status['total_splits'][0]->total))</strong></p>
@@ -135,7 +135,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row problem p-2 mb-2 mx-1 mx-sm-0 justify-content-center">
+            <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
                 <div class="col">
                     <div class="row justify-content-center">
                         <p><strong>Items with majority opinions : @php( print($status['total_recats'][0]->total)) </strong></p>
