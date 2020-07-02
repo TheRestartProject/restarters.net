@@ -63,7 +63,7 @@ class NewGroupWithinRadius extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'title' => 'A new Restart Group available near you:',
+            'title' => 'A new repair group near you:',
             'name' => $this->arr['group_name'],
             'url' => $this->arr['group_url'],
         ];
