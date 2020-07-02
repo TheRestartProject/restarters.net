@@ -29,3 +29,10 @@ vendor/squizlabs/
 vendor/theseer/
 vendor/webmozart/
 vendor/composer/
+*GTAGS
+*GRTAGS
+*GPATH
+.ac-php-conf.json
+anonymise-db.sql
+temp_db.sql
+restarters-anonymised.sql
