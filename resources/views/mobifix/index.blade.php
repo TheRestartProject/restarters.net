@@ -43,7 +43,7 @@
         </div>
 
         @if ($fault)
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 notification">
+        <div class="row problem panel p-3 mb-4 mx-1 mx-sm-0 notification">
             <div class="col">
                 <div class="row">
                     <div class="col">
@@ -81,7 +81,7 @@
             @csrf
             <div class="container fault-type">
                 <div class="row"> 
-                    <div class="col panel p-2">
+                    <div class="col panel p-3">
                         <p><span class="question">Where is the fault?</span></p>
                         <div class="container">
                             <input type="hidden" id="iddevices" name="iddevices" value="@php( print($fault->iddevices))">
