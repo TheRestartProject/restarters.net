@@ -100,7 +100,7 @@
                     @if (isset($role) && $r->idroles == $role)
                       <option value="{{ $r->idroles }}" selected>{{ $r->role }}</option>
                     @else
-                      <option value="{{ $r->idroles }}">{{ $r->role }}</option>
+                      <option value="{{ $r->idroles }}">@lang($r->role)</option>
                     @endif
                   @endforeach
                 </select>
@@ -185,11 +185,7 @@
                         </span>
                       </td>
                       <td>
-                        @if ($u->role == 'Administrator')
-                          Admin
-                        @else
-                          {{ $u->role }}
-                        @endif
+                          @lang($u->role)
                       </td>
                       <td class="d-none d-sm-table-cell">
                         @if (!empty($u->location))
