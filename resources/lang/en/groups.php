@@ -65,7 +65,7 @@ return array (
     'about_group_name_header' => 'About :group',
     'all_volunteers_group_name_header' => 'All volunteers of :group',
     'all_volunteers_group_name_message' => 'Here\'s a list of all of the volunteers affiliated with your group and their skills.',
-    'restarter_column_table' => 'Restarter',
+    'restarter_column_table' => 'Repairer',
     'skills_column_table' => 'Skills',
     'join_group_button' => 'Follow group',
     'share_stats_header' => 'Share your stats',

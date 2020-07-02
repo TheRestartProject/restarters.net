@@ -35,7 +35,7 @@ return array (
   'total_hours' => 'Total hours',
   'country_name' => 'Country name',
   'town_city_name' => 'Town/city name',
-  'restarter_name' => 'Restarter',
+  'restarter_name' => 'Volunteer',
   'hours' => 'Hours',
   'location' => 'Location',
   'event_date' => 'Event date',
