@@ -85,4 +85,9 @@
         border: 1px solid #EEE;
     }
 
+ .question, .statement {
+     font-size: 1rem;
+     font-weight: bold;
+     text-transform: uppercase;
+ }
 </style>

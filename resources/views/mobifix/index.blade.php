@@ -81,7 +81,8 @@
             @csrf
             <div class="container fault-type">
                 <div class="row"> 
-                    <div class="col panel">
+                    <div class="col panel p-2">
+                        <p><span class="question">Where is the fault?</span></p>
                         <div class="container">
                             <input type="hidden" id="iddevices" name="iddevices" value="@php( print($fault->iddevices))">
                             <input type="hidden" id="fault_type" name="fault_type" value="">
@@ -95,10 +96,7 @@
                                 </p>
                             </div>
                             @endif
-                            <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded">
-                                <span class="">I don't know,&nbsp;<span class="underline">F</span>etch another repair</span>
-                            </button>
-                            <div class="container options">
+                            <div class="container options mb-3">
                                 <p class="confirm hide">
                                     <button class="btn-md btn-info btn-rounded" id="change"><span class="underline">G</span>o with "<span id="fault-type-new"></span>"</button>
                                 </p>
@@ -108,6 +106,9 @@
                                     @endforeach                                            
                                 </div>
                             </div>
+                            <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded">
+                                <span class="">I don't know,&nbsp;<span class="underline">F</span>etch another repair</span>
+                            </button>
                         </div>
                     </div>
                 </div>
