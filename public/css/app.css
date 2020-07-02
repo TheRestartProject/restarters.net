@@ -21425,15 +21425,15 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
-html > .container,
-body > .container {
+html > .container:not(.container-nav),
+body > .container:not(.container-nav) {
   padding-top: 20px;
   min-height: 1200px;
 }
 
 @media (min-width: 768px) {
-  html > .container,
-  body > .container {
+  html > .container:not(.container-nav),
+  body > .container:not(.container-nav) {
     padding-top: 50px;
   }
 }
@@ -21461,6 +21461,10 @@ body > .container {
 
 .container {
   max-width: 1270px;
+}
+
+.container-nav .navbar {
+  padding: 1rem 0;
 }
 
 .block {

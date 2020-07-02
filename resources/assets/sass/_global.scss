@@ -5,7 +5,7 @@ body {
   color: #000000;
   font-family: $font-family-second;
 
-  &>.container {
+  &>.container:not(.container-nav) {
     padding-top: 20px;
     min-height: 1200px;
 
@@ -38,6 +38,10 @@ footer {
 
 .container {
   max-width: 1270px;
+}
+
+.container-nav .navbar {
+    padding: 1rem 0;
 }
 
 .block {

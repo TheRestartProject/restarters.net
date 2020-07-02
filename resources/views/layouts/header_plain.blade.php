@@ -63,17 +63,22 @@
         <!-- End Google Tag Manager (noscript) -->
 
         @if (isset($show_login_join_to_anons) && $show_login_join_to_anons)
-            <nav class="navbar navbar-expand-md navbar-light nav-laravel">
-                <a class="d-none d-sm-block navbar-brand" role="button" data-toggle="collapse" aria-expanded="false" href="#startMenu" aria-controls="startMenu" aria-label="Toggle start menu">
-                    @include('includes/logo')
-                </a>
+            <div class="container container-nav">
+                <nav class="navbar navbar-expand-md navbar-light">
+                    <div class="d-none d-sm-block navbar-brand">
+                        @include('includes/logo')
+                    </div>
+                    <div class="d-block d-md-none">
+                        @include('includes/logo-plain')
+                    </div>
 
-            <div id="navbarSupportedContent" class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
-                <li><a class="nav-link" href="/login">Sign in</a></li>
-                <li><a class="nav-link" href="/about">Join Restarters</a></li>
-            </ul>
+                <div id="navbarSupportedContent" class="collapse navbar-collapse">
+                    <ul class="navbar-nav ml-auto">
+                        <li><a class="nav-link" href="/login">Sign in</a></li>
+                        <li><a class="nav-link" href="/about">Join Restarters</a></li>
+                    </ul>
+                </div>
+
+                </nav>
             </div>
-
-            </nav>
         @endif
