@@ -2,7 +2,7 @@
 @section('content')
     <div class="container">
     <div class="row justify-content-center">
-      <div class="col-md-6">
+      <div class="col-md-6 panel">
         <div class="row row-compressed profile-header">
           <div class="col-3">
             @if (!isset($user->path) || is_null($user->path))
@@ -14,7 +14,7 @@
           <div class="col-9 d-flex">
             <div class="align-self-center">
               <h3>{{ $user->name }}</h3>
-              <p>{{ FixometerHelper::getRoleName($user->role) }}@if (!empty($user->location)), {{ $user->location }} @endif</p>
+              <p>@lang(FixometerHelper::getRoleName($user->role))@if (!empty($user->location)), {{ $user->location }} @endif</p>
               @if ( $user->existsOnDiscourse() )
                 <p><a href="{{ env('DISCOURSE_URL') }}/u/{{ $user->username }}">View profile on Talk</a></p>
               @else
@@ -40,8 +40,8 @@
     <br>
     <div class="row justify-content-center">
 
-      <div class="col-sm-12 col-md-4 order-md-2">
-        <div class="block block__profile">
+      <div class="col-sm-12 col-md-4 order-md-2 panel">
+        <div class="block__profile">
           <h4>@lang('profile.my_skills')</h4>
           <ul class="nav flex-column">
             @if (isset($skills))
@@ -53,8 +53,8 @@
         </div>
       </div>
 
-      <div class="col-sm-12 col-md-6 order-md-1">
-        <div class="block block__profile">
+      <div class="col-sm-12 col-md-6 order-md-1 panel">
+        <div class="">
           <h4>@lang('profile.biography')</h4>
           <p>
               @if ($user->biography)
