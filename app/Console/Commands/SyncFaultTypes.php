@@ -12,14 +12,14 @@ class SyncFaultTypes extends Command
      *
      * @var string
      */
-    protected $signature = 'faultcat:sync';
-
+    protected $signature = 'faultcat:sync {category : [computers|mobiles]}';
+    
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Update devices table with fault types for given categories';
 
     /**
      * Create a new command instance.
@@ -38,12 +38,31 @@ class SyncFaultTypes extends Command
      */
     public function handle()
     {
-        $Faultcat = new Faultcat;
-        $result = $Faultcat->updateDevices();
-        if ($result) {
-            $this->info($result . ' rows updated');
-        } else {
-            $this->info('0 rows updated');
+        $type = $this->argument('category');        
+        switch ($type) {
+            case 'computers':
+                $this->info('Updating devices with computer fault types');
+                $Faultcat = new Faultcat;
+                $result = $Faultcat->updateDevices();
+                if ($result) {
+                    $this->info($result . ' rows updated');
+                } else {
+                    $this->info('0 rows updated');
+                }
+                break;
+            case 'mobiles':
+                $this->info('Updating devices with mobile fault types');
+                $Mobifix = new Mobifix;
+                $result = $Mobifix->updateDevices();
+                if ($result) {
+                    $this->info($result . ' rows updated');
+                } else {
+                    $this->info('0 rows updated');
+                }
+                break;                
+            default: 
+                $this->info('Unknown category ' . $type);
         }
+        
     }
 }

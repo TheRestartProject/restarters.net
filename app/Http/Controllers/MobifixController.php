@@ -19,7 +19,6 @@ class MobifixController extends Controller {
             $user = Auth::user();
         } else {
             $user = Microtask::getAnonUserCta($request);
-//            logger('MobifixController@index');
 //            logger(print_r($user,1));
             if ($user->action) {
                 return redirect()->action('MobifixController@cta');
