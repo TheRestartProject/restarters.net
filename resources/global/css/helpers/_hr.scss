@@ -9,7 +9,7 @@
     height: 5px;
     border-top: 5px solid #000;
     margin-top: 50px;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
   }
 
   &-dashed {
@@ -21,5 +21,7 @@
     background-position: left;
     height: 3px;
     background-size: 20px 35px;
+    margin-top: 30px;
+    margin-bottom: 30px;
   }
 }

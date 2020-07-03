@@ -35,10 +35,24 @@
                 </div>
             </div>
 
+            <div class="row">
+                @include('device.global-impact')
+            </div>
+
+            <hr class="mt-md-50 hr-dashed">
+
+            <div class="row">
+                <div class="col-12">
+                    <h2>Repair Records</h2>
+                </div>
+                <div class="col-12">
+                    Browse or search our global database of repair.
+                </div>
+            </div>
+
             <div class="row justify-content-center">
 
                 <div class="col-lg-3">
-
 
                     <div class="collapse d-lg-block d-xl-block fixed-overlay-md" id="collapseFilter">
 
@@ -239,7 +253,7 @@
 
                             <button class="btn btn-secondary btn-groups w-100" type="submit">@lang('devices.search_all_devices')</button>
                             <button class="btn btn-secondary btn-groups mt-10 w-100" type="submit" disabled>
-                                @lang('devices.number_of_repairs'): {{ $list->total() }}
+                                @lang('devices.number_of_repairs'): {{ $list->count() }}
                             </button>
 
                         </aside>
@@ -348,17 +362,6 @@
 
                                 <br>
 
-                                <div class="d-flex justify-content-center">
-                                    <nav aria-label="Page navigation example">
-                                        <ul class="pagination">
-                                            @if (!empty($_GET))
-                                            {!! $list->appends(request()->input())->links() !!}
-                                            @else
-                                            {!! $list->links() !!}
-                                            @endif
-                                        </ul>
-                                    </nav>
-                                </div>
 
                             </div>
 

@@ -17314,7 +17314,7 @@ select.form-control:not([class*="select2"]) {
   height: 5px;
   border-top: 5px solid #000;
   margin-top: 50px;
-  margin-bottom: 50px;
+  margin-bottom: 20px;
 }
 
 .hr-dashed {
@@ -17324,6 +17324,8 @@ select.form-control:not([class*="select2"]) {
   background-position: left;
   height: 3px;
   background-size: 20px 35px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 .select2-search__field {
