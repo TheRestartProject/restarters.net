@@ -82,12 +82,12 @@
             <div class="container fault-type">
                 <div class="row"> 
                     <div class="col panel p-3">
-                        <p><span class="question">Where is the fault?</span></p>
+                        <p><span class="question">Where is the main fault?</span></p>
                         <div class="container">
                             <input type="hidden" id="iddevices" name="iddevices" value="@php( print($fault->iddevices))">
                             <input type="hidden" id="fault_type" name="fault_type" value="">
                             @if (count($fault->suggestions))
-                            <div class="buttons suggestions">
+                            <div class="buttons suggestions ">
                                 <p class="title is-size-6-mobile is-size-6-tablet">Suggestions</p>
                                 <p>
                                     @foreach($fault->suggestions as $fault_type)

@@ -89,5 +89,6 @@
      font-size: 1rem;
      font-weight: bold;
      text-transform: uppercase;
- }
+    }
+    
 </style>
