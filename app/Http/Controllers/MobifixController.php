@@ -109,158 +109,81 @@ class MobifixController extends Controller {
 
     protected function _suggestions() {
         return [
-            'battery' => [
+            'battery|power' => [
                 'Power/battery',
-            ],
-            'lcd' => [
-                'Screen',
             ],
             'button' => [
                 'On/Off button',
                 'Volume buttons',
                 'Other buttons',
             ],
-            'camera' => [
+            'camera|lens|picture|photo|video' => [
                 'Camera',
             ],
-            'digiti' => [
-                'Screen',
-            ],
-            'display' => [
-                'Screen',
-            ],
-            'card' => [
+            'card|sim' => [
                 'Sim card slot',
                 'Memory card slot',
                 'Storage problem',
             ],
-            'usb' => [
-                'USB / charging port',
-            ],
-            'sim' => [
-                'Sim card slot',
-            ],
-            'start' => [
-                'Software update',
+            'start|boot' => [                
                 'Stuck booting',
                 'Power/battery',
+                'Software update',
             ],
             'switch' => [
-                'Software update',
-                'Stuck booting',
                 'Other buttons',
+                'Power/battery',
             ],
-            'boot' => [
-                'Software update',
-                'Stuck booting',
-            ],
-            'connector' => [
+            'cable|connector|port|usb' => [
                 'USB / charging port',
             ],
-            'cable' => [
-                'USB / charging port',
-            ],
-            'jack' => [
-                'Headphone jack',
-            ],
-            'speaker' => [
-                'Speaker/amplifier',
-            ],
-            'memory' => [
+            'memory|ram' => [
                 'Memory card slot',
-                'Stuck booting',
                 'Software update',
-            ],
-            'storage' => [
-                'Storage problem'
-            ],
-            'space' => [
-                'Storage problem'
-            ],
-            'full' => [
-                'Storage problem'
-            ],
-            'ram' => [
-                'Memory card slot',
                 'Stuck booting',
-                'Software update',
             ],
-            'glass' => [
-                'Screen',
+            'storage|space|full' => [
+                'Storage problem'
             ],
-            'charg' => [
+            'charg|plug' => [
                 'Charger',
                 'USB / charging port',
                 'Power/battery',
-            ],
-            'lens' => [
-                'Camera',
             ],
             'mic' => [
                 'Microphone',
             ],
-            'audio' => [
-                'Speaker/amplifier',
-                'Volume buttons',
-                'Headphone jack',
-            ],
-            'app(s)?' => [
+            'app(s)?|software' => [
                 'Software update',
                 'Storage problem',
                 'Stuck booting',
             ],
-            'headphone' => [
+            'headphone|jack' => [
                 'Headphone jack',
-            ],
-            'touchscreen' => [
-                'Screen',
             ],
             'bluetooth' => [
                 'Bluetooth',
             ],
-            'reader' => [
+            'sc(r)?een|display|touch|glass|lcd|reader|digiti' => [
                 'Screen',
             ],
-            'sc(r)?een' => [
-                'Screen',
-            ],
-            'plug' => [
-                'USB / charging port',
-                'Charger',
-            ],
-            'bricked' => [
-                'Software update',
-                'Storage problem',
-                'Stuck booting',
-            ],
-            'volume' => [
-                'Volume buttons',
-                'Speaker/amplifier',
-                'Headphone jack',
-            ],
-            'off' => [
+            ' off| on' => [
                 'On/Off button',
                 'Stuck booting',
             ],
-            'port' => [
-                'USB / charging port',
-            ],
-            'sound' => [
+            'sound|audio|speaker|volume' => [
                 'Speaker/amplifier',
                 'Headphone jack',
                 'Volume buttons',
             ],
-            'power' => [
-                'Power/battery',
-            ],
-            'slow' => [
+            'slow|virus|bricked' => [
                 'Stuck booting',
                 'Storage problem',
                 'Software update',
             ],
-            'virus' => [
-                'Stuck booting',
+            'update|reset' => [
                 'Software update',
+                'Stuck booting',
             ],
         ];
     }
