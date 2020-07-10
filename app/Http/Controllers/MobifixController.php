@@ -111,12 +111,12 @@ class MobifixController extends Controller {
     protected function _faultdescs() {
         return [
             'Power/battery' => '',
-            'Screen' => 'Fault involves screen - glass, touch...',
+            'Screen' => 'Fault involves screen assembly - glass, touch, LCD...',
             'Stuck booting' => 'Powers on but OS does not load/errors',
             'Camera' => '',
-            'Headphone jack' => '',
+            'Headphone jack' => 'Broken, loose, dirty...',
             'Speaker/amplifier' => 'No sound, volume issues...',
-            'Charger' => '',
+            'Charger' => 'Problem with the charger not the phone itself',
             'On/Off button' => '',
             'Volume buttons' => '',
             'Other buttons' => '',
