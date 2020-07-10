@@ -49,10 +49,11 @@ class MobifixController extends Controller {
         // match problem terms with suggestions
         $suggestions = $this->_suggestions();
         $fault_types = $this->_faulttypes();
-        $fault->suggestions = [];
+        $fault->descriptions = $this->_faultdescs();
+        $fault->suggestions = [];        
         foreach ($suggestions as $term => $faults) {
             if (preg_match("/$term/", strtolower($fault->problem), $matches)) {
-                $fault->suggestions = array_unique(array_merge($fault->suggestions, $faults));
+                $fault->suggestions = array_unique(array_merge($fault->suggestions, $faults));                
                 $fault_types = array_diff($fault_types, $faults);
             }
         }
@@ -104,6 +105,30 @@ class MobifixController extends Controller {
             'Memory card slot',
             'Unknown',
             'Other',
+        ];
+    }
+    
+    protected function _faultdescs() {
+        return [
+            'Power/battery' => '',
+            'Screen' => 'Fault involves screen assembly - glass, touch, LCD...',
+            'Stuck booting' => 'Powers on but OS does not load/errors',
+            'Camera' => '',
+            'Headphone jack' => 'Broken, loose, dirty...',
+            'Speaker/amplifier' => 'No sound, volume issues...',
+            'Charger' => 'Problem with the charger not the phone itself',
+            'On/Off button' => '',
+            'Volume buttons' => '',
+            'Other buttons' => '',
+            'Software update' => 'Problem after update, lack of updates...',
+            'Storage problem' => 'Run out of storage space, corrupted storage...',
+            'USB/charging port' => 'Broken, loose, dirty...',
+            'Sim card slot' => '',
+            'Microphone' => '',
+            'Bluetooth' => '',
+            'Memory card slot' => '',
+            'Unknown' => 'Not enough info to determine the main fault',
+            'Other' => 'Main fault is known but there is no option for it',
         ];
     }
 
