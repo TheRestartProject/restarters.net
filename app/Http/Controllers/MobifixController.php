@@ -45,12 +45,13 @@ class MobifixController extends Controller {
         }
         $Mobifix = new Mobifix;
         $fault = $Mobifix->fetchFault()[0];
+//        $fault->problem = "usb issue";
         $fault->translate = rawurlencode($fault->problem);
         // match problem terms with suggestions
         $suggestions = $this->_suggestions();
         $fault_types = $this->_faulttypes();
         $fault->descriptions = $this->_faultdescs();
-        $fault->suggestions = [];        
+        $fault->suggestions = [];
         foreach ($suggestions as $term => $faults) {
             if (preg_match("/$term/", strtolower($fault->problem), $matches)) {
                 $fault->suggestions = array_unique(array_merge($fault->suggestions, $faults));                
@@ -160,7 +161,7 @@ class MobifixController extends Controller {
                 'Power/battery',
             ],
             'cable|connector|port|usb' => [
-                'USB / charging port',
+                'USB/charging port',
             ],
             'memory|ram' => [
                 'Memory card slot',
@@ -172,7 +173,7 @@ class MobifixController extends Controller {
             ],
             'charg|plug' => [
                 'Charger',
-                'USB / charging port',
+                'USB/charging port',
                 'Power/battery',
             ],
             'mic' => [
