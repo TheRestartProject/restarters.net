@@ -9,6 +9,7 @@ use App\Cluster;
 use App\Device;
 use App\Events\ApproveEvent;
 use App\Events\EditEvent;
+use App\Events\EventDeleted;
 use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Group;
@@ -1014,46 +1015,6 @@ class PartyController extends Controller
         ]);
     }
 
-    public function delete($id)
-    {
-        if (FixometerHelper::hasRole($this->user, 'Administrator') || (hasRole($this->user, 'Host') && in_array($id, $this->hostParties))) {
-            // fetch the postID in WP to delete it later
-            $party = $this->Party->findOne($id);
-            $wpId = $party->wordpress_post_id;
-
-            $usersDelete = $this->Party->deleteUserList($id);
-            $r = $this->Party->delete($id);
-
-            if ( ! $r) {
-                $response = 'action=de&code=403';
-            } else {
-                if ( ! is_null($wpId) && is_numeric($wpId)) {
-                    // delete from WordPress
-                    /** Start WP XML-RPC **/
-                    $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
-                    $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
-
-                    $deletion = $wpClient->deletePost($wpId);
-                    if ( ! $wpId) {
-                        $response = 'action=de&code=500';
-                    } else {
-                        $response = 'action=de&code=200';
-                    }
-                } else {
-                    $response = 'action=de&code=200';
-                }
-            }
-
-            if (FixometerHelper::hasRole($this->user, 'Host')) {
-                header('Location: /host?'.$response);
-            } else {
-                header('Location: /party?'.$response);
-            }
-        } else {
-            header('Location: /user/forbidden');
-        }
-    }
-
     public static function stats($id, $class = null)
     {
         $Device = new Device;
@@ -1536,28 +1497,36 @@ class PartyController extends Controller
         return redirect()->back()->with('warning', 'Sorry - you do not have the correct permissions for this action');
     }
 
+
+    /**
+     * Called via AJAX.
+     * @param id The event id.
+     */
     public function deleteEvent($id)
     {
+        $event = Party::findOrFail($id);
         $user = Auth::user();
-        $event = Party::find($id);
 
-        if ( ! isset($id) || is_null($event)) {
-            abort(404);
+        Log::info("User {$user->id} attempting to delete event {$id}");
+
+        if (! FixometerHelper::userHasEditPartyPermission($id) &&
+            ! FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id)) {
+            return redirect()->back()->with('warning', 'You do not have permission to delete this event');
         }
 
-        // Check for authentication
-        if (FixometerHelper::userHasEditPartyPermission($id) || FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id)) {
-            // Let's delete everything just to be certain
-            $audits = Audits::where('auditable_type', 'App\Party')->where('auditable_id', $id)->delete();
-            $device = Device::where('event', $id)->delete();
-            $event_users = EventsUsers::where('event', $id)->delete();
-            $event = Party::where('idevents', $id)->delete();
+        $event = Party::findOrFail($id);
+        $eventData = $event->toArray();
 
-            // Let the user know everything has been done
-            return redirect('/party')->with('success', 'Event has been deleted');
-        }
+        $audits = Audits::where('auditable_type', 'App\Party')->where('auditable_id', $id)->delete();
+        $device = Device::where('event', $id)->delete();
+        $event_users = EventsUsers::where('event', $id)->delete();
+        $event->delete();
 
-        return redirect()->back()->with('warning', 'You do not have permission to delete this event');
+        event(new EventDeleted($event));
+
+        Log::info("Event deleted");
+
+        return redirect('/party')->with('success', 'Event has been deleted');
     }
 
     public function noDataEntered()
