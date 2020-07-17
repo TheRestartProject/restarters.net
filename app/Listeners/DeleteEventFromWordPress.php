@@ -39,7 +39,7 @@ class DeleteEventFromWordPress
         $repairEvent = $event->repairEvent;
 
         try {
-            if ($repairEvent->shouldPushToWordPress()) {
+            if ($repairEvent->shouldPushToWordPress() && !empty($repairEvent->wordpress_post_id)) {
                 $this->wpClient->deletePost($repairEvent->wordpress_post_id);
             }
         } catch (\Exception $ex) {
