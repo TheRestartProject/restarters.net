@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
+use App\Events\EventDeleted;
 use App\Events\EventImagesUploaded;
 use App\Events\UserFollowedGroup;
 use App\Events\UserUpdated;
 use App\Events\UserDeleted;
 use App\Listeners\AddUserToDiscourseGroup;
 use App\Listeners\AnonymiseSoftDeletedUser;
+use App\Listeners\DeleteEventFromWordPress;
 use App\Listeners\RemoveSoftDeletedUserFromAllGroups;
 use App\Listeners\SendAdminModerateEventPhotosNotification;
 use App\Listeners\SendAdminUserDeletedNotification;
@@ -27,22 +29,22 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\LogSuccessfulLogin',
         ],
 
-        // Notify When Approve Event Occurs
         'App\Events\ApproveEvent' => [
             'App\Listeners\CreateWordPressApproveEventPost',
         ],
 
-        // Notify When Edit Event Occurs
         'App\Events\EditEvent' => [
             'App\Listeners\CreateWordPressEditEventPost',
         ],
 
-        // Notify When Approve Group Occurs
+        EventDeleted::class => [
+            DeleteEventFromWordPress::class,
+        ],
+
         'App\Events\ApproveGroup' => [
             'App\Listeners\CreateWordPressApproveGroupPost',
         ],
 
-        // Notify When Edit Group Occurs
         'App\Events\EditGroup' => [
             'App\Listeners\CreateWordPressEditGroupPost',
         ],
