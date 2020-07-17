@@ -79,6 +79,12 @@ Route::prefix('misccat')->group(function () {
     Route::get('/status', 'MisccatController@status');
 });
 
+Route::prefix('MobiFix')->group(function () {
+    Route::get('/', 'MobifixController@index');
+    Route::post('/', 'MobifixController@index');
+    Route::get('/cta', 'MobifixController@cta');
+    Route::get('/status', 'MobifixController@status');
+});
 Route::prefix('mobifix')->group(function () {
     Route::get('/', 'MobifixController@index');
     Route::post('/', 'MobifixController@index');
