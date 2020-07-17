@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App;
 use Auth;
 use App\Device;
 use App\EventsUsers;
@@ -30,6 +31,7 @@ use FixometerHelper;
 use FixometerFile;
 use Notification;
 use Lang;
+use LaravelLocalization;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -239,6 +241,25 @@ class UserController extends Controller
         }
 
         return redirect()->back()->with('error', 'Current Password does not match!');
+    }
+
+    public function storeLanguage(Request $request)
+    {
+        if ($request->input('id') !== null) {
+            $id = $request->input('id');
+        } else {
+            $id = Auth::id();
+        }
+
+        $user = User::find($id);
+        $user->language = $request->input('user_language');
+        $user->save();
+
+        session()->put('locale', $user->language);
+        LaravelLocalization::setLocale($user->language);
+        App::setLocale($user->language);
+
+        return redirect()->back()->with('message', 'Language preference updated');
     }
 
     public function postSoftDeleteUser(Request $request)

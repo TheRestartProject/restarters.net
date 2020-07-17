@@ -43,6 +43,45 @@
 
 </div>
 
+<div class="edit-panel">
+    <div class="form-row">
+        <div class="col">
+            <h4>Language</h4>
+            <p>choose yo lang</p>
+        </div>
+    </div>
+
+    <form action="/profile/edit-language" method="post">
+        @csrf
+
+        {{ Form::hidden('id', $user->id) }}
+
+        <fieldset class="language">
+            <div class="form-row">
+            <div class="form-group col-lg-6">
+                <label for="user_language">Preferred language</label>
+                <select class="form-control" id="user_language" name="user_language">
+                    @foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                        @if (isset($user->language) && $localeCode == $user->language)
+                        <option value="{{ $localeCode }}" selected>{{ $properties['native'] }}</option>
+                        @else
+                        <option value="{{ $localeCode }}">{{ $properties['native'] }}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+            </div>
+        </fieldset>
+
+        <div class="form-row">
+            <div class="form-group col-lg-12">
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 
 @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
     <div class="edit-panel">

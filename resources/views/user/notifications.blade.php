@@ -22,13 +22,13 @@
             <div class="col-lg-4 offset-lg-sidebar">
                 <div class="list-group" id="list-tab" role="tablist">
                     <a class="list-group-item list-group-item-action" id="list-profile-list"
-                       href="{{ route('edit-profile') }}#list-profile" role="tab">Profile</a>
+                       href="{{ route('edit-profile', ['id' => $user->id]) }}#list-profile" role="tab">Profile</a>
                     <a class="list-group-item list-group-item-action" id="list-account-list"
-                       href="{{ route('edit-profile') }}#list-account" role="tab">Account</a>
+                       href="{{ route('edit-profile', ['id' => $user->id]) }}#list-account" role="tab">Account</a>
                     <a class="list-group-item list-group-item-action" id="list-email-preferences-list"
-                       href="{{ route('edit-profile') }}#list-email-preferences" role="tab">Email preferences</a>
+                       href="{{ route('edit-profile', ['id' => $user->id]) }}#list-email-preferences" role="tab">Email preferences</a>
                     <a class="list-group-item list-group-item-action" id="list-calendar-links-list"
-                       href="{{ route('edit-profile') }}#list-calendar-links" role="tab">Calendars</a>
+                       href="{{ route('edit-profile', ['id' => $user->id]) }}#list-calendar-links" role="tab">Calendars</a>
                     <a class="list-group-item list-group-item-action active" id="list-notifications-list"
                        data-toggle="list" href="#list-notifications" role="tab" aria-controls="list-notifications">@lang('notifications.notifications')</a>
                 </div>

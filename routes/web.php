@@ -103,6 +103,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/{id}', 'UserController@index');
         Route::post('/edit-info', 'UserController@postProfileInfoEdit');
         Route::post('/edit-password', 'UserController@postProfilePasswordEdit');
+        Route::post('/edit-language', 'UserController@storeLanguage');
         Route::post('/edit-preferences', 'UserController@postProfilePreferencesEdit');
         Route::post('/edit-tags', 'UserController@postProfileTagsEdit');
         Route::post('/edit-photo', 'UserController@postProfilePictureEdit');
