@@ -18,9 +18,11 @@
                             @include('svgs.fixometer.fixometer-doodle')
                         </div>
 
+                        @if (count($user_groups) > 0)
                         <button data-target="#add-device-modal" data-toggle="modal" aria-expanded="true" aria-controls="add-device-modal" class="btn btn-sm btn-primary ml-auto">
                             Add Data
                         </button>
+                        @endif
 
                     </div>
 
@@ -310,7 +312,7 @@
                                         <tr>
 
                                             @if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-                                            <th width="60" class="text-left"></th>
+                                            <th width="60" colspan="3" class="text-left"></th>
                                             @else
                                             <th width="60" class="text-left"></th>
                                             @endif

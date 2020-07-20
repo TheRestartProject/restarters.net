@@ -56,6 +56,12 @@ class DeviceController extends Controller
         ->select('groups.*')
         ->get();
 
+        $items = Device::with(['deviceEvent'])
+               ->join('events', 'events.idevents', '=', 'devices.event')
+               ->orderBy('events.event_date', 'desc')
+               ->orderBy('devices.iddevices', 'asc')
+               ->paginate(15);
+
         return view('fixometer.index', [
             'title' => Lang::get('devices.fixometer'),
             'categories' => $categories,
@@ -75,7 +81,7 @@ class DeviceController extends Controller
             'sort_direction' => 'DSC',
             'sort_column' => 'event_date',
             'user_groups' => $user_groups,
-            'items' => Device::paginate(15),
+            'items' => $items,
         ]);
     }
 
