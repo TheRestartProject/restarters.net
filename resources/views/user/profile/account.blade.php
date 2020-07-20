@@ -46,8 +46,7 @@
 <div class="edit-panel">
     <div class="form-row">
         <div class="col">
-            <h4>Language</h4>
-            <p>choose yo lang</p>
+            <h4>@lang('profile.language_panel_title')</h4>
         </div>
     </div>
 
@@ -59,7 +58,7 @@
         <fieldset class="language">
             <div class="form-row">
             <div class="form-group col-lg-6">
-                <label for="user_language">Preferred language</label>
+                <label for="user_language">@lang('profile.preferred_language')</label>
                 <select class="form-control" id="user_language" name="user_language">
                     @foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
                         @if (isset($user->language) && $localeCode == $user->language)
