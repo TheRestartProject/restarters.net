@@ -408,7 +408,7 @@ class DeviceController extends Controller
 
             $audits = Device::findOrFail($id)->audits;
 
-            return view('device.edit', [
+            return view('fixometer.edit', [
                 'title' => 'Edit Device',
                 'response' => $response,
                 'categories' => $Categories->findAll(),

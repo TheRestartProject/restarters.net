@@ -10,7 +10,7 @@ return array (
   'edit_devices_details' => 'Edit device details',
   'edit_devices_details_content' => 'Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.',
   'search_all_devices' => 'Search devices',
-  'export_device_data' => 'Export device data',
+  'export_device_data' => 'Export data',
   'by_taxonomy' => 'By taxonomy',
   'by_date' => 'By date',
   'various' => 'Various',
