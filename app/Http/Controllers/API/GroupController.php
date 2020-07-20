@@ -203,4 +203,25 @@ class GroupController extends Controller
 
         return response()->json($groups);
     }
+
+
+    public static function getEventsForGroup(Request $request, Group $group)
+    {
+        $group = $group->load('parties');
+
+        $events = $group->parties->sortByDesc('event_date');
+
+        if ($request->has('format') && $request->input('format') == 'location') {
+            $events = $events->map(function($event) {
+                return (object) [
+                    'id' => $event->idevents,
+                    'location' => $event->FriendlyLocation,
+                ];
+            });
+        }
+
+        return response()->json([
+            'events' => $events->values()->toJson(),
+        ]);
+    }
 }

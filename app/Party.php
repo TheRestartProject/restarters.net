@@ -859,8 +859,8 @@ class Party extends Model implements Auditable
 
     public function getFriendlyLocationAttribute()
     {
-        $short_location = str_limit($this->location, 15);
+        $short_location = str_limit($this->venue, 30);
 
-        return "{$this->getEventDate('d/m/Y')} at {$short_location}";
+        return "{$this->getEventDate('d/m/Y')} / {$short_location}";
     }
 }

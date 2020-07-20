@@ -7,7 +7,6 @@
 @section('content')
 
 <section class="devices">
-    <form id="device-search" action="/device/search/" method="get">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-md-12">
@@ -19,9 +18,9 @@
                             @include('svgs.fixometer.fixometer-doodle')
                         </div>
 
-                        <!-- <button data-target="#add-device-modal" data-toggle="modal" aria-expanded="true" aria-controls="add-device-modal" class="btn btn-sm btn-primary ml-auto">
-                             Add Data
-                             </button> -->
+                        <button data-target="#add-device-modal" data-toggle="modal" aria-expanded="true" aria-controls="add-device-modal" class="btn btn-sm btn-primary ml-auto">
+                            Add Data
+                        </button>
 
                     </div>
 
@@ -76,6 +75,7 @@
                             </div>
                         </div>
 
+                        <form id="device-search" action="/device/search/" method="get">
                         <input type="hidden" name="sort_direction" value="{{{ $sort_direction }}}">
 
                         @php( $active_filter = false )
@@ -387,5 +387,7 @@
                 </div>
     </form>
 </section>
+
+@include('fixometer.add-data-modal')
 
 @endsection

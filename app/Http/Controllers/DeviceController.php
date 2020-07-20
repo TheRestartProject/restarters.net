@@ -173,38 +173,6 @@ class DeviceController extends Controller
         $global_impact_data = app('App\Http\Controllers\ApiController')
                             ->homepage_data();
         $global_impact_data = $global_impact_data->getData();
-        /*$impact_data = (object) [
-          'participants' => 0,
-          'hours_volunteered' => 0,
-          'items_fixed' => 0,
-          'waste_prevented' => 0,
-          'emissions' => 0,
-        ];
-
-        $all_deviced_grouped->each(function($devices, $event_id) use($impact_data, $emissionRatio) {
-          $devices->each(function($device) use($impact_data, $emissionRatio) {
-            $stats = $device->getStats($emissionRatio);
-
-            if ($stats['is_fixed']) {
-              $impact_data->items_fixed += 1;
-            }
-
-            if ($stats['co2_emissions_prevented'] > 0) {
-              $impact_data->emissions += $stats['co2_emissions_prevented'];
-            }
-
-            if ($stats['ewaste_prevented'] > 0) {
-              $impact_data->waste_prevented += $stats['ewaste_prevented'];
-            }
-          });
-
-          $event = $devices->last()->deviceEvent;
-          $impact_data->participants += $event->pax;
-          $impact_data->hours_volunteered += $event->hoursVolunteered();
-        });
-
-        $impact_data->emissions = round($impact_data->emissions);
-        $impact_data->waste_prevented = number_format(round($impact_data->waste_prevented, 2), 0);*/
 
         $most_recent_finished_event = Party::with('theGroup')
         ->hasDevicesRepaired(5)
