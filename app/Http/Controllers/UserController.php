@@ -254,7 +254,7 @@ class UserController extends Controller
 
         $newLanguage = $request->input('user_language');
         $user = User::find($userId);
-        $user->setLanguage = $newLanguage;
+        $user->language = $newLanguage;
         $user->save();
 
         // Update current language settings in the app.
@@ -267,7 +267,7 @@ class UserController extends Controller
             event(new UserLanguageUpdated($user));
         }
 
-        return redirect()->back()->with('message', 'Language preference updated');
+        return redirect()->back()->with('message', Lang::get('profile.language_updated'));
     }
 
     public function postSoftDeleteUser(Request $request)
