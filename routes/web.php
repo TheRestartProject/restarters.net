@@ -137,8 +137,17 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     //Device Controller
     Route::resource('device-url', 'DeviceUrlController');
-    Route::prefix('device')->group(function () {
+
+    Route::prefix('fixometer')->group(function () {
         Route::get('/', 'DeviceController@index')->name('devices');
+        Route::get('/search', 'DeviceController@search')->name('fixometer-search');
+    });
+
+    // TODO: the rest of these to be redirect properly.
+    Route::prefix('device')->group(function () {
+        Route::get('/', function() {
+            return redirect('/fixometer');
+        });
         Route::get('/search', 'DeviceController@search');
         Route::get('/page-edit/{id}', 'DeviceController@edit');
         Route::post('/page-edit/{id}', 'DeviceController@edit');

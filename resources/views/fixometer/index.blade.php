@@ -75,7 +75,7 @@
                             </div>
                         </div>
 
-                        <form id="device-search" action="/device/search/" method="get">
+                        <form id="device-search" action="{{ route('fixometer-search') }}" method="get">
                         <input type="hidden" name="sort_direction" value="{{{ $sort_direction }}}">
 
                         @php( $active_filter = false )
