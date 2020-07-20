@@ -27,7 +27,7 @@
 
 <div class="col-12">
   <div class="row">
-    <div class="col d-none d-md-block mb-30 mb-md-0">
+    <div class="col d-none d-md-block mb-30 mb-lg-0">
       <div class="card card-summary">
         <div class="card-body">
           <div class="svg-wrapper">
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <div class="col mb-30 mb-md-0">
+    <div class="col-6 col-md mb-30 mb-lg-0">
       <div class="card card-summary">
         <div class="card-body">
           <div class="svg-wrapper">
@@ -52,7 +52,7 @@
       </div>
     </div>
 
-    <div class="col mb-30 mb-md-0">
+    <div class="col-6 col-md mb-30 mb-lg-0">
       <div class="card card-summary">
         <div class="card-body">
           <div class="svg-wrapper">
@@ -64,7 +64,7 @@
       </div>
     </div>
 
-    <div class="col mb-30 mb-md-0">
+    <div class="col mb-30 mb-lg-0">
       <div class="card card-summary">
         <div class="card-body">
           <div class="svg-wrapper">
