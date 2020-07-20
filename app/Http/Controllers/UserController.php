@@ -7,6 +7,7 @@ use Auth;
 use App\Device;
 use App\EventsUsers;
 use App\Events\PasswordChanged;
+use App\Events\UserLanguageUpdated;
 use App\Group;
 use App\Mail\RegistrationWelcome;
 use App\Network;
@@ -246,18 +247,25 @@ class UserController extends Controller
     public function storeLanguage(Request $request)
     {
         if ($request->input('id') !== null) {
-            $id = $request->input('id');
+            $userId = $request->input('id');
         } else {
-            $id = Auth::id();
+            $userId = Auth::id();
         }
 
-        $user = User::find($id);
-        $user->language = $request->input('user_language');
+        $newLanguage = $request->input('user_language');
+        $user = User::find($userId);
+        $user->setLanguage = $newLanguage;
         $user->save();
 
-        session()->put('locale', $user->language);
-        LaravelLocalization::setLocale($user->language);
-        App::setLocale($user->language);
+        // Update current language settings in the app.
+        // But don't update it for an admin if they're changing someone else's settings.
+        if ($userId == Auth::id()) {
+            session()->put('locale', $newLanguage);
+            LaravelLocalization::setLocale($newLanguage);
+            App::setLocale($newLanguage);
+
+            event(new UserLanguageUpdated($user));
+        }
 
         return redirect()->back()->with('message', 'Language preference updated');
     }
