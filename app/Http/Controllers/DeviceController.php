@@ -23,48 +23,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Lang;
 use Notification;
 use View;
 
 class DeviceController extends Controller
 {
-    // public function __construct($model, $controller, $action){
-    //     parent::__construct($model, $controller, $action);
-    //
-    //     $Auth = new Auth($url);
-    //     if(!$Auth->isLoggedIn()){
-    //         header('Location: /user/login');
-    //     }
-    //     else {
-    //
-    //         $user = $Auth->getProfile();
-    //         $this->user = $user;
-    //         $this->set('user', $user);
-    //         $this->set('header', true);
-    //
-    //         if(FixometerHelper::hasRole($this->user, 'Host')){
-    //             $Group = new Group;
-    //             $Party = new Party;
-    //             $group = $Group->ofThisUser($this->user->id);
-    //             $this->set('usergroup', $group[0]);
-    //             $parties = $Party->ofThisGroup($group[0]->idgroups);
-    //
-    //             foreach($parties as $party){
-    //                 $this->hostParties[] = $party->idevents;
-    //             }
-    //             $User = new User;
-    //             $this->set('profile', $User->profilePage($this->user->id));
-    //
-    //             return view('device.index', [
-    //               'user' => $user,
-    //               'header' => true,
-    //               'usergroup' => $group[0],
-    //               'profile' => $User->profilePage($this->user->id),
-    //             ]);
-    //         }
-    //     }
-    // }
-
     public function index($search = null)
     {
         $Category = new Category;
@@ -80,19 +44,19 @@ class DeviceController extends Controller
         ->first();
 
         // TODO: Breaks page and causes 500 error.
-        // $global_impact_data = app('App\Http\Controllers\ApiController')
-        // ->homepage_data();
+         $global_impact_data = app('App\Http\Controllers\ApiController')
+         ->homepage_data();
 
-        // $global_impact_data = $global_impact_data->getData();
+         $global_impact_data = $global_impact_data->getData();
 
         // Loads instantly...
-        $global_impact_data = (object) [
-            'participants' => '16,424',
-            'hours_volunteered' => '29,832',
-            'items_fixed' => '13,453',
-            'waste_prevented' => '19,338',
-            'emissions' => '300568',
-        ];
+        // $global_impact_data = (object) [
+        //     'participants' => '16,424',
+        //     'hours_volunteered' => '29,832',
+        //     'items_fixed' => '13,453',
+        //     'waste_prevented' => '19,338',
+        //     'emissions' => '300568',
+        // ];
 
         $user_groups = Group::with('allRestarters', 'parties', 'groupImage.image')
         ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
@@ -103,8 +67,8 @@ class DeviceController extends Controller
         ->select('groups.*')
         ->get();
 
-        return view('device.index', [
-            'title' => 'Devices',
+        return view('fixometer.index', [
+            'title' => Lang::get('devices.fixometer'),
             'categories' => $categories,
             'groups' => $all_groups,
             'most_recent_finished_event' => $most_recent_finished_event,

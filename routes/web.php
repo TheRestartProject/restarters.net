@@ -161,7 +161,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::post('/create', 'GroupController@create');
         Route::get('/edit/{id}', 'GroupController@edit');
         Route::post('/edit/{id}', 'GroupController@edit');
-        Route::get('/view/{id}', 'GroupController@view');
+        Route::get('/view/{id}', 'GroupController@view')->name('group.show');
         Route::post('/invite', 'GroupController@postSendInvite');
         Route::get('/accept-invite/{id}/{hash}', 'GroupController@confirmInvite');
         Route::get('/join/{id}', 'GroupController@getJoinGroup');

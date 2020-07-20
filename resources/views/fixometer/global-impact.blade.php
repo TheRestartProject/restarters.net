@@ -1,17 +1,16 @@
 <div class="col-12 mt-20 mb-30">
   <div class="d-flex align-items-center justify-content-between">
     <h2 class="mb-0">
-      Our Global Impact
+      @lang('devices.global_impact')
     </h2>
 
     @if (isset($most_recent_finished_event) && ! empty($most_recent_finished_event))
       <div class="d-none d-md-block">
         <div class="call_to_action">
-          <div class="mr-30">
+          <div class="mr-10">
             @include('svgs.fixometer.clap_doodle')
           </div>
-
-          {{ $most_recent_finished_event->theGroup->name }} prevented {{ $most_recent_finished_event->WastePrevented }}kg of waste!
+          <a style="color:white; text-decoration:underline;" href="{{ route('group.show', ['id' => $most_recent_finished_event->theGroup->idgroups]) }}">{{ $most_recent_finished_event->theGroup->name }}</a>&nbsp;@lang('devices.group_prevented', ['amount' => $most_recent_finished_event->WastePrevented])
         </div>
       </div>
     @endif
@@ -21,7 +20,7 @@
 <div class="col-12">
     <div class="row">
         <div class="col">
-            <p><strong>Repairers around the world are having a huge impact!</strong>  <a href="">Read more</a> about how we assess our impact on the environment.</p>
+            <p><strong>@lang('devices.huge_impact')</strong> @lang('devices.impact_read_more')</p>
         </div>
     </div>
 </div>
@@ -36,7 +35,7 @@
           </div>
 
           <h3>{{ $impact_data->participants }}</h3>
-          <p>participants</p>
+          <p>@lang('devices.participants')</p>
         </div>
       </div>
     </div>
@@ -48,7 +47,7 @@
             @include('svgs.fixometer.clock_doodle')
           </div>
           <h3>{{ $impact_data->hours_volunteered }}</h3>
-          <p>hours of volunteered time</p>
+          <p>@lang('devices.hours_volunteered')</p>
         </div>
       </div>
     </div>
@@ -60,7 +59,7 @@
             @include('svgs.fixometer.phone_doodle')
           </div>
           <h3>{{ $impact_data->items_fixed }}</h3>
-          <p>devices repaired</p>
+          <p>@lang('devices.items_repaired')</p>
         </div>
       </div>
     </div>
@@ -72,8 +71,8 @@
             @include('svgs.fixometer.trash_doodle')
           </div>
 
-          <h3>{{ $impact_data->waste_prevented }}</h3>
-          <p>waste prevented</p>
+          <h3>{{ $impact_data->weights }} kg</h3>
+          <p>@lang('devices.waste_prevented')</p>
         </div>
       </div>
     </div>
@@ -86,7 +85,7 @@
           </div>
 
           <h3>{{ number_format($impact_data->emissions, 0) }} kg</h3>
-          <p>CO2 emissinos prevented</p>
+          <p>@lang('devices.co2_prevented')</p>
         </div>
       </div>
     </div>

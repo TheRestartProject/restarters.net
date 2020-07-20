@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-@lang('devices.devices')
+@lang('devices.fixometer')
 @endsection
 
 @section('content')
@@ -13,7 +13,7 @@
                 <div class="col-12 col-md-12">
                     <div class="d-flex align-items-center">
                         <h1 id="dashboard__header" class="mb-0 mr-30">
-                            @lang('devices.devices')
+                            @lang('devices.fixometer')
                         </h1>
                         <div class="mr-auto d-none d-md-block">
                             @include('svgs.fixometer.fixometer-doodle')
@@ -36,7 +36,7 @@
             </div>
 
             <div class="row">
-                @include('device.global-impact')
+                @include('fixometer.global-impact')
             </div>
 
             <hr class="mt-md-50 hr-dashed">

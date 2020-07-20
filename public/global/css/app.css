@@ -8798,8 +8798,7 @@ button.bg-dark:focus {
 }
 
 .pr-15,
-.px-15,
-.call_to_action {
+.px-15 {
   padding-right: 15px !important;
 }
 
@@ -8809,8 +8808,7 @@ button.bg-dark:focus {
 }
 
 .pl-15,
-.px-15,
-.call_to_action {
+.px-15 {
   padding-left: 15px !important;
 }
 
@@ -16988,6 +16986,8 @@ select.form-control:not([class*="select2"]) {
 
 .call_to_action {
   background-color: #222;
+  padding-left: 0.5rem;
+  padding-right: 1.5rem;
   font-family: Asap;
   font-size: 18px;
   font-weight: bold;
