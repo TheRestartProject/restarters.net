@@ -43,20 +43,9 @@ class DeviceController extends Controller
         ->orderBy('event_date', 'DESC')
         ->first();
 
-        // TODO: Breaks page and causes 500 error.
-         $global_impact_data = app('App\Http\Controllers\ApiController')
-         ->homepage_data();
-
-         $global_impact_data = $global_impact_data->getData();
-
-        // Loads instantly...
-        // $global_impact_data = (object) [
-        //     'participants' => '16,424',
-        //     'hours_volunteered' => '29,832',
-        //     'items_fixed' => '13,453',
-        //     'waste_prevented' => '19,338',
-        //     'emissions' => '300568',
-        // ];
+        $global_impact_data = app('App\Http\Controllers\ApiController')
+                            ->homepage_data();
+        $global_impact_data = $global_impact_data->getData();
 
         $user_groups = Group::with('allRestarters', 'parties', 'groupImage.image')
         ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
@@ -86,7 +75,7 @@ class DeviceController extends Controller
             'sort_direction' => 'DSC',
             'sort_column' => 'event_date',
             'user_groups' => $user_groups,
-            'list' => Device::paginate(15),
+            'items' => Device::paginate(15),
         ]);
     }
 
@@ -181,7 +170,10 @@ class DeviceController extends Controller
         $footprintRatioCalculator = new FootprintRatioCalculator();
         $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-        $impact_data = (object) [
+        $global_impact_data = app('App\Http\Controllers\ApiController')
+                            ->homepage_data();
+        $global_impact_data = $global_impact_data->getData();
+        /*$impact_data = (object) [
           'participants' => 0,
           'hours_volunteered' => 0,
           'items_fixed' => 0,
@@ -212,7 +204,7 @@ class DeviceController extends Controller
         });
 
         $impact_data->emissions = round($impact_data->emissions);
-        $impact_data->waste_prevented = number_format(round($impact_data->waste_prevented, 2), 0);
+        $impact_data->waste_prevented = number_format(round($impact_data->waste_prevented, 2), 0);*/
 
         $most_recent_finished_event = Party::with('theGroup')
         ->hasDevicesRepaired(5)
@@ -229,13 +221,13 @@ class DeviceController extends Controller
         ->select('groups.*')
         ->get();
 
-        return view('device.index', [
-            'impact_data' => $impact_data,
+        return view('fixometer.index', [
+            'impact_data' => $global_impact_data,
             'title' => 'Devices',
             'categories' => $categories,
             'groups' => Group::all(),
             'most_recent_finished_event' => $most_recent_finished_event,
-            'list' => $all_devices_paginated,
+            'items' => $all_devices_paginated,
             'selected_groups' => $request->input('groups'),
             'selected_categories' => $request->input('categories'),
             'from_date' => $request->input('from-date'),

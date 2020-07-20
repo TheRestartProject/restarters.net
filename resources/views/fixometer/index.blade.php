@@ -253,7 +253,7 @@
 
                             <button class="btn btn-secondary btn-groups w-100" type="submit">@lang('devices.search_all_devices')</button>
                             <button class="btn btn-secondary btn-groups mt-10 w-100" type="submit" disabled>
-                                @lang('devices.number_of_repairs'): {{ $list->count() }}
+                                @lang('devices.number_of_repairs'): {{ $items->total() }}
                             </button>
 
                         </aside>
@@ -349,7 +349,7 @@
                                     <tbody>
                                         @php( $user = Auth::user() )
                                         @php( $is_admin = FixometerHelper::hasRole($user, 'Administrator') )
-                                        @foreach($list as $device)
+                                        @foreach($items as $device)
                                         @if ( $is_admin || $device->repaired_by == $user->id )
                                         @include('partials.device-row-with-edit')
                                         @else
@@ -361,6 +361,18 @@
 
 
                                 <br>
+
+                                <div class="d-flex justify-content-center">
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination">
+                                            @if (!empty($_GET))
+                                                {!! $items->appends(request()->input())->links() !!}
+                                            @else
+                                                {!! $items->links() !!}
+                                            @endif
+                                        </ul>
+                                    </nav>
+                                </div>
 
 
                             </div>
