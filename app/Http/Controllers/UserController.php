@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App;
 use Auth;
 use App\Device;
 use App\EventsUsers;
 use App\Events\PasswordChanged;
+use App\Events\UserLanguageUpdated;
 use App\Group;
 use App\Mail\RegistrationWelcome;
 use App\Network;
@@ -30,6 +32,7 @@ use FixometerHelper;
 use FixometerFile;
 use Notification;
 use Lang;
+use LaravelLocalization;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -239,6 +242,32 @@ class UserController extends Controller
         }
 
         return redirect()->back()->with('error', 'Current Password does not match!');
+    }
+
+    public function storeLanguage(Request $request)
+    {
+        if ($request->input('id') !== null) {
+            $userId = $request->input('id');
+        } else {
+            $userId = Auth::id();
+        }
+
+        $newLanguage = $request->input('user_language');
+        $user = User::find($userId);
+        $user->language = $newLanguage;
+        $user->save();
+
+        // Update current language settings in the app.
+        // But don't update it for an admin if they're changing someone else's settings.
+        if ($userId == Auth::id()) {
+            session()->put('locale', $newLanguage);
+            LaravelLocalization::setLocale($newLanguage);
+            App::setLocale($newLanguage);
+
+            event(new UserLanguageUpdated($user));
+        }
+
+        return redirect()->back()->with('message', Lang::get('profile.language_updated'));
     }
 
     public function postSoftDeleteUser(Request $request)

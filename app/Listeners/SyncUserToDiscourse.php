@@ -2,14 +2,14 @@
 
 namespace App\Listeners;
 
-use App\Events\UserUpdated;
+use App\Events\UserEmailUpdated;
 
 class SyncUserToDiscourse
 {
     /**
      * @param UserUpdated $event
      */
-    public function handle(UserUpdated $event)
+    public function handle(UserEmailUpdated $event)
     {
         $user = $event->user;
 
