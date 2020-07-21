@@ -446,7 +446,7 @@ class Party extends Model implements Auditable
     public function scopeUpcomingEventsInUserArea($query, $user)
     {
       //Look for groups where user ID exists in pivot table
-      $user_group_ids = $user->user_groups_ids;
+      $user_group_ids = UserGroups::where('user', $user->id)->pluck('group')->toArray();
 
       return $this
       ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))

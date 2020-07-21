@@ -74,5 +74,5 @@ return array (
   'waste_prevented' => 'waste prevented',
   'co2_prevented' => 'CO2 emissions prevented',
   'add_data_title' => 'Add Data',
-  'add_data_description' => 'Adding data lets you see the impact of repair.',
+  'add_data_description' => 'Adding repair data helps show the impact of repair.',
 );
