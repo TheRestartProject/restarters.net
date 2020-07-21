@@ -52,7 +52,7 @@
                     </div>
 
                     <a href="#" class="ml-auto btn btn-primary btn-sm change-event-url">
-                        Go to event
+                        @lang('devices.add_data_action_button')
                     </a>
                 </div>
             </div>

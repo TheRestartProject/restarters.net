@@ -20,7 +20,7 @@
 
                         @if (count($user_groups) > 0)
                         <button data-target="#add-device-modal" data-toggle="modal" aria-expanded="true" aria-controls="add-device-modal" class="btn btn-sm btn-primary ml-auto">
-                            Add Data
+                            @lang('devices.add_data_button')
                         </button>
                         @endif
 
@@ -53,7 +53,7 @@
             </div>
             <div class="row">
                 <div class="col-12 col-md-8">
-                    Browse or search our global database of repair.
+                    @lang('devices.search_text')
                 </div>
             </div>
 
