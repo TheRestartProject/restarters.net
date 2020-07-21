@@ -10,7 +10,7 @@
           <div class="mr-10">
             @include('svgs.fixometer.clap_doodle')
           </div>
-          <a style="color:white; text-decoration:underline;" href="{{ route('group.show', ['id' => $most_recent_finished_event->theGroup->idgroups]) }}">{{ $most_recent_finished_event->theGroup->name }}</a>&nbsp;@lang('devices.group_prevented', ['amount' => $most_recent_finished_event->WastePrevented])
+          <a style="color:white; text-decoration:underline;" href="{{ route('group.show', ['id' => $most_recent_finished_event->theGroup->idgroups]) }}">{{ $most_recent_finished_event->theGroup->name }}</a>&nbsp;@lang('devices.group_prevented', ['amount' => number_format($most_recent_finished_event->WastePrevented, 0)])
         </div>
       </div>
     @endif
@@ -71,7 +71,7 @@
             @include('svgs.fixometer.trash_doodle')
           </div>
 
-          <h3>{{ $impact_data->weights }} kg</h3>
+          <h3>{{ number_format($impact_data->weights, 0) }} kg</h3>
           <p>@lang('devices.waste_prevented')</p>
         </div>
       </div>
