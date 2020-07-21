@@ -5,7 +5,7 @@ namespace App;
 use App\Device;
 use App\EventUsers;
 use App\Helpers\FootprintRatioCalculator;
-
+use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,6 +16,7 @@ class Party extends Model implements Auditable
 {
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
+    use \App\Traits\GlobalScopes;
 
     protected $table = 'events';
     protected $primaryKey = 'idevents';
@@ -36,7 +37,6 @@ class Party extends Model implements Auditable
         'created_at',
         'updated_at',
         'shareable_code',
-        'online',
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'idevents', 'user_id', 'wordpress_post_id'];
 
@@ -113,7 +113,6 @@ class Party extends Model implements Auditable
                     `e`.`hours`,
                     `e`.`free_text`,
                     `e`.`wordpress_post_id`,
-                    `e`.`online`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
 
@@ -414,15 +413,25 @@ class Party extends Model implements Auditable
     * Laravel specific code
     */
 
-    public function scopeUpcomingEvents()
+    public function scopeUpcomingEvents($query, $by_event = false)
     {
+      if( $by_event ) {
         return $this->join('groups', 'groups.idgroups', '=', 'events.group')
-                     ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+                     ->join('events_users', 'events_users.event', '=', 'events.idevents')
                      ->whereNotNull('events.wordpress_post_id')
                      ->whereDate('event_date', '>=', date('Y-m-d'))
                      ->select('events.*')
                      ->groupBy('idevents')
                      ->orderBy('event_date', 'ASC');
+      }
+
+      return $this->join('groups', 'groups.idgroups', '=', 'events.group')
+            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->whereNotNull('events.wordpress_post_id')
+            ->whereDate('event_date', '>=', date('Y-m-d'))
+            ->select('events.*')
+            ->groupBy('idevents')
+            ->orderBy('event_date', 'ASC');
     }
 
     /**
@@ -437,7 +446,7 @@ class Party extends Model implements Auditable
     public function scopeUpcomingEventsInUserArea($query, $user)
     {
       //Look for groups where user ID exists in pivot table
-      $user_group_ids = UserGroups::where('user', $user->id)->pluck('group')->toArray();
+      $user_group_ids = $user->user_groups_ids;
 
       return $this
       ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
@@ -537,7 +546,7 @@ class Party extends Model implements Auditable
     // Doesn't work if called 'group' - I guess because a reserved SQL keyword.
     public function theGroup()
     {
-        return $this->belongsTo(Group::class, 'group', 'idgroups');
+        return $this->hasOne('App\Group', 'idgroups', 'group');
     }
 
     public function getEventDate($format = 'd/m/Y')
@@ -727,9 +736,8 @@ class Party extends Model implements Auditable
      */
     public function isVolunteer($user_id = NULL)
     {
-        $attributes = ['user' => $user_id ?: auth()->id()];
-
-        return $this->allConfirmedVolunteers()->where($attributes)->exists();
+        return $this->allConfirmedVolunteers
+        ->contains('user', $user_id ?: auth()->id());
     }
 
     public function isBeingAttendedBy($userId)
@@ -775,8 +783,8 @@ class Party extends Model implements Auditable
     public function checkForMissingData()
     {
       $participants_count = $this->participants;
-      $volunteers_count = $this->allConfirmedVolunteers()->count();
-      $devices_count = $this->allDevices()->count();
+      $volunteers_count = $this->allConfirmedVolunteers->count();
+      $devices_count = $this->allDevices->count();
 
       return [
         'participants_count' => $participants_count,
@@ -815,23 +823,44 @@ class Party extends Model implements Auditable
       }
     }
 
-    public function shouldPushToWordpress()
+    public function scopeHasDevicesRepaired($query, int $has_x_devices_fixed = 1)
     {
-        return $this->theGroup->eventsShouldPushToWordpress();
+        return $query->whereHas('allDevices', function($query) {
+          return $query->where('repair_status', 1);
+        }, '>=', $has_x_devices_fixed);
     }
 
-    public function associatedNetworkCoordinators()
+    public function scopeEventHasFinished($query)
     {
-        $group = $this->theGroup;
+        $now = Carbon::now();
 
-        $coordinators = collect([]);
+        return $query->whereRaw("CONCAT(`event_date`, ' ', `end`) < '{$now}'");
+    }
 
-        foreach ($group->networks as $network) {
-            foreach ($network->coordinators as $coordinator) {
-                $coordinators->push($coordinator);
-            }
-        }
+    public function getWastePreventedAttribute()
+    {
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-        return $coordinators;
+        return round($this->getEventStats($emissionRatio)['ewaste'], 2);
+    }
+
+    public function scopeWithAll($query)
+    {
+        return $query->with([
+          'allDevices.deviceCategory',
+          'allInvited',
+          'allConfirmedVolunteers',
+          'host',
+          'theGroup.groupImage.image',
+          'devices.deviceCategory',
+        ]);
+    }
+
+    public function getFriendlyLocationAttribute()
+    {
+        $short_location = str_limit($this->venue, 30);
+
+        return "{$this->getEventDate('d/m/Y')} / {$short_location}";
     }
 }

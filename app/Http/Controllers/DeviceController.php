@@ -23,127 +23,51 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Lang;
 use Notification;
 use View;
 
 class DeviceController extends Controller
 {
-    // public function __construct($model, $controller, $action){
-    //     parent::__construct($model, $controller, $action);
-    //
-    //     $Auth = new Auth($url);
-    //     if(!$Auth->isLoggedIn()){
-    //         header('Location: /user/login');
-    //     }
-    //     else {
-    //
-    //         $user = $Auth->getProfile();
-    //         $this->user = $user;
-    //         $this->set('user', $user);
-    //         $this->set('header', true);
-    //
-    //         if(FixometerHelper::hasRole($this->user, 'Host')){
-    //             $Group = new Group;
-    //             $Party = new Party;
-    //             $group = $Group->ofThisUser($this->user->id);
-    //             $this->set('usergroup', $group[0]);
-    //             $parties = $Party->ofThisGroup($group[0]->idgroups);
-    //
-    //             foreach($parties as $party){
-    //                 $this->hostParties[] = $party->idevents;
-    //             }
-    //             $User = new User;
-    //             $this->set('profile', $User->profilePage($this->user->id));
-    //
-    //             return view('device.index', [
-    //               'user' => $user,
-    //               'header' => true,
-    //               'usergroup' => $group[0],
-    //               'profile' => $User->profilePage($this->user->id),
-    //             ]);
-    //         }
-    //     }
-    // }
-
     public function index($search = null)
     {
         $Category = new Category;
-        // $Group = new Group;
-        // $Device = new Device;
 
         $categories = $Category->listed();
 
-        // if (isset($_GET['fltr']) && ! empty($_GET['fltr'])) {
-        //     // Get params and clean them up
-        //     // DATES...
-        //     if (isset($_GET['from-date']) && ! empty($_GET['from-date'])) {
-        //         if ( ! DateTime::createFromFormat('d/m/Y', $_GET['from-date'])) {
-        //             $response['danger'] = 'Invalid "from date"';
-        //             $fromTimeStamp = null;
-        //         } else {
-        //             $fromDate = DateTime::createFromFormat('d/m/Y', $_GET['from-date']);
-        //             $fromTimeStamp = strtotime($fromDate->format('Y-m-d'));
-        //         }
-        //     } else {
-        //         $fromTimeStamp = 1;
-        //     }
-        //
-        //     if (isset($_GET['to-date']) && ! empty($_GET['to-date'])) {
-        //         if ( ! DateTime::createFromFormat('d/m/Y', $_GET['to-date'])) {
-        //             $response['danger'] = 'Invalid "to date"';
-        //         } else {
-        //             $toDate = DateTime::createFromFormat('d/m/Y', $_GET['to-date']);
-        //             $toTimeStamp = strtotime($toDate->format('Y-m-d'));
-        //         }
-        //     } else {
-        //         $toTimeStamp = time();
-        //     }
-        //
-        //     $params = array(
-        //         'brand' => filter_var($_GET['brand'], FILTER_SANITIZE_STRING),
-        //         'model' => filter_var($_GET['model'], FILTER_SANITIZE_STRING),
-        //         'problem' => filter_var($_GET['free-text'], FILTER_SANITIZE_STRING),
-        //
-        //         'category' => isset($_GET['categories']) ? filter_var($_GET['categories'], FILTER_SANITIZE_STRING) : null, //isset($_GET['categories']) ? implode(', ', filter_var_array($_GET['categories'], FILTER_SANITIZE_NUMBER_INT)) : null,
-        //         'group' => isset($_GET['groups']) ? filter_var($_GET['groups'], FILTER_SANITIZE_STRING) : null, //isset($_GET['groups']) ? implode(', ', filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT)) : null,
-        //
-        //         'event_date' => array($fromTimeStamp,  $toTimeStamp),
-        //
-        //     );
-        //
-        //     $list = $Device->getList($params);
-        // } else {
-        //     $list = $Device->getList();
-        // }
-
-        $user = Auth::user();
-
-        // if (FixometerHelper::hasRole($user, 'Administrator')) {
         $all_groups = Group::all();
 
-        // $all_devices = DeviceList::orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
-        $all_devices = Device::with('deviceCategory')
-                                ->with('deviceEvent')
-                                    ->with('barriers')
-                                        ->orderBy('iddevices', 'DSC')
-                                            ->paginate(env('PAGINATE'));
-        // } else {
-        //     $groups_user_ids = UserGroups::where('user', $user->id)
-        //     ->pluck('group')
-        //     ->toArray();
-        //
-        //     $device_ids = Device::whereIn('event', EventsUsers::where('user', Auth::id())->pluck('event'))->pluck('iddevices');
-        //
-        //     $all_devices = DeviceList::whereIn('id', $device_ids)->orderBy('sorter', 'DSC')->paginate(env('PAGINATE'));
-        //
-        //     $all_groups = Group::whereIn('idgroups', $groups_user_ids)->get();
-        // }
+        $most_recent_finished_event = Party::with('theGroup')
+        ->hasDevicesRepaired(5)
+        ->eventHasFinished()
+        ->orderBy('event_date', 'DESC')
+        ->first();
 
-        return view('device.index', [
-            'title' => 'Devices',
+        $global_impact_data = app('App\Http\Controllers\ApiController')
+                            ->homepage_data();
+        $global_impact_data = $global_impact_data->getData();
+
+        $user_groups = Group::with('allRestarters', 'parties', 'groupImage.image')
+        ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+        ->join('events', 'events.group', '=', 'groups.idgroups')
+        ->where('users_groups.user', Auth::id())
+        ->orderBy('groups.name', 'ASC')
+        ->groupBy('groups.idgroups')
+        ->select('groups.*')
+        ->get();
+
+        $items = Device::with(['deviceEvent'])
+               ->join('events', 'events.idevents', '=', 'devices.event')
+               ->orderBy('events.event_date', 'desc')
+               ->orderBy('devices.iddevices', 'asc')
+               ->paginate(15);
+
+        return view('fixometer.index', [
+            'title' => Lang::get('devices.fixometer'),
             'categories' => $categories,
             'groups' => $all_groups,
-            'list' => $all_devices,
+            'most_recent_finished_event' => $most_recent_finished_event,
+            'impact_data' => $global_impact_data,
             'selected_groups' => null,
             'selected_categories' => null,
             'from_date' => null,
@@ -156,6 +80,8 @@ class DeviceController extends Controller
             'status' => null,
             'sort_direction' => 'DSC',
             'sort_column' => 'event_date',
+            'user_groups' => $user_groups,
+            'items' => $items,
         ]);
     }
 
@@ -167,12 +93,14 @@ class DeviceController extends Controller
         $sort_direction = $request->input('sort_direction');
         $sort_column = $request->input('sort_column');
 
-        $all_devices = Device::with('deviceCategory')
-                                ->with('deviceEvent')
-                                    ->with('barriers')
-                                        ->join('events', 'events.idevents', '=', 'devices.event')
-                                            ->join('groups', 'groups.idgroups', '=', 'events.group')
-                     ->select('devices.*', 'groups.name AS group_name');
+        $all_devices = Device::with([
+          'deviceCategory',
+          'deviceEvent',
+          'barriers'
+        ])
+        ->join('events', 'events.idevents', '=', 'devices.event')
+        ->join('groups', 'groups.idgroups', '=', 'events.group')
+        ->select('devices.*', 'groups.name AS group_name');
 
         if ($request->input('sort_column') !== null) {
             $all_devices = $all_devices->orderBy($sort_column, $sort_direction);
@@ -203,7 +131,11 @@ class DeviceController extends Controller
             $to = $d_to->format('Y-m-d').' 23:59:59';
         }
 
-        if (! empty($date_from) && ! empty($date_to)) {
+        if (empty($date_from) && empty($date_to)) {
+          $all_devices->whereHas('deviceEvent', function($query) {
+            return $query->whereDate('event_date', '<', date('Y-m-d'));
+          });
+        } elseif (! empty($date_from) && ! empty($date_to)) {
             $all_devices = $all_devices->whereBetween('event_date', [$from, $to]);
         } elseif (! empty($date_from)) {
             $all_devices = $all_devices->whereDate('event_date', '>=', $from);
@@ -235,13 +167,41 @@ class DeviceController extends Controller
         if ($raw == true) {
             return $all_devices->get();
         }
-        $all_devices = $all_devices->paginate(env('PAGINATE'));
 
-        return view('device.index', [
+        $all_deviced_grouped = $all_devices->get()
+        ->groupBy('event');
+
+        $all_devices_paginated = $all_devices->paginate(env('PAGINATE'));
+
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $global_impact_data = app('App\Http\Controllers\ApiController')
+                            ->homepage_data();
+        $global_impact_data = $global_impact_data->getData();
+
+        $most_recent_finished_event = Party::with('theGroup')
+        ->hasDevicesRepaired(5)
+        ->eventHasFinished()
+        ->orderBy('event_date', 'DESC')
+        ->first();
+
+        $user_groups = Group::with('allRestarters', 'parties', 'groupImage.image')
+        ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+        ->join('events', 'events.group', '=', 'groups.idgroups')
+        ->where('users_groups.user', Auth::id())
+        ->orderBy('groups.name', 'ASC')
+        ->groupBy('groups.idgroups')
+        ->select('groups.*')
+        ->get();
+
+        return view('fixometer.index', [
+            'impact_data' => $global_impact_data,
             'title' => 'Devices',
             'categories' => $categories,
             'groups' => Group::all(),
-            'list' => $all_devices,
+            'most_recent_finished_event' => $most_recent_finished_event,
+            'items' => $all_devices_paginated,
             'selected_groups' => $request->input('groups'),
             'selected_categories' => $request->input('categories'),
             'from_date' => $request->input('from-date'),
@@ -254,6 +214,7 @@ class DeviceController extends Controller
             'wiki' => $request->input('wiki'),
             'sort_direction' => $sort_direction,
             'sort_column' => $sort_column,
+            'user_groups' => $user_groups,
         ]);
     }
 
@@ -421,7 +382,7 @@ class DeviceController extends Controller
 
             $audits = Device::findOrFail($id)->audits;
 
-            return view('device.edit', [
+            return view('fixometer.edit', [
                 'title' => 'Edit Device',
                 'response' => $response,
                 'categories' => $Categories->findAll(),
@@ -1030,4 +991,9 @@ class DeviceController extends Controller
     {
         $request->session()->put('column_preferences', $request->input('column_preferences'));
     }
+
+    // public function test() {
+  //   $g = new Device;
+  //   dd($g->export());
+  // }
 }
