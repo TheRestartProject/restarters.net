@@ -20421,6 +20421,8 @@ td.col-device-auto {
   margin: 30px 0 0 0;
   font-family: "Open Sans", sans-serif;
   font-size: 15px;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
 
 .pagination a,

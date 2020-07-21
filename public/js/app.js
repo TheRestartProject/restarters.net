@@ -35216,6 +35216,7 @@ __webpack_require__(167);
 __webpack_require__(168);
 __webpack_require__(169);
 __webpack_require__(170);
+__webpack_require__(223);
 __webpack_require__(171);
 window.Dropzone = __webpack_require__(172);
 window.Tokenfield = __webpack_require__(173);
@@ -94620,6 +94621,101 @@ function isUndefined(arg) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */,
+/* 194 */,
+/* 195 */,
+/* 196 */,
+/* 197 */,
+/* 198 */,
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */,
+/* 204 */,
+/* 205 */,
+/* 206 */,
+/* 207 */,
+/* 208 */,
+/* 209 */,
+/* 210 */,
+/* 211 */,
+/* 212 */,
+/* 213 */,
+/* 214 */,
+/* 215 */,
+/* 216 */,
+/* 217 */,
+/* 218 */,
+/* 219 */,
+/* 220 */,
+/* 221 */,
+/* 222 */,
+/* 223 */
+/***/ (function(module, exports) {
+
+function searchEventsByGroup() {
+    $group_id = $(".change-group :selected").val();
+
+    if ($group_id == null) {
+        return false;
+    }
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $("input[name='_token']").val()
+        },
+        type: 'GET',
+        url: '/api/groups/' + $group_id + '/events?format=location',
+        datatype: 'json',
+        success: function success(response) {
+            console.log(response);
+            $('.change-events option').remove();
+            $events = JSON.parse(response.events);
+
+            $.each($events, function ($key, $event) {
+                var data = {
+                    id: $event.id,
+                    text: $event.location
+                };
+
+                var newOption = new Option(data.text, data.id, false, false);
+                $('.change-events').append(newOption).trigger('change');
+            });
+
+            console.log('Success: Found ' + $('.change-events option').length + ' events.');
+        }
+    });
+}
+
+$(document).ready(function () {
+    searchEventsByGroup();
+
+    $('.change-group').on('change', function () {
+        searchEventsByGroup();
+    });
+
+    $('.change-events').on('change', function () {
+        $('.change-event-url').attr('href', '/party/view/' + $(this).val() + '#devices-section');
+    });
+});
 
 /***/ })
 /******/ ]);
