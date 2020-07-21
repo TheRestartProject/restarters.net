@@ -37,6 +37,7 @@ class Party extends Model implements Auditable
         'created_at',
         'updated_at',
         'shareable_code',
+        'online',
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'idevents', 'user_id', 'wordpress_post_id'];
 
@@ -113,6 +114,7 @@ class Party extends Model implements Auditable
                     `e`.`hours`,
                     `e`.`free_text`,
                     `e`.`wordpress_post_id`,
+                    `e`.`online`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
 
@@ -862,5 +864,25 @@ class Party extends Model implements Auditable
         $short_location = str_limit($this->venue, 30);
 
         return "{$this->getEventDate('d/m/Y')} / {$short_location}";
+    }
+
+    public function shouldPushToWordpress()
+    {
+        return $this->theGroup->eventsShouldPushToWordpress();
+    }
+
+    public function associatedNetworkCoordinators()
+    {
+        $group = $this->theGroup;
+
+        $coordinators = collect([]);
+
+        foreach ($group->networks as $network) {
+            foreach ($network->coordinators as $coordinator) {
+                $coordinators->push($coordinator);
+            }
+        }
+
+        return $coordinators;
     }
 }
