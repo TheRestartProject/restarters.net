@@ -19,7 +19,6 @@ class MobifixController extends Controller {
             $user = Auth::user();
         } else {
             $user = Microtask::getAnonUserCta($request);
-//            logger(print_r($user,1));
             if ($user->action) {
                 return redirect()->action('MobifixController@cta');
             }
@@ -45,7 +44,9 @@ class MobifixController extends Controller {
         }
         $Mobifix = new Mobifix;
         $fault = $Mobifix->fetchFault()[0];
-//        $fault->problem = "usb issue";
+        if (!$fault) {
+            return redirect()->action('MobifixController@status');
+        }
         $fault->translate = rawurlencode($fault->problem);
         // match problem terms with suggestions
         $suggestions = $this->_suggestions();
@@ -54,7 +55,7 @@ class MobifixController extends Controller {
         $fault->suggestions = [];
         foreach ($suggestions as $term => $faults) {
             if (preg_match("/$term/", strtolower($fault->problem), $matches)) {
-                $fault->suggestions = array_unique(array_merge($fault->suggestions, $faults));                
+                $fault->suggestions = array_unique(array_merge($fault->suggestions, $faults));
                 $fault_types = array_diff($fault_types, $faults);
             }
         }
@@ -79,9 +80,11 @@ class MobifixController extends Controller {
 
         $Mobifix = new Mobifix;
         $data = $Mobifix->fetchStatus();
+        $complete = $data['total_opinions_2'][0]->total + $data['total_opinions_1'][0]->total + $data['total_opinions_0'][0]->total == 0;
         return view('mobifix.status', [
             'status' => $data,
             'user' => $user,
+            'complete' => $complete,
         ]);
     }
 
@@ -108,7 +111,7 @@ class MobifixController extends Controller {
             'Other',
         ];
     }
-    
+
     protected function _faultdescs() {
         return [
             'Power/battery' => '',
@@ -151,7 +154,7 @@ class MobifixController extends Controller {
                 'Memory card slot',
                 'Storage problem',
             ],
-            'start|boot' => [                
+            'start|boot' => [
                 'Stuck booting',
                 'Power/battery',
                 'Software update',
