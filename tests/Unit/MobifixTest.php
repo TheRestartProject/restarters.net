@@ -77,7 +77,26 @@ class MobifixTest extends TestCase {
         $expected[5] = 'fault_type_1';
         $expected[10] = 'foo';
         $expected[11] = 'foo';
-//        logger(print_r($expected, 1));
+        foreach ($expected as $k => $v) {
+            $this->assertDatabaseHas('devices', [
+                'iddevices' => $k,
+                'fault_type' => $v,
+            ]);
+        }
+    }
+
+    /** @test */
+    public function update_mobifix_empty_problem() {
+
+        $this->_setup_data();
+
+        $Mobifix = new Mobifix;
+        $result = $Mobifix->updateDevicesWithEmptyProblem();
+        $expected = array_fill(1, 11, '');
+        $expected[1] = 'foo';
+        $expected[9] = 'Unknown';
+        $expected[10] = 'foo';
+        $expected[11] = 'foo';
         foreach ($expected as $k => $v) {
             $this->assertDatabaseHas('devices', [
                 'iddevices' => $k,
@@ -92,7 +111,7 @@ class MobifixTest extends TestCase {
      *  opinions = 1 (1 record)
      *  opinions = 2 (2 records - 1 majority, 1 split)
      *  opinions = 3 (4 records - 1 consensus, 1 majority, 1 split, 1 adjudicated)
-     * 
+     *
      * @return array
      */
     protected function _setup_data() {
