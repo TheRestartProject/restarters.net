@@ -80,7 +80,7 @@
         <form id="log-task" action="" method="POST">
             @csrf
             <div class="container fault-type">
-                <div class="row"> 
+                <div class="row">
                     <div class="col panel p-3">
                         <p><span class="question">Where is the main fault?</span></p>
                         <div class="container">
@@ -90,7 +90,7 @@
                             <div class="buttons suggestions ">
                                 <p class="title is-size-6-mobile is-size-6-tablet">Suggestions</p>
                                 <p>
-                                    @foreach($fault->suggestions as $fault_type)                                    
+                                    @foreach($fault->suggestions as $fault_type)
                                     <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip" title="@php( print($fault->descriptions[$fault_type]) )"><span>@php( print($fault_type))</span></button>
                                     @endforeach
                                 </p>
@@ -103,7 +103,7 @@
                                 <div class="buttons">
                                     @foreach($fault->faulttypes as $fault_type)
                                     <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" title="@php( print($fault->descriptions[$fault_type]))"><span>@php( print($fault_type))</span></button>
-                                    @endforeach                                            
+                                    @endforeach
                                 </div>
                             </div>
                             <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded">
@@ -116,7 +116,7 @@
         </form>
         @endif
     </div>
-    @include('mobifix/info-modal')        
+    @include('mobifix/info-modal')
     @include('partials/task-cta-modal')
 </section>
 
@@ -132,7 +132,7 @@
                 doOption(e);
             });
         });
-        
+
         document.getElementById('change').addEventListener('click', function (e) {
             e.preventDefault();
             doChange();
@@ -182,7 +182,7 @@
                     document.querySelector('#fault_type').value);
             document.forms['log-task'].submit();
         }
-        
+
         if (window.location.href.indexOf('cta') != -1) {
             document.getElementById('btn-cta-open').click();
         }

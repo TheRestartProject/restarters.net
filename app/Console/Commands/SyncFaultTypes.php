@@ -13,7 +13,7 @@ class SyncFaultTypes extends Command
      * @var string
      */
     protected $signature = 'faultcat:sync {category : [computers|mobiles]}';
-    
+
     /**
      * The console command description.
      *
@@ -38,16 +38,22 @@ class SyncFaultTypes extends Command
      */
     public function handle()
     {
-        $type = $this->argument('category');        
+        $type = $this->argument('category');
         switch ($type) {
             case 'computers':
                 $this->info('Updating devices with computer fault types');
                 $Faultcat = new Faultcat;
                 $result = $Faultcat->updateDevices();
                 if ($result) {
-                    $this->info($result . ' rows updated');
+                    $this->info($result . ' rows updated with fault_type');
                 } else {
-                    $this->info('0 rows updated');
+                    $this->info('0 rows updated with fault_type');
+                }
+                $result = $Faultcat->updateDevicesWithEmptyProblem();
+                if ($result) {
+                    $this->info($result . ' rows updated with Unknown');
+                } else {
+                    $this->info('0 rows updated with Unknown');
                 }
                 break;
             case 'mobiles':
@@ -55,14 +61,20 @@ class SyncFaultTypes extends Command
                 $Mobifix = new Mobifix;
                 $result = $Mobifix->updateDevices();
                 if ($result) {
-                    $this->info($result . ' rows updated');
+                    $this->info($result . ' rows updated with fault_type');
                 } else {
-                    $this->info('0 rows updated');
+                    $this->info('0 rows updated with fault_type');
                 }
-                break;                
-            default: 
+                $result = $Mobifix->updateDevicesWithEmptyProblem();
+                if ($result) {
+                    $this->info($result . ' rows updated with Unknown');
+                } else {
+                    $this->info('0 rows updated with Unknown');
+                }
+                break;
+            default:
                 $this->info('Unknown category ' . $type);
         }
-        
+
     }
 }
