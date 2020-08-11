@@ -50,14 +50,23 @@ This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a 
   - php-curl
   - php-mysql
   - php-xml
+  - php-xmlrpc
   - php-intl
 - mysql/mariadb
-  - and create a database
+  - and create a database:
+    - CREATE DATABASE restarters 
+  - add users:
+    - CREATE USER 'restarters'@'localhost' IDENTIFIED BY 's3cr3t'; 
+    - CREATE USER 'tester'@'localhost' IDENTIFIED BY 'tester';
+  - give users permissions:
+    - GRANT ALL PRIVILEGES ON restarters.* TO 'restarters'@'localhost';
+    - GRANT ALL PRIVILEGES ON restarters.* TO 'tester'@'localhost';
 - npm
 
 #### Install
 
 - clone this repository
+- php composer.phar install
 - copy .env.example -> .env
 - edit .env
   - update DB settings to match your local DB
