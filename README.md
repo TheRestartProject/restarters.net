@@ -54,13 +54,13 @@ This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a 
   - php-intl
 - mysql/mariadb
   - and create a database:
-    - CREATE DATABASE restarters 
+    - CREATE DATABASE restarters_db_test
   - add users:
     - CREATE USER 'restarters'@'localhost' IDENTIFIED BY 's3cr3t'; 
     - CREATE USER 'tester'@'localhost' IDENTIFIED BY 'tester';
   - give users permissions:
-    - GRANT ALL PRIVILEGES ON restarters.* TO 'restarters'@'localhost';
-    - GRANT ALL PRIVILEGES ON restarters.* TO 'tester'@'localhost';
+    - GRANT ALL PRIVILEGES ON restarters_db_test.* TO 'restarters'@'localhost';
+    - GRANT ALL PRIVILEGES ON restarters_db_test.* TO 'tester'@'localhost';
 - npm
 
 #### Install
