@@ -6,6 +6,7 @@ use App\Device;
 use App\EventUsers;
 use App\Helpers\FootprintRatioCalculator;
 
+use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -292,58 +293,20 @@ class Party extends Model implements Auditable
 
     public function ofThisGroup($group = 'admin', $only_past = false, $devices = false)
     {
-        //Tested
-        $sql = 'SELECT
-                    *,
-	`e`.`venue` AS `venue`, `e`.`location` as `location`,
-
-
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
-
-                FROM `'.$this->table.'` AS `e`
-
-                    INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
-
-                    LEFT JOIN (
-                        SELECT COUNT(`dv`.`iddevices`) AS `device_count`, `dv`.`event`
-                        FROM `devices` AS `dv`
-                        GROUP BY  `dv`.`event`
-                    ) AS `d` ON `d`.`event` = `e`.`idevents` ';
-        //UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) )
-        if (is_numeric($group) && $group != 'admin') {
-            $sql .= ' WHERE `e`.`group` = :id ';
-        }
-
-        // TODO: BUG: this does not work if you are an Admin, as the
-        // where statement hasn't been built.  Could fix with a WHERE 1=1,
-        // but leaving for now as we might deprecate this method anyway, and
-        // not sure what effect it might have in various parts of the app.
-        if ($only_past == true) {
-            $sql .= ' AND TIMESTAMP(`e`.`event_date`, `e`.`start`) < NOW()';
-        }
-
-        $sql .= ' ORDER BY `e`.`event_date` DESC';
-
-        if (is_numeric($group) && $group != 'admin') {
-            try {
-                $parties = DB::select(DB::raw($sql), array('id' => $group));
-            } catch (\Illuminate\Database\QueryException $e) {
-                dd($e);
-            }
-        } else {
-            try {
-                $parties = DB::select(DB::raw($sql));
-            } catch (\Illuminate\Database\QueryException $e) {
-                dd($e);
-            }
-        }
-
-        if ($devices) {
-            $devices = new Device;
-            foreach ($parties as $i => $party) {
-                $parties[$i]->devices = $devices->ofThisEvent($party->idevents);
-            }
-        }
+        $parties = Party::when($only_past, function($query) {
+            # We only want the ones in the past.
+            return $query->where(function ($query) {
+                # Before today, or before the start time.
+                return $query->where('event_date', '<', Carbon::now()->toDateString())
+                    ->orWhere(function($query) {
+                        return $query->where('event_date', '=', Carbon::now()->toDateString())
+                            ->where('start', '<', Carbon::now()->toTimeString());
+                    });
+            });
+        })->when(is_numeric($group), function ($query) use ($group) {
+            # For a specific group.  Note that 'admin' is not numeric so won't pass this test.
+            return $query->where('group', $group);
+        })->get();
 
         return $parties;
     }
