@@ -62,4 +62,23 @@ class NetworkTest extends TestCase
         // assert
         // tested manually, need a mock to test this automatically...
     }
+
+    /** test */
+    // Check that we can have three digit lat/lngs.
+    public function test_three_digit_lat_lng() {
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create();
+        $userId = $user->id;
+
+        $user->name = 'Joe Bloggs';
+        $user->latitude = 123.456;
+        $user->longitude = 132.654;
+
+        $user->save();
+
+        $user = User::where('id', $userId)->first();
+        $this->assertEquals(123.456, $user->latitude);
+        $this->assertEquals(132.654, $user->longitude);
+    }
 }
