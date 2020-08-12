@@ -40,7 +40,8 @@ class CountsTests extends TestCase
 
         $event = factory(Party::class)->create([
             'group' => $group,
-            'event_date' => '2130-01-01'
+            'event_date' => '2130-01-01',
+            'start' => '12:13'
         ]);
         $event->save();
 
@@ -49,5 +50,6 @@ class CountsTests extends TestCase
 
         // The event we created is in the future, so the count of all should be more than the count in the past.
         $this->assertGreaterThan($pastcount, $allcount);
+        $this->assertEquals('2130-01-01 12:13', $event->event_timestamp);
     }
 }
