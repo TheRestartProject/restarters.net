@@ -31,6 +31,7 @@ class ApiController extends Controller
 
         $co2Total = $Device->getWeights();
 
+        $result['participants'] = $participants;
         $result['hours_volunteered'] = $hours_volunteered;
         $result['items_fixed'] = $Device->statusCount()[0]->counter;
         $result['weights'] = round($co2Total[0]->total_weights);

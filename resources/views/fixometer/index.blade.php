@@ -1,32 +1,27 @@
 @extends('layouts.app')
 
 @section('title')
-@lang('devices.devices')
+@lang('devices.fixometer')
 @endsection
 
 @section('content')
 
 <section class="devices">
-    <form id="device-search" action="/device/search/" method="get">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-md-12">
                     <div class="d-flex align-items-center">
                         <h1 id="dashboard__header" class="mb-0 mr-30">
-                            @lang('devices.devices')
+                            @lang('devices.fixometer')
                         </h1>
                         <div class="mr-auto d-none d-md-block">
                             @include('svgs.fixometer.fixometer-doodle')
                         </div>
 
-                        <!-- <button data-target="#add-device-modal" data-toggle="modal" aria-expanded="true" aria-controls="add-device-modal" class="btn btn-sm btn-primary ml-auto">
-                             Add Data
-                             </button> -->
-                        @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
-                            <a href="/export/devices/?{{{ Request::getQueryString() }}}" class="btn btn-primary btn-save ml-auto">
-                                <i class="fa fa-download"></i>
-                                @lang('devices.export_device_data')
-                            </a>
+                        @if (count($user_groups) > 0)
+                        <button data-target="#add-device-modal" data-toggle="modal" aria-expanded="true" aria-controls="add-device-modal" class="btn btn-sm btn-primary ml-auto">
+                            @lang('devices.add_data_button')
+                        </button>
                         @endif
 
                     </div>
@@ -35,10 +30,36 @@
                 </div>
             </div>
 
-            <div class="row justify-content-center">
+            <div class="row">
+                @include('fixometer.global-impact')
+            </div>
+
+            <hr class="mt-md-50 hr-dashed">
+
+            <div class="row">
+                <div class="col col-md-8">
+                    <h2>Repair Records</h2>
+                </div>
+                <div class="col col-md-4 text-center text-md-right">
+                    @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+                        <a href="/export/devices/?{{{ Request::getQueryString() }}}" class="btn btn-primary btn-save ml-auto">
+                            <i class="fa fa-download"></i>
+                            @lang('devices.export_device_data')
+                        </a>
+                    @endif
+
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-8">
+                    @lang('devices.search_text')
+                </div>
+            </div>
+
+            <div class="row justify-content-center mt-20">
 
                 <div class="col-lg-3">
-
 
                     <div class="collapse d-lg-block d-xl-block fixed-overlay-md" id="collapseFilter">
 
@@ -56,6 +77,7 @@
                             </div>
                         </div>
 
+                        <form id="device-search" action="{{ route('fixometer-search') }}" method="get">
                         <input type="hidden" name="sort_direction" value="{{{ $sort_direction }}}">
 
                         @php( $active_filter = false )
@@ -239,7 +261,7 @@
 
                             <button class="btn btn-secondary btn-groups w-100" type="submit">@lang('devices.search_all_devices')</button>
                             <button class="btn btn-secondary btn-groups mt-10 w-100" type="submit" disabled>
-                                @lang('devices.number_of_repairs'): {{ $list->total() }}
+                                @lang('devices.number_of_repairs'): {{ $items->total() }}
                             </button>
 
                         </aside>
@@ -290,9 +312,9 @@
                                         <tr>
 
                                             @if( !FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-                                            <th width="120" colspan="3"></th>
+                                            <th width="60" colspan="3" class="text-left"></th>
                                             @else
-                                            <th width="120"></th>
+                                            <th width="60" class="text-left"></th>
                                             @endif
 
                                             <th scope="col" class="category" @if( !FixometerHelper::checkColumn('category', $user_preferences) ) style="display: none;" @endif>
@@ -300,27 +322,27 @@
                                                     @lang('devices.category')
                                                 </label>
                                             </th>
-                                            <th scope="col" class="brand" @if( !FixometerHelper::checkColumn('brand', $user_preferences) ) style="display: none;" @endif>
+                                            <th scope="col" class="brand d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('brand', $user_preferences) ) style="display: none;" @endif>
                                                 <label for="label-brand" class="sort-column @if( $sort_column == 'brand' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
                                                     @lang('devices.brand')
                                                 </label>
                                             </th>
-                                            <th scope="col" class="model" @if( !FixometerHelper::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
+                                            <th scope="col" class="model d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
                                                 <label for="label-model" class="sort-column @if( $sort_column == 'model' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
                                                     @lang('devices.model')
                                                 </label>
                                             </th>
-                                            <th scope="col" class="problem" @if( !FixometerHelper::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
+                                            <th scope="col" class="problem d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
                                                 <label for="label-problem" class="sort-column @if( $sort_column == 'problem' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
                                                     @lang('devices.comment')
                                                 </label>
                                             </th>
-                                            <th scope="col" class="group_name" @if( !FixometerHelper::checkColumn('group_name', $user_preferences) ) style="display: none;" @endif>
+                                            <th scope="col" class="group_name d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('group_name', $user_preferences) ) style="display: none;" @endif>
                                                 <label for="label-group_name" class="sort-column @if( $sort_column == 'group_name' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
                                                     @lang('devices.group')
                                                 </label>
                                             </th>
-                                            <th scope="col" class="event_date" @if( !FixometerHelper::checkColumn('event_date', $user_preferences) ) style="display: none;" @endif>
+                                            <th scope="col" class="event_date d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('event_date', $user_preferences) ) style="display: none;" @endif>
                                                 <label for="label-event_date" class="sort-column @if( $sort_column == 'event_date' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
                                                     @lang('devices.devices_date')
                                                 </label>
@@ -335,11 +357,11 @@
                                     <tbody>
                                         @php( $user = Auth::user() )
                                         @php( $is_admin = FixometerHelper::hasRole($user, 'Administrator') )
-                                        @foreach($list as $device)
+                                        @foreach($items as $device)
                                         @if ( $is_admin || $device->repaired_by == $user->id )
-                                        @include('partials.device-row-with-edit')
+                                        @include('fixometer.device-row-with-edit')
                                         @else
-                                        @include('partials.device-row-collapse')
+                                        @include('fixometer.device-row-collapse')
                                         @endif
                                         @endforeach
                                     </tbody>
@@ -349,16 +371,15 @@
                                 <br>
 
                                 <div class="d-flex justify-content-center">
-                                    <nav aria-label="Page navigation example">
-                                        <ul class="pagination">
+                                    <nav aria-label="Page navigation">
                                             @if (!empty($_GET))
-                                            {!! $list->appends(request()->input())->links() !!}
+                                                {!! $items->appends(request()->input())->links() !!}
                                             @else
-                                            {!! $list->links() !!}
+                                                {!! $items->links() !!}
                                             @endif
-                                        </ul>
                                     </nav>
                                 </div>
+
 
                             </div>
 
@@ -368,5 +389,7 @@
                 </div>
     </form>
 </section>
+
+@include('fixometer.add-data-modal')
 
 @endsection

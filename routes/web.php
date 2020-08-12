@@ -79,6 +79,12 @@ Route::prefix('misccat')->group(function () {
     Route::get('/status', 'MisccatController@status');
 });
 
+Route::prefix('MobiFix')->group(function () {
+    Route::get('/', 'MobifixController@index');
+    Route::post('/', 'MobifixController@index');
+    Route::get('/cta', 'MobifixController@cta');
+    Route::get('/status', 'MobifixController@status');
+});
 Route::prefix('mobifix')->group(function () {
     Route::get('/', 'MobifixController@index');
     Route::post('/', 'MobifixController@index');
@@ -97,6 +103,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/{id}', 'UserController@index');
         Route::post('/edit-info', 'UserController@postProfileInfoEdit');
         Route::post('/edit-password', 'UserController@postProfilePasswordEdit');
+        Route::post('/edit-language', 'UserController@storeLanguage');
         Route::post('/edit-preferences', 'UserController@postProfilePreferencesEdit');
         Route::post('/edit-tags', 'UserController@postProfileTagsEdit');
         Route::post('/edit-photo', 'UserController@postProfilePictureEdit');
@@ -137,8 +144,17 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     //Device Controller
     Route::resource('device-url', 'DeviceUrlController');
-    Route::prefix('device')->group(function () {
+
+    Route::prefix('fixometer')->group(function () {
         Route::get('/', 'DeviceController@index')->name('devices');
+        Route::get('/search', 'DeviceController@search')->name('fixometer-search');
+    });
+
+    // TODO: the rest of these to be redirected properly.
+    Route::prefix('device')->group(function () {
+        Route::get('/', function() {
+            return redirect('/fixometer');
+        });
         Route::get('/search', 'DeviceController@search');
         Route::get('/page-edit/{id}', 'DeviceController@edit');
         Route::post('/page-edit/{id}', 'DeviceController@edit');
@@ -161,7 +177,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::post('/create', 'GroupController@create');
         Route::get('/edit/{id}', 'GroupController@edit');
         Route::post('/edit/{id}', 'GroupController@edit');
-        Route::get('/view/{id}', 'GroupController@view');
+        Route::get('/view/{id}', 'GroupController@view')->name('group.show');
         Route::post('/invite', 'GroupController@postSendInvite');
         Route::get('/accept-invite/{id}/{hash}', 'GroupController@confirmInvite');
         Route::get('/join/{id}', 'GroupController@getJoinGroup');
