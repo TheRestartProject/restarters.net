@@ -564,6 +564,11 @@ class Party extends Model implements Auditable
         return date('H:i', strtotime($this->end));
     }
 
+    public function getEventTimestampAttribute()
+    {
+        return "{$this->event_date} {$this->start}";
+    }
+
     public function getEventStartEnd()
     {
         return $this->getEventStart().'-'.$this->getEventEnd();
