@@ -1064,11 +1064,10 @@ class PartyController extends Controller
     public function getGroupEmails($event_id, $object = false)
     {
         $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
-        ->where('user', '!=', Auth::user()->id)
         ->pluck('user')
         ->toArray();
 
-        // Users already associated with the event.
+        // Users already associated with the event.  Normally this would already include the host.
         // (Not including those invited but not RSVPed)
         $event_user_ids = EventsUsers::where('event', $event_id)
         ->where('user', '!=', Auth::user()->id)
