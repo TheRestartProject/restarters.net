@@ -71,7 +71,7 @@ This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a 
 - copy .env.example -> .env
 - edit .env
   - update DB settings to match your local DB
-- edit /etc/hosts -> 127.0.0.1 restarters.test
+- edit /etc/hosts -> 127.0.0.1 restarters.test talk.restarters.test
 
 - Generate an app key: `php artisan key:generate`
 
