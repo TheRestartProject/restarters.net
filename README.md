@@ -67,6 +67,7 @@ This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a 
 
 - clone this repository
 - php composer.phar install
+- npm install
 - copy .env.example -> .env
 - edit .env
   - update DB settings to match your local DB
