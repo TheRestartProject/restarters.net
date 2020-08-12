@@ -282,12 +282,13 @@
 
 .call_to_action {
   @extend .text-white;
-  @extend .px-15;
   @extend .d-flex;
   @extend .flex-row;
   @extend .align-items-center;
 
   background-color: $black;
+  padding-left: 0.5rem;
+  padding-right: 1.5rem;
   font-family: Asap;
   font-size: 18px;
   font-weight: bold;

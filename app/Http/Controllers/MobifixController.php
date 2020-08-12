@@ -45,14 +45,16 @@ class MobifixController extends Controller {
         }
         $Mobifix = new Mobifix;
         $fault = $Mobifix->fetchFault()[0];
+//        $fault->problem = "usb issue";
         $fault->translate = rawurlencode($fault->problem);
         // match problem terms with suggestions
         $suggestions = $this->_suggestions();
         $fault_types = $this->_faulttypes();
+        $fault->descriptions = $this->_faultdescs();
         $fault->suggestions = [];
         foreach ($suggestions as $term => $faults) {
             if (preg_match("/$term/", strtolower($fault->problem), $matches)) {
-                $fault->suggestions = array_unique(array_merge($fault->suggestions, $faults));
+                $fault->suggestions = array_unique(array_merge($fault->suggestions, $faults));                
                 $fault_types = array_diff($fault_types, $faults);
             }
         }
@@ -106,161 +108,108 @@ class MobifixController extends Controller {
             'Other',
         ];
     }
+    
+    protected function _faultdescs() {
+        return [
+            'Power/battery' => '',
+            'Screen' => 'Fault involves screen assembly - glass, touch, LCD...',
+            'Stuck booting' => 'Powers on but OS does not load/errors',
+            'Camera' => '',
+            'Headphone jack' => 'Broken, loose, dirty...',
+            'Speaker/amplifier' => 'No sound, volume issues...',
+            'Charger' => 'Problem with the charger not the phone itself',
+            'On/Off button' => '',
+            'Volume buttons' => '',
+            'Other buttons' => '',
+            'Software update' => 'Problem after update, lack of updates...',
+            'Storage problem' => 'Run out of storage space, corrupted storage...',
+            'USB/charging port' => 'Broken, loose, dirty...',
+            'Sim card slot' => '',
+            'Microphone' => '',
+            'Bluetooth' => '',
+            'Memory card slot' => '',
+            'Unknown' => 'Not enough info to determine the main fault',
+            'Other' => 'Main fault is known but there is no option for it',
+        ];
+    }
 
     protected function _suggestions() {
         return [
-            'battery' => [
+            'battery|power' => [
                 'Power/battery',
-            ],
-            'lcd' => [
-                'Screen',
             ],
             'button' => [
                 'On/Off button',
                 'Volume buttons',
                 'Other buttons',
             ],
-            'camera' => [
+            'camera|lens|picture|photo|video' => [
                 'Camera',
             ],
-            'digiti' => [
-                'Screen',
-            ],
-            'display' => [
-                'Screen',
-            ],
-            'card' => [
+            'card|sim' => [
                 'Sim card slot',
                 'Memory card slot',
                 'Storage problem',
             ],
-            'usb' => [
-                'USB / charging port',
-            ],
-            'sim' => [
-                'Sim card slot',
-            ],
-            'start' => [
-                'Software update',
+            'start|boot' => [                
                 'Stuck booting',
                 'Power/battery',
+                'Software update',
             ],
             'switch' => [
-                'Software update',
-                'Stuck booting',
                 'Other buttons',
-            ],
-            'boot' => [
-                'Software update',
-                'Stuck booting',
-            ],
-            'connector' => [
-                'USB / charging port',
-            ],
-            'cable' => [
-                'USB / charging port',
-            ],
-            'jack' => [
-                'Headphone jack',
-            ],
-            'speaker' => [
-                'Speaker/amplifier',
-            ],
-            'memory' => [
-                'Memory card slot',
-                'Stuck booting',
-                'Software update',
-            ],
-            'storage' => [
-                'Storage problem'
-            ],
-            'space' => [
-                'Storage problem'
-            ],
-            'full' => [
-                'Storage problem'
-            ],
-            'ram' => [
-                'Memory card slot',
-                'Stuck booting',
-                'Software update',
-            ],
-            'glass' => [
-                'Screen',
-            ],
-            'charg' => [
-                'Charger',
-                'USB / charging port',
                 'Power/battery',
             ],
-            'lens' => [
-                'Camera',
+            'cable|connector|port|usb' => [
+                'USB/charging port',
+            ],
+            'memory|ram' => [
+                'Memory card slot',
+                'Software update',
+                'Stuck booting',
+            ],
+            'storage|space|full' => [
+                'Storage problem'
+            ],
+            'charg|plug' => [
+                'Charger',
+                'USB/charging port',
+                'Power/battery',
             ],
             'mic' => [
                 'Microphone',
             ],
-            'audio' => [
-                'Speaker/amplifier',
-                'Volume buttons',
-                'Headphone jack',
-            ],
-            'app(s)?' => [
+            'app(s)?|software' => [
                 'Software update',
                 'Storage problem',
                 'Stuck booting',
             ],
-            'headphone' => [
+            'headphone|jack' => [
                 'Headphone jack',
-            ],
-            'touchscreen' => [
-                'Screen',
             ],
             'bluetooth' => [
                 'Bluetooth',
             ],
-            'reader' => [
+            'sc(r)?een|display|touch|glass|lcd|reader|digiti' => [
                 'Screen',
             ],
-            'sc(r)?een' => [
-                'Screen',
-            ],
-            'plug' => [
-                'USB / charging port',
-                'Charger',
-            ],
-            'bricked' => [
-                'Software update',
-                'Storage problem',
-                'Stuck booting',
-            ],
-            'volume' => [
-                'Volume buttons',
-                'Speaker/amplifier',
-                'Headphone jack',
-            ],
-            'off' => [
+            ' off| on' => [
                 'On/Off button',
                 'Stuck booting',
             ],
-            'port' => [
-                'USB / charging port',
-            ],
-            'sound' => [
+            'sound|audio|speaker|volume' => [
                 'Speaker/amplifier',
                 'Headphone jack',
                 'Volume buttons',
             ],
-            'power' => [
-                'Power/battery',
-            ],
-            'slow' => [
+            'slow|virus|bricked' => [
                 'Stuck booting',
                 'Storage problem',
                 'Software update',
             ],
-            'virus' => [
-                'Stuck booting',
+            'update|reset' => [
                 'Software update',
+                'Stuck booting',
             ],
         ];
     }

@@ -18,4 +18,7 @@ return array (
   'profile_picture' => 'Profile picture',
   'delete_account' => 'Delete account',
   'delete_account_text' => 'I understand that deleting my account will remove all of my personal data and this is a permanent action.',
+  'language_panel_title' => 'Language settings',
+  'preferred_language' => 'Preferred language',
+  'language_updated' => 'Languaged preference updated',
 );

@@ -5,7 +5,6 @@ namespace App;
 use App\Device;
 use App\EventUsers;
 use App\Helpers\FootprintRatioCalculator;
-
 use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +16,7 @@ class Party extends Model implements Auditable
 {
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
+    use \App\Traits\GlobalScopes;
 
     protected $table = 'events';
     protected $primaryKey = 'idevents';
@@ -37,7 +37,6 @@ class Party extends Model implements Auditable
         'created_at',
         'updated_at',
         'shareable_code',
-        'online',
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'idevents', 'user_id', 'wordpress_post_id'];
 
@@ -114,7 +113,6 @@ class Party extends Model implements Auditable
                     `e`.`hours`,
                     `e`.`free_text`,
                     `e`.`wordpress_post_id`,
-                    `e`.`online`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
 
@@ -293,20 +291,58 @@ class Party extends Model implements Auditable
 
     public function ofThisGroup($group = 'admin', $only_past = false, $devices = false)
     {
-        $parties = Party::when($only_past, function($query) {
-            # We only want the ones in the past.
-            return $query->where(function ($query) {
-                # Before today, or before the start time.
-                return $query->where('event_date', '<', Carbon::now()->toDateString())
-                    ->orWhere(function($query) {
-                        return $query->where('event_date', '=', Carbon::now()->toDateString())
-                            ->where('start', '<', Carbon::now()->toTimeString());
-                    });
-            });
-        })->when(is_numeric($group), function ($query) use ($group) {
-            # For a specific group.  Note that 'admin' is not numeric so won't pass this test.
-            return $query->where('group', $group);
-        })->get();
+        //Tested
+        $sql = 'SELECT
+                    *,
+	`e`.`venue` AS `venue`, `e`.`location` as `location`,
+
+
+                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
+
+                FROM `'.$this->table.'` AS `e`
+
+                    INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
+
+                    LEFT JOIN (
+                        SELECT COUNT(`dv`.`iddevices`) AS `device_count`, `dv`.`event`
+                        FROM `devices` AS `dv`
+                        GROUP BY  `dv`.`event`
+                    ) AS `d` ON `d`.`event` = `e`.`idevents` ';
+        //UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) )
+        if (is_numeric($group) && $group != 'admin') {
+            $sql .= ' WHERE `e`.`group` = :id ';
+        }
+
+        // TODO: BUG: this does not work if you are an Admin, as the
+        // where statement hasn't been built.  Could fix with a WHERE 1=1,
+        // but leaving for now as we might deprecate this method anyway, and
+        // not sure what effect it might have in various parts of the app.
+        if ($only_past == true) {
+            $sql .= ' AND TIMESTAMP(`e`.`event_date`, `e`.`start`) < NOW()';
+        }
+
+        $sql .= ' ORDER BY `e`.`event_date` DESC';
+
+        if (is_numeric($group) && $group != 'admin') {
+            try {
+                $parties = DB::select(DB::raw($sql), array('id' => $group));
+            } catch (\Illuminate\Database\QueryException $e) {
+                dd($e);
+            }
+        } else {
+            try {
+                $parties = DB::select(DB::raw($sql));
+            } catch (\Illuminate\Database\QueryException $e) {
+                dd($e);
+            }
+        }
+
+        if ($devices) {
+            $devices = new Device;
+            foreach ($parties as $i => $party) {
+                $parties[$i]->devices = $devices->ofThisEvent($party->idevents);
+            }
+        }
 
         return $parties;
     }
@@ -377,15 +413,25 @@ class Party extends Model implements Auditable
     * Laravel specific code
     */
 
-    public function scopeUpcomingEvents()
+    public function scopeUpcomingEvents($query, $by_event = false)
     {
+      if( $by_event ) {
         return $this->join('groups', 'groups.idgroups', '=', 'events.group')
-                     ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+                     ->join('events_users', 'events_users.event', '=', 'events.idevents')
                      ->whereNotNull('events.wordpress_post_id')
                      ->whereDate('event_date', '>=', date('Y-m-d'))
                      ->select('events.*')
                      ->groupBy('idevents')
                      ->orderBy('event_date', 'ASC');
+      }
+
+      return $this->join('groups', 'groups.idgroups', '=', 'events.group')
+            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->whereNotNull('events.wordpress_post_id')
+            ->whereDate('event_date', '>=', date('Y-m-d'))
+            ->select('events.*')
+            ->groupBy('idevents')
+            ->orderBy('event_date', 'ASC');
     }
 
     /**
@@ -500,7 +546,7 @@ class Party extends Model implements Auditable
     // Doesn't work if called 'group' - I guess because a reserved SQL keyword.
     public function theGroup()
     {
-        return $this->belongsTo(Group::class, 'group', 'idgroups');
+        return $this->hasOne('App\Group', 'idgroups', 'group');
     }
 
     public function getEventDate($format = 'd/m/Y')
@@ -516,11 +562,6 @@ class Party extends Model implements Auditable
     public function getEventEnd()
     {
         return date('H:i', strtotime($this->end));
-    }
-
-    public function getEventTimestampAttribute()
-    {
-        return "{$this->event_date} {$this->start}";
     }
 
     public function getEventStartEnd()
@@ -695,9 +736,8 @@ class Party extends Model implements Auditable
      */
     public function isVolunteer($user_id = NULL)
     {
-        $attributes = ['user' => $user_id ?: auth()->id()];
-
-        return $this->allConfirmedVolunteers()->where($attributes)->exists();
+        return $this->allConfirmedVolunteers
+        ->contains('user', $user_id ?: auth()->id());
     }
 
     public function isBeingAttendedBy($userId)
@@ -743,8 +783,8 @@ class Party extends Model implements Auditable
     public function checkForMissingData()
     {
       $participants_count = $this->participants;
-      $volunteers_count = $this->allConfirmedVolunteers()->count();
-      $devices_count = $this->allDevices()->count();
+      $volunteers_count = $this->allConfirmedVolunteers->count();
+      $devices_count = $this->allDevices->count();
 
       return [
         'participants_count' => $participants_count,
@@ -783,23 +823,44 @@ class Party extends Model implements Auditable
       }
     }
 
-    public function shouldPushToWordpress()
+    public function scopeHasDevicesRepaired($query, int $has_x_devices_fixed = 1)
     {
-        return $this->theGroup->eventsShouldPushToWordpress();
+        return $query->whereHas('allDevices', function($query) {
+          return $query->where('repair_status', 1);
+        }, '>=', $has_x_devices_fixed);
     }
 
-    public function associatedNetworkCoordinators()
+    public function scopeEventHasFinished($query)
     {
-        $group = $this->theGroup;
+        $now = Carbon::now();
 
-        $coordinators = collect([]);
+        return $query->whereRaw("CONCAT(`event_date`, ' ', `end`) < '{$now}'");
+    }
 
-        foreach ($group->networks as $network) {
-            foreach ($network->coordinators as $coordinator) {
-                $coordinators->push($coordinator);
-            }
-        }
+    public function getWastePreventedAttribute()
+    {
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-        return $coordinators;
+        return round($this->getEventStats($emissionRatio)['ewaste'], 2);
+    }
+
+    public function scopeWithAll($query)
+    {
+        return $query->with([
+          'allDevices.deviceCategory',
+          'allInvited',
+          'allConfirmedVolunteers',
+          'host',
+          'theGroup.groupImage.image',
+          'devices.deviceCategory',
+        ]);
+    }
+
+    public function getFriendlyLocationAttribute()
+    {
+        $short_location = str_limit($this->venue, 30);
+
+        return "{$this->getEventDate('d/m/Y')} / {$short_location}";
     }
 }
