@@ -125,7 +125,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     //Admin Controller
     Route::prefix('admin')->group(function () {
-        Route::get('/', 'AdminController@index');
         Route::get('/stats', 'AdminController@stats');
     });
 

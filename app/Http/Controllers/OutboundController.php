@@ -26,55 +26,6 @@ class OutboundController extends Controller
     //  $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
   // }
 
-    public function index()
-    {
-
-        $groups = new Group;
-        $parties = new Party;
-        $devices = new Device;
-
-        $counters = array();
-        $counters['groups'] = $groups->howMany();
-        $counters['parties'] = $parties->howMany();
-        $counters['pax'] = $parties->attendees();
-
-        $allParties = $parties->ofThisGroup('admin', true, true);
-        $hours_volunteered = 0;
-        foreach ($allParties as $party) {
-            $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
-        }
-
-        $counters['hours'] = $hours_volunteered;
-        $counters['devices'] = $devices->howMany();
-        $counters['statuses'] = $devices->statusCount();
-        $counters['most_seen'] = $devices->findMostSeen();
-
-        $rates = array();
-        $mostseen = array();
-        $states = array();
-        for ($i = 1; $i < 5; $i++) {
-            $mostseen[$i] = $devices->findMostSeen(null, $i);
-            $rates['most'][$i] = $devices->successRates($i);
-            $rates['least'][$i] = $devices->successRates($i, 'ASC');
-            $states[$i] = $devices->clusterCount($i);
-        }
-
-        // $this->set('mostseen', $mostseen);
-        // $this->set('counters', $counters);
-        // $this->set('rates', $rates);
-        // $this->set('states', $states);
-
-        return view('outbound.index', [
-        'mostseen' => $mostseen,
-        'counters' => $counters,
-        'rates' => $rates,
-        'states' => $states,
-        ]);
-    }
-
-
-
-
     /** type can be either party or group
      * id is id of group or party to display
      * */
@@ -203,14 +154,5 @@ class OutboundController extends Controller
         }
 
         abort(404);
-    }
-
-    public function visualisationEmbed($type, $id)
-    {
-
-        if (is_numeric($id)) {
-        } else {
-            abort(404);
-        }
     }
 }
