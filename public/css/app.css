@@ -22343,6 +22343,10 @@ h2 sup a:hover {
   width: 100%;
 }
 
+.language-bar .dropdown-menu.show {
+  bottom: 0px;
+}
+
 @media (min-width: 992px) {
   .language-bar {
     -webkit-box-pack: end;
