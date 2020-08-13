@@ -79,7 +79,34 @@ class FaultcatTest extends TestCase {
         $expected[17] = 'foo';
         $expected[21] = 'foo';
         $expected[22] = 'foo';
-//        logger(print_r($expected, 1));
+        foreach ($expected as $k => $v) {
+            $this->assertDatabaseHas('devices', [
+                'iddevices' => $k,
+                'fault_type' => $v,
+            ]);
+        }
+    }
+
+    /** @test */
+    public function update_faultcat_empty_problem() {
+
+        $this->_setup_data();
+
+        $Faultcat = new Faultcat;
+        $result = $Faultcat->updateDevicesWithEmptyProblem();
+        $expected = array_fill(1, 15, '');
+        $expected[1] = 'foo';
+        $expected[5] = 'foo';
+        $expected[9] = 'foo';
+        $expected[13] = 'foo';
+        $expected[17] = 'foo';
+        $expected[21] = 'foo';
+        $expected[22] = 'foo';
+        $expected[4] = 'Unknown';
+        $expected[8] = 'Unknown';
+        $expected[12] = 'Unknown';
+        $expected[16] = 'Unknown';
+        $expected[20] = 'Unknown';
         foreach ($expected as $k => $v) {
             $this->assertDatabaseHas('devices', [
                 'iddevices' => $k,
@@ -96,7 +123,7 @@ class FaultcatTest extends TestCase {
      *  opinions = 3 (2 records - 1 majority, 1 split)
      *  opinions = 4 (2 records - 1 majority, 1 split)
      *  opinions = 5 (4 records - 1 consensus, 1 majority, 1 split, 1 adjudicated)
-     * 
+     *
      * @return array
      */
     protected function _setup_data() {
