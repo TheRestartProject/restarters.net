@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Faultcat;
+use App\Mobifix;
 
 class SyncFaultTypes extends Command
 {
