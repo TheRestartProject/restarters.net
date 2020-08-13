@@ -38,7 +38,7 @@ class DeviceController extends Controller
         $all_groups = Group::all();
 
         $most_recent_finished_event = Party::with('theGroup')
-        ->hasDevicesRepaired(5)
+        ->hasDevicesRepaired(1)
         ->eventHasFinished()
         ->orderBy('event_date', 'DESC')
         ->first();
@@ -181,7 +181,7 @@ class DeviceController extends Controller
         $global_impact_data = $global_impact_data->getData();
 
         $most_recent_finished_event = Party::with('theGroup')
-        ->hasDevicesRepaired(5)
+        ->hasDevicesRepaired(1)
         ->eventHasFinished()
         ->orderBy('event_date', 'DESC')
         ->first();

@@ -19,14 +19,14 @@ class Mobifix extends Model {
      *
      * @var array
      */
-    protected $fillable = ['iddevices', 'fault_type', 'user_id', 'ip_address', 'session_id']; 
+    protected $fillable = ['iddevices', 'fault_type', 'user_id', 'ip_address', 'session_id'];
 
     /**
      * Fetch a single random computer device record that has less than 3
      * existing opinions and a non-empty problem.
-     * 
+     *
      * Not the most efficient query
-     * 
+     *
      * @return array
      */
     public function fetchFault() {
@@ -34,7 +34,7 @@ class Mobifix extends Model {
 d.`iddevices` as iddevices,
 TRIM(d.`brand`) as brand,
 TRIM(d.`model`) as model,
-IF(d.`repair_status`=1, 'Fixed',IF(d.`repair_status`=2, 'Repairable', 
+IF(d.`repair_status`=1, 'Fixed',IF(d.`repair_status`=2, 'Repairable',
 IF(d.`repair_status`=3, 'End of life', 'Unknown'))) as repair_status,
 TRIM(d.`problem`) as problem,
 COUNT(o.`iddevices`) as opinions_count
@@ -48,23 +48,23 @@ ORDER BY rand()
 LIMIT 1;"
         );
     }
-    
+
     /**
-     * 
+     *
      *
      * @return mixed
      */
     public function fetchStatus() {
 
         $result = [];
-        
+
         $result['total_devices'] = DB::select("
 SELECT COUNT(DISTINCT d.iddevices) AS total
 FROM devices d
 WHERE d.category = 25
 AND LENGTH(TRIM(d.problem)) > 0
 ");
-        
+
         $result['total_opinions_3'] = DB::select("
 SELECT COUNT(DISTINCT o.iddevices) AS total
 FROM devices_faults_mobiles_opinions o
@@ -112,7 +112,7 @@ HAVING
 OR adjudicated_opinion IS NOT NULL
 ) AS results
 ");
-        
+
         $result['list_recats'] = DB::select("
 SELECT winning_opinion, COUNT(winning_opinion) AS total FROM
 (SELECT
@@ -135,8 +135,8 @@ OR adjudicated_opinion IS NOT NULL
 GROUP BY winning_opinion
 ORDER BY total DESC
 ");
-  
-                $result['total_splits'] = DB::select("
+
+        $result['total_splits'] = DB::select("
 SELECT COUNT(DISTINCT items) as total FROM
 (SELECT
 d.iddevices AS items,
@@ -154,8 +154,8 @@ HAVING
 AND adjudicated_opinion IS NULL
 ) AS results
 ");
-        
-                $result['list_splits'] = DB::select("
+
+        $result['list_splits'] = DB::select("
 SELECT
 d.iddevices,
 ANY_VALUE(a.fault_type) AS adjudicated_opinion,
@@ -175,10 +175,10 @@ GROUP BY d.iddevices
 HAVING
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
 AND adjudicated_opinion IS NULL
-");        
+");
         return $result;
-    }    
-    
+    }
+
     /**
      * Write the winning opinions to `devices`.`fault_type`.
      *
@@ -207,12 +207,27 @@ ORDER BY NULL);");
 
         DB::statement("ALTER TABLE `devices_faults_mobiles_temporary` ADD PRIMARY KEY(`iddevices`);");
 
-        $result = DB::update("UPDATE devices d, devices_faults_mobiles_temporary t 
+        $result = DB::update("UPDATE devices d, devices_faults_mobiles_temporary t
 SET d.fault_type = t.winning_opinion
 WHERE d.iddevices = t.iddevices;");
 
         DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_faults_mobiles_temporary`");
 
+        return $result;
+    }
+
+    /**
+     * Write "Unknown" to `devices`.`fault_type` for records with empty problem.
+     *
+     * @return mixed
+     */
+    public function updateDevicesWithEmptyProblem() {
+
+        $result = DB::update("UPDATE devices d
+SET d.fault_type = 'Unknown'
+WHERE d.category = 25
+AND LENGTH(d.problem) = 0
+");
         return $result;
     }
 

@@ -73,6 +73,9 @@ return array (
   'items_repaired' => 'items repaired',
   'waste_prevented' => 'waste prevented',
   'co2_prevented' => 'CO2 emissions prevented',
+  'add_data_button' => 'Add Data',
   'add_data_title' => 'Add Data',
   'add_data_description' => 'Adding repair data helps show the impact of repair.',
+  'search_text' => 'Browse or search our global database of repair.',
+  'add_data_action_button' => 'Go to event',
 );

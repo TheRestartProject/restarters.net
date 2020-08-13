@@ -36,3 +36,17 @@ vendor/composer/
 anonymise-db.sql
 temp_db.sql
 restarters-anonymised.sql
+/.idea/$CACHE_FILE$
+/.idea/.gitignore
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/deployment.xml
+/.idea/encodings.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/php.xml
+/.idea/php-test-framework.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/restarters.net.iml
+/.idea/vcs.xml
+/.idea/webServers.xml

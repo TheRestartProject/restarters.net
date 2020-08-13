@@ -22384,6 +22384,10 @@ h2 sup a:hover {
   }
 }
 
+.language-bar .dropdown-menu.show {
+  bottom: 0px;
+}
+
 .language-bar .dropdown-item {
   font-family: Asap, sans-serif;
   font-weight: 600;

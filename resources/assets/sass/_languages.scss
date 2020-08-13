@@ -44,6 +44,10 @@
             right: 0 !important;
             width: 190px;
         }
+
+        &.show {
+            bottom: 0px;
+        }
     }
 
     .dropdown-item {
@@ -120,8 +124,6 @@
             }
         }
     }
-
-
 }
 
 .fixed-layout,
