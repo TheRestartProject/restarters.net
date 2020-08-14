@@ -201,4 +201,44 @@ class CreateEventTest extends TestCase
             [$coordinator], AdminModerationEvent::class
         );
     }
+
+    /** @test */
+    public function a_host_can_be_added_later()
+    {
+        // Disable discourse integration as this doesn't currently work in a test environment.  We are considering
+        // a better solution.
+        config(['restarters.features.discourse_integration' => false]);
+
+        $this->withoutExceptionHandling();
+
+        $host = factory(User::class)->states('Host')->create();
+        $this->actingAs($host);
+
+        $group = factory(Group::class)->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        // Create the event
+        $response = $this->get('/party/create');
+        $this->get('/party/create')->assertStatus(200);
+
+        $eventAttributes = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2000-01-01', 'wordpress_post_id' => '99999']);
+        $response = $this->post('/party/create/', $eventAttributes);
+
+        // Find the event id
+        $party = $group->parties()->first();
+
+        // Remove the host from the event
+        $this->post('/party/remove-volunteer/', [
+            'user_id' => $host->id,
+            'event_id' => $party->idevents
+        ])->assertStatus(200);
+
+        // Assert that we see the host in the list of volunteers to add to the event.
+        $this->get('/party/view/1')->assertSeeInOrder(['Group member', '<option value="' . $host->id . '">', '</div>']);
+
+        // Assert we can add them back in.
+
+        config(['restarters.features.discourse_integration' => true]);
+    }
 }
