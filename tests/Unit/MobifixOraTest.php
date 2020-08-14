@@ -26,10 +26,33 @@ class MobifixOraTest extends TestCase {
 
         $data = $this->_setup_devices();
         $MobifixOra = new MobifixOra;
+
         $result = $MobifixOra->fetchFault();
         $this->assertTrue(is_array($result), 'fetch_mobifixora_record: result is not array');
-        $this->assertEquals(count($result), 1, 'fetch_mobifixora_record: wrong result count');
+        $this->assertEquals(1, count($result), 'fetch_mobifixora_record: wrong result count');
         $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_mobifixora_record: id_ords is null');
+
+        // leave only 1 record
+        $exclude = [];
+        foreach ($data as $v) {
+            $exclude[] = $v['id'];
+        }
+        $include = array_pop($exclude);
+        $result = $MobifixOra->fetchFault($exclude);
+        $this->assertTrue(is_array($result), 'fetch_mobifixora_record: result is not array');
+        $this->assertEquals(1, count($result), 'fetch_mobifixora_record: wrong result count');
+        $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_mobifixora_record: id_ords is null');
+        $this->assertEquals($include, $result[0]->id_ords, 'fetch_mobifixora_record: wrong value');
+
+        // exclude all records for one partner
+        $exclude = [];
+        foreach ($data as $k => $v) {
+            if ($v['data_provider'] == 'anstiftung') {
+                $exclude[] = $v['id'];
+            }
+        }
+        $result = $MobifixOra->fetchFault($exclude, 'anstiftung');
+        $this->assertTrue(empty($result), 'fetch_mobifixora_record: result is not false');
     }
 
     /** @test */
@@ -41,7 +64,7 @@ class MobifixOraTest extends TestCase {
             // Illuminate\Foundation\Testing\TestResponse
             $response = $this->get('/mobifixora');
             $seshids = $this->app['session']->get('mobifixora.exclusions');
-            $this->assertEquals(count($seshids), $i, 'mobifixora.exclusions wrong length');
+            $this->assertEquals($i, count($seshids), 'mobifixora.exclusions wrong length');
             $response->assertSuccessful();
             $response->assertViewIs('mobifixora.index');
         }
@@ -63,12 +86,12 @@ class MobifixOraTest extends TestCase {
         foreach ($opinions['status'] as $k => $v) {
             $this->assertTrue(array_key_exists($k, $result), 'fetch_mobifixora_status: missing key - ' . $k);
             if (!is_array($v)) {
-                $this->assertEquals($result[$k][0]->total, $v, 'fetch_mobifixora_status: wrong ' . $k);
+                $this->assertEquals($v, $result[$k][0]->total, 'fetch_mobifixora_status: wrong ' . $k);
             } else {
                 $this->assertTrue(is_array($result[$k]), 'fetch_mobifixora_status: not array - ' . $k);
                 foreach ($v[0] as $key => $val) {
                     $this->assertTrue(array_key_exists($key, $result[$k][0]), 'fetch_mobifixora_status: missing key - ' . $key);
-                    $this->assertEquals($result[$k][0]->{$key}, $val, 'fetch_mobifixora_status: wrong ' . $key);
+                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_mobifixora_status: wrong ' . $key);
                 }
             }
         }
