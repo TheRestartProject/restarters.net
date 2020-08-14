@@ -78,10 +78,8 @@ class MobifixOraSetup extends Migration {
         });
 
         $data = base_path() . '/database/data_updates/devices_mobifix_ora.php';
-        logger($data);
         if (file_exists($data)) {
             include($data);
-            logger('inserting mobifixora_data');
             foreach ($mobifixora_data as $k => $v) {
                 DB::table('devices_mobifix_ora')->insert([
                     'id_ords' => $v['id'],

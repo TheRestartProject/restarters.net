@@ -43,7 +43,7 @@ class MobifixOraController extends Controller {
         }
         $fault = $this->_fetchRecord($request);
         if (!$fault) {
-            return redirect()->action('MobifixOraController@status');
+            return redirect()->action('MobifixOraController@status')->withSuccess('done');
         }
         $fault->translate = rawurlencode($fault->problem);
         $MobifixOra = new MobifixOra;
@@ -85,14 +85,16 @@ class MobifixOraController extends Controller {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
-            $user = null;
+            $user = Microtask::getAnonUserCta($request);
         }
         $partner = $request->input('partner', NULL);
         $MobifixOra = new MobifixOra;
         $data = $MobifixOra->fetchStatus($partner);
+        $complete = $data['total_opinions_2'][0]->total + $data['total_opinions_1'][0]->total + $data['total_opinions_0'][0]->total == 0;
         return view('mobifixora.status', [
             'status' => $data,
             'user' => $user,
+            'complete' => $complete,
         ]);
     }
 
@@ -108,12 +110,12 @@ class MobifixOraController extends Controller {
 //        $request->session()->flush();
         $result = FALSE;
         $partner = $request->input('partner', NULL);
-        $exclusions = $request->session()->get('mobifix.exclusions', []);
+        $exclusions = $request->session()->get('mobifixora.exclusions', []);
         $Mobifixora = new MobifixOra;
         $fault = $Mobifixora->fetchFault($exclusions, $partner);
         if ($fault) {
             $result = $fault[0];
-            $request->session()->push('mobifix.exclusions', $result->id_ords);
+            $request->session()->push('mobifixora.exclusions', $result->id_ords);
         }
         return $result;
     }
