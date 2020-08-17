@@ -89,4 +89,5 @@ return array (
   'hot_topics' => 'Hot topics',
   'hot_topics_text' => 'Join in on the latest hot topics on repair at Restarters Talk.',
   'hot_topics_link' => 'All weekly hot topics',
+  'quantity' => 'Quantity',
 );

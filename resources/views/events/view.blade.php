@@ -115,7 +115,7 @@
             </div>
             @else
                 @if( $event->hasFinished() )
-                    <button data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
+                    <a data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">Share event stats</a>
                 @else
                     @if (! Auth::user()->isInGroup($event->theGroup->idgroups))
                         <a class="btn btn-tertiary" href="/group/join/{{ $event->theGroup->idgroups }}">Follow group</a>
@@ -419,7 +419,10 @@
           </ul>
           <div class="tab-content" id="itemsTabContent">
             <div class="tab-pane fade show active" id="items-powered" role="tabpanel" aria-labelledby="items-powered-tab">
-              <p>A <b>powered item</b> is anything that has or requires a power source.</p>
+              <p class="mt-3">A <b>powered item</b> is anything that has or requires a power source.</p>
+              <a class="collapsed row-button" id="open-add-powered" data-toggle="collapse" href="#row-add-device" role="button" aria-expanded="false" aria-controls="row-add-device">
+                <button class="btn btn-primary text-center mb-4 align-bottom" type="button" id="add-device-powered"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> Add Item</button>
+              </a>
               <div class="table-responsive">
                 <table class="table table-repair" role="table" id="device-table">
                   <thead>
@@ -441,46 +444,22 @@
                   </tr>
                   </thead>
                   <tbody>
+                  @include('partials.tables.row-device', [
+                      'add' => TRUE,
+                      'device' => new \App\Device()
+                  ])
                   @foreach($event->devices as $device)
-                    @include('partials.tables.row-device')
+                    @include('partials.tables.row-device', [
+                        'add' => FALSE
+                    ])
                   @endforeach
                   </tbody>
                 </table>
               </div>
-
-              @include('partials.event-add-device')
-
             </div>
             <div class="tab-pane fade" id="items-unpowered" role="tabpanel" aria-labelledby="items-unpowered-tab">
-              <div class="table-responsive">
-                <table class="table table-repair" role="table" id="device-table">
-                  <thead>
-                  <tr>
-                    <th width="60"></th>
-                    <th class="text-center"><svg width="22" height="17" viewBox="0 0 17 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="position:relative;z-index:1;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><title>Camera</title><path d="M8.25,4.781c-1.367,0 -2.475,1.071 -2.475,2.391c0,1.32 1.108,2.39 2.475,2.39c1.367,0 2.475,-1.07 2.475,-2.39c0,-1.32 -1.108,-2.391 -2.475,-2.391Zm6.6,-2.39l-1.98,0c-0.272,0 -0.566,-0.204 -0.652,-0.454l-0.511,-1.484c-0.087,-0.249 -0.38,-0.453 -0.652,-0.453l-5.61,0c-0.272,0 -0.566,0.204 -0.652,0.454l-0.511,1.483c-0.087,0.25 -0.38,0.454 -0.652,0.454l-1.98,0c-0.908,0 -1.65,0.717 -1.65,1.593l0,7.172c0,0.877 0.742,1.594 1.65,1.594l13.2,0c0.907,0 1.65,-0.717 1.65,-1.594l0,-7.172c0,-0.876 -0.743,-1.593 -1.65,-1.593Zm-6.6,8.765c-2.278,0 -4.125,-1.784 -4.125,-3.984c0,-2.2 1.847,-3.985 4.125,-3.985c2.278,0 4.125,1.785 4.125,3.985c0,2.2 -1.847,3.984 -4.125,3.984Zm6.022,-6.057c-0.318,0 -0.577,-0.25 -0.577,-0.558c0,-0.308 0.259,-0.558 0.577,-0.558c0.32,0 0.578,0.25 0.578,0.558c0,0.308 -0.259,0.558 -0.578,0.558Z" style="fill:#0394a6;fill-rule:nonzero;"/></svg></th>
-                    <th class="d-none d-md-table-cell">Category</th>
-                    <th class="d-none d-md-table-cell">Brand</th>
-                    <th class="d-none d-md-table-cell">Model</th>
-                    <th class="d-none d-md-table-cell">Age</th>
-                    <th><span class="d-none d-sm-inline">Description of problem/solution</span></th>
-                    <th width="65px">Status</th>
-                    <th width="95px">Spare parts</th>
-                    @if( Auth::check() )
-                      @if(FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) )
-                        <th width="35px" class="d-none d-md-table-cell"></th>
-                      @endif
-                    @endif
-                  </tr>
-                  </thead>
-                  <tbody>
-                  @foreach($event->devices as $device)
-                    @include('partials.tables.row-device')
-                  @endforeach
-                  </tbody>
-                </table>
-              </div>
-
-              @include('partials.event-add-device')
+              <p class="mt-3">An <b>unpowered item</b> is anything that doesn't have or require a power source.</p>
+              TODO copy from powered
             </div>
           </div>
         </div>

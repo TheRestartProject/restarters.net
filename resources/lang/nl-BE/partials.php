@@ -88,4 +88,5 @@ return array (
   'yes_third_party' => 'Ja - van een derde partij',
   'your_recent_events' => 'Je meest recente activiteiten',
   'your_recent_events_txt1' => 'Dit zijn activiteiten waarop je antwoordde of waaraan je werd toegevoegd door een organisator',
+  'quantity' => 'Quantity',
 );

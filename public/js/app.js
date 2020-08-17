@@ -36445,7 +36445,7 @@ $(document).ready(function () {
     e.preventDefault();
     $form = $(this);
 
-    if ($form.find('select[name=category]').val() === '') {
+    if ($form.find('select[name=category-]').val() === '') {
       alert('Category field is required');
       return false;
     }
@@ -36457,18 +36457,19 @@ $(document).ready(function () {
       type: 'post',
       url: '/device/create',
       data: {
-        category: $form.find('select[name=category]').val(),
-        weight: $form.find('input[name=weight]').val(),
-        brand: $form.find('select[name=brand]').val(),
-        model: $form.find('input[name=model]').val(),
-        age: $form.find('input[name=age]').val(),
-        problem: $form.find('input[name=problem]').val(),
-        repair_status: $form.find('select[name=repair_status]').val(),
-        repair_details: $form.find('select[name=repair_details]').val(),
-        spare_parts: $form.find('select[name=spare_parts]').val(),
-        quantity: $form.find('select[name=quantity]').val(),
-        event_id: $form.find('input[name=event_id]').val(),
-        barrier: $form.find('#repair_barrier').val()
+        category: $form.find('select[name=category-]').val(),
+        weight: $form.find('input[name=weight-]').val(),
+        brand: $form.find('select[name=brand-]').val(),
+        model: $form.find('input[name=model-]').val(),
+        age: $form.find('input[name=age-]').val(),
+        problem: $form.find('input[name=problem-]').val(),
+        repair_status: parseInt($('#status-').val()),
+        repair_details: parseInt($('#repair-info-').val()),
+        spare_parts: parseInt($('#spare-parts-').val()),
+        quantity: $form.find('select[name=quantity-]').val(),
+        event_id: $('#event_id').val(),
+        barrier: $('#barrier-').val(),
+        quantity: $('#add-quantity').val(),
       },
       datatype: 'json',
       success: function success(json) {
