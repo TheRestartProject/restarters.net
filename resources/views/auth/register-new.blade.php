@@ -233,10 +233,11 @@
                 </div>
                 @if( Auth::check() )
                 <div class="form-check d-flex align-items-top justify-content-start">
-                    <input class="checkbox-top form-check-input" type="checkbox" name="consent_past_data" id="consent_past_data" value="1" @if( old('consent_past_data') == 1 ) checked @endif>
-                    <label class="form-check-label" for="consent_past_data">
-                      @lang('registration.reg-step-4-label3')
-                    </label>
+                    <input type="hidden" name="consent_past_data" id="consent_past_data" value="1" />
+                    <!-- <input class="checkbox-top form-check-input" type="checkbox" name="consent_past_data" id="consent_past_data" value="1" @if( old('consent_past_data') == 1 ) checked @endif>
+                         <label class="form-check-label" for="consent_past_data">
+                         @lang('registration.reg-step-4-label3')
+                         </label> -->
                 </div>
                 @endif
             </fieldset>
