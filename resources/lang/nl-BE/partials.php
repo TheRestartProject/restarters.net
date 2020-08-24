@@ -82,7 +82,7 @@ return array (
   'welcome_text' => 'We geven info en tips over het organiseren van repareer activiteiten en helpen je om je competenties te delen.',
   'welcome_title' => 'Aan de slag',
   'wiki_text' => 'Ben je op zoek naar tips en advies rond herstellingen? Of wil je zelf een tip delen? Neem dan een kijkje in onze wiki!',
-  'wiki_title' => 'Restarters Wiki',
+  'wiki_title' => 'Wiki',
   'yes' => 'Ja',
   'yes_manufacturer' => 'Ja - van de producent',
   'yes_third_party' => 'Ja - van een derde partij',

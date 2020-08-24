@@ -45,7 +45,7 @@ return array (
   'restarter_getting_started_text' => 'We offer materials on how to help others fix their electronics at community events: on how to share your repair skills in your community and help organise events.',
   'welcome_title' => 'Getting started in community repair',
   'welcome_text' => 'We offer materials on how to help others fix their electronics at community events: on how to share your repair skills in your community and help organise events',
-  'wiki_title' => 'Restarters Wiki',
+  'wiki_title' => 'Wiki',
   'wiki_text' => 'A changing selection of pages from our repair wiki.  Read and contribute advice for community repair!',
   'remove_volunteer' => 'Remove volunteer',
   'host' => 'Host',

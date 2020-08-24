@@ -50,7 +50,7 @@ return array (
   'filter-results' => 'Risultato del filtro',
   'menu_tools' => 'Strumenti per la comunità',
   'menu_discourse' => 'Discussione',
-  'menu_wiki' => 'Restarters Wiki',
+  'menu_wiki' => 'Wiki',
   'menu_other' => 'Altri Link',
   'menu_help_feedback' => 'Aiuto & Riscontri',
   'menu_faq' => 'FAQs',
@@ -61,4 +61,5 @@ return array (
   'discourse_url' => 'https://talk.restarters.net',
   'wiki_url' => 'https://wiki.restarters.net',
   'please_select' => 'Seleziona per favore',
+  'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
 );

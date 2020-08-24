@@ -23,7 +23,7 @@ return array (
   'menu_help_feedback' => 'Help & Feedback',
   'menu_other' => 'Andere linken',
   'menu_tools' => 'Gemeenschapstools',
-  'menu_wiki' => 'Restarters Wiki',
+  'menu_wiki' => 'Wiki',
   'new_group' => 'Een nieuwe groep maken',
   'next' => 'Volgende',
   'onboarding_content_1' => 'vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.',
@@ -61,4 +61,5 @@ return array (
   'your_name_validation' => 'Typ aub je naam',
   'your_repair_skills' => 'Je competenties',
   'side_attention' => 'Dit vraagt je aandacht',
+  'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
 );

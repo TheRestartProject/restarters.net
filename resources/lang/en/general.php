@@ -55,9 +55,6 @@ return array (
   'email_alerts_text' => 'Please choose what kind of email updates you would like to receive. You can change these at any time. Our Privacy Policy is available <a href="https://therestartproject.org/data-and-privacy-policy/fixometer/" rel="noopener noreferrer" target="_blank">here</a>',
   'filter-results' => 'Filter results',
   'menu_discourse' => 'Talk',
-  'menu_fixometer' => 'Fixometer',
-  'menu_events' => 'Events',
-  'menu_groups' => 'Groups',
   'menu_wiki' => 'Wiki',
   'menu_help_feedback' => 'Help & Feedback',
   'menu_faq' => 'FAQs',
@@ -65,4 +62,7 @@ return array (
   'discourse_url' => 'https://talk.restarters.net',
   'please_select' => 'Please select',
   'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
+  'menu_fixometer' => 'Fixometer',
+  'menu_events' => 'Events',
+  'menu_groups' => 'Groups',
 );

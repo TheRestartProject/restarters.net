@@ -38,7 +38,7 @@ return array (
   'fixed' => 'Fixed',
   'repairable' => 'Repairable',
   'age' => 'Age',
-  'restart-party' => 'Restart party',
+  'restart-party' => 'repair event',
   'category_of_device' => 'Category of device',
   'spare_parts_required' => 'Spare parts required?',
   'save_device' => 'Save device',

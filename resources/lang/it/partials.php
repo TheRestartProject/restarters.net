@@ -45,7 +45,7 @@ return array (
   'restarter_getting_started_text' => 'Offriamo materialie su come aiutare gli altri a riparare i loro dispositivi elettronici durante eventi comunitari, su come condividere le tue capacità di riparazione nella tua comunità e aiutare a organizzare eventi.',
   'welcome_title' => 'Introduzione alla riparazione  comunitaria',
   'welcome_text' => 'Offriamo materiale su come aiutare gli altri a riparare i loro dispositivi elettronici durante eventi comunitari, su come condividere le tue capacità di riparazione nella tua comunità e aiutare a organizzare gli eventi',
-  'wiki_title' => 'Restarters Wiki',
+  'wiki_title' => 'Wiki',
   'wiki_text' => 'Una selezione in continua evoluzione di pagine dal nostro wiki di riparazione. Leggi e contribuisci con i consigli per la riparazione comunitaria!',
   'remove_volunteer' => 'Rimuovi volontario',
   'host' => 'Ospitante',
