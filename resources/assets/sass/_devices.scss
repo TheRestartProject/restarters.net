@@ -146,6 +146,16 @@ td.col-device-auto {
 }
 
 .device-field-row {
-display: grid;
-grid-template-columns: 80px 81px auto auto;
+  display: grid;
+  grid-template-columns: 80px 81px auto auto;
+}
+
+.device-select-row {
+  display: grid;
+  grid-template-columns: auto 50px;
+
+  .btn {
+    min-width: initial !important;
+    color: black;
+  }
 }

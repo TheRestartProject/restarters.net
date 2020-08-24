@@ -5,52 +5,65 @@
                 <div class="card-body d-flex flex-column">
                     <h3>ITEM</h3>
                     <div class="mt-4">
-                        <div class="form-control form-control__select form-control-lg mb-2">
-                            <select name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
-                                <option value="">@lang('devices.category')</option>
-                                @foreach( $clusters as $cluster )
-                                    <optgroup label="{{{ $cluster->name }}}">
-                                        @foreach( $cluster->categories as $category )
-                                            @if( $device->category == $category->idcategories )
-                                                <option value="{{{ $category->idcategories }}}" selected>{{{ $category->name }}}</option>
-                                            @else
-                                                <option value="{{{ $category->idcategories }}}">{{{ $category->name }}}</option>
-                                            @endif
-                                        @endforeach
-                                    </optgroup>
-                                @endforeach
-                                @if( $device->category == 46 )
-                                    <option value="46" selected>@lang('partials.category_none')</option>
-                                @else
-                                    <option value="46">@lang('partials.category_none')</option>
-                                @endif
-                            </select>
-                        </div>
-
-                        <div class="form-control form-control__select mb-2">
-                            <select name="brand-{{ $device->iddevices }}" class="select2-with-input" id="brand-{{ $device->iddevices }}">
-                                @php($i = 1)
-                                @if( empty($device->brand) )
-                                    <option value="" selected>Brand</option>
-                                @else
-                                    <option value="">Brand</option>
-                                @endif
-                                @foreach($brands as $brand)
-                                    @if ($device->brand == $brand->brand_name)
-                                        <option value="{{ $brand->brand_name }}" selected>{{ $brand->brand_name }}</option>
-                                        @php($i++)
+                        <div class="mb-2 device-select-row">
+                            <div class="form-control form-control__select form-control-lg d-inline">
+                                <select name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
+                                    <option value="">@lang('devices.category')</option>
+                                    @foreach( $clusters as $cluster )
+                                        <optgroup label="{{{ $cluster->name }}}">
+                                            @foreach( $cluster->categories as $category )
+                                                @if( $device->category == $category->idcategories )
+                                                    <option value="{{{ $category->idcategories }}}" selected>{{{ $category->name }}}</option>
+                                                @else
+                                                    <option value="{{{ $category->idcategories }}}">{{{ $category->name }}}</option>
+                                                @endif
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                    @if( $device->category == 46 )
+                                        <option value="46" selected>@lang('partials.category_none')</option>
                                     @else
-                                        <option value="{{ $brand->brand_name }}">{{ $brand->brand_name }}</option>
+                                        <option value="46">@lang('partials.category_none')</option>
                                     @endif
-                                @endforeach
-                                @if( $i == 1 && !empty($device->brand) )
-                                    <option value="{{ $device->brand }}" selected>{{ $device->brand }}</option>
-                                @endif
-                            </select>
+                                </select>
+                            </div>
+                            <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_category')" class="ml-3 mt-2">
+                                <img src="/icons/info_ico_black.svg">
+                            </div>
                         </div>
 
-                        <div class="form-group mb-2">
-                            <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}" placeholder="@lang('partials.model')" autocomplete="off">
+                        <div class="mb-2 device-select-row">
+                            <div class="form-control form-control__select">
+                                <select name="brand-{{ $device->iddevices }}" class="select2-with-input" id="brand-{{ $device->iddevices }}">
+                                    @php($i = 1)
+                                    @if( empty($device->brand) )
+                                        <option value="" selected>Brand</option>
+                                    @else
+                                        <option value="">Brand</option>
+                                    @endif
+                                    @foreach($brands as $brand)
+                                        @if ($device->brand == $brand->brand_name)
+                                            <option value="{{ $brand->brand_name }}" selected>{{ $brand->brand_name }}</option>
+                                            @php($i++)
+                                        @else
+                                            <option value="{{ $brand->brand_name }}">{{ $brand->brand_name }}</option>
+                                        @endif
+                                    @endforeach
+                                    @if( $i == 1 && !empty($device->brand) )
+                                        <option value="{{ $device->brand }}" selected>{{ $device->brand }}</option>
+                                    @endif
+                                </select>
+                            </div>
+                            <div></div>
+                        </div>
+
+                        <div class="mb-2 device-select-row">
+                            <div class="form-group">
+                                <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}" placeholder="@lang('partials.model')" autocomplete="off">
+                            </div>
+                            <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_model')" class="ml-3 mt-2">
+                                <img src="/icons/info_ico_black.svg">
+                            </div>
                         </div>
 
                         <div class="device-field-row align-items-center mb-2">
@@ -81,7 +94,7 @@
                         </span>
                         </div>
 
-                        <p class="text-danger">TODO Info buttons, add photos before add device</p>
+                        <p class="text-danger">TODO Add photos before add device</p>
                     </div>
                 </div>
             </div>
@@ -161,8 +174,13 @@
                 <div class="card-body">
                     <h3>ASSESSMENT</h3>
                     <div class="mt-4">
-                        <div class="form-group">
-                            <textarea class="form-control" rows="6" name="problem-{{ $device->iddevices }}" id="problem-{{ $device->iddevices }}" placeholder="@lang('partials.description_of_problem_solution')">{!! $device->problem !!}</textarea>
+                        <div class="mb-2 device-select-row">
+                            <div class="form-group">
+                                <textarea class="form-control" rows="6" name="problem-{{ $device->iddevices }}" id="problem-{{ $device->iddevices }}" placeholder="@lang('partials.description_of_problem_solution')">{!! $device->problem !!}</textarea>
+                            </div>
+                            <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_problem')"  class="ml-3 mt-2">
+                                <img src="/icons/info_ico_black.svg">
+                            </div>
                         </div>
                         @include('partials.useful-repair-urls-add-or-edit', ['urls' => $device->urls, 'device' => $device])
 
@@ -171,7 +189,7 @@
                             <label class="form-check-label" for="wiki-{{ $device->iddevices }}">@lang('partials.solution_text2')</label>
                         </div>
 
-                        <p class="text-danger">TODO Notes field does not exist yet</p>
+{{--                        <p class="text-danger">TODO Notes field does not exist yet</p>--}}
                     </div>
                 </div>
             </div>
@@ -192,7 +210,9 @@
                     <option value="10">10</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-tertiary">@lang('partials.cancel')</button>
+            <a class="collapsed" data-toggle="collapse" href="#add-device" role="button" aria-expanded="false" aria-controls="add-device">
+                <button class="btn btn-tertiary" type="button">@lang('partials.cancel')</button>
+            </a>
         </div>
     </div>
 </form>

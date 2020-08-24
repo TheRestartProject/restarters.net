@@ -83,4 +83,7 @@ return array (
   'age_approx' => 'yrs - approximate, if known',
   'repair_source' => 'Source of repair information',
   'repair_url' => 'URL for repair information',
+  'tooltip_category' => "Choose the category that best fits this powered item. For more information about these categories, <a target='_blank' rel='noopener noreferrer' href='https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--category'>click here</a>.",
+  'tooltip_model' => "Add as much information about the specific model of device here as you can (e.g. ‘Galaxy S10 5G’).",
+  'tooltip_problem' => "<p>Please provide as much detail as you can about the problem with the device and what was done to repair it. For example:</p><ul><li>How did it break?</li><li>What, specifically, was broken?</li><li>What steps were taken to fix it and did they work?</li></ul><p><a href='https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--comments' target='_blank' rel='noopener nofollower'>More information</a></p>",
 );

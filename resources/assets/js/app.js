@@ -890,19 +890,15 @@ function initAutocomplete() {
     //   }
     // });
 
-    console.log("Set change for category");
     jQuery(document).on('change', '.category', function (e) {
       // Weights are automatically determined from the category except for "None of the above".  So we disable
       // the field except for that category.
       $value = parseInt(jQuery(this).val());
       $field = jQuery(this).parents('td').find('.weight');
-      console.log("Category value", $value, parseInt($value))
       if( $value === 46 || $value === '' ){
-        console.log("Not disabled")
         $field.prop('disabled', null);
         $field.parents('.display-weight').removeClass('d-none');
       } else {
-        console.log("Disabled")
         $field.val('');
         $field.trigger('change');
         $field.prop('disabled', true);
@@ -969,6 +965,11 @@ function initAutocomplete() {
       if (hash) {
           $('a[href=\"'+hash).tab('show');
       }
+  });
+
+  jQuery(document).ready(function () {
+    // Enable popovers - Bootstrap doesn't enable these by default.
+    $('[data-toggle="popover"]').popover()
   });
 
   $('#register-form-submit').on('click', function(e) {
