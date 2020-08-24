@@ -64,6 +64,11 @@
       }
 
     }
+
+    .add-url {
+      display: grid;
+      align-items: stretch;
+    }
   }
 
   label {
@@ -133,10 +138,14 @@ td.col-device-auto {
 
 .device-info {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat( auto-fit, minmax(360px, 1fr) );
+
+  .useful-repair-urls .input-group .form-control {
+    border-radius: initial;
+  }
 }
 
 .device-field-row {
-    display: grid;
-    grid-template-columns: 80px 81px auto auto;
+display: grid;
+grid-template-columns: 80px 81px auto auto;
 }

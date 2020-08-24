@@ -81,4 +81,6 @@ return array (
   'weight' => 'Weight',
   'required_impact' => 'kg - required for environmental impact calculation',
   'age_approx' => 'yrs - approximate, if known',
+  'repair_source' => 'Source of repair information',
+  'repair_url' => 'URL for repair information',
 );

@@ -87,4 +87,5 @@ return array (
   'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
   'save' => 'Save device',
   'quantity' => 'Quantity',
+  'cancel' => 'Cancel',
 );

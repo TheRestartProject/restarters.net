@@ -91,4 +91,5 @@ admin',
   'hot_topics_link' => 'Argomenti piu\' seguiti della settimana',
   'hot_topics_text' => 'Unisciti alla conversazione su gli argomenti piu\' seguiti della settimana',
   'quantity' => 'Quantity',
+  'cancel' => 'Cancel',
 );

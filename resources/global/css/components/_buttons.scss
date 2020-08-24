@@ -179,6 +179,38 @@
   border-color: $black !important;
 }
 
+.btn-tertiary {
+  color: $white;
+  background-color: transparent;
+  box-shadow: 5px 5px 0 0 $white;
+  width: auto;
+  border: solid 1px $white;
+  padding: 10px;
+  border-radius: 0;
+  font-size: 16px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  text-transform: uppercase;
+  line-height: 1.13;
+  letter-spacing: 1.2px;
+  transition: none;
+
+  &:hover {
+    box-shadow: 5px 5px 0 0 $black;
+    border: 2px solid $black;
+    padding: 9px;
+    background-color: $brand-orange;
+    color: $black;
+    border-color: $black;
+    text-decoration: underline;
+
+    &:active {
+      color: $white;
+    }
+  }
+}
+
 .show {
   .dropdown-toggle {
     background-color: $black !important;

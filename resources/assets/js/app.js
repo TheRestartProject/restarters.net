@@ -728,7 +728,7 @@ function initAutocomplete() {
   }
 
   repair_barrier_options = {
-    placeholder: "-- Choose barriers to repair --"
+    placeholder: "Choose barriers to repair"
   }
 
   tag_options_with_input = {

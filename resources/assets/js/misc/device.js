@@ -196,8 +196,10 @@ jQuery(function () {
     $repair_details = $(this).parents('form').find('.repair-details-edit');
     $spare_parts = $(this).parents('form').find('.spare-parts');
     $barrier = $(this).parents('form').find('.repair-barrier');
+    console.log("Change", $status, $repair_details, $spare_parts, $barrier);
 
     if( $status == 1 ){ // Fixed
+      console.log("Fixed")
 
       // Reset and hide repair details
       $repair_details.parents('.col-device').addClass('d-none').removeClass('col-device-auto');
@@ -211,6 +213,7 @@ jQuery(function () {
       $barrier.val(0).trigger('change');
 
     } else if( $status == 2 ){ // Repairable
+      console.log("Repairable")
 
       // Show repair details field
       $repair_details.parents('.col-device').removeClass('d-none').addClass('col-device-auto');
