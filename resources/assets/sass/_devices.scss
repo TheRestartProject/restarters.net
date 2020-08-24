@@ -130,3 +130,13 @@ td.col-device-auto {
         top: 2px;
     }
 }
+
+.device-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.device-field-row {
+    display: grid;
+    grid-template-columns: 80px 81px auto auto;
+}

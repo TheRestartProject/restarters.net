@@ -59,4 +59,7 @@ return array (
   'device_info' => 'Device info',
   'repair_info' => 'Repair info',
   'event_info' => 'Event info',
+  'weight' => 'Weight',
+  'required_impact' => 'kg - required for environmental impact calculation',
+  'age_approx' => 'yrs - approximate, if known',
 );

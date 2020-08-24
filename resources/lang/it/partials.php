@@ -77,11 +77,11 @@ return array (
   'description_of_problem' => 'Descrizione del problema',
   'description_of_problem_solution' => 'Descrizione del problema/soluzione',
   'solution_text' => 'I commenti della soluzione potrebbero aiutare i Restarters a lavorare su un dispositivo simile in futuro? O è un qualcosa di divertente?',
+  'solution_text2' => 'Interesting case study to share?',
   'device_images' => 'Immagini del dispositivo',
   'remove_file' => 'Rimuovi file',
   'add_image' => 'Aggiungi immagine',
   'no_devices_added' => 'Nessun dispositivo aggiunto',
-  'est_weight' => 'Peso stimato',
   'add_a_device' => 'Aggiungi un dispositivo',
   'this_event_hasnt_started' => 'Questo evento non c\'e\' stato',
   'event_requires_moderation_by_an_admin' => 'L\'evento richiede la moderazione di un 

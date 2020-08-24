@@ -78,4 +78,7 @@ return array (
   'add_data_description' => 'Adding repair data helps show the impact of repair.',
   'search_text' => 'Browse or search our global database of repair.',
   'add_data_action_button' => 'Go to event',
+  'weight' => 'Weight',
+  'required_impact' => 'kg - required for environmental impact calculation',
+  'age_approx' => 'yrs - approximate, if known',
 );

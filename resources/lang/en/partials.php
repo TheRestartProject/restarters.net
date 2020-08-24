@@ -1,7 +1,6 @@
 <?php
 
 return array (
-  'est_weight' => 'Est. weight',
   'category' => 'Category',
   'brand' => 'Brand',
   'status' => 'Repair status',
@@ -78,6 +77,7 @@ return array (
   'most_seen' => 'Most seen',
   'description_of_problem_solution' => 'Description of problem/solution',
   'solution_text' => 'Could the solution comments help repairers working on a similar device in future?  Or is it a fun case study?',
+  'solution_text2' => 'Interesting case study to share?',
   'device_images' => 'Device images',
   'remove_file' => 'Remove file',
   'add_image' => 'Add image',

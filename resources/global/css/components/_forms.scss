@@ -23,6 +23,11 @@
     margin-right: 10px;
     z-index: 1;
   }
+
+  .form-check-large {
+    width: 25px;
+    height: 25px;
+  }
 }
 
 .form-control {
@@ -214,4 +219,8 @@ select.form-control:not([class*="select2"]) {
 
 #participants_qty, #volunteer_qty {
     border: none !important;
+}
+
+.form-control-lg {
+  height: 45px !important;
 }

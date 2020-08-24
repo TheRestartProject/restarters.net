@@ -1,3 +1,5 @@
+@import "../../../assets/sass/variables";
+
 .card-summary {
   @extend .rounded-0;
   @extend .h-100;
@@ -51,6 +53,25 @@
       text-align: center;
       color: $black;
     }
+  }
+}
+
+.card-event-add-item {
+  background-color: $brand-blue;
+  border-radius: 0px;
+
+  .card-body h3 {
+    font-size: $font-size-base;
+    color: $brand-white;
+    font-weight: bold;
+  }
+
+  .form-control {
+    padding: 8px;
+  }
+
+  .numeric {
+    width: 81px;
   }
 }
 

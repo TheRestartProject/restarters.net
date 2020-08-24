@@ -420,9 +420,14 @@
           <div class="tab-content" id="itemsTabContent">
             <div class="tab-pane fade show active" id="items-powered" role="tabpanel" aria-labelledby="items-powered-tab">
               <p class="mt-3">A <b>powered item</b> is anything that has or requires a power source.</p>
-              <a class="collapsed row-button" id="open-add-powered" data-toggle="collapse" href="#row-add-device" role="button" aria-expanded="false" aria-controls="row-add-device">
-                <button class="btn btn-primary text-center mb-4 align-bottom" type="button" id="add-device-powered"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> Add Item</button>
-              </a>
+              @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) )
+                <a class="collapsed row-button" id="open-add-powered" data-toggle="collapse" href="#add-device" role="button" aria-expanded="false" aria-controls="add-device">
+                  <button class="btn btn-primary text-center mb-4 align-bottom" type="button" id="add-device-powered"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> Add Item</button>
+                </a>
+                @include('fixometer.device-add-or-edit', [
+                    'device' => new \App\Device()
+                ])
+              @endif
               <div class="table-responsive">
                 <table class="table table-repair" role="table" id="device-table">
                   <thead>
@@ -444,10 +449,6 @@
                   </tr>
                   </thead>
                   <tbody>
-                  @include('partials.tables.row-device', [
-                      'add' => TRUE,
-                      'device' => new \App\Device()
-                  ])
                   @foreach($event->devices as $device)
                     @include('partials.tables.row-device', [
                         'add' => FALSE

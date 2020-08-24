@@ -56,4 +56,7 @@ return array (
   'n/a' => 'N/A',
   'from_manufacturer' => 'From manufacturer',
   'from_third_party' => 'From third party',
+  'weight' => 'Weight',
+  'required_impact' => 'kg - required for environmental impact calculation',
+  'age_approx' => 'yrs - approximate, if known',
 );
