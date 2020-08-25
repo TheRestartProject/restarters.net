@@ -7,7 +7,7 @@ return array (
   'add_avatar' => 'Ajoutez un avatar',
   'add_skills' => 'Ajoutez vos compétences',
   'join_group' => 'Rejoignez un repair café',
-  'rsvp_event' => 'RSVP à un événement',
+  'rsvp_event' => 'Répondez à un événement',
   'visit_wiki' => 'Visiter le wiki',
   'discussion_header' => 'Forum de discussion',
   'join_discussion' => 'Rejoignez le forum',
