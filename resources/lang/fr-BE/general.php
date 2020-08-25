@@ -3,7 +3,7 @@
 return array (
   'top_item1' => 'Événements',
   'top_item2' => 'Réparations',
-  'top_item3' => 'Groupes',
+  'top_item3' => 'Repair Cafés',
   'login' => 'Se connecter',
   'register' => 'S\'enregistrer',
   'dashboard' => 'Tableau de bord',
@@ -20,7 +20,7 @@ return array (
   'onboarding_content_1' => 'vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum. ',
   'onboarding_content_2' => 'praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.',
   'onboarding_content_3' => 'praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.',
-  'new_group' => 'Créer un nouveau groupe',
+  'new_group' => 'Créer un nouveau Repair Café',
   'next' => 'Suivant',
   'previous' => 'Précédent',
   'tag_line' => 'Réparons!',
@@ -46,7 +46,7 @@ return array (
   'email_alerts' => 'E-mails et alertes',
   'email_alerts_text' => 'Veuillez choisir le type de mise à jour par courriel que vous aimeriez recevoir. Vous pouvez les changer à tout moment. Notre politique de confidentialité est disponible <a href="https://therestartproject.org/data-and-privacy-policy/fixometer/" rel="noopener noreferrer" target="_blank">ici</a>',
   'email_alerts_pref1' => 'Je souhaite recevoir le bulletin mensuel The Restart Project',
-  'email_alerts_pref2' => 'Je souhaite recevoir des notifications par e-mail sur des événements ou des groupes proches de moi',
+  'email_alerts_pref2' => 'Je souhaite recevoir des notifications par e-mail sur des événements ou des Repair Cafés proches de chez moi',
   'filter-results' => 'Résultats du filtre',
   'menu_tools' => 'Outils pour la communauté',
   'menu_discourse' => 'Forum',
@@ -64,5 +64,5 @@ return array (
   'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
   'menu_fixometer' => 'Fixometer',
   'menu_events' => 'Événements',
-  'menu_groups' => 'Groupes',
+  'menu_groups' => 'Repair Cafés',
 );
