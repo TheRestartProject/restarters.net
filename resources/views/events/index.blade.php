@@ -118,7 +118,7 @@
         <section class="table-section upcoming_events_in_area" id="events-3">
             <header>
                 <h2>@lang('events.other_events_near_you')</h2>
-                <p>No events near you right now?  See if you can join an <a href="{{ route('all-upcoming-events') }}?online=1">online event</a>.</p>
+                <p>@lang('events.no_events_near_you', ['url' => route('all-upcoming-events').'?online=1']).</p>
             </header>
             <div class="table-responsive">
                 <table class="table table-events table-striped" role="table">

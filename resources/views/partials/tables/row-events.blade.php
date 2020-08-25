@@ -60,7 +60,7 @@
 
       @if ( $event->isVolunteer() )
         <td class="d-none d-sm-table-cell text-center">
-          You're going!
+          @lang('events.youre_going')
         </td>
       @else
         <td class="d-none d-sm-table-cell cell-warning text-center">
@@ -76,7 +76,7 @@
 
       @if ( $event->isVolunteer() )
         <td class="d-none d-sm-table-cell cell-info text-center">
-          You're going!
+          @lang('events.youre_going')
         </td>
       @else
         <td class="d-none d-sm-table-cell cell-info text-center">

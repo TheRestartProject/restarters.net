@@ -64,7 +64,7 @@
                     <p>{{ trans_choice('events.upcoming_search_match', $upcoming_events_count) }}</p>
                     @if ($online)
                     <p>
-                        Looking for online events? Also see our <a href="{{{ env('DISCOURSE_URL') }}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}/c/events/">events listings on Talk</a> for other types of online events.
+                        @lang('events.looking_for_online_events', ['url' => env('DISCOURSE_URL').'/session/sso?return_path='.env('DISCOURSE_URL').'/c/events/'])
                     </p>
                     @endif
                     @else

@@ -54,7 +54,7 @@
                     <div class="col-lg-5">
                         <div class="form-check" id="online-checkbox-group">
                             <label class="form-check-label">
-                                Online event?
+                                @lang('events.online_event_question')
                                 <input id="online" type="checkbox" value="1" name="online" class="form-check-input" style="position:relative;top:2px">
                             </label>
                         </div>

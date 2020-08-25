@@ -116,4 +116,8 @@ return array (
   'upcoming_search_match' => '{0}There are no events that match your search.|{1}There is 1 event that matches your search.|[2,*]There are :count events that match your search.',
   'create_new_event_mobile' => 'Create',
   'no_upcoming_for_your_groups' => 'There are currently no upcoming events for your groups',
+  'youre_going' => 'You\'re going!',
+  'no_events_near_you' => 'No events near you right now?  See if you can join an <a href=":url">online event</a>',
+  'looking_for_online_events' => 'Looking for online events? Also see our <a href=":url">events listings on Talk</a> for other types of online events.',
+  'online_event_question' => 'Online event?',
 );
