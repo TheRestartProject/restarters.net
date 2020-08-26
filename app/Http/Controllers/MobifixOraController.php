@@ -22,9 +22,9 @@ class MobifixOraController extends Controller {
             $user = Auth::user();
         } else {
             $user = Microtask::getAnonUserCta($request);
-//            if ($user->action) {
-//                return redirect()->action('MobifixOraController@cta');
-//            }
+            if ($user->action) {
+                return redirect()->action('MobifixOraController@cta');
+            }
         }
         if ($request->has('id-ords')) {
             $insert = [
@@ -60,6 +60,7 @@ class MobifixOraController extends Controller {
         return view('mobifixora.index', [
             'fault' => $fault,
             'user' => $user,
+            'partner' => $request->input('partner', NULL),
         ]);
     }
 
@@ -95,6 +96,7 @@ class MobifixOraController extends Controller {
             'status' => $data,
             'user' => $user,
             'complete' => $complete,
+            'partner' => $request->input('partner', NULL),
         ]);
     }
 
