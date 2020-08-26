@@ -202,8 +202,7 @@
                             <label class="form-check-label" for="wiki-{{ $device->iddevices }}">@lang('partials.solution_text2')</label>
                         </div>
 
-                        <p class="text-danger">TODO Add useful info on create</p>
-                        <p class="text-danger">TODO Notes field does not exist yet</p>
+{{--                        <p class="text-danger">TODO Notes field does not exist yet</p>--}}
                     </div>
                 </div>
             </div>
