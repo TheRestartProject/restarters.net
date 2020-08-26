@@ -450,9 +450,7 @@
                   </thead>
                   <tbody>
                   @foreach($event->devices as $device)
-                    @include('partials.tables.row-device', [
-                        'add' => FALSE
-                    ])
+                  @include('partials.tables.row-device')
                   @endforeach
                   </tbody>
                 </table>

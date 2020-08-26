@@ -891,12 +891,10 @@ function initAutocomplete() {
     // });
 
     jQuery(document).on('change', '.category', function (e) {
-      // Weights are automatically determined from the category except for "None of the above".  So we disable
-      // the field except for that category.
       $value = parseInt(jQuery(this).val());
       $field = jQuery(this).parents('td').find('.weight');
       if( $value === 46 || $value === '' ){
-        $field.prop('disabled', null);
+        $field.prop('disabled', false);
         $field.parents('.display-weight').removeClass('d-none');
       } else {
         $field.val('');
@@ -1337,12 +1335,13 @@ function initAutocomplete() {
           repair_details: $form.find('select[name=repair_details]').val(),
           spare_parts: $form.find('select[name=spare_parts]').val(),
           quantity: $form.find('select[name=quantity]').val(),
-          event_id: $('#event_id').val(),
-          barrier: $form.find('#repair_barrier').val()
+          barrier: $form.find('select[name=barrier]').val(),
+          // The event id is not held in the form itself.
+          event_id: $('#event_id').val()
         },
         datatype: 'json',
-        success: function success(json) {
-          if (json.success) {
+        success: function(json) {
+          if( json.success ){
 
             //Reset appearance
             $form.trigger("reset");
@@ -1382,12 +1381,13 @@ function initAutocomplete() {
             loadDropzones();
             $(".select2-with-input").select2("destroy"); //TODO
             $(".select2-with-input").select2(tag_options_with_input); //TODO
-          } else if (json) {
+
+          } else if( json ) {
 
             var error_message = '';
             var error_count = 0;
-            $.each(json, function (key, value) {
-              if (error_count > 0) {
+            $.each( json, function( key, value) {
+              if( error_count > 0 ){
                 error_message += ', ' + value;
               } else {
                 error_message += value;
@@ -1396,24 +1396,31 @@ function initAutocomplete() {
             });
 
             alert(error_message);
+
           } else {
 
             alert('Something went wrong, please try again');
+
           }
 
           console.log(json);
-        },
-        error: function error(json) {
 
-          if (json.responseJSON.message) {
+        },
+        error: function(json) {
+
+          if( json.responseJSON.message ){
 
             alert(json.responseJSON.message);
+
           } else {
 
             alert('Something went wrong, please try again');
+
           }
+
         }
       });
+
     });
 
     jQuery(document).on('submit', '.edit-device', function (e) {
