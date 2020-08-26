@@ -1339,21 +1339,7 @@ function initAutocomplete() {
         success: function(json) {
           console.log("Add returned", json)
           if( json.success ){
-
-            // $.ajax({
-            //   type: 'POST',
-            //   url: '/device-url',
-            //   headers: {
-            //     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            //   },
-            //   data: {
-            //     device_id : $device_id,
-            //     url : $value.val(),
-            //     source : $source.val(),
-            //   },
-            //   success: function(data) {
-
-                //Reset appearance
+            //Reset appearance
             $form.trigger("reset");
             jQuery('#device-start').focus();
 

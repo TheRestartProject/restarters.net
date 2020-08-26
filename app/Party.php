@@ -627,9 +627,17 @@ class Party extends Model implements Auditable
         $fixed_devices = 0;
         $repairable_devices = 0;
         $dead_devices = 0;
+        $devices_powered = 0;
+        $devices_unpowered = 0;
 
         if ( ! empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
+                if ($device->deviceCategory->powered) {
+                    $devices_powered++;
+                } else {
+                    $devices_unpowered++;
+                }
+
                 if ($device->isFixed()) {
                     $co2Diverted += $device->co2Diverted($emissionRatio, $Device->displacement);
                     $ewasteDiverted += $device->ewasteDiverted();
@@ -659,6 +667,8 @@ class Party extends Model implements Auditable
                 'dead_devices' => $dead_devices,
                 'participants' => $this->pax,
                 'volunteers' => $this->volunteers,
+                'devices_powered' => $devices_powered,
+                'devices_unpowered' => $devices_unpowered
             ];
         }
     }

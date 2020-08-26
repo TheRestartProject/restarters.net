@@ -411,10 +411,10 @@
         <div id="devices-section" class="collapse d-lg-block collapse-section">
           <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
-              <a class="nav-link active" id="items-powered-tab" data-toggle="tab" href="#items-powered" role="tab" aria-controls="items-powered" aria-selected="true">POWERED <span class="badge badge-pill badge-secondary">{{ count($formdata->devices) }} TODO </span></a>
+              <a class="nav-link active" id="items-powered-tab" data-toggle="tab" href="#items-powered" role="tab" aria-controls="items-powered" aria-selected="true">POWERED <span class="badge badge-pill badge-secondary">{{ $stats['devices_powered'] }} TODO </span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="items-powered-tab" data-toggle="tab" href="#items-unpowered" role="tab" aria-controls="items-unpowered">UNPOWERED <span class="badge badge-pill badge-secondary">{{ count($formdata->devices) }} TODO </span></a>
+              <a class="nav-link" id="items-powered-tab" data-toggle="tab" href="#items-unpowered" role="tab" aria-controls="items-unpowered">UNPOWERED <span class="badge badge-pill badge-secondary">{{ $stats['devices_unpowered'] }}</span></a>
             </li>
           </ul>
           <div class="tab-content" id="itemsTabContent">
