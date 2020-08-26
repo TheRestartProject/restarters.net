@@ -1,5 +1,5 @@
 <form id="device-add-or-edit" class="add-device" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
-    <div class="collapse" id="add-device">
+    <div class="collapse" id="add-device-{{ $powered ? 'powered' : 'unpowered' }}">
         <div class="device-info">
             <div class="card-event-add-item card flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right border-white">
                 <div class="card-body d-flex flex-column">
@@ -10,15 +10,29 @@
                                 <select name="category" id="category-{{ $device->iddevices }}" class="category select2">
                                     <option value="">@lang('devices.category')</option>
                                     @foreach( $clusters as $cluster )
-                                        <optgroup label="{{{ $cluster->name }}}">
-                                            @foreach( $cluster->categories as $category )
-                                                @if( $device->category == $category->idcategories )
-                                                    <option value="{{{ $category->idcategories }}}" selected>{{{ $category->name }}}</option>
-                                                @else
-                                                    <option value="{{{ $category->idcategories }}}">{{{ $category->name }}}</option>
-                                                @endif
-                                            @endforeach
-                                        </optgroup>
+                                        @php
+                                        $empty = true;
+
+                                        foreach( $cluster->categories as $category ) {
+                                            if ($powered && $category->powered || !$powered && !$category->powered) {
+                                                $empty = false;
+
+                                            }
+                                        }
+                                        @endphp
+                                        @if (!$empty)
+                                            <optgroup label="{{{ $cluster->name }}}">
+                                                @foreach( $cluster->categories as $category )
+                                                    @if ($powered && $category->powered || !$powered && !$category->powered)
+                                                        @if( $device->category == $category->idcategories)
+                                                            <option value="{{{ $category->idcategories }}}" selected>{{{ $category->name }}}</option>
+                                                        @else
+                                                            <option value="{{{ $category->idcategories }}}">{{{ $category->name }}}</option>
+                                                        @endif
+                                                    @endif
+                                                @endforeach
+                                            </optgroup>
+                                        @endif
                                     @endforeach
                                     @if( $device->category == 46 )
                                         <option value="46" selected>@lang('partials.category_none')</option>
