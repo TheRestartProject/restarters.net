@@ -58,6 +58,7 @@ class MobifixOraController extends Controller {
         // send non-suggested fault_types to view
         $fault->faulttypes = array_diff_key($fault_types, $fault->suggestions);
         return view('mobifixora.index', [
+            'title' => 'MobiFixORA',
             'fault' => $fault,
             'user' => $user,
             'partner' => $request->input('partner', NULL),
@@ -93,6 +94,7 @@ class MobifixOraController extends Controller {
         $data = $MobifixOra->fetchStatus($partner);
         $complete = $data['total_opinions_2'][0]->total + $data['total_opinions_1'][0]->total + $data['total_opinions_0'][0]->total == 0;
         return view('mobifixora.status', [
+            'title' => 'MobiFixORA',
             'status' => $data,
             'user' => $user,
             'complete' => $complete,
