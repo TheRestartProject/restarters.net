@@ -1315,7 +1315,7 @@ function initAutocomplete() {
       e.preventDefault();
       $form = $(this);
 
-      if( $form.find('select[name=category]').val() === '' ) {
+      if ($form.find('select[name=category]').val() === '') {
         alert('Category field is required');
         return false;
       }
@@ -1337,12 +1337,12 @@ function initAutocomplete() {
           repair_details: $form.find('select[name=repair_details]').val(),
           spare_parts: $form.find('select[name=spare_parts]').val(),
           quantity: $form.find('select[name=quantity]').val(),
-          event_id: $form.find('input[name=event_id]').val(),
+          event_id: $('#event_id').val(),
           barrier: $form.find('#repair_barrier').val()
         },
         datatype: 'json',
-        success: function(json) {
-          if( json.success ){
+        success: function success(json) {
+          if (json.success) {
 
             //Reset appearance
             $form.trigger("reset");
@@ -1370,30 +1370,24 @@ function initAutocomplete() {
             //Finished appending
 
             //Update stats
-            $('#waste-insert').html( json.stats['ewaste'] );
-            $('#co2-insert').html(  json.stats['co2'] );
-            $('#fixed-insert').html(  json.stats['fixed_devices'] );
-            $('#repair-insert').html(  json.stats['repairable_devices'] );
-            $('#dead-insert').html(  json.stats['dead_devices'] );
+            $('#waste-insert').html(json.stats['ewaste']);
+            $('#co2-insert').html(json.stats['co2']);
+            $('#fixed-insert').html(json.stats['fixed_devices']);
+            $('#repair-insert').html(json.stats['repairable_devices']);
+            $('#dead-insert').html(json.stats['dead_devices']);
 
-            //Give users some visual feedback
-            $('.btn-add').addClass('btn-primary');
-            $('.btn-add').removeClass('btn-secondary');
-            setTimeout(function(e){
-              $('.btn-add').removeClass('btn-primary');
-              $('.btn-add').addClass('btn-secondary');
-            }, 1000);
+            // Collapse the Add back again.  That also acts as feedback that we've done something.
+            $('.add-device .collapse').removeClass('show')
 
             loadDropzones();
             $(".select2-with-input").select2("destroy"); //TODO
             $(".select2-with-input").select2(tag_options_with_input); //TODO
-
-          } else if( json ) {
+          } else if (json) {
 
             var error_message = '';
             var error_count = 0;
-            $.each( json, function( key, value) {
-              if( error_count > 0 ){
+            $.each(json, function (key, value) {
+              if (error_count > 0) {
                 error_message += ', ' + value;
               } else {
                 error_message += value;
@@ -1402,31 +1396,24 @@ function initAutocomplete() {
             });
 
             alert(error_message);
-
           } else {
 
             alert('Something went wrong, please try again');
-
           }
 
           console.log(json);
-
         },
-        error: function(json) {
+        error: function error(json) {
 
-          if( json.responseJSON.message ){
+          if (json.responseJSON.message) {
 
             alert(json.responseJSON.message);
-
           } else {
 
             alert('Something went wrong, please try again');
-
           }
-
         }
       });
-
     });
 
     jQuery(document).on('submit', '.edit-device', function (e) {

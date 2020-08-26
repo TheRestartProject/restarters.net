@@ -1,4 +1,4 @@
-<form id="data-add" class="add-device" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
+<form id="device-add-or-edit" class="add-device" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
     <div class="collapse" id="add-device">
         <div class="device-info">
             <div class="card-event-add-item card flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right border-white">
@@ -7,7 +7,7 @@
                     <div class="mt-4">
                         <div class="mb-2 device-select-row">
                             <div class="form-control form-control__select form-control-lg d-inline">
-                                <select name="category-{{ $device->iddevices }}" id="category-{{ $device->iddevices }}" class="category select2">
+                                <select name="category" id="category-{{ $device->iddevices }}" class="category select2">
                                     <option value="">@lang('devices.category')</option>
                                     @foreach( $clusters as $cluster )
                                         <optgroup label="{{{ $cluster->name }}}">
@@ -34,7 +34,7 @@
 
                         <div class="mb-2 device-select-row">
                             <div class="form-control form-control__select">
-                                <select name="brand-{{ $device->iddevices }}" class="select2-with-input" id="brand-{{ $device->iddevices }}">
+                                <select name="brand" class="select2-with-input" id="brand-{{ $device->iddevices }}">
                                     @php($i = 1)
                                     @if( empty($device->brand) )
                                         <option value="" selected>Brand</option>
@@ -59,7 +59,7 @@
 
                         <div class="mb-2 device-select-row">
                             <div class="form-group">
-                                <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model-{{ $device->iddevices }}" value="{{ $device->model }}" placeholder="@lang('partials.model')" autocomplete="off">
+                                <input type="text" class="form-control field" id="model-{{ $device->iddevices }}" name="model" value="{{ $device->model }}" placeholder="@lang('partials.model')" autocomplete="off">
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_model')" class="ml-3 mt-2">
                                 <img src="/icons/info_ico_black.svg">
@@ -86,7 +86,7 @@
                             </label>
                             <div class="display-weight">
                                 <div class="input-group">
-                                    <input type="number" class="form-control field" id="age-{{ $device->iddevices }}" name="age-{{ $device->iddevices }}" min="0" step="0.5" value="{{ $device->age }}" autocomplete="off">
+                                    <input type="number" class="form-control field" id="age-{{ $device->iddevices }}" name="age" min="0" step="0.5" value="{{ $device->age }}" autocomplete="off">
                                 </div>
                             </div>
                             <span class="text-black text-right mb-1">
@@ -127,7 +127,7 @@
                         </div>
 
                         <div class="form-control form-control__select mb-2 col-device">
-                            <select class="repair_details select2 repair-details-edit" name="repair-info" id="repair-info-{{ $device->iddevices }}">
+                            <select class="repair_details select2 repair-details-edit" name="repair_info" id="repair-info-{{ $device->iddevices }}">
                                 <option value="0">@lang('partials.repair_details') ?</option>
                                 @if ( $device->more_time_needed == 1 )
                                     <option value="1" selected>@lang('partials.more_time')</option>
@@ -150,7 +150,7 @@
                         </div>
 
                         <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device">
-                            <select class="select2 spare-parts" name="spare-parts-{{ $device->iddevices }}" id="spare-parts-{{ $device->iddevices }}">
+                            <select class="select2 spare-parts" name="spare_parts" id="spare-parts-{{ $device->iddevices }}">
                                 <option @if ( $device->spare_parts == 1 && is_null($device->parts_provider) ) value="4" @else value="0" @endif>@lang('general.please_select')</option>
                                 <option value="1" @if ( $device->spare_parts == 1 && !is_null($device->parts_provider) ) selected @endif>@lang('partials.yes_manufacturer')</option>
                                 <option value="3" @if ( $device->parts_provider == 2 ) selected @endif>@lang('partials.yes_third_party')</option>
@@ -159,7 +159,7 @@
                         </div>
 
                         <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device">
-                            <select class="select2 select2-repair-barrier repair-barrier" name="barrier-{{ $device->iddevices }}[]" multiple id="barrier-{{ $device->iddevices }}">
+                            <select class="select2 select2-repair-barrier repair-barrier" name="barrier" multiple id="barrier-{{ $device->iddevices }}">
                                 <option></option>
                                 @foreach( FixometerHelper::allBarriers() as $barrier )
                                     <option value="{{{ $barrier->id }}}" @if ( $device->barriers->contains($barrier->id) ) selected @endif>{{{ $barrier->barrier }}}</option>
@@ -176,7 +176,7 @@
                     <div class="mt-4">
                         <div class="mb-2 device-select-row">
                             <div class="form-group">
-                                <textarea class="form-control" rows="6" name="problem-{{ $device->iddevices }}" id="problem-{{ $device->iddevices }}" placeholder="@lang('partials.description_of_problem_solution')">{!! $device->problem !!}</textarea>
+                                <textarea class="form-control" rows="6" name="problem" id="problem-{{ $device->iddevices }}" placeholder="@lang('partials.description_of_problem_solution')">{!! $device->problem !!}</textarea>
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_problem')"  class="ml-3 mt-2">
                                 <img src="/icons/info_ico_black.svg">
@@ -185,11 +185,12 @@
                         @include('partials.useful-repair-urls-add-or-edit', ['urls' => $device->urls, 'device' => $device])
 
                         <div class="form-check d-flex align-items-center justify-content-start">
-                            <input class="form-check-input form-check-large" type="checkbox" name="wiki-{{ $device->iddevices }}" id="wiki-{{ $device->iddevices }}" value="1" @if( $device->wiki == 1 ) checked @endif>
+                            <input class="form-check-input form-check-large" type="checkbox" name="wiki" id="wiki-{{ $device->iddevices }}" value="1" @if( $device->wiki == 1 ) checked @endif>
                             <label class="form-check-label" for="wiki-{{ $device->iddevices }}">@lang('partials.solution_text2')</label>
                         </div>
 
-{{--                        <p class="text-danger">TODO Notes field does not exist yet</p>--}}
+                        <p class="text-danger">TODO Add useful info on create</p>
+                        <p class="text-danger">TODO Notes field does not exist yet</p>
                     </div>
                 </div>
             </div>
