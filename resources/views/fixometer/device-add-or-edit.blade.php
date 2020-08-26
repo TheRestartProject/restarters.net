@@ -93,8 +93,7 @@
                             @lang('devices.age_approx')
                         </span>
                         </div>
-
-                        <p class="text-danger">TODO Add photos before add device</p>
+{{--                        <p class="text-danger">TODO Add photos before add device, but only if quantity is 1.</p>--}}
                     </div>
                 </div>
             </div>

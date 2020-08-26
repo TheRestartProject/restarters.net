@@ -1318,32 +1318,42 @@ function initAutocomplete() {
         return false;
       }
 
+      var formdata = $form.serializeArray()
+
+      // The event id is not held in the form itself.
+      formdata.push({
+        'name': 'event_id',
+        'value': $('#event_id').val()
+      })
+
+      console.log("Form data", JSON.stringify(formdata))
+
       $.ajax({
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
         },
         type: 'post',
         url: '/device/create',
-        data: {
-          category: $form.find('select[name=category]').val(),
-          weight: $form.find('input[name=weight]').val(),
-          brand: $form.find('select[name=brand]').val(),
-          model: $form.find('input[name=model]').val(),
-          age: $form.find('input[name=age]').val(),
-          problem: $form.find('input[name=problem]').val(),
-          repair_status: $form.find('select[name=repair_status]').val(),
-          repair_details: $form.find('select[name=repair_details]').val(),
-          spare_parts: $form.find('select[name=spare_parts]').val(),
-          quantity: $form.find('select[name=quantity]').val(),
-          barrier: $form.find('select[name=barrier]').val(),
-          // The event id is not held in the form itself.
-          event_id: $('#event_id').val()
-        },
+        data: formdata,
         datatype: 'json',
         success: function(json) {
+          console.log("Add returned", json)
           if( json.success ){
 
-            //Reset appearance
+            // $.ajax({
+            //   type: 'POST',
+            //   url: '/device-url',
+            //   headers: {
+            //     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            //   },
+            //   data: {
+            //     device_id : $device_id,
+            //     url : $value.val(),
+            //     source : $source.val(),
+            //   },
+            //   success: function(data) {
+
+                //Reset appearance
             $form.trigger("reset");
             jQuery('#device-start').focus();
 

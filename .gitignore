@@ -51,3 +51,6 @@ restarters-anonymised.sql
 /.idea/vcs.xml
 /.idea/webServers.xml
 /.idea/sshConfigs.xml
+/.idea/phpunit.xml
+/.idea/restarters.iml
+/.idea/workspace.xml

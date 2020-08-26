@@ -8,6 +8,7 @@ use App\Category;
 use App\Cluster;
 use App\Device;
 use App\DeviceList;
+use App\DeviceUrl;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\FootprintRatioCalculator;
@@ -543,6 +544,8 @@ class DeviceController extends Controller
         $quantity = $request->input('quantity');
         $event_id = $request->input('event_id');
         $barrier = $request->input('barrier');
+        $useful_url = $request->input('url');
+        $useful_source = $request->input('source');
 
         // Get party for later
         $event = Party::find($event_id);
@@ -604,7 +607,18 @@ class DeviceController extends Controller
             $device[$i]->parts_provider = $parts_provider;
             $device[$i]->event = $event_id;
             $device[$i]->repaired_by = Auth::id();
+
             $device[$i]->save();
+
+            if ($useful_url && $useful_source) {
+                // Devices can have multiple URLs, but we only support one on the create - and it gets applied to each
+                // device.
+                DeviceUrl::create([
+                  'device_id' => $device[$i]->iddevices,
+                  'source' => $useful_source,
+                  'url' => $useful_url
+               ]);
+            }
 
             // Update barriers
             if (isset($barrier) && ! empty($barrier) && $repair_status == 3) { // Only sync when repair status is end-of-life
