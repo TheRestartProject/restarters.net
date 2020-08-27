@@ -421,7 +421,7 @@
             <div class="tab-pane fade show active" id="items-powered" role="tabpanel" aria-labelledby="items-powered-tab">
               <p class="mt-3">A <b>powered item</b> is anything that has or requires a power source.</p>
               @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) )
-                <a class="collapsed row-button" id="open-add-powered" data-toggle="collapse" href="#add-edit-device-powered-" role="button" aria-expanded="false" aria-controls="add-device">
+                <a class="collapsed row-button" id="open-add-powered" data-toggle="collapse" href="#add-edit-device-powered-" role="button" aria-expanded="false" aria-controls="add-edit-device-powered-">
                   <button class="btn btn-primary text-center mb-4 align-bottom" type="button"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> @lang('partials.add_device_powered')</button>
                 </a>
                 @include('fixometer.device-add-or-edit', [
@@ -435,7 +435,7 @@
             </div>
             <div class="tab-pane fade" id="items-unpowered" role="tabpanel" aria-labelledby="items-unpowered-tab">
               <p class="mt-3">An <b>unpowered item</b> is anything that doesn't have or require a power source.</p>
-              <a class="collapsed row-button" id="open-add-unpowered" data-toggle="collapse" href="#add-edit-device-unpowered-" role="button" aria-expanded="false" aria-controls="add-device">
+              <a class="collapsed row-button" id="open-add-unpowered" data-toggle="collapse" href="#add-edit-device-unpowered-" role="button" aria-expanded="false" aria-controls="add-edit-device-unpowered-">
                 <button class="btn btn-primary text-center mb-4 align-bottom" type="button"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> @lang('partials.add_device_unpowered')</button>
               </a>
               @include('fixometer.device-add-or-edit', [
