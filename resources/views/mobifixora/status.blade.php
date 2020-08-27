@@ -7,10 +7,10 @@
 @endsection
 
 @section('extra-meta')
-<meta name="description" content="MobiFix ORA is a web app to collaboratively categorise the type of faults in smartphones brought to community events such as Restart Parties and Repair Cafés">
-<meta name="keywords" content="MobiFixORA, MobiFix, smartphones, mobiles, handi iPhone, Samsung Galaxy, community events, Restart Parties, Repair Cafés, repair data, Right to Repair, Open Repair Alliance, The Restart Project, Open Repair Data, FixFest">
-<meta property="og:title" content="MobiFixORA">
-<meta property="og:description" content="MobiFix ORA is a web app to collaboratively categorise the type of faults in smartphones brought to community events such as Restart Parties and Repair Cafés">
+<meta name="description" content="MobiFix:ORA is a web app to collaboratively categorise the type of faults in smartphones brought to community events such as Restart Parties and Repair Cafés">
+<meta name="keywords" content="MobiFix:ORA, MobiFix, smartphones, mobiles, handi iPhone, Samsung Galaxy, community events, Restart Parties, Repair Cafés, repair data, Right to Repair, Open Repair Alliance, The Restart Project, Open Repair Data, FixFest">
+<meta property="og:title" content="MobiFix:ORA">
+<meta property="og:description" content="MobiFix:ORA is a web app to collaboratively categorise the type of faults in smartphones brought to community events such as Restart Parties and Repair Cafés">
 <meta property="og:image" content="{{ asset('/images/mobifix/og-mobifixora.png') }}">
 <meta property="og:url" content="https://restarters.net/mobifixora/">
 @endsection
@@ -25,7 +25,7 @@
     <div class="container mt-1 mt-sm-4">
         <div class="row row-compressed">
             <div class="col-6">
-                <h1 class="pull-left">MobiFixORA Status</h1>
+                <h1 class="pull-left">MobiFix:ORA Status</h1>
             </div>
             <div class="col-6 pull-right">
                 <!--

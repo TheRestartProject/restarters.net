@@ -18,12 +18,13 @@ class MobifixOraController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
+        $partner = $request->input('partner', NULL);
         if (Auth::check()) {
             $user = Auth::user();
         } else {
             $user = Microtask::getAnonUserCta($request);
             if ($user->action) {
-                return redirect()->action('MobifixOraController@cta');
+                return redirect()->action('MobifixOraController@cta', ['partner' => $partner]);
             }
         }
         if ($request->has('id-ords')) {
@@ -61,7 +62,7 @@ class MobifixOraController extends Controller {
             'title' => 'MobiFixORA',
             'fault' => $fault,
             'user' => $user,
-            'partner' => $request->input('partner', NULL),
+            'partner' => $partner,
         ]);
     }
 
