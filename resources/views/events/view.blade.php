@@ -426,7 +426,9 @@
                 </a>
                 @include('fixometer.device-add-or-edit', [
                     'device' => new \App\Device(),
-                    'powered' => TRUE
+                    'powered' => TRUE,
+                    'add' => TRUE,
+                    'edit' => FALSE
                 ])
               @endif
               @include('partials.device-list', [
@@ -440,7 +442,9 @@
               </a>
               @include('fixometer.device-add-or-edit', [
                   'device' => new \App\Device(),
-                  'powered' => FALSE
+                  'powered' => FALSE,
+                  'add' => TRUE,
+                  'edit' => FALSE
               ])
               @include('partials.device-list', [
                   'powered' => FALSE

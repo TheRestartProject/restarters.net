@@ -74871,7 +74871,6 @@ function editDeviceUrl(event) {
 }
 
 function removeNewDeviceUrl(event) {
-
   event.preventDefault();
 
   $row = $(this).parents('.input-group');

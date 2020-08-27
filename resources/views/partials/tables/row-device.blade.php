@@ -1,3 +1,6 @@
+@php
+$editable = ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) ) || ( is_object($is_attending) && $is_attending->status == 1 )
+@endphp
 <tr id="summary-{{ $device->iddevices }}">
     <td>
         <a class="collapsed row-button" data-toggle="collapse" href="#row-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="row-1">
@@ -9,7 +12,7 @@
     <span class="arrow">▴</span>
         </a>
         <a class="collapsed row-button" data-toggle="collapse" href="#add-edit-device-{{ $device->deviceCategory->powered  ? 'powered' : 'unpowered' }}-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="row-1">
-            @if( ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) ) || ( is_object($is_attending) && $is_attending->status == 1 ) )
+            @if ($editable)
                 Edit2
             @else
                 View2
@@ -53,7 +56,9 @@
     <td colspan="11" class="p-0">
         @include('fixometer.device-add-or-edit', [
             'device' => $device,
-            'powered' => $device->deviceCategory->powered
+            'powered' => $device->deviceCategory->powered,
+            'add' => FALSE,
+            'edit' => TRUE
         ])
     </td>
 </tr>
@@ -230,7 +235,7 @@
                   <textarea class="form-control" rows="6" name="problem-{{ $device->iddevices }}" id="problem-{{ $device->iddevices }}">{!! $device->problem !!}</textarea>
               </div>
 
-              @include('partials.useful-repair-urls', ['urls' => $device->urls, 'device' => $device])
+              @include('partials.useful-repair-urls', ['urls' => $device->urls, 'device' => $device, 'editable' => $editable])
 
           </div>
           <div class="col-12 col-lg-6 flex-column d-flex">

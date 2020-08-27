@@ -1,5 +1,5 @@
 <div class="add-edit-device-collapse collapse" id="add-edit-device-{{ $powered ? 'powered' : 'unpowered' }}-{{ $device->iddevices }}">
-    <form class="{{ $device->iddevices ? 'edit-device' : 'add-device' }}" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
+    <form class="{{ $edit ? 'edit-device' : 'add-device' }}" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
         <div class="device-info">
             <div class="card-event-add-item card flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right border-white">
                 <div class="card-body d-flex flex-column">
@@ -196,7 +196,7 @@
                             </div>
                         </div>
 
-                        @include('partials.useful-repair-urls-add-or-edit', ['urls' => $device->urls, 'device' => $device])
+                        @include('partials.useful-repair-urls-add-or-edit', ['urls' => $device->urls, 'device' => $device, 'editable' => $add || $edit])
 
                         <div class="form-check d-flex align-items-center justify-content-start">
                             <input class="form-check-input form-check-large" type="checkbox" name="wiki" value="1" @if( $device->wiki == 1 ) checked @endif>
@@ -209,27 +209,28 @@
             </div>
         </div>
         <div class="d-flex justify-content-center flex-wrap card-event-add-item pt-4 pb-4">
-            @if ($device->iddevices)
-                <button type="submit" class="btn btn-primary btn-save2 mr-2">@lang('partials.save')</button>
-            @else
-                <button type="submit" class="btn btn-primary btn-save2 mr-2">@lang('partials.add_device')</button>
-            @endif
-            @if (!$device->iddevices)
-                {{-- We only have the quantity when adding. --}}
-                <div class="form-control form-control__select flex-md-shrink-1 ml-4 mr-4" style="width: 70px;">
-                    <select name="quantity" class="quantity select2">
-                        <option selected value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                    </select>
-                </div>
+            @if ($add || $edit)
+                @if ($edit)
+                    <button type="submit" class="btn btn-primary btn-save2 mr-2">@lang('partials.save')</button>
+                @else
+                    <button type="submit" class="btn btn-primary btn-save2 mr-2">@lang('partials.add_device')</button>
+
+                    {{-- We only have the quantity when adding. --}}
+                    <div class="form-control form-control__select flex-md-shrink-1 ml-4 mr-4" style="width: 70px;">
+                        <select name="quantity" class="quantity select2">
+                            <option selected value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                @endif
             @endif
             <a class="collapsed ml-2" data-toggle="collapse" href="#add-edit-device-{{ $powered ? 'powered' : 'unpowered' }}-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="add-device">
                 <button class="btn btn-tertiary" type="button">@lang('partials.cancel')</button>
