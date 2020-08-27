@@ -7,15 +7,16 @@
 @endsection
 
 @section('extra-meta')
-
 <meta name="description" content="MobiFix ORA is a web app to collaboratively categorise the type of faults in smartphones brought to community events such as Restart Parties and Repair Cafés">
 <meta name="keywords" content="MobiFixORA, MobiFix, smartphones, mobiles, handi iPhone, Samsung Galaxy, community events, Restart Parties, Repair Cafés, repair data, Right to Repair, Open Repair Alliance, The Restart Project, Open Repair Data, FixFest">
 <meta property="og:title" content="MobiFixORA">
 <meta property="og:description" content="MobiFix ORA is a web app to collaboratively categorise the type of faults in smartphones brought to community events such as Restart Parties and Repair Cafés">
 <meta property="og:image" content="{{ asset('/images/mobifix/og-mobifixora.png') }}">
 <meta property="og:url" content="https://restarters.net/mobifixora/">
-<title><?php echo $title; ?></title>
+@endsection
 
+@section('title')
+<?php echo $title; ?>
 @endsection
 
 @section('content')
