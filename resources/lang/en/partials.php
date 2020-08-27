@@ -18,6 +18,8 @@ return array (
   'discussion_text' => 'Meet other event organisers and repair volunteers, trade tips, get help, or discuss the system-level barriers to longer-lasting products',
   'join_the_discussion' => 'Join the discussion',
   'add_device' => 'Add device',
+  'add_device_powered' => 'Add Powered Item',
+  'add_device_unpowered' => 'Add Unpowered Item',
   1 => 'How to set up a group',
   2 => 'how_to_set_up_a_group_text',
   3 => 'Once you\'ve gone through some preliminary steps to organise a group, we can create one for you here.',
