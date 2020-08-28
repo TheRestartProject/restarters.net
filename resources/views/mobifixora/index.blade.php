@@ -8,10 +8,10 @@
 
 @section('extra-meta')
 <meta name="description" content="MobiFix ORA is a web app to collaboratively categorise the type of faults in smartphones brought to community events such as Restart Parties and Repair Cafés">
-<meta name="keywords" content="MobiFixORA, MobiFix, smartphones, mobiles, handi iPhone, Samsung Galaxy, community events, Restart Parties, Repair Cafés, repair data, Right to Repair, Open Repair Alliance, The Restart Project, Open Repair Data, FixFest">
-<meta property="og:title" content="MobiFixORA">
+<meta name="keywords" content="MobiFix:ORA, MobiFix, smartphones, mobiles, handi iPhone, Samsung Galaxy, community events, Restart Parties, Repair Cafés, repair data, Right to Repair, Open Repair Alliance, The Restart Project, Open Repair Data, FixFest">
+<meta property="og:title" content="MobiFix:ORA">
 <meta property="og:description" content="MobiFix ORA is a web app to collaboratively categorise the type of faults in smartphones brought to community events such as Restart Parties and Repair Cafés">
-<meta property="og:image" content="{{ asset('/images/mobifix/og-mobifixora.png') }}">
+<!--<meta property="og:image" content="{{ asset('/images/mobifix/og-mobifixora.png') }}">-->
 <meta property="og:url" content="https://restarters.net/mobifixora/">
 @endsection
 
@@ -26,7 +26,7 @@
         <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>
         <div class="row row-compressed">
             <div class="col-6">
-                <h1 class="pull-left">MobiFixORA</h1>
+                <h1 class="pull-left">MobiFix:ORA</h1>
             </div>
             <div class="col-6">
                 <?php
@@ -55,6 +55,12 @@
                 </a>
             </div>
         </div>
+
+        @if($errors->any())
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
+            {{$errors->first()}}
+        </div>
+        @endif
 
         @if ($fault)
         <div class="row problem panel p-3 mb-4 mx-1 mx-sm-0 notification">
@@ -112,7 +118,7 @@
                             <input type="hidden" id="id-ords" name="id-ords" value="@php( print($fault->id_ords))">
                             <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
                             @if (count($fault->suggestions))
-                            <div class="buttons suggestions ">
+                            <div class="buttons suggestions">
                                 <p class="title is-size-6-mobile is-size-6-tablet">Suggestions</p>
                                 <p>
                                     @foreach($fault->suggestions as $fault_type)

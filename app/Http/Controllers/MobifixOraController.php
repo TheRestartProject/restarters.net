@@ -18,15 +18,19 @@ class MobifixOraController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
+        $partner = $request->input('partner', NULL);
         if (Auth::check()) {
             $user = Auth::user();
         } else {
             $user = Microtask::getAnonUserCta($request);
             if ($user->action) {
-                return redirect()->action('MobifixOraController@cta');
+                return redirect()->action('MobifixOraController@cta', ['partner' => $partner]);
             }
         }
         if ($request->has('id-ords')) {
+            if (!$request->input('fault-type-id')) {
+                return redirect()->back()->withErrors(['Oops, there was an error, please try again, sorry! If this error persists please contact The Restart Project.']);
+            }
             $insert = [
                 'id_ords' => $request->input('id-ords'),
                 'fault_type_id' => $request->input('fault-type-id'),
@@ -61,7 +65,7 @@ class MobifixOraController extends Controller {
             'title' => 'MobiFixORA',
             'fault' => $fault,
             'user' => $user,
-            'partner' => $request->input('partner', NULL),
+            'partner' => $partner,
         ]);
     }
 
