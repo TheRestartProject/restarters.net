@@ -29,7 +29,7 @@
                 <hr/>
                 <img src="{{ asset('/images/mobifix/whale-spouting.png') }}" alt="happy whale" width="48" height="48" />
                 <p>
-                    Find out more, and give us your feedback, in the <a href="https://talk.restarters.net/t/get-involved-in-repair-data-with-mobifix/3142" target="_blank">MobiFix discussion</a>.
+                    Find out more, and give us your feedback, in the <a href="https://talk.restarters.net/t/get-involved-in-open-repair-data-with-mobifix-ora/3273" target="_blank">MobiFix discussion</a>.
                 </p>
             </div>
         </div>
