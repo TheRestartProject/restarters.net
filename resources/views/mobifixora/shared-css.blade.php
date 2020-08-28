@@ -1,10 +1,10 @@
 <style>
- /*
-    this is css shared between the main mobifix view,
- and the demographics view.  should be moved to a shared layout,
- or into sass.  just putting it here for now to remove duplication
- between the files.
-  */
+    /*
+       this is css shared between the main mobifix view,
+    and the demographics view.  should be moved to a shared layout,
+    or into sass.  just putting it here for now to remove duplication
+    between the files.
+    */
     body {
         text-align: center !important;
     }
@@ -51,10 +51,6 @@
         background-color: #FFF;
     }
 
-    .tag {
-        margin-bottom: 2px;
-    }
-
     .mobifix .btn {
         font-family: 'Open Sans';
     }
@@ -74,21 +70,13 @@
     }
 
     .btn-fault-suggestion {
-        background-colour: pink !important;
-    }
-
-    .text-is-italic {
-        font-style: italic;
-    }
-
-    .border-grey {
-        border: 1px solid #EEE;
+        margin-bottom: 3px;
     }
 
     .question, .statement {
-     font-size: 1rem;
-     font-weight: bold;
-     text-transform: uppercase;
+        font-size: 1rem;
+        font-weight: bold;
+        text-transform: uppercase;
     }
 
     .translation {

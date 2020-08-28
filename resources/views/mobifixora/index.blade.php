@@ -56,6 +56,12 @@
             </div>
         </div>
 
+        @if($errors->any())
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
+            {{$errors->first()}}
+        </div>
+        @endif
+
         @if ($fault)
         <div class="row problem panel p-3 mb-4 mx-1 mx-sm-0 notification">
             <div class="col">
@@ -112,7 +118,7 @@
                             <input type="hidden" id="id-ords" name="id-ords" value="@php( print($fault->id_ords))">
                             <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
                             @if (count($fault->suggestions))
-                            <div class="buttons suggestions ">
+                            <div class="buttons suggestions">
                                 <p class="title is-size-6-mobile is-size-6-tablet">Suggestions</p>
                                 <p>
                                     @foreach($fault->suggestions as $fault_type)

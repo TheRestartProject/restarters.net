@@ -28,6 +28,9 @@ class MobifixOraController extends Controller {
             }
         }
         if ($request->has('id-ords')) {
+            if (!$request->input('fault-type-id')) {
+                return redirect()->back()->withErrors(['Oops, there was an error, please try again, sorry! If this error persists please contact The Restart Project.']);
+            }
             $insert = [
                 'id_ords' => $request->input('id-ords'),
                 'fault_type_id' => $request->input('fault-type-id'),
