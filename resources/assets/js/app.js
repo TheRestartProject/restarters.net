@@ -16,6 +16,21 @@ require('./misc/notifications');
 require('./misc/device');
 require('./fixometer');
 require('leaflet');
+
+import Vue from 'vue';
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+
+Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
+
+// Set up internationalisation.  translations.js is built in webpack.mix.js from the PHP lang folder.
+// TODO Set up locale on the fly.
+import lang from 'lang.js';
+import translations from './translations.js';
+const Lang = new lang()
+Lang.setLocale('en')
+Lang.setMessages(translations)
+
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
 
@@ -619,7 +634,7 @@ function initAutocomplete() {
 
       $(".dropzoneEl").each(function( index ) {
 
-        $dropzone = $(this);
+        var $dropzone = $(this);
 
         if ($(this).data('deviceid') !== undefined) {
           prefix = '-'+$(this).data('deviceid');
@@ -720,18 +735,18 @@ function initAutocomplete() {
 
   }
 
-  tag_options = {
+  var tag_options = {
     tags: true,
     createTag: function (params) {
       return null;
     }
   }
 
-  repair_barrier_options = {
+  var repair_barrier_options = {
     placeholder: "-- Choose barriers to repair --"
   }
 
-  tag_options_with_input = {
+  var tag_options_with_input = {
     tags: true,
     minimumInputLength: 2,
     formatInputTooShort: "Type a brand name",
@@ -1097,8 +1112,6 @@ function initAutocomplete() {
     });
 
     $('.tokenfield').tokenfield();
-
-    $current_column = $('input[name=sort_column]:checked').val();
 
     $('input[name=sort_column]').on('click', function(e) {
         $form = $('#device-search');
@@ -1674,3 +1687,33 @@ function initAutocomplete() {
 
     alert("Copied the link: " + $copy_link);
   });
+
+jQuery(document).ready(function () {
+  // Vue.
+  //
+  // Create a mixing so that $lang is available in all components.
+  Vue.mixin({
+    computed: {
+      $lang() {
+        return Lang
+      }
+    }
+  })
+
+  // Initialise Vue instances on any divs which have asked for it.
+  //
+  // Normally you'd initialise one instance on a single top-level div.  But we put content directly under body.
+  // Initialising multiple instances is a bit more expensive, but not much.
+  //
+  // We need to list all the components we will use in here; they are stored in resources/assets/js/components.
+  console.log("Initialise vue")
+  new Vue({
+    el: '.vue',
+    components: {
+      'examplecomponent': require('./components/ExampleComponent.vue'),
+      'repairstatus': require('./components/RepairStatus.vue'),
+    }
+  })
+
+  console.log("Initialised")
+})

@@ -39,6 +39,12 @@
     @endif
 </tr>
 @if( ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) ) || ( is_object($is_attending) && $is_attending->status == 1 ) )
+    <tr>
+        <td colspan="12" class="vue">
+            <RepairStatus :device="{{ $device }}" :categories="{{ $clusters }}"/>
+        </td>
+    </tr>
+
 <tr class="collapse table-row-details" id="row-{{ $device->iddevices }}">
     <td colspan="11">
         <form id="data-{{ $device->iddevices }}" class="edit-device" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
