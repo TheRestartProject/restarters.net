@@ -2,20 +2,20 @@
   <div>
     Repair status for {{ device.iddevices }} {{ device }}
     <div class="d-flex justify-content-between flex-wrap">
-<!--      Can change to use select2 - need to install that component.-->
-      <b-select :value="device.repair_status" :options="statusOptions" class="not100" />
-      <b-select :value="detailsValue" :options="detailsOptions" class="not100" />
-      <b-select :value="partsValue" :options="partsOptions" class="not100" />
+      <!--      Can change to use select2 - need to install that component.-->
+      <b-select :value="device.repair_status" :options="statusOptions" class="not100"/>
+      <b-select :value="detailsValue" :options="detailsOptions" class="not100"/>
+      <b-select :value="partsValue" :options="partsOptions" class="not100"/>
     </div>
   </div>
 </template>
 <script>
-const STATUS_PLEASE_SELECT = 0;
+const STATUS_PLEASE_SELECT = 0
 const STATUS_FIXED = 1
 const STATUS_REPAIRABLE = 2
 const STATUS_END_OF_LIFE = 3
 
-const DETAILS_PLEASE_SELECT = 0;
+const DETAILS_PLEASE_SELECT = 0
 const DETAILS_MORE_TIME = 1
 const DETAILS_PROFESSIONAL_HELP = 2
 const DETAILS_DIY = 3
@@ -33,27 +33,27 @@ export default {
     }
   },
   computed: {
-    statusOptions() {
+    statusOptions () {
       return [
-            {
-              value: STATUS_PLEASE_SELECT,
-              text: this.$lang.get('general.please_select')
-            },
-            {
-              value: STATUS_FIXED,
-              text: this.$lang.get('partials.fixed')
-            },
-            {
-              value: STATUS_REPAIRABLE,
-              text: this.$lang.get('partials.repairable')
-            },
-            {
-              value: STATUS_END_OF_LIFE,
-              text: this.$lang.get('partials.end_of_life')
-            },
-        ]
+        {
+          value: STATUS_PLEASE_SELECT,
+          text: this.$lang.get('general.please_select')
+        },
+        {
+          value: STATUS_FIXED,
+          text: this.$lang.get('partials.fixed')
+        },
+        {
+          value: STATUS_REPAIRABLE,
+          text: this.$lang.get('partials.repairable')
+        },
+        {
+          value: STATUS_END_OF_LIFE,
+          text: this.$lang.get('partials.end_of_life')
+        },
+      ]
     },
-    detailsOptions() {
+    detailsOptions () {
       return [
         {
           value: DETAILS_PLEASE_SELECT,
@@ -73,7 +73,7 @@ export default {
         }
       ]
     },
-    partsOptions() {
+    partsOptions () {
       return [
         {
           value: PARTS_PLEASE_SELECT,
@@ -93,7 +93,7 @@ export default {
         }
       ]
     },
-    detailsValue() {
+    detailsValue () {
       if (this.device.more_time_needed) {
         return DETAILS_MORE_TIME
       } else if (this.device.professional_help) {
@@ -104,7 +104,7 @@ export default {
         return DETAILS_PLEASE_SELECT
       }
     },
-    partsValue() {
+    partsValue () {
       // This logic seems to produce different output from the current, but the current logic looks wrong.
       if (this.spare_parts === 2) {
         return PARTS_NO
