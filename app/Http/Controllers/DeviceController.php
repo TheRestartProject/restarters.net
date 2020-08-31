@@ -536,8 +536,10 @@ class DeviceController extends Controller
         $weight = $request->input('weight');
         $brand = $request->input('brand');
         $model = $request->input('model');
+        $item_type = $request->input('item_type');
         $age = $request->input('age');
         $problem = $request->input('problem');
+        $notes = $request->input('notes');
         $repair_status = $request->input('repair_status');
         $repair_details = $request->input('repair_details');
         $spare_parts = $request->input('spare_parts');
@@ -557,9 +559,11 @@ class DeviceController extends Controller
             $device[$i]->category_creation = $category;
             $device[$i]->estimate = $weight;
             $device[$i]->brand = $brand;
+            $device[$i]->item_type = $item_type;
             $device[$i]->model = $model;
             $device[$i]->age = $age;
             $device[$i]->problem = $problem;
+            $device[$i]->notes = $notes;
             $device[$i]->repair_status = $repair_status;
 
             if ($repair_details == 1) {

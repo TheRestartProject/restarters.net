@@ -3,6 +3,7 @@
 return array (
   'category' => 'Category',
   'brand' => 'Brand',
+  'item_type' => 'Item Type',
   'status' => 'Repair status',
   'model' => 'Model',
   'age_placeholder' => 'Age (yrs)',

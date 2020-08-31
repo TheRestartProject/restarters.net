@@ -22,8 +22,12 @@ $editable = ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Adminis
     </td>
     <td class="text-center">0</td>
     <td class="d-none d-md-table-cell"><div class="category">{{ $device->deviceCategory->name }}</div></td>
+    @if ($powered)
     <td class="d-none d-md-table-cell"><div class="brand">{{ $device->brand }}</div></td>
     <td class="d-none d-md-table-cell"><div class="model">{{ $device->model }}</div></td>
+    @else
+    <td class="d-none d-md-table-cell"><div class="item_type">{{ $device->item_type }}</div></td>
+    @endif
     <td class="d-none d-md-table-cell"><div class="age">{{ $device->age }}</div></td>
     <td width="300"><div class="problem">{!! $device->getShortProblem() !!}</div></td>
     @if ( $device->repair_status == 1 )

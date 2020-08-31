@@ -9,14 +9,20 @@
         </a>
     </td>
     <td class="category" @if( !FixometerHelper::checkColumn('category', $user_preferences) ) style="display: none;" @endif>
-        {{{ $device->deviceCategory->name }}}
+        {{{ $device->deviceCategory->name }}} powered
     </td>
-    <td class="brand d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('brand', $user_preferences) ) style="display: none;" @endif>
-        {{{ $device->brand }}}
-    </td>
-    <td class="model d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
-        {{{ $device->model }}}
-    </td>
+    @if ($powered)
+        <td class="brand d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('brand', $user_preferences) ) style="display: none;" @endif>
+            {{{ $device->brand }}}
+        </td>
+        <td class="model d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
+            {{{ $device->model }}}
+        </td>
+    @else
+        <td class="item_type d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('item_type', $user_preferences) ) style="display: none;" @endif>
+            {{{ $device->item_type }}} type
+        </td>
+    @endif
     <td class="problem d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->getShortProblem() }}}
     </td>

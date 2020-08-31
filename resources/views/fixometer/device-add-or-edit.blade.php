@@ -34,26 +34,29 @@
                                             </optgroup>
                                         @endif
                                     @endforeach
-                                    @if( $device->category == 46 )
-                                        <option value="46" selected>@lang('partials.category_none')</option>
-                                    @else
-                                        <option value="46">@lang('partials.category_none')</option>
+                                    @if ($powered)
+                                        @if( $device->category == 46 )
+                                            <option value="46" selected>@lang('partials.category_none')</option>
+                                        @else
+                                            <option value="46">@lang('partials.category_none')</option>
+                                        @endif
                                     @endif
                                 </select>
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_category')" class="ml-3 mt-2">
-                                <img class="icon-info" src="/icons/info_ico_black.svg">
+                                <img class="icon-info clickable" src="/icons/info_ico_black.svg">
                             </div>
                         </div>
 
+                        @if ($powered)
                         <div class="mb-2 device-select-row">
                             <div class="form-control form-control__select">
                                 <select name="brand" class="select2-with-input">
                                     @php($i = 1)
                                     @if( empty($device->brand) )
-                                        <option value="" selected>Brand</option>
+                                        <option value="" selected>@lang('devices.brand')</option>
                                     @else
-                                        <option value="">Brand</option>
+                                        <option value="">@lang('devices.brand')</option>
                                     @endif
                                     @foreach($brands as $brand)
                                         @if ($device->brand == $brand->brand_name)
@@ -76,9 +79,19 @@
                                 <input type="text" class="form-control field" name="model" value="{{ $device->model }}" placeholder="@lang('partials.model')" autocomplete="off">
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_model')" class="ml-3 mt-2">
-                                <img class="icon-info" src="/icons/info_ico_black.svg">
+                                <img class="icon-info clickable" src="/icons/info_ico_black.svg">
                             </div>
                         </div>
+                        @else
+                            <div class="mb-2 device-select-row">
+                                <div class="form-group">
+                                    <input type="text" class="form-control field" name="item_type" value="{{ $device->item_type }}" placeholder="@lang('partials.item_type')" autocomplete="off">
+                                </div>
+                                <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_model')" class="ml-3 mt-2">
+                                    <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="device-field-row align-items-center mb-2">
                             <label class="text-white text-bold">
@@ -86,7 +99,8 @@
                             </label>
                             <div class="display-weight">
                                 <div class="input-group">
-                                    <input disabled type="number" class="weight form-control form-control-lg field numeric" name="weight" min="0.01" step=".01" autocomplete="off" value="{{ $device->estimate }}">
+                                    {{-- Powered devices don't allow editing of the weight except for the "None of the above" category, whereas unpowered do. --}}
+                                    <input {{ $powered ? 'disabled' : '' }} type="number" class="{{ $powered ? 'weight' : '' }} form-control form-control-lg field numeric" name="weight" min="0.01" step=".01" autocomplete="off" value="{{ $device->estimate }}">
                                 </div>
                             </div>
                             <span class="text-white text-right mb-1">
@@ -118,7 +132,7 @@
                     <div class="mt-4 d-flex flex-column">
                         <div class="form-control form-control__select mb-2 col-device">
                             <select class="select2 repair-status" name="repair_status" data-device="{{ $device->iddevices }}" placeholder="Description of problem">
-                                <option value="0">@lang('general.please_select')</option>
+                                <option value="0">@lang('devices.repair_outcome')</option>
                                 @if ( $device->repair_status == 1 )
                                     <option value="1" selected>@lang('partials.fixed')</option>
                                     <option value="2">@lang('partials.repairable')</option>
@@ -140,7 +154,7 @@
                         </div>
 
                         <div class="form-control form-control__select mb-2 col-device">
-                            <select class="repair_details select2 repair-details-edit" name="repair_info">
+                            <select class="repair_details select2 repair-details-edit" name="repair_details">
                                 <option value="0">@lang('partials.repair_details') ?</option>
                                 @if ( $device->more_time_needed == 1 )
                                     <option value="1" selected>@lang('partials.more_time')</option>
@@ -164,7 +178,7 @@
 
                         <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device">
                             <select class="select2 spare-parts" name="spare_parts">
-                                <option @if ( $device->spare_parts == 1 && is_null($device->parts_provider) ) value="4" @else value="0" @endif>@lang('general.please_select')</option>
+                                <option @if ( $device->spare_parts == 1 && is_null($device->parts_provider) ) value="4" @else value="0" @endif>@lang('devices.spare_parts_required')</option>
                                 <option value="1" @if ( $device->spare_parts == 1 && !is_null($device->parts_provider) ) selected @endif>@lang('partials.yes_manufacturer')</option>
                                 <option value="3" @if ( $device->parts_provider == 2 ) selected @endif>@lang('partials.yes_third_party')</option>
                                 <option value="2" @if ( $device->spare_parts == 2 ) selected @endif>@lang('partials.no')</option>
@@ -192,7 +206,16 @@
                                 <textarea class="form-control" rows="6" name="problem" placeholder="@lang('partials.description_of_problem_solution')">{!! $device->problem !!}</textarea>
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_problem')"  class="ml-3 mt-2">
-                                <img class="icon-info" src="/icons/info_ico_black.svg">
+                                <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                            </div>
+                        </div>
+
+                        <div class="mb-2 device-select-row">
+                            <div class="form-group">
+                                <textarea class="form-control" rows="6" name="notes" placeholder="@lang('devices.placeholder_notes')">{!! $device->notes !!}</textarea>
+                            </div>
+                            <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_notes')"  class="ml-3 mt-2">
+                                <img class="icon-info clickable" src="/icons/info_ico_black.svg">
                             </div>
                         </div>
 

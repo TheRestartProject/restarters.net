@@ -893,6 +893,14 @@ function initAutocomplete() {
     jQuery(document).on('change', '.category', function (e) {
       $value = parseInt(jQuery(this).val());
       $field = jQuery(this).parents('td').find('.weight');
+
+      if (!$field.length) {
+        // At present this global JS is used in both old and new designs which have different DOM structure, so we
+        // need to cope with both.
+        $field = jQuery(this).parents('.card-body').find('.weight')
+      }
+
+      console.log("Category change", $(this), $value, $field)
       if( $value === 46 || $value === '' ){
         $field.prop('disabled', false);
         $field.parents('.display-weight').removeClass('d-none');
