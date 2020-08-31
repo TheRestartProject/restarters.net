@@ -632,7 +632,6 @@ class Party extends Model implements Auditable
 
         if ( ! empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
-                error_log("{$device->name} {$device->deviceCategory->powered}");
                 if ($device->deviceCategory->powered) {
                     $devices_powered++;
                 } else {
