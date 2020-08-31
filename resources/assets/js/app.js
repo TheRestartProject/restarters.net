@@ -1707,12 +1707,15 @@ jQuery(document).ready(function () {
   //
   // We need to list all the components we will use in here; they are stored in resources/assets/js/components.
   console.log("Initialise vue")
-  new Vue({
-    el: '.vue',
-    components: {
-      'examplecomponent': require('./components/ExampleComponent.vue'),
-      'repairstatus': require('./components/RepairStatus.vue'),
-    }
+  $(".vue").each(function(index) {
+    console.log("Add Vue to ", $(this))
+    new Vue({
+      el: $(this).get(0),
+      components: {
+        'examplecomponent': require('./components/ExampleComponent.vue'),
+        'repairstatus': require('./components/RepairStatus.vue'),
+      }
+    })
   })
 
   console.log("Initialised")
