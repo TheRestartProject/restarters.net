@@ -118,10 +118,9 @@
                                 </div>
                             </div>
                             <span class="text-black text-right mb-1">
-                            @lang('devices.age_approx')
-                        </span>
+                                @lang('devices.age_approx')
+                            </span>
                         </div>
-{{--                        <p class="text-danger">TODO Add photos before add device, but only if quantity is 1.</p>--}}
                     </div>
                 </div>
             </div>
@@ -260,4 +259,29 @@
             </a>
         </div>
     </form>
+    <div class="d-flex flex-wrap justify-content-left pt-3 photoform">
+        <label for="file">@lang('devices.images')</label>
+        @if ($edit)
+            <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="ml-4 dropzone dz-thumbnail dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1="" data-field2="">
+                @csrf
+                <div class="dz-default dz-message"></div>
+                <div class="fallback">
+                    <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />
+                </div>
+            </form>
+        @endif
+
+        <div class="previews">
+            @if( !empty($device->images) )
+                @foreach($device->images as $image)
+                    <div id="device-image-{{ $device->iddevices }}" class="dz-image">
+                        <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
+                            <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder"></a>
+                        <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">Remove file</a>
+                    </div>
+                @endforeach
+            @endif
+            <div class="uploads-{{ $formdata->iddevices }}"></div>
+        </div>
+    </div>
 </div>

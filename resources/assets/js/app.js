@@ -606,10 +606,7 @@ function initAutocomplete() {
   }
 
   function loadDropzones() {
-
     if (jQuery(".dropzoneEl").length > 0 ) {
-      console.log(jQuery(".dropzoneEl").length);
-
       var field1 = jQuery('.dropzone').data('field1');
       var field2 = jQuery('.dropzone').data('field2');
 

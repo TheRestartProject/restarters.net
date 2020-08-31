@@ -1,6 +1,7 @@
 <?php
 
 return array (
+  'images' => 'Images',
   'field_device_images' => 'Add device images here',
   'field_device_images_2' => 'Choose compelling images that show off your work',
   'useful_repair_urls_helper' => 'Enter URL here',

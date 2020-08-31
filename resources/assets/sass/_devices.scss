@@ -159,3 +159,16 @@ td.col-device-auto {
     color: black;
   }
 }
+
+// We cannot nest forms in HTML, but the design has the photo form showing within the rest of the form for the device.
+// We therefore have the photos outside the form, and reposition them.  This will lead to overflow problems when
+// there are many photos, so we add a max-height too.
+//
+// In the long run this should be restuctured so that AJAX calls are made to submit forms.
+.photoform {
+  top: -350px;
+  left: 24px;
+  position: relative;
+  height: 250px;
+  width: 338px;
+}
