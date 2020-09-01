@@ -9,8 +9,8 @@
 @section('extra-meta')
 <meta name="description" content="Help analyse faults in smartphones brought to events such as Repair Cafés and Restart Parties, and contribute to the current push for Right to Repair!">
 <meta name="keywords" content="MobiFix:ORA, MobiFix, smartphones, mobiles, handi iPhone, Samsung Galaxy, community events, Restart Parties, Repair Cafés, repair data, Right to Repair, Open Repair Alliance, The Restart Project, Open Repair Data, FixFest">
-<meta property="og:title" content="Help analyse faults in smartphones brought to events such as Repair Cafés and Restart Parties, and contribute to the current push for Right to Repair!">
-<meta property="og:description" content="">
+<meta property="og:title" content="MobiFix:ORA">
+<meta property="og:description" content="Help analyse faults in smartphones brought to events such as Repair Cafés and Restart Parties, and contribute to the current push for Right to Repair!">
 <meta property="og:image" content="{{ asset('/images/mobifix/og-mobifix-toolbox.png') }}">
 <meta property="og:url" content="https://restarters.net/mobifixora/">
 @endsection
