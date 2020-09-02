@@ -24,11 +24,9 @@ Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
 // Set up internationalisation.  translations.js is built in webpack.mix.js from the PHP lang folder.
-// TODO Set up locale on the fly.
 import lang from 'lang.js';
 import translations from './translations.js';
 const Lang = new lang()
-Lang.setLocale('en')
 Lang.setMessages(translations)
 
 window.Dropzone = require('dropzone');
@@ -1225,6 +1223,9 @@ function initAutocomplete() {
       copyToClipboard(text, el);
     });
 
+    // Set current locale.  Passed via DOM element from languages.blade.php.
+    const locale = $('#language-current').html() ? $('#language-current').html() : 'en'
+    Lang.setLocale(locale)
   });
 
   // COPY TO CLIPBOARD
