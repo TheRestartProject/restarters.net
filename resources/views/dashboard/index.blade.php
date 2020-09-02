@@ -8,10 +8,9 @@
 <section class="dashboard">
   <div class="container">
   <div class="row row-compressed">
-      <div class="col vue">
+      <div class="col">
             <h1 id="dashboard__header">@lang('dashboard.title')</h1>
             <p>@lang('dashboard.subtitle')</p>
-          <ExampleComponent />
       </div>
   </div>
 

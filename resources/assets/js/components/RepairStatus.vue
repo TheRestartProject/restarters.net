@@ -1,5 +1,8 @@
 <template>
   <div>
+    This is just an example Vue component.  It's not used anywhere yet, and we'll delete it when we have better
+    examples.
+
     Repair status for {{ device.iddevices }} {{ device }}
     <div class="d-flex justify-content-between flex-wrap">
       <!--      Can change to use select2 - need to install that component.-->
