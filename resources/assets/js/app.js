@@ -1324,6 +1324,9 @@ function initAutocomplete() {
     $('#fixed-insert').html(stats['fixed_devices']);
     $('#repair-insert').html(stats['repairable_devices']);
     $('#dead-insert').html(stats['dead_devices']);
+    $('#devices-total').html(stats['devices_unpowered'] + stats['devices_powered']);
+    $('#devices-powered').html(stats['devices_powered']);
+    $('#devices-unpowered').html(stats['devices_unpowered']);
   }
   
   $( document ).ready(function() {
@@ -1495,8 +1498,11 @@ function initAutocomplete() {
           type: 'get',
           url: $href,
           success: function(data) {
-            $('#summary-'+$device).fadeOut(1000);
-            $('#row-'+$device).fadeOut(1000);
+            if (data.success) {
+              $('#summary-'+$device).fadeOut(1000);
+              $('#row-'+$device).fadeOut(1000);
+              updateEventStats(data.stats)
+            }
           },
           error: function(error) {
             alert(error);

@@ -961,13 +961,23 @@ class DeviceController extends Controller
         $party = $curr->event;
 
         if (FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($party, $user->id)) {
-            $r = $curr->delete();
+            $curr->delete();
+
             if ($request->ajax()) {
-                return response()->json(['success' => true]);
+                $footprintRatioCalculator = new FootprintRatioCalculator();
+                $emissionRatio = $footprintRatioCalculator->calculateRatio();
+                $theParty = Party::find($party);
+                $stats = $theParty->getEventStats($emissionRatio);
+
+                return response()->json([
+                    'success' => true,
+                    'stats' => $stats
+                ]);
             }
 
             return redirect('/party/view/'.$party)->with('success', 'Device has been deleted!');
         }
+
         if ($request->ajax()) {
             return response()->json(['success' => false]);
         }
