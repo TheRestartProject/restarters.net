@@ -224,8 +224,6 @@
                             <input class="form-check-input form-check-large" type="checkbox" name="wiki" value="1" @if( $device->wiki == 1 ) checked @endif>
                             <label class="form-check-label" for="wiki-{{ $device->iddevices }}">@lang('partials.solution_text2')</label>
                         </div>
-
-{{--                        <p class="text-danger">TODO Notes field does not exist yet</p>--}}
                     </div>
                 </div>
             </div>
@@ -259,31 +257,32 @@
             </a>
         </div>
     </form>
-    <div class="d-flex flex-wrap justify-content-left pt-3 photoform">
-        <label for="file">@lang('devices.images')</label>
-        @if ($edit)
-            <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="ml-4 dropzone dz-thumbnail dropzoneEl" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1="" data-field2="">
-                @csrf
-                <div class="dz-default dz-message"></div>
-                <div class="fallback">
-                    <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />
-                </div>
-            </form>
-{{--            TODO Adding photos doesn't update inline.--}}
-        @endif
+    <div class="d-flex flex-wrap justify-content-left pt-3">
+        <label for="file" class="photolabel">@lang('devices.images')</label>
+        <div class="photoform d-flex flex-wrap previews">
+            @if ($edit)
+                <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dz-thumbnail dropzoneEl mr-1" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1="" data-field2="">
+                    @csrf
+                    <div class="dz-default dz-message"></div>
+                    <div class="fallback">
+                        <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />
+                    </div>
+                </form>
+            @endif
 
-        <div class="previews">
             @php( $images = $device->getImages() )
             @if( count($images) > 0 )
                 @foreach($images as $image)
-                    <div id="device-image-{{ $device->iddevices }}" class="dz-image">
-                        <a href="/uploads/{{ $image->path }}" data-toggle="lightbox" class="">
-                            <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder" class="image-thumb"></a>
+                    <div class="dz-preview ml-0 mr-1 p-0">
+                        <div id="device-image-{{ $device->iddevices }}" class="dz-image">
+                            <a href="/uploads/{{ $image->path }}" data-toggle="lightbox" class="">
+                                <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder" class="image-thumb"></a>
+                        </div>
                         <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">Remove file</a>
                     </div>
                 @endforeach
             @endif
-            <div class="uploads-{{ $formdata->iddevices }}"></div>
+            <div class="uploads-{{ $device->iddevices }}"></div>
         </div>
     </div>
 </div>

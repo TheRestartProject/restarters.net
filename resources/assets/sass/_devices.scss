@@ -162,29 +162,42 @@ td.col-device-auto {
 
 // We cannot nest forms in HTML, but the design has the photo form showing within the rest of the form for the device.
 // We therefore have the photos outside the form, and reposition them.  This will lead to overflow problems when
-// there are many photos, so we add a max-height too.
-//
-// In the long run this should be restuctured so that AJAX calls are made to submit forms.
+// there are many photos, so we add a max-height too.  We should restructure the photo section into a Vue component
+// so that we can sort out the display properly without interfering with other global JS/CSS.
+.photolabel {
+  top: -350px;
+  left: 20px;
+  position: relative;
+}
+
 .photoform {
   top: -350px;
   left: 24px;
   position: relative;
   height: 250px;
   width: 338px;
+  margin-left: 16px;
 
   .dz-image {
     position: absolute;
 
-    .image-thumb {
-      margin-left: 16px;
+    img {
       width: 86px !important;
       height: 86px !important;
     }
+  }
 
-    .ajax-delete-image {
+  .dz-preview {
+    position: relative;
+    min-width: 86px !important;
+    max-width: 86px !important;
+    margin-left: 16px;
+    height: 86px !important;
+
+    .dz-remove {
       position: relative;
-      top: -50px;
-      left: 50px;
+      top: 33px;
+      left: 33px;
     }
   }
 
