@@ -105,12 +105,12 @@ class MobifixOraSetup extends Migration {
             1 => [
                 'title' => 'Power/battery',
                 'description' => '',
-                'regex' => 'battery|power|start|boot|switch|charg|plug'
+                'regex' => 'batter|power|start|boot|switch|charg|plug|bricked'
             ],
             2 => [
                 'title' => 'Screen',
                 'description' => 'Fault involves screen assembly - glass, touch, LCD...',
-                'regex' => 'sc(r)?een|display|touch|glass|lcd|reader|digiti',
+                'regex' => 'sc(r)?een|display|touch|glass|lcd|reader|flicker|digiti|window',
             ],
             3 => [
                 'title' => 'Stuck booting',
@@ -125,7 +125,7 @@ class MobifixOraSetup extends Migration {
             5 => [
                 'title' => 'Headphone jack',
                 'description' => 'Broken, loose, dirty...',
-                'regex' => 'headphone|jack|sound|audio|speaker|volume',
+                'regex' => 'headphone|jack|sound|audio|speaker|volume|socket',
             ],
             6 => [
                 'title' => 'Speaker/amplifier',
@@ -135,7 +135,7 @@ class MobifixOraSetup extends Migration {
             7 => [
                 'title' => 'Charger',
                 'description' => 'Problem with the charger not the phone itself',
-                'regex' => 'charg|plug',
+                'regex' => 'charg|plug|socket',
             ],
             8 => [
                 'title' => 'On/Off button',
@@ -170,7 +170,7 @@ class MobifixOraSetup extends Migration {
             14 => [
                 'title' => 'Sim card slot',
                 'description' => '',
-                'regex' => 'card|sim',
+                'regex' => 'card|sim|socket',
             ],
             15 => [
                 'title' => 'Microphone',
@@ -185,14 +185,49 @@ class MobifixOraSetup extends Migration {
             17 => [
                 'title' => 'Memory card slot',
                 'description' => '',
-                'regex' => 'memory|card|slot|sim|ram',
+                'regex' => 'memory|card|slot|sim|ram|socket',
             ],
             18 => [
+                'title' => 'External damage',
+                'description' => 'Damage to the chassis/case',
+                'regex' => 'case|dropped|rear|keyb|shell|frame|edge|housing',
+            ],
+            19 => [
+                'title' => 'Internal damage',
+                'description' => 'System board, internal component...',
+                'regex' => 'board|dropped|component|contact|solder|keyb',
+            ],
+            20 => [
+                'title' => 'Liquid damage',
+                'description' => 'Spillage, submersion, humidity...',
+                'regex' => 'water|humid|moist|liquid|coffee|drink|toilet',
+            ],
+            21 => [
+                'title' => 'Performance',
+                'description' => 'Slow, software crashes a lot...',
+                'regex' => 'slow|crash',
+            ],
+            22 => [
+                'title' => 'Software issue',
+                'description' => 'Apps misbehaving',
+                'regex' => 'software|app(s)?|game|version|mail|install',
+            ],
+            23 => [
+                'title' => 'Access issue',
+                'description' => 'Locked, forgot password...',
+                'regex' => 'locked|password|account',
+            ],
+            24 => [
+                'title' => 'Help/configuration',
+                'description' => 'Advised, changed settings...',
+                'regex' => 'advice|advise|help|config|setting|data|install|transfer|recover|backup|program|mail|support|network|internet|wifi|wi-fi',
+            ],
+            25 => [
                 'title' => 'Unknown',
                 'description' => 'Not enough info to determine the main fault',
                 'regex' => '',
             ],
-            19 => [
+            26 => [
                 'title' => 'Other',
                 'description' => 'Main fault is known but there is no option for it',
                 'regex' => '',

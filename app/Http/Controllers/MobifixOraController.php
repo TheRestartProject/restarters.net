@@ -18,15 +18,19 @@ class MobifixOraController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
+        $partner = $request->input('partner', NULL);
         if (Auth::check()) {
             $user = Auth::user();
         } else {
             $user = Microtask::getAnonUserCta($request);
             if ($user->action) {
-                return redirect()->action('MobifixOraController@cta');
+                return redirect()->action('MobifixOraController@cta', ['partner' => $partner]);
             }
         }
         if ($request->has('id-ords')) {
+            if (!$request->input('fault-type-id')) {
+                return redirect()->back()->withErrors(['Oops, there was an error, please try again, sorry! If this error persists please contact The Restart Project.']);
+            }
             $insert = [
                 'id_ords' => $request->input('id-ords'),
                 'fault_type_id' => $request->input('fault-type-id'),
@@ -58,9 +62,10 @@ class MobifixOraController extends Controller {
         // send non-suggested fault_types to view
         $fault->faulttypes = array_diff_key($fault_types, $fault->suggestions);
         return view('mobifixora.index', [
+            'title' => 'MobiFixORA',
             'fault' => $fault,
             'user' => $user,
-            'partner' => $request->input('partner', NULL),
+            'partner' => $partner,
         ]);
     }
 
@@ -93,6 +98,7 @@ class MobifixOraController extends Controller {
         $data = $MobifixOra->fetchStatus($partner);
         $complete = $data['total_opinions_2'][0]->total + $data['total_opinions_1'][0]->total + $data['total_opinions_0'][0]->total == 0;
         return view('mobifixora.status', [
+            'title' => 'MobiFixORA',
             'status' => $data,
             'user' => $user,
             'complete' => $complete,

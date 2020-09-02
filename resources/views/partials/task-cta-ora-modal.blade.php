@@ -64,10 +64,10 @@
                             <div class="col">
                                 <h5>Want to keep up with our work?</h5>
                                 <p>
-                                    Sign up to the <a href="https://openrepair.org/get-involved" target="_blank">Open Repair Alliance</a> newsletter to get updates on our work on data.
+                                    <a href="https://therestartproject.org/" target="_blank">The Restart Project</a> prototyped this app, you can follow and contribute to discussions on repair data from repair events on their <a href="https://talk.restarters.net/t/our-work-on-repair-data/1150" target="_blank">community platform</a>.
                                 </p>
                                 <p>
-                                    <a href="https://therestartproject.org/" target="_blank">The Restart Project</a> prototyped this app, you can follow and contribute to discussions on repair data from repair events on their <a href="https://talk.restarters.net/t/our-work-on-repair-data/1150" target="_blank">community platform</a>.
+                                    Sign up to the <a href="https://openrepair.org/get-involved" target="_blank">Open Repair Alliance</a> newsletter to get updates on our work on data.
                                 </p>
                             </div>
                         </div>
@@ -75,7 +75,7 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                     <p class="buttons">
-                        <a href="/about" id="btn-join" class="btn btn-md btn-rounded">Join the community</a>
+                        <a href="javascript:void(0);" id="btn-join" class="btn btn-md btn-rounded" target="_blank">Sign up</a>
                         <button id="btn-skip" type="button" class="btn btn-md btn-rounded">Not now</button>
                     </p>
                 </div>
@@ -87,7 +87,7 @@
 
             document.getElementById('btn-join').addEventListener('click', function (e) {
                 e.preventDefault();
-                window.open("/about", '_blank');
+                window.open("https://openrepair.org/get-involved/", '_blank');
                 document.getElementById('btn-skip').click();
             }, true);
 
