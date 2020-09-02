@@ -171,4 +171,24 @@ td.col-device-auto {
   position: relative;
   height: 250px;
   width: 338px;
+
+  .dz-image {
+    position: absolute;
+
+    .image-thumb {
+      margin-left: 16px;
+      width: 86px !important;
+      height: 86px !important;
+    }
+
+    .ajax-delete-image {
+      position: relative;
+      top: -50px;
+      left: 50px;
+    }
+  }
+
+  .dz-remove {
+    background-image: url('../icons/cross.svg');
+  }
 }

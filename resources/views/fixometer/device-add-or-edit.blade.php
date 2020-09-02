@@ -269,14 +269,16 @@
                     <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />
                 </div>
             </form>
+{{--            TODO Adding photos doesn't update inline.--}}
         @endif
 
         <div class="previews">
-            @if( !empty($device->images) )
-                @foreach($device->images as $image)
+            @php( $images = $device->getImages() )
+            @if( count($images) > 0 )
+                @foreach($images as $image)
                     <div id="device-image-{{ $device->iddevices }}" class="dz-image">
-                        <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
-                            <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder"></a>
+                        <a href="/uploads/{{ $image->path }}" data-toggle="lightbox" class="">
+                            <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder" class="image-thumb"></a>
                         <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">Remove file</a>
                     </div>
                 @endforeach
