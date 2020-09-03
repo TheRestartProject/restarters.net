@@ -37,7 +37,7 @@ return array (
   'volunteer_email_address' => 'Adresse e-mail du bénévole (optionnel)',
   'message_volunteer_email_address' => 'Ce champ invitera les bénévoles à rejoindre le Repair Café',
   'volunteer_attended_button' => 'Bénévoles présents',
-  'option_not_registered' => 'Pas enregistré sur le site',
+  'option_not_registered' => 'Pas enregistré sur le Fixometer',
   'option_default' => '-- Sélectionner --',
   'events' => 'Evénements',
   'event' => 'Evénement',
@@ -116,4 +116,8 @@ return array (
   'upcoming_search_from' => 'De',
   'upcoming_search_match' => '{0}Il n\'y a aucun événément correspondant à votre recherche.|{1}Il y a 1 événement correspondant à votre recherche.|[2,*]Il y a :count événements correspondant à votre recherche.',
   'upcoming_search_to' => 'A',
+  'looking_for_online_events' => 'Vous cherchez des événements en ligne? Consultez aussi notre <a href=":url">liste d\'événements Talk</a> pour d\'autres types d\'événements en ligne.',
+  'no_events_near_you' => 'Pas d\'événements proches de chez vous pour le moment? Regardez si vous pouvez rejoindre un <a href=":url">événement en ligne</a>',
+  'online_event_question' => 'Evénement en ligne?',
+  'youre_going' => 'Vous participez!',
 );

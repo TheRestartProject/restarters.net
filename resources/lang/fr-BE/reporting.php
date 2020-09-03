@@ -11,7 +11,7 @@ return array (
   'placeholder_gender_text' => 'Cherchez le genre',
   'placeholder_age_range' => 'Choisissez la tranche d\'âge',
   'placeholder_birth_year' => 'Choisissez l\'année de naissance',
-  'placeholder_group' => 'Choisissez groupe',
+  'placeholder_group' => 'Choisissez repair café',
   'placeholder_gender' => 'Choisissez le genre',
   'placeholder_country' => 'Choisissez le pays',
   'placeholder_region' => 'Chercher région',
@@ -40,6 +40,6 @@ return array (
   'location' => 'Lieu',
   'event_date' => 'Date de l\'événement',
   'event_name' => 'Evénement',
-  'restart_group' => 'Groupe',
+  'restart_group' => 'Repair Café',
   'export_csv' => 'Exporter en CSV',
 );
