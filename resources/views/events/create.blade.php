@@ -17,7 +17,7 @@
       <div class="row">
           <div class="col">
               <h1 class="mb-30 mr-30">
-                  Add new event
+                  @lang('events.add_new_event')
               </h1>
           </div>
       </div>

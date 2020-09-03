@@ -47,17 +47,17 @@
                                 </td>
                                 <td class="d-none d-sm-table-cell">
                                     <div class="form-group">
-                                        <input type="text" class="form-control field" class="model" name="model" placeholder="Model" autocomplete="off">
+                                        <input type="text" class="form-control field" class="model" name="model" placeholder="@lang('partials.model')" autocomplete="off">
                                     </div>
                                 </td>
                                 <td class="d-none d-sm-table-cell" width="100">
                                     <div class="form-group">
-                                        <input type="number" class="form-control field" class="age" name="age" min="0" step="0.5" placeholder="Age (yrs)" autocomplete="off">
+                                        <input type="number" class="form-control field" class="age" name="age" min="0" step="0.5" placeholder="@lang('partials.age_placeholder')" autocomplete="off">
                                     </div>
                                 </td>
                                 <td class="d-none d-sm-table-cell">
                                     <div class="form-group">
-                                        <input type="text" class="form-control field" class="problem" name="problem" placeholder="Description of problem" autocomplete="off">
+                                        <input type="text" class="form-control field" class="problem" name="problem" placeholder="@lang('partials.description_of_problem')" autocomplete="off">
                                     </div>
                                 </td>
                                 <td>
@@ -72,7 +72,7 @@
                                     <div class="d-none col-device">
                                         <div class="form-control form-control__select">
                                             <select name="repair_details" id="repair_details_edit" class="form-control field select2 repair-details-edit">
-                                              <option value="0">-- Next steps --</option>
+                                              <option value="0">-- @lang('partials.choose_next_steps') --</option>
                                               <option value="1">@lang('partials.more_time')</option>
                                               <option value="2">@lang('partials.professional_help')</option>
                                               <option value="3">@lang('partials.diy')</option>
@@ -83,7 +83,7 @@
                                 <td class="d-none col-device">
                                     <div class="form-control form-control__select">
                                         <select name="spare_parts" class="spare_parts spare-parts select2">
-                                          <option value="0">-- Spare parts --</option>
+                                          <option value="0">-- @lang('partials.choose_spare_parts') --</option>
                                           <option value="1">@lang('partials.yes_manufacturer')</option>
                                           <option value="3">@lang('partials.yes_third_party')</option>
                                           <option value="2">@lang('partials.no')</option>
@@ -92,15 +92,15 @@
                                 </td>
                                 <td class="d-none col-device">
                                     <div class="form-control form-control__select form-control__select_placeholder">
-                                        <select name="barrier[]" multiple placeholder="-- Choose barriers to repair --" id="repair_barrier" class="form-control field select2-repair-barrier repair-barrier">
+                                        <select name="barrier[]" multiple placeholder="-- @lang('partials.choose_barriers') --" id="repair_barrier" class="form-control field select2-repair-barrier repair-barrier">
                                           @foreach( FixometerHelper::allBarriers() as $barrier )
-                                            <option value="{{{ $barrier->id }}}">{{{ $barrier->barrier }}}</option>
+                                            <option value="{{{ $barrier->id }}}">@lang($barrier->barrier)</option>
                                           @endforeach
                                         </select>
                                     </div>
                                 </td>
                                 <td class="d-table-cell d-sm-table-cell">
-                                    <input type="submit" class="btn btn-secondary btn-add" value="Add">
+                                    <input type="submit" class="btn btn-secondary btn-add" value="@lang('partials.add_device_button')">
                                 </td>
                                 <td class="d-none">
                                     <div class="form-control form-control__select">

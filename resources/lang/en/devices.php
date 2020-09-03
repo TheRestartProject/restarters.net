@@ -79,4 +79,7 @@ return array (
   'add_data_description' => 'Adding repair data helps show the impact of repair.',
   'search_text' => 'Browse or search our global database of repair.',
   'add_data_action_button' => 'Go to event',
+  'repair_records' => 'Repair Records',
+  'view_record' => 'View',
+  'close_record' => 'Close',
 );

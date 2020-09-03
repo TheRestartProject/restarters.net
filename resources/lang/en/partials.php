@@ -89,4 +89,8 @@ return array (
   'hot_topics' => 'Hot topics',
   'hot_topics_text' => 'Join in on the latest hot topics on repair at Restarters Talk.',
   'hot_topics_link' => 'All weekly hot topics',
+  'choose_barriers' => 'Choose barriers to repair',
+  'choose_spare_parts' => 'Spare parts',
+  'choose_next_steps' => 'Next steps',
+  'add_device_button' => 'Add',
 );

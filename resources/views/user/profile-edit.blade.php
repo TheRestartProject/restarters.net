@@ -6,13 +6,13 @@
           <div class="col-12 col-md-12 mb-50">
               <div class="d-flex align-items-center">
                   <h1 class="mb-0 mr-30">
-                      Profile & Preferences
+                      @lang('profile.page_title')
                   </h1>
 
             @if (Auth::id() == $user->id)
-              <a href="/profile" class="btn btn-primary ml-auto">View profile</a>
+              <a href="/profile" class="btn btn-primary ml-auto">@lang('profile.view_profile')</a>
             @else
-              <a href="/profile/{{ $user->id }}" class="btn btn-primary ml-auto">View user profile</a>
+              <a href="/profile/{{ $user->id }}" class="btn btn-primary ml-auto">@lang('profile.view_user_profile')</a>
             @endif
       </div>
     </div>
@@ -33,13 +33,13 @@
     <div class="row justify-content-center">
       <div class="col-lg-4 offset-lg-sidebar">
         <div class="list-group" id="list-tab" role="tablist">
-          <a class="list-group-item list-group-item-action active" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Profile</a>
-          <a class="list-group-item list-group-item-action" id="list-account-list" data-toggle="list" href="#list-account" role="tab" aria-controls="account">Account</a>
+          <a class="list-group-item list-group-item-action active" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">@lang('profile.profile')</a>
+          <a class="list-group-item list-group-item-action" id="list-account-list" data-toggle="list" href="#list-account" role="tab" aria-controls="account">@lang('profile.account')</a>
 
-          <a class="list-group-item list-group-item-action" id="list-email-preferences-list" data-toggle="list" href="#list-email-preferences" role="tab" aria-controls="email-preferences">Email preferences</a>
-          <a class="list-group-item list-group-item-action" id="list-calendar-links-list" data-toggle="list" href="#list-calendar-links" role="tab" aria-controls="calendar-links">Calendars</a>
+          <a class="list-group-item list-group-item-action" id="list-email-preferences-list" data-toggle="list" href="#list-email-preferences" role="tab" aria-controls="email-preferences">@lang('profile.email_preferences')</a>
+          <a class="list-group-item list-group-item-action" id="list-calendar-links-list" data-toggle="list" href="#list-calendar-links" role="tab" aria-controls="calendar-links">@lang('profile.calendars.title')</a>
           @if (Auth::id() == $user->id)
-              <a class="list-group-item list-group-item-action" id="list-notifications-list" href="{{ route('notifications') }}" role="tab">Notifications</a>
+              <a class="list-group-item list-group-item-action" id="list-notifications-list" href="{{ route('notifications') }}" role="tab">@lang('profile.notifications')</a>
           @endif
 
         </div>

@@ -148,10 +148,10 @@
         <section class="table-section" id="events-4">
           <header>
             @if( !is_null($group) )
-              <h2>Past {{{ $group->name }}} events</h2>
+              <h2>@lang('events.past_events_group', ['group' => $group->name])</h2>
             @else
-              <h2 class="mb-1">Past events <sup><a href="{{{ route('all-past-events') }}}">(See all past)</a></sup></h2>
-              <p class="mb-2">These are past events from groups you are a member of, and events that you RSVPed to.</p>
+              <h2 class="mb-1">@lang('events.past_events') <sup><a href="{{{ route('all-past-events') }}}">(@lang('events.see_all_past'))</a></sup></h2>
+              <p class="mb-2">@lang('events.past_events_explainer')</p>
             @endif
           </header>
           <div class="table-responsive">
@@ -164,7 +164,7 @@
                   @endforeach
                 @else
                   <tr>
-                    <td colspan="13" align="center" class="p-3">There are currently no past events for this group</td>
+                    <td colspan="13" align="center" class="p-3">@lang('events.no_past_events_for_group')</td>
                   </tr>
                 @endif
               </tbody>
