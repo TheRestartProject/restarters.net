@@ -165,39 +165,44 @@ td.col-device-auto {
 // there are many photos, so we add a max-height too.  We should restructure the photo section into a Vue component
 // so that we can sort out the display properly without interfering with other global JS/CSS.
 .photolabel {
-  top: -350px;
+  top: 400px;
   left: 20px;
-  position: relative;
+  position: absolute;
 }
 
 .photoform {
-  top: -350px;
-  left: 24px;
-  position: relative;
+  top: 380px;
+  left: 90px;
+  position: absolute;
   height: 250px;
-  width: 338px;
+  width: 260px;
   margin-left: 16px;
 
   .dz-image {
     position: absolute;
 
     img {
-      width: 86px !important;
-      height: 86px !important;
+      width: 80px !important;
+      height: 80px !important;
     }
+  }
+
+  .dz-thumbnail {
+    width: 80px !important;
+    height: 80px !important;
   }
 
   .dz-preview {
     position: relative;
-    min-width: 86px !important;
-    max-width: 86px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
     margin-left: 16px;
     height: 86px !important;
 
     .dz-remove {
       position: relative;
-      top: 33px;
-      left: 33px;
+      top: 30px;
+      left: 30px;
     }
   }
 

@@ -900,12 +900,10 @@ function initAutocomplete() {
       console.log("Category change", $(this), $value, $field)
       if( $value === 46 || $value === '' ){
         $field.prop('disabled', false);
-        $field.parents('.display-weight').removeClass('d-none');
       } else {
         $field.val('');
         $field.trigger('change');
         $field.prop('disabled', true);
-        $field.parents('.display-weight').addClass('d-none');
       }
     });
 
@@ -1379,7 +1377,7 @@ function initAutocomplete() {
             //Appending...
             for (i = 0; i < $(json.html).length; i++) {
               var row = $(json.html)[i];
-              $target = $(row).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
+              $target = $(row).hide().appendTo('#device-table-' + (json.powered ? 'powered' : 'unpowered') + ' > tbody:last-child').fadeIn(1000);
               select2Fields($target);
             }
             $('.table-row-details').removeAttr('style');

@@ -1,4 +1,4 @@
-<div class="add-edit-device-collapse collapse" id="add-edit-device-{{ $powered ? 'powered' : 'unpowered' }}-{{ $device->iddevices }}">
+<div class="add-edit-device-collapse collapse position-relative" id="add-edit-device-{{ $powered ? 'powered' : 'unpowered' }}-{{ $device->iddevices }}">
     <form class="{{ $edit ? 'edit-device' : 'add-device' }}" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
         <input name="event_id" type="hidden" value="{{ $event->idevents }}">
         <div class="device-info">
@@ -189,7 +189,7 @@
 
                         @if ($device->repair_status !== 1)
                         <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device">
-                            <select class="select2 select2-repair-barrier repair-barrier" name="barrier" multiple>
+                            <select class="select2 select2-repair-barrier repair-barrier" name="barrier[]" multiple>
                                 <option></option>
                                 @foreach( FixometerHelper::allBarriers() as $barrier )
                                     <option value="{{{ $barrier->id }}}" @if ( $device->barriers->contains($barrier->id) ) selected @endif>{{{ $barrier->barrier }}}</option>
@@ -262,9 +262,11 @@
             </a>
         </div>
     </form>
-    <div class="d-flex flex-wrap justify-content-left pt-3">
+    @if (!$add)
         <label for="file" class="photolabel">@lang('devices.images')</label>
-        <div class="photoform d-flex flex-wrap previews">
+    @endif
+    <div class="d-flex flex-wrap justify-content-left pt-3 photoform">
+        <div class="position-relative d-flex flex-wrap previews">
             @if ($edit)
                 <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dz-thumbnail dropzoneEl mr-1" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1="" data-field2="">
                     @csrf
