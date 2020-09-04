@@ -12,7 +12,6 @@ $editable = ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Adminis
             <span class="arrow">▴</span>
         </a>
     </td>
-    <td class="text-center">0</td>
     <td class="d-none d-md-table-cell"><div class="category">{{ $device->deviceCategory->name }}</div></td>
     @if ($powered)
     <td class="d-none d-md-table-cell"><div class="brand">{{ $device->brand }}</div></td>

@@ -329,7 +329,7 @@
                                             </th>
                                             <th scope="col" class="model d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
                                                 <label for="label-model" class="sort-column @if( $sort_column == 'model' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
-                                                    @lang('devices.model')
+                                                    @lang('devices.model_or_type')
                                                 </label>
                                             </th>
                                             <th scope="col" class="problem d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
