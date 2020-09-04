@@ -43,7 +43,7 @@ return array (
   'graphic-camera' => 'Camera',
   'end' => 'End',
   'fixed' => 'Fixed',
-  'repairable' => 'Repairable',
+  'repairable' => 'Fixable',
   'age' => 'Age',
   'restart-party' => 'Restart party',
   'category_of_device' => 'Category of device',
