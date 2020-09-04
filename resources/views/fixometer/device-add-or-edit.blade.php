@@ -3,7 +3,7 @@
         <div class="device-info">
             <div class="card-event-add-item card flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right border-white">
                 <div class="card-body d-flex flex-column">
-                    <h3>ITEM</h3>
+                    <h3>@lang('devices.title_items')</h3>
                     <div class="mt-4">
                         <div class="mb-2 device-select-row">
                             <div class="form-control form-control__select form-control-lg d-inline">
@@ -127,10 +127,10 @@
 
             <div class="card card-event-add-item flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right border-white">
                 <div class="card-body">
-                    <h3>REPAIR</h3>
+                    <h3>@lang('devices.title_repair')</h3>
                     <div class="mt-4 d-flex flex-column">
                         <div class="form-control form-control__select mb-2 col-device">
-                            <select class="select2 repair-status" name="repair_status" data-device="{{ $device->iddevices }}" placeholder="Description of problem">
+                            <select class="select2 repair-status" name="repair_status" data-device="{{ $device->iddevices }}" placeholder="@lang('devices.description_of_problem')">
                                 <option value="0">@lang('devices.repair_outcome')</option>
                                 @if ( $device->repair_status == 1 )
                                     <option value="1" selected>@lang('partials.fixed')</option>
@@ -198,7 +198,7 @@
 
             <div class="card card-event-add-item flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right-0 border-white">
                 <div class="card-body">
-                    <h3>ASSESSMENT</h3>
+                    <h3>@lang('devices.title_assessment')</h3>
                     <div class="mt-4">
                         <div class="mb-2 device-select-row">
                             <div class="form-group">

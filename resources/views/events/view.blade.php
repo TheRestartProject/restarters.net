@@ -411,15 +411,15 @@
         <div id="devices-section" class="collapse d-lg-block collapse-section">
           <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
-              <a class="nav-link active" id="items-powered-tab" data-toggle="tab" href="#items-powered" role="tab" aria-controls="items-powered" aria-selected="true">POWERED <span id="devices-powered" class="badge badge-pill badge-secondary">{{ $stats['devices_powered'] }} </span></a>
+              <a class="nav-link active" id="items-powered-tab" data-toggle="tab" href="#items-powered" role="tab" aria-controls="items-powered" aria-selected="true">@lang('devices.title_powered') <span id="devices-powered" class="badge badge-pill badge-secondary">{{ $stats['devices_powered'] }} </span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="items-powered-tab" data-toggle="tab" href="#items-unpowered" role="tab" aria-controls="items-unpowered">UNPOWERED <span id="devices-unpowered" class="badge badge-pill badge-secondary">{{ $stats['devices_unpowered'] }}</span></a>
+              <a class="nav-link" id="items-powered-tab" data-toggle="tab" href="#items-unpowered" role="tab" aria-controls="items-unpowered">@lang('devices.title_powered') <span id="devices-unpowered" class="badge badge-pill badge-secondary">{{ $stats['devices_unpowered'] }}</span></a>
             </li>
           </ul>
           <div class="tab-content" id="itemsTabContent">
             <div class="tab-pane fade show active" id="items-powered" role="tabpanel" aria-labelledby="items-powered-tab">
-              <p class="mt-3">A <b>powered item</b> is anything that has or requires a power source.</p>
+              <p class="mt-3">@lang('devices.description_powered')</p>
               @include('partials.device-list', [
                   'powered' => TRUE
               ])
@@ -436,7 +436,7 @@
               @endif
             </div>
             <div class="tab-pane fade" id="items-unpowered" role="tabpanel" aria-labelledby="items-unpowered-tab">
-              <p class="mt-3">An <b>unpowered item</b> is anything that doesn't have or require a power source.</p>
+              <p class="mt-3">@lang('devices.description_unpowered')</p>
               @include('partials.device-list', [
                   'powered' => FALSE
               ])
