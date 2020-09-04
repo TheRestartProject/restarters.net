@@ -1,5 +1,5 @@
 <div class="table-responsive">
-    <table class="table table-repair" role="table" id="device-table">
+    <table class="table table-repair" role="table" id="device-table-{{ $powered ? 'powered' : 'unpowered' }}">
         <thead>
         <tr>
             <th width="60"></th>

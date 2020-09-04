@@ -1,5 +1,6 @@
 <div class="add-edit-device-collapse collapse" id="add-edit-device-{{ $powered ? 'powered' : 'unpowered' }}-{{ $device->iddevices }}">
     <form class="{{ $edit ? 'edit-device' : 'add-device' }}" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
+        <input name="event_id" type="hidden" value="{{ $event->idevents }}">
         <div class="device-info">
             <div class="card-event-add-item card flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right border-white">
                 <div class="card-body d-flex flex-column">

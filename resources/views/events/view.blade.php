@@ -421,7 +421,8 @@
             <div class="tab-pane fade show active" id="items-powered" role="tabpanel" aria-labelledby="items-powered-tab">
               <p class="mt-3">@lang('devices.description_powered')</p>
               @include('partials.device-list', [
-                  'powered' => TRUE
+                  'powered' => TRUE,
+                  'event_id' => $event->idevents
               ])
               @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) )
                 <a class="collapsed row-button" id="open-add-powered" data-toggle="collapse" href="#add-edit-device-powered-" role="button" aria-expanded="false" aria-controls="add-edit-device-powered-">

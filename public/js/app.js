@@ -36468,7 +36468,7 @@ $(document).ready(function () {
         spare_parts: $form.find('select[name=spare_parts]').val(),
         quantity: $form.find('select[name=quantity]').val(),
         event_id: $form.find('input[name=event_id]').val(),
-        barrier: $form.find('#repair_barrier').val()
+        barrier: $form.find('select[name=barrier]').val()
       },
       datatype: 'json',
       success: function success(json) {
@@ -36493,7 +36493,10 @@ $(document).ready(function () {
           //Appending...
           for (i = 0; i < $(json.html).length; i++) {
             var row = $(json.html)[i];
-            $target = $(row).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
+
+            // Append to the appropriate table based on what the server told us about the powered/unpowered nature
+            // of this device.
+            $target = $(row).hide().appendTo('#device-table-' + (json.powered ? 'powered' : 'unpowered') + '> tbody:last-child').fadeIn(1000);
             select2Fields($target);
           }
           $('.table-row-details').removeAttr('style');

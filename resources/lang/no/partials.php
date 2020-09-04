@@ -11,7 +11,7 @@ return array (
   'discussion' => 'Discussion',
   'discussion_text' => 'Meet other event organisers and repair volunteers, trade tips, get help, or discuss the system-level barriers to longer-lasting products',
   'join_the_discussion' => 'Join the discussion',
-  'add_device' => 'Add device',
+  'add_device' => 'Add item',
   1 => 'How to set up a group',
   2 => 'how_to_set_up_a_group_text',
   3 => 'Once you\'ve gone through some preliminary steps to organise a group, we can create one for you here.',
@@ -85,7 +85,7 @@ return array (
   'add_a_device' => 'Add a device',
   'this_event_hasnt_started' => 'This event hasn\'t started',
   'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
-  'save' => 'Save device',
+  'save' => 'Save item',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
 );

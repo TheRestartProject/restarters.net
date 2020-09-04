@@ -522,6 +522,8 @@ class DeviceController extends Controller
 
     public function ajaxCreate(Request $request)
     {
+        $powered = NULL;
+
         $rules = [
             'category' => 'required|filled',
         ];
@@ -614,6 +616,8 @@ class DeviceController extends Controller
 
             $device[$i]->save();
 
+            $powered = $device[$i]->deviceCategory->powered;
+
             if ($useful_url && $useful_source) {
                 // Devices can have multiple URLs, but we only support one on the create - and it gets applied to each
                 // device.
@@ -654,6 +658,7 @@ class DeviceController extends Controller
                 'clusters' => $clusters,
                 'brands' => $brands,
                 'is_attending' => $is_attending,
+                'powered' => $d->deviceCategory->powered
             ])->render();
         }
         //end of handle loop
@@ -671,6 +676,7 @@ class DeviceController extends Controller
         $return['stats'] = $stats;
         $return['deviceCount'] = $deviceCount;
         $return['deviceMiscCount'] = $deviceMiscCount;
+        $return['powered'] = $powered;
 
         return response()->json($return);
 
