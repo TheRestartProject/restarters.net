@@ -68,7 +68,6 @@ class SyncLanguageSettingsToDiscourse
                 ]]
             );
         } catch (\Exception $ex) {
-            dd($ex);
             Log::error('Could not sync '.$user->id.' language to Discourse: '.$ex->getMessage());
         }
     }
