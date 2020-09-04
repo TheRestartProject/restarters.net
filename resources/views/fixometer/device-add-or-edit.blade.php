@@ -153,6 +153,7 @@
                             </select>
                         </div>
 
+                        @if ($device->repair_status !== 1)
                         <div class="form-control form-control__select mb-2 col-device">
                             <select class="repair_details select2 repair-details-edit" name="repair_details">
                                 <option value="0">@lang('partials.repair_details') ?</option>
@@ -175,6 +176,7 @@
                                 @endif
                             </select>
                         </div>
+                        @endif
 
                         <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device">
                             <select class="select2 spare-parts" name="spare_parts">
@@ -185,6 +187,7 @@
                             </select>
                         </div>
 
+                        @if ($device->repair_status !== 1)
                         <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device">
                             <select class="select2 select2-repair-barrier repair-barrier" name="barrier" multiple>
                                 <option></option>
@@ -193,6 +196,7 @@
                                 @endforeach
                             </select>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>
