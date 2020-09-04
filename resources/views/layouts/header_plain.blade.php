@@ -26,6 +26,7 @@
         @else
           <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         @endif
+        <link href="{{ asset('global/css/app.css') }}" rel="stylesheet">
 
         <!-- Cookie banner with fine-grained opt-in -->
         <script src="{{ asset('js/gdpr-cookie-notice.js') }}"></script>
