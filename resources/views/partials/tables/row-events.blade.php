@@ -60,7 +60,7 @@
 
       @if ( $event->isVolunteer() )
         <td class="d-none d-sm-table-cell text-center">
-          You're going!
+          @lang('events.youre_going')
         </td>
       @else
         <td class="d-none d-sm-table-cell cell-warning text-center">
@@ -76,7 +76,7 @@
 
       @if ( $event->isVolunteer() )
         <td class="d-none d-sm-table-cell cell-info text-center">
-          You're going!
+          @lang('events.youre_going')
         </td>
       @else
         <td class="d-none d-sm-table-cell cell-info text-center">
@@ -113,7 +113,7 @@
         <td class="d-none d-sm-table-cell cell-figure">{{{ $stats['dead_devices'] }}}</td>
       @else
         <td class="d-none d-sm-table-cell cell-danger text-center" colspan="5">
-          No devices added <a href="/party/view/{{ $event->idevents }}">Add a device</a>
+          @lang('partials.no_devices_added') <a href="/party/view/{{ $event->idevents }}">@lang('partials.add_a_device')</a>
         </td>
       @endif
 

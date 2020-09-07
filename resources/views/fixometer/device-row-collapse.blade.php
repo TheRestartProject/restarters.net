@@ -4,8 +4,8 @@
         <button type="button" class="btn btn-device-toggle btn-secondary collapsed"
             data-toggle="collapse" aria-controls="row-{{{ $device->iddevices }}}" aria-expanded="false"
             data-target="#row-{{{ $device->iddevices }}}">
-            <span class="btn-state-1">View</span>
-            <span class="btn-state-2">Close</span>
+            <span class="btn-state-1">@lang('devices.view_record')</span>
+            <span class="btn-state-2">@lang('devices.close_record')</span>
         </button>
     </td>
     <td class="category" @if( !FixometerHelper::checkColumn('category', $user_preferences) ) style="display: none;" @endif>

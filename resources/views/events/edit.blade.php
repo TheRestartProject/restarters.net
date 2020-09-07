@@ -17,7 +17,7 @@
     <div class="row">
       <div class="col">
         <h1 class="mb-30 mr-30">
-            Editing <a style="color:black; text-decoration:underline" href="/party/view/{{ $formdata->id }}">{{ $formdata->venue }}</a>
+            @lang('events.editing', ['event' => '<a style="color:black; text-decoration:underline" href="/party/view/'. $formdata->id .'">'. $formdata->venue .'</a>'])
         </h1>
       </div>
     </div>
@@ -30,14 +30,14 @@
 
         <ul class="nav nav-tabs">
           <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#details">Event details</a>
+            <a class="nav-link active" data-toggle="tab" href="#details">@lang('events.event_details')</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#photos">Event photos</a>
+            <a class="nav-link" data-toggle="tab" href="#photos">@lang('events.event_photos')</a>
           </li>
           @if( $audits && FixometerHelper::hasRole(Auth::user(), 'Administrator') )
           <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#log">Event log</a>
+            <a class="nav-link" data-toggle="tab" href="#log">@lang('events.event_log')</a>
           </li>
           @endif
         </ul>
@@ -71,7 +71,7 @@
                             </div>
                             <div class="col-lg-5">
                                 <div class="form-check" id="online-checkbox-group">
-                                    <label class="form-check-label">Online event?
+                                    <label class="form-check-label">@lang('events.online_event_question')
                                         <input id="online" type="checkbox" value="1" name="online" @if ( $formdata->online == 1) checked @endif class="form-check-input" style="position:relative;top:2px">
                                     </label>
                                 </div>

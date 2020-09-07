@@ -6,7 +6,7 @@ return array (
   'field_device_images_2' => 'Choose compelling images that show off your work',
   'useful_repair_urls_helper' => 'Enter URL here',
   'useful_repair_urls_explanation' => 'Useful repair URL',
-  'fixometer' => 'Fixometer',
+  'devices' => 'Repairs',
   'edit_devices' => 'Edit device',
   'edit_devices_details' => 'Edit device details',
   'edit_devices_details_content' => 'Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.',
@@ -66,6 +66,7 @@ return array (
   'event_info' => 'Event info',
   'suitable_help' => 'Show repairs where the comments have been marked as helpful for future repair attempts.',
   'number_of_repairs' => 'Number of items',
+  'fixometer' => 'Fixometer',
   'global_impact' => 'Our Global Impact',
   'group_prevented' => 'prevented :amount kg of waste!',
   'huge_impact' => 'Repairers around the world are having a huge impact!',
@@ -97,5 +98,8 @@ return array (
   'title_powered' => 'POWERED',
   'title_unpowered' => 'UNPOWERED',
   'description_powered' => 'A <b>powered item</b> is anything that has or requires a power source.',
-  'description_unpowered' => 'An <b>unpowered item</b> is anything that doesn\'t have or require a power source.'
+  'description_unpowered' => 'An <b>unpowered item</b> is anything that doesn\'t have or require a power source.',
+  'repair_records' => 'Repair Records',
+  'view_record' => 'View',
+  'close_record' => 'Close',
 );

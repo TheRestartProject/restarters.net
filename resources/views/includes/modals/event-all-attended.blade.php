@@ -6,7 +6,7 @@
 
       <div class="modal-header">
 
-        <h5 id="eventAllVolunteersLabel">All Restarters @if( $event->hasFinished() ) attended @else confirmed @endif</h5>
+        <h5 id="eventAllVolunteersLabel">@if( $event->hasFinished() ) @lang('events.all_restarters_attended_modal_heading') @else @lang('events.all_restarters_confirmed_modal_heading') @endif</h5>
         @include('partials.cross')
 
       </div>

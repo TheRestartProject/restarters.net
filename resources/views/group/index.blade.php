@@ -24,7 +24,7 @@
           <div class="col-12 col-md-12">
               <div class="d-flex align-items-center">
                   <h1 class="mb-0 mr-30">
-                      Groups
+                      @lang('groups.groups')
                   </h1>
 
                   <div class="mr-auto d-none d-md-block">

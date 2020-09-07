@@ -29,7 +29,7 @@ return array (
   'how_to_host_an_event_text' => 'We have years of experience hosting community repair events, and we offer materials on how to organise events them. We also offer peer to peer support on our forum.',
   'view_the_materials' => 'View the materials',
   'our_global_environmental_impact' => 'Our Global Environmental Impact',
-  'the_impact_of_restarters' => 'The impact of Restarters\' fixing around the world.',
+  'the_impact_of_restarters' => 'The impact of repairers\' fixing around the world.',
   'waste_prevented' => 'waste prevented',
   'co2' => 'CO<sub>2</sub> emissions prevented',
   'more_info' => 'More Info',
@@ -54,7 +54,7 @@ return array (
   'restarter_getting_started_text' => 'We offer materials on how to help others fix their electronics at community events: on how to share your repair skills in your community and help organise events.',
   'welcome_title' => 'Getting started in community repair',
   'welcome_text' => 'We offer materials on how to help others fix their electronics at community events: on how to share your repair skills in your community and help organise events',
-  'wiki_title' => 'Restarters Wiki',
+  'wiki_title' => 'Wiki',
   'wiki_text' => 'A changing selection of pages from our repair wiki.  Read and contribute advice for community repair!',
   'remove_volunteer' => 'Remove volunteer',
   'host' => 'Host',
@@ -93,5 +93,9 @@ return array (
   'hot_topics_text' => 'Join in on the latest hot topics on repair at Restarters Talk.',
   'hot_topics_link' => 'All weekly hot topics',
   'quantity' => 'Quantity',
-  'cancel' => 'Cancel'
+  'cancel' => 'Cancel',
+  'choose_barriers' => 'Choose barriers to repair',
+  'choose_spare_parts' => 'Spare parts',
+  'choose_next_steps' => 'Next steps',
+  'add_device_button' => 'Add',
 );

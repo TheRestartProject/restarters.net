@@ -50,7 +50,7 @@ return array (
   'filter-results' => 'Filter results',
   'menu_tools' => 'Community Tools',
   'menu_discourse' => 'Discussion',
-  'menu_wiki' => 'Restarters Wiki',
+  'menu_wiki' => 'Wiki',
   'menu_other' => 'Other Links',
   'menu_help_feedback' => 'Help & Feedback',
   'menu_faq' => 'FAQs',

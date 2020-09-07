@@ -10,10 +10,10 @@ return array (
                                 <li>Documenter et faire tomber les barrières à la réparation</li>
                             </ul>',
   'more' => 'En savoir plus',
-  'stat_1' => 'Appareils<br>réparés',
+  'stat_1' => 'Appareils réparés',
   'stat_2' => 'Émissions de CO<sub>2</sub> évitées',
   'stat_3' => 'Déchets<br>évités',
   'stat_4' => 'Événements<br>réalisés',
-  'lead' => 'Welcome to our Restarter community',
+  'lead' => 'Bienvenue dans la communauté',
   'login_title' => 'Se connecter',
 );

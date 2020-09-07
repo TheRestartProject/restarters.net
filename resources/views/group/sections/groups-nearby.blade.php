@@ -1,5 +1,5 @@
 <section class="table-section" id="groups-near">
-  <h2>@lang('groups.groups_title2') <sup>(<a href="/group/all">See all groups</a>)</sup></h2>
+  <h2>@lang('groups.groups_title2') <sup>(<a href="/group/all">@lang('groups.see_all_groups')</a>)</sup></h2>
   <div class="table-responsive">
     <table role="table" class="table table-striped table-hover table-layout-fixed">
       @include('partials.tables.head-groups')

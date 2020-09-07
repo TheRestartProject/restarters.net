@@ -38,7 +38,7 @@
 
             <div class="row">
                 <div class="col col-md-8">
-                    <h2>Repair Records</h2>
+                    <h2>@lang('devices.repair_records')</h2>
                 </div>
                 <div class="col col-md-4 text-center text-md-right">
                     @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))

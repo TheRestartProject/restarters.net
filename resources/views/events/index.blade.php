@@ -24,7 +24,7 @@
           <div class="col-12 col-md-12">
               <div class="d-flex align-items-center">
                   <h1 class="mb-0 mr-30">
-                      Events
+                      @lang('events.events')
                   </h1>
 
                   <div class="mr-auto d-none d-md-block">
@@ -118,7 +118,7 @@
         <section class="table-section upcoming_events_in_area" id="events-3">
             <header>
                 <h2>@lang('events.other_events_near_you')</h2>
-                <p>No events near you right now?  See if you can join an <a href="{{ route('all-upcoming-events') }}?online=1">online event</a>.</p>
+                <p>@lang('events.no_events_near_you', ['url' => route('all-upcoming-events').'?online=1']).</p>
             </header>
             <div class="table-responsive">
                 <table class="table table-events table-striped" role="table">
@@ -148,10 +148,10 @@
         <section class="table-section" id="events-4">
           <header>
             @if( !is_null($group) )
-              <h2>Past {{{ $group->name }}} events</h2>
+              <h2>@lang('events.past_events_group', ['group' => $group->name])</h2>
             @else
-              <h2 class="mb-1">Past events <sup><a href="{{{ route('all-past-events') }}}">(See all past)</a></sup></h2>
-              <p class="mb-2">These are past events from groups you are a member of, and events that you RSVPed to.</p>
+              <h2 class="mb-1">@lang('events.past_events') <sup><a href="{{{ route('all-past-events') }}}">(@lang('events.see_all_past'))</a></sup></h2>
+              <p class="mb-2">@lang('events.past_events_explainer')</p>
             @endif
           </header>
           <div class="table-responsive">
@@ -164,7 +164,7 @@
                   @endforeach
                 @else
                   <tr>
-                    <td colspan="13" align="center" class="p-3">There are currently no past events for this group</td>
+                    <td colspan="13" align="center" class="p-3">@lang('events.no_past_events_for_group')</td>
                   </tr>
                 @endif
               </tbody>

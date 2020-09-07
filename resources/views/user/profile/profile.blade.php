@@ -18,12 +18,12 @@
 
     <div class="form-row">
         <div class="form-group col-lg-6">
-        <label for="name">Name:</label>
+        <label for="name">@lang('profile.name'):</label>
         <input type="text" class="form-control" id="name" name="name" value="{{ $user->name }}">
         </div>
 
         <div class="form-group col-lg-6">
-            <label for="country">@lang('registration.country'):<sup>*</sup></label>
+            <label for="country">@lang('profile.country'):<sup>*</sup></label>
             <div class="form-control form-control__select">
                 <select id="country" name="country" required aria-required="true" class="field select2">
                     <option value=""></option>
@@ -41,7 +41,7 @@
     </div>
     <div class="form-row">
         <div class="form-group col-lg-6">
-        <label for="email">Email address:</label>
+        <label for="email">@lang('profile.email_address'):</label>
         <input type="text" class="form-control" id="email" name="email" value="{{ $user->email }}">
         </div>
         <div class="form-group col-lg-6">
@@ -74,7 +74,7 @@
     </div>
     <div class="form-row">
         <div class="form-group col-lg-12">
-        <label for="biography">Your biography (optional):</label>
+        <label for="biography">@lang('profile.biography'):</label>
         <textarea class="form-control" id="biography" name="biography" rows="8" cols="80">{{ $user->biography }}</textarea>
         </div>
     </div>
@@ -108,12 +108,12 @@
             <div class="form-control form-control__select">
             <select id="tags" name="tags[]" class="select2-tags" multiple>
                 @foreach( FixometerHelper::skillCategories() as $key => $skill_category )
-                    <optgroup label="{{{ $skill_category }}}">
+                    <optgroup label="@lang($skill_category)">
                     @foreach ($skills[$key] as $skill)
                         @if ( !empty($user_skills) && in_array($skill->id, $user_skills))
-                        <option value="{{ $skill->id }}" selected>{{ $skill->skill_name }}</option>
+                        <option value="{{ $skill->id }}" selected>@lang($skill->skill_name)</option>
                         @else
-                        <option value="{{ $skill->id }}">{{ $skill->skill_name }}</option>
+                        <option value="{{ $skill->id }}">@lang($skill->skill_name)</option>
                         @endif
                     @endforeach
                     </optgroup>
