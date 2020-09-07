@@ -624,6 +624,7 @@ class Party extends Model implements Auditable
 
         $co2Diverted = 0;
         $ewasteDiverted = 0;
+        $unpoweredWasteDiverted = 0;
         $fixed_devices = 0;
         $repairable_devices = 0;
         $dead_devices = 0;
@@ -634,13 +635,18 @@ class Party extends Model implements Auditable
             foreach ($this->allDevices as $device) {
                 if ($device->deviceCategory->powered) {
                     $devices_powered++;
+
+                    if ($device->isFixed()) {
+                        $co2Diverted += $device->co2Diverted($emissionRatio, $Device->displacement);
+                        $ewasteDiverted += $device->ewasteDiverted();
+                    }
                 } else {
                     $devices_unpowered++;
-                }
 
-                if ($device->isFixed()) {
-                    $co2Diverted += $device->co2Diverted($emissionRatio, $Device->displacement);
-                    $ewasteDiverted += $device->ewasteDiverted();
+                    if ($device->isFixed()) {
+                        // CO2 estimates don't include unpowered items.
+                        $unpoweredWasteDiverted += $device->unpoweredWasteDiverted();
+                    }
                 }
 
                 switch ($device->repair_status) {
@@ -662,6 +668,7 @@ class Party extends Model implements Auditable
             return [
                 'co2' => $co2Diverted,
                 'ewaste' => $ewasteDiverted,
+                'unpowered_waste' => $unpoweredWasteDiverted,
                 'fixed_devices' => $fixed_devices,
                 'repairable_devices' => $repairable_devices,
                 'dead_devices' => $dead_devices,
