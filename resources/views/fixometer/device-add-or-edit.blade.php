@@ -153,8 +153,8 @@
                             </select>
                         </div>
 
-                        <div class="form-control form-control__select mb-2 col-device {{ $device->repair_status !== 1 ? '' : 'd-none' }}">
-                            <select class="repair_details select2 repair-details-edit" name="repair_details">
+                        <div class="form-control form-control__select mb-2 col-device {{ $device->repair_status == 2 ? '' : 'd-none' }}">
+                            <select class="repair_details select2 repair-details-edit " name="repair_details">
                                 <option value="0">@lang('partials.repair_details') ?</option>
                                 @if ( $device->more_time_needed == 1 )
                                     <option value="1" selected>@lang('partials.more_time')</option>
@@ -176,7 +176,7 @@
                             </select>
                         </div>
 
-                        <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device">
+                        <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device {{ $device->repair_status != 3 ? '' : 'd-none' }}">
                             <select class="select2 spare-parts" name="spare_parts">
                                 <option @if ( $device->spare_parts == 1 && is_null($device->parts_provider) ) value="4" @else value="0" @endif>@lang('devices.spare_parts_required')</option>
                                 <option value="1" @if ( $device->spare_parts == 1 && !is_null($device->parts_provider) ) selected @endif>@lang('partials.yes_manufacturer')</option>
@@ -185,7 +185,7 @@
                             </select>
                         </div>
 
-                        <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device {{ $device->repair_status !== 1 ? '' : 'd-none' }}">
+                        <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device {{ $device->repair_status == 3 ? '' : 'd-none' }}">
                             <select class="select2 select2-repair-barrier repair-barrier" name="barrier[]" multiple>
                                 <option></option>
                                 @foreach( FixometerHelper::allBarriers() as $barrier )
