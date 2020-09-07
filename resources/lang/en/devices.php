@@ -78,4 +78,6 @@ return array (
   'add_data_description' => 'Adding repair data helps show the impact of repair.',
   'search_text' => 'Browse or search our global database of repair.',
   'add_data_action_button' => 'Go to event',
+  'powered_items' => 'powered items',
+  'unpowered_items' => 'unpowered items',
 );

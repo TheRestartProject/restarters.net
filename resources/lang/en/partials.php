@@ -89,4 +89,7 @@ return array (
   'hot_topics' => 'Hot topics',
   'hot_topics_text' => 'Join in on the latest hot topics on repair at Restarters Talk.',
   'hot_topics_link' => 'All weekly hot topics',
+  'powered_only' => '(calculated from powered items only)',
+  'emissions_equivalent_consume_low' => 'the same amount of emissions as<br /> watching :value hour of TV|the same amount of emissions as<br /> watching :value hours of TV',
+  'emissions_equivalent_consume_high' => 'the same amount of emissions as<br /> driving for :value km|the same amount of emissions as<br /> driving for :value km'
 );

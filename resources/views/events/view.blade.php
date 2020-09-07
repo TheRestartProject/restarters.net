@@ -402,6 +402,9 @@
 
         </div>
 
+        <div class="vue w-100">
+          <EventStats class="ml-2 mr-2" :stats="{{ json_encode($event->getEventStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}" />
+        </div>
         @if( $event->isInProgress() || $event->hasFinished() )
 
         <div class="col-lg-12">

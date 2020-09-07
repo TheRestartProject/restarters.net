@@ -1,3 +1,5 @@
+@import './_variables';
+
 body,
 html {
   background-color: #f5f7fa !important;
@@ -46,4 +48,12 @@ h2 {
     border-bottom: 3px solid $black;
     color: $black;
   }
+}
+
+.text-brand {
+  color: $brand;
+}
+
+.text-brand-light {
+  color: $brand-light;
 }

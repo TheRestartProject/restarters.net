@@ -1706,18 +1706,16 @@ jQuery(document).ready(function () {
   // Normally you'd initialise one instance on a single top-level div.  But we put content directly under body.
   // Initialising multiple instances is a bit more expensive, but not much.
   //
-  // We need to list all the components we will use in here; they are stored in resources/assets/js/components.
-  console.log("Initialise vue")
+  // We need to list all the top-level components we will use in pages here; they are stored in
+  // resources/assets/js/components.
   $(".vue").each(function(index) {
-    console.log("Add Vue to ", $(this))
     new Vue({
       el: $(this).get(0),
       components: {
         'examplecomponent': require('./components/ExampleComponent.vue'),
         'repairstatus': require('./components/RepairStatus.vue'),
+        'eventstats': require('./components/EventStats.vue'),
       }
     })
   })
-
-  console.log("Initialised")
 })
