@@ -117,4 +117,5 @@ return array (
     'upcoming_search_count' => 'There are :count upcoming events in total.',
     //'upcoming_search_match' => 'There are :count upcoming events that match your search.',
     'upcoming_search_match' => '{0}There are no events that match your search.|{1}There is 1 event that matches your search.|[2,*]There are :count events that match your search.',
+    'not_counting' => 'Not counting toward this event\'s evironmental impact is|Not counting toward this event\'s evironmental impact are'
 );

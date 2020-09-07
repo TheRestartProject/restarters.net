@@ -4,6 +4,7 @@ export default {
       // Laravel blade templates allow pluralisation, the simplest case being of the form singular|plural.
       // lang.js doesn't have that, so do the simple case ourselves.
       const p = str.indexOf('|')
+      val = parseInt(val)
 
       if (p !== -1) {
         if (val === 1) {
@@ -32,7 +33,6 @@ export default {
         value: '<span class="text-brand-light font-weight-bold">' + val.toLocaleString() + '</span>'
       })
 
-      console.log("Returning", this.pluralise(ret, val))
       return this.pluralise(ret, val)
     }
   }

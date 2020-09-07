@@ -9,6 +9,7 @@
   </div>
 </template>
 <script>
+// TODO Unpowered stat
 import EventStatsValue from './EventStatsValue'
 export default {
   components: {EventStatsValue},

@@ -627,6 +627,7 @@ class Party extends Model implements Auditable
         $fixed_devices = 0;
         $repairable_devices = 0;
         $dead_devices = 0;
+        $no_weight = 0;
 
         if ( ! empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
@@ -649,6 +650,10 @@ class Party extends Model implements Auditable
 
                         break;
                 }
+
+                if (!$device->deviceCategory->weight) {
+                    $no_weight++;
+                }
             }
 
             return [
@@ -657,6 +662,7 @@ class Party extends Model implements Auditable
                 'fixed_devices' => $fixed_devices,
                 'repairable_devices' => $repairable_devices,
                 'dead_devices' => $dead_devices,
+                'no_weight' => $no_weight,
                 'participants' => $this->pax,
                 'volunteers' => $this->volunteers,
             ];
