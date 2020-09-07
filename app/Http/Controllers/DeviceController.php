@@ -746,6 +746,7 @@ class DeviceController extends Controller
         $category = $request->input('category');
         $weight = $request->input('weight');
         $brand = $request->input('brand');
+        $item_type = $request->input('item_type');
         $model = $request->input('model');
         $age = $request->input('age');
         $problem = $request->input('problem');
@@ -767,52 +768,6 @@ class DeviceController extends Controller
         $event = Party::find($event_id);
 
         if (FixometerHelper::userHasEditEventsDevicesPermission($event_id)) {
-            // if ($repair_status == 2) {
-            //   switch ($repair_details) {
-            //     case 1:
-            //         Device::find($id)->update([
-            //           'category' => $category,
-            //           'category_creation' => $category,
-            //           'brand' => $brand,
-            //           'model' => $model,
-            //           'age' => $age,
-            //           'problem' => $problem,
-            //           'spare_parts' => $spare_parts,
-            //           'repair_status' => $repair_status,
-            //           'more_time_needed' => 1,
-            //           'wiki' => $wiki,
-            //         ]);
-            //         break;
-            //     case 2:
-            //         Device::find($id)->update([
-            //           'category' => $category,
-            //           'category_creation' => $category,
-            //           'brand' => $brand,
-            //           'model' => $model,
-            //           'age' => $age,
-            //           'problem' => $problem,
-            //           'spare_parts' => $spare_parts,
-            //           'repair_status' => $repair_status,
-            //           'professional_help' => 1,
-            //           'wiki' => $wiki,
-            //         ]);
-            //         break;
-            //     case 3:
-            //         Device::find($id)->update([
-            //           'category' => $category,
-            //           'category_creation' => $category,
-            //           'brand' => $brand,
-            //           'model' => $model,
-            //           'age' => $age,
-            //           'problem' => $problem,
-            //           'spare_parts' => $spare_parts,
-            //           'repair_status' => $repair_status,
-            //           'do_it_yourself' => 1,
-            //           'wiki' => $wiki,
-            //         ]);
-            //         break;
-            //   }
-
             if ($repair_details == 1) {
                 $more_time_needed = 1;
             } else {
@@ -885,6 +840,7 @@ class DeviceController extends Controller
                 'category_creation' => $category,
                 'estimate' => $weight,
                 'brand' => $brand,
+                'item_type' => $item_type,
                 'model' => $model,
                 'age' => $age,
                 'problem' => $problem,

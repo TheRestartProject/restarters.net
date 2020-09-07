@@ -4,9 +4,11 @@
         <tr>
             <th width="60"></th>
             <th class="d-none d-md-table-cell">Category</th>
-            <th class="d-none d-md-table-cell">@lang('devices.brand')</th>
             @if ($powered)
+            <th class="d-none d-md-table-cell">@lang('devices.brand')</th>
             <th class="d-none d-md-table-cell">Model</th>
+            @else
+            <th class="d-none d-md-table-cell">@lang('devices.model_or_type')</th>
             @endif
             <th class="d-none d-md-table-cell">Age</th>
             <th><span class="d-none d-sm-inline">Description of problem/solution</span></th>
