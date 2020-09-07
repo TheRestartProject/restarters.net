@@ -187,7 +187,7 @@
                             <select class="select2 select2-repair-barrier repair-barrier" name="barrier[]" multiple>
                                 <option></option>
                                 @foreach( FixometerHelper::allBarriers() as $barrier )
-                                    <option value="{{{ $barrier->id }}}" @if ( $device->barriers->contains($barrier->id) ) selected @endif>{{{ $barrier->barrier }}}</option>
+                                    <option value="{{{ $barrier->id }}}" @if ( $device->barriers->contains($barrier->id) ) selected @endif>@lang($barrier->barrier)</option>
                                 @endforeach
                             </select>
                         </div>
