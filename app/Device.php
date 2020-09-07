@@ -529,6 +529,21 @@ AND devices.event = events.idevents ';
         return $ewasteDiverted;
     }
 
+    public function unpoweredWasteDiverted()
+    {
+        $wasteDiverted = 0;
+
+        if ($this->isFixed()) {
+            if (is_numeric($this->estimate)) {
+                $wasteDiverted = $this->estimate;
+            } else {
+                $wasteDiverted = (float) $this->deviceCategory->weight;
+            }
+        }
+
+        return $wasteDiverted;
+    }
+
     public function isFixed()
     {
         return $this->repair_status == env('DEVICE_FIXED');
