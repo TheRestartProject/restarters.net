@@ -1,14 +1,14 @@
 <template>
   <div>
     <h2 class="mt-2 mb-2">Environmental Impact</h2>
-    <div class="d-flex justify-content-between flex-wrap">
-      <div class="d-flex justify-content-between flex-column">
-        <EventStatsValue :count="stats.ewaste" icon="trash" size="md" title="partials.waste_prevented" unit="kg" />
-        <div class="not_counting p-1">
+    <div class="impact-container">
+      <EventStatsValue :count="stats.ewaste" icon="trash" size="md" title="partials.waste_prevented" unit="kg" class="impact-waste" />
+      <div class="impact-notincluded">
+        <div class="impact-notincluded-content p-1">
           {{ notincluded }}
         </div>
       </div>
-      <EventStatsValue :count="stats.co2" icon="cloud_empty" size="lg" title="partials.co2" subtitle="partials.powered_only" :description="equivalent_consumer(stats.co2)" unit="kg" />
+      <EventStatsValue :count="stats.co2" icon="cloud_empty" size="lg" title="partials.co2" subtitle="partials.powered_only" :description="equivalent_consumer(stats.co2)" unit="kg" class="impact-co2" />
     </div>
   </div>
 </template>
@@ -69,11 +69,67 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
-.not_counting {
+.impact-container {
+  display: grid;
+  grid-template-columns: 1fr;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+.impact-waste {
+  grid-row-start: 1;
+  grid-row-end: 2;
+  grid-column-start: 1;
+  grid-column-end: 2;
+  margin-bottom: 20px;
+
+  @include media-breakpoint-up(md) {
+    margin-bottom: 0px;
+  }
+}
+
+.impact-notincluded {
+  display: grid;
+  grid-row-start: 3;
+  grid-row-end: 4;
+  grid-column-start: 1;
+  grid-column-end: 2;
+
+  @include media-breakpoint-up(md) {
+    grid-row-start: 2;
+    grid-row-end: 2;
+    align-content: end;
+  }
+}
+
+.impact-co2 {
+  grid-row-start: 2;
+  grid-row-end: 3;
+  grid-column-start: 1;
+  grid-column-end: 2;
+  margin-bottom: 20px;
+
+  @include media-breakpoint-up(md) {
+    grid-row-start: 1;
+    grid-row-end: 3;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    margin-bottom: 0px;
+    margin-left: 20px;
+  }
+}
+
+
+.impact-notincluded-content {
   color: $brand-light;
   font-size: 11px;
   border: 1px solid $brand-light;
-  width: 152px;
 }
+
 </style>

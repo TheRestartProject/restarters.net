@@ -22,13 +22,27 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 .stats {
   display: grid;
-  grid-template-columns: auto 40px auto;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 0px auto;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr 20px 1fr;
+    grid-template-rows: 1fr;
+  }
 }
 
 .statsborder {
-  border-top: 1px solid $black;
+  border-top: none;
+  margin-top: 20px;
+
+  @include media-breakpoint-up(md) {
+    border-top: 1px solid $black;
+  }
 }
 </style>

@@ -79,31 +79,49 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 .event-stat {
   border: 1px solid black;
   text-align: center !important;
   box-shadow: $black $shadow $shadow 0px 0px;
-  margin-right: 30px;
   background-color: $white;
+  display: grid;
+  align-items: center;
+  padding: 5px;
 
-  &-sm {
-    width: 90px;
-    height: 152px;
-  }
+  margin-top: 1rem !important;
 
-  &-md {
-    width: 152px;
-    height: 152px;
-  }
-
-  &-lg {
-    width: 385px;
+  @include media-breakpoint-up(md) {
+    margin-top: 0px;
   }
 
   &-primary {
+    // Primary becomes horizontal and left-aligned at small breakpoints
     background-color: $brand-light;
     color: white;
+
+    display: flex;
+    justify-content: left;
+
+    .event-stat-count {
+      margin-left: 1rem;
+    }
+
+    .event-stat-icon {
+      margin-top: 0.5rem !important;
+    }
+
+    @include media-breakpoint-up(md) {
+      display: grid;
+      justify-content: center;
+
+      .event-stat-count {
+        margin-left: 0px;
+      }
+    }
   }
 }
 
