@@ -900,10 +900,12 @@ function initAutocomplete() {
       console.log("Category change", $(this), $value, $field)
       if( $value === 46 || $value === '' ){
         $field.prop('disabled', false);
+        $field.parents('.display-weight').removeClass('d-none');
       } else {
         $field.val('');
         $field.trigger('change');
         $field.prop('disabled', true);
+        $field.parents('.display-weight').addClass('d-none');
       }
     });
 

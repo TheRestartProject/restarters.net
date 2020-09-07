@@ -94,15 +94,13 @@
                             </div>
                         @endif
 
-                        <div class="device-field-row align-items-center mb-2">
+                        <div class="device-field-row align-items-center mb-2 display-weight weight {{ (!$powered || $device->category == 46) ? '' : 'd-none' }}">
                             <label class="text-white text-bold">
                                 @lang('devices.weight')*
                             </label>
-                            <div class="display-weight">
-                                <div class="input-group">
-                                    {{-- Powered devices don't allow editing of the weight except for the "None of the above" category, whereas unpowered do. --}}
-                                    <input {{ $powered ? 'disabled' : '' }} type="number" class="{{ $powered ? 'weight' : '' }} form-control form-control-lg field numeric" name="weight" min="0.01" step=".01" autocomplete="off" value="{{ $device->estimate }}">
-                                </div>
+                            <div class="input-group">
+                                {{-- Powered devices don't allow editing of the weight except for the "None of the above" category, whereas unpowered do. --}}
+                                <input {{ $powered ? 'disabled' : '' }} type="number" class="{{ $powered ? 'weight' : '' }} form-control form-control-lg field numeric" name="weight" min="0.01" step=".01" autocomplete="off" value="{{ $device->estimate }}">
                             </div>
                             <span class="text-white text-right mb-1">
                             @lang('devices.required_impact')
