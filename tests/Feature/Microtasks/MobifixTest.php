@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
 use App\Device;
 use App\Category;
@@ -31,7 +31,6 @@ class MobifixTest extends TestCase {
 
         for ($i = 0; $i < 101; $i++) {
             $result = $Mobifix->fetchFault();
-//            logger(print_r($result,1));
             $this->assertTrue(is_array($result), 'fetch_mobifix_record: result is not array');
             $this->assertEquals(count($result), 1, 'fetch_mobifix_record: wrong result count');
             $this->assertGreaterThan(0, $result[0]->iddevices, 'fetch_mobifix_record: iddevices is 0 or null');
@@ -47,7 +46,6 @@ class MobifixTest extends TestCase {
 
         $Mobifix = new Mobifix;
         $result = $Mobifix->fetchStatus();
-//        logger(print_r($result, 1));
         $this->assertTrue(is_array($result));
         foreach ($data['status'] as $k => $v) {
             $this->assertTrue(array_key_exists($k, $result), 'fetch_mobifix_status: missing key - ' . $k);
@@ -144,10 +142,7 @@ class MobifixTest extends TestCase {
             // record already has a fault_type which must not change
             $devs_ex[$i++] = $this->_insert_mobifix_device($cat, $id, Str::random(40), 'foo');
         }
-
-        logger(print_r($devs_in, 1));
         $devs = array_keys($devs_in);
-        logger(print_r($devs, 1));
         // iddevices = 1 : 3 opinions with consensus : recat
         factory(Mobifix::class, 3)->create(
                 [
@@ -258,7 +253,6 @@ class MobifixTest extends TestCase {
                 ],
             ],
         ];
-        logger(print_r($status, 1));
         return [
             'categories_include' => $cats_in,
             'categories_exclude' => $cats_ex,

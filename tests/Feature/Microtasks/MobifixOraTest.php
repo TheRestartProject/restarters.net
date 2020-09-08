@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
 use App\MobifixOra;
 use DB;
@@ -60,6 +60,7 @@ class MobifixOraTest extends TestCase {
 
         $data = $this->_setup_devices();
         $this->withSession([]);
+        $this->_bypass_cta();
         for ($i = 1; $i <= count($data); $i++) {
             // Illuminate\Foundation\Testing\TestResponse
             $response = $this->get('/mobifixora');
@@ -90,8 +91,8 @@ class MobifixOraTest extends TestCase {
             } else {
                 $this->assertTrue(is_array($result[$k]), 'fetch_mobifixora_status: not array - ' . $k);
                 foreach ($v[0] as $key => $val) {
-                    $this->assertTrue(array_key_exists($key, $result[$k][0]), 'fetch_mobifixora_status: missing key - ' . $key);
-                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_mobifixora_status: wrong ' . $key);
+                    $this->assertTrue(array_key_exists($key, $result[$k][0]), 'fetch_mobifixora_status #' . $k . ': missing key - ' . $key);
+                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_mobifixora_status #' . $k . ': wrong ' . $key);
                 }
             }
         }
@@ -263,17 +264,17 @@ class MobifixOraTest extends TestCase {
         // $data[1] : 3 opinions with majority : recat
         $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 2);
         $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 2);
-        $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 18);
+        $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 25);
 
         // $data[2] : 3 opinions split
         $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 2);
-        $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 18);
-        $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 19);
+        $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 25);
+        $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 26);
 
         // $data[3] : 3 opinions adjudicated : recat
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 2);
-        $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 18);
-        $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 19);
+        $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 25);
+        $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 26);
         DB::update("INSERT INTO devices_faults_mobiles_ora_adjudicated SET id_ords = '" . $data[3]['id'] . "', fault_type_id=2");
 
         // $devs[4] : 2 opinions with majority : recat
@@ -282,10 +283,10 @@ class MobifixOraTest extends TestCase {
 
         // $devs[5] : 2 opinions split
         $opinions[$data[5]['id']][] = $this->_insert_opinion($data[5]['id'], 2);
-        $opinions[$data[5]['id']][] = $this->_insert_opinion($data[5]['id'], 18);
+        $opinions[$data[5]['id']][] = $this->_insert_opinion($data[5]['id'], 25);
 
         // $devs[6] : 1 opinion
-        $opinions[$data[6]['id']][] = $this->_insert_opinion($data[6]['id'], 19);
+        $opinions[$data[6]['id']][] = $this->_insert_opinion($data[6]['id'], 26);
 
         $status = [
             'total_devices' => 8,
@@ -325,6 +326,12 @@ class MobifixOraTest extends TestCase {
             'id_ords' => $id_ords,
         ]);
         return $insert;
+    }
+
+    protected function _bypass_cta() {
+        $this->app['session']->put('microtask.cta', 1);
+        $this->app['session']->put('microtask.clicks', 5);
+        $this->app['session']->put('microtask.sesh', \Carbon\Carbon::now()->timestamp);
     }
 
 }
