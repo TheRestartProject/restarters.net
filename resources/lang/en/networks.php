@@ -25,6 +25,7 @@ return array (
     'all_networks' => 'All networks',
     'all_networks_explainer' => 'All networks in the system (admin-only).',
     'all_networks_no_networks' => 'There are no networks in the system.',
+    'description' => 'Description',
   ),
   'show' => 
   array (
