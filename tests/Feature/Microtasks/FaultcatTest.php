@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
 use App\Device;
 use App\Category;
@@ -46,7 +46,6 @@ class FaultcatTest extends TestCase {
 
         $Faultcat = new Faultcat;
         $result = $Faultcat->fetchStatus();
-//        logger(print_r($result, 1));
         $this->assertTrue(is_array($result));
         foreach ($data['status'] as $k => $v) {
             $this->assertTrue(array_key_exists($k, $result), 'fetch_faultcat_status: missing key - ' . $k);
@@ -155,10 +154,7 @@ class FaultcatTest extends TestCase {
             // record already has a fault_type which must not change
             $devs_ex[$i++] = $this->_insert_faultcat_device($cat, $id, Str::random(40), 'foo');
         }
-
-//        logger(print_r($devs_in, 1));
         $devs = array_keys($devs_in);
-//        logger(print_r($devs, 1));
         // iddevices = 1 : 5 opinions with consensus
         factory(Faultcat::class, 5)->create(
                 [
@@ -305,7 +301,6 @@ class FaultcatTest extends TestCase {
                 ],
             ],
         ];
-//        logger(print_r($status, 1));
         return [
             'categories_include' => $cats_in,
             'categories_exclude' => $cats_ex,

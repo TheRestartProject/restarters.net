@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
 use App\Device;
 use App\Category;
@@ -105,13 +105,13 @@ class MisccatTest extends TestCase {
 
         $this->assertEquals($result['status'][7]->code, 5, 'fetch_misccat_status: wrong code');
         $this->assertEquals($result['status'][7]->total, 2, 'fetch_misccat_status: wrong total');
-        
+
 //        Log::info($result['list_recats']);
         $this->assertEquals(count($result['list_recats']), 3, 'fetch_misccat_status: wrong count for list_recats');
 
         $this->assertEquals($result['list_recats'][0]->items, 1, 'fetch_misccat_status: wrong total for list_recats[0]');
         $this->assertEquals($result['list_recats'][0]->top_opinion, 'Cat1', 'fetch_misccat_status: wrong top_opinion for list_recats[0]');
-        
+
         $this->assertEquals($result['list_recats'][1]->items, 1, 'fetch_misccat_status: wrong total for list_recats[1]');
         $this->assertEquals($result['list_recats'][1]->top_opinion, 'Cat2', 'fetch_misccat_status: wrong top_opinion for list_recats[1]');
 
@@ -211,7 +211,7 @@ class MisccatTest extends TestCase {
             'devices_misc_adjudicated' => [],
         ];
 
-//WHEN 0 THEN 'Is Misc and has no opinions'        
+//WHEN 0 THEN 'Is Misc and has no opinions'
 // 1 device record = "Misc", 0 misccat records
         $result['0'] = [
             'devices' => [
