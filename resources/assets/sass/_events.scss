@@ -345,7 +345,10 @@
         border-top: 5px solid #0394a6;
         border-left: none;
         border-right: none;
-        border-bottom: none;
+
+        @include media-breakpoint-up(md) {
+            border-bottom: none;
+        }
     }
 
     .nav-item {
