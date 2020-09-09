@@ -358,14 +358,17 @@
                                         @php( $user = Auth::user() )
                                         @php( $is_admin = FixometerHelper::hasRole($user, 'Administrator') )
                                         @foreach($items as $device)
-                                        @if ( $is_admin || $device->repaired_by == $user->id )
-                                        @include('fixometer.device-row-with-edit', [
-                                            'powered' => $device->deviceCategory->powered
-                                        ])
-                                        @else
-                                        @include('fixometer.device-row-collapse', [
-                                            'powered' => $device->deviceCategory->powered
-                                        ])
+                                        @if ($device->deviceCategory->powered)
+                                            {{-- TODO unpowered devices not yet shown on this page--}}
+                                            @if ( $is_admin || $device->repaired_by == $user->id )
+                                            @include('fixometer.device-row-with-edit', [
+                                                'powered' => $device->deviceCategory->powered
+                                            ])
+                                            @else
+                                            @include('fixometer.device-row-collapse', [
+                                                'powered' => $device->deviceCategory->powered
+                                            ])
+                                            @endif
                                         @endif
                                         @endforeach
                                     </tbody>
