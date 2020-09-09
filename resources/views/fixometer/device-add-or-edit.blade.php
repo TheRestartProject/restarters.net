@@ -220,7 +220,7 @@
                         @include('partials.useful-repair-urls-add-or-edit', ['urls' => $device->urls, 'device' => $device, 'editable' => $add || $edit])
 
                         <div class="form-check d-flex align-items-center justify-content-start">
-                            <input class="form-check-input form-check-large" type="checkbox" name="wiki" value="1" @if( $device->wiki == 1 ) checked @endif>
+                            <input class="form-check-input form-check-large" type="checkbox" id="wiki-{{ $device->iddevices }}" name="wiki" value="1" @if( $device->wiki == 1 ) checked @endif>
                             <label class="form-check-label" for="wiki-{{ $device->iddevices }}">@lang('partials.solution_text2')</label>
                         </div>
                     </div>
