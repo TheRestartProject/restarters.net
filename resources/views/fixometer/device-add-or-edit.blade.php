@@ -8,8 +8,8 @@
                     <div class="mt-4">
                         <div class="mb-2 device-select-row">
                             <div class="form-control form-control__select form-control-lg d-inline">
-                                <select name="category" class="category select2">
-                                    <option value="">@lang('devices.category')</option>
+                                <select name="category" class="category select2" data-placeholder="@lang('devices.category')">
+                                    <option></option>
                                     @foreach( $clusters as $cluster )
                                         @php
                                         $empty = true;
@@ -52,13 +52,8 @@
                         @if ($powered)
                         <div class="mb-2 device-select-row">
                             <div class="form-control form-control__select">
-                                <select name="brand" class="select2-with-input">
-                                    @php($i = 1)
-                                    @if( empty($device->brand) )
-                                        <option value="" selected>@lang('devices.brand')</option>
-                                    @else
-                                        <option value="">@lang('devices.brand')</option>
-                                    @endif
+                                <select name="brand" class="select2-with-input" data-placeholder="@lang('devices.brand')">
+                                    <option></option>
                                     @foreach($brands as $brand)
                                         @if ($device->brand == $brand->brand_name)
                                             <option value="{{ $brand->brand_name }}" selected>{{ $brand->brand_name }}</option>
@@ -129,8 +124,8 @@
                     <h3>@lang('devices.title_repair')</h3>
                     <div class="mt-4 d-flex flex-column">
                         <div class="form-control form-control__select mb-2 col-device">
-                            <select class="select2 repair-status" name="repair_status" data-device="{{ $device->iddevices }}" placeholder="@lang('devices.description_of_problem')">
-                                <option value="0">@lang('devices.repair_outcome')</option>
+                            <select class="select2 repair-status" name="repair_status" data-device="{{ $device->iddevices }}" placeholder="@lang('devices.description_of_problem')" data-placeholder="@lang('devices.repair_outcome')">
+                                <option></option>
                                 @if ( $device->repair_status == 1 )
                                     <option value="1" selected>@lang('partials.fixed')</option>
                                     <option value="2">@lang('partials.repairable')</option>
@@ -152,8 +147,8 @@
                         </div>
 
                         <div class="form-control form-control__select mb-2 col-device {{ $device->repair_status == 2 ? '' : 'd-none' }}">
-                            <select class="repair_details select2 repair-details-edit " name="repair_details">
-                                <option value="0">@lang('partials.repair_details') ?</option>
+                            <select class="repair_details select2 repair-details-edit " name="repair_details" data-placeholder="@lang('devices.repair_details')">
+                                <option></option>
                                 @if ( $device->more_time_needed == 1 )
                                     <option value="1" selected>@lang('partials.more_time')</option>
                                     <option value="2">@lang('partials.professional_help')</option>
@@ -175,8 +170,8 @@
                         </div>
 
                         <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device {{ $device->repair_status != 3 ? '' : 'd-none' }}">
-                            <select class="select2 spare-parts" name="spare_parts">
-                                <option @if ( $device->spare_parts == 1 && is_null($device->parts_provider) ) value="4" @else value="0" @endif>@lang('devices.spare_parts_required')</option>
+                            <select class="select2 spare-parts" name="spare_parts" data-placeholder="@lang('devices.spare_parts_required')">
+                                <option></option>
                                 <option value="1" @if ( $device->spare_parts == 1 && !is_null($device->parts_provider) ) selected @endif>@lang('partials.yes_manufacturer')</option>
                                 <option value="3" @if ( $device->parts_provider == 2 ) selected @endif>@lang('partials.yes_third_party')</option>
                                 <option value="2" @if ( $device->spare_parts == 2 ) selected @endif>@lang('partials.no')</option>
@@ -185,7 +180,6 @@
 
                         <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device {{ $device->repair_status == 3 ? '' : 'd-none' }}">
                             <select class="select2 select2-repair-barrier repair-barrier" name="barrier[]" multiple>
-                                <option></option>
                                 @foreach( FixometerHelper::allBarriers() as $barrier )
                                     <option value="{{{ $barrier->id }}}" @if ( $device->barriers->contains($barrier->id) ) selected @endif>@lang($barrier->barrier)</option>
                                 @endforeach

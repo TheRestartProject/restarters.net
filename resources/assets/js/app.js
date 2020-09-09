@@ -762,6 +762,12 @@ function initAutocomplete() {
     		allowClear: true,
       });
 
+      jQuery('.select2[data-placeholder]').each(function() {
+        $(this).select2({
+          placeholder: $(this).data('placeholder')
+        })
+      })
+
     } else {
 
       $target.find('.select2').select2();
@@ -774,6 +780,12 @@ function initAutocomplete() {
     		allowClear: true,
       });
 
+
+      $target.find('.select2[data-placeholder]').each(function() {
+        $(this).select2({
+          placeholder: $(this).data('placeholder')
+        })
+      })
     }
 
 
