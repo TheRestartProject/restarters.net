@@ -18,7 +18,6 @@ export default {
     }
   }
 }
-// TODO Info button
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';

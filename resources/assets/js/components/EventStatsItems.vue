@@ -1,17 +1,16 @@
 <template>
   <div>
-    <h2 class="mt-2 mb-2">Items fixed</h2>
+    <h2 class="mt-2 mb-2">{{ translatedItems }}</h2>
     <div class="items-container">
       <EventStatsValue :count="stats.fixed_devices" icon="fixed" size="sm" variant="primary" class="event-stat-fixed" />
       <div />
-      <EventStatsValue :count="stats.fixed_devices" icon="powered" size="md" title="devices.powered_items" class="event-stat-powered" />
+      <EventStatsValue :count="stats.devices_powered" icon="powered" size="md" title="devices.powered_items" class="event-stat-powered" />
       <div />
-      <EventStatsValue :count="stats.fixed_devices" icon="unpowered" size="md" title="devices.unpowered_items" class="event-stat-unpowered" />
+      <EventStatsValue :count="stats.devices_unpowered" icon="unpowered" size="md" title="devices.unpowered_items" class="event-stat-unpowered" />
     </div>
   </div>
 </template>
 <script>
-// TODO Unpowered stat
 import EventStatsValue from './EventStatsValue'
 
 export default {
@@ -20,6 +19,11 @@ export default {
     stats: {
       required: true,
       type: Object
+    }
+  },
+  computed: {
+    translatedItems() {
+      return this.$lang.get('events.items_fixed')
     }
   }
 }

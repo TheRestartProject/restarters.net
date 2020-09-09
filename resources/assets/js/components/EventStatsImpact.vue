@@ -1,8 +1,13 @@
 <template>
   <div>
-    <h2 class="mt-2 mb-2">Environmental Impact</h2>
+    <h2 class="mt-2 mb-2">
+      {{ translatedImpact }}
+      <span v-b-popover.html :title="translatedImpactCalculation">
+        <img class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg">
+      </span>
+    </h2>
     <div class="impact-container">
-      <EventStatsValue :count="stats.ewaste" icon="trash" size="md" title="partials.waste_prevented" unit="kg" class="impact-waste" />
+      <EventStatsValue :count="stats.ewaste + stats.unpowered_waste" icon="trash" size="md" title="partials.waste_prevented" unit="kg" class="impact-waste" />
       <div class="impact-notincluded">
         <div class="impact-notincluded-content p-1">
           {{ notincluded }}
@@ -27,10 +32,14 @@ export default {
     }
   },
   computed: {
+    translatedImpact() {
+      return this.$lang.get('events.environmental_impact')
+    },
+    translatedImpactCalculation() {
+      return this.$lang.get('events.impact_calculation')
+    },
     notincluded() {
-      // We need to construct a
       let ret = []
-      // TODO Unpowered
 
       if (this.stats.dead_devices) {
         ret.push(this.pluralise(this.$lang.get('partials.to_be_recycled', {
@@ -64,8 +73,6 @@ export default {
     }
   }
 }
-// TODO ewaste needs to cover unpowered too
-// TODO Info button
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
