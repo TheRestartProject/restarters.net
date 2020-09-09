@@ -16428,9 +16428,10 @@ table.sortable > thead th div.mozilla {
 }
 
 .alert-success {
+  color: #222;
+  border-radius: 0px;
   background-color: #fff4e4;
   border: 3px dashed #222;
-  border-radius: 15px;
   padding: 20px 45px 20px 35px;
   font-size: 16px;
   overflow: hidden;
