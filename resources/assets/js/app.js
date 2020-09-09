@@ -1390,6 +1390,9 @@ function initAutocomplete() {
             // Collapse the Add back again.  That also acts as feedback that we've done something.
             $('.add-edit-device-collapse').removeClass('show')
 
+            // Reset form.  Need to kick select2.
+            $form.get(0).reset()
+            $form.find('select').change()
             deviceFormEnableDisable($form, false)
           } else if( json ) {
 
