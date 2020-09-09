@@ -409,14 +409,14 @@
         <h2 id="devices" class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#devices-section" role="button" aria-expanded="false" aria-controls="devices-section">Devices <span class="badge badge-pill badge-primary">{{ $stats['devices_powered'] + $stats['devices_unpowered'] }}</span></a></h2>
 
         <div id="devices-section" class="collapse d-lg-block collapse-section">
-          <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item">
-              <a class="nav-link active" id="items-powered-tab" data-toggle="tab" href="#items-powered" role="tab" aria-controls="items-powered" aria-selected="true">@lang('devices.title_powered') <span id="devices-powered" class="badge badge-pill badge-secondary">{{ $stats['devices_powered'] }} </span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" id="items-unpowered-tab" data-toggle="tab" href="#items-unpowered" role="tab" aria-controls="items-unpowered">@lang('devices.title_unpowered') <span id="devices-unpowered" class="badge badge-pill badge-secondary">{{ $stats['devices_unpowered'] }}</span></a>
-            </li>
-          </ul>
+          <div class="nav nav-tabs d-flex" id="myTab" role="tablist">
+            <div class="nav-item flex-grow-1 active">
+              <a class="nav-link active" id="items-powered-tab" data-toggle="tab" href="#items-powered" role="tab" aria-controls="items-powered" aria-selected="true"><b>@lang('devices.title_powered')</b> <span id="devices-powered">({{ $stats['devices_powered'] }})</span></a>
+            </div>
+            <div class="nav-item flex-grow-1">
+              <a class="nav-link" id="items-unpowered-tab" data-toggle="tab" href="#items-unpowered" role="tab" aria-controls="items-unpowered"><b>@lang('devices.title_unpowered')</b> <span id="devices-unpowered">({{ $stats['devices_unpowered'] }})</span></a>
+            </div>
+          </div>
           <div class="tab-content" id="itemsTabContent">
             <div class="tab-pane fade show active" id="items-powered" role="tabpanel" aria-labelledby="items-powered-tab">
               <p class="mt-3">@lang('devices.description_powered')</p>
