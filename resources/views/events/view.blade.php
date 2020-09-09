@@ -426,7 +426,7 @@
               ])
               @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) )
                 <a class="collapsed row-button" id="open-add-powered" data-toggle="collapse" href="#add-edit-device-powered-" role="button" aria-expanded="false" aria-controls="add-edit-device-powered-">
-                  <button class="btn btn-primary text-center mb-4 align-bottom" type="button"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> @lang('partials.add_device_powered')</button>
+                  <button class="btn btn-primary text-center mb-4 ml-4 align-bottom" type="button"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> @lang('partials.add_device_powered')</button>
                 </a>
                 @include('fixometer.device-add-or-edit', [
                     'device' => new \App\Device(),
@@ -443,7 +443,7 @@
               ])
               @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) )
                 <a class="collapsed row-button" id="open-add-unpowered" data-toggle="collapse" href="#add-edit-device-unpowered-" role="button" aria-expanded="false" aria-controls="add-edit-device-unpowered-">
-                  <button class="btn btn-primary text-center mb-4 align-bottom" type="button"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> @lang('partials.add_device_unpowered')</button>
+                  <button class="btn btn-primary text-center mb-4 ml-4 align-bottom" type="button"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> @lang('partials.add_device_unpowered')</button>
                 </a>
                 @include('fixometer.device-add-or-edit', [
                     'device' => new \App\Device(),
