@@ -18,12 +18,11 @@
   </div>
 </template>
 <script>
-import EventStatsItem from './EventStatsItem'
 import EventStatsValue from './EventStatsValue'
 import co2equivalent from '../mixins/co2equivalent'
 
 export default {
-  components: {EventStatsValue, EventStatsItem},
+  components: {EventStatsValue},
   mixins: [ co2equivalent ],
   props: {
     stats: {
