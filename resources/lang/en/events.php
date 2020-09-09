@@ -170,5 +170,6 @@ return array (
   'editing' => 'Editing :event',
   'event_log' => 'Event log',
   'add_new_event' => 'Add new event',
-  'created_success_message' => 'Event created!  It will be approved by a coordinator shortly.  You can continue to edit it in the meantime.'
+  'created_success_message' => 'Event created!  It will be approved by a coordinator shortly.  You can continue to edit it in the meantime.',
+  'not_counting' => 'Not counting toward this event\'s evironmental impact is|Not counting toward this event\'s evironmental impact are'
 );
