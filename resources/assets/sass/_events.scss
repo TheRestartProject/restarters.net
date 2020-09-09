@@ -354,4 +354,8 @@
     .nav-item {
         margin: 0px;
     }
+
+    .active-row td {
+        background-color: $warning;
+    }
 }

@@ -2,16 +2,6 @@
 $editable = ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) ) || ( is_object($is_attending) && $is_attending->status == 1 )
 @endphp
 <tr id="summary-{{ $device->iddevices }}">
-    <td>
-        <a class="collapsed row-button" data-toggle="collapse" href="#add-edit-device-{{ $device->deviceCategory->powered  ? 'powered' : 'unpowered' }}-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="row-1">
-            @if ($editable)
-                Edit
-            @else
-                View
-            @endif
-            <span class="arrow">▴</span>
-        </a>
-    </td>
     <td class="d-none d-md-table-cell"><div class="category">{{ $device->deviceCategory->name }}</div></td>
     @if ($powered)
     <td class="d-none d-md-table-cell"><div class="brand">{{ $device->brand }}</div></td>
@@ -43,8 +33,17 @@ $editable = ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Adminis
     <td>
       <svg @if ( $device->spare_parts == 0 || $device->spare_parts == 2 ) style="display: none;" @endif class="table-tick" width="21" height="17" viewBox="0 0 16 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;position:relative;z-index:1"><g><path d="M5.866,12.648l2.932,-2.933l-5.865,-5.866l-2.933,2.933l5.866,5.866Z" style="fill:#0394a6;"/><path d="M15.581,2.933l-2.933,-2.933l-9.715,9.715l2.933,2.933l9.715,-9.715Z" style="fill:#0394a6;"/></g></svg>
     </td>
+    <td>
+        <a class="collapsed row-button" data-toggle="collapse" href="#add-edit-device-{{ $device->deviceCategory->powered  ? 'powered' : 'unpowered' }}-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="row-1">
+            @if ($editable)
+                <img class="icon" src="/icons/edit_ico_green.svg" />
+            @else
+                <img class="icon" src="/images/add-icon.svg" />
+            @endif
+        </a>
+    </td>
     @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) )
-    <td class="d-none d-md-table-cell"><a data-device-id="{{{ $device->iddevices }}}" class="row-button delete-device" href="{{ url('/device/delete/'.$device->iddevices) }}"><img class="icon-delete" src="/images/delete_ico_red.svg" /></a></td>
+    <td class="d-none d-md-table-cell"><a data-device-id="{{{ $device->iddevices }}}" class="row-button delete-device" href="{{ url('/device/delete/'.$device->iddevices) }}"><img class="icon" src="/images/delete_ico_red.svg" /></a></td>
     @endif
 </tr>
 <tr class="table-row-details">

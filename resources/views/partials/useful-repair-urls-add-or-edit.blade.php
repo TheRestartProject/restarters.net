@@ -38,7 +38,7 @@
                 <div class="add-url">
                     @if ($edit)
                         <button class="btn btn-link" type="button">
-                            <img style="width:20px;height:20px" class="icon-add" src="/images/add-icon.svg" />
+                            <img style="width:20px;height:20px" class="icon" src="/images/add-icon.svg" />
                         </button>
                     @endif
                 </div>

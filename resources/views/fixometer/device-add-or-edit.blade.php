@@ -46,9 +46,9 @@
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_category')" class="ml-3 mt-2">
                                 @if ($add)
-                                <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                                <img class="icon clickable" src="/icons/info_ico_black.svg">
                                 @elseif ($edit)
-                                <img class="icon-info clickable" src="/icons/info_ico_green.svg">
+                                <img class="icon clickable" src="/icons/info_ico_green.svg">
                                 @endif
                             </div>
                         </div>
@@ -80,9 +80,9 @@
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_model')" class="ml-3 mt-2">
                                 @if ($add)
-                                    <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                                    <img class="icon clickable" src="/icons/info_ico_black.svg">
                                 @elseif ($edit)
-                                    <img class="icon-info clickable" src="/icons/info_ico_green.svg">
+                                    <img class="icon clickable" src="/icons/info_ico_green.svg">
                                 @endif
                             </div>
                         </div>
@@ -93,9 +93,9 @@
                                 </div>
                                 <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_model')" class="ml-3 mt-2">
                                     @if ($add)
-                                        <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                                        <img class="icon clickable" src="/icons/info_ico_black.svg">
                                     @elseif ($edit)
-                                        <img class="icon-info clickable" src="/icons/info_ico_green.svg">
+                                        <img class="icon clickable" src="/icons/info_ico_green.svg">
                                     @endif
                                 </div>
                             </div>
@@ -211,9 +211,9 @@
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_problem')"  class="ml-3 mt-2">
                                 @if ($add)
-                                    <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                                    <img class="icon clickable" src="/icons/info_ico_black.svg">
                                 @elseif ($edit)
-                                    <img class="icon-info clickable" src="/icons/info_ico_green.svg">
+                                    <img class="icon clickable" src="/icons/info_ico_green.svg">
                                 @endif
                             </div>
                         </div>
@@ -224,9 +224,9 @@
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_notes')"  class="ml-3 mt-2">
                                 @if ($add)
-                                    <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                                    <img class="icon clickable" src="/icons/info_ico_black.svg">
                                 @elseif ($edit)
-                                    <img class="icon-info clickable" src="/icons/info_ico_green.svg">
+                                    <img class="icon clickable" src="/icons/info_ico_green.svg">
                                 @endif
                             </div>
                         </div>
