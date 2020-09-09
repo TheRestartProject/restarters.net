@@ -168,9 +168,19 @@ td.col-device-auto {
   top: 400px;
   left: 20px;
   position: absolute;
+
+  @include media-breakpoint-down(sm) {
+    display: none !important;
+  }
 }
 
 .photoform {
+  .previews {
+    @include media-breakpoint-down(sm) {
+      display: none !important;
+    }
+  }
+
   top: 380px;
   left: 90px;
   position: absolute;
