@@ -6,7 +6,7 @@ return array (
   'item_type' => 'Item Type',
   'status' => 'Repair status',
   'model' => 'Model',
-  'age_placeholder' => 'Age (yrs)',
+  'age_placeholder' => 'Age (years)',
   'description_of_problem' => 'Description of problem',
   'community_news' => 'Community news',
   'community_news_text' => 'The latest from our community blog - we are always looking for guest posts, send ideas to <a href="mailto:janet@therestartproject.org">janet@therestartproject.org</a>',

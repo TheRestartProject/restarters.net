@@ -57,7 +57,7 @@ return array (
   'fixed' => 'Fixed',
   'model' => 'Model',
   'age' => 'Age',
-  'age_placeholder' => 'Age (yrs)',
+  'age_placeholder' => 'Age (years)',
   'spare_parts' => 'Spare parts',
   'repairable' => 'Fixable',
   'end' => 'End',
