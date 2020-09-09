@@ -88,6 +88,10 @@
         background: #fff;
     }
 
+    .btn-tertiary {
+        color: white;
+    }
+
     .stats {
         margin-top: 0;
     }
@@ -149,4 +153,9 @@
             text-align: center;
         }
     }
+}
+
+.popover.show {
+    -webkit-box-shadow: 5px 5px 0 0 black;
+    box-shadow: 5px 5px 0 0 black;
 }

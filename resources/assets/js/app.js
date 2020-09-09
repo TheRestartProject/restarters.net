@@ -619,10 +619,7 @@ function initAutocomplete() {
   }
 
   function loadDropzones() {
-
     if (jQuery(".dropzoneEl").length > 0 ) {
-      console.log(jQuery(".dropzoneEl").length);
-
       var field1 = jQuery('.dropzone').data('field1');
       var field2 = jQuery('.dropzone').data('field2');
 
@@ -741,7 +738,7 @@ function initAutocomplete() {
   }
 
   var repair_barrier_options = {
-    placeholder: "-- Choose barriers to repair --"
+    placeholder: "Choose barriers to repair"
   }
 
   var tag_options_with_input = {

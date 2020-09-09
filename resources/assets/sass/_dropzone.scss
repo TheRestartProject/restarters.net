@@ -1,3 +1,18 @@
+.dz-thumbnail {
+  min-height: revert;
+  width: 86px;
+  height: 86px;
+  padding: 0px;
+
+  background-color: rgba(255, 255, 255, 0.2) !important;
+
+  .dz-message {
+    background-image: url('../images/upload_ico_grey.svg') !important;
+    position: relative;
+    top: -10px;
+  }
+}
+
 .dz-clickable.dropzone {
   border-style: dashed;
   border-color: #BEC0C0;

@@ -107,4 +107,6 @@ return array (
   'shareable_link_box' => 'Link condivisibile',
   'type_shareable_link_message' => 'Condividi il link sopra per invitare le persone a partecipare a questo evento. Se una persona con cui condividi il collegamento non ha ancora un account, verrà chiesto di registrarsi.',
   'see_all_upcoming' => 'Vedi tutti gli eventi futuri',
+  'online_event' => 'EVENTO ONLINE',
+  'online_event_search' => 'Online?',
 );

@@ -35,7 +35,7 @@
     <td class="cell-figure d-none d-sm-table-cell">{{ $event->volunteers }}</td>
     <td class="cell-rsvp">
         @if ($event->isBeingAttendedBy(Auth::user()->id))
-            <div>You're going!</div>
+            <div>@lang('events.youre_going')</div>
         @else
             <a class="btn btn-primary" href="/party/view/{{ $event->idevents }}">RSVP</a>
         @endif

@@ -17,7 +17,7 @@ class Device extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'model', 'age', 'problem', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type'];
+    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'item_type', 'model', 'age', 'problem', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -527,6 +527,21 @@ AND devices.event = events.idevents ';
         }
 
         return $ewasteDiverted;
+    }
+
+    public function unpoweredWasteDiverted()
+    {
+        $wasteDiverted = 0;
+
+        if ($this->isFixed()) {
+            if (is_numeric($this->estimate)) {
+                $wasteDiverted = $this->estimate;
+            } else {
+                $wasteDiverted = (float) $this->deviceCategory->weight;
+            }
+        }
+
+        return $wasteDiverted;
     }
 
     public function isFixed()

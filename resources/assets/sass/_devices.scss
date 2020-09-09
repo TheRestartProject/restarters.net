@@ -64,6 +64,11 @@
       }
 
     }
+
+    .add-url {
+      display: grid;
+      align-items: stretch;
+    }
   }
 
   label {
@@ -129,4 +134,79 @@ td.col-device-auto {
         position: relative;
         top: 2px;
     }
+}
+
+.device-info {
+  display: grid;
+  grid-template-columns: repeat( auto-fit, minmax(360px, 1fr) );
+
+  .useful-repair-urls .input-group .form-control {
+    border-radius: initial;
+  }
+}
+
+.device-field-row {
+  display: grid;
+  grid-template-columns: 80px 81px auto auto;
+}
+
+.device-select-row {
+  display: grid;
+  grid-template-columns: auto 50px;
+
+  .btn {
+    min-width: initial !important;
+    color: black;
+  }
+}
+
+// We cannot nest forms in HTML, but the design has the photo form showing within the rest of the form for the device.
+// We therefore have the photos outside the form, and reposition them.  This will lead to overflow problems when
+// there are many photos, so we add a max-height too.  We should restructure the photo section into a Vue component
+// so that we can sort out the display properly without interfering with other global JS/CSS.
+.photolabel {
+  top: 400px;
+  left: 20px;
+  position: absolute;
+}
+
+.photoform {
+  top: 380px;
+  left: 90px;
+  position: absolute;
+  height: 250px;
+  width: 260px;
+  margin-left: 16px;
+
+  .dz-image {
+    position: absolute;
+
+    img {
+      width: 80px !important;
+      height: 80px !important;
+    }
+  }
+
+  .dz-thumbnail {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .dz-preview {
+    position: relative;
+    min-width: 80px !important;
+    max-width: 80px !important;
+    margin-left: 16px;
+    height: 86px !important;
+
+    .dz-remove {
+      position: relative;
+      top: 30px;
+      left: 30px;
+    }
+  }
+
+  .dz-remove {
+    background-image: url('../icons/cross.svg');
+  }
 }

@@ -38,7 +38,7 @@
 
             <div class="row">
                 <div class="col col-md-8">
-                    <h2>Repair Records</h2>
+                    <h2>@lang('devices.repair_records')</h2>
                 </div>
                 <div class="col col-md-4 text-center text-md-right">
                     @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
@@ -329,7 +329,7 @@
                                             </th>
                                             <th scope="col" class="model d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
                                                 <label for="label-model" class="sort-column @if( $sort_column == 'model' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
-                                                    @lang('devices.model')
+                                                    @lang('devices.model_or_type')
                                                 </label>
                                             </th>
                                             <th scope="col" class="problem d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
@@ -359,9 +359,13 @@
                                         @php( $is_admin = FixometerHelper::hasRole($user, 'Administrator') )
                                         @foreach($items as $device)
                                         @if ( $is_admin || $device->repaired_by == $user->id )
-                                        @include('fixometer.device-row-with-edit')
+                                        @include('fixometer.device-row-with-edit', [
+                                            'powered' => $device->deviceCategory->powered
+                                        ])
                                         @else
-                                        @include('fixometer.device-row-collapse')
+                                        @include('fixometer.device-row-collapse', [
+                                            'powered' => $device->deviceCategory->powered
+                                        ])
                                         @endif
                                         @endforeach
                                     </tbody>

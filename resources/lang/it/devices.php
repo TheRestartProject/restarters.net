@@ -64,4 +64,9 @@ return array (
   'suitable_help' => 'Mostra le riparazioni in cui i commenti sono stati contrassegnati come utili per futuri tentativi di riparazione.',
   'uploaded_photos' => 'Foto caricate',
   'useful_repair_info' => 'Sorgente di informazioni',
+  'weight' => 'Peso',
+  'required_impact' => 'kg - required for environmental impact calculation',
+  'age_approx' => 'yrs - approximate, if known',
+  'repair_source' => 'Source of repair information',
+  'repair_url' => 'URL for repair information',
 );

@@ -114,7 +114,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="model">@lang('devices.model'):</label>
+                                            <label for="model">@lang('devices.model_or_type'):</label>
                                             <input type="text" name="model" id="model" class="form-control field" value="<?php echo $formdata->model; ?>">
                                         </div>
                                         <div class="form-group">
