@@ -1467,6 +1467,10 @@ function initAutocomplete() {
 
           setTimeout(() => {
             deviceFormEnableDisable($form, false)
+
+            // Collapse the Add back again.  That also acts as feedback that we've done something.
+            $('.add-edit-device-collapse').removeClass('show')
+            $('.active-row').removeClass('active-row')
           }, 2000)
 
           // Reset if none of the above is selected

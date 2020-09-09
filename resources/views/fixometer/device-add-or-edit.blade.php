@@ -2,7 +2,7 @@
     <form class="{{ $edit ? 'edit-device' : 'add-device' }}" data-device="{{ $device->iddevices }}" method="post" enctype="multipart/form-data">
         <input name="event_id" type="hidden" value="{{ $event->idevents }}">
         <div class="device-info">
-            <div class="card-event-add-item card flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right border-white">
+            <div class="card {{ $edit ? 'card-event-edit-item' :  'card-event-add-item' }} flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right border-white">
                 <div class="card-body d-flex flex-column">
                     <h3>@lang('devices.title_items')</h3>
                     <div class="mt-4">
@@ -45,7 +45,11 @@
                                 </select>
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_category')" class="ml-3 mt-2">
-                                <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                                @if ($add)
+                                <img class="icon clickable" src="/icons/info_ico_black.svg">
+                                @elseif ($edit)
+                                <img class="icon clickable" src="/icons/info_ico_green.svg">
+                                @endif
                             </div>
                         </div>
 
@@ -75,7 +79,11 @@
                                 <input type="text" class="form-control field" name="model" value="{{ $device->model }}" placeholder="@lang('partials.model')" autocomplete="off">
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_model')" class="ml-3 mt-2">
-                                <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                                @if ($add)
+                                    <img class="icon clickable" src="/icons/info_ico_black.svg">
+                                @elseif ($edit)
+                                    <img class="icon clickable" src="/icons/info_ico_green.svg">
+                                @endif
                             </div>
                         </div>
                         @else
@@ -84,20 +92,24 @@
                                     <input type="text" class="form-control field" name="item_type" value="{{ $device->item_type }}" placeholder="@lang('partials.item_type')" autocomplete="off">
                                 </div>
                                 <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_model')" class="ml-3 mt-2">
-                                    <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                                    @if ($add)
+                                        <img class="icon clickable" src="/icons/info_ico_black.svg">
+                                    @elseif ($edit)
+                                        <img class="icon clickable" src="/icons/info_ico_green.svg">
+                                    @endif
                                 </div>
                             </div>
                         @endif
 
                         <div class="device-field-row align-items-center mb-2 display-weight weight {{ (!$powered || $device->category == 46) ? '' : 'd-none' }}">
-                            <label class="text-white text-bold">
+                            <label class="mandatory text-bold">
                                 @lang('devices.weight')*
                             </label>
                             <div class="input-group">
                                 {{-- Powered devices don't allow editing of the weight except for the "None of the above" category, whereas unpowered do. --}}
                                 <input {{ $powered ? 'disabled' : '' }} type="number" class="{{ $powered ? 'weight' : '' }} form-control form-control-lg field numeric" name="weight" min="0.01" step=".01" autocomplete="off" value="{{ $device->estimate }}">
                             </div>
-                            <span class="text-white text-right mb-1">
+                            <span class="mandatory text-right mb-1">
                             @lang('devices.required_impact')
                         </span>
                         </div>
@@ -119,7 +131,7 @@
                 </div>
             </div>
 
-            <div class="card card-event-add-item flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right border-white">
+            <div class="card {{ $edit ? 'card-event-edit-item' :  'card-event-add-item' }} flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right border-white">
                 <div class="card-body">
                     <h3>@lang('devices.title_repair')</h3>
                     <div class="mt-4 d-flex flex-column">
@@ -189,7 +201,7 @@
                 </div>
             </div>
 
-            <div class="card card-event-add-item flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right-0 border-white">
+            <div class="card {{ $edit ? 'card-event-edit-item' :  'card-event-add-item' }} flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right-0 border-white">
                 <div class="card-body">
                     <h3>@lang('devices.title_assessment')</h3>
                     <div class="mt-4">
@@ -198,7 +210,11 @@
                                 <textarea class="form-control" rows="6" name="problem" placeholder="@lang('partials.description_of_problem_solution')">{!! $device->problem !!}</textarea>
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_problem')"  class="ml-3 mt-2">
-                                <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                                @if ($add)
+                                    <img class="icon clickable" src="/icons/info_ico_black.svg">
+                                @elseif ($edit)
+                                    <img class="icon clickable" src="/icons/info_ico_green.svg">
+                                @endif
                             </div>
                         </div>
 
@@ -207,7 +223,11 @@
                                 <textarea class="form-control" rows="6" name="notes" placeholder="@lang('devices.placeholder_notes')">{!! $device->notes !!}</textarea>
                             </div>
                             <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_notes')"  class="ml-3 mt-2">
-                                <img class="icon-info clickable" src="/icons/info_ico_black.svg">
+                                @if ($add)
+                                    <img class="icon clickable" src="/icons/info_ico_black.svg">
+                                @elseif ($edit)
+                                    <img class="icon clickable" src="/icons/info_ico_green.svg">
+                                @endif
                             </div>
                         </div>
 
@@ -221,7 +241,7 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex justify-content-center flex-wrap card-event-add-item pt-4 pb-4">
+        <div class="d-flex justify-content-center flex-wrap {{ $edit ? 'card-event-edit-item' :  'card-event-add-item' }} pt-4 pb-4">
             @if ($add || $edit)
                 @if ($edit)
                     <button type="submit" class="btn btn-primary btn-save2 mr-2">@lang('partials.save')</button>

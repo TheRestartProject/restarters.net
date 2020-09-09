@@ -2,7 +2,6 @@
     <table class="table table-repair" role="table" id="device-table-{{ $powered ? 'powered' : 'unpowered' }}">
         <thead>
         <tr>
-            <th width="60"></th>
             <th class="d-none d-md-table-cell">Category</th>
             @if ($powered)
             <th class="d-none d-md-table-cell">@lang('devices.brand')</th>
@@ -19,6 +18,7 @@
                     <th width="35px" class="d-none d-md-table-cell"></th>
                 @endif
             @endif
+            <th/>
         </tr>
         </thead>
         <tbody>

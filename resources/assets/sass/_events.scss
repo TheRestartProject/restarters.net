@@ -324,8 +324,38 @@
 }
 
 #devices-section {
+    border: 1px solid #0394a6 !important;
     background-color: white;
     border: 1px solid black;
-    box-shadow: 5px 5px black;
-    padding: 10px;
+    box-shadow: 5px 5px #0394a6;
+
+    .tab-content p {
+        padding-left: 45px;
+    }
+
+    .nav-link {
+        padding-left: 45px;
+        border-top: none;
+        border-left: 1px solid #0394a6;
+        border-right: 1px solid #0394a6;
+        border-bottom: 1px solid #0394a6;
+    }
+
+    .nav-link.active {
+        border-top: 5px solid #0394a6;
+        border-left: none;
+        border-right: none;
+
+        @include media-breakpoint-up(md) {
+            border-bottom: none;
+        }
+    }
+
+    .nav-item {
+        margin: 0px;
+    }
+
+    .active-row td {
+        background-color: $warning;
+    }
 }
