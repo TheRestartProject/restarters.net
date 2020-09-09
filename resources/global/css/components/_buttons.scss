@@ -197,9 +197,8 @@
   transition: none;
 
   &:hover {
-    box-shadow: 5px 5px 0 0 $black;
-    border: 2px solid $black;
-    padding: 9px;
+    box-shadow: 5px 5px 0 0 $black !important;
+    border: 1px solid $black !important;
     background-color: $brand-orange;
     color: $black;
     border-color: $black;
