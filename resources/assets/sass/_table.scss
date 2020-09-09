@@ -92,29 +92,12 @@
         }
 
         .repair_status .badge {
-            width: 70px;
+            width: 90px;
             padding: 0px;
             border-radius: 0px;
             font-size:small;
             line-height: 2;
             text-transform: uppercase;
-        }
-
-        .repair_status .badge-success {
-            background-color: #0392a6;
-            color: white;
-        }
-
-        .repair_status .badge-warning {
-            background-color: white;
-            color: #0392a6;
-            border: 1px solid #0392a6;
-        }
-
-        .repair_status .badge-danger {
-            background-color: black;
-            color: white;
-            border: 1px solid #0392a6;
         }
 
         tr {

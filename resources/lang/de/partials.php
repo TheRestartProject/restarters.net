@@ -59,7 +59,7 @@ return array (
   'age' => 'Age',
   'age_placeholder' => 'Age (years)',
   'spare_parts' => 'Spare parts',
-  'repairable' => 'Fixable',
+  'repairable' => 'Repairable',
   'end' => 'End',
   'end_of_life' => 'End-of-life',
   'repair_details' => 'Next steps',

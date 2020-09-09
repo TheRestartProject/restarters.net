@@ -63,7 +63,7 @@ return array (
   'fixed' => 'Fixed',
   'age' => 'Age',
   'spare_parts' => 'Spare parts',
-  'repairable' => 'Fixable',
+  'repairable' => 'Repairable',
   'end' => 'End',
   'end_of_life' => 'End-of-life',
   'repair_details' => 'Next steps',

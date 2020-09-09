@@ -36,7 +36,7 @@ return array (
   'graphic-camera' => 'Camera',
   'end' => 'End',
   'fixed' => 'Fixed',
-  'repairable' => 'Fixable',
+  'repairable' => 'Repairable',
   'age' => 'Age',
   'restart-party' => 'repair event',
   'category_of_device' => 'Category of device',
