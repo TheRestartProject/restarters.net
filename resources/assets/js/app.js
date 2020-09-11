@@ -1481,7 +1481,9 @@ function initAutocomplete() {
           summary_row.find('.brand').text(values.brand);
           summary_row.find('.model').text(values.model);
           summary_row.find('.age').text(values.age);
-          summary_row.find('.problem').text(values.problem);
+
+          // Laravel blade template truncates problem at 60 characters, so we should do the same.
+          summary_row.find('.problem').text(values.problem.length >= 60 ? (values.problem.substring(0, 60) + '...') : values.problem);
 
           if( values.repair_status == 1 ){
             summary_row.find('.repair_status').empty().html('<span class="badge badge-success">Fixed</span>');
