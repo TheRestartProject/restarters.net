@@ -336,6 +336,7 @@
     .nav-link {
         padding-left: 45px;
         border-top: none;
+        padding-top: 5px;
         border-left: 1px solid #0394a6;
         border-right: 1px solid #0394a6;
         border-bottom: 1px solid #0394a6;
@@ -343,6 +344,8 @@
 
     .nav-link.active {
         border-top: 5px solid #0394a6;
+        padding-top: 0px;
+        padding-left: 46px;
         border-left: none;
         border-right: none;
 
