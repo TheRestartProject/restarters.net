@@ -1,4 +1,4 @@
-<div class="table-responsive">
+<div class="table-responsive pl-3 pl-md-0 pr-3 pr-md-0">
     <table class="table table-repair" role="table" id="device-table-{{ $powered ? 'powered' : 'unpowered' }}">
         <thead>
         <tr>
