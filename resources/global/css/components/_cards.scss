@@ -59,7 +59,7 @@
 .card-event-add-item, .card-event-edit-item {
   border-radius: 0px;
 
-  .form-control {
+  .textarea {
     padding: 8px;
   }
 
@@ -70,15 +70,12 @@
 
 .card-event-add-item  {
   background-color: $brand-light;
+  color: $white;
 
   .card-body h3 {
     font-size: $font-size-base;
     color: $brand-white;
     font-weight: bold;
-  }
-
-  .mandatory {
-    color: $white;
   }
 }
 
@@ -89,10 +86,6 @@
     font-size: $font-size-base;
     color: $brand-light;
     font-weight: bold;
-  }
-
-  .mandatory {
-    color: $brand-light;
   }
 
   .btn-tertiary {

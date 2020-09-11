@@ -609,7 +609,7 @@ class DeviceController extends Controller
             }
             // EO new logic Nov 2018
 
-            $device[$i]->spare_parts = $spare_parts;
+            $device[$i]->spare_parts = isset($spare_parts) ? $spare_parts : 0;
             $device[$i]->parts_provider = $parts_provider;
             $device[$i]->event = $event_id;
             $device[$i]->repaired_by = Auth::id();
