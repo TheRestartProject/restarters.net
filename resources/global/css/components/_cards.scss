@@ -59,8 +59,13 @@
 .card-event-add-item, .card-event-edit-item {
   border-radius: 0px;
 
-  .textarea {
-    padding: 8px;
+  .form-control:not(textarea) {
+    outline: 2px transparent;
+    margin: 0px;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   .numeric {
