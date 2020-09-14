@@ -92,10 +92,18 @@ return array (
   'hot_topics' => 'Hot topics',
   'hot_topics_text' => 'Join in on the latest hot topics on repair at Restarters Talk.',
   'hot_topics_link' => 'All weekly hot topics',
+  'powered_only' => '(calculated from powered items only)',
+  'emissions_equivalent_consume_low' => 'the same amount of emissions as<br /> watching :value hour of TV|the same amount of emissions as<br /> watching :value hours of TV',
+  'emissions_equivalent_consume_high' => 'the same amount of emissions as<br /> driving for :value km|the same amount of emissions as<br /> driving for :value km',
+  'to_be_recycled' => ':value item to be recycled|:value items to be recycled',
+  'to_be_repaired' => ':value item to be repaired|:value items to be repaired',
+  'no_weight' => ':value misc or unpowered item with no weight estimate|:value misc or unpowered items with no weight estimate',
+  'and' => 'and',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
   'choose_barriers' => 'Choose barriers to repair',
   'choose_spare_parts' => 'Spare parts',
   'choose_next_steps' => 'Next steps',
   'add_device_button' => 'Add',
+  'loading' => 'Loading'
 );

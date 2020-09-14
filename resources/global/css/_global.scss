@@ -1,3 +1,5 @@
+@import './_variables';
+
 body,
 html {
   background-color: #f5f7fa !important;
@@ -45,5 +47,46 @@ h2 {
   &:focus {
     border-bottom: 3px solid $black;
     color: $black;
+  }
+}
+
+.text-brand {
+  color: $brand;
+}
+
+.text-brand-light {
+  color: $brand-light;
+}
+
+.vue-placeholder {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  justify-items: center;
+  color: lightgrey;
+  -webkit-animation: pulsate 1s ease-out;
+  -webkit-animation-iteration-count: infinite;
+  opacity: 0.5;
+
+  &-large {
+    width: 100%;
+    height: 416px;
+  }
+
+  &-content {
+    align-self: center;
+    justify-self: center;
+  }
+}
+
+@-webkit-keyframes pulsate {
+  0% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1.0;
+  }
+  100% {
+    opacity: 0.25;
   }
 }
