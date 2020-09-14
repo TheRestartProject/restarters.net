@@ -1,8 +1,7 @@
 <template>
   <div>
     <h2>{{ translatedTitle }}</h2>
-    {{ attendees }}
-    <div class="attendance">
+    <div class="attendance mt-4">
       <div>
         <div>
           <h3>
@@ -19,7 +18,24 @@
       </div>
       <div />
       <div>
-        Block
+        <b-tabs class="ourtabs attendance-tabs w-100">
+          <b-tab active title-item-class="w-50">
+            <template slot="title">
+              <b>{{ translatedConfirmed }}</b> ({{ confirmed.length }})
+            </template>
+            <p>
+              <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" />
+            </p>
+          </b-tab>
+          <b-tab title-item-class="w-50">
+            <template slot="title">
+              <b>{{ translatedInvited }}</b> ({{ invited.length }})
+            </template>
+            <p>
+              Content 2
+            </p>
+          </b-tab>
+        </b-tabs>
       </div>
     </div>
   </div>
@@ -27,9 +43,12 @@
 <script>
 import { GUEST, HOST, RESTARTER } from '../constants'
 import EventAttendanceCount from './EventAttendanceCount'
+import EventAttendee from './EventAttendee'
+
+// TODO +/- modals
 
 export default {
-  components: {EventAttendanceCount},
+  components: {EventAttendee, EventAttendanceCount},
   props: {
     eventId: {
       type: Number,
@@ -38,20 +57,34 @@ export default {
     attendance:  {
       type: Array,
       required: true
+    },
+    invitations:  {
+      type: Array,
+      required: true
     }
   },
   computed: {
     attendees() {
+      // Everyone, both invited and confirmed.
       return this.$store.getters['attendance/byEvent'](this.eventId)
     },
-    participants() {
+    confirmed() {
       return this.attendees.filter((a) => {
-        console.log("Participant", a)
+        return a.confirmed
+      })
+    },
+    invited() {
+      return this.attendees.filter((a) => {
+        return !a.confirmed
+      })
+    },
+    participants() {
+      return this.confirmed.filter((a) => {
         return a.role === GUEST
       })
     },
     volunteers() {
-      return this.attendees.filter((a) => {
+      return this.confirmed.filter((a) => {
         return a.role === HOST || a.role === RESTARTER
       })
     },
@@ -63,7 +96,14 @@ export default {
     },
     translatedParticipants() {
       return this.$lang.get('events.stat-0')
+    },
+    translatedConfirmed() {
+      return this.$lang.get('events.confirmed')
+    },
+    translatedInvited() {
+      return this.$lang.get('events.invited')
     }
+
   },
   created() {
     // The attendance is passed from the server to the client via a prop on this component.  When we are created
@@ -71,9 +111,21 @@ export default {
     //
     // Further down the line this initial data might be provided either by an API call from the client to the server,
     // or from Vue server-side rendering, where the whole initial state is passed to the client.
+    let attendees = []
+
+    this.attendance.forEach((a) => {
+      a.confirmed = true
+      attendees.push(a)
+    })
+
+    this.invitations.forEach((a) => {
+      a.confirmed = false
+      attendees.push(a)
+    })
+
     this.$store.dispatch('attendance/set', {
       eventId: this.eventId,
-      attendees: this.attendance
+      attendees: attendees
     })
   }
 }
@@ -84,6 +136,14 @@ export default {
 .attendance {
   display: grid;
   grid-template-columns: 1fr 50px 2fr;
+}
+
+.attendance-tabs {
+  height: 350px;
+
+  ::v-deep .nav-item {
+    width: 50%;
+  }
 }
 
 h3 {

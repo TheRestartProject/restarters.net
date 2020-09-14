@@ -287,8 +287,24 @@
           </div>
           @endif
 
+          <div class="vue-placeholder vue-placeholder-large">
+            <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+          </div>
+
           <div class="vue w-100 mb-4">
-            <EventAttendance class="ml-2 mr-2" :event-id="{{ $event->idevents }}":attendance="{{ json_encode($attended) }}" />
+            <?php
+              // We need to expand the user object to pass to the client.  TODO put this somewhere better.
+              $expanded_attended = [];
+              foreach ($attended as $att) {
+                  $thisone = $att;
+                  $thisone['volunteer'] = $att->volunteer;
+                  $thisone['userSkills'] = $att->volunteer->userSkills;
+                  $thisone['fullName'] = $att->getFullName();
+                  $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
+                  $expanded_attended[] = $thisone;
+              }
+            ?>
+            <EventAttendance class="ml-2 mr-2" :event-id="{{ $event->idevents }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($invited) }}" />
           </div>
 
           <h2 id="attendance" class="d-none d-lg-block">@lang('events.event_attendance')</h2>
@@ -377,7 +393,7 @@
         <h2 id="devices" class="d-none d-lg-block"><svg width="20" height="18" viewBox="0 0 15 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="position:relative;z-index:1;top:-3px;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M13.528,13.426l-12.056,0c-0.812,0 -1.472,-0.66 -1.472,-1.472l0,-7.933c0,-0.812 0.66,-1.472 1.472,-1.472l4.686,0l-1.426,-2.035c-0.059,-0.086 -0.039,-0.203 0.047,-0.263l0.309,-0.217c0.086,-0.06 0.204,-0.039 0.263,0.047l1.729,2.468l0.925,0l1.728,-2.468c0.06,-0.086 0.178,-0.107 0.263,-0.047l0.31,0.217c0.085,0.06 0.106,0.177 0.046,0.263l-1.425,2.035l4.601,0c0.812,0 1.472,0.66 1.472,1.472l0,7.933c0,0.812 -0.66,1.472 -1.472,1.472Zm-4.012,-9.499l-7.043,0c-0.607,0 -1.099,0.492 -1.099,1.099l0,5.923c0,0.607 0.492,1.099 1.099,1.099l7.043,0c0.606,0 1.099,-0.492 1.099,-1.099l0,-5.923c0,-0.607 -0.493,-1.099 -1.099,-1.099Zm3.439,3.248c0.448,0 0.812,0.364 0.812,0.812c0,0.449 -0.364,0.813 -0.812,0.813c-0.448,0 -0.812,-0.364 -0.812,-0.813c0,-0.448 0.364,-0.812 0.812,-0.812Zm0,-2.819c0.448,0 0.812,0.364 0.812,0.812c0,0.449 -0.364,0.813 -0.812,0.813c-0.448,0 -0.812,-0.364 -0.812,-0.813c0,-0.448 0.364,-0.812 0.812,-0.812Z" style="fill:#0394a6;"/></svg> @lang('devices.title_items_at_event') <span id="devices-total" class="badge badge-pill badge-primary">{{ $stats['devices_powered'] + $stats['devices_unpowered'] }}</span></h2>
           <h2 id="devices" class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#devices-section" role="button" aria-expanded="false" aria-controls="devices-section"><b>@lang('devices.title_items_at_event')</b> <span class="font-weight-light">({{ $stats['devices_powered'] + $stats['devices_unpowered'] }})</span></a></h2>
 
-        <div id="devices-section" class="collapse d-lg-block collapse-section p-0">
+        <div id="devices-section" class="ourtabs ourtabs-brand collapse d-lg-block collapse-section p-0">
           <ul class="nav nav-tabs d-flex" id="myTab" role="tablist">
             <li class="nav-item flex-grow-1 active">
               <a class="nav-link active" id="items-powered-tab" data-toggle="tab" href="#items-powered" role="tab" aria-controls="items-powered" aria-selected="true"><b>@lang('devices.title_powered')</b> <span id="devices-powered">({{ $stats['devices_powered'] }})</span></a>
