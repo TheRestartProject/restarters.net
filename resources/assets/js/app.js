@@ -19,7 +19,7 @@ require('leaflet');
 
 import Vue from 'vue';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-
+import store from './store'
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
@@ -1708,10 +1708,12 @@ jQuery(document).ready(function () {
   $(".vue").each(function(index) {
     new Vue({
       el: $(this).get(0),
+      store: store,
       components: {
         'examplecomponent': require('./components/ExampleComponent.vue'),
         'repairstatus': require('./components/RepairStatus.vue'),
         'eventstats': require('./components/EventStats.vue'),
+        'eventattendance': require('./components/EventAttendance.vue')
       }
     })
   })

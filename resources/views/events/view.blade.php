@@ -287,6 +287,10 @@
           </div>
           @endif
 
+          <div class="vue w-100">
+            <EventAttendance class="ml-2 mr-2" :event-id="{{ $event->idevents }}":attendance="{{ json_encode($attended) }}" />
+          </div>
+
           <h2 id="attendance" class="d-none d-lg-block">@lang('events.event_attendance')</h2>
           <h2 id="attendance" class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#events-attendance-section" role="button" aria-expanded="false" aria-controls="events-attendance-section">@lang('events.event_attendance') <span class="badge badge-pill badge-primary" id="attended-counter">{{ count($attended) }}</span></a></h2>
 
@@ -434,3 +438,9 @@
   @include('includes.modals.event-request-review')
 
   @endsection
+<script>
+import EventAttendance from '../../assets/js/components/EventAttendance'
+export default {
+  components: {EventAttendance}
+}
+</script>
