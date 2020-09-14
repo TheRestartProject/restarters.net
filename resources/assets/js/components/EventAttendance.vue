@@ -1,7 +1,19 @@
 <template>
-  <div class="attendance">
-    Attendance for {{ eventId }}
+  <div>
+    <h2>{{ translatedTitle }}</h2>
     {{ attendees }}
+    <div class="attendance">
+      <div>
+        <div>
+          <h3>{{ translatedParticipants }}</h3>
+          <h3>{{ translatedVolunteers }}</h3>
+        </div>
+      </div>
+      <div />
+      <div>
+        Block
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -21,6 +33,15 @@ export default {
     attendees() {
       console.log("Attendees", this.$store.getters['attendance/byEvent'](this.eventId))
       return this.$store.getters['attendance/byEvent'](this.eventId)
+    },
+    translatedTitle() {
+      return this.$lang.get('events.event_attendance')
+    },
+    translatedVolunteers() {
+      return this.$lang.get('events.stat-2')
+    },
+    translatedParticipants() {
+      return this.$lang.get('events.stat-0')
     }
   },
   created() {
@@ -42,4 +63,15 @@ export default {
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
+
+.attendance {
+  display: grid;
+  grid-template-columns: 1fr 50px 2fr;
+}
+
+h3 {
+  font-family: Asap;
+  font-size: 18px;
+  font-weight: bold;
+}
 </style>

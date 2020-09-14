@@ -21,7 +21,7 @@ return array (
   'field_event_device_images_2' => '',
   'stat-1' => 'Invited',
   'stat-0' => 'Participants',
-  'stat-2' => 'Repairers',
+  'stat-2' => 'Volunteers',
   'stat-7' => 'Waste prevented',
   'stat-6' => 'CO2 emissions prevented',
   'stat-5' => 'Fixed devices',
