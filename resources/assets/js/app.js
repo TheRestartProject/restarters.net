@@ -16,6 +16,7 @@ require('./misc/notifications');
 require('./misc/device');
 require('./fixometer');
 require('leaflet');
+require('./constants');
 
 import Vue from 'vue';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'

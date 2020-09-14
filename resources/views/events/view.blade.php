@@ -287,7 +287,7 @@
           </div>
           @endif
 
-          <div class="vue w-100">
+          <div class="vue w-100 mb-4">
             <EventAttendance class="ml-2 mr-2" :event-id="{{ $event->idevents }}":attendance="{{ json_encode($attended) }}" />
           </div>
 

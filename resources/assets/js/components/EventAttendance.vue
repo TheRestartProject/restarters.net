@@ -5,8 +5,16 @@
     <div class="attendance">
       <div>
         <div>
-          <h3>{{ translatedParticipants }}</h3>
-          <h3>{{ translatedVolunteers }}</h3>
+          <h3>
+            <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
+            {{ translatedParticipants }}
+          </h3>
+          <EventAttendanceCount :count="participants.length" class="mt-2 mb-4" />
+          <h3>
+            <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
+            {{ translatedVolunteers }}
+          </h3>
+          <EventAttendanceCount :count="volunteers.length" class="mt-2" />
         </div>
       </div>
       <div />
@@ -17,8 +25,11 @@
   </div>
 </template>
 <script>
+import { GUEST, HOST, RESTARTER } from '../constants'
+import EventAttendanceCount from './EventAttendanceCount'
 
 export default {
+  components: {EventAttendanceCount},
   props: {
     eventId: {
       type: Number,
@@ -31,8 +42,18 @@ export default {
   },
   computed: {
     attendees() {
-      console.log("Attendees", this.$store.getters['attendance/byEvent'](this.eventId))
       return this.$store.getters['attendance/byEvent'](this.eventId)
+    },
+    participants() {
+      return this.attendees.filter((a) => {
+        console.log("Participant", a)
+        return a.role === GUEST
+      })
+    },
+    volunteers() {
+      return this.attendees.filter((a) => {
+        return a.role === HOST || a.role === RESTARTER
+      })
     },
     translatedTitle() {
       return this.$lang.get('events.event_attendance')
@@ -50,7 +71,6 @@ export default {
     //
     // Further down the line this initial data might be provided either by an API call from the client to the server,
     // or from Vue server-side rendering, where the whole initial state is passed to the client.
-    console.log("Set initial attendees in store", this.eventId, this.attendance)
     this.$store.dispatch('attendance/set', {
       eventId: this.eventId,
       attendees: this.attendance
@@ -60,9 +80,6 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
 
 .attendance {
   display: grid;
