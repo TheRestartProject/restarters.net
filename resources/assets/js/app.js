@@ -616,7 +616,7 @@ function initAutocomplete() {
 
       $(".dropzoneEl").each(function( index ) {
 
-        $dropzone = $(this);
+        var $dropzone = $(this);
 
         if ($(this).data('deviceid') !== undefined) {
           prefix = '-'+$(this).data('deviceid');
@@ -717,18 +717,18 @@ function initAutocomplete() {
 
   }
 
-  tag_options = {
+  var tag_options = {
     tags: true,
     createTag: function (params) {
       return null;
     }
   }
 
-  repair_barrier_options = {
+  var repair_barrier_options = {
     placeholder: "Choose barriers to repair"
   }
 
-  tag_options_with_input = {
+  var tag_options_with_input = {
     tags: true,
     minimumInputLength: 2,
     formatInputTooShort: "Type a brand name",
@@ -1120,7 +1120,7 @@ function initAutocomplete() {
 
     $('.tokenfield').tokenfield();
 
-    $current_column = $('input[name=sort_column]:checked').val();
+    var $current_column = $('input[name=sort_column]:checked').val();
 
     $('input[name=sort_column]').on('click', function(e) {
         $form = $('#device-search');
