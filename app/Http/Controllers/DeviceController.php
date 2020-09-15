@@ -566,7 +566,7 @@ class DeviceController extends Controller
             $device[$i]->age = $age;
             $device[$i]->problem = $problem;
             $device[$i]->notes = $notes;
-            $device[$i]->repair_status = $repair_status;
+            $device[$i]->repair_status = isset($repair_status) ? $repair_status : 0;
 
             if ($repair_details == 1) {
                 $device[$i]->more_time_needed = 1;
