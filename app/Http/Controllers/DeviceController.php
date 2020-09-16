@@ -618,7 +618,7 @@ class DeviceController extends Controller
 
             $powered = $device[$i]->deviceCategory->powered;
 
-            if ($useful_url && $useful_source) {
+            if ($useful_url) {
                 // Devices can have multiple URLs, but we only support one on the create - and it gets applied to each
                 // device.
                 DeviceUrl::create([
