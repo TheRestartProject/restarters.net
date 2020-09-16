@@ -134,7 +134,7 @@
 
       <div>
         <div class="vue-placeholder vue-placeholder-large">
-          <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+          <div class="vue-placeholder-content">@lang('partials.loading')...TODO not styled correctly</div>
         </div>
 
         <?php
@@ -158,11 +158,18 @@
           $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
           $expanded_invited[] = $thisone;
         }
+
+        $expanded_hosts = [];
+        foreach ($hosts as $host) {
+          $thisone = $host;
+          $thisone['volunteer'] = $host->volunteer;
+          $expanded_hosts[] = $thisone;
+        }
         ?>
 
         <div class="d-flex">
           <div class="w-50 vue">
-            <EventDetails class="pr-2" :event-id="{{ $event->idevents }}" :event="{{ $event }}" />
+            <EventDetails class="pr-2" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" />
           </div>
           <div class="w-50 vue">
             <EventAttendance class="pl-2" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" />
@@ -245,10 +252,3 @@
   @include('includes.modals.event-request-review')
 
   @endsection
-<script>
-import EventAttendance from '../../assets/js/components/EventAttendance'
-import EventDetails from '../../assets/js/components/EventDetails'
-export default {
-  components: {EventDetails, EventAttendance}
-}
-</script>

@@ -105,7 +105,8 @@ export default {
   computed: {
     upcoming() {
       const now = new Date().getTime()
-      const date = new Date(this.event.event_date)
+      const date = new Date(this.event.event_date).getTime()
+      console.log("Attendance upcoming", now, date, date > now, this.event)
       return date > now
     },
     attendees() {
@@ -218,8 +219,12 @@ export default {
   overflow-y: auto;
 }
 
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+}
+
 h3 {
-  font-family: Asap;
   font-size: 18px;
   font-weight: bold;
 }

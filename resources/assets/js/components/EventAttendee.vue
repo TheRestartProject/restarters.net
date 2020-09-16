@@ -22,7 +22,7 @@
         <b-img src="/icons/delete_ico_red.svg" />
       </div>
     </div>
-<!--    TODO         only host or admin can remove-->
+<!--    TODO Make remvoe work. Only host or admin can remove-->
   </div>
 </template>
 <script>

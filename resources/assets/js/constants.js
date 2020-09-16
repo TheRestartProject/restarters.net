@@ -8,4 +8,4 @@ export const NETWORK_COORDINATOR = 6;
 
 export const DEFAULT_PROFILE = '/images/placeholder-avatar.png'
 
-export const DATE_FORMAT = 'D jS M Y';
+export const DATE_FORMAT = 'ddd Do MMM Y';
