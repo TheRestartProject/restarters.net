@@ -1710,7 +1710,6 @@ jQuery(document).ready(function () {
       el: $(this).get(0),
       components: {
         'examplecomponent': require('./components/ExampleComponent.vue'),
-        'repairstatus': require('./components/RepairStatus.vue'),
         'eventstats': require('./components/EventStats.vue'),
       }
     })
