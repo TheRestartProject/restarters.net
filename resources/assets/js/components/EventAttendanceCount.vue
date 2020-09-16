@@ -1,5 +1,7 @@
 <template>
   <div class="d-flex justify-content-between attendance-button-wrapper">
+<!--    TODO Inc/dec-->
+<!--    TODO Count is editable-->
     <b-btn variant="white" class="attendance-button">
       -
     </b-btn>

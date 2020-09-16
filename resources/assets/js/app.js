@@ -21,6 +21,7 @@ require('./constants');
 import Vue from 'vue';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import store from './store'
+import pluralize from './mixins/pluralize'
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
@@ -1690,7 +1691,7 @@ function initAutocomplete() {
 jQuery(document).ready(function () {
   // Vue.
   //
-  // Create a mixing so that $lang is available in all components.
+  // Create a mixin so that $lang is available in all components.
   Vue.mixin({
     computed: {
       $lang() {
@@ -1698,6 +1699,8 @@ jQuery(document).ready(function () {
       }
     }
   })
+
+  Vue.mixin(pluralize)
 
   // Initialise Vue instances on any divs which have asked for it.
   //
@@ -1712,7 +1715,6 @@ jQuery(document).ready(function () {
       store: store,
       components: {
         'examplecomponent': require('./components/ExampleComponent.vue'),
-        'repairstatus': require('./components/RepairStatus.vue'),
         'eventstats': require('./components/EventStats.vue'),
         'eventattendance': require('./components/EventAttendance.vue')
       }

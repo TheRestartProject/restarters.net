@@ -105,5 +105,6 @@ return array (
   'choose_spare_parts' => 'Spare parts',
   'choose_next_steps' => 'Next steps',
   'add_device_button' => 'Add',
-  'loading' => 'Loading'
+  'loading' => 'Loading',
+  'skills' => 'skill|skills'
 );
