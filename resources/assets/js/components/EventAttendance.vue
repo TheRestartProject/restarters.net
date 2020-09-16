@@ -82,8 +82,6 @@ import { GUEST, HOST, RESTARTER } from '../constants'
 import EventAttendanceCount from './EventAttendanceCount'
 import EventAttendee from './EventAttendee'
 
-// TODO +/- modals
-
 export default {
   components: {EventAttendee, EventAttendanceCount},
   props: {

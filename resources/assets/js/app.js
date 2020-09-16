@@ -1716,7 +1716,8 @@ jQuery(document).ready(function () {
       components: {
         'examplecomponent': require('./components/ExampleComponent.vue'),
         'eventstats': require('./components/EventStats.vue'),
-        'eventattendance': require('./components/EventAttendance.vue')
+        'eventattendance': require('./components/EventAttendance.vue'),
+        'eventdetails': require('./components/EventDetails.vue')
       }
     })
   })

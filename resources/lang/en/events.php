@@ -132,7 +132,7 @@ return array (
   'share_event_stats' => 'Share event stats',
   'invite_volunteers' => 'Invite volunteers',
   'follow_group' => 'Follow group',
-  'event_details' => 'Event details',
+  'event_details' => 'Details',
   'date_time' => 'Date/time',
   'add_to_calendar' => 'Add to calendar',
   'event_address' => 'Address',

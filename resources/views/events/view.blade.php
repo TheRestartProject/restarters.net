@@ -132,193 +132,41 @@
         </div>
       </div>
 
-      <div class="row">
-          <div class="col-lg-12">
-            <p></p>
-            <p></p>
-          </div>
-      </div>
-
-      <div class="row">
-        <div class="col-lg-4">
-
-          <aside id="event-details" class="sidebar-lg-offset">
-
-            <h2>@lang('events.event_details')</h2>
-            <div class="card events-card">
-                @if ( ! $event->online )
-              <div id="event-map" class="map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
-              @endif
-
-              <div class="events-card__details">
-
-                <div class="row flex-row d-flex">
-
-                  <div class="col-4 d-flex flex-column"><strong>@lang('events.date_time'): </strong></div>
-                  <div class="col-8 d-flex flex-column">
-                      {{ date('D jS M Y', $formdata->event_date) }}<br>
-                      {{ $event->getEventStartEnd() }}
-                      @if( $event->isUpcoming() && ! empty($calendar_links) )
-                          <div class="dropdown dropdown-calendar">
-                              <a
-                                class="btn btn-link dropdown-toggle"
-                                href="#"
-                                role="button"
-                                id="addToCalendar"
-                                data-toggle="dropdown"
-                                aria-haspopup="true"
-                                aria-expanded="false">@lang('events.add_to_calendar')</a>
-
-                              <div class="dropdown-menu" aria-labelledby="addToCalendar">
-                                <span class="dropdown-menu-arrow"></span>
-                                <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['google'] }}}">Google Calendar</a>
-                                <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['webOutlook'] }}}">Outlook</a>
-                                <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['ics'] }}}">iCal</a>
-                                <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['yahoo'] }}}">Yahoo Calendar</a>
-                              </div>
-                          </div>
-                      @endif
-                  </div>
-
-                  @if ( ! $event->online )
-                  <div class="col-4 d-flex flex-column"><strong>@lang('events.event_address'): </strong></div>
-
-                  <div class="col-8 d-flex flex-column"><address>{{ $formdata->location }}</address></div>
-                  @endif
-
-                  @if( count($hosts) > 0 )
-                  <div class="col-4 d-flex flex-column"><strong>{{{ str_plural('Host', count($hosts) ) }}}: </strong></div>
-                  <div class="col-8 d-flex flex-column">
-                    @foreach( $hosts as $host )
-                    {{ $host->volunteer->name }}<br>
-                    @endforeach
-                  </div>
-                  @endif
-
-                  @if( $event->isInProgress() || $event->hasFinished() )
-                  <div class="col-4 col-label d-flex flex-column"><strong>@lang('events.participants'):</strong></div>
-                  <div class="col-8 d-flex flex-column">
-                    @if( Auth::check() )
-                    @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-                    <div>
-                      <div class="input-group-qty">
-                        <label for="participants_qty" class="sr-only">@lang('events.quantity'):</label>
-                        <button class="decrease btn-value">–</button>
-                        <input name="participants_qty" id="participants_qty" maxlength="3" value="{{ $formdata->pax }}" title="Qty" class="input-text form-control qty" type="number">
-                        <button class="increase btn-value">+</button>
-                      </div>
-                    </div>
-                    @else
-                    {{ $formdata->pax }}
-                    @endif
-                    @else
-                    {{ $formdata->pax }}
-                    @endif
-
-                  </div>
-                  @endif
-
-                  @if( $event->isInProgress() || $event->hasFinished() )
-
-                    <div class="col-4 col-label d-flex flex-column"><strong>@lang('events.volunteers'):</strong></div>
-
-                    <div class="col-8 d-flex flex-column">
-                      @if( Auth::check() )
-                      @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
-                      <div>
-                        <div class="input-group-qty">
-                          <label for="volunteer_qty" class="sr-only">@lang('events.quantity'):</label>
-                          <button class="decreaseVolunteers btn-value">–</button>
-                          <input name="volunteer_qty" id="volunteer_qty" maxlength="3" value="{{ $event->volunteers }}" title="Qty" class="input-text form-control qty" type="number">
-                          <button class="increaseVolunteers btn-value">+</button>
-                        </div>
-                      </div>
-                      @else
-                      {{ $event->volunteers }}
-                      @endif
-                      @else
-                      {{ $event->volunteers }}
-                      @endif
-
-                    </div>
-
-                    <div class="col-12 invalid-feedback" id="warning_volunteers_message" style="display: none;">
-                      @lang('events.warning_volunteers_message')
-                    </div>
-
-                  @endif
-
-                </div>
-
-              </div>
-
-            </div>
-            @if( !empty($images) )
-            <h2 class="d-none d-lg-block">@lang('events.event_photos')</h2>
-            <h2 class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#event-photos-section" role="button" aria-expanded="false" aria-control"event-photos-section">@lang('events.event_photos') <span class="badge badge-pill badge-primary" id="photos-counter">1</span></a></h2>
-            <div id="event-photos-section" class="collapse d-lg-block collapse-section">
-              <ul class="photo-list">
-                @foreach($images as $image)
-                <li>
-                  <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
-                    <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder" width="100">
-                  </a>
-                </li>
-                @endforeach
-              </ul>
-            </div>
-            @endif
-
-          </aside>
-        </div>
-        <div class="col-lg-8">
-
-          @if( !empty($formdata->free_text) )
-          <h2 id="description" class="d-none d-lg-block">@lang('events.event_description')</h2>
-          <h2 id="description" class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#description-section" role="button" aria-expanded="false" aria-controls="description-section">@lang('events.event_description')</a></h2>
-
-          <div id="description-section" class="collapse d-lg-block collapse-section">
-            <div class="events__description">
-              {!! str_limit(strip_tags($formdata->free_text), 440, '...') !!}
-              @if( strlen(strip_tags($formdata->free_text)) > 440 )
-              <button data-toggle="modal" data-target="#event-description"><span>Read more</span></button>
-              @endif
-            </div>
-          </div>
-          @endif
-
-          <div class="vue-placeholder vue-placeholder-large">
-            <div class="vue-placeholder-content">@lang('partials.loading')...</div>
-          </div>
-
-          <div class="vue w-100 mb-4">
-            <?php
-              // We need to expand the user object to pass to the client.  TODO put this somewhere better.
-              $expanded_attended = [];
-              foreach ($attended as $att) {
-                  $thisone = $att;
-                  $thisone['volunteer'] = $att->volunteer;
-                  $thisone['userSkills'] = $att->volunteer->userSkills;
-                  $thisone['fullName'] = $att->getFullName();
-                  $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
-                  $expanded_attended[] = $thisone;
-              }
-              $expanded_invited = [];
-              foreach ($invited as $att) {
-                $thisone = $att;
-                $thisone['volunteer'] = $att->volunteer;
-                $thisone['userSkills'] = $att->volunteer->userSkills;
-                $thisone['fullName'] = $att->getFullName();
-                $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
-                $expanded_invited[] = $thisone;
-              }
-            ?>
-            <EventAttendance class="ml-2 mr-2"  :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" />
-          </div>
-        </div>
-
+      <div>
         <div class="vue-placeholder vue-placeholder-large">
           <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+        </div>
+
+        <?php
+        // We need to expand the user objects to pass to the client.  In due course this will be replaced
+        // by an API call to get the event details.
+        $expanded_attended = [];
+        foreach ($attended as $att) {
+          $thisone = $att;
+          $thisone['volunteer'] = $att->volunteer;
+          $thisone['userSkills'] = $att->volunteer->userSkills;
+          $thisone['fullName'] = $att->getFullName();
+          $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
+          $expanded_attended[] = $thisone;
+        }
+        $expanded_invited = [];
+        foreach ($invited as $att) {
+          $thisone = $att;
+          $thisone['volunteer'] = $att->volunteer;
+          $thisone['userSkills'] = $att->volunteer->userSkills;
+          $thisone['fullName'] = $att->getFullName();
+          $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
+          $expanded_invited[] = $thisone;
+        }
+        ?>
+
+        <div class="d-flex">
+          <div class="w-50 vue">
+            <EventDetails class="pr-2" :event-id="{{ $event->idevents }}" :event="{{ $event }}" />
+          </div>
+          <div class="w-50 vue">
+            <EventAttendance class="pl-2" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" />
+          </div>
         </div>
 
         @if( $event->isInProgress() || $event->hasFinished() )
@@ -327,8 +175,11 @@
           </div>
         @endif
 
-        @if( $event->isInProgress() || $event->hasFinished() )
+      </div>
 
+      @if( $event->isInProgress() || $event->hasFinished() )
+
+      <div class="row">
         <div class="col-lg-12 p-sm-0">
         <h2 id="devices" class="d-none d-lg-block"><svg width="20" height="18" viewBox="0 0 15 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="position:relative;z-index:1;top:-3px;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M13.528,13.426l-12.056,0c-0.812,0 -1.472,-0.66 -1.472,-1.472l0,-7.933c0,-0.812 0.66,-1.472 1.472,-1.472l4.686,0l-1.426,-2.035c-0.059,-0.086 -0.039,-0.203 0.047,-0.263l0.309,-0.217c0.086,-0.06 0.204,-0.039 0.263,0.047l1.729,2.468l0.925,0l1.728,-2.468c0.06,-0.086 0.178,-0.107 0.263,-0.047l0.31,0.217c0.085,0.06 0.106,0.177 0.046,0.263l-1.425,2.035l4.601,0c0.812,0 1.472,0.66 1.472,1.472l0,7.933c0,0.812 -0.66,1.472 -1.472,1.472Zm-4.012,-9.499l-7.043,0c-0.607,0 -1.099,0.492 -1.099,1.099l0,5.923c0,0.607 0.492,1.099 1.099,1.099l7.043,0c0.606,0 1.099,-0.492 1.099,-1.099l0,-5.923c0,-0.607 -0.493,-1.099 -1.099,-1.099Zm3.439,3.248c0.448,0 0.812,0.364 0.812,0.812c0,0.449 -0.364,0.813 -0.812,0.813c-0.448,0 -0.812,-0.364 -0.812,-0.813c0,-0.448 0.364,-0.812 0.812,-0.812Zm0,-2.819c0.448,0 0.812,0.364 0.812,0.812c0,0.449 -0.364,0.813 -0.812,0.813c-0.448,0 -0.812,-0.364 -0.812,-0.813c0,-0.448 0.364,-0.812 0.812,-0.812Z" style="fill:#0394a6;"/></svg> @lang('devices.title_items_at_event') <span id="devices-total" class="badge badge-pill badge-primary">{{ $stats['devices_powered'] + $stats['devices_unpowered'] }}</span></h2>
           <h2 id="devices" class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#devices-section" role="button" aria-expanded="false" aria-controls="devices-section"><b>@lang('devices.title_items_at_event')</b> <span class="font-weight-light">({{ $stats['devices_powered'] + $stats['devices_unpowered'] }})</span></a></h2>
@@ -381,8 +232,8 @@
           </div>
         </div>
       </div>
+
       @endif
-    </div>
   </section>
 
   @include('includes.modals.event-invite-to')
@@ -396,7 +247,8 @@
   @endsection
 <script>
 import EventAttendance from '../../assets/js/components/EventAttendance'
+import EventDetails from '../../assets/js/components/EventDetails'
 export default {
-  components: {EventAttendance}
+  components: {EventDetails, EventAttendance}
 }
 </script>
