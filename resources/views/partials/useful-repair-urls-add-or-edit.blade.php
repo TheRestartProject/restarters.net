@@ -3,7 +3,7 @@
         <div class="input-group" data-device_id="{{{ $device->iddevices }}}" data-id="{{{ $url->id }}}">
             <div class="mb-2 device-select-row w-100">
                 <div>
-                    <input @if( !$editable ) disabled @endif name="url" value="{{{ $url->url }}}" type="url" class="form-control w-100" placeholder="@lang('devices.useful_repair_urls_helper')" aria-label="@lang('devices.useful_repair_urls_explanation')">
+                    <input @if( !$editable ) disabled @endif name="url" value="{{{ $url->url }}}" type="url" class="form-control w-100" placeholder="@lang('devices.repair_url')" aria-label="@lang('devices.useful_repair_urls_explanation')">
                     <div class="form-control form-control__select mt-2">
                         <select @if( !$editable ) disabled @endif class="select2" name="source">
                             <option value="">@lang('general.please_select')</option>
@@ -26,10 +26,10 @@
         <div class="input-group" data-device_id="{{{ $device->iddevices }}}">
             <div class="mb-2 device-select-row w-100">
                 <div>
-                    <input type="url" name="url" class="form-control" placeholder="@lang('devices.repair_source')" aria-label="@lang('devices.useful_repair_urls_explanation')">
+                    <input type="url" name="url" class="form-control" placeholder="@lang('devices.useful_repair_urls_explanation')" aria-label="@lang('devices.useful_repair_urls_explanation')">
                     <div class="form-control form-control__select mt-2">
                         <select class="select2" name="source">
-                            <option value="">@lang('devices.repair_url')</option>
+                            <option value="">@lang('devices.repair_source')</option>
                             <option value="1">@lang('devices.from_manufacturer')</option>
                             <option value="2">@lang('devices.from_third_party')</option>
                         </select>
