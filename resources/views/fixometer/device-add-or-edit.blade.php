@@ -136,7 +136,7 @@
                     <h3>@lang('devices.title_repair')</h3>
                     <div class="mt-4 d-flex flex-column">
                         <div class="form-control form-control__select mb-2 col-device">
-                            <select class="select2 repair-status" name="repair_status" data-device="{{ $device->iddevices }}" placeholder="@lang('devices.description_of_problem')" data-placeholder="@lang('devices.repair_outcome')">
+                            <select class="select2 repair-status" name="repair_status" data-device="{{ $device->iddevices }}" data-placeholder="@lang('devices.repair_outcome')">
                                 <option></option>
                                 @if ( $device->repair_status == 1 )
                                     <option value="1" selected>@lang('partials.fixed')</option>
