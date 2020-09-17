@@ -172,6 +172,6 @@ return array (
   'event_log' => 'Event log',
   'add_new_event' => 'Add new event',
   'created_success_message' => 'Event created!  It will be approved by a coordinator shortly.  You can continue to edit it in the meantime.',
-  'not_counting' => 'Not counting toward this event\'s evironmental impact is|Not counting toward this event\'s evironmental impact are',
+  'not_counting' => 'Not counting toward this event\'s environmental impact is|Not counting toward this event\'s environmental impact are',
   'impact_calculation' => '<b>How do we calculate environmental impact?</b><p>For powered items: We’ve researched the average weight and CO2 footprint of products across a range of categories, from smartphones to hairdryers. When you enter a powered item that you’ve fixed, we use these averages to estimate the impact of that repair based on the category of the item.</p><p>For unpowered items: When you enter an unpowered item that you’ve repaired, we use the item weight you enter yourself. This is because we don’t have reference data for unpowered items yet, which also means we can’t provide a CO2 estimate.</p><p><a href="https://therestartproject.org/faq/" target="_blank" rel="nofollow">Learn more about how we calculate impact here</a></p>'
 );
