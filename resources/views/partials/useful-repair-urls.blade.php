@@ -7,8 +7,8 @@
     <div class="input-group save-url" data-device_id="{{{ $device->iddevices }}}" data-id="{{{ $url->id }}}">
       <input @if( !Auth::check() ) disabled @endif value="{{{ $url->url }}}" type="url" class="form-control mr-1" placeholder="@lang('devices.useful_repair_urls_helper')" aria-label="@lang('devices.useful_repair_urls_explanation')">
       <div class="form-control form-control__select ml-1">
-        <select @if( !Auth::check() ) disabled @endif class="select2" name="source">
-          <option value="">@lang('general.please_select')</option>
+        <select @if( !Auth::check() ) disabled @endif class="select2" name="source" data-placeholder="@lang('general.please_select')">
+          <option></option>
           <option value="1" @if ($url->source == 1) selected @endif>@lang('devices.from_manufacturer')</option>
           <option value="2" @if ($url->source == 2) selected @endif>@lang('devices.from_third_party')</option>
         </select>

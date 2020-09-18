@@ -3,10 +3,10 @@
         <div class="input-group" data-device_id="{{{ $device->iddevices }}}" data-id="{{{ $url->id }}}">
             <div class="mb-2 device-select-row w-100">
                 <div>
-                    <input @if( !$editable ) disabled @endif name="url" value="{{{ $url->url }}}" type="url" class="form-control w-100" placeholder="@lang('devices.useful_repair_urls_helper')" aria-label="@lang('devices.useful_repair_urls_explanation')">
+                    <input @if( !$editable ) disabled @endif name="url" value="{{{ $url->url }}}" type="url" class="form-control w-100" placeholder="@lang('devices.repair_url')" aria-label="@lang('devices.useful_repair_urls_explanation')">
                     <div class="form-control form-control__select mt-2">
-                        <select @if( !$editable ) disabled @endif class="select2" name="source">
-                            <option value="">@lang('general.please_select')</option>
+                        <select @if( !$editable ) disabled @endif class="select2" name="source" data-placeholder="@lang('general.please_select')">
+                            <option></option>
                             <option value="1" @if ($url->source == 1) selected @endif>@lang('devices.from_manufacturer')</option>
                             <option value="2" @if ($url->source == 2) selected @endif>@lang('devices.from_third_party')</option>
                         </select>
@@ -26,10 +26,10 @@
         <div class="input-group" data-device_id="{{{ $device->iddevices }}}">
             <div class="mb-2 device-select-row w-100">
                 <div>
-                    <input type="url" name="url" class="form-control" placeholder="@lang('devices.repair_source')" aria-label="@lang('devices.useful_repair_urls_explanation')">
+                    <input type="url" name="url" class="form-control" placeholder="@lang('devices.useful_repair_urls_explanation')" aria-label="@lang('devices.useful_repair_urls_explanation')">
                     <div class="form-control form-control__select mt-2">
-                        <select class="select2" name="source">
-                            <option value="">@lang('devices.repair_url')</option>
+                        <select class="select2" name="source" data-placeholder="@lang('devices.repair_source')">
+                            <option></option>
                             <option value="1">@lang('devices.from_manufacturer')</option>
                             <option value="2">@lang('devices.from_third_party')</option>
                         </select>
@@ -38,7 +38,7 @@
                 <div class="add-url">
                     @if ($edit)
                         <button class="btn btn-link" type="button">
-                            <img style="width:20px;height:20px" class="icon-add" src="/images/add-icon.svg" />
+                            <img style="width:20px;height:20px" class="icon" src="/images/add-icon.svg" />
                         </button>
                     @endif
                 </div>

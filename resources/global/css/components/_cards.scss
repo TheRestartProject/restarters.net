@@ -56,22 +56,48 @@
   }
 }
 
-.card-event-add-item {
-  background-color: $brand-light;
+.card-event-add-item, .card-event-edit-item {
   border-radius: 0px;
+
+  .form-control:not(textarea) {
+    outline: 2px transparent;
+    margin: 0px;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .numeric {
+    width: 81px;
+  }
+}
+
+.card-event-add-item  {
+  background-color: $brand-light;
+  color: $white;
 
   .card-body h3 {
     font-size: $font-size-base;
     color: $brand-white;
     font-weight: bold;
   }
+}
 
-  .form-control {
-    padding: 8px;
+.card-event-edit-item  {
+  background-color: #f5f7fa;
+
+  .card-body h3 {
+    font-size: $font-size-base;
+    color: $brand-light;
+    font-weight: bold;
   }
 
-  .numeric {
-    width: 81px;
+  .btn-tertiary {
+    color: $brand-light;
+    background-color: white;
+    border: 1px solid $brand-light;
+    box-shadow: 5px 5px 0 0 $brand-light;
   }
 }
 

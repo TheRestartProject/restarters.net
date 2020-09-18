@@ -36,7 +36,7 @@ return array (
   'graphic-camera' => 'Camera',
   'end' => 'End',
   'fixed' => 'Fixed',
-  'repairable' => 'Fixable',
+  'repairable' => 'Repairable',
   'age' => 'Age',
   'restart-party' => 'Restart party',
   'category_of_device' => 'Category of device',
@@ -58,7 +58,7 @@ return array (
   'from_third_party' => 'From third party',
   'weight' => 'Weight',
   'required_impact' => 'kg - required for environmental impact calculation',
-  'age_approx' => 'yrs - approximate, if known',
+  'age_approx' => 'years - approximate, if known',
   'repair_source' => 'Source of repair information',
   'repair_url' => 'URL for repair information',
 );
