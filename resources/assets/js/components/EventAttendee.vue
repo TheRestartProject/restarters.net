@@ -8,7 +8,9 @@
             lineheight: true,
             'font-weight-bold': host
             }">
-            {{ attendee.volunteer.name }}
+            <span class="flex-shrink-1">
+              {{ attendee.volunteer.name }}
+            </span>
             <span class="host pl-1" v-if="host">
               {{ translatedHost }}
             </span>
@@ -18,11 +20,11 @@
           </div>
         </div>
       </div>
-      <div v-if="attendee.confirmed">
+      <div v-if="attendee.confirmed" class="ml-2">
         <b-img src="/icons/delete_ico_red.svg" />
       </div>
     </div>
-<!--    TODO Make remvoe work. Only host or admin can remove-->
+<!--    TODO Make remove work. Only host or admin can remove-->
   </div>
 </template>
 <script>
@@ -78,6 +80,8 @@ export default {
 
 .lineheight {
   line-height: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .star {
