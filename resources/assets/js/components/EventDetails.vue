@@ -56,6 +56,7 @@
       <l-marker :lat-lng="[event.latitude, event.longitude]" :interactive="false" />
     </l-map>
     TODO Event photos
+    <read-more :text="free_text" class="mt-2 readmore small" :max-chars="440" :more-str="translatedReadMore" :less-str="translatedReadLess" />
   </div>
 </template>
 <script>
@@ -63,6 +64,7 @@ import { DATE_FORMAT } from '../constants'
 import moment from 'moment'
 import map from '../mixins/map'
 import ExternalLink from './ExternalLink'
+const htmlToText = require('html-to-text');
 
 export default {
   components: {ExternalLink},
@@ -96,11 +98,27 @@ export default {
     date() {
       return new moment(this.event.event_date).format(DATE_FORMAT)
     },
+    free_text() {
+      // Strip HTML
+      let ret = htmlToText.fromString(this.event.free_text);
+
+      // Remove duplicate blank lines.
+      ret = ret.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
+      console.log("Stripped", ret)
+      return ret
+    },
     translatedEventDetails() {
       return this.$lang.get('events.event_details')
     },
     translatedViewMap() {
       return this.$lang.get('events.view_map')
+    },
+    translatedReadMore() {
+      return this.$lang.get('events.read_more')
+    },
+    translatedReadLess() {
+      return this.$lang.get('events.read_less')
     }
   }
 }
@@ -123,5 +141,9 @@ export default {
 h2 {
   font-size: 24px;
   font-weight: bold;
+}
+
+.readmore {
+  white-space: pre-wrap !important;
 }
 </style>
