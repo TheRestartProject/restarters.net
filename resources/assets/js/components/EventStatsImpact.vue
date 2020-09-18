@@ -8,7 +8,7 @@
     </h2>
     <div class="impact-container">
       <EventStatsValue :count="stats.ewaste + stats.unpowered_waste" icon="trash" size="md" title="partials.waste_prevented" unit="kg" class="impact-waste" />
-      <div v-if="notincluded">
+      <div v-if="notincluded" class="d-flex justify-content-end">
         <div class="impact-notincluded">
           <div class="impact-notincluded-content p-1">
             {{ notincluded }}
