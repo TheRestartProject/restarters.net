@@ -3,7 +3,7 @@
     <h2>{{ translatedTitle }}</h2>
     <div :class="{
       attendance: true,
-      'mt-4': true,
+      'mt-2': true,
       upcoming: upcoming
       }">
       <div>
@@ -35,15 +35,15 @@
             </p>
             <hr />
             <div v-if="upcoming" class="d-flex justify-content-end">
+<!--              TODO In due course these modals should become Vue components.-->
               <a data-toggle="modal" data-target="#event-all-attended" href="#" class="mr-2">
                 {{ translatedSeeAllConfirmed }}
               </a>
             </div>
             <div v-else>
-<!--              TODO Not tested-->
               <div class="d-flex justify-content-between">
                 <b-btn variant="link">
-                  Add?
+                  TODO Add
                 </b-btn>
                 <b-btn variant="link">
                   {{ translatedSeeAllAttended }}
@@ -106,7 +106,6 @@ export default {
     upcoming() {
       const now = new Date().getTime()
       const date = new Date(this.event.event_date).getTime()
-      console.log("Attendance upcoming", now, date, date > now, this.event)
       return date > now
     },
     attendees() {

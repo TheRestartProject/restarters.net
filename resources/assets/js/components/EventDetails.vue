@@ -19,7 +19,7 @@
         <b-img-lazy src="/icons/time_ico.svg" class="icon" />
       </div>
       <div>
-        Time
+        {{ start }}-{{ end }}
       </div>
     </div>
     <div class="border-top-thin d-flex pt-1 pb-1">
@@ -40,21 +40,33 @@
         <div>
           {{ event.location}}
         </div>
-        <div>
-          TODO view on map
-        </div>
+        <ExternalLink :href="'https://www.openstreetmap.org/#map=20/' + event.latitude + '/' + event.longitude">
+          {{ translatedViewMap }}
+        </ExternalLink>
       </div>
     </div>
-    TODO map only if !event->online
+    <l-map
+        ref="map"
+        :zoom="16"
+        :center="[event.latitude, event.longitude]"
+        :style="'width: 100%; height: 200px'"
+        v-if="!event.online"
+    >
+      <l-tile-layer :url="tiles" :attribution="attribution" />
+      <l-marker :lat-lng="[event.latitude, event.longitude]" :interactive="false" />
+    </l-map>
     TODO Event photos
-<!--    {{ event }}-->
   </div>
 </template>
 <script>
 import { DATE_FORMAT } from '../constants'
 import moment from 'moment'
+import map from '../mixins/map'
+import ExternalLink from './ExternalLink'
 
 export default {
+  components: {ExternalLink},
+  mixins: [ map ],
   props: {
     eventId: {
       type: Number,
@@ -75,11 +87,20 @@ export default {
       const date = new Date(this.event.event_date)
       return date > now
     },
+    start() {
+      return this.event.start.substring(0, 5)
+    },
+    end() {
+      return this.event.end.substring(0, 5)
+    },
     date() {
       return new moment(this.event.event_date).format(DATE_FORMAT)
     },
     translatedEventDetails() {
       return this.$lang.get('events.event_details')
+    },
+    translatedViewMap() {
+      return this.$lang.get('events.view_map')
     }
   }
 }

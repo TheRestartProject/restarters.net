@@ -22,6 +22,24 @@ import Vue from 'vue';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import store from './store'
 import pluralize from './mixins/pluralize'
+import {
+  LMap,
+  LTileLayer,
+  LMarker,
+} from 'vue2-leaflet'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+
+// Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
+// eslint-disable-next-line
+delete L.Icon.Default.prototype._getIconUrl
+// eslint-disable-next-line
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+})
+
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
@@ -1701,6 +1719,15 @@ jQuery(document).ready(function () {
   })
 
   Vue.mixin(pluralize)
+
+  // We use Leaflet
+  Vue.use({
+    install(Vue, options) {
+      Vue.component('l-map', LMap)
+      Vue.component('l-marker', LMarker)
+      Vue.component('l-tile-layer', LTileLayer)
+    }
+  })
 
   // Initialise Vue instances on any divs which have asked for it.
   //

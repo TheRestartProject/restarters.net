@@ -134,7 +134,7 @@
 
       <div>
         <div class="vue-placeholder vue-placeholder-large">
-          <div class="vue-placeholder-content">@lang('partials.loading')...TODO not styled correctly</div>
+          <div class="vue-placeholder-content">@lang('partials.loading')...</div>
         </div>
 
         <?php
