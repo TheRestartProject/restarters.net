@@ -67,7 +67,7 @@
                 <img class="icon" src="/images/add-icon.svg" />
                 {{ translatedInviteToJoin }}
               </a>
-              <a data-toggle="modal" data-target="#event-all-volunteers" href="#" class="mr-2">
+              <a data-toggle="modal" data-target="#event-all-volunteers" href="#" class="mr-2" v-if="invited.length">
                 {{ translatedSeeAllInvited }}
               </a>
             </div>
@@ -163,7 +163,7 @@ export default {
       return this.$lang.get('events.invited_none')
     },
     translatedInviteToJoin() {
-      return this.$lang.get('events.invited_to_join')
+      return this.$lang.get('events.invite_to_join')
     }
   },
   created() {
@@ -226,5 +226,9 @@ h2 {
 h3 {
   font-size: 18px;
   font-weight: bold;
+}
+
+.icon {
+  width: 30px;
 }
 </style>

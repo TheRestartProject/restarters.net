@@ -10,7 +10,12 @@
           {{ date }}
         </div>
         <div>
-          TODO add calendar
+          <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" text="Add to calendar">
+            <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.google">{{ translatedCalendarGoogle }}</b-dropdown-item>
+            <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.webOutlook">{{ translatedCalendarOutlook }}</b-dropdown-item>
+            <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.ics">{{ translatedCalendariCal }}</b-dropdown-item>
+            <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.yahoo">{{ translatedCalendarYahoo }}</b-dropdown-item>
+          </b-dropdown>
         </div>
       </div>
     </div>
@@ -81,6 +86,10 @@ export default {
     hosts: {
       type: Array,
       required: true
+    },
+    calendarLinks: {
+      type: Array,
+      required: false
     }
   },
   computed: {
@@ -119,6 +128,18 @@ export default {
     },
     translatedReadLess() {
       return this.$lang.get('events.read_less')
+    },
+    translatedCalendarGoogle() {
+      return this.$lang.get('events.calendar_google')
+    },
+    translatedCalendarOutlook() {
+      return this.$lang.get('events.calendar_outlook')
+    },
+    translatedCalendariCal() {
+      return this.$lang.get('events.calendar_ical')
+    },
+    translatedCalendarYahoo() {
+      return this.$lang.get('events.calendar_yahoo')
     }
   }
 }

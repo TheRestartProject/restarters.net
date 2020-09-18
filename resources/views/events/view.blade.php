@@ -169,10 +169,10 @@
 
         <div class="d-flex">
           <div class="w-50 vue">
-            <EventDetails class="pr-2" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" />
+            <EventDetails class="pr-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links) }}" />
           </div>
           <div class="w-50 vue">
-            <EventAttendance class="pl-2" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" />
+            <EventAttendance class="pl-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" />
           </div>
         </div>
 

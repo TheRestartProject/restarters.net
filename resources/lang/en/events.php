@@ -179,4 +179,8 @@ return array (
   'view_map' => 'View map',
   'read_more' => 'READ MORE',
   'read_less' => 'READ LESS',
+  'calendar_google' => 'Google Calendar',
+  'calendar_outlook' => 'Outlook',
+  'calendar_ical' => 'iCal',
+  'calendar_yahoo' => 'Yahoo Calendar'
 );
