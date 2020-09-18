@@ -8,9 +8,11 @@
     </h2>
     <div class="impact-container">
       <EventStatsValue :count="stats.ewaste + stats.unpowered_waste" icon="trash" size="md" title="partials.waste_prevented" unit="kg" class="impact-waste" />
-      <div class="impact-notincluded">
-        <div class="impact-notincluded-content p-1">
-          {{ notincluded }}
+      <div v-if="notincluded">
+        <div class="impact-notincluded">
+          <div class="impact-notincluded-content p-1">
+            {{ notincluded }}
+          </div>
         </div>
       </div>
       <EventStatsValue :count="stats.co2" icon="cloud_empty" size="lg" title="partials.co2" subtitle="partials.powered_only" :description="equivalent_consumer(stats.co2)" unit="kg" class="impact-co2" />
