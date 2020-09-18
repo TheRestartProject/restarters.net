@@ -27,7 +27,7 @@
             <template slot="title">
               <b>{{ translatedConfirmed }}</b> ({{ confirmed.length }})
             </template>
-            <div v-if="confirmed.length" class="maxheight">
+            <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
               <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" />
             </div>
             <p v-else>
@@ -63,7 +63,7 @@
             </p>
             <hr />
             <div v-if="upcoming" class="d-flex justify-content-between">
-              <a data-toggle="modal" data-target="#event-invite-to" href="#" class="mr-2">
+              <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
                 <img class="icon" src="/images/add-icon.svg" />
                 {{ translatedInviteToJoin }}
               </a>

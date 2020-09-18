@@ -106,5 +106,6 @@ return array (
   'choose_next_steps' => 'Next steps',
   'add_device_button' => 'Add',
   'loading' => 'Loading',
-  'skills' => 'skill|skills'
+  'skills' => 'skill|skills',
+  'something_wrong' => 'Something has gone wrong'
 );

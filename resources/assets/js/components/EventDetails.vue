@@ -10,7 +10,8 @@
           {{ date }}
         </div>
         <div>
-          <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" text="Add to calendar">
+<!--          TODO styling of dropdown isn't quite right yet.-->
+          <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" text="Add to calendar" variant="white" class="linkdrop" no-caret>
             <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.google">{{ translatedCalendarGoogle }}</b-dropdown-item>
             <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.webOutlook">{{ translatedCalendarOutlook }}</b-dropdown-item>
             <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.ics">{{ translatedCalendariCal }}</b-dropdown-item>
@@ -37,7 +38,7 @@
         </div>
       </div>
     </div>
-    <div class="border-top-thin d-flex pt-1 pb-1" v-if="!event.online">
+    <div class="border-top-thin d-flex pt-1 pb-1" v-if="!event.online && event.location">
       <div class="mr-2">
         <b-img-lazy src="/icons/map_marker_ico.svg" class="icon" />
       </div>
@@ -55,7 +56,7 @@
         :zoom="16"
         :center="[event.latitude, event.longitude]"
         :style="'width: 100%; height: 200px'"
-        v-if="!event.online"
+        v-if="!event.online && event.location"
     >
       <l-tile-layer :url="tiles" :attribution="attribution" />
       <l-marker :lat-lng="[event.latitude, event.longitude]" :interactive="false" />
@@ -88,7 +89,7 @@ export default {
       required: true
     },
     calendarLinks: {
-      type: Array,
+      type: Object,
       required: false
     }
   },
@@ -114,7 +115,6 @@ export default {
       // Remove duplicate blank lines.
       ret = ret.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
-      console.log("Stripped", ret)
       return ret
     },
     translatedEventDetails() {

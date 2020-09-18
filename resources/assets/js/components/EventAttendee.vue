@@ -15,16 +15,28 @@
               {{ translatedHost }}
             </span>
           </div>
-          <div v-if="skills" class="small d-flex">
-           <b-img-lazy src="/images/star.svg" class="star mr-1" /> {{ skills }}
+          <div :class="{
+             'small': true,
+             'd-flex': true,
+             'text-muted': noskills
+            }">
+           <b-img-lazy src="/images/star.svg" :class="{
+             'star': true,
+             'mr-1': true,
+             'faded': noskills
+            }" /> {{ skills }}
           </div>
         </div>
       </div>
-      <div v-if="attendee.confirmed" class="ml-2">
+      <b-btn variant="none" v-if="attendee.confirmed" @click="remove" class="p-0">
         <b-img src="/icons/delete_ico_red.svg" />
-      </div>
+      </b-btn>
     </div>
-<!--    TODO Make remove work. Only host or admin can remove-->
+    <b-alert variant="danger" v-if="error">
+      {{ translatedSomethingWrong }}: {{ error }}
+    </b-alert>
+<!--    TODO Only host or admin can remove-->
+<!--    TODO Remove confirm-->
   </div>
 </template>
 <script>
@@ -37,6 +49,11 @@ export default {
       required: true
     }
   },
+  data () {
+    return {
+      error: null
+    }
+  },
   computed: {
     profile() {
       return this.attendee.volunteer && this.attendee.volunteer.profilePath ? this.attendee.volunteer.profilePath : DEFAULT_PROFILE
@@ -44,23 +61,35 @@ export default {
     host() {
       return this.attendee.role === HOST
     },
-    translatedHost() {
-      return this.$lang.get('partials.host')
+    noskills() {
+      return !this.attendee.volunteer.user_skills || !this.attendee.volunteer.user_skills.length
     },
     skills() {
       let ret = null
       let skills = this.attendee.volunteer.user_skills
-
-      if (skills && skills.length) {
-        ret = skills.length + ' ' + this.pluralise(this.$lang.get('partials.skills'), skills.length)
-      }
-
+      ret = (skills && skills.length ? skills.length : '0') + ' ' + this.pluralise(this.$lang.get('partials.skills'), skills.length)
       return ret
-    }
+    },
+    translatedHost() {
+      return this.$lang.get('partials.host')
+    },
+    translatedSomethingWrong() {
+      return this.$lang.get('partials.something_wrong')
+    },
   },
   methods: {
     brokenProfileImage(event) {
       event.target.src = DEFAULT_PROFILE
+    },
+    async remove() {
+      try {
+        await this.$store.dispatch('attendance/remove', {
+          userId: this.attendee.user,
+          eventId: this.attendee.event,
+        })
+      } catch (e) {
+        this.error = e.message
+      }
     }
   }
 }
@@ -91,5 +120,9 @@ export default {
 .host {
   text-transform: uppercase;
   color: $brand-light;
+}
+
+.faded {
+  opacity: 0.5;
 }
 </style>
