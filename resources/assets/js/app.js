@@ -568,11 +568,11 @@ function initAutocomplete() {
 
   function removeUser() {
 
-    user_id = jQuery(this).data('remove-volunteer');
-    event_id = jQuery(this).data('event-id');
-    type = jQuery(this).data('type');
-    counter = jQuery('#'+type+'-counter');
-    current_count = parseInt(counter.text());
+    var user_id = jQuery(this).data('remove-volunteer');
+    var event_id = jQuery(this).data('event-id');
+    var type = jQuery(this).data('type');
+    var counter = jQuery('#'+type+'-counter');
+    var current_count = parseInt(counter.text());
 
     $.ajax({
       headers: {
@@ -743,7 +743,6 @@ function initAutocomplete() {
 
   var tag_options_with_input = {
     tags: true,
-    minimumInputLength: 2,
     formatInputTooShort: "Type a brand name",
     language: {
       inputTooShort: function inputTooShort() {
@@ -913,8 +912,8 @@ function initAutocomplete() {
     // });
 
     jQuery(document).on('change', '.category', function (e) {
-      $value = parseInt(jQuery(this).val());
-      $field = jQuery(this).parents('td').find('.weight');
+      var $value = parseInt(jQuery(this).val());
+      var $field = jQuery(this).parents('td').find('.weight');
 
       if (!$field.length) {
         // At present this global JS is used in both old and new designs which have different DOM structure, so we
@@ -936,8 +935,8 @@ function initAutocomplete() {
 
     jQuery('.toggle-manual-invite').on('change', function (e) {
 
-      $value = jQuery(this).val();
-      $toggle = jQuery('.show-hide-manual-invite');
+      var $value = jQuery(this).val();
+      var $toggle = jQuery('.show-hide-manual-invite');
 
       $('#full_name, #volunteer_email_address').val('');
 
@@ -1085,19 +1084,19 @@ function initAutocomplete() {
 
     // Dismissable Alert copy link action
     $('.btn-action').on('click', function () {
-      $copy_link = $(this).attr('data-copy-link');
+      var $copy_link = $(this).attr('data-copy-link');
       copyLink($copy_link);
     });
 
     // Copy Calendar Feed link
     $('#btn-copy').on('click', function () {
-      $link = $(this).parents('div').parents('div').find('input[type=text]');
+      var $link = $(this).parents('div').parents('div').find('input[type=text]');
       copyLink($link.val());
     });
 
     // User Profile Settings - Calendar copy links
     $('.btn-copy-input-text').on('click', function () {
-      $link = $(this).parent('div').parent('div').find('input[type=text]');
+      var $link = $(this).parent('div').parent('div').find('input[type=text]');
       copyLink($link.val());
     });
 
@@ -1114,7 +1113,7 @@ function initAutocomplete() {
 
 
     $('.information-alert').on('closed.bs.alert', function () {
-      $dismissable_id = $(this).attr('id');
+      var $dismissable_id = $(this).attr('id');
       $.ajax({
         headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1136,8 +1135,8 @@ function initAutocomplete() {
     var $current_column = $('input[name=sort_column]:checked').val();
 
     $('input[name=sort_column]').on('click', function(e) {
-        $form = $('#device-search');
-        $sort_direction = $form.find('input[name=sort_direction]');
+        var $form = $('#device-search');
+        var $sort_direction = $form.find('input[name=sort_direction]');
             if( $sort_direction.val() === 'DSC' ){
                 $sort_direction.val('ASC');
             } else {
@@ -1148,7 +1147,7 @@ function initAutocomplete() {
 
     $('.filter-columns').on('click', function(e) {
 
-      $table = $('#sort-table');
+      var $table = $('#sort-table');
 
       var hide_columns = $table.find('.'+$(this).data('id'));
       $(hide_columns).toggle();
@@ -1271,20 +1270,20 @@ function initAutocomplete() {
       document.body.appendChild(copyTextArea);
       copyTextArea.select();
 
-      $original_popover_text = element.attr('data-content');
+      var $original_popover_text = element.attr('data-content');
 
       try {
         var successful = document.execCommand('copy');
         var message = successful ? 'Copied!' : 'Whoops, not copied!';
-        $set_success_message_in_popover = element.attr('data-content', message);
-        $show_popover = element.popover('show');
+        var $set_success_message_in_popover = element.attr('data-content', message);
+        var $show_popover = element.popover('show');
 
       } catch (err) {
         console.log('Oops, unable to copy');
       }
 
       document.body.removeChild(copyTextArea);
-      $set_original_popover_message = element.attr('data-content', $original_popover_text);
+      var $set_original_popover_message = element.attr('data-content', $original_popover_text);
 
     } else {
       // Fallback if browser doesn't support .execCommand('copy')
@@ -1380,7 +1379,7 @@ function initAutocomplete() {
     $('.add-device').on('submit', function(e) {
 
       e.preventDefault();
-      $form = $(this);
+      var $form = $(this);
 
       if( $form.find('select[name=category]').val() === '' ) {
         alert('Category field is required');
@@ -1405,9 +1404,9 @@ function initAutocomplete() {
             jQuery('#device-start').focus();
 
             //Appending...
-            for (i = 0; i < $(json.html).length; i++) {
+            for (var i = 0; i < $(json.html).length; i++) {
               var row = $(json.html)[i];
-              $target = $(row).hide().appendTo('#device-table-' + (json.powered ? 'powered' : 'unpowered') + ' > tbody:last-child').fadeIn(1000);
+              var $target = $(row).hide().appendTo('#device-table-' + (json.powered ? 'powered' : 'unpowered') + ' > tbody:last-child').fadeIn(1000);
               select2Fields($target);
             }
             $('.table-row-details').removeAttr('style');
@@ -1529,8 +1528,8 @@ function initAutocomplete() {
 
       e.preventDefault();
       if (window.confirm("Are you sure? This cannot be undone.")) {
-        $device = jQuery(this).data('device-id');
-        $href = $(this).attr('href');
+        var $device = jQuery(this).data('device-id');
+        var $href = $(this).attr('href');
         $.ajax({
           type: 'get',
           url: $href,
@@ -1553,9 +1552,9 @@ function initAutocomplete() {
       e.preventDefault();
 
       if (window.confirm("Are you sure? This cannot be undone.")) {
-        $this = jQuery(this);
-        $device = jQuery(this).data('device-id');
-        $href = $(this).attr('href');
+        var $this = jQuery(this);
+        var $device = jQuery(this).data('device-id');
+        var $href = $(this).attr('href');
         $.ajax({
           type: 'get',
           url: $href,
@@ -1605,7 +1604,7 @@ function initAutocomplete() {
       if($(this).attr('data-count-attended') > 0 || $(this).attr('data-count-invited') > 0 || $(this).attr('data-count-volunteers') > 0) {
         return confirm('Are you sure you want to delete this event?');
 
-        id = $(this).attr('data-party-id');
+        var id = $(this).attr('data-party-id');
 
         $.ajax({
           headers: {
@@ -1634,13 +1633,13 @@ function initAutocomplete() {
     });
 
     $('.select2-with-input-group').on("select2:select", function(e) {
-      $input_field = $(this).parents('.input-group-select2').find('input[type=text]');
+      var $input_field = $(this).parents('.input-group-select2').find('input[type=text]');
 
-      $current_url = $input_field.val();
+      var $current_url = $input_field.val();
 
-      $remove_current_area = $current_url.lastIndexOf('/') + 1;
-      $creating_new_url =  $current_url.substring( 0, $remove_current_area );
-      $new_url = $creating_new_url.concat( $(this).val() );
+      var $remove_current_area = $current_url.lastIndexOf('/') + 1;
+      var $creating_new_url =  $current_url.substring( 0, $remove_current_area );
+      var $new_url = $creating_new_url.concat( $(this).val() );
 
       $input_field.val($new_url);
     });
@@ -1649,7 +1648,7 @@ function initAutocomplete() {
 
   // Copy Calendar Feed link
   $(document).on("click", "#btn-copy", function () {
-    $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
+    var $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
 
     var $temp = $("<input>");
     $("body").append($temp);
