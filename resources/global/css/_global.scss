@@ -96,8 +96,16 @@ h2 {
 }
 
 .linkdrop {
+  color: blue;
+
   button {
-    color: $brand-light;
+    color: $brand-light !important;
     padding: 0px;
+  }
+
+  &.show {
+    button {
+      background-color: transparent !important;
+    }
   }
 }

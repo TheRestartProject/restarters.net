@@ -10,7 +10,6 @@
           {{ date }}
         </div>
         <div>
-<!--          TODO styling of dropdown isn't quite right yet.-->
           <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" text="Add to calendar" variant="white" class="linkdrop" no-caret>
             <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.google">{{ translatedCalendarGoogle }}</b-dropdown-item>
             <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.webOutlook">{{ translatedCalendarOutlook }}</b-dropdown-item>
@@ -46,7 +45,7 @@
         <div>
           {{ event.location}}
         </div>
-        <ExternalLink :href="'https://www.openstreetmap.org/#map=20/' + event.latitude + '/' + event.longitude">
+        <ExternalLink :href="'https://www.openstreetmap.org/?mlat=' + event.latitude + '&mlon=' + event.longitude + '#map=20/' + event.latitude + '/' + event.longitude">
           {{ translatedViewMap }}
         </ExternalLink>
       </div>
@@ -166,5 +165,9 @@ h2 {
 
 .readmore {
   white-space: pre-wrap !important;
+}
+
+::v-deep .linkdrop button[aria-expanded="true"] {
+  padding: 5px;
 }
 </style>
