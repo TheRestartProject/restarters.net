@@ -170,12 +170,17 @@
         $attendance_edit = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
         ?>
 
-        <div class="d-flex">
-          <div class="w-50 vue">
-            <EventDetails class="pr-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links) }}" />
+        <div class="d-flex flex-wrap">
+          <div class="w-xs-100 w-md-50">
+            <div class="vue">
+              <EventDetails class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links) }}" />
+            </div>
+            <div class="vue">
+              <EventDescription class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" />
+            </div>
           </div>
-          <div class="w-50 vue">
-            <EventAttendance class="pl-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $attendance_edit ? 'true' : 'false' }}" />
+          <div class="w-xs-100 w-md-50 vue">
+            <EventAttendance class="pl-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $attendance_edit ? 'true' : 'false' }}" />
           </div>
         </div>
 

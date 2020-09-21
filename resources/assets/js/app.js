@@ -1746,7 +1746,8 @@ jQuery(document).ready(function () {
         'examplecomponent': require('./components/ExampleComponent.vue'),
         'eventstats': require('./components/EventStats.vue'),
         'eventattendance': require('./components/EventAttendance.vue'),
-        'eventdetails': require('./components/EventDetails.vue')
+        'eventdetails': require('./components/EventDetails.vue'),
+        'eventdescription': require('./components/EventDescription.vue')
       }
     })
   })

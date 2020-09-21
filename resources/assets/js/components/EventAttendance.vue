@@ -1,89 +1,96 @@
 <template>
-  <div>
-    <h2>{{ translatedTitle }}</h2>
-    <div :class="{
+  <CollapsibleSection collapsed>
+    <template slot="title">
+      {{ translatedTitle }}
+      <hr class="d-md-none" />
+    </template>
+    <template slot="content">
+      <div :class="{
       attendance: true,
       'mt-2': true,
       upcoming: upcoming
       }">
-      <div>
         <div>
-          <h3>
-            <b-img src="/icons/group_ico.svg" class="mr-2" />
-            {{ translatedParticipants }}
-          </h3>
-          <EventAttendanceCount :count="participants.length" class="mt-2 mb-4" />
-          <h3>
-            <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
-            {{ translatedVolunteers }}
-          </h3>
-          <EventAttendanceCount :count="volunteers.length" class="mt-2" />
+          <div>
+            <h3>
+              <b-img src="/icons/group_ico.svg" class="mr-2" />
+              {{ translatedParticipants }}
+            </h3>
+            <EventAttendanceCount :count="participants.length" class="mt-2 mb-4" />
+            <h3>
+              <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
+              {{ translatedVolunteers }}
+            </h3>
+            <EventAttendanceCount :count="volunteers.length" class="mt-2" />
+          </div>
+        </div>
+        <div />
+        <div>
+          <b-tabs class="ourtabs attendance-tabs w-100">
+            <b-tab active title-item-class="w-50" class="pt-2">
+              <template slot="title">
+                <b>{{ translatedConfirmed }}</b> ({{ confirmed.length }})
+              </template>
+              <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
+                <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" :canedit="canedit" />
+              </div>
+              <p v-else>
+                {{ translatedNoConfirmed }}
+              </p>
+              <hr />
+              <div v-if="upcoming" class="d-flex justify-content-end">
+                <!--              TODO In due course these modals should become Vue components.-->
+                <a data-toggle="modal" data-target="#event-all-attended" href="#" class="mr-2">
+                  {{ translatedSeeAllConfirmed }}
+                </a>
+              </div>
+              <div v-else>
+                <div class="d-flex justify-content-between">
+                  <b-btn variant="link">
+                    TODO Add.  Include warn if
+                  </b-btn>
+                  <b-btn variant="link">
+                    {{ translatedSeeAllAttended }}
+                  </b-btn>
+                </div>
+              </div>
+            </b-tab>
+            <b-tab title-item-class="w-50" class="pt-2">
+              <!--    TODO looks wrong on mobile-->
+              <template slot="title">
+                <b>{{ translatedInvited }}</b> ({{ invited.length }})
+              </template>
+              <div v-if="invited.length" class="maxheight">
+                <EventAttendee v-for="a in invited" :key="'eventattendee-' + a.idevents_users" :attendee="a" />
+              </div>
+              <p v-else>
+                {{ translatedNoInvited }}
+              </p>
+              <hr />
+              <div v-if="upcoming" class="d-flex justify-content-between">
+                <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
+                  <img class="icon" src="/images/add-icon.svg" />
+                  {{ translatedInviteToJoin }}
+                </a>
+                <a data-toggle="modal" data-target="#event-all-volunteers" href="#" class="mr-2" v-if="invited.length">
+                  {{ translatedSeeAllInvited }}
+                </a>
+              </div>
+            </b-tab>
+          </b-tabs>
         </div>
       </div>
-      <div />
-      <div>
-        <b-tabs class="ourtabs attendance-tabs w-100">
-          <b-tab active title-item-class="w-50" class="pt-2">
-            <template slot="title">
-              <b>{{ translatedConfirmed }}</b> ({{ confirmed.length }})
-            </template>
-            <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
-              <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" :canedit="canedit" />
-            </div>
-            <p v-else>
-              {{ translatedNoConfirmed }}
-            </p>
-            <hr />
-            <div v-if="upcoming" class="d-flex justify-content-end">
-<!--              TODO In due course these modals should become Vue components.-->
-              <a data-toggle="modal" data-target="#event-all-attended" href="#" class="mr-2">
-                {{ translatedSeeAllConfirmed }}
-              </a>
-            </div>
-            <div v-else>
-              <div class="d-flex justify-content-between">
-                <b-btn variant="link">
-                  TODO Add.  Include warn if
-                </b-btn>
-                <b-btn variant="link">
-                  {{ translatedSeeAllAttended }}
-                </b-btn>
-              </div>
-            </div>
-          </b-tab>
-          <b-tab title-item-class="w-50" class="pt-2">
-            <template slot="title">
-              <b>{{ translatedInvited }}</b> ({{ invited.length }})
-            </template>
-            <div v-if="invited.length" class="maxheight">
-              <EventAttendee v-for="a in invited" :key="'eventattendee-' + a.idevents_users" :attendee="a" />
-            </div>
-            <p v-else>
-              {{ translatedNoInvited }}
-            </p>
-            <hr />
-            <div v-if="upcoming" class="d-flex justify-content-between">
-              <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
-                <img class="icon" src="/images/add-icon.svg" />
-                {{ translatedInviteToJoin }}
-              </a>
-              <a data-toggle="modal" data-target="#event-all-volunteers" href="#" class="mr-2" v-if="invited.length">
-                {{ translatedSeeAllInvited }}
-              </a>
-            </div>
-          </b-tab>
-        </b-tabs>
-      </div>
-    </div>
-  </div>
+    </template>
+  </CollapsibleSection>
 </template>
 <script>
 import { GUEST, HOST, RESTARTER } from '../constants'
 import EventAttendanceCount from './EventAttendanceCount'
 import EventAttendee from './EventAttendee'
+import CollapsibleSection from './CollapsibleSection'
 
 export default {
-  components: {EventAttendee, EventAttendanceCount},
+  components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
   props: {
     eventId: {
       type: Number,
