@@ -8,7 +8,7 @@
         <div class="mr-2">
           <b-img-lazy src="/icons/date_ico.svg" class="icon" />
         </div>
-        <div class="d-flex justify-content-between w-100">
+        <div class="d-flex justify-content-between w-100 flex-wrap">
           <div>
             {{ date }}
           </div>
@@ -44,11 +44,11 @@
         <div class="mr-2">
           <b-img-lazy src="/icons/map_marker_ico.svg" class="icon" />
         </div>
-        <div class="d-flex justify-content-between w-100">
+        <div class="justify-content-between w-100 d-flex flex-wrap">
           <div>
             {{ event.location}}
           </div>
-          <ExternalLink :href="'https://www.openstreetmap.org/?mlat=' + event.latitude + '&mlon=' + event.longitude + '#map=20/' + event.latitude + '/' + event.longitude">
+          <ExternalLink :href="'https://www.openstreetmap.org/?mlat=' + event.latitude + '&mlon=' + event.longitude + '#map=20/' + event.latitude + '/' + event.longitude" class="text-nowrap">
             {{ translatedViewMap }}
           </ExternalLink>
         </div>

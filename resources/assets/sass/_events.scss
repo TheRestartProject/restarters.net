@@ -334,7 +334,7 @@
     }
 
     .nav-link {
-        padding-left: 45px;
+        padding-left: calc(10% + 1px) !important;
         border-top: none;
         padding-top: 10px;
         border-left: 1px solid $black ;
@@ -346,7 +346,7 @@
     .nav-link.active {
         border-top: 5px solid $black;
         padding-top: 5px;
-        padding-left: 46px;
+        padding-left: calc(10% + 1px) !important;
         border-left: none;
         border-right: none;
 

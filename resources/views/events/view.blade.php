@@ -132,65 +132,208 @@
         </div>
       </div>
 
-      <div>
-        <div class="vue-placeholder vue-placeholder-large">
-          <div class="vue-placeholder-content">@lang('partials.loading')...</div>
-        </div>
+      <!-- So far only upcoming events have been moved over to Vue. -->
+      @if($event->isUpcoming())
+        <div>
+          <div class="vue-placeholder vue-placeholder-large">
+            <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+          </div>
 
-        <?php
-        // We need to expand the user objects to pass to the client.  In due course this will be replaced
-        // by an API call to get the event details.
-        $expanded_attended = [];
-        foreach ($attended as $att) {
-          $thisone = $att;
-          $thisone['volunteer'] = $att->volunteer;
-          $thisone['userSkills'] = $att->volunteer->userSkills;
-          $thisone['fullName'] = $att->getFullName();
-          $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
-          $expanded_attended[] = $thisone;
-        }
-        $expanded_invited = [];
-        foreach ($invited as $att) {
-          $thisone = $att;
-          $thisone['volunteer'] = $att->volunteer;
-          $thisone['userSkills'] = $att->volunteer->userSkills;
-          $thisone['fullName'] = $att->getFullName();
-          $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
-          $expanded_invited[] = $thisone;
-        }
+          <?php
+          // We need to expand the user objects to pass to the client.  In due course this will be replaced
+          // by an API call to get the event details.
+          $expanded_attended = [];
+          foreach ($attended as $att) {
+            $thisone = $att;
+            $thisone['volunteer'] = $att->volunteer;
+            $thisone['userSkills'] = $att->volunteer->userSkills;
+            $thisone['fullName'] = $att->getFullName();
+            $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
+            $expanded_attended[] = $thisone;
+          }
+          $expanded_invited = [];
+          foreach ($invited as $att) {
+            $thisone = $att;
+            $thisone['volunteer'] = $att->volunteer;
+            $thisone['userSkills'] = $att->volunteer->userSkills;
+            $thisone['fullName'] = $att->getFullName();
+            $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
+            $expanded_invited[] = $thisone;
+          }
 
-        $expanded_hosts = [];
-        foreach ($hosts as $host) {
-          $thisone = $host;
-          $thisone['volunteer'] = $host->volunteer;
-          $expanded_hosts[] = $thisone;
-        }
+          $expanded_hosts = [];
+          foreach ($hosts as $host) {
+            $thisone = $host;
+            $thisone['volunteer'] = $host->volunteer;
+            $expanded_hosts[] = $thisone;
+          }
 
-        error_log("Check edit");
-        $attendance_edit = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
-        ?>
+          error_log("Check edit");
+          $attendance_edit = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
+          ?>
 
-        <div class="d-flex flex-wrap">
-          <div class="w-xs-100 w-md-50">
-            <div class="vue">
-              <EventDetails class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links) }}" />
+          <div class="d-flex flex-wrap">
+            <div class="w-xs-100 w-md-50">
+              <div class="vue">
+                <EventDetails class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links) }}" />
+              </div>
+              <div class="vue">
+                <EventDescription class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" />
+              </div>
             </div>
-            <div class="vue">
-              <EventDescription class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" />
+            <div class="w-xs-100 w-md-50 vue">
+              <EventAttendance class="pl-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $attendance_edit ? 'true' : 'false' }}" />
             </div>
           </div>
-          <div class="w-xs-100 w-md-50 vue">
-            <EventAttendance class="pl-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $attendance_edit ? 'true' : 'false' }}" />
+
+          @if( $event->isInProgress() || $event->hasFinished() )
+            <div class="vue w-100">
+              <EventStats class="ml-2 mr-2" :stats="{{ json_encode($event->getEventStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}" />
+            </div>
+          @endif
+
+        </div>
+      @else
+        <div class="row">
+          <div class="col-lg-12">
+            <p></p>
+            <p></p>
           </div>
         </div>
+        <div class="row">
+          <div class="col-lg-4">
 
-        @if( $event->isInProgress() || $event->hasFinished() )
-          <div class="vue w-100">
-            <EventStats class="ml-2 mr-2" :stats="{{ json_encode($event->getEventStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}" />
+            <aside id="event-details" class="sidebar-lg-offset">
+
+              <h2>@lang('events.event_details')</h2>
+              <div class="card events-card">
+                @if ( ! $event->online )
+                  <div id="event-map" class="map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
+                @endif
+
+                <div class="events-card__details">
+
+                  <div class="row flex-row d-flex">
+
+                    <div class="col-4 d-flex flex-column"><strong>@lang('events.date_time'): </strong></div>
+                    <div class="col-8 d-flex flex-column">
+                      {{ date('D jS M Y', $formdata->event_date) }}<br>
+                      {{ $event->getEventStartEnd() }}
+                      @if( $event->isUpcoming() && ! empty($calendar_links) )
+                        <div class="dropdown dropdown-calendar">
+                          <a
+                                  class="btn btn-link dropdown-toggle"
+                                  href="#"
+                                  role="button"
+                                  id="addToCalendar"
+                                  data-toggle="dropdown"
+                                  aria-haspopup="true"
+                                  aria-expanded="false">@lang('events.add_to_calendar')</a>
+
+                          <div class="dropdown-menu" aria-labelledby="addToCalendar">
+                            <span class="dropdown-menu-arrow"></span>
+                            <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['google'] }}}">Google Calendar</a>
+                            <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['webOutlook'] }}}">Outlook</a>
+                            <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['ics'] }}}">iCal</a>
+                            <a target="_blank" class="dropdown-item" href="{{{ $calendar_links['yahoo'] }}}">Yahoo Calendar</a>
+                          </div>
+                        </div>
+                      @endif
+                    </div>
+
+                    @if ( ! $event->online )
+                      <div class="col-4 d-flex flex-column"><strong>@lang('events.event_address'): </strong></div>
+
+                      <div class="col-8 d-flex flex-column"><address>{{ $formdata->location }}</address></div>
+                    @endif
+
+                    @if( count($hosts) > 0 )
+                      <div class="col-4 d-flex flex-column"><strong>{{{ str_plural('Host', count($hosts) ) }}}: </strong></div>
+                      <div class="col-8 d-flex flex-column">
+                        @foreach( $hosts as $host )
+                          {{ $host->volunteer->name }}<br>
+                        @endforeach
+                      </div>
+                    @endif
+
+                    @if( $event->isInProgress() || $event->hasFinished() )
+                      <div class="col-4 col-label d-flex flex-column"><strong>@lang('events.participants'):</strong></div>
+                      <div class="col-8 d-flex flex-column">
+                        @if( Auth::check() )
+                          @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+                            <div>
+                              <div class="input-group-qty">
+                                <label for="participants_qty" class="sr-only">@lang('events.quantity'):</label>
+                                <button class="decrease btn-value">–</button>
+                                <input name="participants_qty" id="participants_qty" maxlength="3" value="{{ $formdata->pax }}" title="Qty" class="input-text form-control qty" type="number">
+                                <button class="increase btn-value">+</button>
+                              </div>
+                            </div>
+                          @else
+                            {{ $formdata->pax }}
+                          @endif
+                        @else
+                          {{ $formdata->pax }}
+                        @endif
+
+                      </div>
+                    @endif
+
+                    @if( $event->isInProgress() || $event->hasFinished() )
+
+                      <div class="col-4 col-label d-flex flex-column"><strong>@lang('events.volunteers'):</strong></div>
+
+                      <div class="col-8 d-flex flex-column">
+                        @if( Auth::check() )
+                          @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+                            <div>
+                              <div class="input-group-qty">
+                                <label for="volunteer_qty" class="sr-only">@lang('events.quantity'):</label>
+                                <button class="decreaseVolunteers btn-value">–</button>
+                                <input name="volunteer_qty" id="volunteer_qty" maxlength="3" value="{{ $event->volunteers }}" title="Qty" class="input-text form-control qty" type="number">
+                                <button class="increaseVolunteers btn-value">+</button>
+                              </div>
+                            </div>
+                          @else
+                            {{ $event->volunteers }}
+                          @endif
+                        @else
+                          {{ $event->volunteers }}
+                        @endif
+
+                      </div>
+
+                      <div class="col-12 invalid-feedback" id="warning_volunteers_message" style="display: none;">
+                        @lang('events.warning_volunteers_message')
+                      </div>
+
+                    @endif
+
+                  </div>
+
+                </div>
+
+              </div>
+              @if( !empty($images) )
+                <h2 class="d-none d-lg-block">@lang('events.event_photos')</h2>
+                <h2 class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#event-photos-section" role="button" aria-expanded="false" aria-control"event-photos-section">@lang('events.event_photos') <span class="badge badge-pill badge-primary" id="photos-counter">1</span></a></h2>
+                <div id="event-photos-section" class="collapse d-lg-block collapse-section">
+                  <ul class="photo-list">
+                    @foreach($images as $image)
+                      <li>
+                        <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
+                          <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder" width="100">
+                        </a>
+                      </li>
+                    @endforeach
+                  </ul>
+                </div>
+              @endif
+
+            </aside>
           </div>
-        @endif
-
-      </div>
+        </div>
+      @endif
 
       @if( $event->isInProgress() || $event->hasFinished() )
 

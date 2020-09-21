@@ -99,9 +99,10 @@ h2 {
 }
 
 .linkdrop {
-  color: blue;
+  color: $brand-light !important;
 
   button {
+    background-color: transparent !important;
     color: $brand-light !important;
     padding: 0px;
   }

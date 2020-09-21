@@ -15741,12 +15741,12 @@ a.form-text-corrected:focus {
   color: #fff;
 }
 
-.show .dropdown-toggle {
+.dropdown.show .dropdown-toggle {
   background-color: #222 !important;
   color: #fff;
 }
 
-.show .dropdown-toggle svg path {
+.dropdown.show .dropdown-toggle svg path {
   fill: #fff !important;
 }
 

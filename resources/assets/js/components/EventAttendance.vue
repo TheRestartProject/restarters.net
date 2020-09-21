@@ -47,7 +47,7 @@
               <div v-else>
                 <div class="d-flex justify-content-between">
                   <b-btn variant="link">
-                    TODO Add.  Include warn if
+                    TODO Add.
                   </b-btn>
                   <b-btn variant="link">
                     {{ translatedSeeAllAttended }}
@@ -56,7 +56,6 @@
               </div>
             </b-tab>
             <b-tab title-item-class="w-50" class="pt-2">
-              <!--    TODO looks wrong on mobile-->
               <template slot="title">
                 <b>{{ translatedInvited }}</b> ({{ invited.length }})
               </template>
