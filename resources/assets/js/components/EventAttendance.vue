@@ -28,7 +28,7 @@
               <b>{{ translatedConfirmed }}</b> ({{ confirmed.length }})
             </template>
             <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
-              <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" />
+              <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" :canedit="canedit" />
             </div>
             <p v-else>
               {{ translatedNoConfirmed }}
@@ -43,7 +43,7 @@
             <div v-else>
               <div class="d-flex justify-content-between">
                 <b-btn variant="link">
-                  TODO Add
+                  TODO Add.  Include warn if
                 </b-btn>
                 <b-btn variant="link">
                   {{ translatedSeeAllAttended }}
@@ -100,6 +100,13 @@ export default {
     invitations:  {
       type: Array,
       required: true
+    },
+    // TODO In due course the permissions should be handled by having the user in the store and querying that, rather
+    // than passing down props.
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {

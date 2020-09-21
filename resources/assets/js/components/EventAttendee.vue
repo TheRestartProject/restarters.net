@@ -28,25 +28,31 @@
           </div>
         </div>
       </div>
-      <b-btn variant="none" v-if="attendee.confirmed" @click="remove" class="p-0">
+      <b-btn variant="none" v-if="attendee.confirmed && canedit" @click="confirm" class="p-0">
         <b-img src="/icons/delete_ico_red.svg" />
       </b-btn>
     </div>
     <b-alert variant="danger" v-if="error">
       {{ translatedSomethingWrong }}: {{ error }}
     </b-alert>
-<!--    TODO Only host or admin can remove-->
-<!--    TODO Remove confirm-->
+    <ConfirmModal @confirm="remove" ref="confirm" />
   </div>
 </template>
 <script>
 import { DEFAULT_PROFILE, HOST } from '../constants'
+import ConfirmModal from './ConfirmModal'
 
 export default {
+  components: {ConfirmModal},
   props: {
     attendee: {
       type: Object,
       required: true
+    },
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
@@ -90,6 +96,9 @@ export default {
       } catch (e) {
         this.error = e.message
       }
+    },
+    confirm() {
+      this.$refs.confirm.show()
     }
   }
 }

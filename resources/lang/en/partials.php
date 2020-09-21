@@ -107,5 +107,7 @@ return array (
   'add_device_button' => 'Add',
   'loading' => 'Loading',
   'skills' => 'skill|skills',
-  'something_wrong' => 'Something has gone wrong'
+  'something_wrong' => 'Something has gone wrong',
+  'are_you_sure' => 'Are you sure?',
+  'please_confirm' => 'Please confirm that you wish to proceed.'
 );
