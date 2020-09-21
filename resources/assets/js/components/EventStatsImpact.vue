@@ -63,9 +63,10 @@ export default {
       if (!ret.length) {
         return null
       } else if (ret.length === 1) {
-        return ret[0]
+        const intro = this.pluralise(this.$lang.get('events.not_counting'), this.stats.no_weight)
+        return intro + ' ' + ret[0] + '.'
       } else {
-        const intro = this.pluralise(this.$lang.get('events.not_counting'), (this.stats.dead_devices + this.stats.repairable_devices + this.stats.no_weight))
+        const intro = this.pluralise(this.$lang.get('events.not_counting'), this.stats.no_weight)
         const first = ret.slice(0, -1)
         const last = ret[ret.length - 1]
 
