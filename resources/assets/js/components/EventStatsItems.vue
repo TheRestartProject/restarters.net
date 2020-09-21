@@ -4,9 +4,9 @@
     <div class="items-container">
       <EventStatsValue :count="stats.fixed_devices" icon="fixed" size="sm" variant="primary" class="event-stat-fixed" />
       <div />
-      <EventStatsValue :count="stats.devices_powered" icon="powered" size="md" title="devices.powered_items" class="event-stat-powered" />
+      <EventStatsValue :count="stats.fixed_powered" icon="powered" size="md" title="devices.powered_items" class="event-stat-powered" />
       <div />
-      <EventStatsValue :count="stats.devices_unpowered" icon="unpowered" size="md" title="devices.unpowered_items" class="event-stat-unpowered" />
+      <EventStatsValue :count="stats.fixed_unpowered" icon="unpowered" size="md" title="devices.unpowered_items" class="event-stat-unpowered" />
     </div>
   </div>
 </template>

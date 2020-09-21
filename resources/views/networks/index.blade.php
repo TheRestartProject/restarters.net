@@ -24,7 +24,8 @@
             <thead>
                 <tr>
                     <th scope="col" width="20%"></th>
-                    <th scope="col">@lang('networks.general.network')</th>
+                    <th scope="col" width="20%">@lang('networks.general.network')</th>
+                    <th scope="col">@lang('networks.index.description')</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,6 +43,9 @@
                             </td>
                             <td>
                                 <a href="/networks/{{$network->id}}">{{ $network->name }}</a>
+                            </td>
+                            <td>
+                                {{ $network->description }}
                             </td>
                         </tr>
                     @endforeach

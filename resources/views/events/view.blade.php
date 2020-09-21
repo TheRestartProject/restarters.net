@@ -463,6 +463,15 @@
           </div>
 
         </div>
+
+        <div class="vue-placeholder vue-placeholder-large">
+          <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+        </div>
+
+        @if( $event->isInProgress() || $event->hasFinished() )
+          <div class="vue w-100">
+            <EventStats :stats="{{ json_encode($event->getEventStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}" />
+        </div>
         @endif
 
         @if( $event->isInProgress() || $event->hasFinished() )

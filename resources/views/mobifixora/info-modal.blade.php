@@ -23,7 +23,7 @@
                     To enable community repair to contribute to the current push for right to repair regulations for smartphones, we want to see what types of faults are commonly encountered.
                 </p>
                 <p>
-                    So we’d like to analyse the data collected so far, to learn about key faults seen at repair events - and this is where you can help, by playing MobiFix!
+                    So we’d like to analyse the data collected so far, to learn about key faults seen at repair events - and this is where you can help, by playing MobiFix:ORA!
                 </p>
 
                 <hr/>

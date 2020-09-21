@@ -590,11 +590,11 @@ function initAutocomplete() {
 
   function removeUser() {
 
-    user_id = jQuery(this).data('remove-volunteer');
-    event_id = jQuery(this).data('event-id');
-    type = jQuery(this).data('type');
-    counter = jQuery('#'+type+'-counter');
-    current_count = parseInt(counter.text());
+    var user_id = jQuery(this).data('remove-volunteer');
+    var event_id = jQuery(this).data('event-id');
+    var type = jQuery(this).data('type');
+    var counter = jQuery('#'+type+'-counter');
+    var current_count = parseInt(counter.text());
 
     $.ajax({
       headers: {
@@ -765,7 +765,6 @@ function initAutocomplete() {
 
   var tag_options_with_input = {
     tags: true,
-    minimumInputLength: 2,
     formatInputTooShort: "Type a brand name",
     language: {
       inputTooShort: function inputTooShort() {
@@ -797,6 +796,12 @@ function initAutocomplete() {
     		allowClear: true,
       });
 
+      jQuery('.select2[data-placeholder]').each(function() {
+        $(this).select2({
+          placeholder: $(this).data('placeholder')
+        })
+      })
+
     } else {
 
       $target.find('.select2').select2();
@@ -809,6 +814,12 @@ function initAutocomplete() {
     		allowClear: true,
       });
 
+
+      $target.find('.select2[data-placeholder]').each(function() {
+        $(this).select2({
+          placeholder: $(this).data('placeholder')
+        })
+      })
     }
 
 
@@ -923,8 +934,16 @@ function initAutocomplete() {
     // });
 
     jQuery(document).on('change', '.category', function (e) {
-      $value = parseInt(jQuery(this).val());
-      $field = jQuery(this).parents('td').find('.weight');
+      var $value = parseInt(jQuery(this).val());
+      var $field = jQuery(this).parents('td').find('.weight');
+
+      if (!$field.length) {
+        // At present this global JS is used in both old and new designs which have different DOM structure, so we
+        // need to cope with both.
+        $field = jQuery(this).parents('.card-body').find('.weight')
+      }
+
+      console.log("Category change", $(this), $value, $field)
       if( $value === 46 || $value === '' ){
         $field.prop('disabled', false);
         $field.parents('.display-weight').removeClass('d-none');
@@ -938,8 +957,8 @@ function initAutocomplete() {
 
     jQuery('.toggle-manual-invite').on('change', function (e) {
 
-      $value = jQuery(this).val();
-      $toggle = jQuery('.show-hide-manual-invite');
+      var $value = jQuery(this).val();
+      var $toggle = jQuery('.show-hide-manual-invite');
 
       $('#full_name, #volunteer_email_address').val('');
 
@@ -995,6 +1014,11 @@ function initAutocomplete() {
       if (hash) {
           $('a[href=\"'+hash).tab('show');
       }
+  });
+
+  jQuery(document).ready(function () {
+    // Enable popovers - Bootstrap doesn't enable these by default.
+    $('[data-toggle="popover"]').popover()
   });
 
   $('#register-form-submit').on('click', function(e) {
@@ -1082,19 +1106,19 @@ function initAutocomplete() {
 
     // Dismissable Alert copy link action
     $('.btn-action').on('click', function () {
-      $copy_link = $(this).attr('data-copy-link');
+      var $copy_link = $(this).attr('data-copy-link');
       copyLink($copy_link);
     });
 
     // Copy Calendar Feed link
     $('#btn-copy').on('click', function () {
-      $link = $(this).parents('div').parents('div').find('input[type=text]');
+      var $link = $(this).parents('div').parents('div').find('input[type=text]');
       copyLink($link.val());
     });
 
     // User Profile Settings - Calendar copy links
     $('.btn-copy-input-text').on('click', function () {
-      $link = $(this).parent('div').parent('div').find('input[type=text]');
+      var $link = $(this).parent('div').parent('div').find('input[type=text]');
       copyLink($link.val());
     });
 
@@ -1111,7 +1135,7 @@ function initAutocomplete() {
 
 
     $('.information-alert').on('closed.bs.alert', function () {
-      $dismissable_id = $(this).attr('id');
+      var $dismissable_id = $(this).attr('id');
       $.ajax({
         headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1130,9 +1154,11 @@ function initAutocomplete() {
 
     $('.tokenfield').tokenfield();
 
+    var $current_column = $('input[name=sort_column]:checked').val();
+
     $('input[name=sort_column]').on('click', function(e) {
-        $form = $('#device-search');
-        $sort_direction = $form.find('input[name=sort_direction]');
+        var $form = $('#device-search');
+        var $sort_direction = $form.find('input[name=sort_direction]');
             if( $sort_direction.val() === 'DSC' ){
                 $sort_direction.val('ASC');
             } else {
@@ -1143,7 +1169,7 @@ function initAutocomplete() {
 
     $('.filter-columns').on('click', function(e) {
 
-      $table = $('#sort-table');
+      var $table = $('#sort-table');
 
       var hide_columns = $table.find('.'+$(this).data('id'));
       $(hide_columns).toggle();
@@ -1266,20 +1292,20 @@ function initAutocomplete() {
       document.body.appendChild(copyTextArea);
       copyTextArea.select();
 
-      $original_popover_text = element.attr('data-content');
+      var $original_popover_text = element.attr('data-content');
 
       try {
         var successful = document.execCommand('copy');
         var message = successful ? 'Copied!' : 'Whoops, not copied!';
-        $set_success_message_in_popover = element.attr('data-content', message);
-        $show_popover = element.popover('show');
+        var $set_success_message_in_popover = element.attr('data-content', message);
+        var $show_popover = element.popover('show');
 
       } catch (err) {
         console.log('Oops, unable to copy');
       }
 
       document.body.removeChild(copyTextArea);
-      $set_original_popover_message = element.attr('data-content', $original_popover_text);
+      var $set_original_popover_message = element.attr('data-content', $original_popover_text);
 
     } else {
       // Fallback if browser doesn't support .execCommand('copy')
@@ -1316,6 +1342,42 @@ function initAutocomplete() {
     tokenFieldCheck();
   });
 
+  function deviceFormCollect($form) {
+    var formdata = $form.serializeArray()
+
+    // The event id is not held in the form itself.
+    formdata.push({
+      'name': 'event_id',
+      'value': $('#event_id').val()
+    })
+
+    // The wiki flag is passed as 0/1 not true/false.
+    formdata = formdata.map((v) => {
+      if (v.name === 'wiki') {
+        return v.value ? 1 : 0
+      } else {
+        return v
+      }
+    })
+
+    return formdata
+  }
+
+  function deviceFormEnableDisable(form, disabled) {
+    form.find(':input').attr("disabled", disabled);
+  }
+
+  function updateEventStats(stats) {
+    $('#waste-insert').html(stats['ewaste']);
+    $('#co2-insert').html(stats['co2']);
+    $('#fixed-insert').html(stats['fixed_devices']);
+    $('#repair-insert').html(stats['repairable_devices']);
+    $('#dead-insert').html(stats['dead_devices']);
+    $('#devices-total').html(stats['devices_unpowered'] + stats['devices_powered']);
+    $('#devices-powered').html(stats['devices_powered']);
+    $('#devices-unpowered').html(stats['devices_unpowered']);
+  }
+
   $( document ).ready(function() {
 
     $("textarea#message_to_restarters[name=message_to_restarters]").on("keydown", function(event){
@@ -1339,12 +1401,17 @@ function initAutocomplete() {
     $('.add-device').on('submit', function(e) {
 
       e.preventDefault();
-      $form = $(this);
+      var $form = $(this);
 
       if( $form.find('select[name=category]').val() === '' ) {
         alert('Category field is required');
         return false;
       }
+
+      var formdata = deviceFormCollect($form)
+
+      // Provide some visual feedback that we're submitting.
+      deviceFormEnableDisable($form, true)
 
       $.ajax({
         headers: {
@@ -1352,68 +1419,34 @@ function initAutocomplete() {
         },
         type: 'post',
         url: '/device/create',
-        data: {
-          category: $form.find('select[name=category]').val(),
-          weight: $form.find('input[name=weight]').val(),
-          brand: $form.find('select[name=brand]').val(),
-          model: $form.find('input[name=model]').val(),
-          age: $form.find('input[name=age]').val(),
-          problem: $form.find('input[name=problem]').val(),
-          repair_status: $form.find('select[name=repair_status]').val(),
-          repair_details: $form.find('select[name=repair_details]').val(),
-          spare_parts: $form.find('select[name=spare_parts]').val(),
-          quantity: $form.find('select[name=quantity]').val(),
-          event_id: $form.find('input[name=event_id]').val(),
-          barrier: $form.find('#repair_barrier').val()
-        },
+        data: formdata,
         datatype: 'json',
         success: function(json) {
           if( json.success ){
-
-            //Reset appearance
-            $form.trigger("reset");
             jQuery('#device-start').focus();
 
-            $form.find(".select2.select2-hidden-accessible").select2('data', {}); // clear out values selected
-            $form.find(".select2.select2-hidden-accessible").select2({ allowClear: false }); // re-init to show default stat
-
-            $form.find(".select2-with-input.select2-hidden-accessible").select2('data', {}); // clear out values selected
-            $form.find(".select2-with-input.select2-hidden-accessible").select2(tag_options); // re-init to show default stat
-
-            $form.find('.display-weight').addClass('d-none');
-            $form.find('.repair-more').removeClass('col-device-auto');
-            $form.find('.repair-details-edit, .spare-parts, .repair-barrier').parents('.col-device').addClass('d-none');
-            $form.find('.repair-details-edit, .spare-parts, .repair-barrier').parents('.col-device').removeClass('col-device-auto');
-            //EO reset appearance
-
             //Appending...
-            for (i = 0; i < $(json.html).length; i++) {
+            for (var i = 0; i < $(json.html).length; i++) {
               var row = $(json.html)[i];
-              $target = $(row).hide().appendTo('#device-table > tbody:last-child').fadeIn(1000);
+              var $target = $(row).hide().appendTo('#device-table-' + (json.powered ? 'powered' : 'unpowered') + ' > tbody:last-child').fadeIn(1000);
               select2Fields($target);
             }
             $('.table-row-details').removeAttr('style');
             //Finished appending
 
-            //Update stats
-            $('#waste-insert').html( json.stats['ewaste'] );
-            $('#co2-insert').html(  json.stats['co2'] );
-            $('#fixed-insert').html(  json.stats['fixed_devices'] );
-            $('#repair-insert').html(  json.stats['repairable_devices'] );
-            $('#dead-insert').html(  json.stats['dead_devices'] );
+            updateEventStats(json.stats)
 
-            //Give users some visual feedback
-            $('.btn-add').addClass('btn-primary');
-            $('.btn-add').removeClass('btn-secondary');
-            setTimeout(function(e){
-              $('.btn-add').removeClass('btn-primary');
-              $('.btn-add').addClass('btn-secondary');
-            }, 1000);
+            // Collapse the Add back again.  That also acts as feedback that we've done something.
+            $('.add-edit-device-collapse').removeClass('show')
 
             loadDropzones();
             $(".select2-with-input").select2("destroy"); //TODO
             $(".select2-with-input").select2(tag_options_with_input); //TODO
 
+            // Reset form.  Need to kick select2.
+            $form.get(0).reset()
+            $form.find('select').change()
+            deviceFormEnableDisable($form, false)
           } else if( json ) {
 
             var error_message = '';
@@ -1428,64 +1461,35 @@ function initAutocomplete() {
             });
 
             alert(error_message);
-
           } else {
-
             alert('Something went wrong, please try again');
-
           }
-
-          console.log(json);
-
         },
         error: function(json) {
-
           if( json.responseJSON.message ){
-
             alert(json.responseJSON.message);
-
           } else {
-
             alert('Something went wrong, please try again');
-
           }
-
         }
       });
-
     });
 
     jQuery(document).on('submit', '.edit-device', function (e) {
-
       e.preventDefault();
 
-      var form = $(this);
-      var device_id = form.data('device');
+      var $form = $(this);
+      var device_id = $form.data('device');
       var summary_row = $('#summary-'+device_id);
+      var $category_name = $form.find("select[name='category'] option:selected").text();
+      var formdata = deviceFormCollect($form)
+      var values = {}
+      formdata.forEach((v) => {
+        values[v.name] = v.value
+      })
 
-      if( $('#wiki-'+device_id).is(':checked') ){
-        $wiki = 1;
-      } else {
-        $wiki = 0;
-      }
-
-      $category = $('#category-'+device_id).val();
-      $category_name = $('#category-'+device_id+' option:selected').text();
-      $weight = $('#weight-'+device_id).val();
-      $brand = $('#brand-'+device_id).val();
-      $model = $('#model-'+device_id).val();
-      $age = $('#age-'+device_id).val();
-      $problem = $('#problem-'+device_id).val();
-      $repair_status = parseInt($('#status-'+device_id).val());
-      $repair_details = parseInt($('#repair-info-'+device_id).val());
-      // $repair_details_name = $('#repair-info-'+device_id+' option:selected').text();
-      $spare_parts = parseInt($('#spare-parts-'+device_id).val());
-      $barrier = $('#barrier-'+device_id).val();
-      $event_id = $('#event_id').val();
-
-      //Visual improvements
-      $(this).find(':input').attr("disabled", true);
-      $('.btn-save2').text('Saving...');
+      // Provide some visual feedback that we're submitting.
+      deviceFormEnableDisable($form, true)
 
       $.ajax({
         headers: {
@@ -1493,80 +1497,51 @@ function initAutocomplete() {
         },
         type: 'post',
         url: '/device/edit/'+device_id,
-        data: {
-          category: $category,
-          weight: $weight,
-          brand: $brand,
-          model: $model,
-          age: $age,
-          problem: $problem,
-          repair_status: $repair_status,
-          repair_details: $repair_details,
-          spare_parts: $spare_parts,
-          wiki: $wiki,
-          event_id: $event_id,
-          barrier: $barrier,
-          // files:$('#file-'+device_id).val(),
-        },
+        data: formdata,
         datatype: 'json',
         success: function(data) {
-
-          $('#waste-insert').html( data.stats.ewaste );
-          $('#co2-insert').html(  data.stats.co2 );
-          $('#fixed-insert').html(  data.stats.fixed_devices );
-          $('#repair-insert').html(  data.stats.repairable_devices );
-          $('#dead-insert').html(  data.stats.dead_devices );
+          updateEventStats(data.stats)
 
           if (data.error) {
             alert(data.error);
-            // } else if (data.success) {
-            //   alert(data.success);
           }
 
-          //Visual improvements
-          setTimeout(function(e){
-            form.find(':input').attr("disabled", false);
-            $('.btn-save2').addClass('btn-success').removeClass('btn-primary').text('Saved');
-          }, 1000);
+          setTimeout(() => {
+            deviceFormEnableDisable($form, false)
 
-          //Visual improvements
-          setTimeout(function(e){
-            $('.btn-save2').removeClass('btn-success').addClass('btn-primary').text('Update');
-          }, 3000);
+            // Collapse the Add back again.  That also acts as feedback that we've done something.
+            $('.add-edit-device-collapse').removeClass('show')
+            $('.active-row').removeClass('active-row')
+          }, 2000)
 
           // Reset if none of the above is selected
           if( $category_name === 'None of the above' )
             $category_name = 'Misc';
 
           summary_row.find('.category').text($category_name);
-          summary_row.find('.brand').text($brand);
-          summary_row.find('.model').text($model);
-          summary_row.find('.age').text($age);
-          summary_row.find('.problem').text($problem);
+          summary_row.find('.brand').text(values.brand);
+          summary_row.find('.model').text(values.model);
+          summary_row.find('.age').text(values.age);
 
-          if( $repair_status === 1 ){
+          // Laravel blade template truncates problem at 60 characters, so we should do the same.
+          summary_row.find('.problem').text(values.problem.length >= 60 ? (values.problem.substring(0, 60) + '...') : values.problem);
+
+          if( values.repair_status == 1 ){
             summary_row.find('.repair_status').empty().html('<span class="badge badge-success">Fixed</span>');
-          } else if( $repair_status === 2 ){
+          } else if( values.repair_status == 2 ){
             summary_row.find('.repair_status').empty().html('<span class="badge badge-warning">Repairable</span>');
-          } else if( $repair_status === 3 ){
+          } else if( values.repair_status == 3 ){
             summary_row.find('.repair_status').empty().html('<span class="badge badge-danger">End</span>');
           } else {
             summary_row.find('.repair_status').empty();
           }
 
-          // if( $repair_details === 0 ){
-          //   summary_row.find('.repair_details').text('N/A');
-          // } else {
-          //   summary_row.find('.repair_details').text($repair_details_name);
-          // }
-
           // Hide tick when no spare parts selected or not needed
-          if( $spare_parts == 0 || $spare_parts == 2 ){
+          if( values.spare_parts == 0 || values.spare_parts == 2 ){
             summary_row.find('.table-tick').hide();
           } else {
             summary_row.find('.table-tick').show();
           }
-
         },
         error: function(error) {
           alert(error);
@@ -1579,14 +1554,17 @@ function initAutocomplete() {
 
       e.preventDefault();
       if (window.confirm("Are you sure? This cannot be undone.")) {
-        $device = jQuery(this).data('device-id');
-        $href = $(this).attr('href');
+        var $device = jQuery(this).data('device-id');
+        var $href = $(this).attr('href');
         $.ajax({
           type: 'get',
           url: $href,
           success: function(data) {
-            $('#summary-'+$device).fadeOut(1000);
-            $('#row-'+$device).fadeOut(1000);
+            if (data.success) {
+              $('#summary-'+$device).fadeOut(1000);
+              $('#row-'+$device).fadeOut(1000);
+              updateEventStats(data.stats)
+            }
           },
           error: function(error) {
             alert(error);
@@ -1600,9 +1578,9 @@ function initAutocomplete() {
       e.preventDefault();
 
       if (window.confirm("Are you sure? This cannot be undone.")) {
-        $this = jQuery(this);
-        $device = jQuery(this).data('device-id');
-        $href = $(this).attr('href');
+        var $this = jQuery(this);
+        var $device = jQuery(this).data('device-id');
+        var $href = $(this).attr('href');
         $.ajax({
           type: 'get',
           url: $href,
@@ -1652,7 +1630,7 @@ function initAutocomplete() {
       if($(this).attr('data-count-attended') > 0 || $(this).attr('data-count-invited') > 0 || $(this).attr('data-count-volunteers') > 0) {
         return confirm('Are you sure you want to delete this event?');
 
-        id = $(this).attr('data-party-id');
+        var id = $(this).attr('data-party-id');
 
         $.ajax({
           headers: {
@@ -1681,13 +1659,13 @@ function initAutocomplete() {
     });
 
     $('.select2-with-input-group').on("select2:select", function(e) {
-      $input_field = $(this).parents('.input-group-select2').find('input[type=text]');
+      var $input_field = $(this).parents('.input-group-select2').find('input[type=text]');
 
-      $current_url = $input_field.val();
+      var $current_url = $input_field.val();
 
-      $remove_current_area = $current_url.lastIndexOf('/') + 1;
-      $creating_new_url =  $current_url.substring( 0, $remove_current_area );
-      $new_url = $creating_new_url.concat( $(this).val() );
+      var $remove_current_area = $current_url.lastIndexOf('/') + 1;
+      var $creating_new_url =  $current_url.substring( 0, $remove_current_area );
+      var $new_url = $creating_new_url.concat( $(this).val() );
 
       $input_field.val($new_url);
     });
@@ -1696,7 +1674,7 @@ function initAutocomplete() {
 
   // Copy Calendar Feed link
   $(document).on("click", "#btn-copy", function () {
-    $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
+    var $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
 
     var $temp = $("<input>");
     $("body").append($temp);

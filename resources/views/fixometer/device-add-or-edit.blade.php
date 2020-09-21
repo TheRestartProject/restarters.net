@@ -102,20 +102,20 @@
                         @endif
 
                         <div class="device-field-row align-items-center mb-2 display-weight weight {{ (!$powered || $device->category == 46) ? '' : 'd-none' }}">
-                            <label class="mandatory text-bold">
-                                @lang('devices.weight')*
+                            <label class="text-bold">
+                                @lang('devices.weight')
                             </label>
                             <div class="input-group">
                                 {{-- Powered devices don't allow editing of the weight except for the "None of the above" category, whereas unpowered do. --}}
                                 <input {{ $powered ? 'disabled' : '' }} type="number" class="{{ $powered ? 'weight' : '' }} form-control form-control-lg field numeric" name="weight" min="0.01" step=".01" autocomplete="off" value="{{ $device->estimate }}">
                             </div>
-                            <span class="mandatory text-right mb-1">
+                            <span class="text-right mb-1">
                             @lang('devices.required_impact')
                         </span>
                         </div>
 
                         <div class="device-field-row align-items-center mb-2">
-                            <label class="text-black text-bold">
+                            <label class="text-bold">
                                 @lang('devices.age')
                             </label>
                             <div class="display-weight">
@@ -123,7 +123,7 @@
                                     <input type="number" class="form-control field" name="age" min="0" step="0.5" value="{{ $device->age }}" autocomplete="off">
                                 </div>
                             </div>
-                            <span class="text-black text-right mb-1">
+                            <span class="text-right mb-1">
                                 @lang('devices.age_approx')
                             </span>
                         </div>
@@ -136,7 +136,7 @@
                     <h3>@lang('devices.title_repair')</h3>
                     <div class="mt-4 d-flex flex-column">
                         <div class="form-control form-control__select mb-2 col-device">
-                            <select class="select2 repair-status" name="repair_status" data-device="{{ $device->iddevices }}" placeholder="@lang('devices.description_of_problem')" data-placeholder="@lang('devices.repair_outcome')">
+                            <select class="select2 repair-status" name="repair_status" data-device="{{ $device->iddevices }}" data-placeholder="@lang('devices.repair_outcome')">
                                 <option></option>
                                 @if ( $device->repair_status == 1 )
                                     <option value="1" selected>@lang('partials.fixed')</option>

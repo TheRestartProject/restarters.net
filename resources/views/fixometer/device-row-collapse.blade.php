@@ -11,7 +11,7 @@
     <td class="category" @if( !FixometerHelper::checkColumn('category', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->deviceCategory->name }}}
     </td>
-    @if (!$powered)
+    @if ($powered)
     <td class="brand" @if( !FixometerHelper::checkColumn('brand', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->brand }}}
     </td>
