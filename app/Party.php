@@ -669,7 +669,7 @@ class Party extends Model implements Auditable
                         break;
                 }
 
-                if ($device->isFixed() && !$device->deviceCategory->weight && !$device->estimate) {
+                if ($device->isFixed() && ($device->category == 46 || !$device->deviceCategory->weight) && !$device->estimate) {
                     $no_weight++;
                 }
             }
