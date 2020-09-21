@@ -3,6 +3,7 @@ $focus1 : #0062cc;
 $brand: #0394a6;
 $black: #222;
 $white: #fff;
+$brand-light: #4aaebc;
 
 // Font Variables //
 $font-family-sans-serif: 'Asap', sans-serif;
@@ -35,3 +36,5 @@ $spacers: map-merge(
   ),
   $spacers
 );
+
+$shadow: 5px;

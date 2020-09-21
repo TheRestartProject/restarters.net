@@ -329,7 +329,7 @@
                                             </th>
                                             <th scope="col" class="model d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
                                                 <label for="label-model" class="sort-column @if( $sort_column == 'model' ) sort-column-{{{ strtolower($sort_direction) }}} @endif">
-                                                    @lang('devices.model')
+                                                    @lang('devices.model_or_type')
                                                 </label>
                                             </th>
                                             <th scope="col" class="problem d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
@@ -358,10 +358,17 @@
                                         @php( $user = Auth::user() )
                                         @php( $is_admin = FixometerHelper::hasRole($user, 'Administrator') )
                                         @foreach($items as $device)
-                                        @if ( $is_admin || $device->repaired_by == $user->id )
-                                        @include('fixometer.device-row-with-edit')
-                                        @else
-                                        @include('fixometer.device-row-collapse')
+                                        @if ($device->deviceCategory->powered)
+                                            {{-- TODO unpowered devices not yet shown on this page--}}
+                                            @if ( $is_admin || $device->repaired_by == $user->id )
+                                            @include('fixometer.device-row-with-edit', [
+                                                'powered' => $device->deviceCategory->powered
+                                            ])
+                                            @else
+                                            @include('fixometer.device-row-collapse', [
+                                                'powered' => $device->deviceCategory->powered
+                                            ])
+                                            @endif
                                         @endif
                                         @endforeach
                                     </tbody>

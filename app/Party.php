@@ -624,15 +624,34 @@ class Party extends Model implements Auditable
 
         $co2Diverted = 0;
         $ewasteDiverted = 0;
+        $unpoweredWasteDiverted = 0;
         $fixed_devices = 0;
+        $fixed_powered = 0;
+        $fixed_unpowered = 0;
         $repairable_devices = 0;
         $dead_devices = 0;
+        $no_weight = 0;
+        $devices_powered = 0;
+        $devices_unpowered = 0;
 
         if ( ! empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
-                if ($device->isFixed()) {
-                    $co2Diverted += $device->co2Diverted($emissionRatio, $Device->displacement);
-                    $ewasteDiverted += $device->ewasteDiverted();
+                if ($device->deviceCategory->powered) {
+                    $devices_powered++;
+
+                    if ($device->isFixed()) {
+                        $co2Diverted += $device->co2Diverted($emissionRatio, $Device->displacement);
+                        $ewasteDiverted += $device->ewasteDiverted();
+                        $fixed_powered++;
+                    }
+                } else {
+                    $devices_unpowered++;
+
+                    if ($device->isFixed()) {
+                        // CO2 estimates don't include unpowered items.
+                        $unpoweredWasteDiverted += $device->unpoweredWasteDiverted();
+                        $fixed_unpowered++;
+                    }
                 }
 
                 switch ($device->repair_status) {
@@ -649,16 +668,26 @@ class Party extends Model implements Auditable
 
                         break;
                 }
+
+                if ($device->isFixed() && ($device->category == 46 || !$device->deviceCategory->weight) && !$device->estimate) {
+                    $no_weight++;
+                }
             }
 
             return [
                 'co2' => $co2Diverted,
                 'ewaste' => $ewasteDiverted,
+                'unpowered_waste' => $unpoweredWasteDiverted,
                 'fixed_devices' => $fixed_devices,
+                'fixed_powered' => $fixed_powered,
+                'fixed_unpowered' => $fixed_unpowered,
                 'repairable_devices' => $repairable_devices,
                 'dead_devices' => $dead_devices,
+                'no_weight' => $no_weight,
                 'participants' => $this->pax,
                 'volunteers' => $this->volunteers,
+                'devices_powered' => $devices_powered,
+                'devices_unpowered' => $devices_unpowered
             ];
         }
     }

@@ -23,6 +23,11 @@
     margin-right: 10px;
     z-index: 1;
   }
+
+  .form-check-large {
+    width: 25px;
+    height: 25px;
+  }
 }
 
 .form-control {
@@ -125,7 +130,7 @@ label.form-check-label {
     margin-top: 0;
     margin-bottom: 0;
     text-transform: uppercase;
-    min-height: 46px;
+    min-height: 34px;
 
     .select2-search--inline {
       width: 100%;
@@ -163,9 +168,11 @@ label.form-check-label {
   .form-control {
     border-radius: 0;
     border: 1px solid $black !important;
+    margin: 2px;
 
     &:focus {
       border: 3px solid $black !important;
+      margin: 0px;
       -webkit-box-shadow: none;
       box-shadow: none;
       font-weight: normal;
@@ -214,4 +221,8 @@ select.form-control:not([class*="select2"]) {
 
 #participants_qty, #volunteer_qty {
     border: none !important;
+}
+
+.form-control-lg {
+  height: 45px !important;
 }
