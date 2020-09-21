@@ -62,4 +62,9 @@ return array (
   'repair_info' => 'Herstel info',
   'uploaded_photos' => 'Upgeloade foto\'s',
   'useful_repair_info' => 'Informatie gevonden bij',
+  'weight' => 'Gewicht',
+  'required_impact' => 'kg - required for environmental impact calculation',
+  'age_approx' => 'years - approximate, if known',
+  'repair_source' => 'Source of repair information',
+  'repair_url' => 'URL for repair information',
 );

@@ -89,4 +89,7 @@ return array (
   'hot_topics' => 'Sujets d\'actualité',
   'hot_topics_link' => 'Tous les derniers sujets d\'actualités',
   'hot_topics_text' => 'Prenez part au dernier sujet d\'actualité de réparation sur Restarters Talk',
+  'solution_text2' => 'Interesting case study to share?',
+  'quantity' => 'Quantity',
+  'cancel' => 'Cancel',
 );

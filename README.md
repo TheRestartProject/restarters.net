@@ -65,36 +65,38 @@ This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a 
 
 #### Install
 
-- clone this repository
-- php composer.phar install
-- npm install
-- copy .env.example -> .env
-- edit .env
+- Clone this repository
+`php composer.phar install`
+`npm install`
+- Copy .env.example -> .env
+- Edit .env
   - update DB settings to match your local DB
-- edit /etc/hosts -> 127.0.0.1 restarters.test talk.restarters.test
+- Edit /etc/hosts -> 127.0.0.1 restarters.test talk.restarters.test
 
 - Generate an app key: `php artisan key:generate`
 
-- initialise the DB:
+- Initialise the DB:
 
 ```
 $ php artisan migrate
 ```
 
-- create a first admin user
+- Create a first admin user
 
 ```
 $ php artisan tinker
 > User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2]);
 ```
 
-- run the app: 
+- Create a folder for image uploads:
+`mkdir public/uploads`
+- Run the app: 
 
 ```
 $ php artisan serve --host=restarters.test
 ```
 
-* login!
+* Login!
 
 ## Methodology
 

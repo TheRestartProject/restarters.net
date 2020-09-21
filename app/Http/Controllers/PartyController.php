@@ -30,6 +30,7 @@ use App\Session;
 use App\User;
 use App\UserGroups;
 
+use Lang;
 use Auth;
 use DateTime;
 use DB;

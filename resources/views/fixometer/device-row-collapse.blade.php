@@ -11,12 +11,18 @@
     <td class="category" @if( !FixometerHelper::checkColumn('category', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->deviceCategory->name }}}
     </td>
+    @if ($powered)
     <td class="brand" @if( !FixometerHelper::checkColumn('brand', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->brand }}}
     </td>
     <td class="model" @if( !FixometerHelper::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->model }}}
     </td>
+    @else
+    <td class="item_type" @if( !FixometerHelper::checkColumn('item_type', $user_preferences) ) style="display: none;" @endif>
+        {{{ $device->item_type }}}
+    </td>
+    @endif
     <td class="problem" @if( !FixometerHelper::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->getShortProblem() }}}
     </td>
