@@ -1439,10 +1439,6 @@ function initAutocomplete() {
             // Collapse the Add back again.  That also acts as feedback that we've done something.
             $('.add-edit-device-collapse').removeClass('show')
 
-            loadDropzones();
-            $(".select2-with-input").select2("destroy"); //TODO
-            $(".select2-with-input").select2(tag_options_with_input); //TODO
-
             // Reset form.  Need to kick select2.
             $form.get(0).reset()
             $form.find('select').change()

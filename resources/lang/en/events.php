@@ -134,7 +134,7 @@ return array (
   'follow_group' => 'Follow group',
   'event_details' => 'Details',
   'date_time' => 'Date/time',
-  'add_to_calendar' => 'Add&nbsp;to&nbsp;calendar',
+  'add_to_calendar' => 'Add to calendar',
   'event_address' => 'Address',
   'participants' => 'Participants',
   'quantity' => 'Quantity',

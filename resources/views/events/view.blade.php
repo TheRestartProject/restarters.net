@@ -175,7 +175,6 @@
             $expanded_hosts[] = $thisone;
           }
 
-          error_log("Check edit");
           $attendance_edit = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
           ?>
 
@@ -554,9 +553,3 @@
   @include('includes.modals.event-request-review')
 
 @endsection
-<script>
-import EventImages from '../../assets/js/components/EventImages'
-export default {
-  components: {EventImages}
-}
-</script>
