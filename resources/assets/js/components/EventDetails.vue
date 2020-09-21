@@ -1,77 +1,82 @@
 <template>
-  <div class="lineheight">
-    <h2>{{ translatedEventDetails }}</h2>
-    <div class="border-top-thick d-flex pt-1 pb-1">
-      <div class="mr-2">
-        <b-img-lazy src="/icons/date_ico.svg" class="icon" />
+  <CollapsibleSection class="lineheight">
+    <template slot="title">
+      {{ translatedEventDetails }}
+    </template>
+    <template slot="content">
+      <div class="border-top-thick d-flex pt-1 pb-1">
+        <div class="mr-2">
+          <b-img-lazy src="/icons/date_ico.svg" class="icon" />
+        </div>
+        <div class="d-flex justify-content-between w-100">
+          <div>
+            {{ date }}
+          </div>
+          <div>
+            <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" text="Add to calendar" variant="white" class="linkdrop" no-caret>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.google">{{ translatedCalendarGoogle }}</b-dropdown-item>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.webOutlook">{{ translatedCalendarOutlook }}</b-dropdown-item>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.ics">{{ translatedCalendariCal }}</b-dropdown-item>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.yahoo">{{ translatedCalendarYahoo }}</b-dropdown-item>
+            </b-dropdown>
+          </div>
+        </div>
       </div>
-      <div class="d-flex justify-content-between w-100">
-        <div>
-          {{ date }}
+      <div class="border-top-thin d-flex pt-1 pb-1">
+        <div class="mr-2">
+          <b-img-lazy src="/icons/time_ico.svg" class="icon" />
         </div>
         <div>
-          <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" text="Add to calendar" variant="white" class="linkdrop" no-caret>
-            <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.google">{{ translatedCalendarGoogle }}</b-dropdown-item>
-            <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.webOutlook">{{ translatedCalendarOutlook }}</b-dropdown-item>
-            <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.ics">{{ translatedCalendariCal }}</b-dropdown-item>
-            <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.yahoo">{{ translatedCalendarYahoo }}</b-dropdown-item>
-          </b-dropdown>
+          {{ start }}-{{ end }}
         </div>
       </div>
-    </div>
-    <div class="border-top-thin d-flex pt-1 pb-1">
-      <div class="mr-2">
-        <b-img-lazy src="/icons/time_ico.svg" class="icon" />
-      </div>
-      <div>
-        {{ start }}-{{ end }}
-      </div>
-    </div>
-    <div class="border-top-thin d-flex pt-1 pb-1">
-      <div class="mr-2">
-        <b-img-lazy src="/icons/host_ico.svg" class="icon" />
-      </div>
-      <div>
-        <div v-for="host in hosts">
-           {{ host.volunteer.name }}
+      <div class="border-top-thin d-flex pt-1 pb-1">
+        <div class="mr-2">
+          <b-img-lazy src="/icons/host_ico.svg" class="icon" />
         </div>
-      </div>
-    </div>
-    <div class="border-top-thin d-flex pt-1 pb-1" v-if="!event.online && event.location">
-      <div class="mr-2">
-        <b-img-lazy src="/icons/map_marker_ico.svg" class="icon" />
-      </div>
-      <div class="d-flex justify-content-between w-100">
         <div>
-          {{ event.location}}
+          <div v-for="host in hosts">
+            {{ host.volunteer.name }}
+          </div>
         </div>
-        <ExternalLink :href="'https://www.openstreetmap.org/?mlat=' + event.latitude + '&mlon=' + event.longitude + '#map=20/' + event.latitude + '/' + event.longitude">
-          {{ translatedViewMap }}
-        </ExternalLink>
       </div>
-    </div>
-    <l-map
-        ref="map"
-        :zoom="16"
-        :center="[event.latitude, event.longitude]"
-        :style="'width: 100%; height: 200px'"
-        v-if="!event.online && event.location"
-    >
-      <l-tile-layer :url="tiles" :attribution="attribution" />
-      <l-marker :lat-lng="[event.latitude, event.longitude]" :interactive="false" />
-    </l-map>
-    TODO Event photos
-  </div>
+      <div class="border-top-thin d-flex pt-1 pb-1" v-if="!event.online && event.location">
+        <div class="mr-2">
+          <b-img-lazy src="/icons/map_marker_ico.svg" class="icon" />
+        </div>
+        <div class="d-flex justify-content-between w-100">
+          <div>
+            {{ event.location}}
+          </div>
+          <ExternalLink :href="'https://www.openstreetmap.org/?mlat=' + event.latitude + '&mlon=' + event.longitude + '#map=20/' + event.latitude + '/' + event.longitude">
+            {{ translatedViewMap }}
+          </ExternalLink>
+        </div>
+      </div>
+      <l-map
+          ref="map"
+          :zoom="16"
+          :center="[event.latitude, event.longitude]"
+          :style="'width: 100%; height: 200px'"
+          v-if="!event.online && event.location"
+      >
+        <l-tile-layer :url="tiles" :attribution="attribution" />
+        <l-marker :lat-lng="[event.latitude, event.longitude]" :interactive="false" />
+      </l-map>
+      TODO Event photos
+    </template>
+  </CollapsibleSection>
 </template>
 <script>
 import { DATE_FORMAT } from '../constants'
 import moment from 'moment'
 import map from '../mixins/map'
 import ExternalLink from './ExternalLink'
+import CollapsibleSection from './CollapsibleSection'
 const htmlToText = require('html-to-text');
 
 export default {
-  components: {ExternalLink},
+  components: {CollapsibleSection, ExternalLink},
   mixins: [ map ],
   props: {
     eventId: {
