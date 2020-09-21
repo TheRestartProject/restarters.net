@@ -1167,7 +1167,6 @@ class PartyController extends Controller
     {
         $user_id = $request->input('user_id');
         $event_id = $request->input('event_id');
-        error_log("Remove $user_id from $event_id");
 
         $return = [
             'success' => false,
@@ -1180,7 +1179,6 @@ class PartyController extends Controller
 
             //Let's delete the user
             $delete_user = EventsUsers::where('user', $user_id)->where('event', $event_id)->delete();
-            error_log("Deleted? $delete_user");
             if ($delete_user == 1) {
                 //If the user accepted the invitation, we decrement
                 if ($volunteer->status == 1) {
