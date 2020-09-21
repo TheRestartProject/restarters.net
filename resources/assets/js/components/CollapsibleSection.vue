@@ -24,7 +24,8 @@
     </div>
     <hr :class="{
       'd-none': !expanded,
-      'd-md-block': true
+      'd-md-block': true,
+      'mt-0': true
     }" />
   </div>
 </template>

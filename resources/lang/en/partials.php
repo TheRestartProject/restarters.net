@@ -101,6 +101,7 @@ return array (
   'and' => 'and',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
+  'close' => 'Close',
   'choose_barriers' => 'Choose barriers to repair',
   'choose_spare_parts' => 'Spare parts',
   'choose_next_steps' => 'Next steps',
