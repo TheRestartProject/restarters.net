@@ -2,7 +2,12 @@
   <div>
     <div class="d-block d-md-none">
       <h2 class="d-flex d-md-none justify-content-between">
-        <slot name="title" />
+        <span class="w-100">
+          <slot name="title" />
+          <span v-if="count">
+            ({{ count }})
+          </span>
+        </span>
         <span @click="toggle">
           <img class="icon" v-if="expanded" src="/images/minus-icon.svg" alt="Collapse" />
           <img class="icon" v-else src="/images/add-icon.svg" alt="Expand" />
@@ -25,6 +30,7 @@
 // This gives us a component which:
 // - on desktop is always expanded, and may or may not have a title
 // - on mobile has a title, an expand/contract button, and the ability to collapse by default
+// - optional count on mobile to encourage clicks.
 
 export default {
   props: {
@@ -37,6 +43,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    count: {
+      type: Number,
+      required: false,
+      default: null
     }
   },
   data () {

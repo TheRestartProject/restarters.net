@@ -139,7 +139,7 @@ return array (
   'participants' => 'Participants',
   'quantity' => 'Quantity',
   'volunteers' => 'Volunteers',
-  'event_photos' => 'Event photos',
+  'event_photos' => 'Photos',
   'environmental_impact' => 'Environmental impact',
   'items_fixed' => 'Items fixed',
   'waste_prevented' => 'Waste prevented',

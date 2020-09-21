@@ -7,6 +7,7 @@ export const GUEST = 5
 export const NETWORK_COORDINATOR = 6
 
 export const DEFAULT_PROFILE = '/images/placeholder-avatar.png'
+export const PLACEHOLDER = '/images/placeholder.png'
 export const DATE_FORMAT = 'ddd Do MMM Y'
 export const TIME_FORMAT = 'HH:MM'
 

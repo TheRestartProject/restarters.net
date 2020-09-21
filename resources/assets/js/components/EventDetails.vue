@@ -63,7 +63,6 @@
         <l-tile-layer :url="tiles" :attribution="attribution" />
         <l-marker :lat-lng="[event.latitude, event.longitude]" :interactive="false" />
       </l-map>
-      TODO Event photos
     </template>
   </CollapsibleSection>
 </template>

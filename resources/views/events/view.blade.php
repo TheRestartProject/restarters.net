@@ -185,6 +185,7 @@
                 <EventDetails class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links) }}" />
               </div>
               <div class="vue">
+                <hr class="d-block d-md-none">
                 <EventDescription class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" />
               </div>
             </div>
@@ -192,6 +193,17 @@
               <EventAttendance class="pl-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $attendance_edit ? 'true' : 'false' }}" />
             </div>
           </div>
+          @if( !empty($images) )
+            <?php
+              $collected_images = [];
+              foreach ($images as $image) {
+                $collected_images[] = $image;
+              }
+            ?>
+            <div class="vue">
+              <EventImages :images="{{ json_encode($collected_images)}}" />
+            </div>
+          @endif
 
           @if( $event->isInProgress() || $event->hasFinished() )
             <div class="vue w-100">
@@ -542,3 +554,9 @@
   @include('includes.modals.event-request-review')
 
 @endsection
+<script>
+import EventImages from '../../assets/js/components/EventImages'
+export default {
+  components: {EventImages}
+}
+</script>

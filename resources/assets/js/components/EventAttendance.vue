@@ -1,8 +1,7 @@
 <template>
-  <CollapsibleSection collapsed>
+  <CollapsibleSection collapsed :count="attendees.length">
     <template slot="title">
       {{ translatedTitle }}
-      <hr class="d-md-none" />
     </template>
     <template slot="content">
       <div :class="{
