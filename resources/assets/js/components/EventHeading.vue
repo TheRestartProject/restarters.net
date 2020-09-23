@@ -1,50 +1,30 @@
 <template>
-  <div class="border-top-very-thick border-bottom-thin mb-3">
-    <div class="d-flex flex-wrap mt-4 mb-4">
-      <div class="bord d-flex w-50">
-        <div class="datebox">
-          <span class="day">{{ date }}</span> <br />
-          {{ month }}
-        </div>
-        <h1 class="ml-3 mr-3">
-          {{ event.venue ? event.venue : event.location }}
-        </h1>
-      </div>
-      <div class="pl-md-4 d-flex w-50">
-        <div class="d-flex justify-content-between w-100">
-          <div class="d-flex">
-            <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage" />
-            <div v-html="translatedOrganised" class="ml-2"/>
+  <div>
+    <div class="d-flex justify-content-between mb-3">
+      <h1 class="d-block d-md-none">{{ translatedEvents }}</h1>
+      <EventActions v-bind="$props" class="d-block d-md-none" />
+    </div>
+    <div class="border-top-very-thick border-bottom-thin mb-3">
+      <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
+        <div class="bord d-flex w-xs-100 w-md-50">
+          <div class="datebox">
+            <span class="day">{{ date }}</span> <br />
+            {{ month }}
           </div>
-          <div>
-            <b-dropdown variant="primary" :text="translatedEventActions">
-              <b-dropdown-item :href="'/party/edit/' + eventId">
-                {{ translatedEditEvent }}
-              </b-dropdown-item>
-              <b-dropdown-item @click="confirmDelete">
-                {{ translatedDeleteEvent }}
-              </b-dropdown-item>
-              <div v-if="finished">
-                <b-dropdown-item data-toggle="modal" data-target="#event-request-review">
-                  {{ translatedRequestReview }}
-                </b-dropdown-item>
-                <b-dropdown-item data-toggle="modal" data-target="#event-share-stats">
-                  {{ translatedShareEventStats }}
-                </b-dropdown-item>
-              </div>
-              <div v-else-if="upcoming">
-                <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="canInvite">
-                  {{ translatedInviteVolunteers }}
-                </b-dropdown-item>
-                <b-dropdown-item :href="'/party/join/' + eventId" v-else>
-                  {{ translatedRSVP }}
-                </b-dropdown-item>
-              </div>
-              <b-dropdown-item :href="'/group/join/' + event.the_group.idgroups" v-if="!inGroup">
-                {{ translatedFollowGroup }}
-              </b-dropdown-item>
-            </b-dropdown>
-            <ConfirmModal @confirm="confirmedDelete" ref="confirmdelete" />
+          <h1 class="ml-3 mr-3 d-none d-md-block">
+            {{ event.venue ? event.venue : event.location }}
+          </h1>
+          <h2 class="ml-3 d-block d-md-none">
+            {{ event.venue ? event.venue : event.location }}
+          </h2>
+        </div>
+        <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0">
+          <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="d-flex" v-if="event.the_group">
+              <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block" />
+              <div v-html="translatedOrganised" class="ml-md-2"/>
+            </div>
+            <EventActions v-bind="$props" class="d-none d-md-block ml-2" />
           </div>
         </div>
       </div>
@@ -52,15 +32,14 @@
   </div>
 </template>
 <script>
-import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
+import { DEFAULT_PROFILE } from '../constants'
 import moment from 'moment'
-import ExternalLink from './ExternalLink'
-import ConfirmModal from './ConfirmModal'
+import EventActions from './EventActions'
 
 // TODO Discuss criteria for event delete with Neil.
 
 export default {
-  components: {ConfirmModal, ExternalLink},
+  components: {EventActions},
   props: {
     eventId: {
       type: Number,
@@ -77,7 +56,8 @@ export default {
     },
     attending: {
       type: Object,
-      required: true
+      required: false,
+      default: null
     },
     inGroup: {
       type: Boolean,
@@ -121,54 +101,21 @@ export default {
     groupImage() {
       return this.event.the_group && this.event.the_group.group_image ? ('/uploads/mid_' + this.event.the_group.group_image.image.path) : DEFAULT_PROFILE
     },
+    translatedEvents() {
+      return this.$lang.get('events.events')
+    },
     translatedOrganised() {
       // TODO not good to construct HTML here, but we will fix this when we change past events to use this component.
       console.log("Event", this.event)
       return this.$lang.get('events.organised_by', {
-        group: '<br /><b><a href="/group/view/' + this.event.the_group.idgroups  + '">' + this.event.the_group.name.trim() + '</a></b>'
+        group: '<br class="d-none d-md-block"/><b><a href="/group/view/' + this.event.the_group.idgroups  + '">' + this.event.the_group.name.trim() + '</a></b>'
       })
     },
-    translatedEventActions() {
-      return this.$lang.get('events.event_actions').toUpperCase()
-    },
-    translatedEditEvent() {
-      return this.$lang.get('events.edit_event')
-    },
-    translatedDeleteEvent() {
-      return this.$lang.get('events.delete_event')
-    },
-    translatedRequestReview() {
-      return this.$lang.get('events.request_review')
-    },
-    translatedShareEventStats() {
-      return this.$lang.get('events.share_event_stats')
-    },
-    translatedInviteVolunteers() {
-      return this.$lang.get('events.invite_volunteers')
-    },
-    translatedRSVP() {
-      return this.$lang.get('events.RSVP')
-    }
   },
   methods: {
     brokenGroupImage(event) {
       event.target.src = DEFAULT_PROFILE
     },
-    confirmDelete() {
-      this.$refs.confirmdelete.show()
-    },
-    async confirmedDelete() {
-      // TODO When events move into the store this should become a store action.
-      let ret = await axios.post('/party/delete/' + this.eventId, {
-        id: this.eventId
-      }, {
-        headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
-        }
-      })
-
-      window.location = '/party'
-    }
   }
 }
 </script>
@@ -212,6 +159,12 @@ export default {
   .day {
     font-size: 1.7rem;
     line-height: 1.7rem;
+  }
+}
+
+.maybeborder {
+  @include media-breakpoint-down(sm) {
+    border-top: 1px solid $black;
   }
 }
 </style>

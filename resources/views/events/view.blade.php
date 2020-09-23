@@ -57,88 +57,6 @@
         </div>
       @endif
 
-      <div class="events__header row align-content-top">
-        <div class="col-lg-8 d-flex flex-column">
-
-          <header>
-            <h1>{{ $event->getEventName() }}@if ($event->online) <span class="badge badge-info">@lang('events.online_event')</span>@endif</h1>
-            <p>@lang('events.organised_by', ['group' => '<a href="/group/view/'. $formdata->group_id .'">'. trim($formdata->group_name) .'</a>'])</p>
-            {{--
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
-                <li class="breadcrumb-item"><a href="{{ url('/group') }}">@lang('groups.groups')</a></li>
-                <li class="breadcrumb-item"><a href="/group/view/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ $event->getEventName() }}</li>
-              </ol>
-            </nav>
-            --}}
-            @php( $group_image = $event->theGroup->groupImage )
-            @if( is_object($group_image) && is_object($group_image->image) )
-              <img src="{{ asset('/uploads/mid_' . $group_image->image->path) }}" alt="{{{ $event->theGroup->name }}}" class="event-icon">
-            @else
-              <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}" class="event-icon">
-            @endif
-          </header>
-
-        </div>
-        <div class="col-lg-4">
-          <div class="button-group button-group__r">
-            @if( Auth::check() )
-              @if( FixometerHelper::userHasEditPartyPermission($formdata->id) || FixometerHelper::userIsHostOfGroup($formdata->group_id, Auth::user()->id) )
-                <div class="dropdown">
-                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    @lang('events.event_actions')
-                  </button>
-                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">@lang('events.edit_event')</a>
-                    @if( !$event->isInProgress() && !$event->hasFinished() )
-                      <form action="{{ url('/') }}/party/delete/{{ $formdata->id }}" method="post">
-                        @csrf
-                        <button id="deleteEvent" class="dropdown-item" data-party-id="{{$formdata->id}}" data-count-attended="{{count($attended)}}" data-count-invited="{{count($invited)}}" data-count-volunteers="{{$event->volunteers}}">@lang('events.delete_event')</button>
-                      </form>
-                    @endif
-                    @if( $event->hasFinished() )
-                      <a href="#" class="btn dropdown-item" data-toggle="modal" data-target="#event-request-review">@lang('events.request_review')</a>
-                      <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">@lang('events.share_event_stats')</button>
-                    @else
-                      @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
-                        <button data-toggle="modal" data-target="#event-invite-to" class="btn dropdown-item">@lang('events.invite_volunteers')</button>
-                      @else
-                        <a class="btn dropdown-item" href="/party/join/{{ $formdata->id }}">RSVP</a>
-                      @endif
-                    @endif
-                    @if (! Auth::user()->isInGroup($event->theGroup->idgroups))
-                      <a class="btn dropdown-item" href="/group/join/{{ $event->theGroup->idgroups }}">@lang('events.follow_group')</a>
-                    @endif
-                  </div>
-                </div>
-              @else
-                @if( $event->hasFinished() )
-                  <a data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">@lang('events.share_event_stats')</a>
-                @else
-                  @if (! Auth::user()->isInGroup($event->theGroup->idgroups))
-                    <a class="btn btn-tertiary" href="/group/join/{{ $event->theGroup->idgroups }}">@lang('events.follow_group')</a>
-                  @endif
-                  @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
-                    <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">@lang('events.invite_volunteers')</button>
-                  @else
-                    <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
-                  @endif
-                @endif
-              @endif
-            @endif
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-lg-12">
-          <p></p>
-          <p></p>
-        </div>
-      </div>
-
       <!-- So far only upcoming events have been moved over to Vue. -->
       @if($event->isUpcoming())
         <div>
@@ -175,6 +93,12 @@
             $expanded_hosts[] = $thisone;
           }
 
+          // Trigger expansion of group.
+          $group_image = $event->theGroup->groupImage;
+          if (is_object($group_image->image)) {
+            $group_image->image->path;
+          }
+
           $can_edit_event = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
           ?>
 
@@ -209,6 +133,88 @@
           @endif
         </div>
       @else
+          <div class="events__header row align-content-top">
+            <div class="col-lg-8 d-flex flex-column">
+
+              <header>
+                <h1>{{ $event->getEventName() }}@if ($event->online) <span class="badge badge-info">@lang('events.online_event')</span>@endif</h1>
+                <p>@lang('events.organised_by', ['group' => '<a href="/group/view/'. $formdata->group_id .'">'. trim($formdata->group_name) .'</a>'])</p>
+                {{--
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{{ route('dashboard') }}}">FIXOMETER</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url('/group') }}">@lang('groups.groups')</a></li>
+                    <li class="breadcrumb-item"><a href="/group/view/{{ $formdata->group_id }}">{{ trim($formdata->group_name) }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $event->getEventName() }}</li>
+                  </ol>
+                </nav>
+                --}}
+                @php( $group_image = $event->theGroup->groupImage )
+                @if( is_object($group_image) && is_object($group_image->image) )
+                  <img src="{{ asset('/uploads/mid_' . $group_image->image->path) }}" alt="{{{ $event->theGroup->name }}}" class="event-icon">
+                @else
+                  <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $event->host->name }}}" class="event-icon">
+                @endif
+              </header>
+
+            </div>
+            <div class="col-lg-4">
+              <div class="button-group button-group__r">
+                @if( Auth::check() )
+                  @if( FixometerHelper::userHasEditPartyPermission($formdata->id) || FixometerHelper::userIsHostOfGroup($formdata->group_id, Auth::user()->id) )
+                    <div class="dropdown">
+                      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @lang('events.event_actions')
+                      </button>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a href="{{ url('/') }}/party/edit/{{ $formdata->id, count($attended), count($invited) }}" class="dropdown-item">@lang('events.edit_event')</a>
+                        @if( !$event->isInProgress() && !$event->hasFinished() )
+                          <form action="{{ url('/') }}/party/delete/{{ $formdata->id }}" method="post">
+                            @csrf
+                            <button id="deleteEvent" class="dropdown-item" data-party-id="{{$formdata->id}}" data-count-attended="{{count($attended)}}" data-count-invited="{{count($invited)}}" data-count-volunteers="{{$event->volunteers}}">@lang('events.delete_event')</button>
+                          </form>
+                        @endif
+                        @if( $event->hasFinished() )
+                          <a href="#" class="btn dropdown-item" data-toggle="modal" data-target="#event-request-review">@lang('events.request_review')</a>
+                          <button data-toggle="modal" data-target="#event-share-stats" class="btn dropdown-item">@lang('events.share_event_stats')</button>
+                        @else
+                          @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
+                            <button data-toggle="modal" data-target="#event-invite-to" class="btn dropdown-item">@lang('events.invite_volunteers')</button>
+                          @else
+                            <a class="btn dropdown-item" href="/party/join/{{ $formdata->id }}">RSVP</a>
+                          @endif
+                        @endif
+                        @if (! Auth::user()->isInGroup($event->theGroup->idgroups))
+                          <a class="btn dropdown-item" href="/group/join/{{ $event->theGroup->idgroups }}">@lang('events.follow_group')</a>
+                        @endif
+                      </div>
+                    </div>
+                  @else
+                    @if( $event->hasFinished() )
+                      <a data-toggle="modal" data-target="#event-share-stats" class="btn btn-primary">@lang('events.share_event_stats')</a>
+                    @else
+                      @if (! Auth::user()->isInGroup($event->theGroup->idgroups))
+                        <a class="btn btn-tertiary" href="/group/join/{{ $event->theGroup->idgroups }}">@lang('events.follow_group')</a>
+                      @endif
+                      @if( is_object($is_attending) && $is_attending->status == 1 && $event->isUpcoming() )
+                        <button data-toggle="modal" data-target="#event-invite-to" class="btn btn-primary">@lang('events.invite_volunteers')</button>
+                      @else
+                        <a class="btn btn-primary" href="/party/join/{{ $formdata->id }}">RSVP</a>
+                      @endif
+                    @endif
+                  @endif
+                @endif
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-12">
+              <p></p>
+              <p></p>
+            </div>
+          </div>
+
           <div class="row">
             <div class="col-lg-4">
 
@@ -506,9 +512,3 @@
   @include('includes.modals.event-request-review')
 
 @endsection
-<script>
-import EventHeading from '../../assets/js/components/EventHeading'
-export default {
-  components: {EventHeading}
-}
-</script>
