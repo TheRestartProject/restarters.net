@@ -67,25 +67,16 @@
   </CollapsibleSection>
 </template>
 <script>
-import { DATE_FORMAT } from '../constants'
-import moment from 'moment'
 import map from '../mixins/map'
+import event from '../mixins/event'
 import ExternalLink from './ExternalLink'
 import CollapsibleSection from './CollapsibleSection'
 const htmlToText = require('html-to-text');
 
 export default {
   components: {CollapsibleSection, ExternalLink},
-  mixins: [ map ],
+  mixins: [ map, event ],
   props: {
-    eventId: {
-      type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
-      required: true
-    },
     hosts: {
       type: Array,
       required: true
@@ -96,20 +87,6 @@ export default {
     }
   },
   computed: {
-    upcoming() {
-      const now = new Date().getTime()
-      const date = new Date(this.event.event_date).getTime()
-      return date > now
-    },
-    start() {
-      return this.event.start.substring(0, 5)
-    },
-    end() {
-      return this.event.end.substring(0, 5)
-    },
-    date() {
-      return new moment(this.event.event_date).format(DATE_FORMAT)
-    },
     translatedEventDetails() {
       return this.$lang.get('events.event_details')
     },

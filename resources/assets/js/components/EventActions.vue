@@ -31,40 +31,14 @@
   </div>
 </template>
 <script>
+import event from '../mixins/event'
 import ConfirmModal from './ConfirmModal'
+import map from '../mixins/map'
 
 export default {
   components: {ConfirmModal},
-  props: {
-    eventId: {
-      type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
-      required: true
-    },
-    canedit: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    attending: {
-      type: Object,
-      required: false,
-      default: null
-    },
-    inGroup: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
+  mixins: [ event ],
   computed: {
-    canInvite() {
-      // TODO Check this logic with Neil
-      return this.upcoming && this.attending && this.attending.role === HOST;
-    },
     translatedEventActions() {
       return this.$lang.get('events.event_actions').toUpperCase()
     },
