@@ -43,16 +43,16 @@
                 <div v-if="upcoming" class="d-flex justify-content-end">
                   <!-- TODO LATER In due course these modals should become Vue components.-->
                   <a data-toggle="modal" data-target="#event-all-attended" href="#" class="mr-2">
-                    {{ translatedSeeAllConfirmed }}
+                    {{ translatedSeeAll }}
                   </a>
                 </div>
                 <div v-else>
                   <div class="d-flex justify-content-between">
-                    <b-btn variant="link">
-                      TODO Add.
+                    <b-btn variant="link" data-toggle="modal" data-target="#event-add-volunteer">
+                      {{ translatedAddVolunteer }}
                     </b-btn>
                     <b-btn variant="link">
-                      {{ translatedSeeAllAttended }}
+                      {{ translatedSeeAll }}
                     </b-btn>
                   </div>
                 </div>
@@ -135,14 +135,8 @@ export default {
     translatedInvited() {
       return this.$lang.get('events.invited')
     },
-    translatedSeeAllConfirmed() {
-      return this.$lang.get('events.see_all_confirmed')
-    },
-    translatedSeeAllInvited() {
-      return this.$lang.get('events.see_all_invited')
-    },
-    translatedSeeAllAttended() {
-      return this.$lang.get('events.see_all_attended')
+    translatedSeeAll() {
+      return this.$lang.get('events.see_all')
     },
     translatedNoConfirmed() {
       return this.$lang.get('events.confirmed_none')
@@ -155,6 +149,9 @@ export default {
     },
     translatedMismatch() {
       return this.$lang.get('events.warning_volunteers_message')
+    },
+    translatedAddVolunteer() {
+      return this.$lang.get('events.add_volunteer_modal_heading')
     }
   },
   created() {
@@ -202,6 +199,10 @@ export default {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
         }
       })
+
+      if (ret && ret.data && ret.data.success) {
+        this.volunteerCount = val
+      }
     }
   }
 }
@@ -211,7 +212,7 @@ export default {
 
 .attendance {
   display: grid;
-  grid-template-columns: 1fr 50px 2fr;
+  grid-template-columns: minmax(0, 1fr) 50px 2fr;
 
   &.upcoming {
     grid-template-columns: 0 0px 1fr;

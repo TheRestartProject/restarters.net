@@ -41,6 +41,15 @@ export default {
       default: false
     }
   },
+  data () {
+    return {
+      volunteerCount: null
+    }
+  },
+  mounted() {
+    // TODO LATER this should be removed when the events are moved into a store.
+    this.volunteerCount = this.event.volunteers
+  },
   computed: {
     upcoming() {
       const now = new Date().getTime()
@@ -92,7 +101,8 @@ export default {
       })
     },
     volunteerCountMismatch() {
-      return this.event.volunteers !== this.volunteers.length
+      console.log("Calc mismatch");
+      return this.volunteerCount !== this.volunteers.length
     },
     canInvite() {
       // TODO Check this logic with Neil
