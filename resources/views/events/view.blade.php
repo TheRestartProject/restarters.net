@@ -175,8 +175,12 @@
             $expanded_hosts[] = $thisone;
           }
 
-          $can_edit_attendance = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
+          $can_edit_event = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
           ?>
+
+          <div class="vue">
+            <EventHeading :event-id="{{ $event->idevents }}" :event="{{ $event }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}" :attending="{{ json_encode($is_attending) }}" :in-group="{{ Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}" />
+          </div>
 
           <div class="d-flex flex-wrap">
             <div class="w-xs-100 w-md-50">
@@ -189,7 +193,7 @@
               </div>
             </div>
             <div class="w-xs-100 w-md-50 vue">
-              <EventAttendance class="pl-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $can_edit_attendance ? 'true' : 'false' }}" />
+              <EventAttendance class="pl-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}" />
             </div>
           </div>
           @if( !empty($images) )
@@ -502,3 +506,9 @@
   @include('includes.modals.event-request-review')
 
 @endsection
+<script>
+import EventHeading from '../../assets/js/components/EventHeading'
+export default {
+  components: {EventHeading}
+}
+</script>

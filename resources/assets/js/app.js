@@ -1716,6 +1716,7 @@ jQuery(document).ready(function () {
       store: store,
       components: {
         'examplecomponent': require('./components/ExampleComponent.vue'),
+        'eventheading': require('./components/EventHeading.vue'),
         'eventstats': require('./components/EventStats.vue'),
         'eventattendance': require('./components/EventAttendance.vue'),
         'eventdetails': require('./components/EventDetails.vue'),
