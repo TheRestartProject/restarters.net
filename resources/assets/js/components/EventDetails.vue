@@ -12,7 +12,7 @@
           <div>
             {{ date }}
           </div>
-          <div>
+          <div v-if="upcoming">
             <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" text="Add to calendar" variant="white" class="linkdrop" no-caret>
               <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.google">{{ translatedCalendarGoogle }}</b-dropdown-item>
               <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.webOutlook">{{ translatedCalendarOutlook }}</b-dropdown-item>
