@@ -4,14 +4,14 @@
       'd-flex': true,
       'd-md-none': hideTitle,
       'justify-content-between': true
-      }">
+      }" @click="toggle">
       <span>
         <slot name="title" />
         <span v-if="count" class="d-inline d-md-none text-muted">
           (<span class="count">{{ count }}</span>)
         </span>
       </span>
-      <span @click="toggle" class="d-inline d-md-none">
+      <span class="d-inline d-md-none">
         <img class="icon" v-if="expanded" src="/images/minus-icon.svg" alt="Collapse" />
         <img class="icon" v-else src="/images/add-icon.svg" alt="Expand" />
       </span>
