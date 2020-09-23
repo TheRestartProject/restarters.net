@@ -98,7 +98,7 @@ export default {
   computed: {
     upcoming() {
       const now = new Date().getTime()
-      const date = new Date(this.event.event_date)
+      const date = new Date(this.event.event_date).getTime()
       return date > now
     },
     start() {

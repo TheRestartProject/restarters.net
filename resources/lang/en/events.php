@@ -72,6 +72,7 @@ return array (
   'create_new_event' => 'Create new event',
   'edit_event' => 'Edit event',
   'edit_event_content' => 'You can keep your event details up-to-date here.',
+  'delete_event' => 'Delete event',
   'past_events' => 'Past events',
   'past_events_group' => 'Past :group events',
   'past_events_explainer' => 'These are past events from groups you are a member of, and events that you RSVPed to.',
@@ -182,5 +183,7 @@ return array (
   'calendar_google' => 'Google Calendar',
   'calendar_outlook' => 'Outlook',
   'calendar_ical' => 'iCal',
-  'calendar_yahoo' => 'Yahoo Calendar'
+  'calendar_yahoo' => 'Yahoo Calendar',
+  'confirm_delete' => 'Are you sure you want to delete this event?',
+  'RSVP' => 'RSVP'
 );
