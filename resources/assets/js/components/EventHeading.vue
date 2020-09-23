@@ -20,11 +20,11 @@
         </div>
         <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0">
           <div class="d-flex justify-content-between w-100 flex-wrap">
-            <div class="d-flex" v-if="event.the_group">
+            <div class="d-flex mr-2" v-if="event.the_group">
               <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block" />
               <div v-html="translatedOrganised" class="ml-md-2"/>
             </div>
-            <EventActions v-bind="$props" class="d-none d-md-block ml-2" />
+            <EventActions v-bind="$props" class="d-none d-md-block" />
           </div>
         </div>
       </div>
