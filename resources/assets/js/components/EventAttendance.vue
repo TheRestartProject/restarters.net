@@ -4,85 +4,88 @@
       {{ translatedTitle }}
     </template>
     <template slot="content">
-      <div :class="{
+      <div class="mt-2">
+        <p v-if="volunteerCountMismatch" class="warningbox small text-danger p-1">
+          {{ translatedMismatch }}
+        </p>
+        <div :class="{
       attendance: true,
-      'mt-2': true,
       upcoming: upcoming
       }">
-        <div>
           <div>
-            <h3>
-              <b-img src="/icons/group_ico.svg" class="mr-2" />
-              {{ translatedParticipants }}
-            </h3>
-            <EventAttendanceCount :count="event.participants" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
-            <h3>
-              <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
-              {{ translatedVolunteers }}
-            </h3>
-            <EventAttendanceCount :count="event.volunteers" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
+            <div v-if="!upcoming">
+              <h3>
+                <b-img src="/icons/group_ico.svg" class="mr-2" />
+                {{ translatedParticipants }}
+              </h3>
+              <EventAttendanceCount :count="event.participants" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
+              <h3>
+                <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
+                {{ translatedVolunteers }}
+              </h3>
+              <EventAttendanceCount :count="event.volunteers" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
+            </div>
           </div>
-        </div>
-        <div />
-        <div>
-          <b-tabs class="ourtabs attendance-tabs w-100">
-            <b-tab active title-item-class="w-50" class="pt-2">
-              <template slot="title">
-                <b>{{ translatedConfirmed }}</b> ({{ confirmed.length }})
-              </template>
-              <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
-                <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" :canedit="canedit" />
-              </div>
-              <p v-else>
-                {{ translatedNoConfirmed }}
-              </p>
-              <hr />
-              <div v-if="upcoming" class="d-flex justify-content-end">
-                <!--              TODO In due course these modals should become Vue components.-->
-                <a data-toggle="modal" data-target="#event-all-attended" href="#" class="mr-2">
-                  {{ translatedSeeAllConfirmed }}
-                </a>
-              </div>
-              <div v-else>
-                <div class="d-flex justify-content-between">
-                  <b-btn variant="link">
-                    TODO Add.
-                  </b-btn>
-                  <b-btn variant="link">
-                    {{ translatedSeeAllAttended }}
-                  </b-btn>
+          <div />
+          <div>
+            <b-tabs class="ourtabs attendance-tabs w-100">
+              <b-tab active title-item-class="w-50" class="pt-2">
+                <template slot="title">
+                  <b>{{ translatedConfirmed }}</b> ({{ confirmed.length }})
+                </template>
+                <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
+                  <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" :canedit="canedit" />
                 </div>
-              </div>
-            </b-tab>
-            <b-tab title-item-class="w-50" class="pt-2">
-              <template slot="title">
-                <b>{{ translatedInvited }}</b> ({{ invited.length }})
-              </template>
-              <div v-if="invited.length" class="maxheight">
-                <EventAttendee v-for="a in invited" :key="'eventattendee-' + a.idevents_users" :attendee="a" />
-              </div>
-              <p v-else>
-                {{ translatedNoInvited }}
-              </p>
-              <hr />
-              <div v-if="upcoming" class="d-flex justify-content-between">
-                <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
-                  <img class="icon" src="/images/add-icon.svg" />
-                  {{ translatedInviteToJoin }}
-                </a>
-                <a data-toggle="modal" data-target="#event-all-volunteers" href="#" class="mr-2" v-if="invited.length">
-                  {{ translatedSeeAllInvited }}
-                </a>
-              </div>
-            </b-tab>
-          </b-tabs>
+                <p v-else>
+                  {{ translatedNoConfirmed }}
+                </p>
+                <hr />
+                <div v-if="upcoming" class="d-flex justify-content-end">
+                  <!-- TODO LATER In due course these modals should become Vue components.-->
+                  <a data-toggle="modal" data-target="#event-all-attended" href="#" class="mr-2">
+                    {{ translatedSeeAllConfirmed }}
+                  </a>
+                </div>
+                <div v-else>
+                  <div class="d-flex justify-content-between">
+                    <b-btn variant="link">
+                      TODO Add.
+                    </b-btn>
+                    <b-btn variant="link">
+                      {{ translatedSeeAllAttended }}
+                    </b-btn>
+                  </div>
+                </div>
+              </b-tab>
+              <b-tab title-item-class="w-50" class="pt-2">
+                <template slot="title">
+                  <b>{{ translatedInvited }}</b> ({{ invited.length }})
+                </template>
+                <div v-if="invited.length" class="maxheight">
+                  <EventAttendee v-for="a in invited" :key="'eventattendee-' + a.idevents_users" :attendee="a" />
+                </div>
+                <p v-else>
+                  {{ translatedNoInvited }}
+                </p>
+                <hr />
+                <div v-if="upcoming" class="d-flex justify-content-between">
+                  <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
+                    <img class="icon" src="/images/add-icon.svg" />
+                    {{ translatedInviteToJoin }}
+                  </a>
+                  <a data-toggle="modal" data-target="#event-all-volunteers" href="#" class="mr-2" v-if="invited.length">
+                    {{ translatedSeeAllInvited }}
+                  </a>
+                </div>
+              </b-tab>
+            </b-tabs>
+          </div>
         </div>
       </div>
     </template>
   </CollapsibleSection>
 </template>
 <script>
-import { GUEST, HOST, RESTARTER } from '../constants'
 import event from '../mixins/event'
 import EventAttendanceCount from './EventAttendanceCount'
 import EventAttendee from './EventAttendee'
@@ -90,6 +93,7 @@ import CollapsibleSection from './CollapsibleSection'
 
 export default {
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
+  mixins: [event],
   props: {
     eventId: {
       type: Number,
@@ -107,7 +111,7 @@ export default {
       type: Array,
       required: true
     },
-    // TODO In due course the permissions should be handled by having the user in the store and querying that, rather
+    // TODO LATER In due course the permissions should be handled by having the user in the store and querying that, rather
     // than passing down props.
     canedit: {
       type: Boolean,
@@ -116,35 +120,6 @@ export default {
     }
   },
   computed: {
-    upcoming() {
-      const now = new Date().getTime()
-      const date = new Date(this.event.event_date).getTime()
-      return date > now
-    },
-    attendees() {
-      // Everyone, both invited and confirmed.
-      return this.$store.getters['attendance/byEvent'](this.eventId)
-    },
-    confirmed() {
-      return this.attendees.filter((a) => {
-        return a.confirmed
-      })
-    },
-    invited() {
-      return this.attendees.filter((a) => {
-        return !a.confirmed
-      })
-    },
-    participants() {
-      return this.confirmed.filter((a) => {
-        return a.role === GUEST
-      })
-    },
-    volunteers() {
-      return this.confirmed.filter((a) => {
-        return a.role === HOST || a.role === RESTARTER
-      })
-    },
     translatedTitle() {
       return this.$lang.get('events.event_attendance')
     },
@@ -177,6 +152,9 @@ export default {
     },
     translatedInviteToJoin() {
       return this.$lang.get('events.invite_to_join')
+    },
+    translatedMismatch() {
+      return this.$lang.get('events.warning_volunteers_message')
     }
   },
   created() {
@@ -266,5 +244,9 @@ h3 {
 
 .icon {
   width: 30px;
+}
+
+.warningbox {
+  border: 1px solid $brand-danger;
 }
 </style>

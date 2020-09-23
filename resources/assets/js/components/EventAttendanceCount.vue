@@ -1,7 +1,6 @@
 <template>
   <div v-if="canedit" class="attendance-button-wrapper">
     <div class="d-flex justify-content-between">
-      <!--    TODO Warning if count doesn't match confirmed volunteers -->
       <b-input-group>
         <b-input-group-prepend>
           <b-btn variant="white" class="attendance-button" @click="dec">

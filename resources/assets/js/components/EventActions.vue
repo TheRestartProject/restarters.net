@@ -69,7 +69,7 @@ export default {
       this.$refs.confirmdelete.show()
     },
     async confirmedDelete() {
-      // TODO When events move into the store this should become a store action.
+      // TODO LATER When events move into the store this should become a store action.
       let ret = await axios.post('/party/delete/' + this.eventId, {
         id: this.eventId
       }, {

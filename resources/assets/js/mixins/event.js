@@ -1,5 +1,5 @@
 // This mixin includes lots of function relating to events.
-// TODO In due course the event will move into the store and we'll just pass the id.  All the other props will then
+// TODO LATER In due course the event will move into the store and we'll just pass the id.  All the other props will then
 // become computed data in here.
 import { DATE_FORMAT, GUEST, HOST, RESTARTER } from '../constants'
 import moment from 'moment'
@@ -90,6 +90,9 @@ export default {
       return this.confirmed.filter((a) => {
         return a.role === HOST || a.role === RESTARTER
       })
+    },
+    volunteerCountMismatch() {
+      return this.event.volunteers !== this.volunteers.length
     },
     canInvite() {
       // TODO Check this logic with Neil
