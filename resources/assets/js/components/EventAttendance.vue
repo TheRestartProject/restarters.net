@@ -82,68 +82,15 @@
   </CollapsibleSection>
 </template>
 <script>
-import { GUEST, HOST, RESTARTER } from '../constants'
+import event from '../mixins/event'
 import EventAttendanceCount from './EventAttendanceCount'
 import EventAttendee from './EventAttendee'
 import CollapsibleSection from './CollapsibleSection'
 
 export default {
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
-  props: {
-    eventId: {
-      type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
-      required: true
-    },
-    attendance:  {
-      type: Array,
-      required: true
-    },
-    invitations:  {
-      type: Array,
-      required: true
-    },
-    // TODO In due course the permissions should be handled by having the user in the store and querying that, rather
-    // than passing down props.
-    canedit: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
+  mixins: [ event ],
   computed: {
-    upcoming() {
-      const now = new Date().getTime()
-      const date = new Date(this.event.event_date).getTime()
-      return date > now
-    },
-    attendees() {
-      // Everyone, both invited and confirmed.
-      return this.$store.getters['attendance/byEvent'](this.eventId)
-    },
-    confirmed() {
-      return this.attendees.filter((a) => {
-        return a.confirmed
-      })
-    },
-    invited() {
-      return this.attendees.filter((a) => {
-        return !a.confirmed
-      })
-    },
-    participants() {
-      return this.confirmed.filter((a) => {
-        return a.role === GUEST
-      })
-    },
-    volunteers() {
-      return this.confirmed.filter((a) => {
-        return a.role === HOST || a.role === RESTARTER
-      })
-    },
     translatedTitle() {
       return this.$lang.get('events.event_attendance')
     },

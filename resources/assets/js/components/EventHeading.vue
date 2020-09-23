@@ -33,6 +33,7 @@
 </template>
 <script>
 import { DEFAULT_PROFILE } from '../constants'
+import event from '../mixins/event'
 import moment from 'moment'
 import EventActions from './EventActions'
 
@@ -40,31 +41,7 @@ import EventActions from './EventActions'
 
 export default {
   components: {EventActions},
-  props: {
-    eventId: {
-      type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
-      required: true
-    },
-    canedit: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    attending: {
-      type: Object,
-      required: false,
-      default: null
-    },
-    inGroup: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
+  mixins: [event],
   computed: {
     upcoming() {
       const now = new Date().getTime()

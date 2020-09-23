@@ -12,6 +12,7 @@
 import { DATE_FORMAT } from '../constants'
 import moment from 'moment'
 import map from '../mixins/map'
+import event from '../mixins/event'
 import ExternalLink from './ExternalLink'
 import CollapsibleSection from './CollapsibleSection'
 import ReadMore from './ReadMore'
@@ -19,27 +20,8 @@ const htmlToText = require('html-to-text');
 
 export default {
   components: {ReadMore, CollapsibleSection, ExternalLink},
-  mixins: [ map ],
-  props: {
-    eventId: {
-      type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
-      required: true
-    }
-  },
+  mixins: [ map, event ],
   computed: {
-    free_text() {
-      // Strip HTML
-      let ret = htmlToText.fromString(this.event.free_text);
-
-      // Remove duplicate blank lines.
-      ret = ret.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
-      return ret
-    },
     translatedDescription() {
       return this.$lang.get('events.event_description')
     },
