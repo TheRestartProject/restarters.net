@@ -29,7 +29,6 @@ import {
 } from 'vue2-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import ReadMore from 'vue-read-more';
 
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
@@ -43,7 +42,6 @@ L.Icon.Default.mergeOptions({
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
-Vue.use(ReadMore);
 
 // Set up internationalisation.  translations.js is built in webpack.mix.js from the PHP lang folder.
 import lang from 'lang.js';

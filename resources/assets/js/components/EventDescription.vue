@@ -14,10 +14,11 @@ import moment from 'moment'
 import map from '../mixins/map'
 import ExternalLink from './ExternalLink'
 import CollapsibleSection from './CollapsibleSection'
+import ReadMore from './ReadMore'
 const htmlToText = require('html-to-text');
 
 export default {
-  components: {CollapsibleSection, ExternalLink},
+  components: {ReadMore, CollapsibleSection, ExternalLink},
   mixins: [ map ],
   props: {
     eventId: {
