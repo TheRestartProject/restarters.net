@@ -175,7 +175,7 @@
             $expanded_hosts[] = $thisone;
           }
 
-          $attendance_edit = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
+          $can_edit_attendance = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
           ?>
 
           <div class="d-flex flex-wrap">
@@ -189,7 +189,7 @@
               </div>
             </div>
             <div class="w-xs-100 w-md-50 vue">
-              <EventAttendance class="pl-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $attendance_edit ? 'true' : 'false' }}" />
+              <EventAttendance class="pl-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $can_edit_attendance ? 'true' : 'false' }}" />
             </div>
           </div>
           @if( !empty($images) )
@@ -203,13 +203,6 @@
               <EventImages :images="{{ json_encode($collected_images)}}" />
             </div>
           @endif
-
-          @if( $event->isInProgress() || $event->hasFinished() )
-            <div class="vue w-100">
-              <EventStats class="ml-2 mr-2" :stats="{{ json_encode($event->getEventStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}" />
-            </div>
-          @endif
-
         </div>
       @else
           <div class="row">
@@ -497,6 +490,7 @@
           </div>
         @endif
       </div>
+    </div>
   </section>
 
   @include('includes.modals.event-invite-to')
