@@ -337,7 +337,6 @@
         padding-left: calc(10% + 1px) !important;
         border-top: none;
         padding-top: 10px;
-        border-left: 1px solid $black ;
         border-right: 1px solid $black;
         border-bottom: 1px solid $black;
         text-transform: uppercase;
@@ -348,10 +347,17 @@
         padding-top: 5px;
         padding-left: calc(10% + 1px) !important;
         border-left: none;
-        border-right: none;
+        border-right: 1px solid $black;
 
         @include media-breakpoint-up(md) {
             border-bottom: none;
+        }
+    }
+
+    li:first-of-type {
+        .nav-link.active {
+            border-left: 0px;
+            padding-left: calc(10% + 2px) !important;
         }
     }
 
