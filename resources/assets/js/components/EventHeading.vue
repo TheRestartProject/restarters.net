@@ -43,22 +43,6 @@ export default {
   components: {EventActions},
   mixins: [event],
   computed: {
-    upcoming() {
-      const now = new Date().getTime()
-      const date = new Date(this.event.event_date).getTime()
-      return date > now
-    },
-    finished() {
-      const now = new Date().getTime()
-      const date = new Date(this.event.event_date)
-      return date < now
-    },
-    inProgress() {
-      const now = new Date().getTime()
-      const start = new Date(this.event.event_date + ' ' + this.event.start).getTime()
-      const end = new Date(this.event.event_date + ' ' + this.event.start).getTime()
-      return now >= start && now <= end
-    },
     canInvite() {
       // TODO Check this logic with Neil
       return this.upcoming && this.attending && this.attending.role === HOST;

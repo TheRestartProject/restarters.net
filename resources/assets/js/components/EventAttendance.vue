@@ -15,12 +15,12 @@
               <b-img src="/icons/group_ico.svg" class="mr-2" />
               {{ translatedParticipants }}
             </h3>
-            <EventAttendanceCount :count="participants.length" class="mt-2 mb-4" />
+            <EventAttendanceCount :count="participants.length" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
             <h3>
               <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
               {{ translatedVolunteers }}
             </h3>
-            <EventAttendanceCount :count="volunteers.length" class="mt-2" />
+            <EventAttendanceCount :count="volunteers.length" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
           </div>
         </div>
         <div />
@@ -82,6 +82,7 @@
   </CollapsibleSection>
 </template>
 <script>
+import { GUEST, HOST, RESTARTER } from '../constants'
 import event from '../mixins/event'
 import EventAttendanceCount from './EventAttendanceCount'
 import EventAttendee from './EventAttendee'
@@ -89,8 +90,61 @@ import CollapsibleSection from './CollapsibleSection'
 
 export default {
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
-  mixins: [ event ],
+  props: {
+    eventId: {
+      type: Number,
+      required: true
+    },
+    event: {
+      type: Object,
+      required: true
+    },
+    attendance:  {
+      type: Array,
+      required: true
+    },
+    invitations:  {
+      type: Array,
+      required: true
+    },
+    // TODO In due course the permissions should be handled by having the user in the store and querying that, rather
+    // than passing down props.
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
   computed: {
+    upcoming() {
+      const now = new Date().getTime()
+      const date = new Date(this.event.event_date).getTime()
+      return date > now
+    },
+    attendees() {
+      // Everyone, both invited and confirmed.
+      return this.$store.getters['attendance/byEvent'](this.eventId)
+    },
+    confirmed() {
+      return this.attendees.filter((a) => {
+        return a.confirmed
+      })
+    },
+    invited() {
+      return this.attendees.filter((a) => {
+        return !a.confirmed
+      })
+    },
+    participants() {
+      return this.confirmed.filter((a) => {
+        return a.role === GUEST
+      })
+    },
+    volunteers() {
+      return this.confirmed.filter((a) => {
+        return a.role === HOST || a.role === RESTARTER
+      })
+    },
     translatedTitle() {
       return this.$lang.get('events.event_attendance')
     },
@@ -174,6 +228,7 @@ export default {
 
 .maxheight {
   max-height: 240px;
+  min-height: 240px;
   overflow-y: auto;
 }
 
