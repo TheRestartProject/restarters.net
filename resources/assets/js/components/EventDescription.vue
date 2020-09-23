@@ -16,7 +16,6 @@ import event from '../mixins/event'
 import ExternalLink from './ExternalLink'
 import CollapsibleSection from './CollapsibleSection'
 import ReadMore from './ReadMore'
-const htmlToText = require('html-to-text');
 
 export default {
   components: {ReadMore, CollapsibleSection, ExternalLink},

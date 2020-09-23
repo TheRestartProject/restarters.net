@@ -3,6 +3,7 @@
 // become computed data in here.
 import { DATE_FORMAT, GUEST, HOST, RESTARTER } from '../constants'
 import moment from 'moment'
+const htmlToText = require('html-to-text');
 
 export default {
   props: {
@@ -16,11 +17,13 @@ export default {
     },
     attendance:  {
       type: Array,
-      required: true
+      required: false,
+      default: function () { return [] }
     },
     invitations:  {
       type: Array,
-      required: true
+      required: false,
+      default: function () { return [] }
     },
     canedit: {
       type: Boolean,
@@ -43,6 +46,17 @@ export default {
       const now = new Date().getTime()
       const date = new Date(this.event.event_date).getTime()
       return date > now
+    },
+    finished() {
+      const now = new Date().getTime()
+      const date = new Date(this.event.event_date)
+      return date < now
+    },
+    inProgress() {
+      const now = new Date().getTime()
+      const start = new Date(this.event.event_date + ' ' + this.event.start).getTime()
+      const end = new Date(this.event.event_date + ' ' + this.event.start).getTime()
+      return now >= start && now <= end
     },
     start() {
       return this.event.start.substring(0, 5)
