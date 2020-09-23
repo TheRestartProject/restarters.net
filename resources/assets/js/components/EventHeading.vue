@@ -8,18 +8,22 @@
       <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
         <div class="bord d-flex w-xs-100 w-md-50">
           <div class="datebox">
-            <span class="day">{{ date }}</span> <br />
-            {{ month }}
+            <span class="day align-top">{{ date }}</span> <br />
+            <span>
+              {{ month }}
+            </span>
           </div>
-          <h1 class="ml-3 mr-3 d-none d-md-block">
-            {{ event.venue ? event.venue : event.location }}
-          </h1>
+          <div class=" d-none d-md-block">
+            <h1 class="ml-3 mr-3 mb-0 centreme">
+              {{ event.venue ? event.venue : event.location }}
+            </h1>
+          </div>
           <h2 class="ml-3 d-block d-md-none">
             {{ event.venue ? event.venue : event.location }}
           </h2>
         </div>
-        <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0">
-          <div class="d-flex justify-content-between w-100 flex-wrap">
+        <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
+          <div class="d-flex justify-content-between w-100 flex-wrap centreme">
             <div class="d-flex mr-2" v-if="event.the_group">
               <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block" />
               <div v-html="translatedOrganised" class="ml-md-2"/>
@@ -127,5 +131,10 @@ export default {
   @include media-breakpoint-down(sm) {
     border-top: 1px solid $black;
   }
+}
+
+.centreme {
+  align-items: center;
+  display: flex !important;
 }
 </style>
