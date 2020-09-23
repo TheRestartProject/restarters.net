@@ -15,12 +15,12 @@
               <b-img src="/icons/group_ico.svg" class="mr-2" />
               {{ translatedParticipants }}
             </h3>
-            <EventAttendanceCount :count="participants.length" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
+            <EventAttendanceCount :count="event.participants" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
             <h3>
               <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
               {{ translatedVolunteers }}
             </h3>
-            <EventAttendanceCount :count="volunteers.length" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
+            <EventAttendanceCount :count="event.volunteers" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
           </div>
         </div>
         <div />
@@ -203,6 +203,28 @@ export default {
       eventId: this.eventId,
       attendees: attendees
     })
+  },
+  methods: {
+    async changeParticipants(val) {
+      let ret = await axios.post('/party/update-quantity', {
+        quantity: val,
+        event_id: this.eventId
+      }, {
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        }
+      })
+    },
+    async changeVolunteers(val) {
+      let ret = await axios.post('/party/update-volunteerquantity', {
+        quantity: val,
+        event_id: this.eventId
+      }, {
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        }
+      })
+    }
   }
 }
 </script>

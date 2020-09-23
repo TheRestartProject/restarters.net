@@ -1,17 +1,26 @@
 <template>
-  <div class="d-flex justify-content-between attendance-button-wrapper">
-<!--    TODO Inc/dec-->
-<!--    TODO Count is editable-->
-<!--    TODO Warning if count doesn't match confirmed volunteers -->
-    <b-btn variant="white" class="attendance-button">
-      -
-    </b-btn>
-    <div class="attendance-count pt-1">
-      {{ count }}
+  <div v-if="canedit" class="attendance-button-wrapper">
+    <div class="d-flex justify-content-between">
+      <!--    TODO Warning if count doesn't match confirmed volunteers -->
+      <b-input-group>
+        <b-input-group-prepend>
+          <b-btn variant="white" class="attendance-button" @click="dec">
+            -
+          </b-btn>
+        </b-input-group-prepend>
+        <b-input v-model="current" class="attendance-count pt-1 text-center" type="number" step="1" @keyup="set" />
+        <b-input-group-append>
+          <b-btn variant="white" class="attendance-button" @click="inc">
+            +
+          </b-btn>
+        </b-input-group-append>
+      </b-input-group>
     </div>
-    <b-btn variant="white" class="attendance-button">
-      +
-    </b-btn>
+  </div>
+  <div v-else class="d-flex justify-content-center">
+    <div class="attendance-count pt-1">
+      {{ current }}
+    </div>
   </div>
 </template>
 <script>
@@ -20,6 +29,35 @@ export default {
     count: {
       type: Number,
       required: true
+    },
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
+  data () {
+    return {
+      current: null
+    }
+  },
+  mounted() {
+    this.current = this.count
+  },
+  methods: {
+    inc() {
+      this.current++;
+      this.$emit('change', this.current)
+    },
+    dec() {
+      if (this.current > 0) {
+        this.current--;
+        this.$emit('change', this.current)
+      }
+    },
+    set() {
+      // This is triggered on keyup as the change even doesn't fire while you're still in the field.
+      this.$emit('change', this.current)
     }
   }
 }
@@ -32,7 +70,7 @@ export default {
 }
 
 .attendance-count {
-  font-size: 24px;
+  font-size: 23px;
   font-weight: bold;
   color: $brand-light;
 }
@@ -49,4 +87,5 @@ export default {
   font-family: monospace;
   text-align: center;
 }
+
 </style>
