@@ -915,21 +915,19 @@ class DeviceController extends Controller
 
     public function delete(Request $request, $id)
     {
-        $Device = new Device;
         $user = Auth::user();
 
-        // get device party
-        $curr = $Device->find($id);
-        $party = $curr->event;
+        $device = Device::find($id);
+        $eventId = $device->event;
 
-        if (FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($party, $user->id)) {
-            $curr->delete();
+        if (FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($eventId, $user->id)) {
+            $device->delete();
 
             if ($request->ajax()) {
                 $footprintRatioCalculator = new FootprintRatioCalculator();
                 $emissionRatio = $footprintRatioCalculator->calculateRatio();
-                $theParty = Party::find($party);
-                $stats = $theParty->getEventStats($emissionRatio);
+                $event = Party::find($eventId);
+                $stats = $event->getEventStats($emissionRatio);
 
                 return response()->json([
                     'success' => true,
@@ -937,14 +935,14 @@ class DeviceController extends Controller
                 ]);
             }
 
-            return redirect('/party/view/'.$party)->with('success', 'Device has been deleted!');
+            return redirect('/party/view/'.$eventId)->with('success', 'Device has been deleted!');
         }
 
         if ($request->ajax()) {
             return response()->json(['success' => false]);
         }
 
-        return redirect('/party/view/'.$party->with('warning', 'You do not have the right permissions for deleting a device'));
+        return redirect('/party/view/'.$eventId)->with('warning', 'You do not have the right permissions for deleting a device');
     }
 
     public function imageUpload(Request $request, $id)

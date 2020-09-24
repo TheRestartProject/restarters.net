@@ -2,6 +2,7 @@
 /public/storage
 /public/uploads
 /public/devices.csv
+/public/report.html
 npm-debug.log
 yarn-error.log
 .env
