@@ -15,16 +15,17 @@
               {{ translatedHost }}
             </span>
           </div>
-          <div :class="{
+          <div :id="'skills-' + attendee.volunteer.id" data-toggle="popover" data-placement="top" :data-content="skillList" :class="{
              'small': true,
              'd-flex': true,
+             'clickme' : true,
              'text-muted': noskills
             }">
            <b-img-lazy src="/images/star.svg" :class="{
              'star': true,
              'mr-1': true,
              'faded': noskills
-            }" /> {{ skills }}
+            }" /> {{ skillCount }}
           </div>
         </div>
       </div>
@@ -70,10 +71,25 @@ export default {
     noskills() {
       return !this.attendee.volunteer.user_skills || !this.attendee.volunteer.user_skills.length
     },
-    skills() {
+    skillCount() {
       let ret = null
       let skills = this.attendee.volunteer.user_skills
       ret = (skills && skills.length ? skills.length : '0') + ' ' + this.pluralise(this.$lang.get('partials.skills'), skills.length)
+      return ret
+    },
+    skillList() {
+      let ret = null
+      let skills = this.attendee.volunteer.user_skills
+
+      if (skills) {
+        let names = []
+        skills.forEach((s) => {
+          names.push(s.skill_name.skill_name)
+        })
+
+        ret = names.join(', ')
+      }
+
       return ret
     },
     translatedHost() {
@@ -100,6 +116,13 @@ export default {
     confirm() {
       this.$refs.confirm.show()
     }
+  },
+  mounted() {
+    this.$nextTick(() => {
+      // For some reason b-popup doesn't work.  This is probably an interaction between the global JS, Bootstrap and
+      // Bootstrap Vue, but it's not obvious what.  Enable this popover directly here.
+      $('[data-toggle="popover"]').popover()
+    })
   }
 }
 </script>

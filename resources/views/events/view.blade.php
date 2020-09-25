@@ -67,24 +67,28 @@
           <?php
           // We need to expand the user objects to pass to the client.  In due course this will be replaced
           // by an API call to get the event details.
-          $expanded_attended = [];
-          foreach ($attended as $att) {
-            $thisone = $att;
-            $thisone['volunteer'] = $att->volunteer;
-            $thisone['userSkills'] = $att->volunteer->userSkills;
-            $thisone['fullName'] = $att->getFullName();
-            $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
-            $expanded_attended[] = $thisone;
+          function expandVolunteer($volunteers) {
+            $ret = [];
+
+            foreach ($volunteers as $volunteer) {
+              $volunteer['volunteer'] = $volunteer->volunteer;
+              $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+
+              foreach ($volunteer['userSkills'] as &$skill) {
+                // Force expansion
+                $skill->skillName->skill_name;
+              }
+
+              $volunteer['fullName'] = $volunteer->getFullName();
+              $volunteer['profilePath'] = $volunteer->volunteer->getProfile($volunteer->id)->path;
+              $ret[] = $volunteer;
+            }
+
+            return $ret;
           }
-          $expanded_invited = [];
-          foreach ($invited as $att) {
-            $thisone = $att;
-            $thisone['volunteer'] = $att->volunteer;
-            $thisone['userSkills'] = $att->volunteer->userSkills;
-            $thisone['fullName'] = $att->getFullName();
-            $thisone['profilePath'] = $att->volunteer->getProfile($att->id)->path;
-            $expanded_invited[] = $thisone;
-          }
+          
+          $expanded_attended = expandVolunteer($attended);
+          $expanded_invited = expandVolunteer($invited);
 
           $expanded_hosts = [];
           foreach ($hosts as $host) {
@@ -109,7 +113,7 @@
           <div class="d-flex flex-wrap">
             <div class="w-xs-100 w-md-50">
               <div class="vue">
-                <EventDetails class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links) }}" />
+                <EventDetails class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null) }}" />
               </div>
               <div class="vue">
                 <EventDescription class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" />
