@@ -1,14 +1,20 @@
 <template>
   <div>
-    <p v-html="formattedString"></p>
-    <span v-show="text.length > maxChars">
-			<a :href="link" id="readmore" v-if="!isReadMore" v-on:click="triggerReadMore($event, true)" v-html="moreStr" class="d-flex justify-content-center"/>
-			<a :href="link" id="readmore" v-if="isReadMore" v-on:click="triggerReadMore($event, false)" v-html="lessStr" class="d-flex justify-content-center" />
-		</span>
+    <span v-if="text">
+      <p v-html="formattedString"></p>
+    </span>
+    <span v-else-if="html">
+      <div v-html="truncatedHTML" />
+    </span>
+    <span v-show="needsTruncating">
+      <a :href="link" id="readmore" v-if="!isReadMore" v-on:click="triggerReadMore($event, true)" v-html="moreStr" class="d-flex justify-content-center"/>
+      <a :href="link" id="readmore" v-if="isReadMore" v-on:click="triggerReadMore($event, false)" v-html="lessStr" class="d-flex justify-content-center" />
+    </span>
   </div>
 </template>
 
 <script>
+const truncate = require('html-truncate');
 // Originally based on https://github.com/orlyyani/read-more, with thanks.
 
 export default {
@@ -23,7 +29,11 @@ export default {
     },
     text: {
       type: String,
-      required: true
+      required: false
+    },
+    html: {
+      type: String,
+      required: false
     },
     link: {
       type: String,
@@ -50,6 +60,14 @@ export default {
       }
 
       return val_container;
+    },
+    truncatedHTML() {
+      // We need to truncate HTML with care to ensure that the result is tag safe; string truncation isn't good
+      // enough.
+      return this.html ? truncate(this.html, this.maxChars) : null
+    },
+    needsTruncating() {
+      return (this.text && text.length > maxChars) || (this.html && this.truncatedHTML !== this.html)
     }
   },
 

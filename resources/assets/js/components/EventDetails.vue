@@ -71,7 +71,6 @@ import map from '../mixins/map'
 import event from '../mixins/event'
 import ExternalLink from './ExternalLink'
 import CollapsibleSection from './CollapsibleSection'
-const htmlToText = require('html-to-text');
 
 export default {
   components: {CollapsibleSection, ExternalLink},

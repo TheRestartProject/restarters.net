@@ -3,7 +3,6 @@
 // become computed data in here.
 import { DATE_FORMAT, GUEST, HOST, RESTARTER } from '../constants'
 import moment from 'moment'
-const htmlToText = require('html-to-text');
 
 export default {
   props: {
@@ -62,7 +61,6 @@ export default {
     },
     finished() {
       const end = new moment(this.event.event_date + ' ' + this.event.end)
-      console.log("Finishes at", end)
       return end.isBefore()
     },
     inProgress() {
@@ -109,15 +107,6 @@ export default {
     },
     volunteerCountMismatch() {
       return this.volunteerCount !== this.volunteers.length
-    },
-    free_text() {
-      // Strip HTML
-      let ret = htmlToText.fromString(this.event.free_text);
-
-      // Remove duplicate blank lines.
-      ret = ret.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
-      return ret
-    },
+    }
   }
 }

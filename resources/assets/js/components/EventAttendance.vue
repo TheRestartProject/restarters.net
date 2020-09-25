@@ -5,7 +5,7 @@
     </template>
     <template slot="content">
       <div class="mt-2">
-        <p v-if="volunteerCountMismatch" class="warningbox small text-danger p-1">
+        <p v-if="!upcoming && volunteerCountMismatch" class="warningbox small text-danger p-1">
           {{ translatedMismatch }}
         </p>
         <div :class="{
@@ -51,8 +51,8 @@
                     <b-btn variant="link" data-toggle="modal" data-target="#event-add-volunteer">
                       {{ translatedAddVolunteer }}
                     </b-btn>
-                  <b-btn variant="link" variant="link" data-toggle="modal" data-target="#event-all-attended" href="#">
-                    {{ translatedSeeAllAttended }}
+                  <b-btn variant="link" data-toggle="modal" data-target="#event-all-attended" href="#">
+                    {{ translatedSeeAll }}
                     </b-btn>
                   </div>
                 </div>
@@ -74,7 +74,7 @@
                     {{ translatedInviteToJoin }}
                   </a>
                   <a data-toggle="modal" data-target="#event-all-volunteers" href="#" class="mr-2" v-if="invited.length">
-                    {{ translatedSeeAllInvited }}
+                    {{ translatedSeeAll }}
                   </a>
                 </div>
               </b-tab>
