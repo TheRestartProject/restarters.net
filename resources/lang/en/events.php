@@ -126,7 +126,7 @@ return array (
   'no_events_near_you' => 'No events near you right now?  See if you can join an <a href=":url">online event</a>',
   'looking_for_online_events' => 'Looking for online events? Also see our <a href=":url">events listings on Talk</a> for other types of online events.',
   'online_event_question' => 'Online event?',
-  'organised_by' => 'Organised by :group',
+  'organised_by' => 'Organised by',
   'event_actions' => 'Event actions',
   'edit_event' => 'Edit event',
   'request_review' => 'Request review',

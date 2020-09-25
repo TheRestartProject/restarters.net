@@ -62,6 +62,7 @@ export default {
     },
     finished() {
       const end = new moment(this.event.event_date + ' ' + this.event.end)
+      console.log("Finishes at", end)
       return end.isBefore()
     },
     inProgress() {
@@ -104,7 +105,6 @@ export default {
       })
     },
     volunteerCountMismatch() {
-      console.log("Calc mismatch");
       return this.volunteerCount !== this.volunteers.length
     },
     free_text() {

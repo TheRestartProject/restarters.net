@@ -26,7 +26,15 @@
           <div class="d-flex justify-content-between w-100 flex-wrap centreme">
             <div class="d-flex mr-2" v-if="event.the_group">
               <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block" />
-              <div v-html="translatedOrganised" class="ml-md-2"/>
+              <div class="ml-md-2">
+                {{ translatedOrganised }}
+                <br class="d-none d-md-block"/>
+                <b>
+                  <a :href="'/group/view/' + event.the_group.idgroups">
+                    {{ event.the_group.name.trim() }}
+                  </a>
+                </b>
+              </div>
             </div>
             <EventActions v-bind="$props" class="d-none d-md-block" />
           </div>
@@ -52,10 +60,11 @@ export default {
       return this.$lang.get('events.events')
     },
     translatedOrganised() {
-      // TODO not good to construct HTML here, but we will fix this when we change past events to use this component.
-      console.log("Event", this.event)
+      // Existing translations may have a :group parameter, so set that empty so that it doesn't appear in the result.
+      // We no longer use that parameter because the design has different styling for the translated text and the
+      // group name.
       return this.$lang.get('events.organised_by', {
-        group: '<br class="d-none d-md-block"/><b><a href="/group/view/' + this.event.the_group.idgroups  + '">' + this.event.the_group.name.trim() + '</a></b>'
+        group: ''
       })
     },
   },
