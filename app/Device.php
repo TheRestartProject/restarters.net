@@ -26,7 +26,15 @@ class Device extends Model implements Auditable
      */
     protected $hidden = [];
 
-    //Table Relations
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function($device) {
+            $device->barriers()->detach();
+            $device->urls()->delete();
+        });
+    }
 
     // Setters
 
