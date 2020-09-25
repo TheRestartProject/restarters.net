@@ -3,6 +3,7 @@
     <h2 :class="{
       'd-flex': true,
       'd-md-none': hideTitle,
+      'mb-3': true,
       'justify-content-between': true
       }" @click="toggle">
       <span>
