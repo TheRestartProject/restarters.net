@@ -74,6 +74,13 @@ export default {
   color: $brand-light;
 }
 
+.attendance-count::-webkit-outer-spin-button, .attendance-count::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
 .attendance-button {
   width: 50px;
   height: 50px;
@@ -86,5 +93,4 @@ export default {
   font-family: monospace;
   text-align: center;
 }
-
 </style>

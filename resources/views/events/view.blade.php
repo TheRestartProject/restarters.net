@@ -98,10 +98,11 @@
         }
 
         $can_edit_event = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
+        $is_attending = is_object($is_attending) && $is_attending->status == 1;
         ?>
 
         <div class="vue">
-          <EventHeading :event-id="{{ $event->idevents }}" :event="{{ $event }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}" :attending="{{ json_encode($is_attending) }}" :in-group="{{ Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}" />
+          <EventHeading :event-id="{{ $event->idevents }}" :event="{{ $event }}" :is-attending="{{ $is_attending ? 'true' : 'false' }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}" :attending="{{ json_encode($is_attending) }}" :in-group="{{ Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}" />
         </div>
 
         <div class="d-flex flex-wrap">

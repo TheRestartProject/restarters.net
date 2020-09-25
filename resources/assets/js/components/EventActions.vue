@@ -1,31 +1,49 @@
 <template>
   <div>
     <b-dropdown variant="primary" :text="translatedEventActions">
-      <b-dropdown-item :href="'/party/edit/' + eventId">
-        {{ translatedEditEvent }}
-      </b-dropdown-item>
-      <b-dropdown-item @click="confirmDelete">
-        {{ translatedDeleteEvent }}
-      </b-dropdown-item>
-      <div v-if="finished">
-        <b-dropdown-item data-toggle="modal" data-target="#event-request-review">
-          {{ translatedRequestReview }}
+      <div v-if="canedit">
+        <b-dropdown-item :href="'/party/edit/' + eventId">
+          {{ translatedEditEvent }}
         </b-dropdown-item>
-        <b-dropdown-item data-toggle="modal" data-target="#event-share-stats">
+        <b-dropdown-item @click="confirmDelete" v-if="!inProgress && !finished">
+          {{ translatedDeleteEvent }}
+        </b-dropdown-item>
+        <div v-if="finished">
+          <b-dropdown-item data-toggle="modal" data-target="#event-request-review">
+            {{ translatedRequestReview }}
+          </b-dropdown-item>
+          <b-dropdown-item data-toggle="modal" data-target="#event-share-stats">
+            {{ translatedShareEventStats }}
+          </b-dropdown-item>
+        </div>
+        <div v-else>
+          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="attending && upcoming">
+            {{ translatedInviteVolunteers }}
+          </b-dropdown-item>
+          <b-dropdown-item :href="'/party/join/' + eventId" v-else>
+            {{ translatedRSVP }}
+          </b-dropdown-item>
+        </div>
+        <b-dropdown-item :href="'/group/join/' + event.the_group.idgroups" v-if="!inGroup">
+          {{ translatedFollowGroup }}
+        </b-dropdown-item>
+      </div>
+      <div v-else>
+        <b-dropdown-item data-toggle="modal" data-target="#event-share-stats" v-if="finished">
           {{ translatedShareEventStats }}
         </b-dropdown-item>
+        <div v-else>
+          <b-dropdown-item :href="'/group/join/' + event.the_group.idgroups" v-if="!inGroup">
+            {{ translatedFollowGroup }}
+          </b-dropdown-item>
+          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="attending && upcoming">
+            {{ translatedInviteVolunteers }}
+          </b-dropdown-item>
+          <b-dropdown-item :href="'/party/join/' + eventId" v-else>
+            {{ translatedRSVP }}
+          </b-dropdown-item>
+        </div>
       </div>
-      <div v-else-if="upcoming">
-        <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="canInvite">
-          {{ translatedInviteVolunteers }}
-        </b-dropdown-item>
-        <b-dropdown-item :href="'/party/join/' + eventId" v-else>
-          {{ translatedRSVP }}
-        </b-dropdown-item>
-      </div>
-      <b-dropdown-item :href="'/group/join/' + event.the_group.idgroups" v-if="!inGroup">
-        {{ translatedFollowGroup }}
-      </b-dropdown-item>
     </b-dropdown>
     <ConfirmModal @confirm="confirmedDelete" ref="confirmdelete" />
   </div>
@@ -33,7 +51,6 @@
 <script>
 import event from '../mixins/event'
 import ConfirmModal from './ConfirmModal'
-import map from '../mixins/map'
 
 export default {
   components: {ConfirmModal},

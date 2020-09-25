@@ -212,7 +212,7 @@ export default {
 
 .attendance {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 50px 2fr;
+  grid-template-columns: 1fr 50px minmax(0, 2fr);
 
   &.upcoming {
     grid-template-columns: 0 0px 1fr;
@@ -231,6 +231,7 @@ export default {
   max-height: 240px;
   min-height: 240px;
   overflow-y: auto;
+  overflow-x: hidden
 }
 
 h2 {

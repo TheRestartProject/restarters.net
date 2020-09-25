@@ -30,6 +30,11 @@ export default {
       required: false,
       default: false
     },
+    isAttending: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     attending: {
       type: Object,
       required: false,
@@ -71,6 +76,9 @@ export default {
     date() {
       return new moment(this.event.event_date).format(DATE_FORMAT)
     },
+    month() {
+      return new moment(this.event.event_date).format('MMM').toUpperCase()
+    },
     attendees() {
       // Everyone, both invited and confirmed.
       return this.$store.getters['attendance/byEvent'](this.eventId)
@@ -98,10 +106,6 @@ export default {
     volunteerCountMismatch() {
       console.log("Calc mismatch");
       return this.volunteerCount !== this.volunteers.length
-    },
-    canInvite() {
-      // TODO Check this logic with Neil
-      return this.upcoming && this.attending && this.attending.role === HOST;
     },
     free_text() {
       // Strip HTML

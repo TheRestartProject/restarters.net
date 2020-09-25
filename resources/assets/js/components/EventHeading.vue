@@ -41,28 +41,10 @@ import event from '../mixins/event'
 import moment from 'moment'
 import EventActions from './EventActions'
 
-// TODO Discuss criteria for event delete with Neil.
-
 export default {
   components: {EventActions},
   mixins: [event],
   computed: {
-    canInvite() {
-      // TODO Check this logic with Neil
-      return this.upcoming && this.attending && this.attending.role === HOST;
-    },
-    start() {
-      return this.event.start.substring(0, 5)
-    },
-    end() {
-      return this.event.end.substring(0, 5)
-    },
-    date() {
-      return new moment(this.event.event_date).format('D')
-    },
-    month() {
-      return new moment(this.event.event_date).format('MMM').toUpperCase()
-    },
     groupImage() {
       return this.event.the_group && this.event.the_group.group_image ? ('/uploads/mid_' + this.event.the_group.group_image.image.path) : DEFAULT_PROFILE
     },

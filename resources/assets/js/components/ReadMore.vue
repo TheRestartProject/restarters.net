@@ -2,8 +2,8 @@
   <div>
     <p v-html="formattedString"></p>
     <span v-show="text.length > maxChars">
-			<a :href="link" id="readmore" v-show="!isReadMore" v-on:click="triggerReadMore($event, true)" v-html="moreStr" />
-			<a :href="link" id="readmore" v-show="isReadMore" v-on:click="triggerReadMore($event, false)" v-html="lessStr" />
+			<a :href="link" id="readmore" v-if="!isReadMore" v-on:click="triggerReadMore($event, true)" v-html="moreStr" class="d-flex justify-content-center"/>
+			<a :href="link" id="readmore" v-if="isReadMore" v-on:click="triggerReadMore($event, false)" v-html="lessStr" class="d-flex justify-content-center" />
 		</span>
   </div>
 </template>
