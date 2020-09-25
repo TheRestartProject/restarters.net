@@ -8,7 +8,7 @@
       <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
         <div class="bord d-flex w-xs-100 w-md-50">
           <div class="datebox">
-            <span class="day align-top">{{ date }}</span> <br />
+            <span class="day align-top">{{ dayofmonth }}</span> <br />
             <span>
               {{ month }}
             </span>

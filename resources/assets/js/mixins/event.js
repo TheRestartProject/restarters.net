@@ -77,6 +77,9 @@ export default {
     date() {
       return new moment(this.event.event_date).format(DATE_FORMAT)
     },
+    dayofmonth() {
+      return new moment(this.event.event_date).format('D')
+    },
     month() {
       return new moment(this.event.event_date).format('MMM').toUpperCase()
     },
