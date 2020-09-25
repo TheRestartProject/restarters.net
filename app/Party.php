@@ -595,9 +595,14 @@ class Party extends Model implements Auditable
 
     public function isInProgress()
     {
-        $date_now = new \DateTime();
-        $event_start = new \DateTime($this->event_date.' '.$this->start);
-        $event_end = new \DateTime($this->event_date.' '.$this->end);
+        $date_now = Carbon::now();
+
+        $event_start = new Carbon($this->event_date.' '.$this->start);
+        // Temporarily start an hour early for Repair Together
+        // Until we have timezone support.
+        $event_start = $event_start->addHours(-1);
+
+        $event_end = new Carbon($this->event_date.' '.$this->end);
 
         if ($date_now >= $event_start && $date_now <= $event_end) {
             return true;
