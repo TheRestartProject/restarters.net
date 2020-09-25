@@ -52,20 +52,15 @@ export default {
   },
   computed: {
     upcoming() {
-      const now = new Date().getTime()
-      const date = new Date(this.event.event_date).getTime()
-      return date > now
+      const start = new moment(this.event.event_date + ' ' + this.event.start)
+      return start.isAfter()
     },
     finished() {
-      const now = new Date().getTime()
-      const date = new Date(this.event.event_date)
-      return date < now
+      const end = new moment(this.event.event_date + ' ' + this.event.end)
+      return end.isBefore()
     },
     inProgress() {
-      const now = new Date().getTime()
-      const start = new Date(this.event.event_date + ' ' + this.event.start).getTime()
-      const end = new Date(this.event.event_date + ' ' + this.event.start).getTime()
-      return now >= start && now <= end
+      return !this.upcoming && !this.finished
     },
     start() {
       return this.event.start.substring(0, 5)

@@ -110,7 +110,6 @@
               <EventDetails class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links) }}" />
             </div>
             <div class="vue">
-              <hr class="d-block d-md-none">
               <EventDescription class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" />
             </div>
           </div>
@@ -163,7 +162,7 @@
                     'powered' => TRUE,
                     'event_id' => $event->idevents
                 ])
-                @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) )
+                  @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($event->idevents, Auth::user()->id) ) )
                   <a class="collapsed row-button" id="open-add-powered" data-toggle="collapse" href="#add-edit-device-powered-" role="button" aria-expanded="false" aria-controls="add-edit-device-powered-">
                     <button class="btn btn-primary text-center mb-4 ml-4 align-bottom" type="button"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> @lang('partials.add_device_powered')</button>
                   </a>
@@ -180,7 +179,7 @@
                 @include('partials.device-list', [
                     'powered' => FALSE
                 ])
-                @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) )
+                  @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($event->idevents, Auth::user()->id) ) )
                   <a class="collapsed row-button" id="open-add-unpowered" data-toggle="collapse" href="#add-edit-device-unpowered-" role="button" aria-expanded="false" aria-controls="add-edit-device-unpowered-">
                     <button class="btn btn-primary text-center mb-4 ml-4 align-bottom" type="button"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> @lang('partials.add_device_unpowered')</button>
                   </a>
