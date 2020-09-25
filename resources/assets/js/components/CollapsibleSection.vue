@@ -22,7 +22,11 @@
     }">
       <slot name="content" />
     </div>
-    <hr class="mt-0 d-md-none" />
+    <hr :class="{
+      'd-none': !expanded,
+      'd-md-block': true,
+      'mt-0': true
+    }" />
   </div>
 </template>
 <script>

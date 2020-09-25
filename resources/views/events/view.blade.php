@@ -112,6 +112,7 @@
                 <EventDetails class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links) }}" />
               </div>
               <div class="vue">
+                <hr class="d-block d-md-none">
                 <EventDescription class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" />
               </div>
             </div>
