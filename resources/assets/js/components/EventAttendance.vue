@@ -51,8 +51,8 @@
                     <b-btn variant="link" data-toggle="modal" data-target="#event-add-volunteer">
                       {{ translatedAddVolunteer }}
                     </b-btn>
-                    <b-btn variant="link">
-                      {{ translatedSeeAll }}
+                  <b-btn variant="link" variant="link" data-toggle="modal" data-target="#event-all-attended" href="#">
+                    {{ translatedSeeAllAttended }}
                     </b-btn>
                   </div>
                 </div>
