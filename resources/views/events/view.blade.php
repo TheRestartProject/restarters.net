@@ -80,7 +80,7 @@
               }
 
               $volunteer['fullName'] = $volunteer->getFullName();
-              $volunteer['profilePath'] = $volunteer->volunteer->getProfile($volunteer->id)->path;
+              $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
               $ret[] = $volunteer;
             }
 

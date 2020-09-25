@@ -63,7 +63,7 @@ export default {
   },
   computed: {
     profile() {
-      return this.attendee.volunteer && this.attendee.volunteer.profilePath ? this.attendee.volunteer.profilePath : DEFAULT_PROFILE
+      return this.attendee ? this.attendee.profilePath : DEFAULT_PROFILE
     },
     host() {
       return this.attendee.role === HOST
