@@ -78,7 +78,7 @@
         }
 
               $volunteer['fullName'] = $volunteer->getFullName();
-              $volunteer['profilePath'] = $volunteer->volunteer->getProfile($volunteer->id)->path;
+              $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
               $ret[] = $volunteer;
         }
 
@@ -87,13 +87,7 @@
 
           $expanded_attended = expandVolunteer($attended);
           $expanded_invited = expandVolunteer($invited);
-
-        $expanded_hosts = [];
-        foreach ($hosts as $host) {
-          $thisone = $host;
-          $thisone['volunteer'] = $host->volunteer;
-          $expanded_hosts[] = $thisone;
-        }
+          $expanded_hosts = expandVolunteer($hosts);
 
         // Trigger expansion of group.
         $group_image = $event->theGroup->groupImage;
