@@ -8,7 +8,7 @@
       <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
         <div class="bord d-flex w-xs-100 w-md-50">
           <div class="datebox">
-            <span class="day align-top">{{ date }}</span> <br />
+            <span class="day align-top">{{ dayofmonth }}</span> <br />
             <span>
               {{ month }}
             </span>
@@ -26,7 +26,15 @@
           <div class="d-flex justify-content-between w-100 flex-wrap centreme">
             <div class="d-flex mr-2" v-if="event.the_group">
               <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block" />
-              <div v-html="translatedOrganised" class="ml-md-2"/>
+              <div class="ml-md-2">
+                {{ translatedOrganised }}
+                <br class="d-none d-md-block"/>
+                <b>
+                  <a :href="'/group/view/' + event.the_group.idgroups">
+                    {{ event.the_group.name.trim() }}
+                  </a>
+                </b>
+              </div>
             </div>
             <EventActions v-bind="$props" class="d-none d-md-block" />
           </div>
@@ -41,28 +49,10 @@ import event from '../mixins/event'
 import moment from 'moment'
 import EventActions from './EventActions'
 
-// TODO Discuss criteria for event delete with Neil.
-
 export default {
   components: {EventActions},
   mixins: [event],
   computed: {
-    canInvite() {
-      // TODO Check this logic with Neil
-      return this.upcoming && this.attending && this.attending.role === HOST;
-    },
-    start() {
-      return this.event.start.substring(0, 5)
-    },
-    end() {
-      return this.event.end.substring(0, 5)
-    },
-    date() {
-      return new moment(this.event.event_date).format('D')
-    },
-    month() {
-      return new moment(this.event.event_date).format('MMM').toUpperCase()
-    },
     groupImage() {
       return this.event.the_group && this.event.the_group.group_image ? ('/uploads/mid_' + this.event.the_group.group_image.image.path) : DEFAULT_PROFILE
     },
@@ -70,10 +60,11 @@ export default {
       return this.$lang.get('events.events')
     },
     translatedOrganised() {
-      // TODO not good to construct HTML here, but we will fix this when we change past events to use this component.
-      console.log("Event", this.event)
+      // Existing translations may have a :group parameter, so set that empty so that it doesn't appear in the result.
+      // We no longer use that parameter because the design has different styling for the translated text and the
+      // group name.
       return this.$lang.get('events.organised_by', {
-        group: '<br class="d-none d-md-block"/><b><a href="/group/view/' + this.event.the_group.idgroups  + '">' + this.event.the_group.name.trim() + '</a></b>'
+        group: ''
       })
     },
   },

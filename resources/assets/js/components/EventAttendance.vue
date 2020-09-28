@@ -4,85 +4,88 @@
       {{ translatedTitle }}
     </template>
     <template slot="content">
-      <div :class="{
+      <div class="mt-2">
+        <p v-if="!upcoming && volunteerCountMismatch" class="warningbox small text-danger p-1">
+          {{ translatedMismatch }}
+        </p>
+        <div :class="{
       attendance: true,
-      'mt-2': true,
       upcoming: upcoming
       }">
-        <div>
-          <div v-if="!upcoming">
-            <h3>
-              <b-img src="/icons/group_ico.svg" class="mr-2" />
-              {{ translatedParticipants }}
-            </h3>
-            <EventAttendanceCount :count="participants.length" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
-            <h3>
-              <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
-              {{ translatedVolunteers }}
-            </h3>
-            <EventAttendanceCount :count="volunteers.length" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
+          <div>
+            <div v-if="!upcoming">
+              <h3>
+                <b-img src="/icons/group_ico.svg" class="mr-2" />
+                {{ translatedParticipants }}
+              </h3>
+              <EventAttendanceCount :count="event.participants" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
+              <h3>
+                <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
+                {{ translatedVolunteers }}
+              </h3>
+              <EventAttendanceCount :count="event.volunteers" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
+            </div>
           </div>
-        </div>
-        <div />
-        <div>
-          <b-tabs class="ourtabs attendance-tabs w-100">
-            <b-tab active title-item-class="w-50" class="pt-2">
-              <template slot="title">
-                <b>{{ translatedConfirmed }}</b> ({{ confirmed.length }})
-              </template>
-              <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
-                <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" :canedit="canedit" />
-              </div>
-              <p v-else>
-                {{ translatedNoConfirmed }}
-              </p>
-              <hr />
-              <div v-if="upcoming" class="d-flex justify-content-end">
-                <!--              TODO In due course these modals should become Vue components.-->
-                <a data-toggle="modal" data-target="#event-all-attended" href="#" class="mr-2">
-                  {{ translatedSeeAllConfirmed }}
-                </a>
-              </div>
-              <div v-else>
-                <div class="d-flex justify-content-between">
-                  <b-btn variant="link">
-                    TODO Add.
-                  </b-btn>
-                  <b-btn variant="link">
-                    {{ translatedSeeAllAttended }}
-                  </b-btn>
+          <div />
+          <div>
+            <b-tabs class="ourtabs attendance-tabs w-100">
+              <b-tab active title-item-class="w-50" class="pt-2">
+                <template slot="title">
+                  <b>{{ translatedConfirmed }}</b> ({{ confirmed.length }})
+                </template>
+                <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
+                  <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" :canedit="canedit" />
                 </div>
-              </div>
-            </b-tab>
-            <b-tab title-item-class="w-50" class="pt-2">
-              <template slot="title">
-                <b>{{ translatedInvited }}</b> ({{ invited.length }})
-              </template>
-              <div v-if="invited.length" class="maxheight">
-                <EventAttendee v-for="a in invited" :key="'eventattendee-' + a.idevents_users" :attendee="a" />
-              </div>
-              <p v-else>
-                {{ translatedNoInvited }}
-              </p>
-              <hr />
-              <div v-if="upcoming" class="d-flex justify-content-between">
-                <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
-                  <img class="icon" src="/images/add-icon.svg" />
-                  {{ translatedInviteToJoin }}
-                </a>
-                <a data-toggle="modal" data-target="#event-all-volunteers" href="#" class="mr-2" v-if="invited.length">
-                  {{ translatedSeeAllInvited }}
-                </a>
-              </div>
-            </b-tab>
-          </b-tabs>
+                <p v-else>
+                  {{ translatedNoConfirmed }}
+                </p>
+                <hr />
+                <div v-if="upcoming" class="d-flex justify-content-end">
+                  <!-- TODO LATER In due course these modals should become Vue components.-->
+                  <a data-toggle="modal" data-target="#event-all-attended" href="#" class="mr-2">
+                    {{ translatedSeeAll }}
+                  </a>
+                </div>
+                <div v-else>
+                  <div class="d-flex justify-content-between">
+                    <b-btn variant="link" data-toggle="modal" data-target="#event-add-volunteer">
+                      {{ translatedAddVolunteer }}
+                    </b-btn>
+                  <b-btn variant="link" data-toggle="modal" data-target="#event-all-attended" href="#">
+                    {{ translatedSeeAll }}
+                    </b-btn>
+                  </div>
+                </div>
+              </b-tab>
+              <b-tab title-item-class="w-50" class="pt-2">
+                <template slot="title">
+                  <b>{{ translatedInvited }}</b> ({{ invited.length }})
+                </template>
+                <div v-if="invited.length" class="maxheight">
+                  <EventAttendee v-for="a in invited" :key="'eventattendee-' + a.idevents_users" :attendee="a" />
+                </div>
+                <p v-else>
+                  {{ translatedNoInvited }}
+                </p>
+                <hr />
+                <div v-if="upcoming" class="d-flex justify-content-between">
+                  <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
+                    <img class="icon" src="/images/add-icon.svg" />
+                    {{ translatedInviteToJoin }}
+                  </a>
+                  <a data-toggle="modal" data-target="#event-all-volunteers" href="#" class="mr-2" v-if="invited.length">
+                    {{ translatedSeeAll }}
+                  </a>
+                </div>
+              </b-tab>
+            </b-tabs>
+          </div>
         </div>
       </div>
     </template>
   </CollapsibleSection>
 </template>
 <script>
-import { GUEST, HOST, RESTARTER } from '../constants'
 import event from '../mixins/event'
 import EventAttendanceCount from './EventAttendanceCount'
 import EventAttendee from './EventAttendee'
@@ -108,7 +111,7 @@ export default {
       type: Array,
       required: true
     },
-    // TODO In due course the permissions should be handled by having the user in the store and querying that, rather
+    // TODO LATER In due course the permissions should be handled by having the user in the store and querying that, rather
     // than passing down props.
     canedit: {
       type: Boolean,
@@ -132,14 +135,8 @@ export default {
     translatedInvited() {
       return this.$lang.get('events.invited')
     },
-    translatedSeeAllConfirmed() {
-      return this.$lang.get('events.see_all_confirmed')
-    },
-    translatedSeeAllInvited() {
-      return this.$lang.get('events.see_all_invited')
-    },
-    translatedSeeAllAttended() {
-      return this.$lang.get('events.see_all_attended')
+    translatedSeeAll() {
+      return this.$lang.get('events.see_all')
     },
     translatedNoConfirmed() {
       return this.$lang.get('events.confirmed_none')
@@ -149,6 +146,12 @@ export default {
     },
     translatedInviteToJoin() {
       return this.$lang.get('events.invite_to_join')
+    },
+    translatedMismatch() {
+      return this.$lang.get('events.warning_volunteers_message')
+    },
+    translatedAddVolunteer() {
+      return this.$lang.get('events.add_volunteer_modal_heading')
     }
   },
   created() {
@@ -175,6 +178,32 @@ export default {
       eventId: this.eventId,
       attendees: attendees
     })
+  },
+  methods: {
+    async changeParticipants(val) {
+      let ret = await axios.post('/party/update-quantity', {
+        quantity: val,
+        event_id: this.eventId
+      }, {
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        }
+      })
+    },
+    async changeVolunteers(val) {
+      let ret = await axios.post('/party/update-volunteerquantity', {
+        quantity: val,
+        event_id: this.eventId
+      }, {
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        }
+      })
+
+      if (ret && ret.data && ret.data.success) {
+        this.volunteerCount = val
+      }
+    }
   }
 }
 </script>
@@ -183,7 +212,7 @@ export default {
 
 .attendance {
   display: grid;
-  grid-template-columns: 1fr 50px 2fr;
+  grid-template-columns: 1fr 50px minmax(0, 2fr);
 
   &.upcoming {
     grid-template-columns: 0 0px 1fr;
@@ -202,6 +231,7 @@ export default {
   max-height: 240px;
   min-height: 240px;
   overflow-y: auto;
+  overflow-x: hidden
 }
 
 h2 {
@@ -216,5 +246,9 @@ h3 {
 
 .icon {
   width: 30px;
+}
+
+.warningbox {
+  border: 1px solid $brand-danger;
 }
 </style>

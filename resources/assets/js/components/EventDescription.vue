@@ -4,7 +4,7 @@
       {{ translatedDescription }}
     </template>
     <template slot="content">
-      <read-more :text="free_text" class="mt-2 readmore small" :max-chars="440" :more-str="translatedReadMore" :less-str="translatedReadLess" />
+      <read-more :html="event.free_text" class="mt-2 readmore small" :max-chars="440" :more-str="translatedReadMore" :less-str="translatedReadLess" />
     </template>
   </CollapsibleSection>
 </template>
@@ -29,7 +29,7 @@ export default {
     },
     translatedReadLess() {
       return this.$lang.get('events.read_less')
-    },
+    }
   }
 }
 </script>
