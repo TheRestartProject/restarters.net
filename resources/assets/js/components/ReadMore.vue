@@ -1,14 +1,24 @@
 <template>
   <div>
-    <p v-html="formattedString"></p>
-    <span v-show="text.length > maxChars">
-			<a :href="link" id="readmore" v-show="!isReadMore" v-on:click="triggerReadMore($event, true)" v-html="moreStr" />
-			<a :href="link" id="readmore" v-show="isReadMore" v-on:click="triggerReadMore($event, false)" v-html="lessStr" />
-		</span>
+    <span v-if="text">
+      <p v-html="formattedString"></p>
+    </span>
+    <span v-else-if="html">
+      <span v-if="!needsTruncating" v-html="html" />
+      <span v-else>
+        <span v-if="!isReadMore" v-html="truncatedHTML" />
+        <span v-else v-html="html" />
+      </span>
+    </span>
+    <span v-if="needsTruncating">
+      <a :href="link" id="readmore" v-if="!isReadMore" v-on:click="triggerReadMore($event, true)" v-html="moreStr" class="d-flex justify-content-center"/>
+      <a :href="link" id="readmore" v-if="isReadMore" v-on:click="triggerReadMore($event, false)" v-html="lessStr" class="d-flex justify-content-center" />
+    </span>
   </div>
 </template>
 
 <script>
+const truncate = require('html-truncate');
 // Originally based on https://github.com/orlyyani/read-more, with thanks.
 
 export default {
@@ -23,7 +33,11 @@ export default {
     },
     text: {
       type: String,
-      required: true
+      required: false
+    },
+    html: {
+      type: String,
+      required: false
     },
     link: {
       type: String,
@@ -50,6 +64,19 @@ export default {
       }
 
       return val_container;
+    },
+    truncatedHTML() {
+      // We need to truncate HTML with care to ensure that the result is tag safe; string truncation isn't good
+      // enough.
+      return this.html ? truncate(this.html, this.maxChars) : null
+    },
+    untruncatedHTML() {
+      return this.html ? truncate(this.html, this.maxChars) : this.html
+    },
+    needsTruncating() {
+      const ret = (this.text && (text.length > maxChars)) || (this.html && (this.truncatedHTML !== this.html))
+      console.log("Needs", ret, this.maxChars, this.truncatedHTML !== this.untruncatedHTML, this.truncatedHTML, this.untruncatedHTML)
+      return ret
     }
   },
 

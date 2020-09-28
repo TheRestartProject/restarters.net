@@ -3,6 +3,7 @@
     <h2 :class="{
       'd-flex': true,
       'd-md-none': hideTitle,
+      'mb-3': true,
       'justify-content-between': true
       }" @click="toggle">
       <span>
@@ -22,11 +23,7 @@
     }">
       <slot name="content" />
     </div>
-    <hr :class="{
-      'd-none': !expanded,
-      'd-md-block': true,
-      'mt-0': true
-    }" />
+    <hr class="mt-0 d-md-none" />
   </div>
 </template>
 <script>

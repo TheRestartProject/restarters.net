@@ -98,7 +98,11 @@ h2 {
   float: right;
 }
 
-.linkdrop {
+.clickme {
+  cursor: pointer;
+}
+
+.linkdrop.dropdown {
   color: $brand-light !important;
 
   button {
@@ -107,8 +111,8 @@ h2 {
     padding: 0px;
   }
 
-  &.show {
-    button {
+  &.show  {
+    .dropdown-toggle {
       background-color: transparent !important;
     }
   }
