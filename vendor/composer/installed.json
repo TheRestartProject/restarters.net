@@ -984,6 +984,58 @@
         ]
     },
     {
+        "name": "fzaninotto/faker",
+        "version": "v1.9.1",
+        "version_normalized": "1.9.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/fzaninotto/Faker.git",
+            "reference": "fc10d778e4b84d5bd315dad194661e091d307c6f"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/fc10d778e4b84d5bd315dad194661e091d307c6f",
+            "reference": "fc10d778e4b84d5bd315dad194661e091d307c6f",
+            "shasum": ""
+        },
+        "require": {
+            "php": "^5.3.3 || ^7.0"
+        },
+        "require-dev": {
+            "ext-intl": "*",
+            "phpunit/phpunit": "^4.8.35 || ^5.7",
+            "squizlabs/php_codesniffer": "^2.9.2"
+        },
+        "time": "2019-12-12T13:22:17+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.9-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Faker\\": "src/Faker/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "François Zaninotto"
+            }
+        ],
+        "description": "Faker is a PHP library that generates fake data for you.",
+        "keywords": [
+            "data",
+            "faker",
+            "fixtures"
+        ]
+    },
+    {
         "name": "guzzlehttp/guzzle",
         "version": "6.3.3",
         "version_normalized": "6.3.3.0",
@@ -1985,6 +2037,97 @@
             "s3",
             "sftp",
             "storage"
+        ]
+    },
+    {
+        "name": "mariuzzo/laravel-js-localization",
+        "version": "v1.6.0",
+        "version_normalized": "1.6.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/rmariuzzo/Laravel-JS-Localization.git",
+            "reference": "76026e0008909f02f1abf471d040f701a76a70f7"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/rmariuzzo/Laravel-JS-Localization/zipball/76026e0008909f02f1abf471d040f701a76a70f7",
+            "reference": "76026e0008909f02f1abf471d040f701a76a70f7",
+            "shasum": ""
+        },
+        "require": {
+            "illuminate/config": "^4.2 || ^5.0 || ^6.0 || ^7.0",
+            "illuminate/console": "^4.2 || ^5.0 || ^6.0 || ^7.0",
+            "illuminate/filesystem": "^4.2 || ^5.0 || ^6.0 || ^7.0",
+            "php": "^5.4 || ^7.0",
+            "tedivm/jshrink": "~1.0"
+        },
+        "require-dev": {
+            "orchestra/testbench": "^2.2 || ^3.0 || ^4.0",
+            "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.0"
+        },
+        "time": "2020-03-27T04:07:54+00:00",
+        "type": "library",
+        "extra": {
+            "laravel": {
+                "providers": [
+                    "Mariuzzo\\LaravelJsLocalization\\LaravelJsLocalizationServiceProvider"
+                ]
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Mariuzzo\\LaravelJsLocalization\\": "src/Mariuzzo/LaravelJsLocalization/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Rubens Mariuzzo",
+                "email": "rubens@mariuzzo.com",
+                "homepage": "https://github.com/rmariuzzo",
+                "role": "Developer"
+            },
+            {
+                "name": "German Popoter",
+                "email": "me@gpopoteur.com",
+                "homepage": "https://github.com/gpopoteur",
+                "role": "Developer"
+            },
+            {
+                "name": "Galievskiy Dmitriy",
+                "homepage": "https://github.com/xAockd",
+                "role": "Developer"
+            },
+            {
+                "name": "Ramon Ackermann",
+                "homepage": "https://github.com/sboo",
+                "role": "Developer"
+            },
+            {
+                "name": "Anton Komarev",
+                "homepage": "https://github.com/antonkomarev",
+                "role": "Developer"
+            },
+            {
+                "name": "Pascal Baljet",
+                "homepage": "https://github.com/pascalbaljetmedia",
+                "role": "Developer"
+            }
+        ],
+        "description": "Laravel Localization in JavaScript",
+        "homepage": "https://github.com/rmariuzzo/laravel-js-localization",
+        "keywords": [
+            "JS",
+            "i18n",
+            "javascript",
+            "lang",
+            "laravel",
+            "laravel 5",
+            "localization"
         ]
     },
     {
@@ -4091,6 +4234,54 @@
         "keywords": [
             "debug",
             "dump"
+        ]
+    },
+    {
+        "name": "tedivm/jshrink",
+        "version": "v1.3.3",
+        "version_normalized": "1.3.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/tedious/JShrink.git",
+            "reference": "566e0c731ba4e372be2de429ef7d54f4faf4477a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/tedious/JShrink/zipball/566e0c731ba4e372be2de429ef7d54f4faf4477a",
+            "reference": "566e0c731ba4e372be2de429ef7d54f4faf4477a",
+            "shasum": ""
+        },
+        "require": {
+            "php": "^5.6|^7.0"
+        },
+        "require-dev": {
+            "friendsofphp/php-cs-fixer": "^2.8",
+            "php-coveralls/php-coveralls": "^1.1.0",
+            "phpunit/phpunit": "^6"
+        },
+        "time": "2019-06-28T18:11:46+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "JShrink": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Robert Hafner",
+                "email": "tedivm@tedivm.com"
+            }
+        ],
+        "description": "Javascript Minifier built in PHP",
+        "homepage": "http://github.com/tedious/JShrink",
+        "keywords": [
+            "javascript",
+            "minifier"
         ]
     },
     {
