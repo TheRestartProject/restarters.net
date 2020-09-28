@@ -6,7 +6,7 @@
     <span v-else-if="html">
       <span v-if="!needsTruncating" v-html="html" />
       <span v-else>
-        <span v-if="isReadMore" v-html="truncatedHTML" />
+        <span v-if="!isReadMore" v-html="truncatedHTML" />
         <span v-else v-html="html" />
       </span>
     </span>
