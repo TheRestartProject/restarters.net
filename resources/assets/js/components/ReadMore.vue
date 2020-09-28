@@ -6,8 +6,8 @@
     <span v-else-if="html">
       <span v-if="!needsTruncating" v-html="html" />
       <span v-else>
-        <span v-html="truncatedHTML" />
-        <span v-if="isReadMore">...</span>
+        <span v-if="isReadMore" v-html="truncatedHTML" />
+        <span v-else v-html="html" />
       </span>
     </span>
     <span v-if="needsTruncating">
@@ -68,13 +68,13 @@ export default {
     truncatedHTML() {
       // We need to truncate HTML with care to ensure that the result is tag safe; string truncation isn't good
       // enough.
-      return this.html ? truncate(this.html, !this.isReadMore ? this.maxChars : 100000) : null
+      return this.html ? truncate(this.html, this.maxChars) : null
     },
     untruncatedHTML() {
       return this.html ? truncate(this.html, this.maxChars) : this.html
     },
     needsTruncating() {
-      const ret = (this.text && text.length > maxChars) || (this.html && this.truncatedHTML !== this.html)
+      const ret = (this.text && (text.length > maxChars)) || (this.html && (this.truncatedHTML !== this.html))
       console.log("Needs", ret, this.maxChars, this.truncatedHTML !== this.untruncatedHTML, this.truncatedHTML, this.untruncatedHTML)
       return ret
     }
