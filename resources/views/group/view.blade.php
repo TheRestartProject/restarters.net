@@ -41,7 +41,34 @@
           }
 
           $can_edit_group = FixometerHelper::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
-      ?>
+
+          function expandVolunteer($volunteers) {
+              $ret = [];
+
+              foreach ($volunteers as $volunteer) {
+                  $volunteer['volunteer'] = $volunteer->volunteer;
+
+                  if ($volunteer['volunteer']) {
+                      $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+
+                      foreach ($volunteer['userSkills'] as &$skill) {
+                          // Force expansion
+                          $skill->skillName->skill_name;
+                      }
+
+                      $volunteer['fullName'] = $volunteer->name;
+                      $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                      $ret[] = $volunteer;
+                  }
+              }
+
+              return $ret;
+          }
+
+          $expanded_volunteers = expandVolunteer($view_group->allConfirmedVolunteers);
+//          ->take(20));
+
+          ?>
       <div class="vue">
         <GroupHeading :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :group-list="{{ json_encode($grouplist) }}" :user-groups="{{ json_encode($usergroups) }}" :canedit="{{ $can_edit_group ? 'true' : 'false' }}" :ingroup="{{ $in_group ? 'true': 'false' }}"/>
       </div>
@@ -51,7 +78,7 @@
               <GroupDescription class="pr-md-3" :group-id="{{ $group->idgroups }}" :group="{{ $group }}" />
           </div>
           <div class="w-xs-100 w-md-50 vue">
-              <GroupVolunteers class="pl-md-3" :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :volunteers="{{ json_encode($view_group->allConfirmedVolunteers) }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}" />
+              <GroupVolunteers class="pl-md-3" :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :volunteers="{{ json_encode($expanded_volunteers) }}" :canedit="{{ $can_edit_group ? 'true' : 'false' }}" />
           </div>
       </div>
 

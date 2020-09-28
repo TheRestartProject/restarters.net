@@ -1,7 +1,6 @@
 // This mixin includes lots of function relating to groups.
 // TODO In due course the group will move into the store and we'll just pass the id.  All the other props will then
 // become computed data in here.
-const htmlToText = require('html-to-text');
 
 export default {
   props: {
@@ -38,16 +37,5 @@ export default {
       required: false,
       default: function () { return [] }
     },
-  },
-  computed: {
-    free_text() {
-      // Strip HTML
-      let ret = htmlToText.fromString(this.group.free_text);
-
-      // Remove duplicate blank lines.
-      ret = ret.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
-      return ret
-    }
   }
 }

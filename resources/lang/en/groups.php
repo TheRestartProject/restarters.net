@@ -131,4 +131,6 @@ return array (
   'host' => 'Host',
   'see_all_groups' => 'See all groups',
   'follow_group' => 'Follow',
+  'see_all_volunteers' => 'See all :count volunteer|See all :count volunteers',
+  'no_volunteers' => 'There are no volunteers in this group'
 );

@@ -65,29 +65,29 @@
         <?php
         // We need to expand the user objects to pass to the client.  In due course this will be replaced
         // by an API call to get the event details.
-          function expandVolunteer($volunteers) {
-            $ret = [];
+        function expandVolunteer($volunteers) {
+          $ret = [];
 
-            foreach ($volunteers as $volunteer) {
-              $volunteer['volunteer'] = $volunteer->volunteer;
-              $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+          foreach ($volunteers as $volunteer) {
+            $volunteer['volunteer'] = $volunteer->volunteer;
+            $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
 
-              foreach ($volunteer['userSkills'] as &$skill) {
-                // Force expansion
-                $skill->skillName->skill_name;
-        }
+            foreach ($volunteer['userSkills'] as &$skill) {
+              // Force expansion
+              $skill->skillName->skill_name;
+            }
 
-              $volunteer['fullName'] = $volunteer->getFullName();
-              $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
-              $ret[] = $volunteer;
-        }
-
-            return $ret;
+            $volunteer['fullName'] = $volunteer->getFullName();
+            $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+            $ret[] = $volunteer;
           }
 
-          $expanded_attended = expandVolunteer($attended);
-          $expanded_invited = expandVolunteer($invited);
-          $expanded_hosts = expandVolunteer($hosts);
+          return $ret;
+        }
+
+        $expanded_attended = expandVolunteer($attended);
+        $expanded_invited = expandVolunteer($invited);
+        $expanded_hosts = expandVolunteer($hosts);
 
         // Trigger expansion of group.
         $group_image = $event->theGroup->groupImage;

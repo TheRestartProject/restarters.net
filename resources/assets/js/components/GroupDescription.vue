@@ -1,10 +1,10 @@
 <template>
   <CollapsibleSection class="lineheight" collapsed hide-title>
     <template slot="title">
-      {{ translatedDescription }}
+      {{ translatedAbout }}
     </template>
     <template slot="content">
-      <read-more :html="free_text" class="mt-2" :max-chars="440" :more-str="translatedReadMore" :less-str="translatedReadLess" />
+      <read-more :html="group.free_text" class="mt-2" :max-chars="440" :more-str="translatedReadMore" :less-str="translatedReadLess" />
     </template>
   </CollapsibleSection>
 </template>
@@ -19,7 +19,7 @@ export default {
   components: {ReadMore, CollapsibleSection, ExternalLink},
   mixins: [ map, group ],
   computed: {
-    translatedDescription() {
+    translatedAbout() {
       return this.$lang.get('groups.about')
     },
     translatedReadMore() {
