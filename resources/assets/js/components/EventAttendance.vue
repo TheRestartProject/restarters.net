@@ -10,7 +10,7 @@
       upcoming: upcoming
       }">
         <div>
-          <div>
+          <div v-if="!upcoming">
             <h3>
               <b-img src="/icons/group_ico.svg" class="mr-2" />
               {{ translatedParticipants }}
@@ -90,6 +90,7 @@ import CollapsibleSection from './CollapsibleSection'
 
 export default {
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
+  mixins: [event],
   props: {
     eventId: {
       type: Number,
@@ -116,35 +117,6 @@ export default {
     }
   },
   computed: {
-    upcoming() {
-      const now = new Date().getTime()
-      const date = new Date(this.event.event_date).getTime()
-      return date > now
-    },
-    attendees() {
-      // Everyone, both invited and confirmed.
-      return this.$store.getters['attendance/byEvent'](this.eventId)
-    },
-    confirmed() {
-      return this.attendees.filter((a) => {
-        return a.confirmed
-      })
-    },
-    invited() {
-      return this.attendees.filter((a) => {
-        return !a.confirmed
-      })
-    },
-    participants() {
-      return this.confirmed.filter((a) => {
-        return a.role === GUEST
-      })
-    },
-    volunteers() {
-      return this.confirmed.filter((a) => {
-        return a.role === HOST || a.role === RESTARTER
-      })
-    },
     translatedTitle() {
       return this.$lang.get('events.event_attendance')
     },
