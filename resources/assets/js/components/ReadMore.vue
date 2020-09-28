@@ -10,7 +10,7 @@
         <span v-if="isReadMore">...</span>
       </span>
     </span>
-    <span v-show="needsTruncating">
+    <span v-if="needsTruncating">
       <a :href="link" id="readmore" v-if="!isReadMore" v-on:click="triggerReadMore($event, true)" v-html="moreStr" class="d-flex justify-content-center"/>
       <a :href="link" id="readmore" v-if="isReadMore" v-on:click="triggerReadMore($event, false)" v-html="lessStr" class="d-flex justify-content-center" />
     </span>
@@ -71,11 +71,12 @@ export default {
       return this.html ? truncate(this.html, !this.isReadMore ? this.maxChars : 100000) : null
     },
     untruncatedHTML() {
-      return this.html ? truncate(this.html, this.maxChars) : 100000
+      return this.html ? truncate(this.html, this.maxChars) : this.html
     },
     needsTruncating() {
-      console.log("Needs", this.maxChars, this.truncatedHTML !== this.untruncatedHTML, this.truncatedHTML, this.untruncatedHTML)
-      return (this.text && text.length > maxChars) || (this.html && this.truncatedHTML !== this.html)
+      const ret = (this.text && text.length > maxChars) || (this.html && this.truncatedHTML !== this.html)
+      console.log("Needs", ret, this.maxChars, this.truncatedHTML !== this.untruncatedHTML, this.truncatedHTML, this.untruncatedHTML)
+      return ret
     }
   },
 
