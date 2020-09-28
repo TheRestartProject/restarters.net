@@ -1,14 +1,14 @@
 <template>
   <div>
-    <div class="d-flex justify-content-start mb-3">
+    <div class="d-flex justify-content-between mb-3">
       <h1 class="d-block d-md-none">{{ translatedGroups }}</h1>
       <GroupActions v-bind="$props" class="d-block d-md-none" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
       <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
         <div class="bord d-flex w-xs-100 w-md-50">
-          <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block" />
-          <h2 class="ml-4">
+          <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block mr-4" />
+          <h2>
             {{ group.name }}
           </h2>
         </div>
@@ -40,10 +40,10 @@ export default {
       return this.group.path ? ('/uploads/mid_' + this.event.the_group.group_image.image.path) : DEFAULT_PROFILE
     },
     translatedGroups() {
-      return this.$lang.get('group.groups')
+      return this.$lang.get('groups.groups')
     },
     translatedWebsite() {
-      return this.$lang.get('group.website')
+      return this.$lang.get('groups.website')
     }
   },
   methods: {
