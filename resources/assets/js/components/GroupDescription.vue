@@ -4,29 +4,29 @@
       {{ translatedDescription }}
     </template>
     <template slot="content">
-      <read-more :text="free_text" class="mt-2 readmore small" :max-chars="440" :more-str="translatedReadMore" :less-str="translatedReadLess" />
+      <read-more :html="free_text" class="mt-2" :max-chars="440" :more-str="translatedReadMore" :less-str="translatedReadLess" />
     </template>
   </CollapsibleSection>
 </template>
 <script>
 import map from '../mixins/map'
-import event from '../mixins/event'
+import group from '../mixins/group'
 import ExternalLink from './ExternalLink'
 import CollapsibleSection from './CollapsibleSection'
 import ReadMore from './ReadMore'
 
 export default {
   components: {ReadMore, CollapsibleSection, ExternalLink},
-  mixins: [ map, event ],
+  mixins: [ map, group ],
   computed: {
     translatedDescription() {
-      return this.$lang.get('events.event_description')
+      return this.$lang.get('groups.about')
     },
     translatedReadMore() {
-      return this.$lang.get('events.read_more')
+      return this.$lang.get('groups.read_more')
     },
     translatedReadLess() {
-      return this.$lang.get('events.read_less')
+      return this.$lang.get('groups.read_less')
     },
   }
 }

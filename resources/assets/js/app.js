@@ -1721,7 +1721,10 @@ jQuery(document).ready(function () {
         'eventattendance': require('./components/EventAttendance.vue'),
         'eventdetails': require('./components/EventDetails.vue'),
         'eventdescription': require('./components/EventDescription.vue'),
-        'eventimages': require('./components/EventImages.vue')
+        'eventimages': require('./components/EventImages.vue'),
+        'groupheading':  require('./components/GroupHeading.vue'),
+        'groupdescription':  require('./components/GroupDescription.vue'),
+        'groupvolunteers':  require('./components/GroupVolunteers.vue'),
       }
     })
   })
