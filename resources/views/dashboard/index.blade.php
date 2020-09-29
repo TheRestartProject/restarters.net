@@ -26,16 +26,17 @@
                       <div class="action-text mb-0">
                           <div class='mb-2'>
                             <span class='badge badge-warning'>NEW!</span>
-                            <strong>Online repair events</strong>
+                            <strong>Recording unpowered items</strong>
                           </div>
-                          <p>Right now, community repair events are happening online. Check the list of <a href="{{ route('all-upcoming-events') }}?online=1">upcoming online events.</a>
+                          <p>
+                              It is now possible to record repairs of non-electronic/electrical items at your events!
                           </p>
                       </div>
                   </div>
 
                   <div class="float-right mt-3 mt-sm-0">
                       @php( $user = Auth::user() )
-                      <a href='{{ route('all-upcoming-events') }}?online=1' class='btn btn-md btn-primary btn-block' title=''>Show me the events</a>
+                      <a href='https://talk.restarters.net/t/you-can-now-record-unpowered-items-in-the-fixometer/3388' class='btn btn-md btn-primary btn-block' title=''>Learn how here</a>
                       <button type="button" class="close set-dismissed-cookie float-none ml-2" data-dismiss="alert" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                       </button>
