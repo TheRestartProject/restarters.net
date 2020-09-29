@@ -8,6 +8,7 @@ use App\Events\UserFollowedGroup;
 use App\Events\UserUpdated;
 use App\Events\UserEmailUpdated;
 use App\Events\UserLanguageUpdated;
+use App\Events\UserRegistered;
 use App\Events\UserDeleted;
 use App\Listeners\AddUserToDiscourseGroup;
 use App\Listeners\AnonymiseSoftDeletedUser;
@@ -61,14 +62,6 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\SyncUserProperties',
         ],
 
-        UserEmailUpdated::class => [
-            SyncUserToDiscourse::class,
-        ],
-
-        'App\Events\UserLanguageUpdated' => [
-            'App\Listeners\SyncLanguageSettingsToDiscourse',
-        ],
-
         UserFollowedGroup::class => [
             AddUserToDiscourseGroup::class,
         ],
@@ -87,6 +80,15 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\LogOutOfWiki::class,
         ],
 
+    ];
+
+    /**
+     * The subscriber classes to register.
+     *
+     * @var array
+     */
+    protected $subscribe = [
+        'App\Listeners\DiscourseUserEventSubscriber',
     ];
 
     /**
