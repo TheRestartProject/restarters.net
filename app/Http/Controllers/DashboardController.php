@@ -33,19 +33,7 @@ class DashboardController extends Controller
         $has_skills = ! empty(UsersSkills::where('user', Auth::id())->get()->toArray());
         $in_event = ! empty(EventsUsers::where('user', Auth::id())->get()->toArray());
 
-        // TODO: move this to it's own class, which caches results (on success).
-        $userExistsInDiscourse = false;
-
-        try {
-            $discourseApiKey = env('DISCOURSE_APIKEY');
-            $discourseApiUser = env('DISCOURSE_APIUSER');
-            $emailToSearchFor = trim($user->email);
-            $discourseQuery = sprintf('%s/admin/users/list/all.json?email=%s&api_key=%s&api_username=%s', env('DISCOURSE_URL'), $emailToSearchFor, $discourseApiKey, $discourseApiUser);
-            $discourseResult = json_decode(file_get_contents($discourseQuery));
-            $userExistsInDiscourse = count($discourseResult) >= 1;
-        } catch (\Exception $ex) {
-            Log::error('Error occurred while searching for user in Discourse');
-        }
+        $userExistsInDiscourse = $user->existsOnDiscourse();
 
         if ( ! is_null($user->idimages) && ! is_null($user->path)) {
             $has_profile_pic = true;

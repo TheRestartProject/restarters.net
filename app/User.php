@@ -344,7 +344,7 @@ class User extends Authenticatable implements Auditable
     {
         try {
             $client = app('discourse-client');
-            $emailToSearchFor = trim($this->email);
+            $emailToSearchFor = urlencode(trim($this->email));
             $endpoint = sprintf('/admin/users/list/all.json?email=%s', $emailToSearchFor);
             $response = $client->request('GET', $endpoint);
             $discourseResult = json_decode($response->getBody());
