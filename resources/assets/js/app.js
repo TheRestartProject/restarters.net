@@ -1685,6 +1685,7 @@ jQuery(document).ready(function () {
       components: {
         'examplecomponent': require('./components/ExampleComponent.vue'),
         'eventstats': require('./components/EventStats.vue'),
+        'groupstats': require('./components/GroupStats.vue'),
       }
     })
   })

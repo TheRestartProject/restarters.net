@@ -272,7 +272,8 @@ class Group extends Model implements Auditable
             'hours' => $hours_volunteered,
             'parties' => count($allPastParties),
             'co2' => $co2,
-            'waste' => $waste,
+            'ewaste' => $waste,
+            'unpowered_waste' => 0,
         ];
     }
 
