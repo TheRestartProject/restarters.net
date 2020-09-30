@@ -10,6 +10,7 @@ return array(
     'Msurguy\\Honeypot\\' => array($vendorDir . '/msurguy/honeypot/src'),
     'Mcamara\\LaravelLocalization' => array($vendorDir . '/mcamara/laravel-localization/src'),
     'JakubOnderka\\PhpConsoleHighlighter' => array($vendorDir . '/jakub-onderka/php-console-highlighter/src'),
+    'JShrink' => array($vendorDir . '/tedivm/jshrink/src'),
     'Doctrine\\DBAL\\' => array($vendorDir . '/doctrine/dbal/lib'),
     'Doctrine\\Common\\Lexer\\' => array($vendorDir . '/doctrine/lexer/lib'),
     'Detection' => array($vendorDir . '/mobiledetect/mobiledetectlib/namespaced'),
