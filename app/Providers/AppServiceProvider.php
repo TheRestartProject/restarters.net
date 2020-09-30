@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
                     $response = $client->request('GET', '/notifications.json?username='.Auth::user()->username);
                     $talk_notifications = json_decode($response->getBody()->getContents(), true);
 
-                    if (! empty($talk_notifications)) {
+                    if (! empty($talk_notifications) && array_key_exists('notifications', $talk_notifications)) {
                         $total_talk_notifications = 0;
                         foreach ($talk_notifications['notifications'] as $notification) {
                             if ($notification['read'] !== true) {
