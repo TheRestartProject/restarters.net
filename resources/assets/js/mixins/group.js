@@ -12,16 +12,6 @@ export default {
       type: Object,
       required: true
     },
-    groupList: {
-      type: Array,
-      required: false,
-      default: function () { return [] }
-    },
-    userGroups: {
-      type: Array,
-      required: false,
-      default: function () { return [] }
-    },
     canedit: {
       type: Boolean,
       required: false,

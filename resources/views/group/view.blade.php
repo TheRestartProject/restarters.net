@@ -74,7 +74,7 @@
       </div>
 
       <div class="vue">
-        <GroupHeading :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :group-list="{{ json_encode($grouplist) }}" :user-groups="{{ json_encode($usergroups) }}" :canedit="{{ $can_edit_group ? 'true' : 'false' }}" :ingroup="{{ $in_group ? 'true': 'false' }}"/>
+        <GroupHeading :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :canedit="{{ $can_edit_group ? 'true' : 'false' }}" :ingroup="{{ $in_group ? 'true': 'false' }}"/>
       </div>
 
       <div class="d-flex flex-wrap">
