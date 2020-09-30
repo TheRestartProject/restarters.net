@@ -26,5 +26,12 @@
     "All rights reserved.": "Tous droits réservés.",
     "Name": "Nom",
     "Register": "Inscrivez-vous",
-    "Remember Me": "Se rappeler de moi"
+    "Remember Me": "Se rappeler de moi",
+    "Administrator": "Administrateur",
+    "Lack of equipment": "Manque d'équipement",
+    "No way to open the product": "Pas de moyen d'ouvrir l'appareil",
+    "Repair information not available": "Informations de réparation non disponibles",
+    "Restarter": "Réparateur",
+    "Spare parts not available": "Pièces détachées non disponibles",
+    "Spare parts too expensive": "Pièces détachées trop coûteuses"
 }
