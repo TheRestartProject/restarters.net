@@ -70,17 +70,22 @@
 
             foreach ($volunteers as $volunteer) {
               $volunteer['volunteer'] = $volunteer->volunteer;
-              $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+              $volunteer['userSkills'] = [];
+              $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
+
+              if (!empty($volunteer->volunteer)) {
+                  $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+                  $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+              }
 
               foreach ($volunteer['userSkills'] as $skill) {
                 // Force expansion
                 $skill->skillName->skill_name;
-        }
+              }
 
               $volunteer['fullName'] = $volunteer->getFullName();
-              $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
               $ret[] = $volunteer;
-        }
+            }
 
             return $ret;
           }
