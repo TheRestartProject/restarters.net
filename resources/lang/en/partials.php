@@ -101,9 +101,14 @@ return array (
   'and' => 'and',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
+  'close' => 'Close',
   'choose_barriers' => 'Choose barriers to repair',
   'choose_spare_parts' => 'Spare parts',
   'choose_next_steps' => 'Next steps',
   'add_device_button' => 'Add',
-  'loading' => 'Loading'
+  'loading' => 'Loading',
+  'skills' => 'skill|skills',
+  'something_wrong' => 'Something has gone wrong',
+  'are_you_sure' => 'Are you sure?',
+  'please_confirm' => 'Please confirm that you wish to proceed.'
 );

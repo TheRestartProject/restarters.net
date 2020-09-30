@@ -1,4 +1,7 @@
 @import './_variables';
+@import '~bootstrap/scss/_functions';
+@import '~bootstrap/scss/_variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 body,
 html {
@@ -79,6 +82,10 @@ h2 {
   }
 }
 
+.d-grid {
+  display: grid;
+}
+
 @-webkit-keyframes pulsate {
   0% {
     opacity: 0.25;
@@ -88,5 +95,37 @@ h2 {
   }
   100% {
     opacity: 0.25;
+  }
+}
+
+#readmore {
+  float: right;
+}
+
+.clickme {
+  cursor: pointer;
+}
+
+.linkdrop.dropdown {
+  color: $brand-light !important;
+
+  button {
+    background-color: transparent !important;
+    color: $brand-light !important;
+    padding: 0px;
+  }
+
+  &.show  {
+    .dropdown-toggle {
+      background-color: transparent !important;
+    }
+  }
+}
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @each $size, $length in $sizes {
+    @include media-breakpoint-up($breakpoint) {
+      .w-#{$breakpoint}-#{$size} {width: $length !important;}
+    }
   }
 }
