@@ -33,9 +33,11 @@
           </div>
         </div>
       </div>
-      <b-btn variant="none" v-if="canedit" @click="confirm" class="p-0">
-        <b-img src="/icons/edit_ico_green.svg" />
-      </b-btn>
+      <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown">
+        <b-dropdown-item :href="'/group/make-host/' + groupId + '/' + volunteer.user" v-if="volunteer.role === restarter">{{ translatedMakeHost }}</b-dropdown-item>
+        <b-dropdown-item target="_blank" rel="noopener" :href="'/group/remove-volunteer/' + groupId + '/' + volunteer.user">{{ translatedRemoveVolunteer }}</b-dropdown-item>
+      </b-dropdown>
+      <button class="dropdown-toggle d-none" />
     </div>
     <b-alert variant="danger" v-if="error">
       {{ translatedSomethingWrong }}: {{ error }}
@@ -44,12 +46,17 @@
   </div>
 </template>
 <script>
-import { DEFAULT_PROFILE, HOST } from '../constants'
+import { DEFAULT_PROFILE, HOST, RESTARTER } from '../constants'
 import ConfirmModal from './ConfirmModal'
+import volunteers from '../store/volunteers'
 
 export default {
   components: {ConfirmModal},
   props: {
+    groupId: {
+      type: Number,
+      required: true
+    },
     volunteer: {
       type: Object,
       required: true
@@ -58,11 +65,13 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
   },
   data () {
     return {
-      error: null
+      error: null,
+      restarter: RESTARTER,
+      show: false
     }
   },
   computed: {
@@ -102,6 +111,12 @@ export default {
     translatedSomethingWrong() {
       return this.$lang.get('partials.something_wrong')
     },
+    translatedRemoveVolunteer() {
+      return this.$lang.get('groups.remove_volunteer')
+    },
+    translatedMakeHost() {
+      return this.$lang.get('groups.make_host')
+    }
   },
   methods: {
     brokenProfileImage(event) {

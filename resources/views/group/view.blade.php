@@ -69,6 +69,10 @@
 //          ->take(20));
 
           ?>
+      <div class="vue-placeholder vue-placeholder-large">
+          <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+      </div>
+
       <div class="vue">
         <GroupHeading :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :group-list="{{ json_encode($grouplist) }}" :user-groups="{{ json_encode($usergroups) }}" :canedit="{{ $can_edit_group ? 'true' : 'false' }}" :ingroup="{{ $in_group ? 'true': 'false' }}"/>
       </div>
@@ -83,47 +87,7 @@
       </div>
 
           <div class="row">
-            <div class="col-lg-3">
-
-                <h2 id="about-grp">@lang('groups.about')
-                  @if( FixometerHelper::hasRole( $user, 'Administrator' ) || $is_host_of_group )
-                    <sup>(<a href="{{ url('/group/edit/'.$group->idgroups) }}">Edit group</a>)</sup>
-                  @endif
-                </h2>
-
-                <div class="events__description">
-                    <p>{!! str_limit(strip_tags($group->free_text), 160, '...') !!}</p>
-                    @if( strlen($group->free_text) > 160 )
-                      <button data-toggle="modal" data-target="#group-description"><span>@lang('groups.read_more')</span></button>
-                    @endif
-                </div><!-- /events__description -->
-
-
-                @if ($in_group)
-                  <h2 id="volunteers">@lang('groups.volunteers') <sup>(<a data-toggle="modal" data-target="#invite-to-group" href="#">@lang('groups.invite_to_group')</a>)</sup></h2>
-                @else
-                  <h2 id="volunteers">@lang('groups.volunteers') <sup>(<a href="/group/join/{{ $group->idgroups }}">@lang('groups.join_group_button')</a>)</sup></h2>
-                @endif
-
-                <div class="tab">
-
-                    <div class="users-list-wrap users-list__single">
-                        <ul class="users-list">
-
-                            @foreach( $view_group->allConfirmedVolunteers->take(3) as $volunteer )
-                              @include('partials.volunteer-badge')
-                            @endforeach
-
-                        </ul>
-                        @if( $view_group->allConfirmedVolunteers->count() > 3 )
-                          <a class="users-list__more" href="#" data-toggle="modal" data-target="#group-volunteers">See all {{{ $view_group->allConfirmedVolunteers->count() }}} volunteers</a>
-                        @endif
-                    </div>
-
-                </div>
-
-            </div>
-            <div class="col-lg-9">
+            <div class="col-lg-12">
 
                 <h2 id="key-stats">@lang('groups.key_stats')</h2>
                 <ul class="properties">

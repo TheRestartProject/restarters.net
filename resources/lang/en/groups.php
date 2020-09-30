@@ -132,5 +132,7 @@ return array (
   'see_all_groups' => 'See all groups',
   'follow_group' => 'Follow',
   'see_all_volunteers' => 'See all :count volunteer|See all :count volunteers',
-  'no_volunteers' => 'There are no volunteers in this group'
+  'no_volunteers' => 'There are no volunteers in this group',
+  'remove_volunteer' => 'Remove Volunteer',
+  'make_host' => 'Make Host'
 );

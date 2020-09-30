@@ -7,7 +7,7 @@
       <div class="mt-2">
         <div v-if="volunteers.length">
           <div class="maxheight" :key="'confirm-' + volunteers.length">
-            <GroupVolunteer v-for="a in volunteers" :key="'group-' + a.idusers_groups" :volunteer="a" :canedit="canedit" v-if="!a.deleted_at"/>
+            <GroupVolunteer v-for="a in volunteers" :key="'group-' + a.idusers_groups" :volunteer="a" :canedit="canedit" v-if="!a.deleted_at" :group-id="groupId" />
           </div>
           <div class="d-flex justify-content-between">
             <a class="justify-content-end" href="#" data-toggle="modal" data-target="#invite-to-group">
@@ -81,7 +81,7 @@ export default {
     // Similarly the group should be in the store and passed just by id, but we haven't introduced a group store yet.
     this.$store.dispatch('volunteers/set', {
       groupId: this.groupId,
-      volunteers: volunteers
+      volunteers: this.volunteers
     })
   },
   methods: {
