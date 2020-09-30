@@ -18,6 +18,7 @@
 </template>
 
 <script>
+const htmlToText = require('html-to-text');
 const truncate = require('html-truncate');
 // Originally based on https://github.com/orlyyani/read-more, with thanks.
 
@@ -74,8 +75,16 @@ export default {
       return this.html ? truncate(this.html, this.maxChars) : this.html
     },
     needsTruncating() {
-      const ret = (this.text && (text.length > maxChars)) || (this.html && (this.truncatedHTML !== this.html))
-      return ret
+      if (this.text && (text.length > maxChars)) {
+        return true
+      }
+
+      // For HTML we need to do a more complex check, as truncate() can result in HTML which is different from
+      // the original even if it's not removed anything, because of slight HTML differences.
+      const origtext = htmlToText.fromString(this.html)
+      const truncatedtext = htmlToText.fromString(this.truncatedHTML)
+
+      return origtext !== truncatedtext
     }
   },
 
