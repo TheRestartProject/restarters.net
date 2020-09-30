@@ -36,7 +36,7 @@
       <?php
           // Trigger expansion of group.
           $group_image = $group->groupImage;
-          if (is_object($group_image->image)) {
+          if (is_object($group_image) && is_object($group_image->image)) {
               $group_image->image->path;
           }
 
