@@ -20,4 +20,23 @@ return array (
   'language_updated' => 'Préférence de langue mise à jour',
   'preferred_language' => 'Langue de préférence',
   'skills_updated' => 'Compétences mises à jour!',
+  'account' => 'Compte',
+  'calendars' => 
+  array (
+    'all_events' => 'Tous les événements (administrateurs seulement)',
+    'copy_link' => 'Copier lien',
+    'events_by_area' => 'Evénements par région',
+    'explainer' => 'Vous pouvez maintenant suivre les événements en utilisant le calendrier en vous inscrivant dans le calendrier ci-dessous. Vous pouvez vous inscrire à autant de calendriers que vous voulez.',
+    'find_out_more' => 'En savoir plus',
+    'group_calendars' => 'Calendriers des Repair Cafés',
+    'my_events' => 'Mes événements',
+    'title' => 'Calendriers',
+  ),
+  'country' => 'Pays',
+  'email_address' => 'Adresse e-mail',
+  'email_preferences' => 'Préférences E-mail',
+  'page_title' => 'Profil & préférences',
+  'profile' => 'Profil',
+  'view_profile' => 'Voir profil',
+  'view_user_profile' => 'Voir profil d\'utilisateur',
 );
