@@ -47,6 +47,7 @@ Vue.use(IconsPlugin)
 import lang from 'lang.js';
 import translations from './translations.js';
 const Lang = new lang()
+Lang.setFallback('en')
 Lang.setMessages(translations)
 
 window.Dropzone = require('dropzone');
