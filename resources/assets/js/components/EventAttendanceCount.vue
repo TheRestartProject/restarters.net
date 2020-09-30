@@ -75,6 +75,8 @@ export default {
   font-size: 23px;
   font-weight: bold;
   color: $brand-light;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
 
   @include media-breakpoint-down(sm) {
     font-size: 16px;
