@@ -82,6 +82,10 @@ h2 {
   }
 }
 
+.d-grid {
+  display: grid;
+}
+
 @-webkit-keyframes pulsate {
   0% {
     opacity: 0.25;
