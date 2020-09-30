@@ -8,6 +8,7 @@ use App\Device;
 use App\EventsUsers;
 use App\Events\PasswordChanged;
 use App\Events\UserLanguageUpdated;
+use App\Events\UserRegistered;
 use App\Group;
 use App\Mail\RegistrationWelcome;
 use App\Network;
@@ -1339,6 +1340,8 @@ class UserController extends Controller
                 Log::error('Failed to send post-registration welcome email: ' . $ex->getMessage());
             }
         }
+
+        event(new UserRegistered($user));
 
         if (Auth::check()) { //Existing users are to update
             return redirect('dashboard');
