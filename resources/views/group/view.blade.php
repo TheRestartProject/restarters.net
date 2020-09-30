@@ -51,7 +51,7 @@
                   if ($volunteer['volunteer']) {
                       $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
 
-                      foreach ($volunteer['userSkills'] as &$skill) {
+                      foreach ($volunteer['userSkills'] as $skill) {
                           // Force expansion
                           $skill->skillName->skill_name;
                       }
