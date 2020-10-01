@@ -100,7 +100,7 @@
           $group_image->image->path;
         }
 
-        $can_edit_event = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
+        $can_edit_event = FixometerHelper::userHasEditPartyPermission($event->idevents);
         $is_attending = is_object($is_attending) && $is_attending->status == 1;
         ?>
 
