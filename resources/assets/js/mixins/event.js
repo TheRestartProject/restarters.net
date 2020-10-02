@@ -43,6 +43,16 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    devices: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    clusters: {
+      type: Array,
+      required: false,
+      default: null
     }
   },
   data () {

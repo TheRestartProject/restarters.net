@@ -1,0 +1,122 @@
+<template>
+  <CollapsibleSection class="lineheight" collapsed :count="deviceCount" always-show-count count-badge>
+    <template slot="title">
+      <div class="d-flex">
+        <b-img class="icon" src="/images/tv.svg" />&nbsp;{{ translatedTitle }}
+      </div>
+    </template>
+    <template slot="content">
+      <b-tabs class="ourtabs ourtabs-brand w-100">
+        <b-tab active title-item-class="w-50" class="pt-2">
+          <template slot="title">
+            <b>{{ translatedPowered }}</b> ({{ powered.length }})
+          </template>
+          <p v-html="translatedDescriptionPowered" />
+          <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :event-id="eventId" :event="event" />
+          <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingPowered = true">
+            <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddPowered }}
+          </b-btn>
+          <EventDevice :powered="true" :add="true" :edit="false" :clusters="clusters" :event-id="eventId" :event="event" />
+        </b-tab>
+        <b-tab title-item-class="w-50" class="pt-2">
+          <template slot="title">
+            <b>{{ translatedUnpowered }}</b> ({{ unpowered.length }})
+          </template>
+          <p v-html="translatedDescriptionUnpowered" />
+          <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :event-id="eventId" :event="event" />
+          <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingUnpowered = true">
+            <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddUnpowered }}
+          </b-btn>
+          TODO
+        </b-tab>
+      </b-tabs>
+    </template>
+  </CollapsibleSection>
+</template>
+<script>
+import event from '../mixins/event'
+import ExternalLink from './ExternalLink'
+import CollapsibleSection from './CollapsibleSection'
+import EventDeviceList from './EventDeviceList'
+import EventDeviceSummary from './EventDeviceSummary'
+import EventDevice from './EventDevice'
+
+export default {
+  components: {EventDevice, EventDeviceSummary, EventDeviceList, CollapsibleSection, ExternalLink},
+  mixins: [ event ],
+  data () {
+    return {
+      addingPowered: false,
+      addingInowered: false,
+    }
+  },
+  computed: {
+    deviceCount() {
+      return this.devices ? this.devices.length : 0
+    },
+    allDevices() {
+      return this.$store.getters['devices/byEvent'](this.eventId)
+    },
+    powered() {
+      return this.allDevices.filter((d) => {
+        return d.category.powered
+      })
+    },
+    unpowered() {
+      return this.allDevices.filter((d) => {
+        return !d.category.powered
+      })
+    },
+    translatedTitle() {
+      return this.$lang.get('devices.title_items_at_event')
+    },
+    translatedPowered() {
+      return this.$lang.get('devices.title_powered')
+    },
+    translatedUnpowered() {
+      return this.$lang.get('devices.title_unpowered')
+    },
+    translatedDescriptionPowered() {
+      return this.$lang.get('devices.description_powered')
+    },
+    translatedDescriptionUnpowered() {
+      return this.$lang.get('devices.description_unpowered')
+    },
+    translatedAddPowered() {
+      return this.$lang.get('partials.add_device_powered')
+    },
+    translatedAddUnpowered() {
+      return this.$lang.get('partials.add_device_unpowered')
+    }
+  },
+  created() {
+    // The devices are passed from the server to the client via a prop on this component.  When we are created
+    // we put it in the store.  From then on we get the data from the store so that we get reactivity.
+    //
+    // Further down the line this initial data might be provided either by an API call from the client to the server,
+    // or from Vue server-side rendering, where the whole initial state is passed to the client.
+    //
+    // Similarly the event should be in the store and passed just by id, but we haven't introduced an event store yet.
+    this.$store.dispatch('devices/set', {
+      eventId: this.eventId,
+      devices: this.devices
+    })
+  }
+}
+</script>
+<style scoped lang="scss">
+@import 'resources/global/css/_variables';
+
+.lineheight {
+  line-height: 2;
+}
+
+.readmore {
+  white-space: pre-wrap !important;
+}
+
+.icon {
+  width: 20px;
+  margin-bottom: 3px;
+}
+</style>

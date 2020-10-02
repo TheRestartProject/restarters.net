@@ -6,12 +6,21 @@
       'mb-3': true,
       'justify-content-between': true
       }" @click="toggle">
-      <span>
+      <div class="d-flex">
         <slot name="title" />
-        <span v-if="count" class="d-inline d-md-none text-muted">
-          (<span class="count">{{ count }}</span>)
-        </span>
-      </span>
+        <div v-if="count" :class="{
+          'd-inline' : true,
+          'd-md-none' : !alwaysShowCount,
+          'text-muted' : true
+        }">
+          <span v-if="countBadge">
+            <b-badge variant="primary" pill>{{ count }}</b-badge>
+          </span>
+          <span v-else>
+            (<span class="count">{{ count }}</span>)
+          </span>
+        </div>
+      </div>
       <span class="d-inline d-md-none">
         <img class="icon" v-if="expanded" src="/images/minus-icon.svg" alt="Collapse" />
         <img class="icon" v-else src="/images/add-icon.svg" alt="Expand" />
@@ -49,6 +58,16 @@ export default {
       type: Number,
       required: false,
       default: null
+    },
+    alwaysShowCount: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    countBadge: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {

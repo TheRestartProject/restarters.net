@@ -29,6 +29,8 @@ import {
 } from 'vue2-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.min.css'
 
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
@@ -1700,6 +1702,7 @@ jQuery(document).ready(function () {
       Vue.component('l-map', LMap)
       Vue.component('l-marker', LMarker)
       Vue.component('l-tile-layer', LTileLayer)
+      Vue.component('multiselect', Multiselect)
     }
   })
 
@@ -1721,7 +1724,8 @@ jQuery(document).ready(function () {
         'eventattendance': require('./components/EventAttendance.vue'),
         'eventdetails': require('./components/EventDetails.vue'),
         'eventdescription': require('./components/EventDescription.vue'),
-        'eventimages': require('./components/EventImages.vue')
+        'eventimages': require('./components/EventImages.vue'),
+        'eventdevices': require('./components/EventDevices.vue'),
       }
     })
   })

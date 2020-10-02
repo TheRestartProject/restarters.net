@@ -104,4 +104,7 @@ return array (
   'repair_records' => 'Repair Records',
   'view_record' => 'View',
   'close_record' => 'Close',
+  'model' => 'Model',
+  'status' => 'Status',
+  'spare_parts' => 'Spare parts'
 );
