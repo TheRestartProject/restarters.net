@@ -61,7 +61,7 @@
 
             <div class="d-flex flex-row justify-content-between align-items-center">
               <a href="#" class="text-dark mb-0" data-dismiss="modal">@lang('groups.cancel_invites_link')</a>
-              <button disabled type="submit" class="btn btn-primary m-0">@lang('groups.send_invite_button')</button>
+              <button disabled type="submit" class="btn btn-primary text-dark m-0">@lang('groups.send_invite_button')</button>
             </div>
           </form>
         </div>

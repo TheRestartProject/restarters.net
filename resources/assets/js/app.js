@@ -16,9 +16,29 @@ require('./misc/notifications');
 require('./misc/device');
 require('./fixometer');
 require('leaflet');
+require('./constants');
 
 import Vue from 'vue';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import store from './store'
+import pluralize from './mixins/pluralize'
+import {
+  LMap,
+  LTileLayer,
+  LMarker,
+} from 'vue2-leaflet'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+
+// Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
+// eslint-disable-next-line
+delete L.Icon.Default.prototype._getIconUrl
+// eslint-disable-next-line
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+})
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
@@ -1355,7 +1375,7 @@ function initAutocomplete() {
     $('#devices-powered').html(stats['devices_powered']);
     $('#devices-unpowered').html(stats['devices_unpowered']);
   }
-  
+
   $( document ).ready(function() {
 
     $("textarea#message_to_restarters[name=message_to_restarters]").on("keydown", function(event){
@@ -1663,12 +1683,23 @@ function initAutocomplete() {
 jQuery(document).ready(function () {
   // Vue.
   //
-  // Create a mixing so that $lang is available in all components.
+  // Create a mixin so that $lang is available in all components.
   Vue.mixin({
     computed: {
       $lang() {
         return Lang
       }
+    }
+  })
+
+  Vue.mixin(pluralize)
+
+  // We use Leaflet
+  Vue.use({
+    install(Vue, options) {
+      Vue.component('l-map', LMap)
+      Vue.component('l-marker', LMarker)
+      Vue.component('l-tile-layer', LTileLayer)
     }
   })
 
@@ -1682,10 +1713,19 @@ jQuery(document).ready(function () {
   $(".vue").each(function(index) {
     new Vue({
       el: $(this).get(0),
+      store: store,
       components: {
         'examplecomponent': require('./components/ExampleComponent.vue'),
+        'eventheading': require('./components/EventHeading.vue'),
         'eventstats': require('./components/EventStats.vue'),
-        'groupstats': require('./components/GroupStats.vue'),
+        'eventattendance': require('./components/EventAttendance.vue'),
+        'eventdetails': require('./components/EventDetails.vue'),
+        'eventdescription': require('./components/EventDescription.vue'),
+        'eventimages': require('./components/EventImages.vue'),
+        'groupheading':  require('./components/GroupHeading.vue'),
+        'groupdescription':  require('./components/GroupDescription.vue'),
+        'groupvolunteers':  require('./components/GroupVolunteers.vue'),
+        'groupstats': require('./components/GroupStats.vue')
       }
     })
   })

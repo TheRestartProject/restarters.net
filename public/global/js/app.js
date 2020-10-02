@@ -60,20 +60,20 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 508);
+/******/ 	return __webpack_require__(__webpack_require__.s = 784);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 508:
+/***/ 784:
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(509);
+module.exports = __webpack_require__(785);
 
 
 /***/ }),
 
-/***/ 509:
+/***/ 785:
 /***/ (function(module, exports, __webpack_require__) {
 
 // import jquery from 'jquery';
@@ -88,9 +88,9 @@ window.onload = function () {
     "use strict";
 
     $(document).ready(function () {
-      __webpack_require__(510);
-      __webpack_require__(511);
-      __webpack_require__(512);
+      __webpack_require__(786);
+      __webpack_require__(787);
+      __webpack_require__(788);
 
       console.log('Global js ready!');
 
@@ -146,7 +146,7 @@ window.onload = function () {
 
 /***/ }),
 
-/***/ 510:
+/***/ 786:
 /***/ (function(module, exports) {
 
 $('.toggle-dropdown-menu').click(function () {
@@ -174,7 +174,7 @@ $('.toggle-dropdown-menu').click(function () {
 
 /***/ }),
 
-/***/ 511:
+/***/ 787:
 /***/ (function(module, exports) {
 
 // API call to current site - check for notifications
@@ -228,7 +228,7 @@ function ajaxSearchNotifications() {
 
 /***/ }),
 
-/***/ 512:
+/***/ 788:
 /***/ (function(module, exports) {
 
 // API call to current site - check for user authenticated

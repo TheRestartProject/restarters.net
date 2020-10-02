@@ -20898,6 +20898,14 @@ td.col-device-auto {
   margin: 8px 0;
 }
 
+.edit-dropdown button.dropdown-toggle {
+  background-image: url("/icons/edit_ico_green.svg");
+  -o-object-fit: cover;
+     object-fit: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .popover-group {
   bottom: 2px;
   left: 5px;
@@ -21549,47 +21557,68 @@ td.col-device-auto {
   background-color: #fff !important;
 }
 
-#devices-section {
-  border: 1px solid #0394a6 !important;
+.ourtabs {
+  border: 1px solid #000 !important;
   background-color: white;
-  border: 1px solid black;
+  border: 1px solid #000;
+  -webkit-box-shadow: 5px 5px #000;
+          box-shadow: 5px 5px #000;
+}
+
+.ourtabs .tab-content p {
+  padding-left: 45px;
+}
+
+.ourtabs .nav-link {
+  padding-left: calc(10% + 1px) !important;
+  border-top: none;
+  padding-top: 10px;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  text-transform: uppercase;
+}
+
+.ourtabs .nav-link.active {
+  border-top: 5px solid #000;
+  padding-top: 5px;
+  padding-left: calc(10% + 1px) !important;
+  border-left: none;
+  border-right: 1px solid #000;
+}
+
+@media (min-width: 768px) {
+  .ourtabs .nav-link.active {
+    border-bottom: none;
+  }
+}
+
+.ourtabs li:first-of-type .nav-link.active {
+  border-left: 0px;
+  padding-left: calc(10% + 2px) !important;
+}
+
+.ourtabs .nav-item {
+  margin: 0px;
+}
+
+.ourtabs .active-row td {
+  background-color: #ffc107;
+}
+
+.ourtabs.ourtabs-brand {
+  border: 1px solid #0394a6 !important;
   -webkit-box-shadow: 5px 5px #0394a6;
           box-shadow: 5px 5px #0394a6;
 }
 
-#devices-section .tab-content p {
-  padding-left: 45px;
-}
-
-#devices-section .nav-link {
-  padding-left: 45px;
-  border-top: none;
-  padding-top: 5px;
+.ourtabs.ourtabs-brand .nav-link {
   border-left: 1px solid #0394a6;
   border-right: 1px solid #0394a6;
   border-bottom: 1px solid #0394a6;
 }
 
-#devices-section .nav-link.active {
+.ourtabs.ourtabs-brand .nav-link.active {
   border-top: 5px solid #0394a6;
-  padding-top: 0px;
-  padding-left: 46px;
-  border-left: none;
-  border-right: none;
-}
-
-@media (min-width: 768px) {
-  #devices-section .nav-link.active {
-    border-bottom: none;
-  }
-}
-
-#devices-section .nav-item {
-  margin: 0px;
-}
-
-#devices-section .active-row td {
-  background-color: #ffc107;
 }
 
 .networks {

@@ -25,6 +25,7 @@ return array (
   'groups_name_of' => 'Name of group',
   'groups_about_group' => 'Tell us about your group',
   'groups_website' => 'Your website',
+  'website' => 'Website',
   'groups_website_small' => 'Don\'t have a website? Feel free to add a Facebook group or similar',
   'groups_group_small' => 'A couple of examples include \'Restarters Torino\' or \'Nottingham Fixers\'',
   'groups_location' => 'Location',
@@ -98,7 +99,9 @@ return array (
   'volunteers_nearby' => 'Volunteers nearby',
   'share_group_stats' => 'Share group stats',
   'about' => 'About',
-  'read_more' => 'Read more',
+  'about_none' => 'There is no description for this group yet.',
+  'read_more' => 'READ MORE&nbsp;<img class="icon" src="/images/add-icon.svg" style="width: 20px;" />',
+  'read_less' => '<img class="icon" src="/images/minus-icon.svg" style="width: 20px;" />&nbsp;READ LESS',
   'volunteers' => 'Volunteers',
   'invite_to_group' => 'Invite to group',
   'key_stats' => 'Key stats',
@@ -131,4 +134,8 @@ return array (
   'host' => 'Host',
   'see_all_groups' => 'See all groups',
   'follow_group' => 'Follow',
+  'see_all_volunteers' => 'See all :count volunteer|See all :count volunteers',
+  'no_volunteers' => 'There are no volunteers in this group',
+  'remove_volunteer' => 'Remove Volunteer',
+  'make_host' => 'Make Host'
 );

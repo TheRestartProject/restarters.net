@@ -43,7 +43,7 @@ $editable = ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Adminis
         </a>
     </td>
     @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id) ) )
-    <td class="d-none d-md-table-cell"><a data-device-id="{{{ $device->iddevices }}}" class="row-button delete-device" href="{{ url('/device/delete/'.$device->iddevices) }}"><img class="icon" src="/images/delete_ico_red.svg" /></a></td>
+    <td class="d-none d-md-table-cell"><a data-device-id="{{{ $device->iddevices }}}" class="row-button delete-device" href="{{ url('/device/delete/'.$device->iddevices) }}"><img class="icon" src="/icons/delete_ico_red.svg" /></a></td>
     @endif
 </tr>
 <tr class="table-row-details">
