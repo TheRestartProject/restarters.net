@@ -8,9 +8,9 @@
       <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
         <div class="bord d-flex w-xs-100 w-md-50">
           <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block mr-4" />
-          <h2>
+          <h1>
             {{ group.name }}
-          </h2>
+          </h1>
         </div>
         <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
           <div class="d-flex justify-content-between w-100 flex-wrap centreme">
@@ -37,7 +37,7 @@ export default {
   mixins: [group],
   computed: {
     groupImage() {
-      return this.group.path ? ('/uploads/mid_' + this.event.the_group.group_image.image.path) : DEFAULT_PROFILE
+      return this.group && this.group.group_image && this.group.group_image.image ? ('/uploads/mid_' + this.group.group_image.image.path) : DEFAULT_PROFILE
     },
     translatedGroups() {
       return this.$lang.get('groups.groups')
@@ -74,9 +74,10 @@ export default {
 }
 
 .groupImage {
-  width: 50px;
-  height: 50px;
+  width: 67px;
+  height: 67px;
   object-fit: cover;
+  border: 3px solid black;
 }
 
 .maybeborder {

@@ -99,6 +99,7 @@ return array (
   'volunteers_nearby' => 'Volunteers nearby',
   'share_group_stats' => 'Share group stats',
   'about' => 'About',
+  'about_none' => 'There is no description for this group yet.',
   'read_more' => 'READ MORE&nbsp;<img class="icon" src="/images/add-icon.svg" style="width: 20px;" />',
   'read_less' => '<img class="icon" src="/images/minus-icon.svg" style="width: 20px;" />&nbsp;READ LESS',
   'volunteers' => 'Volunteers',

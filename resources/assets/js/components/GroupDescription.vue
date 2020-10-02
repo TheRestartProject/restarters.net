@@ -1,10 +1,13 @@
 <template>
-  <CollapsibleSection class="lineheight" collapsed hide-title>
+  <CollapsibleSection class="lineheight" collapsed>
     <template slot="title">
       {{ translatedAbout }}
     </template>
     <template slot="content">
-      <read-more :html="group.free_text" class="mt-2" :max-chars="440" :more-str="translatedReadMore" :less-str="translatedReadLess" />
+      <p v-if="!group.free_text" class="text-muted">
+        {{ translatedNoAbout}}
+      </p>
+      <read-more v-else :html="group.free_text" class="mt-2" :max-chars="440" :more-str="translatedReadMore" :less-str="translatedReadLess" />
     </template>
   </CollapsibleSection>
 </template>
@@ -19,6 +22,9 @@ export default {
   components: {ReadMore, CollapsibleSection, ExternalLink},
   mixins: [ map, group ],
   computed: {
+    translatedNoAbout() {
+      return this.$lang.get('groups.about_none')
+    },
     translatedAbout() {
       return this.$lang.get('groups.about')
     },
@@ -44,5 +50,9 @@ export default {
 
 .icon {
   width: 30px;
+}
+
+.text-muted {
+  font-size: 18px !important;
 }
 </style>

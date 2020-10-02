@@ -101,7 +101,6 @@ export default {
 
 .maxheight {
   max-height: 240px;
-  min-height: 240px;
   overflow-y: auto;
   overflow-x: hidden
 }
