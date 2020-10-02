@@ -19,7 +19,7 @@
 
 <script>
 const htmlToText = require('html-to-text');
-const truncate = require('html-truncate');
+import clip from "text-clipper"
 // Originally based on https://github.com/orlyyani/read-more, with thanks.
 
 export default {
@@ -69,10 +69,8 @@ export default {
     truncatedHTML() {
       // We need to truncate HTML with care to ensure that the result is tag safe; string truncation isn't good
       // enough.
-      return this.html ? truncate(this.html, this.maxChars) : null
-    },
-    untruncatedHTML() {
-      return this.html ? truncate(this.html, this.maxChars) : this.html
+      const ret = this.html ? clip(this.html, this.maxChars, { html: true, maxLines: 10 }) : null
+      return ret
     },
     needsTruncating() {
       if (this.text && (text.length > maxChars)) {
