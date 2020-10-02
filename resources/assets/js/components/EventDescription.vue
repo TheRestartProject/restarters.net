@@ -9,8 +9,6 @@
   </CollapsibleSection>
 </template>
 <script>
-import { DATE_FORMAT } from '../constants'
-import moment from 'moment'
 import map from '../mixins/map'
 import event from '../mixins/event'
 import ExternalLink from './ExternalLink'
