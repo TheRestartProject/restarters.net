@@ -251,20 +251,34 @@ class Group extends Model implements Auditable
         $participants = 0;
         $hours_volunteered = 0;
         $co2 = 0;
-        $waste = 0;
+        $ewaste = 0;
+        $unpowered_waste = 0;
+        $fixed_devices = 0;
+        $fixed_powered = 0;
+        $fixed_unpowered = 0;
+        $repairable_devices = 0;
+        $dead_devices = 0;
+        $no_weight = 0;
+        $devices_powered = 0;
+        $devices_unpowered = 0;
 
-        foreach ($allPastParties as $party) {
-            $partyco2 = 0;
-            $participants += $party->pax;
-            $hours_volunteered += $party->hoursVolunteered();
+        foreach ($allPastParties as $event) {
+            $eventStats = $event->getEventStats($emissionRatio);
 
-            foreach ($party->devices as $device) {
-                if ($device->isFixed()) {
-                    $partyco2 += $device->co2Diverted($emissionRatio, $Device->displacement);
-                    $waste += $device->ewasteDiverted();
-                }
-            }
-            $co2 += $partyco2;
+            $co2 += $eventStats['co2'];
+            $participants += $eventStats['participants'];
+            $hours_volunteered += $event->hoursVolunteered();
+            $ewaste += $eventStats['ewaste'];
+            $unpowered_waste += $eventStats['unpowered_waste'];
+
+            $fixed_devices += $eventStats['fixed_devices'];
+            $fixed_powered += $eventStats['fixed_powered'];
+            $fixed_unpowered += $eventStats['fixed_unpowered'];
+            $repairable_devices += $eventStats['repairable_devices'];
+            $dead_devices += $eventStats['dead_devices'];
+            $no_weight += $eventStats['no_weight'];
+            $devices_powered += $eventStats['devices_powered'];
+            $devices_unpowered += $eventStats['devices_unpowered'];
         }
 
         return [
@@ -272,8 +286,11 @@ class Group extends Model implements Auditable
             'hours' => $hours_volunteered,
             'parties' => count($allPastParties),
             'co2' => $co2,
-            'ewaste' => $waste,
-            'unpowered_waste' => 0,
+            'ewaste' => $ewaste,
+            'unpowered_waste' => $unpowered_waste,
+            'repairable_devices' => $repairable_devices,
+            'dead_devices' => $dead_devices,
+            'no_weight' => $no_weight,
         ];
     }
 
