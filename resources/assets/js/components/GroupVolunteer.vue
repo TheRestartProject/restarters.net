@@ -18,17 +18,19 @@
               {{ translatedHost }}
             </span>
             </div>
-            <div :id="'skills-' + volunteer.volunteer.id" data-toggle="popover" data-placement="left" :data-content="skillList" :class="{
+            <div :id="'skills-' + volunteer.volunteer.id" :class="{
              'small': true,
              'd-flex': true,
              'clickme' : true,
              'text-muted': noskills
             }">
-              <b-img-lazy src="/images/star.svg" :class="{
-             'star': true,
-             'mr-1': true,
-             'faded': noskills
-            }" /> {{ skillCount }}
+              <div data-toggle="popover" data-placement="left" :data-content="skillList">
+                <b-img-lazy src="/images/star.svg" :class="{
+                   'star': true,
+                   'mr-1': true,
+                   'faded': noskills
+                  }" /> {{ skillCount }}
+              </div>
             </div>
           </div>
         </div>
