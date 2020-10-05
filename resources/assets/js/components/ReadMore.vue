@@ -75,7 +75,6 @@ export default {
     },
     needsTruncating() {
       const ret = (this.text && (text.length > maxChars)) || (this.html && (this.truncatedHTML !== this.html))
-      console.log("Needs", ret, this.maxChars, this.truncatedHTML !== this.untruncatedHTML, this.truncatedHTML, this.untruncatedHTML)
       return ret
     }
   },

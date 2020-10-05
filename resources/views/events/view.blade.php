@@ -159,11 +159,25 @@
         $expanded_clusters[] = $cluster;
       }
 
+      $expanded_brands = [];
+
+      foreach ($brands as $brand) {
+        $brand->brand_name;
+        $expanded_brands[] = $brand;
+      }
+
       ?>
 
       @if( $event->isInProgress() || $event->hasFinished() )
         <div class="vue w-100">
-          <EventDevices :event-id="{{ $event->idevents }}" :event="{{ $event }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}" :devices="{{ json_encode($expanded_devices) }}" :clusters="{{ json_encode($expanded_clusters) }}" />
+          <EventDevices
+            :event-id="{{ $event->idevents }}"
+            :event="{{ $event }}"
+            :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
+            :devices="{{ json_encode($expanded_devices) }}"
+            :clusters="{{ json_encode($expanded_clusters) }}"
+            :brands="{{ json_encode($expanded_brands) }}"
+          />
         </div>
 
         <div class="col-lg-12 p-sm-0">

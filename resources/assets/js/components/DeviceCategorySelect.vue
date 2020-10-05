@@ -14,7 +14,9 @@
       :group-select="false"
       :taggable="false"
       selectLabel=""
-      ref="multiselect">
+      ref="multiselect"
+      @select="$emit('update:category', $event)"
+    >
     </multiselect>
     <div v-b-popover.html.left :title="translatedTooltipCategory" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
@@ -24,9 +26,15 @@
 </template>
 <script>
 
-// TODO Not emitting and setting
 export default {
   props: {
+    category: {
+      type: Object,
+      required: false,
+      default: function() {
+        return []
+      }
+    },
     clusters: {
       type: Array,
       required: true
@@ -43,36 +51,11 @@ export default {
   },
   data () {
     return {
-      value: null,
-      category: null,
-      options: [
-        {
-          cluster: 'Javascript',
-          categories: [
-            { name: 'Vue.js', category: 'Front-end' },
-            { name: 'Adonis', category: 'Backend' }
-          ]
-        },
-        {
-          cluster: 'Ruby',
-          categories: [
-            { name: 'Rails', category: 'Backend' },
-            { name: 'Sinatra', category: 'Backend' }
-          ]
-        },
-        {
-          cluster: 'Other',
-          categories: [
-            { name: 'Laravel', category: 'Backend' },
-            { name: 'Phoenix', category: 'Backend' }
-          ]
-        }
-      ]
+      value: null
     }
   },
   computed: {
     categoryOptions() {
-      // TODO
       let ret = []
 
       this.clusters.forEach((cluster) => {
@@ -95,7 +78,6 @@ export default {
         }
       })
 
-      console.log("Options", ret, this.options)
       return ret
     },
     translatedCategory() {
@@ -104,16 +86,6 @@ export default {
     translatedTooltipCategory() {
       return this.$lang.get('devices.tooltip_category')
     }
-  },
-  mounted() {
-    console.log(this.$refs.multiselect)
   }
 }
 </script>
-<style scoped lang="scss">
-@import 'resources/global/css/_variables';
-@import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
-</style>

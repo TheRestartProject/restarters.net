@@ -53,6 +53,11 @@ export default {
       type: Array,
       required: false,
       default: null
+    },
+    brands: {
+      type: Array,
+      required: false,
+      default: null
     }
   },
   data () {

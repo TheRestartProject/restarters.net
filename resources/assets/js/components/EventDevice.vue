@@ -7,33 +7,14 @@
       <div class="br">
         <b-card no-body class="p-3">
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
-          <CategorySelect class="mb-2" v-model="category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
+          {{category}},{{brand}},{{model}}
+          <DeviceCategorySelect class="mb-2" :category.sync="category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
+          <DeviceBrandSelect class="mb-2" :brand.sync="brand" :brands="brands" v-if="powered" />
+          <DeviceModel class="mb-2" :model.sync="model" />
         </b-card>
       </div>
       <div class="" />
       <div class="bl" />
-
-<!--          @if ($powered)-->
-<!--          <div class="mb-2 device-select-row">-->
-<!--            <div class="form-control form-control__select">-->
-<!--              <select name="brand" class="select2-with-input" data-placeholder="@lang('devices.brand')">-->
-<!--                <option></option>-->
-<!--                @php( $i = 0 )-->
-<!--                @foreach($brands as $brand)-->
-<!--                @if ($device->brand == $brand->brand_name)-->
-<!--                <option value="{{ $brand->brand_name }}" selected>{{ $brand->brand_name }}</option>-->
-<!--                @php($i++)-->
-<!--                @else-->
-<!--                <option value="{{ $brand->brand_name }}">{{ $brand->brand_name }}</option>-->
-<!--                @endif-->
-<!--                @endforeach-->
-<!--                @if( $i == 1 && !empty($device->brand) )-->
-<!--                <option value="{{ $device->brand }}" selected>{{ $device->brand }}</option>-->
-<!--                @endif-->
-<!--              </select>-->
-<!--            </div>-->
-<!--            <div></div>-->
-<!--          </div>-->
 
 <!--          <div class="mb-2 device-select-row">-->
 <!--            <div class="form-group">-->
@@ -265,10 +246,12 @@
 // TODO Edit / delete
 import event from '../mixins/event'
 import { FIXED, REPAIRABLE, END_OF_LIFE, SPARE_PARTS_MANUFACTURER, SPARE_PARTS_THIRD_PARTY } from '../constants'
-import CategorySelect from './CategorySelect'
+import DeviceCategorySelect from './DeviceCategorySelect'
+import DeviceBrandSelect from './DeviceBrandSelect'
+import DeviceModel from './DeviceModel'
 
 export default {
-  components: {CategorySelect},
+  components: {DeviceModel, DeviceBrandSelect, DeviceCategorySelect},
   mixins: [ event ],
   props: {
     device: {
@@ -298,7 +281,9 @@ export default {
   },
   data () {
     return {
-      category: null
+      category: null,
+      brand: null,
+      model: null
     }
   },
   computed: {
