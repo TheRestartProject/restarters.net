@@ -93,7 +93,6 @@ export default {
     skillList() {
       let ret = null
       let skills = this.volunteer.volunteer.user_skills
-      skills.push({ skill_name: 'test'})
 
       if (skills) {
         let names = []
