@@ -1,7 +1,7 @@
 <template>
-  <div class="d-flex w-100 justify-content-between">
+  <div class="w-100 device-select-row">
     <multiselect
-      v-model="category"
+      v-model="value"
       :placeholder="translatedCategory"
       :options="categoryOptions"
       group-label="cluster"
@@ -9,13 +9,13 @@
       :multiple="false"
       :allow-empty="false"
       deselect-label=""
-      track-by="name"
+      track-by="value"
       label="name"
       :group-select="false"
       :taggable="false"
       selectLabel=""
       ref="multiselect"
-      @select="$emit('update:category', $event)"
+      @select="$emit('update:category', $event.value)"
     >
     </multiselect>
     <div v-b-popover.html.left :title="translatedTooltipCategory" class="ml-3 mt-2">
@@ -26,14 +26,14 @@
 </template>
 <script>
 
+import { CATEGORY_MISC } from '../constants'
+
 export default {
   props: {
     category: {
-      type: Object,
+      type: Number,
       required: false,
-      default: function() {
-        return []
-      }
+      default: null
     },
     clusters: {
       type: Array,
@@ -53,6 +53,9 @@ export default {
     return {
       value: null
     }
+  },
+  mounted() {
+    this.value = this.category
   },
   computed: {
     categoryOptions() {
@@ -78,6 +81,17 @@ export default {
         }
       })
 
+      ret.push({
+        cluster: '---',
+        categories: [
+          {
+            name: this.$lang.get('partials.category_none'),
+            value: CATEGORY_MISC,
+          }
+        ]
+      })
+
+      console.log("Returning", this.clusters, ret)
       return ret
     },
     translatedCategory() {
@@ -89,3 +103,9 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+.device-select-row {
+  display: grid;
+  grid-template-columns: auto 50px;
+}
+</style>

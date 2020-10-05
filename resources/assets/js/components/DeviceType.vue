@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 device-select-row">
-    <b-input @change="$emit('update:model', $event)" :placeholder="translatedModel" size="lg" class="marg" />
-    <div v-b-popover.html.left :title="translatedTooltipModel" class="ml-3 mt-2">
+    <b-input @change="$emit('update:type', $event)" :placeholder="translatedType" size="lg" class="marg" />
+    <div v-b-popover.html.left :title="translatedTooltipType" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
     </div>
@@ -11,7 +11,7 @@
 
 export default {
   props: {
-    model: {
+    type: {
       type: String,
       required: false,
       default: null
@@ -28,11 +28,11 @@ export default {
     }
   },
   computed: {
-    translatedModel() {
-      return this.$lang.get('devices.model')
+    translatedType() {
+      return this.$lang.get('devices.type')
     },
-    translatedTooltipModel() {
-      return this.$lang.get('devices.tooltip_model')
+    translatedTooltipType() {
+      return this.$lang.get('devices.tooltip_type')
     }
   }
 }
@@ -44,7 +44,7 @@ export default {
 }
 
 .device-select-row {
- display: grid;
- grid-template-columns: auto 50px;
+  display: grid;
+  grid-template-columns: auto 50px;
 }
 </style>

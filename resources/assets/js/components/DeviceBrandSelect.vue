@@ -1,7 +1,7 @@
 <template>
-  <div class="d-flex w-100 justify-content-between">
+  <div class="w-100 device-select-row">
     <multiselect
-        v-model="brand"
+        v-model="value"
         :placeholder="translatedBrand"
         :options="brands"
         :multiple="false"
@@ -12,9 +12,9 @@
         :taggable="false"
         selectLabel=""
         ref="multiselect"
-        @select="$emit('update:brand', $event)"
+        @select="$emit('update:brand', $event.value)"
     />
-    <div class="ml-3 mt-2 spacer" />
+    <div />
   </div>
 </template>
 <script>
@@ -22,11 +22,9 @@
 export default {
   props: {
     brand: {
-      type: Object,
+      type: Number,
       required: false,
-      default: function() {
-        return []
-      }
+      default: null
     },
     brands: {
       type: Array,
@@ -42,11 +40,15 @@ export default {
     translatedBrand() {
       return this.$lang.get('devices.brand')
     }
+  },
+  mounted() {
+    this.value = this.brand
   }
 }
 </script>
-<style scoped>
-.spacer {
-  width: 28px;
+<style scoped lang="scss">
+.device-select-row {
+  display: grid;
+  grid-template-columns: auto 50px;
 }
 </style>

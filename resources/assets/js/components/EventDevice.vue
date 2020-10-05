@@ -8,52 +8,17 @@
         <b-card no-body class="p-3">
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
           <DeviceCategorySelect class="mb-2" :category.sync="category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
-          <DeviceBrandSelect class="mb-2" :brand.sync="brand" :brands="brands" v-if="powered" />
-          <DeviceModel class="mb-2" :model.sync="model" />
+          <div v-if="powered">
+            <DeviceBrandSelect class="mb-2" :brand.sync="brand" :brands="brands" />
+            <DeviceModel class="mb-2" :model.sync="model" />
+          </div>
+          <DeviceType class="mb-2" :type.sync="type" v-else />
+          <DeviceWeight v-if="showWeight" :estimate.sync="estimate" />
+          <DeviceAge :age.sync="age" />
         </b-card>
       </div>
       <div class="" />
       <div class="bl" />
-
-<!--          <div class="mb-2 device-select-row">-->
-<!--            <div class="form-group">-->
-<!--              <input type="text" class="form-control field" name="model" value="{{ $device->model }}" placeholder="@lang('partials.model')" autocomplete="off">-->
-<!--            </div>-->
-<!--            <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_model')" class="ml-3 mt-2">-->
-<!--              @if ($add)-->
-<!--              <img class="icon clickable" src="/icons/info_ico_black.svg">-->
-<!--              @elseif ($edit)-->
-<!--              <img class="icon clickable" src="/icons/info_ico_green.svg">-->
-<!--              @endif-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          @else-->
-<!--          <div class="mb-2 device-select-row">-->
-<!--            <div class="form-group">-->
-<!--              <input type="text" class="form-control field" name="item_type" value="{{ $device->item_type }}" placeholder="@lang('partials.item_type')" autocomplete="off">-->
-<!--            </div>-->
-<!--            <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_model')" class="ml-3 mt-2">-->
-<!--              @if ($add)-->
-<!--              <img class="icon clickable" src="/icons/info_ico_black.svg">-->
-<!--              @elseif ($edit)-->
-<!--              <img class="icon clickable" src="/icons/info_ico_green.svg">-->
-<!--              @endif-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          @endif-->
-
-<!--          <div class="device-field-row align-items-center mb-2 display-weight weight {{ (!$powered || $device->category == 46) ? '' : 'd-none' }}">-->
-<!--            <label class="text-bold">-->
-<!--              @lang('devices.weight')-->
-<!--            </label>-->
-<!--            <div class="input-group">-->
-<!--              {{&#45;&#45; Powered devices don't allow editing of the weight except for the "None of the above" category, whereas unpowered do. &#45;&#45;}}-->
-<!--              <input {{ $powered ? 'disabled' : '' }} type="number" class="{{ $powered ? 'weight' : '' }} form-control form-control-lg field numeric" name="weight" min="0.01" step=".01" autocomplete="off" value="{{ $device->estimate }}">-->
-<!--            </div>-->
-<!--            <span class="text-right mb-1">-->
-<!--                          @lang('devices.required_impact')-->
-<!--                      </span>-->
-<!--          </div>-->
 
 <!--          <div class="device-field-row align-items-center mb-2">-->
 <!--            <label class="text-bold">-->
@@ -244,13 +209,23 @@
 <script>
 // TODO Edit / delete
 import event from '../mixins/event'
-import { FIXED, REPAIRABLE, END_OF_LIFE, SPARE_PARTS_MANUFACTURER, SPARE_PARTS_THIRD_PARTY } from '../constants'
+import {
+  FIXED,
+  REPAIRABLE,
+  END_OF_LIFE,
+  SPARE_PARTS_MANUFACTURER,
+  SPARE_PARTS_THIRD_PARTY,
+  CATEGORY_MISC
+} from '../constants'
 import DeviceCategorySelect from './DeviceCategorySelect'
 import DeviceBrandSelect from './DeviceBrandSelect'
 import DeviceModel from './DeviceModel'
+import DeviceWeight from './DeviceWeight'
+import DeviceAge from './DeviceAge'
+import DeviceType from './DeviceType'
 
 export default {
-  components: {DeviceModel, DeviceBrandSelect, DeviceCategorySelect},
+  components: {DeviceType, DeviceAge, DeviceWeight, DeviceModel, DeviceBrandSelect, DeviceCategorySelect},
   mixins: [ event ],
   props: {
     device: {
@@ -282,7 +257,10 @@ export default {
     return {
       category: null,
       brand: null,
-      model: null
+      model: null,
+      type: null,
+      estimate: null,
+      age: null
     }
   },
   computed: {
@@ -296,6 +274,11 @@ export default {
     },
     sparePartsNeeded() {
       return this.device.spare_parts === SPARE_PARTS_MANUFACTURER || this.device.spare_parts === SPARE_PARTS_THIRD_PARTY
+    },
+    showWeight() {
+      // Powered devices don't allow editing of the weight except for the "None of the above" category, whereas
+      // unpowered do.
+      return (this.device && !this.device.powered) || this.category === CATEGORY_MISC
     },
     translatedTitleItems() {
       return this.$lang.get('devices.title_items')
