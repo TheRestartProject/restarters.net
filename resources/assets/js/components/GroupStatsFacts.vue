@@ -2,19 +2,19 @@
   <div>
     <h2 class="mt-2 mb-2">{{ translatedFacts }}</h2>
     <div class="items-container">
-      <EventStatsValue :count="stats.parties" icon="coffee" size="md" variant="primary" title="groups.events" class="group-stat-events" />
+      <StatsValue :count="stats.parties" icon="coffee" size="md" variant="primary" title="groups.events" class="group-stat-events" />
       <div />
-      <EventStatsValue :count="stats.pax" icon="participants" size="md" title="groups.participants" class="group-stat-participants" />
+      <StatsValue :count="stats.pax" icon="participants" size="md" title="groups.participants" class="group-stat-participants" />
       <div />
-      <EventStatsValue :count="stats.hours" icon="clock" size="md" title="groups.hours_volunteered" class="group-stat-hours-volunteered" />
+      <StatsValue :count="stats.hours" icon="clock" size="md" title="groups.hours_volunteered" class="group-stat-hours-volunteered" />
     </div>
   </div>
 </template>
 <script>
-import EventStatsValue from './EventStatsValue'
+import StatsValue from './StatsValue'
 
 export default {
-  components: {EventStatsValue},
+  components: {StatsValue},
   props: {
     stats: {
       required: true,

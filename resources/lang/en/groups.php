@@ -137,5 +137,6 @@ return array (
   'see_all_volunteers' => 'See all :count volunteer|See all :count volunteers',
   'no_volunteers' => 'There are no volunteers in this group',
   'remove_volunteer' => 'Remove Volunteer',
-  'make_host' => 'Make Host'
+  'make_host' => 'Make Host',
+  'not_counting' => 'Not counting toward this group\'s environmental impact is|Not counting toward this group\'s environmental impact are',
 );

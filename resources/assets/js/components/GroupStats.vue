@@ -2,15 +2,15 @@
   <div class="stats">
     <GroupStatsFacts :stats="stats" class="statsborder" />
     <div />
-    <EventStatsImpact :stats="stats" class="statsborder" />
+    <StatsImpact :stats="stats" statsEntity="group" class="statsborder" />
   </div>
 </template>
 <script>
 import GroupStatsFacts from './GroupStatsFacts'
-import EventStatsImpact from './EventStatsImpact'
+import StatsImpact from './StatsImpact'
 
 export default {
-  components: {EventStatsImpact, GroupStatsFacts},
+  components: {GroupStatsFacts, StatsImpact },
   props: {
     stats: {
       required: true,
