@@ -18,7 +18,7 @@
               {{ translatedHost }}
             </span>
             </div>
-            <div :id="'skills-' + volunteer.volunteer.id" data-toggle="popover" data-placement="top" :data-content="skillList" :class="{
+            <div :id="'skills-' + volunteer.volunteer.id" data-toggle="popover" data-placement="left" :data-content="skillList" :class="{
              'small': true,
              'd-flex': true,
              'clickme' : true,
@@ -93,6 +93,7 @@ export default {
     skillList() {
       let ret = null
       let skills = this.volunteer.volunteer.user_skills
+      skills.push({ skill_name: 'test'})
 
       if (skills) {
         let names = []
