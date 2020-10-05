@@ -7,7 +7,7 @@
     <div class="border-top-very-thick border-bottom-thin mb-3">
       <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
         <div class="bord d-flex w-xs-100 w-md-50">
-          <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block mr-4" />
+          <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage mr-4 mb-3" />
           <h1>
             {{ group.name }}
           </h1>

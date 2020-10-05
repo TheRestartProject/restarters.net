@@ -4,10 +4,10 @@
       <p v-html="formattedString"></p>
     </span>
     <span v-else-if="html">
-      <span v-if="!needsTruncating" v-html="html" />
+      <span v-if="!needsTruncating" v-html="html" class="w-100" />
       <span v-else>
-        <span v-if="!isReadMore" v-html="truncatedHTML" />
-        <span v-else v-html="html" />
+        <span v-if="!isReadMore" v-html="truncatedHTML" class="w-100" />
+        <span v-else v-html="html" class="w-100" />
       </span>
     </span>
     <span v-if="needsTruncating">
