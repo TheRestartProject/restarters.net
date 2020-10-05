@@ -7,7 +7,6 @@
       <div class="br">
         <b-card no-body class="p-3">
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
-          {{category}},{{brand}},{{model}}
           <DeviceCategorySelect class="mb-2" :category.sync="category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
           <DeviceBrandSelect class="mb-2" :brand.sync="brand" :brands="brands" v-if="powered" />
           <DeviceModel class="mb-2" :model.sync="model" />

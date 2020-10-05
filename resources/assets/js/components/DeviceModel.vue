@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex w-100 justify-content-between">
-    <b-input @change="$emit('update:model', $event)" :placeholder="translatedModel" size="lg" />
+    <b-input @change="$emit('update:model', $event)" :placeholder="translatedModel" size="lg" class="marg" />
     <div v-b-popover.html.left :title="translatedTooltipModel" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
@@ -37,3 +37,9 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+.marg {
+  // Some card styles are getting in the way.
+  margin: 2px !important;
+}
+</style>

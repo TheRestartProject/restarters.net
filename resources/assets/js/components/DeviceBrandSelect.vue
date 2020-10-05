@@ -47,6 +47,6 @@ export default {
 </script>
 <style scoped>
 .spacer {
-  width: 27px;
+  width: 28px;
 }
 </style>

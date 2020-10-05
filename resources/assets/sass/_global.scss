@@ -551,17 +551,53 @@ h2 {
   }
 }
 
-.multiselect, .multiselect__tags {
-  min-height: 50px !important;
-}
+.multiselect {
+  font-family: "Open Sans", "sans-serif" !important;
 
-.multiselect__tags {
-  padding: 14px 40px 0 8px !important;
+  outline: 3px;
+  margin: 2px;
+  margin-right: 3px;
+
+  &.multiselect--active {
+    border: 3px solid #222 !important;
+    outline: 0px !important;
+    margin: 0px !important;
+
+    .multiselect__tags, input {
+      background-color: #fff2df !important;
+    }
+
+    input {
+      margin-left: 5px;
+      margin-top: 6px;
+      margin-bottom: 3px;
+    }
+  }
+
+  .multiselect__tags {
+    padding: 3px 40px 3px 12px !important;
+    border: 1px solid #222 !important;
+
+    input {
+      min-height: 25px !important;
+      line-height: 25px !important;
+      padding: 0px !important;
+    }
+
+    .multiselect__single {
+      padding-left: 5px;
+      margin-bottom: 6px;
+      padding-top: 5px;
+      min-height: 25px !important;
+      line-height: 25px !important;
+    }
+  }
 }
 
 .multiselect__select {
   padding: 8px 8px !important;
-  top: 8px !important;
+  top: 12px !important;
+  margin-top: -9px !important;
 
   &:before {
     border: solid black;
@@ -571,6 +607,18 @@ h2 {
   }
 }
 
+
+.multiselect__input {
+  padding-top: 6px !important;
+  padding-left: 6px !important;
+}
+
 .multiselect__placeholder {
   padding-left: 6px !important;
+  margin-bottom: 0px !important;
+  padding-top: 0px !important;
+  margin-bottom: 3px !important;
+  margin-top: 3px !important;
+  font-size: 15px !important;
+  color: #6c757d !important;
 }
