@@ -38,9 +38,3 @@ export default {
   }
 }
 </script>
-<style scoped lang="scss">
-.device-select-row {
-  display: grid;
-  grid-template-columns: auto 50px;
-}
-</style>

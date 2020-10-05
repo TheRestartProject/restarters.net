@@ -28,7 +28,7 @@ export default {
     translatedNotes() {
       return this.$lang.get('devices.placeholder_notes')
     },
-    translatedTooltipProblem() {
+    translatedTooltipNotes() {
       return this.$lang.get('devices.tooltip_notes')
     }
   }
@@ -38,10 +38,5 @@ export default {
 .marg {
   // Some card styles are getting in the way.
   margin: 2px !important;
-}
-
-.device-select-row {
-  display: grid;
-  grid-template-columns: auto 50px;
 }
 </style>

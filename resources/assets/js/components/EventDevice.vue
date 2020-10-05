@@ -28,7 +28,8 @@
         <b-card no-body class="p-3">
           <h3 class="mt-2 mb-4">{{ translatedTitleAssessment }}</h3>
           <DeviceProblem :problem.sync="problem" class="mb-4" />
-          <DeviceNotes :notes.sync="notes" class="mb-2" />
+          <DeviceNotes :notes.sync="notes" class="mb-4" />
+          <DeviceUsefulUrls :device="device" class="mb-2" />
 <!--          TODO Useful URLs-->
 <!--          TODO Case study-->
         </b-card>
@@ -128,9 +129,11 @@ import DeviceType from './DeviceType'
 import DeviceRepairStatus from './DeviceRepairStatus'
 import DeviceProblem from './DeviceProblem'
 import DeviceNotes from './DeviceNotes'
+import DeviceUsefulUrls from './DeviceUsefulUrls'
 
 export default {
   components: {
+    DeviceUsefulUrls,
     DeviceNotes,
     DeviceProblem,
     DeviceRepairStatus,
@@ -193,6 +196,9 @@ export default {
     },
     translatedTitleRepair() {
       return this.$lang.get('devices.title_repair')
+    },
+    translatedTitleAssessment() {
+      return this.$lang.get('devices.title_assessment')
     },
     translatedCategory() {
       return this.$lang.get('devices.category')

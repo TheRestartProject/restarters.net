@@ -145,9 +145,9 @@
       $expanded_devices = [];
 
       foreach ($event->devices as $device) {
-        # Expand category.
         $device->category = $device->deviceCategory;
         $device->shortProblem = $device->getShortProblem();
+        $device->urls;
 
         $expanded_devices[] = $device;
       }
