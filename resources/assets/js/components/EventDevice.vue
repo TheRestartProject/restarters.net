@@ -17,85 +17,17 @@
           <DeviceAge :age.sync="age" />
         </b-card>
       </div>
-      <div class="" />
+      <div>
+        <b-card no-body class="p-3">
+          <h3 class="mt-2 mb-4">{{ translatedTitleRepair }}</h3>
+          <DeviceRepairStatus :status.sync="status" :steps.sync="steps" :parts.sync="parts" />
+        </b-card>
+      </div>
       <div class="bl" />
-
-<!--          <div class="device-field-row align-items-center mb-2">-->
-<!--            <label class="text-bold">-->
-<!--              @lang('devices.age')-->
-<!--            </label>-->
-<!--            <div class="display-weight">-->
-<!--              <div class="input-group">-->
-<!--                <input type="number" class="form-control field" name="age" min="0" step="0.5" value="{{ $device->age }}" autocomplete="off">-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <span class="text-right mb-1">-->
-<!--                              @lang('devices.age_approx')-->
-<!--                          </span>-->
-
-<!--            </div>-->
-<!--          </div>-->
     </div>
   </b-form>
 
-<!--      <div class="card {{ $edit ? 'card-event-edit-item' :  'card-event-add-item' }} flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right border-white">-->
-<!--        <div class="card-body">-->
-<!--          <h3>@lang('devices.title_repair')</h3>-->
-<!--          <div class="mt-4 d-flex flex-column">-->
-<!--            <div class="form-control form-control__select mb-2 col-device">-->
-<!--              <select class="select2 repair-status" name="repair_status" data-device="{{ $device->iddevices }}" data-placeholder="@lang('devices.repair_outcome')">-->
-<!--                <option></option>-->
-<!--                @if ( $device->repair_status == 1 )-->
-<!--                <option value="1" selected>@lang('partials.fixed')</option>-->
-<!--                <option value="2">@lang('partials.repairable')</option>-->
-<!--                <option value="3">@lang('partials.end_of_life')</option>-->
-<!--                @elseif ( $device->repair_status == 2 )-->
-<!--                <option value="1">@lang('partials.fixed')</option>-->
-<!--                <option value="2" selected>@lang('partials.repairable')</option>-->
-<!--                <option value="3">@lang('partials.end_of_life')</option>-->
-<!--                @elseif ( $device->repair_status == 3 )-->
-<!--                <option value="1">@lang('partials.fixed')</option>-->
-<!--                <option value="2">@lang('partials.repairable')</option>-->
-<!--                <option value="3" selected>@lang('partials.end_of_life')</option>-->
-<!--                @else-->
-<!--                <option value="1">@lang('partials.fixed')</option>-->
-<!--                <option value="2">@lang('partials.repairable')</option>-->
-<!--                <option value="3">@lang('partials.end_of_life')</option>-->
-<!--                @endif-->
-<!--              </select>-->
-<!--            </div>-->
 
-<!--            <div class="form-control form-control__select mb-2 col-device {{ $device->repair_status == 2 ? '' : 'd-none' }}">-->
-<!--              <select class="repair_details select2 repair-details-edit " name="repair_details" data-placeholder="@lang('devices.repair_details')">-->
-<!--                <option></option>-->
-<!--                @if ( $device->more_time_needed == 1 )-->
-<!--                <option value="1" selected>@lang('partials.more_time')</option>-->
-<!--                <option value="2">@lang('partials.professional_help')</option>-->
-<!--                <option value="3">@lang('partials.diy')</option>-->
-<!--                @elseif ( $device->professional_help == 1 )-->
-<!--                <option value="1">@lang('partials.more_time')</option>-->
-<!--                <option value="2" selected>@lang('partials.professional_help')</option>-->
-<!--                <option value="3">@lang('partials.diy')</option>-->
-<!--                @elseif ( $device->do_it_yourself == 1 )-->
-<!--                <option value="1" >@lang('partials.more_time')</option>-->
-<!--                <option value="2">@lang('partials.professional_help')</option>-->
-<!--                <option value="3" selected>@lang('partials.diy')</option>-->
-<!--                @else-->
-<!--                <option value="1">@lang('partials.more_time')</option>-->
-<!--                <option value="2">@lang('partials.professional_help')</option>-->
-<!--                <option value="3">@lang('partials.diy')</option>-->
-<!--                @endif-->
-<!--              </select>-->
-<!--            </div>-->
-
-<!--            <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device {{ $device->repair_status != 3 ? '' : 'd-none' }}">-->
-<!--              <select class="select2 spare-parts" name="spare_parts" data-placeholder="@lang('devices.spare_parts_required')">-->
-<!--                <option></option>-->
-<!--                <option value="1" @if ( $device->spare_parts == 1 && !is_null($device->parts_provider) ) selected @endif>@lang('partials.yes_manufacturer')</option>-->
-<!--                <option value="3" @if ( $device->parts_provider == 2 ) selected @endif>@lang('partials.yes_third_party')</option>-->
-<!--                <option value="2" @if ( $device->spare_parts == 2 ) selected @endif>@lang('partials.no')</option>-->
-<!--              </select>-->
-<!--            </div>-->
 
 <!--            <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device {{ $device->repair_status == 3 ? '' : 'd-none' }}">-->
 <!--              <select class="select2 select2-repair-barrier repair-barrier" name="barrier[]" multiple>-->
@@ -223,9 +155,12 @@ import DeviceModel from './DeviceModel'
 import DeviceWeight from './DeviceWeight'
 import DeviceAge from './DeviceAge'
 import DeviceType from './DeviceType'
+import DeviceRepairStatus from './DeviceRepairStatus'
 
 export default {
-  components: {DeviceType, DeviceAge, DeviceWeight, DeviceModel, DeviceBrandSelect, DeviceCategorySelect},
+  components: {
+    DeviceRepairStatus,
+    DeviceType, DeviceAge, DeviceWeight, DeviceModel, DeviceBrandSelect, DeviceCategorySelect},
   mixins: [ event ],
   props: {
     device: {
@@ -260,18 +195,13 @@ export default {
       model: null,
       type: null,
       estimate: null,
-      age: null
+      age: null,
+      status: null,
+      parts: null,
+      steps: null
     }
   },
   computed: {
-    status() {
-      switch (this.device.repair_status) {
-        case FIXED: return this.$lang.get('partials.fixed'); break;
-        case REPAIRABLE: return this.$lang.get('partials.repairable'); break;
-        case END_OF_LIFE: return this.$lang.get('partials.end'); break;
-        default: return null
-      }
-    },
     sparePartsNeeded() {
       return this.device.spare_parts === SPARE_PARTS_MANUFACTURER || this.device.spare_parts === SPARE_PARTS_THIRD_PARTY
     },
@@ -282,6 +212,9 @@ export default {
     },
     translatedTitleItems() {
       return this.$lang.get('devices.title_items')
+    },
+    translatedTitleRepair() {
+      return this.$lang.get('devices.title_repair')
     },
     translatedCategory() {
       return this.$lang.get('devices.category')

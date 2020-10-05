@@ -11,7 +11,7 @@
 
 export default {
   props: {
-    type: {
+    value: {
       type: String,
       required: false,
       default: null
@@ -20,11 +20,6 @@ export default {
       type: String,
       required: false,
       default: 'black'
-    }
-  },
-  data () {
-    return {
-      value: null
     }
   },
   computed: {

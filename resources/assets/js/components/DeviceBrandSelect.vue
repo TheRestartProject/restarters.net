@@ -1,18 +1,18 @@
 <template>
   <div class="w-100 device-select-row">
     <multiselect
-        v-model="value"
+        :value="value"
         :placeholder="translatedBrand"
         :options="brands"
+        track-by="id"
+        label="brand_name"
         :multiple="false"
         :allow-empty="false"
         deselect-label=""
-        track-by="id"
-        label="brand_name"
         :taggable="false"
         selectLabel=""
         ref="multiselect"
-        @select="$emit('update:brand', $event.value)"
+        @select="$emit('update:brand', $event.id)"
     />
     <div />
   </div>
@@ -21,7 +21,7 @@
 
 export default {
   props: {
-    brand: {
+    value: {
       type: Number,
       required: false,
       default: null
@@ -31,18 +31,10 @@ export default {
       required: true
     }
   },
-  data () {
-    return {
-      value: null,
-    }
-  },
   computed: {
     translatedBrand() {
       return this.$lang.get('devices.brand')
     }
-  },
-  mounted() {
-    this.value = this.brand
   }
 }
 </script>

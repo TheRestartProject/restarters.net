@@ -1,16 +1,16 @@
 <template>
   <div class="w-100 device-select-row">
     <multiselect
-      v-model="value"
+      :value="value"
       :placeholder="translatedCategory"
       :options="categoryOptions"
+      track-by="value"
+      label="name"
       group-label="cluster"
       group-values="categories"
       :multiple="false"
       :allow-empty="false"
       deselect-label=""
-      track-by="value"
-      label="name"
       :group-select="false"
       :taggable="false"
       selectLabel=""
@@ -30,7 +30,7 @@ import { CATEGORY_MISC } from '../constants'
 
 export default {
   props: {
-    category: {
+    value: {
       type: Number,
       required: false,
       default: null
@@ -48,14 +48,6 @@ export default {
       required: false,
       default: 'black'
     }
-  },
-  data () {
-    return {
-      value: null
-    }
-  },
-  mounted() {
-    this.value = this.category
   },
   computed: {
     categoryOptions() {
@@ -91,7 +83,6 @@ export default {
         ]
       })
 
-      console.log("Returning", this.clusters, ret)
       return ret
     },
     translatedCategory() {

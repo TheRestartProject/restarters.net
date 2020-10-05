@@ -18,6 +18,10 @@ export const FIXED = 1
 export const REPAIRABLE = 2
 export const END_OF_LIFE = 3
 
+export const NEXT_STEPS_MORE_TIME = 1
+export const NEXT_STEPS_PROFESSIONAL = 2
+export const NEXT_STEPS_DIY = 3
+
 export const SPARE_PARTS_MANUFACTURER = 1
 export const SPARE_PARTS_NOT_NEEDED = 2
 export const SPARE_PARTS_THIRD_PARTY = 3
