@@ -15,6 +15,7 @@
           <DeviceType class="mb-2" :type.sync="type" v-else />
           <DeviceWeight v-if="showWeight" :estimate.sync="estimate" />
           <DeviceAge :age.sync="age" />
+<!--          TODO Photos-->
         </b-card>
       </div>
       <div>
@@ -23,52 +24,21 @@
           <DeviceRepairStatus :status.sync="status" :steps.sync="steps" :parts.sync="parts" :barriers.sync="barriers" :barrierList="barrierList" />
         </b-card>
       </div>
-      <div class="bl" />
+      <div class="bl">
+        <b-card no-body class="p-3">
+          <h3 class="mt-2 mb-4">{{ translatedTitleAssessment }}</h3>
+          <DeviceProblem :problem.sync="problem" class="mb-4" />
+          <DeviceNotes :notes.sync="notes" class="mb-2" />
+<!--          TODO Useful URLs-->
+<!--          TODO Case study-->
+        </b-card>
+      </div>
     </div>
+<!--    TODO Footer buttons and actions-->
   </b-form>
 
 
 
-<!--            <div class="form-control form-control__select form-control__select_placeholder mb-2 col-device {{ $device->repair_status == 3 ? '' : 'd-none' }}">-->
-<!--              <select class="select2 select2-repair-barrier repair-barrier" name="barrier[]" multiple>-->
-<!--                @foreach( FixometerHelper::allBarriers() as $barrier )-->
-<!--                <option value="{{{ $barrier->id }}}" @if ( $device->barriers->contains($barrier->id) ) selected @endif>@lang($barrier->barrier)</option>-->
-<!--                @endforeach-->
-<!--              </select>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-
-<!--      <div class="card {{ $edit ? 'card-event-edit-item' :  'card-event-add-item' }} flex-grow-1 border border-top-0 border-bottom-1 border-left-0 border-right-0 border-white">-->
-<!--        <div class="card-body">-->
-<!--          <h3>@lang('devices.title_assessment')</h3>-->
-<!--          <div class="mt-4">-->
-<!--            <div class="mb-2 device-select-row">-->
-<!--              <div class="form-group">-->
-<!--                <textarea class="form-control" rows="6" name="problem" placeholder="@lang('partials.description_of_problem_solution')">{!! $device->problem !!}</textarea>-->
-<!--              </div>-->
-<!--              <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_problem')"  class="ml-3 mt-2">-->
-<!--                @if ($add)-->
-<!--                <img class="icon clickable" src="/icons/info_ico_black.svg">-->
-<!--                @elseif ($edit)-->
-<!--                <img class="icon clickable" src="/icons/info_ico_green.svg">-->
-<!--                @endif-->
-<!--              </div>-->
-<!--            </div>-->
-
-<!--            <div class="mb-2 device-select-row">-->
-<!--              <div class="form-group">-->
-<!--                <textarea class="form-control" rows="6" name="notes" placeholder="@lang('devices.placeholder_notes')">{!! $device->notes !!}</textarea>-->
-<!--              </div>-->
-<!--              <div data-toggle="popover" data-placement="left" data-html="true" data-content="@lang('devices.tooltip_notes')"  class="ml-3 mt-2">-->
-<!--                @if ($add)-->
-<!--                <img class="icon clickable" src="/icons/info_ico_black.svg">-->
-<!--                @elseif ($edit)-->
-<!--                <img class="icon clickable" src="/icons/info_ico_green.svg">-->
-<!--                @endif-->
-<!--              </div>-->
-<!--            </div>-->
 
 <!--            @include('partials.useful-repair-urls-add-or-edit', ['urls' => $device->urls, 'device' => $device, 'editable' => $add || $edit])-->
 
@@ -156,9 +126,13 @@ import DeviceWeight from './DeviceWeight'
 import DeviceAge from './DeviceAge'
 import DeviceType from './DeviceType'
 import DeviceRepairStatus from './DeviceRepairStatus'
+import DeviceProblem from './DeviceProblem'
+import DeviceNotes from './DeviceNotes'
 
 export default {
   components: {
+    DeviceNotes,
+    DeviceProblem,
     DeviceRepairStatus,
     DeviceType, DeviceAge, DeviceWeight, DeviceModel, DeviceBrandSelect, DeviceCategorySelect},
   mixins: [ event ],
@@ -190,6 +164,7 @@ export default {
   },
   data () {
     return {
+      // TODO These should really come from a device object in the store
       category: null,
       brand: null,
       model: null,
@@ -199,7 +174,9 @@ export default {
       status: null,
       parts: null,
       steps: null,
-      barriers: null
+      barriers: null,
+      problem: null,
+      notes: null
     }
   },
   computed: {
