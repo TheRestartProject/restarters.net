@@ -1,5 +1,5 @@
 <template>
-  <CollapsibleSection class="lineheight" collapsed>
+  <CollapsibleSection class="lineheight no-explict-width" collapsed>
     <template slot="title">
       {{ translatedAbout }}
     </template>
