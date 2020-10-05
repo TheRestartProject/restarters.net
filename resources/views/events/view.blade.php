@@ -177,6 +177,7 @@
             :devices="{{ json_encode($expanded_devices) }}"
             :clusters="{{ json_encode($expanded_clusters) }}"
             :brands="{{ json_encode($expanded_brands) }}"
+            :barrier-list="{{ json_encode(FixometerHelper::allBarriers()) }}"
           />
         </div>
 

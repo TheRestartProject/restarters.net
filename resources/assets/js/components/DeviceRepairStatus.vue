@@ -2,7 +2,7 @@
   <div>
     <multiselect
         class="mb-2"
-        :value="statusValue"
+        v-model="statusValue"
         :placeholder="translatedRepairOutcome"
         :options="statusOptions"
         track-by="id"
@@ -12,13 +12,11 @@
         deselect-label=""
         :taggable="false"
         selectLabel=""
-        ref="multiselect"
-        @select="$emit('update:status', $event.id)">
-    </multiselect>
+    />
     <multiselect
         class="mb-2"
         v-if="showSteps"
-        :value="stepsValue"
+        v-model="stepsValue"
         :placeholder="translatedNextSteps"
         :options="stepsOptions"
         :multiple="false"
@@ -28,12 +26,10 @@
         label="text"
         :taggable="false"
         selectLabel=""
-        ref="multiselect"
-        @select="$emit('update:steps', $event.id)"
     />
     <multiselect
         v-if="showParts"
-        :value="partsValue"
+        v-model="partsValue"
         :placeholder="translatedSpareParts"
         :options="partsOptions"
         :multiple="false"
@@ -43,8 +39,21 @@
         label="text"
         :taggable="false"
         selectLabel=""
-        ref="multiselect"
-        @select="$emit('update:parts', $event.id)"
+    />
+    <multiselect
+        v-if="showBarriers"
+        v-model="barriersValue"
+        :placeholder="translatedBarriers"
+        :options="barrierList"
+        :multiple="true"
+        :allow-empty="false"
+        deselect-label=""
+        track-by="id"
+        label="barrier"
+        :taggable="false"
+        selectLabel=""
+        selectedLabel=""
+        :allowEmpty="true"
     />
   </div>
 </template>
@@ -74,10 +83,30 @@ export default {
       type: Number,
       required: false,
       default: null
+    },
+    barriers: {
+      type: Array,
+      required: false,
+      default: function() {
+        return []
+      }
+    },
+    barrierList: {
+      type: Array,
+      required: true
     }
   },
   computed: {
-    // We have to have a separate copy of this to avoid multiselect mutating the prop directly, which Vue doesn't
+    showSteps () {
+      return this.status === REPAIRABLE
+    },
+    showParts () {
+      return this.status === REPAIRABLE || this.status === FIXED
+    },
+    showBarriers () {
+      return this.status === END_OF_LIFE
+    },
+    // We have to have a separate copy of values to avoid multiselect mutating the prop directly, which Vue doesn't
     // like.  multiselect is also a bit annoying about not being able to set by the value, only the option object.
     //
     // This kind of two-way binding will improve in Vue 3, supposedly.
@@ -88,7 +117,7 @@ export default {
         })
       },
       set(newval) {
-        this.$emit('update:status', newval)
+        this.$emit('update:status', newval.id)
       }
     },
     statusOptions () {
@@ -114,7 +143,7 @@ export default {
         })
       },
       set(newval) {
-        this.$emit('update:steps', newval)
+        this.$emit('update:steps', newval.id)
       }
     },
     stepsOptions () {
@@ -140,7 +169,7 @@ export default {
         })
       },
       set(newval) {
-        this.$emit('update:parts', newval)
+        this.$emit('update:parts', newval.id)
       }
     },
     partsOptions () {
@@ -159,11 +188,19 @@ export default {
         }
       ]
     },
-    showSteps () {
-      return this.status === REPAIRABLE
-    },
-    showParts () {
-      return this.status === REPAIRABLE || this.status === FIXED
+    barriersValue: {
+      get() {
+        // We have an array of ids which we need to map to an array of options.
+        return this.barrierList.filter(b => {
+          console.log("Get barriers", this.barriers)
+          return this.barriers && this.barriers.indexOf(b.id) !== -1
+        })
+      },
+      set(newval) {
+        // We have an array of options we want to emit as an array of ids.
+        console.log("Set barriers", newval.map(o => o.id))
+        this.$emit('update:barriers', newval.map(o => o.id))
+      }
     },
     translatedRepairOutcome () {
       return this.$lang.get('devices.repair_outcome')
@@ -182,6 +219,9 @@ export default {
     },
     translatedDIY () {
       return this.$lang.get('partials.diy')
+    },
+    translatedBarriers() {
+      return this.$lang.get('partials.choose_barriers')
     },
   }
 }

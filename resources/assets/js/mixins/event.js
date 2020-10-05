@@ -58,6 +58,11 @@ export default {
       type: Array,
       required: false,
       default: null
+    },
+    barrierList: {
+      type: Array,
+      required: false,
+      default: null
     }
   },
   data () {

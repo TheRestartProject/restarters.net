@@ -20,7 +20,7 @@
       <div>
         <b-card no-body class="p-3">
           <h3 class="mt-2 mb-4">{{ translatedTitleRepair }}</h3>
-          <DeviceRepairStatus :status.sync="status" :steps.sync="steps" :parts.sync="parts" />
+          <DeviceRepairStatus :status.sync="status" :steps.sync="steps" :parts.sync="parts" :barriers.sync="barriers" :barrierList="barrierList" />
         </b-card>
       </div>
       <div class="bl" />
@@ -198,7 +198,8 @@ export default {
       age: null,
       status: null,
       parts: null,
-      steps: null
+      steps: null,
+      barriers: null
     }
   },
   computed: {

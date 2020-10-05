@@ -52,5 +52,6 @@ input {
 .device-field-row {
   display: grid;
   grid-template-columns: 80px 81px auto auto;
+  line-height: 1rem;
 }
 </style>
