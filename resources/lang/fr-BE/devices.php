@@ -79,4 +79,7 @@ return array (
   'participants' => 'Participants',
   'search_text' => 'Parcourez  notre base de données de réparation',
   'waste_prevented' => 'Déchets évités',
+  'close_record' => 'Fermer',
+  'repair_records' => 'Données de réparation',
+  'view_record' => 'Voir',
 );

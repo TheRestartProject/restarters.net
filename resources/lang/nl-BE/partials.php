@@ -28,6 +28,7 @@ return array (
   'diy' => 'Doe het zelf',
   'end' => 'Einde',
   'end_of_life' => 'Onherstelbaar',
+  'est_weight' => 'Geschat gewicht',
   'event_requires_moderation_by_an_admin' => 'De activiteit moet door een admin goedgekeurd worden',
   'fixed' => 'Hersteld',
   'getting_started_link' => 'Info en tips bekijken',
@@ -68,7 +69,6 @@ return array (
   'see_all_events' => 'Alle activiteiten bekijken',
   'see_more_posts' => 'Meer posts bekijken',
   'solution_text' => 'Is je oplossing nuttig voor andere Restarters die een gelijkaardig toestel proberen te herstellen? Of is het een leuke case study?',
-  'solution_text2' => 'Interesting case study to share?',
   'spare_parts' => 'Wisselstukken',
   'status' => 'Herstel status',
   'the_impact_of_restarters' => 'De impact van de Restart herstellers wereldwijd',
@@ -88,6 +88,7 @@ return array (
   'yes_third_party' => 'Ja - van een derde partij',
   'your_recent_events' => 'Je meest recente activiteiten',
   'your_recent_events_txt1' => 'Dit zijn activiteiten waarop je antwoordde of waaraan je werd toegevoegd door een organisator',
+  'solution_text2' => 'Interesting case study to share?',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
 );

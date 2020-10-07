@@ -1,0 +1,5 @@
+<?php
+
+return array (
+  'powered_only' => '(calculated from powered items only)',
+);

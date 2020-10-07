@@ -70,17 +70,22 @@
 
             foreach ($volunteers as $volunteer) {
               $volunteer['volunteer'] = $volunteer->volunteer;
-              $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+              $volunteer['userSkills'] = [];
+              $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
+
+              if (!empty($volunteer->volunteer)) {
+                  $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+                  $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+              }
 
               foreach ($volunteer['userSkills'] as $skill) {
                 // Force expansion
                 $skill->skillName->skill_name;
-        }
+              }
 
               $volunteer['fullName'] = $volunteer->getFullName();
-              $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
               $ret[] = $volunteer;
-        }
+            }
 
             return $ret;
           }
@@ -91,16 +96,16 @@
 
         // Trigger expansion of group.
         $group_image = $event->theGroup->groupImage;
-        if (is_object($group_image->image)) {
+        if (is_object($group_image) && is_object($group_image->image)) {
           $group_image->image->path;
         }
 
-        $can_edit_event = (FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator');
+        $can_edit_event = FixometerHelper::userHasEditPartyPermission($event->idevents);
         $is_attending = is_object($is_attending) && $is_attending->status == 1;
         ?>
 
         <div class="vue">
-          <EventHeading :event-id="{{ $event->idevents }}" :event="{{ $event }}" :is-attending="{{ $is_attending ? 'true' : 'false' }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}":in-group="{{ Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}" />
+          <EventHeading :event-id="{{ $event->idevents }}" :event="{{ $event }}" :is-attending="{{ $is_attending ? 'true' : 'false' }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}":in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}" />
         </div>
 
         <div class="d-flex flex-wrap">

@@ -69,7 +69,7 @@ return array (
   'add_event_content' => 'Annoncez votre événement sur le site du Restart Project, et faites‐en part à tous les Restarters de votre entourage.',
   'field_venue_helper' => 'i.e. l’endroit où va se dérouler l’événement',
   'field_event_name' => 'Nom de l’événement',
-  'field_event_name_helper' => 'Svp tapez le nom d’un lieu – évitez \'Restart Party\' ou \'Repair Cafe\'.',
+  'field_event_name_helper' => 'Svp tapez le nom d’un lieu – évitez \'Restart Party\' ou \'Repair Café\'.',
   'field_event_group' => 'Evénement du groupe',
   'field_event_desc' => 'Description',
   'field_event_date' => 'Date de l’événement',
@@ -110,4 +110,8 @@ return array (
   'shareable_link_box' => 'Lien partagé',
   'type_shareable_link_message' => 'Partagez le lien ci-dessus pour inviter des personnes à rejoindre l\'événement. Si une personne avec laquelle vous partagez le lien n\'a pas encore de compte, il lui sera demandé de s\'enregistrer.',
   'upcoming_for_your_groups' => 'Evénements à venir pour vos groupes',
+  'attended' => 'Ont participé',
+  'brand' => 'Marque',
+  'category' => 'Catégorie',
+  'see_all_attended' => 'Voir tous les participants',
 );

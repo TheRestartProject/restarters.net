@@ -91,4 +91,6 @@ return array (
   'shareable_link_box' => 'Lien partagé',
   'type_shareable_link_message' => 'Partagez le lien ci-dessus pour inviter les personnes à rejoindre ce groupe. Si une personne avec qui vous partagez le lien n\'a pas encore de compte, il lui sera demandé de s\'enregistrer.',
   'upcoming_none_planned' => 'Aucun prévu',
+  'created_at' => 'créé',
+  'create_groups_mobile' => 'créer',
 );
