@@ -13,8 +13,8 @@
           </h1>
         </div>
         <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
-          <div class="d-flex justify-content-between w-100 flex-wrap centreme">
-            <div>
+          <div class="d-flex justify-content-between w-100">
+            <div class="flex-wrap">
               <b>{{ group.location }}</b> <br />
               <ExternalLink v-if="group.website" :href="group.website">{{ translatedWebsite }}</ExternalLink>
             </div>
@@ -75,9 +75,6 @@ export default {
 
 .groupImage {
   width: 67px;
-  height: 67px;
-  object-fit: cover;
-  border: 3px solid black;
 }
 
 .maybeborder {
