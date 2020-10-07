@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     translatedModel() {
-      return this.$lang.get('devices.model')
+      return this.$lang.get('devices.model_or_type')
     },
     translatedTooltipModel() {
       return this.$lang.get('devices.tooltip_model')

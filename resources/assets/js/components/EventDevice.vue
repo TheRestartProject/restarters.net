@@ -4,8 +4,8 @@
       'add-device': add
       }">
     <div class="device-info">
-      <div class="br">
-        <b-card no-body class="p-3">
+      <div class="br d-flex flex-column">
+        <b-card no-body class="p-3 flex-grow-1 botwhite">
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
           <DeviceCategorySelect class="mb-2" :category.sync="category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
           <div v-if="powered">
@@ -18,14 +18,14 @@
 <!--          TODO Photos-->
         </b-card>
       </div>
-      <div>
-        <b-card no-body class="p-3">
+      <div class="d-flex flex-column botwhite">
+        <b-card no-body class="p-3 flex-grow-1">
           <h3 class="mt-2 mb-4">{{ translatedTitleRepair }}</h3>
           <DeviceRepairStatus :status.sync="status" :steps.sync="steps" :parts.sync="parts" :barriers.sync="barriers" :barrierList="barrierList" />
         </b-card>
       </div>
-      <div class="bl">
-        <b-card no-body class="p-3">
+      <div class="bl d-flex flex-column botwhite">
+        <b-card no-body class="p-3 flex-grow-1">
           <h3 class="mt-2 mb-4">{{ translatedTitleAssessment }}</h3>
           <DeviceProblem :problem.sync="problem" class="mb-4" />
           <DeviceNotes :notes.sync="notes" class="mb-4" />
@@ -39,7 +39,18 @@
         </b-card>
       </div>
     </div>
-<!--    TODO Footer buttons and actions-->
+    <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
+      <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
+        {{ translatedAddDevice }}
+      </b-btn>
+      <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
+        {{ translatedSave }}
+      </b-btn>
+      <DeviceQuantity :quantity.sync="quantity" class="flex-md-shrink-1 ml-4 mr-4" />
+      <b-btn variant="tertiary" class="ml-2" @click="cancel">
+        {{ translatedCancel }}
+      </b-btn>
+    </div>
   </b-form>
 
 
@@ -52,26 +63,8 @@
 <!--      @else-->
 <!--      <button type="submit" class="btn btn-primary btn-save2 mr-2">@lang('partials.add_device')</button>-->
 
-<!--      {{&#45;&#45; We only have the quantity when adding. &#45;&#45;}}-->
-<!--      <div class="form-control form-control__select flex-md-shrink-1 ml-4 mr-4" style="width: 70px;">-->
-<!--        <select name="quantity" class="quantity select2">-->
-<!--          <option selected value="1">1</option>-->
-<!--          <option value="2">2</option>-->
-<!--          <option value="3">3</option>-->
-<!--          <option value="4">4</option>-->
-<!--          <option value="5">5</option>-->
-<!--          <option value="6">6</option>-->
-<!--          <option value="7">7</option>-->
-<!--          <option value="8">8</option>-->
-<!--          <option value="9">9</option>-->
-<!--          <option value="10">10</option>-->
-<!--        </select>-->
-<!--      </div>-->
 <!--      @endif-->
 <!--      @endif-->
-<!--      <a class="collapsed ml-2" data-toggle="collapse" href="#add-edit-device-{{ $powered ? 'powered' : 'unpowered' }}-{{ $device->iddevices }}" role="button" aria-expanded="false" aria-controls="add-device">-->
-<!--        <button class="btn btn-tertiary" type="button">@lang('partials.cancel')</button>-->
-<!--      </a>-->
 <!--    </div>-->
 <!--  </b-form>-->
 <!--  @if (!$add)-->
@@ -124,9 +117,11 @@ import DeviceRepairStatus from './DeviceRepairStatus'
 import DeviceProblem from './DeviceProblem'
 import DeviceNotes from './DeviceNotes'
 import DeviceUsefulUrls from './DeviceUsefulUrls'
+import DeviceQuantity from './DeviceQuantity'
 
 export default {
   components: {
+    DeviceQuantity,
     DeviceUsefulUrls,
     DeviceNotes,
     DeviceProblem,
@@ -174,7 +169,8 @@ export default {
       barriers: null,
       problem: null,
       notes: null,
-      wiki: false
+      wiki: false,
+      quantity: 1
     }
   },
   computed: {
@@ -200,8 +196,30 @@ export default {
     },
     translatedCaseStudy() {
       return this.$lang.get('partials.solution_text2')
-    }
+    },
+    translatedSave() {
+      return this.$lang.get('partials.save')
+    },
+    translatedAddDevice() {
+      return this.$lang.get('partials.add_device')
+    },
+    translatedCancel() {
+      return this.$lang.get('partials.cancel')
+    },
   },
+  methods: {
+    cancel() {
+      this.$emit('cancel')
+    },
+    addDevice() {
+      // TODO
+      this.$emit('cancel')
+    },
+    saveDevice() {
+      // TODO
+      this.$emit('cancel')
+    }
+  }
 }
 </script>
 <style scoped lang="scss">
@@ -260,5 +278,9 @@ h3 {
   .card {
     background-color: $brand-light;
   }
+}
+
+.botwhite {
+  border-bottom: 1px solid white;
 }
 </style>

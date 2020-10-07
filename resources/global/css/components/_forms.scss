@@ -28,9 +28,16 @@
     width: 25px;
     height: 25px;
 
-    label.custom-control-label::before {
+    label.custom-control-label::before, label.custom-control-label::after {
       width: 25px;
       height: 25px;
+      border-radius: 0;
+    }
+
+    .custom-control-input:checked ~ .custom-control-label::after {
+      background-image: url('/images/tick.svg') !important;
+      background-color: white;
+      background-size: 23px 23px;
     }
   }
 }
