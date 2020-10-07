@@ -185,59 +185,6 @@
             :barrier-list="{{ json_encode(FixometerHelper::allBarriers()) }}"
           />
         </div>
-
-        <div class="col-lg-12 p-sm-0">
-          <h2 id="devices" class="d-none d-lg-block"><svg width="20" height="18" viewBox="0 0 15 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="position:relative;z-index:1;top:-3px;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M13.528,13.426l-12.056,0c-0.812,0 -1.472,-0.66 -1.472,-1.472l0,-7.933c0,-0.812 0.66,-1.472 1.472,-1.472l4.686,0l-1.426,-2.035c-0.059,-0.086 -0.039,-0.203 0.047,-0.263l0.309,-0.217c0.086,-0.06 0.204,-0.039 0.263,0.047l1.729,2.468l0.925,0l1.728,-2.468c0.06,-0.086 0.178,-0.107 0.263,-0.047l0.31,0.217c0.085,0.06 0.106,0.177 0.046,0.263l-1.425,2.035l4.601,0c0.812,0 1.472,0.66 1.472,1.472l0,7.933c0,0.812 -0.66,1.472 -1.472,1.472Zm-4.012,-9.499l-7.043,0c-0.607,0 -1.099,0.492 -1.099,1.099l0,5.923c0,0.607 0.492,1.099 1.099,1.099l7.043,0c0.606,0 1.099,-0.492 1.099,-1.099l0,-5.923c0,-0.607 -0.493,-1.099 -1.099,-1.099Zm3.439,3.248c0.448,0 0.812,0.364 0.812,0.812c0,0.449 -0.364,0.813 -0.812,0.813c-0.448,0 -0.812,-0.364 -0.812,-0.813c0,-0.448 0.364,-0.812 0.812,-0.812Zm0,-2.819c0.448,0 0.812,0.364 0.812,0.812c0,0.449 -0.364,0.813 -0.812,0.813c-0.448,0 -0.812,-0.364 -0.812,-0.813c0,-0.448 0.364,-0.812 0.812,-0.812Z" style="fill:#0394a6;"/></svg> @lang('devices.title_items_at_event') <span id="devices-total" class="badge badge-pill badge-primary">{{ $stats['devices_powered'] + $stats['devices_unpowered'] }}</span></h2>
-          <h2 id="devices" class="collapse-header"><a class="collapsed" data-toggle="collapse" href="#devices-section" role="button" aria-expanded="false" aria-controls="devices-section"><b>@lang('devices.title_items_at_event')</b> <span class="font-weight-light">({{ $stats['devices_powered'] + $stats['devices_unpowered'] }})</span></a></h2>
-
-          <div id="devices-section" class="collapse d-lg-block collapse-section p-0 ourtabs ourtabs-brand">
-            <ul class="nav nav-tabs d-flex" id="myTab" role="tablist">
-              <li class="nav-item flex-grow-1 active">
-                <a class="nav-link active" id="items-powered-tab" data-toggle="tab" href="#items-powered" role="tab" aria-controls="items-powered" aria-selected="true"><b>@lang('devices.title_powered')</b> <span id="devices-powered">({{ $stats['devices_powered'] }})</span></a>
-              </li>
-              <li class="nav-item flex-grow-1">
-                <a class="nav-link" id="items-unpowered-tab" data-toggle="tab" href="#items-unpowered" role="tab" aria-controls="items-unpowered"><b>@lang('devices.title_unpowered')</b> <span id="devices-unpowered">({{ $stats['devices_unpowered'] }})</span></a>
-              </li>
-            </ul>
-            <div class="tab-content" id="itemsTabContent">
-              <div class="tab-pane fade show active" id="items-powered" role="tabpanel" aria-labelledby="items-powered-tab">
-                <p class="mt-3">@lang('devices.description_powered')</p>
-                @include('partials.device-list', [
-                    'powered' => TRUE,
-                    'event_id' => $event->idevents
-                ])
-                  @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($event->idevents, Auth::user()->id) ) )
-                  <a class="collapsed row-button" id="open-add-powered" data-toggle="collapse" href="#add-edit-device-powered-" role="button" aria-expanded="false" aria-controls="add-edit-device-powered-">
-                    <button class="btn btn-primary text-center mb-4 ml-4 align-bottom" type="button"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> @lang('partials.add_device_powered')</button>
-                  </a>
-                  @include('fixometer.device-add-or-edit', [
-                      'device' => new \App\Device(),
-                      'powered' => TRUE,
-                      'add' => TRUE,
-                      'edit' => FALSE
-                  ])
-                @endif
-              </div>
-              <div class="tab-pane fade" id="items-unpowered" role="tabpanel" aria-labelledby="items-unpowered-tab">
-                <p class="mt-3">@lang('devices.description_unpowered')</p>
-                @include('partials.device-list', [
-                    'powered' => FALSE
-                ])
-                  @if( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($event->idevents, Auth::user()->id) ) )
-                  <a class="collapsed row-button" id="open-add-unpowered" data-toggle="collapse" href="#add-edit-device-unpowered-" role="button" aria-expanded="false" aria-controls="add-edit-device-unpowered-">
-                    <button class="btn btn-primary text-center mb-4 ml-4 align-bottom" type="button"><img style="width:20px;height:20px" class="mb-1" src="/images/add-icon.svg" /> @lang('partials.add_device_unpowered')</button>
-                  </a>
-                  @include('fixometer.device-add-or-edit', [
-                      'device' => new \App\Device(),
-                      'powered' => FALSE,
-                      'add' => TRUE,
-                      'edit' => FALSE
-                  ])
-                @endif
-              </div>
-            </div>
-          </div>
-        </div>
       @endif
     </div>
   </section>

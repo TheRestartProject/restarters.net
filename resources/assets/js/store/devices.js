@@ -17,6 +17,11 @@ export default {
     set(state, params) {
       Vue.set(state.list, params.eventId, params.devices)
     },
+    add(state, params) {
+      // Add the new devices to the existing list.
+      Vue.set(state.list, params.eventId, state.list[params.eventId].concat(params.devices))
+      console.log("Now got devices", state.list[params.eventId])
+    },
     remove(state, params) {
       let newarr = state.list[params.eventId].filter((a) => {
         return a.user !== params.userId
@@ -29,7 +34,11 @@ export default {
     set({commit}, params) {
       commit('set', params);
     },
+    add({commit}, params) {
+      commit('add', params);
+    },
     async remove({commit}, params) {
+      // TODO
       let ret = await axios.post('/party/remove-volunteer', {
         user_id: params.userId,
         event_id: params.eventId

@@ -3,7 +3,7 @@
     <label class="text-bold text-white">
       {{ translatedAge }}
     </label>
-    <b-input type="number" @change="$emit('update:age', $event)" size="lg" class="marg"  min="0" step="0.5" autocomplete="off" />
+    <b-input type="number" @change="$emit('update:age', parseInt($event))" size="lg" class="marg"  min="0" step="0.5" autocomplete="off" />
     <span class="text-right mb-1 text-white">
       {{ translatedAgeApprox }}
     </span>

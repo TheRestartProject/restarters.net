@@ -607,7 +607,6 @@ class DeviceController extends Controller
             } elseif (count($barrier) > 0) {
                 $spare_parts = 2;
             }
-            // EO new logic Nov 2018
 
             $device[$i]->spare_parts = isset($spare_parts) ? $spare_parts : 0;
             $device[$i]->parts_provider = $parts_provider;
@@ -615,8 +614,6 @@ class DeviceController extends Controller
             $device[$i]->repaired_by = Auth::id();
 
             $device[$i]->save();
-
-            $powered = $device[$i]->deviceCategory->powered;
 
             if ($useful_url) {
                 // Devices can have multiple URLs, but we only support one on the create - and it gets applied to each
@@ -644,101 +641,19 @@ class DeviceController extends Controller
                     'event_url' => url('/party/edit/'.$event_id),
                 ]));
             }
+
+            // Expand a few things so that the new devices are returned with the same information that existing
+            // ones are returned in view.
+            $device[$i]->category = $device[$i]->deviceCategory;
+            $device[$i]->shortProblem = $device[$i]->getShortProblem();
+            $device[$i]->urls;
         }
         // end quantity loop
 
-        $brands = Brands::all();
-        $clusters = Cluster::all();
-        $is_attending = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
-
-        //Change to handle loop
-        foreach ($device as $d) {
-            $views[] = View::make('partials.tables.row-device', [
-                'device' => $d,
-                'clusters' => $clusters,
-                'brands' => $brands,
-                'is_attending' => $is_attending,
-                'powered' => $d->deviceCategory->powered
-            ])->render();
-        }
-        //end of handle loop
-
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
-
-        $stats = $event->getEventStats($emissionRatio);
-
-        // get the number of rows in the DB where event id already exists
-        $deviceCount = DB::table('devices')->where('event', $event_id)->count();
-
-        $return['html'] = $views;
         $return['success'] = true;
-        $return['stats'] = $stats;
-        $return['deviceCount'] = $deviceCount;
-        $return['deviceMiscCount'] = $deviceMiscCount;
-        $return['powered'] = $powered;
+        $return['devices'] = $device;
 
         return response()->json($return);
-
-        //$brand_name = Brands::find($brand)->brand_name;
-
-      // $data = [];
-      //
-      // if ($post_data['repair_status'] == 2) {
-      //   switch ($post_data['repair_details']) {
-      //     case 1:
-      //         Device::create([
-      //           'event' => $request->input('event_id'),
-      //           'category' => $post_data['category'],
-      //           'category_creation' => $post_data['category'],
-      //           'brand' => $brand,
-      //           'model' => $post_data['model'],
-      //           'age' => $post_data['age'],
-      //           'problem' => $post_data['problem'],
-      //           'spare_parts' => $post_data['spare_parts'],
-      //           'repair_status' => $post_data['repair_status'],
-      //           'repaired_by' => Auth::id(),
-      //           'more_time_needed' => 1,
-      //         ]);
-      //         break;
-      //     case 2:
-      //         Device::create([
-      //           'event' => $request->input('event_id'),
-      //           'category' => $post_data['category'],
-      //           'category_creation' => $post_data['category'],
-      //           'brand' => $brand,
-      //           'model' => $post_data['model'],
-      //           'age' => $post_data['age'],
-      //           'problem' => $post_data['problem'],
-      //           'spare_parts' => $post_data['spare_parts'],
-      //           'repair_status' => $post_data['repair_status'],
-      //           'repaired_by' => Auth::id(),
-      //           'professional_help' => 1,
-      //         ]);
-      //         break;
-      //     case 3:
-      //         Device::create([
-      //           'event' => $request->input('event_id'),
-      //           'category' => $post_data['category'],
-      //           'category_creation' => $post_data['category'],
-      //           'brand' => $brand,
-      //           'model' => $post_data['model'],
-      //           'age' => $post_data['age'],
-      //           'problem' => $post_data['problem'],
-      //           'spare_parts' => $post_data['spare_parts'],
-      //           'repair_status' => $post_data['repair_status'],
-      //           'repaired_by' => Auth::id(),
-      //           'do_it_yourself' => 1,
-      //         ]);
-      //         break;
-      //   }
-      //
-      //   if ($post_data['repair_status'] == 0) {
-      //     $data['error'] = "Device couldn't be added - no repair details added";
-      //   }
-      //
-      // } else {
-      // }
     }
 
     public function ajaxEdit(Request $request, $id)

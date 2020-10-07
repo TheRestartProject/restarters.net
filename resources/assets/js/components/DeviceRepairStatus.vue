@@ -192,13 +192,11 @@ export default {
       get() {
         // We have an array of ids which we need to map to an array of options.
         return this.barrierList.filter(b => {
-          console.log("Get barriers", this.barriers)
           return this.barriers && this.barriers.indexOf(b.id) !== -1
         })
       },
       set(newval) {
         // We have an array of options we want to emit as an array of ids.
-        console.log("Set barriers", newval.map(o => o.id))
         this.$emit('update:barriers', newval.map(o => o.id))
       }
     },

@@ -7,31 +7,31 @@
       <div class="br d-flex flex-column">
         <b-card no-body class="p-3 flex-grow-1 botwhite">
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
-          <DeviceCategorySelect class="mb-2" :category.sync="category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
+          <DeviceCategorySelect class="mb-2" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
           <div v-if="powered">
-            <DeviceBrandSelect class="mb-2" :brand.sync="brand" :brands="brands" />
-            <DeviceModel class="mb-2" :model.sync="model" />
+            <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" />
+            <DeviceModel class="mb-2" :model.sync="currentDevice.model" />
           </div>
-          <DeviceType class="mb-2" :type.sync="type" v-else />
-          <DeviceWeight v-if="showWeight" :estimate.sync="estimate" />
-          <DeviceAge :age.sync="age" />
+          <DeviceType class="mb-2" :type.sync="currentDevice.type" v-else />
+          <DeviceWeight v-if="showWeight" :estimate.sync="currentDevice.estimate" />
+          <DeviceAge :age.sync="currentDevice.age" />
 <!--          TODO Photos-->
         </b-card>
       </div>
       <div class="d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1">
           <h3 class="mt-2 mb-4">{{ translatedTitleRepair }}</h3>
-          <DeviceRepairStatus :status.sync="status" :steps.sync="steps" :parts.sync="parts" :barriers.sync="barriers" :barrierList="barrierList" />
+          <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.repair_details" :parts.sync="currentDevice.spare_parts" :barriers.sync="currentDevice.barrier" :barrierList="barrierList" />
         </b-card>
       </div>
       <div class="bl d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1">
           <h3 class="mt-2 mb-4">{{ translatedTitleAssessment }}</h3>
-          <DeviceProblem :problem.sync="problem" class="mb-4" />
-          <DeviceNotes :notes.sync="notes" class="mb-4" />
-          <DeviceUsefulUrls :device="device" class="mb-2" />
+          <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" />
+          <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" />
+          <DeviceUsefulUrls :device="device" :useful-urls.sync="currentDevice.usefulURLs" class="mb-2" />
           <div class="d-flex">
-            <b-form-checkbox class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" />
+            <b-form-checkbox v-model="currentDevice.wiki" class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" />
             <label class="text-white" :for="'wiki-' + (add ? '' : device.iddevices)">
               {{ translatedCaseStudy }}
             </label>
@@ -46,7 +46,7 @@
       <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
         {{ translatedSave }}
       </b-btn>
-      <DeviceQuantity :quantity.sync="quantity" class="flex-md-shrink-1 ml-4 mr-4" />
+      <DeviceQuantity :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-4 mr-4" />
       <b-btn variant="tertiary" class="ml-2" @click="cancel">
         {{ translatedCancel }}
       </b-btn>
@@ -88,7 +88,6 @@
 <script>
 // TODO Edit / delete
 // TODO Remove redundant blades
-// TODO Remove $('.add-device').on('submit', edit too
 import event from '../mixins/event'
 import {
   FIXED,
@@ -147,21 +146,7 @@ export default {
   },
   data () {
     return {
-      // TODO These should really come from a device object in the store
-      category: null,
-      brand: null,
-      model: null,
-      type: null,
-      estimate: null,
-      age: null,
-      status: null,
-      parts: null,
-      steps: null,
-      barriers: null,
-      problem: null,
-      notes: null,
-      wiki: false,
-      quantity: 1
+      currentDevice: {},
     }
   },
   computed: {
@@ -198,12 +183,64 @@ export default {
       return this.$lang.get('partials.cancel')
     },
   },
+  mounted() {
+    // We take a copy of what's passed in so that we can then edit it in here before saving or cancelling.  We need
+    this.currentDevice = {
+      event_id: this.eventId,
+      category: null,
+      brand: null,
+      model: null,
+      age: null,
+      repair_status: null,
+      spare_parts: null,
+      problem: null,
+      assessment: null,
+      quantity: 1
+    }
+
+    if (this.device) {
+      this.currentDevice = {...this.currentDevice, ...this.device}
+    }
+  },
   methods: {
     cancel() {
       this.$emit('cancel')
     },
-    addDevice() {
-      // TODO
+    async addDevice() {
+      // The device we send to the server is what is in currentDevice, with a couple of tweaks:
+      // - The server takes the brand as a string rather than an id.
+      // - The server only supports a single useful URL on add, via the url and source parameters
+      // We map those here to keep the interface to the components neater.
+      let device = this.currentDevice
+
+      if (device.urls && device.urls.length) {
+        device.url = device.urls[0].url
+        device.source = device.urls[0].source
+      }
+
+      const selectedBrand = this.brands.find(b => {
+        return b.id === device.brand
+      })
+
+      device.brand = selectedBrand ? selectedBrand.brand_name : null
+
+      console.log("Create device with", device)
+      let ret = await axios.post('/device/create', device, {
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        }
+      })
+
+      console.log("Returned", ret)
+
+      if (ret && ret.data && ret.data.success && ret.data.devices) {
+        // We have been returned the device objects from the server.  Add them into the store, and lo!  All our
+        // stats and views will update.
+        await this.$store.dispatch('devices/add', {
+          eventId: this.eventId,
+          devices: ret.data.devices
+        })
+      }
       this.$emit('cancel')
     },
     saveDevice() {
