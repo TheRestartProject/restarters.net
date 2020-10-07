@@ -536,21 +536,6 @@ h2 {
   }
 }
 
-.multiselect-caret {
-  position: absolute;
-  top: 1px;
-  right: 1px;
-  width: 20px;
-
-  b {
-    border-width: 5px 4px 0 4px;
-    margin-left: -4px;
-    margin-top: -2px;
-    position: absolute;
-    top: 50%;
-  }
-}
-
 .multiselect {
   font-family: "Open Sans", "sans-serif" !important;
 
@@ -590,6 +575,8 @@ h2 {
       padding-top: 5px;
       min-height: 25px !important;
       line-height: 25px !important;
+      font-weight: bold;
+      color: black !important;
     }
 
     .multiselect__tag {
@@ -614,41 +601,41 @@ h2 {
       line-height: 35px !important
     }
   }
-}
 
-.multiselect__select {
-  padding: 8px 8px !important;
-  top: 12px !important;
-  margin-top: -9px !important;
-  padding-left: 0px !important;
-  padding-right: 0px !important;
+  .multiselect__select {
+    padding: 8px 8px !important;
+    top: 12px !important;
+    margin-top: -9px !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
 
-  &:before {
-    border: solid black;
-    top: 83% !important;
-    border-width: 8px 8px 0 !important;
-    border-color: black transparent transparent !important;
+    &:before {
+      border: solid black;
+      top: 83% !important;
+      border-width: 8px 8px 0 !important;
+      border-color: black transparent transparent !important;
+    }
   }
-}
 
-.multiselect__option--selected {
-  background-color: $brand-muted;
-}
+  .multiselect__option--selected {
+    background-color: $brand-muted;
+  }
 
-.multiselect__tag span {
-  margin-right: 10px !important;
-}
+  .multiselect__tag span {
+    margin-right: 10px !important;
+  }
 
-.multiselect__input {
-  padding-top: 6px !important;
-  padding-left: 6px !important;
-}
+  .multiselect__input {
+    padding-top: 6px !important;
+    padding-left: 6px !important;
+  }
 
-.multiselect__placeholder {
-  padding-left: 6px !important;
-  padding-top: 0px !important;
-  margin-bottom: 3px !important;
-  margin-top: 3px !important;
-  font-size: 15px !important;
-  color: $brand-placeholder !important;
+  .multiselect__placeholder {
+    padding-left: 6px !important;
+    padding-top: 0px !important;
+    margin-bottom: 3px !important;
+    margin-top: 3px !important;
+    font-size: 15px !important;
+    color: $brand-placeholder !important;
+  }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="font-weight-bold">
+  <div>
     <multiselect
         v-model="quantityValue"
         :options="quantities"

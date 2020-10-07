@@ -56,17 +56,6 @@
 
 
 
-<!--    <div class="d-flex justify-content-center flex-wrap {{ $edit ? 'card-event-edit-item' :  'card-event-add-item' }} pt-4 pb-4">-->
-<!--      @if ($add || $edit)-->
-<!--      @if ($edit)-->
-<!--      <button type="submit" class="btn btn-primary btn-save2 mr-2">@lang('partials.save')</button>-->
-<!--      @else-->
-<!--      <button type="submit" class="btn btn-primary btn-save2 mr-2">@lang('partials.add_device')</button>-->
-
-<!--      @endif-->
-<!--      @endif-->
-<!--    </div>-->
-<!--  </b-form>-->
 <!--  @if (!$add)-->
 <!--  <label for="file" class="photolabel">@lang('devices.images')</label>-->
 <!--  @endif-->
@@ -98,6 +87,8 @@
 </template>
 <script>
 // TODO Edit / delete
+// TODO Remove redundant blades
+// TODO Remove $('.add-device').on('submit', edit too
 import event from '../mixins/event'
 import {
   FIXED,
