@@ -63,7 +63,7 @@ export default {
       return 'impact-stat impact-stat-' + this.size + ' impact-stat-' + this.variant
     },
     translatedTitle() {
-      return this.$lang.get(this.title)
+      return this.$lang.choice(this.title, this.roundedCount)
     },
     translatedSubtitle() {
       return this.$lang.get(this.subtitle)
