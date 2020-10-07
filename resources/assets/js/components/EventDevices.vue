@@ -16,7 +16,7 @@
           <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingPowered = true">
             <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddPowered }}
           </b-btn>
-          <EventDevice :powered="true" :add="true" :edit="false" :clusters="clusters" :event-id="eventId" :event="event" :brands="brands" :barrier-list="barrierList" />
+          <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :event-id="eventId" :event="event" :brands="brands" :barrier-list="barrierList" />
         </b-tab>
         <b-tab title-item-class="w-50" class="pt-2">
           <template slot="title">
@@ -27,7 +27,7 @@
           <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingUnpowered = true">
             <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddUnpowered }}
           </b-btn>
-          <EventDevice :powered="false" :add="true" :edit="false" :clusters="clusters" :event-id="eventId" :event="event" :brands="brands" :barrier-list="barrierList" />
+          <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :event-id="eventId" :event="event" :brands="brands" :barrier-list="barrierList" />
         </b-tab>
       </b-tabs>
     </template>
@@ -47,7 +47,7 @@ export default {
   data () {
     return {
       addingPowered: false,
-      addingInowered: false,
+      addingUnpowered: false,
     }
   },
   computed: {

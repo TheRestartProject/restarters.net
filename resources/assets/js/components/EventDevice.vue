@@ -30,8 +30,12 @@
           <DeviceProblem :problem.sync="problem" class="mb-4" />
           <DeviceNotes :notes.sync="notes" class="mb-4" />
           <DeviceUsefulUrls :device="device" class="mb-2" />
-<!--          TODO Useful URLs-->
-<!--          TODO Case study-->
+          <div class="d-flex">
+            <b-form-checkbox class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" />
+            <label class="text-white" :for="'wiki-' + (add ? '' : device.iddevices)">
+              {{ translatedCaseStudy }}
+            </label>
+          </div>
         </b-card>
       </div>
     </div>
@@ -41,16 +45,6 @@
 
 
 
-<!--            @include('partials.useful-repair-urls-add-or-edit', ['urls' => $device->urls, 'device' => $device, 'editable' => $add || $edit])-->
-
-<!--            <div class="form-check d-flex align-items-center justify-content-start">-->
-<!--              <input class="form-check-input form-check-large" type="checkbox" id="wiki-{{ $device->iddevices }}" name="wiki" value="1" @if( $device->wiki == 1 ) checked @endif>-->
-<!--              <label class="form-check-label" for="wiki-{{ $device->iddevices }}">@lang('partials.solution_text2')</label>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
 <!--    <div class="d-flex justify-content-center flex-wrap {{ $edit ? 'card-event-edit-item' :  'card-event-add-item' }} pt-4 pb-4">-->
 <!--      @if ($add || $edit)-->
 <!--      @if ($edit)-->
@@ -179,7 +173,8 @@ export default {
       steps: null,
       barriers: null,
       problem: null,
-      notes: null
+      notes: null,
+      wiki: false
     }
   },
   computed: {
@@ -203,6 +198,9 @@ export default {
     translatedCategory() {
       return this.$lang.get('devices.category')
     },
+    translatedCaseStudy() {
+      return this.$lang.get('partials.solution_text2')
+    }
   },
 }
 </script>
@@ -254,10 +252,6 @@ h3 {
   font-size: 0.9rem;
   color: #fff;
   font-weight: bold;
-}
-
-.edit-device {
-
 }
 
 .add-device {

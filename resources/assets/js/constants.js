@@ -27,4 +27,7 @@ export const SPARE_PARTS_NOT_NEEDED = 2
 export const SPARE_PARTS_THIRD_PARTY = 3
 export const SPARE_PARTS_HISTORICAL = 4
 
+export const USEFUL_URL_SOURCE_MANUFACTURER = 1
+export const USEFUL_URL_SOURCE_THIRD_PARTY = 2
+
 export const CATEGORY_MISC = 46

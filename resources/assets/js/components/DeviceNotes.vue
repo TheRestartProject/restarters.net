@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 device-select-row">
-    <b-textarea rows="6" @change="$emit('update:notes', $event)" :placeholder="translatedNotes" class="marg">
+    <b-textarea rows="6" @change="$emit('update:notes', $event)" :placeholder="translatedNotes">
       {{ value }}
     </b-textarea>
     <div v-b-popover.html.left :title="translatedTooltipNotes" class="ml-3 mt-2">
@@ -34,9 +34,3 @@ export default {
   }
 }
 </script>
-<style scoped lang="scss">
-.marg {
-  // Some card styles are getting in the way.
-  margin: 2px !important;
-}
-</style>
