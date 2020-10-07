@@ -241,56 +241,36 @@ class Group extends Model implements Auditable
 
     public function getGroupStats($emissionRatio)
     {
-        $Device = new Device;
-
-        $allPastParties = Party::pastEvents()
-                        ->with('devices.deviceCategory')
+        $allPastEvents = Party::pastEvents()
                         ->where('events.group', $this->idgroups)
                         ->get();
 
-        $participants = 0;
-        $hours_volunteered = 0;
-        $co2 = 0;
-        $ewaste = 0;
-        $unpowered_waste = 0;
-        $fixed_devices = 0;
-        $fixed_powered = 0;
-        $fixed_unpowered = 0;
-        $repairable_devices = 0;
-        $dead_devices = 0;
-        $no_weight = 0;
-        $devices_powered = 0;
-        $devices_unpowered = 0;
+        $groupStats = [];
 
-        foreach ($allPastParties as $event) {
+        // Rollup all events stats into stats for this group.
+        foreach ($allPastEvents as $event) {
             $eventStats = $event->getEventStats($emissionRatio);
 
-            $co2 += $eventStats['co2'];
-            $participants += $eventStats['participants'];
-            $hours_volunteered += $event->hoursVolunteered();
-            $ewaste += $eventStats['ewaste'];
-            $unpowered_waste += $eventStats['unpowered_waste'];
-
-            $fixed_devices += $eventStats['fixed_devices'];
-            $fixed_powered += $eventStats['fixed_powered'];
-            $fixed_unpowered += $eventStats['fixed_unpowered'];
-            $repairable_devices += $eventStats['repairable_devices'];
-            $dead_devices += $eventStats['dead_devices'];
-            $no_weight += $eventStats['no_weight'];
-            $devices_powered += $eventStats['devices_powered'];
-            $devices_unpowered += $eventStats['devices_unpowered'];
+            foreach ($eventStats as $statKey => $statValue) {
+                if (! array_key_exists($statKey, $groupStats)) {
+                    $groupStats[$statKey] = 0;
+                }
+                $groupStats[$statKey] += $statValue;
+            }
         }
 
+        // Keeping the specific subset of stats returned for now,
+        // with existing names.
         return [
-            'pax' => $participants,
-            'hours' => $hours_volunteered,
-            'parties' => count($allPastParties),
-            'co2' => $co2,
-            'ewaste' => $ewaste,
-            'unpowered_waste' => $unpowered_waste,
-            'repairable_devices' => $repairable_devices,
-            'dead_devices' => $dead_devices,
-            'no_weight' => $no_weight,
+            'pax' => $groupStats['participants'],
+            'hours' => $groupStats['hours_volunteered'],
+            'parties' => count($allPastEvents),
+            'co2' => $groupStats['co2'],
+            'ewaste' => $groupStats['ewaste'],
+            'unpowered_waste' => $groupStats['unpowered_waste'],
+            'repairable_devices' => $groupStats['repairable_devices'],
+            'dead_devices' => $groupStats['dead_devices'],
+            'no_weight' => $groupStats['no_weight'],
         ];
     }
 

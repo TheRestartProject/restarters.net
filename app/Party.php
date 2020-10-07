@@ -691,6 +691,7 @@ class Party extends Model implements Auditable
                 'no_weight' => $no_weight,
                 'participants' => $this->pax,
                 'volunteers' => $this->volunteers,
+                'hours_volunteered' => $this->hoursVolunteered(),
                 'devices_powered' => $devices_powered,
                 'devices_unpowered' => $devices_unpowered
             ];
