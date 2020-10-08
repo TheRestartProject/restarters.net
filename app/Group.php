@@ -268,6 +268,7 @@ class Group extends Model implements Auditable
             'co2' => $groupStats['co2'],
             'ewaste' => $groupStats['ewaste'],
             'unpowered_waste' => $groupStats['unpowered_waste'],
+            'waste' => $groupStats['ewaste'] + $groupStats['unpowered_waste'],
             'repairable_devices' => $groupStats['repairable_devices'],
             'dead_devices' => $groupStats['dead_devices'],
             'no_weight' => $groupStats['no_weight'],
