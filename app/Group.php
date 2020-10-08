@@ -262,16 +262,16 @@ class Group extends Model implements Auditable
         // Keeping the specific subset of stats returned for now,
         // with existing names.
         return [
-            'pax' => $groupStats['participants'],
-            'hours' => $groupStats['hours_volunteered'],
+            'pax' => $groupStats['participants'] ?? 0,
+            'hours' => $groupStats['hours_volunteered'] ?? 0,
             'parties' => count($allPastEvents),
-            'co2' => $groupStats['co2'],
-            'ewaste' => $groupStats['ewaste'],
-            'unpowered_waste' => $groupStats['unpowered_waste'],
-            'waste' => $groupStats['ewaste'] + $groupStats['unpowered_waste'],
-            'repairable_devices' => $groupStats['repairable_devices'],
-            'dead_devices' => $groupStats['dead_devices'],
-            'no_weight' => $groupStats['no_weight'],
+            'co2' => $groupStats['co2'] ?? 0,
+            'ewaste' => $groupStats['ewaste'] ?? 0,
+            'unpowered_waste' => $groupStats['unpowered_waste'] ?? 0,
+            'waste' => ($groupStats['ewaste'] ?? 0) + ($groupStats['unpowered_waste'] ?? 0),
+            'repairable_devices' => $groupStats['repairable_devices'] ?? 0,
+            'dead_devices' => $groupStats['dead_devices'] ?? 0,
+            'no_weight' => $groupStats['no_weight'] ?? 0,
         ];
     }
 
