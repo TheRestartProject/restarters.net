@@ -41,8 +41,4 @@ export default {
 .readmore {
   white-space: pre-wrap !important;
 }
-
-.icon {
-  width: 30px;
-}
 </style>

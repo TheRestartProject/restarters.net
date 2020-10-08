@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="canedit">
-      <b-dropdown variant="primary" :text="translatedGroupActions" v-if="canedit">
+      <b-dropdown variant="primary" :text="translatedGroupActions" v-if="canedit" class="deepnowrap">
         <b-dropdown-item :href="'/group/edit/' + groupId">
           {{ translatedEditGroup }}
         </b-dropdown-item>
@@ -20,7 +20,7 @@
       </b-dropdown>
     </div>
     <div v-else>
-      <b-dropdown variant="primary" :text="translatedGroupActions" v-if="canedit">
+      <b-dropdown variant="primary" :text="translatedGroupActions" v-if="canedit" class="deepnowrap">
         <b-dropdown-item data-toggle="modal" data-target="#invite-to-group" v-if="ingroup">
           {{ translatedInviteVolunteers }}
         </b-dropdown-item>
