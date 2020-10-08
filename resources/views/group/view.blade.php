@@ -91,12 +91,12 @@
           <div class="vue-placeholder-content">@lang('partials.loading')...</div>
       </div>
 
-      <div class="vue w-100">
+      <div class="vue w-100 mt-md-50">
           <GroupStats :stats="{{ json_encode($group->getGroupStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}" />
       </div>
 
 
-          <div class="row">
+          <div class="row mt-md-50">
             <div class="col-lg-12">
                 <h2 id="upcoming-grp">@lang('groups.group_events')
                   @if ( Auth::check() && $group->isVolunteer() )
@@ -178,7 +178,7 @@
             </div>
           </div>
 
-            <div class="row mt-20">
+            <div class="row mt-md-50">
 
                 <div class="col-lg-12">
                 <h2 id="device-breakdown">@lang('groups.device_breakdown')</h2>
