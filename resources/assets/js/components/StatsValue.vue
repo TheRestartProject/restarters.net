@@ -1,6 +1,6 @@
 <template>
   <div :class="className">
-    <div class="impact-stat-icon mt-3 mb-2">
+    <div class="impact-stat-icon mt-2 mb-2">
       <b-img :src="src" class="impact-stat-img" />
     </div>
     <div :class="'impact-stat-count impact-stat-count-' + variant">
@@ -106,18 +106,16 @@ export default {
     color: white;
 
     display: flex;
-    justify-content: left;
-
-    .impact-stat-count {
-      margin-left: 1rem;
-    }
+    justify-content: center;
 
     .impact-stat-icon {
+      margin-right: 0.5rem;
       margin-top: 0.5rem !important;
+      height: auto;
     }
 
-    .impact-stat-title {
-      margin-left: 0.5rem;
+    .impact-stat-count {
+      margin-right: 0.5rem;
     }
 
     @include media-breakpoint-up(md) {
@@ -125,11 +123,11 @@ export default {
       justify-content: center;
 
       .impact-stat-count {
-        margin-left: 0px;
+        margin-right: 0px;
       }
 
-      .impact-stat-title {
-        margin-left: 0px;
+      .impact-stat-icon {
+        margin-right: 0px;
       }
     }
   }
