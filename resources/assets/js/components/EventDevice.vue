@@ -12,8 +12,8 @@
             <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" />
             <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" />
           </div>
-          <DeviceType class="mb-2" :type.sync="currentDevice.type" :icon-variant="add ? 'black' : 'brand'" v-else />
-          <DeviceWeight v-if="showWeight" :estimate.sync="currentDevice.estimate" />
+          <DeviceType class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" v-else />
+          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" />
           <DeviceAge :age.sync="currentDevice.age" />
 <!--          TODO Photos-->
         </b-card>
@@ -39,6 +39,9 @@
         </b-card>
       </div>
     </div>
+    <div>
+      {{ currentDevice }}
+    </div>
     <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
       <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
         {{ translatedAddDevice }}
@@ -46,7 +49,7 @@
       <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
         {{ translatedSave }}
       </b-btn>
-      <DeviceQuantity :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-4 mr-4" />
+      <DeviceQuantity :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2" />
       <b-btn variant="tertiary" class="ml-2" @click="cancel">
         {{ translatedCancel }}
       </b-btn>
@@ -155,7 +158,7 @@ export default {
     showWeight() {
       // Powered devices don't allow editing of the weight except for the "None of the above" category, whereas
       // unpowered do.
-      return (this.device && !this.device.powered) || this.category === CATEGORY_MISC
+      return !this.powered || (this.currentDevice && this.currentDevice.category === CATEGORY_MISC)
     },
     translatedTitleItems() {
       return this.$lang.get('devices.title_items')
@@ -199,6 +202,17 @@ export default {
 
     if (this.device) {
       this.currentDevice = {...this.currentDevice, ...this.device}
+
+      // Some values we need to munge back to the id for our selects.
+      if (this.currentDevice.category) {
+        this.currentDevice.category = this.currentDevice.category.idcategories
+      }
+
+      if (this.currentDevice.brand) {
+        this.currentDevice.brand = this.brands.find(b => {
+          return b.brand_name === this.currentDevice.brand
+        }).id
+      }
     }
   },
   methods: {
@@ -271,6 +285,10 @@ export default {
 .device-info {
   display: grid;
   grid-template-columns: repeat( auto-fit, minmax(350px, 1fr) );
+
+  @include media-breakpoint-down(sm) {
+    grid-template-columns: 100%;
+  }
 
   .useful-repair-urls .input-group .form-control {
     border-radius: initial;

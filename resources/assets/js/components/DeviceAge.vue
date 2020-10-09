@@ -3,7 +3,7 @@
     <label class="text-bold">
       {{ translatedAge }}
     </label>
-    <b-input type="number" @change="$emit('update:age', parseInt($event))" size="lg" class="marg"  min="0" step="0.5" autocomplete="off" />
+    <b-input type="number" @change="$emit('update:age', parseInt($event))" size="lg" class="marg p-1 text-center"  min="0" step="0.5" autocomplete="off" :value="age" />
     <span class="text-right mb-1">
       {{ translatedAgeApprox }}
     </span>
@@ -14,7 +14,8 @@
 export default {
   props: {
     age: {
-      type: Number,
+      // Server may return string
+      type: [Number, String],
       required: false,
       default: 0
     },
@@ -43,5 +44,9 @@ export default {
 .marg {
   // Some card styles are getting in the way.
   margin: 2px !important;
+}
+
+input {
+  width: 81px;
 }
 </style>

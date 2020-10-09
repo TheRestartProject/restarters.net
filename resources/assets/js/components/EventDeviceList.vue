@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-table-simple responsive class="pl-3 pr-3 pb-2 mb-2" table-class="m-0">
+    <b-table-simple responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0">
       <b-thead>
         <b-tr>
           <b-th>
@@ -9,25 +9,26 @@
           <b-th v-if="powered">
             {{ translatedModel }}
           </b-th>
-          <b-th v-if="powered">
+          <b-th v-if="powered" class="d-none d-md-table-cell">
             {{ translatedBrand }}
           </b-th>
           <b-th v-if="!powered">
             {{ translatedModelOrType }}
           </b-th>
-          <b-th>
+          <b-td v-if="!powered" class="d-table-cell d-md-none" />
+          <b-th class="d-none d-md-table-cell">
             {{ translatedAge }}
           </b-th>
-          <b-th>
+          <b-th class="d-none d-md-table-cell">
             {{ translatedDescription }}
           </b-th>
-          <b-th>
+          <b-th class="d-none d-md-table-cell">
             {{ translatedStatus }}
           </b-th>
-          <b-th>
+          <b-th class="d-none d-md-table-cell">
             {{ translatedSpareParts }}
           </b-th>
-          <b-th v-if="canedit">
+          <b-th v-if="canedit" class="d-none d-md-table-cell">
           </b-th>
         </b-tr>
       </b-thead>

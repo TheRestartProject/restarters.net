@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 device-select-row">
     <multiselect
-        :value="value"
+        v-model="brandValue"
         :placeholder="translatedBrand"
         :options="brands"
         track-by="id"
@@ -21,7 +21,7 @@
 
 export default {
   props: {
-    value: {
+    brand: {
       type: Number,
       required: false,
       default: null
@@ -32,6 +32,21 @@ export default {
     }
   },
   computed: {
+    brandValue: {
+      get() {
+        let ret = null
+        if (this.brand) {
+          ret = this.brands.find(o => {
+            return o.id === this.brand
+          })
+        }
+
+        return ret
+      },
+      set(newval) {
+        this.$emit('update:category', newval.value)
+      }
+    },
     translatedBrand() {
       return this.$lang.get('devices.brand')
     }

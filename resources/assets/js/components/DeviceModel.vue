@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 device-select-row">
-    <b-input @change="$emit('update:model', $event)" :placeholder="translatedModel" size="lg" class="marg" />
+    <b-input @change="$emit('update:model', $event)" :placeholder="translatedModel" size="lg" class="marg" :value="model" />
     <div v-b-popover.html.left :title="translatedTooltipModel" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
@@ -11,7 +11,7 @@
 
 export default {
   props: {
-    value: {
+    model: {
       type: String,
       required: false,
       default: null

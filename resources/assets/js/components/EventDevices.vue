@@ -2,7 +2,7 @@
   <CollapsibleSection class="lineheight" collapsed :count="deviceCount" always-show-count count-badge>
     <template slot="title">
       <div class="d-flex">
-        <b-img class="icon" src="/images/tv.svg" />&nbsp;{{ translatedTitle }}
+        <b-img class="d-none d-md-block icon" src="/images/tv.svg" />&nbsp;{{ translatedTitle }}
       </div>
     </template>
     <template slot="content">

@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 device-select-row">
     <multiselect
-      :value="value"
+      v-model="categoryValue"
       :placeholder="translatedCategory"
       :options="categoryOptions"
       track-by="value"
@@ -15,7 +15,7 @@
       :taggable="false"
       selectLabel=""
       ref="multiselect"
-      @select="$emit('update:category', $event.value)"
+      @select=""
     >
     </multiselect>
     <div v-b-popover.html.left :title="translatedTooltipCategory" class="ml-3 mt-2">
@@ -30,7 +30,7 @@ import { CATEGORY_MISC } from '../constants'
 
 export default {
   props: {
-    value: {
+    category: {
       type: Number,
       required: false,
       default: null
@@ -51,6 +51,24 @@ export default {
     }
   },
   computed: {
+    categoryValue: {
+      get() {
+        let ret = null
+
+        this.categoryOptions.forEach(c => {
+          c.categories.forEach(o => {
+            if (o.value === this.category) {
+              ret = o
+            }
+          })
+        })
+
+        return ret
+      },
+      set(newval) {
+        this.$emit('update:category', newval.value)
+      }
+    },
     categoryOptions() {
       let ret = []
 

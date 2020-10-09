@@ -5,31 +5,53 @@
         <h3 class="noheader">
           {{ device.category.name }}
         </h3>
+        <div class="d-block d-md-none">
+          <div :class="badgeClass + ' d-block d-md-none'">
+            {{ status }}
+          </div>
+          <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon" />
+        </div>
       </b-td>
       <b-td v-if="powered">
         {{ device.model }}
+        <div class="d-block d-md-none">
+          <span class="pl-2 pr-2 clickme" @click="editDevice">
+            <b-img class="icon" src="/icons/edit_ico_green.svg" />
+          </span>
+          <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
+            <b-img class="icon" src="/icons/delete_ico_red.svg" />
+          </span>
+        </div>
       </b-td>
-      <b-td v-if="powered">
+      <b-td class="d-none d-md-table-cell" v-if="powered">
         {{ device.brand }}
       </b-td>
       <b-td v-if="!powered">
         {{ device.item_type }}
+        <div class="d-block d-md-none">
+          <span class="pl-2 pr-2 clickme" @click="editDevice">
+            <b-img class="icon" src="/icons/edit_ico_green.svg" />
+          </span>
+          <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
+            <b-img class="icon" src="/icons/delete_ico_red.svg" />
+          </span>
+        </div>
       </b-td>
-      <b-td>
+      <b-td class="d-none d-md-table-cell">
         {{ device.age }}
       </b-td>
-      <b-td>
+      <b-td class="d-none d-md-table-cell">
         {{ device.shortProblem }}
       </b-td>
-      <b-td>
+      <b-td class="d-none d-md-table-cell">
         <span :class="badgeClass">
           {{ status }}
         </span>
       </b-td>
-      <b-td class="text-center">
-        <b-img v-if="!sparePartsNeeded" src="/images/tick.svg" class="icon" />
+      <b-td class="text-center d-none d-md-table-cell">
+        <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon" />
       </b-td>
-      <b-td v-if="canedit" class="text-right">
+      <b-td v-if="canedit" class="text-right d-none d-md-table-cell">
         <span class="pl-2 pr-2 clickme" @click="editDevice">
           <b-img class="icon" src="/icons/edit_ico_green.svg" />
         </span>
@@ -40,7 +62,7 @@
       </b-td>
     </b-tr>
     <b-tr v-else>
-      <b-td :colspan="powered ? 8 : 7" class="p-0">
+      <b-td colspan="8" class="p-0">
         <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @cancel="editing = false" />
       </b-td>
     </b-tr>
