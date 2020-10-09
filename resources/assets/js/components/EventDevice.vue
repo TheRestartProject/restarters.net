@@ -124,7 +124,7 @@ export default {
       required: false,
       default: null
     },
-    eventId: {
+    idevents: {
       type: Number,
       required: true
     },
@@ -186,7 +186,7 @@ export default {
   mounted() {
     // We take a copy of what's passed in so that we can then edit it in here before saving or cancelling.  We need
     this.currentDevice = {
-      event_id: this.eventId,
+      event_id: this.idevents,
       category: null,
       brand: null,
       model: null,
@@ -224,24 +224,7 @@ export default {
 
       device.brand = selectedBrand ? selectedBrand.brand_name : null
 
-      console.log("Create device with", device)
-      let ret = await axios.post('/device/create', device, {
-        headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
-        }
-      })
-
-      console.log("Returned", ret)
-
-      if (ret && ret.data && ret.data.success && ret.data.devices) {
-        // We have been returned the device objects from the server.  Add them into the store, and lo!  All our
-        // stats and views will update.
-        // TODO Visual indicator on the new rows.
-        await this.$store.dispatch('devices/add', {
-          eventId: this.eventId,
-          devices: ret.data.devices
-        })
-      }
+      await this.$store.dispatch('devices/add', device)
       this.$emit('cancel')
     },
     saveDevice() {

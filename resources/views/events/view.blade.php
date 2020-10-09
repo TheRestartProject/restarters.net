@@ -105,20 +105,20 @@
         ?>
 
         <div class="vue">
-          <EventHeading :event-id="{{ $event->idevents }}" :event="{{ $event }}" :is-attending="{{ $is_attending ? 'true' : 'false' }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}":in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}" />
+          <EventHeading :idevents="{{ $event->idevents }}" :event="{{ $event }}" :is-attending="{{ $is_attending ? 'true' : 'false' }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}":in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}" />
         </div>
 
         <div class="d-flex flex-wrap">
           <div class="w-xs-100 w-md-50">
             <div class="vue">
-                <EventDetails class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null) }}" />
+                <EventDetails class="pr-md-3" :idevents="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null) }}" />
             </div>
             <div class="vue">
-              <EventDescription class="pr-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" />
+              <EventDescription class="pr-md-3" :idevents="{{ $event->idevents }}" :event="{{ $event }}" />
             </div>
           </div>
           <div class="w-xs-100 w-md-50 vue">
-            <EventAttendance class="pl-md-3" :event-id="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}" />
+            <EventAttendance class="pl-md-3" :idevents="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}" />
           </div>
         </div>
         @if( !empty($images) )
@@ -176,7 +176,7 @@
       @if( $event->isInProgress() || $event->hasFinished() )
         <div class="vue w-100">
           <EventDevices
-            :event-id="{{ $event->idevents }}"
+            :idevents="{{ $event->idevents }}"
             :event="{{ $event }}"
             :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
             :devices="{{ json_encode($expanded_devices) }}"

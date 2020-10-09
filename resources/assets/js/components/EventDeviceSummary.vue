@@ -22,14 +22,21 @@
         {{ device.shortProblem }}
       </b-td>
       <b-td>
-        {{ status }}
+        <span :class="badgeClass">
+          {{ status }}
+        </span>
       </b-td>
       <b-td class="text-center">
         <b-img v-if="!sparePartsNeeded" src="/images/tick.svg" class="icon" />
       </b-td>
-      <b-td v-if="canedit">
-        <b-img class="icon mr-3" src="/icons/edit_ico_green.svg" />
-        <b-img class="icon" src="/icons/delete_ico_red.svg" />
+      <b-td v-if="canedit" class="text-right">
+        <span class="pl-2 pr-2 clickme">
+          <b-img class="icon" src="/icons/edit_ico_green.svg" />
+        </span>
+        <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
+          <b-img class="icon" src="/icons/delete_ico_red.svg" />
+        </span>
+        <ConfirmModal :key="'modal-' + device.iddevices" ref="confirmDelete" @confirm="deleteConfirmed" />
       </b-td>
     </b-tr>
   </transition>
@@ -38,8 +45,10 @@
 // TODO Edit / delete
 import event from '../mixins/event'
 import { FIXED, REPAIRABLE, END_OF_LIFE, SPARE_PARTS_MANUFACTURER, SPARE_PARTS_THIRD_PARTY } from '../constants'
+import ConfirmModal from './ConfirmModal'
 
 export default {
+  components: {ConfirmModal},
   mixins: [ event ],
   props: {
     device: {
@@ -58,14 +67,37 @@ export default {
     },
     status() {
       switch (this.device.repair_status) {
-        case FIXED: return this.$lang.get('partials.fixed'); break;
-        case REPAIRABLE: return this.$lang.get('partials.repairable'); break;
-        case END_OF_LIFE: return this.$lang.get('partials.end'); break;
+        case FIXED: return this.$lang.get('partials.fixed');
+        case REPAIRABLE: return this.$lang.get('partials.repairable');
+        case END_OF_LIFE: return this.$lang.get('partials.end');
         default: return null
+      }
+    },
+    badgeClass() {
+      switch (this.device.repair_status) {
+        case FIXED:
+          return 'badge badge-success'
+        case REPAIRABLE:
+          return 'badge badge-warning'
+        case END_OF_LIFE:
+          return 'badge badge-danger'
+        default:
+          return null
       }
     },
     sparePartsNeeded() {
       return this.device.spare_parts === SPARE_PARTS_MANUFACTURER || this.device.spare_parts === SPARE_PARTS_THIRD_PARTY
+    }
+  },
+  methods: {
+    deleteConfirm() {
+      this.$refs.confirmDelete.show()
+    },
+    deleteConfirmed() {
+      this.$store.dispatch('devices/delete', {
+        iddevices: this.device.iddevices,
+        idevents: this.idevents
+      })
     }
   }
 }
@@ -89,11 +121,20 @@ export default {
   margin: 0;
 }
 
-.recent-enter {
+.recent-enter, .recent-leave-to {
   opacity: 0;
 }
 
-.recent-enter-active {
+.recent-enter-active, .recent-enter-leave {
   transition: opacity 3s;
+}
+
+.badge {
+  width: 90px;
+  padding: 0;
+  border-radius: 0;
+  font-size: small;
+  line-height: 2;
+  text-transform: uppercase;
 }
 </style>

@@ -30,7 +30,7 @@
 
     @if( isset($type) )
       @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator'))
-        <button class="users-list__remove js-remove volunteer-{{ $volunteer->user }}" data-remove-volunteer="{{ $volunteer->user }}" data-event-id="{{ $volunteer->event }}" data-type="{{{ $type }}}">@lang('partials.remove_volunteer')</button>
+        <button class="users-list__remove js-remove volunteer-{{ $volunteer->user }}" data-remove-volunteer="{{ $volunteer->user }}" data-idevents="{{ $volunteer->event }}" data-type="{{{ $type }}}">@lang('partials.remove_volunteer')</button>
       @endif
     @endif
 

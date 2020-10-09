@@ -644,6 +644,7 @@ class DeviceController extends Controller
 
             // Expand a few things so that the new devices are returned with the same information that existing
             // ones are returned in view.
+            $device[$i]->idevents = $device[$i]->event;
             $device[$i]->category = $device[$i]->deviceCategory;
             $device[$i]->shortProblem = $device[$i]->getShortProblem();
             $device[$i]->urls;
@@ -842,11 +843,9 @@ class DeviceController extends Controller
                 $footprintRatioCalculator = new FootprintRatioCalculator();
                 $emissionRatio = $footprintRatioCalculator->calculateRatio();
                 $event = Party::find($eventId);
-                $stats = $event->getEventStats($emissionRatio);
 
                 return response()->json([
-                    'success' => true,
-                    'stats' => $stats
+                    'success' => true
                 ]);
             }
 

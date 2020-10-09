@@ -9,40 +9,45 @@ export default {
     list: []
   },
   getters: {
-    byEvent: state => eventId => {
-      return state.list[eventId]
+    byEvent: state => idevents => {
+      return state.list[idevents]
     }
   },
   mutations: {
     set(state, params) {
-      Vue.set(state.list, params.eventId, params.devices)
+      Vue.set(state.list, params.idevents, params.devices)
     },
     add(state, params) {
-      // Add the new devices to the existing list.
-      Vue.set(state.list, params.eventId, state.list[params.eventId].concat(params.devices))
-      console.log("Now got devices", state.list[params.eventId])
+      // Add the new device to the existing list.
+      state.list[params.idevents].push(params)
     },
     remove(state, params) {
-      let newarr = state.list[params.eventId].filter((a) => {
-        return a.user !== params.userId
+      let newarr = state.list[params.idevents].filter((a) => {
+        return a.iddevices !== params.iddevices
       })
 
-      Vue.set(state.list, params.eventId, newarr)
+      Vue.set(state.list, params.idevents, newarr)
     },
   },
   actions: {
     set({commit}, params) {
       commit('set', params);
     },
-    add({commit}, params) {
-      commit('add', params);
+    async add({commit}, params) {
+      let ret = await axios.post('/device/create', params, {
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        }
+      })
+
+      if (ret && ret.data && ret.data.success && ret.data.devices) {
+        // We have been returned the device objects from the server.  Add them into the store, and lo!  All our
+        // stats and views will update.
+        commit('add', ret.data.devices[0]);
+      }
     },
-    async remove({commit}, params) {
-      // TODO
-      let ret = await axios.post('/party/remove-volunteer', {
-        user_id: params.userId,
-        event_id: params.eventId
-      }, {
+    async delete({commit}, params) {
+      const ret = await axios.get('/device/delete/' + params.iddevices, {
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
         }

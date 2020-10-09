@@ -111,7 +111,7 @@ export default {
       try {
         await this.$store.dispatch('attendance/remove', {
           userId: this.attendee.user,
-          eventId: this.attendee.event,
+          idevents: this.attendee.event,
         })
       } catch (e) {
         this.error = e.message

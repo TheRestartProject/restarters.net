@@ -6,7 +6,7 @@ import moment from 'moment'
 
 export default {
   props: {
-    eventId: {
+    idevents: {
       type: Number,
       required: true
     },
@@ -103,7 +103,7 @@ export default {
     },
     attendees() {
       // Everyone, both invited and confirmed.
-      return this.$store.getters['attendance/byEvent'](this.eventId)
+      return this.$store.getters['attendance/byEvent'](this.idevents)
     },
     confirmed() {
       return this.attendees.filter((a) => {

@@ -97,7 +97,7 @@ export default {
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],
   props: {
-    eventId: {
+    idevents: {
       type: Number,
       required: true
     },
@@ -177,7 +177,7 @@ export default {
     })
 
     this.$store.dispatch('attendance/set', {
-      eventId: this.eventId,
+      idevents: this.idevents,
       attendees: attendees
     })
   },
@@ -185,7 +185,7 @@ export default {
     async changeParticipants(val) {
       let ret = await axios.post('/party/update-quantity', {
         quantity: val,
-        event_id: this.eventId
+        event_id: this.idevents
       }, {
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
@@ -195,7 +195,7 @@ export default {
     async changeVolunteers(val) {
       let ret = await axios.post('/party/update-volunteerquantity', {
         quantity: val,
-        event_id: this.eventId
+        event_id: this.idevents
       }, {
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()

@@ -32,7 +32,7 @@
         </b-tr>
       </b-thead>
       <b-tbody class="borders">
-        <EventDeviceSummary v-for="device in devices" :key="'device-' + device.iddevices" :device="device" :canedit="canedit" :powered="powered" :event-id="eventId" :event="event" />
+        <EventDeviceSummary v-for="device in devices" :key="'device-' + device.iddevices" :device="device" :canedit="canedit" :powered="powered" :idevents="idevents" :event="event" />
       </b-tbody>
     </b-table-simple>
   </div>

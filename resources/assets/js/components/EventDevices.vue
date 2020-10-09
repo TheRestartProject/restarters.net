@@ -13,22 +13,22 @@
             <b>{{ translatedPowered }}</b> ({{ powered.length }})
           </template>
           <p v-html="translatedDescriptionPowered" />
-          <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :event-id="eventId" :event="event" :brands="brands" :barrier-list="barrierList" />
+          <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" />
           <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingPowered = true">
             <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddPowered }}
           </b-btn>
-          <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :event-id="eventId" :event="event" :brands="brands" :barrier-list="barrierList" @cancel="addingPowered = false" />
+          <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" @cancel="addingPowered = false" />
         </b-tab>
         <b-tab title-item-class="w-50" class="pt-2">
           <template slot="title">
             <b>{{ translatedUnpowered }}</b> ({{ unpowered.length }})
           </template>
           <p v-html="translatedDescriptionUnpowered" />
-          <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :event-id="eventId" :event="event" :brands="brands" :barrier-list="barrierList" />
+          <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" />
           <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingUnpowered = true">
             <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddUnpowered }}
           </b-btn>
-          <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :event-id="eventId" :event="event" :brands="brands" :barrier-list="barrierList" @cancel="addingUnpowered = false"/>
+          <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" @cancel="addingUnpowered = false"/>
         </b-tab>
       </b-tabs>
     </template>
@@ -56,7 +56,7 @@ export default {
       return this.devices ? this.devices.length : 0
     },
     allDevices() {
-      return this.$store.getters['devices/byEvent'](this.eventId)
+      return this.$store.getters['devices/byEvent'](this.idevents)
     },
     powered() {
       return this.allDevices.filter((d) => {
@@ -99,7 +99,7 @@ export default {
     //
     // Similarly the event should be in the store and passed just by id, but we haven't introduced an event store yet.
     this.$store.dispatch('devices/set', {
-      eventId: this.eventId,
+      idevents: this.idevents,
       devices: this.devices
     })
   }
