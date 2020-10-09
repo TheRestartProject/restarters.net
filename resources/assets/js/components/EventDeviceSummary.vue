@@ -1,36 +1,38 @@
 <template>
-  <b-tr>
-    <b-td>
-      <h3 class="noheader">
-        {{ device.category.name }}
-      </h3>
-    </b-td>
-    <b-td v-if="powered">
-      {{ device.model }}
-    </b-td>
-    <b-td v-if="powered">
-      {{ device.brand }}
-    </b-td>
-    <b-td v-if="!powered">
-      {{ device.item_type }}
-    </b-td>
-    <b-td>
-      {{ device.age }}
-    </b-td>
-    <b-td>
-      {{ device.shortProblem }}
-    </b-td>
-    <b-td>
-      {{ status }}
-    </b-td>
-    <b-td class="text-center">
-      <b-img v-if="!sparePartsNeeded" src="/images/tick.svg" class="icon" />
-    </b-td>
-    <b-td v-if="canedit">
-      <b-img class="icon mr-3" src="/icons/edit_ico_green.svg" />
-      <b-img class="icon" src="/icons/delete_ico_red.svg" />
-    </b-td>
-  </b-tr>
+  <transition name="recent">
+    <b-tr>
+      <b-td>
+        <h3 class="noheader">
+          {{ device.category.name }}
+        </h3>
+      </b-td>
+      <b-td v-if="powered">
+        {{ device.model }}
+      </b-td>
+      <b-td v-if="powered">
+        {{ device.brand }}
+      </b-td>
+      <b-td v-if="!powered">
+        {{ device.item_type }}
+      </b-td>
+      <b-td>
+        {{ device.age }}
+      </b-td>
+      <b-td>
+        {{ device.shortProblem }}
+      </b-td>
+      <b-td>
+        {{ status }}
+      </b-td>
+      <b-td class="text-center">
+        <b-img v-if="!sparePartsNeeded" src="/images/tick.svg" class="icon" />
+      </b-td>
+      <b-td v-if="canedit">
+        <b-img class="icon mr-3" src="/icons/edit_ico_green.svg" />
+        <b-img class="icon" src="/icons/delete_ico_red.svg" />
+      </b-td>
+    </b-tr>
+  </transition>
 </template>
 <script>
 // TODO Edit / delete
@@ -44,6 +46,11 @@ export default {
       type: Object,
       required: true
     },
+    recent: {
+      type: Boolean,
+      required: false,
+      default: true
+    }
   },
   computed: {
     powered() {
@@ -80,5 +87,13 @@ export default {
   font-size: 16px;
   line-height: 1.5;
   margin: 0;
+}
+
+.recent-enter {
+  opacity: 0;
+}
+
+.recent-enter-active {
+  transition: opacity 3s;
 }
 </style>
