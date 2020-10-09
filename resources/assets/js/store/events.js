@@ -30,7 +30,7 @@ export default {
       Vue.set(state.stats, params.idevents, params.stats)
     },
     remove(state, params) {
-      delete state.list[params.id]
+      delete state.list[params.idevents]
     },
   },
   actions: {
@@ -39,6 +39,16 @@ export default {
     },
     setStats({commit}, params) {
       commit('setStats', params);
+    },
+    async delete({commit}, params) {
+      let ret = await axios.post('/party/delete/' + params.idevents, {
+        headers: {
+          // TODO LATER We shouldn't be pulling the token using jQuery.
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        }
+      })
+
+      commit('remove', params)
     }
   },
 }

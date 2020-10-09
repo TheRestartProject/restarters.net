@@ -42,7 +42,6 @@
   </transition>
 </template>
 <script>
-// TODO Edit / delete
 import event from '../mixins/event'
 import { FIXED, REPAIRABLE, END_OF_LIFE, SPARE_PARTS_MANUFACTURER, SPARE_PARTS_THIRD_PARTY } from '../constants'
 import ConfirmModal from './ConfirmModal'

@@ -86,15 +86,11 @@ export default {
       this.$refs.confirmdelete.show()
     },
     async confirmedDelete() {
-      // TODO LATER When events move into the store this should become a store action.
-      let ret = await axios.post('/party/delete/' + this.idevents, {
-        id: this.idevents
-      }, {
-        headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
-        }
+      await this.$store.dispatch('events/delete', {
+        idevents: this.idevents
       })
 
+      // TODO LATER Assumes always works.
       window.location = '/party'
     }
   }

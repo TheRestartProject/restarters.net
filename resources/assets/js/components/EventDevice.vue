@@ -86,8 +86,6 @@
 <!--      <div class="uploads-{{ $device->iddevices }}"></div>-->
 </template>
 <script>
-// TODO Edit / delete
-// TODO Remove redundant blades
 import event from '../mixins/event'
 import {
   FIXED,
