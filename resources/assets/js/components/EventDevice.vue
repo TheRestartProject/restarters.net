@@ -236,6 +236,7 @@ export default {
       if (ret && ret.data && ret.data.success && ret.data.devices) {
         // We have been returned the device objects from the server.  Add them into the store, and lo!  All our
         // stats and views will update.
+        // TODO Visual indicator on the new rows.
         await this.$store.dispatch('devices/add', {
           eventId: this.eventId,
           devices: ret.data.devices
