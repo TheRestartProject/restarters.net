@@ -15,9 +15,9 @@
           <EventAttendance class="pl-md-3" v-bind="$props" />
         </div>
       </div>
-      <EventImages v-bind="$props" />
+      <EventImages v-bind="$props" v-if="images && images.length" />
       <div v-if="inProgress || finished">
-        <EventStats :stats="stats" />
+        <EventStats :idevents="idevents" />
         <EventDevices v-bind="$props" />
       </div>
     </div>

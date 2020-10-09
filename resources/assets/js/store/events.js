@@ -27,7 +27,7 @@ export default {
       Vue.set(state.list, params.idevents, params)
     },
     setStats(state, params) {
-      state.stats[params.idevents] = params.stats
+      Vue.set(state.stats, params.idevents, params.stats)
     },
     remove(state, params) {
       delete state.list[params.id]

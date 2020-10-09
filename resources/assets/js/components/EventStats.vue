@@ -12,9 +12,14 @@ import EventStatsImpact from './EventStatsImpact'
 export default {
   components: {EventStatsImpact, EventStatsItems},
   props: {
-    stats: {
-      required: true,
-      type: Object
+    idevents: {
+      type: Number,
+      required: true
+    }
+  },
+  computed: {
+    stats() {
+      return this.$store.getters['events/getStats'](this.idevents)
     }
   }
 }
