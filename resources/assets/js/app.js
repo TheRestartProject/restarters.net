@@ -1547,8 +1547,10 @@ jQuery(document).ready(function () {
       el: $(this).get(0),
       store: store,
       components: {
-        'examplecomponent': require('./components/ExampleComponent.vue'),
-        'eventheading': require('./components/EventHeading.vue'),
+        'eventpage': require('./components/EventPage.vue'),
+
+        // TODO LATER This child components shouldn't need registering here, but Neil is working on a fix which
+        // changes them, so holding off removing them for now.
         'eventstats': require('./components/EventStats.vue'),
         'eventattendance': require('./components/EventAttendance.vue'),
         'eventdetails': require('./components/EventDetails.vue'),

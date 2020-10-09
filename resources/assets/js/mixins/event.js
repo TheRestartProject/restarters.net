@@ -1,6 +1,7 @@
 // This mixin includes lots of function relating to events.
-// TODO LATER In due course the event will move into the store and we'll just pass the id.  All the other props will then
-// become computed data in here.
+// TODO LATER Because we're moving slowly away from blade templates to Vue we define a lot of props in here.
+// Gradually some the props should move out of this mixin into individual component definitions, or
+// into computed props in here.
 import { DATE_FORMAT, GUEST, HOST, RESTARTER } from '../constants'
 import moment from 'moment'
 
@@ -8,10 +9,6 @@ export default {
   props: {
     idevents: {
       type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
       required: true
     },
     attendance:  {
@@ -63,25 +60,54 @@ export default {
       type: Array,
       required: false,
       default: null
+    },
+    hosts: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    calendarLinks: {
+      type: Object,
+      required: false,
+      default: null
+    },
+    images: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    cluster: {
+      type: Array,
+      required: false,
+      default: null
     }
-  },
-  data () {
-    return {
-      volunteerCount: null
-    }
-  },
-  mounted() {
-    // TODO LATER this should be removed when the events are moved into a store.
-    this.volunteerCount = this.event.volunteers
   },
   computed: {
+    event() {
+      return this.$store.getters['events/get'](this.idevents)
+    },
+    volunteerCount() {
+      return this.event && this.event.volunteers ? this.event.volunteers.length : 0
+    },
     upcoming() {
-      const start = new moment(this.event.event_date + ' ' + this.event.start)
-      return start.isAfter()
+      let ret = false;
+
+      if (this.event) {
+        const start = new moment(this.event.event_date + ' ' + this.event.start)
+        ret = start.isAfter()
+      }
+
+      return ret
     },
     finished() {
-      const end = new moment(this.event.event_date + ' ' + this.event.end)
-      return end.isBefore()
+      let ret = false;
+
+      if (this.event) {
+        const end = new moment(this.event.event_date + ' ' + this.event.end)
+        ret = end.isBefore()
+      }
+
+      return ret
     },
     inProgress() {
       return !this.upcoming && !this.finished
@@ -93,13 +119,13 @@ export default {
       return this.event.end.substring(0, 5)
     },
     date() {
-      return new moment(this.event.event_date).format(DATE_FORMAT)
+      return this.event ? (new moment(this.event.event_date).format(DATE_FORMAT)) : null
     },
     dayofmonth() {
-      return new moment(this.event.event_date).format('D')
+      return this.event ? (new moment(this.event.event_date).format('D')) : null
     },
     month() {
-      return new moment(this.event.event_date).format('MMM').toUpperCase()
+      return this.event ? (new moment(this.event.event_date).format('MMM').toUpperCase()) : null
     },
     attendees() {
       // Everyone, both invited and confirmed.

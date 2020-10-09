@@ -5,8 +5,8 @@ const axios = require('axios')
 export default {
   namespaced: true,
   state: {
-    // Array indexed by event id containing array of devices.
-    list: []
+    // Object indexed by event id containing array of devices.  Use object rather than array so that it's sparse.
+    list: {}
   },
   getters: {
     byEvent: state => idevents => {

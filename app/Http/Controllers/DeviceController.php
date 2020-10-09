@@ -654,6 +654,10 @@ class DeviceController extends Controller
         $return['success'] = true;
         $return['devices'] = $device;
 
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+        $return['stats'] = $event->getEventStats($emissionRatio);
+
         return response()->json($return);
     }
 
@@ -843,9 +847,11 @@ class DeviceController extends Controller
                 $footprintRatioCalculator = new FootprintRatioCalculator();
                 $emissionRatio = $footprintRatioCalculator->calculateRatio();
                 $event = Party::find($eventId);
+                $stats = $event->getEventStats($emissionRatio);
 
                 return response()->json([
-                    'success' => true
+                    'success' => true,
+                    'stats' => $stats
                 ]);
             }
 

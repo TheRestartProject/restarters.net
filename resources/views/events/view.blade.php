@@ -63,8 +63,8 @@
         </div>
 
         <?php
-        // We need to expand the user objects to pass to the client.  In due course this will be replaced
-        // by an API call to get the event details.
+          // We need to expand a lot of event information to pass to the client.  In due course this will be replaced
+          // by an API call to get the event details, and/or server-side rendering.
           function expandVolunteer($volunteers) {
             $ret = [];
 
@@ -94,98 +94,76 @@
           $expanded_invited = expandVolunteer($invited);
           $expanded_hosts = expandVolunteer($hosts);
 
-        // Trigger expansion of group.
-        $group_image = $event->theGroup->groupImage;
-        if (is_object($group_image) && is_object($group_image->image)) {
-          $group_image->image->path;
-        }
+          // Trigger expansion of group.
+          $group_image = $event->theGroup->groupImage;
+          if (is_object($group_image) && is_object($group_image->image)) {
+            $group_image->image->path;
+          }
 
-        $can_edit_event = FixometerHelper::userHasEditPartyPermission($event->idevents);
-        $is_attending = is_object($is_attending) && $is_attending->status == 1;
+          $can_edit_event = ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($event->idevents, Auth::user()->id) ) );
+          $is_attending = is_object($is_attending) && $is_attending->status == 1;
+
+          $collected_images = [];
+
+          $stats = [];
+
+          if ($event->isInProgress() || $event->hasFinished()) {
+            $stats = $event->getEventStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio());
+          }
+
+          if( !empty($images) ) {
+              foreach ($images as $image) {
+                $collected_images[] = $image;
+              }
+          }
+
+          $expanded_devices = [];
+
+          foreach ($event->devices as $device) {
+            $device->category = $device->deviceCategory;
+            $device->shortProblem = $device->getShortProblem();
+            $device->urls;
+            $expanded_devices[] = $device;
+          }
+
+          $expanded_clusters = [];
+
+          foreach ($clusters as $cluster) {
+            $cluster->categories;
+            $expanded_clusters[] = $cluster;
+          }
+
+          $expanded_brands = [];
+
+          foreach ($brands as $brand) {
+            $brand->brand_name;
+            $expanded_brands[] = $brand;
+          }
         ?>
-
         <div class="vue">
-          <EventHeading :idevents="{{ $event->idevents }}" :event="{{ $event }}" :is-attending="{{ $is_attending ? 'true' : 'false' }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}":in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}" />
+          <EventPage
+                  :idevents="{{ $event->idevents }}"
+                  :devices="{{ json_encode($expanded_devices) }}"
+                  :initial-event="{{ json_encode($event) }}"
+                  :is-attending="{{ $is_attending ? 'true' : 'false' }}"
+                  :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
+                  :in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}"
+                  :hosts="{{ json_encode($expanded_hosts) }}"
+                  :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null) }}"
+                  :attendance="{{ json_encode($expanded_attended) }}"
+                  :invitations="{{ json_encode($expanded_invited) }}"
+                  :images="{{ json_encode($collected_images)}}"
+                  :stats="{{ json_encode($stats) }}"
+                  :clusters="{{ json_encode($expanded_clusters) }}"
+                  :brands="{{ json_encode($expanded_brands) }}"
+                  :barrier-list="{{ json_encode(FixometerHelper::allBarriers()) }}"
+          />
         </div>
-
-        <div class="d-flex flex-wrap">
-          <div class="w-xs-100 w-md-50">
-            <div class="vue">
-                <EventDetails class="pr-md-3" :idevents="{{ $event->idevents }}" :event="{{ $event }}" :hosts="{{ json_encode($expanded_hosts) }}" :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null) }}" />
-            </div>
-            <div class="vue">
-              <EventDescription class="pr-md-3" :idevents="{{ $event->idevents }}" :event="{{ $event }}" />
-            </div>
-          </div>
-          <div class="w-xs-100 w-md-50 vue">
-            <EventAttendance class="pl-md-3" :idevents="{{ $event->idevents }}" :event="{{ $event }}" :attendance="{{ json_encode($expanded_attended) }}" :invitations="{{ json_encode($expanded_invited) }}" :canedit="{{ $can_edit_event ? 'true' : 'false' }}" />
-          </div>
-        </div>
-        @if( !empty($images) )
-          <?php
-            $collected_images = [];
-            foreach ($images as $image) {
-              $collected_images[] = $image;
-            }
-          ?>
-          <div class="vue">
-            <EventImages :images="{{ json_encode($collected_images)}}" />
-          </div>
-        @endif
       </div>
 
       <div class="vue-placeholder vue-placeholder-large">
         <div class="vue-placeholder-content">@lang('partials.loading')...</div>
       </div>
-
-      @if( $event->isInProgress() || $event->hasFinished() )
-        <div class="vue w-100">
-          <EventStats :stats="{{ json_encode($event->getEventStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}" />
-      </div>
-      @endif
-
-      <?php
-
-      $can_edit_event = ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($event->idevents, Auth::user()->id) ) );
-      $expanded_devices = [];
-
-      foreach ($event->devices as $device) {
-        $device->category = $device->deviceCategory;
-        $device->shortProblem = $device->getShortProblem();
-        $device->urls;
-
-        $expanded_devices[] = $device;
-      }
-
-      $expanded_clusters = [];
-
-      foreach ($clusters as $cluster) {
-        $cluster->categories;
-        $expanded_clusters[] = $cluster;
-      }
-
-      $expanded_brands = [];
-
-      foreach ($brands as $brand) {
-        $brand->brand_name;
-        $expanded_brands[] = $brand;
-      }
-
-      ?>
-
-      @if( $event->isInProgress() || $event->hasFinished() )
-        <div class="vue w-100">
-          <EventDevices
-            :idevents="{{ $event->idevents }}"
-            :event="{{ $event }}"
-            :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
-            :devices="{{ json_encode($expanded_devices) }}"
-            :clusters="{{ json_encode($expanded_clusters) }}"
-            :brands="{{ json_encode($expanded_brands) }}"
-            :barrier-list="{{ json_encode(FixometerHelper::allBarriers()) }}"
-          />
-        </div>
-      @endif
     </div>
   </section>
 

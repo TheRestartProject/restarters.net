@@ -96,31 +96,6 @@ import CollapsibleSection from './CollapsibleSection'
 export default {
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],
-  props: {
-    idevents: {
-      type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
-      required: true
-    },
-    attendance:  {
-      type: Array,
-      required: true
-    },
-    invitations:  {
-      type: Array,
-      required: true
-    },
-    // TODO LATER In due course the permissions should be handled by having the user in the store and querying that, rather
-    // than passing down props.
-    canedit: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
   computed: {
     translatedTitle() {
       return this.$lang.get('events.event_attendance')

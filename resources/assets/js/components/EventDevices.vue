@@ -53,10 +53,10 @@ export default {
   },
   computed: {
     deviceCount() {
-      return this.devices ? this.devices.length : 0
+      return this.powered.length + this.unpowered.length
     },
     allDevices() {
-      return this.$store.getters['devices/byEvent'](this.idevents)
+      return this.$store.getters['devices/byEvent'](this.idevents) || []
     },
     powered() {
       return this.allDevices.filter((d) => {
