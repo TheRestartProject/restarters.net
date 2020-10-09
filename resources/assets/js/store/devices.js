@@ -18,8 +18,25 @@ export default {
       Vue.set(state.list, params.idevents, params.devices)
     },
     add(state, params) {
-      // Add the new device to the existing list.
-      state.list[params.idevents].push(params)
+      let exists = false;
+
+      console.log("Add", params)
+      if (params.iddevices) {
+        console.log("look for existing")
+        state.list[params.idevents].forEach((d, i) => {
+          if (d.iddevices === params.iddevices) {
+            // Found it there already.
+            console.log("Found it")
+            Vue.set(state.list[params.idevents], i, params)
+            exists = true
+          }
+        })
+      }
+
+      if (!exists) {
+        // Append the new device to the existing list.
+        state.list[params.idevents].push(params)
+      }
     },
     remove(state, params) {
       let newarr = state.list[params.idevents].filter((a) => {
@@ -48,6 +65,27 @@ export default {
         // Update our stats
         // TODO LATER There are some uses of event_id in the server which should really be idevents for
         // consistency.
+        dispatch('events/setStats', {
+          idevents: params.event_id,
+          stats: ret.data.stats
+        }, {
+          root: true
+        })
+      }
+    },
+    async edit({commit, dispatch}, params) {
+      let ret = await axios.post('/device/edit/' + params.iddevices, params, {
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        }
+      })
+
+      if (ret && ret.data && ret.data.success && ret.data.device) {
+        // We have been returned the device objects from the server.  Add them into the store, and lo!  All our
+        // stats and views will update.
+        commit('add', ret.data.device);
+
+        // Update our stats
         dispatch('events/setStats', {
           idevents: params.event_id,
           stats: ret.data.stats

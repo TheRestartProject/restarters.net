@@ -31,16 +31,13 @@
           <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" />
           <DeviceUsefulUrls :device="device" :useful-urls.sync="currentDevice.usefulURLs" class="mb-2" />
           <div class="d-flex">
-            <b-form-checkbox v-model="currentDevice.wiki" class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" />
+            <b-form-checkbox v-model="wiki" class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" />
             <label :for="'wiki-' + (add ? '' : device.iddevices)">
               {{ translatedCaseStudy }}
             </label>
           </div>
         </b-card>
       </div>
-    </div>
-    <div>
-      {{ currentDevice }}
     </div>
     <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
       <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
@@ -49,7 +46,7 @@
       <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
         {{ translatedSave }}
       </b-btn>
-      <DeviceQuantity :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2" />
+      <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2" />
       <b-btn variant="tertiary" class="ml-2" @click="cancel">
         {{ translatedCancel }}
       </b-btn>
@@ -160,6 +157,15 @@ export default {
       // unpowered do.
       return !this.powered || (this.currentDevice && this.currentDevice.category === CATEGORY_MISC)
     },
+    wiki: {
+      // Need to convert server's number to/from a boolean.
+      get() {
+        return !!this.currentDevice.wiki
+      },
+      set(newval) {
+        this.currentDevice.wiki = newval
+      }
+    },
     translatedTitleItems() {
       return this.$lang.get('devices.title_items')
     },
@@ -220,6 +226,14 @@ export default {
       this.$emit('cancel')
     },
     async addDevice() {
+      await this.$store.dispatch('devices/add', this.prepareDeviceForServer())
+      this.$emit('cancel')
+    },
+    async saveDevice() {
+      await this.$store.dispatch('devices/edit', this.prepareDeviceForServer())
+      this.$emit('cancel')
+    },
+    prepareDeviceForServer() {
       // The device we send to the server is what is in currentDevice, with a couple of tweaks:
       // - The server takes the brand as a string rather than an id.
       // - The server only supports a single useful URL on add, via the url and source parameters
@@ -237,12 +251,7 @@ export default {
 
       device.brand = selectedBrand ? selectedBrand.brand_name : null
 
-      await this.$store.dispatch('devices/add', device)
-      this.$emit('cancel')
-    },
-    saveDevice() {
-      // TODO
-      this.$emit('cancel')
+      return device
     }
   }
 }

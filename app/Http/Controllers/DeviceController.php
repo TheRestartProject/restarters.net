@@ -670,12 +670,14 @@ class DeviceController extends Controller
         $model = $request->input('model');
         $age = $request->input('age');
         $problem = $request->input('problem');
+        $notes = $request->input('notes');
         $repair_status = $request->input('repair_status');
         $barrier = $request->input('barrier');
         $repair_details = $request->input('repair_details');
         $spare_parts = $request->input('spare_parts');
         $event_id = $request->input('event_id');
         $wiki = $request->input('wiki');
+        $estimate = $request->input('estimate');
 
         if (empty($repair_status)) { //Override
             $repair_status = 0;
@@ -684,8 +686,6 @@ class DeviceController extends Controller
         if ($repair_status != 2) { //Override
             $repair_details = 0;
         }
-
-        $event = Party::find($event_id);
 
         if (FixometerHelper::userHasEditEventsDevicesPermission($event_id)) {
             if ($repair_details == 1) {
@@ -729,7 +729,6 @@ class DeviceController extends Controller
                 Log::error('An error occurred while sending ReviewNotes email: '.$ex->getMessage());
             }
 
-            // New logic Nov 2018
             if ($spare_parts == 3) { // Third party
                 $spare_parts = 1;
                 $parts_provider = 2;
@@ -753,7 +752,6 @@ class DeviceController extends Controller
             } elseif (count($barrier) > 0) {
                 $spare_parts = 2;
             }
-            // EO new logic Nov 2018
 
             Device::find($id)->update([
                 'category' => $category,
@@ -764,6 +762,7 @@ class DeviceController extends Controller
                 'model' => $model,
                 'age' => $age,
                 'problem' => $problem,
+                'notes' => $notes,
                 'spare_parts' => $spare_parts,
                 'parts_provider' => $parts_provider,
                 'repair_status' => $repair_status,
@@ -771,6 +770,7 @@ class DeviceController extends Controller
                 'do_it_yourself' => $professional_help,
                 'professional_help' => $do_it_yourself,
                 'wiki' => $wiki,
+                'estimate' => $estimate
             ]);
 
             // Update barriers
@@ -794,6 +794,16 @@ class DeviceController extends Controller
             // }
 
             $data['success'] = 'Device updated!';
+
+            // Expand a few things so that the devices are returned with the same information that existing
+            // ones are returned in view.
+            $device = Device::find($id);
+            $device->idevents = $device->event;
+            $device->category = $device->deviceCategory;
+            $device->shortProblem = $device->getShortProblem();
+            $device->urls;
+
+            $data['device'] = $device;
 
             return response()->json($data);
 
