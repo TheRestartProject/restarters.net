@@ -241,38 +241,37 @@ class Group extends Model implements Auditable
 
     public function getGroupStats($emissionRatio)
     {
-        $Device = new Device;
-
-        $allPastParties = Party::pastEvents()
-                        ->with('devices.deviceCategory')
+        $allPastEvents = Party::pastEvents()
                         ->where('events.group', $this->idgroups)
                         ->get();
 
-        $participants = 0;
-        $hours_volunteered = 0;
-        $co2 = 0;
-        $waste = 0;
+        $groupStats = [];
 
-        foreach ($allPastParties as $party) {
-            $partyco2 = 0;
-            $participants += $party->pax;
-            $hours_volunteered += $party->hoursVolunteered();
+        // Rollup all events stats into stats for this group.
+        foreach ($allPastEvents as $event) {
+            $eventStats = $event->getEventStats($emissionRatio);
 
-            foreach ($party->devices as $device) {
-                if ($device->isFixed()) {
-                    $partyco2 += $device->co2Diverted($emissionRatio, $Device->displacement);
-                    $waste += $device->ewasteDiverted();
+            foreach ($eventStats as $statKey => $statValue) {
+                if (! array_key_exists($statKey, $groupStats)) {
+                    $groupStats[$statKey] = 0;
                 }
+                $groupStats[$statKey] += $statValue;
             }
-            $co2 += $partyco2;
         }
 
+        // Keeping the specific subset of stats returned for now,
+        // with existing names.
         return [
-            'pax' => $participants,
-            'hours' => $hours_volunteered,
-            'parties' => count($allPastParties),
-            'co2' => $co2,
-            'waste' => $waste,
+            'pax' => $groupStats['participants'] ?? 0,
+            'hours' => $groupStats['hours_volunteered'] ?? 0,
+            'parties' => count($allPastEvents),
+            'co2' => $groupStats['co2'] ?? 0,
+            'ewaste' => $groupStats['ewaste'] ?? 0,
+            'unpowered_waste' => $groupStats['unpowered_waste'] ?? 0,
+            'waste' => ($groupStats['ewaste'] ?? 0) + ($groupStats['unpowered_waste'] ?? 0),
+            'repairable_devices' => $groupStats['repairable_devices'] ?? 0,
+            'dead_devices' => $groupStats['dead_devices'] ?? 0,
+            'no_weight' => $groupStats['no_weight'] ?? 0,
         ];
     }
 

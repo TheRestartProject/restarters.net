@@ -33,215 +33,71 @@
           </div>
       @endif
 
-      <div class="events__header row align-content-top">
-          <div class="col-lg-7 d-flex flex-column">
+      <?php
+          // Trigger expansion of group.
+          $group_image = $group->groupImage;
+          if (is_object($group_image) && is_object($group_image->image)) {
+              $group_image->image->path;
+          }
 
-            <header>
+          $can_edit_group = FixometerHelper::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
 
-                @if( FixometerHelper::hasRole( $user, 'Administrator' ) || ( $is_host_of_group && $user_groups > 1 ) )
+          function expandVolunteer($volunteers) {
+              $ret = [];
 
-                  <h1 class="sr-only">{{{ $group->name }}}</h1>
-                  <button class="btn btn-title dropdown-toggle" type="button" id="dropdownTitle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      {{{ $group->name }}}
-                  </button>
-                  <div class="dropdown-menu dropdown-menu__titles" aria-labelledby="dropdownTitle">
+              foreach ($volunteers as $volunteer) {
+                  $volunteer['volunteer'] = $volunteer->volunteer;
 
-                    @if( FixometerHelper::hasRole( $user, 'Administrator' ) )
+                  if ($volunteer['volunteer']) {
+                      $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
 
-                      @foreach($grouplist as $g)
-                        <a class="dropdown-item" href="{{ url('/group/view') }}/{{ $g->id }}">
-                          @if(!empty($g->path))
-                            <img src="{{ url('/uploads/thumbnail_'.$g->path) }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
-                          @else
-                            <img src="{{ url('/images/placeholder_small.jpg') }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
-                          @endif
-                          <span>{{ $g->name }}</span>
-                        </a>
-                      @endforeach
+                      foreach ($volunteer['userSkills'] as $skill) {
+                          // Force expansion
+                          $skill->skillName->skill_name;
+                      }
 
-                    @else
+                      $volunteer['fullName'] = $volunteer->name;
+                      $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                      $ret[] = $volunteer;
+                  }
+              }
 
-                      @foreach($userGroups as $g)
-                        <a class="dropdown-item" href="{{ url('/group/view/'.$g->idgroups) }}" title="Switch to {{ $g->name }}">
-                          @if(!empty($g->path))
-                            <img src="{{ url('/uploads/mid_'.$g->path) }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
-                          @else
-                            <img src="{{ url('/images/placeholder_small.jpg') }}" alt="{{ $g->name }} group image" class="dropdown-item-icon">
-                          @endif
-                          <span>{{ $g->name }}</span>
-                        </a>
-                      @endforeach
+              return $ret;
+          }
 
-                    @endif
+          $expanded_volunteers = expandVolunteer($view_group->allConfirmedVolunteers);
+//          ->take(20));
 
-                  </div>
-                @else
-                  <h1>{{{ $group->name }}}</h1>
-                @endif
+          ?>
+      <div class="vue-placeholder vue-placeholder-large">
+          <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+      </div>
 
-                <p>{{{ $group->location }}}</p>
+      <div class="vue">
+        <GroupHeading :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :canedit="{{ $can_edit_group ? 'true' : 'false' }}" :ingroup="{{ $in_group ? 'true': 'false' }}"/>
+      </div>
 
-                @if( !empty($group->website) )
-                  <a class="events__header__url" href="{{{ $group->website }}}" rel="noopener noreferrer">{{{ $group->website }}}</a>
-                @endif
-
-                @php( $groupImage = $group->groupImage )
-                @if( is_object($groupImage) && is_object($groupImage->image) )
-                  <img src="{{ asset('/uploads/mid_'. $groupImage->image->path) }}" alt="{{{ $group->name }}} group image" class="event-icon">
-                @else
-                  <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="{{{ $group->name }}} group image" class="event-icon">
-                @endif
-
-            </header>
-
-
-
+      <div class="d-flex flex-wrap">
+          <div class="w-xs-100 w-md-50 vue">
+              <GroupDescription class="pr-md-3" :group-id="{{ $group->idgroups }}" :group="{{ $group }}" />
           </div>
-          <div class="col-lg-5">
-
-            @if( FixometerHelper::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group )
-              <div class="button-group button-group__r">
-
-                  <div class="dropdown">
-                      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          @lang('groups.group_actions')
-                      </button>
-                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                          <a class="dropdown-item" href="{{ url('/group/edit/'.$group->idgroups) }}">@lang('groups.edit_group')</a>
-                          <a class="dropdown-item" href="{{ url('/party/create') }}/{{ $group->idgroups }}">@lang('groups.add_event')</a>
-                          <a class="dropdown-item" data-toggle="modal" data-target="#invite-to-group" href="#">@lang('groups.invite_volunteers')</a>
-                          <a class="dropdown-item" href="{{ url('/group/nearby/'.$group->idgroups) }}#">@lang('groups.volunteers_nearby')</a>
-                          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#group-share-stats">@lang('groups.share_group_stats')</a>
-                      </div>
-                  </div>
-
-              </div>
-            @else
-              <div class="button-group button-group__r">
-                  @if ($in_group)
-                    <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#invite-to-group">@lang('groups.invite_volunteers')</a>
-                  @else
-                    <a class="btn btn-primary" href="/group/join/{{ $group->idgroups }}" id="join-group">@lang('groups.join_group_button')</a>
-                  @endif
-                  <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#group-share-stats">@lang('groups.share_group_stats')</a>
-              </div>
-            @endif
-
+          <div class="w-xs-100 w-md-50 vue">
+              <GroupVolunteers class="pl-md-3" :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :volunteers="{{ json_encode($expanded_volunteers) }}" :canedit="{{ $can_edit_group ? 'true' : 'false' }}" />
           </div>
       </div>
 
-        <div class="row">
-            <div class="col-lg-3">
 
-                <h2 id="about-grp">@lang('groups.about')
-                  @if( FixometerHelper::hasRole( $user, 'Administrator' ) || $is_host_of_group )
-                    <sup>(<a href="{{ url('/group/edit/'.$group->idgroups) }}">Edit group</a>)</sup>
-                  @endif
-                </h2>
+      <div class="vue-placeholder vue-placeholder-large">
+          <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+      </div>
 
-                <div class="events__description">
-                    <p>{!! str_limit(strip_tags($group->free_text), 160, '...') !!}</p>
-                    @if( strlen($group->free_text) > 160 )
-                      <button data-toggle="modal" data-target="#group-description"><span>@lang('groups.read_more')</span></button>
-                    @endif
-                </div><!-- /events__description -->
+      <div class="vue w-100 mt-md-50">
+          <GroupStats :stats="{{ json_encode($group->getGroupStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}" />
+      </div>
 
 
-                @if ($in_group)
-                  <h2 id="volunteers">@lang('groups.volunteers') <sup>(<a data-toggle="modal" data-target="#invite-to-group" href="#">@lang('groups.invite_to_group')</a>)</sup></h2>
-                @else
-                  <h2 id="volunteers">@lang('groups.volunteers') <sup>(<a href="/group/join/{{ $group->idgroups }}">@lang('groups.join_group_button')</a>)</sup></h2>
-                @endif
-
-                <div class="tab">
-
-                    <div class="users-list-wrap users-list__single">
-                        <ul class="users-list">
-
-                            @foreach( $view_group->allConfirmedVolunteers->take(3) as $volunteer )
-                              @include('partials.volunteer-badge')
-                            @endforeach
-
-                        </ul>
-                        @if( $view_group->allConfirmedVolunteers->count() > 3 )
-                          <a class="users-list__more" href="#" data-toggle="modal" data-target="#group-volunteers">See all {{{ $view_group->allConfirmedVolunteers->count() }}} volunteers</a>
-                        @endif
-                    </div>
-
-                </div>
-
-            </div>
-            <div class="col-lg-9">
-
-                <h2 id="key-stats">@lang('groups.key_stats')</h2>
-                <ul class="properties">
-                    <li class="properties__item__full_xs">
-                        <div class="h-100">
-                          <div class="row h-100">
-                            <div class="col-6 col-lg-12 d-flex align-content-center flex-column">
-                              <h3>@lang('groups.participants')</h3>
-                              <svg width="18" height="18" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M8.147,2.06c0.624,0.413 1.062,1.113 1.141,1.925c0.255,0.125 0.537,0.197 0.837,0.197c1.093,0 1.98,-0.936 1.98,-2.091c0,-1.155 -0.887,-2.091 -1.98,-2.091c-1.083,0 -1.962,0.92 -1.978,2.06Zm-1.297,4.282c1.093,0 1.98,-0.937 1.98,-2.092c0,-1.155 -0.887,-2.091 -1.98,-2.091c-1.094,0 -1.981,0.937 -1.981,2.091c0,1.155 0.887,2.092 1.981,2.092Zm0.839,0.142l-1.68,0c-1.397,0 -2.535,1.951 -2.535,3.428l0,2.92l0.006,0.034l0.141,0.047c1.334,0.44 2.493,0.587 3.447,0.587c1.863,0 2.943,-0.561 3.01,-0.597l0.132,-0.071l0.014,0l0,-2.92c0,-1.477 -1.137,-3.428 -2.535,-3.428Zm3.276,-1.937l-1.667,0c-0.018,0.704 -0.303,1.117 -0.753,1.573c1.242,0.391 2.152,2.358 2.152,3.795l0,0.669c1.646,-0.064 2.594,-0.557 2.657,-0.59l0.132,-0.07l0.014,0l0,-2.921c0,-1.477 -1.137,-2.456 -2.535,-2.456Zm-7.59,-0.364c0.388,0 0.748,-0.12 1.053,-0.323c0.097,-0.669 0.437,-1.253 0.921,-1.651c0.002,-0.039 0.006,-0.078 0.006,-0.117c0,-1.155 -0.887,-2.091 -1.98,-2.091c-1.093,0 -1.98,0.936 -1.98,2.091c0,1.154 0.887,2.091 1.98,2.091Zm1.779,1.937c-0.449,-0.454 -0.732,-0.863 -0.753,-1.563c-0.062,-0.005 -0.123,-0.01 -0.186,-0.01l-1.68,0c-1.398,0 -2.535,0.979 -2.535,2.456l0,2.92l0.005,0.034l0.142,0.047c1.07,0.353 2.025,0.515 2.855,0.567l0,-0.656c0,-1.437 0.909,-3.404 2.152,-3.795Z" style="fill:#0394a6;fill-rule:nonzero;"/></svg>
-                              </div>
-                              <div class="col-6 col-lg-12 d-flex align-items-end">
-                                {{{ number_format($pax, 0, '.' , ',') }}}
-                              </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="properties__item__full_xs">
-                        <div class="h-100">
-                          <div class="row h-100">
-                            <div class="col-6 col-lg-12 d-flex align-content-center flex-column">
-                            <h3>@lang('groups.hours_volunteered')</h3>
-                            <svg width="17" height="20" viewBox="0 0 12 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><path d="M9.268,3.161c-0.332,-0.212 -0.776,-0.119 -0.992,0.207c-0.216,0.326 -0.122,0.763 0.21,0.975c1.303,0.834 2.08,2.241 2.08,3.766c0,1.523 -0.777,2.93 -2.078,3.764c-0.001,0.001 -0.001,0.001 -0.002,0.001c-0.741,0.475 -1.601,0.725 -2.486,0.725c-0.885,0 -1.745,-0.25 -2.486,-0.725c-0.001,0 -0.001,0 -0.001,0c-1.302,-0.834 -2.08,-2.241 -2.08,-3.765c0,-1.525 0.778,-2.932 2.081,-3.766c0.332,-0.212 0.426,-0.649 0.21,-0.975c-0.216,-0.326 -0.66,-0.419 -0.992,-0.207c-1.711,1.095 -2.732,2.945 -2.732,4.948c0,2.003 1.021,3.852 2.732,4.947c0,0 0.001,0.001 0.002,0.001c0.973,0.623 2.103,0.952 3.266,0.952c1.164,0 2.294,-0.33 3.268,-0.953c1.711,-1.095 2.732,-2.944 2.732,-4.947c0,-2.003 -1.021,-3.853 -2.732,-4.948" style="fill:#0394a6;fill-rule:nonzero;"/><path d="M7.59,2.133c0.107,-0.36 -0.047,-1.227 -0.503,-1.758c-0.214,0.301 -0.335,0.688 -0.44,1.022c-0.182,0.066 -0.364,-0.014 -0.581,-0.082c-0.116,-0.037 -0.505,-0.121 -0.584,-0.245c-0.074,-0.116 0.073,-0.249 0.146,-0.388c0.051,-0.094 0.094,-0.231 0.136,-0.337c0.049,-0.126 0.07,-0.247 -0.006,-0.345c-0.462,0.034 -1.144,0.404 -1.394,0.906c-0.067,0.133 -0.101,0.393 -0.089,0.519c0.011,0.104 0.097,0.313 0.161,0.424c0.249,0.426 0.588,0.781 0.766,1.206c0.22,0.525 0.172,0.969 0.182,1.52c0.041,2.214 -0.006,2.923 -0.01,5.109c0,0.189 -0.014,0.415 0.031,0.507c0.26,0.527 1.029,0.579 1.29,-0.001c0.087,-0.191 0.028,-0.571 0.017,-0.843c-0.033,-0.868 -0.056,-1.708 -0.08,-2.526c-0.033,-1.142 -0.06,-0.901 -0.117,-1.97c-0.028,-0.529 -0.023,-1.117 0.275,-1.629c0.141,-0.24 0.657,-0.78 0.8,-1.089" style="fill:#0394a6;fill-rule:nonzero;"/></g></svg>
-                            </div>
-                            <div class="col-6 col-lg-12 d-flex align-items-end">
-                              {{{ number_format($hours, 0, '.' , ',') }}}
-                            </div>
-                          </div>
-                        </div>
-                    </li>
-                    <li class="properties__item__full_xs">
-                        <div class="h-100">
-                          <div class="row h-100">
-                            <div class="col-6 col-lg-12 d-flex align-content-center flex-column">
-                              <h3>@lang('groups.total_events')</h3>
-                              <svg width="18" height="18" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M12.462,13.5l-11.423,0c-0.282,0 -0.525,-0.106 -0.731,-0.318c-0.205,-0.212 -0.308,-0.463 -0.308,-0.753l0,-9.215c0,-0.29 0.103,-0.541 0.308,-0.753c0.206,-0.212 0.449,-0.318 0.731,-0.318l1.038,0l0,-0.804c0,-0.368 0.127,-0.683 0.381,-0.945c0.255,-0.263 0.56,-0.394 0.917,-0.394l0.519,0c0.357,0 0.663,0.131 0.917,0.394c0.254,0.262 0.382,0.577 0.382,0.945l0,0.804l3.115,0l0,-0.804c0,-0.368 0.127,-0.683 0.381,-0.945c0.254,-0.263 0.56,-0.394 0.917,-0.394l0.519,0c0.357,0 0.663,0.131 0.917,0.393c0.254,0.263 0.381,0.578 0.381,0.946l0,0.804l1.039,0c0.281,0 0.525,0.106 0.73,0.318c0.205,0.212 0.308,0.463 0.308,0.753l0,9.215c0,0.29 -0.103,0.541 -0.308,0.753c-0.206,0.212 -0.449,0.318 -0.73,0.318Zm-0.087,-3.805l-2.25,0l0,1.909l2.25,0l0,-1.909Zm-6,0l-2.25,0l0,1.909l2.25,0l0,-1.909Zm-3,0l-2.25,0l0,1.909l2.25,0l0,-1.909Zm6,0l-2.25,0l0,1.909l2.25,0l0,-1.909Zm3,-2.658l-2.25,0l0,1.908l2.25,0l0,-1.908Zm-6,0l-2.25,0l0,1.908l2.25,0l0,-1.908Zm-3,0l-2.25,0l0,1.908l2.25,0l0,-1.908Zm6,0l-2.25,0l0,1.908l2.25,0l0,-1.908Zm3,-2.658l-2.25,0l0,1.908l2.25,0l0,-1.908Zm-6,0l-2.25,0l0,1.908l2.25,0l0,-1.908Zm-3,0l-2.25,0l0,1.908l2.25,0l0,-1.908Zm6,0l-2.25,0l0,1.908l2.25,0l0,-1.908Zm-5.481,-3.307l-0.519,0c-0.07,0 -0.131,0.026 -0.182,0.079c-0.052,0.053 -0.077,0.116 -0.077,0.188l0,1.661c0,0.073 0.025,0.135 0.077,0.188c0.051,0.053 0.112,0.08 0.182,0.08l0.519,0c0.071,0 0.131,-0.027 0.183,-0.08c0.051,-0.053 0.077,-0.115 0.077,-0.188l0,-1.661c0,-0.072 -0.026,-0.135 -0.077,-0.188c-0.051,-0.053 -0.112,-0.079 -0.183,-0.079Zm6.231,0l-0.519,0c-0.07,0 -0.131,0.026 -0.183,0.079c-0.051,0.053 -0.077,0.116 -0.077,0.188l0,1.661c0,0.073 0.026,0.135 0.077,0.188c0.052,0.053 0.113,0.08 0.183,0.08l0.519,0c0.071,0 0.131,-0.027 0.183,-0.08c0.051,-0.053 0.077,-0.115 0.077,-0.188l0,-1.661c0,-0.072 -0.026,-0.135 -0.077,-0.188c-0.052,-0.053 -0.112,-0.079 -0.183,-0.079Z" style="fill:#0394a6;fill-rule:nonzero;"/></svg>
-                            </div>
-                            <div class="col-6 col-lg-12 d-flex align-items-end">
-                              {{{ number_format(count($allparties), 0, '.' , ',') }}}
-                            </div>
-                          </div>
-                        </div>
-                    </li>
-                    <li class="properties__item__full_xs">
-                        <div class="h-100">
-                            <div class="row h-100">
-                              <div class="col-6 col-lg-12 d-flex align-content-center flex-column">
-                                <h3>@lang('groups.waste_prevented')</h3>
-                                <svg width="17" height="17" viewBox="0 0 13 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><path d="M12.15,0c0,0 -15.921,1.349 -11.313,10.348c0,0 0.59,-1.746 2.003,-3.457c0.852,-1.031 2,-2.143 3.463,-2.674c0.412,-0.149 0.696,0.435 0.094,0.727c0,0 -4.188,2.379 -4.732,6.112c0,0 1.805,1.462 3.519,1.384c1.714,-0.078 4.268,-1.078 4.707,-3.551c0.44,-2.472 1.245,-6.619 2.259,-8.889Z" style="fill:#0394a6;"/><path d="M1.147,13.369c0,0 0.157,-0.579 0.55,-2.427c0.394,-1.849 0.652,-0.132 0.652,-0.132l-0.25,2.576l-0.952,-0.017Z" style="fill:#0394a6;"/></g></svg>
-                              </div>
-                                                                                                                                                                                                                                 <div class="col-6 col-lg-12 d-flex align-items-end">
-                                {{{ number_format(round($groupWaste), 0, '.' , ',') }}} kg
-                              </div>
-                          </div>
-                        </div>
-                    </li>
-                    <li class="properties__item__full_xs">
-                        <div class="h-100">
-                          <div class="row h-100">
-                            <div class="col-6 col-lg-12 d-flex align-content-center flex-column">
-                              <h3>@lang('groups.co2_prevented')</h3>
-                              <svg width="20" height="12" viewBox="0 0 15 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><circle cx="2.854" cy="6.346" r="2.854" style="fill:#0394a6;"/><circle cx="11.721" cy="5.92" r="3.279" style="fill:#0394a6;"/><circle cx="7.121" cy="4.6" r="4.6" style="fill:#0394a6;"/><rect x="2.854" y="6.346" width="8.867" height="2.854" style="fill:#0394a6;"/></g></svg>
-                            </div>
-                                                                                                                                                                                                                               <div class="col-6 col-lg-12 d-flex align-items-end">
-                              {{{ number_format(round($groupCo2), 0, '.' , ',') }}} kg
-                            </div>
-                          </div>
-                        </div>
-                    </li>
-                </ul>
-
+          <div class="row mt-md-50">
+            <div class="col-lg-12">
                 <h2 id="upcoming-grp">@lang('groups.group_events')
                   @if ( Auth::check() && $group->isVolunteer() )
                     @php( $copy_link = url("/calendar/group/{$group->idgroups}") )
@@ -319,88 +175,12 @@
                     <a href="/party/group/{{{ $group->idgroups }}}">@lang('groups.see_all_events')</a>
                   </div>
                 </div>
+            </div>
+          </div>
 
-                <br>
+            <div class="row mt-md-50">
 
-                <h2 id="environmental-impact">@lang('groups.environmental_impact')</h2>
-
-                <div class="row row-compressed-xs no-gutters">
-                    <div class="col-lg-3 d-flex flex-column">
-                        <ul class="properties">
-                            <li class="properties__item__full properties__item__half_xs">
-                                <div>
-                                <h3>@lang('groups.waste_prevented')</h3>
-                                @php( $sum = 0 )
-                                @foreach($waste_year_data as $y)
-                                    @php( $sum += $y->waste )
-                                @endforeach
-                                {{{  number_format(round($groupWaste), 0, '.' , ',') }}} kg
-                                <svg width="17" height="17" viewBox="0 0 13 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><path d="M12.15,0c0,0 -15.921,1.349 -11.313,10.348c0,0 0.59,-1.746 2.003,-3.457c0.852,-1.031 2,-2.143 3.463,-2.674c0.412,-0.149 0.696,0.435 0.094,0.727c0,0 -4.188,2.379 -4.732,6.112c0,0 1.805,1.462 3.519,1.384c1.714,-0.078 4.268,-1.078 4.707,-3.551c0.44,-2.472 1.245,-6.619 2.259,-8.889Z" style="fill:#0394a6;"/><path d="M1.147,13.369c0,0 0.157,-0.579 0.55,-2.427c0.394,-1.849 0.652,-0.132 0.652,-0.132l-0.25,2.576l-0.952,-0.017Z" style="fill:#0394a6;"/></g></svg>
-                                </div>
-                            </li>
-                            <li class="properties__item__full properties__item__half_xs">
-                                <div>
-                                    <h3>@lang('groups.co2_prevented')</h3>
-                                    @php( $sum = 0 )
-                                    @foreach($year_data as $y)
-                                        @php( $sum += $y->co2 )
-                                    @endforeach
-                                    {{{ number_format(round($groupCo2), 0, '.' , ',') }}} kg
-                                    <svg width="20" height="12" viewBox="0 0 15 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><circle cx="2.854" cy="6.346" r="2.854" style="fill:#0394a6;"/><circle cx="11.721" cy="5.92" r="3.279" style="fill:#0394a6;"/><circle cx="7.121" cy="4.6" r="4.6" style="fill:#0394a6;"/><rect x="2.854" y="6.346" width="8.867" height="2.854" style="fill:#0394a6;"/></g></svg>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <?php
-                    /** find size of needed SVGs **/
-                    if($sum >= 3000) {
-                        $consume_svg = 'svg-car1';
-                        $consume_label = 'equal_to_driving';
-                        $consume_eql_to = (1 / 0.12) * $groupCo2;
-                        $consume_legend = number_format(round($consume_eql_to), 0, '.', ',') . ' km';
-
-                        $manufacture_svg = 'svg-car2';
-                        $manufacture_label = 'like_manufacturing';
-                        $manufacture_eql_to = round($groupCo2 / 6000);
-                        $manufacture_legend = $manufacture_eql_to . ' ' . trans_choice('groups.cars', $manufacture_eql_to);
-                    }
-                    else {
-                        $consume_svg = 'svg-tv';
-                        $consume_label = 'like_watching_tv';
-                        $consume_eql_to = ((1 / 0.024) * $groupCo2) / 24;
-                        $consume_eql_to = number_format(round($consume_eql_to), 0, '.', ',');
-                        $consume_legend = $consume_eql_to . ' ' . trans_choice('groups.days', $consume_eql_to);
-
-                        $manufacture_svg = 'svg-sofa';
-                        $manufacture_label = 'like_manufacturing';
-                        $manufacture_eql_to = round($groupCo2 / 100);
-                        $manufacture_legend = $manufacture_eql_to . ' ' . trans_choice('groups.sofas', $manufacture_eql_to);
-                    }
-                    ?>
-
-                    <div class="col-lg-9 d-flex flex-column">
-                        <div class="row row-compressed-xs no-gutters properties">
-                            <div class="col-lg-6 d-flex flex-column">
-                                <div class="stat">
-                                    <h3>@lang('groups.'.$consume_label)</h3>
-                                    @include('partials/'.$consume_svg)
-                                    <p>{{{ $consume_legend }}}</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 d-flex flex-column">
-                                <div class="stat">
-                                    <h3>@lang('groups.'.$manufacture_label)</h3>
-                                    @include('partials/'.$manufacture_svg)
-                                    <p>{{{ $manufacture_legend }}}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <br>
-
+                <div class="col-lg-12">
                 <h2 id="device-breakdown">@lang('groups.device_breakdown')</h2>
 
                 <div class="row row-compressed-xs no-gutters">

@@ -2,19 +2,19 @@
   <div>
     <h2 class="mt-2 mb-2">{{ translatedItems }}</h2>
     <div class="items-container">
-      <EventStatsValue :count="stats.fixed_devices" icon="fixed" size="sm" variant="primary" class="event-stat-fixed" />
+      <StatsValue :count="stats.fixed_devices" icon="fixed" size="sm" variant="primary" class="event-stat-fixed" />
       <div />
-      <EventStatsValue :count="stats.fixed_powered" icon="powered" size="md" title="devices.powered_items" class="event-stat-powered" />
+      <StatsValue :count="stats.fixed_powered" icon="powered" size="md" title="devices.powered_items" class="event-stat-powered" />
       <div />
-      <EventStatsValue :count="stats.fixed_unpowered" icon="unpowered" size="md" title="devices.unpowered_items" class="event-stat-unpowered" />
+      <StatsValue :count="stats.fixed_unpowered" icon="unpowered" size="md" title="devices.unpowered_items" class="event-stat-unpowered" />
     </div>
   </div>
 </template>
 <script>
-import EventStatsValue from './EventStatsValue'
+import StatsValue from './StatsValue'
 
 export default {
-  components: {EventStatsValue},
+  components: {StatsValue},
   props: {
     stats: {
       required: true,

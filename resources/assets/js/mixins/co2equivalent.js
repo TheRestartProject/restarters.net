@@ -17,7 +17,7 @@ export default {
         value: '<span class="text-brand-light font-weight-bold">' + val.toLocaleString() + '</span>'
       })
 
-      return this.pluralise(ret, val)
+      return this.$lang.choice(ret, val)
     }
   }
 }
