@@ -48,19 +48,19 @@ export default {
       let ret = []
 
       if (this.stats.dead_devices) {
-        ret.push(this.pluralise(this.$lang.get('partials.to_be_recycled', {
+        ret.push(this.$lang.choice(this.$lang.get('partials.to_be_recycled', {
           value: this.stats.dead_devices
         }), this.stats.dead_devices))
       }
 
       if (this.stats.repairable_devices) {
-        ret.push(this.pluralise(this.$lang.get('partials.to_be_repaired', {
+        ret.push(this.$lang.choice(this.$lang.get('partials.to_be_repaired', {
           value: this.stats.repairable_devices
         }), this.stats.repairable_devices))
       }
 
       if (this.stats.no_weight) {
-        ret.push(this.pluralise(this.$lang.get('partials.no_weight', {
+        ret.push(this.$lang.choice(this.$lang.get('partials.no_weight', {
           value: this.stats.no_weight
         }), this.stats.no_weight))
       }
@@ -68,10 +68,10 @@ export default {
       if (!ret.length) {
         return null
       } else if (ret.length === 1) {
-        const intro = this.pluralise(this.$lang.get(langSource + '.not_counting'), this.stats.no_weight)
+        const intro = this.$lang.choice(this.$lang.get(langSource + '.not_counting'), this.stats.no_weight)
         return intro + ' ' + ret[0] + '.'
       } else {
-        const intro = this.pluralise(this.$lang.get(langSource + '.not_counting'), this.stats.no_weight)
+        const intro = this.$lang.choice(this.$lang.get(langSource + '.not_counting'), this.stats.no_weight)
         const first = ret.slice(0, -1)
         const last = ret[ret.length - 1]
 

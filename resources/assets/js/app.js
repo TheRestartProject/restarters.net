@@ -21,7 +21,6 @@ require('./constants');
 import Vue from 'vue';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import store from './store'
-import pluralize from './mixins/pluralize'
 import {
   LMap,
   LTileLayer,
@@ -1692,8 +1691,6 @@ jQuery(document).ready(function () {
       }
     }
   })
-
-  Vue.mixin(pluralize)
 
   // We use Leaflet
   Vue.use({
