@@ -3,7 +3,7 @@
     <b-input @change="$emit('update:type', $event)" :placeholder="translatedType" size="lg" class="marg" />
     <div v-b-popover.html.left :title="translatedTooltipType" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
-      <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
+      <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else />
     </div>
   </div>
 </template>

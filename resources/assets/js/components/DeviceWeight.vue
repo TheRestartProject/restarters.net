@@ -1,10 +1,10 @@
 <template>
   <div class="w-100 align-items-center device-field-row">
-    <label class="text-bold text-white">
+    <label class="text-bold">
       {{ translatedWeight }}
     </label>
     <b-input type="number" @change="$emit('update:weight', $event)" size="lg" class="marg"  min="0.01" step=".01" autocomplete="off" />
-    <span class="text-right mb-1 text-white">
+    <span class="text-right mb-1">
       {{ translatedRequiredImpact }}
     </span>
   </div>

@@ -1,6 +1,6 @@
 <template>
   <transition name="recent">
-    <b-tr>
+    <b-tr v-if="!editing">
       <b-td>
         <h3 class="noheader">
           {{ device.category.name }}
@@ -30,7 +30,7 @@
         <b-img v-if="!sparePartsNeeded" src="/images/tick.svg" class="icon" />
       </b-td>
       <b-td v-if="canedit" class="text-right">
-        <span class="pl-2 pr-2 clickme">
+        <span class="pl-2 pr-2 clickme" @click="editDevice">
           <b-img class="icon" src="/icons/edit_ico_green.svg" />
         </span>
         <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
@@ -39,15 +39,21 @@
         <ConfirmModal :key="'modal-' + device.iddevices" ref="confirmDelete" @confirm="deleteConfirmed" />
       </b-td>
     </b-tr>
+    <b-tr v-else>
+      <b-td :colspan="powered ? 8 : 7" class="p-0">
+        <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @cancel="editing = false" />
+      </b-td>
+    </b-tr>
   </transition>
 </template>
 <script>
 import event from '../mixins/event'
 import { FIXED, REPAIRABLE, END_OF_LIFE, SPARE_PARTS_MANUFACTURER, SPARE_PARTS_THIRD_PARTY } from '../constants'
 import ConfirmModal from './ConfirmModal'
+import EventDevice from './EventDevice'
 
 export default {
-  components: {ConfirmModal},
+  components: {EventDevice, ConfirmModal},
   mixins: [ event ],
   props: {
     device: {
@@ -58,6 +64,11 @@ export default {
       type: Boolean,
       required: false,
       default: true
+    }
+  },
+  data () {
+    return {
+      editing: false
     }
   },
   computed: {
@@ -97,6 +108,16 @@ export default {
         iddevices: this.device.iddevices,
         idevents: this.idevents
       })
+    },
+    editDevice() {
+      // When we are editing, the original row disappears to be replaced by a new row containing just the editable
+      // device.  This is arguably the right thing anyway, but matters are complicated:
+      // - we want a transition on the row for when new devices are added.
+      // - transitions can only have a single child.
+      // - transition-group exists to solve this, but that inserts a DOM tag.  But we're within a table, and
+      //   inserting a DOM tag breaks the table layout.
+      // So swapping out the row enables us to use transitions within the table structure.
+      this.editing = true
     }
   }
 }

@@ -10,9 +10,9 @@
           <DeviceCategorySelect class="mb-2" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
           <div v-if="powered">
             <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" />
-            <DeviceModel class="mb-2" :model.sync="currentDevice.model" />
+            <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" />
           </div>
-          <DeviceType class="mb-2" :type.sync="currentDevice.type" v-else />
+          <DeviceType class="mb-2" :type.sync="currentDevice.type" :icon-variant="add ? 'black' : 'brand'" v-else />
           <DeviceWeight v-if="showWeight" :estimate.sync="currentDevice.estimate" />
           <DeviceAge :age.sync="currentDevice.age" />
 <!--          TODO Photos-->
@@ -32,7 +32,7 @@
           <DeviceUsefulUrls :device="device" :useful-urls.sync="currentDevice.usefulURLs" class="mb-2" />
           <div class="d-flex">
             <b-form-checkbox v-model="currentDevice.wiki" class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" />
-            <label class="text-white" :for="'wiki-' + (add ? '' : device.iddevices)">
+            <label :for="'wiki-' + (add ? '' : device.iddevices)">
               {{ translatedCaseStudy }}
             </label>
           </div>
@@ -137,7 +137,8 @@ export default {
       default: false
     },
     powered: {
-      type: Boolean,
+      // The server might return a number rather than a boolean.
+      type: [ Boolean, Number ],
       required: false,
       default: false
     }
@@ -269,7 +270,7 @@ export default {
 
 .device-info {
   display: grid;
-  grid-template-columns: repeat( auto-fit, minmax(360px, 1fr) );
+  grid-template-columns: repeat( auto-fit, minmax(350px, 1fr) );
 
   .useful-repair-urls .input-group .form-control {
     border-radius: initial;
@@ -277,9 +278,9 @@ export default {
 }
 
 h3 {
-  font-size: 0.9rem;
-  color: #fff;
+  font-size: $font-size-base;
   font-weight: bold;
+  color: #fff;
 }
 
 .add-device {
@@ -287,6 +288,40 @@ h3 {
 
   .card {
     background-color: $brand-light;
+  }
+
+  ::v-deep {
+    label {
+      color: white;
+      font-weight: bold;
+    }
+  }
+}
+
+.edit-device {
+  background-color: $brand-grey;
+  color: black;
+
+  h3 {
+    color: $brand-light;
+  }
+
+  .btn-tertiary {
+    color: $brand-light;
+    background-color: white;
+    border: 1px solid $brand-light;
+    box-shadow: 5px 5px 0 0 $brand-light;
+  }
+
+  .card {
+    background-color: $brand-grey;
+  }
+
+  ::v-deep {
+    label {
+      color: black;
+      font-weight: bold;
+    }
   }
 }
 

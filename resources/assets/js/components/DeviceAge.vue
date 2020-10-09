@@ -1,10 +1,10 @@
 <template>
   <div class="w-100 align-items-center device-field-row">
-    <label class="text-bold text-white">
+    <label class="text-bold">
       {{ translatedAge }}
     </label>
     <b-input type="number" @change="$emit('update:age', parseInt($event))" size="lg" class="marg"  min="0" step="0.5" autocomplete="off" />
-    <span class="text-right mb-1 text-white">
+    <span class="text-right mb-1">
       {{ translatedAgeApprox }}
     </span>
   </div>

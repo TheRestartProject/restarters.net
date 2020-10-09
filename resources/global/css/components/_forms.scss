@@ -238,3 +238,7 @@ select.form-control:not([class*="select2"]) {
 .form-control-lg {
   height: 45px !important;
 }
+
+label {
+  font-weight: bold;
+}

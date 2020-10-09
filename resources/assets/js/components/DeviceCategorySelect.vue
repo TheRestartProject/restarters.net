@@ -40,7 +40,8 @@ export default {
       required: true
     },
     powered: {
-      type: Boolean,
+      // The server might return a number rather than a boolean.
+      type: [ Boolean, Number ],
       required: true
     },
     iconVariant: {
