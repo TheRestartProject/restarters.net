@@ -18,7 +18,7 @@
       @select=""
     >
     </multiselect>
-    <div v-b-popover.html.left :title="translatedTooltipCategory" class="ml-3 mt-2">
+    <div v-b-popover.html.left="translatedTooltipCategory" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
     </div>
