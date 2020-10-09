@@ -505,6 +505,10 @@ h2 {
   border: 1px solid $black !important;
 }
 
+.deepnowrap button {
+  white-space: nowrap !important;
+}
+
 // We use multiselect in the new Vue code, and select2 in the old jQuery code.  We want to make them look the same.
 .multiselect__option {
   padding-left: 10px !important;

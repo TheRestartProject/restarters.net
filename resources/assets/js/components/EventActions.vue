@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-dropdown variant="primary" :text="translatedEventActions">
+    <b-dropdown variant="primary" :text="translatedEventActions" class="deepnowrap">
       <div v-if="canedit">
         <b-dropdown-item :href="'/party/edit/' + idevents">
           {{ translatedEditEvent }}
