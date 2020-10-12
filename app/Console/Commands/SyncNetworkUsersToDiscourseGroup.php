@@ -7,7 +7,7 @@ use App\User;
 
 use Illuminate\Console\Command;
 
-class SyncRepairTogetherUsersToDiscourse extends Command
+class SyncNetworkUsersToDiscourseGroup extends Command
 {
     private $discourseClient;
 
@@ -61,6 +61,9 @@ class SyncRepairTogetherUsersToDiscourse extends Command
             } catch (\Exception $ex) {
                 $this->error($ex->getMessage());
             }
+            // Sleep to avoid Discourse rate limiting of 60 requests per minute.
+            // See https://meta.discourse.org/t/global-rate-limits-and-throttling-in-discourse/78612
+            sleep(1);
         }
     }
 
@@ -94,9 +97,10 @@ class SyncRepairTogetherUsersToDiscourse extends Command
                 ],
             ]
         );
+        $this->info($response->getReasonPhrase());
 
         if ( ! $response->getStatusCode() === 200) {
-            Log::error('Could not sync '.$user->id.' to Discourse: '.$response->getReasonPhrase());
+            $this->error('Could not sync '.$user->id.' to Discourse: '.$response->getReasonPhrase());
         }
     }
 }
