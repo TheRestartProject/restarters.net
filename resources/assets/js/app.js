@@ -13,7 +13,6 @@ require('summernote');
 require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
-require('./misc/device');
 require('./fixometer');
 require('leaflet');
 require('./constants');

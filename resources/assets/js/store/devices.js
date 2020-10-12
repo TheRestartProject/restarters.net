@@ -14,19 +14,16 @@ export default {
     }
   },
   mutations: {
-    set(state, params) {
+    set (state, params) {
       Vue.set(state.list, params.idevents, params.devices)
     },
-    add(state, params) {
-      let exists = false;
+    add (state, params) {
+      let exists = false
 
-      console.log("Add", params)
       if (params.iddevices) {
-        console.log("look for existing")
         state.list[params.idevents].forEach((d, i) => {
           if (d.iddevices === params.iddevices) {
             // Found it there already.
-            console.log("Found it")
             Vue.set(state.list[params.idevents], i, params)
             exists = true
           }
@@ -38,29 +35,78 @@ export default {
         state.list[params.idevents].push(params)
       }
     },
-    remove(state, params) {
+    remove (state, params) {
       let newarr = state.list[params.idevents].filter((a) => {
         return a.iddevices !== params.iddevices
       })
 
       Vue.set(state.list, params.idevents, newarr)
     },
+    addURL(state, params) {
+      // Fix the device.  This isn't very efficient but the numbers involved are never very large.
+      for (let idevents in state.list) {
+        const devices = state.list[idevents]
+
+        for (let dix = 0; dix < state.list[idevents].length; dix++) {
+          const device = devices[dix]
+
+          if (params.device_id === device.iddevices) {
+            let exists = device.urls.findIndex(u => {
+              return u.id === params.id
+            })
+
+            if (exists !== -1) {
+              device.urls[exists] = params.url
+            } else {
+              device.urls.push(params.url)
+            }
+
+            devices[dix] = device
+            Vue.set(state.list, idevents, devices)
+          }
+        }
+      }
+    },
+    removeURL(state, params) {
+      for (let idevents in state.list) {
+        const devices = state.list[idevents]
+
+        for (let dix = 0; dix < state.list[idevents].length; dix++) {
+          const device = devices[dix]
+
+          if (params.device_id === device.iddevices) {
+            device.urls = device.urls.filter(u => {
+              return u.id !== params.url.id
+            })
+
+            devices[dix] = device
+            Vue.set(state.list, idevents, devices)
+          }
+        }
+      }
+    }
   },
   actions: {
-    set({commit}, params) {
-      commit('set', params);
+    set ({commit}, params) {
+      commit('set', params)
     },
-    async add({commit, dispatch}, params) {
+    async add ({commit, dispatch}, params) {
+      let created = null
+
       let ret = await axios.post('/device/create', params, {
         headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
+          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
         }
       })
 
       if (ret && ret.data && ret.data.success && ret.data.devices) {
         // We have been returned the device objects from the server.  Add them into the store, and lo!  All our
         // stats and views will update.
-        commit('add', ret.data.devices[0]);
+        created = ret.data.devices
+
+        created.forEach(d => {
+          commit('add', d)
+        })
 
         // Update our stats
         // TODO LATER There are some uses of event_id in the server which should really be idevents for
@@ -72,18 +118,20 @@ export default {
           root: true
         })
       }
+
+      return created
     },
-    async edit({commit, dispatch}, params) {
+    async edit ({commit, dispatch}, params) {
       let ret = await axios.post('/device/edit/' + params.iddevices, params, {
         headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
+          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
         }
       })
 
       if (ret && ret.data && ret.data.success && ret.data.device) {
         // We have been returned the device objects from the server.  Add them into the store, and lo!  All our
         // stats and views will update.
-        commit('add', ret.data.device);
+        commit('add', ret.data.device)
 
         // Update our stats
         dispatch('events/setStats', {
@@ -94,10 +142,10 @@ export default {
         })
       }
     },
-    async delete({commit, dispatch}, params) {
+    async delete ({commit, dispatch}, params) {
       const ret = await axios.get('/device/delete/' + params.iddevices, {
         headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
+          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
         }
       })
 
@@ -112,7 +160,65 @@ export default {
           root: true
         })
       } else {
-        throw new Exception("Server request failed")
+        throw new Exception('Server request failed')
+      }
+    },
+    async addURL ({commit}, params) {
+      const ret = await axios.post('/device-url/', {
+        device_id: params.iddevices,
+        url: params.url.url,
+        source: params.url.source
+      }, {
+        headers: {
+          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+        }
+      })
+
+      if (ret && ret.data && ret.data.success) {
+        // Update our store with the new URL.
+        const newurl = {
+          id: ret.data.id,
+          url: params.url.url,
+          source: params.url.source
+        }
+
+        commit('addURL', {
+          device_id: params.iddevices,
+          url: newurl
+        })
+      }
+    },
+    async editURL ({commit}, params) {
+      const ret = await axios.put('/device-url/' + params.url.id, {
+        url: params.url.url,
+        source: params.url.source
+      }, {
+        headers: {
+          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+        }
+      })
+
+      if (ret && ret.data && ret.data.success) {
+        // Update our store with the new URL.
+        commit('addURL', {
+          device_id: params.iddevices,
+          url: params.url
+        })
+      }
+    },
+    async deleteURL ({commit}, params) {
+      const ret = await axios.delete('/device-url/' + params.url.id, {
+        headers: {
+          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+        }
+      })
+
+      if (ret && ret.data && ret.data.success) {
+        // Update our store with the new URL.
+        commit('removeURL', {
+          device_id: params.iddevices,
+          url: params.url,
+        })
       }
     }
   },

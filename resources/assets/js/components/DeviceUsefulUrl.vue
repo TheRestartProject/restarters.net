@@ -1,12 +1,16 @@
 <template>
   <div>
     <div class="device-select-row mb-2 w-100">
-      <b-input :value="urlValue" :placeholder="translatedRepairURL" size="lg" class="marg" />
-      <div />
+      <b-input v-model="urlValue" :placeholder="translatedRepairURL" size="lg" class="marg" />
+      <div>
+        <b-btn variant="none" @click="deleteMe" class="p-0 ml-3 mt-2" v-if="notBlank">
+          <b-img src="/icons/cross_ico.svg" class="icon" />
+        </b-btn>
+      </div>
     </div>
     <div class="device-select-row mb-2 w-100">
       <multiselect
-          v-model="source"
+          v-model="sourceValue"
           :placeholder="translatedRepairSource"
           :options="statusOptions"
           track-by="id"
@@ -38,6 +42,9 @@ export default {
     }
   },
   computed: {
+    notBlank() {
+      return this.urlValue || this.sourceValue
+    },
     statusOptions() {
       return [
         {
@@ -55,7 +62,10 @@ export default {
         return this.url ? this.url.url : null
       },
       set(newval) {
-        this.$emit('update:url', newval)
+        this.$emit('update:url', {
+          source: this.sourceValue,
+          url: newval
+        })
       }
     },
     sourceValue: {
@@ -64,12 +74,15 @@ export default {
           return null
         }
 
-        return this.options.find(o => {
-          return o.id === this.url.id
+        return this.statusOptions.find(o => {
+          return o.id === this.url.source
         })
       },
       set(newval) {
-        this.$emit('update:source', newval.id)
+        this.$emit('update:url', {
+          source: newval.id,
+          url: this.urlValue
+        })
       }
     },
     translatedRepairSource() {
@@ -84,6 +97,11 @@ export default {
     translatedFromManufacturer() {
       return this.$lang.get('devices.from_manufacturer')
     }
+  },
+  methods: {
+    deleteMe() {
+      this.$emit('delete')
+    }
   }
 }
 </script>
@@ -91,5 +109,9 @@ export default {
 .marg {
   // Some card styles are getting in the way.
   margin: 2px !important;
+}
+
+.icon {
+  width: 25px;
 }
 </style>

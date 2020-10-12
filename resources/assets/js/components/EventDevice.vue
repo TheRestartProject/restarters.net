@@ -29,7 +29,7 @@
           <h3 class="mt-2 mb-4">{{ translatedTitleAssessment }}</h3>
           <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" />
           <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" />
-          <DeviceUsefulUrls :device="device" :useful-urls.sync="currentDevice.usefulURLs" class="mb-2" />
+          <DeviceUsefulUrls :device="device" :urls.sync="currentDevice.urls" class="mb-2" />
           <div class="d-flex">
             <b-form-checkbox v-model="wiki" class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" />
             <label :for="'wiki-' + (add ? '' : device.iddevices)">
@@ -191,7 +191,7 @@ export default {
       return this.$lang.get('partials.cancel')
     },
   },
-  mounted() {
+  created() {
     // We take a copy of what's passed in so that we can then edit it in here before saving or cancelling.  We need
     this.currentDevice = {
       event_id: this.idevents,
@@ -203,11 +203,13 @@ export default {
       spare_parts: null,
       problem: null,
       assessment: null,
-      quantity: 1
+      quantity: 1,
+      urls: []
     }
 
     if (this.device) {
-      this.currentDevice = {...this.currentDevice, ...this.device}
+      // Take a deep clone because we're messing with arrays.
+      this.currentDevice = {...this.currentDevice, ...JSON.parse(JSON.stringify(this.device))}
 
       // Some values we need to munge back to the id for our selects.
       if (this.currentDevice.category) {
@@ -226,11 +228,62 @@ export default {
       this.$emit('cancel')
     },
     async addDevice() {
-      await this.$store.dispatch('devices/add', this.prepareDeviceForServer())
+      const createdDevices = await this.$store.dispatch('devices/add', this.prepareDeviceForServer())
+
+      if (this.currentDevice.urls) {
+        // We have some useful URLs.  Apply them to each of the created devices.
+        createdDevices.forEach(async (d) => {
+          this.currentDevice.urls.forEach(async (u) => {
+            await this.$store.dispatch('devices/addURL', {
+              iddevices: d.iddevices,
+              url: u
+            })
+          })
+        })
+      }
+
       this.$emit('cancel')
     },
     async saveDevice() {
       await this.$store.dispatch('devices/edit', this.prepareDeviceForServer())
+
+      // We need to update the useful URLs, which might have been added/edited/deleted from what we originally had.
+      this.currentDevice.urls.forEach(async (u) => {
+        if (!u.id) {
+          // This has no id, and hence is a new useful URL added in this edit.  Create it.
+          await this.$store.dispatch('devices/addURL', {
+            iddevices: this.device.iddevices,
+            url: u
+          })
+        } else {
+          // This has an id, and therefore already existed on the server.
+          const existing = this.device.urls.find(u2 => {
+            return u2.id === u.id
+          })
+
+          if (existing.url !== u.url || existing.source !== u.source) {
+            await this.$store.dispatch('devices/editURL', {
+              iddevices: this.device.iddevices,
+              url: u
+            })
+          }
+        }
+      })
+
+      // Now find any URLs which were present originally but are no longer present - these need to be deleted.
+      this.device.urls.forEach(async (u) => {
+        const present = this.currentDevice.urls.find(u2 => {
+          return u2.id === u.id
+        })
+
+        if (!present) {
+          await this.$store.dispatch('devices/deleteURL', {
+            iddevices: this.device.iddevices,
+            url: u
+          })
+        }
+      })
+
       this.$emit('cancel')
     },
     prepareDeviceForServer() {

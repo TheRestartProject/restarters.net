@@ -54,7 +54,8 @@ class DeviceUrlController extends Controller
           // Return information
             if ($create) {
                 return response()->json([
-                'success' => $create->id
+                    'success' => TRUE,
+                    'id' => $create->id,
                 ]);
             } else {
                 abort(404);
