@@ -134,7 +134,9 @@ class JoinEvent extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-
+            'title' => 'You\'ve been invited to join an event: ',
+            'name' => $this->arr['event']->venue,
+            'url' => url('/party/view/'.$this->arr['event']->idevents),
         ];
     }
 }
