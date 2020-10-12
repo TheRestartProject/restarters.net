@@ -123,6 +123,7 @@
             $device->category = $device->deviceCategory;
             $device->shortProblem = $device->getShortProblem();
             $device->urls;
+            $device->images = $device->getImages();
             $expanded_devices[] = $device;
           }
 

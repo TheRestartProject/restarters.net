@@ -878,12 +878,22 @@ class DeviceController extends Controller
     public function imageUpload(Request $request, $id)
     {
         try {
+            $images = [];
+
             if (isset($_FILES) && ! empty($_FILES)) {
                 $file = new FixometerFile;
                 $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
+                $device = Device::find($id);
+                $images = $device->getImages();
             }
 
-            return 'success - image uploaded';
+
+            // Return the current set of images.
+            return response()->json([
+                'success' => true,
+                'iddevices' => $id,
+                'images' => $images
+            ]);
         } catch (\Exception $e) {
             return 'fail - image could not be uploaded';
         }

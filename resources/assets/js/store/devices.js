@@ -11,6 +11,13 @@ export default {
   getters: {
     byEvent: state => idevents => {
       return state.list[idevents]
+    },
+    byDevice: state => (idevents, iddevices) => {
+      const device = state.list[idevents].find(d => {
+        return d.iddevices === iddevices
+      })
+
+      return device ? device.images : []
     }
   },
   mutations: {
@@ -84,7 +91,40 @@ export default {
           }
         }
       }
-    }
+    },
+    setImages(state, params) {
+      for (let idevents in state.list) {
+        const devices = state.list[idevents]
+
+        for (let dix = 0; dix < state.list[idevents].length; dix++) {
+          const device = devices[dix]
+
+          if (params.iddevices === device.iddevices) {
+            device.images = params.images
+            devices[dix] = device
+            Vue.set(state.list, idevents, devices)
+          }
+        }
+      }
+    },
+    removeImage(state, params) {
+      for (let idevents in state.list) {
+        const devices = state.list[idevents]
+
+        for (let dix = 0; dix < state.list[idevents].length; dix++) {
+          const device = devices[dix]
+
+          if (params.iddevices === device.iddevices) {
+            device.images = device.images.filter(u => {
+              return u.idimages !== params.idimages
+            })
+
+            devices[dix] = device
+            Vue.set(state.list, idevents, devices)
+          }
+        }
+      }
+    },
   },
   actions: {
     set ({commit}, params) {
@@ -220,6 +260,22 @@ export default {
           url: params.url,
         })
       }
+    },
+    setImages({commit}, params) {
+      commit('setImages', params)
+    },
+    async deleteImage({commit}, params) {
+      params.idimages = params.idxref
+      const url = '/device/image/delete/' + params.iddevices + '/' + params.idimages + '/' + params.path
+      const ret = await axios.get(url, {
+        headers: {
+          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+        }
+      })
+
+      // TODO LATER This isn't a proper API call, and returns success/failure via a redirect to another page.  Assume
+      // it works until we have a better API.
+      commit('removeImage', params)
     }
   },
 }

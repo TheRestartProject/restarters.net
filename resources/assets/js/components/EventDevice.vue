@@ -15,7 +15,7 @@
           <DeviceType class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" v-else />
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" />
           <DeviceAge :age.sync="currentDevice.age" />
-<!--          TODO Photos-->
+          <DeviceImages :idevents="idevents" :device="currentDevice" :edit="edit" class="mt-2" :images="currentImages" @remove="removeImage($event)" />
         </b-card>
       </div>
       <div class="d-flex flex-column botwhite">
@@ -52,38 +52,6 @@
       </b-btn>
     </div>
   </b-form>
-
-
-
-
-<!--  @if (!$add)-->
-<!--  <label for="file" class="photolabel">@lang('devices.images')</label>-->
-<!--  @endif-->
-<!--  <div class="d-flex flex-wrap justify-content-left pt-3 photoform">-->
-<!--    <div class="position-relative d-flex flex-wrap previews">-->
-<!--      @if ($edit)-->
-<!--      <form id="dropzoneEl-{{ $device->iddevices }}" data-deviceid="{{ $device->iddevices }}" class="dropzone dz-thumbnail dropzoneEl mr-1" action="/device/image-upload/{{ $device->iddevices }}" method="post" enctype="multipart/form-data" data-field1="" data-field2="">-->
-<!--        @csrf-->
-<!--        <div class="dz-default dz-message"></div>-->
-<!--        <div class="fallback">-->
-<!--          <input id="file-{{ $device->iddevices }}" name="file-{{ $device->iddevices }}" type="file" multiple />-->
-<!--        </div>-->
-<!--      </form>-->
-<!--      @endif-->
-
-<!--      @php( $images = $device->getImages() )-->
-<!--      @if( count($images) > 0 )-->
-<!--      @foreach($images as $image)-->
-<!--      <div class="dz-preview ml-0 mr-1 p-0">-->
-<!--        <div id="device-image-{{ $device->iddevices }}" class="dz-image">-->
-<!--          <a href="/uploads/{{ $image->path }}" data-toggle="lightbox" class="">-->
-<!--            <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder" class="image-thumb"></a>-->
-<!--        </div>-->
-<!--        <a href="/device/image/delete/{{ $device->iddevices }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $device->iddevices }}" class="dz-remove ajax-delete-image">Remove file</a>-->
-<!--      </div>-->
-<!--      @endforeach-->
-<!--      @endif-->
-<!--      <div class="uploads-{{ $device->iddevices }}"></div>-->
 </template>
 <script>
 import event from '../mixins/event'
@@ -106,9 +74,13 @@ import DeviceProblem from './DeviceProblem'
 import DeviceNotes from './DeviceNotes'
 import DeviceUsefulUrls from './DeviceUsefulUrls'
 import DeviceQuantity from './DeviceQuantity'
+import FileUploader from './FileUploader'
+import DeviceImages from './DeviceImages'
 
 export default {
   components: {
+    DeviceImages,
+    FileUploader,
     DeviceQuantity,
     DeviceUsefulUrls,
     DeviceNotes,
@@ -190,6 +162,11 @@ export default {
     translatedCancel() {
       return this.$lang.get('partials.cancel')
     },
+    currentImages() {
+      // TODO LATER The images are currently added/removed/deleted immediately, and so we get them from the store.
+      // This should be deferred until the save.
+      return this.$store.getters['devices/byDevice'](this.idevents, this.device.iddevices)
+    }
   },
   created() {
     // We take a copy of what's passed in so that we can then edit it in here before saving or cancelling.  We need
@@ -305,6 +282,13 @@ export default {
       device.brand = selectedBrand ? selectedBrand.brand_name : null
 
       return device
+    },
+    removeImage(image) {
+      // TODO LATER The remove of the image should not happen until the edit completes.  At the moment we do it
+      // immediately.  The way we set ids here is poor, but this is because the underlying API call for images
+      // is weak.
+      image.iddevices = this.currentDevice.iddevices
+      this.$store.dispatch('devices/deleteImage', image)
     }
   }
 }
