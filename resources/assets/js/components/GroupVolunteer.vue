@@ -1,5 +1,5 @@
 <template>
-  <div class="pl-4 pr-4">
+  <div>
     <div class="pt-2 pb-2 blackbord d-flex justify-content-between">
       <div class="d-flex w-100">
         <b-img-lazy :src="profile" class="profile mr-2" rounded="circle" @error.native="brokenProfileImage" />
@@ -10,32 +10,36 @@
             'font-weight-bold': host,
             'd-flex': true,
             'flex-wrap': true
-            }" :title="attendee.volunteer.name">
+            }" :title="volunteer.volunteer.name">
             <span class="pr-1 overflow-hidden ellipsis">
-              {{ attendee.volunteer.name }}
+              {{ volunteer.volunteer.name }}
             </span>
               <span class="host" v-if="host">
               {{ translatedHost }}
             </span>
             </div>
-          <div :id="'skills-' + attendee.volunteer.id" data-toggle="popover" data-placement="top" :data-content="skillList" :class="{
+            <div :id="'skills-' + volunteer.volunteer.id" :class="{
              'small': true,
              'd-flex': true,
              'clickme' : true,
              'text-muted': noskills
             }">
-              <b-img-lazy src="/images/star.svg" :class="{
-             'star': true,
-             'mr-1': true,
-             'faded': noskills
-            }" /> {{ skillCount }}
+              <div data-toggle="popover" data-placement="left" :data-content="skillList">
+                <b-img-lazy src="/images/star.svg" :class="{
+                   'star': true,
+                   'mr-1': true,
+                   'faded': noskills
+                  }" /> {{ skillCount }}
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <b-btn variant="none" v-if="attendee.confirmed && canedit" @click="confirm" class="p-0">
-        <b-img src="/icons/delete_ico_red.svg" />
-      </b-btn>
+      <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown">
+        <b-dropdown-item :href="'/group/make-host/' + groupId + '/' + volunteer.user" v-if="volunteer.role === restarter">{{ translatedMakeHost }}</b-dropdown-item>
+        <b-dropdown-item target="_blank" rel="noopener" :href="'/group/remove-volunteer/' + groupId + '/' + volunteer.user">{{ translatedRemoveVolunteer }}</b-dropdown-item>
+      </b-dropdown>
+      <button class="dropdown-toggle d-none" />
     </div>
     <b-alert variant="danger" v-if="error">
       {{ translatedSomethingWrong }}: {{ error }}
@@ -44,13 +48,18 @@
   </div>
 </template>
 <script>
-import { DEFAULT_PROFILE, HOST } from '../constants'
+import { DEFAULT_PROFILE, HOST, RESTARTER } from '../constants'
 import ConfirmModal from './ConfirmModal'
+import volunteers from '../store/volunteers'
 
 export default {
   components: {ConfirmModal},
   props: {
-    attendee: {
+    groupId: {
+      type: Number,
+      required: true
+    },
+    volunteer: {
       type: Object,
       required: true
     },
@@ -58,32 +67,34 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
   },
   data () {
     return {
-      error: null
+      error: null,
+      restarter: RESTARTER,
+      show: false
     }
   },
   computed: {
     profile() {
-      return this.attendee ? this.attendee.profilePath : DEFAULT_PROFILE
+      return this.volunteer ? this.volunteer.profilePath : DEFAULT_PROFILE
     },
     host() {
-      return this.attendee.role === HOST
+      return this.volunteer.role === HOST
     },
     noskills() {
-      return !this.attendee.volunteer.user_skills || !this.attendee.volunteer.user_skills.length
+      return !this.volunteer.volunteer.user_skills || !this.volunteer.volunteer.user_skills.length
     },
     skillCount() {
       let ret = null
-      let skills = this.attendee.volunteer.user_skills
+      let skills = this.volunteer.volunteer.user_skills
       ret = (skills && skills.length ? skills.length : '0') + ' ' + this.$lang.choice(this.$lang.get('partials.skills'), skills.length)
       return ret
     },
     skillList() {
       let ret = null
-      let skills = this.attendee.volunteer.user_skills
+      let skills = this.volunteer.volunteer.user_skills
 
       if (skills) {
         let names = []
@@ -102,6 +113,12 @@ export default {
     translatedSomethingWrong() {
       return this.$lang.get('partials.something_wrong')
     },
+    translatedRemoveVolunteer() {
+      return this.$lang.get('groups.remove_volunteer')
+    },
+    translatedMakeHost() {
+      return this.$lang.get('groups.make_host')
+    }
   },
   methods: {
     brokenProfileImage(event) {
@@ -110,8 +127,8 @@ export default {
     async remove() {
       try {
         await this.$store.dispatch('attendance/remove', {
-          userId: this.attendee.user,
-          eventId: this.attendee.event,
+          userId: this.volunteer.user,
+          eventId: this.volunteer.event,
         })
       } catch (e) {
         this.error = e.message

@@ -4,10 +4,10 @@
       <p v-html="formattedString"></p>
     </span>
     <span v-else-if="html">
-      <span v-if="!needsTruncating" v-html="html" />
+      <span v-if="!needsTruncating" v-html="html" class="w-100" />
       <span v-else>
-        <span v-if="!isReadMore" v-html="truncatedHTML" />
-        <span v-else v-html="html" />
+        <span v-if="!isReadMore" v-html="truncatedHTML" class="w-100" />
+        <span v-else v-html="html" class="w-100" />
       </span>
     </span>
     <span v-if="needsTruncating">
@@ -18,7 +18,8 @@
 </template>
 
 <script>
-const truncate = require('html-truncate');
+const htmlToText = require('html-to-text');
+import clip from "text-clipper"
 // Originally based on https://github.com/orlyyani/read-more, with thanks.
 
 export default {
@@ -68,15 +69,20 @@ export default {
     truncatedHTML() {
       // We need to truncate HTML with care to ensure that the result is tag safe; string truncation isn't good
       // enough.
-      return this.html ? truncate(this.html, this.maxChars) : null
-    },
-    untruncatedHTML() {
-      return this.html ? truncate(this.html, this.maxChars) : this.html
+      const ret = this.html ? clip(this.html, this.maxChars, { html: true, maxLines: 10 }) : null
+      return ret
     },
     needsTruncating() {
-      const ret = (this.text && (text.length > maxChars)) || (this.html && (this.truncatedHTML !== this.html))
-      console.log("Needs", ret, this.maxChars, this.truncatedHTML !== this.untruncatedHTML, this.truncatedHTML, this.untruncatedHTML)
-      return ret
+      if (this.text && (text.length > maxChars)) {
+        return true
+      }
+
+      // For HTML we need to do a more complex check, as truncate() can result in HTML which is different from
+      // the original even if it's not removed anything, because of slight HTML differences.
+      const origtext = htmlToText.fromString(this.html)
+      const truncatedtext = htmlToText.fromString(this.truncatedHTML)
+
+      return origtext !== truncatedtext
     }
   },
 

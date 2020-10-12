@@ -1,12 +1,12 @@
 <template>
   <div>
-    <h2 class="mt-2 mb-2">{{ translatedItems }}</h2>
+    <h2 class="mt-2 mb-2">{{ translatedFacts }}</h2>
     <div class="items-container">
-      <StatsValue :count="stats.fixed_devices" icon="fixed" size="sm" variant="primary" class="event-stat-fixed" />
+      <StatsValue :count="stats.parties" icon="coffee" size="md" variant="primary" title="groups.events" class="group-stat-events" />
       <div />
-      <StatsValue :count="stats.fixed_powered" icon="powered" size="md" title="devices.powered_items" class="event-stat-powered" />
+      <StatsValue :count="stats.pax" icon="participants" size="md" title="groups.participants" class="group-stat-participants" />
       <div />
-      <StatsValue :count="stats.fixed_unpowered" icon="unpowered" size="md" title="devices.unpowered_items" class="event-stat-unpowered" />
+      <StatsValue :count="stats.hours" icon="clock" size="md" title="groups.hours_volunteered" class="group-stat-hours-volunteered" />
     </div>
   </div>
 </template>
@@ -22,8 +22,8 @@ export default {
     }
   },
   computed: {
-    translatedItems() {
-      return this.$lang.get('events.items_fixed')
+    translatedFacts() {
+      return this.$lang.get('groups.group_facts')
     }
   }
 }
@@ -39,12 +39,12 @@ export default {
   grid-template-rows: 80px 180px;
 
   @include media-breakpoint-up(md) {
-    grid-template-columns: 1fr 20px 2fr 20px 2fr;
+    grid-template-columns: 1fr 20px 1fr 20px 1fr;
     grid-template-rows: 1fr
   }
 }
 
-.event-stat-fixed {
+.group-stat-events {
   grid-row-start: 1;
   grid-row-end: 2;
   grid-column-start: 1;
@@ -58,7 +58,7 @@ export default {
   }
 }
 
-.event-stat-powered {
+.group-stat-participants {
   grid-row-start: 2;
   grid-row-end: 3;
   grid-column-start: 1;
@@ -72,7 +72,7 @@ export default {
   }
 }
 
-.event-stat-unpowered {
+.group-stat-hours-volunteered {
   grid-row-start: 2;
   grid-row-end: 3;
   grid-column-start: 3;

@@ -21,7 +21,6 @@ require('./constants');
 import Vue from 'vue';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import store from './store'
-import pluralize from './mixins/pluralize'
 import {
   LMap,
   LTileLayer,
@@ -1693,8 +1692,6 @@ jQuery(document).ready(function () {
     }
   })
 
-  Vue.mixin(pluralize)
-
   // We use Leaflet
   Vue.use({
     install(Vue, options) {
@@ -1722,7 +1719,11 @@ jQuery(document).ready(function () {
         'eventattendance': require('./components/EventAttendance.vue'),
         'eventdetails': require('./components/EventDetails.vue'),
         'eventdescription': require('./components/EventDescription.vue'),
-        'eventimages': require('./components/EventImages.vue')
+        'eventimages': require('./components/EventImages.vue'),
+        'groupheading':  require('./components/GroupHeading.vue'),
+        'groupdescription':  require('./components/GroupDescription.vue'),
+        'groupvolunteers':  require('./components/GroupVolunteers.vue'),
+        'groupstats': require('./components/GroupStats.vue')
       }
     })
   })

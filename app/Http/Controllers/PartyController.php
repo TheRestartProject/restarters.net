@@ -636,7 +636,10 @@ class PartyController extends Controller
         //Event details
         $images = $File->findImages(env('TBL_EVENTS'), $id);
         $party = $Party->findThis($id, true)[0];
-        $hosts = EventsUsers::where('event', $id)->where('role', 3)->where('status', 1)->get();
+
+        // status is a string, so using 'like' rather than = otherwise 
+        // those with an invite string starting with '1' are included.
+        $hosts = EventsUsers::where('event', $id)->where('role', 3)->where('status', 'like', '1')->get();
 
         if (Auth::check()) {
             $is_attending = EventsUsers::where('event', $id)->where('user', Auth::user()->id)->first();
@@ -645,7 +648,9 @@ class PartyController extends Controller
         }
 
         //Info for attendance tabs
-        $attendees = EventsUsers::where('event', $id)->where('status', 1);
+        // status is a string, so using 'like' rather than = otherwise 
+        // those with an invite string starting with '1' are included.
+        $attendees = EventsUsers::where('event', $id)->where('status', 'like', '1');
         $attended = clone $attendees->get();
 
         if (count($attended) > 5 && $event->hasFinished() && ! Auth::guest() && ! FixometerHelper::hasRole(Auth::user(), 'Restarter')) {
@@ -1072,7 +1077,7 @@ class PartyController extends Controller
         // removed.
         // (Not including those invited but not RSVPed)
         $event_user_ids = EventsUsers::where('event', $event_id)
-            ->where('status', 1)
+            ->where('status', 'like', '1')
             ->pluck('user')
             ->toArray();
 
@@ -1108,7 +1113,7 @@ class PartyController extends Controller
         // (Not including those invited but not RSVPed)
         $event_user_ids = EventsUsers::where('event', $event_id)
         ->where('user', '!=', Auth::user()->id)
-        ->where('status', 1)
+        ->where('status', 'like', '1')
         ->pluck('user')
         ->toArray();
 

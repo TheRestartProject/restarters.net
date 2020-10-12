@@ -1,5 +1,5 @@
 <template>
-  <CollapsibleSection class="lineheight" collapsed hide-title>
+  <CollapsibleSection class="lineheight no-explict-width" collapsed hide-title>
     <template slot="title">
       {{ translatedDescription }}
     </template>
@@ -9,8 +9,6 @@
   </CollapsibleSection>
 </template>
 <script>
-import { DATE_FORMAT } from '../constants'
-import moment from 'moment'
 import map from '../mixins/map'
 import event from '../mixins/event'
 import ExternalLink from './ExternalLink'
@@ -42,9 +40,5 @@ export default {
 
 .readmore {
   white-space: pre-wrap !important;
-}
-
-.icon {
-  width: 30px;
 }
 </style>
