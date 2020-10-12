@@ -98,6 +98,9 @@ class SyncNetworkUsersToDiscourseGroup extends Command
             ]
         );
         $this->info($response->getReasonPhrase());
+        if ($response->getReasonPhrase() !== 'OK') {
+            $this->error($response->getReasonPhrase());
+        }
 
         if ( ! $response->getStatusCode() === 200) {
             $this->error('Could not sync '.$user->id.' to Discourse: '.$response->getReasonPhrase());
