@@ -36,13 +36,29 @@ The core of the application is built using the Laravel framework. It integrates
 with Discourse for community discussion and with Mediawiki for the community
 knowledgebase.
 
+## Develop using Docker and Docker Compose
+
+Currently only includes the Fixometer.
+
+1. First edit `/etc/hosts -> 127.0.0.1 restarters.test talk.restarters.test`
+2. Make sure you have Docker and Docker Compose installed.
+3. Copy `./compose/local/env` to `.env`.  
+4. Edit .env and provide a valid value of `GOOGLE_API_CONSOLE_KEY`. 
+5. `docker-compose up --build`
+
+You can then log in:
+- To the Fixometer at `http://restarters.test:8000` using an email of `jane@bloggs.net` and a password `passw0rd`.
+- To Mailhog (to see emails sent) at `http://restarters.test:8025/`
+
+If you change files locally, they will be picked up automatically.  There may be a delay of a second or so for changes to the client code (e.g. a `.vue` or `.js` file).
+
 ## Installation
 
 See Installation Guidelines in the wiki.
 
 ### Basic setup
 
-This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a different OS!
+This is currently assuming Debian / Ubuntu. Get in touch if you're trying on a different OS!
 
 #### Prerequisites
 
@@ -114,3 +130,7 @@ made possible with modest funding from the Innovation in Waste Prevention Fund,
 Defra-funded and administered by WRAP. Subsequent development has been financed
 by the Shuttleworth Foundation, and by Nesta and the Department for Digital,
 Culture, Media & Sport.
+
+```
+
+```

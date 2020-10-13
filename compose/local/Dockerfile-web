@@ -1,0 +1,10 @@
+FROM node:8.10
+WORKDIR /app
+
+RUN apt-get update -y && apt-get install -y openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev bash npm vim procps
+
+COPY . /app
+RUN chmod +x ./compose/scripts/start-web.sh
+
+# Command to run this container.
+CMD ./compose/scripts/start-web.sh
