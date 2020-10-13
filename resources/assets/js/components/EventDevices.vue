@@ -6,11 +6,24 @@
       </div>
     </template>
     <template slot="content">
-<!--      TODO counts and icons on tabs-->
       <b-tabs class="ourtabs ourtabs-brand w-100">
         <b-tab active title-item-class="w-50" class="pt-2">
           <template slot="title">
-            <b>{{ translatedPowered }}</b> ({{ powered.length }})
+            <div class="d-flex justify-content-between text-brand font-weight-bold">
+              <div>
+                <b>{{ translatedPowered }}</b> ({{ powered.length }})
+              </div>
+              <div class="d-flex">
+                <div class="mr-3 lower">
+                  <b-img src="/images/trash_brand.svg" class="icon" />
+                  {{ Math.round(stats.ewaste) }} kg
+                </div>
+                <div class="mr-1 lower">
+                  <b-img src="/images/co2_brand.svg" class="icon" />
+                  {{ Math.round(stats.co2) }} kg
+                </div>
+              </div>
+            </div>
           </template>
           <p v-html="translatedDescriptionPowered" />
           <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
@@ -21,7 +34,15 @@
         </b-tab>
         <b-tab title-item-class="w-50" class="pt-2">
           <template slot="title">
-            <b>{{ translatedUnpowered }}</b> ({{ unpowered.length }})
+            <div class="d-flex justify-content-between text-brand font-weight-bold">
+              <div>
+                <b>{{ translatedUnpowered }}</b> ({{ unpowered.length }})
+              </div>
+              <div class="lower">
+                <b-img src="/images/trash_brand.svg" class="icon" />
+                {{ Math.round(stats.unpowered_waste) }} kg
+              </div>
+            </div>
           </template>
           <p v-html="translatedDescriptionUnpowered" />
           <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
@@ -52,6 +73,9 @@ export default {
     }
   },
   computed: {
+    stats() {
+      return this.$store.getters['events/getStats'](this.idevents)
+    },
     allDevices() {
       return this.$store.getters['devices/byEvent'](this.idevents) || []
     },
@@ -119,5 +143,9 @@ export default {
 .icon {
   width: 20px;
   margin-bottom: 3px;
+}
+
+.lower {
+  text-transform: lowercase;
 }
 </style>

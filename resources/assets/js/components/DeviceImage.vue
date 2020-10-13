@@ -1,7 +1,7 @@
 <template>
   <div class="position-relative">
     <b-img :src="'/uploads/' + image.path" class="align-self-start" />
-    <b-btn variant="none" class="remove" @click="confirm">
+    <b-btn variant="none" class="remove align-content-center" @click="confirm">
       ╳
     </b-btn>
     <ConfirmModal @confirm="remove" ref="confirm" />
@@ -37,7 +37,7 @@ export default {
   font-size: 16px;
   min-width: unset;
   padding: 5px;
-  font-weight: bold;
-  border: 1px solid grey;
+  font-weight: bolder;
+  border: 2px solid grey;
 }
 </style>
