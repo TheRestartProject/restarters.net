@@ -6,6 +6,8 @@ use App\Events\UserEmailUpdated;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
 
+use Illuminate\Support\Facades\Log;
+
 class DiscourseUserEventSubscriber
 {
     private $discourseClient;

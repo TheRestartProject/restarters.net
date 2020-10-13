@@ -1,12 +1,16 @@
 <div class="card {{ $notification->read_at ? 'status-is-read' : 'status-read' }} {{{ FixometerHelper::notificationClasses($notification->type) }}}">
     <div class="card-body">
         <h5 class="card-title mb-1">
-            {{{ $notification->data['title'] }}}
+            @if (!empty($notification->data['title']))
+                {{{ $notification->data['title'] }}}
+            @endif
 
             @if (!empty($notification->data['url']))
                 <a href="{{{ $notification->data['url'] }}}">{{{ $notification->data['name'] }}}</a>
             @else
-                {{{ $notification->data['name'] }}}
+                @if (!empty($notification->data['name']))
+                    {{{ $notification->data['name'] }}}
+                @endif
             @endif
         </h5>
         <time title="{{{ $notification->created_at->toDayDateTimeString() }}}">{{{ $notification->created_at->diffForHumans() }}}</time>
