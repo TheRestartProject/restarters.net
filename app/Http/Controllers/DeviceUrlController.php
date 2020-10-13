@@ -44,18 +44,18 @@ class DeviceUrlController extends Controller
 
         // Check we have the permission
         if (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id)) {
-          // Create URL
+            // Create URL
             $create = DeviceUrl::create([
             'device_id' => $request->input('device_id'),
             'source' => $request->input('source'),
             'url' => $request->input('url')
             ]);
 
-          // Return information
+            // Return information
             if ($create) {
                 return response()->json([
                     'success' => TRUE,
-                    'id' => $create->id,
+                    'id' => $create->id
                 ]);
             } else {
                 abort(404);

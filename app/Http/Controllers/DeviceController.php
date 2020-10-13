@@ -643,7 +643,7 @@ class DeviceController extends Controller
             }
 
             // Expand a few things so that the new devices are returned with the same information that existing
-            // ones are returned in view.
+            // ones are returned in the view blade.
             $device[$i]->idevents = $device[$i]->event;
             $device[$i]->category = $device[$i]->deviceCategory;
             $device[$i]->shortProblem = $device[$i]->getShortProblem();
@@ -796,7 +796,7 @@ class DeviceController extends Controller
             $data['success'] = 'Device updated!';
 
             // Expand a few things so that the devices are returned with the same information that existing
-            // ones are returned in view.
+            // ones are returned in the view blade.
             $device = Device::find($id);
             $device->idevents = $device->event;
             $device->category = $device->deviceCategory;
@@ -888,7 +888,7 @@ class DeviceController extends Controller
             }
 
 
-            // Return the current set of images.
+            // Return the current set of images for this device so that the client doesn't need to merge.
             return response()->json([
                 'success' => true,
                 'iddevices' => $id,
