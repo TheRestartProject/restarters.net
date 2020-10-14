@@ -60,9 +60,9 @@ export default {
       return this.$lang.get('groups.volunteers')
     },
     translatedSeeAll() {
-      return this.$lang.choice(this.$lang.get('groups.see_all_volunteers', {
+      return this.$lang.choice('groups.see_all_volunteers', this.volunteers.length, {
         count: this.volunteers.length
-      }), this.volunteers.length)
+      })
     },
     translatedNoVolunteers() {
       return this.$lang.get('groups.no_volunteers')
