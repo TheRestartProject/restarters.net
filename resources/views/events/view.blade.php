@@ -123,6 +123,14 @@
             $device->category = $device->deviceCategory;
             $device->shortProblem = $device->getShortProblem();
             $device->urls;
+
+            $barriers = [];
+
+            foreach ($device->barriers as $barrier) {
+              $barriers[] = $barrier->id;
+            }
+
+            $device->barrier = $barriers;
             $device->images = $device->getImages();
             $expanded_devices[] = $device;
           }

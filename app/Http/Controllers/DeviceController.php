@@ -648,6 +648,14 @@ class DeviceController extends Controller
             $device[$i]->category = $device[$i]->deviceCategory;
             $device[$i]->shortProblem = $device[$i]->getShortProblem();
             $device[$i]->urls;
+
+            $barriers = [];
+
+            foreach ($device[$i]->barriers as $barrier) {
+                $barriers[] = $barrier->id;
+            }
+
+            $device[$i]->barrier = $barriers;
         }
         // end quantity loop
 
@@ -802,6 +810,14 @@ class DeviceController extends Controller
             $device->category = $device->deviceCategory;
             $device->shortProblem = $device->getShortProblem();
             $device->urls;
+
+            $barriers = [];
+
+            foreach ($device->barriers as $barrier) {
+                $barriers[] = $barrier->id;
+            }
+
+            $device->barrier = $barriers;
 
             $data['device'] = $device;
 
