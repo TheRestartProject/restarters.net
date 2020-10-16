@@ -116,6 +116,6 @@ export default {
 <style scoped lang="scss">
 // Reduce the size of the options so they fit
 ::v-deep .multiselect__single, .multiselect__content-wrapper {
-  font-size: 14px;
+  font-size: 13px;
 }
 </style>
