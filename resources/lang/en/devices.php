@@ -89,7 +89,7 @@ return array (
   'unpowered_items' => 'unpowered items',
   'weight' => 'Weight',
   'required_impact' => 'kg - required for environmental impact calculation',
-  'age_approx' => 'years - approximate, if known',
+  'age_approx' => 'years (approximate if unknown)',
   'repair_source' => 'Source of repair information',
   'repair_url' => 'URL for repair information',
   'tooltip_category' => 'Choose the category that best fits this item. <a target=\'_blank\' rel=\'noopener noreferrer\' href=\'https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--category\'>More information about these categories...</a>',
