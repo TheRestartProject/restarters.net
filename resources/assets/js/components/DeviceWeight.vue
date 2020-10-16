@@ -3,7 +3,7 @@
     <label class="text-bold">
       {{ translatedWeight }}
     </label>
-    <b-input type="number" @change="$emit('update:weight', $event)" size="lg" class="marg p-1 text-center"  min="0.01" step=".1" autocomplete="off" :value="weight" />
+    <b-input type="number" @change="$emit('update:weight', parseFloat($event))" size="lg" class="marg p-1 text-center"  min="0.01" step=".1" autocomplete="off" :value="weight" />
     <span class="text-right mb-1">
       {{ translatedRequiredImpact }}
     </span>
