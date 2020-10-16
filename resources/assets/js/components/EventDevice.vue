@@ -9,6 +9,7 @@
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
           <DeviceCategorySelect class="mb-2" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
           <div v-if="powered">
+            Brand: {{ currentDevice.brand }}
             <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" />
             <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" />
           </div>
@@ -203,12 +204,6 @@ export default {
         this.currentDevice.category = this.currentDevice.category.idcategories
       }
 
-      if (this.currentDevice.brand) {
-        this.currentDevice.brand = this.brands.find(b => {
-          return b.brand_name === this.currentDevice.brand
-        }).id
-      }
-
       this.currentDevice.estimate = parseFloat(this.currentDevice.estimate)
 
       this.nextSteps()
@@ -216,7 +211,7 @@ export default {
   },
   methods: {
     cancel() {
-      this.$emit('cancel')
+      this.$emit('close')
     },
     nextSteps() {
       // The next step value is held in multiple properties of the object.
@@ -245,7 +240,7 @@ export default {
         })
       }
 
-      this.$emit('cancel')
+      this.$emit('close')
     },
     async saveDevice() {
       await this.$store.dispatch('devices/edit', this.prepareDeviceForServer())
@@ -287,7 +282,7 @@ export default {
         }
       })
 
-      this.$emit('cancel')
+      this.$emit('close')
     },
     prepareDeviceForServer() {
       // The device we send to the server is what is in currentDevice, with a couple of tweaks:
@@ -300,12 +295,6 @@ export default {
         device.url = device.urls[0].url
         device.source = device.urls[0].source
       }
-
-      const selectedBrand = this.brands.find(b => {
-        return b.id === device.brand
-      })
-
-      device.brand = selectedBrand ? selectedBrand.brand_name : null
 
       return device
     },

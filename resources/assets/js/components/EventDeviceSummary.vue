@@ -1,6 +1,6 @@
 <template>
   <transition name="recent">
-    <b-tr v-if="!editing">
+    <b-tr v-if="!editing" :key="'summary-' + device.iddevices">
       <b-td>
         <h3 class="noheader">
           {{ device.category.name }}
@@ -63,9 +63,9 @@
         <ConfirmModal :key="'modal-' + device.iddevices" ref="confirmDelete" @confirm="deleteConfirmed" />
       </b-td>
     </b-tr>
-    <b-tr v-else>
+    <b-tr v-else :key="'editing-' + device.iddevices">
       <b-td colspan="8" class="p-0">
-        <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @cancel="editing = false" />
+        <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="close" />
       </b-td>
     </b-tr>
   </transition>
@@ -92,7 +92,8 @@ export default {
   },
   data () {
     return {
-      editing: false
+      editing: false,
+      saveScroll: null
     }
   },
   computed: {
@@ -142,6 +143,13 @@ export default {
       //   inserting a DOM tag breaks the table layout.
       // So swapping out the row enables us to use transitions within the table structure.
       this.editing = true
+
+      // Save the scroll position.
+      this.saveScroll = window.scrollY
+    },
+    close() {
+      this.editing = false
+      window.scrollY = this.saveScroll
     }
   }
 }
