@@ -207,6 +207,7 @@ export default {
       brand: null,
       model: null,
       age: null,
+      repair_details: null,
       repair_status: null,
       spare_parts: null,
       problem: null,
@@ -244,6 +245,7 @@ export default {
       } else {
         this.currentDevice.repair_details = null
       }
+      console.log("Calc next steps", this.currentDevice.repair_details)
     },
     async addDevice() {
       if (!this.currentDevice.category) {
