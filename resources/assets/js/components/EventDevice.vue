@@ -7,9 +7,12 @@
       <div class="br d-flex flex-column">
         <b-card no-body class="p-3 flex-grow-1 botwhite">
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
-          <DeviceCategorySelect class="mb-2" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
+          <DeviceCategorySelect :class="{
+            'mb-2': true,
+            'border': missingCategory,
+            'border-danger': missingCategory
+            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
           <div v-if="powered">
-            Brand: {{ currentDevice.brand }}
             <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" />
             <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" />
           </div>
@@ -41,7 +44,7 @@
       </div>
     </div>
     <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
-      <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice" :disabled="!currentDevice.category">
+      <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
         {{ translatedAddDevice }}
       </b-btn>
       <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
@@ -119,9 +122,21 @@ export default {
   data () {
     return {
       currentDevice: {},
+      missingCategory: false
+    }
+  },
+  watch: {
+    currentCategory(newval) {
+      if (this.missingCategory && newval) {
+        // Reset warning.
+        this.missingCategory = false
+      }
     }
   },
   computed: {
+    currentCategory() {
+      return this.currentDevice ? this.currentDevice.category : null
+    },
     sparePartsNeeded() {
       return this.device.spare_parts === SPARE_PARTS_MANUFACTURER || this.device.spare_parts === SPARE_PARTS_THIRD_PARTY
     },
@@ -226,21 +241,27 @@ export default {
       }
     },
     async addDevice() {
-      const createdDevices = await this.$store.dispatch('devices/add', this.prepareDeviceForServer())
+      if (!this.currentDevice.category) {
+        this.missingCategory = true
+      } else {
+        this.missingCategory = false
 
-      if (this.currentDevice.urls) {
-        // We have some useful URLs.  Apply them to each of the created devices.
-        createdDevices.forEach(async (d) => {
-          this.currentDevice.urls.forEach(async (u) => {
-            await this.$store.dispatch('devices/addURL', {
-              iddevices: d.iddevices,
-              url: u
+        const createdDevices = await this.$store.dispatch('devices/add', this.prepareDeviceForServer())
+
+        if (this.currentDevice.urls) {
+          // We have some useful URLs.  Apply them to each of the created devices.
+          createdDevices.forEach(async (d) => {
+            this.currentDevice.urls.forEach(async (u) => {
+              await this.$store.dispatch('devices/addURL', {
+                iddevices: d.iddevices,
+                url: u
+              })
             })
           })
-        })
-      }
+        }
 
-      this.$emit('close')
+        this.$emit('close')
+      }
     },
     async saveDevice() {
       await this.$store.dispatch('devices/edit', this.prepareDeviceForServer())
