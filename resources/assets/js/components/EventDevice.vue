@@ -41,7 +41,7 @@
       </div>
     </div>
     <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
-      <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
+      <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice" :disabled="!currentDevice.category">
         {{ translatedAddDevice }}
       </b-btn>
       <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">

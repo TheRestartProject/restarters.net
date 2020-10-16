@@ -615,16 +615,6 @@ class DeviceController extends Controller
 
             $device[$i]->save();
 
-            if ($useful_url) {
-                // Devices can have multiple URLs, but we only support one on the create - and it gets applied to each
-                // device.
-                DeviceUrl::create([
-                  'device_id' => $device[$i]->iddevices,
-                  'source' => $useful_source,
-                  'url' => $useful_url
-               ]);
-            }
-
             // Update barriers
             if (isset($barrier) && ! empty($barrier) && $repair_status == 3) { // Only sync when repair status is end-of-life
                 Device::find($device[$i]->iddevices)->barriers()->sync($barrier);
