@@ -1,16 +1,18 @@
 <template>
   <div class="position-relative">
-    <b-img :src="'/uploads/' + image.path" class="align-self-start" />
+    <b-img-lazy :src="'/uploads/' + image.path" class="align-self-start clickme" @click.native="zoom" />
     <b-btn variant="none" class="remove align-content-center" @click="confirm">
       ╳
     </b-btn>
     <ConfirmModal @confirm="remove" ref="confirm" />
+    <DeviceImageModal :image="image" ref="modal" />
   </div>
 </template>
 <script>
 import ConfirmModal from './ConfirmModal'
+import DeviceImageModal from './DeviceImageModal'
 export default {
-  components: {ConfirmModal},
+  components: {DeviceImageModal, ConfirmModal},
   props: {
     image: {
       type: Object,
@@ -23,6 +25,10 @@ export default {
     },
     confirm() {
       this.$refs.confirm.show()
+    },
+    zoom() {
+      console.log("Zoom")
+      this.$refs.modal.show()
     }
   }
 }

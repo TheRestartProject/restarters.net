@@ -521,6 +521,11 @@ h2 {
     }
   }
 
+  &.multiselect__option--selected {
+    color: white;
+    background-color: $brand-muted;
+  }
+
   &.multiselect__option--group.multiselect__option--disabled {
     background-color: white !important;
     font-weight: bold !important;
