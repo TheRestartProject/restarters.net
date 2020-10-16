@@ -535,7 +535,7 @@ class DeviceController extends Controller
         }
 
         $category = $request->input('category');
-        $weight = $request->input('weight');
+        $weight = $request->input('estimate');
         $brand = $request->input('brand');
         $model = $request->input('model');
         $item_type = $request->input('item_type');
