@@ -52,12 +52,14 @@
         <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon" />
       </b-td>
       <b-td v-if="canedit" class="text-right d-none d-md-table-cell">
-        <span class="pl-2 pr-2 clickme" @click="editDevice">
-          <b-img class="icon" src="/icons/edit_ico_green.svg" />
-        </span>
-        <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
-          <b-img class="icon" src="/icons/delete_ico_red.svg" />
-        </span>
+        <div class="d-flex">
+          <span class="pl-2 pr-2 clickme" @click="editDevice">
+            <b-img class="icon" src="/icons/edit_ico_green.svg" />
+          </span>
+            <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
+            <b-img class="icon" src="/icons/delete_ico_red.svg" />
+          </span>
+        </div>
         <ConfirmModal :key="'modal-' + device.iddevices" ref="confirmDelete" @confirm="deleteConfirmed" />
       </b-td>
     </b-tr>
