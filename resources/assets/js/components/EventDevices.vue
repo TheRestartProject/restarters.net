@@ -1,57 +1,115 @@
 <template>
-  <CollapsibleSection class="lineheight" collapsed :count="deviceCount" always-show-count count-badge>
+  <CollapsibleSection class="lineheight" collapsed :count="deviceCount" always-show-count count-class="text-black font-weight-normal">
     <template slot="title">
       <div class="d-flex">
         <b-img class="d-none d-md-block icon" src="/images/tv.svg" />&nbsp;{{ translatedTitle }}
       </div>
     </template>
     <template slot="content">
-      <b-tabs class="ourtabs ourtabs-brand w-100">
-        <b-tab active title-item-class="w-50" class="pt-2">
-          <template slot="title">
-            <div class="d-flex justify-content-between text-brand font-weight-bold">
-              <div>
-                <b>{{ translatedPowered }}</b> ({{ powered.length }})
+      <div class="d-none d-md-block">
+        <b-tabs class="ourtabs ourtabs-brand w-100">
+          <b-tab active title-item-class="w-50" class="pt-2">
+            <template slot="title">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b>{{ translatedPowered }}</b> ({{ powered.length }})
+                </div>
+                <div class="d-flex">
+                  <div class="mr-3 lower">
+                    <b-img src="/images/trash_brand.svg" class="icon" />
+                    {{ Math.round(stats.ewaste) }} kg
+                  </div>
+                  <div class="mr-1 lower">
+                    <b-img src="/images/co2_brand.svg" class="icon" />
+                    {{ Math.round(stats.co2) }} kg
+                  </div>
+                </div>
               </div>
-              <div class="d-flex">
-                <div class="mr-3 lower">
+            </template>
+            <p v-html="translatedDescriptionPowered" />
+            <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
+            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingPowered = true">
+              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddPowered }}
+            </b-btn>
+            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="addingPowered = false" />
+          </b-tab>
+          <b-tab title-item-class="w-50" class="pt-2">
+            <template slot="title">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b>{{ translatedUnpowered }}</b> ({{ unpowered.length }})
+                </div>
+                <div class="lower">
                   <b-img src="/images/trash_brand.svg" class="icon" />
-                  {{ Math.round(stats.ewaste) }} kg
-                </div>
-                <div class="mr-1 lower">
-                  <b-img src="/images/co2_brand.svg" class="icon" />
-                  {{ Math.round(stats.co2) }} kg
+                  {{ Math.round(stats.unpowered_waste) }} kg
                 </div>
               </div>
-            </div>
-          </template>
-          <p v-html="translatedDescriptionPowered" />
-          <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
-          <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingPowered = true">
-            <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddPowered }}
-          </b-btn>
-          <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="addingPowered = false" />
-        </b-tab>
-        <b-tab title-item-class="w-50" class="pt-2">
+            </template>
+            <p v-html="translatedDescriptionUnpowered" />
+            <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
+            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingUnpowered = true">
+              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddUnpowered }}
+            </b-btn>
+            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" @close="addingUnpowered = false"/>
+          </b-tab>
+        </b-tabs>
+      </div>
+      <div class="d-block d-md-none">
+        <CollapsibleSection class="lineheight" collapsed :count="powered.length" always-show-count count-class="text-black font-weight-normal small">
           <template slot="title">
-            <div class="d-flex justify-content-between text-brand font-weight-bold">
+            <div class="d-flex justify-content-between small ml-1 align-self-center">
               <div>
-                <b>{{ translatedUnpowered }}</b> ({{ unpowered.length }})
-              </div>
-              <div class="lower">
-                <b-img src="/images/trash_brand.svg" class="icon" />
-                {{ Math.round(stats.unpowered_waste) }} kg
+                <b>{{ translatedPowered }}</b>
               </div>
             </div>
           </template>
-          <p v-html="translatedDescriptionUnpowered" />
-          <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
-          <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingUnpowered = true">
-            <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddUnpowered }}
-          </b-btn>
-          <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" @close="addingUnpowered = false"/>
-        </b-tab>
-      </b-tabs>
+          <template slot="title-right">
+            <div class="d-flex text-brand small">
+              <div class="ml-2 mr-1 pt-1 lower align-self-center">
+                <b-img src="/images/trash_brand.svg" class="icon" />
+                {{ Math.round(stats.ewaste) }}
+              </div>
+              <div class="ml-1 mr-1 lower pt-1 small align-self-center">
+                <b-img src="/images/co2_brand.svg" class="icon" />
+                {{ Math.round(stats.co2) }}
+              </div>
+            </div>
+          </template>
+          <template slot="content">
+            <p v-html="translatedDescriptionPowered" />
+            <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
+            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingPowered = true">
+              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddPowered }}
+            </b-btn>
+            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="addingPowered = false" />
+          </template>
+        </CollapsibleSection>
+        <CollapsibleSection class="lineheight" collapsed :count="unpowered.length" always-show-count count-class="text-black font-weight-normal small">
+          <template slot="title">
+            <div class="d-flex justify-content-between small ml-1 align-self-center">
+              <div>
+                <b>{{ translatedUnpowered }}</b>
+              </div>
+            </div>
+          </template>
+          <template slot="title-right">
+            <div class="d-flex text-brand small">
+              <div class="ml-2 mr-1 pt-1 lower align-self-center">
+                <b-img src="/images/trash_brand.svg" class="icon" />
+                {{ Math.round(stats.unpowered_waste) }}
+              </div>
+            </div>
+          </template>
+          <template slot="content">
+            <p v-html="translatedDescriptionUnpowered" />
+            <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
+            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4" @click="addingUnpowered = true">
+              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ translatedAddUnpowered }}
+            </b-btn>
+            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="addingUnpowered = false" />
+          </template>
+        </CollapsibleSection>
+      </div>
     </template>
   </CollapsibleSection>
 </template>
@@ -131,6 +189,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 .lineheight {
   line-height: 2;

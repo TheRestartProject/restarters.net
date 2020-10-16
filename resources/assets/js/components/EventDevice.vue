@@ -9,8 +9,7 @@
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
           <DeviceCategorySelect :class="{
             'mb-2': true,
-            'border': missingCategory,
-            'border-danger': missingCategory
+            'border-thick': missingCategory
             }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
           <div v-if="powered">
             <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" />
@@ -43,6 +42,9 @@
         </b-card>
       </div>
     </div>
+    <b-alert :show="missingCategory" variant="danger">
+      <p>{{ translatedError }}</p>
+    </b-alert>
     <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
       <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
         {{ translatedAddDevice }}
@@ -177,6 +179,9 @@ export default {
     },
     translatedCancel() {
       return this.$lang.get('partials.cancel')
+    },
+    translatedError() {
+      return this.$lang.get('events.form_error')
     },
     currentImages() {
       // TODO LATER The images are currently added/removed/deleted immediately, and so we get them from the store.
@@ -427,5 +432,9 @@ h3 {
 
 .botwhite {
   border-bottom: 1px solid white;
+}
+
+.border-thick {
+  border: 3px solid red;
 }
 </style>

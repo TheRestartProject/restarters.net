@@ -17,9 +17,10 @@
             <b-badge variant="primary" pill>{{ count }}</b-badge>
           </span>
           <span v-else>
-            (<span class="count">{{ count }}</span>)
+            <span :class="countClass">({{ count }})</span>
           </span>
         </div>
+        <slot name="title-right" />
       </div>
       <span class="d-inline d-md-none">
         <img class="icon" v-if="expanded" src="/images/minus-icon.svg" alt="Collapse" />
@@ -68,6 +69,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    countClass: {
+      type: String,
+      required: false,
+      default: 'count'
     }
   },
   data () {
