@@ -44,8 +44,6 @@
     },
     "autoload": {
         "files": [
-            "app/Helpers/Fixometer.php",
-            "app/Helpers/FixometerFile.php"
         ],
         "classmap": [
             "database/seeds",

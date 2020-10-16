@@ -39,3 +39,8 @@ temp_db.sql
 restarters-anonymised.sql
 /.idea
 .dir-locals.el
+/public/public/global/js/app.js
+/public/public/js/app.js
+/mix-manifest.json
+/report.html
+/public/public/js/wiki.js

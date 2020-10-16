@@ -1,6 +1,6 @@
 let mix = require('laravel-mix');
 let webpack = require('webpack');
-const WebpackShellPlugin = require('webpack-shell-plugin');
+const WebpackShellPluginNext = require('webpack-shell-plugin-next');
 require('laravel-mix-bundle-analyzer');
 
 if (!mix.inProduction()) {
@@ -13,7 +13,7 @@ mix.webpackConfig({
     plugins: [
         new webpack.IgnorePlugin(/^codemirror$/),
         // Build a JS translation file that corresponds to our PHP lang/ folder.
-        new WebpackShellPlugin({onBuildStart:['php artisan lang:js --no-lib --quiet resources/assets/js/translations.js'], onBuildEnd:[]})
+        new WebpackShellPluginNext({onBuildStart:['php artisan lang:js --no-lib --quiet resources/assets/js/translations.js'], onBuildEnd:[]})
     ]
 });
 

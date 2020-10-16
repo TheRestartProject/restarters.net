@@ -4,7 +4,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: ./compose/local/Dockerfile-app
+      dockerfile: ./compose/local/Dockerfile
     ports:
       - "8000:8181"
       - "8090:9000"
@@ -15,14 +15,6 @@ services:
       - db
       - redis
       - mailhog
-  web:
-    build:
-      context: .
-      dockerfile: ./compose/local/Dockerfile-web
-    volumes:
-      - .:/app
-    depends_on:
-      - app
   db:
     image: "mysql:5.7"
     env_file: .env
@@ -47,4 +39,3 @@ services:
 
 volumes:
   dbdata:
-  app:

@@ -2,12 +2,12 @@
     "private": true,
     "scripts": {
         "dev": "npm run development",
-        "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
         "watch": "npm run development -- --watch",
         "watch-poll": "npm run watch -- --watch-poll",
         "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
         "prod": "npm run production",
-        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --config=node_modules/laravel-mix/setup/webpack.config.js"
     },
     "devDependencies": {
         "axios": "^0.19.2",
@@ -22,8 +22,7 @@
         "lodash.mergewith": "^4.6.2",
         "lodash.template": "^4.5.0",
         "popper.js": "^1.14.4",
-        "vue": "^2.5.17",
-        "webpack-shell-plugin": "^0.5.0"
+        "vue": "^2.5.17"
     },
     "dependencies": {
         "ajv": "^6.5.4",
@@ -56,6 +55,9 @@
         "text-clipper": "^2.1.0",
         "tokenfield": "^0.9.10",
         "vue2-leaflet": "^2.5.2",
-        "vuex": "^3.5.1"
+        "vuex": "^3.5.1",
+        "webpack": "^5.1.2",
+        "webpack-cli": "^4.0.0",
+        "webpack-shell-plugin-next": "^1.2.0"
     }
 }
