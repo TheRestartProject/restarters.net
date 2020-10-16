@@ -27,8 +27,8 @@
       <div class="bl d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1">
           <h3 class="mt-2 mb-4">{{ translatedTitleAssessment }}</h3>
-          <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" />
-          <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" />
+          <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" :icon-variant="add ? 'black' : 'brand'" />
+          <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4"  :icon-variant="add ? 'black' : 'brand'" />
           <DeviceUsefulUrls :device="device" :urls.sync="currentDevice.urls" class="mb-2" />
           <div class="d-flex">
             <b-form-checkbox v-model="wiki" class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" />
@@ -61,7 +61,7 @@ import {
   END_OF_LIFE,
   SPARE_PARTS_MANUFACTURER,
   SPARE_PARTS_THIRD_PARTY,
-  CATEGORY_MISC
+  CATEGORY_MISC, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME
 } from '../constants'
 import DeviceCategorySelect from './DeviceCategorySelect'
 import DeviceBrandSelect from './DeviceBrandSelect'
@@ -165,7 +165,17 @@ export default {
     currentImages() {
       // TODO LATER The images are currently added/removed/deleted immediately, and so we get them from the store.
       // This should be deferred until the save.
-      return this.device ? this.$store.getters['devices/byDevice'](this.idevents, this.device.iddevices): []
+      let ret = []
+
+      if (this.device) {
+        ret = this.$store.getters['devices/byDevice'](this.idevents, this.device.iddevices)
+
+        if (!ret) {
+          ret = []
+        }
+      }
+
+      return ret
     }
   },
   created() {
@@ -198,11 +208,27 @@ export default {
           return b.brand_name === this.currentDevice.brand
         }).id
       }
+
+      this.currentDevice.estimate = parseFloat(this.currentDevice.estimate)
+
+      this.nextSteps()
     }
   },
   methods: {
     cancel() {
       this.$emit('cancel')
+    },
+    nextSteps() {
+      // The next step value is held in multiple properties of the object.
+      if (this.currentDevice.do_it_yourself) {
+        this.currentDevice.repair_details = NEXT_STEPS_DIY
+      } else if (this.currentDevice.professional_help) {
+        this.currentDevice.repair_details = NEXT_STEPS_PROFESSIONAL
+      } else if (this.currentDevice.more_time_needed) {
+        this.currentDevice.repair_details = NEXT_STEPS_MORE_TIME
+      } else {
+        this.currentDevice.repair_details = null
+      }
     },
     async addDevice() {
       const createdDevices = await this.$store.dispatch('devices/add', this.prepareDeviceForServer())
