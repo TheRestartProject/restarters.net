@@ -165,7 +165,7 @@ export default {
     currentImages() {
       // TODO LATER The images are currently added/removed/deleted immediately, and so we get them from the store.
       // This should be deferred until the save.
-      return this.$store.getters['devices/byDevice'](this.idevents, this.device.iddevices)
+      return this.device ? this.$store.getters['devices/byDevice'](this.idevents, this.device.iddevices): []
     }
   },
   created() {
