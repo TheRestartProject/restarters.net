@@ -3,7 +3,7 @@
     <h2 class="mt-2 mb-2">
       {{ translatedImpact }}
       <span v-b-popover.focus="translatedImpactCalculation">
-        <b-img class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg">
+        <b-img class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg" />
       </span>
     </h2>
     <div class="impact-container">

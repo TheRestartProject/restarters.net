@@ -66,7 +66,15 @@
           }
 
           $expanded_volunteers = expandVolunteer($view_group->allConfirmedVolunteers);
-//          ->take(20));
+
+          $expanded_events = [];
+
+          foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+              $thisone = $event->getAttributes();
+              $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
+              $thisone['allinvitedcount'] = $event->allInvited->count();
+              $expanded_events[] = $thisone;
+          }
 
           ?>
       <div class="vue-placeholder vue-placeholder-large">
@@ -95,6 +103,9 @@
           <GroupStats :stats="{{ json_encode($group->getGroupStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}" />
       </div>
 
+      <div class="vue">
+          <GroupEvents :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :canedit="{{ $can_edit_group ? 'true' : 'false' }}" :events="{{ json_encode($expanded_events) }}"/>
+      </div>
 
           <div class="row mt-md-50">
             <div class="col-lg-12">

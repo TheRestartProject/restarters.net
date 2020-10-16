@@ -113,7 +113,7 @@ return array (
   'waste_prevented' => 'Waste prevented',
   'co2_prevented' => 'CO<sub>2</sub> emissions prevented',
   'group_events' => 'Group events',
-  'upcoming_active' => 'Upcoming & Active',
+  'upcoming_active' => 'Upcoming',
   'past' => 'Past',
   'no_upcoming_events' => 'There are currently no upcoming events for this group',
   'no_past_events' => 'There are currently no past events for this group',

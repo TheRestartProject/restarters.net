@@ -137,8 +137,6 @@ export default {
     //
     // Further down the line this initial data might be provided either by an API call from the client to the server,
     // or from Vue server-side rendering, where the whole initial state is passed to the client.
-    //
-    // Similarly the event should be in the store and passed just by id, but we haven't introduced an event store yet.
     let attendees = []
 
     this.attendance.forEach((a) => {
