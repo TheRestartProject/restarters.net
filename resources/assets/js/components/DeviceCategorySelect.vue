@@ -92,15 +92,17 @@ export default {
         }
       })
 
-      ret.push({
-        cluster: '---',
-        categories: [
-          {
-            name: this.$lang.get('partials.category_none'),
-            value: CATEGORY_MISC,
-          }
-        ]
-      })
+      if (this.powered) {
+        ret.push({
+          cluster: '---',
+          categories: [
+            {
+              name: this.$lang.get('partials.category_none'),
+              value: CATEGORY_MISC,
+            }
+          ]
+        })
+      }
 
       return ret
     },
