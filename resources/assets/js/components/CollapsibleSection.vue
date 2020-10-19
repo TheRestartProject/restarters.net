@@ -6,7 +6,7 @@
       'mb-3': true,
       'justify-content-between': true
       }" @click="toggle">
-      <div class="d-flex">
+      <div class="d-flex w-100">
         <slot name="title" />
         <div v-if="count" :class="{
           'd-inline' : true,

@@ -139,4 +139,6 @@ return array (
   'remove_volunteer' => 'Remove Volunteer',
   'make_host' => 'Make Host',
   'not_counting' => 'Not counting toward this group\'s environmental impact is|Not counting toward this group\'s environmental impact are',
+  'calendar_copy_title' => 'Access all group events in your personal calendar',
+  'calendar_copy_description' => 'Add all upcoming events for :group to your Google/Outlook/Yahoo/Apple calendar with the link below:'
 );

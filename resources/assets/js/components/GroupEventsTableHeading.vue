@@ -8,10 +8,10 @@
       <b-th>
       </b-th>
       <b-th>
-        <b-img src="/images/mail_ico.svg" />
+        <b-img class="icon" src="/images/mail_ico.svg" />
       </b-th>
       <b-th>
-        <b-img src="/images/participants.svg" />
+        <b-img class="icon" src="/images/participants.svg" />
       </b-th>
       <b-th>
       </b-th>
@@ -24,25 +24,25 @@
       <b-th>
       </b-th>
       <b-th>
-        <b-img src="/images/participants.svg" />
+        <b-img class="icon" src="/images/participants.svg" />
       </b-th>
       <b-th>
-        Drill
+        <b-img class="icon" src="/icons/volunteer_ico.svg" />
       </b-th>
       <b-th>
-        <b-img src="/images/trash.svg" />
+        <b-img class="icon" src="/images/trash.svg" />
       </b-th>
       <b-th>
-        <b-img src="/images/cloud-empty.svg" />
+        <b-img class="icon" src="/images/cloud_empty.svg" />
       </b-th>
       <b-th>
-        <b-img src="/images/fixed.svg" />
+        <b-img class="icon" src="/images/fixed.svg" />
       </b-th>
       <b-th>
-        <b-img src="/images/repairable_ico.svg" />
+        <b-img class="icon" src="/images/repairable_ico.svg" />
       </b-th>
       <b-th>
-        <b-img src="/images/dead_ico.svg" />
+        <b-img class="icon" src="/images/dead_ico.svg" />
       </b-th>
     </b-tr>
   </b-thead>
@@ -58,3 +58,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+.icon {
+  width: 30px;
+}
+</style>

@@ -77,7 +77,7 @@ return array (
   'event_name' => 'Event',
   'event_date' => 'Date',
   'event_location' => 'Location',
-  'event_all' => 'See all events',
+  'event_all' => 'see all',
   'add_event' => 'Add event',
   'add_an_event' => 'Add an event',
   'add_event_content' => 'Announce your event on The Restart Project website and to fixers near you.',

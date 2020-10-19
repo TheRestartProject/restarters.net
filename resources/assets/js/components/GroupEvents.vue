@@ -1,9 +1,25 @@
 <template>
   <CollapsibleSection class="lineheight" collapsed :count="upcoming.length" count-badge>
     <template slot="title">
-      <div class="d-flex">
-        {{ translatedTitle }}
+      <div class="d-flex justify-content-between w-100">
+        <div>
+          {{ translatedTitle }}
+          <b-btn v-if="calendarCopyUrl" class="ml-2" variant="none" @click="showCalendar">
+            <b-img-lazy src="/images/subs_cal_ico.svg" />
+          </b-btn>
+        </div>
+        <b-btn variant="primary" href="/party/create" class="align-self-center">
+          {{ translatedAddEvent }}
+        </b-btn>
       </div>
+      <CalendarAddModal ref="calendar" :copy-url="calendarCopyUrl" :edit-url="calendarEditUrl" v-if="calendarCopyUrl">
+        <template slot="title">
+          {{ translatedCalendarTitle }}
+        </template>
+        <template slot="description">
+          {{ translatedCalendarDescription }}
+        </template>
+      </CalendarAddModal>
     </template>
     <template slot="content">
       <b-tabs class="ourtabs w-100">
@@ -24,7 +40,11 @@
               <GroupEventSummary v-for="e in upcomingFirst" :key="'event-' + e.idevents" :idevents="e.idevents" />
             </b-tbody>
           </b-table-simple>
-          TODO Calendar, add, see all
+          <div class="text-right">
+            <b-btn variant="link" :href="'/party/group/' + groupId">
+              {{ translatedSeeAll }}
+            </b-btn>
+          </div>
         </b-tab>
         <b-tab title-item-class="w-50" class="pt-2">
           <template slot="title">
@@ -37,7 +57,17 @@
           <p v-if="!past.length">
             {{ translatedNoPast }}.
           </p>
-          Past event list
+          <b-table-simple v-else responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+            <GroupEventsTableHeading past />
+            <b-tbody class="borders">
+              <GroupEventSummary v-for="e in pastFirst" :key="'event-' + e.idevents" :idevents="e.idevents" />
+            </b-tbody>
+          </b-table-simple>
+          <div class="text-right">
+            <b-btn variant="link" :href="'/party/group/' + groupId">
+              {{ translatedSeeAll }}
+            </b-btn>
+          </div>
         </b-tab>
       </b-tabs>
     </template>
@@ -49,14 +79,25 @@ import CollapsibleSection from './CollapsibleSection'
 import GroupEventsTableHeading from './GroupEventsTableHeading'
 import moment from 'moment'
 import GroupEventSummary from './GroupEventSummary'
+import CalendarAddModal from './CalendarAddModal'
 
 export default {
-  components: {GroupEventSummary, CollapsibleSection, GroupEventsTableHeading},
+  components: {CalendarAddModal, GroupEventSummary, CollapsibleSection, GroupEventsTableHeading},
   mixins: [ group ],
   props: {
     events: {
       type: Array,
       required: true
+    },
+    calendarCopyUrl: {
+      type: String,
+      required: false,
+      default: null
+    },
+    calendarEditUrl: {
+      type: String,
+      required: false,
+      default: null
     }
   },
   data () {
@@ -79,6 +120,18 @@ export default {
     translatedPast() {
       return this.$lang.get('groups.past')
     },
+    translatedAddEvent() {
+      return this.$lang.get('events.add_new_event')
+    },
+    translatedSeeAll() {
+      return this.$lang.get('events.event_all')
+    },
+    translatedCalendarTitle() {
+      return this.$lang.get('groups.calendar_copy_title')
+    },
+    translatedCalendarDescription() {
+      return this.$lang.get('groups.calendar_copy_description')
+    },
     past() {
       return this.events.filter(e => {
           const start = new moment(e.event_date + ' ' + e.start)
@@ -89,7 +142,6 @@ export default {
       return this.past.slice(0, 3)
     },
     upcoming() {
-      console.log(this.events)
       return this.events.filter(e => {
         const start = new moment(e.event_date + ' ' + e.start)
         return start.isAfter()
@@ -97,6 +149,11 @@ export default {
     },
     upcomingFirst() {
       return this.upcoming.slice(0, 3)
+    }
+  },
+  methods: {
+    showCalendar() {
+      this.$refs.calendar.show()
     }
   },
   created() {

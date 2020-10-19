@@ -69,13 +69,23 @@
 
           $expanded_events = [];
 
+          $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
+          $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
           foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
               $thisone = $event->getAttributes();
               $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
               $thisone['allinvitedcount'] = $event->allInvited->count();
+
+              // TODO LATER Consider whether these should be in the event or passed into the store.
+              $thisone['stats'] = $event->getEventStats($emissionRatio);
+              $thisone['participants_count'] = $event->participants;
+              $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+
               $expanded_events[] = $thisone;
           }
 
+          $showCalendar = Auth::check() && ($group->isVolunteer() || FixometerHelper::hasRole( $user, 'Administrator'));
           ?>
       <div class="vue-placeholder vue-placeholder-large">
           <div class="vue-placeholder-content">@lang('partials.loading')...</div>
@@ -94,7 +104,6 @@
           </div>
       </div>
 
-
       <div class="vue-placeholder vue-placeholder-large">
           <div class="vue-placeholder-content">@lang('partials.loading')...</div>
       </div>
@@ -104,22 +113,20 @@
       </div>
 
       <div class="vue">
-          <GroupEvents :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :canedit="{{ $can_edit_group ? 'true' : 'false' }}" :events="{{ json_encode($expanded_events) }}"/>
+          <GroupEvents
+                  :group-id="{{ $group->idgroups }}"
+                  :group="{{ $group }}"
+                  :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+                  :events="{{ json_encode($expanded_events) }}"
+                  calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
+                  calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
+          />
       </div>
+
 
           <div class="row mt-md-50">
             <div class="col-lg-12">
                 <h2 id="upcoming-grp">@lang('groups.group_events')
-                  @if ( Auth::check() && $group->isVolunteer() )
-                    @php( $copy_link = url("/calendar/group/{$group->idgroups}") )
-                    @php( $user_edit_link = url("/profile/edit/{$user->id}#list-calendar-links") )
-                    @include('partials.calendar-feed-button', [
-                      'copy_link' => $copy_link,
-                      'user_edit_link' => $user_edit_link,
-                      'modal_title' => 'Access all group events in your personal calendar',
-                      'modal_text' => 'Add all of ' . $group->name . '\'s upcoming events to your Google/Outlook/Yahoo/Apple calendar with the link below:',
-                    ])
-                  @endif
                 @if( FixometerHelper::hasRole( $user, 'Administrator' ) || FixometerHelper::hasRole( $user, 'Host' ) )<sup>(<a href="{{ url('/party/create') }}">Add event</a>)</sup>@endif</h2>
 
                 <ul class="nav nav-tabs" id="myTab" role="tablist">

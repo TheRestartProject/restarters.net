@@ -112,6 +112,9 @@ export default {
     inProgress() {
       return !this.upcoming && !this.finished
     },
+    startingSoon() {
+      return this.upcoming && !this.finished && (new moment().isSame(this.event.event_date, 'day'))
+    },
     start() {
       return this.event.start.substring(0, 5)
     },
