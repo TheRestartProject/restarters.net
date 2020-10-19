@@ -1,12 +1,17 @@
 <template>
-  <div class="device-photo-layout">
-    <label>
-      {{ translatedImages }}
-    </label>
-    <div class="d-flex flex-wrap device-photos dropzone-previews">
-      <FileUploader :url="'/device/image-upload/' + device.iddevices" v-if="edit" previews-container=".device-photos" @uploaded="uploaded($event)" />
-      <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)" />
+  <div>
+    <div class="device-photo-layout" v-if="!add">
+      <label v-if="!add">
+        {{ translatedImages }}
+      </label>
+      <div class="d-flex flex-wrap device-photos dropzone-previews">
+        <FileUploader :url="'/device/image-upload/' + device.iddevices" v-if="edit" previews-container=".device-photos" @uploaded="uploaded($event)" />
+        <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)" />
+      </div>
     </div>
+    <p class="p-0" v-else>
+      {{ translatedExcuse }}
+    </p>
   </div>
 </template>
 <script>
@@ -28,6 +33,11 @@ export default {
       type: Array,
       required: true
     },
+    add: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     edit: {
       type: Boolean,
       required: false,
@@ -37,6 +47,9 @@ export default {
   computed: {
     translatedImages() {
       return this.$lang.get('devices.images')
+    },
+    translatedExcuse() {
+      return this.$lang.get('devices.images_on_edit')
     }
   },
   methods: {

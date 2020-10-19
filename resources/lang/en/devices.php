@@ -53,6 +53,7 @@ return array (
   'suitable' => 'Helpful repair info?',
   'delete_device_content' => 'Delete this device from the Fixometer',
   'delete_device' => 'Delete device',
+  'confirm_delete' => 'Clicking confirm will delete this item from the event.',
   'n/a' => 'N/A',
   'from_manufacturer' => 'From manufacturer',
   'from_third_party' => 'From third party',
@@ -110,5 +111,6 @@ return array (
   'close_record' => 'Close',
   'model' => 'Model',
   'status' => 'Status',
-  'spare_parts' => 'Spare parts'
+  'spare_parts' => 'Spare parts',
+  'images_on_edit' => 'Currently images can only be added by editing an item after it has been added.'
 );

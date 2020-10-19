@@ -18,7 +18,7 @@
           <DeviceType class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" v-else />
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" />
           <DeviceAge :age.sync="currentDevice.age" />
-          <DeviceImages :idevents="idevents" :device="currentDevice" :edit="edit" class="mt-2" :images="currentImages" @remove="removeImage($event)" />
+          <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" class="mt-2" :images="currentImages" @remove="removeImage($event)" />
         </b-card>
       </div>
       <div class="d-flex flex-column botwhite">
@@ -395,6 +395,7 @@ h3 {
 
   .card {
     background-color: $brand-light;
+    border-radius: 0;
   }
 
   ::v-deep {
@@ -422,6 +423,7 @@ h3 {
 
   .card {
     background-color: $brand-grey;
+    border-radius: 0;
   }
 
   ::v-deep {
