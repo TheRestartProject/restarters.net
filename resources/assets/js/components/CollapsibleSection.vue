@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 :class="{
+    <component :is="headingLevel" :class="{
       'd-flex': true,
       'd-md-none': hideTitle,
       'mb-3': true,
@@ -26,7 +26,7 @@
         <img class="icon" v-if="expanded" src="/images/minus-icon.svg" alt="Collapse" />
         <img class="icon" v-else src="/images/add-icon.svg" alt="Expand" />
       </span>
-    </h2>
+    </component>
     <div :class="{
       'd-none': !expanded,
       'd-md-block': true
@@ -74,6 +74,11 @@ export default {
       type: String,
       required: false,
       default: 'count'
+    },
+    headingLevel: {
+      type: String,
+      required: false,
+      default: 'h2'
     }
   },
   data () {

@@ -20,27 +20,6 @@
           </div>
       @endif
 
-      <div class="row mb-30">
-          <div class="col-12 col-md-12">
-              <div class="d-flex align-items-center">
-                  <h1 class="mb-0 mr-30">
-                      @lang('events.events')
-                  </h1>
-
-                  <div class="mr-auto d-none d-md-block">
-                      @include('svgs.fixometer.events-doodle')
-                  </div>
-
-                  @if( FixometerHelper::userCanCreateEvents(Auth::user()) )
-                      <a href="/party/create" class="btn btn-primary ml-auto">
-                          <span class="d-none d-lg-block">@lang('events.create_new_event')</span>
-                          <span class="d-block d-lg-none">@lang('events.create_new_event_mobile')</span>
-                      </a>
-                  @endif
-              </div>
-          </div>
-      </div>
-
     {{-- Events List --}}
     <div class="row justify-content-center">
       <div class="col-lg-12">
@@ -71,48 +50,39 @@
         @endif
         {{-- END Events to Moderate (Admin Only) --}}
 
-        {{-- Upcoming events for your Groups --}}
-        <section class="table-section" id="events-2">
-          <header>
-            @if( !is_null($group) )
-              <h2>Upcoming {{{ $group->name }}} events</h2>
-            @else
-              <h2>@lang('events.upcoming_for_your_groups')
-                  @if ( Auth::check() )
-                      @php( $user = auth()->user() )
-                      @php( $copy_link = url("/calendar/user/{$user->calendar_hash}") )
-                      @php( $user_edit_link = url("/profile/edit/{$user->id}") )
-                      @include('partials.calendar-feed-button', [
-                                     'copy_link' => $copy_link,
-                                     'user_edit_link' => $user_edit_link,
-                                     'modal_title' => __('calendars.events_modal_title'),
-                                     'modal_text' => __('calendars.events_modal_text'),
-                                     ])
-                  @endif
-                  @if ( FixometerHelper::hasRole(Auth::user(), 'Administrator') && is_null($group) )
-                      <sup>(<a href="{{{ route('all-upcoming-events') }}}">@lang('events.see_all_upcoming'))</a></sup></h2>
-                  @endif
-            @endif
+          <?php
+          $expanded_events = [];
 
-          </header>
+          $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
+          $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-          <div class="table-responsive">
-            <table class="table table-events table-striped table-layout-fixed" role="table">
-              @include('events.tables.headers.head-events-upcoming-only', ['hide_invite' => false])
-              <tbody>
-                @if( ! $upcoming_events->isEmpty() )
-                  @foreach ($upcoming_events as $event)
-                    @include('partials.tables.row-events', ['show_invites_count' => true, 'EmissionRatio' => $EmissionRatio])
-                  @endforeach
-                @else
-                  <tr><td colspan="7" align="center" class="p-3"><p>@lang('events.no_upcoming_for_your_groups')</p></td></tr>
-                @endif
-              </tbody>
-            </table>
+          foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+              $thisone = $event->getAttributes();
+              $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
+              $thisone['allinvitedcount'] = $event->allInvited->count();
+
+              // TODO LATER Consider whether these should be in the event or passed into the store.
+              $thisone['stats'] = $event->getEventStats($emissionRatio);
+              $thisone['participants_count'] = $event->participants;
+              $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+
+              $expanded_events[] = $thisone;
+          }
+
+          $showCalendar = Auth::check() && ($group->isVolunteer() || FixometerHelper::hasRole( $user, 'Administrator'));
+          ?>
+
+          <div class="vue">
+              <GroupEvents
+                      heading-level="h1"
+                      :group-id="{{ $group->idgroups }}"
+                      :group="{{ $group }}"
+                      :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+                      :events="{{ json_encode($expanded_events) }}"
+                      calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
+                      calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
+              />
           </div>
-        </section>
-        {{-- END Upcoming events for your Groups --}}
-
 
         @if( is_null($group) )
         <section class="table-section upcoming_events_in_area" id="events-3">
@@ -142,42 +112,6 @@
             </div>
         </section>
         @endif
-
-
-        {{-- Past events --}}
-        <section class="table-section" id="events-4">
-          <header>
-            @if( !is_null($group) )
-              <h2>@lang('events.past_events_group', ['group' => $group->name])</h2>
-            @else
-              <h2 class="mb-1">@lang('events.past_events') <sup><a href="{{{ route('all-past-events') }}}">(@lang('events.see_all_past'))</a></sup></h2>
-              <p class="mb-2">@lang('events.past_events_explainer')</p>
-            @endif
-          </header>
-          <div class="table-responsive">
-          <table class="table table-events table-striped table-layout-fixed" role="table">
-              @include('partials.tables.head-events', ['hide_invite' => true])
-              <tbody>
-                @if( !$past_events->isEmpty() )
-                  @foreach($past_events as $event)
-                    @include('partials.tables.row-events', ['show_invites_count' => false, 'EmissionRatio' => $EmissionRatio])
-                  @endforeach
-                @else
-                  <tr>
-                    <td colspan="13" align="center" class="p-3">@lang('events.no_past_events_for_group')</td>
-                  </tr>
-                @endif
-              </tbody>
-          </table>
-          </div>
-
-          <div class="d-flex justify-content-center">
-            <nav aria-label="Page navigation example">
-              {!! $past_events->links() !!}
-            </nav>
-          </div>
-        </section>
-        {{-- END Past events --}}
 
       </div>
     </div>

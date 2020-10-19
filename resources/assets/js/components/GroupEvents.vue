@@ -1,5 +1,5 @@
 <template>
-  <CollapsibleSection class="lineheight" collapsed :count="upcoming.length" count-badge>
+  <CollapsibleSection class="lineheight" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel">
     <template slot="title">
       <div class="d-flex justify-content-between w-100">
         <div>
@@ -34,13 +34,13 @@
           <p v-if="!upcoming.length">
             {{ translatedNoUpcoming }}.
           </p>
-          <b-table-simple v-else responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+          <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
             <GroupEventsTableHeading />
-            <b-tbody class="borders">
-              <GroupEventSummary v-for="e in upcomingFirst" :key="'event-' + e.idevents" :idevents="e.idevents" />
+            <b-tbody class="table-height">
+              <GroupEventSummary v-for="e in upcomingToShow" :key="'event-' + e.idevents" :idevents="e.idevents" />
             </b-tbody>
           </b-table-simple>
-          <div class="text-right">
+          <div class="text-right" v-if="limit">
             <b-btn variant="link" :href="'/party/group/' + groupId">
               {{ translatedSeeAll }}
             </b-btn>
@@ -57,13 +57,13 @@
           <p v-if="!past.length">
             {{ translatedNoPast }}.
           </p>
-          <b-table-simple v-else responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+          <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
             <GroupEventsTableHeading past />
-            <b-tbody class="borders">
-              <GroupEventSummary v-for="e in pastFirst" :key="'event-' + e.idevents" :idevents="e.idevents" />
+            <b-tbody class="table-height">
+              <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" />
             </b-tbody>
           </b-table-simple>
-          <div class="text-right">
+          <div class="text-right" v-if="limit">
             <b-btn variant="link" :href="'/party/group/' + groupId">
               {{ translatedSeeAll }}
             </b-btn>
@@ -98,10 +98,15 @@ export default {
       type: String,
       required: false,
       default: null
-    }
-  },
-  data () {
-    return {
+    },
+    limit: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    headingLevel: {
+      type: String,
+      required: true
     }
   },
   computed: {
@@ -138,8 +143,8 @@ export default {
           return start.isBefore()
       })
     },
-    pastFirst() {
-      return this.past.slice(0, 3)
+    pastToShow() {
+      return this.limit ? this.past.slice(0, this.limit) : this.past
     },
     upcoming() {
       return this.events.filter(e => {
@@ -147,8 +152,8 @@ export default {
         return start.isAfter()
       })
     },
-    upcomingFirst() {
-      return this.upcoming.slice(0, 3)
+    upcomingToShow() {
+      return this.limit ? this.upcoming.slice(0, this.limit) : this.upcoming
     }
   },
   methods: {
@@ -183,5 +188,10 @@ export default {
 
 .lower {
   text-transform: lowercase;
+}
+
+::v-deep .table-height {
+  height: 600px;
+  overflow-y: scroll;
 }
 </style>

@@ -86,7 +86,8 @@
           }
 
           $showCalendar = Auth::check() && ($group->isVolunteer() || FixometerHelper::hasRole( $user, 'Administrator'));
-          ?>
+      ?>
+
       <div class="vue-placeholder vue-placeholder-large">
           <div class="vue-placeholder-content">@lang('partials.loading')...</div>
       </div>
@@ -114,87 +115,16 @@
 
       <div class="vue">
           <GroupEvents
+                  heading-level="h2"
                   :group-id="{{ $group->idgroups }}"
                   :group="{{ $group }}"
                   :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
                   :events="{{ json_encode($expanded_events) }}"
+                  :limit="3"
                   calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
                   calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
           />
       </div>
-
-
-          <div class="row mt-md-50">
-            <div class="col-lg-12">
-                <h2 id="upcoming-grp">@lang('groups.group_events')
-                @if( FixometerHelper::hasRole( $user, 'Administrator' ) || FixometerHelper::hasRole( $user, 'Host' ) )<sup>(<a href="{{ url('/party/create') }}">Add event</a>)</sup>@endif</h2>
-
-                <ul class="nav nav-tabs" id="myTab" role="tablist">
-                  <li class="nav-item">
-                    <a class="nav-link active" id="upcoming-past-tab" data-toggle="tab" href="#upcoming-past" role="tab" aria-controls="upcoming-past" aria-selected="true">@lang('groups.upcoming_active')</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" id="past-tab" data-toggle="tab" href="#past" role="tab" aria-controls="past" aria-selected="false">@lang('groups.past')</a>
-                  </li>
-                </ul>
-                <div class="tab-content" id="eventsTabContent">
-                  <div class="tab-pane fade show active" id="upcoming-past" role="tabpanel" aria-labelledby="upcoming-past-tab">
-
-                    <div class="events-list-wrap">
-                      <div class="table-responsive">
-                          <table class="table table-events table-striped" role="table">
-
-                              @include('events.tables.headers.head-events-upcoming-only', ['hide-invite' => false, 'group_view' => true])
-
-                              <tbody>
-
-                                @if( !$upcoming_events->isEmpty() )
-                                  @foreach ($upcoming_events as $event)
-                                    @include('partials.tables.row-events', ['show_invites_count' => true, 'group_view' => true])
-                                  @endforeach
-                                @else
-                                  <tr>
-                                    <td colspan="13" align="center" class="p-3">@lang('groups.no_upcoming_events')</td>
-                                  </tr>
-                                @endif
-
-                              </tbody>
-                          </table>
-                      </div>
-                    </div>
-
-                  </div>
-                  <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
-                    <div class="events-list-wrap">
-                      <div class="table-responsive">
-                          <table class="table table-events table-striped" role="table">
-
-                              @include('partials.tables.head-events', ['group_view' => true, 'hide_invite' => true])
-
-                              <tbody>
-
-                                @if( !$past_events->isEmpty() )
-                                  @foreach ($past_events as $event)
-                                    @include('partials.tables.row-events', ['group_view' => true, 'hide_invite' => true])
-                                  @endforeach
-                                @else
-                                  <tr>
-                                    <td colspan="13" align="center" class="p-3">@lang('groups.no_past_events')</td>
-                                  </tr>
-                                @endif
-
-                              </tbody>
-                          </table>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="events-link-wrap text-center">
-                    <a href="/party/group/{{{ $group->idgroups }}}">@lang('groups.see_all_events')</a>
-                  </div>
-                </div>
-            </div>
-          </div>
 
             <div class="row mt-md-50">
 
