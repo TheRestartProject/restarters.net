@@ -1,9 +1,9 @@
 <template>
   <div class="w-100 device-select-row">
     <multiselect
-        v-model="brandValue"
+        :value="brandValue"
         :placeholder="translatedBrand"
-        :options="brands"
+        :options="brandsPlusCustom"
         track-by="id"
         label="brand_name"
         :multiple="false"
@@ -12,7 +12,9 @@
         :taggable="false"
         selectLabel=""
         ref="multiselect"
-        @select="$emit('update:brand', $event.id)"
+        @select="selected"
+        @search-change="input"
+        :showNoResults="false"
     />
     <div />
   </div>
@@ -22,7 +24,7 @@
 export default {
   props: {
     brand: {
-      type: Number,
+      type: String,
       required: false,
       default: null
     },
@@ -36,19 +38,55 @@ export default {
       get() {
         let ret = null
         if (this.brand) {
-          ret = this.brands.find(o => {
-            return o.id === this.brand
+          ret = this.brandsPlusCustom.find(o => {
+            return o.brand_name === this.brand
           })
         }
 
         return ret
       },
       set(newval) {
-        this.$emit('update:category', newval.value)
+        this.$emit('update:category', newval.brand_name)
       }
+    },
+    brandsPlusCustom() {
+      // We might have been given a brand string which is not one of the standard brands.  In order to display this
+      // in the options list, we need to add it.
+      let ret = JSON.parse(JSON.stringify(this.brands))
+
+      if (this.brand) {
+        let exists = this.brands.find(b => {
+          return b.brand_name === this.brand
+        })
+
+        if (!exists) {
+          ret.unshift({
+            id: -1,
+            brand_name: this.brand
+          })
+        }
+      }
+
+      ret.sort((a, b) => {
+        return a.brand_name.localeCompare(b.brand_name)
+      })
+
+      return ret
     },
     translatedBrand() {
       return this.$lang.get('devices.brand')
+    },
+  },
+  methods: {
+    selected(selectedOption, id) {
+      this.$emit('update:brand', selectedOption.brand_name)
+    },
+    input(value, id) {
+      // multiselect isn't really intended to allow you to choose a value not in the list, but we can force that to
+      // happen by emitting an update at this point.
+      if (value) {
+        this.$emit('update:brand', value)
+      }
     }
   }
 }

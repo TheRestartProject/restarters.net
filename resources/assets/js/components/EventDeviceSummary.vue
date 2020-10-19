@@ -1,6 +1,6 @@
 <template>
   <transition name="recent">
-    <b-tr v-if="!editing">
+    <b-tr v-if="!editing" :key="'summary-' + device.iddevices">
       <b-td>
         <h3 class="noheader">
           {{ device.category.name }}
@@ -15,7 +15,7 @@
       <b-td v-if="powered">
         {{ device.model }}
         <div class="d-block d-md-none">
-          <span class="pl-2 pr-2 clickme" @click="editDevice">
+          <span class="pl-0 pl-md-2 pr-2 clickme" @click="editDevice">
             <b-img class="icon" src="/icons/edit_ico_green.svg" />
           </span>
           <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
@@ -29,7 +29,7 @@
       <b-td v-if="!powered">
         {{ device.item_type }}
         <div class="d-block d-md-none">
-          <span class="pl-2 pr-2 clickme" @click="editDevice">
+          <span class="pl-0 pl-md-2 pr-2 clickme" @click="editDevice">
             <b-img class="icon" src="/icons/edit_ico_green.svg" />
           </span>
           <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
@@ -52,18 +52,20 @@
         <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon" />
       </b-td>
       <b-td v-if="canedit" class="text-right d-none d-md-table-cell">
-        <span class="pl-2 pr-2 clickme" @click="editDevice">
-          <b-img class="icon" src="/icons/edit_ico_green.svg" />
-        </span>
-        <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
-          <b-img class="icon" src="/icons/delete_ico_red.svg" />
-        </span>
+        <div class="d-flex">
+          <span class="pl-0 pl-md-2 pr-2 clickme" @click="editDevice">
+            <b-img class="icon" src="/icons/edit_ico_green.svg" />
+          </span>
+            <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
+            <b-img class="icon" src="/icons/delete_ico_red.svg" />
+          </span>
+        </div>
         <ConfirmModal :key="'modal-' + device.iddevices" ref="confirmDelete" @confirm="deleteConfirmed" />
       </b-td>
     </b-tr>
-    <b-tr v-else>
+    <b-tr v-else :key="'editing-' + device.iddevices">
       <b-td colspan="8" class="p-0">
-        <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @cancel="editing = false" />
+        <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="close" />
       </b-td>
     </b-tr>
   </transition>
@@ -90,7 +92,8 @@ export default {
   },
   data () {
     return {
-      editing: false
+      editing: false,
+      saveScroll: null
     }
   },
   computed: {
@@ -140,6 +143,13 @@ export default {
       //   inserting a DOM tag breaks the table layout.
       // So swapping out the row enables us to use transitions within the table structure.
       this.editing = true
+
+      // Save the scroll position.
+      this.saveScroll = window.scrollY
+    },
+    close() {
+      this.editing = false
+      window.scrollY = this.saveScroll
     }
   }
 }

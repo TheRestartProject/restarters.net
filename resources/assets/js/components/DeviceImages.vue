@@ -71,6 +71,8 @@ export default {
 
   img {
     width: 100px !important;
+    height: 100px !important;
+    object-fit: cover;
     margin-bottom: 0.25rem !important;
     margin-right: 0.25rem !important;
   }

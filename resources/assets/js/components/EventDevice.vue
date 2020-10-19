@@ -7,7 +7,10 @@
       <div class="br d-flex flex-column">
         <b-card no-body class="p-3 flex-grow-1 botwhite">
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
-          <DeviceCategorySelect class="mb-2" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
+          <DeviceCategorySelect :class="{
+            'mb-2': true,
+            'border-thick': missingCategory
+            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
           <div v-if="powered">
             <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" />
             <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" />
@@ -27,8 +30,8 @@
       <div class="bl d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1">
           <h3 class="mt-2 mb-4">{{ translatedTitleAssessment }}</h3>
-          <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" />
-          <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" />
+          <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" :icon-variant="add ? 'black' : 'brand'" />
+          <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4"  :icon-variant="add ? 'black' : 'brand'" />
           <DeviceUsefulUrls :device="device" :urls.sync="currentDevice.urls" class="mb-2" />
           <div class="d-flex">
             <b-form-checkbox v-model="wiki" class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" />
@@ -39,6 +42,9 @@
         </b-card>
       </div>
     </div>
+    <b-alert :show="missingCategory" variant="danger">
+      <p>{{ translatedError }}</p>
+    </b-alert>
     <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
       <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
         {{ translatedAddDevice }}
@@ -61,7 +67,7 @@ import {
   END_OF_LIFE,
   SPARE_PARTS_MANUFACTURER,
   SPARE_PARTS_THIRD_PARTY,
-  CATEGORY_MISC
+  CATEGORY_MISC, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME
 } from '../constants'
 import DeviceCategorySelect from './DeviceCategorySelect'
 import DeviceBrandSelect from './DeviceBrandSelect'
@@ -118,9 +124,21 @@ export default {
   data () {
     return {
       currentDevice: {},
+      missingCategory: false
+    }
+  },
+  watch: {
+    currentCategory(newval) {
+      if (this.missingCategory && newval) {
+        // Reset warning.
+        this.missingCategory = false
+      }
     }
   },
   computed: {
+    currentCategory() {
+      return this.currentDevice ? this.currentDevice.category : null
+    },
     sparePartsNeeded() {
       return this.device.spare_parts === SPARE_PARTS_MANUFACTURER || this.device.spare_parts === SPARE_PARTS_THIRD_PARTY
     },
@@ -162,10 +180,23 @@ export default {
     translatedCancel() {
       return this.$lang.get('partials.cancel')
     },
+    translatedError() {
+      return this.$lang.get('events.form_error')
+    },
     currentImages() {
       // TODO LATER The images are currently added/removed/deleted immediately, and so we get them from the store.
       // This should be deferred until the save.
-      return this.$store.getters['devices/byDevice'](this.idevents, this.device.iddevices)
+      let ret = []
+
+      if (this.device) {
+        ret = this.$store.getters['devices/byDevice'](this.idevents, this.device.iddevices)
+
+        if (!ret) {
+          ret = []
+        }
+      }
+
+      return ret
     }
   },
   created() {
@@ -176,6 +207,7 @@ export default {
       brand: null,
       model: null,
       age: null,
+      repair_details: null,
       repair_status: null,
       spare_parts: null,
       problem: null,
@@ -193,33 +225,50 @@ export default {
         this.currentDevice.category = this.currentDevice.category.idcategories
       }
 
-      if (this.currentDevice.brand) {
-        this.currentDevice.brand = this.brands.find(b => {
-          return b.brand_name === this.currentDevice.brand
-        }).id
-      }
+      this.currentDevice.estimate = parseFloat(this.currentDevice.estimate)
+
+      this.nextSteps()
     }
   },
   methods: {
     cancel() {
-      this.$emit('cancel')
+      this.$emit('close')
+    },
+    nextSteps() {
+      // The next step value is held in multiple properties of the object.
+      if (this.currentDevice.do_it_yourself) {
+        this.currentDevice.repair_details = NEXT_STEPS_DIY
+      } else if (this.currentDevice.professional_help) {
+        this.currentDevice.repair_details = NEXT_STEPS_PROFESSIONAL
+      } else if (this.currentDevice.more_time_needed) {
+        this.currentDevice.repair_details = NEXT_STEPS_MORE_TIME
+      } else {
+        this.currentDevice.repair_details = null
+      }
+      console.log("Calc next steps", this.currentDevice.repair_details)
     },
     async addDevice() {
-      const createdDevices = await this.$store.dispatch('devices/add', this.prepareDeviceForServer())
+      if (!this.currentDevice.category) {
+        this.missingCategory = true
+      } else {
+        this.missingCategory = false
 
-      if (this.currentDevice.urls) {
-        // We have some useful URLs.  Apply them to each of the created devices.
-        createdDevices.forEach(async (d) => {
-          this.currentDevice.urls.forEach(async (u) => {
-            await this.$store.dispatch('devices/addURL', {
-              iddevices: d.iddevices,
-              url: u
+        const createdDevices = await this.$store.dispatch('devices/add', this.prepareDeviceForServer())
+
+        if (this.currentDevice.urls) {
+          // We have some useful URLs.  Apply them to each of the created devices.
+          createdDevices.forEach(async (d) => {
+            this.currentDevice.urls.forEach(async (u) => {
+              await this.$store.dispatch('devices/addURL', {
+                iddevices: d.iddevices,
+                url: u
+              })
             })
           })
-        })
-      }
+        }
 
-      this.$emit('cancel')
+        this.$emit('close')
+      }
     },
     async saveDevice() {
       await this.$store.dispatch('devices/edit', this.prepareDeviceForServer())
@@ -261,7 +310,7 @@ export default {
         }
       })
 
-      this.$emit('cancel')
+      this.$emit('close')
     },
     prepareDeviceForServer() {
       // The device we send to the server is what is in currentDevice, with a couple of tweaks:
@@ -274,12 +323,6 @@ export default {
         device.url = device.urls[0].url
         device.source = device.urls[0].source
       }
-
-      const selectedBrand = this.brands.find(b => {
-        return b.id === device.brand
-      })
-
-      device.brand = selectedBrand ? selectedBrand.brand_name : null
 
       return device
     },
@@ -391,5 +434,9 @@ h3 {
 
 .botwhite {
   border-bottom: 1px solid white;
+}
+
+.border-thick {
+  border: 3px solid red;
 }
 </style>

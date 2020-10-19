@@ -343,6 +343,10 @@ table th {
   color: #5A5A5A;
 }
 
+.text-black {
+  color: black;
+}
+
 .skills-list {
 
   li {
@@ -519,6 +523,11 @@ h2 {
     &.multiselect__option--selected {
       background-color: $brand-muted;
     }
+  }
+
+  &.multiselect__option--selected {
+    color: white;
+    background-color: $brand-muted;
   }
 
   &.multiselect__option--group.multiselect__option--disabled {

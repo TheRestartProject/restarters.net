@@ -535,7 +535,7 @@ class DeviceController extends Controller
         }
 
         $category = $request->input('category');
-        $weight = $request->input('weight');
+        $weight = $request->input('estimate');
         $brand = $request->input('brand');
         $model = $request->input('model');
         $item_type = $request->input('item_type');
@@ -615,16 +615,6 @@ class DeviceController extends Controller
 
             $device[$i]->save();
 
-            if ($useful_url) {
-                // Devices can have multiple URLs, but we only support one on the create - and it gets applied to each
-                // device.
-                DeviceUrl::create([
-                  'device_id' => $device[$i]->iddevices,
-                  'source' => $useful_source,
-                  'url' => $useful_url
-               ]);
-            }
-
             // Update barriers
             if (isset($barrier) && ! empty($barrier) && $repair_status == 3) { // Only sync when repair status is end-of-life
                 Device::find($device[$i]->iddevices)->barriers()->sync($barrier);
@@ -648,6 +638,14 @@ class DeviceController extends Controller
             $device[$i]->category = $device[$i]->deviceCategory;
             $device[$i]->shortProblem = $device[$i]->getShortProblem();
             $device[$i]->urls;
+
+            $barriers = [];
+
+            foreach ($device[$i]->barriers as $barrier) {
+                $barriers[] = $barrier->id;
+            }
+
+            $device[$i]->barrier = $barriers;
         }
         // end quantity loop
 
@@ -802,6 +800,14 @@ class DeviceController extends Controller
             $device->category = $device->deviceCategory;
             $device->shortProblem = $device->getShortProblem();
             $device->urls;
+
+            $barriers = [];
+
+            foreach ($device->barriers as $barrier) {
+                $barriers[] = $barrier->id;
+            }
+
+            $device->barrier = $barriers;
 
             $data['device'] = $device;
 
