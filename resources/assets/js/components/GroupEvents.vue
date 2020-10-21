@@ -37,7 +37,7 @@
           <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
             <GroupEventsTableHeading />
             <b-tbody class="table-height">
-              <GroupEventSummary v-for="e in upcomingToShow" :key="'event-' + e.idevents" :idevents="e.idevents" />
+              <GroupEventSummary v-for="e in upcomingToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" />
             </b-tbody>
           </b-table-simple>
           <div class="text-right" v-if="limit">
@@ -60,7 +60,7 @@
           <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
             <GroupEventsTableHeading past />
             <b-tbody class="table-height">
-              <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" />
+              <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" />
             </b-tbody>
           </b-table-simple>
           <div class="text-right" v-if="limit">

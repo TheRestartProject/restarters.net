@@ -77,10 +77,14 @@
               $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
               $thisone['allinvitedcount'] = $event->allInvited->count();
 
-              // TODO LATER Consider whether these should be in the event or passed into the store.
+              // TODO LATER Consider whether these stats should be in the event or passed into the store.
               $thisone['stats'] = $event->getEventStats($emissionRatio);
               $thisone['participants_count'] = $event->participants;
               $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+
+              $thisone['isVolunteer'] = $event->isVolunteer();
+              $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
+              $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
 
               $expanded_events[] = $thisone;
           }

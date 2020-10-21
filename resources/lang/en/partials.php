@@ -84,6 +84,7 @@ return array (
   'no_devices_added' => 'No devices added',
   'add_a_device' => 'Add a device',
   'this_event_hasnt_started' => 'This event hasn\'t started',
+  'event_requires_moderation' => 'Event requires moderation',
   'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
   'save' => 'Save item',
   'hot_topics' => 'Hot topics',

@@ -66,6 +66,10 @@
               $thisone['participants_count'] = $event->participants;
               $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
 
+              $thisone['isVolunteer'] = $event->isVolunteer();
+              $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
+              $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+
               $expanded_events[] = $thisone;
           }
 
