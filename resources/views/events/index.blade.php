@@ -55,6 +55,7 @@
 
           $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
           $emissionRatio = $footprintRatioCalculator->calculateRatio();
+          $can_edit_group = Auth::user() && FixometerHelper::hasRole( Auth::user(), 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
 
           foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
               $thisone = $event->getAttributes();
