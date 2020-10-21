@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100 device-select-row">
+  <div class="w-100 device-select-row device-category">
     <multiselect
       v-model="categoryValue"
       :placeholder="translatedCategory"
@@ -22,6 +22,7 @@
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
     </div>
+    <div class="multiselect__content-wrapper d-none" />
   </div>
 </template>
 <script>
@@ -115,9 +116,12 @@ export default {
   }
 }
 </script>
-<style scoped lang="scss">
-// Reduce the size of the options so they fit
-::v-deep .multiselect__single, .multiselect__content-wrapper {
-  font-size: 13px;
+<style>
+/*
+ Increase the width to avoid scrolling.  Having trouble with v-deep here, so use a global style but restricted
+ a bit by class.
+*/
+.device-category .multiselect__content-wrapper {
+  width: 360px !important;
 }
 </style>
