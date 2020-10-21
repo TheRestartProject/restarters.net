@@ -110,8 +110,7 @@ class PartyController extends Controller
                 ->get();
 
             $past_events = Party::pastEvents()
-                ->where('events.group', $group_id)
-                ->paginate(10);
+                ->where('events.group', $group_id);
 
             $group = Group::find($group_id);
             $upcoming_events_in_area = null;
