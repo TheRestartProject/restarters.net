@@ -1,12 +1,17 @@
 <template>
-  <div class="device-photo-layout">
-    <label>
-      {{ translatedImages }}
-    </label>
-    <div class="d-flex flex-wrap device-photos dropzone-previews">
-      <FileUploader :url="'/device/image-upload/' + device.iddevices" v-if="edit" previews-container=".device-photos" @uploaded="uploaded($event)" />
-      <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)" />
+  <div>
+    <div class="device-photo-layout" v-if="!add">
+      <label v-if="!add">
+        {{ translatedImages }}
+      </label>
+      <div class="d-flex flex-wrap device-photos dropzone-previews">
+        <FileUploader :url="'/device/image-upload/' + device.iddevices" v-if="edit" previews-container=".device-photos" @uploaded="uploaded($event)" />
+        <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)" />
+      </div>
     </div>
+    <p class="p-0" v-else>
+      {{ translatedExcuse }}
+    </p>
   </div>
 </template>
 <script>
@@ -16,6 +21,7 @@ import DeviceImage from './DeviceImage'
 export default {
   components: {DeviceImage, FileUploader},
   props: {
+    // This is deliberately not retrieved from the store as it can be the current, unsaved device.
     device: {
       type: Object,
       required: true
@@ -24,9 +30,10 @@ export default {
       type: Number,
       required: true
     },
-    images: {
-      type: Array,
-      required: true
+    add: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     edit: {
       type: Boolean,
@@ -35,20 +42,29 @@ export default {
     }
   },
   computed: {
+    images() {
+      // TODO LATER The images are currently added/removed/deleted immediately, and so we get them from the store.
+      // This should be deferred until the save.
+      if (this.device) {
+        return this.$store.getters['devices/imagesByDevice'](this.device.iddevices)
+      } else {
+        return []
+      }
+    },
     translatedImages() {
       return this.$lang.get('devices.images')
+    },
+    translatedExcuse() {
+      return this.$lang.get('devices.images_on_edit')
     }
   },
   methods: {
     uploaded(images) {
       // We have uploaded some images.  Add them to the store.
       this.$store.dispatch('devices/setImages', {
-        idevents: this.idevents,
         iddevices: this.device.iddevices,
         images: images
       })
-
-      this.$emit('update:images')
     }
   }
 }

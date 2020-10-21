@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="quantity">
     <multiselect
         v-model="quantityValue"
         :options="quantities"
@@ -10,6 +10,8 @@
         deselect-label=""
         :taggable="false"
         selectLabel=""
+        placeholder=""
+        selectedLabel=""
         ref="multiselect"
         @select="$emit('update:quantity', $event.id)"
     />
@@ -56,3 +58,8 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+.quantity {
+  width: 5rem;
+}
+</style>
