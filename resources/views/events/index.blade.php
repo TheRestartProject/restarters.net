@@ -85,7 +85,7 @@
                       :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
                       :events="{{ json_encode($expanded_events) }}"
                       calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
-                      calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
+                      calendar-edit-url="{{ $showCalendar && Auth::user() ? url("/profile/edit/" + Auth::user()->id + "#list-calendar-links") : '' }}"
               />
           </div>
 
