@@ -6,32 +6,36 @@ export default {
   namespaced: true,
   state: {
     // Object indexed by event id containing array of devices.  Use object rather than array so that it's sparse.
-    list: {}
+    devices: {},
+
+    // Object indexed by device id containing list of images.
+    images: {}
   },
   getters: {
     byEvent: state => idevents => {
-      return state.list[idevents]
+      return state.devices[idevents]
     },
-    byDevice: state => (idevents, iddevices) => {
-      const device = state.list[idevents].find(d => {
-        return d.iddevices === iddevices
-      })
-
-      return device ? device.images : []
+    imagesByDevice: state => (iddevices) => {
+      return state.images[iddevices]
     }
   },
   mutations: {
     set (state, params) {
-      Vue.set(state.list, params.idevents, params.devices)
+      Vue.set(state.devices, params.idevents, params.devices)
+
+      params.devices.forEach(d => {
+        Vue.set(state.images, d.iddevices, d.images)
+      })
     },
     add (state, params) {
       let exists = false
 
       if (params.iddevices) {
-        state.list[params.idevents].forEach((d, i) => {
+        state.devices[params.idevents].forEach((d, i) => {
           if (d.iddevices === params.iddevices) {
             // Found it there already.
-            Vue.set(state.list[params.idevents], i, params)
+            Vue.set(state.devices, i, params)
+            Vue.set(state.images, params.iddevices, params.images)
             exists = true
           }
         })
@@ -39,22 +43,24 @@ export default {
 
       if (!exists) {
         // Append the new device to the existing list.
-        state.list[params.idevents].push(params)
+        state.devices[params.idevents].push(params)
+        Vue.set(state.images, params.iddevices, params.images)
       }
     },
     remove (state, params) {
-      let newarr = state.list[params.idevents].filter((a) => {
+      let newarr = state.devices[params.idevents].filter((a) => {
         return a.iddevices !== params.iddevices
       })
 
-      Vue.set(state.list, params.idevents, newarr)
+      Vue.set(state.devices, params.idevents, newarr)
+      Vue.delete(state.images, params.iddevices)
     },
     addURL(state, params) {
       // Fix the device.  This isn't very efficient but the numbers involved are never very large.
-      for (let idevents in state.list) {
-        const devices = state.list[idevents]
+      for (let idevents in state.devices) {
+        const devices = state.devices[idevents]
 
-        for (let dix = 0; dix < state.list[idevents].length; dix++) {
+        for (let dix = 0; dix < state.devices[idevents].length; dix++) {
           const device = devices[dix]
 
           if (params.device_id === device.iddevices) {
@@ -69,16 +75,16 @@ export default {
             }
 
             devices[dix] = device
-            Vue.set(state.list, idevents, devices)
+            Vue.set(state.devices, idevents, devices)
           }
         }
       }
     },
     removeURL(state, params) {
-      for (let idevents in state.list) {
-        const devices = state.list[idevents]
+      for (let idevents in state.devices) {
+        const devices = state.devices[idevents]
 
-        for (let dix = 0; dix < state.list[idevents].length; dix++) {
+        for (let dix = 0; dix < state.devices[idevents].length; dix++) {
           const device = devices[dix]
 
           if (params.device_id === device.iddevices) {
@@ -87,43 +93,18 @@ export default {
             })
 
             devices[dix] = device
-            Vue.set(state.list, idevents, devices)
+            Vue.set(state.devices, idevents, devices)
           }
         }
       }
     },
     setImages(state, params) {
-      for (let idevents in state.list) {
-        const devices = state.list[idevents]
-
-        for (let dix = 0; dix < state.list[idevents].length; dix++) {
-          const device = devices[dix]
-
-          if (params.iddevices === device.iddevices) {
-            device.images = params.images
-            devices[dix] = device
-            Vue.set(state.list, idevents, devices)
-          }
-        }
-      }
+      Vue.set(state.images, params.iddevices, params.images)
     },
     removeImage(state, params) {
-      for (let idevents in state.list) {
-        const devices = state.list[idevents]
-
-        for (let dix = 0; dix < state.list[idevents].length; dix++) {
-          const device = devices[dix]
-
-          if (params.iddevices === device.iddevices) {
-            device.images = device.images.filter(u => {
-              return u.idimages !== params.idimages
-            })
-
-            devices[dix] = device
-            Vue.set(state.list, idevents, devices)
-          }
-        }
-      }
+      Vue.set(state.images, params.iddevices, state.images[params.iddevices].filter(u => {
+        return u.idimages !== params.idimages
+      }))
     },
   },
   actions: {

@@ -21,16 +21,13 @@ import DeviceImage from './DeviceImage'
 export default {
   components: {DeviceImage, FileUploader},
   props: {
+    // This is deliberately not retrieved from the store as it can be the current, unsaved device.
     device: {
       type: Object,
       required: true
     },
     idevents: {
       type: Number,
-      required: true
-    },
-    images: {
-      type: Array,
       required: true
     },
     add: {
@@ -45,6 +42,15 @@ export default {
     }
   },
   computed: {
+    images() {
+      // TODO LATER The images are currently added/removed/deleted immediately, and so we get them from the store.
+      // This should be deferred until the save.
+      if (this.device) {
+        return this.$store.getters['devices/imagesByDevice'](this.device.iddevices)
+      } else {
+        return []
+      }
+    },
     translatedImages() {
       return this.$lang.get('devices.images')
     },
@@ -56,12 +62,9 @@ export default {
     uploaded(images) {
       // We have uploaded some images.  Add them to the store.
       this.$store.dispatch('devices/setImages', {
-        idevents: this.idevents,
         iddevices: this.device.iddevices,
         images: images
       })
-
-      this.$emit('update:images')
     }
   }
 }
