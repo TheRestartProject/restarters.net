@@ -85,7 +85,7 @@
               $expanded_events[] = $thisone;
           }
 
-          $showCalendar = Auth::check() && ($group->isVolunteer() || FixometerHelper::hasRole( $user, 'Administrator'));
+          $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || FixometerHelper::hasRole( $user, 'Administrator'));
       ?>
 
       <div class="vue-placeholder vue-placeholder-large">
