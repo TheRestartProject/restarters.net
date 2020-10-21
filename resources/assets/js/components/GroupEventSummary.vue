@@ -12,7 +12,7 @@
       {{ date }} <br />
       {{ start }} - {{ end }}
     </b-td>
-    <b-td>
+    <b-td class="text-left">
       <b>{{ event.venue ? event.venue : event.location }}</b>
     </b-td>
     <b-td v-if="upcoming">
