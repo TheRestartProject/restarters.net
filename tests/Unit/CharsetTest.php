@@ -9,9 +9,7 @@ use App\Network;
 use App\User;
 use DB;
 use Tests\TestCase;
-//use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-//use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Log;
 
 class CharsetTest extends TestCase {
@@ -25,13 +23,11 @@ class CharsetTest extends TestCase {
     /** @test */
     public function test_charset_db_insert() {
 
-//        $this->artisan('migrate:fresh');
-
         DB::statement("SET foreign_key_checks=0");
 
         $bom = "\xEF\xBB\xBF";
 
-//        User
+// User
         $name = "Möñiqûé";
         $shortname = "Möñ";
         Log::info("$bom User name: $name");
@@ -48,7 +44,7 @@ class CharsetTest extends TestCase {
         $this->assertEquals($name, $user->name);
         $this->assertEquals($shortname, $user->username);
 
-//        Group
+// Group
         $name = "Repair Café -l'Möñiqûé";
         $location = "Malmö, Sweden";
         $freetext = "Le Repair Café est ouvert à tous et l'entrée est évidemment libre.";
@@ -69,7 +65,7 @@ class CharsetTest extends TestCase {
         $this->assertEquals($location, $group->location);
         $this->assertEquals($freetext, $group->free_text);
 
-        // Add user to group
+// User Group
         DB::table('users_groups')->insert(
                 [
                     'user' => $user->id,
@@ -78,7 +74,7 @@ class CharsetTest extends TestCase {
                 ]
         );
 
-//        Event
+// Event
         $venue = "Repair Café -l'Möñiqûé";
         $location = "Stapelbäddsgatan, Malmö, Sweden";
         $freetext = "Petit électro, électronique, vélo ...";
@@ -101,7 +97,7 @@ class CharsetTest extends TestCase {
         $this->assertEquals($location, $event->location);
         $this->assertEquals($freetext, $event->free_text);
 
-        // Add user to event
+// Event User
         DB::table('events_users')->insert(
                 [
                     'user' => $user->id,
@@ -110,7 +106,7 @@ class CharsetTest extends TestCase {
                 ]
         );
 
-//        Network
+// Network
         $name = "Repair Réseau - l'Möñiqûé";
         $shortname = "Réseau Möñiqûé";
         $description = "Le Repair Réseau de l'Möñiqûé";
@@ -131,7 +127,7 @@ class CharsetTest extends TestCase {
         $this->assertEquals($shortname, $network->shortname);
         $this->assertEquals($description, $network->description);
 
-//        Device
+// Device
         $brand = "Mû";
         $model = "hÖv€rçråft";
         $problem = "is ßûll ôf Éèls.";
@@ -160,7 +156,7 @@ class CharsetTest extends TestCase {
         $this->assertEquals($str, $device->item_type);
         $this->assertEquals($str, $device->notes);
 
-        // visit the event page
+// Visit the event page
         $response = $this->get('party/view/' . $event->idevents);
         $response->assertSeeText($group->name);
         $response->assertSeeText($event->venue);
