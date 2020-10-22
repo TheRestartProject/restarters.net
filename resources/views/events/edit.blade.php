@@ -122,18 +122,30 @@
                       <div class="col-lg-7">
                            <div class="form-group">
                         <label for="field_event_time">@lang('events.field_event_time'):</label>
+
+                        <?php
+
+                        $startTime = date('H:i', strtotime($formdata->start));
+                        $endTime = date('H:i', strtotime($formdata->end));
+                        ?>
+                        @if ($agent->browser() == 'Safari' && $agent->isDesktop())
+                            <div class="vue">
+                                <EventTimeRangePicker starttimeinit="{{ $startTime }}" endtimeinit="{{ $endTime }}" />
+                            </div>
+                        @else
                         <div class="row">
 
                           <div class="col-6">
-                            <input type="time" id="start-time" name="start" class="form-control field" value="{{ date('H:i', strtotime($formdata->start)) }}">
+                            <input type="time" id="start-time" name="start" class="form-control field" value="{{ $startTime }}">
                           </div>
                           <div class="col-6">
                             <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
-                            <input type="time" id="end-time" name="end" class="form-control field" value="{{ date('H:i', strtotime($formdata->end)) }}">
+                            <input type="time" id="end-time" name="end" class="form-control field" value="{{ $endTime }}">
                           </div>
-                          </div>
-
                         </div>
+                        @endif
+
+                      </div>
                       </div>
                       <div class="col-12">
 

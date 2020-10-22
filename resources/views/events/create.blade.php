@@ -124,20 +124,25 @@
                   <div class="col-lg-7">
                     <div class="form-group">
 
-                      <label for="field_event_time">@lang('events.field_event_time'):</label>
+                        <label for="field_event_time">@lang('events.field_event_time'):</label>
+                        @if ($agent->browser() == 'Safari' && $agent->isDesktop())
+                            <div class="vue">
+                                <EventTimeRangePicker />
+                            </div>
+                        @else
+                            <div class="row">
 
-                      <div class="row">
+                                <div class="col-6">
+                                    <input type="time" id="start-time" name="start" class="form-control field" required>
+                                </div>
 
-                        <div class="col-6">
-                          <input type="time" id="start-time" name="start" class="form-control field" required>
-                        </div>
+                                <div class="col-6">
+                                    <input type="time" id="end-time" name="end" class="form-control field" required>
+                                </div>
 
-                        <div class="col-6">
-                          <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
-                          <input type="time" id="end-time" name="end" class="form-control field" required>
-                        </div>
+                            </div>
 
-                      </div>
+                       @endif
 
                     </div>
                   </div>
