@@ -15,7 +15,16 @@
 
 <script>
 export default {
-  props: ['starttimeinit', 'endtimeinit'  ],
+  props: {
+    starttimeinit: {
+      required: false,
+      type: String
+    },
+    endtimeinit: {
+      required: false,
+      type: String
+    }
+  },
   data() {
     return {
       startTime: this.starttimeinit,
@@ -46,6 +55,10 @@ export default {
     padding: 0 10px;
 }
 
+/deep/ label {
+    font-weight: normal;
+}
+
 /deep/ .b-time .form-control {
     width: 100%;
     height: 100%;
@@ -53,12 +66,22 @@ export default {
     padding: 0 10px;
 }
 
-/deep/ #start-time, /deep/ #end-time {
+/deep/ #start-time__outer_ {
+    border-right: 0;
+}
+
+/deep/ #start-time,
+/deep/ #end-time {
     padding: 0;
 }
 
-/deep/ #start-time__value_, /deep/ #end-time__value_ {
+/deep/ #start-time__value_,
+/deep/ #end-time__value_ {
     border: 0;
     margin: 0;
+}
+
+/deep/ output {
+    justify-content: center;
 }
 </style>
