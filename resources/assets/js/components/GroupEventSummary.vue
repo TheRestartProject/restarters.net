@@ -120,6 +120,7 @@ export default {
   text-align: center;
   padding-top: 8px;
   font-weight: bold;
+  font-size: 15px;
 
   .day {
     font-size: 1.7rem;

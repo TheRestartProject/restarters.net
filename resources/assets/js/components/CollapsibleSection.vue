@@ -11,7 +11,10 @@
         <div v-if="count" :class="{
           'd-inline' : true,
           'd-md-none' : !alwaysShowCount,
-          'text-muted' : true
+          'text-muted' : true,
+          'd-flex' : true,
+          'flex-column' : true,
+          'justify-content-center' : true
         }">
           <span v-if="countBadge">
             <b-badge variant="primary" pill>{{ count }}</b-badge>
@@ -22,7 +25,7 @@
         </div>
         <slot name="title-right" />
       </div>
-      <span class="d-inline d-md-none">
+      <span class="d-inline d-md-none clickme d-flex flex-column justify-content-center">
         <img class="icon" v-if="expanded" src="/images/minus-icon.svg" alt="Collapse" />
         <img class="icon" v-else src="/images/add-icon.svg" alt="Expand" />
       </span>
