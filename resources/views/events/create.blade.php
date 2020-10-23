@@ -115,7 +115,13 @@
                 <div class="row">
                   <div class="col-lg-7">
                     <label for="event_date">@lang('events.field_event_date'):</label>
-                    <input type="date" id="event_date" name="event_date" class="form-control field" required>
+                    @if ($agent->browser() == 'Safari' && $agent->isDesktop())
+                        <div class="vue">
+                            <EventDatePicker />
+                        </div>
+                    @else
+                        <input type="date" id="event_date" name="event_date" class="form-control field" required>
+                    @endif
                   </div>
                 </div>
               </div>
