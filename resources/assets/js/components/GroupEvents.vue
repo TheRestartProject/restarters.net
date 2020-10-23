@@ -4,7 +4,7 @@
       <div class="d-flex justify-content-between w-100">
         <div>
           {{ translatedTitle }}
-          <b-btn v-if="calendarCopyUrl" class="ml-2" variant="none" @click="showCalendar">
+          <b-btn v-if="calendarCopyUrl" class="ml-2" variant="primary" @click="showCalendar">
             <b-img-lazy src="/images/subs_cal_ico.svg" />
           </b-btn>
         </div>
@@ -57,7 +57,7 @@
           <p v-if="!past.length">
             {{ translatedNoPast }}.
           </p>
-          <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+          <b-table-simple v-else responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
             <GroupEventsTableHeading past />
             <b-tbody class="table-height">
               <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" />
@@ -132,10 +132,14 @@ export default {
       return this.$lang.get('events.event_all')
     },
     translatedCalendarTitle() {
-      return this.$lang.get('groups.calendar_copy_title')
+      return this.$lang.get('groups.calendar_copy_title', {
+        group: this.group.name
+      })
     },
     translatedCalendarDescription() {
-      return this.$lang.get('groups.calendar_copy_description')
+      return this.$lang.get('groups.calendar_copy_description', {
+        group: this.group.name
+      })
     },
     past() {
       return this.events.filter(e => {

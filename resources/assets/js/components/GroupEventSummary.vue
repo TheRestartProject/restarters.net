@@ -8,12 +8,12 @@
         </span>
       </div>
     </b-td>
-    <b-td class="date">
+    <b-td class="date text-left">
       {{ date }} <br />
       {{ start }} - {{ end }}
     </b-td>
     <b-td class="text-left">
-      <b>{{ event.venue ? event.venue : event.location }}</b>
+      <b><a :href="'/party/view/' + idevents">{{ event.venue ? event.venue : event.location }}</a></b>
     </b-td>
     <b-td v-if="upcoming">
       {{ event.allinvitedcount }}
@@ -30,10 +30,10 @@
       </span>
     </b-td>
     <b-td v-else-if="upcoming">
-      <div v-if="event.attending">
-        <b-badge variant="primary" class="m-0 fullsize">
+      <div v-if="event.attending" class="text-black font-weight-bold d-flex">
+        <span>
           {{ translatedYoureGoing }}
-        </b-badge>
+        </span>
       </div>
       <!-- We can't RSVP if the event is starting soon. -->
       <b-btn variant="primary" :href="'/party/join/' + idevents" :disabled="startingSoon" v-else>
@@ -87,7 +87,6 @@ export default {
     },
     noDevices() {
       // Whether there are no devices at this event, and we have permissions to do something about that.
-      console.log(this.event, this.canedit)
       return this.event && this.stats && (this.stats.fixed_devices + this.stats.repairable_devices + this.stats.dead_devices === 0) && this.canedit && this.finished
     },
     translatedRequiresModeration() {

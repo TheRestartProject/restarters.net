@@ -118,6 +118,7 @@
       </div>
 
       <div class="vue">
+          <hr style="color: white; border-top: 1px solid black;" />
           <GroupEvents
                   heading-level="h2"
                   :group-id="{{ $group->idgroups }}"

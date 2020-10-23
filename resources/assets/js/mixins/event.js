@@ -125,7 +125,7 @@ export default {
       return this.event ? (new moment(this.event.event_date).format(DATE_FORMAT)) : null
     },
     dayofmonth() {
-      return this.event ? (new moment(this.event.event_date).format('D')) : null
+      return this.event ? (new moment(this.event.event_date).format('DD')) : null
     },
     month() {
       return this.event ? (new moment(this.event.event_date).format('MMM').toUpperCase()) : null

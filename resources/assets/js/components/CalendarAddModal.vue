@@ -19,8 +19,13 @@
       </b-input-group-append>
     </b-input-group>
     <b-alert v-if="failed" show variant="danger" class="mt-2 mb-2">
-      <p>
+      <p class="m-0">
         {{ translatedSomethingWrong }}
+      </p>
+    </b-alert>
+    <b-alert v-if="copied" show variant="info" class="mt-2 mb-2">
+      <p class="m-0">
+        {{ translatedCopied }}
       </p>
     </b-alert>
     <div class="d-flex justify-content-between flex-wrap mt-4 mb-4">
@@ -58,12 +63,16 @@ export default {
   data: function() {
     return {
       showModal: false,
-      failed: false
+      failed: false,
+      copied: false
     }
   },
   computed: {
     translatedSomethingWrong() {
       return this.$lang.get('partials.something_wrong')
+    },
+    translatedCopied() {
+      return this.$lang.get('partials.copied_to_clipboard')
     },
     translatedClose() {
       return this.$lang.get('partials.close')
@@ -86,7 +95,7 @@ export default {
       try {
         this.$refs.container.select()
         await this.$copyText(this.$refs.container)
-        this.hide()
+        this.copied = true
       } catch (e) {
         this.failed = true
       }

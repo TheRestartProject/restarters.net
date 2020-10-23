@@ -5,7 +5,7 @@
       }">
     <div class="device-info">
       <div class="br d-flex flex-column">
-        <b-card no-body class="p-3 flex-grow-1 botwhite">
+        <b-card no-body class="p-3 flex-grow-1 botwhite border-0">
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
           <DeviceCategorySelect :class="{
             'mb-2': true,
@@ -22,13 +22,13 @@
         </b-card>
       </div>
       <div class="d-flex flex-column botwhite">
-        <b-card no-body class="p-3 flex-grow-1">
+        <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ translatedTitleRepair }}</h3>
           <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.repair_details" :parts.sync="currentDevice.spare_parts" :barriers.sync="currentDevice.barrier" :barrierList="barrierList" />
         </b-card>
       </div>
       <div class="bl d-flex flex-column botwhite">
-        <b-card no-body class="p-3 flex-grow-1">
+        <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ translatedTitleAssessment }}</h3>
           <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" :icon-variant="add ? 'black' : 'brand'" />
           <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4"  :icon-variant="add ? 'black' : 'brand'" />

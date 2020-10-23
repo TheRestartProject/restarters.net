@@ -1,5 +1,5 @@
 <template>
-  <b-thead>
+  <b-thead class="text-center">
     <b-tr v-if="!past">
       <b-th>
       </b-th>
