@@ -2,7 +2,7 @@
   <div :class="'d-flex flex-column justify-content-end medal-' + position">
     <div class="bg-white d-flex flex-column justify-content-between text-center font-weight-bold height medal">
       <div>
-        <b-img-lazy class="position-absolute rosette" :src="'/images/medal-' + position + '.jpg'" />
+        <b-img-lazy class="position-absolute rosette" :src="'/images/rosette_' + position + '_ico.svg'" />
       </div>
       <div class="d-flex flex-column">
         <span class="text-brand large">
