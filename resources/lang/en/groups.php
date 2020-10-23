@@ -120,7 +120,7 @@ return array (
   'see_all_events' => 'See all events',
   'environmental_impact' => 'Environmental impact',
   'device_breakdown' => 'Device breakdown',
-  'total_devices' => 'Total devices worked on',
+  'total_devices' => 'Devices worked on',
   'fixed_devices' => 'Fixed devices',
   'repairable_devices' => 'Repairable devices',
   'end_of_life_devices' => 'End-of-life devices',
@@ -138,5 +138,5 @@ return array (
   'no_volunteers' => 'There are no volunteers in this group',
   'remove_volunteer' => 'Remove Volunteer',
   'make_host' => 'Make Host',
-  'not_counting' => 'Not counting toward this group\'s environmental impact is|Not counting toward this group\'s environmental impact are',
+  'not_counting' => 'Not counting toward this group\'s environmental impact is|Not counting toward this group\'s environmental impact are'
 );

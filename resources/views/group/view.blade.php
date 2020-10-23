@@ -178,7 +178,19 @@
             </div>
           </div>
 
-            <div class="row mt-md-50">
+          <?php
+          $stats = [
+              'fixed' => isset($group_device_count_status[0]) ? (int)$group_device_count_status[0]->counter : 0,
+              'repairable' => isset($group_device_count_status[1]) ? (int)$group_device_count_status[1]->counter : 0,
+              'dead' => isset($group_device_count_status[2]) ? (int)$group_device_count_status[2]->counter : 0
+            ];
+          ?>
+
+          <div class="vue w-100 mt-md-50">
+              <GroupDevicesWorkedOn :stats="{{ json_encode($stats) }}" />
+          </div>
+
+          <div class="row mt-md-50">
 
                 <div class="col-lg-12">
                 <h2 id="device-breakdown">@lang('groups.device_breakdown')</h2>
