@@ -50,6 +50,8 @@
         @endif
         {{-- END Events to Moderate (Admin Only) --}}
 
+          @if( !is_null($group) )
+
           <?php
           $expanded_events = [];
 
@@ -88,6 +90,8 @@
                       calendar-edit-url="{{ $showCalendar && Auth::user() ? url("/profile/edit/" . Auth::user()->id . "#list-calendar-links") : '' }}"
               />
           </div>
+
+        @endif
 
         @if( is_null($group) )
         <section class="table-section upcoming_events_in_area" id="events-3">
