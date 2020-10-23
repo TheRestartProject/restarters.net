@@ -137,7 +137,7 @@ class PartyController extends Controller
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
 
         $is_host_of_group = FixometerHelper::userHasEditGroupPermission($group_id, Auth::user()->id);
-        $isCoordinatorForGroup = Auth::user()->isCoordinatorForGroup($group);
+        $isCoordinatorForGroup = $group && Auth::user()->isCoordinatorForGroup($group);
 
         return view('events.index', [
             'moderate_events' => $moderate_events,
