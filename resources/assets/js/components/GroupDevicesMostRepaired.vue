@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="d-flex flex-column h-100">
     <h2 class="mt-2 mb-4">{{ translatedMostRepairedDevices }}</h2>
     <div class="podia">
       <GroupDeviceRepairPodium v-if="devices.length >= 2" :position="2" :device="devices[1]" />
@@ -35,5 +35,6 @@ export default {
 .podia {
   display: grid;
   grid-template-columns: 1fr 20px 1fr 20px 1fr;
+  flex-grow: 1;
 }
 </style>

@@ -139,7 +139,6 @@ export default {
   }
 }
 
-
 .impact-notincluded-content {
   color: $brand-light;
   font-size: 11px;
