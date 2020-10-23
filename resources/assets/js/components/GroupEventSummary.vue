@@ -1,6 +1,9 @@
 <template>
-  <b-tr v-if="event && stats" class="text-center">
-    <b-td>
+  <b-tr v-if="event && stats" :class="{
+    'text-center': true,
+    attending: event.attending
+    }">
+    <b-td class="datecell">
       <div class="datebox d-flex flex-column">
         <span class="day align-top">{{ dayofmonth }}</span>
         <span class="month">
@@ -8,7 +11,7 @@
         </span>
       </div>
     </b-td>
-    <b-td class="date text-left">
+    <b-td class="date text-left pl-3">
       {{ date }} <br />
       {{ start }} - {{ end }}
     </b-td>
@@ -125,6 +128,24 @@ export default {
 
   .month {
     line-height: 1rem;
+  }
+}
+
+.attending {
+  background-color: $brand-grey;
+
+  .datecell {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    padding-left: 9px;
+    padding-right: 9px;
+    text-align: center;
+    background-color: $black;
+
+    .datebox {
+      background-color: $black;
+      color: $white;
+    }
   }
 }
 

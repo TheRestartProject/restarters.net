@@ -40,7 +40,7 @@
               <GroupEventSummary v-for="e in upcomingToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" />
             </b-tbody>
           </b-table-simple>
-          <div class="text-right" v-if="limit">
+          <div class="text-center" v-if="limit">
             <b-btn variant="link" :href="'/party/group/' + groupId">
               {{ translatedSeeAll }}
             </b-btn>
@@ -63,7 +63,7 @@
               <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" />
             </b-tbody>
           </b-table-simple>
-          <div class="text-right" v-if="limit">
+          <div class="text-center" v-if="limit">
             <b-btn variant="link" :href="'/party/group/' + groupId">
               {{ translatedSeeAll }}
             </b-btn>
