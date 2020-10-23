@@ -1,15 +1,9 @@
 <template>
-    <div>
-    <b-row class="no-gutters">
-        <b-col>
-            <b-form-timepicker id="start-time" v-model="startTime" placeholder="--:--" @input="changeEndTime" />
-            <input type="hidden" name="start" :value="startTime" />
-        </b-col>
-        <b-col>
-            <b-form-timepicker id="end-time" v-model="endTime" placeholder="--:--" />
-            <input type="hidden" name="end" :value="endTime" />
-        </b-col>
-    </b-row>
+    <div class="d-flex">
+        <b-form-timepicker id="start-time" v-model="startTime" placeholder="--:--" @input="changeEndTime" />
+        <input type="hidden" name="start" :value="startTime" />
+        <b-form-timepicker id="end-time" v-model="endTime" placeholder="--:--" />
+        <input type="hidden" name="end" :value="endTime" />
     </div>
 </template>
 
