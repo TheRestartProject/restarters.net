@@ -186,8 +186,13 @@
             ];
           ?>
 
-          <div class="vue w-100 mt-md-50">
-              <GroupDevicesWorkedOn :stats="{{ json_encode($stats) }}" />
+          <div class="d-flex">
+              <div class="vue w-100 mt-md-50 mr-4">
+                  <GroupDevicesWorkedOn :stats="{{ json_encode($stats) }}" />
+              </div>
+              <div class="vue w-100 mt-md-50">
+                  <GroupDevicesMostRepaired :devices="{{ json_encode($top) }}" />
+              </div>
           </div>
 
           <div class="row mt-md-50">

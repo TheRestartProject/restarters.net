@@ -1725,6 +1725,7 @@ jQuery(document).ready(function () {
         'groupvolunteers':  require('./components/GroupVolunteers.vue'),
         'groupstats': require('./components/GroupStats.vue'),
         'groupdevicesworkedon': require('./components/GroupDevicesWorkedOn.vue'),
+        'groupdevicesmostrepaired': require('./components/GroupDevicesMostRepaired.vue'),
       }
     })
   })
