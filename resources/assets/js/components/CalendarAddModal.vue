@@ -13,7 +13,7 @@
     <b-input-group class="mt-2">
       <b-input readonly size="lg" :value="copyUrl" ref="container" />
       <b-input-group-append>
-        <b-button variant="white" class="butt" @click="copyIt">
+        <b-button variant="white" class="butt" v-clipboard:copy="copyUrl" v-clipboard:success="copySucceed" v-clipboard:error="copyFail">
           <b-img src="/images/copy.svg" />
         </b-button>
       </b-input-group-append>
@@ -47,6 +47,7 @@
 import Vue from 'vue'
 import VueClipboard from 'vue-clipboard2'
 
+VueClipboard.config.autoSetContainer = true
 Vue.use(VueClipboard)
 
 export default {
@@ -91,14 +92,11 @@ export default {
     hide() {
       this.showModal = false
     },
-    async copyIt() {
-      try {
-        this.$refs.container.select()
-        await this.$copyText(this.$refs.container)
-        this.copied = true
-      } catch (e) {
-        this.failed = true
-      }
+    copySucceed() {
+      this.copied = true
+    },
+    copyFail() {
+      this.failed = true
     }
   }
 }

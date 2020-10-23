@@ -27,7 +27,7 @@
         <b-img class="icon" src="/images/participants.svg" />
       </b-th>
       <b-th>
-        <b-img class="icon" src="/icons/volunteer_ico.svg" />
+        <b-img class="icon" src="/icons/volunteer_ico-thick.svg" />
       </b-th>
       <b-th>
         <b-img class="icon" src="/images/trash.svg" />
