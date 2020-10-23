@@ -1,8 +1,8 @@
 <template>
     <div class="d-flex">
-        <b-form-timepicker id="start-time" v-model="startTime" placeholder="--:--" @input="changeEndTime" />
+        <b-form-timepicker class="start-time" v-model="startTime" placeholder="--:--" @input="changeEndTime" />
         <input type="hidden" name="start" :value="startTime" />
-        <b-form-timepicker id="end-time" v-model="endTime" placeholder="--:--" />
+        <b-form-timepicker class="end-time" v-model="endTime" placeholder="--:--" />
         <input type="hidden" name="end" :value="endTime" />
     </div>
 </template>
@@ -45,12 +45,36 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.b-form-timepicker.form-control {
-    padding: 0 10px;
+.b-form-timepicker {
+    &.form-control {
+        padding: 0 10px;
+    }
+
+    &:first-child {
+        border-right: 0;
+    }
 }
 
 /deep/ label {
     font-weight: normal;
+}
+
+/deep/ .start-time label,
+/deep/ .end-time label {
+    padding: 0.5rem 0 !important;
+    border: 0;
+    margin:0;
+}
+
+/deep/ .start-time .btn,
+/deep/ .end-time .btn {
+    padding: 0.5rem !important;
+    border: 0;
+    margin: 0;
+}
+
+/deep/ output {
+    justify-content: center;
 }
 
 /deep/ .b-time .form-control {
@@ -58,24 +82,5 @@ export default {
     height: 100%;
     border: 0;
     padding: 0 10px;
-}
-
-/deep/ #start-time__outer_ {
-    border-right: 0;
-}
-
-/deep/ #start-time,
-/deep/ #end-time {
-    padding: 0;
-}
-
-/deep/ #start-time__value_,
-/deep/ #end-time__value_ {
-    border: 0;
-    margin: 0;
-}
-
-/deep/ output {
-    justify-content: center;
 }
 </style>
