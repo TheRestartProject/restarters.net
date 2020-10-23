@@ -1723,7 +1723,9 @@ jQuery(document).ready(function () {
         'groupheading':  require('./components/GroupHeading.vue'),
         'groupdescription':  require('./components/GroupDescription.vue'),
         'groupvolunteers':  require('./components/GroupVolunteers.vue'),
-        'groupstats': require('./components/GroupStats.vue')
+        'groupstats': require('./components/GroupStats.vue'),
+        'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),
+        'eventdatepicker': require('./components/EventDatePicker.vue')
       }
     })
   })
