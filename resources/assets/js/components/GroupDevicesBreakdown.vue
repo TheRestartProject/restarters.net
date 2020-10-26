@@ -1,6 +1,5 @@
 <template>
   <div>
-    {{ clusterStats }}
     <h2 class="mt-4">{{ translatedDeviceBreakdown }}</h2>
     <b-tabs class="ourtabs w-100 mt-2" justified>
       <b-tab active class="pt-2">
@@ -19,13 +18,13 @@
         <template slot="title">
           <b>{{ translatedHomeEntertainment }}</b>
         </template>
-        <GroupDevicesBreakdownCluster :stats="clusterStats[1]" />
+        <GroupDevicesBreakdownCluster :stats="clusterStats[3]" />
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
           <b>{{ translatedKitchenAndHouseholdItems }}</b>
         </template>
-        <GroupDevicesBreakdownCluster :stats="clusterStats[2]" />
+        <GroupDevicesBreakdownCluster :stats="clusterStats[4]" />
       </b-tab>
     </b-tabs>
   </div>
@@ -64,4 +63,8 @@ export default {
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
+
+/deep/ .impact-stat-subtitle {
+  font-size: 80%;
+}
 </style>

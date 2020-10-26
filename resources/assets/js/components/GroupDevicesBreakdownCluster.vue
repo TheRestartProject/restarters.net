@@ -8,7 +8,11 @@
     <div />
     <div class="divider" />
     <div />
-<!--    TODO The items-->
+    <StatsValue :count="stats.most_seen.count" icon="most-seen_ico" size="md" :subtitle="stats.most_seen.name" class="group-stat-most-seen" :border="false" :translate="false" variant="" />
+    <div />
+    <StatsValue :count="stats.most_repaired.count" icon="most-repaired_ico" size="md" :subtitle="stats.most_repaired.name" class="group-most-repaired" :border="false" :translate="false" variant="tertiary" />
+    <div />
+    <StatsValue :count="stats.least_repaired.count" icon="least-repaired_ico" size="md" :subtitle="stats.least_repaired.name" class="group-least-repaired" :border="false" :translate="false" variant="tertiary" />
   </div>
 </template>
 <script>
@@ -36,7 +40,7 @@ export default {
 
 .items-container {
   display: grid;
-  grid-template-columns: 1fr 20px 1fr 20px 1fr 5px 1px 5px;
+  grid-template-columns: 1fr 20px 1fr 20px 1fr 5px 1px 5px 1fr 20px 1fr 20px 1fr;
   grid-template-rows: 1fr
 }
 
@@ -64,4 +68,26 @@ export default {
 .divider {
   border-right: 1px solid $brand-light;
 }
+
+.group-most-seen {
+  grid-row-start: 1;
+  grid-row-end: 2;
+  grid-column-start: 9;
+  grid-column-end: 10;
+}
+
+.group-most-repaired {
+  grid-row-start: 1;
+  grid-row-end: 2;
+  grid-column-start: 11;
+  grid-column-end: 12;
+}
+
+.group-least-repaired {
+  grid-row-start: 1;
+  grid-row-end: 2;
+  grid-column-start: 13;
+  grid-column-end: 15;
+}
+
 </style>

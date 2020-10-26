@@ -233,7 +233,15 @@
                   'most_seen' => [
                       'name' => $most_seen,
                       'count' => $most_seen_type
-                    ]
+                    ],
+                  'most_repaired' => [
+                      'name' => $most_repaired,
+                      'count' => $most_repaired_type
+                  ],
+                  'least_repaired' => [
+                      'name' => $least_repaired,
+                      'count' => $least_repaired_type
+                  ]
               ];
           }
 

@@ -41,6 +41,11 @@ export default {
       required: false,
       default: null
     },
+    translate: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
     percent: {
       type: Number,
       required: false,
@@ -76,13 +81,13 @@ export default {
       return 'impact-stat impact-stat-' + this.size + ' impact-stat-' + this.variant + (this.border ? ' hasBorder' : '')
     },
     translatedTitle() {
-      return this.$lang.choice(this.title, this.roundedCount)
+      return this.translate ? this.$lang.choice(this.title, this.roundedCount) : this.title
     },
     translatedSubtitle() {
-      return this.$lang.get(this.subtitle)
+      return this.translate ? this.$lang.get(this.subtitle) : this.subtitle
     },
     translatedDescription() {
-      return this.$lang.get(this.description)
+      return this.translate ? this.$lang.get(this.description) : this.description
     },
     roundedCount() {
       return Math.round(this.count).toLocaleString()
@@ -171,7 +176,7 @@ export default {
 }
 
 .impact-stat-img {
-  width: 46px;
+  height: 46px;
 }
 
 .impact-stat-icon {
