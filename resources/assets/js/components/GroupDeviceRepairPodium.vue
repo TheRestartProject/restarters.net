@@ -1,16 +1,18 @@
 <template>
-  <div :class="'d-flex flex-column justify-content-end medal-' + position">
-    <div class="bg-white d-flex flex-column justify-content-between text-center font-weight-bold height medal">
-      <div>
-        <b-img-lazy class="position-absolute rosette" :src="'/images/rosette_' + position + '_ico.svg'" />
-      </div>
-      <div class="d-flex flex-column">
+  <div class="d-flex flex-column justify-content-end height">
+    <div :class="'medal-' + position">
+      <div class="bg-white d-flex flex-column justify-content-between text-center font-weight-bold medal">
+        <div>
+          <b-img-lazy class="position-absolute rosette" :src="'/images/rosette_' + position + '_ico.svg'" />
+        </div>
+        <div class="d-flex flex-column">
         <span class="text-brand large">
           {{ device.counter }}
         </span>
-        <span class="font-weight-bold small mb-2">
+          <span class="font-weight-bold small mb-2">
           {{ device.name }}
         </span>
+        </div>
       </div>
     </div>
   </div>
@@ -34,23 +36,28 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
+.height {
+  height: 220px;
+
+  /deep/ .medal-1 {
+    height: 200px
+  }
+
+  /deep/ .medal-2 {
+    height: 170px;
+  }
+
+  /deep/ .medal-3 {
+    height: 140px;
+  }
+}
+
 .medal {
   border: 1px solid black;
   text-align: center !important;
   -webkit-box-shadow: $black 5px 5px 0px 0px;
   box-shadow: $black 5px 5px 0px 0px;
-}
-
-.medal-1 .height {
   height: 100%
-}
-
-.medal-2 .height {
-  height: 85%
-}
-
-.medal-3 .height {
-  height: 70%
 }
 
 .large {
