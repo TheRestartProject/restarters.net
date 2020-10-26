@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="bg-white">
     <h2 class="mt-4">{{ translatedDeviceBreakdown }}</h2>
-    <b-tabs class="ourtabs w-100 mt-2" justified>
+    <b-tabs class="ourtabs w-100 mt-2 d-none d-md-block" justified>
       <b-tab active class="pt-2">
         <template slot="title">
           <b>{{ translatedComputerAndHomeOffice }}</b>
@@ -27,6 +27,48 @@
         <GroupDevicesBreakdownCluster :stats="clusterStats[4]" />
       </b-tab>
     </b-tabs>
+    <div class="d-block d-md-none border-top-thick">
+      <CollapsibleSection header-level="h3">
+        <template slot="title">
+          <span class="mobtitle">
+            {{ translatedComputerAndHomeOffice }}
+          </span>
+        </template>
+        <template slot="content">
+          <GroupDevicesBreakdownCluster :stats="clusterStats[1]" />
+        </template>
+      </CollapsibleSection>
+      <CollapsibleSection collapsed header-level="h3">
+        <template slot="title">
+          <span class="mobtitle">
+            {{ translatedElectronicGadget }}
+          </span>
+        </template>
+        <template slot="content">
+          <GroupDevicesBreakdownCluster :stats="clusterStats[2]" />
+        </template>
+      </CollapsibleSection>
+      <CollapsibleSection collapsed header-level="h3">
+        <template slot="title">
+          <span class="mobtitle">
+            {{ translatedHomeEntertainment }}
+          </span>
+        </template>
+        <template slot="content">
+          <GroupDevicesBreakdownCluster :stats="clusterStats[3]" />
+        </template>
+      </CollapsibleSection>
+      <CollapsibleSection collapsed header-level="h3">
+        <template slot="title">
+          <span class="mobtitle">
+            {{ translatedKitchenAndHouseholdItems }}
+          </span>
+        </template>
+        <template slot="content">
+          <GroupDevicesBreakdownCluster :stats="clusterStats[4]" />
+        </template>
+      </CollapsibleSection>
+    </div>
     <div class="small mt-3">
       <p class="small text-brand">
         {{ translatedNoUnpoweredStats }}
@@ -36,8 +78,9 @@
 </template>
 <script>
 import GroupDevicesBreakdownCluster from './GroupDevicesBreakdownCluster'
+import CollapsibleSection from './CollapsibleSection'
 export default {
-  components: {GroupDevicesBreakdownCluster},
+  components: {CollapsibleSection, GroupDevicesBreakdownCluster},
   props: {
     clusterStats: {
       type: Object,
@@ -74,5 +117,14 @@ export default {
 
 /deep/ .impact-stat-subtitle {
   font-size: 80%;
+}
+
+.border-top-thick {
+  border-top: 5px solid $black;
+}
+
+.mobtitle {
+  text-transform: uppercase;
+  font-size: 18px;
 }
 </style>

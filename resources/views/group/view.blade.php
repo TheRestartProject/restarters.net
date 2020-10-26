@@ -247,7 +247,7 @@
 
       ?>
 
-      <div class="d-flex">
+      <div class="d-flex flex-wrap">
           <div class="vue w-100 mt-md-50 mr-4">
               <GroupDevicesWorkedOn :stats="{{ json_encode($stats) }}" />
           </div>

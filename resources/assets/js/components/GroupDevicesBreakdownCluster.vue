@@ -11,9 +11,9 @@
       <div />
       <StatsValue :count="stats.most_seen.count" icon="most-seen_ico" size="md" :subtitle="stats.most_seen.name" class="group-stat-most-seen" :border="false" :translate="false" variant="" />
       <div />
-      <StatsValue :count="stats.most_repaired.count" icon="most-repaired_ico" size="md" :subtitle="stats.most_repaired.name" class="group-most-repaired" :border="false" :translate="false" variant="tertiary" />
+      <StatsValue :count="stats.most_repaired.count" icon="most-repaired_ico" size="md" :subtitle="stats.most_repaired.name" class="group-stat-most-repaired" :border="false" :translate="false" variant="tertiary" />
       <div />
-      <StatsValue :count="stats.least_repaired.count" icon="least-repaired_ico" size="md" :subtitle="stats.least_repaired.name" class="group-least-repaired" :border="false" :translate="false" variant="tertiary" />
+      <StatsValue :count="stats.least_repaired.count" icon="least-repaired_ico" size="md" :subtitle="stats.least_repaired.name" class="group-stat-least-repaired" :border="false" :translate="false" variant="tertiary" />
     </div>
   </div>
 </template>
@@ -42,8 +42,13 @@ export default {
 
 .items-container {
   display: grid;
-  grid-template-columns: 1fr 20px 1fr 20px 1fr 5px 1px 5px 1fr 20px 1fr 20px 1fr;
-  grid-template-rows: 1fr
+  grid-template-columns: 1fr 20px 1fr 20px 1fr;
+  grid-template-rows: 1fr 18px 1px 8px 1fr;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr 20px 1fr 20px 1fr 5px 1px 5px 1fr 20px 1fr 20px 1fr;
+    grid-template-rows: 1fr;
+  }
 }
 
 .group-stat-fixed {
@@ -68,28 +73,58 @@ export default {
 }
 
 .divider {
-  border-right: 1px solid $brand-light;
+  border-bottom: 1px solid $black;
+  grid-row-start: 2;
+  grid-row-end: 3;
+  grid-column-start: 1;
+  grid-column-end: 6;
+
+  @include media-breakpoint-up(md) {
+    border-right: 1px solid $brand-light;
+    border-bottom: 0;
+  }
 }
 
-.group-most-seen {
-  grid-row-start: 1;
-  grid-row-end: 2;
-  grid-column-start: 9;
-  grid-column-end: 10;
+.group-stat-most-seen {
+  grid-row-start: 3;
+  grid-row-end: 4;
+  grid-column-start: 1;
+  grid-column-end: 2;
+
+  @include media-breakpoint-up(md) {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 9;
+    grid-column-end: 10;
+  }
 }
 
-.group-most-repaired {
-  grid-row-start: 1;
-  grid-row-end: 2;
-  grid-column-start: 11;
-  grid-column-end: 12;
+.group-stat-most-repaired {
+  grid-row-start: 3;
+  grid-row-end: 4;
+  grid-column-start: 3;
+  grid-column-end: 4;
+
+  @include media-breakpoint-up(md) {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 11;
+    grid-column-end: 12;
+  }
 }
 
-.group-least-repaired {
-  grid-row-start: 1;
-  grid-row-end: 2;
-  grid-column-start: 13;
-  grid-column-end: 15;
+.group-stat-least-repaired {
+  grid-row-start: 3;
+  grid-row-end: 4;
+  grid-column-start: 5;
+  grid-column-end: 6;
+
+  @include media-breakpoint-up(md) {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 13;
+    grid-column-end: 15;
+  }
 }
 
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 :class="{
+    <component :is="headerLevel" :class="{
       'd-flex': true,
       'd-md-none': hideTitle,
       'mb-3': true,
@@ -16,7 +16,7 @@
         <img class="icon" v-if="expanded" src="/images/minus-icon.svg" alt="Collapse" />
         <img class="icon" v-else src="/images/add-icon.svg" alt="Expand" />
       </span>
-    </h2>
+    </component>
     <div :class="{
       'd-none': !expanded,
       'd-md-block': true
@@ -39,6 +39,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    headerLevel: {
+      type: String,
+      required: false,
+      default: 'h2'
     },
     hideTitle: {
       type: Boolean,
