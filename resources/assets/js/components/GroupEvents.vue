@@ -68,7 +68,7 @@
       </template>
     </CollapsibleSection>
     <div class="d-block d-md-none">
-      <h2 class="border-bottom-thick d-flex justify-content-between w-100 pt-2">
+      <component :is="headingLevel" class="border-bottom-thick d-flex justify-content-between w-100 pt-2">
         {{ translatedTitle }}
         <b-btn v-if="calendarCopyUrl" class="ml-2" variant="primary" @click="showCalendar">
           <b-img-lazy class="mobileicon" src="/images/subs_cal_ico.svg" />
@@ -78,12 +78,15 @@
           {{ translatedAddEventMobile }}
         </span>
         </b-btn>
-      </h2>
-      <CollapsibleSection class="lineheight" collapsed :count="upcoming.length" count-class="black" :heading-level="headingSubLevel">
+      </component>
+      <CollapsibleSection class="lineheight" collapsed :heading-level="headingSubLevel">
         <template slot="title">
-          <span class="text-uppercase">
-            {{ translatedUpcoming }}
-          </span>
+          <div class="d-flex flex-column justify-content-center lineheight">
+            <div class="text-uppercase fontsize">
+              <span class="font-weight-bold">{{ translatedUpcoming }}</span>
+              <span class="text-muted fontsize">({{ upcoming.length }})</span>
+            </div>
+          </div>
         </template>
         <template slot="content">
           <p v-if="!upcoming.length">
@@ -102,11 +105,14 @@
           </div>
         </template>
       </CollapsibleSection>
-      <CollapsibleSection class="lineheight" collapsed :count="past.length" count-class="black" :heading-level="headingSubLevel">
+      <CollapsibleSection class="lineheight" collapsed :heading-level="headingSubLevel">
         <template slot="title">
-          <span class="text-uppercase">
-          {{ translatedPast }}
-          </span>
+          <div class="d-flex flex-column justify-content-center lineheight">
+            <div class="text-uppercase fontsize">
+              <span class="font-weight-bold">{{ translatedPast }}</span>
+              <span class="text-muted fontsize">({{ past.length }})</span>
+            </div>
+          </div>
         </template>
         <template slot="content">
           <p v-if="!upcoming.length">
@@ -276,4 +282,10 @@ export default {
 .border-bottom-thick {
   border-top: 5px solid $black;
 }
+
+/deep/ .fontsize {
+  //Override standard sizes for cosmetic purposes.
+  font-size: 18px !important;
+}
+
 </style>
