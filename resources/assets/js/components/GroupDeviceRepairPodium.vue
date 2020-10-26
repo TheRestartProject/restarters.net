@@ -1,18 +1,31 @@
 <template>
-  <div class="d-flex flex-column justify-content-end height">
-    <div :class="'medal-' + position">
-      <div class="bg-white d-flex flex-column justify-content-between text-center font-weight-bold medal">
-        <div>
-          <b-img-lazy class="position-absolute rosette" :src="'/images/rosette_' + position + '_ico.svg'" />
+  <div>
+    <div class="d-none d-md-flex flex-column justify-content-end height">
+      <div :class="'medal-' + position">
+        <div class="bg-white d-flex flex-column justify-content-between text-center font-weight-bold medal">
+          <div>
+            <b-img-lazy class="position-absolute rosette" :src="'/images/rosette_' + position + '_ico.svg'" />
+          </div>
+          <div class="d-flex flex-column">
+          <span class="text-brand large">
+            {{ device.counter }}
+          </span>
+          <span class="font-weight-bold small mb-2">
+            {{ device.name }}
+          </span>
+          </div>
         </div>
-        <div class="d-flex flex-column">
-        <span class="text-brand large">
+      </div>
+    </div>
+    <div class="d-block d-md-none">
+      <div class="d-flex mb-2 border-black">
+        <b-img-lazy :src="'/images/rosette_' + position + '_ico.svg'" class="mr-3 mb-2" />
+        <span class="text-brand large mr-3">
           {{ device.counter }}
         </span>
-          <span class="font-weight-bold small mb-2">
+        <span class="font-weight-bold align-content-center mt-2">
           {{ device.name }}
         </span>
-        </div>
       </div>
     </div>
   </div>
@@ -37,18 +50,18 @@ export default {
 @import '~bootstrap/scss/mixins/_breakpoints';
 
 .height {
-  height: 220px;
+  height: 152px;
 
   /deep/ .medal-1 {
-    height: 200px
+    height: 152px
   }
 
   /deep/ .medal-2 {
-    height: 170px;
+    height: 132px;
   }
 
   /deep/ .medal-3 {
-    height: 140px;
+    height: 112px;
   }
 }
 
@@ -67,5 +80,9 @@ export default {
 .rosette {
   width: 40px;
   transform: translate(-20px, -22px);
+}
+
+.border-black {
+  border-bottom: 1px solid black;
 }
 </style>

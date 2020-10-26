@@ -247,12 +247,12 @@
 
       ?>
 
-      <div class="d-flex flex-wrap">
+      <div class="d-flex flex-wrap flex-md-nowrap">
           <div class="vue w-100 mt-md-50 mr-4">
-              <GroupDevicesWorkedOn :stats="{{ json_encode($stats) }}" />
+              <GroupDevicesWorkedOn :stats="{{ json_encode($stats) }}" class="mt-4" />
           </div>
           <div class="vue w-100 mt-md-50">
-              <GroupDevicesMostRepaired :devices="{{ json_encode($top) }}" />
+              <GroupDevicesMostRepaired :devices="{{ json_encode($top) }}" class="mt-3" />
           </div>
       </div>
 

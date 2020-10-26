@@ -1,11 +1,16 @@
 <template>
   <div class="d-flex flex-column h-100">
     <h2 class="mt-2 mb-4">{{ translatedMostRepairedDevices }}</h2>
-    <div class="podia">
+    <div class="podia d-none d-md-block">
       <GroupDeviceRepairPodium v-if="devices.length >= 2" :position="2" :device="devices[1]" />
       <div />
       <GroupDeviceRepairPodium v-if="devices.length >= 1" :position="1" :device="devices[0]" />
       <div />
+      <GroupDeviceRepairPodium v-if="devices.length >= 3" :position="3" :device="devices[2]" />
+    </div>
+    <div class="d-block d-md-none">
+      <GroupDeviceRepairPodium v-if="devices.length >= 1" :position="1" :device="devices[0]" />
+      <GroupDeviceRepairPodium v-if="devices.length >= 2" :position="2" :device="devices[1]" />
       <GroupDeviceRepairPodium v-if="devices.length >= 3" :position="3" :device="devices[2]" />
     </div>
   </div>
@@ -34,7 +39,14 @@ export default {
 
 .podia {
   display: grid;
-  grid-template-columns: 1fr 20px 1fr 20px 1fr;
   flex-grow: 1;
+
+  grid-template-columns: 1fr 0px;
+  grid-template-rows: 1fr 1fr 1fr;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr 20px 1fr 20px 1fr;
+    grid-template-rows: 1fr;
+  }
 }
 </style>
