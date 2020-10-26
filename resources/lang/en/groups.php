@@ -138,5 +138,9 @@ return array (
   'no_volunteers' => 'There are no volunteers in this group',
   'remove_volunteer' => 'Remove Volunteer',
   'make_host' => 'Make Host',
-  'not_counting' => 'Not counting toward this group\'s environmental impact is|Not counting toward this group\'s environmental impact are'
+  'not_counting' => 'Not counting toward this group\'s environmental impact is|Not counting toward this group\'s environmental impact are',
+  'computed_and_home_office' => 'Computer & Home Office',
+  'electronic_gadget' => 'Electronic Gadget',
+  'home_entertainment' => 'Home Entertainment',
+  'kitchen_and_household_items' => 'Kitchen & Household Items'
 );

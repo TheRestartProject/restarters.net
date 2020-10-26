@@ -1,0 +1,67 @@
+<template>
+  <div class="items-container pb-2">
+    <StatsValue :count="stats.fixed" icon="fixed" size="md" :percent="pc(stats.fixed)" class="group-stat-fixed" :border="false" />
+    <div />
+    <StatsValue :count="stats.repairable" icon="repairable" size="md" :percent="pc(stats.repairable)" class="group-stat-repairable" :border="false" />
+    <div />
+    <StatsValue :count="stats.dead" icon="dead" size="md" :percent="pc(stats.dead)" class="group-stat-dead" :border="false" />
+    <div />
+    <div class="divider" />
+    <div />
+<!--    TODO The items-->
+  </div>
+</template>
+<script>
+import StatsValue from './StatsValue'
+export default {
+  components: {StatsValue},
+  props: {
+    stats: {
+      type: Object,
+      required: true
+    }
+  },
+  methods: {
+    pc(val) {
+      return Math.round(10000 * val / this.stats.total) / 100
+    }
+  }
+}
+</script>
+<style scoped lang="scss">
+@import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
+
+.items-container {
+  display: grid;
+  grid-template-columns: 1fr 20px 1fr 20px 1fr 5px 1px 5px;
+  grid-template-rows: 1fr
+}
+
+.group-stat-fixed {
+  grid-row-start: 1;
+  grid-row-end: 2;
+  grid-column-start: 1;
+  grid-column-end: 2;
+}
+
+.group-stat-repairable {
+  grid-row-start: 1;
+  grid-row-end: 2;
+  grid-column-start: 3;
+  grid-column-end: 4;
+}
+
+.group-stat-dead {
+  grid-row-start: 1;
+  grid-row-end: 2;
+  grid-column-start: 5;
+  grid-column-end: 6;
+}
+
+.divider {
+  border-right: 1px solid $brand-light;
+}
+</style>

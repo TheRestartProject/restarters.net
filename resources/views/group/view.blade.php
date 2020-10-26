@@ -184,6 +184,59 @@
               'repairable' => isset($group_device_count_status[1]) ? (int)$group_device_count_status[1]->counter : 0,
               'dead' => isset($group_device_count_status[2]) ? (int)$group_device_count_status[2]->counter : 0
             ];
+
+          $category_clusters = [
+            1 => 'Computers and Home Office',
+            2 => 'Electronic Gadgets',
+            3 => 'Home Entertainment',
+            4 => 'Kitchen and Household Items'
+          ];
+
+          $cluster_stats = [];
+
+          foreach( $category_clusters as $key => $category_cluster ) {
+              $fixed = isset($clusters['all'][$key][0]) ? (int)$clusters['all'][$key][0]->counter : 0;
+              $repairable = isset($clusters['all'][$key][1]) ? (int)$clusters['all'][$key][1]->counter : 0;
+              $dead = isset($clusters['all'][$key][2]) ? (int)$clusters['all'][$key][2]->counter : 0;
+              $total = $clusters['all'][$key]['total'];
+
+              //Seen and repaired stats
+              if ( isset( $mostleast[$key]['most_seen'][0] ) ) {
+                  $most_seen = $mostleast[$key]['most_seen'][0]->name;
+                  $most_seen_type = $mostleast[$key]['most_seen'][0]->counter;
+              } else {
+                  $most_seen = null;
+                  $most_seen_type = null;
+              }
+
+              if ( isset( $mostleast[$key]['most_repaired'][0] ) ) {
+                  $most_repaired = $mostleast[$key]['most_repaired'][0]->name;
+                  $most_repaired_type = $mostleast[$key]['most_repaired'][0]->counter;
+              } else {
+                  $most_repaired = null;
+                  $most_repaired_type = null;
+              }
+
+              if ( isset( $mostleast[$key]['least_repaired'][0] ) ) {
+                  $least_repaired = $mostleast[$key]['least_repaired'][0]->name;
+                  $least_repaired_type = $mostleast[$key]['least_repaired'][0]->counter;
+              } else {
+                  $least_repaired = null;
+                  $least_repaired_type = null;
+              }
+
+              $cluster_stats[$key] = [
+                  'fixed' => $fixed,
+                  'repairable' => $repairable,
+                  'dead' => $dead,
+                  'total' => $total,
+                  'most_seen' => [
+                      'name' => $most_seen,
+                      'count' => $most_seen_type
+                    ]
+              ];
+          }
+
           ?>
 
           <div class="d-flex">
@@ -193,6 +246,10 @@
               <div class="vue w-100 mt-md-50">
                   <GroupDevicesMostRepaired :devices="{{ json_encode($top) }}" />
               </div>
+          </div>
+
+          <div class="vue">
+              <GroupDevicesBreakdown :cluster-stats="{{ json_encode($cluster_stats) }}" />
           </div>
 
           <div class="row mt-md-50">

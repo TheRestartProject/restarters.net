@@ -7,7 +7,10 @@
       {{ roundedCount }} {{ unit }}
     </div>
     <!-- The translations may include HTML tags, so we need to insert as HTML. -->
-    <div class="impact-stat-title" v-html="translatedTitle" />
+    <div class="impact-stat-title" v-if="title" v-html="translatedTitle" />
+    <div class="impact-stat-title" v-if="percent">
+      {{ percent }}%
+    </div>
     <div class="impact-stat-subtitle" v-html="translatedSubtitle" />
     <div v-if="description" class="impact-stat-description pt-3 m-3" v-html="translatedDescription" />
   </div>
@@ -38,6 +41,11 @@ export default {
       required: false,
       default: null
     },
+    percent: {
+      type: Number,
+      required: false,
+      default: null
+    },
     subtitle: {
       type: String,
       required: false,
@@ -52,6 +60,11 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    border: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   computed: {
@@ -60,7 +73,7 @@ export default {
       return '/images/' + this.icon + '.svg'
     },
     className() {
-      return 'impact-stat impact-stat-' + this.size + ' impact-stat-' + this.variant
+      return 'impact-stat impact-stat-' + this.size + ' impact-stat-' + this.variant + (this.border ? ' hasBorder' : '')
     },
     translatedTitle() {
       return this.$lang.choice(this.title, this.roundedCount)
@@ -86,15 +99,17 @@ export default {
 /* Using a prefix to avoid possible collision with any global style rules.
  * 'impact' can refer to either a repair related impact stat, or an environmental impact stat.  */
 .impact-stat {
-  border: 1px solid black;
   text-align: center !important;
-  box-shadow: $black $shadow $shadow 0px 0px;
   background-color: $white;
   display: grid;
   align-items: center;
   padding: 5px;
-
   margin-top: 1rem !important;
+
+  &.hasBorder {
+    border: 1px solid black;
+    box-shadow: $black $shadow $shadow 0px 0px;
+  }
 
   @include media-breakpoint-up(md) {
     margin-top: 0px;
