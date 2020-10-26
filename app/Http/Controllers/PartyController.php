@@ -174,6 +174,12 @@ class PartyController extends Controller
         $allGroups = Group::orderBy('name')->get();
 
         if ($request->isMethod('post')) {
+            $request->validate([
+                'event_date' => 'required',
+                'start' => 'required',
+                'end' => 'required',
+            ]);
+
             $error = array();
 
             if ($request->has('location')) {
