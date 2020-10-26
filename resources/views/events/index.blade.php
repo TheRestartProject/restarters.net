@@ -82,6 +82,7 @@
           <div class="vue">
               <GroupEvents
                       heading-level="h1"
+                      heading-sub-level="h2"
                       :group-id="{{ $group->idgroups }}"
                       :group="{{ $group }}"
                       :canedit="{{ $can_edit_group ? 'true' : 'false' }}"

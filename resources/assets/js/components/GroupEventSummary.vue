@@ -3,7 +3,7 @@
     'text-center': true,
     attending: event.attending
     }">
-    <b-td class="datecell">
+    <b-td class="datecell" width="76px">
       <div class="datebox d-flex flex-column">
         <span class="day align-top">{{ dayofmonth }}</span>
         <span class="month">
@@ -12,16 +12,19 @@
       </div>
     </b-td>
     <b-td class="date text-left pl-3">
-      {{ date }} <br />
-      {{ start }} - {{ end }}
+      {{ date }}
+      <br class="d-none d-md-block" />
+      {{ start }} <span class="d-none d-md-inline">- {{ end }}</span>
+      <br class="d-block d-md-none" />
+      <b class="d-block d-md-none"><a :href="'/party/view/' + idevents">{{ event.venue ? event.venue : event.location }}</a></b>
     </b-td>
-    <b-td class="text-left">
+    <b-td class="text-left d-none d-md-table-cell">
       <b><a :href="'/party/view/' + idevents">{{ event.venue ? event.venue : event.location }}</a></b>
     </b-td>
-    <b-td v-if="upcoming">
+    <b-td v-if="upcoming" class="d-none d-md-table-cell">
       {{ event.allinvitedcount }}
     </b-td>
-    <b-td v-if="upcoming">
+    <b-td v-if="upcoming" class="d-none d-md-table-cell">
       {{ event.volunteers }}
     </b-td>
     <b-td v-if="upcoming && event.requiresModeration" class="cell-warning">
@@ -33,7 +36,7 @@
       </span>
     </b-td>
     <b-td v-else-if="upcoming">
-      <div v-if="event.attending" class="text-black font-weight-bold d-flex">
+      <div v-if="event.attending" class="text-black font-weight-bold d-flex d-none d-md-table-cell">
         <span>
           {{ translatedYoureGoing }}
         </span>
@@ -44,36 +47,40 @@
       </b-btn>
     </b-td>
     <b-td v-if="!upcoming" :class="{
-      'cell-danger': event.participants_count === 0
+      'cell-danger': event.participants_count === 0,
+      'd-none': true,
+      'd-md-table-cell': true
     }
     ">
       {{ event.participants_count }}
     </b-td>
     <b-td v-if="!upcoming" :class="{
-      'cell-danger': event.volunteers_count <= 1
+      'cell-danger': event.volunteers_count <= 1,
+      'd-none': true,
+      'd-md-table-cell': true
     }
     ">
       {{ event.volunteers_count }}
     </b-td>
-    <b-td colspan="5" v-if="noDevices" class="cell-danger text-center">
+    <b-td colspan="5" v-if="noDevices" class="cell-danger text-center d-none d-md-table-cell">
       {{ translatedNoDevices }}
       <a :href="'/party/view/' + this.idevents">
         {{ translatedAddADevice}}
       </a>
     </b-td>
-    <b-td v-if="!upcoming && !noDevices">
+    <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
       {{ Math.round(stats.ewaste) }}kg
     </b-td>
-    <b-td v-if="!upcoming && !noDevices">
+    <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
       {{ Math.round(stats.co2) }}kg
     </b-td>
-    <b-td v-if="!upcoming && !noDevices">
+    <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
       {{ stats.fixed_devices }}
     </b-td>
-    <b-td v-if="!upcoming && !noDevices">
+    <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
       {{ stats.repairable_devices }}
     </b-td>
-    <b-td v-if="!upcoming && !noDevices">
+    <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
       {{ stats.dead_devices }}
     </b-td>
   </b-tr>

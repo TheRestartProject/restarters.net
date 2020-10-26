@@ -7,10 +7,10 @@
       </b-th>
       <b-th>
       </b-th>
-      <b-th>
+      <b-th class="d-none d-md-table-cell">
         <b-img class="icon" src="/images/mail_ico.svg" />
       </b-th>
-      <b-th>
+      <b-th class="d-none d-md-table-cell">
         <b-img class="icon" src="/images/participants.svg" />
       </b-th>
       <b-th>
@@ -21,27 +21,27 @@
       </b-th>
       <b-th>
       </b-th>
-      <b-th>
+      <b-th class="d-none d-md-table-cell">
       </b-th>
-      <b-th>
+      <b-th class="d-none d-md-table-cell">
         <b-img class="icon" src="/images/participants.svg" />
       </b-th>
-      <b-th>
+      <b-th class="d-none d-md-table-cell">
         <b-img class="icon" src="/icons/volunteer_ico-thick.svg" />
       </b-th>
-      <b-th>
+      <b-th class="d-none d-md-table-cell">
         <b-img class="icon" src="/images/trash.svg" />
       </b-th>
-      <b-th>
+      <b-th class="d-none d-md-table-cell">
         <b-img class="icon" src="/images/cloud_empty.svg" />
       </b-th>
-      <b-th>
+      <b-th class="d-none d-md-table-cell">
         <b-img class="icon" src="/images/fixed.svg" />
       </b-th>
-      <b-th>
+      <b-th class="d-none d-md-table-cell">
         <b-img class="icon" src="/images/repairable_ico.svg" />
       </b-th>
-      <b-th>
+      <b-th class="d-none d-md-table-cell">
         <b-img class="icon" src="/images/dead_ico.svg" />
       </b-th>
     </b-tr>

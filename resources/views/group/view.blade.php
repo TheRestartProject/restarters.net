@@ -121,6 +121,7 @@
           <hr style="color: white; border-top: 1px solid black;" />
           <GroupEvents
                   heading-level="h2"
+                  heading-sub-level="h2"
                   :group-id="{{ $group->idgroups }}"
                   :group="{{ $group }}"
                   :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
