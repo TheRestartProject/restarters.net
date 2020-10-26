@@ -186,4 +186,5 @@ return array (
   'calendar_yahoo' => 'Yahoo Calendar',
   'confirm_delete' => 'Are you sure you want to delete this event?',
   'RSVP' => 'RSVP',
+  'form_error' => 'Please check the form above for errors.'
 );

@@ -96,31 +96,6 @@ import CollapsibleSection from './CollapsibleSection'
 export default {
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],
-  props: {
-    eventId: {
-      type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
-      required: true
-    },
-    attendance:  {
-      type: Array,
-      required: true
-    },
-    invitations:  {
-      type: Array,
-      required: true
-    },
-    // TODO LATER In due course the permissions should be handled by having the user in the store and querying that, rather
-    // than passing down props.
-    canedit: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
   computed: {
     translatedTitle() {
       return this.$lang.get('events.event_attendance')
@@ -177,7 +152,7 @@ export default {
     })
 
     this.$store.dispatch('attendance/set', {
-      eventId: this.eventId,
+      idevents: this.idevents,
       attendees: attendees
     })
   },
@@ -185,7 +160,7 @@ export default {
     async changeParticipants(val) {
       let ret = await axios.post('/party/update-quantity', {
         quantity: val,
-        event_id: this.eventId
+        event_id: this.idevents
       }, {
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
@@ -195,7 +170,7 @@ export default {
     async changeVolunteers(val) {
       let ret = await axios.post('/party/update-volunteerquantity', {
         quantity: val,
-        event_id: this.eventId
+        event_id: this.idevents
       }, {
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
