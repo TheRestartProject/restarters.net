@@ -102,8 +102,6 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-@import 'resources/global/css/_variables';
-
 .butt {
   border-radius: 0;
   border: 1px solid black;

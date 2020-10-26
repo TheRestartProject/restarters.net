@@ -154,6 +154,16 @@ export default {
   components: {CalendarAddModal, GroupEventSummary, CollapsibleSection, GroupEventsTableHeading},
   mixins: [ group ],
   props: {
+    groupId: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    group: {
+      type: Object,
+      required: false,
+      default: null
+    },
     events: {
       type: Array,
       required: true
@@ -209,12 +219,12 @@ export default {
     },
     translatedCalendarTitle() {
       return this.$lang.get('groups.calendar_copy_title', {
-        group: this.group.name
+        group: this.group ? this.group.name : this.$lang.get('groups.groups_title1').toLowerCase()
       })
     },
     translatedCalendarDescription() {
       return this.$lang.get('groups.calendar_copy_description', {
-        group: this.group.name
+        group: this.group ? this.group.name : this.$lang.get('groups.groups_title1').toLowerCase()
       })
     },
     past() {

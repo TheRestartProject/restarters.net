@@ -20,6 +20,27 @@
           </div>
       @endif
 
+      <div class="row mb-30">
+          <div class="col-12 col-md-12">
+              <div class="d-flex align-items-center">
+                  <h1 class="mb-0 mr-30">
+                      @lang('events.events')
+                  </h1>
+
+                  <div class="mr-auto d-none d-md-block">
+                      @include('svgs.fixometer.events-doodle')
+                  </div>
+
+                  @if( FixometerHelper::userCanCreateEvents(Auth::user()) )
+                      <a href="/party/create" class="btn btn-primary ml-auto">
+                          <span class="d-none d-lg-block">@lang('events.create_new_event')</span>
+                          <span class="d-block d-lg-none">@lang('events.create_new_event_mobile')</span>
+                      </a>
+                  @endif
+              </div>
+          </div>
+      </div>
+
     {{-- Events List --}}
     <div class="row justify-content-center">
       <div class="col-lg-12">
@@ -50,52 +71,60 @@
         @endif
         {{-- END Events to Moderate (Admin Only) --}}
 
-          @if( !is_null($group) )
+      <?php
+      $expanded_events = [];
 
-          <?php
-          $expanded_events = [];
+      $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
+      $emissionRatio = $footprintRatioCalculator->calculateRatio();
+      $can_edit_group = Auth::user() && $group && (FixometerHelper::hasRole( Auth::user(), 'Administrator') || $isCoordinatorForGroup || $is_host_of_group);
 
-          $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
-          $emissionRatio = $footprintRatioCalculator->calculateRatio();
-          $can_edit_group = Auth::user() && FixometerHelper::hasRole( Auth::user(), 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
+      foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+          $thisone = $event->getAttributes();
+          $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
+          $thisone['allinvitedcount'] = $event->allInvited->count();
 
-          foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-              $thisone = $event->getAttributes();
-              $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
-              $thisone['allinvitedcount'] = $event->allInvited->count();
+          // TODO LATER Consider whether these should be in the event or passed into the store.
+          $thisone['stats'] = $event->getEventStats($emissionRatio);
+          $thisone['participants_count'] = $event->participants;
+          $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
 
-              // TODO LATER Consider whether these should be in the event or passed into the store.
-              $thisone['stats'] = $event->getEventStats($emissionRatio);
-              $thisone['participants_count'] = $event->participants;
-              $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+          $thisone['isVolunteer'] = $event->isVolunteer();
+          $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
+          $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
 
-              $thisone['isVolunteer'] = $event->isVolunteer();
-              $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
-              $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+          $expanded_events[] = $thisone;
+      }
 
-              $expanded_events[] = $thisone;
+      $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
+      $calendar_copy_url = '';
+      $calendar_edit_url = '';
+
+      if ($showCalendar) {
+          if ($group) {
+              $calendar_copy_url = url("/calendar/group/{$group->idgroups}");
+              $calendar_edit_url = url("/profile/edit/" . Auth::user()->id);
+          } else {
+              $calendar_copy_url = url("/calendar/user/" . Auth::user()->calendar_hash);
+              $calendar_edit_url = url("/profile/edit/" . Auth::user()->id . "#list-calendar-links");
           }
+      }
+      ?>
 
-          $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
-          ?>
-
-          <div class="vue">
-              <GroupEvents
-                      heading-level="h1"
-                      heading-sub-level="h2"
-                      :group-id="{{ $group->idgroups }}"
-                      :group="{{ $group }}"
-                      :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
-                      :events="{{ json_encode($expanded_events) }}"
-                      calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
-                      calendar-edit-url="{{ $showCalendar && Auth::user() ? url("/profile/edit/" . Auth::user()->id . "#list-calendar-links") : '' }}"
-              />
-          </div>
-
-        @endif
+      <div class="vue">
+          <GroupEvents
+                  heading-level="h1"
+                  heading-sub-level="h2"
+                  :group-id="{{ $group ? $group->idgroups : 'null' }}"
+                  :group="{{ $group ? $group : 'null' }}"
+                  :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+                  :events="{{ json_encode($expanded_events) }}"
+                  calendar-copy-url="{{ $calendar_copy_url }}"
+                  calendar-edit-url="{{ $calendar_edit_url }}"
+          />
+      </div>
 
         @if( is_null($group) )
-        <section class="table-section upcoming_events_in_area" id="events-3">
+        <section class="table-section upcoming_events_in_area mt-4" id="events-3">
             <header>
                 <h2>@lang('events.other_events_near_you')</h2>
                 <p>@lang('events.no_events_near_you', ['url' => route('all-upcoming-events').'?online=1']).</p>
