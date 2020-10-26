@@ -1,18 +1,20 @@
 <template>
-  <div class="items-container pb-2">
-    <StatsValue :count="stats.fixed" icon="fixed" size="md" :percent="pc(stats.fixed)" class="group-stat-fixed" :border="false" />
-    <div />
-    <StatsValue :count="stats.repairable" icon="repairable" size="md" :percent="pc(stats.repairable)" class="group-stat-repairable" :border="false" />
-    <div />
-    <StatsValue :count="stats.dead" icon="dead" size="md" :percent="pc(stats.dead)" class="group-stat-dead" :border="false" />
-    <div />
-    <div class="divider" />
-    <div />
-    <StatsValue :count="stats.most_seen.count" icon="most-seen_ico" size="md" :subtitle="stats.most_seen.name" class="group-stat-most-seen" :border="false" :translate="false" variant="" />
-    <div />
-    <StatsValue :count="stats.most_repaired.count" icon="most-repaired_ico" size="md" :subtitle="stats.most_repaired.name" class="group-most-repaired" :border="false" :translate="false" variant="tertiary" />
-    <div />
-    <StatsValue :count="stats.least_repaired.count" icon="least-repaired_ico" size="md" :subtitle="stats.least_repaired.name" class="group-least-repaired" :border="false" :translate="false" variant="tertiary" />
+  <div>
+    <div class="items-container pb-2">
+      <StatsValue :count="stats.fixed" icon="fixed" size="md" :percent="pc(stats.fixed)" class="group-stat-fixed" :border="false" />
+      <div />
+      <StatsValue :count="stats.repairable" icon="repairable" size="md" :percent="pc(stats.repairable)" class="group-stat-repairable" :border="false" />
+      <div />
+      <StatsValue :count="stats.dead" icon="dead" size="md" :percent="pc(stats.dead)" class="group-stat-dead" :border="false" />
+      <div />
+      <div class="divider" />
+      <div />
+      <StatsValue :count="stats.most_seen.count" icon="most-seen_ico" size="md" :subtitle="stats.most_seen.name" class="group-stat-most-seen" :border="false" :translate="false" variant="" />
+      <div />
+      <StatsValue :count="stats.most_repaired.count" icon="most-repaired_ico" size="md" :subtitle="stats.most_repaired.name" class="group-most-repaired" :border="false" :translate="false" variant="tertiary" />
+      <div />
+      <StatsValue :count="stats.least_repaired.count" icon="least-repaired_ico" size="md" :subtitle="stats.least_repaired.name" class="group-least-repaired" :border="false" :translate="false" variant="tertiary" />
+    </div>
   </div>
 </template>
 <script>

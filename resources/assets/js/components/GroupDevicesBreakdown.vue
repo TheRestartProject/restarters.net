@@ -27,6 +27,11 @@
         <GroupDevicesBreakdownCluster :stats="clusterStats[4]" />
       </b-tab>
     </b-tabs>
+    <div class="small mt-3">
+      <p class="small text-brand">
+        {{ translatedNoUnpoweredStats }}
+      </p>
+    </div>
   </div>
 </template>
 <script>
@@ -55,6 +60,9 @@ export default {
     translatedKitchenAndHouseholdItems() {
       return this.$lang.get('groups.kitchen_and_household_items')
     },
+    translatedNoUnpoweredStats() {
+      return this.$lang.get('groups.no_unpowered_stats')
+    }
   }
 }
 </script>
