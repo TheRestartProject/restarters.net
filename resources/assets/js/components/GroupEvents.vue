@@ -4,12 +4,12 @@
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
           <div>
-            {{ translatedTitle }}
+            <span v-if="group">{{ group.name }}</span> {{ translatedTitle }}
             <b-btn v-if="calendarCopyUrl" class="ml-2" variant="primary" @click="showCalendar">
               <b-img-lazy src="/images/subs_cal_ico.svg" />
             </b-btn>
           </div>
-          <b-btn variant="primary" href="/party/create" class="align-self-center">
+          <b-btn variant="primary" href="/party/create" class="align-self-center" v-if="addButton">
             <span class="d-none d-md-block">
               {{ translatedAddEvent }}
             </span>
@@ -32,7 +32,7 @@
             <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
               <GroupEventsTableHeading />
               <b-tbody class="table-height">
-                <GroupEventSummary v-for="e in upcomingToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" />
+                <GroupEventSummary v-for="e in upcomingToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
               </b-tbody>
             </b-table-simple>
             <div class="text-center" v-if="limit">
@@ -55,7 +55,7 @@
             <b-table-simple v-else responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
               <GroupEventsTableHeading past />
               <b-tbody class="table-height">
-                <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" />
+                <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
               </b-tbody>
             </b-table-simple>
             <div class="text-center" v-if="limit">
@@ -95,7 +95,7 @@
           <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
             <GroupEventsTableHeading />
             <b-tbody class="table-height">
-              <GroupEventSummary v-for="e in upcomingToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" />
+              <GroupEventSummary v-for="e in upcomingToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
             </b-tbody>
           </b-table-simple>
           <div class="text-right" v-if="limit">
@@ -121,7 +121,7 @@
           <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
             <GroupEventsTableHeading past />
             <b-tbody class="table-height">
-              <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" />
+              <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
             </b-tbody>
           </b-table-simple>
           <div class="text-right" v-if="limit">
@@ -190,11 +190,23 @@ export default {
     headingSubLevel: {
       type: String,
       required: true
+    },
+    addButton: {
+      type: Boolean,
+      required: true
+    },
+    addGroupName: {
+      type: Boolean,
+      required: false
     }
   },
   computed: {
     translatedTitle() {
-      return this.$lang.get('groups.group_events')
+      // If we have a group then we are putting the name and just want "events" (force the plural).  Otherwise
+      // "Your events".
+      return this.group ? this.$lang.choice('groups.events', {
+        value: 2
+      }) : this.$lang.get('events.your_events')
     },
     translatedUpcoming() {
       return this.$lang.get('groups.upcoming_active')

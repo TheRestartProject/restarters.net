@@ -33,7 +33,7 @@
 
                   @if( FixometerHelper::userCanCreateEvents(Auth::user()) )
                       <a href="/party/create" class="btn btn-primary ml-auto">
-                          <span class="d-none d-lg-block">@lang('events.create_new_event')</span>
+                          <span class="d-none d-lg-block">@lang('events.add_event')</span>
                           <span class="d-block d-lg-none">@lang('events.create_new_event_mobile')</span>
                       </a>
                   @endif
@@ -92,10 +92,12 @@
           $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
           $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
 
+          $thisone['group'] = \App\Group::where('idgroups', $event->group)->first();
+
           $expanded_events[] = $thisone;
       }
 
-      $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
+      $showCalendar = Auth::check() && (!$group || ($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
       $calendar_copy_url = '';
       $calendar_edit_url = '';
 
@@ -112,14 +114,16 @@
 
       <div class="vue">
           <GroupEvents
-                  heading-level="h1"
-                  heading-sub-level="h2"
+                  heading-level="h2"
+                  heading-sub-level="h3"
                   :group-id="{{ $group ? $group->idgroups : 'null' }}"
                   :group="{{ $group ? $group : 'null' }}"
                   :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
                   :events="{{ json_encode($expanded_events) }}"
                   calendar-copy-url="{{ $calendar_copy_url }}"
                   calendar-edit-url="{{ $calendar_edit_url }}"
+                  :add-button="false"
+                  :add-group-name="{{ $group ? 'false' : 'true' }}"
           />
       </div>
 
