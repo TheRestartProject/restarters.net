@@ -1557,6 +1557,8 @@ jQuery(document).ready(function () {
         'groupdescription':  require('./components/GroupDescription.vue'),
         'groupvolunteers':  require('./components/GroupVolunteers.vue'),
         'groupstats': require('./components/GroupStats.vue'),
+        'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),
+        'eventdatepicker': require('./components/EventDatePicker.vue'),
         'groupevents': require('./components/GroupEvents.vue')
       }
     })
