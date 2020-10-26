@@ -20,6 +20,10 @@
     </b-td>
     <b-td class="text-left d-none d-md-table-cell">
       <b><a :href="'/party/view/' + idevents">{{ event.venue ? event.venue : event.location }}</a></b>
+      <span v-if="addGroupName" class="small">
+        <br />
+        <a :href="'/group/view/' + event.group.idgroups">{{ event.group.name }}</a>
+      </span>
     </b-td>
     <b-td v-if="upcoming" class="d-none d-md-table-cell">
       {{ event.allinvitedcount }}
@@ -90,6 +94,12 @@ import event from '../mixins/event'
 
 export default {
   mixins: [ event ],
+  props: {
+    addGroupName: {
+      type: Boolean,
+      required: false,
+    }
+  },
   computed: {
     stats() {
       // TODO LATER Consider whether these should be in the event or the store.
