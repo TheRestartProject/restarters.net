@@ -53,33 +53,6 @@ class PartyController extends Controller
 
     public function __construct(Geocoder $geocoder)
     {
-        //($model, $controller, $action)
-
-        // parent::__construct($model, $controller, $action);
-        //
-        // $Auth = new Auth($url);
-        // if(!$Auth->isLoggedIn() && $action != 'stats'){
-        //     header('Location: /user/login');
-        // }
-        //
-        // $user = $Auth->getProfile();
-        // $this->user = $user;
-        // $this->set('user', $user);
-        // $this->set('header', true);
-        //
-        // if (hasRole($this->user, 'Host'))
-        // {
-        //     $Group = new Group;
-        //     $group = $Group->ofThisUser($this->user->id);
-        //     $this->set('usergroup', $group[0]);
-        //     $parties = $this->Party->ofThisGroup($group[0]->idgroups);
-        //
-        //     foreach($parties as $party){
-        //         $this->hostParties[] = $party->idevents;
-        //     }
-        //     $User = new User;
-        //     $this->set('profile', $User->profilePage($this->user->id));
-
         $Device = new Device;
         $weights = $Device->getWeights();
 
@@ -90,9 +63,6 @@ class PartyController extends Controller
         $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
 
         $this->geocoder = $geocoder;
-        // }
-      //
-      // $this->permissionsChecker = new PermissionsChecker($this->user, $this->hostParties);
     }
 
     public function index($group_id = null)
@@ -130,8 +100,6 @@ class PartyController extends Controller
 
             $group = null;
         }
-
-
 
         //Looks to see whether user has a group already, if they do, they can create events
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
@@ -206,6 +174,12 @@ class PartyController extends Controller
         $allGroups = Group::orderBy('name')->get();
 
         if ($request->isMethod('post')) {
+            $request->validate([
+                'event_date' => 'required',
+                'start' => 'required',
+                'end' => 'required',
+            ]);
+
             $error = array();
 
             if ($request->has('location')) {
@@ -293,14 +267,6 @@ class PartyController extends Controller
                 $party = Party::create($data);
                 $idParty = $party->idevents;
                 if (is_numeric($idParty)) {
-
-                      /** check and create User List **/
-                    // $_POST['users'][] = 29;
-                    // if(isset($_POST['users']) && !empty($_POST['users'])){
-                    //   $users = $_POST['users'];
-                    //   $Party->createUserList($idParty, $users);
-                    // }
-
                     EventsUsers::create([
                         'event' => $idParty,
                         'user' => Auth::user()->id,
@@ -590,17 +556,7 @@ class PartyController extends Controller
         }
 
         $party = $Party->findThis($id)[0];
-        // $this->set('images', $images);
-        // $this->set('title', 'Edit Party');
-        // $this->set('group_list', $Groups->findAll());
-        // $this->set('formdata', $Party);
-
-        // $remotePost = $wpClient->getPost($Party->wordpress_post_id);//NB: Add back in when wordpress stuff is fixed
         $remotePost = null;
-
-        // $this->set('remotePost', $remotePost);
-        //
-        // $this->set('grouplist', $Groups->findList());
 
         $audits = Party::findOrFail($id)->audits;
 
@@ -812,10 +768,6 @@ class PartyController extends Controller
         if ( ! FixometerHelper::hasRole($user, 'Host') && ! FixometerHelper::hasRole($user, 'Administrator')) {
             return redirect('/user/forbidden');
         }
-        // $this->set('js',
-        //             array('foot' => array(
-        //                             '/components/jquery.floatThead/dist/jquery.floatThead.min.js'
-        //             )));
 
         $Device = new Device;
         $Category = new Category;
@@ -945,22 +897,6 @@ class PartyController extends Controller
                 unset($party);
             }
             /** EOF WP Sync **/
-          /*
-          if($error == false){
-          // If is Admin, redir to host + group id
-          if(hasRole($this->user, 'Administrator')){
-          header('Location: /group/view/' . $partygroup);
-        }
-        else {
-        header('Location: /host');
-          }
-        }
-        else {
-        //echo "No.";
-
-        }
-        */
-      // $this->set('response', $response);
         }
 
         $party = $Party->findThis($id, true);
@@ -1000,11 +936,6 @@ class PartyController extends Controller
         }
 
         $party->co2 = number_format(round($party->co2), 0, '.', ',');
-
-        // $this->set('party', $party);
-        // $this->set('devices', $party->devices);
-        // $this->set('categories', $categories);
-        // $this->set('restarters', $restarters);
 
         if ( ! isset($response)) {
             $response = null;
@@ -1048,24 +979,6 @@ class PartyController extends Controller
             'party' => $eventStats,
         ]);
     }
-
-    // public function deleteImage($party_id, $id, $path){
-//
-//     $user = Auth::user();
-//
-//     $is_host_of_party = FixometerHelper::userHasEditPartyPermission($party_id, $user->id);
-//     if( FixometerHelper::hasRole($user, 'Administrator') || $is_host_of_party ){
-//
-//         $Image = new FixometerFile;
-//         $Image->deleteImage($id, $path);
-//
-//         return redirect()->back()->with('message', 'Thank you, the image has been deleted');
-//
-//     }
-//
-//     return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
-//
-    // }
 
     public function getGroupEmails($event_id, $object = false)
     {

@@ -48,7 +48,7 @@
                     <div class="col-lg-7">
                         <div class="form-group">
                         <label for="event_name">@lang('events.field_event_name'):</label>
-                        <input type="text" class="form-control field" id="event_name" name="venue" required placeholder="@lang('events.field_event_name_helper')">
+                        <input type="text" class="form-control field" id="event_name" name="venue" required placeholder="@lang('events.field_event_name_helper')" value="{{ old('venue') }}">
                         </div>
                     </div>
                     <div class="col-lg-5">
@@ -108,14 +108,23 @@
                 <div class="rte" name="description" id="description"></div>
               </div>
 
-              <input type="hidden" name="free_text" id="free_text" value="">
+              <input type="hidden" name="free_text" id="free_text" value="{{ old('free_text') }}">
             </div>
             <div class="col-lg-6">
               <div class="form-group">
                 <div class="row">
                   <div class="col-lg-7">
                     <label for="event_date">@lang('events.field_event_date'):</label>
-                    <input type="date" id="event_date" name="event_date" class="form-control field" required>
+                    @if ($agent->browser() == 'Safari' && $agent->isDesktop())
+                        <div class="vue">
+                            <EventDatePicker />
+                        </div>
+                    @else
+                        <input type="date" id="event_date" name="event_date" class="form-control field" required>
+                    @endif
+                    @if($errors->has('event_date')) 
+                        <p class="text-danger">{{ $errors->first('event_date') }}</p>
+                    @endif
                   </div>
                 </div>
               </div>
@@ -124,20 +133,31 @@
                   <div class="col-lg-7">
                     <div class="form-group">
 
-                      <label for="field_event_time">@lang('events.field_event_time'):</label>
+                        <label for="field_event_time">@lang('events.field_event_time'):</label>
+                        @if ($agent->browser() == 'Safari' && $agent->isDesktop())
+                            <div class="vue">
+                                <EventTimeRangePicker />
+                            </div>
+                            @if($errors->has('start')) 
+                                <p class="text-danger">{{ $errors->first('start') }}</p>
+                            @endif
+                            @if($errors->has('end')) 
+                                <p class="text-danger">{{ $errors->first('end') }}</p>
+                            @endif
+                        @else
+                            <div class="row">
 
-                      <div class="row">
+                                <div class="col-6">
+                                    <input type="time" id="start-time" name="start" class="form-control field" required>
+                                </div>
 
-                        <div class="col-6">
-                          <input type="time" id="start-time" name="start" class="form-control field" required>
-                        </div>
+                                <div class="col-6">
+                                    <input type="time" id="end-time" name="end" class="form-control field" required>
+                                </div>
 
-                        <div class="col-6">
-                          <label class="sr-only" for="field_event_time_2">@lang('events.field_event_time'):</label>
-                          <input type="time" id="end-time" name="end" class="form-control field" required>
-                        </div>
+                            </div>
 
-                      </div>
+                       @endif
 
                     </div>
                   </div>
@@ -147,7 +167,7 @@
                           <div class="col-lg-7">
                             <div class="form-group">
                               <label for="autocomplete">@lang('events.field_event_venue'):</label>
-                              <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock">
+                              <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ old('location') }}">
 
                               <small id="locationHelpBlock" class="form-text text-muted">
                                 @lang('events.field_venue_helper')
