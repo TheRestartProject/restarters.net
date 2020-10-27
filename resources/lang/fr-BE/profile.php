@@ -39,4 +39,6 @@ return array (
   'profile' => 'Profil',
   'view_profile' => 'Voir profil',
   'view_user_profile' => 'Voir profil d\'utilisateur',
+  'name' => 'Nom',
+  'notifications' => 'Notifications',
 );
