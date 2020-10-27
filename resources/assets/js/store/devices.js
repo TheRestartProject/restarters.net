@@ -34,7 +34,7 @@ export default {
         state.devices[params.idevents].forEach((d, i) => {
           if (d.iddevices === params.iddevices) {
             // Found it there already.
-            Vue.set(state.devices, i, params)
+            Vue.set(state.devices[params.idevents], i, params)
             Vue.set(state.images, params.iddevices, params.images)
             exists = true
           }
