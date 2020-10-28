@@ -7,7 +7,7 @@
       <div class="mt-2">
         <div v-if="volunteers.length">
           <div class="maxheight" :key="'confirm-' + volunteers.length">
-            <GroupVolunteer v-for="a in volunteers" :key="'group-' + a.idusers_groups" :volunteer="a" :canedit="canedit" v-if="!a.deleted_at" :group-id="groupId" />
+            <GroupVolunteer v-for="a in volunteers" :key="'group-' + a.idusers_groups" :volunteer="a" :canedit="canedit" v-if="!a.deleted_at" :idgroups="idgroups" />
           </div>
           <div class="d-flex justify-content-between">
             <a class="justify-content-end" href="#" data-toggle="modal" data-target="#invite-to-group">
@@ -35,24 +35,9 @@ export default {
   components: {Group, CollapsibleSection, GroupVolunteer},
   mixins: [group],
   props: {
-    groupId: {
+    idgroups: {
       type: Number,
       required: true
-    },
-    group: {
-      type: Object,
-      required: true
-    },
-    volunteers:  {
-      type: Array,
-      required: true
-    },
-    // TODO LATER In due course the permissions should be handled by having the user in the store and querying that, rather
-    // than passing down props.
-    canedit: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
   computed: {
@@ -80,7 +65,7 @@ export default {
     //
     // Similarly the group should be in the store and passed just by id, but we haven't introduced a group store yet.
     this.$store.dispatch('volunteers/set', {
-      groupId: this.groupId,
+      idgroups: this.idgroups,
       volunteers: this.volunteers
     })
   },

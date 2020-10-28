@@ -82,6 +82,10 @@ import CollapsibleSection from './CollapsibleSection'
 export default {
   components: {CollapsibleSection, GroupDevicesBreakdownCluster},
   props: {
+    idgroups: {
+      type: Number,
+      required: true
+    },
     clusterStats: {
       type: Object,
       required: true

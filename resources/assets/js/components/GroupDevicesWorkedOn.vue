@@ -18,6 +18,10 @@ import StatsValue from './StatsValue'
 export default {
   components: {StatsValue},
   props: {
+    idgroups: {
+      type: Number,
+      required: true
+    },
     stats: {
       required: true,
       type: Object

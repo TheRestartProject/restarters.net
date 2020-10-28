@@ -58,6 +58,9 @@ export default {
     // But let's not bite off too much at once.
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
+    // TODO LATER We add some properties to the group before adding it to the store.  These should move into
+    // computed properties once we have good access to the session on the client, and there should be a separate store
+    // for volunteers.
     this.initialEvent.idevents = this.idevents
     this.$store.dispatch('events/set', this.initialEvent)
 

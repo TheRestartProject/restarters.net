@@ -22,6 +22,10 @@ import GroupDeviceRepairPodium from './GroupDeviceRepairPodium'
 export default {
   components: {GroupDeviceRepairPodium},
   props: {
+    idgroups: {
+      type: Number,
+      required: true
+    },
     devices: {
       type: Array,
       required: true

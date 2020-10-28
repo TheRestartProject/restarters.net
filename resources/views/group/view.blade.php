@@ -90,6 +90,73 @@
           }
 
           $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
+
+          $device_stats = [
+              'fixed' => isset($group_device_count_status[0]) ? (int)$group_device_count_status[0]->counter : 0,
+              'repairable' => isset($group_device_count_status[1]) ? (int)$group_device_count_status[1]->counter : 0,
+              'dead' => isset($group_device_count_status[2]) ? (int)$group_device_count_status[2]->counter : 0
+            ];
+
+          $category_clusters = [
+            1 => 'Computers and Home Office',
+            2 => 'Electronic Gadgets',
+            3 => 'Home Entertainment',
+            4 => 'Kitchen and Household Items'
+          ];
+
+          $cluster_stats = [];
+
+          foreach( $category_clusters as $key => $category_cluster ) {
+              $fixed = isset($clusters['all'][$key][0]) ? (int)$clusters['all'][$key][0]->counter : 0;
+              $repairable = isset($clusters['all'][$key][1]) ? (int)$clusters['all'][$key][1]->counter : 0;
+              $dead = isset($clusters['all'][$key][2]) ? (int)$clusters['all'][$key][2]->counter : 0;
+              $total = $clusters['all'][$key]['total'];
+
+              //Seen and repaired stats
+              if ( isset( $mostleast[$key]['most_seen'][0] ) ) {
+                  $most_seen = $mostleast[$key]['most_seen'][0]->name;
+                  $most_seen_type = $mostleast[$key]['most_seen'][0]->counter;
+              } else {
+                  $most_seen = null;
+                  $most_seen_type = null;
+              }
+
+              if ( isset( $mostleast[$key]['most_repaired'][0] ) ) {
+                  $most_repaired = $mostleast[$key]['most_repaired'][0]->name;
+                  $most_repaired_type = $mostleast[$key]['most_repaired'][0]->counter;
+              } else {
+                  $most_repaired = null;
+                  $most_repaired_type = null;
+              }
+
+              if ( isset( $mostleast[$key]['least_repaired'][0] ) ) {
+                  $least_repaired = $mostleast[$key]['least_repaired'][0]->name;
+                  $least_repaired_type = $mostleast[$key]['least_repaired'][0]->counter;
+              } else {
+                  $least_repaired = null;
+                  $least_repaired_type = null;
+              }
+
+              $cluster_stats[$key] = [
+                  'fixed' => $fixed,
+                  'repairable' => $repairable,
+                  'dead' => $dead,
+                  'total' => $total,
+                  'most_seen' => [
+                      'name' => $most_seen,
+                      'count' => $most_seen_type
+                    ],
+                  'most_repaired' => [
+                      'name' => $most_repaired,
+                      'count' => $most_repaired_type
+                  ],
+                  'least_repaired' => [
+                      'name' => $least_repaired,
+                      'count' => $least_repaired_type
+                  ]
+              ];
+          }
+
       ?>
 
       <div class="vue-placeholder vue-placeholder-large">
@@ -97,122 +164,18 @@
       </div>
 
       <div class="vue">
-        <GroupHeading :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :canedit="{{ $can_edit_group ? 'true' : 'false' }}" :ingroup="{{ $in_group ? 'true': 'false' }}"/>
-      </div>
-
-      <div class="d-flex flex-wrap">
-          <div class="w-xs-100 w-md-50 vue">
-              <GroupDescription class="pr-md-3" :group-id="{{ $group->idgroups }}" :group="{{ $group }}" />
-          </div>
-          <div class="w-xs-100 w-md-50 vue">
-              <GroupVolunteers class="pl-md-3" :group-id="{{ $group->idgroups }}" :group="{{ $group }}" :volunteers="{{ json_encode($expanded_volunteers) }}" :canedit="{{ $can_edit_group ? 'true' : 'false' }}" />
-          </div>
-      </div>
-
-      <div class="vue-placeholder vue-placeholder-large">
-          <div class="vue-placeholder-content">@lang('partials.loading')...</div>
-      </div>
-
-      <div class="vue w-100 mt-md-50">
-          <GroupStats :stats="{{ json_encode($group->getGroupStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}" />
-      </div>
-
-      <div class="vue">
-          <hr style="color: white; border-top: 1px solid black;" />
-          <GroupEvents
-                  heading-level="h2"
-                  heading-sub-level="h3"
-                  :group-id="{{ $group->idgroups }}"
-                  :group="{{ $group }}"
-                  :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+          <GroupPage
+                  :idgroups="{{ $group->idgroups }}"
+                  :initial-group="{{ $group }}"
+                  :group-stats="{{ json_encode($group->getGroupStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}"
+                  :device-stats="{{ json_encode($device_stats) }}"
+                  :cluster-stats="{{ json_encode($cluster_stats) }}"
+                  :top-devices="{{ json_encode($top) }}"
                   :events="{{ json_encode($expanded_events) }}"
-                  :limit="3"
+                  :volunteers="{{ json_encode($expanded_volunteers) }}"
                   calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
                   calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
-                  add-button
           />
-      </div>
-
-      <?php
-      $stats = [
-          'fixed' => isset($group_device_count_status[0]) ? (int)$group_device_count_status[0]->counter : 0,
-          'repairable' => isset($group_device_count_status[1]) ? (int)$group_device_count_status[1]->counter : 0,
-          'dead' => isset($group_device_count_status[2]) ? (int)$group_device_count_status[2]->counter : 0
-        ];
-
-      $category_clusters = [
-        1 => 'Computers and Home Office',
-        2 => 'Electronic Gadgets',
-        3 => 'Home Entertainment',
-        4 => 'Kitchen and Household Items'
-      ];
-
-      $cluster_stats = [];
-
-      foreach( $category_clusters as $key => $category_cluster ) {
-          $fixed = isset($clusters['all'][$key][0]) ? (int)$clusters['all'][$key][0]->counter : 0;
-          $repairable = isset($clusters['all'][$key][1]) ? (int)$clusters['all'][$key][1]->counter : 0;
-          $dead = isset($clusters['all'][$key][2]) ? (int)$clusters['all'][$key][2]->counter : 0;
-          $total = $clusters['all'][$key]['total'];
-
-          //Seen and repaired stats
-          if ( isset( $mostleast[$key]['most_seen'][0] ) ) {
-              $most_seen = $mostleast[$key]['most_seen'][0]->name;
-              $most_seen_type = $mostleast[$key]['most_seen'][0]->counter;
-          } else {
-              $most_seen = null;
-              $most_seen_type = null;
-          }
-
-          if ( isset( $mostleast[$key]['most_repaired'][0] ) ) {
-              $most_repaired = $mostleast[$key]['most_repaired'][0]->name;
-              $most_repaired_type = $mostleast[$key]['most_repaired'][0]->counter;
-          } else {
-              $most_repaired = null;
-              $most_repaired_type = null;
-          }
-
-          if ( isset( $mostleast[$key]['least_repaired'][0] ) ) {
-              $least_repaired = $mostleast[$key]['least_repaired'][0]->name;
-              $least_repaired_type = $mostleast[$key]['least_repaired'][0]->counter;
-          } else {
-              $least_repaired = null;
-              $least_repaired_type = null;
-          }
-
-          $cluster_stats[$key] = [
-              'fixed' => $fixed,
-              'repairable' => $repairable,
-              'dead' => $dead,
-              'total' => $total,
-              'most_seen' => [
-                  'name' => $most_seen,
-                  'count' => $most_seen_type
-                ],
-              'most_repaired' => [
-                  'name' => $most_repaired,
-                  'count' => $most_repaired_type
-              ],
-              'least_repaired' => [
-                  'name' => $least_repaired,
-                  'count' => $least_repaired_type
-              ]
-          ];
-      }
-
-      ?>
-
-      <div class="d-flex flex-wrap flex-md-nowrap">
-          <div class="vue w-100 mt-md-50 mr-md-4">
-              <GroupDevicesWorkedOn :stats="{{ json_encode($stats) }}" class="mt-4" />
-          </div>
-          <div class="vue w-100 mt-md-50">
-              <GroupDevicesMostRepaired :devices="{{ json_encode($top) }}" class="mt-3" />
-          </div>
-      </div>
-
-      <div class="vue">
-          <GroupDevicesBreakdown :cluster-stats="{{ json_encode($cluster_stats) }}" />
       </div>
   </div>
 </section>
