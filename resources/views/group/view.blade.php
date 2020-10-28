@@ -122,7 +122,7 @@
           <GroupEvents
                   heading-level="h2"
                   heading-sub-level="h3"
-                  :eventsgroup-id="{{ $group->idgroups }}"
+                  :group-id="{{ $group->idgroups }}"
                   :group="{{ $group }}"
                   :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
                   :events="{{ json_encode($expanded_events) }}"

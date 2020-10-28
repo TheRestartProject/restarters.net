@@ -26,6 +26,7 @@ return array(
     'App\\Console\\Commands\\SyncGroups' => $baseDir . '/app/Console/Commands/SyncGroups.php',
     'App\\Console\\Commands\\SyncMiscCategories' => $baseDir . '/app/Console/Commands/SyncMiscCategories.php',
     'App\\Console\\Commands\\SyncMobiFixOra' => $baseDir . '/app/Console/Commands/SyncMobiFixOra.php',
+    'App\\Console\\Commands\\SyncNetworkUsersToDiscourseGroup' => $baseDir . '/app/Console/Commands/SyncNetworkUsersToDiscourseGroup.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Dashboard' => $baseDir . '/app/Dashboard.php',
     'App\\Device' => $baseDir . '/app/Device.php',

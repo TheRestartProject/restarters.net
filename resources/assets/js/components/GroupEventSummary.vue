@@ -73,10 +73,10 @@
       </a>
     </b-td>
     <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
-      {{ Math.round(stats.ewaste) }}kg
+      {{ Math.round(stats.ewaste) }} kg
     </b-td>
     <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
-      {{ Math.round(stats.co2) }}kg
+      {{ Math.round(stats.co2) }} kg
     </b-td>
     <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
       {{ stats.fixed_devices }}
