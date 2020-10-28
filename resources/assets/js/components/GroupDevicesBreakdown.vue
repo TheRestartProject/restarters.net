@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white">
+  <div>
     <h2 class="mt-4">{{ translatedDeviceBreakdown }}</h2>
     <b-tabs class="ourtabs w-100 mt-2 d-none d-md-block" justified>
       <b-tab active class="pt-2">
@@ -27,7 +27,7 @@
         <GroupDevicesBreakdownCluster :stats="clusterStats[4]" />
       </b-tab>
     </b-tabs>
-    <div class="d-block d-md-none border-top-thick">
+    <div class="d-block d-md-none border-top-thick pt-3">
       <CollapsibleSection header-level="h3">
         <template slot="title">
           <span class="mobtitle">
