@@ -33,7 +33,7 @@
 
                   @if( FixometerHelper::userCanCreateEvents(Auth::user()) )
                       <a href="/party/create" class="btn btn-primary ml-auto">
-                          <span class="d-none d-lg-block">@lang('events.create_new_event')</span>
+                          <span class="d-none d-lg-block">@lang('events.add_event')</span>
                           <span class="d-block d-lg-none">@lang('events.create_new_event_mobile')</span>
                       </a>
                   @endif
@@ -71,51 +71,64 @@
         @endif
         {{-- END Events to Moderate (Admin Only) --}}
 
-        {{-- Upcoming events for your Groups --}}
-        <section class="table-section" id="events-2">
-          <header>
-            @if( !is_null($group) )
-              <h2>Upcoming {{{ $group->name }}} events</h2>
-            @else
-              <h2>@lang('events.upcoming_for_your_groups')
-                  @if ( Auth::check() )
-                      @php( $user = auth()->user() )
-                      @php( $copy_link = url("/calendar/user/{$user->calendar_hash}") )
-                      @php( $user_edit_link = url("/profile/edit/{$user->id}") )
-                      @include('partials.calendar-feed-button', [
-                                     'copy_link' => $copy_link,
-                                     'user_edit_link' => $user_edit_link,
-                                     'modal_title' => __('calendars.events_modal_title'),
-                                     'modal_text' => __('calendars.events_modal_text'),
-                                     ])
-                  @endif
-                  @if ( FixometerHelper::hasRole(Auth::user(), 'Administrator') && is_null($group) )
-                      <sup>(<a href="{{{ route('all-upcoming-events') }}}">@lang('events.see_all_upcoming'))</a></sup></h2>
-                  @endif
-            @endif
+      <?php
+      $expanded_events = [];
 
-          </header>
+      $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
+      $emissionRatio = $footprintRatioCalculator->calculateRatio();
+      $can_edit_group = Auth::user() && $group && (FixometerHelper::hasRole( Auth::user(), 'Administrator') || $isCoordinatorForGroup || $is_host_of_group);
 
-          <div class="table-responsive">
-            <table class="table table-events table-striped table-layout-fixed" role="table">
-              @include('events.tables.headers.head-events-upcoming-only', ['hide_invite' => false])
-              <tbody>
-                @if( ! $upcoming_events->isEmpty() )
-                  @foreach ($upcoming_events as $event)
-                    @include('partials.tables.row-events', ['show_invites_count' => true, 'EmissionRatio' => $EmissionRatio])
-                  @endforeach
-                @else
-                  <tr><td colspan="7" align="center" class="p-3"><p>@lang('events.no_upcoming_for_your_groups')</p></td></tr>
-                @endif
-              </tbody>
-            </table>
-          </div>
-        </section>
-        {{-- END Upcoming events for your Groups --}}
+      foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+          $thisone = $event->getAttributes();
+          $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
+          $thisone['allinvitedcount'] = $event->allInvited->count();
 
+          // TODO LATER Consider whether these should be in the event or passed into the store.
+          $thisone['stats'] = $event->getEventStats($emissionRatio);
+          $thisone['participants_count'] = $event->participants;
+          $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+
+          $thisone['isVolunteer'] = $event->isVolunteer();
+          $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
+          $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+
+          $thisone['group'] = \App\Group::where('idgroups', $event->group)->first();
+
+          $expanded_events[] = $thisone;
+      }
+
+      $showCalendar = Auth::check() && (!$group || ($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
+      $calendar_copy_url = '';
+      $calendar_edit_url = '';
+
+      if ($showCalendar) {
+          if ($group) {
+              $calendar_copy_url = url("/calendar/group/{$group->idgroups}");
+              $calendar_edit_url = url("/profile/edit/" . Auth::user()->id);
+          } else {
+              $calendar_copy_url = url("/calendar/user/" . Auth::user()->calendar_hash);
+              $calendar_edit_url = url("/profile/edit/" . Auth::user()->id . "#list-calendar-links");
+          }
+      }
+      ?>
+
+      <div class="vue">
+          <GroupEvents
+                  heading-level="h2"
+                  heading-sub-level="h3"
+                  :group-id="{{ $group ? $group->idgroups : 'null' }}"
+                  :group="{{ $group ? $group : 'null' }}"
+                  :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+                  :events="{{ json_encode($expanded_events) }}"
+                  calendar-copy-url="{{ $calendar_copy_url }}"
+                  calendar-edit-url="{{ $calendar_edit_url }}"
+                  :add-button="false"
+                  :add-group-name="{{ $group ? 'false' : 'true' }}"
+          />
+      </div>
 
         @if( is_null($group) )
-        <section class="table-section upcoming_events_in_area" id="events-3">
+        <section class="table-section upcoming_events_in_area mt-4" id="events-3">
             <header>
                 <h2>@lang('events.other_events_near_you')</h2>
                 <p>@lang('events.no_events_near_you', ['url' => route('all-upcoming-events').'?online=1']).</p>
@@ -142,42 +155,6 @@
             </div>
         </section>
         @endif
-
-
-        {{-- Past events --}}
-        <section class="table-section" id="events-4">
-          <header>
-            @if( !is_null($group) )
-              <h2>@lang('events.past_events_group', ['group' => $group->name])</h2>
-            @else
-              <h2 class="mb-1">@lang('events.past_events') <sup><a href="{{{ route('all-past-events') }}}">(@lang('events.see_all_past'))</a></sup></h2>
-              <p class="mb-2">@lang('events.past_events_explainer')</p>
-            @endif
-          </header>
-          <div class="table-responsive">
-          <table class="table table-events table-striped table-layout-fixed" role="table">
-              @include('partials.tables.head-events', ['hide_invite' => true])
-              <tbody>
-                @if( !$past_events->isEmpty() )
-                  @foreach($past_events as $event)
-                    @include('partials.tables.row-events', ['show_invites_count' => false, 'EmissionRatio' => $EmissionRatio])
-                  @endforeach
-                @else
-                  <tr>
-                    <td colspan="13" align="center" class="p-3">@lang('events.no_past_events_for_group')</td>
-                  </tr>
-                @endif
-              </tbody>
-          </table>
-          </div>
-
-          <div class="d-flex justify-content-center">
-            <nav aria-label="Page navigation example">
-              {!! $past_events->links() !!}
-            </nav>
-          </div>
-        </section>
-        {{-- END Past events --}}
 
       </div>
     </div>

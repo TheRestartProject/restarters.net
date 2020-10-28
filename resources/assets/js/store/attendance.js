@@ -9,20 +9,20 @@ export default {
     list: []
   },
   getters: {
-    byEvent: state => eventId => {
-      return state.list[eventId]
+    byEvent: state => idevents => {
+      return state.list[idevents]
     }
   },
   mutations: {
     set(state, params) {
-      Vue.set(state.list, params.eventId, params.attendees)
+      Vue.set(state.list, params.idevents, params.attendees)
     },
     remove(state, params) {
-      let newarr = state.list[params.eventId].filter((a) => {
+      let newarr = state.list[params.idevents].filter((a) => {
         return a.user !== params.userId
       })
 
-      Vue.set(state.list, params.eventId, newarr)
+      Vue.set(state.list, params.idevents, newarr)
     },
   },
   actions: {
@@ -32,7 +32,7 @@ export default {
     async remove({commit}, params) {
       let ret = await axios.post('/party/remove-volunteer', {
         user_id: params.userId,
-        event_id: params.eventId
+        event_id: params.idevents
       }, {
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()

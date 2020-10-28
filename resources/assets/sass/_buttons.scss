@@ -13,11 +13,6 @@
 }
 
 .btn-primary {
-    background-color: $brand;
-    border: 0;
-    color: #FFF;
-    font-size: 16px;
-    border-radius: 3px;
     width: auto;
     box-shadow: 5px 5px 0 0 $black;
     border: solid 1px $black;
@@ -68,6 +63,10 @@
         color: $white !important;
         box-shadow: 0 0 0 0.2rem rgba($black, 0.5) !important;
         border-color: $black !important;
+    }
+
+    &:disabled {
+        color: grey !important;
     }
 }
 

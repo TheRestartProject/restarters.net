@@ -343,6 +343,10 @@ table th {
   color: #5A5A5A;
 }
 
+.text-black {
+  color: black;
+}
+
 .skills-list {
 
   li {
@@ -507,4 +511,143 @@ h2 {
 
 .deepnowrap button {
   white-space: nowrap !important;
+}
+
+// We use multiselect in the new Vue code, and select2 in the old jQuery code.  We want to make them look the same.
+.multiselect__option {
+  padding-left: 10px !important;
+
+  &.multiselect__option--highlight {
+    background-color: $brand-muted;
+
+    &.multiselect__option--selected {
+      background-color: $brand-muted;
+    }
+  }
+
+  &.multiselect__option--selected {
+    color: white;
+    background-color: $brand-muted;
+  }
+
+  &.multiselect__option--group.multiselect__option--disabled {
+    background-color: white !important;
+    font-weight: bold !important;
+    color: black !important;
+  }
+}
+
+.multiselect__tags {
+  border-bottom-left-radius:0px !important;
+  border-bottom-right-radius:0px !important;
+  border-top-left-radius:0px !important;
+  border-top-right-radius:0px !important;
+
+  input {
+    font-family:"Open Sans", sans-serif;
+    font-size:15px;
+  }
+}
+
+.multiselect {
+  font-family: "Open Sans", "sans-serif" !important;
+
+  outline: 3px;
+  margin: 2px;
+  margin-right: 3px;
+
+  &.multiselect--active {
+    border: 3px solid #222 !important;
+    outline: 0px !important;
+    margin: 0px !important;
+
+    .multiselect__tags, input {
+      background-color: #fff2df !important;
+    }
+
+    input {
+      margin-left: 5px;
+      margin-top: 6px;
+      margin-bottom: 3px;
+    }
+  }
+
+  .multiselect__tags {
+    padding: 3px 40px 3px 12px !important;
+    border: 1px solid #222 !important;
+
+    input {
+      min-height: 25px !important;
+      line-height: 25px !important;
+      padding: 0px !important;
+    }
+
+    .multiselect__single {
+      padding-left: 5px;
+      margin-bottom: 6px;
+      padding-top: 5px;
+      min-height: 25px !important;
+      line-height: 25px !important;
+      color: black !important;
+    }
+
+    .multiselect__tag {
+      background-color: $brand-orange !important;
+      color: #222 !important;
+      font-size: 14px !important;
+      padding: 0 12px 0 10px !important;
+      border: 2px solid #000 !important;
+      border-radius: 0 !important;
+      line-height: 35px !important;
+      -webkit-box-shadow: 2px 2px 0 0 #222 !important;
+      box-shadow: 2px 2px 0 0 #222 !important;
+      margin-bottom: 2px !important;
+      text-transform: none !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    .multiselect__tag-icon {
+      border-radius: 0 !important;
+      line-height: 35px !important
+    }
+  }
+
+  .multiselect__select {
+    padding: 8px 8px !important;
+    top: 12px !important;
+    margin-top: -9px !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+
+    &:before {
+      border: solid black;
+      top: 83% !important;
+      border-width: 8px 8px 0 !important;
+      border-color: black transparent transparent !important;
+    }
+  }
+
+  .multiselect__option--selected {
+    background-color: $brand-muted;
+  }
+
+  .multiselect__tag span {
+    margin-right: 10px !important;
+  }
+
+  .multiselect__input {
+    padding-top: 6px !important;
+    padding-left: 6px !important;
+  }
+
+  .multiselect__placeholder {
+    padding-left: 6px !important;
+    padding-top: 0px !important;
+    margin-bottom: 3px !important;
+    margin-top: 3px !important;
+    font-size: 15px !important;
+    color: $brand-placeholder !important;
+  }
 }

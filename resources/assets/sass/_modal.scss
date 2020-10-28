@@ -24,6 +24,10 @@
   }
 }
 
+.modal-backdrop {
+  opacity: 50% !important;
+}
+
 .form-control {
   border: 2px solid #BEC0C0;
   &:focus{

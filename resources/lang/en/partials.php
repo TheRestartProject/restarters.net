@@ -69,8 +69,8 @@ return array (
   'professional_help' => 'Professional help',
   'diy' => 'Do it yourself',
   'yes' => 'Yes',
-  'yes_manufacturer' => 'Spare parts required - from manufacturer',
-  'yes_third_party' => 'Spare parts required - from 3rd party',
+  'yes_manufacturer' => 'Parts required - from manufacturer',
+  'yes_third_party' => 'Parts required - from 3rd party',
   'no' => 'No spare parts required',
   'n_a' => 'N/A',
   'least_repaired' => 'Least repaired',
@@ -84,6 +84,7 @@ return array (
   'no_devices_added' => 'No devices added',
   'add_a_device' => 'Add a device',
   'this_event_hasnt_started' => 'This event hasn\'t started',
+  'event_requires_moderation' => 'Event requires moderation',
   'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
   'save' => 'Save item',
   'hot_topics' => 'Hot topics',
@@ -112,5 +113,6 @@ return array (
   'something_wrong' => 'Something has gone wrong',
   'are_you_sure' => 'Are you sure?',
   'please_confirm' => 'Please confirm that you wish to proceed.',
+  'copied_to_clipboard' => 'Copied to clipboard.',
   'total' => 'total'
 );

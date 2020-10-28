@@ -66,9 +66,32 @@
           }
 
           $expanded_volunteers = expandVolunteer($view_group->allConfirmedVolunteers);
-//          ->take(20));
 
-          ?>
+          $expanded_events = [];
+
+          $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
+          $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+          foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+              $thisone = $event->getAttributes();
+              $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
+              $thisone['allinvitedcount'] = $event->allInvited->count();
+
+              // TODO LATER Consider whether these stats should be in the event or passed into the store.
+              $thisone['stats'] = $event->getEventStats($emissionRatio);
+              $thisone['participants_count'] = $event->participants;
+              $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+
+              $thisone['isVolunteer'] = $event->isVolunteer();
+              $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
+              $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+
+              $expanded_events[] = $thisone;
+          }
+
+          $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
+      ?>
+
       <div class="vue-placeholder vue-placeholder-large">
           <div class="vue-placeholder-content">@lang('partials.loading')...</div>
       </div>
@@ -86,7 +109,6 @@
           </div>
       </div>
 
-
       <div class="vue-placeholder vue-placeholder-large">
           <div class="vue-placeholder-content">@lang('partials.loading')...</div>
       </div>
@@ -95,87 +117,20 @@
           <GroupStats :stats="{{ json_encode($group->getGroupStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio())) }}" />
       </div>
 
-
-      <div class="row mt-md-50">
-        <div class="col-lg-12">
-            <h2 id="upcoming-grp">@lang('groups.group_events')
-              @if ( Auth::check() && $group->isVolunteer() )
-                @php( $copy_link = url("/calendar/group/{$group->idgroups}") )
-                @php( $user_edit_link = url("/profile/edit/{$user->id}#list-calendar-links") )
-                @include('partials.calendar-feed-button', [
-                  'copy_link' => $copy_link,
-                  'user_edit_link' => $user_edit_link,
-                  'modal_title' => 'Access all group events in your personal calendar',
-                  'modal_text' => 'Add all of ' . $group->name . '\'s upcoming events to your Google/Outlook/Yahoo/Apple calendar with the link below:',
-                ])
-              @endif
-            @if( FixometerHelper::hasRole( $user, 'Administrator' ) || FixometerHelper::hasRole( $user, 'Host' ) )<sup>(<a href="{{ url('/party/create') }}">Add event</a>)</sup>@endif</h2>
-
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-              <li class="nav-item">
-                <a class="nav-link active" id="upcoming-past-tab" data-toggle="tab" href="#upcoming-past" role="tab" aria-controls="upcoming-past" aria-selected="true">@lang('groups.upcoming_active')</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" id="past-tab" data-toggle="tab" href="#past" role="tab" aria-controls="past" aria-selected="false">@lang('groups.past')</a>
-              </li>
-            </ul>
-            <div class="tab-content" id="eventsTabContent">
-              <div class="tab-pane fade show active" id="upcoming-past" role="tabpanel" aria-labelledby="upcoming-past-tab">
-
-                <div class="events-list-wrap">
-                  <div class="table-responsive">
-                      <table class="table table-events table-striped" role="table">
-
-                          @include('events.tables.headers.head-events-upcoming-only', ['hide-invite' => false, 'group_view' => true])
-
-                          <tbody>
-
-                            @if( !$upcoming_events->isEmpty() )
-                              @foreach ($upcoming_events as $event)
-                                @include('partials.tables.row-events', ['show_invites_count' => true, 'group_view' => true])
-                              @endforeach
-                            @else
-                              <tr>
-                                <td colspan="13" align="center" class="p-3">@lang('groups.no_upcoming_events')</td>
-                              </tr>
-                            @endif
-
-                          </tbody>
-                      </table>
-                  </div>
-                </div>
-
-              </div>
-              <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
-                <div class="events-list-wrap">
-                  <div class="table-responsive">
-                      <table class="table table-events table-striped" role="table">
-
-                          @include('partials.tables.head-events', ['group_view' => true, 'hide_invite' => true])
-
-                          <tbody>
-
-                            @if( !$past_events->isEmpty() )
-                              @foreach ($past_events as $event)
-                                @include('partials.tables.row-events', ['group_view' => true, 'hide_invite' => true])
-                              @endforeach
-                            @else
-                              <tr>
-                                <td colspan="13" align="center" class="p-3">@lang('groups.no_past_events')</td>
-                              </tr>
-                            @endif
-
-                          </tbody>
-                      </table>
-                  </div>
-                </div>
-              </div>
-
-              <div class="events-link-wrap text-center">
-                <a href="/party/group/{{{ $group->idgroups }}}">@lang('groups.see_all_events')</a>
-              </div>
-            </div>
-        </div>
+      <div class="vue">
+          <hr style="color: white; border-top: 1px solid black;" />
+          <GroupEvents
+                  heading-level="h2"
+                  heading-sub-level="h3"
+                  :eventsgroup-id="{{ $group->idgroups }}"
+                  :group="{{ $group }}"
+                  :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+                  :events="{{ json_encode($expanded_events) }}"
+                  :limit="3"
+                  calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
+                  calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
+                  add-button
+          />
       </div>
 
       <?php
