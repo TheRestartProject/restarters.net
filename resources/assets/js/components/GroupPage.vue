@@ -27,12 +27,12 @@
         add-button
     />
 
-    <div class="d-flex flex-wrap flex-md-nowrap">
+    <div class="d-flex flex-wrap flex-md-nowrap pt-4">
       <div class="w-100 mt-md-50 mr-md-4">
-        <GroupDevicesWorkedOn :idgroups="idgroups" :stats="deviceStats" class="mt-4" />
+        <GroupDevicesWorkedOn :idgroups="idgroups" :stats="deviceStats" class="pt-2 dashbord" />
       </div>
       <div class="w-100 mt-md-50">
-        <GroupDevicesMostRepaired :idgroups="idgroups" :devices="topDevices" class="mt-3" />
+        <GroupDevicesMostRepaired :idgroups="idgroups" :devices="topDevices" class="pt-2 dashbord" />
       </div>
     </div>
 
@@ -134,3 +134,9 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+@import 'resources/global/css/_variables';
+.dashbord {
+  border-top: 3px dashed grey;
+}
+</style>
