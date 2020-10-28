@@ -140,5 +140,14 @@ return array (
   'make_host' => 'Make Host',
   'not_counting' => 'Not counting toward this group\'s environmental impact is|Not counting toward this group\'s environmental impact are',
   'calendar_copy_title' => 'Access all group events in your personal calendar',
-  'calendar_copy_description' => 'Add all upcoming events for :group to your Google/Outlook/Yahoo/Apple calendar with the link below:'
+  'calendar_copy_description' => 'Add all upcoming events for :group to your Google/Outlook/Yahoo/Apple calendar with the link below:',
+  'volunteers_invited' => 'Volunteers invited',
+  'volunteers_confirmed' => 'Volunteers confirmed',
+  'participants_attended' => 'Participants attended',
+  'volunteers_attended' => 'Volunteers attended',
+  'waste_prevented' => 'Waste prevented',
+  'co2_emissions_prevented' => 'CO2 emissions prevented',
+  'fixed_items' => 'Fixed items',
+  'repairable_items' => 'Repairable items',
+  'end_of_life_items' => 'End-of-life items',
 );
