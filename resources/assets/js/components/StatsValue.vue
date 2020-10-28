@@ -120,11 +120,14 @@ export default {
     margin-top: 0px;
   }
 
-  &-primary {
+  &-primary, &-brand {
     // Primary becomes horizontal and left-aligned at small breakpoints
     background-color: $brand-light;
     color: white;
+  }
 
+  &-primary {
+    // Primary becomes horizontal and left-aligned at small breakpoints
     display: flex;
     justify-content: center;
 

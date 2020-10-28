@@ -1,12 +1,14 @@
 <template>
   <div class="d-flex flex-column h-100">
     <h2 class="mt-2 mb-4">{{ translatedMostRepairedDevices }}</h2>
-    <div class="podia d-none d-md-block">
-      <GroupDeviceRepairPodium v-if="devices.length >= 2" :position="2" :device="devices[1]" />
-      <div />
-      <GroupDeviceRepairPodium v-if="devices.length >= 1" :position="1" :device="devices[0]" />
-      <div />
-      <GroupDeviceRepairPodium v-if="devices.length >= 3" :position="3" :device="devices[2]" />
+    <div class=" d-none d-md-block">
+      <div class="podia">
+        <GroupDeviceRepairPodium v-if="devices.length >= 2" :position="2" :device="devices[1]" />
+        <div />
+        <GroupDeviceRepairPodium v-if="devices.length >= 1" :position="1" :device="devices[0]" />
+        <div />
+        <GroupDeviceRepairPodium v-if="devices.length >= 3" :position="3" :device="devices[2]" />
+      </div>
     </div>
     <div class="d-block d-md-none">
       <GroupDeviceRepairPodium v-if="devices.length >= 1" :position="1" :device="devices[0]" />

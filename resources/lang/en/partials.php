@@ -112,4 +112,5 @@ return array (
   'something_wrong' => 'Something has gone wrong',
   'are_you_sure' => 'Are you sure?',
   'please_confirm' => 'Please confirm that you wish to proceed.',
+  'total' => 'total'
 );
