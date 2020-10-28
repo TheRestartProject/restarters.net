@@ -9,11 +9,11 @@
       <div />
       <div class="divider" />
       <div />
-      <StatsValue :count="stats.most_seen.count" icon="most-seen_ico" size="md" :subtitle="stats.most_seen.name" class="group-stat-most-seen" :border="false" :translate="false" variant="" />
+      <StatsValue :count="stats.most_seen.count" icon="most-seen_ico" size="md" :subtitle="translate(stats.most_seen.name)" class="group-stat-most-seen" :border="false" :translate="false" variant="" />
       <div />
-      <StatsValue :count="stats.most_repaired.count" icon="most-repaired_ico" size="md" :subtitle="stats.most_repaired.name" class="group-stat-most-repaired" :border="false" :translate="false" variant="tertiary" />
+      <StatsValue :count="stats.most_repaired.count" icon="most-repaired_ico" size="md" :subtitle="translate(stats.most_repaired.name)" class="group-stat-most-repaired" :border="false" :translate="false" variant="tertiary" />
       <div />
-      <StatsValue :count="stats.least_repaired.count" icon="least-repaired_ico" size="md" :subtitle="stats.least_repaired.name" class="group-stat-least-repaired" :border="false" :translate="false" variant="tertiary" />
+      <StatsValue :count="stats.least_repaired.count" icon="least-repaired_ico" size="md" :subtitle="translate(stats.least_repaired.name)" class="group-stat-least-repaired" :border="false" :translate="false" variant="tertiary" />
     </div>
   </div>
 </template>
@@ -30,6 +30,10 @@ export default {
   methods: {
     pc(val) {
       return Math.round(10000 * val / this.stats.total) / 100
+    },
+    translate(category) {
+      // Need to translate categories.
+      return this.$lang.get('strings.' + category)
     }
   }
 }
