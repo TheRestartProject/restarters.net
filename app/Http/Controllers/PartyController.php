@@ -81,7 +81,7 @@ class PartyController extends Controller
 
             $past_events = Party::pastEvents()
                 ->where('events.group', $group_id)
-                ->paginate(10);
+                ->get();
 
             $group = Group::find($group_id);
             $upcoming_events_in_area = null;
@@ -104,6 +104,9 @@ class PartyController extends Controller
         //Looks to see whether user has a group already, if they do, they can create events
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
 
+        $is_host_of_group = FixometerHelper::userHasEditGroupPermission($group_id, Auth::user()->id);
+        $isCoordinatorForGroup = $group && Auth::user()->isCoordinatorForGroup($group);
+
         return view('events.index', [
             'moderate_events' => $moderate_events,
             'upcoming_events' => $upcoming_events,
@@ -111,6 +114,8 @@ class PartyController extends Controller
             'upcoming_events_in_area' => $upcoming_events_in_area,
             'user_groups' => $user_groups,
             'EmissionRatio' => $this->EmissionRatio,
+            'is_host_of_group' => $is_host_of_group,
+            'isCoordinatorForGroup' => $isCoordinatorForGroup,
             'group' => $group,
         ]);
     }

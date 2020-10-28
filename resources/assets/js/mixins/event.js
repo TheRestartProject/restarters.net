@@ -112,6 +112,9 @@ export default {
     inProgress() {
       return !this.upcoming && !this.finished
     },
+    startingSoon() {
+      return this.upcoming && !this.finished && (new moment().isSame(this.event.event_date, 'day'))
+    },
     start() {
       return this.event.start.substring(0, 5)
     },
@@ -122,7 +125,7 @@ export default {
       return this.event ? (new moment(this.event.event_date).format(DATE_FORMAT)) : null
     },
     dayofmonth() {
-      return this.event ? (new moment(this.event.event_date).format('D')) : null
+      return this.event ? (new moment(this.event.event_date).format('DD')) : null
     },
     month() {
       return this.event ? (new moment(this.event.event_date).format('MMM').toUpperCase()) : null

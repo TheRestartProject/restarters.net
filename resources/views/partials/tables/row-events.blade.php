@@ -41,8 +41,8 @@
     @endif
 
 
-
     @if( $event->requiresModerationByAdmin() )
+
 
 
 

@@ -26,6 +26,11 @@ export default {
       params.devices = null
       Vue.set(state.list, params.idevents, params)
     },
+    setList(state, params) {
+      params.events.forEach(e => {
+        Vue.set(state.list, e.idevents, e)
+      })
+    },
     setStats(state, params) {
       Vue.set(state.stats, params.idevents, params.stats)
     },
@@ -36,6 +41,9 @@ export default {
   actions: {
     set({commit}, params) {
       commit('set', params);
+    },
+    setList({commit}, params) {
+      commit('setList', params);
     },
     setStats({commit}, params) {
       commit('setStats', params);
