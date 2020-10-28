@@ -1,6 +1,6 @@
 <template>
   <div>
-    <component :is="headerLevel" :class="{
+    <component :is="headingLevel" :class="{
       'd-flex': true,
       'd-md-none': hideTitle,
       'mb-3': true,
