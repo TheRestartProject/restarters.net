@@ -73,34 +73,6 @@
   }
 }
 
-.card-event-add-item  {
-  background-color: $brand-light;
-  color: $white;
-
-  .card-body h3 {
-    font-size: $font-size-base;
-    color: $brand-white;
-    font-weight: bold;
-  }
-}
-
-.card-event-edit-item  {
-  background-color: #f5f7fa;
-
-  .card-body h3 {
-    font-size: $font-size-base;
-    color: $brand-light;
-    font-weight: bold;
-  }
-
-  .btn-tertiary {
-    color: $brand-light;
-    background-color: white;
-    border: 1px solid $brand-light;
-    box-shadow: 5px 5px 0 0 $brand-light;
-  }
-}
-
 .card-info-box {
   @extend .box-shadow-offset;
   @extend .rounded-0;

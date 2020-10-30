@@ -17,7 +17,7 @@ class Device extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'item_type', 'model', 'age', 'problem', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type'];
+    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'item_type', 'model', 'age', 'problem', 'notes', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type'];
 
     /**
      * The attributes that should be hidden for arrays.

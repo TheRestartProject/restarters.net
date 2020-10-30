@@ -53,6 +53,7 @@ return array (
   'suitable' => 'Helpful repair info?',
   'delete_device_content' => 'Delete this device from the Fixometer',
   'delete_device' => 'Delete device',
+  'confirm_delete' => 'Clicking confirm will delete this item from the event.',
   'n/a' => 'N/A',
   'from_manufacturer' => 'From manufacturer',
   'from_third_party' => 'From third party',
@@ -89,7 +90,7 @@ return array (
   'unpowered_items' => 'unpowered items',
   'weight' => 'Weight',
   'required_impact' => 'kg - required for environmental impact calculation',
-  'age_approx' => 'years - approximate, if known',
+  'age_approx' => 'years (approximate if unknown)',
   'repair_source' => 'Source of repair information',
   'repair_url' => 'URL for repair information',
   'tooltip_category' => 'Choose the category that best fits this item. <a target=\'_blank\' rel=\'noopener noreferrer\' href=\'https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--category\'>More information about these categories...</a>',
@@ -105,4 +106,11 @@ return array (
   'title_unpowered' => 'UNPOWERED',
   'description_powered' => 'A <b>powered item</b> is anything that has or requires a power source.',
   'description_unpowered' => 'An <b>unpowered item</b> is anything that doesn\'t have or require a power source.',
+  'repair_records' => 'Repair Records',
+  'view_record' => 'View',
+  'close_record' => 'Close',
+  'model' => 'Model',
+  'status' => 'Status',
+  'spare_parts' => 'Spare parts',
+  'images_on_edit' => 'Currently images can only be added by editing an item after it has been added.'
 );

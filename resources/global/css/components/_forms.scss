@@ -24,9 +24,21 @@
     z-index: 1;
   }
 
-  .form-check-large {
+  &.form-check-large {
     width: 25px;
     height: 25px;
+
+    label.custom-control-label::before, label.custom-control-label::after {
+      width: 25px;
+      height: 25px;
+      border-radius: 0;
+    }
+
+    .custom-control-input:checked ~ .custom-control-label::after {
+      background-image: url('/images/tick.svg') !important;
+      background-color: white;
+      background-size: 22px 22px;
+    }
   }
 }
 
@@ -225,4 +237,8 @@ select.form-control:not([class*="select2"]) {
 
 .form-control-lg {
   height: 45px !important;
+}
+
+label {
+  font-weight: bold;
 }

@@ -5,7 +5,8 @@ require('laravel-mix-bundle-analyzer');
 
 if (!mix.inProduction()) {
     mix.bundleAnalyzer({
-        analyzerMode: 'static'
+        analyzerMode: 'static',
+        openAnalyzer: false
     });
 }
 
@@ -16,7 +17,6 @@ mix.webpackConfig({
         new WebpackShellPluginNext({onBuildStart:['php artisan lang:js --no-lib --quiet resources/assets/js/translations.js'], onBuildEnd:[]})
     ]
 });
-
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management

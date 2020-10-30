@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-img-lazy :src="'/uploads/thumbnail_' + image.path" thumbnail class="mr-2 mb-2 size d-inline" @error.native="brokenImage" @click.native="zoom" />
+    <b-img-lazy :src="'/uploads/thumbnail_' + image.path" thumbnail class="mr-2 mb-2 size d-inline clickme" @error.native="brokenImage" @click.native="zoom" />
     <EventImageModal :image="image" ref="modal" />
   </div>
 </template>
