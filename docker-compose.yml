@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  app:
+  restarters:
     build:
       context: .
       dockerfile: ./compose/local/Dockerfile
@@ -9,7 +9,7 @@ services:
       - "8000:8181"
       - "8090:9000"
     volumes:
-      - .:/app
+      - ./:/app
     env_file: .env
     depends_on:
       - db

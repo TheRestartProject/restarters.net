@@ -44,7 +44,7 @@ You can then log in:
 - To the Fixometer at `http://restarters.test:8000` using an email of `jane@bloggs.net` and a password `passw0rd`.
 - To Mailhog (to see emails sent) at `http://restarters.test:8025/`
 
-If you change files locally, they will be picked up automatically.  There may be a delay of a second or so for changes to the client code (e.g. a `.vue` or `.js` file).
+If you change files locally, they will be picked up automatically.  There may be a delay of a second or so for changes to the client code (e.g. a `.vue` or `.js` file), while the rebuild happens.
 
 ## Tech
 
