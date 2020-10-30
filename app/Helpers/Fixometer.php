@@ -100,8 +100,12 @@ class FixometerHelper
     public static function userHasEditPartyPermission($partyId, $userId = null)
     {
         if (is_null($userId)) {
-            $userId = Auth::user()->id;
+            if (empty(Auth::user()))
+                return false;
+            else
+                $userId = Auth::user()->id;
         }
+
         $user = User::find($userId);
 
         if (FixometerHelper::hasRole($user, 'Administrator')) {

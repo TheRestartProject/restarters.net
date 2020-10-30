@@ -1,15 +1,18 @@
 <template>
   <div :class="className">
-    <div class="event-stat-icon mt-3 mb-2">
-      <b-img :src="src" class="event-stat-img" />
+    <div class="impact-stat-icon mt-2 mb-2">
+      <b-img :src="src" class="impact-stat-img" :width="iconWidth" />
     </div>
-    <div :class="'event-stat-count event-stat-count-' + variant">
+    <div :class="'impact-stat-count impact-stat-count-' + variant">
       {{ roundedCount }} {{ unit }}
     </div>
     <!-- The translations may include HTML tags, so we need to insert as HTML. -->
-    <div class="event-stat-title" v-html="translatedTitle" />
-    <div class="event-stat-subtitle" v-html="translatedSubtitle" />
-    <div v-if="description" class="event-stat-description pt-3 m-3" v-html="translatedDescription" />
+    <div class="impact-stat-title" v-if="title" v-html="translatedTitle" />
+    <div class="impact-stat-title" v-if="percent !== null">
+      {{ percent }}%
+    </div>
+    <div class="impact-stat-subtitle" v-html="translatedSubtitle" />
+    <div v-if="description" class="impact-stat-description pt-3 m-3" v-html="translatedDescription" />
   </div>
 </template>
 <script>
@@ -33,8 +36,23 @@ export default {
       type: String,
       required: true
     },
+    iconWidth: {
+      type: Number,
+      required: false,
+      default: null
+    },
     title: {
       type: String,
+      required: false,
+      default: null
+    },
+    translate: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    percent: {
+      type: Number,
       required: false,
       default: null
     },
@@ -52,6 +70,11 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    border: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   computed: {
@@ -60,16 +83,16 @@ export default {
       return '/images/' + this.icon + '.svg'
     },
     className() {
-      return 'event-stat event-stat-' + this.size + ' event-stat-' + this.variant
+      return 'impact-stat impact-stat-' + this.size + ' impact-stat-' + this.variant + (this.border ? ' hasBorder' : '')
     },
     translatedTitle() {
-      return this.$lang.get(this.title)
+      return this.translate ? this.$lang.choice(this.title, this.roundedCount) : this.title
     },
     translatedSubtitle() {
-      return this.$lang.get(this.subtitle)
+      return this.translate ? this.$lang.get(this.subtitle) : this.subtitle
     },
     translatedDescription() {
-      return this.$lang.get(this.description)
+      return this.translate ? this.$lang.get(this.description) : this.description
     },
     roundedCount() {
       return Math.round(this.count).toLocaleString()
@@ -83,49 +106,64 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-.event-stat {
-  border: 1px solid black;
+/* Using a prefix to avoid possible collision with any global style rules.
+ * 'impact' can refer to either a repair related impact stat, or an environmental impact stat.  */
+.impact-stat {
   text-align: center !important;
-  box-shadow: $black $shadow $shadow 0px 0px;
   background-color: $white;
   display: grid;
   align-items: center;
   padding: 5px;
-
   margin-top: 1rem !important;
+  grid-template-columns: 1fr;
+  grid-template-rows: 55px 54px auto auto auto;
+
+  &.hasBorder {
+    border: 1px solid black;
+    box-shadow: $black $shadow $shadow 0px 0px;
+  }
 
   @include media-breakpoint-up(md) {
     margin-top: 0px;
   }
 
-  &-primary {
+  &-primary, &-brand {
     // Primary becomes horizontal and left-aligned at small breakpoints
     background-color: $brand-light;
     color: white;
+  }
 
+  &-primary {
+    // Primary becomes horizontal and left-aligned at small breakpoints
     display: flex;
-    justify-content: left;
+    justify-content: center;
 
-    .event-stat-count {
-      margin-left: 1rem;
+    .impact-stat-icon {
+      margin-right: 0.5rem;
+      margin-top: 0.5rem !important;
+      height: auto;
     }
 
-    .event-stat-icon {
-      margin-top: 0.5rem !important;
+    .impact-stat-count {
+      margin-right: 0.5rem;
     }
 
     @include media-breakpoint-up(md) {
       display: grid;
       justify-content: center;
 
-      .event-stat-count {
-        margin-left: 0px;
+      .impact-stat-count {
+        margin-right: 0px;
+      }
+
+      .impact-stat-icon {
+        margin-right: 0px;
       }
     }
   }
 }
 
-.event-stat-count {
+.impact-stat-count {
   font-family: $font-family-third;
   font-size: 36px;
   font-weight: bold;
@@ -141,21 +179,21 @@ export default {
   }
 }
 
-.event-stat-title {
+.impact-stat-title {
   font-family: $font-family-third;
   font-size: 18px;
   font-weight: bold;
 }
 
-.event-stat-img {
-  max-width: 46px;
+.impact-stat-img {
+  height: 46px;
 }
 
-.event-stat-icon {
+.impact-stat-icon {
   height: 41px;
 }
 
-.event-stat-description {
+.impact-stat-description {
   border-top: 3px dashed #222;
   font-family: $font-family-third;
   font-size: 18px;

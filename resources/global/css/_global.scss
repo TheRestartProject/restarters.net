@@ -82,6 +82,10 @@ h2 {
   }
 }
 
+.d-grid {
+  display: grid;
+}
+
 @-webkit-keyframes pulsate {
   0% {
     opacity: 0.25;
@@ -116,6 +120,10 @@ h2 {
       background-color: transparent !important;
     }
   }
+}
+
+.no-explict-width div {
+  width: unset !important;
 }
 
 @each $breakpoint in map-keys($grid-breakpoints) {

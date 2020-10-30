@@ -2,19 +2,24 @@
   <div class="stats">
     <EventStatsItems :stats="stats" class="statsborder" />
     <div />
-    <EventStatsImpact :stats="stats" class="statsborder" />
+    <StatsImpact :stats="stats" statsEntity="event" class="statsborder" />
   </div>
 </template>
 <script>
 import EventStatsItems from './EventStatsItems'
-import EventStatsImpact from './EventStatsImpact'
+import StatsImpact from './StatsImpact'
 
 export default {
-  components: {EventStatsImpact, EventStatsItems},
+  components: {StatsImpact, EventStatsItems},
   props: {
-    stats: {
-      required: true,
-      type: Object
+    idevents: {
+      type: Number,
+      required: true
+    }
+  },
+  computed: {
+    stats() {
+      return this.$store.getters['events/getStats'](this.idevents)
     }
   }
 }

@@ -23,11 +23,11 @@
           </h2>
         </div>
         <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
-          <div class="d-flex justify-content-between w-100 flex-wrap centreme">
+          <div class="d-flex justify-content-between w-100">
             <div class="d-flex mr-2" v-if="event.the_group">
               <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block" />
-              <div class="ml-md-2">
-                {{ translatedOrganised }}
+              <div class="d-flex flex-wrap ml-md-2">
+                {{ translatedOrganised }}&nbsp;
                 <br class="d-none d-md-block"/>
                 <b>
                   <a :href="'/group/view/' + event.the_group.idgroups">

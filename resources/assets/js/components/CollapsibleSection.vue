@@ -1,22 +1,35 @@
 <template>
   <div>
-    <h2 :class="{
+    <component :is="headingLevel" :class="{
       'd-flex': true,
       'd-md-none': hideTitle,
       'mb-3': true,
       'justify-content-between': true
       }" @click="toggle">
-      <span>
+      <div class="d-flex w-100">
         <slot name="title" />
-        <span v-if="count" class="d-inline d-md-none text-muted">
-          (<span class="count">{{ count }}</span>)
-        </span>
-      </span>
-      <span class="d-inline d-md-none">
+        <div v-if="count" :class="{
+          'd-inline' : true,
+          'd-md-none' : !alwaysShowCount,
+          'text-muted' : true,
+          'd-flex' : true,
+          'flex-column' : true,
+          'justify-content-center' : true
+        }">
+          <span v-if="countBadge">
+            <b-badge variant="primary" pill>{{ count }}</b-badge>
+          </span>
+          <span v-else>
+            <span :class="countClass">({{ count }})</span>
+          </span>
+        </div>
+        <slot name="title-right" />
+      </div>
+      <span class="d-inline d-md-none clickme d-flex flex-column justify-content-center">
         <img class="icon" v-if="expanded" src="/images/minus-icon.svg" alt="Collapse" />
         <img class="icon" v-else src="/images/add-icon.svg" alt="Expand" />
       </span>
-    </h2>
+    </component>
     <div :class="{
       'd-none': !expanded,
       'd-md-block': true
@@ -40,6 +53,11 @@ export default {
       required: false,
       default: false
     },
+    headerLevel: {
+      type: String,
+      required: false,
+      default: 'h2'
+    },
     hideTitle: {
       type: Boolean,
       required: false,
@@ -49,6 +67,26 @@ export default {
       type: Number,
       required: false,
       default: null
+    },
+    alwaysShowCount: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    countBadge: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    countClass: {
+      type: String,
+      required: false,
+      default: 'count'
+    },
+    headingLevel: {
+      type: String,
+      required: false,
+      default: 'h2'
     }
   },
   data () {

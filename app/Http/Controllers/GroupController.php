@@ -539,12 +539,10 @@ class GroupController extends Controller
         //Event tabs
         $upcoming_events = Party::upcomingEvents()
         ->where('events.group', $group->idgroups)
-        ->take(5)
         ->get();
 
         $past_events = Party::pastEvents()
         ->where('events.group', $group->idgroups)
-        ->take(5)
         ->get();
 
         //Checking user for validatity

@@ -78,7 +78,7 @@ export default {
     skillCount() {
       let ret = null
       let skills = this.attendee.volunteer.user_skills
-      ret = (skills && skills.length ? skills.length : '0') + ' ' + this.pluralise(this.$lang.get('partials.skills'), skills.length)
+      ret = (skills && skills.length ? skills.length : '0') + ' ' + this.$lang.choice('partials.skills', skills.length)
       return ret
     },
     skillList() {
@@ -111,7 +111,7 @@ export default {
       try {
         await this.$store.dispatch('attendance/remove', {
           userId: this.attendee.user,
-          eventId: this.attendee.event,
+          idevents: this.attendee.event,
         })
       } catch (e) {
         this.error = e.message

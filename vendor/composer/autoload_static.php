@@ -467,6 +467,7 @@ class ComposerStaticInit82587c9947f0c277da993ca59a480583
         'App\\Console\\Commands\\SyncGroups' => __DIR__ . '/../..' . '/app/Console/Commands/SyncGroups.php',
         'App\\Console\\Commands\\SyncMiscCategories' => __DIR__ . '/../..' . '/app/Console/Commands/SyncMiscCategories.php',
         'App\\Console\\Commands\\SyncMobiFixOra' => __DIR__ . '/../..' . '/app/Console/Commands/SyncMobiFixOra.php',
+        'App\\Console\\Commands\\SyncNetworkUsersToDiscourseGroup' => __DIR__ . '/../..' . '/app/Console/Commands/SyncNetworkUsersToDiscourseGroup.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Dashboard' => __DIR__ . '/../..' . '/app/Dashboard.php',
         'App\\Device' => __DIR__ . '/../..' . '/app/Device.php',

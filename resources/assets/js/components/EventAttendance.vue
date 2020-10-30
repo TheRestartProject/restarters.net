@@ -12,22 +12,24 @@
       attendance: true,
       upcoming: upcoming
       }">
-          <div>
-            <div v-if="!upcoming">
-              <h3>
+          <div class="counts">
+            <div v-if="!upcoming" class="count-participants">
+              <b>
                 <b-img src="/icons/group_ico.svg" class="mr-2" />
                 {{ translatedParticipants }}
-              </h3>
+              </b>
               <EventAttendanceCount :count="event.participants" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
-              <h3>
+            </div>
+            <div v-if="!upcoming" class="count-volunteers">
+              <b>
                 <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
                 {{ translatedVolunteers }}
-              </h3>
+              </b>
               <EventAttendanceCount :count="event.volunteers" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
             </div>
           </div>
-          <div />
-          <div>
+          <div class="spacer" />
+          <div class="thetabs">
             <b-tabs class="ourtabs attendance-tabs w-100">
               <b-tab active title-item-class="w-50" class="pt-2">
                 <template slot="title">
@@ -94,31 +96,6 @@ import CollapsibleSection from './CollapsibleSection'
 export default {
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],
-  props: {
-    eventId: {
-      type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
-      required: true
-    },
-    attendance:  {
-      type: Array,
-      required: true
-    },
-    invitations:  {
-      type: Array,
-      required: true
-    },
-    // TODO LATER In due course the permissions should be handled by having the user in the store and querying that, rather
-    // than passing down props.
-    canedit: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
   computed: {
     translatedTitle() {
       return this.$lang.get('events.event_attendance')
@@ -160,8 +137,6 @@ export default {
     //
     // Further down the line this initial data might be provided either by an API call from the client to the server,
     // or from Vue server-side rendering, where the whole initial state is passed to the client.
-    //
-    // Similarly the event should be in the store and passed just by id, but we haven't introduced an event store yet.
     let attendees = []
 
     this.attendance.forEach((a) => {
@@ -175,7 +150,7 @@ export default {
     })
 
     this.$store.dispatch('attendance/set', {
-      eventId: this.eventId,
+      idevents: this.idevents,
       attendees: attendees
     })
   },
@@ -183,7 +158,7 @@ export default {
     async changeParticipants(val) {
       let ret = await axios.post('/party/update-quantity', {
         quantity: val,
-        event_id: this.eventId
+        event_id: this.idevents
       }, {
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
@@ -193,7 +168,7 @@ export default {
     async changeVolunteers(val) {
       let ret = await axios.post('/party/update-volunteerquantity', {
         quantity: val,
-        event_id: this.eventId
+        event_id: this.idevents
       }, {
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
@@ -209,13 +184,73 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 .attendance {
   display: grid;
   grid-template-columns: 1fr 50px minmax(0, 2fr);
+  grid-template-rows: auto auto;
 
   &.upcoming {
     grid-template-columns: 0 0px 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  @include media-breakpoint-down(sm) {
+    grid-template-columns: 100%;
+  }
+}
+
+.counts {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: auto auto !important;
+
+  @include media-breakpoint-down(sm) {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+}
+
+.count-participants {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+}
+
+.count-volunteers {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+
+  @include media-breakpoint-down(sm) {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+  }
+}
+
+.spacer {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+
+  @include media-breakpoint-down(sm) {
+    display: none;
+  }
+}
+
+.thetabs {
+  grid-column: 3 / 4;
+  grid-row: 1 / 2;
+
+  @include media-breakpoint-down(sm) {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
   }
 }
 

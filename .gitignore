@@ -38,3 +38,4 @@ anonymise-db.sql
 temp_db.sql
 restarters-anonymised.sql
 /.idea
+.dir-locals.el
