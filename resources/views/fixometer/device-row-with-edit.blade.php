@@ -9,7 +9,7 @@
         </a>
     </td>
     <td class="category" @if( !FixometerHelper::checkColumn('category', $user_preferences) ) style="display: none;" @endif>
-        @lang($device->deviceCategory->name)
+        @lang('_json.' . $device->deviceCategory->name)
     </td>
     @if ($powered)
         <td class="brand d-none d-md-table-cell" @if( !FixometerHelper::checkColumn('brand', $user_preferences) ) style="display: none;" @endif>
