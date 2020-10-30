@@ -117,22 +117,22 @@
                                                 <select id="categories" name="categories[]" class="form-control select2-tags" multiple title="Choose categories...">
                                                     @if(isset($categories))
                                                     @foreach($categories as $cluster)
-                                                    <optgroup label="<?php echo __($cluster->name); ?>">
+                                                    <optgroup label="<?php echo $cluster->name; ?>">
                                                         @foreach($cluster->categories as $c)
                                                         @if (!empty($selected_categories) && in_array($c->idcategories, $selected_categories))
                                                         <option value="<?php echo $c->idcategories; ?>" selected>
-                                                            <?php echo __($c->name); ?>
+                                                            <?php echo $c->name; ?>
                                                         </option>
                                                         @else
                                                         <option value="<?php echo $c->idcategories; ?>">
-                                                            <?php echo __($c->name); ?>
+                                                            <?php echo $c->name; ?>
                                                         </option>
                                                         @endif
                                                         @endforeach
                                                     </optgroup>
                                                     @endforeach
                                                     @endif
-                                                    <option value="46">@lang('Misc')</option>
+                                                    <option value="46">Misc</option>
                                                 </select>
                                             </div>
                                         </div>
