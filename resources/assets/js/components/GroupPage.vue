@@ -32,7 +32,7 @@
         <GroupDevicesWorkedOn :idgroups="idgroups" :stats="deviceStats" class="pt-2 dashbord" />
       </div>
       <div class="w-100 mt-md-50">
-        <GroupDevicesMostRepaired :idgroups="idgroups" :devices="topDevices" class="pt-2 dashbord" />
+        <GroupDevicesMostRepaired :idgroups="idgroups" :devices="topDevices" class="pt-2 dashbord mt-4 mt-md-0" />
       </div>
     </div>
 

@@ -1,14 +1,14 @@
 <template>
   <div :class="className">
     <div class="impact-stat-icon mt-2 mb-2">
-      <b-img :src="src" class="impact-stat-img" />
+      <b-img :src="src" class="impact-stat-img" :width="iconWidth" />
     </div>
     <div :class="'impact-stat-count impact-stat-count-' + variant">
       {{ roundedCount }} {{ unit }}
     </div>
     <!-- The translations may include HTML tags, so we need to insert as HTML. -->
     <div class="impact-stat-title" v-if="title" v-html="translatedTitle" />
-    <div class="impact-stat-title" v-if="percent">
+    <div class="impact-stat-title" v-if="percent !== null">
       {{ percent }}%
     </div>
     <div class="impact-stat-subtitle" v-html="translatedSubtitle" />
@@ -35,6 +35,11 @@ export default {
     icon: {
       type: String,
       required: true
+    },
+    iconWidth: {
+      type: Number,
+      required: false,
+      default: null
     },
     title: {
       type: String,
@@ -110,6 +115,8 @@ export default {
   align-items: center;
   padding: 5px;
   margin-top: 1rem !important;
+  grid-template-columns: 1fr;
+  grid-template-rows: 55px 54px auto auto auto;
 
   &.hasBorder {
     border: 1px solid black;

@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 class="mt-4">{{ translatedDeviceBreakdown }}</h2>
-    <b-tabs class="ourtabs w-100 mt-2 d-none d-md-block" justified>
+    <b-tabs class="ourtabs w-100 mt-4 d-none d-md-block" justified>
       <b-tab active class="pt-2">
         <template slot="title">
           <b>{{ translatedComputerAndHomeOffice }}</b>

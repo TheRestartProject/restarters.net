@@ -2,7 +2,7 @@
   <div>
     <h2 class="mt-2 mb-2">{{ translatedDevicesWorkedOn }}</h2>
     <div class="items-container text-lowercase">
-      <StatsValue :count="stats.fixed + stats.repairable + stats.dead" icon="drill" size="md" variant="brand" title="partials.total" class="group-stat-total" />
+      <StatsValue :count="stats.fixed + stats.repairable + stats.dead" icon="drill" :icon-width="50" size="md" variant="brand" title="partials.total" class="group-stat-total" />
       <div />
       <StatsValue :count="stats.fixed" icon="fixed" size="md" title="partials.fixed" class="group-stat-fixed" />
       <div />

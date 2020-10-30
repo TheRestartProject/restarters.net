@@ -9,11 +9,11 @@
       <div />
       <div class="divider" />
       <div />
-      <StatsValue :count="stats.most_seen.count" icon="most-seen_ico" size="md" :subtitle="translate(stats.most_seen.name)" class="group-stat-most-seen" :border="false" :translate="false" variant="" />
+      <StatsValue :count="stats.most_seen.count" icon="most-seen_ico" size="md" :subtitle="translate(stats.most_seen.name)" class="group-stat-most-seen" :border="false" :translate="false" />
       <div />
-      <StatsValue :count="stats.most_repaired.count" icon="most-repaired_ico" size="md" :subtitle="translate(stats.most_repaired.name)" class="group-stat-most-repaired" :border="false" :translate="false" variant="tertiary" />
+      <StatsValue :count="stats.most_repaired.count" icon="most-repaired_ico" size="md" :subtitle="translate(stats.most_repaired.name)" class="group-stat-most-repaired" :border="false" :translate="false" />
       <div />
-      <StatsValue :count="stats.least_repaired.count" icon="least-repaired_ico" size="md" :subtitle="translate(stats.least_repaired.name)" class="group-stat-least-repaired" :border="false" :translate="false" variant="tertiary" />
+      <StatsValue :count="stats.least_repaired.count" icon="least-repaired_ico" size="md" :subtitle="translate(stats.least_repaired.name)" class="group-stat-least-repaired" :border="false" :translate="false" />
     </div>
   </div>
 </template>
@@ -29,11 +29,15 @@ export default {
   },
   methods: {
     pc(val) {
-      return Math.round(10000 * val / this.stats.total) / 100
+      return this.stats.total ? (Math.round(10000 * val / this.stats.total) / 100) : 0
     },
     translate(category) {
-      // Need to translate categories.
-      return this.$lang.get('strings.' + category)
+      // Need to translate categories.  Might be null if there were no items.
+      if (category === null) {
+        return ''
+      } else {
+        return this.$lang.get('strings.' + category)
+      }
     }
   }
 }
@@ -86,12 +90,16 @@ export default {
   @include media-breakpoint-up(md) {
     border-right: 1px solid $brand-light;
     border-bottom: 0;
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 7;
+    grid-column-end: 8;
   }
 }
 
 .group-stat-most-seen {
-  grid-row-start: 3;
-  grid-row-end: 4;
+  grid-row-start: 5;
+  grid-row-end: 6;
   grid-column-start: 1;
   grid-column-end: 2;
 
@@ -104,8 +112,8 @@ export default {
 }
 
 .group-stat-most-repaired {
-  grid-row-start: 3;
-  grid-row-end: 4;
+  grid-row-start: 5;
+  grid-row-end: 6;
   grid-column-start: 3;
   grid-column-end: 4;
 
@@ -118,8 +126,8 @@ export default {
 }
 
 .group-stat-least-repaired {
-  grid-row-start: 3;
-  grid-row-end: 4;
+  grid-row-start: 5;
+  grid-row-end: 6;
   grid-column-start: 5;
   grid-column-end: 6;
 

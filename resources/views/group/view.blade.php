@@ -110,7 +110,7 @@
               $fixed = isset($clusters['all'][$key][0]) ? (int)$clusters['all'][$key][0]->counter : 0;
               $repairable = isset($clusters['all'][$key][1]) ? (int)$clusters['all'][$key][1]->counter : 0;
               $dead = isset($clusters['all'][$key][2]) ? (int)$clusters['all'][$key][2]->counter : 0;
-              $total = $clusters['all'][$key]['total'];
+              $total = $clusters['all'][$key]['total'] ? $clusters['all'][$key]['total'] : 0;
 
               //Seen and repaired stats
               if ( isset( $mostleast[$key]['most_seen'][0] ) ) {
@@ -118,7 +118,7 @@
                   $most_seen_type = $mostleast[$key]['most_seen'][0]->counter;
               } else {
                   $most_seen = null;
-                  $most_seen_type = null;
+                  $most_seen_type = 0;
               }
 
               if ( isset( $mostleast[$key]['most_repaired'][0] ) ) {
@@ -126,7 +126,7 @@
                   $most_repaired_type = $mostleast[$key]['most_repaired'][0]->counter;
               } else {
                   $most_repaired = null;
-                  $most_repaired_type = null;
+                  $most_repaired_type = 0;
               }
 
               if ( isset( $mostleast[$key]['least_repaired'][0] ) ) {
@@ -134,7 +134,7 @@
                   $least_repaired_type = $mostleast[$key]['least_repaired'][0]->counter;
               } else {
                   $least_repaired = null;
-                  $least_repaired_type = null;
+                  $least_repaired_type = 0;
               }
 
               $cluster_stats[$key] = [

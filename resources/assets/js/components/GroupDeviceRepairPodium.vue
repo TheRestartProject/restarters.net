@@ -4,7 +4,7 @@
       <div :class="'medal-' + position">
         <div class="bg-white d-flex flex-column justify-content-between text-center font-weight-bold medal">
           <div>
-            <b-img-lazy class="position-absolute rosette" :src="'/images/rosette_' + position + '_ico.svg'" />
+            <b-img-lazy class="position-absolute rosette shift" :src="'/images/rosette_' + position + '_ico.svg'" />
           </div>
           <div class="d-flex flex-column">
           <span class="text-brand large">
@@ -18,8 +18,8 @@
       </div>
     </div>
     <div class="d-block d-md-none">
-      <div class="d-flex mb-2 border-black">
-        <b-img-lazy :src="'/images/rosette_' + position + '_ico.svg'" class="mr-3 mb-2" />
+      <div class="mobile mb-2 border-black">
+        <b-img-lazy :src="'/images/rosette_' + position + '_ico.svg'" class="mr-3 mb-2 rosette" />
         <span class="text-brand large mr-3">
           {{ device.counter }}
         </span>
@@ -79,10 +79,18 @@ export default {
 
 .rosette {
   width: 40px;
-  transform: translate(-20px, -22px);
+
+  &.shift {
+    transform: translate(-20px, -22px);
+  }
 }
 
 .border-black {
   border-bottom: 1px solid black;
+}
+
+.mobile {
+  display: grid;
+  grid-template-columns: 50px 4rem 1fr;
 }
 </style>
