@@ -15,6 +15,9 @@ export default {
     get: state => idgroups => {
       return state.list[idgroups]
     },
+    list: state => {
+      return Object.values(state.list)
+    },
     getStats: state => idgroups => {
       return state.stats[idgroups]
     }

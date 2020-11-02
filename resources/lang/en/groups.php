@@ -11,12 +11,12 @@ return array (
   'town-city-placeholder' => 'E.g. Paris, London, Brussels',
   'group' => 'Group',
   'groups' => 'Groups',
-  'all_groups' => 'Groups',
+  'all_groups' => 'All Groups',
   'search_groups' => 'Search groups',
   'by_details' => 'By details',
   'add_groups' => 'Add a group',
   'add_groups_content' => 'Tell us more about your group, so we can create a page for you and help you publicise to potential volunteers and participants.',
-  'create_groups' => 'Create new group',
+  'create_groups' => 'Add a new group',
   'create_group' => 'Create group',
   'groups_title1' => 'Your groups',
   'groups_title2' => 'Groups nearest to you',
@@ -154,5 +154,12 @@ return array (
   'electronic_gadget' => 'Electronic Gadget',
   'home_entertainment' => 'Home Entertainment',
   'kitchen_and_household_items' => 'Kitchen & Household Items',
-  'no_unpowered_stats' => 'At the moment, these stats are only displayed for powered items. We hope to include unpowered items soon.'
+  'no_unpowered_stats' => 'At the moment, these stats are only displayed for powered items. We hope to include unpowered items soon.',
+  'introduction' => 'We are a network of local repair groups from around the world.',
+  'quick_access' => 'Groups you create or follow appear below for quick access.',
+  'why_not1' => 'If you can\'t see any here yet, why not',
+  'why_not2' => 'follow your nearest group',
+  'why_not3' => 'to hear about their upcoming repair events?',
+  'your_area1' => 'You do not currently have a town/city set.  You can set one in',
+  'your_area2' => 'your profile'
 );
