@@ -80,7 +80,7 @@ export default {
           if ((this.powered && c.powered) || (!this.powered && !c.powered)) {
             categories.push({
               // Need to translate.
-              name: this.$lang.get('c.name),
+              name: this.$lang.get(c.name),
               value: c.idcategories
             })
           }
@@ -89,7 +89,7 @@ export default {
         if (categories.length) {
           ret.push({
             // Need to translate.
-            cluster: this.$lang.get('cluster.name),
+            cluster: this.$lang.get(cluster.name),
             categories: categories
           })
         }
