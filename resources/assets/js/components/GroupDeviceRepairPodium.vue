@@ -44,7 +44,7 @@ export default {
   },
   computed: {
     translatedName() {
-      return this.$lang.get('this.device.name)
+      return this.$lang.get(this.device.name)
     }
   }
 }
