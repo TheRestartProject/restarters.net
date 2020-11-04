@@ -1,23 +1,24 @@
 <template>
   <div>
-    <b-table :fields="fields" :items="items" sort-icon-left>
+    <b-table :fields="fields" :items="items" sort-icon-left sort-null-last>
       <template slot="head(group_image)">
         <span />
       </template>
       <template slot="cell(group_image)" slot-scope="data">
-        <b-img-lazy :src="data.item.group_image" class="profile" @error.native="brokenProfileImage" />
+        <b-img-lazy :src="data.item.image" class="profile" @error.native="brokenProfileImage" v-if="data.item.image" />
+        <b-img-lazy :src="defaultProfile" class="profile" v-else />
       </template>
       <template slot="head(group_name)">
-        <span />
+        <b-img src="/icons/group_name_ico.svg" class="mt-3 icon" />
       </template>
       <template slot="cell(group_name)" slot-scope="data">
         <a :href="'/group/view/' + data.item.group_name.idgroups">{{ data.item.group_name.name }}</a>
       </template>
       <template slot="head(location)">
-        <b-img src="/icons/map_marker_ico.svg" class="mt-3" />
+        <b-img src="/icons/map_marker_ico.svg" class="mt-3 icon" />
       </template>
       <template slot="head(next_event)">
-        <b-img src="/icons/events_ico.svg" class="mt-3" />
+        <b-img src="/icons/events_ico.svg" class="mt-3 icon" />
       </template>
       <template slot="cell(next_event)" slot-scope="data">
         <div>
@@ -33,8 +34,8 @@
   </div>
 </template>
 <script>
-// TODO Leave group
-import { DEFAULT_PROFILE } from '../constants'
+import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
+import moment from 'moment'
 
 export default {
   props: {
@@ -47,20 +48,23 @@ export default {
     return {
       fields: [
         { key: 'group_image', label: 'Group Image', tdClass: 'image'},
-        { key: 'group_name', label: 'Group Name' },
+        { key: 'group_name', label: 'Group Name', sortable: true },
         { key: 'location', label: 'Location' },
         { key: 'next_event', label: 'Next Event', sortable: true, tdClass: 'event' },
       ]
     }
   },
   computed: {
+    defaultProfile() {
+      return DEFAULT_PROFILE
+    },
     items() {
       return this.groups.map(g => {
         return {
           group_image: g.group_image ? g.group_image : DEFAULT_PROFILE,
           group_name: g,
           location: g.location,
-          next_event: g.next_event
+          next_event: g.next_event ? (new moment(g.next_event).format(DATE_FORMAT)) : null
         }
       })
     },
@@ -79,6 +83,11 @@ export default {
 
 .profile {
   border: 1px solid black;
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
 }
 
 /deep/ .image {

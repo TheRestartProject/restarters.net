@@ -20,59 +20,58 @@
       </div>
       @endif
 
-      @if ($all)
-        <form action="/group/all/search" method="get" id="device-search">
-          <div class="row justify-content-center">
-            <div class="col-lg-3">
-              @include('group.sections.sidebar-all-groups')
-            </div>
-            <div class="col-lg-9">
-              @include('group.sections.all-groups')
-            </div>
-          </div>
-        </form>
-      @else
-        <?php
-          if (!is_null($your_groups)) {
-            foreach ($your_groups as &$group) {
-              $group_image = $group->groupImage;
-              if (is_object($group_image) && is_object($group_image->image)) {
-                $group_image->image->path;
-              }
+      <?php
+        function expandGroups($groups) {
+            $ret = [];
 
-              $group['location'] = $group->getLocation();
-              $group['next_event'] = $group->getNextUpcomingEvent();
+            if ($groups) {
+                foreach ($groups as $group) {
+                    $group_image = $group->groupImage;
+                    $event = $group->getNextUpcomingEvent();
+
+                    $ret[] = [
+                        'idgroups' => $group['idgroups'],
+                        'name' => $group['name'],
+                        'image' => (is_object($group_image) && is_object($group_image->image)) ?
+                            $group_image->image->path : null,
+                        'location' => rtrim($group['location']),
+                        'next_event' => $event ? $event['event_date'] : null
+                    ];
+                }
             }
-          }
 
-          if (!is_null($groups_near_you)) {
-            foreach ($groups_near_you as &$group) {
-              $group_image = $group->groupImage;
-              if (is_object($group_image) && is_object($group_image->image)) {
-                $group_image->image->path;
-              }
+            return $ret;
+        }
 
-              $group['location'] = $group->getLocation();
-              $group['nextevent'] = $group->getNextUpcomingEvent();
-            }
-          }
+        $all_groups = expandGroups($groups);
 
-          $can_create = FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host');
-          $myid = Auth::user() ? Auth::user()->id : null
-        ?>
+        if (!is_null($your_groups)) {
+            $your_groups = expandGroups($your_groups);
+        }
 
-        <div class="vue">
-            <GroupsPage
-                :your-groups="{{ json_encode($your_groups) }}"
-                your-area="{{ $your_area }}"
-                :nearby-groups="{{ json_encode($groups_near_you) }}"
-                :can-create="{{ $can_create ? 'true' : 'false' }}"
-                :user-id="{{ $myid }}"
-            />
-        </div>
+        if (!is_null($groups_near_you)) {
+            error_log("Expand near ". count($groups_near_you));
+            $groups_near_you = expandGroups($groups_near_you);
+            error_log("Expanded near " . count($groups_near_you));
+        }
 
-        @php( $user_preferences = session('column_preferences') )
-      @endif
+        $can_create = FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host');
+        $myid = Auth::user() ? Auth::user()->id : null
+      ?>
+
+      <div class="vue">
+        <GroupsPage
+          :all-groups="{{ json_encode($all_groups) }}"
+          :your-groups="{{ json_encode($your_groups) }}"
+          :nearby-groups="{{ json_encode($groups_near_you) }}"
+          your-area="{{ $your_area }}"
+          :can-create="{{ $can_create ? 'true' : 'false' }}"
+          :user-id="{{ $myid }}"
+          :all="{{ $all ? 'true' : 'false' }}"
+        />
+      </div>
+
+      @php( $user_preferences = session('column_preferences') )
 
     </section>
   @endsection

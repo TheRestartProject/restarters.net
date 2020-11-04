@@ -39,19 +39,40 @@
         <template slot="title">
           <b class="text-uppercase">{{ translatedAllGroups }}</b>
         </template>
-        TODO
+        // TODO Count of groups, counts in columns
+        // TODO Filter
+        //
+        {{ groups.length }} groups
+        <GroupsTable :groups="groups" class="mt-3" />
       </b-tab>
     </b-tabs>
   </div>
 </template>
 <script>
-
 import GroupsPageInfo from './GroupsPageInfo'
 import GroupsTable from './GroupsTable'
+
+// TODO Mobile layout
+// TODO Link to tab
 export default {
   components: {GroupsTable, GroupsPageInfo},
   props: {
+    all: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    allGroups: {
+      type: Array,
+      required: false,
+      default: null
+    },
     yourGroups: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    nearbyGroups: {
       type: Array,
       required: false,
       default: null
@@ -66,11 +87,6 @@ export default {
       required: false,
       default: null
     },
-    nearbyGroups: {
-      type: Array,
-      required: false,
-      default: null
-    },
     canCreate: {
       type: Boolean,
       required: false,
@@ -78,18 +94,20 @@ export default {
     }
   },
   computed: {
-    allGroups() {
+    groups() {
       let groups = this.$store.getters['groups/list']
 
-      return groups ? groups : []
+      return groups ? groups.sort((a, b) => {
+        return a.name.localeCompare(b.name)
+      }) : []
     },
     myGroups() {
-      return this.allGroups.filter(g => {
+      return this.groups.filter(g => {
         return g.ingroup
       })
     },
     nearGroups() {
-      return this.allGroups.filter(g => {
+      return this.groups.filter(g => {
         return g.nearby
       })
     },
@@ -120,28 +138,26 @@ export default {
     // and so that as/when it changes then reactivity updates all the views.
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
-    // TODO Initial tab
-    let groups = []
+    let groups = {}
+
+    this.allGroups.forEach(g => {
+      groups[g.idgroups] = g
+    })
 
     if (this.yourGroups) {
       this.yourGroups.forEach(g => {
-        g.ingroup = true
-
-        groups.push(g)
+        groups[g.idgroups].ingroup = true
       })
     }
 
     if (this.nearbyGroups) {
       this.yourGroups.forEach(g => {
-        g.nearby = true
-
-        groups.push(g)
+        groups[g.idgroups].nearby = true
       })
     }
 
-
     this.$store.dispatch('groups/setList', {
-      groups
+      groups: Object.values(groups)
     })
   }
 }
