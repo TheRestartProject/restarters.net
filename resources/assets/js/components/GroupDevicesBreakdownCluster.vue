@@ -36,7 +36,7 @@ export default {
       if (category === null) {
         return ''
       } else {
-        return this.$lang.get('category)
+        return this.$lang.get(category)
       }
     }
   }
