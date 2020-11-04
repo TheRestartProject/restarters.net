@@ -53,10 +53,10 @@
                             @if(isset($list))
                             @foreach($list as $p)
                             <tr>
-                                <td><a href="/category/edit/{{ $p->idcategories }}">@lang('_json.' . $p->name)</a></td>
+                                <td><a href="/category/edit/{{ $p->idcategories }}">@lang($p->name)</a></td>
                                 @if( !empty($p->cluster) )
                                 @foreach($categories as $cluster)
-                                {!! $cluster->idclusters == $p->cluster ? '<td>'.__('_json.' . $cluster->name).'</td>' : '' !!}
+                                {!! $cluster->idclusters == $p->cluster ? '<td>'.__($cluster->name).'</td>' : '' !!}
                                 @endforeach
                                 @else
                                 <td>N/A</td>

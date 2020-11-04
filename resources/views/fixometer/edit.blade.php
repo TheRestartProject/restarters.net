@@ -67,7 +67,7 @@
                                                     <option></option>
                                                     @if(isset($categories))
                                                     <?php foreach($categories as $category){ ?>
-                                                    <option value="<?php echo $category->idcategories; ?>" <?php echo ($category->idcategories == $formdata->category ? ' selected' : ''); ?>><?php echo __('_json.' . $category->name); ?></option>
+                                                    <option value="<?php echo $category->idcategories; ?>" <?php echo ($category->idcategories == $formdata->category ? ' selected' : ''); ?>><?php echo __($category->name); ?></option>
                                                     <?php } ?>
                                                     @endif
                                                 </select>
