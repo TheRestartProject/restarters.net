@@ -151,7 +151,7 @@ return array (
   'repairable_items' => 'Repairable items',
   'end_of_life_items' => 'End-of-life items',
   'computed_and_home_office' => 'Computer & Home Office',
-  'electronic_gadget' => 'Electronic Gadget',
+  'electronic_gadget' => 'Electronic Gadgets',
   'home_entertainment' => 'Home Entertainment',
   'kitchen_and_household_items' => 'Kitchen & Household Items',
   'no_unpowered_stats' => 'At the moment, these stats are only displayed for powered items. We hope to include unpowered items soon.'

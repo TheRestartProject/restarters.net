@@ -3,10 +3,10 @@
     <GroupHeading :idgroups="idgroups" :canedit="canedit" :ingroup="ingroup"/>
 
     <div class="d-flex flex-wrap">
-      <div class="w-xs-100 w-md-50 vue">
+      <div class="w-xs-100 w-md-50">
         <GroupDescription class="pr-md-3" :idgroups="idgroups" />
       </div>
-      <div class="w-xs-100 w-md-50 vue">
+      <div class="w-xs-100 w-md-50">
         <GroupVolunteers class="pl-md-3" :idgroups="idgroups" :canedit="canedit" />
       </div>
     </div>
