@@ -8,7 +8,7 @@
       }" @click="toggle">
       <div class="d-flex w-100">
         <div class="d-flex flex-column justify-content-center">
-          <slot name="title" />&nbsp;
+          <slot name="title" />
         </div>
         <div v-if="count" :class="{
           'd-inline' : true,
@@ -19,10 +19,10 @@
           'justify-content-center' : true
         }">
           <span v-if="countBadge">
-            <b-badge variant="primary" pill>{{ count }}</b-badge>
+            &nbsp;<b-badge variant="primary" pill>{{ count }}</b-badge>
           </span>
           <span v-else>
-            <span :class="countClass">({{ count }})</span>
+            &nbsp;<span :class="countClass">({{ count }})</span>
           </span>
         </div>
         <slot name="title-right" />
@@ -115,9 +115,5 @@ export default {
 
 .count {
   color: $brand-light;
-}
-
-.text-muted {
-  font-size: unset;
 }
 </style>
