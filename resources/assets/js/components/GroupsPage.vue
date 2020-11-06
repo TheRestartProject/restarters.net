@@ -39,11 +39,9 @@
         <template slot="title">
           <b class="text-uppercase">{{ translatedAllGroups }}</b>
         </template>
-        // TODO Count of groups, counts in columns
         // TODO Filter
         //
-        {{ groups.length }} groups
-        <GroupsTable :groups="groups" class="mt-3" />
+        <GroupsTable :groups="groups" class="mt-3" count />
       </b-tab>
     </b-tabs>
   </div>

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <p v-if="count" v-html="translatedGroupCount" />
     <b-table :fields="fields" :items="items" sort-icon-left sort-null-last>
       <template slot="head(group_image)">
         <span />
@@ -16,6 +17,12 @@
       </template>
       <template slot="head(location)">
         <b-img src="/icons/map_marker_ico.svg" class="mt-3 icon" />
+      </template>
+      <template slot="head(all_hosts_count)">
+        <b-img src="/icons/volunteer_ico.svg" class="mt-3 icon" />
+      </template>
+      <template slot="head(all_restarters_count)">
+        <b-img src="/icons/volunteer_ico.svg" class="mt-3 icon" />
       </template>
       <template slot="head(next_event)">
         <b-img src="/icons/events_ico.svg" class="mt-3 icon" />
@@ -42,6 +49,11 @@ export default {
     groups: {
       type: Array,
       required: true
+    },
+    count: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
@@ -50,6 +62,8 @@ export default {
         { key: 'group_image', label: 'Group Image', tdClass: 'image'},
         { key: 'group_name', label: 'Group Name', sortable: true },
         { key: 'location', label: 'Location' },
+        { key: 'all_hosts_count', label: 'Hosts', sortable: true },
+        { key: 'all_restarters_count', label: 'Restarters', sortable: true },
         { key: 'next_event', label: 'Next Event', sortable: true, tdClass: 'event' },
       ]
     }
@@ -64,12 +78,19 @@ export default {
           group_image: g.group_image ? g.group_image : DEFAULT_PROFILE,
           group_name: g,
           location: g.location,
-          next_event: g.next_event ? (new moment(g.next_event).format(DATE_FORMAT)) : null
+          next_event: g.next_event ? (new moment(g.next_event).format(DATE_FORMAT)) : null,
+          all_hosts_count: g.all_hosts_count,
+          all_restarters_count: g.all_restarters_count
         }
       })
     },
     translatedNonePlanned() {
       return this.$lang.get('groups.upcoming_none_planned')
+    },
+    translatedGroupCount() {
+      return this.$lang.choice('groups.group_count', this.groups.length, {
+        count: this.groups.length
+      })
     }
   },
   methods: {

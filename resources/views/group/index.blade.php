@@ -35,7 +35,9 @@
                         'image' => (is_object($group_image) && is_object($group_image->image)) ?
                             $group_image->image->path : null,
                         'location' => rtrim($group['location']),
-                        'next_event' => $event ? $event['event_date'] : null
+                        'next_event' => $event ? $event['event_date'] : null,
+                        'all_restarters_count' => $group->all_restarters_count,
+                        'all_hosts_count' => $group->all_hosts_count
                     ];
                 }
             }
@@ -50,9 +52,7 @@
         }
 
         if (!is_null($groups_near_you)) {
-            error_log("Expand near ". count($groups_near_you));
             $groups_near_you = expandGroups($groups_near_you);
-            error_log("Expanded near " . count($groups_near_you));
         }
 
         $can_create = FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host');
