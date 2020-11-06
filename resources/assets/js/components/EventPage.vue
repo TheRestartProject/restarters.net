@@ -2,7 +2,7 @@
   <div>
     <div v-if="event">
       <EventHeading v-bind="$props" />
-      <div class="d-flex flex-wrap">
+      <div class="d-flex flex-wrap flex-md-nowrap">
         <div class="w-xs-100 w-md-50">
           <div class="vue">
             <EventDetails class="pr-md-3" v-bind="$props" />
