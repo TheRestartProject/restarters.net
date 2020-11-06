@@ -59,6 +59,14 @@
           </div>
         </div>
       </template>
+      <template slot="head(follow)">
+        <span />
+      </template>
+      <template slot="cell(follow)" slot-scope="data">
+        <b-btn variant="primary" class="text-nowrap mr-2" v-if="data.item.follow" @click="follow" :to="'/group/join/' + data.item.idgroups">
+          {{ translatedFollow }}
+        </b-btn>
+      </template>
     </b-table>
   </div>
 </template>
@@ -97,6 +105,7 @@ export default {
         { key: 'all_hosts_count', label: 'Hosts', sortable: true },
         { key: 'all_restarters_count', label: 'Restarters', sortable: true },
         { key: 'next_event', label: 'Next Event', sortable: true, tdClass: 'event' },
+        { key: 'follow' , label: 'Follow' }
       ],
       filter: null,
       network: null
@@ -129,12 +138,14 @@ export default {
     items() {
       return this.filteredGroups.map(g => {
         return {
+          idgroups: g.idgroups,
           group_image: g.group_image ? g.group_image : DEFAULT_PROFILE,
           group_name: g,
           location: g.location,
           next_event: g.next_event ? (new moment(g.next_event).format(DATE_FORMAT)) : null,
           all_hosts_count: g.all_hosts_count,
-          all_restarters_count: g.all_restarters_count
+          all_restarters_count: g.all_restarters_count,
+          follow: !g.ingroup
         }
       })
     },
@@ -145,6 +156,9 @@ export default {
       return this.$lang.choice('groups.group_count', this.filteredGroups.length, {
         count: this.filteredGroups.length
       })
+    },
+    translatedFollow() {
+      return this.$lang.get('groups.join_group_button')
     },
     translatedNetworks() {
       return this.$lang.get('networks.network')
