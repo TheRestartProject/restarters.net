@@ -39,9 +39,7 @@
         <template slot="title">
           <b class="text-uppercase">{{ translatedAllGroups }}</b>
         </template>
-        // TODO Filter
-        //
-        <GroupsTable :groups="groups" class="mt-3" count />
+        <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" />
       </b-tab>
     </b-tabs>
   </div>
@@ -89,6 +87,10 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    networks: {
+      type: Array,
+      required: true
     }
   },
   computed: {

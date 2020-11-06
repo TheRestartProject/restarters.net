@@ -37,7 +37,8 @@
                         'location' => rtrim($group['location']),
                         'next_event' => $event ? $event['event_date'] : null,
                         'all_restarters_count' => $group->all_restarters_count,
-                        'all_hosts_count' => $group->all_hosts_count
+                        'all_hosts_count' => $group->all_hosts_count,
+                        'networks' => array_pluck($group->networks, 'id')
                     ];
                 }
             }
@@ -68,6 +69,7 @@
           :can-create="{{ $can_create ? 'true' : 'false' }}"
           :user-id="{{ $myid }}"
           :all="{{ $all ? 'true' : 'false' }}"
+          :networks="{{ json_encode($networks) }}"
         />
       </div>
 
