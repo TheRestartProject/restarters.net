@@ -9,12 +9,14 @@
               <b-img-lazy src="/images/subs_cal_ico.svg" />
             </b-btn>
           </div>
-          <b-btn variant="primary" href="/party/create" class="align-self-center" v-if="addButton">
+        </div>
+      </template>
+      <template slot="title-right">
+        <b-btn variant="primary" href="/party/create" class="align-self-center text-nowrap" v-if="addButton">
             <span class="d-none d-md-block">
               {{ translatedAddEvent }}
             </span>
-          </b-btn>
-        </div>
+        </b-btn>
       </template>
       <template slot="content">
         <b-tabs class="ourtabs w-100">
