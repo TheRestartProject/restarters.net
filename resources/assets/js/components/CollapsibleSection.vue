@@ -7,7 +7,9 @@
       'justify-content-between': true
       }" @click="toggle">
       <div class="d-flex w-100">
-        <slot name="title" />
+        <div class="d-flex flex-column justify-content-center">
+          <slot name="title" />&nbsp;
+        </div>
         <div v-if="count" :class="{
           'd-inline' : true,
           'd-md-none' : !alwaysShowCount,
@@ -116,6 +118,6 @@ export default {
 }
 
 .text-muted {
-  font-size: 28px;
+  font-size: unset;
 }
 </style>
