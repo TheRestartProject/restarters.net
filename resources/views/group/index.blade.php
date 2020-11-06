@@ -38,7 +38,8 @@
                         'next_event' => $event ? $event['event_date'] : null,
                         'all_restarters_count' => $group->all_restarters_count,
                         'all_hosts_count' => $group->all_hosts_count,
-                        'networks' => array_pluck($group->networks, 'id')
+                        'networks' => array_pluck($group->networks, 'id'),
+                        'country' => $group->country
                     ];
                 }
             }
@@ -68,7 +69,8 @@
           your-area="{{ $your_area }}"
           :can-create="{{ $can_create ? 'true' : 'false' }}"
           :user-id="{{ $myid }}"
-          :all="{{ $all ? 'true' : 'false' }}"
+          tab="{{ $tab }}"
+          :network="{{ $network ? $network : 'null' }}"
           :networks="{{ json_encode($networks) }}"
         />
       </div>

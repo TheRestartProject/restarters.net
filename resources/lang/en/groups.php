@@ -163,5 +163,7 @@ return array (
   'your_area1' => 'You do not currently have a town/city set.  You can set one in',
   'your_area2' => 'your profile',
   'group_count' => 'There is <b>:count group</b>.|There are <b>:count groups</b>.',
-  'search_placeholder' => 'Type to search name/location...'
+  'search_name_placeholder' => 'Search name...',
+  'search_location_placeholder' => 'Search location...',
+  'search_country_placeholder' => 'Country'
 );

@@ -12,8 +12,8 @@
         </b-btn>
       </div>
     </h1>
-    <b-tabs class="ourtabs w-100 mt-4" justified>
-      <b-tab active class="pt-2">
+    <b-tabs class="ourtabs w-100 mt-4" justified v-model="currentTab">
+      <b-tab class="pt-2">
         <template slot="title">
           <b class="text-uppercase">{{ translatedYourGroups }}</b>
         </template>
@@ -39,7 +39,7 @@
         <template slot="title">
           <b class="text-uppercase">{{ translatedAllGroups }}</b>
         </template>
-        <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" />
+        <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" :network="network" />
       </b-tab>
     </b-tabs>
   </div>
@@ -49,14 +49,18 @@ import GroupsPageInfo from './GroupsPageInfo'
 import GroupsTable from './GroupsTable'
 
 // TODO Mobile layout
-// TODO Link to tab
 export default {
   components: {GroupsTable, GroupsPageInfo},
   props: {
-    all: {
-      type: Boolean,
+    network: {
+      type: Number,
       required: false,
-      default: false
+      default: null
+    },
+    tab: {
+      type: String,
+      required: false,
+      default: 'mine'
     },
     allGroups: {
       type: Array,
@@ -91,6 +95,11 @@ export default {
     networks: {
       type: Array,
       required: true
+    }
+  },
+  data () {
+    return {
+      currentTab: 0
     }
   },
   computed: {
@@ -133,7 +142,7 @@ export default {
       return this.$lang.get('groups.all_groups')
     }
   },
-  mounted() {
+  created() {
     // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
     // and so that as/when it changes then reactivity updates all the views.
     //
@@ -159,6 +168,20 @@ export default {
     this.$store.dispatch('groups/setList', {
       groups: Object.values(groups)
     })
+
+    // We have three tabs, and might be asked to start on a specific one.
+    switch (this.tab) {
+      case 'nearby':
+        this.currentTab = 1;
+        break;
+      case 'all':
+      case 'network':
+        this.currentTab = 2;
+        break;
+      default:
+        this.currentTab = 0;
+        break;
+    }
   }
 }
 </script>
