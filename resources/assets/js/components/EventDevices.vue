@@ -1,7 +1,7 @@
 <template>
   <CollapsibleSection class="lineheight" collapsed :count="deviceCount" always-show-count count-class="text-black font-weight-normal">
     <template slot="title">
-      <div class="d-flex">
+      <div class="d-flex size">
         <b-img class="d-none d-md-block icon" src="/images/tv.svg" />&nbsp;{{ translatedTitle }}
       </div>
     </template>
@@ -206,5 +206,9 @@ export default {
 
 .lower {
   text-transform: lowercase;
+}
+
+.size {
+  font-size: 28px;
 }
 </style>
