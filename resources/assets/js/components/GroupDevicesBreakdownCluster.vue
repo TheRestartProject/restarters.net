@@ -9,11 +9,11 @@
       <div />
       <div class="divider" />
       <div />
-      <StatsValue :count="stats.most_seen.count" icon="most-seen_ico" size="md" :subtitle="stats.most_seen.name" class="group-stat-most-seen" :border="false" :translate="false" />
+      <StatsValue :count="stats.most_seen.count" icon="most-seen_ico" size="md" :subtitle="translate(stats.most_seen.name)" class="group-stat-most-seen" :border="false" :translate="false" />
       <div />
-      <StatsValue :count="stats.most_repaired.count" icon="most-repaired_ico" size="md" :subtitle="stats.most_repaired.name" class="group-stat-most-repaired" :border="false" :translate="false" />
+      <StatsValue :count="stats.most_repaired.count" icon="most-repaired_ico" size="md" :subtitle="translate(stats.most_repaired.name)" class="group-stat-most-repaired" :border="false" :translate="false" />
       <div />
-      <StatsValue :count="stats.least_repaired.count" icon="least-repaired_ico" size="md" :subtitle="stats.least_repaired.name" class="group-stat-least-repaired" :border="false" :translate="false" />
+      <StatsValue :count="stats.least_repaired.count" icon="least-repaired_ico" size="md" :subtitle="translate(stats.least_repaired.name)" class="group-stat-least-repaired" :border="false" :translate="false" />
     </div>
   </div>
 </template>
@@ -30,6 +30,14 @@ export default {
   methods: {
     pc(val) {
       return this.stats.total ? (Math.round(10000 * val / this.stats.total) / 100) : 0
+    },
+    translate(category) {
+      // Need to translate categories.  Might be null if there were no items.
+      if (category === null) {
+        return ''
+      } else {
+        return this.$lang.get('strings.' + category)
+      }
     }
   }
 }

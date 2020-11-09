@@ -95,17 +95,18 @@ export default {
     translatedDeviceBreakdown() {
       return this.$lang.get('groups.device_breakdown')
     },
+    // The cluster names are translated in the en.json file, or language variant.
     translatedComputerAndHomeOffice() {
-      return this.$lang.get('groups.computed_and_home_office')
+      return this.$lang.get('strings.Computers and Home Office')
     },
     translatedElectronicGadget() {
-      return this.$lang.get('groups.electronic_gadget')
+      return this.$lang.get('strings.Electronic Gadgets')
     },
     translatedHomeEntertainment() {
-      return this.$lang.get('groups.home_entertainment')
+      return this.$lang.get('strings.Home Entertainment')
     },
     translatedKitchenAndHouseholdItems() {
-      return this.$lang.get('groups.kitchen_and_household_items')
+      return this.$lang.get('strings.Kitchen and Household Items')
     },
     translatedNoUnpoweredStats() {
       return this.$lang.get('groups.no_unpowered_stats')
@@ -130,5 +131,10 @@ export default {
 .mobtitle {
   text-transform: uppercase;
   font-size: 18px;
+}
+
+// Some cluster names are a bit long in English, so make more space.
+/deep/ .ourtabs .nav-link {
+  padding-left: calc(5% + 1px) !important;
 }
 </style>
