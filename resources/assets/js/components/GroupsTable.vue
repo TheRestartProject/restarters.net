@@ -129,8 +129,8 @@ export default {
         { key: 'group_image', label: 'Group Image', tdClass: 'image'},
         { key: 'group_name', label: 'Group Name', sortable: true },
         { key: 'location', label: 'Location', tdClass: "hidecell", thClass: "hidecell" },
-        { key: 'all_hosts_count', label: 'Hosts', sortable: true, tdClass: "hidecell", thClass: "hidecell" },
-        { key: 'all_restarters_count', label: 'Restarters', sortable: true, tdClass: "hidecell", thClass: "hidecell" },
+        { key: 'all_hosts_count', label: 'Hosts', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
+        { key: 'all_restarters_count', label: 'Restarters', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
         { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "hidecell event", thClass: "hidecell" },
         { key: 'follow' , label: 'Follow' }
       ],
