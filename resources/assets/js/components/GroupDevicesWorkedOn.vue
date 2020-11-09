@@ -2,13 +2,13 @@
   <div>
     <h2 class="mt-2 mb-2">{{ translatedDevicesWorkedOn }}</h2>
     <div class="items-container text-lowercase">
-      <StatsValue :count="stats.fixed + stats.repairable + stats.dead" icon="drill" :icon-width="50" size="md" variant="brand" title="partials.total" class="group-stat-total" />
+      <StatsValue :count="stats.fixed + stats.repairable + stats.dead" icon="drill" :icon-width="50" size="md" variant="brand" title="partials.total" class="group-stat-total height" />
       <div />
-      <StatsValue :count="stats.fixed" icon="fixed" size="md" title="partials.fixed" class="group-stat-fixed" />
+      <StatsValue :count="stats.fixed" icon="fixed" size="md" title="partials.fixed" class="group-stat-fixed height" />
       <div />
-      <StatsValue :count="stats.repairable" icon="repairable" size="md" title="partials.repairable" class="group-stat-repairable" />
+      <StatsValue :count="stats.repairable" icon="repairable" size="md" title="partials.repairable" class="group-stat-repairable height" />
       <div />
-      <StatsValue :count="stats.dead" icon="dead" size="md" title="partials.end_of_life" class="group-stat-dead" />
+      <StatsValue :count="stats.dead" icon="dead" size="md" title="partials.end_of_life" class="group-stat-dead height" />
     </div>
   </div>
 </template>
@@ -104,5 +104,9 @@ export default {
     grid-column-start: 7;
     grid-column-end: 8;
   }
+}
+
+.height {
+  height: 152px;
 }
 </style>
