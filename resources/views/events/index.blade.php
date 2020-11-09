@@ -20,27 +20,6 @@
           </div>
       @endif
 
-      <div class="row mb-30">
-          <div class="col-12 col-md-12">
-              <div class="d-flex align-items-center">
-                  <h1 class="mb-0 mr-30">
-                      @lang('events.events')
-                  </h1>
-
-                  <div class="mr-auto d-none d-md-block">
-                      @include('svgs.fixometer.events-doodle')
-                  </div>
-
-                  @if( FixometerHelper::userCanCreateEvents(Auth::user()) )
-                      <a href="/party/create" class="btn btn-primary ml-auto">
-                          <span class="d-none d-lg-block">@lang('events.add_event')</span>
-                          <span class="d-block d-lg-none">@lang('events.create_new_event_mobile')</span>
-                      </a>
-                  @endif
-              </div>
-          </div>
-      </div>
-
     {{-- Events List --}}
     <div class="row justify-content-center">
       <div class="col-lg-12">
@@ -110,21 +89,34 @@
               $calendar_edit_url = url("/profile/edit/" . Auth::user()->id . "#list-calendar-links");
           }
       }
+
+      $expanded_events = [];
+
+      foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+          $thisone = $event->getAttributes();
+          $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
+          $thisone['allinvitedcount'] = $event->allInvited->count();
+
+          // TODO LATER Consider whether these stats should be in the event or passed into the store.
+          $thisone['stats'] = $event->getEventStats($emissionRatio);
+          $thisone['participants_count'] = $event->participants;
+          $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+
+          $thisone['isVolunteer'] = $event->isVolunteer();
+          $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
+          $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+
+          $expanded_events[] = $thisone;
+      }
       ?>
 
       <div class="vue">
-          <GroupEvents
-                  heading-level="h2"
-                  heading-sub-level="h3"
-                  :group-id="{{ $group ? $group->idgroups : 'null' }}"
-                  :group="{{ $group ? $group : 'null' }}"
-                  :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
-                  :events="{{ json_encode($expanded_events) }}"
-                  calendar-copy-url="{{ $calendar_copy_url }}"
-                  calendar-edit-url="{{ $calendar_edit_url }}"
-                  :add-button="false"
-                  :add-group-name="{{ $group ? 'false' : 'true' }}"
-          />
+        <GroupEventsPage
+          :idgroups="{{ $group ? $group->idgroups : 'null' }}"
+          :events="{{ json_encode($expanded_events) }}"
+          calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
+          :initial-group="{{ json_encode($group) }}"
+        />
       </div>
 
         @if( is_null($group) )
