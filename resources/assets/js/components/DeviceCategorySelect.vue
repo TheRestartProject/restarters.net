@@ -79,7 +79,6 @@ export default {
         cluster.categories.forEach((c) => {
           if ((this.powered && c.powered) || (!this.powered && !c.powered)) {
             categories.push({
-              // Need to translate.
               name: this.$lang.get('strings.' + c.name),
               value: c.idcategories
             })
@@ -88,7 +87,6 @@ export default {
 
         if (categories.length) {
           ret.push({
-            // Need to translate.
             cluster: this.$lang.get('strings.' + cluster.name),
             categories: categories
           })
