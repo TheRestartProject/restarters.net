@@ -36,8 +36,8 @@
         </div>
       </div>
       <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown">
-        <b-dropdown-item :href="'/group/make-host/' + groupId + '/' + volunteer.user" v-if="volunteer.role === restarter">{{ translatedMakeHost }}</b-dropdown-item>
-        <b-dropdown-item target="_blank" rel="noopener" :href="'/group/remove-volunteer/' + groupId + '/' + volunteer.user">{{ translatedRemoveVolunteer }}</b-dropdown-item>
+        <b-dropdown-item :href="'/group/make-host/' + idgroups + '/' + volunteer.user" v-if="volunteer.role === restarter">{{ translatedMakeHost }}</b-dropdown-item>
+        <b-dropdown-item target="_blank" rel="noopener" :href="'/group/remove-volunteer/' + idgroups + '/' + volunteer.user">{{ translatedRemoveVolunteer }}</b-dropdown-item>
       </b-dropdown>
       <button class="dropdown-toggle d-none" />
     </div>
@@ -55,7 +55,7 @@ import volunteers from '../store/volunteers'
 export default {
   components: {ConfirmModal},
   props: {
-    groupId: {
+    idgroups: {
       type: Number,
       required: true
     },

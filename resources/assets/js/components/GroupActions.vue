@@ -2,16 +2,16 @@
   <div>
     <div v-if="canedit">
       <b-dropdown variant="primary" :text="translatedGroupActions" v-if="canedit" class="deepnowrap">
-        <b-dropdown-item :href="'/group/edit/' + groupId">
+        <b-dropdown-item :href="'/group/edit/' + idgroups">
           {{ translatedEditGroup }}
         </b-dropdown-item>
-        <b-dropdown-item :href="'/party/create/' + groupId">
+        <b-dropdown-item :href="'/party/create/' + idgroups">
           {{ translatedAddEvent }}
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#invite-to-group">
           {{ translatedInviteVolunteers }}
         </b-dropdown-item>
-        <b-dropdown-item :href="'/group/nearby/' + groupId">
+        <b-dropdown-item :href="'/group/nearby/' + idgroups">
           {{ translatedVolunteersNearby }}
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats">
@@ -24,7 +24,7 @@
         <b-dropdown-item data-toggle="modal" data-target="#invite-to-group" v-if="ingroup">
           {{ translatedInviteVolunteers }}
         </b-dropdown-item>
-        <b-dropdown-item :href="'/group/join/' + groupId" v-else>
+        <b-dropdown-item :href="'/group/join/' + idgroups" v-else>
           {{ translatedJoinGroup }}
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats">

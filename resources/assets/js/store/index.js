@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import attendanceModule from './attendance';
 import devicesModule from './devices';
 import eventsModule from './events';
+import groupsModule from './groups';
 import volunteersModule from './volunteers';
 
 Vue.use(Vuex);
@@ -12,6 +13,7 @@ export default new Vuex.Store({
     attendance: attendanceModule,
     devices: devicesModule,
     events: eventsModule,
+    groups: groupsModule,
     volunteers: volunteersModule
   },
 });

@@ -1,5 +1,5 @@
 <template>
-  <CollapsibleSection collapsed :count="attendees.length">
+  <CollapsibleSection collapsed :count="attendees.length" class="width">
     <template slot="title">
       {{ translatedTitle }}
     </template>
@@ -285,5 +285,9 @@ h3 {
 
 .warningbox {
   border: 1px solid $brand-danger;
+}
+
+.width {
+  min-width: 100%;
 }
 </style>

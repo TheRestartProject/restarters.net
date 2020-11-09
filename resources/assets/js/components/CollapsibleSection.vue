@@ -7,7 +7,9 @@
       'justify-content-between': true
       }" @click="toggle">
       <div class="d-flex w-100">
-        <slot name="title" />
+        <div class="d-flex flex-column justify-content-center">
+          <slot name="title" />
+        </div>
         <div v-if="count" :class="{
           'd-inline' : true,
           'd-md-none' : !alwaysShowCount,
@@ -17,10 +19,10 @@
           'justify-content-center' : true
         }">
           <span v-if="countBadge">
-            <b-badge variant="primary" pill>{{ count }}</b-badge>
+            &nbsp;<b-badge variant="primary" pill>{{ count }}</b-badge>
           </span>
           <span v-else>
-            <span :class="countClass">({{ count }})</span>
+            &nbsp;<span :class="countClass">({{ count }})</span>
           </span>
         </div>
         <slot name="title-right" />
@@ -52,6 +54,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    headerLevel: {
+      type: String,
+      required: false,
+      default: 'h2'
     },
     hideTitle: {
       type: Boolean,
@@ -108,9 +115,5 @@ export default {
 
 .count {
   color: $brand-light;
-}
-
-.text-muted {
-  font-size: 28px;
 }
 </style>

@@ -79,7 +79,7 @@ export default {
         cluster.categories.forEach((c) => {
           if ((this.powered && c.powered) || (!this.powered && !c.powered)) {
             categories.push({
-              name: c.name,
+              name: this.$lang.get('strings.' + c.name),
               value: c.idcategories
             })
           }
@@ -87,7 +87,7 @@ export default {
 
         if (categories.length) {
           ret.push({
-            cluster: cluster.name,
+            cluster: this.$lang.get('strings.' + cluster.name),
             categories: categories
           })
         }

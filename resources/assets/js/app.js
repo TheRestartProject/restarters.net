@@ -1536,30 +1536,19 @@ jQuery(document).ready(function () {
   // Normally you'd initialise one instance on a single top-level div.  But we put content directly under body.
   // Initialising multiple instances is a bit more expensive, but not much.
   //
-  // We need to list all the top-level components we will use in pages here; they are stored in
-  // resources/assets/js/components.
+  // We need to list all the top-level components we will use in blades here; they are stored in
+  // resources/assets/js/components.  Lower level components can be included from within those as normal;
+  // they don't need listing here.
   $(".vue").each(function(index) {
     new Vue({
       el: $(this).get(0),
       store: store,
       components: {
         'eventpage': require('./components/EventPage.vue'),
+        'grouppage': require('./components/GroupPage.vue'),
 
-        // TODO LATER This child components shouldn't need registering here, but Neil is working on a fix which
-        // changes them, so holding off removing them for now.
-        'eventstats': require('./components/EventStats.vue'),
-        'eventattendance': require('./components/EventAttendance.vue'),
-        'eventdetails': require('./components/EventDetails.vue'),
-        'eventdescription': require('./components/EventDescription.vue'),
-        'eventimages': require('./components/EventImages.vue'),
-        'eventdevices': require('./components/EventDevices.vue'),
-        'groupheading':  require('./components/GroupHeading.vue'),
-        'groupdescription':  require('./components/GroupDescription.vue'),
-        'groupvolunteers':  require('./components/GroupVolunteers.vue'),
-        'groupstats': require('./components/GroupStats.vue'),
         'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),
         'eventdatepicker': require('./components/EventDatePicker.vue'),
-        'groupevents': require('./components/GroupEvents.vue')
       }
     })
   })
