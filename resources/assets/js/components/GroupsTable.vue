@@ -1,48 +1,37 @@
 <template>
   <div>
     <p v-if="count" v-html="translatedGroupCount" />
-    <div v-if="search" class="pl-4 pr-4 pt-2 pb-2 layout">
-      <b-form-input
-          v-model="searchName"
-          type="search"
-          :placeholder="translatedSearchNamePlaceholder"
-      />
-      <div />
-      <b-form-input
-          v-model="searchLocation"
-          type="search"
-          :placeholder="translatedSearchLocationPlaceholder"
-      />
-      <div />
-      <multiselect
-          v-model="searchCountry"
-          :placeholder="translatedCountries"
-          :options="countryOptions"
-          track-by="country"
-          label="country"
-          :multiple="false"
-          :allow-empty="false"
-          deselect-label=""
-          :taggable="false"
-          selectLabel=""
-          class="mt-0 mb-0"
-      />
-      <div />
-      <multiselect
-          v-model="searchNetwork"
-          :placeholder="translatedNetworks"
-          :options="networkOptions"
-          track-by="id"
-          label="name"
-          :multiple="false"
-          :allow-empty="false"
-          deselect-label=""
-          :taggable="false"
-          selectLabel=""
-          class="mt-0 mb-0"
+    <div class="pl-4 pr-4 pt-2 pb-2 d-none d-md-block">
+      <GroupsTableFilters
+          v-if="search"
+          :name.sync="searchName"
+          :location.sync="searchLocation"
+          :network.sync="searchNetwork"
+          :country.sync="searchCountry"
+          :networks="networks"
+          :groups="groups"
       />
     </div>
-    <b-table :fields="fields" :items="items" sort-null-last>
+    <div class="d-block d-md-none">
+      <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="!searchShow" @click="toggleFilters">
+        {{ translatedShowFilters }}&nbsp;<b-img class="plusminusicon" src="/images/add-icon.svg" />
+      </div>
+      <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="searchShow" @click="toggleFilters">
+        <b-img class="plusminusicon" src="/images/minus-icon.svg" />&nbsp;{{ translatedHideFilters }}
+      </div>
+      <GroupsTableFilters
+          v-if="searchShow"
+          class="pl-1 pr-1 pt-2 pb-2"
+          :name.sync="searchName"
+          :location.sync="searchLocation"
+          :network.sync="searchNetwork"
+          :country.sync="searchCountry"
+          :networks="networks"
+          :groups="groups"
+      />
+    </div>
+    <hr class="d-block d-md-none" />
+    <b-table :fields="fields" :items="items" sort-null-last thead-tr-class="d-none d-md-table-row">
       <template slot="head(group_image)">
         <span />
       </template>
@@ -57,12 +46,14 @@
         <a :href="'/group/view/' + data.item.group_name.idgroups">{{ data.item.group_name.name }}</a>
       </template>
       <template slot="head(location)">
-        <b-img src="/icons/map_marker_ico.svg" class="mt-3 icon" />
+        <b-img src="/icons/map_marker_ico.svg" class="mt-3 icon " />
       </template>
       <template slot="cell(location)" slot-scope="data">
-        {{ data.item.location.location }}
-        <br />
-        <span class="small text-muted">{{ data.item.location.country }}</span>
+        <div class="d-none d-md-block">
+          {{ data.item.location.location }}
+          <br />
+          <span class="small text-muted">{{ data.item.location.country }}</span>
+        </div>
       </template>
       <template slot="head(all_hosts_count)">
         <b-img src="/icons/user_ico.svg" class="mt-3 iconsmall" />
@@ -88,7 +79,12 @@
       </template>
       <template slot="cell(follow)" slot-scope="data">
         <b-btn variant="primary" class="text-nowrap mr-2" v-if="data.item.follow" :to="'/group/join/' + data.item.idgroups">
-          {{ translatedFollow }}
+          <span class="d-block d-md-none">
+            {{ translatedFollowMobile }}
+          </span>
+          <span class="d-none d-md-block">
+            {{ translatedFollow }}
+          </span>
         </b-btn>
       </template>
     </b-table>
@@ -97,10 +93,10 @@
 <script>
 import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
 import moment from 'moment'
-
-// TODO Input box height compared to select
+import GroupsTableFilters from './GroupsTableFilters'
 
 export default {
+  components: {GroupsTableFilters},
   props: {
     groups: {
       type: Array,
@@ -132,16 +128,17 @@ export default {
       fields: [
         { key: 'group_image', label: 'Group Image', tdClass: 'image'},
         { key: 'group_name', label: 'Group Name', sortable: true },
-        { key: 'location', label: 'Location' },
-        { key: 'all_hosts_count', label: 'Hosts', sortable: true },
-        { key: 'all_restarters_count', label: 'Restarters', sortable: true },
-        { key: 'next_event', label: 'Next Event', sortable: true, tdClass: 'event' },
+        { key: 'location', label: 'Location', tdClass: "d-none d-md-cell", thClass: "d-none d-md-table-cell" },
+        { key: 'all_hosts_count', label: 'Hosts', sortable: true, tdClass: "d-none d-md-cell", thClass: "d-none d-md-cell" },
+        { key: 'all_restarters_count', label: 'Restarters', sortable: true, tdClass: "d-none d-md-cell", thClass: "d-none d-md-cell" },
+        { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "d-none d-md-cell event", thClass: "d-none d-md-cell" },
         { key: 'follow' , label: 'Follow' }
       ],
       searchName: null,
       searchLocation: null,
       searchNetwork: null,
-      searchCountry: null
+      searchCountry: null,
+      searchShow: false
     }
   },
   computed: {
@@ -175,34 +172,6 @@ export default {
         return match
       })
     },
-    networkOptions() {
-      return this.networks ? this.networks.map(n => {
-        return {
-          id: n.id,
-          name: n.name
-        }
-      }) : []
-    },
-    countryOptions() {
-      // Return unique countries
-      let ret = []
-
-      if (this.groups) {
-        this.groups.forEach(g => {
-          if (g.country && !ret.find(g2 => {
-            return g2.country && g2.country.localeCompare(g.country) === 0
-          })) {
-            ret.push({
-              country: g.country
-            })
-          }
-        })
-      }
-
-      return ret.sort((a, b) => {
-        return a.country.localeCompare(b.country)
-      })
-    },
     items() {
       return this.filteredGroups.map(g => {
         return {
@@ -228,27 +197,34 @@ export default {
     translatedFollow() {
       return this.$lang.get('groups.join_group_button')
     },
-    translatedNetworks() {
-      return this.$lang.get('networks.network')
+    translatedFollowMobile() {
+      return this.$lang.get('groups.join_group_button_mobile')
     },
-    translatedCountries() {
-      return this.$lang.get('groups.search_country_placeholder')
+    translatedShowFilters() {
+      return this.$lang.get('groups.show_filters')
     },
-    translatedSearchNamePlaceholder() {
-      return this.$lang.get('groups.search_name_placeholder')
-    },
-    translatedSearchLocationPlaceholder() {
-      return this.$lang.get('groups.search_location_placeholder')
+    translatedHideFilters() {
+      return this.$lang.get('groups.hide_filters')
     }
   },
   created() {
-    // Multiselect's v-model uses the options object, so find the relevant one.
-    this.searchNetwork = this.networkOptions.find(n => n.id === this.network)
+    // We might arrive on the page to filter by network.
+    this.searchNetwork = this.network
   },
   methods: {
     brokenProfileImage(event) {
       event.target.src = DEFAULT_PROFILE
     },
+    toggleFilters() {
+      this.searchShow = !this.searchShow
+
+      // Reset the search filters so that we don't end up filtered if we switch screen sizes.  It might be nice
+      // to preserve the filter values, but that would be a bit of a faff with some two-way props bindings.
+      this.searchName = null
+      this.searchLocation = null
+      this.searchNetwork = this.network
+      this.searchCountry = null
+    }
   }
 }
 </script>
@@ -268,7 +244,12 @@ export default {
 }
 
 .iconsmall {
-  width: 27px;
+  height: 25px;
+  margin-bottom: 5px;
+}
+
+.plusminusicon {
+  width: 20px;
 }
 
 /deep/ .image {
@@ -279,18 +260,26 @@ export default {
   width: 8rem;
 }
 
-.layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto auto auto auto auto;
-
-  @include media-breakpoint-up(md) {
-    grid-template-columns: 1fr 20px 1fr 20px 1fr 20px 1fr;
-    grid-template-rows: 1fr;
-  }
-}
-
 /deep/ .table.b-table > thead > tr {
   background-position-x: center !important;
+}
+
+// The multiselect is used in a few places, and we have some inconsistencies in styling.  Here we force it to match
+// the behaviour of the inputs.
+/deep/ .multiselect {
+  &.multiselect--active {
+    border: 0 !important;
+
+    input {
+      margin-left: 6px;
+      margin-top: 2px;
+      margin-bottom: 4px;
+    }
+  }
+
+  .multiselect__tags {
+    padding: 2px 40px 3px 12px !important;
+    border: 2px solid #222 !important;
+  }
 }
 </style>

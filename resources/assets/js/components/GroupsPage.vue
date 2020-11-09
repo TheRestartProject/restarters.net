@@ -8,7 +8,12 @@
       </div>
       <div>
         <b-btn variant="primary" href="/group/create" v-if="canCreate">
-          {{ translatedAddNewGroup}}
+          <span class="d-block d-md-none">
+            {{ translatedAddNewGroupMobile }}
+          </span>
+          <span class="d-none d-md-block">
+            {{ translatedAddNewGroup }}
+          </span>
         </b-btn>
       </div>
     </h1>
@@ -26,7 +31,8 @@
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b class="text-uppercase">{{ translatedNearestGroups }}</b>
+          <b class="text-uppercase d-block d-md-none">{{ translatedNearestGroupsMobile }}</b>
+          <b class="text-uppercase d-none d-md-block">{{ translatedNearestGroups }}</b>
         </template>
         <div v-if="!yourArea" class="text-center">
           {{ translatedYourArea1 }} <a :href="'/profile/edit/' + userId">{{ translatedYourArea2 }}</a>.
@@ -37,7 +43,8 @@
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b class="text-uppercase">{{ translatedAllGroups }}</b>
+          <b class="text-uppercase d-block d-md-none">{{ translatedAllGroupsMobile }}</b>
+          <b class="text-uppercase d-none d-md-block">{{ translatedAllGroups }}</b>
         </template>
         <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" :network="network" />
       </b-tab>
@@ -126,6 +133,9 @@ export default {
     translatedAddNewGroup() {
       return this.$lang.get('groups.create_groups')
     },
+    translatedAddNewGroupMobile() {
+      return this.$lang.get('groups.create_groups_mobile2')
+    },
     translatedYourGroups() {
       return this.$lang.get('groups.groups_title1')
     },
@@ -138,8 +148,14 @@ export default {
     translatedNearestGroups() {
       return this.$lang.get('groups.groups_title2')
     },
+    translatedNearestGroupsMobile() {
+      return this.$lang.get('groups.groups_title2_mobile')
+    },
     translatedAllGroups() {
       return this.$lang.get('groups.all_groups')
+    },
+    translatedAllGroupsMobile() {
+      return this.$lang.get('groups.all_groups_mobile')
     }
   },
   created() {
