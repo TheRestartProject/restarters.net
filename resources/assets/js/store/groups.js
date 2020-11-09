@@ -47,6 +47,28 @@ export default {
     },
     setStats({commit}, params) {
       commit('setStats', params);
+    },
+    async unfollow({commit, getters}, params) {
+      // We can't use the DELETE verb against Laravel - we have to use _method to indicate that.
+      const ret = await axios.post('/api/usersgroups/' + params.idgroups, {
+        _method: 'delete'
+      }, {
+        headers: {
+          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+        }
+      })
+
+      console.log("Returned", ret)
+
+      if (ret.success) {
+        // TODO LATER We partially upgrade the group here.  It would be better to have a proper API call to get the
+        // group, and update the whole thing.
+        const group = getters.get(params.idgroups)
+        group.all_restarters_count = ret.all_restarters_count
+        group.all_hosts_count = ret.all_hosts_count
+        console.log("Set new group", group)
+        commit('set', group)
+      }
     }
   },
 }

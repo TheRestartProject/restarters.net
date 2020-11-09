@@ -73,6 +73,8 @@ return array (
   'skills_column_table' => 'Skills',
   'join_group_button' => 'Follow group',
   'join_group_button_mobile' => 'Follow',
+  'leave_group_button' => 'Unfollow group',
+  'leave_group_button_mobile' => 'Unfollow',
   'share_stats_header' => 'Share your stats',
   'share_stats_message' => ':group have made a real impact fixing electronics and preventing waste. Help share this on your website and get other people involved:',
   'embed_code_header' => 'Embed code',

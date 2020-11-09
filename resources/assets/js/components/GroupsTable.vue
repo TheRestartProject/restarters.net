@@ -86,6 +86,14 @@
             {{ translatedFollow }}
           </span>
         </b-btn>
+        <b-btn variant="primary" class="text-nowrap mr-2" v-else @click="unfollow(data.item.idgroups)">
+          <span class="d-block d-md-none">
+            {{ translatedUnFollowMobile }}
+          </span>
+          <span class="d-none d-md-block">
+            {{ translatedUnFollow }}
+          </span>
+        </b-btn>
       </template>
     </b-table>
   </div>
@@ -200,6 +208,12 @@ export default {
     translatedFollowMobile() {
       return this.$lang.get('groups.join_group_button_mobile')
     },
+    translatedUnFollow() {
+      return this.$lang.get('groups.leave_group_button')
+    },
+    translatedUnFollowMobile() {
+      return this.$lang.get('groups.leave_group_button_mobile')
+    },
     translatedShowFilters() {
       return this.$lang.get('groups.show_filters')
     },
@@ -224,6 +238,12 @@ export default {
       this.searchLocation = null
       this.searchNetwork = this.network
       this.searchCountry = null
+    },
+    unfollow(idgroups) {
+      console.log("Unfollow")
+      this.$store.dispatch('groups/unfollow', {
+        idgroups: idgroups
+      })
     }
   }
 }
