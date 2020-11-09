@@ -1,0 +1,293 @@
+<template>
+  <div>
+    <p v-if="count" v-html="translatedGroupCount" />
+    <div class="pl-4 pr-4 pt-2 pb-2 d-none d-md-block">
+      <GroupsTableFilters
+          v-if="search"
+          :name.sync="searchName"
+          :location.sync="searchLocation"
+          :network.sync="searchNetwork"
+          :country.sync="searchCountry"
+          :networks="networks"
+          :groups="groups"
+      />
+    </div>
+    <div class="d-block d-md-none" v-if="search">
+      <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="!searchShow" @click="toggleFilters">
+        <a href="#">{{ translatedShowFilters }}</a>&nbsp;<b-img class="plusminusicon" src="/images/add-icon.svg" />
+      </div>
+      <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="searchShow" @click="toggleFilters">
+        <b-img class="plusminusicon" src="/images/minus-icon.svg" /><a href="#">&nbsp;{{ translatedHideFilters }}</a>
+      </div>
+      <GroupsTableFilters
+          v-if="searchShow"
+          class="pl-1 pr-1 pt-2 pb-2"
+          :name.sync="searchName"
+          :location.sync="searchLocation"
+          :network.sync="searchNetwork"
+          :country.sync="searchCountry"
+          :networks="networks"
+          :groups="groups"
+      />
+    </div>
+    <hr class="d-block d-md-none" />
+    <b-table :fields="fields" :items="items" sort-null-last thead-tr-class="d-none d-md-table-row">
+      <template slot="head(group_image)">
+        <span />
+      </template>
+      <template slot="cell(group_image)" slot-scope="data">
+        <b-img-lazy :src="data.item.image" class="profile" @error.native="brokenProfileImage" v-if="data.item.image" />
+        <b-img-lazy :src="defaultProfile" class="profile" v-else />
+      </template>
+      <template slot="head(group_name)">
+        <b-img src="/icons/group_name_ico.svg" class="mt-3 icon" />
+      </template>
+      <template slot="cell(group_name)" slot-scope="data">
+        <a :href="'/group/view/' + data.item.group_name.idgroups">{{ data.item.group_name.name }}</a>
+      </template>
+      <template slot="head(location)">
+        <b-img src="/icons/map_marker_ico.svg" class="mt-3 icon " />
+      </template>
+      <template slot="cell(location)" slot-scope="data">
+        <div class="d-none d-md-block">
+          {{ data.item.location.location }}
+          <br />
+          <span class="small text-muted">{{ data.item.location.country }}</span>
+        </div>
+      </template>
+      <template slot="head(all_hosts_count)">
+        <b-img src="/icons/user_ico.svg" class="mt-3 iconsmall" />
+      </template>
+      <template slot="head(all_restarters_count)">
+        <b-img src="/icons/volunteer_ico-thick.svg" class="mt-3 icon" />
+      </template>
+      <template slot="head(next_event)">
+        <b-img src="/icons/events_ico.svg" class="mt-3 icon" />
+      </template>
+      <template slot="cell(next_event)" slot-scope="data">
+        <div>
+          <div v-if="data.item.next_event">
+            {{ data.item.next_event }}
+          </div>
+          <div v-else>
+            {{ translatedNonePlanned}}
+          </div>
+        </div>
+      </template>
+      <template slot="head(follow)">
+        <span />
+      </template>
+      <template slot="cell(follow)" slot-scope="data">
+        <b-btn variant="primary" class="text-nowrap mr-2" v-if="data.item.follow" :to="'/group/join/' + data.item.idgroups">
+          <span class="d-block d-md-none">
+            {{ translatedFollowMobile }}
+          </span>
+          <span class="d-none d-md-block">
+            {{ translatedFollow }}
+          </span>
+        </b-btn>
+      </template>
+    </b-table>
+  </div>
+</template>
+<script>
+import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
+import moment from 'moment'
+import GroupsTableFilters from './GroupsTableFilters'
+
+export default {
+  components: {GroupsTableFilters},
+  props: {
+    groups: {
+      type: Array,
+      required: true
+    },
+    count: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    search: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    network: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    networks: {
+      type: Array,
+      required: false,
+      default: null
+    }
+  },
+  data () {
+    return {
+      fields: [
+        { key: 'group_image', label: 'Group Image', tdClass: 'image'},
+        { key: 'group_name', label: 'Group Name', sortable: true },
+        { key: 'location', label: 'Location', tdClass: "hidecell", thClass: "hidecell" },
+        { key: 'all_hosts_count', label: 'Hosts', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
+        { key: 'all_restarters_count', label: 'Restarters', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
+        { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "hidecell event", thClass: "hidecell" },
+        { key: 'follow' , label: 'Follow' }
+      ],
+      searchName: null,
+      searchLocation: null,
+      searchNetwork: null,
+      searchCountry: null,
+      searchShow: false
+    }
+  },
+  computed: {
+    defaultProfile() {
+      return DEFAULT_PROFILE
+    },
+    filteredGroups() {
+      return this.groups.filter(g => {
+        // Groups can be in multiple networks.
+        let match = true
+
+        if (this.network) {
+          match &= g.networks.find(n => {
+            return parseInt(this.searchNetwork.id) === parseInt(n)
+          })
+        }
+
+        if (this.searchName) {
+          match &= g.name.toLowerCase().indexOf(this.searchName.toLowerCase()) !== -1
+        }
+
+        if (this.searchLocation) {
+          match &= g.location.toLowerCase().indexOf(this.searchLocation.toLowerCase()) !== -1
+        }
+
+        if (this.searchCountry) {
+          console.log("Search country", g, this.searchCountry)
+          match &= g.country && g.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
+        }
+
+        return match
+      })
+    },
+    items() {
+      return this.filteredGroups.map(g => {
+        return {
+          idgroups: g.idgroups,
+          group_image: g.group_image ? g.group_image : DEFAULT_PROFILE,
+          group_name: g,
+          location: g,
+          next_event: g.next_event ? (new moment(g.next_event).format(DATE_FORMAT)) : null,
+          all_hosts_count: g.all_hosts_count,
+          all_restarters_count: g.all_restarters_count,
+          follow: !g.ingroup
+        }
+      })
+    },
+    translatedNonePlanned() {
+      return this.$lang.get('groups.upcoming_none_planned')
+    },
+    translatedGroupCount() {
+      return this.$lang.choice('groups.group_count', this.filteredGroups.length, {
+        count: this.filteredGroups.length
+      })
+    },
+    translatedFollow() {
+      return this.$lang.get('groups.join_group_button')
+    },
+    translatedFollowMobile() {
+      return this.$lang.get('groups.join_group_button_mobile')
+    },
+    translatedShowFilters() {
+      return this.$lang.get('groups.show_filters')
+    },
+    translatedHideFilters() {
+      return this.$lang.get('groups.hide_filters')
+    }
+  },
+  created() {
+    // We might arrive on the page to filter by network.
+    this.searchNetwork = this.network
+  },
+  methods: {
+    brokenProfileImage(event) {
+      event.target.src = DEFAULT_PROFILE
+    },
+    toggleFilters() {
+      this.searchShow = !this.searchShow
+
+      // Reset the search filters so that we don't end up filtered if we switch screen sizes.  It might be nice
+      // to preserve the filter values, but that would be a bit of a faff with some two-way props bindings.
+      this.searchName = null
+      this.searchLocation = null
+      this.searchNetwork = this.network
+      this.searchCountry = null
+    }
+  }
+}
+</script>
+<style scoped lang="scss">
+@import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
+
+.profile {
+  border: 1px solid black;
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+}
+
+.iconsmall {
+  height: 25px;
+  margin-bottom: 5px;
+}
+
+.plusminusicon {
+  width: 20px;
+}
+
+/deep/ .image {
+  width: 90px;
+}
+
+/deep/ .event {
+  width: 8rem;
+}
+
+/deep/ .table.b-table > thead > tr {
+  background-position-x: center !important;
+}
+
+// The multiselect is used in a few places, and we have some inconsistencies in styling.  Here we force it to match
+// the behaviour of the inputs.
+/deep/ .multiselect {
+  &.multiselect--active {
+    border: 0 !important;
+
+    input {
+      margin-left: 6px;
+      margin-top: 2px;
+      margin-bottom: 4px;
+    }
+  }
+
+  .multiselect__tags {
+    padding: 2px 40px 3px 12px !important;
+    border: 2px solid #222 !important;
+  }
+}
+
+/deep/ .hidecell {
+  display: none;
+
+  @include media-breakpoint-up(md) {
+    display: table-cell;
+  }
+}
+</style>
