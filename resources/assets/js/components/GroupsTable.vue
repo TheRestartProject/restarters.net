@@ -12,12 +12,12 @@
           :groups="groups"
       />
     </div>
-    <div class="d-block d-md-none">
+    <div class="d-block d-md-none" v-if="search">
       <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="!searchShow" @click="toggleFilters">
-        {{ translatedShowFilters }}&nbsp;<b-img class="plusminusicon" src="/images/add-icon.svg" />
+        <a href="#">{{ translatedShowFilters }}</a>&nbsp;<b-img class="plusminusicon" src="/images/add-icon.svg" />
       </div>
       <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="searchShow" @click="toggleFilters">
-        <b-img class="plusminusicon" src="/images/minus-icon.svg" />&nbsp;{{ translatedHideFilters }}
+        <b-img class="plusminusicon" src="/images/minus-icon.svg" /><a href="#">&nbsp;{{ translatedHideFilters }}</a>
       </div>
       <GroupsTableFilters
           v-if="searchShow"
@@ -128,10 +128,10 @@ export default {
       fields: [
         { key: 'group_image', label: 'Group Image', tdClass: 'image'},
         { key: 'group_name', label: 'Group Name', sortable: true },
-        { key: 'location', label: 'Location', tdClass: "d-none d-md-cell", thClass: "d-none d-md-table-cell" },
-        { key: 'all_hosts_count', label: 'Hosts', sortable: true, tdClass: "d-none d-md-cell", thClass: "d-none d-md-cell" },
-        { key: 'all_restarters_count', label: 'Restarters', sortable: true, tdClass: "d-none d-md-cell", thClass: "d-none d-md-cell" },
-        { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "d-none d-md-cell event", thClass: "d-none d-md-cell" },
+        { key: 'location', label: 'Location', tdClass: "hidecell", thClass: "hidecell" },
+        { key: 'all_hosts_count', label: 'Hosts', sortable: true, tdClass: "hidecell", thClass: "hidecell" },
+        { key: 'all_restarters_count', label: 'Restarters', sortable: true, tdClass: "hidecell", thClass: "hidecell" },
+        { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "hidecell event", thClass: "hidecell" },
         { key: 'follow' , label: 'Follow' }
       ],
       searchName: null,
@@ -280,6 +280,14 @@ export default {
   .multiselect__tags {
     padding: 2px 40px 3px 12px !important;
     border: 2px solid #222 !important;
+  }
+}
+
+/deep/ .hidecell {
+  display: none;
+
+  @include media-breakpoint-up(md) {
+    display: table-cell;
   }
 }
 </style>

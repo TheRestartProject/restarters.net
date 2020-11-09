@@ -20,7 +20,8 @@
     <b-tabs class="ourtabs w-100 mt-4" justified v-model="currentTab">
       <b-tab class="pt-2">
         <template slot="title">
-          <b class="text-uppercase">{{ translatedYourGroups }}</b>
+          <b class="text-uppercase d-block d-md-none">{{ translatedYourGroupsMobile }}</b>
+          <b class="text-uppercase d-none d-md-block">{{ translatedYourGroups }}</b>
         </template>
         <div class="pt-2 pb-2">
           <GroupsPageInfo />
@@ -138,6 +139,9 @@ export default {
     },
     translatedYourGroups() {
       return this.$lang.get('groups.groups_title1')
+    },
+    translatedYourGroupsMobile() {
+      return this.$lang.get('groups.groups_title1_mobile')
     },
     translatedYourArea1() {
       return this.$lang.get('groups.your_area1')
