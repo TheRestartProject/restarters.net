@@ -110,6 +110,22 @@
       }
       ?>
 
+      @if( is_null($group) )
+      <div class="vue">
+        <GroupEvents
+            heading-level="h2"
+            heading-sub-level="h3"
+            :group-id="{{ $group ? $group->idgroups : 'null' }}"
+            :group="{{ $group ? $group : 'null' }}"
+            :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+            :events="{{ json_encode($expanded_events) }}"
+            calendar-copy-url="{{ $calendar_copy_url }}"
+            calendar-edit-url="{{ $calendar_edit_url }}"
+            :add-button="false"
+            :add-group-name="{{ $group ? 'false' : 'true' }}"
+        />
+      </div>
+      @else
       <div class="vue">
         <GroupEventsPage
           :idgroups="{{ $group ? $group->idgroups : 'null' }}"
@@ -118,6 +134,7 @@
           :initial-group="{{ json_encode($group) }}"
         />
       </div>
+      @endif
 
         @if( is_null($group) )
         <section class="table-section upcoming_events_in_area mt-4" id="events-3">
