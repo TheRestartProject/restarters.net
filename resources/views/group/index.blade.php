@@ -72,6 +72,7 @@
           tab="{{ $tab }}"
           :network="{{ $network ? $network : 'null' }}"
           :networks="{{ json_encode($networks) }}"
+          start-a-group="{{ __('groups.consider_starting_a_group', ['resources_url' => env('DISCOURSE_URL').'/session/sso?return_path='.env('DISCOURSE_URL').'/t/how-to-power-up-community-repair-with-restarters-net/1228/']) }}"
         />
       </div>
 

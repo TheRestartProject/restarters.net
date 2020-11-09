@@ -41,6 +41,12 @@
         <div v-if="nearbyGroups">
           <GroupsTable :groups="nearbyGroups" class="mt-3" />
         </div>
+        <div v-else>
+          <p>
+            {{ translatedNoGroupsNearYou }}
+          </p>
+          <p v-html="startAGroup" />
+        </div>
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
@@ -103,6 +109,10 @@ export default {
     networks: {
       type: Array,
       required: true
+    },
+    startAGroup: {
+      type: String,
+      required: true
     }
   },
   data () {
@@ -142,6 +152,11 @@ export default {
     },
     translatedYourGroupsMobile() {
       return this.$lang.get('groups.groups_title1_mobile')
+    },
+    translatedNoGroupsNearYou() {
+      return this.$lang.get('groups.no_groups_near_you', {
+        area: this.yourArea ? (this.yourArea.charAt(0).toUpperCase() + this.yourArea.slice(1)) : ''
+      })
     },
     translatedYourArea1() {
       return this.$lang.get('groups.your_area1')
