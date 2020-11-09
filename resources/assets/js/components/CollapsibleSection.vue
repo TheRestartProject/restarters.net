@@ -53,6 +53,11 @@ export default {
       required: false,
       default: false
     },
+    headerLevel: {
+      type: String,
+      required: false,
+      default: 'h2'
+    },
     hideTitle: {
       type: Boolean,
       required: false,

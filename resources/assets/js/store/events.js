@@ -8,12 +8,15 @@ export default {
     // List of events indexed by event id.  Use object rather than array so that it's sparse.
     list: {},
 
-    // List of stats indexed
+    // List of stats indexed by event id.
     stats: {}
   },
   getters: {
     get: state => idevents => {
       return state.list[idevents]
+    },
+    getByGroup: state => idgroups => {
+      return Object.values(state.list).filter(e => e.group === idgroups)
     },
     getStats: state => idevents => {
       return state.stats[idevents]

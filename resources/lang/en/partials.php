@@ -113,5 +113,6 @@ return array (
   'something_wrong' => 'Something has gone wrong',
   'are_you_sure' => 'Are you sure?',
   'please_confirm' => 'Please confirm that you wish to proceed.',
-  'copied_to_clipboard' => 'Copied to clipboard.'
+  'copied_to_clipboard' => 'Copied to clipboard.',
+  'total' => 'total'
 );

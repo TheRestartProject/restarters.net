@@ -19,9 +19,9 @@
     "Host": "Host",
     "NetworkCoordinator": "Network Coordinator",
     "Administrator": "Admin",
-    "Spare parts not available": "Spare parts not available",
-    "Spare parts too expensive": "Spare parts too expensive",
-    "No way to open the product": "No way to open the product",
-    "Repair information not available": "Repair information not available",
-    "Lack of equipment": "Lack of equipment"
+    "Spare parts not available":"Spare parts not available",
+    "Spare parts too expensive":"Spare parts too expensive",
+    "No way to open the product":"No way to open the product",
+    "Repair information not available":"Repair information not available",
+    "Lack of equipment":"Lack of equipment"
 }

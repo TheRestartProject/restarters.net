@@ -36,7 +36,7 @@
               </b-tbody>
             </b-table-simple>
             <div class="text-center" v-if="limit">
-              <b-btn variant="link" :href="'/party/group/' + groupId">
+              <b-btn variant="link" :href="'/party/group/' + idgroups">
                 {{ translatedSeeAll }}
               </b-btn>
             </div>
@@ -50,7 +50,7 @@
               </div>
             </template>
             <p v-if="!past.length">
-              {{ translatedNoPast }}.
+              {{ translatedNoPastEvents }}.
             </p>
             <b-table-simple v-else responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
               <GroupEventsTableHeading past />
@@ -59,7 +59,7 @@
               </b-tbody>
             </b-table-simple>
             <div class="text-center" v-if="limit">
-              <b-btn variant="link" :href="'/party/group/' + groupId">
+              <b-btn variant="link" :href="'/party/group/' + idgroups">
                 {{ translatedSeeAll }}
               </b-btn>
             </div>
@@ -99,7 +99,7 @@
             </b-tbody>
           </b-table-simple>
           <div class="text-right" v-if="limit">
-            <b-btn variant="link" :href="'/party/group/' + groupId">
+            <b-btn variant="link" :href="'/party/group/' + idgroups">
               {{ translatedSeeAll }}
             </b-btn>
           </div>
@@ -125,7 +125,7 @@
             </b-tbody>
           </b-table-simple>
           <div class="text-right" v-if="limit">
-            <b-btn variant="link" :href="'/party/group/' + groupId">
+            <b-btn variant="link" :href="'/party/group/' + idgroups">
               {{ translatedSeeAll }}
             </b-btn>
           </div>
@@ -154,19 +154,10 @@ export default {
   components: {CalendarAddModal, GroupEventSummary, CollapsibleSection, GroupEventsTableHeading},
   mixins: [ group ],
   props: {
-    groupId: {
+    idgroups: {
       type: Number,
       required: false,
       default: null
-    },
-    group: {
-      type: Object,
-      required: false,
-      default: null
-    },
-    events: {
-      type: Array,
-      required: true
     },
     calendarCopyUrl: {
       type: String,
@@ -201,12 +192,18 @@ export default {
     }
   },
   computed: {
+    events() {
+      return this.$store.getters['events/getByGroup'](this.idgroups)
+    },
     translatedTitle() {
-      // If we have a group then we are putting the name and just want "events" (force the plural).  Otherwise
+      // If we have a group then we are putting the name elsewhere and just want "events" (force the plural).  Otherwise
       // "Your events".
-      return this.group ? this.$lang.choice('groups.events', {
+      let ret = this.group ? this.$lang.choice('groups.events', {
         value: 2
       }) : this.$lang.get('events.your_events')
+
+      ret = ret.charAt(0).toUpperCase() + ret.slice(1)
+      return ret
     },
     translatedUpcoming() {
       return this.$lang.get('groups.upcoming_active')
@@ -262,13 +259,6 @@ export default {
     showCalendar() {
       this.$refs.calendar.show()
     }
-  },
-  created() {
-    // The events are passed from the server to the client via a prop on this component.  When we are created
-    // we put it in the store.  From then on we get the data from the store so that we get reactivity.
-    this.$store.dispatch('events/setList', {
-      events: this.events
-    })
   }
 }
 </script>
