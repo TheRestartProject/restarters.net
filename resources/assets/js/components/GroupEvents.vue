@@ -189,6 +189,11 @@ export default {
     addGroupName: {
       type: Boolean,
       required: false
+    },
+    initialEvents: {
+      type: Array,
+      required: false,
+      default: null
     }
   },
   computed: {
@@ -258,6 +263,14 @@ export default {
   methods: {
     showCalendar() {
       this.$refs.calendar.show()
+    }
+  },
+  mounted () {
+    // Data can be passed from the blade template to us via props.
+    if (this.initialEvents) {
+      this.$store.dispatch('events/setList', {
+        events: this.initialEvents
+      })
     }
   }
 }

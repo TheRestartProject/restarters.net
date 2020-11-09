@@ -115,14 +115,10 @@
         <GroupEvents
             heading-level="h2"
             heading-sub-level="h3"
-            :group-id="{{ $group ? $group->idgroups : 'null' }}"
-            :group="{{ $group ? $group : 'null' }}"
-            :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
-            :events="{{ json_encode($expanded_events) }}"
+            :initial-events="{{ json_encode($expanded_events) }}"
             calendar-copy-url="{{ $calendar_copy_url }}"
             calendar-edit-url="{{ $calendar_edit_url }}"
             :add-button="false"
-            :add-group-name="{{ $group ? 'false' : 'true' }}"
         />
       </div>
       @else
@@ -131,6 +127,7 @@
           :idgroups="{{ $group ? $group->idgroups : 'null' }}"
           :events="{{ json_encode($expanded_events) }}"
           calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
+          calendar-edit-url="{{ $calendar_edit_url }}"
           :initial-group="{{ json_encode($group) }}"
         />
       </div>
