@@ -1546,6 +1546,7 @@ jQuery(document).ready(function () {
       components: {
         'eventpage': require('./components/EventPage.vue'),
         'grouppage': require('./components/GroupPage.vue'),
+        'microtaskingpage': require('./components/MicrotaskingPage.vue'),
 
         'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),
         'eventdatepicker': require('./components/EventDatePicker.vue'),
