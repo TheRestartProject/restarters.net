@@ -57,8 +57,8 @@ class GroupController extends Controller
         $all_group_tags = GroupTags::all();
         $networks = Network::all();
 
-        // Look for groups where user ID exists in pivot table and where the user has not been deleted from the
-        // group.
+        // Look for groups where user ID exists in pivot table.  We have to explicitly test on deleted_at because
+        // the normal filtering out of soft deletes won't happen for joins.
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
@@ -848,7 +848,6 @@ class GroupController extends Controller
         $alreadyInGroup = UserGroups::where('group', $group_id)
         ->where('user', $user_id)
         ->where('status', 1)
-        ->whereNull('deleted_at')
         ->exists();
 
         if ($alreadyInGroup) {
@@ -863,7 +862,6 @@ class GroupController extends Controller
             ], [
                 'status' => 1,
                 'role' => 4,
-                'deleted_at' => NULL
             ]);
 
             $user = Auth::user();

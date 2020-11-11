@@ -65,8 +65,6 @@
         if ($user) {
             $api_token = $user->ensureAPIToken();
         }
-
-        error_log("API Token " . $api_token);
       ?>
 
       <div class="vue">

@@ -189,6 +189,7 @@
                   calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
                   :ingroup="{{ $in_group ? 'true' : 'false' }}"
                   api-token="{{ $api_token }}"
+                  :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
           />
       </div>
   </div>
