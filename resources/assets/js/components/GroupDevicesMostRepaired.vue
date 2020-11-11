@@ -4,10 +4,13 @@
     <div class=" d-none d-md-block">
       <div class="podia">
         <GroupDeviceRepairPodium v-if="devices.length >= 2" :position="2" :device="devices[1]" />
+        <div v-else />
         <div />
         <GroupDeviceRepairPodium v-if="devices.length >= 1" :position="1" :device="devices[0]" />
+        <div v-else />
         <div />
         <GroupDeviceRepairPodium v-if="devices.length >= 3" :position="3" :device="devices[2]" />
+        <div v-else />
       </div>
     </div>
     <div class="d-block d-md-none">
