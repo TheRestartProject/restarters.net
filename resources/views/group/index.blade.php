@@ -58,7 +58,15 @@
         }
 
         $can_create = FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host');
-        $myid = Auth::user() ? Auth::user()->id : null
+        $user = Auth::user();
+        $myid = $user ? $user->id : null;
+        $api_token = NULL;
+
+        if ($user) {
+            $api_token = $user->ensureAPIToken();
+        }
+
+        error_log("API Token " . $api_token);
       ?>
 
       <div class="vue">
@@ -73,6 +81,7 @@
           :network="{{ $network ? $network : 'null' }}"
           :networks="{{ json_encode($networks) }}"
           start-a-group="{{ __('groups.consider_starting_a_group', ['resources_url' => env('DISCOURSE_URL').'/session/sso?return_path='.env('DISCOURSE_URL').'/t/how-to-power-up-community-repair-with-restarters-net/1228/']) }}"
+          api-token="{{ $api_token }}"
         />
       </div>
 

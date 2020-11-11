@@ -157,7 +157,19 @@
               ];
           }
 
-      ?>
+          $in_group = \App\UserGroups::where('group', $group->idgroups)
+              ->where('user', Auth::id())
+              ->where('status', 1)
+              ->whereNull('deleted_at')
+              ->exists();
+
+          $user = Auth::user();
+
+          if ($user) {
+              $api_token = $user->ensureAPIToken();
+          }
+
+          ?>
 
       <div class="vue-placeholder vue-placeholder-large">
           <div class="vue-placeholder-content">@lang('partials.loading')...</div>
@@ -175,6 +187,8 @@
                   :volunteers="{{ json_encode($expanded_volunteers) }}"
                   calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
                   calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
+                  :ingroup="{{ $in_group ? 'true' : 'false' }}"
+                  api-token="{{ $api_token }}"
           />
       </div>
   </div>

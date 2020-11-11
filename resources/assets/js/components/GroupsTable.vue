@@ -86,7 +86,7 @@
             {{ translatedFollow }}
           </span>
         </b-btn>
-        <b-btn variant="primary" class="text-nowrap mr-2" v-else @click="unfollow(data.item.idgroups)">
+        <b-btn variant="primary" class="text-nowrap mr-2" v-else @click="leaveGroup(data.item.idgroups)">
           <span class="d-block d-md-none">
             {{ translatedUnFollowMobile }}
           </span>
@@ -94,6 +94,7 @@
             {{ translatedUnFollow }}
           </span>
         </b-btn>
+        <ConfirmModal :key="'leavegroupmodal-' + data.item.idgroups" :ref="'confirmLeave-' + data.item.idgroups" @confirm="leaveConfirmed(data.item.idgroups)" :message="translatedConfirmLeaveGroup" />
       </template>
     </b-table>
   </div>
@@ -102,9 +103,10 @@
 import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
 import moment from 'moment'
 import GroupsTableFilters from './GroupsTableFilters'
+import ConfirmModal from './ConfirmModal'
 
 export default {
-  components: {GroupsTableFilters},
+  components: {ConfirmModal, GroupsTableFilters},
   props: {
     groups: {
       type: Array,
@@ -173,7 +175,6 @@ export default {
         }
 
         if (this.searchCountry) {
-          console.log("Search country", g, this.searchCountry)
           match &= g.country && g.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
         }
 
@@ -219,6 +220,9 @@ export default {
     },
     translatedHideFilters() {
       return this.$lang.get('groups.hide_filters')
+    },
+    translatedConfirmLeaveGroup() {
+      return this.$lang.get('groups.leave_group_confirm')
     }
   },
   created() {
@@ -239,8 +243,10 @@ export default {
       this.searchNetwork = this.network
       this.searchCountry = null
     },
-    unfollow(idgroups) {
-      console.log("Unfollow")
+    leaveGroup(idgroups) {
+      this.$refs['confirmLeave-' + idgroups].show()
+    },
+    leaveConfirmed(idgroups) {
       this.$store.dispatch('groups/unfollow', {
         idgroups: idgroups
       })

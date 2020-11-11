@@ -61,10 +61,11 @@
 <script>
 import GroupsPageInfo from './GroupsPageInfo'
 import GroupsTable from './GroupsTable'
+import auth from '../mixins/auth'
 
-// TODO Mobile layout
 export default {
   components: {GroupsTable, GroupsPageInfo},
+  mixins: [ auth ],
   props: {
     network: {
       type: Number,
@@ -113,6 +114,11 @@ export default {
     startAGroup: {
       type: String,
       required: true
+    },
+    apiToken: {
+      type: String,
+      required: false,
+      default: null
     }
   },
   data () {

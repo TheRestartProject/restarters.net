@@ -57,10 +57,12 @@ class GroupController extends Controller
         $all_group_tags = GroupTags::all();
         $networks = Network::all();
 
-        //Look for groups where user ID exists in pivot table
+        // Look for groups where user ID exists in pivot table and where the user has not been deleted from the
+        // group.
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
+            ->whereNull('users_groups.deleted_at')
             ->orderBy('groups.name', 'ASC')
             ->groupBy('groups.idgroups')
             ->select($group_atts)
@@ -846,13 +848,13 @@ class GroupController extends Controller
         $alreadyInGroup = UserGroups::where('group', $group_id)
         ->where('user', $user_id)
         ->where('status', 1)
+        ->whereNull('deleted_at')
         ->exists();
 
         if ($alreadyInGroup) {
             $response['warning'] = 'You are already part of this group';
             return redirect()->back()->with('response', $response)->with('warning', 'You are already part of this group');
         }
-
 
         try {
             $user_group = UserGroups::updateOrCreate([
@@ -861,6 +863,7 @@ class GroupController extends Controller
             ], [
                 'status' => 1,
                 'role' => 4,
+                'deleted_at' => NULL
             ]);
 
             $user = Auth::user();
@@ -884,7 +887,9 @@ class GroupController extends Controller
 
             return redirect()
                     ->back()
-                    ->with('success', "You are now following {$group->name}!");
+                    ->with('success', __('groups.now_following', [
+                        'name' => $group->name
+                    ]));
 
         } catch (\Exception $e) {
             $response['danger'] = 'Failed to follow this group';

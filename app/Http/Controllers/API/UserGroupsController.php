@@ -98,7 +98,6 @@ class UserGroupsController extends Controller
      */
     public function leave(Request $request, $id)
     {
-        error_log("Leave group $id");
         $authenticatedUser = Auth::user();
         if (!$authenticatedUser) {
             return abort(403, 'Not logged in');

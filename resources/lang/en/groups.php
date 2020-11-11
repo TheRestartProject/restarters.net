@@ -75,6 +75,7 @@ return array (
   'join_group_button_mobile' => 'Follow',
   'leave_group_button' => 'Unfollow group',
   'leave_group_button_mobile' => 'Unfollow',
+  'leave_group_confirm' => 'Please confirm that you want to unfollow this group.',
   'share_stats_header' => 'Share your stats',
   'share_stats_message' => ':group have made a real impact fixing electronics and preventing waste. Help share this on your website and get other people involved:',
   'embed_code_header' => 'Embed code',
@@ -175,4 +176,6 @@ return array (
   'search_country_placeholder' => 'Country',
   'show_filters' => 'Show Filters',
   'hide_filters' => 'Hide Filters',
+  'now_following' => 'You are now following :name!',
+  'now_unfollowed' => 'You have now unfollowed :name.',
 );
