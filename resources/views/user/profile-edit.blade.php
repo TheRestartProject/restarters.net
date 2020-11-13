@@ -41,6 +41,7 @@
           @if (Auth::id() == $user->id)
               <a class="list-group-item list-group-item-action" id="list-notifications-list" href="{{ route('notifications') }}" role="tab">@lang('profile.notifications')</a>
           @endif
+          <a class="list-group-item list-group-item-action" id="list-repair-directory" href="#repair-directory" role="tab">@lang('profile.repair_directory')</a>
 
         </div>
       </div>
@@ -62,6 +63,10 @@
 
           <div class="tab-pane fade" id="list-calendar-links" role="tabpanel" aria-labelledby="list-calendar-links-list">
               @include('user.profile.calendars')
+          </div>
+
+          <div class="tab-pane fade" id="repair-directory" role="tabpanel" aria-labelledby="list-repair-directory">
+            @include('user.profile.repair-directory')
           </div>
 
         </div>

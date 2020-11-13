@@ -15,6 +15,7 @@ return array (
   'delete_account_text' => 'I understand that deleting my account will remove all of my personal data and this is a permanent action.',
   'skills_updated' => 'Skills updated!',
   'notifications' => 'Notifications',
+  'repair_directory' => 'Repair Directory',
   'language_panel_title' => 'Language settings',
   'preferred_language' => 'Preferred language',
   'language_updated' => 'Languaged preference updated',
@@ -40,4 +41,9 @@ return array (
   'email_address' => 'Email address',
   'view_profile' => 'View profile',
   'view_user_profile' => 'View user profile',
+  'repair_dir_role' => 'Repair Directory Role',
+  'repair_dir_none' => 'No access',
+  'repair_dir_editor' => 'Editor',
+  'repair_dir_regional_admin' => 'Regional Admin',
+  'repair_dir_superadmin' => 'SuperAdmin'
 );

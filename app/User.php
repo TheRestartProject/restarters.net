@@ -441,6 +441,21 @@ class User extends Authenticatable implements Auditable
       return ! is_null($this->drip_subscriber_id);
     }
 
+    public function isRepairDirectorySuperAdmin()
+    {
+        return $this->repairdir_role == Role::REPAIR_DIRECTORY_SUPERADMIN;
+    }
+
+    public function isRepairDirectoryRegionalAdmin()
+    {
+        return $this->repairdir_role == Role::REPAIR_DIRECTORY_REGIONAL_ADMIN;
+    }
+
+    public function isRepairDirectoryEditor()
+    {
+        return $this->repairdir_role == Role::REPAIR_DIRECTORY_EDITOR;
+    }
+
     public function hasRole($roleName)
     {
         $usersRole = $this->role()->first()->role;
