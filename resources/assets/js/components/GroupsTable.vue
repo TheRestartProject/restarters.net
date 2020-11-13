@@ -8,8 +8,10 @@
           :location.sync="searchLocation"
           :network.sync="searchNetwork"
           :country.sync="searchCountry"
+          :tags.sync="searchTags"
           :networks="networks"
           :groups="groups"
+          :all-group-tags="allGroupTags"
       />
     </div>
     <div class="d-block d-md-none" v-if="search">
@@ -28,15 +30,16 @@
           :country.sync="searchCountry"
           :networks="networks"
           :groups="groups"
+          :all-group-tags="allGroupTags"
       />
     </div>
     <hr class="d-block d-md-none" />
-    <b-table :fields="fields" :items="items" sort-null-last thead-tr-class="d-none d-md-table-row">
+    <b-table :fields="fields" :items="items" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare">
       <template slot="head(group_image)">
         <span />
       </template>
       <template slot="cell(group_image)" slot-scope="data">
-        <b-img-lazy :src="data.item.image" class="profile" @error.native="brokenProfileImage" v-if="data.item.image" />
+        <b-img-lazy :src="data.item.group_name.image" class="profile" @error.native="brokenProfileImage" v-if="data.item.group_name.image" />
         <b-img-lazy :src="defaultProfile" class="profile" v-else />
       </template>
       <template slot="head(group_name)">
@@ -131,6 +134,11 @@ export default {
       type: Array,
       required: false,
       default: null
+    },
+    allGroupTags: {
+      type: Array,
+      required: false,
+      default: null
     }
   },
   data () {
@@ -148,7 +156,8 @@ export default {
       searchLocation: null,
       searchNetwork: null,
       searchCountry: null,
-      searchShow: false
+      searchShow: false,
+      searchTags: null
     }
   },
   computed: {
@@ -160,7 +169,7 @@ export default {
         // Groups can be in multiple networks.
         let match = true
 
-        if (this.network) {
+        if (this.searchNetwork) {
           match &= g.networks.find(n => {
             return parseInt(this.searchNetwork.id) === parseInt(n)
           })
@@ -176,6 +185,17 @@ export default {
 
         if (this.searchCountry) {
           match &= g.country && g.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
+        }
+
+        if (this.searchTags) {
+          // Tag in common?
+          if (this.searchTags.length) {
+            const tagsInCommon = this.searchTags.filter(t => {
+              return g.group_tags.indexOf(t.id) !== -1
+            })
+
+            match &= tagsInCommon.length > 0
+          }
         }
 
         return match
@@ -231,6 +251,7 @@ export default {
   },
   methods: {
     brokenProfileImage(event) {
+      console.log("Broken image", event)
       event.target.src = DEFAULT_PROFILE
     },
     toggleFilters() {
@@ -242,6 +263,30 @@ export default {
       this.searchLocation = null
       this.searchNetwork = this.network
       this.searchCountry = null
+    },
+    sortCompare(aRow, bRow, key, sortDesc, formatter, compareOptions, compareLocale) {
+      const a = aRow[key]
+      const b = bRow[key]
+
+console.log(aRow, bRow, key)
+      if (key === 'group_name') {
+        // We need a custom sort because we are putting a link into the group field.
+        return b.name.localeCompare(a.name, compareLocale, compareOptions)
+      } else if (key === 'next_event') {
+        // Sort no events to the end.
+        if (!aRow.next_event && !bRow.next_event) {
+          return 0
+        } else if (aRow.next_event && !bRow.next_event) {
+          return -1
+        } else if (bRow.next_event && !aRow.next_event) {
+          return 1
+        } else {
+          console.log("Compare date", new Date(aRow.next_event).getTime(), new Date(bRow.next_event).getTime(), new Date(aRow.next_event).getTime() - new Date(bRow.next_event).getTime())
+          return new Date(aRow.next_event).getTime() - new Date(bRow.next_event).getTime()
+        }
+      } else {
+        return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
+      }
     },
     leaveGroup(idgroups) {
       this.$refs['confirmLeave-' + idgroups].show()

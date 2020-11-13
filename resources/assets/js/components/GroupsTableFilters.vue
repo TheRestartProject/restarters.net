@@ -7,6 +7,21 @@
         class="mb-1 mb-md-0"
     />
     <div />
+    <multiselect
+        v-model="searchTags"
+        :placeholder="translatedSearchTagsPlaceholder"
+        :options="allGroupTags"
+        track-by="id"
+        label="tag_name"
+        :multiple="true"
+        :allow-empty="false"
+        deselect-label=""
+        :taggable="true"
+        selectLabel=""
+        class="m-0 mb-1 mb-md-0"
+        allow-empty
+    />
+    <div />
     <b-form-input
         v-model="searchLocation"
         type="search"
@@ -26,6 +41,7 @@
         :taggable="false"
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
+        allow-empty
     />
     <div />
     <multiselect
@@ -40,6 +56,7 @@
         :taggable="false"
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
+        allow-empty
     />
   </div>
 </template>
@@ -51,11 +68,16 @@ export default {
       required: true
     },
     network: {
-      type: Number,
+      type: Object,
       required: false,
       default: null
     },
     networks: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    allGroupTags: {
       type: Array,
       required: false,
       default: null
@@ -66,7 +88,8 @@ export default {
       searchName: null,
       searchLocation: null,
       searchNetwork: null,
-      searchCountry: null
+      searchCountry: null,
+      searchTags: null
     }
   },
   watch: {
@@ -81,6 +104,9 @@ export default {
     },
     searchCountry(newVal) {
       this.$emit('update:country', newVal)
+    },
+    searchTags(newVal) {
+      this.$emit('update:tags', newVal)
     },
   },
   computed: {
@@ -123,6 +149,9 @@ export default {
     },
     translatedSearchLocationPlaceholder() {
       return this.$lang.get('groups.search_location_placeholder')
+    },
+    translatedSearchTagsPlaceholder() {
+      return this.$lang.get('groups.search_tags_placeholder')
     }
   },
   created() {
@@ -140,10 +169,10 @@ export default {
 .layout {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto auto auto auto auto;
+  grid-template-rows: auto auto auto auto auto auto auto auto auto;
 
   @include media-breakpoint-up(md) {
-    grid-template-columns: 1fr 20px 1fr 20px 1fr 20px 1fr;
+    grid-template-columns: 1fr 20px 1fr 20px 1fr 20px 1fr 20px 1fr;
     grid-template-rows: 1fr;
   }
 }

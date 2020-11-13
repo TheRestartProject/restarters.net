@@ -27,19 +27,21 @@
             if ($groups) {
                 foreach ($groups as $group) {
                     $group_image = $group->groupImage;
+
                     $event = $group->getNextUpcomingEvent();
 
                     $ret[] = [
                         'idgroups' => $group['idgroups'],
                         'name' => $group['name'],
                         'image' => (is_object($group_image) && is_object($group_image->image)) ?
-                            $group_image->image->path : null,
+                            env('UPLOADS_URL').'mid_'.$group_image->image->path : null,
                         'location' => rtrim($group['location']),
                         'next_event' => $event ? $event['event_date'] : null,
                         'all_restarters_count' => $group->all_restarters_count,
                         'all_hosts_count' => $group->all_hosts_count,
                         'networks' => array_pluck($group->networks, 'id'),
-                        'country' => $group->country
+                        'country' => $group->country,
+                        'group_tags' => $group->group_tags()->get()->pluck('id')
                     ];
                 }
             }
@@ -67,6 +69,10 @@
         }
       ?>
 
+      <div class="vue-placeholder vue-placeholder-large">
+        <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+      </div>
+
       <div class="vue">
         <GroupsPage
           :all-groups="{{ json_encode($all_groups) }}"
@@ -79,6 +85,7 @@
           :network="{{ $network ? $network : 'null' }}"
           :networks="{{ json_encode($networks) }}"
           start-a-group="{{ __('groups.consider_starting_a_group', ['resources_url' => env('DISCOURSE_URL').'/session/sso?return_path='.env('DISCOURSE_URL').'/t/how-to-power-up-community-repair-with-restarters-net/1228/']) }}"
+          :all-group-tags="{{ json_encode($all_group_tags) }}"
           api-token="{{ $api_token }}"
         />
       </div>

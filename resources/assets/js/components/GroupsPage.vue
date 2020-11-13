@@ -2,7 +2,7 @@
   <div>
 <!--    TODO Notification box - when does this happen? -->
     <h1 class="d-flex justify-content-between">
-      <div>
+      <div class="d-flex">
         {{ translatedTitle }}
         <b-img class="ml-2" src="/images/group_doodle_ico.svg" />
       </div>
@@ -24,7 +24,7 @@
           <b class="text-uppercase d-none d-md-block">{{ translatedYourGroups }}</b>
         </template>
         <div class="pt-2 pb-2">
-          <GroupsPageInfo />
+          <GroupsPageInfo @nearest="currentTab = 1"/>
           <div v-if="myGroups">
             <GroupsTable :groups="myGroups" class="mt-3" />
           </div>
@@ -53,7 +53,7 @@
           <b class="text-uppercase d-block d-md-none">{{ translatedAllGroupsMobile }}</b>
           <b class="text-uppercase d-none d-md-block">{{ translatedAllGroups }}</b>
         </template>
-        <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" :network="network" />
+        <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" :network="network" :all-group-tags="allGroupTags" />
       </b-tab>
     </b-tabs>
   </div>
@@ -119,6 +119,10 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    allGroupTags: {
+      type: Array,
+      required: true
     }
   },
   data () {
@@ -183,12 +187,33 @@ export default {
       return this.$lang.get('groups.all_groups_mobile')
     }
   },
+  watch: {
+    currentTab(newVal) {
+      // We want to update the URL in the browser.  In a full app this would be done by the router, but hack it in
+      // here.
+      try {
+        let tag = '';
+
+        switch (newVal) {
+          case 1: tag = 'nearby'; break;
+          case 2: tag = 'all'; break;
+          default: tag = 'mine'; break;
+        }
+
+        console.log("Route to", tag)
+        window.history.pushState(null, "Groups", "/group/" + tag);
+      } catch (e) {
+        console.error("Failed to update URL")
+      }
+    }
+  },
   created() {
     // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
     // and so that as/when it changes then reactivity updates all the views.
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
     let groups = {}
+    console.log("All groups", this.allGroups)
 
     this.allGroups.forEach(g => {
       groups[g.idgroups] = g
