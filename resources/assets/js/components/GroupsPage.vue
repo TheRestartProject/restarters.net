@@ -207,6 +207,7 @@ export default {
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
     let groups = {}
+    console.log("All groups", this.allGroups)
 
     this.allGroups.forEach(g => {
       groups[g.idgroups] = g

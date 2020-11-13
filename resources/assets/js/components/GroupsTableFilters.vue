@@ -68,7 +68,7 @@ export default {
       required: true
     },
     network: {
-      type: Number,
+      type: Object,
       required: false,
       default: null
     },

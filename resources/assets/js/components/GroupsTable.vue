@@ -39,7 +39,7 @@
         <span />
       </template>
       <template slot="cell(group_image)" slot-scope="data">
-        <b-img-lazy :src="data.item.image" class="profile" @error.native="brokenProfileImage" v-if="data.item.image" />
+        <b-img-lazy :src="data.item.group_name.image" class="profile" @error.native="brokenProfileImage" v-if="data.item.group_name.image" />
         <b-img-lazy :src="defaultProfile" class="profile" v-else />
       </template>
       <template slot="head(group_name)">
@@ -159,7 +159,7 @@ export default {
         // Groups can be in multiple networks.
         let match = true
 
-        if (this.network) {
+        if (this.searchNetwork) {
           match &= g.networks.find(n => {
             return parseInt(this.searchNetwork.id) === parseInt(n)
           })
@@ -232,6 +232,7 @@ export default {
   },
   methods: {
     brokenProfileImage(event) {
+      console.log("Broken image", event)
       event.target.src = DEFAULT_PROFILE
     },
     toggleFilters() {
