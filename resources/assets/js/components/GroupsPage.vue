@@ -3,8 +3,10 @@
 <!--    TODO Notification box - when does this happen? -->
     <h1 class="d-flex justify-content-between">
       <div class="d-flex">
+        <div class="mt-2">
         {{ translatedTitle }}
-        <b-img class="ml-2" src="/images/group_doodle_ico.svg" />
+        </div>
+        <b-img class="ml-4" src="/images/group_doodle_ico.svg" />
       </div>
       <div>
         <b-btn variant="primary" href="/group/create" v-if="canCreate">
@@ -53,7 +55,7 @@
           <b class="text-uppercase d-block d-md-none">{{ translatedAllGroupsMobile }}</b>
           <b class="text-uppercase d-none d-md-block">{{ translatedAllGroups }}</b>
         </template>
-        <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" :network="network" :all-group-tags="allGroupTags" />
+        <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" :network="network" :all-group-tags="allGroupTags" :show-tags="showTags" />
       </b-tab>
     </b-tabs>
   </div>
@@ -102,6 +104,11 @@ export default {
       default: null
     },
     canCreate: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    showTags: {
       type: Boolean,
       required: false,
       default: false
@@ -207,7 +214,6 @@ export default {
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
     let groups = {}
-    console.log("All groups", this.allGroups)
 
     this.allGroups.forEach(g => {
       groups[g.idgroups] = g

@@ -60,7 +60,10 @@
         }
 
         $can_create = FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host');
+        $show_tags = $can_create;
+
         $myid = Auth::user() ? Auth::user()->id : null
+
       ?>
 
       <div class="vue-placeholder vue-placeholder-large">
@@ -80,6 +83,7 @@
           :networks="{{ json_encode($networks) }}"
           start-a-group="{{ __('groups.consider_starting_a_group', ['resources_url' => env('DISCOURSE_URL').'/session/sso?return_path='.env('DISCOURSE_URL').'/t/how-to-power-up-community-repair-with-restarters-net/1228/']) }}"
           :all-group-tags="{{ json_encode($all_group_tags) }}"
+          :show-tags="{{ $show_tags ? 'true' : 'false' }}"
         />
       </div>
 

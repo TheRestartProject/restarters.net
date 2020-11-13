@@ -12,6 +12,7 @@
           :networks="networks"
           :groups="groups"
           :all-group-tags="allGroupTags"
+          :show-tags="showTags"
       />
     </div>
     <div class="d-block d-md-none" v-if="search">
@@ -31,6 +32,7 @@
           :networks="networks"
           :groups="groups"
           :all-group-tags="allGroupTags"
+          :show-tags="showTags"
       />
     </div>
     <hr class="d-block d-md-none" />
@@ -129,6 +131,11 @@ export default {
       type: Array,
       required: false,
       default: null
+    },
+    showTags: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
@@ -262,8 +269,7 @@ console.log(aRow, bRow, key)
         } else if (bRow.next_event && !aRow.next_event) {
           return 1
         } else {
-          console.log("Compare date", new Date(aRow.next_event).getTime(), new Date(bRow.next_event).getTime(), new Date(aRow.next_event).getTime() - new Date(bRow.next_event).getTime())
-          return new Date(aRow.next_event).getTime() - new Date(bRow.next_event).getTime()
+          return new moment(aRow.group_name.next_event).unix() - new moment(bRow.group_name.next_event).unix()
         }
       } else {
         return toString(a).localeCompare(toString(b), compareLocale, compareOptions)

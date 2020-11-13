@@ -34,7 +34,7 @@ export default {
       // acceptable because of access restrictions on who can edit this.
       return '<p><b>' + this.translatedWeAre + '</b></p>' +
           '<p>' + this.translatedQuickAccess + '</p>' +
-          '<p>' + this.translatedWhyNot1 + ' <a href="#">' + this.translatedWhyNot2 + '</a> ' + this.translatedWhyNot3 + '</p>'
+          '<p>' + this.translatedWhyNot1 + ' <a href="/group/nearby">' + this.translatedWhyNot2 + '</a> ' + this.translatedWhyNot3 + '</p>'
     },
     translatedWeAre() {
       return this.$lang.get('groups.introduction')
