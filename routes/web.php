@@ -122,6 +122,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::post('/edit-tags', 'UserController@postProfileTagsEdit');
         Route::post('/edit-photo', 'UserController@postProfilePictureEdit');
         Route::post('/edit-admin-settings', 'UserController@postAdminEdit');
+        Route::post('/edit-repair-directory', 'UserController@postProfileRepairDirectory');
     });
 
     Route::post('/edit-user', 'UserController@postEdit');

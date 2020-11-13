@@ -245,6 +245,39 @@ class UserController extends Controller
         return redirect()->back()->with('error', 'Current Password does not match!');
     }
 
+    public function postProfileRepairDirectory(Request $request)
+    {
+        $rules = [
+            'role' => 'required|digits_between:' . Role::REPAIR_DIRECTORY_SUPERADMIN . ',' . Role::REPAIR_DIRECTORY_EDITOR
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $id = $request->input('id');
+        $role = $request->input('role');
+        $myrole = Auth::user()->repairdir_role;
+
+        // Check that we are allowed to change the role, based on our own role.
+        if ($myrole === Role::REPAIR_DIRECTORY_SUPERADMIN ||
+            ($myrole === Role::REPAIR_DIRECTORY_REGIONAL_ADMIN && ($role === Role::REPAIR_DIRECTORY_EDITOR || $role === Role::REPAIR_DIRECTORY_NONE))) {
+            $user = User::find($id)->update(
+                [
+                    'repairdir_role' => $role,
+                ]
+            );
+
+            $user->save();
+            return redirect()->back()->with('message', 'User Profile Updated!');
+        } else {
+            return redirect()->back()->with('error', 'Permission denied.');
+        }
+
+    }
+
     public function storeLanguage(Request $request)
     {
         if ($request->input('id') !== null) {
