@@ -1,6 +1,5 @@
 <template>
   <div>
-<!--    TODO Notification box - when does this happen? -->
     <h1 class="d-flex justify-content-between">
       <div class="d-flex">
         <div class="mt-2">
