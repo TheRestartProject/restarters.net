@@ -112,22 +112,21 @@ function validateForm() {
 
     });
 
-    if ( validCount !== jQuery('#step-2').find('input,select').filter('[required]:visible').length ) {
-      return false;
+    var valid = validCount === jQuery('#step-2').find('input,select').filter('[required]:visible').length
 
-    } else if ( jQuery('#password').length > 0 && jQuery('#password').val().length < 6 ) {
+    if ( jQuery('#password').length > 0 && jQuery('#password').val().length < 6 ) {
 
       jQuery('#password').addClass('is-invalid');
       jQuery('#password-confirm').addClass('is-invalid');
       jQuery('.email-invalid-feedback').show();
-      return false;
+      valid = false;
 
     } else if ( jQuery('#password').length > 0 && jQuery('#password').val() !== jQuery('#password-confirm').val() ) {
 
       jQuery('#password').addClass('is-invalid');
       jQuery('#password-confirm').addClass('is-invalid');
       jQuery('.email-invalid-feedback').show();
-      return false;
+      valid = false;
 
     } else {
 
@@ -139,6 +138,8 @@ function validateForm() {
       jQuery('#step-3').addClass('registration__step--active');
 
     }
+
+    return valid
 
   });
 
