@@ -39,7 +39,8 @@
                         'all_restarters_count' => $group->all_restarters_count,
                         'all_hosts_count' => $group->all_hosts_count,
                         'networks' => array_pluck($group->networks, 'id'),
-                        'country' => $group->country
+                        'country' => $group->country,
+                        'group_tags' => $group->group_tags()->get()->pluck('id')
                     ];
                 }
             }

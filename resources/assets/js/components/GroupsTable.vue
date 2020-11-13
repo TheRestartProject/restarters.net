@@ -8,8 +8,10 @@
           :location.sync="searchLocation"
           :network.sync="searchNetwork"
           :country.sync="searchCountry"
+          :tags.sync="searchTags"
           :networks="networks"
           :groups="groups"
+          :all-group-tags="allGroupTags"
       />
     </div>
     <div class="d-block d-md-none" v-if="search">
@@ -28,6 +30,7 @@
           :country.sync="searchCountry"
           :networks="networks"
           :groups="groups"
+          :all-group-tags="allGroupTags"
       />
     </div>
     <hr class="d-block d-md-none" />
@@ -121,6 +124,11 @@ export default {
       type: Array,
       required: false,
       default: null
+    },
+    allGroupTags: {
+      type: Array,
+      required: false,
+      default: null
     }
   },
   data () {
@@ -138,7 +146,8 @@ export default {
       searchLocation: null,
       searchNetwork: null,
       searchCountry: null,
-      searchShow: false
+      searchShow: false,
+      searchTags: null
     }
   },
   computed: {
@@ -165,8 +174,18 @@ export default {
         }
 
         if (this.searchCountry) {
-          console.log("Search country", g, this.searchCountry)
           match &= g.country && g.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
+        }
+
+        if (this.searchTags) {
+          // Tag in common?
+          if (this.searchTags.length) {
+            const tagsInCommon = this.searchTags.filter(t => {
+              return g.group_tags.indexOf(t.id) !== -1
+            })
+
+            match &= tagsInCommon.length > 0
+          }
         }
 
         return match

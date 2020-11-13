@@ -53,7 +53,7 @@
           <b class="text-uppercase d-block d-md-none">{{ translatedAllGroupsMobile }}</b>
           <b class="text-uppercase d-none d-md-block">{{ translatedAllGroups }}</b>
         </template>
-        <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" :network="network" />
+        <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" :network="network" :all-group-tags="allGroupTags" />
       </b-tab>
     </b-tabs>
   </div>
