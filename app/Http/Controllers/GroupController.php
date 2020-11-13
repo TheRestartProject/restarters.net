@@ -887,7 +887,8 @@ class GroupController extends Controller
             return redirect()
                     ->back()
                     ->with('success', __('groups.now_following', [
-                        'name' => $group->name
+                        'name' => $group->name,
+                        'link' => url('/group/view/'.$group->idgroups)
                     ]));
 
         } catch (\Exception $e) {

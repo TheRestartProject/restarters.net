@@ -177,6 +177,6 @@ return array (
   'search_tags_placeholder' => 'Tag',
   'show_filters' => 'Show Filters',
   'hide_filters' => 'Hide Filters',
-  'now_following' => 'You are now following :name!',
-  'now_unfollowed' => 'You have now unfollowed :name.',
+  'now_following' => 'You are now following <a href=":link">:name</a>!',
+  'now_unfollowed' => 'You have now unfollowed <a href=":link">:name</a>.',
 );

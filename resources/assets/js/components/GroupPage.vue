@@ -1,8 +1,6 @@
 <template>
   <div v-if="group">
-    <div class="alert alert-success" v-if="haveLeft">
-      {{ translatedHaveLeft }}
-    </div>
+    <div class="alert alert-success" v-if="haveLeft" v-html="translatedHaveLeft" />
     <GroupHeading :idgroups="idgroups" :canedit="canedit" :ingroup="ingroup" @left="haveLeft = true" />
 
     <div class="d-flex flex-wrap">
@@ -130,7 +128,8 @@ export default {
     },
     translatedHaveLeft() {
       return this.$lang.get('groups.now_unfollowed', {
-        name: this.group.name
+        name: this.group.name,
+        link: '/group/view/' + this.group.id
       })
     }
   },

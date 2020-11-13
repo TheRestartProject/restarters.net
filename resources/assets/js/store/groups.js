@@ -67,7 +67,6 @@ export default {
         group.all_restarters_count = ret.data.all_restarters_count
         group.all_hosts_count = ret.data.all_hosts_count
         group.ingroup = false
-        console.log("Left group", group)
         commit('set', group)
       }
     }

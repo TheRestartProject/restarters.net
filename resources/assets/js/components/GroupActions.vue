@@ -17,7 +17,7 @@
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats" v-if="canedit">
           {{ translatedShareGroupStatus }}
         </b-dropdown-item>
-        <b-dropdown-item data-toggle="modal" @click="unfollow" v-if="ingroup">
+        <b-dropdown-item data-toggle="modal" @click="leaveGroup" v-if="ingroup">
           {{ translatedLeaveGroup }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/group/join/' + idgroups" v-else>
