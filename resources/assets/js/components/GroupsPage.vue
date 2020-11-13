@@ -6,14 +6,14 @@
         <div class="mt-2">
         {{ translatedTitle }}
         </div>
-        <b-img class="ml-4" src="/images/group_doodle_ico.svg" />
+        <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
       </div>
       <div>
         <b-btn variant="primary" href="/group/create" v-if="canCreate">
-          <span class="d-block d-md-none">
+          <span class="d-block d-lg-none">
             {{ translatedAddNewGroupMobile }}
           </span>
-          <span class="d-none d-md-block">
+          <span class="d-none d-lg-block">
             {{ translatedAddNewGroup }}
           </span>
         </b-btn>
@@ -34,8 +34,8 @@
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b class="text-uppercase d-block d-md-none">{{ translatedNearestGroupsMobile }}</b>
-          <b class="text-uppercase d-none d-md-block">{{ translatedNearestGroups }}</b>
+          <b class="text-uppercase d-block d-lg-none">{{ translatedNearestGroupsMobile }}</b>
+          <b class="text-uppercase d-none d-lg-block">{{ translatedNearestGroups }}</b>
         </template>
         <div v-if="!yourArea" class="text-center">
           {{ translatedYourArea1 }} <a :href="'/profile/edit/' + userId">{{ translatedYourArea2 }}</a>.
@@ -251,3 +251,8 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+.height {
+  height: 76px;
+}
+</style>
