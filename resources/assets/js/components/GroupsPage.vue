@@ -2,7 +2,7 @@
   <div>
 <!--    TODO Notification box - when does this happen? -->
     <h1 class="d-flex justify-content-between">
-      <div>
+      <div class="d-flex">
         {{ translatedTitle }}
         <b-img class="ml-2" src="/images/group_doodle_ico.svg" />
       </div>
@@ -24,7 +24,7 @@
           <b class="text-uppercase d-none d-md-block">{{ translatedYourGroups }}</b>
         </template>
         <div class="pt-2 pb-2">
-          <GroupsPageInfo />
+          <GroupsPageInfo @nearest="currentTab = 1"/>
           <div v-if="myGroups">
             <GroupsTable :groups="myGroups" class="mt-3" />
           </div>
@@ -113,6 +113,10 @@ export default {
     startAGroup: {
       type: String,
       required: true
+    },
+    allGroupTags: {
+      type: Array,
+      required: true
     }
   },
   data () {
@@ -175,6 +179,26 @@ export default {
     },
     translatedAllGroupsMobile() {
       return this.$lang.get('groups.all_groups_mobile')
+    }
+  },
+  watch: {
+    currentTab(newVal) {
+      // We want to update the URL in the browser.  In a full app this would be done by the router, but hack it in
+      // here.
+      try {
+        let tag = '';
+
+        switch (newVal) {
+          case 1: tag = 'nearby'; break;
+          case 2: tag = 'all'; break;
+          default: tag = 'mine'; break;
+        }
+
+        console.log("Route to", tag)
+        window.history.pushState(null, "Groups", "/group/" + tag);
+      } catch (e) {
+        console.error("Failed to update URL")
+      }
     }
   },
   created() {

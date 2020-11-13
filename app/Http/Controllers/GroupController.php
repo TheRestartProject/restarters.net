@@ -91,7 +91,8 @@ class GroupController extends Controller
             'your_area' => $user->location,
             'tab' => $tab,
             'network' => $network,
-            'networks' => $networks
+            'networks' => $networks,
+            'all_group_tags' => $all_group_tags
         ]);
     }
 

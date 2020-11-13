@@ -15,7 +15,7 @@
         </div>
         <div class="p-3">
           {{ translatedWhyNot1 }}
-          <a href="#">
+          <a href="#" @click="$emit('nearest')">
             {{ translatedWhyNot2}}
           </a>
           {{ translatedWhyNot3 }}

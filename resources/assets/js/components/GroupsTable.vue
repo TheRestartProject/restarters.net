@@ -31,7 +31,7 @@
       />
     </div>
     <hr class="d-block d-md-none" />
-    <b-table :fields="fields" :items="items" sort-null-last thead-tr-class="d-none d-md-table-row">
+    <b-table :fields="fields" :items="items" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare">
       <template slot="head(group_image)">
         <span />
       </template>
@@ -224,6 +224,30 @@ export default {
       this.searchLocation = null
       this.searchNetwork = this.network
       this.searchCountry = null
+    },
+    sortCompare(aRow, bRow, key, sortDesc, formatter, compareOptions, compareLocale) {
+      const a = aRow[key]
+      const b = bRow[key]
+
+console.log(aRow, bRow, key)
+      if (key === 'group_name') {
+        // We need a custom sort because we are putting a link into the group field.
+        return b.name.localeCompare(a.name, compareLocale, compareOptions)
+      } else if (key === 'next_event') {
+        // Sort no events to the end.
+        if (!aRow.next_event && !bRow.next_event) {
+          return 0
+        } else if (aRow.next_event && !bRow.next_event) {
+          return -1
+        } else if (bRow.next_event && !aRow.next_event) {
+          return 1
+        } else {
+          console.log("Compare date", new Date(aRow.next_event).getTime(), new Date(bRow.next_event).getTime(), new Date(aRow.next_event).getTime() - new Date(bRow.next_event).getTime())
+          return new Date(aRow.next_event).getTime() - new Date(bRow.next_event).getTime()
+        }
+      } else {
+        return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
+      }
     }
   }
 }

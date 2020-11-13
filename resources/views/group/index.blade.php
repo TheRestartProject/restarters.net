@@ -61,6 +61,10 @@
         $myid = Auth::user() ? Auth::user()->id : null
       ?>
 
+      <div class="vue-placeholder vue-placeholder-large">
+        <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+      </div>
+
       <div class="vue">
         <GroupsPage
           :all-groups="{{ json_encode($all_groups) }}"
@@ -73,6 +77,7 @@
           :network="{{ $network ? $network : 'null' }}"
           :networks="{{ json_encode($networks) }}"
           start-a-group="{{ __('groups.consider_starting_a_group', ['resources_url' => env('DISCOURSE_URL').'/session/sso?return_path='.env('DISCOURSE_URL').'/t/how-to-power-up-community-repair-with-restarters-net/1228/']) }}"
+          :all-group-tags="{{ json_encode($all_group_tags) }}"
         />
       </div>
 
