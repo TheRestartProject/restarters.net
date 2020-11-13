@@ -201,7 +201,6 @@ export default {
           default: tag = 'mine'; break;
         }
 
-        console.log("Route to", tag)
         window.history.pushState(null, "Groups", "/group/" + tag);
       } catch (e) {
         console.error("Failed to update URL")
