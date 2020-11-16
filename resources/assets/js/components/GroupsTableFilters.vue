@@ -20,6 +20,7 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
+        :selectedLabel="translatedRemove"
     />
     <b-form-input
         v-model="searchLocation"
@@ -40,6 +41,7 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
+        :selectedLabel="translatedRemove"
     />
     <multiselect
         v-model="searchNetwork"
@@ -54,6 +56,7 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
+        :selectedLabel="translatedRemove"
     />
   </div>
 </template>
@@ -139,6 +142,9 @@ export default {
       return ret.sort((a, b) => {
         return a.country.localeCompare(b.country)
       })
+    },
+    translatedRemove() {
+      return this.$lang.get('partials.remove')
     },
     translatedNetworks() {
       return this.$lang.get('networks.network')

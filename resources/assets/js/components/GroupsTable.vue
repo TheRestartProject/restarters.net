@@ -36,7 +36,7 @@
       />
     </div>
     <hr class="d-block d-md-none" />
-    <b-table :fields="fields" :items="items" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare">
+    <b-table :fields="fields" :items="itemsToShow" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare">
       <template slot="head(group_image)">
         <span />
       </template>
@@ -154,7 +154,8 @@ export default {
       searchNetwork: null,
       searchCountry: null,
       searchShow: false,
-      searchTags: null
+      searchTags: null,
+      show: 3
     }
   },
   computed: {
@@ -212,6 +213,9 @@ export default {
         }
       })
     },
+    itemsToShow() {
+      return this.items.slice(0, this.show)
+    },
     translatedNonePlanned() {
       return this.$lang.get('groups.upcoming_none_planned')
     },
@@ -237,6 +241,9 @@ export default {
     // We might arrive on the page to filter by network.
     this.searchNetwork = this.network
   },
+  mounted() {
+    this.loadMore()
+  },
   methods: {
     brokenProfileImage(event) {
       console.log("Broken image", event)
@@ -256,7 +263,7 @@ export default {
       const a = aRow[key]
       const b = bRow[key]
 
-console.log(aRow, bRow, key)
+      console.log("Sort", key, a, b)
       if (key === 'group_name') {
         // We need a custom sort because we are putting a link into the group field.
         return b.name.localeCompare(a.name, compareLocale, compareOptions)
@@ -271,10 +278,26 @@ console.log(aRow, bRow, key)
         } else {
           return new moment(aRow.group_name.next_event).unix() - new moment(bRow.group_name.next_event).unix()
         }
+      } else if (key === 'all_hosts_count' || key === 'all_restarters_count') {
+        if (parseInt(a) < parseInt(b)) {
+          return -1
+        } else if (parseInt(a) > parseInt(b)) {
+          return 1
+        } else {
+          return 0
+        }
       } else {
         return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
       }
-    }
+    },
+    loadMore() {
+      // We can't use a genuine infinite scroll because we need the data loaded into the table for filtering.  But
+      // we can load it gradually so that the page looks more responsive.
+      if (this.show < this.items.length) {
+        this.show += 10
+        setTimeout(this.loadMore, 1)
+      }
+    },
   }
 }
 </script>
