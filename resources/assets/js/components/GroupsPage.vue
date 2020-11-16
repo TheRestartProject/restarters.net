@@ -19,7 +19,7 @@
       </div>
     </h1>
     <b-tabs class="ourtabs w-100 mt-4" justified v-model="currentTab">
-      <b-tab class="pt-2">
+      <b-tab class="pt-2" lazy>
         <template slot="title">
           <b class="text-uppercase d-block d-md-none">{{ translatedYourGroupsMobile }}</b>
           <b class="text-uppercase d-none d-md-block">{{ translatedYourGroups }}</b>
@@ -31,7 +31,7 @@
           </div>
         </div>
       </b-tab>
-      <b-tab class="pt-2">
+      <b-tab class="pt-2" lazy>
         <template slot="title">
           <b class="text-uppercase d-block d-lg-none">{{ translatedNearestGroupsMobile }}</b>
           <b class="text-uppercase d-none d-lg-block">{{ translatedNearestGroups }}</b>
@@ -49,7 +49,7 @@
           <p v-html="startAGroup" />
         </div>
       </b-tab>
-      <b-tab class="pt-2">
+      <b-tab class="pt-2" lazy>
         <template slot="title">
           <b class="text-uppercase d-block d-md-none">{{ translatedAllGroupsMobile }}</b>
           <b class="text-uppercase d-none d-md-block">{{ translatedAllGroups }}</b>
@@ -207,6 +207,7 @@ export default {
     }
   },
   created() {
+    console.log("Groups page created")
     // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
     // and so that as/when it changes then reactivity updates all the views.
     //

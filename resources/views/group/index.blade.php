@@ -34,7 +34,7 @@
                         'idgroups' => $group['idgroups'],
                         'name' => $group['name'],
                         'image' => (is_object($group_image) && is_object($group_image->image)) ?
-                            env('UPLOADS_URL').'mid_'.$group_image->image->path : null,
+                            asset('uploads/mid_'.$group_image->image->path) : null,
                         'location' => rtrim($group['location']),
                         'next_event' => $event ? $event['event_date'] : null,
                         'all_restarters_count' => $group->all_restarters_count,
