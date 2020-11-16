@@ -102,7 +102,11 @@ class UserController extends Controller
     {
         if (is_null($id)) {
             $user = Auth::user();
-        } else  if (!FixometerHelper::hasRole(Auth::user(), 'Administrator') && !Auth::user()->isRepairDirectorySuperAdmin() && !Auth::user()->isRepairDirectoryRegionalAdmin()) {
+        } else if (!FixometerHelper::hasRole(Auth::user(), 'Administrator') &&
+            !Auth::user()->isRepairDirectorySuperAdmin() &&
+            !Auth::user()->isRepairDirectoryRegionalAdmin() &&
+            Auth::user()->id !== intval($id)
+        ) {
             // We don't have permissions to see any of the tabs on this page, so we shouldn't see the page.
             abort(404);
         } else {

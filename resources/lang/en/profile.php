@@ -40,6 +40,7 @@ return array (
   'email_address' => 'Email address',
   'view_profile' => 'View profile',
   'view_user_profile' => 'View user profile',
+  'repair_directory' => 'Repair Directory',
   'repair_dir_role' => 'Repair Directory Role',
   'repair_dir_none' => 'No access',
   'repair_dir_editor' => 'Editor',
