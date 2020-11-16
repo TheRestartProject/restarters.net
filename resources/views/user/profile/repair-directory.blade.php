@@ -11,6 +11,8 @@
 
     {{ Form::hidden('id', $user->id) }}
 
+    @php(error_log("Edit profile on {$user->id}"))
+
     @php($role = $user->repairdir_role)
 
     <fieldset>
@@ -22,7 +24,11 @@
           <div class="form-control form-control__select">
             <select id="role" name="role" required aria-required="true" class="field select2">
               <option value="<?php echo \App\Role::REPAIR_DIRECTORY_NONE; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_NONE) selected @endif>@lang('profile.repair_dir_none')</option>
+              @if(Auth::user()->isRepairDirectoryRegionalAdmin() || Auth::user()->isRepairDirectorySuperAdmin())
               <option value="<?php echo \App\Role::REPAIR_DIRECTORY_EDITOR; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_EDITOR) selected @endif>@lang('profile.repair_dir_editor')</option>
+              @else
+              <option value="<?php echo \App\Role::REPAIR_DIRECTORY_EDITOR; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_EDITOR) selected @endif disabled>@lang('profile.repair_dir_editor')</option>
+              @endif
               @if(Auth::user()->isRepairDirectoryRegionalAdmin() || Auth::user()->isRepairDirectorySuperAdmin())
               <option value="<?php echo \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN) selected @endif>@lang('profile.repair_dir_regional_admin')</option>
               @else

@@ -100,7 +100,7 @@ class UserController extends Controller
 
     public function getProfileEdit($id = null)
     {
-
+        error_log("Get profile edit $id");
         if (is_null($id) || !FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
             $user = Auth::user();
         } else {
