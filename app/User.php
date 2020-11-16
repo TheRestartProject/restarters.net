@@ -73,6 +73,11 @@ class User extends Authenticatable implements Auditable
         return $this->hasOne('App\Role', 'idroles', 'role');
     }
 
+    public function repairdir_role() {
+        // Make sure we don't return a null value.  The client select would struggle with null values.
+        return $this->repairdir_role ? $this->repairdir_role : Role::REPAIR_DIRECTORY_NONE;
+    }
+
     public function userSkills()
     {
         return $this->hasMany('App\UsersSkills', 'user', 'id');

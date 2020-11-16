@@ -15,7 +15,7 @@ class Role extends Model
     const GUSET = 5;
     const NETWORK_COORDINATOR = 6;
 
-    const REPAIR_DIRECTORY_NONE = NULL;
+    const REPAIR_DIRECTORY_NONE = 0;
     const REPAIR_DIRECTORY_SUPERADMIN = 1;
     const REPAIR_DIRECTORY_REGIONAL_ADMIN = 2;
     const REPAIR_DIRECTORY_EDITOR = 3;

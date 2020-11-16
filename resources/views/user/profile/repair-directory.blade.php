@@ -29,7 +29,7 @@
               @else
               <option value="<?php echo \App\Role::REPAIR_DIRECTORY_EDITOR; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_EDITOR) selected @endif disabled>@lang('profile.repair_dir_editor')</option>
               @endif
-              @if(Auth::user()->isRepairDirectoryRegionalAdmin() || Auth::user()->isRepairDirectorySuperAdmin())
+              @if(Auth::user()->isRepairDirectorySuperAdmin())
               <option value="<?php echo \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN) selected @endif>@lang('profile.repair_dir_regional_admin')</option>
               @else
               <option value="<?php echo \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN; ?> @if ($role === \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN) selected @endif" disabled>@lang('profile.repair_dir_regional_admin')</option>
