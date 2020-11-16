@@ -15,7 +15,6 @@ return array (
   'delete_account_text' => 'I understand that deleting my account will remove all of my personal data and this is a permanent action.',
   'skills_updated' => 'Skills updated!',
   'notifications' => 'Notifications',
-  'repair_directory' => 'Repair Directory',
   'language_panel_title' => 'Language settings',
   'preferred_language' => 'Preferred language',
   'language_updated' => 'Languaged preference updated',

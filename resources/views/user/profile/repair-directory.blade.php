@@ -11,8 +11,6 @@
 
     {{ Form::hidden('id', $user->id) }}
 
-    @php(error_log("Edit profile on {$user->id}"))
-
     @php($role = $user->repairdir_role)
 
     <fieldset>
