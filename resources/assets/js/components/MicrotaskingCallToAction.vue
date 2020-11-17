@@ -5,11 +5,16 @@
         </template>
 
         <template slot="content">
-            <p class="dashbord pt-3">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            </p>
+            <div class="layout">
+                <p class="dashbord pt-3">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
-            <a href="/mobifix" class="btn">Get involved</a>
+                </p>
+                <div style="align-self:center; justify-self:right">
+                <a href="/mobifix" style="align-self: center" class="btn btn-primary pull-right">Get involved</a>
+                </div>
+            </div>
+
         </template>
     </CollapsibleSection>
 </template>
@@ -33,7 +38,7 @@ export default {
 @import '~bootstrap/scss/mixins/_breakpoints';
 
 #cta {
-    background-color: $brand;
+    background-color: #4aaebc;
     border: 1px solid $black;
 
     @include media-breakpoint-up(md) {
@@ -41,7 +46,16 @@ export default {
     }
 }
 
-.dashbord {
+.layout {
     border-top: 3px dashed black;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+
+    @include media-breakpoint-up(md) {
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: 1fr;
+    }
 }
 </style>

@@ -12,30 +12,38 @@
                This is an easy way to make a difference, whether or not you can join us at our repair events.  Join us, and contribute as little or as much time and brain-power you can.  Most of the tasks here are OK for non-technical people.  And we're always here to help.
             </p>
 
-            <b-table-simple sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+            <b-table-simple sticky-header="50vh" responsive class="pl-0 pr-0 pb-2 mb-2" table-class="m-0 leave-tables-alone">
                 <b-thead class="text-center">
                     <b-tr>
                     <b-th> </b-th>
+                    <b-th> </b-th>
                     <b-th class="d-none d-md-table-cell">
-                        <b-img class="icon" src="/images/mail_ico.svg" :title="translatedVolunteersInvited" />
+                        <b-img class="icon" src="/images/gauge_ico.svg" :title="translatedVolunteersInvited" />
                     </b-th>
                     <b-th class="d-none d-md-table-cell">
-                        <b-img class="icon" src="/images/participants.svg" :title="translatedVolunteersConfirmed" />
+                        <b-img class="icon" src="/images/thumbs-up_ico.svg" :title="translatedVolunteersConfirmed" />
                     </b-th>
                     </b-tr>
                 </b-thead>
 
                 <b-tbody class="table-height">
                     <b-tr>
-                        <b-td>
+                        <b-td class="text-center">
                             <b-img class="icon" src="/images/participants.svg" :title="translatedVolunteersConfirmed" />
+                        </b-td>
+                        <b-td>
                             Upstream volunteer contributions
                         </b-td>
                         <b-td class="text-center">{{ totalContributions }}</b-td>
                         <b-td class="text-center">3 quests</b-td>
                     </b-tr>
                     <b-tr>
-                        <b-td>My contributions</b-td>
+                        <b-td class="text-center">
+                        <b-img class="icon" src="/images/user_ico.svg" :title="translatedVolunteersConfirmed" />
+                        </b-td>
+                        <b-td>
+                        My contributions
+                        </b-td>
                         <b-td class="text-center">{{ currentUserContributions }}</b-td>
                         <b-td class="text-center">{{ currentUserQuests }} quests</b-td>
                     </b-tr>
@@ -82,6 +90,10 @@ export default {
     @include media-breakpoint-up(md) {
         box-shadow: 5px 5px $black;
     }
+}
+
+.table td:first-child {
+    padding-left: 0;
 }
 
 .dashbord {
