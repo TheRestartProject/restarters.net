@@ -6,8 +6,8 @@
         :placeholder="translatedSearchNamePlaceholder"
         class="mb-1 mb-md-0"
     />
-    <div />
     <multiselect
+        v-if="showTags"
         v-model="searchTags"
         :placeholder="translatedSearchTagsPlaceholder"
         :options="allGroupTags"
@@ -20,15 +20,14 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
+        :selectedLabel="translatedRemove"
     />
-    <div />
     <b-form-input
         v-model="searchLocation"
         type="search"
         :placeholder="translatedSearchLocationPlaceholder"
         class="mb-1 mb-md-0"
     />
-    <div />
     <multiselect
         v-model="searchCountry"
         :placeholder="translatedCountries"
@@ -42,8 +41,8 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
+        :selectedLabel="translatedRemove"
     />
-    <div />
     <multiselect
         v-model="searchNetwork"
         :placeholder="translatedNetworks"
@@ -57,6 +56,7 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
+        :selectedLabel="translatedRemove"
     />
   </div>
 </template>
@@ -81,6 +81,11 @@ export default {
       type: Array,
       required: false,
       default: null
+    },
+    showTags: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
@@ -138,6 +143,9 @@ export default {
         return a.country.localeCompare(b.country)
       })
     },
+    translatedRemove() {
+      return this.$lang.get('partials.remove')
+    },
     translatedNetworks() {
       return this.$lang.get('networks.network')
     },
@@ -169,10 +177,11 @@ export default {
 .layout {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto auto auto auto auto auto auto;
+  grid-template-rows: auto;
 
   @include media-breakpoint-up(md) {
-    grid-template-columns: 1fr 20px 1fr 20px 1fr 20px 1fr 20px 1fr;
+    grid-column-gap: 20px;
+    grid-template-columns: repeat( auto-fit, minmax(0px, 1fr) );
     grid-template-rows: 1fr;
   }
 }

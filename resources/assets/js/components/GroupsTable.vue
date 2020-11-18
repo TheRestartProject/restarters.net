@@ -12,6 +12,7 @@
           :networks="networks"
           :groups="groups"
           :all-group-tags="allGroupTags"
+          :show-tags="showTags"
       />
     </div>
     <div class="d-block d-md-none" v-if="search">
@@ -31,10 +32,11 @@
           :networks="networks"
           :groups="groups"
           :all-group-tags="allGroupTags"
+          :show-tags="showTags"
       />
     </div>
     <hr class="d-block d-md-none" />
-    <b-table :fields="fields" :items="items" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare">
+    <b-table :fields="fields" :items="itemsToShow" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare">
       <template slot="head(group_image)">
         <span />
       </template>
@@ -139,6 +141,21 @@ export default {
       type: Array,
       required: false,
       default: null
+    },
+    showTags: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    tab: {
+      type: Number,
+      required: false,
+      default: 0
+    },
+    yourArea: {
+      type: String,
+      required: false,
+      default: null
     }
   },
   data () {
@@ -157,7 +174,8 @@ export default {
       searchNetwork: null,
       searchCountry: null,
       searchShow: false,
-      searchTags: null
+      searchTags: null,
+      show: 3
     }
   },
   computed: {
@@ -215,6 +233,9 @@ export default {
         }
       })
     },
+    itemsToShow() {
+      return this.items.slice(0, this.show)
+    },
     translatedNonePlanned() {
       return this.$lang.get('groups.upcoming_none_planned')
     },
@@ -244,10 +265,13 @@ export default {
     translatedConfirmLeaveGroup() {
       return this.$lang.get('groups.leave_group_confirm')
     }
-  },
+},
   created() {
     // We might arrive on the page to filter by network.
     this.searchNetwork = this.network
+  },
+  mounted() {
+    this.loadMore()
   },
   methods: {
     brokenProfileImage(event) {
@@ -268,7 +292,7 @@ export default {
       const a = aRow[key]
       const b = bRow[key]
 
-console.log(aRow, bRow, key)
+      console.log("Sort", key, a, b)
       if (key === 'group_name') {
         // We need a custom sort because we are putting a link into the group field.
         return b.name.localeCompare(a.name, compareLocale, compareOptions)
@@ -281,11 +305,26 @@ console.log(aRow, bRow, key)
         } else if (bRow.next_event && !aRow.next_event) {
           return 1
         } else {
-          console.log("Compare date", new Date(aRow.next_event).getTime(), new Date(bRow.next_event).getTime(), new Date(aRow.next_event).getTime() - new Date(bRow.next_event).getTime())
-          return new Date(aRow.next_event).getTime() - new Date(bRow.next_event).getTime()
+          return new moment(aRow.group_name.next_event).unix() - new moment(bRow.group_name.next_event).unix()
+        }
+      } else if (key === 'all_hosts_count' || key === 'all_restarters_count') {
+        if (parseInt(a) < parseInt(b)) {
+          return -1
+        } else if (parseInt(a) > parseInt(b)) {
+          return 1
+        } else {
+          return 0
         }
       } else {
         return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
+      }
+    },
+    loadMore() {
+      // We can't use a genuine infinite scroll because we need the data loaded into the table for filtering.  But
+      // we can load it gradually so that the page looks more responsive.
+      if (this.show < this.items.length) {
+        this.show += 10
+        setTimeout(this.loadMore, 1)
       }
     },
     leaveGroup(idgroups) {

@@ -1,71 +1,89 @@
 <template>
   <div>
-<!--    TODO Notification box - when does this happen? -->
     <h1 class="d-flex justify-content-between">
       <div class="d-flex">
+        <div class="mt-2">
         {{ translatedTitle }}
-        <b-img class="ml-2" src="/images/group_doodle_ico.svg" />
+        </div>
+        <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
       </div>
       <div>
         <b-btn variant="primary" href="/group/create" v-if="canCreate">
-          <span class="d-block d-md-none">
+          <span class="d-block d-lg-none">
             {{ translatedAddNewGroupMobile }}
           </span>
-          <span class="d-none d-md-block">
+          <span class="d-none d-lg-block">
             {{ translatedAddNewGroup }}
           </span>
         </b-btn>
       </div>
     </h1>
     <b-tabs class="ourtabs w-100 mt-4" justified v-model="currentTab">
-      <b-tab class="pt-2">
+      <b-tab class="pt-2" lazy>
         <template slot="title">
           <b class="text-uppercase d-block d-md-none">{{ translatedYourGroupsMobile }}</b>
           <b class="text-uppercase d-none d-md-block">{{ translatedYourGroups }}</b>
         </template>
         <div class="pt-2 pb-2">
-          <GroupsPageInfo @nearest="currentTab = 1"/>
-          <div v-if="myGroups">
-            <GroupsTable :groups="myGroups" class="mt-3" />
+          <div v-if="myGroups && myGroups.length">
+            <GroupsTable
+                :groups="myGroups"
+                class="mt-3"
+                :tab="currentTab"
+                @nearest="currentTab = 1"
+                your-area="yourArea"
+            />
           </div>
+          <div v-else class="mt-2 mb-2 text-center" v-html="translatedNoGroupsMine" />
         </div>
       </b-tab>
-      <b-tab class="pt-2">
+      <b-tab class="pt-2" lazy>
         <template slot="title">
-          <b class="text-uppercase d-block d-md-none">{{ translatedNearestGroupsMobile }}</b>
-          <b class="text-uppercase d-none d-md-block">{{ translatedNearestGroups }}</b>
+          <b class="text-uppercase d-block d-lg-none">{{ translatedNearestGroupsMobile }}</b>
+          <b class="text-uppercase d-none d-lg-block">{{ translatedNearestGroups }}</b>
         </template>
-        <div v-if="!yourArea" class="text-center">
-          {{ translatedYourArea1 }} <a :href="'/profile/edit/' + userId">{{ translatedYourArea2 }}</a>.
+        <div v-if="nearbyGroups && nearbyGroups.length">
+          <GroupsTable
+              :groups="nearbyGroups"
+              class="mt-3"
+              :tab="currentTab"
+              @all="currentTab = 2"
+              your-area="yourArea"
+          />
         </div>
-        <div v-if="nearbyGroups">
-          <GroupsTable :groups="nearbyGroups" class="mt-3" />
-        </div>
-        <div v-else>
-          <p>
-            {{ translatedNoGroupsNearYou }}
-          </p>
-          <p v-html="startAGroup" />
+        <div v-else class="mt-2 mb-2 text-center">
+          <div v-if="yourArea" v-html=" translatedNoGroupsNearestWithLocation" />
+          <div v-else v-html="translatedNoGroupsNearestNoLocation" />
         </div>
       </b-tab>
-      <b-tab class="pt-2">
+      <b-tab class="pt-2" lazy>
         <template slot="title">
           <b class="text-uppercase d-block d-md-none">{{ translatedAllGroupsMobile }}</b>
           <b class="text-uppercase d-none d-md-block">{{ translatedAllGroups }}</b>
         </template>
-        <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" :network="network" :all-group-tags="allGroupTags" />
+        <GroupsTable
+            :groups="groups"
+            class="mt-3"
+            count
+            search
+            :networks="networks"
+            :network="network"
+            :all-group-tags="allGroupTags"
+            :show-tags="showTags"
+            :tab="currentTab"
+            your-area="yourArea"
+        />
       </b-tab>
     </b-tabs>
   </div>
 </template>
 <script>
-import GroupsPageInfo from './GroupsPageInfo'
 import GroupsTable from './GroupsTable'
 import auth from '../mixins/auth'
 
 export default {
-  components: {GroupsTable, GroupsPageInfo},
-  mixins: [ auth ],
+  components: {GroupsTable},
+  mixins: { auth },
   props: {
     network: {
       type: Number,
@@ -107,12 +125,13 @@ export default {
       required: false,
       default: false
     },
+    showTags: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     networks: {
       type: Array,
-      required: true
-    },
-    startAGroup: {
-      type: String,
       required: true
     },
     apiToken: {
@@ -168,11 +187,14 @@ export default {
         area: this.yourArea ? (this.yourArea.charAt(0).toUpperCase() + this.yourArea.slice(1)) : ''
       })
     },
-    translatedYourArea1() {
-      return this.$lang.get('groups.your_area1')
+    translatedNoGroupsMine() {
+      return this.$lang.get('groups.no_groups_mine')
     },
-    translatedYourArea2() {
-      return this.$lang.get('groups.your_area2')
+    translatedNoGroupsNearestNoLocation() {
+      return this.$lang.get('groups.no_groups_nearest_no_location')
+    },
+    translatedNoGroupsNearestWithLocation() {
+      return this.$lang.get('groups.no_groups_nearest_with_location')
     },
     translatedNearestGroups() {
       return this.$lang.get('groups.groups_title2')
@@ -200,7 +222,6 @@ export default {
           default: tag = 'mine'; break;
         }
 
-        console.log("Route to", tag)
         window.history.pushState(null, "Groups", "/group/" + tag);
       } catch (e) {
         console.error("Failed to update URL")
@@ -208,12 +229,12 @@ export default {
     }
   },
   created() {
+    console.log("Groups page created")
     // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
     // and so that as/when it changes then reactivity updates all the views.
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
     let groups = {}
-    console.log("All groups", this.allGroups)
 
     this.allGroups.forEach(g => {
       groups[g.idgroups] = g
@@ -251,3 +272,8 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+.height {
+  height: 76px;
+}
+</style>

@@ -27,9 +27,12 @@ export default {
       Vue.set(state.list, params.idgroups, params)
     },
     setList(state, params) {
+      let list = {}
       params.groups.forEach(e => {
-        Vue.set(state.list, e.idgroups, e)
+        list[e.idgroups] = e
       })
+
+      state.list = list
     },
     setStats(state, params) {
       Vue.set(state.stats, params.idgroups, params.stats)

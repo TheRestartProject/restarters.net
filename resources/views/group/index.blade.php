@@ -34,7 +34,7 @@
                         'idgroups' => $group['idgroups'],
                         'name' => $group['name'],
                         'image' => (is_object($group_image) && is_object($group_image->image)) ?
-                            env('UPLOADS_URL').'mid_'.$group_image->image->path : null,
+                            asset('uploads/mid_'.$group_image->image->path) : null,
                         'location' => rtrim($group['location']),
                         'next_event' => $event ? $event['event_date'] : null,
                         'all_restarters_count' => $group->all_restarters_count,
@@ -60,8 +60,9 @@
         }
 
         $can_create = FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host');
-        $user = Auth::user();
-        $myid = $user ? $user->id : null;
+        $show_tags = FixometerHelper::hasRole(Auth::user(), 'Administrator');
+
+        $myid = Auth::user() ? Auth::user()->id : null;
         $api_token = NULL;
 
         if ($user) {
@@ -84,8 +85,8 @@
           tab="{{ $tab }}"
           :network="{{ $network ? $network : 'null' }}"
           :networks="{{ json_encode($networks) }}"
-          start-a-group="{{ __('groups.consider_starting_a_group', ['resources_url' => env('DISCOURSE_URL').'/session/sso?return_path='.env('DISCOURSE_URL').'/t/how-to-power-up-community-repair-with-restarters-net/1228/']) }}"
           :all-group-tags="{{ json_encode($all_group_tags) }}"
+          :show-tags="{{ $show_tags ? 'true' : 'false' }}"
           api-token="{{ $api_token }}"
         />
       </div>
