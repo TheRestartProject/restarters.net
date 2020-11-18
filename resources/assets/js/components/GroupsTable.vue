@@ -229,7 +229,7 @@ export default {
       })
     },
     itemsToShow() {
-      return this.items.slice(0, this.show) ? [] : []
+      return this.items.slice(0, this.show)
     },
     translatedNonePlanned() {
       return this.$lang.get('groups.upcoming_none_planned')
