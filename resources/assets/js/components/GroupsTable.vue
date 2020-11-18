@@ -93,21 +93,6 @@
         </b-btn>
       </template>
     </b-table>
-    <div v-if="itemsToShow.length === 0" class="mt-2 mb-2 text-center">
-      {{ translatedNoGroups1 }}
-      <a href="#" @click="$emit('nearest')" v-if="tab === 0">
-        <span v-if="!yourArea">
-          {{ translatedNoGroupsNoLocation }}
-        </span>
-        <span v-else>
-          {{ translatedNoGroupsNearest}}
-        </span>
-      </a>
-      <a href="#" @click="$emit('all')" v-if="tab === 1">
-        {{ translatedNoGroupsAll}}
-      </a>
-      {{ translatedNoGroups3 }}
-    </div>
   </div>
 </template>
 <script>
@@ -260,23 +245,6 @@ export default {
     },
     translatedHideFilters() {
       return this.$lang.get('groups.hide_filters')
-    },
-    translatedNoGroups1() {
-      return this.$lang.get('groups.no_groups_1')
-    },
-    translatedNoGroupsNoLocation() {
-      return this.$lang.get('groups.no_groups_near_you', {
-        area: this.yourArea ? (this.yourArea.charAt(0).toUpperCase() + this.yourArea.slice(1)) : ''
-      })
-    },
-    translatedNoGroupsNearest() {
-      return this.$lang.get('groups.no_groups_nearest')
-    },
-    translatedNoGroupsAll() {
-      return this.$lang.get('groups.no_groups_all')
-    },
-    translatedNoGroups3() {
-      return this.$lang.get('groups.no_groups_3')
     },
 },
   created() {

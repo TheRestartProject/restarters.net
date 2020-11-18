@@ -42,9 +42,6 @@
           <b class="text-uppercase d-block d-lg-none">{{ translatedNearestGroupsMobile }}</b>
           <b class="text-uppercase d-none d-lg-block">{{ translatedNearestGroups }}</b>
         </template>
-        <div v-if="!yourArea" class="text-center">
-          {{ translatedYourArea1 }} <a :href="'/profile/edit/' + userId">{{ translatedYourArea2 }}</a>.
-        </div>
         <div v-if="nearbyGroups && nearbyGroups.length">
           <GroupsTable
               :groups="nearbyGroups"
