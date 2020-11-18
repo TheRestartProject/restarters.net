@@ -93,6 +93,16 @@
         </b-btn>
       </template>
     </b-table>
+    <div v-if="itemsToShow.length === 0" class="mt-2 mb-2 text-center">
+      {{ translatedNoGroups1 }}
+      <a href="#" @click="$emit('nearest')" v-if="tab === 0">
+        {{ translatedNoGroupsNearest}}
+      </a>
+      <a href="#" @click="$emit('all')" v-if="tab === 1">
+        {{ translatedNoGroupsAll}}
+      </a>
+      {{ translatedNoGroups3 }}
+    </div>
   </div>
 </template>
 <script>
@@ -136,6 +146,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    tab: {
+      type: Number,
+      required: false,
+      default: 0
     }
   },
   data () {
@@ -214,7 +229,7 @@ export default {
       })
     },
     itemsToShow() {
-      return this.items.slice(0, this.show)
+      return this.items.slice(0, this.show) ? [] : []
     },
     translatedNonePlanned() {
       return this.$lang.get('groups.upcoming_none_planned')
@@ -235,8 +250,20 @@ export default {
     },
     translatedHideFilters() {
       return this.$lang.get('groups.hide_filters')
-    }
-  },
+    },
+    translatedNoGroups1() {
+      return this.$lang.get('groups.no_groups_1')
+    },
+    translatedNoGroupsNearest() {
+      return this.$lang.get('groups.no_groups_nearest')
+    },
+    translatedNoGroupsAll() {
+      return this.$lang.get('groups.no_groups_all')
+    },
+    translatedNoGroups3() {
+      return this.$lang.get('groups.no_groups_3')
+    },
+},
   created() {
     // We might arrive on the page to filter by network.
     this.searchNetwork = this.network

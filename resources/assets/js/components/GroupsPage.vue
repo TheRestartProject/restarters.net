@@ -25,9 +25,8 @@
           <b class="text-uppercase d-none d-md-block">{{ translatedYourGroups }}</b>
         </template>
         <div class="pt-2 pb-2">
-          <GroupsPageInfo @nearest="currentTab = 1"/>
           <div v-if="myGroups">
-            <GroupsTable :groups="myGroups" class="mt-3" />
+            <GroupsTable :groups="myGroups" class="mt-3" :tab="currentTab" @nearest="currentTab = 1" />
           </div>
         </div>
       </b-tab>
@@ -40,7 +39,7 @@
           {{ translatedYourArea1 }} <a :href="'/profile/edit/' + userId">{{ translatedYourArea2 }}</a>.
         </div>
         <div v-if="nearbyGroups">
-          <GroupsTable :groups="nearbyGroups" class="mt-3" />
+          <GroupsTable :groups="nearbyGroups" class="mt-3" :tab="currentTab" @all="currentTab = 2" />
         </div>
         <div v-else>
           <p>
@@ -54,7 +53,17 @@
           <b class="text-uppercase d-block d-md-none">{{ translatedAllGroupsMobile }}</b>
           <b class="text-uppercase d-none d-md-block">{{ translatedAllGroups }}</b>
         </template>
-        <GroupsTable :groups="groups" class="mt-3" count search :networks="networks" :network="network" :all-group-tags="allGroupTags" :show-tags="showTags" />
+        <GroupsTable
+            :groups="groups"
+            class="mt-3"
+            count
+            search
+            :networks="networks"
+            :network="network"
+            :all-group-tags="allGroupTags"
+            :show-tags="showTags"
+            :tab="currentTab"
+        />
       </b-tab>
     </b-tabs>
   </div>
