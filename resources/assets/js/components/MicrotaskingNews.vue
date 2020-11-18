@@ -1,5 +1,5 @@
 <template>
-    <CollapsibleSection class="lineheight">
+    <CollapsibleSection class="p-3 p-md-0 lineheight">
         <template slot="title">
             Read about our recent success
         </template>

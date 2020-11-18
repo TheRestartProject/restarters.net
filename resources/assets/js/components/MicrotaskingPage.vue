@@ -16,7 +16,7 @@
           </div>
       </div>
       <div>
-          <MicrotaskingDiscussion :topics="topics" />
+          <MicrotaskingDiscussion :topics="topics" :see-all-topics-link="seeAllTopicsLink" />
       </div>
   </div>
 </template>
@@ -42,6 +42,10 @@ export default {
     },
     topics: {
       type: Array,
+      required: true
+    },
+    seeAllTopicsLink: {
+      type: String,
       required: true
     }
   },

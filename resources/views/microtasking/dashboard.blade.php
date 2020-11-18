@@ -33,6 +33,7 @@
               :current-user-quests="{{ $currentUserQuests }}"
               :current-user-contributions="{{ $currentUserContributions }}"
               :topics="{{ json_encode($topics) }}"
+              see-all-topics-link="{{ $seeAllTopicsLink }}"
             />
         </div>
     </div>

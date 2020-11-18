@@ -1,14 +1,14 @@
 <template>
-    <CollapsibleSection class="py-4 lineheight">
+    <CollapsibleSection class="p-3 p-md-0 lineheight">
         <template slot="title">
             What's happening
         </template>
         <template slot="title-right">
-            foo
+            <b-img class="icon ml-3 d-none d-md-block" src="/images/talk_doodle.svg" style="width:70px" :title="translatedVolunteersInvited" />
         </template>
 
         <template slot="content">
-            <div class="content">
+            <div class="content pt-2">
             <b-table-simple responsive class="" table-class="m-0 leave-tables-alone">
 
                 <b-thead class="text-center">
@@ -28,7 +28,9 @@
                 </b-tbody>
             </b-table-simple>
 
-            </b-table-simple>
+            <div class="text-right">
+                <a :href="seeAllTopicsLink">see all</a>
+            </div>
             </div>
         </template>
     </CollapsibleSection>
@@ -43,6 +45,10 @@ export default {
   props: {
     'topics': {
       type: Array,
+      required: true
+    },
+    'seeAllTopicsLink': {
+      type: String,
       required: true
     }
   }

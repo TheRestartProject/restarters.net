@@ -21,11 +21,14 @@ class MicrotaskingController extends Controller
             $currentUserContributions = 0;
         }
 
+        $tag = 'open-data-dive';
+
         return view('microtasking.dashboard', [
             'totalContributions' => $this->getTotalContributions(),
             'currentUserQuests' => $currentUserQuests,
             'currentUserContributions' => $currentUserContributions,
-            'topics' => $this->getDiscussionTopics(),
+            'topics' => $this->getDiscussionTopics($tag, 5),
+            'seeAllTopicsLink' => env('DISCOURSE_URL') . "/tag/{$tag}/l/latest"
         ]);
     }
 
@@ -55,16 +58,18 @@ class MicrotaskingController extends Controller
         return $faultCatContributions + $miscCatContributions + $mobifixContributions;
     }
 
-    private function getDiscussionTopics()
+    private function getDiscussionTopics($tag, $numberOfTopics = null)
     {
         $client = app('discourse-client');
 
-        $tag = 'open-data-dive';
         $endpoint = "/tag/{$tag}/l/latest.json";
         $response = $client->request('GET', $endpoint);
         $discourseResult = json_decode($response->getBody());
 
         $topics = $discourseResult->topic_list->topics;
+        if (!empty($numberOfTopics)) {
+            $topics = array_slice($topics, 0, $numberOfTopics, true);
+        }
 
         $endpoint = "/site.json";
         $response = $client->request('GET', $endpoint);

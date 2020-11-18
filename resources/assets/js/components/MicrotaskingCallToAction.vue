@@ -1,11 +1,11 @@
 <template>
-    <CollapsibleSection id="cta" class="p-4 lineheight">
+    <CollapsibleSection id="cta" class="p-4 lineheight" :show-horizontal-rule="false">
         <template slot="title">
             Help Now!  MobiFix
         </template>
 
         <template slot="content">
-            <div class="layout">
+            <div class="content">
                 <p class="dashbord pt-3">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
@@ -46,7 +46,7 @@ export default {
     }
 }
 
-.layout {
+.content {
     border-top: 3px dashed black;
 
     display: grid;

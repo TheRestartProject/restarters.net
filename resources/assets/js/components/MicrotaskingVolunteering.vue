@@ -1,5 +1,5 @@
 <template>
-    <CollapsibleSection id="volunteering" class="p-4 lineheight">
+    <CollapsibleSection id="volunteering" class="p-4 lineheight" :show-horizontal-rule="false">
         <template slot="title">
             Volunteer from anywhere
         </template>
@@ -17,10 +17,10 @@
                     <b-tr>
                     <b-th> </b-th>
                     <b-th> </b-th>
-                    <b-th class="d-none d-md-table-cell">
+                    <b-th class="d-table-cell">
                         <b-img class="icon" src="/images/gauge_ico.svg" :title="translatedVolunteersInvited" />
                     </b-th>
-                    <b-th class="d-none d-md-table-cell">
+                    <b-th class="d-table-cell">
                         <b-img class="icon" src="/images/thumbs-up_ico.svg" :title="translatedVolunteersConfirmed" />
                     </b-th>
                     </b-tr>
@@ -34,7 +34,7 @@
                         <b-td>
                             Upstream volunteer contributions
                         </b-td>
-                        <b-td class="text-center">{{ totalContributions }}</b-td>
+                        <b-td class="text-center">{{ totalContributions.toLocaleString() }}</b-td>
                         <b-td class="text-center">3 quests</b-td>
                     </b-tr>
                     <b-tr>
