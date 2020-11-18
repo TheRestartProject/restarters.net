@@ -62,7 +62,8 @@
         $can_create = FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host');
         $show_tags = FixometerHelper::hasRole(Auth::user(), 'Administrator');
 
-        $myid = Auth::user() ? Auth::user()->id : null;
+        $user = Auth::user();
+        $myid = $user ? $user->id : null;
         $api_token = NULL;
 
         if ($user) {
