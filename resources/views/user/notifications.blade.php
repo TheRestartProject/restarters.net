@@ -31,8 +31,10 @@
                        href="{{ route('edit-profile', ['id' => $user->id]) }}#list-calendar-links" role="tab">@lang('profile.calendars.title')</a>
                     <a class="list-group-item list-group-item-action active" id="list-notifications-list"
                        data-toggle="list" href="#list-notifications" role="tab" aria-controls="list-notifications">@lang('profile.notifications')</a>
+                    @if(Auth::user()->isRepairDirectoryRegionalAdmin() || Auth::user()->isRepairDirectorySuperAdmin())
                     <a class="list-group-item list-group-item-action" id="list-repair-directory-list"
                        href="{{ route('edit-profile', ['id' => $user->id]) }}#list-repair-directory" role="tab">@lang('profile.repair_directory')</a>
+                    @endif
                 </div>
             </div>
             <div class="col-lg-8" aria-labelledby="list-profile-list">

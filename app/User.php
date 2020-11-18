@@ -27,6 +27,9 @@ class User extends Authenticatable implements Auditable
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
+    // Use the Authorizable trait so that we can call can() on a user to evaluation policies.
+    use \Illuminate\Foundation\Auth\Access\Authorizable;
+
     protected $table = 'users';
 
     /**

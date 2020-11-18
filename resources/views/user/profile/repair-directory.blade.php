@@ -1,5 +1,3 @@
-@inject('controller', 'App\Http\Controllers\UserController')
-
 <div class="edit-panel">
 
   <div class="form-row">
@@ -15,25 +13,25 @@
 
     <?php
       $roles = [];
-
+      
       $roles[\App\Role::REPAIR_DIRECTORY_NONE] = [
         'selected' => Auth::user()->isRepairDirectoryNone(),
-        'disabled' => !$controller::canChangeRepairDirRole(Auth::user(), $user, \App\Role::REPAIR_DIRECTORY_NONE),
+        'disabled' => !Auth::user()->can('canChangeRepairDirRole', [ $user, \App\Role::REPAIR_DIRECTORY_NONE ]),
         'name' => __('profile.repair_dir_none')
       ];
       $roles[\App\Role::REPAIR_DIRECTORY_EDITOR] = [
         'selected' => Auth::user()->isRepairDirectoryEditor(),
-        'disabled' => !$controller::canChangeRepairDirRole(Auth::user(), $user, \App\Role::REPAIR_DIRECTORY_EDITOR),
+        'disabled' => !Auth::user()->can('canChangeRepairDirRole', [ $user, \App\Role::REPAIR_DIRECTORY_EDITOR ]),
         'name' => __('profile.repair_dir_editor')
       ];
       $roles[\App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN] = [
         'selected' => Auth::user()->isRepairDirectoryRegionalAdmin(),
-        'disabled' => !$controller::canChangeRepairDirRole(Auth::user(), $user, \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN),
+        'disabled' => !Auth::user()->can('canChangeRepairDirRole', [ $user, \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN ]),
         'name' => __('profile.repair_dir_regional_admin')
       ];
       $roles[\App\Role::REPAIR_DIRECTORY_SUPERADMIN] = [
         'selected' => Auth::user()->isRepairDirectorySuperAdmin(),
-        'disabled' => !$controller::canChangeRepairDirRole(Auth::user(), $user, \App\Role::REPAIR_DIRECTORY_SUPERADMIN),
+        'disabled' => !Auth::user()->can('canChangeRepairDirRole', [ $user, \App\Role::REPAIR_DIRECTORY_SUPERADMIN ]),
         'name' => __('profile.repair_dir_superadmin')
       ];
 
