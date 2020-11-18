@@ -1,3 +1,5 @@
+@inject('controller', 'App\Http\Controllers\UserController')
+
 <div class="edit-panel">
 
   <div class="form-row">
@@ -11,7 +13,31 @@
 
     {{ Form::hidden('id', $user->id) }}
 
-    @php($role = $user->repairdir_role)
+    <?php
+      $roles = [];
+
+      $roles[\App\Role::REPAIR_DIRECTORY_NONE] = [
+        'selected' => Auth::user()->isRepairDirectoryNone(),
+        'disabled' => !$controller::canChangeRepairDirRole(Auth::user(), $user, \App\Role::REPAIR_DIRECTORY_NONE),
+        'name' => __('profile.repair_dir_none')
+      ];
+      $roles[\App\Role::REPAIR_DIRECTORY_EDITOR] = [
+        'selected' => Auth::user()->isRepairDirectoryEditor(),
+        'disabled' => !$controller::canChangeRepairDirRole(Auth::user(), $user, \App\Role::REPAIR_DIRECTORY_EDITOR),
+        'name' => __('profile.repair_dir_editor')
+      ];
+      $roles[\App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN] = [
+        'selected' => Auth::user()->isRepairDirectoryRegionalAdmin(),
+        'disabled' => !$controller::canChangeRepairDirRole(Auth::user(), $user, \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN),
+        'name' => __('profile.repair_dir_regional_admin')
+      ];
+      $roles[\App\Role::REPAIR_DIRECTORY_SUPERADMIN] = [
+        'selected' => Auth::user()->isRepairDirectorySuperAdmin(),
+        'disabled' => !$controller::canChangeRepairDirRole(Auth::user(), $user, \App\Role::REPAIR_DIRECTORY_SUPERADMIN),
+        'name' => __('profile.repair_dir_superadmin')
+      ];
+
+    ?>
 
     <fieldset>
       <div class="form-group row justify-content-center">
@@ -21,22 +47,16 @@
         <div class="col-lg-6">
           <div class="form-control form-control__select">
             <select id="role" name="role" required aria-required="true" class="field select2">
-              <option value="<?php echo \App\Role::REPAIR_DIRECTORY_NONE; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_NONE) selected @endif>@lang('profile.repair_dir_none')</option>
-              @if(Auth::user()->isRepairDirectoryRegionalAdmin() || Auth::user()->isRepairDirectorySuperAdmin())
-              <option value="<?php echo \App\Role::REPAIR_DIRECTORY_EDITOR; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_EDITOR) selected @endif>@lang('profile.repair_dir_editor')</option>
-              @else
-              <option value="<?php echo \App\Role::REPAIR_DIRECTORY_EDITOR; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_EDITOR) selected @endif disabled>@lang('profile.repair_dir_editor')</option>
-              @endif
-              @if(Auth::user()->isRepairDirectorySuperAdmin())
-              <option value="<?php echo \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN) selected @endif>@lang('profile.repair_dir_regional_admin')</option>
-              @else
-              <option value="<?php echo \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN; ?> @if ($role === \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN) selected @endif" disabled>@lang('profile.repair_dir_regional_admin')</option>
-              @endif
-              @if(Auth::user()->isRepairDirectorySuperAdmin())
-              <option value="<?php echo \App\Role::REPAIR_DIRECTORY_SUPERADMIN; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_SUPERADMIN) selected @endif>@lang('profile.repair_dir_superadmin')</option>
-              @else
-              <option value="<?php echo \App\Role::REPAIR_DIRECTORY_SUPERADMIN; ?>" @if ($role === \App\Role::REPAIR_DIRECTORY_SUPERADMIN) selected @endif disabled>@lang('profile.repair_dir_superadmin')</option>
-              @endif
+              <?php
+
+              foreach ($roles as $role => $info) {
+                echo "<option value=\"$role\"" .
+                   ($info['selected'] ? " selected" : "") .
+                   ($info['disabled'] ? " disabled" : "") .
+                  ">{$info['name']}</option>";
+              }
+
+              ?>
             </select>
           </div>
         </div>
