@@ -25,9 +25,16 @@
           <b class="text-uppercase d-none d-md-block">{{ translatedYourGroups }}</b>
         </template>
         <div class="pt-2 pb-2">
-          <div v-if="myGroups">
-            <GroupsTable :groups="myGroups" class="mt-3" :tab="currentTab" @nearest="currentTab = 1" />
+          <div v-if="myGroups && myGroups.length">
+            <GroupsTable
+                :groups="myGroups"
+                class="mt-3"
+                :tab="currentTab"
+                @nearest="currentTab = 1"
+                your-area="yourArea"
+            />
           </div>
+          <div v-else class="mt-2 mb-2 text-center" v-html="translatedNoGroupsMine" />
         </div>
       </b-tab>
       <b-tab class="pt-2" lazy>
@@ -38,14 +45,18 @@
         <div v-if="!yourArea" class="text-center">
           {{ translatedYourArea1 }} <a :href="'/profile/edit/' + userId">{{ translatedYourArea2 }}</a>.
         </div>
-        <div v-if="nearbyGroups">
-          <GroupsTable :groups="nearbyGroups" class="mt-3" :tab="currentTab" @all="currentTab = 2" />
+        <div v-if="nearbyGroups && nearbyGroups.length">
+          <GroupsTable
+              :groups="nearbyGroups"
+              class="mt-3"
+              :tab="currentTab"
+              @all="currentTab = 2"
+              your-area="yourArea"
+          />
         </div>
-        <div v-else>
-          <p>
-            {{ translatedNoGroupsNearYou }}
-          </p>
-          <p v-html="startAGroup" />
+        <div v-else class="mt-2 mb-2 text-center">
+          <div v-if="yourArea" v-html=" translatedNoGroupsNearestWithLocation" />
+          <div v-else v-html="translatedNoGroupsNearestNoLocation" />
         </div>
       </b-tab>
       <b-tab class="pt-2" lazy>
@@ -63,6 +74,7 @@
             :all-group-tags="allGroupTags"
             :show-tags="showTags"
             :tab="currentTab"
+            your-area="yourArea"
         />
       </b-tab>
     </b-tabs>
@@ -124,10 +136,6 @@ export default {
       type: Array,
       required: true
     },
-    startAGroup: {
-      type: String,
-      required: true
-    },
     allGroupTags: {
       type: Array,
       required: true
@@ -176,11 +184,14 @@ export default {
         area: this.yourArea ? (this.yourArea.charAt(0).toUpperCase() + this.yourArea.slice(1)) : ''
       })
     },
-    translatedYourArea1() {
-      return this.$lang.get('groups.your_area1')
+    translatedNoGroupsMine() {
+      return this.$lang.get('groups.no_groups_mine')
     },
-    translatedYourArea2() {
-      return this.$lang.get('groups.your_area2')
+    translatedNoGroupsNearestNoLocation() {
+      return this.$lang.get('groups.no_groups_nearest_no_location')
+    },
+    translatedNoGroupsNearestWithLocation() {
+      return this.$lang.get('groups.no_groups_nearest_with_location')
     },
     translatedNearestGroups() {
       return this.$lang.get('groups.groups_title2')
