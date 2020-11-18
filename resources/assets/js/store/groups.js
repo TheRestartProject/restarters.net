@@ -62,7 +62,6 @@ export default {
         api_token: apiToken
       })
 
-      console.log("Group unfollow returned", ret)
       if (ret.data.success) {
         // TODO LATER We partially upgrade the group here.  It would be better to have a proper API call to get the
         // group, and update the whole thing.
