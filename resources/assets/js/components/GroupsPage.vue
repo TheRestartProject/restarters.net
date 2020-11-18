@@ -69,12 +69,11 @@
   </div>
 </template>
 <script>
-import GroupsPageInfo from './GroupsPageInfo'
 import GroupsTable from './GroupsTable'
 
 // TODO Mobile layout
 export default {
-  components: {GroupsTable, GroupsPageInfo},
+  components: {GroupsTable},
   props: {
     network: {
       type: Number,
