@@ -265,12 +265,10 @@ class UserController extends Controller
 
         $id = $request->input('id');
         $role = intval($request->input('role'));
-        $myrole = Auth::user()->repairdir_role;
+        $user = User::find($id);
 
         // Check that we are allowed to change the role, based on our own role.
-        if ($myrole === Role::REPAIR_DIRECTORY_SUPERADMIN ||
-            ($myrole === Role::REPAIR_DIRECTORY_REGIONAL_ADMIN && ($role === Role::REPAIR_DIRECTORY_EDITOR || $role === Role::REPAIR_DIRECTORY_NONE))) {
-            $user = User::find($id);
+        if (UserController::canChangeRepairDirRole(Auth::user(), $user, $role)) {
             $user->update([
                 'repairdir_role' => $role,
             ]);
