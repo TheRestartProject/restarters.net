@@ -110,6 +110,9 @@
       }
       ?>
 
+    <div class="vue-placeholder vue-placeholder-large">
+        <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+    </div>
       @if( is_null($group) )
       <div class="vue">
         <GroupEvents
