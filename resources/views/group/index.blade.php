@@ -20,61 +20,73 @@
       </div>
       @endif
 
-      <div class="row mb-30">
-          <div class="col-12 col-md-12">
-              <div class="d-flex align-items-center">
-                  <h1 class="mb-0 mr-30">
-                      @lang('groups.groups')
-                  </h1>
+      <?php
+        function expandGroups($groups) {
+            $ret = [];
 
-                  <div class="mr-auto d-none d-md-block">
-                      @include('svgs.group.group-doodle')
-                  </div>
+            if ($groups) {
+                foreach ($groups as $group) {
+                    $group_image = $group->groupImage;
 
-                  @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host') )
-                      <a href="{{{ route('create-group') }}}" class="btn btn-primary ml-auto">
-                          <span class="d-none d-lg-block">@lang('groups.create_groups')</span>
-                          <span class="d-block d-lg-none">@lang('groups.create_groups_mobile')</span>
-                      </a>
-                  @endif
-              </div>
-          </div>
+                    $event = $group->getNextUpcomingEvent();
+
+                    $ret[] = [
+                        'idgroups' => $group['idgroups'],
+                        'name' => $group['name'],
+                        'image' => (is_object($group_image) && is_object($group_image->image)) ?
+                            asset('uploads/mid_'.$group_image->image->path) : null,
+                        'location' => rtrim($group['location']),
+                        'next_event' => $event ? $event['event_date'] : null,
+                        'all_restarters_count' => $group->all_restarters_count,
+                        'all_hosts_count' => $group->all_hosts_count,
+                        'networks' => array_pluck($group->networks, 'id'),
+                        'country' => $group->country,
+                        'group_tags' => $group->group_tags()->get()->pluck('id')
+                    ];
+                }
+            }
+
+            return $ret;
+        }
+
+        $all_groups = expandGroups($groups);
+
+        if (!is_null($your_groups)) {
+            $your_groups = expandGroups($your_groups);
+        }
+
+        if (!is_null($groups_near_you)) {
+            $groups_near_you = expandGroups($groups_near_you);
+        }
+
+        $can_create = FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host');
+        $show_tags = FixometerHelper::hasRole(Auth::user(), 'Administrator');
+
+        $myid = Auth::user() ? Auth::user()->id : null
+
+      ?>
+
+      <div class="vue-placeholder vue-placeholder-large">
+        <div class="vue-placeholder-content">@lang('partials.loading')...</div>
       </div>
 
-      @if ($all)
-        <form action="/group/all/search" method="get" id="device-search">
-          <div class="row justify-content-center">
-            <div class="col-lg-3">
-              @include('group.sections.sidebar-all-groups')
-            </div>
-            <div class="col-lg-9">
-              @include('group.sections.all-groups')
-            </div>
-          </div>
-        </form>
-      @else
-        <form action="/group/" method="get" id="device-search">
-          <input type="hidden" name="sort_direction" value="{{$sort_direction}}" class="sr-only">
-          <input type="radio" name="sort_column" value="upcoming_event" @if( $sort_column == 'upcoming_event' ) checked @endif id="label-upcoming_event" class="sr-only">
+      <div class="vue">
+        <GroupsPage
+          :all-groups="{{ json_encode($all_groups) }}"
+          :your-groups="{{ json_encode($your_groups) }}"
+          :nearby-groups="{{ json_encode($groups_near_you) }}"
+          your-area="{{ $your_area }}"
+          :can-create="{{ $can_create ? 'true' : 'false' }}"
+          :user-id="{{ $myid }}"
+          tab="{{ $tab }}"
+          :network="{{ $network ? $network : 'null' }}"
+          :networks="{{ json_encode($networks) }}"
+          :all-group-tags="{{ json_encode($all_group_tags) }}"
+          :show-tags="{{ $show_tags ? 'true' : 'false' }}"
+        />
+      </div>
 
-          @if( !is_null($your_groups) )
-            <div class="row">
-              <div class="col">
-                @include('group.sections.user-groups')
-              </div>
-            </div>
-          @endif
-
-          @if( is_null($groups) )
-            <div class="row">
-              <div class="col">
-                @include('group.sections.groups-nearby')
-              </div>
-            </div>
-          @endif
-        </form>
-        @php( $user_preferences = session('column_preferences') )
-      @endif
+      @php( $user_preferences = session('column_preferences') )
 
     </section>
   @endsection

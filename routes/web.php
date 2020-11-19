@@ -196,10 +196,11 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/join/{id}', 'GroupController@getJoinGroup');
         Route::post('/image-upload/{id}', 'GroupController@imageUpload');
         Route::get('/image/delete/{idgroups}/{id}/{path}', 'GroupController@ajaxDeleteImage');
-        Route::get('/search/column', 'GroupController@searchColumn');
-        Route::get('/{all?}', 'GroupController@index')->name('groups');
-        Route::get('/all/search', 'GroupController@search');
-        Route::get('/search', 'GroupController@searchColumn');
+        Route::get('/', 'GroupController@mine')->name('groups');
+        Route::get('/all', 'GroupController@all');
+        Route::get('/mine', 'GroupController@mine');
+        Route::get('/nearby', 'GroupController@nearby');
+        Route::get('/network/{id}', 'GroupController@network');
         Route::get('/make-host/{group_id}/{user_id}', 'GroupController@getMakeHost');
         Route::get('/remove-volunteer/{group_id}/{user_id}', 'GroupController@getRemoveVolunteer');
         Route::get('/nearby/{id}', 'GroupController@volunteersNearby');
