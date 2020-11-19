@@ -189,6 +189,11 @@ export default {
     addGroupName: {
       type: Boolean,
       required: false
+    },
+    initialEvents: {
+      type: Array,
+      required: false,
+      default: null
     }
   },
   computed: {
@@ -238,9 +243,9 @@ export default {
     },
     past() {
       return this.events.filter(e => {
-          const start = new moment(e.event_date + ' ' + e.start)
-          return start.isBefore()
-      })
+        const start = new moment(e.event_date + ' ' + e.start)
+        return start.isBefore()
+      }).sort((a,b) => new moment(b.event_date).format('YYYYMMDD') - new moment(a.event_date).format('YYYYMMDD'))
     },
     pastToShow() {
       return this.limit ? this.past.slice(0, this.limit) : this.past
@@ -258,6 +263,14 @@ export default {
   methods: {
     showCalendar() {
       this.$refs.calendar.show()
+    }
+  },
+  mounted () {
+    // Data can be passed from the blade template to us via props.
+    if (this.initialEvents) {
+      this.$store.dispatch('events/setList', {
+        events: this.initialEvents
+      })
     }
   }
 }

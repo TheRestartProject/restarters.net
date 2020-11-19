@@ -20,6 +20,7 @@
           </div>
       @endif
 
+      @if( is_null($group) )
       <div class="row mb-30">
           <div class="col-12 col-md-12">
               <div class="d-flex align-items-center">
@@ -40,6 +41,7 @@
               </div>
           </div>
       </div>
+      @endif
 
     {{-- Events List --}}
     <div class="row justify-content-center">
@@ -110,22 +112,53 @@
               $calendar_edit_url = url("/profile/edit/" . Auth::user()->id . "#list-calendar-links");
           }
       }
+
+      $expanded_events = [];
+
+      foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+          $thisone = $event->getAttributes();
+          $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
+          $thisone['allinvitedcount'] = $event->allInvited->count();
+
+          // TODO LATER Consider whether these stats should be in the event or passed into the store.
+          $thisone['stats'] = $event->getEventStats($emissionRatio);
+          $thisone['participants_count'] = $event->participants;
+          $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+
+          $thisone['isVolunteer'] = $event->isVolunteer();
+          $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
+          $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+
+          $expanded_events[] = $thisone;
+      }
       ?>
 
+    <div class="vue-placeholder vue-placeholder-large">
+        <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+    </div>
+      @if( is_null($group) )
       <div class="vue">
-          <GroupEvents
-                  heading-level="h2"
-                  heading-sub-level="h3"
-                  :group-id="{{ $group ? $group->idgroups : 'null' }}"
-                  :group="{{ $group ? $group : 'null' }}"
-                  :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
-                  :events="{{ json_encode($expanded_events) }}"
-                  calendar-copy-url="{{ $calendar_copy_url }}"
-                  calendar-edit-url="{{ $calendar_edit_url }}"
-                  :add-button="false"
-                  :add-group-name="{{ $group ? 'false' : 'true' }}"
-          />
+        <GroupEvents
+            heading-level="h2"
+            heading-sub-level="h3"
+            :initial-events="{{ json_encode($expanded_events) }}"
+            :add-group-name="true"
+            calendar-copy-url="{{ $calendar_copy_url }}"
+            calendar-edit-url="{{ $calendar_edit_url }}"
+            :add-button="false"
+        />
       </div>
+      @else
+      <div class="vue">
+        <GroupEventsPage
+          :idgroups="{{ $group ? $group->idgroups : 'null' }}"
+          :events="{{ json_encode($expanded_events) }}"
+          calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
+          calendar-edit-url="{{ $calendar_edit_url }}"
+          :initial-group="{{ json_encode($group) }}"
+        />
+      </div>
+      @endif
 
         @if( is_null($group) )
         <section class="table-section upcoming_events_in_area mt-4" id="events-3">

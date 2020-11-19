@@ -16,7 +16,8 @@ export default {
       return state.list[idevents]
     },
     getByGroup: state => idgroups => {
-      return Object.values(state.list).filter(e => e.group === idgroups)
+      // null idgroups means fetch all
+      return Object.values(state.list).filter(e => (idgroups === null || e.group === idgroups))
     },
     getStats: state => idevents => {
       return state.stats[idevents]
