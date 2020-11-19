@@ -12,7 +12,7 @@
           <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon" />
         </div>
       </b-td>
-      <b-td v-if="powered">ca
+      <b-td v-if="powered">
         {{ device.model }}
         <div class="d-block d-md-none">
           <span class="pl-0 pl-md-2 pr-2 clickme" @click="editDevice">
