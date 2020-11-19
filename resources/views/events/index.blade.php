@@ -20,6 +20,29 @@
           </div>
       @endif
 
+      @if( is_null($group) )
+      <div class="row mb-30">
+          <div class="col-12 col-md-12">
+              <div class="d-flex align-items-center">
+                  <h1 class="mb-0 mr-30">
+                      @lang('events.events')
+                  </h1>
+
+                  <div class="mr-auto d-none d-md-block">
+                      @include('svgs.fixometer.events-doodle')
+                  </div>
+
+                  @if( FixometerHelper::userCanCreateEvents(Auth::user()) )
+                      <a href="/party/create" class="btn btn-primary ml-auto">
+                          <span class="d-none d-lg-block">@lang('events.add_event')</span>
+                          <span class="d-block d-lg-none">@lang('events.create_new_event_mobile')</span>
+                      </a>
+                  @endif
+              </div>
+          </div>
+      </div>
+      @endif
+
     {{-- Events List --}}
     <div class="row justify-content-center">
       <div class="col-lg-12">
@@ -105,6 +128,7 @@
           $thisone['isVolunteer'] = $event->isVolunteer();
           $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
           $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+        $thisone['group'] = \App\Group::where('idgroups', $event->group)->first();
 
           $expanded_events[] = $thisone;
       }
@@ -119,6 +143,7 @@
             heading-level="h2"
             heading-sub-level="h3"
             :initial-events="{{ json_encode($expanded_events) }}"
+            :add-group-name="true"
             calendar-copy-url="{{ $calendar_copy_url }}"
             calendar-edit-url="{{ $calendar_edit_url }}"
             :add-button="false"
