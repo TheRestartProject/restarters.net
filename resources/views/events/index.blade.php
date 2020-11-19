@@ -128,7 +128,6 @@
           $thisone['isVolunteer'] = $event->isVolunteer();
           $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
           $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
-        $thisone['group'] = \App\Group::where('idgroups', $event->group)->first();
 
           $expanded_events[] = $thisone;
       }
