@@ -3,7 +3,7 @@
     <b-tr v-if="!editing" :key="'summary-' + device.iddevices">
       <b-td>
         <h3 class="noheader">
-          {{ device.category.name }}
+          {{ translatedName }}
         </h3>
         <div class="d-block d-md-none">
           <div :class="badgeClass + ' d-block d-md-none'">
@@ -97,6 +97,9 @@ export default {
     }
   },
   computed: {
+    translatedName() {
+      return this.$lang.get('strings.' + this.device.category.name)
+    },
     powered() {
       return this.device.category && this.device.category.powered
     },

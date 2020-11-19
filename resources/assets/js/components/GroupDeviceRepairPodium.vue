@@ -11,7 +11,7 @@
             {{ device.counter }}
           </span>
           <span class="font-weight-bold small mb-2">
-            {{ device.name }}
+            {{ translatedName }}
           </span>
           </div>
         </div>
@@ -40,6 +40,11 @@ export default {
     position: {
       type: Number,
       required: true
+    }
+  },
+  computed: {
+    translatedName() {
+      return this.$lang.get('strings.' + this.device.name)
     }
   }
 }

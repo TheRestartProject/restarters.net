@@ -2,16 +2,12 @@
   <div>
     <div v-if="event">
       <EventHeading v-bind="$props" />
-      <div class="d-flex flex-wrap">
-        <div class="w-xs-100 w-md-50">
-          <div class="vue">
-            <EventDetails class="pr-md-3" v-bind="$props" />
-          </div>
-          <div class="vue">
-            <EventDescription class="pr-md-3" v-bind="$props" />
-          </div>
+      <div class="layout">
+        <div>
+          <EventDetails class="pr-md-3" v-bind="$props" />
+          <EventDescription class="pr-md-3" v-bind="$props" />
         </div>
-        <div class="w-xs-100 w-md-50 vue">
+        <div>
           <EventAttendance class="pl-md-3" v-bind="$props" />
         </div>
       </div>
@@ -78,3 +74,20 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+@import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+  }
+}
+</style>

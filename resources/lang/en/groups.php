@@ -172,4 +172,5 @@ return array (
   'search_tags_placeholder' => 'Tag',
   'show_filters' => 'Show Filters',
   'hide_filters' => 'Hide Filters',
+  'no_unpowered_stats' => 'At the moment, these stats are only displayed for powered items. We hope to include unpowered items soon.'
 );
