@@ -4,6 +4,14 @@
     @lang('microtasking.microtasking')
 @endsection
 
+@if( Auth::guest() )
+{{-- Adding this is here in order to apply global styles. --}}
+{{-- However not blanketly adding it to header_plain, as then that messes up the login/register pages for some reason. --}}
+@section('extra-css')
+<link href="{{ asset('global/css/app.css') }}" rel="stylesheet">
+@endsection
+@endif
+
 @section('content')
 <section class="microtasking">
     <div class="container">
