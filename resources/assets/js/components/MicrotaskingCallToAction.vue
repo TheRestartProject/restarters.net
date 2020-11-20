@@ -1,7 +1,11 @@
 <template>
-    <CollapsibleSection id="cta" class="p-4 lineheight" :show-horizontal-rule="false">
+    <CollapsibleSection id="cta" class="px-4 pb-4 pt-0 lineheight" :show-horizontal-rule="false">
         <template slot="title">
             Help Now!  MobiFix
+        </template>
+
+        <template slot="title-right">
+            <b-img class="ml-auto doodle" src="/images/wire-strippers.svg" />
         </template>
 
         <template slot="content">
@@ -57,5 +61,10 @@ export default {
         grid-template-columns: 2fr 1fr;
         grid-template-rows: 1fr;
     }
+}
+
+.doodle {
+    background-size: auto 75px;
+    height: 75px;
 }
 </style>
