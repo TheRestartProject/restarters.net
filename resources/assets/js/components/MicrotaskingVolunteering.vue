@@ -5,7 +5,8 @@
         </template>
 
         <template slot="content">
-            <p class="dashbord pt-3">
+            <div class="content">
+            <p class="pt-3">
                 We collect data at community events.  But the raw data needs your help to become strong evidence for better products.  With your help, we can change the system.
             </p>
             <p>
@@ -49,6 +50,7 @@
                     </b-tr>
                 </b-tbody>
             </b-table-simple>
+            </div>
 
 
         </template>
@@ -96,7 +98,7 @@ export default {
     padding-left: 0;
 }
 
-.dashbord {
+.content {
     border-top: 3px dashed black;
 }
 </style>

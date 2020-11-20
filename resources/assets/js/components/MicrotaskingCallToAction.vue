@@ -1,16 +1,16 @@
 <template>
-    <CollapsibleSection id="cta" class="px-4 pb-4 pt-0 lineheight" :show-horizontal-rule="false">
+    <CollapsibleSection id="cta" class="px-4 pb-4 pt-4 pt-md-0 lineheight" :show-horizontal-rule="false">
         <template slot="title">
             Help Now!  MobiFix
         </template>
 
         <template slot="title-right">
-            <b-img class="ml-auto doodle" src="/images/wire-strippers.svg" />
+            <b-img class="d-none d-sm-block ml-auto doodle" src="/images/wire-strippers.svg" />
         </template>
 
         <template slot="content">
             <div class="content">
-                <p class="dashbord pt-3">
+                <p class="pt-3">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
                 </p>

@@ -1,14 +1,18 @@
 <template>
     <div id="news">
-        <b-img src="https://placekitten.com/395/435/" />
+        <div class="text-center">
+            <b-img src="https://placekitten.com/395/435/" />
+        </div>
     <CollapsibleSection class="collapsible px-4 pb-4 pt-0 lineheight" :show-horizontal-rule="false">
 
         <template slot="title">
+            <div class="mt-2">
             Read about our recent success
+            </div>
         </template>
 
         <template slot="title-right">
-            <b-img class="ml-auto mt-2 doodle" src="/images/laptop.svg" />
+            <b-img class="d-none d-sm-block ml-auto mt-2 doodle" src="/images/laptop.svg" />
         </template>
 
         <template slot="content">
