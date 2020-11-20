@@ -52,7 +52,7 @@
               </div>
             </template>
             <p v-if="!past.length">
-              {{ translatedNoPastEvents }}.
+              {{ translatedNoPastEvents }}
             </p>
             <b-table-simple v-else responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
               <GroupEventsTableHeading past />
@@ -117,8 +117,8 @@
           </div>
         </template>
         <template slot="content">
-          <p v-if="!upcoming.length">
-            {{ translatedNoPastEvents }}.
+          <p v-if="!past.length">
+            {{ translatedNoPastEvents }}
           </p>
           <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
             <GroupEventsTableHeading past />

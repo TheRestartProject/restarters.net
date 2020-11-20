@@ -117,6 +117,8 @@
 
       foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
           $thisone = $event->getAttributes();
+//          $group = ;
+          $thisone['group'] = \App\Group::find($event->group);
           $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
           $thisone['allinvitedcount'] = $event->allInvited->count();
 
@@ -146,6 +148,8 @@
             calendar-copy-url="{{ $calendar_copy_url }}"
             calendar-edit-url="{{ $calendar_edit_url }}"
             :add-button="false"
+            :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+            add-group-name
         />
       </div>
       @else
@@ -156,6 +160,7 @@
           calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
           calendar-edit-url="{{ $calendar_edit_url }}"
           :initial-group="{{ json_encode($group) }}"
+          :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
         />
       </div>
       @endif
