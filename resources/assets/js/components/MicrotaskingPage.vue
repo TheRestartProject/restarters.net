@@ -1,25 +1,29 @@
 <template>
-  <div class="layout">
-      <div class="top-layout">
-          <div>
-            <MicrotaskingCallToAction class="mb-4" />
-            <MicrotaskingVolunteering
-              class="mb-4"
-              :total-contributions="totalContributions"
-              :current-user-quests="currentUserQuests"
-              :current-user-contributions="currentUserContributions"
-            />
-          </div>
-          <div class="ml-md-5">
-              <b-img src="" />
-              <MicrotaskingNews />
-          </div>
-      </div>
-      <div>
-          <MicrotaskingDiscussion :topics="topics" :see-all-topics-link="seeAllTopicsLink" />
-      </div>
-  </div>
+<div>
+    <h1 class="d-flex justify-content-between">
+        <div class="d-flex">
+            <div class="mt-2">
+                Upstream
+            </div>
+            <b-img class="height ml-4" src="/images/loudspeaker.svg" />
+        </div>
+    </h1>
+
+    <div id="layout">
+        <MicrotaskingCallToAction id="cta" />
+        <MicrotaskingVolunteering id="volunteering"
+          :total-contributions="totalContributions"
+          :current-user-quests="currentUserQuests"
+          :current-user-contributions="currentUserContributions"
+        />
+        <MicrotaskingDiscussion id="discussion"
+          :topics="topics"
+          :see-all-topics-link="seeAllTopicsLink" />
+        <MicrotaskingNews id="news" />
+    </div>
+</div>
 </template>
+
 <script>
 import MicrotaskingCallToAction from './MicrotaskingCallToAction'
 import MicrotaskingVolunteering from './MicrotaskingVolunteering'
@@ -53,27 +57,39 @@ export default {
   }
 }
 </script>
+
 <style scoped lang="scss">
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
-.layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
 
-    @include media-breakpoint-up(md) {
-        grid-template-rows: auto auto;
-    }
-}
-.top-layout {
+#layout {
     display: grid;
+
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
+    grid-gap: 1.5em;
 
     @include media-breakpoint-up(md) {
         grid-template-columns: 2fr 1fr;
-        grid-template-rows: auto auto;
+        grid-template-rows: auto auto auto;
+
+        #cta {
+            grid-area: 1 / 1 / 2 / 2;
+            align-self: start;
+        }
+
+        #volunteering {
+            grid-area: 2 / 1 / 3 / 2;
+        }
+
+        #news {
+            grid-area: 1 / 2 / 3 / 3;
+            align-self: start;
+        }
+
+        #discussion {
+            grid-area: 3 / 1 / 4 / 3;
+        }
     }
 }
 </style>
