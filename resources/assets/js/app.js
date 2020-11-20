@@ -1544,8 +1544,11 @@ jQuery(document).ready(function () {
       el: $(this).get(0),
       store: store,
       components: {
+        'groupspage': require('./components/GroupsPage.vue'),
         'eventpage': require('./components/EventPage.vue'),
         'grouppage': require('./components/GroupPage.vue'),
+        'groupeventspage': require('./components/GroupEventsPage.vue'),
+        'groupevents': require('./components/GroupEvents.vue'),
         'microtaskingpage': require('./components/MicrotaskingPage.vue'),
 
         'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),

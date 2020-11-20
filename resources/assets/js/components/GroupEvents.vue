@@ -9,12 +9,14 @@
               <b-img-lazy src="/images/subs_cal_ico.svg" />
             </b-btn>
           </div>
-          <b-btn variant="primary" href="/party/create" class="align-self-center" v-if="addButton">
+        </div>
+      </template>
+      <template slot="title-right">
+        <b-btn variant="primary" href="/party/create" class="align-self-center text-nowrap" v-if="addButton">
             <span class="d-none d-md-block">
               {{ translatedAddEvent }}
             </span>
-          </b-btn>
-        </div>
+        </b-btn>
       </template>
       <template slot="content">
         <b-tabs class="ourtabs w-100">
@@ -189,6 +191,11 @@ export default {
     addGroupName: {
       type: Boolean,
       required: false
+    },
+    initialEvents: {
+      type: Array,
+      required: false,
+      default: null
     }
   },
   computed: {
@@ -238,9 +245,9 @@ export default {
     },
     past() {
       return this.events.filter(e => {
-          const start = new moment(e.event_date + ' ' + e.start)
-          return start.isBefore()
-      })
+        const start = new moment(e.event_date + ' ' + e.start)
+        return start.isBefore()
+      }).sort((a,b) => new moment(b.event_date).format('YYYYMMDD') - new moment(a.event_date).format('YYYYMMDD'))
     },
     pastToShow() {
       return this.limit ? this.past.slice(0, this.limit) : this.past
@@ -258,6 +265,14 @@ export default {
   methods: {
     showCalendar() {
       this.$refs.calendar.show()
+    }
+  },
+  mounted () {
+    // Data can be passed from the blade template to us via props.
+    if (this.initialEvents) {
+      this.$store.dispatch('events/setList', {
+        events: this.initialEvents
+      })
     }
   }
 }

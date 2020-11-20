@@ -1,7 +1,6 @@
 <template>
-  <div>
+  <div class="mb-2">
     <multiselect
-        class="mb-2"
         v-model="statusValue"
         :placeholder="translatedRepairOutcome"
         :options="statusOptions"
@@ -14,7 +13,6 @@
         selectLabel=""
     />
     <multiselect
-        class="mb-2"
         v-if="showSteps"
         v-model="stepsValue"
         :placeholder="translatedNextSteps"
