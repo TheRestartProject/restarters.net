@@ -83,7 +83,7 @@ import auth from '../mixins/auth'
 
 export default {
   components: {GroupsTable},
-  mixins: { auth },
+  mixins: [ auth ],
   props: {
     network: {
       type: Number,
