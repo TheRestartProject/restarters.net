@@ -117,8 +117,13 @@
 
       foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
           $thisone = $event->getAttributes();
-//          $group = ;
-          $thisone['group'] = \App\Group::find($event->group);
+
+          if (is_null($group)) {
+              // We are showing events for multiple groups and so we need to pass the relevant group, in order that
+              // we can show the group name and link to it.
+              $thisone['group'] = \App\Group::find($event->group);
+          }
+
           $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
           $thisone['allinvitedcount'] = $event->allInvited->count();
 
