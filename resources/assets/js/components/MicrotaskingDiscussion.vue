@@ -8,8 +8,9 @@
         </template>
 
         <template slot="content">
+
             <div class="content pt-2">
-            <b-table-simple responsive class="" table-class="m-0 leave-tables-alone">
+            <b-table-simple v-if="isLoggedIn" responsive class="" table-class="m-0 leave-tables-alone">
 
                 <b-thead class="text-center">
                     <b-tr class="border-0">
@@ -23,12 +24,20 @@
                     </b-th>
                     </b-tr>
                 </b-thead>
-                <b-tbody>
-                    <DiscourseTopic v-for="topic in topics" :topic="topic" :key="'topic' + topic.id" />
+                <b-tbody v-if="isLoggedIn">
+                    <DiscourseTopic
+                      v-for="topic in topics"
+                      :topic="topic"
+                      :key="'topic' + topic.id"
+                      :discourse-base-url="discourseBaseUrl"
+                    />
                 </b-tbody>
             </b-table-simple>
+            <div class="py-4" v-else>
+                Want to see the latest discussion?  <a class="btn btn-primary" href="/about">Join</a>
+            </div>
 
-            <div class="text-right pt-0 pb-2 pr-2">
+            <div v-if="isLoggedIn" class="text-right pt-0 pb-2 pr-2">
                 <a :href="seeAllTopicsLink">{{ translatedSeeAll }}</a>
             </div>
             </div>
@@ -43,12 +52,20 @@ import CollapsibleSection from './CollapsibleSection'
 export default {
   components: {CollapsibleSection, DiscourseTopic},
   props: {
-    'topics': {
+    topics: {
       type: Array,
       required: true
     },
-    'seeAllTopicsLink': {
+    seeAllTopicsLink: {
       type: String,
+      required: true
+    },
+    discourseBaseUrl: {
+      type: String,
+      required: true
+    },
+    isLoggedIn: {
+      type: Boolean,
       required: true
     }
   },

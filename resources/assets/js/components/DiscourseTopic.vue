@@ -28,6 +28,10 @@ export default {
     topic: {
       type: Object,
       required: true
+    },
+    discourseBaseUrl: {
+      type: String,
+      required: true
     }
   },
   computed: {
@@ -35,11 +39,12 @@ export default {
       return new moment(this.topic.created_at).fromNow()
     },
     url() {
-      return 'https://talk.restarters.dev/t/' + this.topic.slug
+      return this.discourseBaseUrl + '/t/' + this.topic.slug
     },
     categoryUrl() {
       // todo - should be category url, but needs building for child categories
-      return 'https://talk.restarters.dev' + this.topic.category.topic_url
+      //return this.discourseBaseUrl + this.topic.category.topic_url
+      return this.discourseBaseUrl + this.topic.category.topic_url
     }
   }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Auth;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MicrotaskingController extends Controller
 {
@@ -21,7 +22,7 @@ class MicrotaskingController extends Controller
             $currentUserContributions = 0;
         }
 
-        $tag = 'open-data-dive';
+        $tag = config('restarters.microtasking.discussion_tag');
 
         return view('microtasking.dashboard', [
             'totalContributions' => $this->getTotalContributions(),
@@ -60,28 +61,38 @@ class MicrotaskingController extends Controller
 
     private function getDiscussionTopics($tag, $numberOfTopics = null)
     {
-        $client = app('discourse-client');
+        if (!Auth::check())
+            return [];
 
-        $endpoint = "/tag/{$tag}/l/latest.json";
-        $response = $client->request('GET', $endpoint);
-        $discourseResult = json_decode($response->getBody());
+        $username = Auth::user()->username;
+        $client = app('discourse-client', ['username' => $username]);
 
-        $topics = $discourseResult->topic_list->topics;
-        if (!empty($numberOfTopics)) {
-            $topics = array_slice($topics, 0, $numberOfTopics, true);
-        }
+        $topics = [];
 
-        $endpoint = "/site.json";
-        $response = $client->request('GET', $endpoint);
-        $discourseResult = json_decode($response->getBody());
-        $categories = $discourseResult->categories;
+        try {
+            $endpoint = "/tag/{$tag}/l/latest.json";
+            $response = $client->request('GET', $endpoint);
+            $discourseResult = json_decode($response->getBody());
 
-        foreach ($topics as $topic) {
-            foreach ($categories as $category) {
-                if ($topic->category_id == $category->id) {
-                    $topic->category = $category;
+            $topics = $discourseResult->topic_list->topics;
+            if (!empty($numberOfTopics)) {
+                $topics = array_slice($topics, 0, $numberOfTopics, true);
+            }
+
+            $endpoint = "/site.json";
+            $response = $client->request('GET', $endpoint);
+            $discourseResult = json_decode($response->getBody());
+            $categories = $discourseResult->categories;
+
+            foreach ($topics as $topic) {
+                foreach ($categories as $category) {
+                    if ($topic->category_id == $category->id) {
+                        $topic->category = $category;
+                    }
                 }
             }
+        } catch (\Exception $ex) {
+            Log::error("Error retrieving microtasking discussion topics for username '{$username}': " . $ex->getMessage());
         }
 
         return $topics;

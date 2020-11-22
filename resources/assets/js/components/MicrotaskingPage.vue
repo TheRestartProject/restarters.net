@@ -17,9 +17,13 @@
           :current-user-contributions="currentUserContributions"
           :is-logged-in="isLoggedIn"
         />
-        <MicrotaskingDiscussion id="discussion"
+        <MicrotaskingDiscussion
+          id="discussion"
           :topics="topics"
-          :see-all-topics-link="seeAllTopicsLink" />
+          :see-all-topics-link="seeAllTopicsLink"
+          :discourse-base-url="discourseBaseUrl"
+          :is-logged-in="isLoggedIn"
+        />
         <MicrotaskingNews id="news" />
     </div>
 </div>
@@ -56,6 +60,10 @@ export default {
     },
     isLoggedIn: {
       type: Boolean,
+      required: true
+    },
+    discourseBaseUrl: {
+      type: String,
       required: true
     }
   },

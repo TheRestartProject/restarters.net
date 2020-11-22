@@ -28,6 +28,7 @@
               :topics="{{ json_encode($topics) }}"
               see-all-topics-link="{{ $seeAllTopicsLink }}"
               :is-logged-in="{{ Auth::check() ? 'true' : 'false'  }}"
+              discourse-base-url="{{ env('DISCOURSE_URL') }}"
             />
         </div>
     </div>
