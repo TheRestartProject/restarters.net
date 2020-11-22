@@ -1,10 +1,10 @@
 <template>
     <CollapsibleSection class="p-3 p-md-0 lineheight">
         <template slot="title">
-            What's happening
+            {{ translatedTitle }}
         </template>
         <template slot="title-right">
-            <b-img class="icon ml-3 d-none d-md-block" src="/images/talk_doodle.svg" style="width:70px" :title="translatedVolunteersInvited" />
+            <b-img class="icon ml-3 d-none d-md-block" src="/images/talk_doodle.svg" style="width:70px" />
         </template>
 
         <template slot="content">
@@ -16,10 +16,10 @@
                     <b-th></b-th>
                     <b-th></b-th>
                     <b-th class="d-none d-md-table-cell">
-                        <b-img class="icon" src="/images/speech_bubble.svg" :title="translatedVolunteersInvited" />
+                        <b-img class="icon" src="/images/speech_bubble.svg" :title="translatedNumberOfComments" />
                     </b-th>
                     <b-th class="d-none d-md-table-cell">
-                        <b-img class="icon" height="28px" src="/images/clock.svg" :title="translatedVolunteersInvited" />
+                        <b-img class="icon" height="28px" src="/images/clock.svg" :title="translatedTopicCreatedAt" />
                     </b-th>
                     </b-tr>
                 </b-thead>
@@ -28,8 +28,8 @@
                 </b-tbody>
             </b-table-simple>
 
-            <div class="text-right">
-                <a :href="seeAllTopicsLink">see all</a>
+            <div class="text-right pt-0 pb-2 pr-2">
+                <a :href="seeAllTopicsLink">{{ translatedSeeAll }}</a>
             </div>
             </div>
         </template>
@@ -51,6 +51,20 @@ export default {
       type: String,
       required: true
     }
+  },
+  computed: {
+    translatedTitle() {
+      return this.$lang.get('microtasking.discussion.title')
+    },
+    translatedNumberOfComments() {
+      return this.$lang.get('microtasking.discussion.number_of_comments')
+    },
+    translatedTopicCreatedAt() {
+      return this.$lang.get('microtasking.discussion.topic_created_at')
+    },
+    translatedSeeAll() {
+      return this.$lang.get('microtasking.discussion.see_all')
+    },
   }
 }
 </script>
@@ -68,5 +82,8 @@ table th {
 }
 .content {
     border-top: 3px dashed black;
+}
+.table-responsive {
+    margin-bottom: 0;
 }
 </style>

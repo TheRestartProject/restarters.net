@@ -1,13 +1,13 @@
 <template>
     <div id="news">
-        <div class="text-center">
+        <div class="d-none d-sm-block text-center">
             <b-img src="https://placekitten.com/395/435/" />
         </div>
     <CollapsibleSection class="collapsible px-4 pb-4 pt-0 lineheight" :show-horizontal-rule="false">
 
         <template slot="title">
             <div class="mt-2">
-            Read about our recent success
+            {{ translatedTitle }}
             </div>
         </template>
 
@@ -16,18 +16,7 @@
         </template>
 
         <template slot="content">
-            <div class="content">
-                <p class="dashbord pt-3">
-                    Through our FaultCat quest, hundreds of volunteers helped us analyse our laptop data.
-
-                    <ul>
-                        <li><a href="">Read the results</a> as they went into this policy paper on laptop lifetimes.</li>
-                        <li>
-                            <a href="">Check out the data visualisation</a> featured in The Times newspaper.
-                        </li>
-                    </ul>
-                </p>
-            </div>
+            <div v-html="translatedContent" class="pt-3 content" />
         </template>
     </CollapsibleSection>
     </div>
@@ -38,7 +27,13 @@ import CollapsibleSection from './CollapsibleSection'
 
 export default {
     components: {CollapsibleSection},
-    props: {
+    computed: {
+      translatedTitle() {
+        return this.$lang.get('microtasking.news.title')
+      },
+      translatedContent() {
+        return this.$lang.get('microtasking.news.content')
+      }
     },
 }
 </script>
@@ -61,10 +56,19 @@ export default {
     background-color: #ffbe5f;
 }
 
+a {
+    color: $black;
+    text-decoration: underline !important;
+
+    &:hover {
+        text-decoration: none !important;
+    }
+}
+
 .content {
     border-top: 3px dashed black;
 
-    a {
+    /deep/ a {
         color: $black;
         text-decoration: underline !important;
 
@@ -73,7 +77,7 @@ export default {
         }
     }
 
-    ul {
+    /deep/ ul {
         list-style-image: url('/images/arrow-right-doodle.svg');
     }
 }

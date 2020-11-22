@@ -1,7 +1,7 @@
 <template>
     <CollapsibleSection id="cta" class="px-4 pb-4 pt-4 pt-md-0 lineheight" :show-horizontal-rule="false">
         <template slot="title">
-            Help Now!  MobiFix
+            {{ translatedTitle }}
         </template>
 
         <template slot="title-right">
@@ -9,13 +9,12 @@
         </template>
 
         <template slot="content">
-            <div class="content">
-                <p class="pt-3">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-
+            <div class="content pt-3">
+                <p>
+                    {{ translatedDescription }}
                 </p>
                 <div style="align-self:center; justify-self:right">
-                <a href="/mobifix" style="align-self: center" class="btn btn-primary pull-right">Get involved</a>
+                <a href="/mobifix" style="align-self: center" class="btn btn-primary pull-right">{{ translatedGetInvolved }}</a>
                 </div>
             </div>
 
@@ -28,9 +27,16 @@ import CollapsibleSection from './CollapsibleSection'
 
 export default {
   components: {CollapsibleSection},
-  props: {
-  },
-  mounted() {
+  computed: {
+    translatedTitle() {
+      return this.$lang.get('microtasking.cta.title')
+    },
+    translatedDescription() {
+      return this.$lang.get('microtasking.cta.description')
+    },
+    translatedGetInvolved() {
+      return this.$lang.get('microtasking.cta.get_involved')
+    },
   }
 }
 </script>

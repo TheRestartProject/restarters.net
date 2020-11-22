@@ -1,17 +1,12 @@
 <template>
     <CollapsibleSection id="volunteering" class="p-4 lineheight" :show-horizontal-rule="false">
         <template slot="title">
-            Volunteer from anywhere
+            {{ translatedTitle }}
         </template>
 
         <template slot="content">
-            <div class="content">
-            <p class="pt-3">
-                We collect data at community events.  But the raw data needs your help to become strong evidence for better products.  With your help, we can change the system.
-            </p>
-            <p>
-               This is an easy way to make a difference, whether or not you can join us at our repair events.  Join us, and contribute as little or as much time and brain-power you can.  Most of the tasks here are OK for non-technical people.  And we're always here to help.
-            </p>
+            <div v-html="translatedContent" class="content pt-3">
+            </div>
 
             <b-table-simple sticky-header="50vh" responsive class="pl-0 pr-0 pb-2 mb-2" table-class="m-0 leave-tables-alone">
                 <b-thead class="text-center">
@@ -19,10 +14,10 @@
                     <b-th> </b-th>
                     <b-th> </b-th>
                     <b-th class="d-table-cell">
-                        <b-img class="icon" src="/images/gauge_ico.svg" :title="translatedVolunteersInvited" />
+                        <b-img class="icon" src="/images/gauge_ico.svg" :title="translatedNumberOfTasks" />
                     </b-th>
                     <b-th class="d-table-cell">
-                        <b-img class="icon" src="/images/thumbs-up_ico.svg" :title="translatedVolunteersConfirmed" />
+                        <b-img class="icon" src="/images/thumbs-up_ico.svg" :title="translatedNumberOfQuests" />
                     </b-th>
                     </b-tr>
                 </b-thead>
@@ -30,23 +25,28 @@
                 <b-tbody class="table-height">
                     <b-tr>
                         <b-td class="text-center">
-                            <b-img class="icon" src="/images/participants.svg" :title="translatedVolunteersConfirmed" />
+                            <b-img class="icon" src="/images/participants.svg" />
                         </b-td>
                         <b-td>
-                            Upstream volunteer contributions
+                            {{ translatedAllContributions }}
                         </b-td>
                         <b-td class="text-center">{{ totalContributions.toLocaleString() }}</b-td>
-                        <b-td class="text-center">3 quests</b-td>
+                        <b-td class="text-center">{{ translatedAllQuests }}</b-td>
                     </b-tr>
                     <b-tr>
                         <b-td class="text-center">
                         <b-img class="icon" src="/images/user_ico.svg" :title="translatedVolunteersConfirmed" />
                         </b-td>
                         <b-td>
-                        My contributions
+                        {{ translatedMyContributions }}
                         </b-td>
-                        <b-td class="text-center">{{ currentUserContributions }}</b-td>
-                        <b-td class="text-center">{{ currentUserQuests }} quests</b-td>
+                        <template v-if="isLoggedIn">
+                            <b-td class="text-center">{{ currentUserContributions }}</b-td>
+                            <b-td class="text-center">{{ translatedMyQuests }}</b-td>
+                        </template>
+                        <template v-else>
+                            <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/about">{{ translatedJoin }}</a></b-td>
+                        </template>
                     </b-tr>
                 </b-tbody>
             </b-table-simple>
@@ -74,6 +74,39 @@ export default {
     currentUserContributions: {
       type: Number,
       required: true
+    },
+    isLoggedIn: {
+      type: Boolean,
+      required: true
+    }
+  },
+  computed: {
+    translatedTitle() {
+      return this.$lang.get('microtasking.volunteering.title')
+    },
+    translatedContent() {
+      return this.$lang.get('microtasking.volunteering.content')
+    },
+    translatedNumberOfTasks() {
+      return this.$lang.get('microtasking.volunteering.number_of_tasks')
+    },
+    translatedNumberOfQuests() {
+      return this.$lang.get('microtasking.volunteering.number_of_quests')
+    },
+    translatedAllContributions() {
+      return this.$lang.get('microtasking.volunteering.all_volunteer_contributions')
+    },
+    translatedAllQuests() {
+      return this.$lang.get('microtasking.volunteering.all_quests')
+    },
+    translatedMyContributions() {
+      return this.$lang.get('microtasking.volunteering.my_contributions')
+    },
+    translatedMyQuests() {
+      return this.$lang.get('microtasking.volunteering.my_quests', { value: this.currentUserQuests })
+    },
+    translatedJoin() {
+      return this.$lang.get('microtasking.volunteering.join')
     }
   }
 }

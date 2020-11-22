@@ -1,7 +1,7 @@
 @extends('layouts.app', ['show_login_join_to_anons' => true])
 
 @section('title')
-    @lang('microtasking.microtasking')
+    @lang('microtasking.title')
 @endsection
 
 @if( Auth::guest() )
@@ -27,6 +27,7 @@
               :current-user-contributions="{{ $currentUserContributions }}"
               :topics="{{ json_encode($topics) }}"
               see-all-topics-link="{{ $seeAllTopicsLink }}"
+              :is-logged-in="{{ Auth::check() ? 'true' : 'false'  }}"
             />
         </div>
     </div>

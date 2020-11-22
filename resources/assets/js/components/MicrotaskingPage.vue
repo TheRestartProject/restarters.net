@@ -3,7 +3,7 @@
     <h1 class="d-flex justify-content-between">
         <div class="d-flex">
             <div class="mt-2">
-                Upstream
+                {{ translatedTitle }}
             </div>
             <b-img class="height ml-4" src="/images/loudspeaker.svg" />
         </div>
@@ -15,6 +15,7 @@
           :total-contributions="totalContributions"
           :current-user-quests="currentUserQuests"
           :current-user-contributions="currentUserContributions"
+          :is-logged-in="isLoggedIn"
         />
         <MicrotaskingDiscussion id="discussion"
           :topics="topics"
@@ -29,6 +30,7 @@ import MicrotaskingCallToAction from './MicrotaskingCallToAction'
 import MicrotaskingVolunteering from './MicrotaskingVolunteering'
 import MicrotaskingDiscussion from './MicrotaskingDiscussion'
 import MicrotaskingNews from './MicrotaskingNews'
+
 export default {
   components: {MicrotaskingCallToAction, MicrotaskingVolunteering, MicrotaskingDiscussion, MicrotaskingNews},
   props: {
@@ -51,10 +53,17 @@ export default {
     seeAllTopicsLink: {
       type: String,
       required: true
+    },
+    isLoggedIn: {
+      type: Boolean,
+      required: true
     }
   },
-  mounted() {
-  }
+  computed: {
+    translatedTitle() {
+      return this.$lang.get('microtasking.title')
+    }
+  },
 }
 </script>
 

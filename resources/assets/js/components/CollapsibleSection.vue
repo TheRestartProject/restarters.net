@@ -3,7 +3,7 @@
     <component :is="headingLevel" :class="{
       'd-flex': true,
       'd-md-none': hideTitle,
-      'mb-3': true,
+      'mb-3': expanded,
       'justify-content-between': true
       }" @click="toggle">
       <div class="d-flex w-100">
