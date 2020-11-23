@@ -19,7 +19,6 @@ export default {
         ret = this.group.volunteers
       }
 
-      console.log("Volunteers", ret)
       return ret
     },
     canedit() {

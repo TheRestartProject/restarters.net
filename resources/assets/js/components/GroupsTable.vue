@@ -91,6 +91,15 @@
             {{ translatedFollow }}
           </span>
         </b-btn>
+        <b-btn variant="primary" class="text-nowrap mr-2" v-else @click="leaveGroup(data.item.idgroups)">
+          <span class="d-block d-md-none">
+            {{ translatedUnFollowMobile }}
+          </span>
+          <span class="d-none d-md-block">
+            {{ translatedUnFollow }}
+          </span>
+        </b-btn>
+        <ConfirmModal :key="'leavegroupmodal-' + data.item.idgroups" :ref="'confirmLeave-' + data.item.idgroups" @confirm="leaveConfirmed(data.item.idgroups)" :message="translatedConfirmLeaveGroup" />
       </template>
     </b-table>
   </div>
@@ -99,9 +108,10 @@
 import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
 import moment from 'moment'
 import GroupsTableFilters from './GroupsTableFilters'
+import ConfirmModal from './ConfirmModal'
 
 export default {
-  components: {GroupsTableFilters},
+  components: {ConfirmModal, GroupsTableFilters},
   props: {
     groups: {
       type: Array,
@@ -240,12 +250,21 @@ export default {
     translatedFollowMobile() {
       return this.$lang.get('groups.join_group_button_mobile')
     },
+    translatedUnFollow() {
+      return this.$lang.get('groups.leave_group_button')
+    },
+    translatedUnFollowMobile() {
+      return this.$lang.get('groups.leave_group_button_mobile')
+    },
     translatedShowFilters() {
       return this.$lang.get('groups.show_filters')
     },
     translatedHideFilters() {
       return this.$lang.get('groups.hide_filters')
     },
+    translatedConfirmLeaveGroup() {
+      return this.$lang.get('groups.leave_group_confirm')
+    }
 },
   created() {
     // We might arrive on the page to filter by network.
@@ -308,6 +327,14 @@ export default {
         setTimeout(this.loadMore, 1)
       }
     },
+    leaveGroup(idgroups) {
+      this.$refs['confirmLeave-' + idgroups].show()
+    },
+    leaveConfirmed(idgroups) {
+      this.$store.dispatch('groups/unfollow', {
+        idgroups: idgroups
+      })
+    }
   }
 }
 </script>
