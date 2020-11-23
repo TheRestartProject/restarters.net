@@ -73,6 +73,9 @@ return array (
   'skills_column_table' => 'Skills',
   'join_group_button' => 'Follow group',
   'join_group_button_mobile' => 'Follow',
+  'leave_group_button' => 'Unfollow group',
+  'leave_group_button_mobile' => 'Unfollow',
+  'leave_group_confirm' => 'Please confirm that you want to unfollow this group.',
   'share_stats_header' => 'Share your stats',
   'share_stats_message' => ':group have made a real impact fixing electronics and preventing waste. Help share this on your website and get other people involved:',
   'embed_code_header' => 'Embed code',
@@ -172,5 +175,7 @@ return array (
   'search_tags_placeholder' => 'Tag',
   'show_filters' => 'Show Filters',
   'hide_filters' => 'Hide Filters',
+  'now_following' => 'You are now following <a href=":link">:name</a>!',
+  'now_unfollowed' => 'You have now unfollowed <a href=":link">:name</a>.',
   'no_unpowered_stats' => 'At the moment, these stats are only displayed for powered items. We hope to include unpowered items soon.'
 );

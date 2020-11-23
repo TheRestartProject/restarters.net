@@ -88,4 +88,38 @@ class UserGroupsController extends Controller
 
         return $userGroupChange;
     }
+
+    /**
+     * Leave the specified group.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function leave(Request $request, $id)
+    {
+        $authenticatedUser = Auth::user();
+        if (!$authenticatedUser) {
+            return abort(403, 'Not logged in');
+        }
+
+        $member = UserGroups::where('group', $id)
+            ->where('user', $authenticatedUser->id)
+            ->where('status', 1)
+            ->first();
+
+        if (!$member) {
+            abort(404, "Not a member");
+        }
+
+        $member->delete();
+
+        $group = Group::where('idgroups', $id)->first();
+         
+        return response()->json([
+            'success' => TRUE,
+            'all_restarters_count' => $group->all_restarters_count,
+            'all_hosts_count' => $group->all_hosts_count,
+        ], 200);
+    }
 }
