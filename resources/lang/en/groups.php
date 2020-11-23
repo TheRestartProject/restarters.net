@@ -177,4 +177,5 @@ return array (
   'hide_filters' => 'Hide Filters',
   'now_following' => 'You are now following <a href=":link">:name</a>!',
   'now_unfollowed' => 'You have now unfollowed <a href=":link">:name</a>.',
+  'no_unpowered_stats' => 'At the moment, these stats are only displayed for powered items. We hope to include unpowered items soon.'
 );

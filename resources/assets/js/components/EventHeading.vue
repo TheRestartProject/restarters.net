@@ -5,8 +5,8 @@
       <EventActions v-bind="$props" class="d-block d-md-none" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
-      <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
-        <div class="bord d-flex w-xs-100 w-md-50">
+      <div class="layout mt-4 mb-3 mb-md-3">
+        <div class="bord d-flex">
           <div class="datebox">
             <span class="day align-top">{{ dayofmonth }}</span> <br />
             <span>
@@ -22,7 +22,7 @@
             {{ event.venue ? event.venue : event.location }}
           </h2>
         </div>
-        <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
+        <div class="pl-md-4 d-flex maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
           <div class="d-flex justify-content-between w-100">
             <div class="d-flex mr-2" v-if="event.the_group">
               <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block" />
@@ -127,5 +127,16 @@ export default {
 .centreme {
   align-items: center;
   display: flex !important;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+  }
 }
 </style>

@@ -185,6 +185,7 @@
                   :top-devices="{{ json_encode($top) }}"
                   :events="{{ json_encode($expanded_events) }}"
                   :volunteers="{{ json_encode($expanded_volunteers) }}"
+                  :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
                   calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
                   calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
                   :ingroup="{{ $in_group ? 'true' : 'false' }}"

@@ -42,7 +42,7 @@
                                         <option></option>
                                         @if(isset($categories))
                                           <?php foreach($categories as $category){ ?>
-                                          <option value="<?php echo $category->idcategories; ?>"><?php echo $category->name; ?></option>
+                                          <option value="<?php echo $category->idcategories; ?>"><?php echo __($category->name); ?></option>
                                           <?php } ?>
                                         @endif
                                     </select>
