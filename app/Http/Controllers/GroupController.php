@@ -936,9 +936,9 @@ class GroupController extends Controller
         $group = Group::find($group_id);
         $loggedInUser = Auth::user();
 
-        if ((FixometerHelper::hasRole($loggedInUser, 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id())) ||
+        if (($loggedInUser->hasRole('Host') && FixometerHelper::userIsHostOfGroup($group_id, $loggedInUser->id)) ||
             $loggedInUser->isCoordinatorForGroup($group) ||
-            FixometerHelper::hasRole($loggedInUser, 'Administrator')) {
+            $loggedInUser->hasRole('Administrator')) {
             $user = User::find($user_id);
 
             $group->makeMemberAHost($user);
