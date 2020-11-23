@@ -934,10 +934,11 @@ class GroupController extends Controller
         // - Is a network coordinator of a network which the group is in.
         // - Is an Administrator
         $group = Group::find($group_id);
+        $loggedInUser = Auth::user();
 
-        if ((FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id())) ||
-            (Auth::user()->hasRole('NetworkCoordinator') && !Auth::user()->networks->intersect($group->networks)->isEmpty()) ||
-            FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if ((FixometerHelper::hasRole($loggedInUser, 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id())) ||
+            $loggedInUser->isCoordinatorForGroup($group) ||
+            FixometerHelper::hasRole($loggedInUser, 'Administrator')) {
             $user = User::find($user_id);
 
             $group->makeMemberAHost($user);
