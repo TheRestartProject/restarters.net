@@ -101,6 +101,9 @@
                                                 @if ( FixometerHelper::hasPermission('verify-translation-access') )
                                                 <li><a href="/translations/view/admin">Translations</a></li>
                                                 @endif
+                                                @if ( Auth::user() && (Auth::user()->isRepairDirectorySuperAdmin() || Auth::user()->isRepairDirectoryRegionalAdmin() || Auth::user()->isRepairDirectoryEditor()))
+                                                <li><a href="{{ config('restarters.repairdirectory.base_url').'/admin' }}">@lang('profile.repair_directory')</a></li>
+                                                @endif
                                                 @if ( FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator') )
                                                     @if (count(Auth::user()->networks) == 1)
                                                         @php( $network = Auth::user()->networks->first() )
