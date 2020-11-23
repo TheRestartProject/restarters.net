@@ -3,12 +3,12 @@
     <CollapsibleSection class="lineheight d-none d-md-block" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel">
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
-          <div>
-            <span v-if="group">{{ group.name }}</span> {{ translatedTitle }}
-            <b-btn v-if="calendarCopyUrl" class="ml-2" variant="primary" @click="showCalendar">
-              <b-img-lazy src="/images/subs_cal_ico.svg" />
-            </b-btn>
-          </div>
+        <div>
+          <span v-if="group">{{ group.name }}</span> {{ translatedTitle }}
+          <b-btn v-if="calendarCopyUrl" class="ml-2" variant="primary" @click="showCalendar">
+            <b-img-lazy src="/images/subs_cal_ico.svg" />
+          </b-btn>
+        </div>
         </div>
       </template>
       <template slot="title-right">
