@@ -100,9 +100,15 @@ class UserController extends Controller
 
     public function getProfileEdit($id = null)
     {
-
-        if (is_null($id) || !FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (is_null($id)) {
             $user = Auth::user();
+        } else if (!FixometerHelper::hasRole(Auth::user(), 'Administrator') &&
+            !Auth::user()->isRepairDirectorySuperAdmin() &&
+            !Auth::user()->isRepairDirectoryRegionalAdmin() &&
+            Auth::user()->id !== intval($id)
+        ) {
+            // We don't have permissions to see any of the tabs on this page, so we shouldn't see the page.
+            abort(404);
         } else {
             $user = User::find($id);
         }
@@ -132,17 +138,17 @@ class UserController extends Controller
         ->toArray();
 
         return view('user.profile-edit', [
-        'user' => $user,
-        'skills' => FixometerHelper::allSkills(),
-        'user_skills' => $user_skills,
-        'user_groups' => $user_groups,
-        'user_preferences' => $user_preferences,
-        'user_permissions' => $user_permissions,
-        'all_groups' => $all_groups,
-        'all_preferences' => $all_preferences,
-        'all_permissions' => $all_permissions,
-        'groups' => $groups,
-        'all_group_areas' => $all_group_areas,
+            'user' => $user,
+            'skills' => FixometerHelper::allSkills(),
+            'user_skills' => $user_skills,
+            'user_groups' => $user_groups,
+            'user_preferences' => $user_preferences,
+            'user_permissions' => $user_permissions,
+            'all_groups' => $all_groups,
+            'all_preferences' => $all_preferences,
+            'all_permissions' => $all_permissions,
+            'groups' => $groups,
+            'all_group_areas' => $all_group_areas,
         ]);
     }
 
@@ -243,6 +249,38 @@ class UserController extends Controller
         }
 
         return redirect()->back()->with('error', 'Current Password does not match!');
+    }
+
+    public function postProfileRepairDirectory(Request $request)
+    {
+        $rules = [
+            'role' => 'required|digits_between:' . Role::REPAIR_DIRECTORY_SUPERADMIN . ',' . Role::REPAIR_DIRECTORY_EDITOR
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $id = $request->input('id');
+        $role = intval($request->input('role'));
+        $user = User::find($id);
+
+        // Check that we are allowed to change the role, based on our own role.
+        try {
+            $this->authorize('canChangeRepairDirRole', Auth::user(), $user, $role);
+        } catch (\Throwable $e) {
+            error_log($e->getMessage());
+        }
+
+        $user->update([
+            'repairdir_role' => $role,
+        ]);
+
+        $user->save();
+
+        return redirect()->back()->with('message', 'User Profile Updated!');
     }
 
     public function storeLanguage(Request $request)

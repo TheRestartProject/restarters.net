@@ -33,13 +33,16 @@
     <div class="row justify-content-center">
       <div class="col-lg-4 offset-lg-sidebar">
         <div class="list-group" id="list-tab" role="tablist">
+          @if (FixometerHelper::hasRole(Auth::user(), 'Administrator') || Auth::id() == $user->id)
           <a class="list-group-item list-group-item-action active" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">@lang('profile.profile')</a>
           <a class="list-group-item list-group-item-action" id="list-account-list" data-toggle="list" href="#list-account" role="tab" aria-controls="account">@lang('profile.account')</a>
 
           <a class="list-group-item list-group-item-action" id="list-email-preferences-list" data-toggle="list" href="#list-email-preferences" role="tab" aria-controls="email-preferences">@lang('profile.email_preferences')</a>
           <a class="list-group-item list-group-item-action" id="list-calendar-links-list" data-toggle="list" href="#list-calendar-links" role="tab" aria-controls="calendar-links">@lang('profile.calendars.title')</a>
-          @if (Auth::id() == $user->id)
-              <a class="list-group-item list-group-item-action" id="list-notifications-list" href="{{ route('notifications') }}" role="tab">@lang('profile.notifications')</a>
+          <a class="list-group-item list-group-item-action" id="list-notifications-list" href="{{ route('notifications') }}" role="tab">@lang('profile.notifications')</a>
+          @endif
+          @if(Auth::user()->isRepairDirectoryRegionalAdmin() || Auth::user()->isRepairDirectorySuperAdmin())
+          <a class="list-group-item list-group-item-action" id="list-repair-directory-list" data-toggle="list" href="#list-repair-directory" role="tab">@lang('profile.repair_directory')</a>
           @endif
 
         </div>
@@ -48,6 +51,7 @@
 
         <div class="tab-content" id="nav-tabContent">
 
+          @if (FixometerHelper::hasRole(Auth::user(), 'Administrator') || Auth::id() == $user->id)
           <div class="tab-pane fade show active" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
               @include('user.profile.profile')
           </div>
@@ -63,6 +67,13 @@
           <div class="tab-pane fade" id="list-calendar-links" role="tabpanel" aria-labelledby="list-calendar-links-list">
               @include('user.profile.calendars')
           </div>
+          @endif
+
+          @if(Auth::user()->isRepairDirectoryRegionalAdmin() || Auth::user()->isRepairDirectorySuperAdmin())
+          <div class="tab-pane fade" id="list-repair-directory" role="tabpanel" aria-labelledby="list-repair-directory">
+            @include('user.profile.repair-directory')
+          </div>
+          @endif
 
         </div>
 
