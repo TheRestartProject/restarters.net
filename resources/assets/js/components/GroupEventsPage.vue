@@ -35,6 +35,11 @@ export default {
       required: false,
       default: null
     },
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
   },
   computed: {
     group() {

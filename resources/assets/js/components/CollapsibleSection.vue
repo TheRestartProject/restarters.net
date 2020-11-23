@@ -6,11 +6,12 @@
       'mb-3': true,
       'justify-content-between': true
       }" @click="toggle">
-      <div class="d-flex w-100">
-        <div class="d-flex flex-column justify-content-center">
-          <slot name="title" />
-        </div>
-        <div v-if="count" :class="{
+      <div class="d-flex w-100 justify-content-between">
+        <div>
+          <div class="d-flex flex-column justify-content-center">
+            <slot name="title" />
+          </div>
+          <div v-if="count" :class="{
           'd-inline' : true,
           'd-md-none' : !alwaysShowCount,
           'text-muted' : true,
@@ -21,9 +22,10 @@
           <span v-if="countBadge">
             &nbsp;<b-badge variant="primary" pill>{{ count }}</b-badge>
           </span>
-          <span v-else>
+            <span v-else>
             &nbsp;<span :class="countClass">({{ count }})</span>
           </span>
+          </div>
         </div>
         <slot name="title-right" />
       </div>

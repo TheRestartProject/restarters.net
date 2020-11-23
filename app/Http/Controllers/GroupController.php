@@ -929,9 +929,15 @@ class GroupController extends Controller
 
     public function getMakeHost($group_id, $user_id, Request $request)
     {
-        //Has current logged in user got permission to add host
-        if ((FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id())) || FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
-            $group = Group::find($group_id);
+        // Has current logged in user got permission to add host?
+        // - Is a host of the group.
+        // - Is a network coordinator of a network which the group is in.
+        // - Is an Administrator
+        $group = Group::find($group_id);
+
+        if ((FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id())) ||
+            (Auth::user()->hasRole('NetworkCoordinator') && !Auth::user()->networks->intersect($group->networks)->isEmpty()) ||
+            FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
             $user = User::find($user_id);
 
             $group->makeMemberAHost($user);
