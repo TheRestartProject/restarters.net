@@ -11,15 +11,15 @@ class RepairStatusToString extends Migration
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         DB::unprepared("DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`");
-        DB::unprepared("
-CREATE FUNCTION `REPAIR_STATUS_TO_STRING`(`id` INT)
-RETURNS VARCHAR(12) CHARSET utf8
-DETERMINISTIC
-NO SQL
-SQL SECURITY INVOKER 
+// Might need to set definer
+//        DB::unprepared("CREATE DEFINER='root'@'localhost' FUNCTION `REPAIR_STATUS_TO_STRING`(`id` INT)
+        DB::unprepared("CREATE FUNCTION `REPAIR_STATUS_TO_STRING`(`id` INT)
+RETURNS varchar(12) CHARSET utf8
+    NO SQL
+    DETERMINISTIC
+    SQL SECURITY INVOKER
 BEGIN
   DECLARE res VARCHAR(12);
   CASE id
