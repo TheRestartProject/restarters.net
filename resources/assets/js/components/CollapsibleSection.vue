@@ -40,7 +40,7 @@
     }">
       <slot name="content" />
     </div>
-    <hr class="mt-0 d-md-none" />
+    <hr v-if="showHorizontalRule" class="mt-0 d-md-none" />
   </div>
 </template>
 <script>
@@ -91,6 +91,11 @@ export default {
       type: String,
       required: false,
       default: 'h2'
+    },
+    showHorizontalRule: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   data () {
