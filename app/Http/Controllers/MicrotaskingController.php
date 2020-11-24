@@ -64,12 +64,12 @@ class MicrotaskingController extends Controller
         if (!Auth::check())
             return [];
 
-        $username = Auth::user()->username;
-        $client = app('discourse-client', ['username' => $username]);
-
         $topics = [];
 
         try {
+            $username = Auth::user()->username;
+            $client = app('discourse-client', ['username' => $username]);
+
             $endpoint = "/tag/{$tag}/l/latest.json";
             $response = $client->request('GET', $endpoint);
             $discourseResult = json_decode($response->getBody());
