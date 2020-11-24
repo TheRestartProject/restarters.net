@@ -165,7 +165,7 @@
           calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
           calendar-edit-url="{{ $calendar_edit_url }}"
           :initial-group="{{ json_encode($group) }}"
-          :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
+          :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
         />
       </div>
       @endif
