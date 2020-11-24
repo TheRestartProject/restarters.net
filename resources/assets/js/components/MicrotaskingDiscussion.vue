@@ -3,7 +3,7 @@
         <template slot="title">
             {{ translatedTitle }}
         </template>
-        <template slot="title-right">
+        <template slot="title-icon">
             <b-img class="icon ml-3 d-none d-md-block" src="/images/talk_doodle.svg" style="width:70px" />
         </template>
 
