@@ -1,10 +1,13 @@
 <template>
   <div :class="className">
-    <div class="impact-stat-icon mt-2 mb-2">
+    <div class="impact-stat-icon mt-2 mb-2" v-if="!iconInline">
       <b-img :src="src" class="impact-stat-img" :width="iconWidth" />
     </div>
-    <div :class="'impact-stat-count impact-stat-count-' + variant">
-      {{ roundedCount }} {{ unit }}
+    <div :class="'impact-stat-count impact-stat-count-' + variant + (iconInline ? ' d-flex' : '')">
+      {{ printableCount }} {{ unit }}
+      <div class="impact-stat-icon mt-2 mb-2" v-if="iconInline">
+        <b-img :src="src" class="impact-stat-img" :width="iconWidth" />
+      </div>
     </div>
     <!-- The translations may include HTML tags, so we need to insert as HTML. -->
     <div class="impact-stat-title" v-if="title" v-html="translatedTitle" />
@@ -13,6 +16,7 @@
     </div>
     <div class="impact-stat-subtitle" v-html="translatedSubtitle" />
     <div v-if="description" class="impact-stat-description pt-3 m-3" v-html="translatedDescription" />
+    <b-img fluid-grow v-if="image" :src="image" />
   </div>
 </template>
 <script>
@@ -75,6 +79,21 @@ export default {
       type: Boolean,
       required: false,
       default: true
+    },
+    countIsNumber: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    iconInline: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    image: {
+      type: String,
+      required: false,
+      default: null
     }
   },
   computed: {
@@ -95,7 +114,10 @@ export default {
       return this.translate ? this.$lang.get(this.description) : this.description
     },
     roundedCount() {
-      return Math.round(this.count).toLocaleString()
+      return this.countIsNumber ? Math.round(this.count) : this.count
+    },
+    printableCount() {
+      return this.countIsNumber ? this.roundedCount.toLocaleString() : this.count
     }
   }
 }
@@ -133,7 +155,12 @@ export default {
     color: white;
   }
 
-  &-primary {
+  &-primary-black {
+    background-color: $brand-light;
+    color: black;
+  }
+
+  &-primary, &-primary-black {
     // Primary becomes horizontal and left-aligned at small breakpoints
     display: flex;
     justify-content: center;
@@ -171,6 +198,11 @@ export default {
   &-primary {
     background-color: $brand-light;
     color: white;
+  }
+
+  &-primary-black {
+    background-color: $brand-light;
+    color: black;
   }
 
   &-secondary {
