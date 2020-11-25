@@ -268,7 +268,7 @@ class UserController extends Controller
         $user = User::find($id);
 
         // Check that we are allowed to change the role, based on our own role.
-        $this->authorize('changeRepairDirRole', Auth::user(), $user, $role);
+        $this->authorize('changeRepairDirRole', [ Auth::user(), $user, $role ]);
 
         $user->update([
             'repairdir_role' => $role,
