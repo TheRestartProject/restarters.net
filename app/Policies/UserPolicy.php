@@ -48,4 +48,15 @@ class UserPolicy
 
         return $ret;
     }
+
+    /**
+     * Determine whether this user can view the Repair Directory settings for users
+     *
+     * @param  \App\User  $user
+     * @return mixed
+     */
+    public function viewRepairDirectorySettings(User $user)
+    {
+        return $user && ($user->isRepairDirectoryRegionalAdmin() || $user->isRepairDirectorySuperAdmin());
+    }
 }

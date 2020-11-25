@@ -41,9 +41,9 @@
           <a class="list-group-item list-group-item-action" id="list-calendar-links-list" data-toggle="list" href="#list-calendar-links" role="tab" aria-controls="calendar-links">@lang('profile.calendars.title')</a>
           <a class="list-group-item list-group-item-action" id="list-notifications-list" href="{{ route('notifications') }}" role="tab">@lang('profile.notifications')</a>
           @endif
-          @if(Auth::user()->isRepairDirectoryRegionalAdmin() || Auth::user()->isRepairDirectorySuperAdmin())
+          @can('viewRepairDirectorySettings', Auth::user())
           <a class="list-group-item list-group-item-action" id="list-repair-directory-list" data-toggle="list" href="#list-repair-directory" role="tab">@lang('profile.repair_directory')</a>
-          @endif
+          @endcan
 
         </div>
       </div>
@@ -69,11 +69,11 @@
           </div>
           @endif
 
-          @if(Auth::user()->isRepairDirectoryRegionalAdmin() || Auth::user()->isRepairDirectorySuperAdmin())
+          @can('viewRepairDirectorySettings', Auth::user())
           <div class="tab-pane fade" id="list-repair-directory" role="tabpanel" aria-labelledby="list-repair-directory">
             @include('user.profile.repair-directory')
           </div>
-          @endif
+          @endcan
 
         </div>
 
