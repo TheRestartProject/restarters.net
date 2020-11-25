@@ -18,27 +18,23 @@ class UserPolicy
      * @param  int  $role
      * @return mixed
      */
-    public function canChangeRepairDirRole(User $perpetrator, User $victim, int $role)
+    public function changeRepairDirRole(User $perpetrator, User $victim, int $role)
     {
         # We have rules for whether you can change the Repair Directory role.  Code is structured for readability
         # of these rules, rather than a single big if.
         #
         # Default to forbidden.
         $ret = FALSE;
-        error_log("Can change role? {$perpetrator->repairdir_role()} . {$victim->id} vs {$perpetrator->id}" );
 
         if ($perpetrator->repairdir_role() === Role::REPAIR_DIRECTORY_SUPERADMIN) {
             # SuperAdmins can do anything
             $ret = TRUE;
         } else if ($perpetrator->repairdir_role() === Role::REPAIR_DIRECTORY_REGIONAL_ADMIN) {
             # Regional Admins can do some things.
-            error_log("Regional admin");
             if ($victim->id === $perpetrator->id) {
                 # Operating on themselves.
-                error_log("Self");
                 if ($role === Role::REPAIR_DIRECTORY_NONE || $role === Role::REPAIR_DIRECTORY_EDITOR) {
                     # Demoting themselves.
-                    error_log("Demote");
                     $ret = TRUE;
                 }
             } else {
@@ -51,5 +47,16 @@ class UserPolicy
         }
 
         return $ret;
+    }
+
+    /**
+     * Determine whether this user can view the Repair Directory settings for users
+     *
+     * @param  \App\User  $user
+     * @return mixed
+     */
+    public function viewRepairDirectorySettings(User $user)
+    {
+        return $user && ($user->isRepairDirectoryRegionalAdmin() || $user->isRepairDirectorySuperAdmin());
     }
 }
