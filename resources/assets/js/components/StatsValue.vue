@@ -16,7 +16,9 @@
     </div>
     <div class="impact-stat-subtitle" v-html="translatedSubtitle" />
     <div v-if="description" class="impact-stat-description pt-3 m-3" v-html="translatedDescription" />
-    <b-img fluid-grow v-if="image" :src="image" />
+    <div class="image d-flex justify-content-around" v-if="image">
+      <b-img :src="image" />
+    </div>
   </div>
 </template>
 <script>
@@ -229,5 +231,11 @@ export default {
   border-top: 3px dashed #222;
   font-family: $font-family-third;
   font-size: 18px;
+}
+
+.image {
+  img {
+    height: 150px;
+  }
 }
 </style>
