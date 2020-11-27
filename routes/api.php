@@ -76,3 +76,9 @@ Route::group(['middleware' => 'auth:api'], function () {
 });
 
 Route::get('/groups/{group}/events', 'API\GroupController@getEventsForGroup');
+
+Route::get('/devices/{page}/{size}', function ($page, $size) {
+    error_log("Page $page size $size");
+    return App\Http\Controllers\ApiController::getDevices($page, $size);
+});
+

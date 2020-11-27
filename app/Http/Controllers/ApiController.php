@@ -120,4 +120,8 @@ class ApiController extends Controller
                ->get();
         return response()->json($users);
     }
+
+    public static function getDevices($page, $size) {
+        return response()->json([]);
+    }
 }
