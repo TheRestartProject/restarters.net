@@ -13,14 +13,14 @@
 </a>
 
 @if(env('APP_SHOW_BRANCH'))
-    <div style="position: fixed; top: 0px; left: 0px; color: red">
+    <div style="position: fixed; top: 0px; left: 0px; color: red; text-transform: uppercase">
         <?php
         // We want to show the current branch.  This will only be set on development or staging environments.
         $branch = "Unknown branch";
         @exec('git branch | ' . "grep ' * '", $shellOutput);
         foreach ($shellOutput as $line) {
             if (strpos($line, '* ') !== false) {
-                echo trim(strtolower(str_replace('* ', '', $line)));
+                $branch = trim(strtolower(str_replace('* ', '', $line)));
             }
         }
         ?>
