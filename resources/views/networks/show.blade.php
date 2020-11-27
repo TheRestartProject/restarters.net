@@ -103,7 +103,7 @@
 
                     <div class="panel">
                     <p>
-                        There are currently {{ $network->groups->count() }} groups in the {{ $network->name }} network. <a href="/group/all/search?network={{ $network->id }}">View these groups</a>.
+                        There are currently {{ $network->groups->count() }} groups in the {{ $network->name }} network. <a href="/group/network/{{ $network->id }}">View these groups</a>.
                     </p>
                     </div>
 

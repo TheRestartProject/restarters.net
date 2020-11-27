@@ -80,7 +80,6 @@
 <script>
 import GroupsTable from './GroupsTable'
 
-// TODO Mobile layout
 export default {
   components: {GroupsTable},
   props: {
