@@ -113,5 +113,7 @@ return array (
   'model' => 'Model',
   'status' => 'Status',
   'spare_parts' => 'Spare parts',
-  'images_on_edit' => 'Currently images can only be added by editing an item after it has been added.'
+  'images_on_edit' => 'Currently images can only be added by editing an item after it has been added.',
+  'table_intro' => 'Click row for details.  Click a column head to sort by that column - click again to reverse sort order.',
+  'assessment' => 'Assessment'
 );

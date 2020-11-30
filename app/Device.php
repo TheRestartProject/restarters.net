@@ -91,7 +91,8 @@ class Device extends Model implements Auditable
         'SELECT
 
 sum(case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) as `total_weights`,
-
+sum(case when (categories.powered = 1) then (case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as ewaste,
+sum(case when (categories.powered = 0) then devices.estimate + 0.0 else 0 end) as unpowered_waste,
 sum(case when (devices.category = 46) then (devices.estimate + 0.0) * @ratio else (categories.footprint * @displacement) end) as `total_footprints`
 
 FROM devices, categories, events,

@@ -21,41 +21,41 @@
       </b-col>
       <b-col cols="9">
         <b-tabs class="ourtabs ourtabs-brand w-100">
-          <b-tab active title-item-class="w-50" class="pt-2">
+          <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2" lazy>
             <template slot="title">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b>{{ translatedPowered }}</b> (TODO powered count)
+                  <b>{{ translatedPowered }}</b> ({{ impactData.fixed_powered.toLocaleString() }})
                 </div>
-                <div class="d-flex">
+                <div class="d-flex text-brand font-weight-bold">
                   <div class="mr-3 lower">
                     <b-img src="/images/trash_brand.svg" class="icon" />
-                    TODO ewaste kg
+                    {{ impactData.ewaste.toLocaleString() }} kg
                   </div>
                   <div class="mr-1 lower">
                     <b-img src="/images/co2_brand.svg" class="icon" />
-                    TODO CO2 kg
+                    {{ impactData.emissions.toLocaleString() }} kg
                   </div>
                 </div>
               </div>
             </template>
-            <p v-html="translatedDescriptionPowered" />
-            <FixometerRecordsTable :powered="true" />
+            <p class="pl-3" v-html="translatedDescriptionPowered" />
+            <FixometerRecordsTable :powered="true" :total="impactData.fixed_powered" />
           </b-tab>
-          <b-tab title-item-class="w-50" class="pt-2">
+          <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2" lazy>
             <template slot="title">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b>{{ translatedUnpowered }}</b> (TODO unpowered count)
+                  <b>{{ translatedUnpowered }}</b> ({{ impactData.fixed_unpowered.toLocaleString() }})
                 </div>
-                <div class="lower">
+                <div class="lower text-brand font-weight-bold">
                   <b-img src="/images/trash_brand.svg" class="icon" />
-                  TODO unpowered_waste kg
+                  {{ impactData.unpowered_waste.toLocaleString() }} kg
                 </div>
               </div>
             </template>
-            <p v-html="translatedDescriptionUnpowered" />
-            <FixometerRecordsTable :powered="false" />
+            <p class="pl-3" v-html="translatedDescriptionUnpowered" />
+            <FixometerRecordsTable :powered="false" :total="impactData.fixed_unpowered" />
           </b-tab>
         </b-tabs>
       </b-col>
@@ -112,6 +112,5 @@ export default {
 @import 'resources/global/css/_variables';
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
-
+@import '~bootstrap/scss/mixins/_breakpoints';  
 </style>

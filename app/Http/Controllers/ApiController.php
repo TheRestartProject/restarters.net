@@ -8,6 +8,7 @@ use App\Party;
 use App\Device;
 use App\User;
 use App\Helpers\FootprintRatioCalculator;
+use Mediawiki\Api\CategoryLoopException;
 
 class ApiController extends Controller
 {
@@ -15,7 +16,6 @@ class ApiController extends Controller
     {
         $result = array();
 
-        $Party = new Party;
         $Device = new Device;
 
         $allparties = Party::pastEvents()->get();
@@ -35,6 +35,8 @@ class ApiController extends Controller
         $result['hours_volunteered'] = $hours_volunteered;
         $result['items_fixed'] = $Device->statusCount()[0]->counter;
         $result['weights'] = round($co2Total[0]->total_weights);
+        $result['ewaste'] = round($co2Total[0]->ewaste);
+        $result['unpowered_waste'] = round($co2Total[0]->unpowered_waste);
         $result['emissions'] = round($co2Total[0]->total_footprints);
 
         $devices = new Device;
@@ -121,7 +123,23 @@ class ApiController extends Controller
         return response()->json($users);
     }
 
-    public static function getDevices($page, $size) {
-        return response()->json([]);
+    public static function getDevices($page, $size, $powered) {
+        $items = Device::with(['deviceEvent.theGroup', 'deviceCategory'])
+        ->join('events', 'events.idevents', '=', 'devices.event')
+        ->join('groups', 'events.group', '=', 'groups.idgroups')
+        ->join('categories', 'devices.category', '=', 'categories.idcategories')
+        ->where('categories.powered', '=', $powered == 'true' ? 1 : 0)
+        ->where('repair_status', '=', 1)
+        ->orderBy('events.event_date', 'desc')
+        ->orderBy('devices.iddevices', 'asc')
+        ->skip(($page - 1) * $size)
+        ->take($size)
+        ->get();
+
+        foreach ($items as &$item) {
+            $item->shortProblem = $item->getShortProblem();
+        }
+
+        return response()->json($items);
     }
 }
