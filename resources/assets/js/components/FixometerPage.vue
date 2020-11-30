@@ -17,11 +17,11 @@
     <p>{{ translatedSearchText}}</p>
     <b-row>
       <b-col cols="3">
-        TODO FILTERS
+        <FixometerFilters :clusters="clusters" :brands="brands" :powered="tabIndex === 0"/>
       </b-col>
       <b-col cols="9">
-        <b-tabs class="ourtabs ourtabs-brand w-100">
-          <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2" lazy>
+        <b-tabs class="ourtabs ourtabs-brand w-100" v-model="tabIndex">
+          <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
             <template slot="title">
               <div class="d-flex justify-content-between">
                 <div>
@@ -42,7 +42,7 @@
             <p class="pl-3" v-html="translatedDescriptionPowered" />
             <FixometerRecordsTable :powered="true" :total="impactData.total_powered" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
           </b-tab>
-          <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2" lazy>
+          <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
             <template slot="title">
               <div class="d-flex justify-content-between">
                 <div>
@@ -63,12 +63,13 @@
   </div>
 </template>
 <script>
-
 import FixometerHeading from './FixometerHeading'
 import FixometerGlobalImpact from './FixometerGlobalImpact'
 import FixometerRecordsTable from './FixometerRecordsTable'
+import FixometerFilters from './FixometerFilters'
+
 export default {
-  components: {FixometerRecordsTable, FixometerGlobalImpact, FixometerHeading},
+  components: {FixometerFilters, FixometerRecordsTable, FixometerGlobalImpact, FixometerHeading},
   props: {
     latestData: {
       type: Object,
@@ -93,6 +94,11 @@ export default {
       required: false,
       default: null
     },
+  },
+  data () {
+    return {
+      tabIndex: 1
+    }
   },
   mounted() {
     // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
