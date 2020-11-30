@@ -25,7 +25,7 @@
             <template slot="title">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b>{{ translatedPowered }}</b> ({{ impactData.fixed_powered.toLocaleString() }})
+                  <b>{{ translatedPowered }}</b> ({{ impactData.total_powered.toLocaleString() }})
                 </div>
                 <div class="d-flex text-brand font-weight-bold">
                   <div class="mr-3 lower">
@@ -40,13 +40,13 @@
               </div>
             </template>
             <p class="pl-3" v-html="translatedDescriptionPowered" />
-            <FixometerRecordsTable :powered="true" :total="impactData.fixed_powered" />
+            <FixometerRecordsTable :powered="true" :total="impactData.total_powered" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
           </b-tab>
           <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2" lazy>
             <template slot="title">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b>{{ translatedUnpowered }}</b> ({{ impactData.fixed_unpowered.toLocaleString() }})
+                  <b>{{ translatedUnpowered }}</b> ({{ impactData.total_unpowered.toLocaleString() }})
                 </div>
                 <div class="lower text-brand font-weight-bold">
                   <b-img src="/images/trash_brand.svg" class="icon" />
@@ -55,7 +55,7 @@
               </div>
             </template>
             <p class="pl-3" v-html="translatedDescriptionUnpowered" />
-            <FixometerRecordsTable :powered="false" :total="impactData.fixed_unpowered" />
+            <FixometerRecordsTable :powered="false" :total="impactData.total_unpowered" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
           </b-tab>
         </b-tabs>
       </b-col>
@@ -77,7 +77,22 @@ export default {
     impactData: {
       type: Object,
       required: true
-    }
+    },
+    clusters: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    brands: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    barrierList: {
+      type: Array,
+      required: false,
+      default: null
+    },
   },
   mounted() {
     // Data is passed from the blade template to us via props.  We put it in the store for all components to use,

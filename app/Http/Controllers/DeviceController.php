@@ -32,11 +32,8 @@ class DeviceController extends Controller
 {
     public function index($search = null)
     {
-        $Category = new Category;
-
-        $categories = $Category->listed();
-
-        $all_groups = Group::all();
+        $clusters = Cluster::with(['categories'])->get()->all();
+        $brands = Brands::orderBy('brand_name', 'asc')->get()->all();
 
         $most_recent_finished_event = Party::with('theGroup')
         ->hasDevicesRepaired(1)
@@ -51,46 +48,18 @@ class DeviceController extends Controller
                             ->homepage_data();
         $global_impact_data = $global_impact_data->getData();
 
-        $user_groups = Group::with('allRestarters', 'parties', 'groupImage.image')
-        ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-        ->join('events', 'events.group', '=', 'groups.idgroups')
-        ->where('users_groups.user', Auth::id())
-        ->orderBy('groups.name', 'ASC')
-        ->groupBy('groups.idgroups')
-        ->select('groups.*')
-        ->get();
-
-        $items = Device::with(['deviceEvent'])
-               ->join('events', 'events.idevents', '=', 'devices.event')
-               ->orderBy('events.event_date', 'desc')
-               ->orderBy('devices.iddevices', 'asc')
-               ->paginate(15);
-
         return view('fixometer.index', [
-            'title' => Lang::get('devices.fixometer'),
-            'categories' => $categories,
-            'groups' => $all_groups,
+            'clusters' => $clusters,
+            'barriers' => \App\Helpers\FixometerHelper::allBarriers(),
+            'brands' => $brands,
             'most_recent_finished_event' => $most_recent_finished_event,
-            'impact_data' => $global_impact_data,
-            'selected_groups' => null,
-            'selected_categories' => null,
-            'from_date' => null,
-            'to_date' => null,
-            'device_id' => null,
-            'brand' => null,
-            'model' => null,
-            'problem' => null,
-            'wiki' => null,
-            'status' => null,
-            'sort_direction' => 'DSC',
-            'sort_column' => 'event_date',
-            'user_groups' => $user_groups,
-            'items' => $items,
+            'impact_data' => $global_impact_data
         ]);
     }
 
     public function search(Request $request, $raw = false)
     {
+        // TODO Can remove this?
         $Category = new Category;
         $categories = $Category->listed();
 

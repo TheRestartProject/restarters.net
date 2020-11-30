@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-brand small pl-3">{{ translatedTableIntro }} TODO</p>
+    <p class="text-brand small pl-3">{{ translatedTableIntro }}</p>
     <div class="pl-3 pr-3">
       <b-table
           :id="'recordstable-' + powered"
@@ -9,7 +9,10 @@
           :per-page="perPage"
           :current-page="currentPage"
           sort-null-last
-          thead-tr-class="d-none d-md-table-row">
+          thead-tr-class="d-none d-md-table-row"
+          tbody-tr-class="clickme"
+          @row-clicked="clicked"
+      >
         <template slot="cell(repair_status)" slot-scope="data">
           <div :class="badgeClass(data)">
             {{ status(data) }}
@@ -28,15 +31,21 @@
         ></b-pagination>
       </div>
     </div>
+    <b-modal v-model="showModal" no-stacking ok-only modal-class="modal-fullscreen">
+      <EventDevice :device="device" :powered="powered" :add="false" :edit="false" :idevents="device.event"
+                   :clusters="clusters" :brands="brands" :barrier-list="barrierList" v-if="device"/>
+    </b-modal>
   </div>
 </template>
 <script>
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 import moment from 'moment'
+import EventDevice from './EventDevice'
 
 const bootaxios = require('axios')
 
 export default {
+  components: {EventDevice},
   props: {
     powered: {
       type: Boolean,
@@ -45,88 +54,143 @@ export default {
     total: {
       type: Number,
       required: true
-    }
+    },
+    clusters: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    brands: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    barrierList: {
+      type: Array,
+      required: false,
+      default: null
+    },
   },
   data () {
     return {
       currentPage: 1,
-      perPage: 5
+      perPage: 5,
+      showModal: false,
+      device: null
     }
   },
   computed: {
-    fields() {
+    fields () {
       let ret = [
-        { key: 'device_category.name', label: this.translatedCategory, thClass: 'width20', tdClass: 'width20' }
+        {
+          key: 'device_category.name',
+          label: this.translatedCategory,
+          thClass: 'width20',
+          tdClass: 'width20',
+          sortable: true
+        }
       ]
 
       if (this.powered) {
-        ret.push({ key: 'model', label: this.translatedModel })
-        ret.push({ key: 'brand', label: this.translatedBrand })
+        ret.push({key: 'model', label: this.translatedModel, sortable: true})
+        ret.push({key: 'brand', label: this.translatedBrand, sortable: true})
       } else {
-        ret.push({ key: 'model', label: this.translatedModelOrType })
+        ret.push({key: 'model', label: this.translatedModelOrType, sortable: true})
       }
 
-      ret.push({ key: 'shortProblem', label: this.translatedAssessment, thClass: 'width10', tdClass: 'width10' })
-      ret.push({ key: 'device_event.the_group.name', label: this.translatedGroup })
-      ret.push({ key: 'repair_status', label: this.translatedStatus, thClass: 'width90px', tdClass: 'width90px' })
-      ret.push({ key: 'device_event.event_date', label: this.translatedDevicesDate, thClass: 'width90px', tdClass: 'width90px' })
+      ret.push({key: 'shortProblem', label: this.translatedAssessment, thClass: 'width10', tdClass: 'width10'})
+      ret.push({key: 'device_event.the_group.name', label: this.translatedGroup, sortable: true})
+      ret.push({
+        key: 'repair_status',
+        label: this.translatedStatus,
+        thClass: 'width90px',
+        tdClass: 'width90px',
+        sortable: true
+      })
+      ret.push({
+        key: 'device_event.event_date',
+        label: this.translatedDevicesDate,
+        thClass: 'width90px',
+        tdClass: 'width90px',
+        sortable: true
+      })
 
       return ret
     },
-    translatedCategory() {
+    translatedCategory () {
       return this.$lang.get('devices.category')
     },
-    translatedBrand() {
+    translatedBrand () {
       return this.$lang.get('devices.brand')
     },
-    translatedModel() {
+    translatedModel () {
       return this.$lang.get('devices.model')
     },
-    translatedModelOrType() {
+    translatedModelOrType () {
       return this.$lang.get('devices.model_or_type')
     },
-    translatedAssessment() {
+    translatedAssessment () {
       return this.$lang.get('devices.assessment')
     },
-    translatedGroup() {
+    translatedGroup () {
       return this.$lang.get('devices.group')
     },
-    translatedStatus() {
+    translatedStatus () {
       return this.$lang.get('devices.status')
     },
-    translatedDevicesDate() {
+    translatedDevicesDate () {
       return this.$lang.get('devices.devices_date')
     },
-    translatedTableIntro() {
+    translatedTableIntro () {
       return this.$lang.get('devices.table_intro')
     },
   },
   methods: {
-    items(ctx, callback) {
-      console.log("Items called", ctx)
+    items (ctx, callback) {
       // Don't use store - we don't need this to be reactive.
-      axios.get('/api/devices/' + ctx.currentPage + '/' + ctx.perPage + '/' + this.powered)
-        .then(ret => {
-          console.log("Returned", ret.data)
-          callback(ret.data)
-        }).catch(() => {
-          callback([])
+      // Default sort is descending date order.
+      // The table will provide a full name in sortBy - we just want the last part.
+      let sortBy = 'event_date'
+      let sortDesc = ctx.sortBy ? (ctx.sortDesc ? 'DESC' : 'ASC') : 'DESC'
+
+      if (ctx.sortBy) {
+        // We have to munge what the table gives us a bit to match what the server can query.
+        console.log('Ctx', ctx.sortBy)
+        sortBy = ctx.sortBy
+            .replace('device_event.the_group.', 'groups.')
+            .replace('device_event.', 'events.')
+            .replace('device_category.', 'categories.')
+      }
+
+      axios.get('/api/devices/' + ctx.currentPage + '/' + ctx.perPage, {
+        params: {
+          sortBy: sortBy,
+          sortDesc: sortDesc,
+          powered: this.powered
+        }
       })
-
-
+          .then(ret => {
+            callback(ret.data)
+          }).catch(() => {
+        callback([])
+      })
 
       // Indicate that callback is being used.
       return null
     },
-    status(data) {
+    status (data) {
       switch (data.item.repair_status) {
-        case FIXED: return this.$lang.get('partials.fixed');
-        case REPAIRABLE: return this.$lang.get('partials.repairable');
-        case END_OF_LIFE: return this.$lang.get('partials.end');
-        default: return null
+        case FIXED:
+          return this.$lang.get('partials.fixed')
+        case REPAIRABLE:
+          return this.$lang.get('partials.repairable')
+        case END_OF_LIFE:
+          return this.$lang.get('partials.end')
+        default:
+          return null
       }
     },
-    badgeClass(data) {
+    badgeClass (data) {
       switch (data.item.repair_status) {
         case FIXED:
           return 'badge badge-success'
@@ -138,8 +202,12 @@ export default {
           return null
       }
     },
-    formatDate(data) {
+    formatDate (data) {
       return new moment(data.item.device_event.event_date).format('DD/MM/YYYY')
+    },
+    clicked (device) {
+      this.device = device
+      this.showModal = true
     }
   }
 }
@@ -166,5 +234,22 @@ export default {
 
 /deep/ .width90px {
   width: 90px;
+}
+
+/deep/ .table th {
+  padding: 5px;
+}
+
+/deep/ .modal-fullscreen .modal-dialog {
+  max-width: 100%;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  display: flex;
+  position: fixed;
+  z-index: 100000;
 }
 </style>

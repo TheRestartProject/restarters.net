@@ -230,7 +230,6 @@ export default {
       } else {
         this.currentDevice.repair_details = null
       }
-      console.log("Calc next steps", this.currentDevice.repair_details)
     },
     async addDevice() {
       if (!this.currentDevice.category) {

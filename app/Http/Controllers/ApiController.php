@@ -8,6 +8,7 @@ use App\Party;
 use App\Device;
 use App\User;
 use App\Helpers\FootprintRatioCalculator;
+use Illuminate\Http\Request;
 use Mediawiki\Api\CategoryLoopException;
 
 class ApiController extends Controller
@@ -42,6 +43,8 @@ class ApiController extends Controller
         $devices = new Device;
         $result['fixed_powered'] = $devices->fixedPoweredCount();
         $result['fixed_unpowered'] = $devices->fixedUnpoweredCount();
+        $result['total_powered'] = $devices->poweredCount();
+        $result['total_unpowered'] = $devices->unpoweredCount();
 
         return response()
             ->json($result, 200);
@@ -123,21 +126,31 @@ class ApiController extends Controller
         return response()->json($users);
     }
 
-    public static function getDevices($page, $size, $powered) {
-        $items = Device::with(['deviceEvent.theGroup', 'deviceCategory'])
+    /**
+     * List/search devices
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public static function getDevices(Request $request, $page, $size) {
+        $powered = $request->input('powered');
+        $sortBy = $request->input('sortBy');
+        $sortDesc = $request->input('sortDesc');
+
+        $items = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
         ->join('events', 'events.idevents', '=', 'devices.event')
         ->join('groups', 'events.group', '=', 'groups.idgroups')
         ->join('categories', 'devices.category', '=', 'categories.idcategories')
         ->where('categories.powered', '=', $powered == 'true' ? 1 : 0)
-        ->where('repair_status', '=', 1)
-        ->orderBy('events.event_date', 'desc')
-        ->orderBy('devices.iddevices', 'asc')
+        ->orderBy($sortBy, $sortDesc)
         ->skip(($page - 1) * $size)
         ->take($size)
         ->get();
 
         foreach ($items as &$item) {
-            $item->shortProblem = $item->getShortProblem();
+            $item['shortProblem'] = $item->getShortProblem();
+            $item['images'] = $item->getImages();
+            $item['category'] = $item['deviceCategory'];
         }
 
         return response()->json($items);

@@ -629,7 +629,7 @@ AND devices.event = events.idevents ';
 
     public function fixedPoweredCount() {
         // We want fixed devices with an powered category.
-        $count = Device::where('repair_status', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function($query) {
+        $count = Device::where('repair_status', '=', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function($query) {
             $query->where('powered', 1);
         }])->get();
 
@@ -643,8 +643,36 @@ AND devices.event = events.idevents ';
 
     public function fixedUnpoweredCount() {
         // We want fixed devices with an unpowered category.
-        $count = Device::where('repair_status', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function($query) {
+        $count = Device::where('repair_status', '=', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function($query) {
             $query->where('powered', 0);
+        }])->get();
+
+        $total = 0;
+        foreach ($count as $c) {
+            $total += $c->device_category_count;
+        }
+
+        return $total;
+    }
+
+    public function unpoweredCount() {
+        // We want devices with an unpowered category.
+        $count = Device::withCount(['deviceCategory' => function($query) {
+            $query->where('powered', 0);
+        }])->get();
+
+        $total = 0;
+        foreach ($count as $c) {
+            $total += $c->device_category_count;
+        }
+
+        return $total;
+    }
+
+    public function poweredCount() {
+        // We want devices with an powered category.
+        $count = Device::withCount(['deviceCategory' => function($query) {
+            $query->where('powered', 1);
         }])->get();
 
         $total = 0;

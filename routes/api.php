@@ -77,7 +77,8 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 Route::get('/groups/{group}/events', 'API\GroupController@getEventsForGroup');
 
-Route::get('/devices/{page}/{size}/{powered}', function ($page, $size, $powered) {
-    return App\Http\Controllers\ApiController::getDevices($page, $size, $powered);
-});
+//Route::get('/devices/{page}/{size}/{powered}/{sortBy?}/{sortDesc?}', function ($page, $size, $powered, $sortBy = NULL, $sortDesc = FALSE) {
+//    return App\Http\Controllers\ApiController::getDevices($page, $size, $powered, $sortBy, $sortDesc);
+//});
 
+Route::get('/devices/{page}/{size}', [ App\Http\Controllers\ApiController::class, 'getDevices' ]);
