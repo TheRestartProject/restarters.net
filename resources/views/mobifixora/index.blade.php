@@ -108,7 +108,6 @@
                 @endif
             </div>
         </div>
-        <form id="get-task" action="" method="GET"></form>
         <form id="log-task" action="" method="POST">
             @csrf
             <div class="container fault-type">
@@ -170,7 +169,7 @@
         }, false);
         document.getElementById('fetch').addEventListener('click', function (e) {
             e.preventDefault();
-            document.forms['get-task'].submit();
+            fetchNew();
         }, false);
         document.addEventListener("keypress", function (e) {
             if (e.code == 'KeyF') {
@@ -200,23 +199,26 @@
         function doChange(e) {
             if (document.getElementById('fault-type-new').dataset.fid !== '') {
                 document.getElementById('fault-type-id').value = document.getElementById('fault-type-new').dataset.fid;
-                submitForm();
+                submitFormLog();
             }
         }
 
-        function submitForm() {
+        function submitFormLog() {
             let fid = document.getElementById('fault-type-id').value;
             let oid = document.getElementById('id-ords').value;
-            if (fid == 0) {
-                console.log('fid==0');
-                document.forms['get-task'].submit();
-            } else if (oid == 0) {
-                console.log('oid==0');
-                document.forms['get-task'].submit();
+            if (!fid) {
+                console.log('fid: ' + fid);
+                fetchNew();
+            } else if (!oid) {
+                console.log('oid: ' + oid);
+                fetchNew();
             } else {
-                console.log('submitForm - id-ords ' + oid + ' / fault-type-id: ' + fid;
+                console.log('submitForm - id-ords ' + oid + ' / fault-type-id: ' + fid);
                 document.forms['log-task'].submit();
             }
+        }
+        function fetchNew() {
+            window.location.replace(window.location.href);
         }
 
         if (window.location.href.indexOf('cta') != -1) {
