@@ -31,21 +31,19 @@
         ></b-pagination>
       </div>
     </div>
-    <b-modal v-model="showModal" no-stacking ok-only modal-class="modal-fullscreen">
-      <EventDevice :device="device" :powered="powered" :add="false" :edit="false" :idevents="device.event"
-                   :clusters="clusters" :brands="brands" :barrier-list="barrierList" v-if="device"/>
-    </b-modal>
+    <DeviceModal ref="modal" :device="device" v-if="device" />
   </div>
 </template>
 <script>
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 import moment from 'moment'
-import EventDevice from './EventDevice'
+import DeviceModel from './DeviceModel'
+import DeviceModal from './DeviceModal'
 
 const bootaxios = require('axios')
 
 export default {
-  components: {EventDevice},
+  components: {DeviceModal, DeviceModel},
   props: {
     powered: {
       type: Boolean,
@@ -146,6 +144,9 @@ export default {
     translatedTableIntro () {
       return this.$lang.get('devices.table_intro')
     },
+    translatedClose() {
+      return this.$lang.get('partials.close')
+    },
   },
   watch: {
     category(newVal) {
@@ -217,7 +218,9 @@ export default {
     },
     clicked (device) {
       this.device = device
-      this.showModal = true
+      this.$nextTick(() => {
+        this.$refs.modal.show()
+      })
     }
   }
 }
@@ -248,18 +251,5 @@ export default {
 
 /deep/ .table th {
   padding: 5px;
-}
-
-/deep/ .modal-fullscreen .modal-dialog {
-  max-width: 100%;
-  margin: 0;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100vh;
-  display: flex;
-  position: fixed;
-  z-index: 100000;
 }
 </style>
