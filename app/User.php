@@ -529,4 +529,17 @@ class User extends Authenticatable implements Auditable
 
         return $groupsUserIsInChargeOf;
     }
+
+    public function ensureAPIToken() {
+        # Generate an API token if we don't already have one.
+        $api_token = $this->api_token;
+
+        if (!$api_token) {
+            $api_token = \Illuminate\Support\Str::random(60);
+            $this->api_token = $api_token;
+            $this->save();
+        }
+
+        return $api_token;
+    }
 }

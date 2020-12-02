@@ -1,6 +1,7 @@
 <template>
   <div v-if="group">
-    <GroupHeading :idgroups="idgroups" :canedit="canedit" :ingroup="ingroup"/>
+    <div class="alert alert-success" v-if="haveLeft" v-html="translatedHaveLeft" />
+    <GroupHeading :idgroups="idgroups" :canedit="canedit" :ingroup="ingroup" @left="haveLeft = true" />
 
     <div class="d-flex flex-wrap">
       <div class="w-xs-100 w-md-50">
@@ -48,12 +49,20 @@ import GroupEvents from './GroupEvents'
 import GroupDevicesWorkedOn from './GroupDevicesWorkedOn'
 import GroupDevicesMostRepaired from './GroupDevicesMostRepaired'
 import GroupDevicesBreakdown from './GroupDevicesBreakdown'
+import auth from '../mixins/auth'
 
 export default {
   components: {
     GroupDevicesBreakdown,
     GroupDevicesMostRepaired,
-    GroupDevicesWorkedOn, GroupEvents, GroupStats, GroupVolunteers, GroupDescription, GroupHeading},
+    GroupDevicesWorkedOn,
+    GroupEvents,
+    GroupStats,
+    GroupVolunteers,
+    GroupDescription,
+    GroupHeading
+  },
+  mixins: [ auth ],
   props: {
     idgroups: {
       type: Number,
@@ -108,9 +117,20 @@ export default {
       required: true
     }
   },
+  data () {
+    return {
+      haveLeft: false
+    }
+  },
   computed: {
     group() {
       return this.$store.getters['groups/get'](this.idgroups)
+    },
+    translatedHaveLeft() {
+      return this.$lang.get('groups.now_unfollowed', {
+        name: this.group.name,
+        link: '/group/view/' + this.group.id
+      })
     }
   },
   mounted () {

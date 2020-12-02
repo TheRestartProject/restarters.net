@@ -57,10 +57,12 @@ class GroupController extends Controller
         $all_group_tags = GroupTags::all();
         $networks = Network::all();
 
-        //Look for groups where user ID exists in pivot table
+        // Look for groups where user ID exists in pivot table.  We have to explicitly test on deleted_at because
+        // the normal filtering out of soft deletes won't happen for joins.
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
+            ->whereNull('users_groups.deleted_at')
             ->orderBy('groups.name', 'ASC')
             ->groupBy('groups.idgroups')
             ->select($group_atts)
@@ -854,7 +856,6 @@ class GroupController extends Controller
             return redirect()->back()->with('response', $response)->with('warning', 'You are already part of this group');
         }
 
-
         try {
             $user_group = UserGroups::updateOrCreate([
                 'user' => $user_id,
@@ -885,7 +886,10 @@ class GroupController extends Controller
 
             return redirect()
                     ->back()
-                    ->with('success', "You are now following {$group->name}!");
+                    ->with('success', __('groups.now_following', [
+                        'name' => $group->name,
+                        'link' => url('/group/view/'.$group->idgroups)
+                    ]));
 
         } catch (\Exception $e) {
             $response['danger'] = 'Failed to follow this group';
@@ -929,9 +933,16 @@ class GroupController extends Controller
 
     public function getMakeHost($group_id, $user_id, Request $request)
     {
-        //Has current logged in user got permission to add host
-        if ((FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id())) || FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
-            $group = Group::find($group_id);
+        // Has current logged in user got permission to add host?
+        // - Is a host of the group.
+        // - Is a network coordinator of a network which the group is in.
+        // - Is an Administrator
+        $group = Group::find($group_id);
+        $loggedInUser = Auth::user();
+
+        if (($loggedInUser->hasRole('Host') && FixometerHelper::userIsHostOfGroup($group_id, $loggedInUser->id)) ||
+            $loggedInUser->isCoordinatorForGroup($group) ||
+            $loggedInUser->hasRole('Administrator')) {
             $user = User::find($user_id);
 
             $group->makeMemberAHost($user);
