@@ -3,6 +3,7 @@
     <p class="text-brand small pl-3">{{ translatedTableIntro }}</p>
     <div class="pl-3 pr-3">
       <b-table
+          ref="table"
           :id="'recordstable-' + powered"
           :fields="fields"
           :items="items"
@@ -51,10 +52,6 @@ export default {
       type: Boolean,
       required: true
     },
-    total: {
-      type: Number,
-      required: true
-    },
     clusters: {
       type: Array,
       required: false,
@@ -70,13 +67,19 @@ export default {
       required: false,
       default: null
     },
+    category: {
+      type: Number,
+      required: false,
+      default: null
+    }
   },
   data () {
     return {
       currentPage: 1,
       perPage: 5,
       showModal: false,
-      device: null
+      device: null,
+      total: 0
     }
   },
   computed: {
@@ -145,6 +148,12 @@ export default {
       return this.$lang.get('devices.table_intro')
     },
   },
+  watch: {
+    category(newVal) {
+      console.log("Category changed to", newVal)
+      this.$refs.table.refresh()
+    }
+  },
   methods: {
     items (ctx, callback) {
       // Don't use store - we don't need this to be reactive.
@@ -166,11 +175,13 @@ export default {
         params: {
           sortBy: sortBy,
           sortDesc: sortDesc,
-          powered: this.powered
+          powered: this.powered,
+          category: this.category
         }
       })
           .then(ret => {
-            callback(ret.data)
+            this.total = ret.data.count
+            callback(ret.data.items)
           }).catch(() => {
         callback([])
       })

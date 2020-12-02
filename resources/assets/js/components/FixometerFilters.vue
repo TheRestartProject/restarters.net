@@ -113,11 +113,12 @@ export default {
     return {
       expandedItems: false,
       expandedEvents: false,
-      category: null,
       model: null,
       brand: null,
       status: null,
-      item_type: null
+      item_type: null,
+      category: null,
+      comments: null
     }
   },
   computed: {
@@ -161,6 +162,11 @@ export default {
         }
       ]
     },
+  },
+  watch: {
+    category(newVal) {
+      this.$emit('update:category', newVal)
+    }
   },
   methods: {
     toggleItems() {

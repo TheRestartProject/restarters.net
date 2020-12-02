@@ -17,7 +17,12 @@
     <p>{{ translatedSearchText}}</p>
     <b-row>
       <b-col cols="3">
-        <FixometerFilters :clusters="clusters" :brands="brands" :powered="tabIndex === 0"/>
+        <FixometerFilters
+            :clusters="clusters"
+            :brands="brands"
+            :powered="tabIndex === 0"
+            :category.sync="category"
+        />
       </b-col>
       <b-col cols="9">
         <b-tabs class="ourtabs ourtabs-brand w-100" v-model="tabIndex">
@@ -40,7 +45,13 @@
               </div>
             </template>
             <p class="pl-3" v-html="translatedDescriptionPowered" />
-            <FixometerRecordsTable :powered="true" :total="impactData.total_powered" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
+            <FixometerRecordsTable
+                :powered="true"
+                :clusters="clusters"
+                :brands="brands"
+                :barrier-list="barrierList"
+                :category="category"
+            />
           </b-tab>
           <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
             <template slot="title">
@@ -55,7 +66,13 @@
               </div>
             </template>
             <p class="pl-3" v-html="translatedDescriptionUnpowered" />
-            <FixometerRecordsTable :powered="false" :total="impactData.total_unpowered" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
+            <FixometerRecordsTable
+                :powered="false"
+                :clusters="clusters"
+                :brands="brands"
+                :barrier-list="barrierList"
+                :category="category"
+            />
           </b-tab>
         </b-tabs>
       </b-col>
@@ -97,7 +114,8 @@ export default {
   },
   data () {
     return {
-      tabIndex: 1
+      tabIndex: 1,
+      category: null
     }
   },
   mounted() {

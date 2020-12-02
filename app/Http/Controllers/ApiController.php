@@ -136,14 +136,25 @@ class ApiController extends Controller
         $powered = $request->input('powered');
         $sortBy = $request->input('sortBy');
         $sortDesc = $request->input('sortDesc');
+        $category = $request->input('category');
 
-        $items = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
+        $wheres = [
+            ['categories.powered', '=', $powered == 'true' ? 1 : 0],
+        ];
+
+        if ($category) {
+            $wheres[] = [ 'idcategories', '=' , $category ];
+        }
+
+        $query = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
         ->join('events', 'events.idevents', '=', 'devices.event')
         ->join('groups', 'events.group', '=', 'groups.idgroups')
         ->join('categories', 'devices.category', '=', 'categories.idcategories')
-        ->where('categories.powered', '=', $powered == 'true' ? 1 : 0)
-        ->orderBy($sortBy, $sortDesc)
-        ->skip(($page - 1) * $size)
+        ->where($wheres)
+        ->orderBy($sortBy, $sortDesc);
+
+        $count = $query->count();
+        $items = $query->skip(($page - 1) * $size)
         ->take($size)
         ->get();
 
@@ -153,6 +164,9 @@ class ApiController extends Controller
             $item['category'] = $item['deviceCategory'];
         }
 
-        return response()->json($items);
+        return response()->json([
+            'count' => $count,
+            'items' => $items
+        ]);
     }
 }
