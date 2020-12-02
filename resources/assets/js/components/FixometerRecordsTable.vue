@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="text-brand small pl-3">{{ translatedTableIntro }}</p>
-    <div class="pl-3 pr-3">
+    <div class="pl-md-3 pr-md-3">
       <b-table
           ref="table"
           :id="'recordstable-' + powered"
@@ -10,7 +10,6 @@
           :per-page="perPage"
           :current-page="currentPage"
           sort-null-last
-          thead-tr-class="d-none d-md-table-row"
           tbody-tr-class="clickme"
           @row-clicked="clicked"
       >
@@ -88,21 +87,21 @@ export default {
         {
           key: 'device_category.name',
           label: this.translatedCategory,
-          thClass: 'width20',
-          tdClass: 'width20',
+          thClass: 'width20 pl-0 pl-md-3',
+          tdClass: 'width20 pl-0 pl-md-3',
           sortable: true
         }
       ]
 
       if (this.powered) {
         ret.push({key: 'model', label: this.translatedModel, sortable: true})
-        ret.push({key: 'brand', label: this.translatedBrand, sortable: true})
+        ret.push({key: 'brand', label: this.translatedBrand, sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
       } else {
-        ret.push({key: 'model', label: this.translatedModelOrType, sortable: true})
+        ret.push({key: 'model', label: this.translatedModelOrType, sortable: true, tdClass: 'pl-0 pl-md-3'})
       }
 
-      ret.push({key: 'shortProblem', label: this.translatedAssessment, thClass: 'width10', tdClass: 'width10'})
-      ret.push({key: 'device_event.the_group.name', label: this.translatedGroup, sortable: true})
+      ret.push({key: 'shortProblem', label: this.translatedAssessment, thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})
+      ret.push({key: 'device_event.the_group.name', label: this.translatedGroup, sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
       ret.push({
         key: 'repair_status',
         label: this.translatedStatus,

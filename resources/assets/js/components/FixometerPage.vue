@@ -15,16 +15,17 @@
       </div>
     </div>
     <p>{{ translatedSearchText}}</p>
-    <b-row>
-      <b-col cols="3">
-        <FixometerFilters
-            :clusters="clusters"
-            :brands="brands"
-            :powered="tabIndex === 0"
-            :category.sync="category"
-        />
-      </b-col>
-      <b-col cols="9">
+    <b-row class="d-none d-md-block">
+<!--      <b-col cols="3">-->
+<!--        TODO Filters are to come in DOT-1288 -->
+<!--        <FixometerFilters-->
+<!--            :clusters="clusters"-->
+<!--            :brands="brands"-->
+<!--            :powered="tabIndex === 0"-->
+<!--            :category.sync="category"-->
+<!--        />-->
+<!--      </b-col>-->
+      <b-col cols="12">
         <b-tabs class="ourtabs ourtabs-brand w-100" v-model="tabIndex">
           <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
             <template slot="title">
@@ -77,6 +78,40 @@
         </b-tabs>
       </b-col>
     </b-row>
+    <div class="d-block d-md-none">
+      <CollapsibleSection collapsed :count="impactData.total_powered" heading-level="h6" count-class="small">
+        <template slot="title">
+          {{ translatedPowered }}
+        </template>
+        <template slot="title-right">
+          <div class="small mt-1">
+            <div class="d-flex text-brand font-weight-bold">
+              <div class="mr-3 lower d-flex align-content-center">
+                <b-img src="/images/trash_brand.svg" class="iconsmall" />
+                <span class="mt-1">
+                  {{ impactData.ewaste.toLocaleString() }}
+                </span>
+              </div>
+              <div class="mr-1 lower d-flex">
+                <b-img src="/images/co2_brand.svg" class="iconsmall" />
+                <span class="mt-1">
+                  {{ impactData.emissions.toLocaleString() }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template slot="content">
+          <FixometerRecordsTable
+              :powered="true"
+              :clusters="clusters"
+              :brands="brands"
+              :barrier-list="barrierList"
+              :category="category"
+          />
+        </template>
+      </CollapsibleSection>
+    </div>
   </div>
 </template>
 <script>
@@ -84,9 +119,10 @@ import FixometerHeading from './FixometerHeading'
 import FixometerGlobalImpact from './FixometerGlobalImpact'
 import FixometerRecordsTable from './FixometerRecordsTable'
 import FixometerFilters from './FixometerFilters'
+import CollapsibleSection from './CollapsibleSection'
 
 export default {
-  components: {FixometerFilters, FixometerRecordsTable, FixometerGlobalImpact, FixometerHeading},
+  components: {CollapsibleSection, FixometerFilters, FixometerRecordsTable, FixometerGlobalImpact, FixometerHeading},
   props: {
     latestData: {
       type: Object,
@@ -151,5 +187,10 @@ export default {
 @import 'resources/global/css/_variables';
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';  
+@import '~bootstrap/scss/mixins/_breakpoints';
+
+.iconsmall {
+  height: 25px;
+  margin-bottom: 5px;
+}
 </style>
