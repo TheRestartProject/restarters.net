@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex justify-content-between mb-3">
       <h1 class="d-block d-md-none">{{ translatedGroups }}</h1>
-      <GroupActions v-bind="$props" class="d-block d-md-none" />
+      <GroupActions v-bind="$props" class="d-block d-md-none" @left="$emit('left')" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
       <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
@@ -18,7 +18,7 @@
               <b>{{ group.location }}</b> <br />
               <ExternalLink v-if="group.website" :href="group.website">{{ translatedWebsite }}</ExternalLink>
             </div>
-            <GroupActions v-bind="$props" class="d-none d-md-block" />
+            <GroupActions v-bind="$props" class="d-none d-md-block" @left="$emit('left')" />
           </div>
         </div>
       </div>
@@ -33,7 +33,6 @@ import ExternalLink from './ExternalLink'
 
 export default {
   components: {ExternalLink, GroupActions},
-  // components: {EventActions},
   mixins: [group],
   computed: {
     groupImage() {

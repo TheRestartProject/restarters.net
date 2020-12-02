@@ -75,7 +75,7 @@
                     <div class="d-none d-sm-block navbar-brand">
                         @include('includes/logo')
                     </div>
-                    <div class="d-block d-md-none">
+                    <div class="d-block d-sm-none">
                         @include('includes/logo-plain')
                     </div>
 
