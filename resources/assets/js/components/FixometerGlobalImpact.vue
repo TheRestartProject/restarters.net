@@ -3,7 +3,18 @@
     <div class="layout">
       <FixometerLatestData :latest-data="latestData" class="latest-data" />
       <StatsValue :count="impactData.weights" icon="trash" size="md" title="partials.waste_prevented" unit="kg" class="impact-waste" />
-      <StatsValue :count="impactData.emissions" icon="cloud_empty" size="lg" title="partials.co2" subtitle="partials.powered_only" :description="equivalent_consumer(impactData.emissions)" unit="kg" class="impact-co2" image="/images/CO2_driving.png" />
+      <StatsValue :count="impactData.emissions"
+                  icon="cloud_empty"
+                  size="lg"
+                  title="partials.co2"
+                  subtitle="partials.powered_only"
+                  :description="equivalent_consumer(impactData.emissions)"
+                  unit="kg"
+                  class="impact-co2"
+      />
+<!--      Image disabled as needs a new version from designer.-->
+<!--      image="/images/CO2_driving.png"-->
+
       <StatsValue :count="impactData.participants" icon="participants" size="md" title="groups.participants" class="impact-participants" />
       <StatsValue :count="impactData.hours_volunteered" icon="clock" size="md" title="groups.hours_volunteered" class="impact-hours-volunteered" />
       <StatsValue :count="impactData.fixed_powered" icon="powered" size="md" title="devices.powered_items" class="impact-powered" />
