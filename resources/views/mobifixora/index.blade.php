@@ -142,7 +142,7 @@
                 </div>
             </div>
         </form>
-        <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded">
+        <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded my-4">
             <span class="">I don't know,&nbsp;<span class="underline">F</span>etch another repair</span>
         </button>
         @endif
