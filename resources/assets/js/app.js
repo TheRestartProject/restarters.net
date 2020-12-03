@@ -1546,8 +1546,9 @@ jQuery(document).ready(function () {
       el: $(this).get(0),
       store: store,
       components: {
-        'groupspage': require('./components/GroupsPage.vue'),
         'eventpage': require('./components/EventPage.vue'),
+        'fixometerpage': require('./components/FixometerPage.vue'),
+        'groupspage': require('./components/GroupsPage.vue'),
         'grouppage': require('./components/GroupPage.vue'),
         'groupeventspage': require('./components/GroupEventsPage.vue'),
         'groupevents': require('./components/GroupEvents.vue'),
