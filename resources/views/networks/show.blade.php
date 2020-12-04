@@ -50,7 +50,7 @@
                                         Network actions
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="/group/network={{ $network->id }}">@lang('networks.show.view_groups_menuitem')</a>
+                                        <a class="dropdown-item" href="/group/network/{{ $network->id }}">@lang('networks.show.view_groups_menuitem')</a>
                                         @can('associateGroups', $network)
                                         <button data-toggle="modal" data-target="#network-add-group" class="dropdown-item">@lang('networks.show.add_groups_menuitem')</button>
                                         @endcan

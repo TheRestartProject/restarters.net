@@ -189,7 +189,7 @@ export default {
 
         if (this.searchNetwork) {
           match &= g.networks.find(n => {
-            return parseInt(this.searchNetwork.id) === parseInt(n)
+            return parseInt(this.searchNetwork) === parseInt(n)
           })
         }
 
