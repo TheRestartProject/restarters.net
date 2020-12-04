@@ -49,7 +49,8 @@ class GroupController extends Controller
         $group_atts = [ 'groups.idgroups' , 'groups.name', 'groups.location', 'groups.country' ];
 
         // Get all groups
-        $groups = Group::select($group_atts)
+        $groups = Group::with(['networks'])
+            ->select($group_atts)
             ->orderBy('name', 'ASC')
             ->get();
 
