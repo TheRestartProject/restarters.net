@@ -79,9 +79,11 @@
 </template>
 <script>
 import GroupsTable from './GroupsTable'
+import auth from '../mixins/auth'
 
 export default {
   components: {GroupsTable},
+  mixins: [ auth ],
   props: {
     network: {
       type: Number,
@@ -131,6 +133,11 @@ export default {
     networks: {
       type: Array,
       required: true
+    },
+    apiToken: {
+      type: String,
+      required: false,
+      default: null
     },
     allGroupTags: {
       type: Array,

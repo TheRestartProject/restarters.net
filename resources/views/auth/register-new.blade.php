@@ -148,14 +148,14 @@
                               <div class="form-group">
                                   <label for="password">@lang('auth.password'):<sup>*</sup></label>
                                   <input type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }} field" id="password" name="password" value="{{{ old('password') }}}" required aria-required="true">
-                                  <div class="invalid-feedback">@lang('auth.repeat_password_validation')</div>
+                                  <div class="email-invalid-feedback invalid-feedback">@lang('auth.repeat_password_validation')</div>
                               </div>
                           </div>
                           <div class="col-lg-6">
                               <div class="form-group">
                                   <label for="password-confirm">@lang('auth.repeat_password'):<sup>*</sup></label>
                                   <input type="password" class="form-control field" id="password-confirm" name="password_confirmation" value="{{{ old('password_confirmation') }}}" required aria-required="true">
-                                  <div class="invalid-feedback">@lang('auth.repeat_password_validation')</div>
+                                  <div class="email-invalid-feedback invalid-feedback">@lang('auth.repeat_password_validation')</div>
                               </div>
                           </div>
                       </div>
