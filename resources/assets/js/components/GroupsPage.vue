@@ -79,10 +79,11 @@
 </template>
 <script>
 import GroupsTable from './GroupsTable'
+import auth from '../mixins/auth'
 
-// TODO Mobile layout
 export default {
   components: {GroupsTable},
+  mixins: [ auth ],
   props: {
     network: {
       type: Number,
@@ -132,6 +133,11 @@ export default {
     networks: {
       type: Array,
       required: true
+    },
+    apiToken: {
+      type: String,
+      required: false,
+      default: null
     },
     allGroupTags: {
       type: Array,
@@ -216,7 +222,10 @@ export default {
           default: tag = 'mine'; break;
         }
 
-        window.history.pushState(null, "Groups", "/group/" + tag);
+        if (!this.network) {
+          // If we are vieiwng a specific network, don't mess with the URL as it's confusing.
+          window.history.pushState(null, "Groups", "/group/" + tag);
+        }
       } catch (e) {
         console.error("Failed to update URL")
       }

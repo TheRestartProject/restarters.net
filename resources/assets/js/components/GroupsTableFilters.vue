@@ -68,7 +68,7 @@ export default {
       required: true
     },
     network: {
-      type: Object,
+      type: Number,
       required: false,
       default: null
     },
@@ -105,7 +105,7 @@ export default {
       this.$emit('update:location', newVal)
     },
     searchNetwork(newVal) {
-      this.$emit('update:network', newVal)
+      this.$emit('update:network', newVal ? newVal.id : null)
     },
     searchCountry(newVal) {
       this.$emit('update:country', newVal)

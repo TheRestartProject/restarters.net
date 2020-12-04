@@ -15,6 +15,10 @@ return [
         'base_url' => env('REPAIRDIRECTORY_URL'),
     ],
 
+    'microtasking' => [
+        'discussion_tag' => env('MICROTASKING_DISCUSSION_TAG', 'open-data-dive')
+    ],
+
     'xref_types' => [
         'networks' => 7,
     ],

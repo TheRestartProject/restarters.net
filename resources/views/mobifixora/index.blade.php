@@ -137,14 +137,14 @@
                                     @endforeach
                                 </div>
                             </div>
-                            <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded">
-                                <span class="">I don't know,&nbsp;<span class="underline">F</span>etch another repair</span>
-                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </form>
+        <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded my-4">
+            <span class="">I don't know,&nbsp;<span class="underline">F</span>etch another repair</span>
+        </button>
         @endif
     </div>
     @include('mobifixora/info-modal')
@@ -163,17 +163,14 @@
                 doOption(e);
             });
         });
-
         document.getElementById('change').addEventListener('click', function (e) {
             e.preventDefault();
             doChange();
         }, false);
-
         document.getElementById('fetch').addEventListener('click', function (e) {
             e.preventDefault();
-            location.reload();
+            fetchNew();
         }, false);
-
         document.addEventListener("keypress", function (e) {
             if (e.code == 'KeyF') {
                 e.preventDefault();
@@ -189,7 +186,6 @@
                 document.getElementById('btn-cta-open').click();
             }
         }, false);
-
         function doOption(e) {
             document.querySelector('.confirm').classList.replace('hide', 'show');
             console.log(e.target);
@@ -203,16 +199,26 @@
         function doChange(e) {
             if (document.getElementById('fault-type-new').dataset.fid !== '') {
                 document.getElementById('fault-type-id').value = document.getElementById('fault-type-new').dataset.fid;
-                submitForm();
+                submitFormLog();
             }
         }
 
-        function submitForm() {
-            console.log('submitForm - id-ords '
-                    + document.getElementById('id-ords').value
-                    + ' / fault-type-id: '
-                    + document.getElementById('fault-type-id').value);
-            document.forms['log-task'].submit();
+        function submitFormLog() {
+            let fid = document.getElementById('fault-type-id').value;
+            let oid = document.getElementById('id-ords').value;
+            if (!fid) {
+                console.log('fid: ' + fid);
+                fetchNew();
+            } else if (!oid) {
+                console.log('oid: ' + oid);
+                fetchNew();
+            } else {
+                console.log('submitForm - id-ords ' + oid + ' / fault-type-id: ' + fid);
+                document.forms['log-task'].submit();
+            }
+        }
+        function fetchNew() {
+            window.location.replace(window.location.href);
         }
 
         if (window.location.href.indexOf('cta') != -1) {
