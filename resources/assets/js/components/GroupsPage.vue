@@ -222,7 +222,10 @@ export default {
           default: tag = 'mine'; break;
         }
 
-        window.history.pushState(null, "Groups", "/group/" + tag);
+        if (!this.network) {
+          // If we are vieiwng a specific network, don't mess with the URL as it's confusing.
+          window.history.pushState(null, "Groups", "/group/" + tag);
+        }
       } catch (e) {
         console.error("Failed to update URL")
       }
