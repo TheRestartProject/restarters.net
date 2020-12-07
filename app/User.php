@@ -27,6 +27,9 @@ class User extends Authenticatable implements Auditable
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
+    // Use the Authorizable trait so that we can call can() on a user to evaluation policies.
+    use \Illuminate\Foundation\Auth\Access\Authorizable;
+
     protected $table = 'users';
 
     /**
@@ -35,7 +38,7 @@ class User extends Authenticatable implements Auditable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash'
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role'
     ];
 
     /**
@@ -71,6 +74,11 @@ class User extends Authenticatable implements Auditable
     public function role()
     {
         return $this->hasOne('App\Role', 'idroles', 'role');
+    }
+
+    public function repairdir_role() {
+        // Make sure we don't return a null value.  The client select would struggle with null values.
+        return $this->repairdir_role ? $this->repairdir_role : Role::REPAIR_DIRECTORY_NONE;
     }
 
     public function userSkills()
@@ -439,6 +447,26 @@ class User extends Authenticatable implements Auditable
     public function isDripSubscriber()
     {
       return ! is_null($this->drip_subscriber_id);
+    }
+
+    public function isRepairDirectoryNone()
+    {
+        return $this->repairdir_role == Role::REPAIR_DIRECTORY_NONE;
+    }
+
+    public function isRepairDirectorySuperAdmin()
+    {
+        return $this->repairdir_role == Role::REPAIR_DIRECTORY_SUPERADMIN;
+    }
+
+    public function isRepairDirectoryRegionalAdmin()
+    {
+        return $this->repairdir_role == Role::REPAIR_DIRECTORY_REGIONAL_ADMIN;
+    }
+
+    public function isRepairDirectoryEditor()
+    {
+        return $this->repairdir_role == Role::REPAIR_DIRECTORY_EDITOR;
     }
 
     public function hasRole($roleName)
