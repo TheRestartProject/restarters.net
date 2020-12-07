@@ -15,22 +15,22 @@
       $roles = [];
       
       $roles[\App\Role::REPAIR_DIRECTORY_NONE] = [
-        'selected' => Auth::user()->isRepairDirectoryNone(),
+        'selected' => $user->isRepairDirectoryNone(),
         'disabled' => !Auth::user()->can('changeRepairDirRole', [ $user, \App\Role::REPAIR_DIRECTORY_NONE ]),
         'name' => __('profile.repair_dir_none')
       ];
       $roles[\App\Role::REPAIR_DIRECTORY_EDITOR] = [
-        'selected' => Auth::user()->isRepairDirectoryEditor(),
+        'selected' => $user->isRepairDirectoryEditor(),
         'disabled' => !Auth::user()->can('changeRepairDirRole', [ $user, \App\Role::REPAIR_DIRECTORY_EDITOR ]),
         'name' => __('profile.repair_dir_editor')
       ];
       $roles[\App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN] = [
-        'selected' => Auth::user()->isRepairDirectoryRegionalAdmin(),
+        'selected' => $user->isRepairDirectoryRegionalAdmin(),
         'disabled' => !Auth::user()->can('changeRepairDirRole', [ $user, \App\Role::REPAIR_DIRECTORY_REGIONAL_ADMIN ]),
         'name' => __('profile.repair_dir_regional_admin')
       ];
       $roles[\App\Role::REPAIR_DIRECTORY_SUPERADMIN] = [
-        'selected' => Auth::user()->isRepairDirectorySuperAdmin(),
+        'selected' => $user->isRepairDirectorySuperAdmin(),
         'disabled' => !Auth::user()->can('changeRepairDirRole', [ $user, \App\Role::REPAIR_DIRECTORY_SUPERADMIN ]),
         'name' => __('profile.repair_dir_superadmin')
       ];
