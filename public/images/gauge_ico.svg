@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="gauge_ico" width="30" height="30" viewBox="0 0 30 30">
+    <defs>
+        <style>
+            .cls-1{fill:none}.cls-2{fill-rule:evenodd}
+        </style>
+    </defs>
+    <path id="Rectangle_249" d="M0 0h30v30H0z" class="cls-1" data-name="Rectangle 249"/>
+    <g id="Layer" transform="translate(2.5 6.253)">
+        <g id="Vrstva_235" data-name="Vrstva 235">
+            <path id="Path_510" d="M14.5 5A12.5 12.5 0 0 0 2 17.5v1.25a1.25 1.25 0 0 0 2.5 0V17.5a10 10 0 0 1 20 0v1.25a1.25 1.25 0 0 0 2.5 0V17.5A12.5 12.5 0 0 0 14.5 5z" class="cls-2" data-name="Path 510" transform="translate(-2 -5)"/>
+            <path id="Path_511" d="M16.864 11.366l-2.5 2.5a3.75 3.75 0 1 0 1.763 1.763l2.5-2.5a1.255 1.255 0 1 0-1.775-1.775zM12.751 18.5A1.25 1.25 0 1 1 14 17.254a1.25 1.25 0 0 1-1.249 1.246z" class="cls-2" data-name="Path 511" transform="translate(-.251 -3.504)"/>
+        </g>
+    </g>
+</svg>
