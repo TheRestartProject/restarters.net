@@ -47,6 +47,10 @@ export default {
     maxChars: {
       type: Number,
       default: 100
+    },
+    maxLines: {
+      type: Number,
+      default: 10
     }
   },
 
@@ -69,7 +73,7 @@ export default {
     truncatedHTML() {
       // We need to truncate HTML with care to ensure that the result is tag safe; string truncation isn't good
       // enough.
-      const ret = this.html ? clip(this.html, this.maxChars, { html: true, maxLines: 10 }) : null
+      const ret = this.html ? clip(this.html, this.maxChars, { html: true, maxLines: this.maxLines }) : null
       return ret
     },
     needsTruncating() {

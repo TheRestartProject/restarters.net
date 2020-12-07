@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="thumbs-up_ico" width="30" height="30" viewBox="0 0 30 30">
+    <defs>
+        <style>
+            .cls-1{fill:none}.cls-2{fill-rule:evenodd}
+        </style>
+    </defs>
+    <path id="Rectangle_55" d="M0 0h30v30H0z" class="cls-1" data-name="Rectangle 55"/>
+    <g id="Layer" transform="translate(3.125 3.75)">
+        <g id="Vrstva_97" data-name="Vrstva 97">
+            <path id="Path_113" d="M3.75 10.56a1.25 1.25 0 0 0-1.25 1.25v10a1.25 1.25 0 0 0 2.5 0v-10a1.25 1.25 0 0 0-1.25-1.25z" class="cls-2" data-name="Path 113" transform="translate(-2.5 -1.11)"/>
+            <path id="Path_114" d="M21.75 10.5h-6.6L13.5 5.563A3.75 3.75 0 0 0 9.95 3h-.7A3.75 3.75 0 0 0 5.5 6.75v15a3.75 3.75 0 0 0 3.75 3.75h9.163a3.75 3.75 0 0 0 2.25-.75L24 22.25a3.75 3.75 0 0 0 1.5-3v-5a3.75 3.75 0 0 0-3.75-3.75zM23 19.25a1.25 1.25 0 0 1-.5 1l-3.337 2.5a1.25 1.25 0 0 1-.75.25H9.25A1.25 1.25 0 0 1 8 21.75v-15A1.25 1.25 0 0 1 9.25 5.5h.7a1.25 1.25 0 0 1 1.187.85l1.875 5.625A1.488 1.488 0 0 0 14.425 13h7.325A1.25 1.25 0 0 1 23 14.25z" class="cls-2" data-name="Path 114" transform="translate(-1.75 -3)"/>
+        </g>
+    </g>
+</svg>

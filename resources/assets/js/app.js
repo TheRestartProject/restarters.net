@@ -13,7 +13,6 @@ require('summernote');
 require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
-require('./misc/device');
 require('./fixometer');
 require('leaflet');
 require('./constants');
@@ -28,6 +27,8 @@ import {
 } from 'vue2-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.min.css'
 
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
@@ -88,8 +89,6 @@ function validateForm() {
     var requiredFieldsArray = Array.from(requiredFields);
     requiredFieldsArray.forEach(element => {
 
-      console.log(element.checkValidity());
-
       if (element.checkValidity() === false ) {
 
         if (element.tagName === 'SELECT') {
@@ -113,30 +112,34 @@ function validateForm() {
 
     });
 
-    if ( validCount !== jQuery('#step-2').find('input,select').filter('[required]:visible').length ) {
-      return false;
+    var valid = validCount === jQuery('#step-2').find('input,select').filter('[required]:visible').length
 
-    } else if ( jQuery('#password').length > 0 && jQuery('#password').val().length < 6 ) {
+    if ( jQuery('#password').length > 0 && jQuery('#password').val().length < 6 ) {
 
       jQuery('#password').addClass('is-invalid');
       jQuery('#password-confirm').addClass('is-invalid');
-      return false;
+      jQuery('.email-invalid-feedback').show();
+      valid = false;
 
     } else if ( jQuery('#password').length > 0 && jQuery('#password').val() !== jQuery('#password-confirm').val() ) {
 
       jQuery('#password').addClass('is-invalid');
       jQuery('#password-confirm').addClass('is-invalid');
-      return false;
+      jQuery('.email-invalid-feedback').show();
+      valid = false;
 
     } else {
 
       jQuery('#password').removeClass('is-invalid');
       jQuery('#password-confirm').removeClass('is-invalid');
+      jQuery('.email-invalid-feedback').hide();
 
       jQuery('.registration__step').removeClass('registration__step--active');
       jQuery('#step-3').addClass('registration__step--active');
 
     }
+
+    return valid
 
   });
 
@@ -1396,178 +1399,6 @@ function initAutocomplete() {
 
     });
 
-    $('.add-device').on('submit', function(e) {
-
-      e.preventDefault();
-      var $form = $(this);
-
-      if( $form.find('select[name=category]').val() === '' ) {
-        alert('Category field is required');
-        return false;
-      }
-
-      var formdata = deviceFormCollect($form)
-
-      // Provide some visual feedback that we're submitting.
-      deviceFormEnableDisable($form, true)
-
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
-        },
-        type: 'post',
-        url: '/device/create',
-        data: formdata,
-        datatype: 'json',
-        success: function(json) {
-          if( json.success ){
-            jQuery('#device-start').focus();
-
-            //Appending...
-            for (var i = 0; i < $(json.html).length; i++) {
-              var row = $(json.html)[i];
-              var $target = $(row).hide().appendTo('#device-table-' + (json.powered ? 'powered' : 'unpowered') + ' > tbody:last-child').fadeIn(1000);
-              select2Fields($target);
-            }
-            $('.table-row-details').removeAttr('style');
-            //Finished appending
-
-            updateEventStats(json.stats)
-
-            // Collapse the Add back again.  That also acts as feedback that we've done something.
-            $('.add-edit-device-collapse').removeClass('show')
-
-            // Reset form.  Need to kick select2.
-            $form.get(0).reset()
-            $form.find('select').change()
-            deviceFormEnableDisable($form, false)
-          } else if( json ) {
-
-            var error_message = '';
-            var error_count = 0;
-            $.each( json, function( key, value) {
-              if( error_count > 0 ){
-                error_message += ', ' + value;
-              } else {
-                error_message += value;
-              }
-              error_count++;
-            });
-
-            alert(error_message);
-          } else {
-            alert('Something went wrong, please try again');
-          }
-        },
-        error: function(json) {
-          if( json.responseJSON.message ){
-            alert(json.responseJSON.message);
-          } else {
-            alert('Something went wrong, please try again');
-          }
-        }
-      });
-    });
-
-    jQuery(document).on('submit', '.edit-device', function (e) {
-      e.preventDefault();
-
-      var $form = $(this);
-      var device_id = $form.data('device');
-      var summary_row = $('#summary-'+device_id);
-      var $category_name = $form.find("select[name='category'] option:selected").text();
-      var formdata = deviceFormCollect($form)
-      var values = {}
-      formdata.forEach((v) => {
-        values[v.name] = v.value
-      })
-
-      // Provide some visual feedback that we're submitting.
-      deviceFormEnableDisable($form, true)
-
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
-        },
-        type: 'post',
-        url: '/device/edit/'+device_id,
-        data: formdata,
-        datatype: 'json',
-        success: function(data) {
-          updateEventStats(data.stats)
-
-          if (data.error) {
-            alert(data.error);
-          }
-
-          setTimeout(() => {
-            deviceFormEnableDisable($form, false)
-
-            // Collapse the Add back again.  That also acts as feedback that we've done something.
-            $('.add-edit-device-collapse').removeClass('show')
-            $('.active-row').removeClass('active-row')
-          }, 2000)
-
-          // Reset if none of the above is selected
-          if( $category_name === 'None of the above' )
-            $category_name = 'Misc';
-
-          summary_row.find('.category').text($category_name);
-          summary_row.find('.brand').text(values.brand);
-          summary_row.find('.model').text(values.model);
-          summary_row.find('.age').text(values.age);
-
-          // Laravel blade template truncates problem at 60 characters, so we should do the same.
-          summary_row.find('.problem').text(values.problem.length >= 60 ? (values.problem.substring(0, 60) + '...') : values.problem);
-
-          if( values.repair_status == 1 ){
-            summary_row.find('.repair_status').empty().html('<span class="badge badge-success">Fixed</span>');
-          } else if( values.repair_status == 2 ){
-            summary_row.find('.repair_status').empty().html('<span class="badge badge-warning">Repairable</span>');
-          } else if( values.repair_status == 3 ){
-            summary_row.find('.repair_status').empty().html('<span class="badge badge-danger">End</span>');
-          } else {
-            summary_row.find('.repair_status').empty();
-          }
-
-          // Hide tick when no spare parts selected or not needed
-          if( values.spare_parts == 0 || values.spare_parts == 2 ){
-            summary_row.find('.table-tick').hide();
-          } else {
-            summary_row.find('.table-tick').show();
-          }
-        },
-        error: function(error) {
-          alert(error);
-        }
-      });
-
-    });
-
-    jQuery(document).on('click', '.delete-device', function (e) {
-
-      e.preventDefault();
-      if (window.confirm("Are you sure? This cannot be undone.")) {
-        var $device = jQuery(this).data('device-id');
-        var $href = $(this).attr('href');
-        $.ajax({
-          type: 'get',
-          url: $href,
-          success: function(data) {
-            if (data.success) {
-              $('#summary-'+$device).fadeOut(1000);
-              $('#row-'+$device).fadeOut(1000);
-              updateEventStats(data.stats)
-            }
-          },
-          error: function(error) {
-            alert(error);
-          }
-        });
-      }
-
-    });
-
     $('.ajax-delete-image').on('click', function (e) {
       e.preventDefault();
 
@@ -1698,6 +1529,7 @@ jQuery(document).ready(function () {
       Vue.component('l-map', LMap)
       Vue.component('l-marker', LMarker)
       Vue.component('l-tile-layer', LTileLayer)
+      Vue.component('multiselect', Multiselect)
     }
   })
 
@@ -1706,24 +1538,24 @@ jQuery(document).ready(function () {
   // Normally you'd initialise one instance on a single top-level div.  But we put content directly under body.
   // Initialising multiple instances is a bit more expensive, but not much.
   //
-  // We need to list all the top-level components we will use in pages here; they are stored in
-  // resources/assets/js/components.
+  // We need to list all the top-level components we will use in blades here; they are stored in
+  // resources/assets/js/components.  Lower level components can be included from within those as normal;
+  // they don't need listing here.
   $(".vue").each(function(index) {
     new Vue({
       el: $(this).get(0),
       store: store,
       components: {
-        'examplecomponent': require('./components/ExampleComponent.vue'),
-        'eventheading': require('./components/EventHeading.vue'),
-        'eventstats': require('./components/EventStats.vue'),
-        'eventattendance': require('./components/EventAttendance.vue'),
-        'eventdetails': require('./components/EventDetails.vue'),
-        'eventdescription': require('./components/EventDescription.vue'),
-        'eventimages': require('./components/EventImages.vue'),
-        'groupheading':  require('./components/GroupHeading.vue'),
-        'groupdescription':  require('./components/GroupDescription.vue'),
-        'groupvolunteers':  require('./components/GroupVolunteers.vue'),
-        'groupstats': require('./components/GroupStats.vue')
+        'eventpage': require('./components/EventPage.vue'),
+        'fixometerpage': require('./components/FixometerPage.vue'),
+        'groupspage': require('./components/GroupsPage.vue'),
+        'grouppage': require('./components/GroupPage.vue'),
+        'groupeventspage': require('./components/GroupEventsPage.vue'),
+        'groupevents': require('./components/GroupEvents.vue'),
+        'microtaskingpage': require('./components/MicrotaskingPage.vue'),
+
+        'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),
+        'eventdatepicker': require('./components/EventDatePicker.vue'),
       }
     })
   })

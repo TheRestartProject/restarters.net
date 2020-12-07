@@ -44,6 +44,9 @@ class DeviceController extends Controller
         ->orderBy('event_date', 'DESC')
         ->first();
 
+        $most_recent_finished_event['id_events'] = $most_recent_finished_event->idevents;
+        $most_recent_finished_event['waste_prevented'] = $most_recent_finished_event->WastePrevented;
+
         $global_impact_data = app('App\Http\Controllers\ApiController')
                             ->homepage_data();
         $global_impact_data = $global_impact_data->getData();
@@ -535,7 +538,7 @@ class DeviceController extends Controller
         }
 
         $category = $request->input('category');
-        $weight = $request->input('weight');
+        $weight = $request->input('estimate');
         $brand = $request->input('brand');
         $model = $request->input('model');
         $item_type = $request->input('item_type');
@@ -607,7 +610,6 @@ class DeviceController extends Controller
             } elseif (count($barrier) > 0) {
                 $spare_parts = 2;
             }
-            // EO new logic Nov 2018
 
             $device[$i]->spare_parts = isset($spare_parts) ? $spare_parts : 0;
             $device[$i]->parts_provider = $parts_provider;
@@ -615,18 +617,6 @@ class DeviceController extends Controller
             $device[$i]->repaired_by = Auth::id();
 
             $device[$i]->save();
-
-            $powered = $device[$i]->deviceCategory->powered;
-
-            if ($useful_url) {
-                // Devices can have multiple URLs, but we only support one on the create - and it gets applied to each
-                // device.
-                DeviceUrl::create([
-                  'device_id' => $device[$i]->iddevices,
-                  'source' => $useful_source,
-                  'url' => $useful_url
-               ]);
-            }
 
             // Update barriers
             if (isset($barrier) && ! empty($barrier) && $repair_status == 3) { // Only sync when repair status is end-of-life
@@ -644,101 +634,32 @@ class DeviceController extends Controller
                     'event_url' => url('/party/edit/'.$event_id),
                 ]));
             }
+
+            // Expand a few things so that the new devices are returned with the same information that existing
+            // ones are returned in the view blade.
+            $device[$i]->idevents = $device[$i]->event;
+            $device[$i]->category = $device[$i]->deviceCategory;
+            $device[$i]->shortProblem = $device[$i]->getShortProblem();
+            $device[$i]->urls;
+
+            $barriers = [];
+
+            foreach ($device[$i]->barriers as $barrier) {
+                $barriers[] = $barrier->id;
+            }
+
+            $device[$i]->barrier = $barriers;
         }
         // end quantity loop
 
-        $brands = Brands::all();
-        $clusters = Cluster::all();
-        $is_attending = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
-
-        //Change to handle loop
-        foreach ($device as $d) {
-            $views[] = View::make('partials.tables.row-device', [
-                'device' => $d,
-                'clusters' => $clusters,
-                'brands' => $brands,
-                'is_attending' => $is_attending,
-                'powered' => $d->deviceCategory->powered
-            ])->render();
-        }
-        //end of handle loop
+        $return['success'] = true;
+        $return['devices'] = $device;
 
         $footprintRatioCalculator = new FootprintRatioCalculator();
         $emissionRatio = $footprintRatioCalculator->calculateRatio();
-
-        $stats = $event->getEventStats($emissionRatio);
-
-        // get the number of rows in the DB where event id already exists
-        $deviceCount = DB::table('devices')->where('event', $event_id)->count();
-
-        $return['html'] = $views;
-        $return['success'] = true;
-        $return['stats'] = $stats;
-        $return['deviceCount'] = $deviceCount;
-        $return['deviceMiscCount'] = $deviceMiscCount;
-        $return['powered'] = $powered;
+        $return['stats'] = $event->getEventStats($emissionRatio);
 
         return response()->json($return);
-
-        //$brand_name = Brands::find($brand)->brand_name;
-
-      // $data = [];
-      //
-      // if ($post_data['repair_status'] == 2) {
-      //   switch ($post_data['repair_details']) {
-      //     case 1:
-      //         Device::create([
-      //           'event' => $request->input('event_id'),
-      //           'category' => $post_data['category'],
-      //           'category_creation' => $post_data['category'],
-      //           'brand' => $brand,
-      //           'model' => $post_data['model'],
-      //           'age' => $post_data['age'],
-      //           'problem' => $post_data['problem'],
-      //           'spare_parts' => $post_data['spare_parts'],
-      //           'repair_status' => $post_data['repair_status'],
-      //           'repaired_by' => Auth::id(),
-      //           'more_time_needed' => 1,
-      //         ]);
-      //         break;
-      //     case 2:
-      //         Device::create([
-      //           'event' => $request->input('event_id'),
-      //           'category' => $post_data['category'],
-      //           'category_creation' => $post_data['category'],
-      //           'brand' => $brand,
-      //           'model' => $post_data['model'],
-      //           'age' => $post_data['age'],
-      //           'problem' => $post_data['problem'],
-      //           'spare_parts' => $post_data['spare_parts'],
-      //           'repair_status' => $post_data['repair_status'],
-      //           'repaired_by' => Auth::id(),
-      //           'professional_help' => 1,
-      //         ]);
-      //         break;
-      //     case 3:
-      //         Device::create([
-      //           'event' => $request->input('event_id'),
-      //           'category' => $post_data['category'],
-      //           'category_creation' => $post_data['category'],
-      //           'brand' => $brand,
-      //           'model' => $post_data['model'],
-      //           'age' => $post_data['age'],
-      //           'problem' => $post_data['problem'],
-      //           'spare_parts' => $post_data['spare_parts'],
-      //           'repair_status' => $post_data['repair_status'],
-      //           'repaired_by' => Auth::id(),
-      //           'do_it_yourself' => 1,
-      //         ]);
-      //         break;
-      //   }
-      //
-      //   if ($post_data['repair_status'] == 0) {
-      //     $data['error'] = "Device couldn't be added - no repair details added";
-      //   }
-      //
-      // } else {
-      // }
     }
 
     public function ajaxEdit(Request $request, $id)
@@ -750,12 +671,14 @@ class DeviceController extends Controller
         $model = $request->input('model');
         $age = $request->input('age');
         $problem = $request->input('problem');
+        $notes = $request->input('notes');
         $repair_status = $request->input('repair_status');
         $barrier = $request->input('barrier');
         $repair_details = $request->input('repair_details');
         $spare_parts = $request->input('spare_parts');
         $event_id = $request->input('event_id');
         $wiki = $request->input('wiki');
+        $estimate = $request->input('estimate');
 
         if (empty($repair_status)) { //Override
             $repair_status = 0;
@@ -764,8 +687,6 @@ class DeviceController extends Controller
         if ($repair_status != 2) { //Override
             $repair_details = 0;
         }
-
-        $event = Party::find($event_id);
 
         if (FixometerHelper::userHasEditEventsDevicesPermission($event_id)) {
             if ($repair_details == 1) {
@@ -809,7 +730,6 @@ class DeviceController extends Controller
                 Log::error('An error occurred while sending ReviewNotes email: '.$ex->getMessage());
             }
 
-            // New logic Nov 2018
             if ($spare_parts == 3) { // Third party
                 $spare_parts = 1;
                 $parts_provider = 2;
@@ -833,7 +753,6 @@ class DeviceController extends Controller
             } elseif (count($barrier) > 0) {
                 $spare_parts = 2;
             }
-            // EO new logic Nov 2018
 
             Device::find($id)->update([
                 'category' => $category,
@@ -844,6 +763,7 @@ class DeviceController extends Controller
                 'model' => $model,
                 'age' => $age,
                 'problem' => $problem,
+                'notes' => $notes,
                 'spare_parts' => $spare_parts,
                 'parts_provider' => $parts_provider,
                 'repair_status' => $repair_status,
@@ -851,6 +771,7 @@ class DeviceController extends Controller
                 'do_it_yourself' => $professional_help,
                 'professional_help' => $do_it_yourself,
                 'wiki' => $wiki,
+                'estimate' => $estimate
             ]);
 
             // Update barriers
@@ -874,6 +795,25 @@ class DeviceController extends Controller
             // }
 
             $data['success'] = 'Device updated!';
+
+            // Expand a few things so that the devices are returned with the same information that existing
+            // ones are returned in the view blade.
+            $device = Device::find($id);
+            $device->idevents = $device->event;
+            $device->category = $device->deviceCategory;
+            $device->shortProblem = $device->getShortProblem();
+            $device->images = $device->getImages();
+            $device->urls;
+
+            $barriers = [];
+
+            foreach ($device->barriers as $barrier) {
+                $barriers[] = $barrier->id;
+            }
+
+            $device->barrier = $barriers;
+
+            $data['device'] = $device;
 
             return response()->json($data);
 
@@ -948,12 +888,22 @@ class DeviceController extends Controller
     public function imageUpload(Request $request, $id)
     {
         try {
+            $images = [];
+
             if (isset($_FILES) && ! empty($_FILES)) {
                 $file = new FixometerFile;
                 $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
+                $device = Device::find($id);
+                $images = $device->getImages();
             }
 
-            return 'success - image uploaded';
+
+            // Return the current set of images for this device so that the client doesn't need to merge.
+            return response()->json([
+                'success' => true,
+                'iddevices' => $id,
+                'images' => $images
+            ]);
         } catch (\Exception $e) {
             return 'fail - image could not be uploaded';
         }

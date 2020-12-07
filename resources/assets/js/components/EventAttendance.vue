@@ -1,5 +1,5 @@
 <template>
-  <CollapsibleSection collapsed :count="attendees.length">
+  <CollapsibleSection collapsed :count="attendees.length" class="width">
     <template slot="title">
       {{ translatedTitle }}
     </template>
@@ -96,31 +96,6 @@ import CollapsibleSection from './CollapsibleSection'
 export default {
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],
-  props: {
-    eventId: {
-      type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
-      required: true
-    },
-    attendance:  {
-      type: Array,
-      required: true
-    },
-    invitations:  {
-      type: Array,
-      required: true
-    },
-    // TODO LATER In due course the permissions should be handled by having the user in the store and querying that, rather
-    // than passing down props.
-    canedit: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
   computed: {
     translatedTitle() {
       return this.$lang.get('events.event_attendance')
@@ -162,8 +137,6 @@ export default {
     //
     // Further down the line this initial data might be provided either by an API call from the client to the server,
     // or from Vue server-side rendering, where the whole initial state is passed to the client.
-    //
-    // Similarly the event should be in the store and passed just by id, but we haven't introduced an event store yet.
     let attendees = []
 
     this.attendance.forEach((a) => {
@@ -177,7 +150,7 @@ export default {
     })
 
     this.$store.dispatch('attendance/set', {
-      eventId: this.eventId,
+      idevents: this.idevents,
       attendees: attendees
     })
   },
@@ -185,7 +158,7 @@ export default {
     async changeParticipants(val) {
       let ret = await axios.post('/party/update-quantity', {
         quantity: val,
-        event_id: this.eventId
+        event_id: this.idevents
       }, {
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
@@ -195,7 +168,7 @@ export default {
     async changeVolunteers(val) {
       let ret = await axios.post('/party/update-volunteerquantity', {
         quantity: val,
-        event_id: this.eventId
+        event_id: this.idevents
       }, {
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
@@ -312,5 +285,9 @@ h3 {
 
 .warningbox {
   border: 1px solid $brand-danger;
+}
+
+.width {
+  min-width: 100%;
 }
 </style>

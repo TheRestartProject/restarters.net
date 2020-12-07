@@ -72,6 +72,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/events/network/{date_from?}/{date_to?}', 'API\EventController@getEventsByUsersNetworks');
 
     Route::get('/usersgroups/changes', 'API\UserGroupsController@changes');
+    Route::delete('/usersgroups/{id}', 'API\UserGroupsController@leave');
 });
 
 Route::get('/groups/{group}/events', 'API\GroupController@getEventsForGroup');

@@ -37,6 +37,10 @@ class ApiController extends Controller
         $result['weights'] = round($co2Total[0]->total_weights);
         $result['emissions'] = round($co2Total[0]->total_footprints);
 
+        $devices = new Device;
+        $result['fixed_powered'] = $devices->fixedPoweredCount();
+        $result['fixed_unpowered'] = $devices->fixedUnpoweredCount();
+
         return response()
             ->json($result, 200);
     }

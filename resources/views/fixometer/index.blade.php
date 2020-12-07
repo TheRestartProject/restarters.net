@@ -8,30 +8,16 @@
 
 <section class="devices">
         <div class="container">
-            <div class="row">
-                <div class="col-12 col-md-12">
-                    <div class="d-flex align-items-center">
-                        <h1 id="dashboard__header" class="mb-0 mr-30">
-                            @lang('devices.fixometer')
-                        </h1>
-                        <div class="mr-auto d-none d-md-block">
-                            @include('svgs.fixometer.fixometer-doodle')
-                        </div>
 
-                        @if (count($user_groups) > 0)
-                        <button data-target="#add-device-modal" data-toggle="modal" aria-expanded="true" aria-controls="add-device-modal" class="btn btn-sm btn-primary ml-auto">
-                            @lang('devices.add_data_button')
-                        </button>
-                        @endif
-
-                    </div>
-
-                    <hr class="hr-lg">
-                </div>
+            <div class="vue-placeholder vue-placeholder-large">
+                <div class="vue-placeholder-content">@lang('partials.loading')...</div>
             </div>
 
-            <div class="row">
-                @include('fixometer.global-impact')
+            <div class="vue">
+                <FixometerPage
+                    :latest-data="{{ json_encode($most_recent_finished_event) }}"
+                    :impact-data="{{ json_encode($impact_data) }}"
+                />
             </div>
 
             <hr class="mt-md-50 hr-dashed">
@@ -117,22 +103,22 @@
                                                 <select id="categories" name="categories[]" class="form-control select2-tags" multiple title="Choose categories...">
                                                     @if(isset($categories))
                                                     @foreach($categories as $cluster)
-                                                    <optgroup label="<?php echo $cluster->name; ?>">
+                                                    <optgroup label="<?php echo __($cluster->name); ?>">
                                                         @foreach($cluster->categories as $c)
                                                         @if (!empty($selected_categories) && in_array($c->idcategories, $selected_categories))
                                                         <option value="<?php echo $c->idcategories; ?>" selected>
-                                                            <?php echo $c->name; ?>
+                                                            <?php echo __($c->name); ?>
                                                         </option>
                                                         @else
                                                         <option value="<?php echo $c->idcategories; ?>">
-                                                            <?php echo $c->name; ?>
+                                                            <?php echo __($c->name); ?>
                                                         </option>
                                                         @endif
                                                         @endforeach
                                                     </optgroup>
                                                     @endforeach
                                                     @endif
-                                                    <option value="46">Misc</option>
+                                                    <option value="46">@lang('Misc')</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -400,3 +386,9 @@
 @include('fixometer.add-data-modal')
 
 @endsection
+<script>
+import FixometerPage from '../../assets/js/components/FixometerPage'
+export default {
+  components: {FixometerPage}
+}
+</script>

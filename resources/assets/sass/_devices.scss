@@ -136,18 +136,11 @@ td.col-device-auto {
     }
 }
 
-.device-info {
-  display: grid;
-  grid-template-columns: repeat( auto-fit, minmax(360px, 1fr) );
-
-  .useful-repair-urls .input-group .form-control {
-    border-radius: initial;
-  }
-}
-
+// TODO These class names could be better, once we've done more Vue refactoring.
 .device-field-row {
   display: grid;
   grid-template-columns: 80px 81px auto auto;
+  line-height: 1rem;
 }
 
 .device-select-row {

@@ -4,28 +4,28 @@
 
 export default {
   props: {
-    groupId: {
+    idgroups: {
       type: Number,
       required: true
+    }
+  },
+  computed: {
+    group() {
+      return this.$store.getters['groups/get'](this.idgroups)
     },
-    group: {
-      type: Object,
-      required: true
+    volunteers() {
+      let ret = []
+      if (this.group && this.group.volunteers) {
+        ret = this.group.volunteers
+      }
+
+      return ret
     },
-    canedit: {
-      type: Boolean,
-      required: false,
-      default: false
+    canedit() {
+      return this.group ? this.group.canedit : false
     },
-    ingroup: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    volunteers: {
-      type: Array,
-      required: false,
-      default: function () { return [] }
-    },
+    ingroup() {
+      return this.group ? this.group.ingroup : false
+    }
   }
 }
