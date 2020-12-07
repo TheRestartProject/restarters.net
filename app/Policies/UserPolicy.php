@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Role;
 use App\User;
+use FixometerHelper;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserPolicy
@@ -58,5 +59,31 @@ class UserPolicy
     public function viewRepairDirectorySettings(User $user)
     {
         return $user && ($user->isRepairDirectoryRegionalAdmin() || $user->isRepairDirectorySuperAdmin());
+    }
+
+    /**
+     * Determine whether this user can see the Admin menu.
+     *
+     * @param  \App\User  $user
+     * @return mixed
+     */
+    public function viewAdminMenu(User $user)
+    {
+        return $user &&
+            ( FixometerHelper::hasRole($user, 'Administrator') ||
+              FixometerHelper::hasPermission('verify-translation-access') ||
+              FixometerHelper::hasRole($user, 'NetworkCoordinator') ||
+              $this->accessRepairDirectory($user));
+    }
+
+    /**
+     * Determine whether this user can access the Repair Directory via the menu.
+     *
+     * @param  \App\User  $user
+     * @return mixed
+     */
+    public function accessRepairDirectory(User $user)
+    {
+        return $user && ($user->isRepairDirectoryEditor() || $user->isRepairDirectoryRegionalAdmin() || $user->isRepairDirectorySuperAdmin());
     }
 }
