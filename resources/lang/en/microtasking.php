@@ -7,9 +7,9 @@ return [
         'title' => 'Read about our recent success',
         'content' => 'Through our FaultCat quest, hundreds of volunteers helped us analyse our laptop data.
                     <ul>
-                        <li><a href="https://ecostandard.org/publications/long-live-the-machine-how-ecodesign-energy-labelling-can-prevent-premature-obsolescence-of-laptops/">Read the results</a> as they went into this policy paper on laptop lifetimes.</li>
+                        <li><a href="https://ecostandard.org/publications/long-live-the-machine-how-ecodesign-energy-labelling-can-prevent-premature-obsolescence-of-laptops/" target="_blank" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'Long live the machine report\')">Read the results</a> has they went into this policy paper on laptop lifetimes.</li>
                         <li>
-                            <a href="https://talk.restarters.net/t/repair-data-in-the-times-piece-on-e-waste/2501">Check out the data visualisation</a> featured in The Times newspaper.
+                            <a href="https://talk.restarters.net/t/repair-data-in-the-times-piece-on-e-waste/2501?utm_source=restarters" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'Repair data in the times\')">Check out the data visualisation</a> featured in The Times newspaper.
                         </li>
                     </ul>
         ',
