@@ -190,6 +190,9 @@ class DeviceController extends Controller
         ->orderBy('event_date', 'DESC')
         ->first();
 
+        $most_recent_finished_event['id_events'] = $most_recent_finished_event->idevents;
+        $most_recent_finished_event['waste_prevented'] = $most_recent_finished_event->WastePrevented;
+
         $user_groups = Group::with('allRestarters', 'parties', 'groupImage.image')
         ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
         ->join('events', 'events.group', '=', 'groups.idgroups')
