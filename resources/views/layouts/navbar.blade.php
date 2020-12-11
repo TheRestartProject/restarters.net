@@ -30,7 +30,7 @@
 
 {{-- Left side of the Navigation --}}
 <ul class="nav-left d-flex justify-content-between w-100 pr-md-3">
-    <li>
+    <li style="flex-basis: 100%;">
 
         <a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}" rel="noopener noreferrer">
         @include('svgs/navigation/talk-icon')
@@ -38,35 +38,35 @@
     </a>
     </li>
 
-    <li class="@if(str_contains(url()->current(), route('devices'))) active @endif">
+    <li class="@if(str_contains(url()->current(), route('devices'))) active @endif" style="flex-basis: 100%;">
     <a href="{{ route('devices') }}">
         @include('svgs/navigation/drill-icon')
         <span>@lang('general.menu_fixometer')</span>
     </a>
     </li>
 
-    <li class="@if(str_contains(url()->current(), route('events'))) active @endif">
+    <li class="@if(str_contains(url()->current(), route('events'))) active @endif" style="flex-basis: 100%;">
     <a href="{{ route('events') }}">
         @include('svgs/navigation/events-icon')
         <span>@lang('general.menu_events')</span>
     </a>
     </li>
 
-    <li class="@if(str_contains(url()->current(), route('groups'))) active @endif">
+    <li class="@if(str_contains(url()->current(), route('groups'))) active @endif" style="flex-basis: 100%;">
     <a href="{{ route('groups') }}">
         @include('svgs/navigation/groups-icon')
         <span>@lang('general.menu_groups')</span>
     </a>
     </li>
 
-    <li>
+    <li style="flex-basis: 100%;">
         <a href="{{config('restarters.wiki.base_url') }}" rel="noopener noreferrer">
         @include('svgs/navigation/wiki-icon')
         <span>@lang('general.menu_wiki')</span>
     </a>
     </li>
 
-    <li>
+    <li class="@if(str_contains(url()->current(), route('workbench'))) active @endif" style="flex-basis: 100%;">
         <a href="{{ route('workbench') }}" rel="noopener noreferrer">
             @include('svgs/navigation/wiki-icon')
             <span>@lang('general.menu_workbench')</span>
