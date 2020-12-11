@@ -64,7 +64,7 @@ Route::prefix('calendar')->group(function () {
     Route::get('/all-events/{hash_env}', 'CalendarEventsController@allEvents')->name('calendar-events-all');
 });
 
-Route::get('microtasking', 'MicrotaskingController@index')->name('workbench');
+Route::get('workbench', 'MicrotaskingController@index')->name('workbench');
 
 Route::prefix('faultcat')->group(function () {
     Route::get('/', 'FaultcatController@index');

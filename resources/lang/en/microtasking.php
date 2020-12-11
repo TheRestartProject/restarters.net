@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'title' => 'Upstream',
+    'title' => 'Workbench',
 
     'news' => [
         'title' => 'Read about our recent success',
