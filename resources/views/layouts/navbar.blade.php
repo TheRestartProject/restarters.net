@@ -1,5 +1,5 @@
 {{-- Start Navigation --}}
-<nav class="nav-wrapper">
+<nav class="nav-wrapper pl-0 pr-0">
 
 {{-- Logo --}}
 <a href="{{ route('home') }}" class="icon-brand">
@@ -29,7 +29,7 @@
 @endif
 
 {{-- Left side of the Navigation --}}
-<ul class="nav-left">
+<ul class="nav-left d-flex justify-content-between w-100 pr-md-3">
     <li>
 
         <a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}" rel="noopener noreferrer">
@@ -64,6 +64,13 @@
         @include('svgs/navigation/wiki-icon')
         <span>@lang('general.menu_wiki')</span>
     </a>
+    </li>
+
+    <li>
+        <a href="{{ route('workbench') }}" rel="noopener noreferrer">
+            @include('svgs/navigation/wiki-icon')
+            <span>@lang('general.menu_workbench')</span>
+        </a>
     </li>
 </ul>
 
