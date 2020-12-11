@@ -716,3 +716,10 @@
 #site-logo {
   width: 180px !important;
 }
+
+.mediawiki nav .nav-left{
+  -webkit-box-pack: justify!important;
+  -ms-flex-pack: justify!important;
+  justify-content: space-between!important;
+  width: 100%;
+}
