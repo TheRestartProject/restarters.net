@@ -160,7 +160,7 @@
           $in_group = \App\UserGroups::where('group', $group->idgroups)
               ->where('user', Auth::id())
               ->where('status', 1)
-              ->whereNull('deleted_at')
+              ->whereNull('users_groups.deleted_at')
               ->exists();
 
           $user = Auth::user();

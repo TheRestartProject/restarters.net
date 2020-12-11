@@ -36,7 +36,7 @@ class CalendarEventsController extends Controller
       $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
       ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
       ->join('events_users', 'events_users.event', '=', 'events.idevents')
-      ->whereNull('deleted_at')
+      ->whereNull('users_groups.deleted_at')
       ->where(function ($query) use ($user) {
         $query->where('events_users.user', $user->id)
         ->orWhere('users_groups.user', $user->id);
