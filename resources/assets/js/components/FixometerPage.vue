@@ -17,8 +17,6 @@
     <p>{{ translatedSearchText}}</p>
     <p>
       TODO Filter on wiki - question with James.
-      TODO Link to URL for search filters
-      TODO Button to share link.
     </p>
     <div class="layout">
       <FixometerFilters
@@ -35,6 +33,8 @@
           :group.sync="group"
           :from_date.sync="from_date"
           :to_date.sync="to_date"
+          :start-expanded-items="startExpandedItems"
+          :start-expanded-events="startExpandedEvents"
       />
       <FixometerFilters
           v-show="tabIndex === 1"
@@ -50,6 +50,8 @@
           :group.sync="group"
           :from_date.sync="from_date"
           :to_date.sync="to_date"
+          :start-expanded-items="startExpandedItems"
+          :start-expanded-events="startExpandedEvents"
       />
       <b-tabs class="ourtabs ourtabs-brand w-100 d-none d-md-block" v-model="tabIndex">
         <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
@@ -238,6 +240,7 @@ export default {
   data () {
     return {
       tabIndex: 0,
+
       category_powered: null,
       category_unpowered: null,
       status: null,
@@ -248,19 +251,140 @@ export default {
       group: null,
       from_date: null,
       to_date: null,
+
+      startExpandedItems: false,
+      startExpandedEvents: false,
+
       powered_total: 0,
       unpowered_total: 0,
       powered_weight: 0,
       unpowered_weight: 0,
       powered_co2: 0,
-      unpowered_co2: 0
+      unpowered_co2: 0,
     }
   },
-  mounted() {
-    // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
-    // and so that as/when it changes then reactivity updates all the views.
+  created() {
+    // Apply any URL paramters.
+    //
+    // We have to list each of these individually for reactivity to notice them.
+    const params = (new URL(document.location)).searchParams
+
+    if (params.has('category_powered')) {
+      this.category_powered = parseInt(params.get('category_powered'))
+      this.startExpandedItems = true
+    }
+
+    if (params.has('category_unpowered')) {
+      this.category_unpowered = parseInt(params.get('category_unpowered'))
+      this.startExpandedItems = true
+    }
+
+    if (params.has('status')) {
+      this.status = parseInt(params.get('status'))
+      this.startExpandedItems = true
+    }
+
+    if (params.has('brand')) {
+      this.brand = params.get('brand')
+      this.startExpandedItems = true
+    }
+
+    if (params.has('model')) {
+      this.model = params.get('model')
+      console.log("Got modal ", this.model)
+      this.startExpandedItems = true
+    }
+
+    if (params.has('item_type')) {
+      this.item_type = params.get('item_type')
+      this.startExpandedItems = true
+    }
+
+    if (params.has('comments')) {
+      this.comments = params.get('comments')
+      this.startExpandedItems = true
+    }
+
+    if (params.has('group')) {
+      this.group = params.get('group')
+      this.startExpandedEvents = true
+    }
+
+    if (params.has('from_date')) {
+      this.from_date = params.get('from_date')
+      this.startExpandedEvents = true
+    }
+
+    if (params.has('to_date')) {
+      this.to_date = params.get('to_date')
+      this.startExpandedEvents = true
+    }
+  },
+  watch: {
+    url(newVal) {
+      try {
+        window.history.pushState({ path: newVal }, window.title, newVal );
+      }
+      catch (ex) {
+        console.warn(ex);
+      }
+    }
   },
   computed: {
+    url() {
+      // We want to change the URL.  In a full app the router would handle this.
+      //
+      // We have to list each of these individually for reactivity to notice them.
+      let ret = ''
+
+      if (this.category_powered) {
+        ret += 'category_powered=' + encodeURIComponent(this.category_powered) + '&'
+      }
+
+      if (this.category_unpowered) {
+        ret += 'category_unpowered=' + encodeURIComponent(this.category_unpowered) + '&'
+      }
+
+      if (this.status) {
+        ret += 'status=' + encodeURIComponent(this.status) + '&'
+      }
+
+      if (this.brand) {
+        ret += 'brand=' + encodeURIComponent(this.brand) + '&'
+      }
+
+      if (this.model) {
+        ret += 'model=' + encodeURIComponent(this.model) + '&'
+      }
+
+      if (this.item_type) {
+        ret += 'item_type=' + encodeURIComponent(this.item_type) + '&'
+      }
+
+      if (this.comments) {
+        ret += 'comments=' + encodeURIComponent(this.comments) + '&'
+      }
+
+      if (this.group) {
+        ret += 'group=' + encodeURIComponent(this.groupd) + '&'
+      }
+
+      if (this.from_date) {
+        ret += 'from_date=' + encodeURIComponent(this.from_date) + '&'
+      }
+
+      if (this.to_date) {
+        ret += 'to_date=' + encodeURIComponent(this.to_date) + '&'
+      }
+
+      if (ret !== '') {
+        ret = '/fixometer?' + ret
+      } else {
+        ret = '/fixometer'
+      }
+
+      return ret
+    },
     translatedRestartRecords() {
       return this.$lang.get('devices.repair_records')
     },

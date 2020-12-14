@@ -117,6 +117,61 @@ export default {
     powered: {
       type: Boolean,
       required: true
+    },
+    startExpandedItems: {
+      type: Boolean,
+      required: false,
+      default: null
+    },
+    startExpandedEvents: {
+      type: Boolean,
+      required: false,
+      default: null
+    },
+    category: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    brand: {
+      type: String,
+      required: false,
+      default: null
+    },
+    model: {
+      type: String,
+      required: false,
+      default: null
+    },
+    item_type: {
+      type: String,
+      required: false,
+      default: null
+    },
+    status: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    comments: {
+      type: String,
+      required: false,
+      default: null
+    },
+    group: {
+      type: String,
+      required: false,
+      default: null
+    },
+    from_date: {
+      type: String,
+      required: false,
+      default: null
+    },
+    to_date: {
+      type: String,
+      required: false,
+      default: null
     }
   },
   data () {
@@ -187,6 +242,10 @@ export default {
         }
       ]
     },
+  },
+  mounted () {
+    this.expandedEvents = this.startExpandedEvents
+    this.expandedItems = this.startExpandedItems
   },
   watch: {
     category(newVal) {
