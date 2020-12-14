@@ -19,7 +19,6 @@
       TODO Filter on wiki - question with James.
       TODO Link to URL for search filters
       TODO Button to share link.
-      TODO Mobile view
     </p>
     <div class="layout">
       <FixometerFilters
@@ -52,7 +51,7 @@
           :from_date.sync="from_date"
           :to_date.sync="to_date"
       />
-      <b-tabs class="ourtabs ourtabs-brand w-100" v-model="tabIndex">
+      <b-tabs class="ourtabs ourtabs-brand w-100 d-none d-md-block" v-model="tabIndex">
         <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
           <template slot="title">
             <div class="d-flex justify-content-between">
@@ -128,17 +127,17 @@
           {{ translatedPowered }}
         </template>
         <template slot="title-right">
-          <div class="small mt-1">
-            <div class="d-flex text-brand font-weight-bold">
+          <div class="small mt-2">
+            <div class="d-flex text-brand font-weight-bold small">
               <div class="mr-3 lower d-flex align-content-center">
                 <b-img src="/images/trash_brand.svg" class="iconsmall" />
-                <span class="mt-1">
+                <span class="mb-1">
                   {{ powered_weight.toLocaleString() }}
                 </span>
               </div>
               <div class="mr-1 lower d-flex">
                 <b-img src="/images/co2_brand.svg" class="iconsmall" />
-                <span class="mt-1">
+                <span class="mb-1">
                   {{ powered_co2.toLocaleString() }}
                 </span>
               </div>
@@ -169,11 +168,11 @@
           {{ translatedUnpowered }}
         </template>
         <template slot="title-right">
-          <div class="small mt-1">
-            <div class="d-flex text-brand font-weight-bold">
+          <div class="small mt-2">
+            <div class="d-flex text-brand font-weight-bold small">
               <div class="mr-1 lower d-flex">
                 <b-img src="/images/trash_brand.svg" class="iconsmall" />
-                <span class="mt-1">
+                <span class="mb-1">
                   {{ unpowered_weight.toLocaleString() }}
                 </span>
               </div>
@@ -293,13 +292,22 @@ export default {
 @import '~bootstrap/scss/mixins/_breakpoints';
 
 .iconsmall {
-  height: 25px;
+  height: 15px;
   margin-bottom: 5px;
 }
 
 .layout {
   display: grid;
-  grid-template-columns: 1fr 3fr;
-  grid-column-gap: 20px;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  grid-column-gap: 0px;
+  grid-row-gap: 20px;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: auto;
+    grid-column-gap: 20px;
+    grid-row-gap: 0px;
+  }
 }
 </style>
