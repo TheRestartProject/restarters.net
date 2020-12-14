@@ -15,7 +15,7 @@
       >
         <template slot="cell(repair_status)" slot-scope="data">
           <div :class="badgeClass(data)">
-            {{ status(data) }}
+            {{ showStatus(data) }}
           </div>
         </template>
         <template slot="cell(device_event.event_date)" slot-scope="data">
@@ -68,7 +68,32 @@ export default {
       type: Number,
       required: false,
       default: null
-    }
+    },
+    brand: {
+      type: String,
+      required: false,
+      default: null
+    },
+    model: {
+      type: String,
+      required: false,
+      default: null
+    },
+    item_type: {
+      type: String,
+      required: false,
+      default: null
+    },
+    status: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    comments: {
+      type: String,
+      required: false,
+      default: null
+    },
   },
   data () {
     return {
@@ -95,7 +120,7 @@ export default {
         ret.push({key: 'model', label: this.translatedModel, sortable: true})
         ret.push({key: 'brand', label: this.translatedBrand, sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
       } else {
-        ret.push({key: 'model', label: this.translatedModelOrType, sortable: true, tdClass: 'pl-0 pl-md-3'})
+        ret.push({key: 'item_type', label: this.translatedModelOrType, sortable: true, tdClass: 'pl-0 pl-md-3'})
       }
 
       ret.push({key: 'shortProblem', label: this.translatedAssessment, thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})
@@ -149,10 +174,27 @@ export default {
     },
   },
   watch: {
-    category(newVal) {
-      console.log("Category changed to", newVal)
+    powered(newVal) {
       this.$refs.table.refresh()
-    }
+    },
+    category(newVal) {
+      this.$refs.table.refresh()
+    },
+    brand(newVal) {
+      this.$refs.table.refresh()
+    },
+    model(newVal) {
+      this.$refs.table.refresh()
+    },
+    comments(newVal) {
+      this.$refs.table.refresh()
+    },
+    item_type(newVal) {
+      this.$refs.table.refresh()
+    },
+    status(newVal) {
+      this.$refs.table.refresh()
+    },
   },
   methods: {
     items (ctx, callback) {
@@ -176,7 +218,12 @@ export default {
           sortBy: sortBy,
           sortDesc: sortDesc,
           powered: this.powered,
-          category: this.category
+          category: this.category,
+          brand: this.brand,
+          model: this.model,
+          item_type: this.item_type,
+          status: this.status,
+          comments: this.comments
         }
       })
           .then(ret => {
@@ -189,7 +236,7 @@ export default {
       // Indicate that callback is being used.
       return null
     },
-    status (data) {
+    showStatus (data) {
       switch (data.item.repair_status) {
         case FIXED:
           return this.$lang.get('partials.fixed')

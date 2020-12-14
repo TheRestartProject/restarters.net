@@ -21,13 +21,14 @@
         <b-card no-body>
           <b-card-body class="p-2">
             <b-form-group :label="translatedCategory">
-              <DeviceCategorySelect :category.sync="category" :clusters="clusters" :powered="powered" />
+              <DeviceCategorySelect :category.sync="category" :clusters="clusters" :powered="powered" allow-empty />
             </b-form-group>
             <b-form-group v-if="powered" :label="translatedModel">
+              Model {{ model }}
               <DeviceModel :model.sync="model" />
             </b-form-group>
             <b-form-group  v-if="powered" :label="translatedBrand">
-              <DeviceBrandSelect :brand.sync="brand" :brands="brands" />
+              <DeviceBrandSelect :brand.sync="brand" :brands="brands" allow-empty />
             </b-form-group>
             <b-form-group v-if="!powered" :label="translatedModelOrType">
               <DeviceModel :model.sync="item_type" />
@@ -40,17 +41,18 @@
                     track-by="id"
                     label="text"
                     :multiple="false"
-                    :allow-empty="false"
+                    allow-empty
+                    selectLabel=""
                     deselect-label=""
                     :taggable="false"
-                    selectLabel=""
+                    :selectedLabel="translatedRemove"
                 />
               </b-form-group>
               <div />
             </div>
             <div class="w-100 device-select-row">
               <b-form-group :label="translatedSearchAssessmentComments">
-                <b-input :model.sync="comments" />
+                <b-input v-model="comments" />
               </b-form-group>
               <div />
             </div>
@@ -122,6 +124,9 @@ export default {
     }
   },
   computed: {
+    translatedRemove() {
+      return this.$lang.get('partials.remove')
+    },
     translatedItemAndRepairInfo() {
       return this.$lang.get('devices.item_and_repair_info')
     },
@@ -166,7 +171,22 @@ export default {
   watch: {
     category(newVal) {
       this.$emit('update:category', newVal)
-    }
+    },
+    brand(newVal) {
+      this.$emit('update:brand', newVal)
+    },
+    model(newVal) {
+      this.$emit('update:model', newVal)
+    },
+    item_type(newVal) {
+      this.$emit('update:item_type', newVal)
+    },
+    status(newVal) {
+      this.$emit('update:status', newVal ? newVal.id : null)
+    },
+    comments(newVal) {
+      this.$emit('update:comments', newVal)
+    },
   },
   methods: {
     toggleItems() {

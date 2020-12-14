@@ -7,7 +7,7 @@
         track-by="id"
         label="brand_name"
         :multiple="false"
-        :allow-empty="false"
+        :allow-empty="allowEmpty"
         deselect-label=""
         :taggable="false"
         selectLabel=""
@@ -15,6 +15,7 @@
         @select="selected"
         @search-change="input"
         :showNoResults="false"
+        :selectedLabel="allowEmpty ? translatedRemove : null"
     />
     <div />
   </div>
@@ -31,9 +32,17 @@ export default {
     brands: {
       type: Array,
       required: true
+    },
+    allowEmpty: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
+    translatedRemove() {
+      return this.$lang.get('partials.remove')
+    },
     brandValue: {
       get() {
         let ret = null
@@ -46,7 +55,7 @@ export default {
         return ret
       },
       set(newval) {
-        this.$emit('update:category', newval.brand_name)
+        this.$emit('update:category', newval ? newval.brand_name : null)
       }
     },
     brandsPlusCustom() {

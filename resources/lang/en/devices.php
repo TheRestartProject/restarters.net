@@ -85,7 +85,7 @@ return array (
   'repair_records' => 'Repair Records',
   'view_record' => 'View',
   'close_record' => 'Close',
-  'model_or_type' => 'Model / Item Type',
+  'model_or_type' => 'Item Type',
   'repair_outcome' => 'Repair outcome?',
   'powered_items' => 'powered item|powered items',
   'unpowered_items' => 'unpowered item|unpowered items',
@@ -118,5 +118,5 @@ return array (
   'assessment' => 'Assessment',
   'item_and_repair_info' => 'Item & Repair Info',
   'event_info' => 'Event Info',
-  'search_assessment_comments' => 'Search assessment comments'
+  'search_assessment_comments' => 'Assessment'
 );

@@ -137,6 +137,11 @@ class ApiController extends Controller
         $sortBy = $request->input('sortBy');
         $sortDesc = $request->input('sortDesc');
         $category = $request->input('category');
+        $brand = $request->input('brand');
+        $model = $request->input('model');
+        $item_type = $request->input('item_type');
+        $status = $request->input('status');
+        $comments = $request->input('comments');
 
         $wheres = [
             ['categories.powered', '=', $powered == 'true' ? 1 : 0],
@@ -144,6 +149,26 @@ class ApiController extends Controller
 
         if ($category) {
             $wheres[] = [ 'idcategories', '=' , $category ];
+        }
+
+        if ($brand) {
+            $wheres[] = [ 'devices.brand', 'LIKE', '%' . $brand . '%'];
+        }
+
+        if ($model) {
+            $wheres[] = [ 'devices.model', 'LIKE', '%' . $model . '%'];
+        }
+
+        if ($item_type) {
+            $wheres[] = [ 'devices.item_type', 'LIKE', '%' . $item_type . '%'];
+        }
+
+        if ($comments) {
+            $wheres[] = [ 'devices.problem', 'LIKE', '%' . $comments . '%'];
+        }
+
+        if ($status) {
+            $wheres[] = [ 'repair_status', '=', $status ];
         }
 
         $query = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])

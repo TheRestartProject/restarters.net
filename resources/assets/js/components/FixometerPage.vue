@@ -15,69 +15,94 @@
       </div>
     </div>
     <p>{{ translatedSearchText}}</p>
-    <b-row class="d-none d-md-block">
-<!--      <b-col cols="3">-->
-<!--        TODO Filters are to come in DOT-1288 -->
-<!--        <FixometerFilters-->
-<!--            :clusters="clusters"-->
-<!--            :brands="brands"-->
-<!--            :powered="tabIndex === 0"-->
-<!--            :category.sync="category"-->
-<!--        />-->
-<!--      </b-col>-->
-      <b-col cols="12">
-        <b-tabs class="ourtabs ourtabs-brand w-100" v-model="tabIndex">
-          <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
-            <template slot="title">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <b>{{ translatedPowered }}</b> ({{ impactData.total_powered.toLocaleString() }})
-                </div>
-                <div class="d-flex text-brand font-weight-bold">
-                  <div class="mr-3 lower">
-                    <b-img src="/images/trash_brand.svg" class="icon" />
-                    {{ impactData.ewaste.toLocaleString() }} kg
-                  </div>
-                  <div class="mr-1 lower">
-                    <b-img src="/images/co2_brand.svg" class="icon" />
-                    {{ impactData.emissions.toLocaleString() }} kg
-                  </div>
-                </div>
+    <p>
+      TODO Update tab titles to reflect search filters.
+      TODO Link to URL for search filters
+      TODO Button to share link.
+    </p>
+    <div class="layout">
+      <FixometerFilters
+          v-show="tabIndex === 0"
+          :clusters="clusters"
+          :brands="brands"
+          :powered="true"
+          :category.sync="category_powered"
+          :brand.sync="brand"
+          :model.sync="model"
+          :item_type.sync="item_type"
+          :comments.sync="comments"
+          :status.sync="status"
+      />
+      <FixometerFilters
+          v-show="tabIndex === 1"
+          :clusters="clusters"
+          :brands="brands"
+          :powered="false"
+          :category.sync="category_unpowered"
+          :brand.sync="brand"
+          :model.sync="model"
+          :item_type.sync="item_type"
+          :comments.sync="comments"
+          :status.sync="status"
+      />
+      <b-tabs class="ourtabs ourtabs-brand w-100" v-model="tabIndex">
+        <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
+          <template slot="title">
+            <div class="d-flex justify-content-between">
+              <div>
+                <b>{{ translatedPowered }}</b> ({{ impactData.total_powered.toLocaleString() }})
               </div>
-            </template>
-            <p class="pl-3" v-html="translatedDescriptionPowered" />
-            <FixometerRecordsTable
-                :powered="true"
-                :clusters="clusters"
-                :brands="brands"
-                :barrier-list="barrierList"
-                :category="category"
-            />
-          </b-tab>
-          <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
-            <template slot="title">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <b>{{ translatedUnpowered }}</b> ({{ impactData.total_unpowered.toLocaleString() }})
-                </div>
-                <div class="lower text-brand font-weight-bold">
+              <div class="d-flex text-brand font-weight-bold">
+                <div class="mr-3 lower">
                   <b-img src="/images/trash_brand.svg" class="icon" />
-                  {{ impactData.unpowered_waste.toLocaleString() }} kg
+                  {{ impactData.ewaste.toLocaleString() }} kg
+                </div>
+                <div class="mr-1 lower">
+                  <b-img src="/images/co2_brand.svg" class="icon" />
+                  {{ impactData.emissions.toLocaleString() }} kg
                 </div>
               </div>
-            </template>
-            <p class="pl-3" v-html="translatedDescriptionUnpowered" />
-            <FixometerRecordsTable
-                :powered="false"
-                :clusters="clusters"
-                :brands="brands"
-                :barrier-list="barrierList"
-                :category="category"
-            />
-          </b-tab>
-        </b-tabs>
-      </b-col>
-    </b-row>
+            </div>
+          </template>
+          <p class="pl-3" v-html="translatedDescriptionPowered" />
+          <FixometerRecordsTable
+              :powered="true"
+              :clusters="clusters"
+              :brands="brands"
+              :barrier-list="barrierList"
+              :category="category_powered"
+              :brand="brand"
+              :model="model"
+              :comments="comments"
+              :status="status"
+          />
+        </b-tab>
+        <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
+          <template slot="title">
+            <div class="d-flex justify-content-between">
+              <div>
+                <b>{{ translatedUnpowered }}</b> ({{ impactData.total_unpowered.toLocaleString() }})
+              </div>
+              <div class="lower text-brand font-weight-bold">
+                <b-img src="/images/trash_brand.svg" class="icon" />
+                {{ impactData.unpowered_waste.toLocaleString() }} kg
+              </div>
+            </div>
+          </template>
+          <p class="pl-3" v-html="translatedDescriptionUnpowered" />
+          <FixometerRecordsTable
+              :powered="false"
+              :clusters="clusters"
+              :brands="brands"
+              :barrier-list="barrierList"
+              :category="category_unpowered"
+              :item_type="item_type"
+              :comments="comments"
+              :status="status"
+          />
+        </b-tab>
+      </b-tabs>
+    </div>
     <div class="d-block d-md-none">
       <CollapsibleSection collapsed :count="impactData.total_powered" heading-level="h6" count-class="small">
         <template slot="title">
@@ -107,7 +132,7 @@
               :clusters="clusters"
               :brands="brands"
               :barrier-list="barrierList"
-              :category="category"
+              :category="category_unpowered"
           />
         </template>
       </CollapsibleSection>
@@ -150,8 +175,14 @@ export default {
   },
   data () {
     return {
-      tabIndex: 1,
-      category: null
+      tabIndex: 0,
+      category_powered: null,
+      category_unpowered: null,
+      status: null,
+      brand: null,
+      model: null,
+      item_type: null,
+      comments: null,
     }
   },
   mounted() {
@@ -192,5 +223,11 @@ export default {
 .iconsmall {
   height: 25px;
   margin-bottom: 5px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-column-gap: 20px;
 }
 </style>
