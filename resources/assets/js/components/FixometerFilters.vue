@@ -21,22 +21,21 @@
         <b-card no-body>
           <b-card-body class="p-2">
             <b-form-group :label="translatedCategory">
-              <DeviceCategorySelect :category.sync="category" :clusters="clusters" :powered="powered" allow-empty />
+              <DeviceCategorySelect :category.sync="current_category" :clusters="clusters" :powered="powered" allow-empty />
             </b-form-group>
             <b-form-group v-if="powered" :label="translatedModel">
-              Model {{ model }}
-              <DeviceModel :model.sync="model" />
+              <DeviceModel :model.sync="current_model" />
             </b-form-group>
             <b-form-group  v-if="powered" :label="translatedBrand">
-              <DeviceBrandSelect :brand.sync="brand" :brands="brands" allow-empty />
+              <DeviceBrandSelect :brand.sync="current_brand" :brands="brands" allow-empty />
             </b-form-group>
             <b-form-group v-if="!powered" :label="translatedModelOrType">
-              <DeviceModel :model.sync="item_type" />
+              <DeviceModel :model.sync="current_item_type" />
             </b-form-group>
             <div class="w-100 device-select-row">
               <b-form-group :label="translatedStatus">
                 <multiselect
-                    v-model="status"
+                    v-model="current_status"
                     :options="statusOptions"
                     track-by="id"
                     label="text"
@@ -52,7 +51,7 @@
             </div>
             <div class="w-100 device-select-row">
               <b-form-group :label="translatedSearchAssessmentComments">
-                <b-input v-model="comments" />
+                <b-input v-model="current_comments" />
               </b-form-group>
               <div />
             </div>
@@ -81,13 +80,13 @@
         <b-card no-body>
           <b-card-body class="p-2">
             <b-form-group :label="translatedGroup">
-              <b-input v-model="group" />
+              <b-input v-model="current_group" />
             </b-form-group>
             <b-form-group :label="translatedFromDate">
-              <b-form-datepicker class="datepicker" v-model="from_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
+              <b-form-datepicker class="datepicker" v-model="current_from_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
             </b-form-group>
             <b-form-group :label="translatedToDate">
-              <b-form-datepicker class="datepicker" v-model="to_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
+              <b-form-datepicker class="datepicker" v-model="current_to_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
             </b-form-group>
           </b-card-body>
         </b-card>
@@ -178,15 +177,15 @@ export default {
     return {
       expandedItems: false,
       expandedEvents: false,
-      model: null,
-      brand: null,
-      status: null,
-      item_type: null,
-      category: null,
-      comments: null,
-      group: null,
-      from_date: null,
-      to_date: null
+      current_model: null,
+      current_brand: null,
+      current_status: null,
+      current_item_type: null,
+      current_category: null,
+      current_comments: null,
+      current_group: null,
+      current_from_date: null,
+      current_to_date: null
     }
   },
   computed: {
@@ -246,33 +245,42 @@ export default {
   mounted () {
     this.expandedEvents = this.startExpandedEvents
     this.expandedItems = this.startExpandedItems
+    this.current_model = this.model
+    this.current_brand = this.brand
+    this.current_status = this.status
+    this.current_item_type = this.item_type
+    this.current_category = this.category
+    this.current_comments = this.comments
+    this.current_group = this.group
+    this.current_from_date = this.from_date
+    this.current_to_date = this.to_date
   },
   watch: {
-    category(newVal) {
+    current_category(newVal) {
       this.$emit('update:category', newVal)
     },
-    brand(newVal) {
+    current_brand(newVal) {
       this.$emit('update:brand', newVal)
     },
-    model(newVal) {
+    current_model(newVal) {
       this.$emit('update:model', newVal)
     },
-    item_type(newVal) {
+    current_item_type(newVal) {
       this.$emit('update:item_type', newVal)
     },
-    status(newVal) {
+    current_status(newVal) {
       this.$emit('update:status', newVal ? newVal.id : null)
     },
-    comments(newVal) {
+    current_comments(newVal) {
       this.$emit('update:comments', newVal)
     },
-    group(newVal) {
+    current_group(newVal) {
       this.$emit('update:group', newVal)
     },
-    from_date(newVal) {
+    current_from_date(newVal) {
       this.$emit('update:from_date', newVal)
     },
-    to_date(newVal) {
+    current_to_date(newVal) {
       this.$emit('update:to_date', newVal)
     }
   },

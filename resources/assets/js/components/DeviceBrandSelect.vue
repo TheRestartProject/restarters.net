@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 device-select-row">
     <multiselect
-        :value="brandValue"
+        v-model="brandValue"
         :placeholder="translatedBrand"
         :options="brandsPlusCustom"
         track-by="id"
@@ -55,7 +55,8 @@ export default {
         return ret
       },
       set(newval) {
-        this.$emit('update:category', newval ? newval.brand_name : null)
+        console.log("Emit brand", newval)
+        this.$emit('update:brand', newval ? newval.brand_name : null)
       }
     },
     brandsPlusCustom() {
