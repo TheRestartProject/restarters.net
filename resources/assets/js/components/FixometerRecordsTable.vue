@@ -94,6 +94,21 @@ export default {
       required: false,
       default: null
     },
+    group: {
+      type: String,
+      required: false,
+      default: null
+    },
+    from_date: {
+      type: String,
+      required: false,
+      default: null
+    },
+    to_date: {
+      type: String,
+      required: false,
+      default: null
+    }
   },
   data () {
     return {
@@ -195,6 +210,15 @@ export default {
     status(newVal) {
       this.$refs.table.refresh()
     },
+    group(newVal) {
+      this.$refs.table.refresh()
+    },
+    from_date(newVal) {
+      this.$refs.table.refresh()
+    },
+    to_date(newVal) {
+      this.$refs.table.refresh()
+    },
   },
   methods: {
     items (ctx, callback) {
@@ -223,7 +247,10 @@ export default {
           model: this.model,
           item_type: this.item_type,
           status: this.status,
-          comments: this.comments
+          comments: this.comments,
+          group: this.group,
+          from_date: this.from_date,
+          to_date: this.to_date
         }
       })
           .then(ret => {

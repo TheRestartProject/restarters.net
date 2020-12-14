@@ -142,6 +142,9 @@ class ApiController extends Controller
         $item_type = $request->input('item_type');
         $status = $request->input('status');
         $comments = $request->input('comments');
+        $group = $request->input('group');
+        $from_date = $request->input('from_date');
+        $to_date = $request->input('to_date');
 
         $wheres = [
             ['categories.powered', '=', $powered == 'true' ? 1 : 0],
@@ -169,6 +172,18 @@ class ApiController extends Controller
 
         if ($status) {
             $wheres[] = [ 'repair_status', '=', $status ];
+        }
+
+        if ($group) {
+            $wheres[] = [ 'groups.name', 'LIKE', '%' . $group . '%'];
+        }
+
+        if ($from_date) {
+            $wheres[] = [ 'events.event_date', '>=', $from_date ];
+        }
+
+        if ($to_date) {
+            $wheres[] = [ 'events.event_date', '<=', $to_date ];
         }
 
         $query = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])

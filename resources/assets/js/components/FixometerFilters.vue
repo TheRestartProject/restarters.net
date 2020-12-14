@@ -80,7 +80,15 @@
       <b-collapse id="collapse-item" v-model="expandedEvents">
         <b-card no-body>
           <b-card-body class="p-2">
-            <p class="card-text">Collapse contents Here TODO</p>
+            <b-form-group :label="translatedGroup">
+              <b-input v-model="group" />
+            </b-form-group>
+            <b-form-group :label="translatedFromDate">
+              <b-form-datepicker class="datepicker" v-model="from_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
+            </b-form-group>
+            <b-form-group :label="translatedToDate">
+              <b-form-datepicker class="datepicker" v-model="to_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
+            </b-form-group>
           </b-card-body>
         </b-card>
       </b-collapse>
@@ -120,7 +128,10 @@ export default {
       status: null,
       item_type: null,
       category: null,
-      comments: null
+      comments: null,
+      group: null,
+      from_date: null,
+      to_date: null
     }
   },
   computed: {
@@ -150,6 +161,15 @@ export default {
     },
     translatedSearchAssessmentComments() {
       return this.$lang.get('devices.search_assessment_comments')
+    },
+    translatedGroup() {
+      return this.$lang.get('devices.group')
+    },
+    translatedFromDate() {
+      return this.$lang.get('devices.from_date')
+    },
+    translatedToDate() {
+      return this.$lang.get('devices.to_date')
     },
     statusOptions () {
       return [
@@ -187,6 +207,15 @@ export default {
     comments(newVal) {
       this.$emit('update:comments', newVal)
     },
+    group(newVal) {
+      this.$emit('update:group', newVal)
+    },
+    from_date(newVal) {
+      this.$emit('update:from_date', newVal)
+    },
+    to_date(newVal) {
+      this.$emit('update:to_date', newVal)
+    }
   },
   methods: {
     toggleItems() {
@@ -244,5 +273,32 @@ export default {
   font-weight: bold;
   margin-bottom: 0px;
   padding-left: 2px;
+}
+
+.b-form-datepicker.form-control {
+  padding: 0 10px;
+}
+
+/deep/ .datepicker {
+  & label {
+    padding-bottom: 0;
+    border: 0;
+    margin: 0;
+    font-weight: normal;
+  }
+
+  .btn {
+    padding: 0.4rem 0.3rem !important;
+    min-width: initial;
+  }
+
+  .form-control {
+    border: unset !important;
+  }
+
+  .btn-primary {
+    background-color: $brand-orange !important;
+    color: $black !important;
+  }
 }
 </style>

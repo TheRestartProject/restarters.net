@@ -16,9 +16,11 @@
     </div>
     <p>{{ translatedSearchText}}</p>
     <p>
+      TODO Filter on wiki - question with James.
       TODO Update tab titles to reflect search filters.
       TODO Link to URL for search filters
       TODO Button to share link.
+      TODO Mobile view
     </p>
     <div class="layout">
       <FixometerFilters
@@ -32,6 +34,9 @@
           :item_type.sync="item_type"
           :comments.sync="comments"
           :status.sync="status"
+          :group.sync="group"
+          :from_date.sync="from_date"
+          :to_date.sync="to_date"
       />
       <FixometerFilters
           v-show="tabIndex === 1"
@@ -44,6 +49,9 @@
           :item_type.sync="item_type"
           :comments.sync="comments"
           :status.sync="status"
+          :group.sync="group"
+          :from_date.sync="from_date"
+          :to_date.sync="to_date"
       />
       <b-tabs class="ourtabs ourtabs-brand w-100" v-model="tabIndex">
         <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
@@ -75,6 +83,9 @@
               :model="model"
               :comments="comments"
               :status="status"
+              :group="group"
+              :from_date="from_date"
+              :to_date="to_date"
           />
         </b-tab>
         <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
@@ -99,6 +110,9 @@
               :item_type="item_type"
               :comments="comments"
               :status="status"
+              :group="group"
+              :from_date="from_date"
+              :to_date="to_date"
           />
         </b-tab>
       </b-tabs>
@@ -183,6 +197,9 @@ export default {
       model: null,
       item_type: null,
       comments: null,
+      group: null,
+      from_date: null,
+      to_date: null
     }
   },
   mounted() {
