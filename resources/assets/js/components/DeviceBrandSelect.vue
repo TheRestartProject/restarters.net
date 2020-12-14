@@ -8,13 +8,13 @@
         label="brand_name"
         :multiple="false"
         :allow-empty="allowEmpty"
-        deselect-label=""
         :taggable="false"
         selectLabel=""
         ref="multiselect"
         @select="selected"
         @search-change="input"
         :showNoResults="false"
+        :deselect-label="allowEmpty ? translatedRemove : null"
         :selectedLabel="allowEmpty ? translatedRemove : null"
     />
     <div />

@@ -10,7 +10,7 @@
       group-values="categories"
       :multiple="false"
       :allow-empty="allowEmpty"
-      deselect-label=""
+      :deselect-label="allowEmpty ? translatedRemove : null"
       :group-select="false"
       :taggable="false"
       selectLabel=""
