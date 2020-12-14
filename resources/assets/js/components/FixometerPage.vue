@@ -17,7 +17,6 @@
     <p>{{ translatedSearchText}}</p>
     <p>
       TODO Filter on wiki - question with James.
-      TODO Update tab titles to reflect search filters.
       TODO Link to URL for search filters
       TODO Button to share link.
       TODO Mobile view
@@ -58,16 +57,16 @@
           <template slot="title">
             <div class="d-flex justify-content-between">
               <div>
-                <b>{{ translatedPowered }}</b> ({{ impactData.total_powered.toLocaleString() }})
+                <b>{{ translatedPowered }}</b> ({{ powered_total.toLocaleString() }})
               </div>
               <div class="d-flex text-brand font-weight-bold">
                 <div class="mr-3 lower">
                   <b-img src="/images/trash_brand.svg" class="icon" />
-                  {{ impactData.ewaste.toLocaleString() }} kg
+                  {{ powered_weight.toLocaleString() }} kg
                 </div>
                 <div class="mr-1 lower">
                   <b-img src="/images/co2_brand.svg" class="icon" />
-                  {{ impactData.emissions.toLocaleString() }} kg
+                  {{ powered_co2.toLocaleString() }} kg
                 </div>
               </div>
             </div>
@@ -86,17 +85,20 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
+              :total.sync="powered_total"
+              :weight.sync="powered_weight"
+              :co2.sync="powered_co2"
           />
         </b-tab>
         <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
           <template slot="title">
             <div class="d-flex justify-content-between">
               <div>
-                <b>{{ translatedUnpowered }}</b> ({{ impactData.total_unpowered.toLocaleString() }})
+                <b>{{ translatedUnpowered }}</b> ({{ unpowered_total.toLocaleString() }})
               </div>
               <div class="lower text-brand font-weight-bold">
                 <b-img src="/images/trash_brand.svg" class="icon" />
-                {{ impactData.unpowered_waste.toLocaleString() }} kg
+                {{ unpowered_weight.toLocaleString() }} kg
               </div>
             </div>
           </template>
@@ -113,12 +115,15 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
+              :total.sync="unpowered_total"
+              :weight.sync="unpowered_weight"
+              :co2.sync="unpowered_co2"
           />
         </b-tab>
       </b-tabs>
     </div>
     <div class="d-block d-md-none">
-      <CollapsibleSection collapsed :count="impactData.total_powered" heading-level="h6" count-class="small">
+      <CollapsibleSection collapsed :count="powered_total" heading-level="h6" count-class="small">
         <template slot="title">
           {{ translatedPowered }}
         </template>
@@ -128,13 +133,13 @@
               <div class="mr-3 lower d-flex align-content-center">
                 <b-img src="/images/trash_brand.svg" class="iconsmall" />
                 <span class="mt-1">
-                  {{ impactData.ewaste.toLocaleString() }}
+                  {{ powered_weight.toLocaleString() }}
                 </span>
               </div>
               <div class="mr-1 lower d-flex">
                 <b-img src="/images/co2_brand.svg" class="iconsmall" />
                 <span class="mt-1">
-                  {{ impactData.emissions.toLocaleString() }}
+                  {{ powered_co2.toLocaleString() }}
                 </span>
               </div>
             </div>
@@ -146,7 +151,51 @@
               :clusters="clusters"
               :brands="brands"
               :barrier-list="barrierList"
+              :category="category_powered"
+              :item_type="item_type"
+              :comments="comments"
+              :status="status"
+              :group="group"
+              :from_date="from_date"
+              :to_date="to_date"
+              :total.sync="powered_total"
+              :weight.sync="powered_weight"
+              :co2.sync="powered_co2"
+          />
+        </template>
+      </CollapsibleSection>
+      <CollapsibleSection collapsed :count="unpowered_total" heading-level="h6" count-class="small">
+        <template slot="title">
+          {{ translatedUnpowered }}
+        </template>
+        <template slot="title-right">
+          <div class="small mt-1">
+            <div class="d-flex text-brand font-weight-bold">
+              <div class="mr-1 lower d-flex">
+                <b-img src="/images/trash_brand.svg" class="iconsmall" />
+                <span class="mt-1">
+                  {{ unpowered_weight.toLocaleString() }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template slot="content">
+          <FixometerRecordsTable
+              :powered="false"
+              :clusters="clusters"
+              :brands="brands"
+              :barrier-list="barrierList"
               :category="category_unpowered"
+              :item_type="item_type"
+              :comments="comments"
+              :status="status"
+              :group="group"
+              :from_date="from_date"
+              :to_date="to_date"
+              :total.sync="unpowered_total"
+              :weight.sync="unpowered_weight"
+              :co2.sync="unpowered_co2"
           />
         </template>
       </CollapsibleSection>
@@ -199,7 +248,13 @@ export default {
       comments: null,
       group: null,
       from_date: null,
-      to_date: null
+      to_date: null,
+      powered_total: 0,
+      unpowered_total: 0,
+      powered_weight: 0,
+      unpowered_weight: 0,
+      powered_co2: 0,
+      unpowered_co2: 0
     }
   },
   mounted() {

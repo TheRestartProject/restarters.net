@@ -116,7 +116,9 @@ export default {
       perPage: 5,
       showModal: false,
       device: null,
-      total: 0
+      total: 0,
+      co2: 0,
+      weight: 0
     }
   },
   computed: {
@@ -219,6 +221,15 @@ export default {
     to_date(newVal) {
       this.$refs.table.refresh()
     },
+    total(newVal) {
+      this.$emit('update:total', newVal)
+    },
+    weight(newVal) {
+      this.$emit('update:weight', newVal)
+    },
+    co2(newVal) {
+      this.$emit('update:co2', newVal)
+    }
   },
   methods: {
     items (ctx, callback) {
@@ -230,7 +241,6 @@ export default {
 
       if (ctx.sortBy) {
         // We have to munge what the table gives us a bit to match what the server can query.
-        console.log('Ctx', ctx.sortBy)
         sortBy = ctx.sortBy
             .replace('device_event.the_group.', 'groups.')
             .replace('device_event.', 'events.')
@@ -255,6 +265,8 @@ export default {
       })
           .then(ret => {
             this.total = ret.data.count
+            this.weight = ret.data.weight
+            this.co2 = ret.data.co2
             callback(ret.data.items)
           }).catch(() => {
         callback([])
