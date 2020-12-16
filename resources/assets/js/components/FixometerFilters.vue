@@ -55,6 +55,13 @@
               </b-form-group>
               <div />
             </div>
+            <div class="w-100 device-select-row">
+              <div class="d-flex">
+                <b-form-checkbox v-model="current_wiki" size="lg" />
+                <label class="mt-1">{{ translatedInterestingCaseStudy }}</label>
+              </div>
+              <div />
+            </div>
           </b-card-body>
         </b-card>
       </b-collapse>
@@ -171,6 +178,11 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    wiki: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
@@ -185,7 +197,8 @@ export default {
       current_comments: null,
       current_group: null,
       current_from_date: null,
-      current_to_date: null
+      current_to_date: null,
+      current_wiki: null
     }
   },
   computed: {
@@ -215,6 +228,9 @@ export default {
     },
     translatedSearchAssessmentComments() {
       return this.$lang.get('devices.search_assessment_comments')
+    },
+    translatedInterestingCaseStudy() {
+      return this.$lang.get('devices.interesting_case_study')
     },
     translatedGroup() {
       return this.$lang.get('devices.group')
@@ -254,6 +270,7 @@ export default {
     this.current_group = this.group
     this.current_from_date = this.from_date
     this.current_to_date = this.to_date
+    this.current_wiki = this.wiki
   },
   watch: {
     current_category(newVal) {
@@ -273,6 +290,9 @@ export default {
     },
     current_comments(newVal) {
       this.$emit('update:comments', newVal)
+    },
+    current_wiki(newVal) {
+      this.$emit('update:wiki', newVal)
     },
     current_group(newVal) {
       this.$emit('update:group', newVal)

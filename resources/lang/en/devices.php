@@ -118,5 +118,6 @@ return array (
   'assessment' => 'Assessment',
   'item_and_repair_info' => 'Item & Repair Info',
   'event_info' => 'Event Info',
-  'search_assessment_comments' => 'Assessment'
+  'search_assessment_comments' => 'Assessment',
+  'interesting_case_study' => 'Interesting case study'
 );

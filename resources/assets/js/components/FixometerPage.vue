@@ -15,9 +15,6 @@
       </div>
     </div>
     <p>{{ translatedSearchText}}</p>
-    <p>
-      TODO Filter on wiki - question with James.
-    </p>
     <div class="layout">
       <FixometerFilters
           v-show="tabIndex === 0"
@@ -29,6 +26,7 @@
           :model.sync="model"
           :item_type.sync="item_type"
           :comments.sync="comments"
+          :wiki.sync="wiki"
           :status.sync="status"
           :group.sync="group"
           :from_date.sync="from_date"
@@ -46,6 +44,7 @@
           :model.sync="model"
           :item_type.sync="item_type"
           :comments.sync="comments"
+          :wiki.sync="wiki"
           :status.sync="status"
           :group.sync="group"
           :from_date.sync="from_date"
@@ -82,6 +81,7 @@
               :brand="brand"
               :model="model"
               :comments="comments"
+              :wiki="wiki"
               :status="status"
               :group="group"
               :from_date="from_date"
@@ -112,6 +112,7 @@
               :category="category_unpowered"
               :item_type="item_type"
               :comments="comments"
+              :wiki="wiki"
               :status="status"
               :group="group"
               :from_date="from_date"
@@ -155,6 +156,7 @@
               :category="category_powered"
               :item_type="item_type"
               :comments="comments"
+              :wiki="wiki"
               :status="status"
               :group="group"
               :from_date="from_date"
@@ -190,6 +192,7 @@
               :category="category_unpowered"
               :item_type="item_type"
               :comments="comments"
+              :wiki="wiki"
               :status="status"
               :group="group"
               :from_date="from_date"
@@ -248,6 +251,7 @@ export default {
       model: null,
       item_type: null,
       comments: null,
+      wiki: null,
       group: null,
       from_date: null,
       to_date: null,
@@ -302,6 +306,11 @@ export default {
 
     if (params.has('comments')) {
       this.comments = params.get('comments')
+      this.startExpandedItems = true
+    }
+
+    if (params.has('wiki')) {
+      this.wiki = params.get('wiki')
       this.startExpandedItems = true
     }
 
@@ -363,6 +372,10 @@ export default {
 
       if (this.comments) {
         ret += 'comments=' + encodeURIComponent(this.comments) + '&'
+      }
+
+      if (this.wiki) {
+        ret += 'wiki=' + encodeURIComponent(this.wiki) + '&'
       }
 
       if (this.group) {

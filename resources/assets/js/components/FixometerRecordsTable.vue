@@ -94,6 +94,11 @@ export default {
       required: false,
       default: null
     },
+    wiki: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     group: {
       type: String,
       required: false,
@@ -206,6 +211,9 @@ export default {
     comments(newVal) {
       this.$refs.table.refresh()
     },
+    wiki(newVal) {
+      this.$refs.table.refresh()
+    },
     item_type(newVal) {
       this.$refs.table.refresh()
     },
@@ -258,6 +266,7 @@ export default {
           item_type: this.item_type,
           status: this.status,
           comments: this.comments,
+          wiki: this.wiki,
           group: this.group,
           from_date: this.from_date,
           to_date: this.to_date

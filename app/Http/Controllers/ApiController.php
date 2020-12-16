@@ -142,6 +142,7 @@ class ApiController extends Controller
         $item_type = $request->input('item_type');
         $status = $request->input('status');
         $comments = $request->input('comments');
+        $wiki = filter_var($request->input('wiki', false), FILTER_VALIDATE_BOOLEAN);
         $group = $request->input('group');
         $from_date = $request->input('from_date');
         $to_date = $request->input('to_date');
@@ -168,6 +169,10 @@ class ApiController extends Controller
 
         if ($comments) {
             $wheres[] = [ 'devices.problem', 'LIKE', '%' . $comments . '%'];
+        }
+
+        if ($wiki) {
+            $wheres[] = [ 'devices.wiki', '=', 1 ];
         }
 
         if ($status) {
