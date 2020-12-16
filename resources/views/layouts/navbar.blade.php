@@ -79,8 +79,8 @@
     <!-- Authentication Links -->
     @php( $user = Auth::user() )
     @if (!$user )
-      <li><a style="text-transform: initial; width:95.365px;" href="/login">Sign in</a></li>
-      <li><a style="text-transform: initial; width:95.365px;" href="/about">Join</a></li>
+      <li style="width:95.365px;"><a style="text-transform: initial;  background: white; color: black; margin-bottom: 10px; border: 2px solid black; width: 70px; height: 40px;" href="/login">@lang('login.login_title')</a></li>
+      <li style="width:95.365px;"><a style="text-transform: initial; background: black; color: white; margin-bottom: 10px; width: 70px; height: 40px;" href="/about">@lang('login.join_title_short')</a></li>
     @else
       <li class="d-flex">
           <div class="badge-group">
