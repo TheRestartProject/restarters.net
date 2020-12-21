@@ -106,8 +106,7 @@ export default {
   },
   computed: {
     stats() {
-      // TODO LATER Consider whether these should be in the event or the store.
-      return this.event ? this.event.stats : null
+      return this.$store.getters['events/getStats'](this.idevents)
     },
     noDevices() {
       // Whether there are no devices at this event, and we have permissions to do something about that.

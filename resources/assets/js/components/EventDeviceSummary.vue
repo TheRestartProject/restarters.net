@@ -84,6 +84,11 @@ export default {
       type: Object,
       required: true
     },
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     recent: {
       type: Boolean,
       required: false,
