@@ -6,11 +6,12 @@
       'mb-3': true,
       'justify-content-between': true
       }" @click="toggle">
-      <div class="d-flex w-100">
-        <div class="d-flex flex-column justify-content-center">
-          <slot name="title" />
-        </div>
-        <div v-if="count" :class="{
+      <div class="d-flex w-100 justify-content-between align-items-center">
+        <div class="d-flex flex-row">
+          <div class="d-flex flex-column justify-content-center">
+            <slot name="title" />
+          </div>
+          <div v-if="count" :class="{
           'd-inline' : true,
           'd-md-none' : !alwaysShowCount,
           'text-muted' : true,
@@ -21,9 +22,11 @@
           <span v-if="countBadge">
             &nbsp;<b-badge variant="primary" pill>{{ count }}</b-badge>
           </span>
-          <span v-else>
+            <span v-else>
             &nbsp;<span :class="countClass">({{ count }})</span>
           </span>
+          </div>
+          <slot name="title-icon" />
         </div>
         <slot name="title-right" />
       </div>
@@ -38,7 +41,7 @@
     }">
       <slot name="content" />
     </div>
-    <hr class="mt-0 d-md-none" />
+    <hr v-if="showHorizontalRule" class="mt-0 d-md-none" />
   </div>
 </template>
 <script>
@@ -89,6 +92,11 @@ export default {
       type: String,
       required: false,
       default: 'h2'
+    },
+    showHorizontalRule: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   data () {

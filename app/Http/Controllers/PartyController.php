@@ -87,10 +87,9 @@ class PartyController extends Controller
             $upcoming_events_in_area = null;
         } else {
             $upcoming_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
-                ->take(3)
                 ->get();
 
-            $past_events = Party::UsersPastEvents([auth()->id()])->paginate(10);
+            $past_events = Party::UsersPastEvents([auth()->id()])->get();
 
             if ( ! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
                 $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())->take(3)->get();

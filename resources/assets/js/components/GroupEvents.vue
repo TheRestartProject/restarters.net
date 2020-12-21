@@ -3,22 +3,24 @@
     <CollapsibleSection class="lineheight d-none d-md-block" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel">
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
-          <div>
-            <span v-if="group">{{ group.name }}</span> {{ translatedTitle }}
-            <b-btn v-if="calendarCopyUrl" class="ml-2" variant="primary" @click="showCalendar">
-              <b-img-lazy src="/images/subs_cal_ico.svg" />
-            </b-btn>
-          </div>
-          <b-btn variant="primary" href="/party/create" class="align-self-center" v-if="addButton">
+        <div>
+          <span v-if="group">{{ group.name }}</span> {{ translatedTitle }}
+          <b-btn v-if="calendarCopyUrl" class="ml-2" variant="primary" @click="showCalendar">
+            <b-img-lazy src="/images/subs_cal_ico.svg" />
+          </b-btn>
+        </div>
+        </div>
+      </template>
+      <template slot="title-right">
+        <b-btn variant="primary" href="/party/create" class="align-self-center text-nowrap" v-if="addButton">
             <span class="d-none d-md-block">
               {{ translatedAddEvent }}
             </span>
-          </b-btn>
-        </div>
+        </b-btn>
       </template>
       <template slot="content">
         <b-tabs class="ourtabs w-100">
-          <b-tab active title-item-class="w-50" class="pt-2">
+          <b-tab active title-item-class="w-50" class="pt-2" lazy>
             <template slot="title">
               <div class="d-flex justify-content-between">
                 <div>
@@ -33,6 +35,11 @@
               <GroupEventsTableHeading />
               <b-tbody class="table-height">
                 <GroupEventSummary v-for="e in upcomingToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
+                <infinite-loading @infinite="loadMoreUpcoming" :force-use-infinite-wrapper="true">
+                  <span slot="no-results" />
+                  <span slot="no-more" />
+                  <span slot="spinner" />
+                </infinite-loading>
               </b-tbody>
             </b-table-simple>
             <div class="text-center" v-if="limit">
@@ -41,7 +48,7 @@
               </b-btn>
             </div>
           </b-tab>
-          <b-tab title-item-class="w-50" class="pt-2">
+          <b-tab title-item-class="w-50" class="pt-2" lazy>
             <template slot="title">
               <div class="d-flex justify-content-between">
                 <div>
@@ -50,12 +57,17 @@
               </div>
             </template>
             <p v-if="!past.length">
-              {{ translatedNoPastEvents }}.
+              {{ translatedNoPastEvents }}
             </p>
             <b-table-simple v-else responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
               <GroupEventsTableHeading past />
               <b-tbody class="table-height">
                 <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
+                <infinite-loading @infinite="loadMorePast" :force-use-infinite-wrapper="true">
+                  <span slot="no-results" />
+                  <span slot="no-more" />
+                  <span slot="spinner" />
+                </infinite-loading>
               </b-tbody>
             </b-table-simple>
             <div class="text-center" v-if="limit">
@@ -96,6 +108,11 @@
             <GroupEventsTableHeading />
             <b-tbody class="table-height">
               <GroupEventSummary v-for="e in upcomingToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
+              <infinite-loading @infinite="loadMoreUpcoming" :force-use-infinite-wrapper="true">
+                <span slot="no-results" />
+                <span slot="no-more" />
+                <span slot="spinner" />
+              </infinite-loading>
             </b-tbody>
           </b-table-simple>
           <div class="text-right" v-if="limit">
@@ -115,13 +132,18 @@
           </div>
         </template>
         <template slot="content">
-          <p v-if="!upcoming.length">
-            {{ translatedNoPastEvents }}.
+          <p v-if="!past.length">
+            {{ translatedNoPastEvents }}
           </p>
           <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
             <GroupEventsTableHeading past />
             <b-tbody class="table-height">
               <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
+              <infinite-loading @infinite="loadMorePast" :force-use-infinite-wrapper="true">
+                <span slot="no-results" />
+                <span slot="no-more" />
+                <span slot="spinner" />
+              </infinite-loading>
             </b-tbody>
           </b-table-simple>
           <div class="text-right" v-if="limit">
@@ -149,9 +171,11 @@ import GroupEventsTableHeading from './GroupEventsTableHeading'
 import moment from 'moment'
 import GroupEventSummary from './GroupEventSummary'
 import CalendarAddModal from './CalendarAddModal'
+import InfiniteLoading from 'vue-infinite-loading'
 
 export default {
-  components: {CalendarAddModal, GroupEventSummary, CollapsibleSection, GroupEventsTableHeading},
+  components: {CalendarAddModal, GroupEventSummary, CollapsibleSection, GroupEventsTableHeading, InfiniteLoading
+  },
   mixins: [ group ],
   props: {
     idgroups: {
@@ -189,6 +213,17 @@ export default {
     addGroupName: {
       type: Boolean,
       required: false
+    },
+    initialEvents: {
+      type: Array,
+      required: false,
+      default: null
+    }
+  },
+  data () {
+    return {
+      showPast: 0,
+      showUpcoming: 0
     }
   },
   computed: {
@@ -238,12 +273,12 @@ export default {
     },
     past() {
       return this.events.filter(e => {
-          const start = new moment(e.event_date + ' ' + e.start)
-          return start.isBefore()
-      })
+        const start = new moment(e.event_date + ' ' + e.start)
+        return start.isBefore()
+      }).sort((a,b) => new moment(b.event_date).format('YYYYMMDD') - new moment(a.event_date).format('YYYYMMDD'))
     },
     pastToShow() {
-      return this.limit ? this.past.slice(0, this.limit) : this.past
+      return this.limit ? this.past.slice(0, this.limit) : this.past.slice(0, this.showPast)
     },
     upcoming() {
       return this.events.filter(e => {
@@ -252,12 +287,36 @@ export default {
       })
     },
     upcomingToShow() {
-      return this.limit ? this.upcoming.slice(0, this.limit) : this.upcoming
+      return this.limit ? this.upcoming.slice(0, this.limit) : this.upcoming.slice(0, this.showUpcoming)
     }
   },
   methods: {
     showCalendar() {
       this.$refs.calendar.show()
+    },
+    loadMoreUpcoming($state) {
+      if (this.showUpcoming < this.upcoming.length) {
+        this.showUpcoming += 1
+        $state.loaded()
+      } else {
+        $state.complete()
+      }
+    },
+    loadMorePast($state) {
+      if (this.showPast < this.past.length) {
+        this.showPast += 1
+        $state.loaded()
+      } else {
+        $state.complete()
+      }
+    },
+  },
+  mounted () {
+    // Data can be passed from the blade template to us via props.
+    if (this.initialEvents) {
+      this.$store.dispatch('events/setList', {
+        events: this.initialEvents
+      })
     }
   }
 }

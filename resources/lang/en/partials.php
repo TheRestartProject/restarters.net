@@ -114,5 +114,6 @@ return array (
   'are_you_sure' => 'Are you sure?',
   'please_confirm' => 'Please confirm that you wish to proceed.',
   'copied_to_clipboard' => 'Copied to clipboard.',
-  'total' => 'total'
+  'total' => 'total',
+  'remove' => 'remove'
 );
