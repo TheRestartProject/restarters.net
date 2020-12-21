@@ -69,22 +69,25 @@
             $ret = [];
 
             foreach ($volunteers as $volunteer) {
-              $volunteer['volunteer'] = $volunteer->volunteer;
-              $volunteer['userSkills'] = [];
-              $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
+              // We might not be able to fetch a volunteer if they're deleted.
+              if ($volunteer->volunteer) {
+                $volunteer['volunteer'] = $volunteer->volunteer;
+                $volunteer['userSkills'] = [];
+                $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
 
-              if (!empty($volunteer->volunteer)) {
-                  $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-                  $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                if (!empty($volunteer->volunteer)) {
+                    $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+                    $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                }
+
+                foreach ($volunteer['userSkills'] as $skill) {
+                  // Force expansion
+                  $skill->skillName->skill_name;
+                }
+
+                $volunteer['fullName'] = $volunteer->getFullName();
+                $ret[] = $volunteer;
               }
-
-              foreach ($volunteer['userSkills'] as $skill) {
-                // Force expansion
-                $skill->skillName->skill_name;
-              }
-
-              $volunteer['fullName'] = $volunteer->getFullName();
-              $ret[] = $volunteer;
             }
 
             return $ret;
