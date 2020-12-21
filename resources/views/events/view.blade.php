@@ -105,7 +105,9 @@
 
           $collected_images = [];
 
-          $stats = [];
+          $stats = [
+              'force_object' => TRUE
+          ];
 
           if ($event->isInProgress() || $event->hasFinished()) {
             $stats = $event->getEventStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio());
@@ -154,7 +156,6 @@
                   :idevents="{{ $event->idevents }}"
                   :devices="{{ json_encode($expanded_devices) }}"
                   :initial-event="{{ json_encode($event) }}"
-                  :is-attending="{{ $is_attending ? 'true' : 'false' }}"
                   :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
                   :in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}"
                   :hosts="{{ json_encode($expanded_hosts) }}"

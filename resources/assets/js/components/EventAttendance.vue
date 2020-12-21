@@ -103,7 +103,17 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    attendance:  {
+      type: Array,
+      required: false,
+      default: function () { return [] }
+    },
+    invitations:  {
+      type: Array,
+      required: false,
+      default: function () { return [] }
+    },
   },
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],

@@ -183,6 +183,12 @@ export default {
       required: false,
       default: null
     },
+    // Included from group mixin.
+    // canedit: {
+    //   type: Boolean,
+    //   required: false,
+    //   default: false
+    // },
     calendarCopyUrl: {
       type: String,
       required: false,

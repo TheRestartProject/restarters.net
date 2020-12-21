@@ -95,6 +95,10 @@ import event from '../mixins/event'
 export default {
   mixins: [ event ],
   props: {
+    idevents: {
+      type: Number,
+      required: true
+    },
     addGroupName: {
       type: Boolean,
       required: false,

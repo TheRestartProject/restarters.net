@@ -8,7 +8,7 @@
           <EventDescription class="pr-md-3" :idevents="idevents" />
         </div>
         <div>
-          <EventAttendance class="pl-md-3" :idevents="idevents" :canedit="canedit" />
+          <EventAttendance class="pl-md-3" :idevents="idevents" :canedit="canedit" :attendance="attendance" :invitations="invitations" />
         </div>
       </div>
       <EventImages :images="images" v-if="images && images.length" />
@@ -59,11 +59,6 @@ export default {
       default: function () { return [] }
     },
     canedit: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    isAttending: {
       type: Boolean,
       required: false,
       default: false

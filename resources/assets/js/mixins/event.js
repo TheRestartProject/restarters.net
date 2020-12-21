@@ -1,7 +1,4 @@
-// This mixin includes lots of function relating to events.
-// TODO LATER Because we're moving slowly away from blade templates to Vue we define a lot of props in here.
-// Gradually some the props should move out of this mixin into individual component definitions, or
-// into computed props in here.
+// This mixin includes function relating to events.
 import { DATE_FORMAT, GUEST, HOST, RESTARTER } from '../constants'
 import moment from 'moment'
 
