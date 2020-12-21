@@ -15,6 +15,10 @@ export default {
     idevents: {
       type: Number,
       required: true
+    },
+    stats: {
+      type: Object,
+      required: false
     }
   },
   computed: {

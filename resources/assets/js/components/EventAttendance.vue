@@ -94,6 +94,17 @@ import EventAttendee from './EventAttendee'
 import CollapsibleSection from './CollapsibleSection'
 
 export default {
+  props: {
+    idevents: {
+      type: Number,
+      required: true
+    },
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],
   computed: {

@@ -76,6 +76,10 @@ export default {
   components: {CollapsibleSection, ExternalLink},
   mixins: [ map, event ],
   props: {
+    idevents: {
+      type: Number,
+      required: true
+    },
     hosts: {
       type: Array,
       required: true
