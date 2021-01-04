@@ -168,6 +168,9 @@
                             <div class="form-group">
                               <label for="autocomplete">@lang('events.field_event_venue'):</label>
                               <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ old('location') }}">
+                              @if($errors->has('location'))
+                                <p class="text-danger">{{ $errors->first('location') }}</p>
+                              @endif
 
                               <small id="locationHelpBlock" class="form-text text-muted">
                                 @lang('events.field_venue_helper')
