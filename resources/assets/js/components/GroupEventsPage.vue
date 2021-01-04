@@ -62,10 +62,6 @@ export default {
       events: this.events
     })
 
-    // TODO LATER We add some properties to the group before adding it to the store.  These should move into
-    // computed properties once we have good access to the session on the client, and there should be a separate store
-    // for volunteers, shared between groups and events.
-    this.initialGroup.idgroups = this.idgroups
     this.$store.dispatch('groups/set', this.initialGroup)
   }
 }
