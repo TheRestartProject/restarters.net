@@ -1,24 +1,19 @@
 <template>
-  <div>
-    <div v-if="event">
-      <EventHeading :idevents="idevents" :canedit="canedit" :in-group="inGroup" :attending="attending" />
-      <div class="layout">
-        <div>
-          <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" />
-          <EventDescription class="pr-md-3" :idevents="idevents" />
-        </div>
-        <div>
-          <EventAttendance class="pl-md-3" :idevents="idevents" :canedit="canedit" :attendance="attendance" :invitations="invitations" />
-        </div>
+  <div v-if="event">
+    <EventHeading :idevents="idevents" :canedit="canedit" :in-group="inGroup" :attending="attending" />
+    <div class="layout">
+      <div>
+        <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" />
+        <EventDescription class="pr-md-3" :idevents="idevents" />
       </div>
-      <EventImages :images="images" v-if="images && images.length" />
-      <div v-if="inProgress || finished">
-        <EventStats :idevents="idevents" />
-        <EventDevices :idevents="idevents" :canedit="canedit" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
+      <div>
+        <EventAttendance class="pl-md-3" :idevents="idevents" :canedit="canedit" :attendance="attendance" :invitations="invitations" />
       </div>
     </div>
-    <div v-else>
-<!--      TODO LATER Error page for missing event?-->
+    <EventImages :images="images" v-if="images && images.length" />
+    <div v-if="inProgress || finished">
+      <EventStats :idevents="idevents" />
+      <EventDevices :idevents="idevents" :canedit="canedit" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
     </div>
   </div>
 </template>
@@ -119,8 +114,6 @@ export default {
     // and so that as/when it changes then reactivity updates all the views.
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
-    // TODO LATER We add some properties to the group before adding it to the store.  These should move into
-    // computed properties once we have good access to the session on the client.
     this.initialEvent.idevents = this.idevents
     this.$store.dispatch('events/set', this.initialEvent)
 

@@ -36,7 +36,6 @@ export default {
       })
     },
     setStats(state, params) {
-      console.log("Set stats", params)
       Vue.set(state.stats, params.idevents, params.stats)
     },
     remove(state, params) {
