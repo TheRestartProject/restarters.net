@@ -199,6 +199,9 @@ class ApiController extends Controller
         ->where($wheres)
         ->orderBy($sortBy, $sortDesc);
 
+        # Get total info across all pages.
+        $count = $query->count();
+
         $items = $query->skip(($page - 1) * $size)
         ->take($size)
         ->get();
@@ -209,8 +212,6 @@ class ApiController extends Controller
             $item['category'] = $item['deviceCategory'];
         }
 
-        # Get total info across all pages.
-        $count = $query->count();
 
         if ($status && $status !== env('DEVICE_FIXED')) {
             # We only count savings from fixed items.  So if we are filtering on repair status other than fixed, then

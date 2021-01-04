@@ -4,15 +4,16 @@
       <div :class="{
         'title': true,
         'd-flex': true,
+        'clickme': true,
         'justify-content-between': true,
         'expanded' : expandedItems
-      }">
+      }" @click="toggleItems">
         <div class="flex-grow-1">
           <h3 class="text-uppercase header pl-2 mt-3 font-weight-bold text-center">
             {{ translatedItemAndRepairInfo }}
           </h3>
         </div>
-        <b-btn variant="link" class="pr-1 pl-0" @click="toggleItems">
+        <b-btn variant="link" class="pr-1 pl-0">
           <img class="icon" v-if="expandedItems" src="/images/minus-icon-brand.svg" alt="Collapse" />
           <img class="icon" v-else src="/images/add-icon-brand.svg" alt="Expand" />
         </b-btn>
@@ -387,5 +388,9 @@ export default {
     background-color: $brand-orange !important;
     color: $black !important;
   }
+}
+
+.clickme {
+  user-select: none;
 }
 </style>

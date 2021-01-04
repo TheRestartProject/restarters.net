@@ -118,7 +118,7 @@ export default {
   data () {
     return {
       currentPage: 1,
-      perPage: 5,
+      perPage: 20,
       showModal: false,
       device: null,
       total: 0,
