@@ -26,10 +26,11 @@ import EventAttendance from './EventAttendance'
 import EventImages from './EventImages'
 import EventStats from './EventStats'
 import EventDevices from './EventDevices'
+import auth from '../mixins/auth'
 
 export default {
   components: {EventDevices, EventStats, EventImages, EventAttendance, EventDescription, EventDetails, EventHeading},
-  mixins: [ event ],
+  mixins: [ event, auth ],
   props: {
     initialEvent: {
       type: Object,

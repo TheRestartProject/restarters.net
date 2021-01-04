@@ -156,20 +156,21 @@
         ?>
         <div class="vue">
           <EventPage
-                  :idevents="{{ $event->idevents }}"
-                  :devices="{{ json_encode($expanded_devices) }}"
-                  :initial-event="{{ json_encode($event) }}"
-                  :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
-                  :in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}"
-                  :hosts="{{ json_encode($expanded_hosts) }}"
-                  :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null) }}"
-                  :attendance="{{ json_encode($expanded_attended) }}"
-                  :invitations="{{ json_encode($expanded_invited) }}"
-                  :images="{{ json_encode($collected_images)}}"
-                  :stats="{{ json_encode($stats) }}"
-                  :clusters="{{ json_encode($expanded_clusters) }}"
-                  :brands="{{ json_encode($expanded_brands) }}"
-                  :barrier-list="{{ json_encode(FixometerHelper::allBarriers()) }}"
+            csrf="{{ csrf_token() }}"
+            :idevents="{{ $event->idevents }}"
+            :devices="{{ json_encode($expanded_devices) }}"
+            :initial-event="{{ json_encode($event) }}"
+            :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
+            :in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}"
+            :hosts="{{ json_encode($expanded_hosts) }}"
+            :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null) }}"
+            :attendance="{{ json_encode($expanded_attended) }}"
+            :invitations="{{ json_encode($expanded_invited) }}"
+            :images="{{ json_encode($collected_images)}}"
+            :stats="{{ json_encode($stats) }}"
+            :clusters="{{ json_encode($expanded_clusters) }}"
+            :brands="{{ json_encode($expanded_brands) }}"
+            :barrier-list="{{ json_encode(FixometerHelper::allBarriers()) }}"
           />
         </div>
       </div>

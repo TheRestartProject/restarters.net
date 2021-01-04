@@ -12,11 +12,13 @@
 </template>
 <script>
 import GroupEvents from './GroupEvents'
+import auth from '../mixins/auth'
 
 export default {
   components: {
     GroupEvents
   },
+  mixins: [ auth ],
   props: {
     idgroups: {
       type: Number,

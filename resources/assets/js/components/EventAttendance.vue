@@ -182,7 +182,7 @@ export default {
         event_id: this.idevents
       }, {
         headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
+          'X-CSRF-TOKEN': this.$store.getters['auth/CSRF']
         }
       })
     },
@@ -192,7 +192,7 @@ export default {
         event_id: this.idevents
       }, {
         headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
+          'X-CSRF-TOKEN': this.$store.getters['auth/CSRF']
         }
       })
 

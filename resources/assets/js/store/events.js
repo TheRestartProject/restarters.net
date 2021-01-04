@@ -52,11 +52,10 @@ export default {
     setStats({commit}, params) {
       commit('setStats', params);
     },
-    async delete({commit}, params) {
+    async delete({commit, rootGetters}, params) {
       let ret = await axios.post('/party/delete/' + params.idevents, {
         headers: {
-          // TODO LATER We shouldn't be pulling the token using jQuery.
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
+          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
         }
       })
 
