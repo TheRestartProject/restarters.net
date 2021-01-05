@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'title' => 'Workbench',
+    'title' => 'Data Workbench',
 
     'news' => [
         'title' => 'Read about our recent success',
