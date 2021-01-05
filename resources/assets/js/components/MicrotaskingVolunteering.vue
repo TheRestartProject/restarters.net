@@ -45,7 +45,7 @@
                             <b-td class="text-center">{{ translatedMyQuests }}</b-td>
                         </template>
                         <template v-else>
-                            <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/mobifix">{{ translatedJoin }}</a></b-td>
+                            <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/about">{{ translatedJoin }}</a></b-td>
                         </template>
                     </b-tr>
                 </b-tbody>
