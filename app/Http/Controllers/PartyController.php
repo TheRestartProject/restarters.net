@@ -182,11 +182,18 @@ class PartyController extends Controller
                 'event_date' => 'required',
                 'start' => 'required',
                 'end' => 'required',
+                'location' => [
+                    function ($attribute, $value, $fail) use ($request){
+                        if (!$request->filled('online') && !$value) {
+                            $fail(__('events.validate_location'));
+                        }
+                    }
+                ]
             ]);
 
             $error = array();
 
-            if ($request->has('location')) {
+            if ($request->filled('location')) {
                 try {
                     $results = $this->geocoder->geocode($request->get('location'));
 
