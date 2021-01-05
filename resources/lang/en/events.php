@@ -188,5 +188,6 @@ return array (
   'confirm_delete' => 'Are you sure you want to delete this event?',
   'RSVP' => 'RSVP',
   'form_error' => 'Please check the form above for errors.',
-  'your_events' => 'Your events'
+  'your_events' => 'Your events',
+  'validate_location' => 'Location must be present unless the event is online.'
 );
