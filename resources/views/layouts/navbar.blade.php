@@ -68,7 +68,7 @@
 
     <li class="@if(str_contains(url()->current(), route('workbench'))) active @endif" style="flex-basis: 100%;">
         <a href="{{ route('workbench') }}" rel="noopener noreferrer">
-            @include('svgs/navigation/wiki-icon')
+            @include('svgs/navigation/workbench-icon')
             <span>@lang('general.menu_workbench')</span>
         </a>
     </li>
