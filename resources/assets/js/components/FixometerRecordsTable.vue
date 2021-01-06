@@ -30,7 +30,7 @@
           <span v-if="data.item.brand">
             {{ data.item.brand }}
           </span>
-          <em v-else>
+          <em v-else class="text-muted">
             [Missing]
           </em>
         </template>
