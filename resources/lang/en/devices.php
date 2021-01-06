@@ -70,7 +70,7 @@ return array (
   'latest_data' => 'Latest Data',
   'group_prevented' => 'prevented <a href="/party/view/:idevents">:amount kg</a> of waste!',
   'huge_impact' => 'Restarters around the world are having a huge impact!',
-  'impact_read_more' => '<a target="_blank" href="https://therestartproject.org/faq">Read more</a> about how we assess our impact on the environment.',
+  'impact_read_more' => '<a target="_blank" href="https://therestartproject.org/faq">Read more</a> about how we assess our impact on the environment. You can make our impact go even further. Help us understand what else this data tells us and what changes we should campaign for over at our <a href="/workbench">Data Workbench</a>.',
   'participants' => 'participants',
   'hours_volunteered' => 'hours of volunteered time',
   'items_repaired' => 'items repaired',

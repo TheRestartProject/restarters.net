@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between mb-3">
       <div class="d-flex">
         <h1>{{ translatedFixometer }}</h1>
-        <b-img src="/images/fixometer_doodle.svg" class="ml-4" />
+        <b-img src="/images/fixometer_doodle.svg" class="ml-4 d-none d-md-block" />
       </div>
       <div>
         <b-btn variant="primary" data-target="#add-device-modal" data-toggle="modal">
