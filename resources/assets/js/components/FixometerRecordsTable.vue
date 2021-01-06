@@ -13,6 +13,35 @@
           tbody-tr-class="clickme"
           @row-clicked="clicked"
       >
+        <template slot="cell(shortProblem)" slot-scope="data">
+          <div v-line-clamp="3">
+            {{ data.item.shortProblem }}
+          </div>
+        </template>
+        <template slot="cell(model)" slot-scope="data">
+          <span v-if="data.item.model">
+            {{ data.item.model }}
+          </span>
+          <em v-else>
+            [Missing]
+          </em>
+        </template>
+        <template slot="cell(brand)" slot-scope="data">
+          <span v-if="data.item.brand">
+            {{ data.item.brand }}
+          </span>
+          <em v-else>
+            [Missing]
+          </em>
+        </template>
+        <template slot="cell(item_type)" slot-scope="data">
+          <span v-if="data.item.item_type">
+            {{ data.item.item_type }}
+          </span>
+          <em v-else>
+            [Missing]
+          </em>
+        </template>
         <template slot="cell(repair_status)" slot-scope="data">
           <div :class="badgeClass(data)">
             {{ showStatus(data) }}
@@ -39,6 +68,12 @@ import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 import moment from 'moment'
 import DeviceModel from './DeviceModel'
 import DeviceModal from './DeviceModal'
+import Vue       from 'vue'
+import lineClamp from 'vue-line-clamp'
+
+Vue.use(lineClamp, {
+  textOverflow: 'ellipsis'
+})
 
 const bootaxios = require('axios')
 

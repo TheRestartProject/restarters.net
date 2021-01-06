@@ -39,6 +39,9 @@ export default {
     date() {
       return new moment(this.device.device_event.event_date).format('DD/MM/YYYY')
     },
+    translatedClose() {
+      return this.$lang.get('partials.close')
+    },
   },
   methods: {
     show () {

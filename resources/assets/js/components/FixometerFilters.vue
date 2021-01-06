@@ -71,15 +71,16 @@
       <div :class="{
         'title': true,
         'd-flex': true,
+        'clickme': true,
         'justify-content-between': true,
         'expanded' : expandedEvents
-      }">
+      }" @click="toggleEvents">
         <div class="flex-grow-1">
           <h3 class="text-uppercase header pl-2 mt-3 font-weight-bold text-center">
             {{ translatedEventInfo }}
           </h3>
         </div>
-        <b-btn variant="link" class="pr-1 pl-0" @click="toggleEvents">
+        <b-btn variant="link" class="pr-1 pl-0">
           <img class="icon" v-if="expandedEvents" src="/images/minus-icon-brand.svg" alt="Collapse" />
           <img class="icon" v-else src="/images/add-icon-brand.svg" alt="Expand" />
         </b-btn>
