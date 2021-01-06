@@ -1,7 +1,7 @@
 <template>
     <div id="news">
         <div class="d-none d-sm-block text-center">
-            <b-img src="https://placekitten.com/395/435/" />
+            <b-img id="news-image" src="/images/times-chart.jpg" />
         </div>
     <CollapsibleSection class="collapsible px-4 pb-4 pt-0 lineheight" :show-horizontal-rule="false">
 
@@ -50,6 +50,10 @@ export default {
     @include media-breakpoint-up(md) {
         box-shadow: 5px 5px $black;
     }
+}
+
+#news-image {
+    width: 450px;
 }
 
 .collapsible {
