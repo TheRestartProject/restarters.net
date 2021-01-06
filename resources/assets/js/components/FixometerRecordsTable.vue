@@ -22,7 +22,7 @@
           <span v-if="data.item.model">
             {{ data.item.model }}
           </span>
-          <em v-else>
+          <em v-else class="text-muted">
             [Missing]
           </em>
         </template>
@@ -38,7 +38,7 @@
           <span v-if="data.item.item_type">
             {{ data.item.item_type }}
           </span>
-          <em v-else>
+          <em v-else class="text-muted">
             [Missing]
           </em>
         </template>
