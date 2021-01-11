@@ -1,9 +1,12 @@
+.postedit-container {
+  z-index: 10000 !important;
+}
+
 .mw-notification {
   padding: 0.75rem 1.25rem;
   border: 0;
   padding-right: 4rem;
   background-color: #f45b69 !important;
-  z-index: 1000;
 
   .postedit-icon,
   .postedit-icon-checkmark,
