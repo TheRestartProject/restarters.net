@@ -193,10 +193,8 @@ export default {
       expandedEvents: false,
       current_model: null,
       current_brand: null,
-      current_status: null,
       current_item_type: null,
       current_category: null,
-      current_comments: null,
       current_group: null,
       current_from_date: null,
       current_to_date: null,
@@ -204,6 +202,24 @@ export default {
     }
   },
   computed: {
+    // We need two-way binding on some of the props, which may change.  So we need to get the current value from
+    // the prop, and if it changes then emit that.  We can't use the prop directly as a v-model.
+    current_status: {
+      get() {
+        return this.statusOptions.find(v => v.id === this.status)
+      },
+      set(newVal) {
+        this.$emit('update:status', newVal ? newVal.id : null)
+      }
+    },
+    current_comments: {
+      get() {
+        return this.comments
+      },
+      set(newVal) {
+        this.$emit('update:comments', newVal)
+      }
+    },
     translatedRemove() {
       return this.$lang.get('partials.remove')
     },
@@ -265,10 +281,8 @@ export default {
     this.expandedItems = this.startExpandedItems
     this.current_model = this.model
     this.current_brand = this.brand
-    this.current_status = this.status
     this.current_item_type = this.item_type
     this.current_category = this.category
-    this.current_comments = this.comments
     this.current_group = this.group
     this.current_from_date = this.from_date
     this.current_to_date = this.to_date
@@ -286,9 +300,6 @@ export default {
     },
     current_item_type(newVal) {
       this.$emit('update:item_type', newVal)
-    },
-    current_status(newVal) {
-      this.$emit('update:status', newVal ? newVal.id : null)
     },
     current_comments(newVal) {
       this.$emit('update:comments', newVal)
