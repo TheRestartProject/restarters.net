@@ -1,0 +1,385 @@
+<template>
+  <div>
+    <p class="text-brand small pl-3">{{ translatedTableIntro }}</p>
+    <div class="pl-md-3 pr-md-3">
+      <b-table
+          ref="table"
+          :id="'recordstable-' + powered"
+          :fields="fields"
+          :items="items"
+          :per-page="perPage"
+          :current-page="currentPage"
+          sort-null-last
+          tbody-tr-class="clickme"
+          @row-clicked="clicked"
+      >
+        <template slot="cell(shortProblem)" slot-scope="data">
+          <div v-line-clamp="3">
+            {{ data.item.shortProblem }}
+          </div>
+        </template>
+        <template slot="cell(model)" slot-scope="data">
+          <span v-if="data.item.model">
+            {{ data.item.model }}
+          </span>
+          <em v-else class="text-muted">
+            [Missing]
+          </em>
+        </template>
+        <template slot="cell(brand)" slot-scope="data">
+          <span v-if="data.item.brand">
+            {{ data.item.brand }}
+          </span>
+          <em v-else class="text-muted">
+            [Missing]
+          </em>
+        </template>
+        <template slot="cell(item_type)" slot-scope="data">
+          <span v-if="data.item.item_type">
+            {{ data.item.item_type }}
+          </span>
+          <em v-else class="text-muted">
+            [Missing]
+          </em>
+        </template>
+        <template slot="cell(repair_status)" slot-scope="data">
+          <div :class="badgeClass(data)">
+            {{ showStatus(data) }}
+          </div>
+        </template>
+        <template slot="cell(device_event.event_date)" slot-scope="data">
+          {{ formatDate(data) }}
+        </template>
+      </b-table>
+      <div class="d-flex justify-content-end" v-if="total > perPage">
+        <b-pagination
+            v-model="currentPage"
+            :total-rows="total"
+            :per-page="perPage"
+            :aria-controls="'recordstable-' + powered"
+        ></b-pagination>
+      </div>
+    </div>
+    <DeviceModal ref="modal" :device="device" v-if="device" />
+  </div>
+</template>
+<script>
+import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
+import moment from 'moment'
+import DeviceModel from './DeviceModel'
+import DeviceModal from './DeviceModal'
+import Vue       from 'vue'
+import lineClamp from 'vue-line-clamp'
+
+Vue.use(lineClamp, {
+  textOverflow: 'ellipsis'
+})
+
+const bootaxios = require('axios')
+
+export default {
+  components: {DeviceModal, DeviceModel},
+  props: {
+    powered: {
+      type: Boolean,
+      required: true
+    },
+    clusters: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    brands: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    barrierList: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    category: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    brand: {
+      type: String,
+      required: false,
+      default: null
+    },
+    model: {
+      type: String,
+      required: false,
+      default: null
+    },
+    item_type: {
+      type: String,
+      required: false,
+      default: null
+    },
+    status: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    comments: {
+      type: String,
+      required: false,
+      default: null
+    },
+    wiki: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    group: {
+      type: String,
+      required: false,
+      default: null
+    },
+    from_date: {
+      type: String,
+      required: false,
+      default: null
+    },
+    to_date: {
+      type: String,
+      required: false,
+      default: null
+    }
+  },
+  data () {
+    return {
+      currentPage: 1,
+      perPage: 20,
+      showModal: false,
+      device: null,
+      total: 0,
+      co2: 0,
+      weight: 0
+    }
+  },
+  computed: {
+    fields () {
+      let ret = [
+        {
+          key: 'device_category.name',
+          label: this.translatedCategory,
+          thClass: 'width20 pl-0 pl-md-3',
+          tdClass: 'width20 pl-0 pl-md-3',
+          sortable: true
+        }
+      ]
+
+      if (this.powered) {
+        ret.push({key: 'model', label: this.translatedModel, sortable: true})
+        ret.push({key: 'brand', label: this.translatedBrand, sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
+      } else {
+        ret.push({key: 'item_type', label: this.translatedModelOrType, sortable: true, tdClass: 'pl-0 pl-md-3'})
+      }
+
+      ret.push({key: 'shortProblem', label: this.translatedAssessment, thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})
+      ret.push({key: 'device_event.the_group.name', label: this.translatedGroup, sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
+      ret.push({
+        key: 'repair_status',
+        label: this.translatedStatus,
+        thClass: 'width90px',
+        tdClass: 'width90px',
+        sortable: true
+      })
+      ret.push({
+        key: 'device_event.event_date',
+        label: this.translatedDevicesDate,
+        thClass: 'width90px',
+        tdClass: 'width90px',
+        sortable: true
+      })
+
+      return ret
+    },
+    translatedCategory () {
+      return this.$lang.get('devices.category')
+    },
+    translatedBrand () {
+      return this.$lang.get('devices.brand')
+    },
+    translatedModel () {
+      return this.$lang.get('devices.model')
+    },
+    translatedModelOrType () {
+      return this.$lang.get('devices.model_or_type')
+    },
+    translatedAssessment () {
+      return this.$lang.get('devices.assessment')
+    },
+    translatedGroup () {
+      return this.$lang.get('devices.group')
+    },
+    translatedStatus () {
+      return this.$lang.get('devices.status')
+    },
+    translatedDevicesDate () {
+      return this.$lang.get('devices.devices_date')
+    },
+    translatedTableIntro () {
+      return this.$lang.get('devices.table_intro')
+    },
+    translatedClose() {
+      return this.$lang.get('partials.close')
+    },
+  },
+  watch: {
+    powered(newVal) {
+      this.$refs.table.refresh()
+    },
+    category(newVal) {
+      this.$refs.table.refresh()
+    },
+    brand(newVal) {
+      this.$refs.table.refresh()
+    },
+    model(newVal) {
+      this.$refs.table.refresh()
+    },
+    comments(newVal) {
+      this.$refs.table.refresh()
+    },
+    wiki(newVal) {
+      this.$refs.table.refresh()
+    },
+    item_type(newVal) {
+      this.$refs.table.refresh()
+    },
+    status(newVal) {
+      this.$refs.table.refresh()
+    },
+    group(newVal) {
+      this.$refs.table.refresh()
+    },
+    from_date(newVal) {
+      this.$refs.table.refresh()
+    },
+    to_date(newVal) {
+      this.$refs.table.refresh()
+    },
+    total(newVal) {
+      this.$emit('update:total', newVal)
+    },
+    weight(newVal) {
+      this.$emit('update:weight', newVal)
+    },
+    co2(newVal) {
+      this.$emit('update:co2', newVal)
+    }
+  },
+  methods: {
+    items (ctx, callback) {
+      // Don't use store - we don't need this to be reactive.
+      // Default sort is descending date order.
+      // The table will provide a full name in sortBy - we just want the last part.
+      let sortBy = 'event_date'
+      let sortDesc = ctx.sortBy ? (ctx.sortDesc ? 'DESC' : 'ASC') : 'DESC'
+
+      if (ctx.sortBy) {
+        // We have to munge what the table gives us a bit to match what the server can query.
+        sortBy = ctx.sortBy
+            .replace('device_event.the_group.', 'groups.')
+            .replace('device_event.', 'events.')
+            .replace('device_category.', 'categories.')
+      }
+
+      axios.get('/api/devices/' + ctx.currentPage + '/' + ctx.perPage, {
+        params: {
+          sortBy: sortBy,
+          sortDesc: sortDesc,
+          powered: this.powered,
+          category: this.category,
+          brand: this.brand,
+          model: this.model,
+          item_type: this.item_type,
+          status: this.status,
+          comments: this.comments,
+          wiki: this.wiki,
+          group: this.group,
+          from_date: this.from_date,
+          to_date: this.to_date
+        }
+      })
+          .then(ret => {
+            this.total = ret.data.count
+            this.weight = ret.data.weight
+            this.co2 = ret.data.co2
+            callback(ret.data.items)
+          }).catch(() => {
+        callback([])
+      })
+
+      // Indicate that callback is being used.
+      return null
+    },
+    showStatus (data) {
+      switch (data.item.repair_status) {
+        case FIXED:
+          return this.$lang.get('partials.fixed')
+        case REPAIRABLE:
+          return this.$lang.get('partials.repairable')
+        case END_OF_LIFE:
+          return this.$lang.get('partials.end')
+        default:
+          return null
+      }
+    },
+    badgeClass (data) {
+      switch (data.item.repair_status) {
+        case FIXED:
+          return 'badge badge-success'
+        case REPAIRABLE:
+          return 'badge badge-warning'
+        case END_OF_LIFE:
+          return 'badge badge-danger'
+        default:
+          return null
+      }
+    },
+    formatDate (data) {
+      return new moment(data.item.device_event.event_date).format('DD/MM/YYYY')
+    },
+    clicked (device) {
+      this.device = device
+      this.$nextTick(() => {
+        this.$refs.modal.show()
+      })
+    }
+  }
+}
+</script>
+<style scoped lang="scss">
+@import 'resources/global/css/_variables';
+
+.badge {
+  width: 90px;
+  padding: 0;
+  border-radius: 0;
+  font-size: small;
+  line-height: 2;
+  text-transform: uppercase;
+}
+
+/deep/ .width10 {
+  width: 10%;
+}
+
+/deep/ .width20 {
+  width: 20%;
+}
+
+/deep/ .width90px {
+  width: 90px;
+}
+
+/deep/ .table th {
+  padding: 5px;
+}
+</style>

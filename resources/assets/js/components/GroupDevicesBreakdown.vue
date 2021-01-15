@@ -28,7 +28,7 @@
       </b-tab>
     </b-tabs>
     <div class="d-block d-md-none border-top-thick pt-3">
-      <CollapsibleSection header-level="h3">
+      <CollapsibleSection heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
             {{ translatedComputerAndHomeOffice }}
@@ -38,7 +38,7 @@
           <GroupDevicesBreakdownCluster :stats="clusterStats[1]" />
         </template>
       </CollapsibleSection>
-      <CollapsibleSection collapsed header-level="h3">
+      <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
             {{ translatedElectronicGadget }}
@@ -48,7 +48,7 @@
           <GroupDevicesBreakdownCluster :stats="clusterStats[2]" />
         </template>
       </CollapsibleSection>
-      <CollapsibleSection collapsed header-level="h3">
+      <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
             {{ translatedHomeEntertainment }}
@@ -58,7 +58,7 @@
           <GroupDevicesBreakdownCluster :stats="clusterStats[3]" />
         </template>
       </CollapsibleSection>
-      <CollapsibleSection collapsed header-level="h3">
+      <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
             {{ translatedKitchenAndHouseholdItems }}

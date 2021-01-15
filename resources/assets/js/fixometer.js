@@ -13,7 +13,6 @@ function searchEventsByGroup() {
         url: '/api/groups/'+ $group_id + '/events?format=location',
         datatype: 'json',
         success: function(response) {
-            console.log(response)
             $('.change-events option').remove();
             $events = JSON.parse(response.events)
 
