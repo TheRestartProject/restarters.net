@@ -35,6 +35,8 @@ class DeviceController extends Controller
         $Category = new Category;
 
         $categories = $Category->listed();
+        $clusters = Cluster::with(['categories'])->get()->all();
+        $brands = Brands::orderBy('brand_name', 'asc')->get()->all();
 
         $all_groups = Group::all();
 
@@ -69,6 +71,9 @@ class DeviceController extends Controller
         return view('fixometer.index', [
             'title' => Lang::get('devices.fixometer'),
             'categories' => $categories,
+            'clusters' => $clusters,
+            'barriers' => \App\Helpers\FixometerHelper::allBarriers(),
+            'brands' => $brands,
             'groups' => $all_groups,
             'most_recent_finished_event' => $most_recent_finished_event,
             'impact_data' => $global_impact_data,
