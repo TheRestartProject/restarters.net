@@ -188,9 +188,9 @@ export default {
         let match = true
 
         if (this.searchNetwork) {
-          match &= g.networks.find(n => {
-            return parseInt(this.searchNetwork.id) === parseInt(n)
-          })
+          match &= typeof g.networks.find(n => {
+            return parseInt(this.searchNetwork) === parseInt(n)
+          }) !== 'undefined'
         }
 
         if (this.searchName) {
