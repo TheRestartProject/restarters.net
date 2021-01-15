@@ -18,6 +18,12 @@ import ReadMore from './ReadMore'
 export default {
   components: {ReadMore, CollapsibleSection, ExternalLink},
   mixins: [ map, event ],
+  props: {
+    idevents: {
+      type: Number,
+      required: true
+    },
+  },
   computed: {
     translatedDescription() {
       return this.$lang.get('events.event_description')

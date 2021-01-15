@@ -212,9 +212,11 @@ import FixometerGlobalImpact from './FixometerGlobalImpact'
 import FixometerRecordsTable from './FixometerRecordsTable'
 import FixometerFilters from './FixometerFilters'
 import CollapsibleSection from './CollapsibleSection'
+import auth from '../mixins/auth'
 
 export default {
   components: {CollapsibleSection, FixometerFilters, FixometerRecordsTable, FixometerGlobalImpact, FixometerHeading},
+  mixins: [ auth ],
   props: {
     latestData: {
       type: Object,

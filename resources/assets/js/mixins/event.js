@@ -1,87 +1,8 @@
-// This mixin includes lots of function relating to events.
-// TODO LATER Because we're moving slowly away from blade templates to Vue we define a lot of props in here.
-// Gradually some the props should move out of this mixin into individual component definitions, or
-// into computed props in here.
+// This mixin includes function relating to events.
 import { DATE_FORMAT, GUEST, HOST, RESTARTER } from '../constants'
 import moment from 'moment'
 
 export default {
-  props: {
-    idevents: {
-      type: Number,
-      required: true
-    },
-    attendance:  {
-      type: Array,
-      required: false,
-      default: function () { return [] }
-    },
-    invitations:  {
-      type: Array,
-      required: false,
-      default: function () { return [] }
-    },
-    canedit: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    isAttending: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    attending: {
-      type: Object,
-      required: false,
-      default: null
-    },
-    inGroup: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    devices: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    clusters: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    brands: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    barrierList: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    hosts: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    calendarLinks: {
-      type: Object,
-      required: false,
-      default: null
-    },
-    images: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    cluster: {
-      type: Array,
-      required: false,
-      default: null
-    }
-  },
   computed: {
     event() {
       return this.$store.getters['events/get'](this.idevents)

@@ -119,6 +119,21 @@ export default {
       type: [ Boolean, Number ],
       required: false,
       default: false
+    },
+    clusters: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    brands: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    barrierList: {
+      type: Array,
+      required: false,
+      default: null
     }
   },
   data () {

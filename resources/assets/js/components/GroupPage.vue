@@ -148,6 +148,13 @@ export default {
 
     this.$store.dispatch('groups/set', this.initialGroup)
 
+    this.events.forEach(e => {
+      this.$store.dispatch('events/setStats', {
+        idevents: e.idevents,
+        stats: e.stats
+      })
+    })
+
     this.$store.dispatch('events/setList', {
       events: this.events
     })

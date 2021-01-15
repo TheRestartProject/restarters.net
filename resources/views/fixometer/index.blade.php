@@ -15,6 +15,7 @@
 
             <div class="vue">
                 <FixometerPage
+                    csrf="{{ csrf_token() }}"
                     :latest-data="{{ json_encode($most_recent_finished_event) }}"
                     :impact-data="{{ json_encode($impact_data) }}"
                     :clusters="{{ json_encode($clusters) }}"

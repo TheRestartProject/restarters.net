@@ -1,4 +1,4 @@
-@extends('layouts.app', ['show_login_join_to_anons' => true])
+@extends('layouts.app', ['show_login_join_to_anons' => true, 'show_navbar_to_anons' => true])
 
 @section('title')
     @lang('microtasking.title')
@@ -22,6 +22,7 @@
 
         <div class="vue">
             <MicrotaskingPage
+              csrf="{{ csrf_token() }}"
               :total-contributions="{{ $totalContributions }}"
               :current-user-quests="{{ $currentUserQuests }}"
               :current-user-contributions="{{ $currentUserContributions }}"
