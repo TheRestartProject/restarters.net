@@ -32,14 +32,9 @@ class DeviceController extends Controller
 {
     public function index($search = null)
     {
-        $Category = new Category;
-
-        $categories = $Category->listed();
         $clusters = Cluster::with(['categories'])->get()->all();
         $brands = Brands::orderBy('brand_name', 'asc')->get()->all();
 
-        $all_groups = Group::all();
-
         $most_recent_finished_event = Party::with('theGroup')
         ->hasDevicesRepaired(1)
         ->eventHasFinished()
@@ -53,166 +48,12 @@ class DeviceController extends Controller
                             ->homepage_data();
         $global_impact_data = $global_impact_data->getData();
 
-        $user_groups = Group::with('allRestarters', 'parties', 'groupImage.image')
-        ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-        ->join('events', 'events.group', '=', 'groups.idgroups')
-        ->where('users_groups.user', Auth::id())
-        ->orderBy('groups.name', 'ASC')
-        ->groupBy('groups.idgroups')
-        ->select('groups.*')
-        ->get();
-
-        $items = Device::with(['deviceEvent'])
-               ->join('events', 'events.idevents', '=', 'devices.event')
-               ->orderBy('events.event_date', 'desc')
-               ->orderBy('devices.iddevices', 'asc')
-               ->paginate(15);
-
         return view('fixometer.index', [
-            'title' => Lang::get('devices.fixometer'),
-            'categories' => $categories,
-            'clusters' => $clusters,
-            'barriers' => \App\Helpers\FixometerHelper::allBarriers(),
-            'brands' => $brands,
-            'groups' => $all_groups,
             'most_recent_finished_event' => $most_recent_finished_event,
             'impact_data' => $global_impact_data,
-            'selected_groups' => null,
-            'selected_categories' => null,
-            'from_date' => null,
-            'to_date' => null,
-            'device_id' => null,
-            'brand' => null,
-            'model' => null,
-            'problem' => null,
-            'wiki' => null,
-            'status' => null,
-            'sort_direction' => 'DSC',
-            'sort_column' => 'event_date',
-            'user_groups' => $user_groups,
-            'items' => $items,
-        ]);
-    }
-
-    public function search(Request $request, $raw = false)
-    {
-        $Category = new Category;
-        $categories = $Category->listed();
-
-        $sort_direction = $request->input('sort_direction');
-        $sort_column = $request->input('sort_column');
-
-        $all_devices = Device::with([
-          'deviceCategory',
-          'deviceEvent',
-          'barriers'
-        ])
-        ->join('events', 'events.idevents', '=', 'devices.event')
-        ->join('groups', 'groups.idgroups', '=', 'events.group')
-        ->select('devices.*', 'groups.name AS group_name');
-
-        if ($request->input('sort_column') !== null) {
-            $all_devices = $all_devices->orderBy($sort_column, $sort_direction);
-        }
-
-        if ($request->input('categories') !== null) {
-            $all_devices = $all_devices->whereIn('devices.category', $request->input('categories'));
-        }
-
-        if ($request->input('groups') !== null) {
-            $all_devices = $all_devices->whereIn('groups.idgroups', $request->input('groups'));
-        }
-
-        if ($request->input('wiki')) {
-            $all_devices = $all_devices->where('devices.wiki', true);
-        }
-
-        $date_from = $request->get('from-date');
-        $date_to = $request->get('to-date');
-
-        if (! empty($date_from)) {
-            $d_from = \DateTime::createFromFormat('Y-m-d', $date_from);
-            $from = $d_from->format('Y-m-d').' 00:00:00';
-        }
-
-        if (! empty($date_to)) {
-            $d_to = \DateTime::createFromFormat('Y-m-d', $date_to);
-            $to = $d_to->format('Y-m-d').' 23:59:59';
-        }
-
-        if (empty($date_from) && empty($date_to)) {
-          $all_devices->whereHas('deviceEvent', function($query) {
-            return $query->whereDate('event_date', '<', date('Y-m-d'));
-          });
-        } elseif (! empty($date_from) && ! empty($date_to)) {
-            $all_devices = $all_devices->whereBetween('event_date', [$from, $to]);
-        } elseif (! empty($date_from)) {
-            $all_devices = $all_devices->whereDate('event_date', '>=', $from);
-        } elseif (! empty($date_to)) {
-            $to = $d_to->format('Y-m-d').' 23:59:59';
-            $all_devices = $all_devices->whereDate('event_date', '<=', $to);
-        }
-
-        if ($request->input('device_id') !== null) {
-            $all_devices = $all_devices->where('id', 'like', $request->input('device_id').'%');
-        }
-
-        if ($request->input('status') !== null) {
-            $all_devices = $all_devices->whereIn('repair_status', $request->input('status'));
-        }
-
-        if ($request->input('brand') !== null) {
-            $all_devices = $all_devices->where('brand', 'like', '%'.$request->input('brand').'%');
-        }
-
-        if ($request->input('model') !== null) {
-            $all_devices = $all_devices->where('model', 'like', '%'.$request->input('model').'%');
-        }
-
-        if ($request->input('problem') !== null) {
-            $all_devices = $all_devices->where('problem', 'like', '%'.$request->input('problem').'%');
-        }
-
-        if ($raw == true) {
-            return $all_devices->get();
-        }
-
-        $all_deviced_grouped = $all_devices->get()
-        ->groupBy('event');
-
-        $all_devices_paginated = $all_devices->paginate(env('PAGINATE'));
-
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
-
-        $global_impact_data = app('App\Http\Controllers\ApiController')
-                            ->homepage_data();
-        $global_impact_data = $global_impact_data->getData();
-
-        $most_recent_finished_event = Party::with('theGroup')
-        ->hasDevicesRepaired(1)
-        ->eventHasFinished()
-        ->orderBy('event_date', 'DESC')
-        ->first();
-
-        $most_recent_finished_event['id_events'] = $most_recent_finished_event->idevents;
-        $most_recent_finished_event['waste_prevented'] = $most_recent_finished_event->WastePrevented;
-
-        $user_groups = Group::with('allRestarters', 'parties', 'groupImage.image')
-        ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-        ->join('events', 'events.group', '=', 'groups.idgroups')
-        ->where('users_groups.user', Auth::id())
-        ->orderBy('groups.name', 'ASC')
-        ->groupBy('groups.idgroups')
-        ->select('groups.*')
-        ->get();
-
-        return view('fixometer.index', [
             'clusters' => $clusters,
             'barriers' => \App\Helpers\FixometerHelper::allBarriers(),
-            'brands' => $brands,
-            'most_recent_finished_event' => $most_recent_finished_event,
-            'impact_data' => $global_impact_data
+            'brands' => $brands
         ]);
     }
 
