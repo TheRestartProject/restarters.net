@@ -238,7 +238,7 @@ export default {
       type: Array,
       required: false,
       default: null
-    },
+    }
   },
   data () {
     return {
