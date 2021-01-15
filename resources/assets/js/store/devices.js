@@ -111,12 +111,12 @@ export default {
     set ({commit}, params) {
       commit('set', params)
     },
-    async add ({commit, dispatch}, params) {
+    async add ({commit, dispatch, rootGetters}, params) {
       let created = null
 
       let ret = await axios.post('/device/create', params, {
         headers: {
-          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
         }
       })
 
@@ -142,10 +142,10 @@ export default {
 
       return created
     },
-    async edit ({commit, dispatch}, params) {
+    async edit ({commit, dispatch, rootGetters}, params) {
       let ret = await axios.post('/device/edit/' + params.iddevices, params, {
         headers: {
-          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
         }
       })
 
@@ -163,10 +163,10 @@ export default {
         })
       }
     },
-    async delete ({commit, dispatch}, params) {
+    async delete ({commit, dispatch, rootGetters}, params) {
       const ret = await axios.get('/device/delete/' + params.iddevices, {
         headers: {
-          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
         }
       })
 
@@ -184,14 +184,14 @@ export default {
         throw new Exception('Server request failed')
       }
     },
-    async addURL ({commit}, params) {
+    async addURL ({commit, rootGetters}, params) {
       const ret = await axios.post('/device-url/', {
         device_id: params.iddevices,
         url: params.url.url,
         source: params.url.source
       }, {
         headers: {
-          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
         }
       })
 
@@ -209,13 +209,13 @@ export default {
         })
       }
     },
-    async editURL ({commit}, params) {
+    async editURL ({commit, rootGetters}, params) {
       const ret = await axios.put('/device-url/' + params.url.id, {
         url: params.url.url,
         source: params.url.source
       }, {
         headers: {
-          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
         }
       })
 
@@ -230,7 +230,7 @@ export default {
     async deleteURL ({commit}, params) {
       const ret = await axios.delete('/device-url/' + params.url.id, {
         headers: {
-          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
         }
       })
 
@@ -245,16 +245,16 @@ export default {
     setImages({commit}, params) {
       commit('setImages', params)
     },
-    async deleteImage({commit}, params) {
+    async deleteImage({commit, rootGetters}, params) {
       params.idimages = params.idxref
       const url = '/device/image/delete/' + params.iddevices + '/' + params.idimages + '/' + params.path
       const ret = await axios.get(url, {
         headers: {
-          'X-CSRF-TOKEN': $('input[name=\'_token\']').val()
+          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
         }
       })
 
-      // TODO LATER This isn't a proper API call, and returns success/failure via a redirect to another page.  Assume
+      // This isn't a proper API call, and returns success/failure via a redirect to another page.  Assume
       // it works until we have a better API.
       commit('removeImage', params)
     }

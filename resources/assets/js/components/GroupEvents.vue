@@ -183,6 +183,12 @@ export default {
       required: false,
       default: null
     },
+    // Included from group mixin.
+    // canedit: {
+    //   type: Boolean,
+    //   required: false,
+    //   default: false
+    // },
     calendarCopyUrl: {
       type: String,
       required: false,
@@ -314,6 +320,13 @@ export default {
   mounted () {
     // Data can be passed from the blade template to us via props.
     if (this.initialEvents) {
+      this.initialEvents.forEach(e => {
+        this.$store.dispatch('events/setStats', {
+          idevents: e.idevents,
+          stats: e.stats
+        })
+      })
+
       this.$store.dispatch('events/setList', {
         events: this.initialEvents
       })

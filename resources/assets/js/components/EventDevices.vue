@@ -124,6 +124,37 @@ import EventDevice from './EventDevice'
 export default {
   components: {EventDevice, EventDeviceSummary, EventDeviceList, CollapsibleSection, ExternalLink},
   mixins: [ event ],
+  props: {
+    idevents: {
+      type: Number,
+      required: true
+    },
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    devices: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    clusters: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    brands: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    barrierList: {
+      type: Array,
+      required: false,
+      default: null
+    }
+  },
   data () {
     return {
       addingPowered: false,

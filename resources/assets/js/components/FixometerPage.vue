@@ -5,11 +5,13 @@
   </div>
 </template>
 <script>
-
 import FixometerHeading from './FixometerHeading'
 import FixometerGlobalImpact from './FixometerGlobalImpact'
+import auth from '../mixins/auth'
+
 export default {
   components: {FixometerGlobalImpact, FixometerHeading},
+  mixins: [ auth ],
   props: {
     latestData: {
       type: Object,
