@@ -32,8 +32,11 @@ class DeviceController extends Controller
 {
     public function index($search = null)
     {
-        $clusters = Cluster::with(['categories'])->get()->all();
-        $brands = Brands::orderBy('brand_name', 'asc')->get()->all();
+        $Category = new Category;
+
+        $categories = $Category->listed();
+
+        $all_groups = Group::all();
 
         $most_recent_finished_event = Party::with('theGroup')
         ->hasDevicesRepaired(1)
