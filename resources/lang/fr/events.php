@@ -114,4 +114,5 @@ return array (
   'brand' => 'Marque',
   'category' => 'Catégorie',
   'see_all_attended' => 'Voir tous les participants',
+  'add_new_event' => 'Ajouter un nouvel événément',
 );
