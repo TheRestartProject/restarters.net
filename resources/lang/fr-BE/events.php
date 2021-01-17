@@ -186,4 +186,7 @@ return array (
   'RSVP' => 'Participer',
   'see_all' => 'Voir tout',
   'view_map' => 'Voir la carte',
+  'add_new_event_mobile' => 'Ajouter',
+  'form_error' => 'Veuillez vérifier que le formulaire ci-dessus ne contient pas d\'erreurs.',
+  'your_events' => 'Vos événements',
 );

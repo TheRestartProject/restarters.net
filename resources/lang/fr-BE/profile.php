@@ -41,4 +41,10 @@ return array (
   'view_user_profile' => 'Voir profil d\'utilisateur',
   'name' => 'Nom',
   'notifications' => 'Notifications',
+  'repair_directory' => 'Répertoire de la réparation',
+  'repair_dir_editor' => 'Editeur',
+  'repair_dir_none' => 'Pas d\'accès',
+  'repair_dir_regional_admin' => 'Administrateur régional',
+  'repair_dir_role' => 'Rôle du répertoire de réparation',
+  'repair_dir_superadmin' => 'Super admin',
 );

@@ -112,4 +112,8 @@ return array (
   'something_wrong' => 'Quelque chose ne va paas',
   'to_be_recycled' => ':value objet à recycler|:value objets à recycler',
   'to_be_repaired' => ':value objet à réparer|:value objets à réparer',
+  'copied_to_clipboard' => 'Copié dans le presse-papier',
+  'event_requires_moderation' => 'L\'événement nécessite une approbation',
+  'remove' => 'Supprimer',
+  'total' => 'total',
 );
