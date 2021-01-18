@@ -46,9 +46,38 @@ export default {
   components: {EventDeviceSummary},
   mixins: [ event ],
   props: {
+    idevents: {
+      type: Number,
+      required: true
+    },
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     powered: {
       type: Boolean,
       required: true
+    },
+    devices: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    clusters: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    brands: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    barrierList: {
+          type: Array,
+          required: false,
+          default: null
     }
   },
   computed: {

@@ -163,7 +163,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     Route::prefix('fixometer')->group(function () {
         Route::get('/', 'DeviceController@index')->name('devices');
-        Route::get('/search', 'DeviceController@search')->name('fixometer-search');
     });
 
     // TODO: the rest of these to be redirected properly.

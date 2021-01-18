@@ -340,6 +340,10 @@
         border-right: 1px solid $black;
         border-bottom: 1px solid $black;
         text-transform: uppercase;
+
+        &.smallpad {
+            padding-left: calc(5% + 1px) !important;
+        }
     }
 
     .nav-link.active {
@@ -348,6 +352,10 @@
         padding-left: calc(10% + 1px) !important;
         border-left: none;
         border-right: 1px solid $black;
+
+        &.smallpad {
+            padding-left: calc(5% + 1px) !important;
+        }
 
         @include media-breakpoint-up(md) {
             border-bottom: none;
@@ -358,6 +366,10 @@
         .nav-link.active {
             border-left: 0px;
             padding-left: calc(10% + 2px) !important;
+
+            &.smallpad {
+                padding-left: calc(5% + 2px) !important;
+            }
         }
     }
 

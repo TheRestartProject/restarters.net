@@ -21,6 +21,12 @@ import ReadMore from './ReadMore'
 export default {
   components: {ReadMore, CollapsibleSection, ExternalLink},
   mixins: [ map, group ],
+  props: {
+    idgroups: {
+      type: Number,
+      required: true
+    }
+  },
   computed: {
     translatedNoAbout() {
       return this.$lang.get('groups.about_none')

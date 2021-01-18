@@ -9,13 +9,14 @@
       group-label="cluster"
       group-values="categories"
       :multiple="false"
-      :allow-empty="false"
-      deselect-label=""
+      :allow-empty="allowEmpty"
+      :deselect-label="allowEmpty ? translatedRemove : null"
       :group-select="false"
       :taggable="false"
       selectLabel=""
       ref="multiselect"
       @select=""
+      :selectedLabel="allowEmpty ? translatedRemove : null"
     >
     </multiselect>
     <div v-b-popover.html.left="translatedTooltipCategory" class="ml-3 mt-2">
@@ -49,9 +50,17 @@ export default {
       type: String,
       required: false,
       default: 'black'
+    },
+    allowEmpty: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
+    translatedRemove() {
+      return this.$lang.get('partials.remove')
+    },
     categoryValue: {
       get() {
         let ret = null
@@ -67,7 +76,7 @@ export default {
         return ret
       },
       set(newval) {
-        this.$emit('update:category', newval.value)
+        this.$emit('update:category', newval ? newval.value : null)
       }
     },
     categoryOptions() {

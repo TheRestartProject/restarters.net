@@ -168,6 +168,12 @@
     color: $black;
     border-color: $black;
   }
+
+  &:disabled,&.disabled {
+    color: grey !important;
+    box-shadow: 5px 5px 0 0 grey !important;
+    border-color: grey;
+  }
 }
 
 .btn-outline-primary {

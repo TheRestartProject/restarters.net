@@ -69,22 +69,25 @@
             $ret = [];
 
             foreach ($volunteers as $volunteer) {
-              $volunteer['volunteer'] = $volunteer->volunteer;
-              $volunteer['userSkills'] = [];
-              $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
+              // We might not be able to fetch a volunteer if they're deleted.
+              if ($volunteer->volunteer) {
+                $volunteer['volunteer'] = $volunteer->volunteer;
+                $volunteer['userSkills'] = [];
+                $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
 
-              if (!empty($volunteer->volunteer)) {
-                  $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-                  $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                if (!empty($volunteer->volunteer)) {
+                    $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+                    $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                }
+
+                foreach ($volunteer['userSkills'] as $skill) {
+                  // Force expansion
+                  $skill->skillName->skill_name;
+                }
+
+                $volunteer['fullName'] = $volunteer->getFullName();
+                $ret[] = $volunteer;
               }
-
-              foreach ($volunteer['userSkills'] as $skill) {
-                // Force expansion
-                $skill->skillName->skill_name;
-              }
-
-              $volunteer['fullName'] = $volunteer->getFullName();
-              $ret[] = $volunteer;
             }
 
             return $ret;
@@ -105,7 +108,9 @@
 
           $collected_images = [];
 
-          $stats = [];
+          $stats = [
+              'force_object' => TRUE
+          ];
 
           if ($event->isInProgress() || $event->hasFinished()) {
             $stats = $event->getEventStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio());
@@ -151,21 +156,21 @@
         ?>
         <div class="vue">
           <EventPage
-                  :idevents="{{ $event->idevents }}"
-                  :devices="{{ json_encode($expanded_devices) }}"
-                  :initial-event="{{ json_encode($event) }}"
-                  :is-attending="{{ $is_attending ? 'true' : 'false' }}"
-                  :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
-                  :in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}"
-                  :hosts="{{ json_encode($expanded_hosts) }}"
-                  :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null) }}"
-                  :attendance="{{ json_encode($expanded_attended) }}"
-                  :invitations="{{ json_encode($expanded_invited) }}"
-                  :images="{{ json_encode($collected_images)}}"
-                  :stats="{{ json_encode($stats) }}"
-                  :clusters="{{ json_encode($expanded_clusters) }}"
-                  :brands="{{ json_encode($expanded_brands) }}"
-                  :barrier-list="{{ json_encode(FixometerHelper::allBarriers()) }}"
+            csrf="{{ csrf_token() }}"
+            :idevents="{{ $event->idevents }}"
+            :devices="{{ json_encode($expanded_devices) }}"
+            :initial-event="{{ json_encode($event) }}"
+            :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
+            :in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}"
+            :hosts="{{ json_encode($expanded_hosts) }}"
+            :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null) }}"
+            :attendance="{{ json_encode($expanded_attended) }}"
+            :invitations="{{ json_encode($expanded_invited) }}"
+            :images="{{ json_encode($collected_images)}}"
+            :stats="{{ json_encode($stats) }}"
+            :clusters="{{ json_encode($expanded_clusters) }}"
+            :brands="{{ json_encode($expanded_brands) }}"
+            :barrier-list="{{ json_encode(FixometerHelper::allBarriers()) }}"
           />
         </div>
       </div>

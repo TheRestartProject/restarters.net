@@ -119,6 +119,21 @@ export default {
       type: [ Boolean, Number ],
       required: false,
       default: false
+    },
+    clusters: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    brands: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    barrierList: {
+      type: Array,
+      required: false,
+      default: null
     }
   },
   data () {
@@ -230,7 +245,6 @@ export default {
       } else {
         this.currentDevice.repair_details = null
       }
-      console.log("Calc next steps", this.currentDevice.repair_details)
     },
     async addDevice() {
       if (!this.currentDevice.category) {

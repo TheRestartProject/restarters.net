@@ -160,6 +160,7 @@
       @else
       <div class="vue">
         <GroupEventsPage
+          csrf="{{ csrf_token() }}"
           :idgroups="{{ $group ? $group->idgroups : 'null' }}"
           :events="{{ json_encode($expanded_events) }}"
           calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"

@@ -1,6 +1,6 @@
 <template>
   <div class="pl-4 pr-4">
-    <div class="pt-2 pb-2 blackbord d-flex justify-content-between">
+    <div class="pt-2 pb-2 blackbord d-flex justify-content-between" v-if="attendee.volunteer">
       <div class="d-flex w-100">
         <b-img-lazy :src="profile" class="profile mr-2" rounded="circle" @error.native="brokenProfileImage" />
         <div class="namewidth flex-grow-1">

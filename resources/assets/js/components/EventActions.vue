@@ -55,6 +55,27 @@ import ConfirmModal from './ConfirmModal'
 export default {
   components: {ConfirmModal},
   mixins: [ event ],
+  props: {
+    idevents: {
+      type: Number,
+      required: true
+    },
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    attending: {
+      type: Object,
+      required: false,
+      default: null
+    },
+    inGroup: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+  },
   computed: {
     translatedEventActions() {
       return this.$lang.get('events.event_actions').toUpperCase()

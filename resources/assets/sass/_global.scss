@@ -516,11 +516,15 @@ h2 {
 .multiselect__option {
   padding-left: 10px !important;
 
+  a {
+    color: white;
+  }
+
   &.multiselect__option--highlight {
     background-color: $brand-muted;
 
-    &.multiselect__option--selected {
-      background-color: $brand-muted;
+    &.multiselect__option--selected, &::after {
+      background-color: $brand-muted !important;
     }
   }
 

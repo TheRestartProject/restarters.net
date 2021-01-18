@@ -22,6 +22,7 @@
 
         <div class="vue">
             <MicrotaskingPage
+              csrf="{{ csrf_token() }}"
               :total-contributions="{{ $totalContributions }}"
               :current-user-quests="{{ $currentUserQuests }}"
               :current-user-contributions="{{ $currentUserContributions }}"

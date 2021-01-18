@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 device-select-row">
-    <b-input @change="$emit('update:model', $event)" :placeholder="translatedModel" size="lg" class="marg" :value="model" />
+    <b-input v-model="value" :placeholder="translatedModel" size="lg" class="marg" />
     <div v-b-popover.html.left="translatedTooltipModel" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
@@ -23,6 +23,14 @@ export default {
     }
   },
   computed: {
+    value: {
+      get() {
+        return this.model
+      },
+      set(newVal) {
+        this.$emit('update:model', newVal)
+      }
+    },
     translatedModel() {
       return this.$lang.get('devices.model_or_type')
     },
