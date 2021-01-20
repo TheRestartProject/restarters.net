@@ -148,7 +148,7 @@
         <GroupEvents
             heading-level="h2"
             heading-sub-level="h3"
-            :initial-events="{{ json_encode($expanded_events) }}"
+            :initial-events="{{ json_encode($expanded_events, JSON_INVALID_UTF8_IGNORE) }}"
             :add-group-name="true"
             calendar-copy-url="{{ $calendar_copy_url }}"
             calendar-edit-url="{{ $calendar_edit_url }}"
@@ -161,10 +161,10 @@
       <div class="vue">
         <GroupEventsPage
           :idgroups="{{ $group ? $group->idgroups : 'null' }}"
-          :events="{{ json_encode($expanded_events) }}"
+          :events="{{ json_encode($expanded_events, JSON_INVALID_UTF8_IGNORE) }}"
           calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
           calendar-edit-url="{{ $calendar_edit_url }}"
-          :initial-group="{{ json_encode($group) }}"
+          :initial-group="{{ json_encode($group, JSON_INVALID_UTF8_IGNORE) }}"
           :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
         />
       </div>

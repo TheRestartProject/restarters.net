@@ -152,20 +152,20 @@
         <div class="vue">
           <EventPage
                   :idevents="{{ $event->idevents }}"
-                  :devices="{{ json_encode($expanded_devices) }}"
-                  :initial-event="{{ json_encode($event) }}"
+                  :devices="{{ json_encode($expanded_devices, JSON_INVALID_UTF8_IGNORE) }}"
+                  :initial-event="{{ json_encode($event, JSON_INVALID_UTF8_IGNORE) }}"
                   :is-attending="{{ $is_attending ? 'true' : 'false' }}"
                   :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
                   :in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}"
-                  :hosts="{{ json_encode($expanded_hosts) }}"
-                  :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null) }}"
-                  :attendance="{{ json_encode($expanded_attended) }}"
-                  :invitations="{{ json_encode($expanded_invited) }}"
-                  :images="{{ json_encode($collected_images)}}"
-                  :stats="{{ json_encode($stats) }}"
-                  :clusters="{{ json_encode($expanded_clusters) }}"
-                  :brands="{{ json_encode($expanded_brands) }}"
-                  :barrier-list="{{ json_encode(FixometerHelper::allBarriers()) }}"
+                  :hosts="{{ json_encode($expanded_hosts, JSON_INVALID_UTF8_IGNORE) }}"
+                  :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null, JSON_INVALID_UTF8_IGNORE) }}"
+                  :attendance="{{ json_encode($expanded_attended, JSON_INVALID_UTF8_IGNORE) }}"
+                  :invitations="{{ json_encode($expanded_invited, JSON_INVALID_UTF8_IGNORE) }}"
+                  :images="{{ json_encode($collected_images, JSON_INVALID_UTF8_IGNORE)}}"
+                  :stats="{{ json_encode($stats, JSON_INVALID_UTF8_IGNORE) }}"
+                  :clusters="{{ json_encode($expanded_clusters, JSON_INVALID_UTF8_IGNORE) }}"
+                  :brands="{{ json_encode($expanded_brands, JSON_INVALID_UTF8_IGNORE) }}"
+                  :barrier-list="{{ json_encode(FixometerHelper::allBarriers(), JSON_INVALID_UTF8_IGNORE) }}"
           />
         </div>
       </div>

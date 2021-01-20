@@ -77,16 +77,16 @@
 
       <div class="vue">
         <GroupsPage
-          :all-groups="{{ json_encode($all_groups) }}"
-          :your-groups="{{ json_encode($your_groups) }}"
-          :nearby-groups="{{ json_encode($groups_near_you) }}"
+          :all-groups="{{ json_encode($all_groups, JSON_INVALID_UTF8_IGNORE) }}"
+          :your-groups="{{ json_encode($your_groups, JSON_INVALID_UTF8_IGNORE) }}"
+          :nearby-groups="{{ json_encode($groups_near_you, JSON_INVALID_UTF8_IGNORE) }}"
           your-area="{{ $your_area }}"
           :can-create="{{ $can_create ? 'true' : 'false' }}"
           :user-id="{{ $myid }}"
           tab="{{ $tab }}"
           :network="{{ $network ? $network : 'null' }}"
-          :networks="{{ json_encode($networks) }}"
-          :all-group-tags="{{ json_encode($all_group_tags) }}"
+          :networks="{{ json_encode($networks, JSON_INVALID_UTF8_IGNORE) }}"
+          :all-group-tags="{{ json_encode($all_group_tags, JSON_INVALID_UTF8_IGNORE) }}"
           :show-tags="{{ $show_tags ? 'true' : 'false' }}"
           api-token="{{ $api_token }}"
         />

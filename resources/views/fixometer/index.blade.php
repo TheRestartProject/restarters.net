@@ -15,8 +15,8 @@
 
             <div class="vue">
                 <FixometerPage
-                    :latest-data="{{ json_encode($most_recent_finished_event) }}"
-                    :impact-data="{{ json_encode($impact_data) }}"
+                    :latest-data="{{ json_encode($most_recent_finished_event, JSON_INVALID_UTF8_IGNORE) }}"
+                    :impact-data="{{ json_encode($impact_data, JSON_INVALID_UTF8_IGNORE) }}"
                 />
             </div>
 
