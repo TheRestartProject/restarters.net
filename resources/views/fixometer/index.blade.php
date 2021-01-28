@@ -16,11 +16,11 @@
             <div class="vue">
                 <FixometerPage
                     csrf="{{ csrf_token() }}"
-                    :latest-data="{{ json_encode($most_recent_finished_event) }}"
-                    :impact-data="{{ json_encode($impact_data) }}"
-                    :clusters="{{ json_encode($clusters) }}"
-                    :brands="{{ json_encode($brands) }}"
-                    :barrier-list="{{ json_encode($barriers) }}"
+                    :latest-data="{{ json_encode($most_recent_finished_event, JSON_INVALID_UTF8_IGNORE) }}"
+                    :impact-data="{{ json_encode($impact_data, JSON_INVALID_UTF8_IGNORE) }}"
+                    :clusters="{{ json_encode($clusters, JSON_INVALID_UTF8_IGNORE) }}"
+                    :brands="{{ json_encode($brands, JSON_INVALID_UTF8_IGNORE) }}"
+                    :barrier-list="{{ json_encode($barriers, JSON_INVALID_UTF8_IGNORE) }}"
                 />
             </div>
         </div>
