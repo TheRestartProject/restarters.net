@@ -1,10 +1,12 @@
 <template>
-  <div>
+  <div :class="{
+      'border-shadow': borderShadow
+  }">
     <component :is="headingLevel" :class="{
       'd-flex': true,
       'd-md-none': hideTitle,
-      'mb-3': true,
-      'justify-content-between': true
+      headingClass : true,
+      'justify-content-between': true,
       }" @click="toggle">
       <div class="d-flex w-100 justify-content-between align-items-center">
         <div class="d-flex flex-row">
@@ -88,11 +90,21 @@ export default {
       required: false,
       default: 'h2'
     },
+    headingClass: {
+      type: String,
+      required: false,
+      default: 'mb-3'
+    },
     showHorizontalRule: {
       type: Boolean,
       required: false,
       default: true
-    }
+    },
+    borderShadow: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   data () {
     return {
@@ -111,6 +123,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 .icon {
   width: 30px;
@@ -118,5 +133,14 @@ export default {
 
 .count {
   color: $brand-light;
+}
+
+.border-shadow {
+  background-color: $white;
+  border: 1px solid $black;
+
+  @include media-breakpoint-up(md) {
+    box-shadow: 5px 5px $black;
+  }
 }
 </style>

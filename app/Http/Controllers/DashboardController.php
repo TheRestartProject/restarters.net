@@ -151,6 +151,18 @@ class DashboardController extends Controller
             $network = $user->networks;
         }
 
+        // Look for groups where user ID exists in pivot table.  We have to explicitly test on deleted_at because
+        // the normal filtering out of soft deletes won't happen for joins.
+        $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
+            ->where('users_groups.user', $user->id)
+            ->whereNull('users_groups.deleted_at')
+            ->orderBy('groups.name', 'ASC')
+            ->groupBy('groups.idgroups')
+            ->select([ 'groups.idgroups' , 'groups.name' ])
+            ->take(3)
+            ->get();
+
         return view('dashboard.index', [
             'show_getting_started' => ! $userExistsInDiscourse || ! $has_profile_pic || ! $has_skills || ! $in_group || ! $in_event,
             'gmaps' => true,
@@ -172,6 +184,7 @@ class DashboardController extends Controller
             'impact_stats' => $impact_stats,
             'wiki_pages' => $wiki_pages,
             'hot_topics' => $this->getDiscourseHotTopics(),
+            'your_groups' => $your_groups
         ]);
 
         /*

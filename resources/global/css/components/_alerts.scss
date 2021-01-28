@@ -54,10 +54,14 @@
   }
 
   &-danger {
-    background-color: #f45b69 !important;
+    background-color: #F49292 !important;
 
     p {
       @extend .text-white;
+    }
+
+    .btn-primary {
+      color: black;
     }
   }
 }
