@@ -16,4 +16,7 @@ return array (
   'stat_4' => 'Events held',
   'lead' => 'Welcome to our Restarter community',
   'login_title' => 'Sign in',
+  'join_title' => 'Join Restarters',
+  'join_title_short' => 'Join'
+
 );

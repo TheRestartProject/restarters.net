@@ -1,20 +1,21 @@
 <template>
   <div class="w-100 device-select-row">
     <multiselect
-        :value="brandValue"
+        v-model="brandValue"
         :placeholder="translatedBrand"
         :options="brandsPlusCustom"
         track-by="id"
         label="brand_name"
         :multiple="false"
-        :allow-empty="false"
-        deselect-label=""
+        :allow-empty="allowEmpty"
         :taggable="false"
         selectLabel=""
         ref="multiselect"
         @select="selected"
         @search-change="input"
         :showNoResults="false"
+        :deselect-label="allowEmpty ? translatedRemove : null"
+        :selectedLabel="allowEmpty ? translatedRemove : null"
     />
     <div />
   </div>
@@ -31,9 +32,17 @@ export default {
     brands: {
       type: Array,
       required: true
+    },
+    allowEmpty: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
+    translatedRemove() {
+      return this.$lang.get('partials.remove')
+    },
     brandValue: {
       get() {
         let ret = null
@@ -46,7 +55,8 @@ export default {
         return ret
       },
       set(newval) {
-        this.$emit('update:category', newval.brand_name)
+        console.log("Emit brand", newval)
+        this.$emit('update:brand', newval ? newval.brand_name : null)
       }
     },
     brandsPlusCustom() {

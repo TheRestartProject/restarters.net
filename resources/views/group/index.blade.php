@@ -77,6 +77,7 @@
 
       <div class="vue">
         <GroupsPage
+          csrf="{{ csrf_token() }}"
           :all-groups="{{ json_encode($all_groups, JSON_INVALID_UTF8_IGNORE) }}"
           :your-groups="{{ json_encode($your_groups, JSON_INVALID_UTF8_IGNORE) }}"
           :nearby-groups="{{ json_encode($groups_near_you, JSON_INVALID_UTF8_IGNORE) }}"

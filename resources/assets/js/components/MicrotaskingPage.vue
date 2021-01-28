@@ -5,7 +5,7 @@
             <div class="mt-2">
                 {{ translatedTitle }}
             </div>
-            <b-img class="height ml-4" src="/images/loudspeaker.svg" />
+            <b-img id="doodle" class="height ml-4" src="/images/workbench_doodle.svg" />
         </div>
     </h1>
 
@@ -34,9 +34,11 @@ import MicrotaskingCallToAction from './MicrotaskingCallToAction'
 import MicrotaskingVolunteering from './MicrotaskingVolunteering'
 import MicrotaskingDiscussion from './MicrotaskingDiscussion'
 import MicrotaskingNews from './MicrotaskingNews'
+import auth from '../mixins/auth'
 
 export default {
   components: {MicrotaskingCallToAction, MicrotaskingVolunteering, MicrotaskingDiscussion, MicrotaskingNews},
+  mixins: [ auth ],
   props: {
     totalContributions: {
       type: Number,
@@ -108,5 +110,9 @@ export default {
             grid-area: 3 / 1 / 4 / 3;
         }
     }
+}
+
+#doodle {
+    height: 75px;
 }
 </style>

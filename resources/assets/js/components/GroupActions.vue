@@ -51,6 +51,12 @@ import ConfirmModal from './ConfirmModal'
 export default {
   components: {ConfirmModal},
   mixins: [ group ],
+  props: {
+    idgroups: {
+      type: Number,
+      required: true
+    }
+  },
   computed: {
     translatedGroupActions() {
       return this.$lang.get('groups.group_actions')

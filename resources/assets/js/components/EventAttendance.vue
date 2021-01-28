@@ -94,6 +94,27 @@ import EventAttendee from './EventAttendee'
 import CollapsibleSection from './CollapsibleSection'
 
 export default {
+  props: {
+    idevents: {
+      type: Number,
+      required: true
+    },
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    attendance:  {
+      type: Array,
+      required: false,
+      default: function () { return [] }
+    },
+    invitations:  {
+      type: Array,
+      required: false,
+      default: function () { return [] }
+    },
+  },
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],
   computed: {
@@ -161,7 +182,7 @@ export default {
         event_id: this.idevents
       }, {
         headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
+          'X-CSRF-TOKEN': this.$store.getters['auth/CSRF']
         }
       })
     },
@@ -171,7 +192,7 @@ export default {
         event_id: this.idevents
       }, {
         headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
+          'X-CSRF-TOKEN': this.$store.getters['auth/CSRF']
         }
       })
 

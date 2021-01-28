@@ -177,20 +177,21 @@
 
       <div class="vue">
           <GroupPage
-                  :idgroups="{{ $group->idgroups }}"
-                  :initial-group="{{ $group }}"
-                  :group-stats="{{ json_encode($group->getGroupStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio()), JSON_INVALID_UTF8_IGNORE) }}"
-                  :device-stats="{{ json_encode($device_stats, JSON_INVALID_UTF8_IGNORE) }}"
-                  :cluster-stats="{{ json_encode($cluster_stats, JSON_INVALID_UTF8_IGNORE) }}"
-                  :top-devices="{{ json_encode($top, JSON_INVALID_UTF8_IGNORE) }}"
-                  :events="{{ json_encode($expanded_events, JSON_INVALID_UTF8_IGNORE) }}"
-                  :volunteers="{{ json_encode($expanded_volunteers, JSON_INVALID_UTF8_IGNORE) }}"
-                  :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
-                  calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
-                  calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
-                  :ingroup="{{ $in_group ? 'true' : 'false' }}"
-                  api-token="{{ $api_token }}"
-                  :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+              csrf="{{ csrf_token() }}"
+              :idgroups="{{ $group->idgroups }}"
+              :initial-group="{{ $group }}"
+              :group-stats="{{ json_encode($group->getGroupStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio()), JSON_INVALID_UTF8_IGNORE) }}"
+              :device-stats="{{ json_encode($device_stats, JSON_INVALID_UTF8_IGNORE) }}"
+              :cluster-stats="{{ json_encode($cluster_stats, JSON_INVALID_UTF8_IGNORE) }}"
+              :top-devices="{{ json_encode($top, JSON_INVALID_UTF8_IGNORE) }}"
+              :events="{{ json_encode($expanded_events, JSON_INVALID_UTF8_IGNORE) }}"
+              :volunteers="{{ json_encode($expanded_volunteers, JSON_INVALID_UTF8_IGNORE) }}"
+              :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+              calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
+              calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
+              :ingroup="{{ $in_group ? 'true' : 'false' }}"
+              api-token="{{ $api_token }}"
+              :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
           />
       </div>
   </div>

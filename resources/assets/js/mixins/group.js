@@ -1,14 +1,6 @@
-// This mixin includes lots of function relating to groups.
-// TODO In due course the group will move into the store and we'll just pass the id.  All the other props will then
-// become computed data in here.
+// This mixin includes unction relating to groups.
 
 export default {
-  props: {
-    idgroups: {
-      type: Number,
-      required: true
-    }
-  },
   computed: {
     group() {
       return this.$store.getters['groups/get'](this.idgroups)

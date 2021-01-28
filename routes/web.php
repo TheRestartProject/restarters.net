@@ -64,7 +64,7 @@ Route::prefix('calendar')->group(function () {
     Route::get('/all-events/{hash_env}', 'CalendarEventsController@allEvents')->name('calendar-events-all');
 });
 
-Route::get('microtasking', 'MicrotaskingController@index');
+Route::get('workbench', 'MicrotaskingController@index')->name('workbench');
 
 Route::prefix('faultcat')->group(function () {
     Route::get('/', 'FaultcatController@index');
@@ -163,7 +163,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     Route::prefix('fixometer')->group(function () {
         Route::get('/', 'DeviceController@index')->name('devices');
-        Route::get('/search', 'DeviceController@search')->name('fixometer-search');
     });
 
     // TODO: the rest of these to be redirected properly.
