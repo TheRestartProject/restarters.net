@@ -166,27 +166,11 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard.index', [
-            'show_getting_started' => ! $userExistsInDiscourse || ! $has_profile_pic || ! $has_skills || ! $in_group || ! $in_event,
-            'gmaps' => true,
-            'user' => $user,
-            'header' => true,
-            'user_exists_in_discourse' => $userExistsInDiscourse,
-            'in_group' => $in_group,
             'groupsNearYou' => $groupsNearYou,
-            'has_skills' => $has_skills,
-            'in_event' => $in_event,
-            'has_profile_pic' => $has_profile_pic,
-            'past_events' => $past_events,
             'upcoming_events' => $upcoming_events,
-            'outdated_groups' => $outdated_groups,
-            'inactive_groups' => $inactive_groups,
-            'news_feed' => $news_feed,
-            'all_groups' => $all_groups,
-            'onboarding' => $onboarding,
-            'impact_stats' => $impact_stats,
-            'wiki_pages' => $wiki_pages,
-            'hot_topics' => $this->getDiscourseHotTopics(),
-            'your_groups' => $your_groups
+            'topics' => $this->getDiscourseHotTopics()['talk_hot_topics'],
+            'your_groups' => $your_groups,
+            'seeAllTopicsLink' => env('DISCOURSE_URL') . "/latest"
         ]);
 
         /*

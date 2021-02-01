@@ -1,16 +1,23 @@
 <template>
   <div>
-    <div class="d-flex justify-content-center align-content-center mb-4">
-      <b-img-lazy fluid src="/images/arrows_doodle.svg" />
+    <div class="d-flex justify-content-center align-content-center">
+      <b-img-lazy fluid src="/images/arrows_doodle.svg" class="d-none d-md-block" />
       <h1 class="ml-2 mr-2 align-self-center">{{ translatedTitle }}</h1>
-      <b-img-lazy fluid src="/images/confetti_doodle.svg" />
+      <b-img-lazy fluid src="/images/confetti_doodle.svg" class="d-none d-md-block" />
     </div>
     <div class="layout">
-      <div class="banner">
-        <DashboardBanner />
+      <DashboardBanner class="banner" />
+      <div class="yourgroups">
+        <DashboardYourGroups />
       </div>
-      <DashboardYourGroups class="yourgroups mb-2" />
       <DashboardRightSidebar class="sidebar" />
+      <DiscourseDiscussion
+          class="discourse"
+          :topics="topics"
+          :see-all-topics-link="seeAllTopicsLink"
+          :discourse-base-url="discourseBaseUrl"
+          :is-logged-in="isLoggedIn"
+      />
     </div>
   </div>
 </template>
@@ -19,9 +26,10 @@ import auth from '../mixins/auth'
 import DashboardBanner from './DashboardBanner'
 import DashboardYourGroups from './DashboardYourGroups'
 import DashboardRightSidebar from './DashboardRightSidebar'
+import DiscourseDiscussion from './DiscourseDiscussion'
 
 export default {
-  components: {DashboardYourGroups,DashboardRightSidebar,DashboardBanner},
+  components: {DashboardYourGroups,DashboardRightSidebar,DashboardBanner,DiscourseDiscussion},
   mixins: [ auth ],
   props: {
     yourGroups: {
@@ -34,6 +42,22 @@ export default {
       required: false,
       default: null
     },
+    topics: {
+      type: Array,
+      required: true
+    },
+    seeAllTopicsLink: {
+      type: String,
+      required: true
+    },
+    isLoggedIn: {
+      type: Boolean,
+      required: true
+    },
+    discourseBaseUrl: {
+      type: String,
+      required: true
+    }
   },
   data () {
     return {
@@ -82,23 +106,53 @@ export default {
 
 .layout {
   display: grid;
-  grid-template-rows: auto auto auto;
-  grid-column-gap: 20px;
-  grid-template-columns: 2fr 1fr;
+  grid-template-rows: auto auto auto auto;
+  grid-template-columns: 1fr;
+
+  @include media-breakpoint-up(md) {
+    grid-template-rows: auto auto 40px auto;
+    grid-column-gap: 20px;
+    grid-template-columns: 2fr 1fr;
+  }
 
   .banner {
     grid-row: 1 / 2;
     grid-column: 1 / 2;
+
+    @include media-breakpoint-up(md) {
+      grid-row: 1 / 2;
+      grid-column: 1 / 3;
+    }
   }
 
   .yourgroups {
     grid-row: 2 / 3;
     grid-column: 1 / 2;
+
+    @include media-breakpoint-up(md) {
+      grid-row: 2 / 3;
+      grid-column: 1 / 2;
+    }
+  }
+
+  .discourse {
+    grid-row: 3 / 4;
+    grid-column: 1 / 2;
+
+    @include media-breakpoint-up(md) {
+      grid-row: 4 / 5;
+      grid-column: 1 / 3;
+    }
   }
 
   .sidebar {
-    grid-row: 1 / 4;
-    grid-column: 2 / 3;
+    grid-row: 4 / 5;
+    grid-column: 1 / 2;
+
+    @include media-breakpoint-up(md) {
+      grid-row: 2 / 3;
+      grid-column: 2 / 3;
+    }
   }
 }
 </style>

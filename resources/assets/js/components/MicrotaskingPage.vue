@@ -17,7 +17,7 @@
           :current-user-contributions="currentUserContributions"
           :is-logged-in="isLoggedIn"
         />
-        <MicrotaskingDiscussion
+        <DiscourseDiscussion
           id="discussion"
           :topics="topics"
           :see-all-topics-link="seeAllTopicsLink"

@@ -2,8 +2,8 @@
   <div>
     <b-img-lazy fluid src="/images/dashboard_3.jpg" class="border border-dark border-bottom-0" />
     <div class="p-4 greyish border border-dark border-bottom-0">
+      <p>TODO Where do the links go?</p>
       <p class="font-weight-bold">
-<!--        TODO links-->
 <!--        eslint-disable-next-line-->
         {{ translatedSidebarIntro1 }} <a href="#">{{ translatedSidebarKit }}</a>
       </p>
@@ -20,6 +20,7 @@
         </div>
       </template>
       <template slot="content">
+        <p>TODO Where do the links go?</p>
         <div class="pl-2 pr-2">
           <div class="pl-3 pr-3">
             <ul class="list-unstyled pt-3 pb-0 mt-0 content">
