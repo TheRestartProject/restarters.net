@@ -10,45 +10,67 @@
     </template>
 
     <template slot="content">
-      <div class="content d-flex">
-        <div class="w-50 pr-2 mt-3">
-          <h3>
-            {{ translatedGroupsHeading }}
-          </h3>
-          <p>
-            {{ translatedCatchUp }}.  TODO Send urgent message?
-          </p>
-          <p class="border border-dark border-top-0 border-left-0 border-right-0" />
-          <DashboardGroup
-              v-for="g in myGroups"
-              :group="g"
-              :key="g.idgroups"
-          />
-          <div class="d-flex justify-content-end">
-            <a href="/groups" class="mr-2">
-              {{ translatedSeeAll }}
-            </a>
-          </div>
-        </div>
-        <div class="w-50 pl-2 mt-3 d-flex justify-content-between">
-          <div>
+      <div class="content">
+        <div class="d-flex">
+          <div class="w-50 pr-2 mt-3">
             <h3>
-              {{ translatedUpcomingEventsTitle }}
+              {{ translatedGroupsHeading }}
             </h3>
-            <p v-if="events.length">
-              {{ translatedUpcomingEventsSubTitle }}
-            </p>
-            <p v-else>
-              {{ translatedNoUpcomingEvents }}.
+            <p>
+              {{ translatedCatchUp }}
             </p>
           </div>
-          <div>
-            <b-btn variant="primary" href="/party/create" class="text-nowrap">
-              {{ translatedAddEvent }}
-            </b-btn>
+          <div class="w-50 pl-2 mt-3">
+            <div class=" d-flex justify-content-between">
+              <div>
+                <h3>
+                  {{ translatedUpcomingEventsTitle }}
+                </h3>
+                <p v-if="events.length">
+                  {{ translatedUpcomingEventsSubTitle }}
+                </p>
+                <p v-else>
+                  {{ translatedNoUpcomingEvents }}.
+                </p>
+              </div>
+              <div>
+                <b-btn variant="primary" href="/party/create" class="text-nowrap">
+                  {{ translatedAddEvent }}
+                </b-btn>
+              </div>
+            </div>
           </div>
         </div>
-        <GroupEventSummary v-for="e in events" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="false" add-group-name="" />
+        <div class="d-flex">
+          <div class="w-50 pr-2 mt-3">
+            <p class="border border-dark border-top-0 border-left-0 border-right-0" />
+            <DashboardGroup
+                v-for="g in myGroups"
+                :group="g"
+                :key="g.idgroups"
+            />
+          </div>
+          <div class="w-50 pl-2 mt-3">
+            <p class="border border-dark border-top-0 border-left-0 border-right-0" />
+            <DashboardEvent v-for="e in events" :key="'event-' + e.idevents" :idevents="e.idevents" class="ml-1" />
+          </div>
+        </div>
+        <div class="d-flex">
+          <div class="w-50 pr-2">
+            <div class="d-flex justify-content-end">
+              <a href="/groups" class="mr-1">
+                {{ translatedSeeAll }}
+              </a>
+            </div>
+          </div>
+          <div class="w-50">
+            <div class="d-flex justify-content-end">
+              <a href="/party" class="mr-1">
+                {{ translatedSeeAll }}
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </template>
   </CollapsibleSection>
@@ -56,10 +78,10 @@
 <script>
 import DashboardGroup from './DashboardGroup'
 import CollapsibleSection from './CollapsibleSection'
-import GroupEventSummary from './GroupEventSummary'
+import DashboardEvent from './DashboardEvent'
 
 export default {
-  components: {GroupEventSummary, CollapsibleSection, DashboardGroup},
+  components: {DashboardEvent, CollapsibleSection, DashboardGroup},
   computed: {
     groups() {
       let groups = this.$store.getters['groups/list']

@@ -80,24 +80,6 @@
             :upcoming-events="{{ json_encode($upcoming_events, JSON_INVALID_UTF8_IGNORE) }}"
         />
       </div>
-
-      <div class="row row-compressed">
-        @if (FixometerHelper::hasRole($user, 'Administrator'))
-          @include('dashboard.restarter')
-        @endif
-        @if (FixometerHelper::hasRole($user, 'Host'))
-          @include('dashboard.host')
-        @endif
-        @if (FixometerHelper::hasRole($user, 'Restarter'))
-          @include('dashboard.restarter')
-        @endif
-        @if (FixometerHelper::hasRole($user, 'NetworkCoordinator'))
-            @include('dashboard.coordinator')
-        @endif
-        <div class="col-12">
-            @include('dashboard.blocks.impact')
-        </div>
-      </div>
     </div>
   </div>
 

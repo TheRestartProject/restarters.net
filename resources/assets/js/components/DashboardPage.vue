@@ -55,8 +55,16 @@ export default {
       groups: Object.values(groups)
     })
 
+    let events = {}
+
+    this.upcomingEvents.forEach(e => {
+      events[e.idevents] = e
+      e.group = e.the_group
+      delete e.the_group
+    })
+
     this.$store.dispatch('events/setList', {
-      events: this.upcomingEvents
+      events: Object.values(events)
     })
   },
   computed: {
