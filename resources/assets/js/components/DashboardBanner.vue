@@ -28,7 +28,7 @@ export default {
       id: 'unpowered',
 
       // Change this to 'secondary' for yellow or 'danger' for pink.
-      variant: 'danger'
+      variant: 'secondary'
     }
   },
   computed: {

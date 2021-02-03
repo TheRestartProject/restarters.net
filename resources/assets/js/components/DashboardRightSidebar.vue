@@ -1,16 +1,17 @@
 <template>
   <div>
-    <b-img-lazy fluid src="/images/dashboard_3.jpg" class="border border-dark border-bottom-0" />
-    <div class="p-4 greyish border border-dark border-bottom-0">
-      <p>TODO Where do the links go?</p>
-      <p class="font-weight-bold">
-<!--        eslint-disable-next-line-->
-        {{ translatedSidebarIntro1 }} <a href="#">{{ translatedSidebarKit }}</a>
-      </p>
-      <p>
-        <!--        eslint-disable-next-line-->
-        {{ translatedSidebarHelp }} <a href="#">{{ translatedSidebarInTouch }}</a>
-      </p>
+    <div class="d-none d-md-block">
+      <b-img-lazy fluid src="/images/dashboard_3.jpg" class="border border-dark border-bottom-0" />
+      <div class="pt-4 pl-4 pr-4 pb-2 greyish border border-dark border-bottom-0">
+        <p class="font-weight-bold">
+          <!--        eslint-disable-next-line-->
+          {{ translatedSidebarIntro1 }} <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">{{ translatedSidebarKit }}</a>
+        </p>
+        <p>
+          <!--        eslint-disable-next-line-->
+          {{ translatedSidebarHelp }} <a href="https://talk.restarters.net/c/community-repair/5">{{ translatedSidebarLetUsKnow }}</a>.
+        </p>
+      </div>
     </div>
     <CollapsibleSection class="orange border border-dark" :show-horizontal-rule="false">
       <template slot="title">
@@ -20,19 +21,17 @@
         </div>
       </template>
       <template slot="content">
-        <p>TODO Where do the links go?</p>
         <div class="pl-2 pr-2">
           <div class="pl-3 pr-3">
+            <!--        eslint-disable-next-line-->
+            <p v-html="translatedGettingTheMostIntro" class="d-block d-md-none" />
             <ul class="list-unstyled pt-3 pb-0 mt-0 content">
-              <li>
-                {{ translatedMakeSure1 }} <a href="#">{{ translatedMakeSure2 }}</a>
-              </li>
-              <li>
-                {{ translatedLearnMore1 }} <a href="#">{{ translatedLearnMore2 }}</a>
-              </li>
-              <li>
-                {{ translatedSkills1}} <a href="#">{{ translatedSkills2 }}</a> {{ translatedSkills3 }}
-              </li>
+              <!--        eslint-disable-next-line-->
+              <li v-html="translatedGettingTheMostBullet1" />
+              <!--        eslint-disable-next-line-->
+              <li v-html="translatedGettingTheMostBullet2" />
+              <!--        eslint-disable-next-line-->
+              <li v-html="translatedGettingTheMostBullet3" />
             </ul>
           </div>
         </div>
@@ -54,32 +53,23 @@ export default {
     translatedSidebarHelp() {
       return this.$lang.get('dashboard.sidebar_help')
     },
-    translatedSidebarInTouch() {
-      return this.$lang.get('dashboard.sidebar_in_touch')
+    translatedSidebarLetUsKnow() {
+      return this.$lang.get('dashboard.sidebar_let_us_know')
     },
     translatedGettingTheMost() {
       return this.$lang.get('dashboard.getting_the_most')
     },
-    translatedMakeSure1() {
-      return this.$lang.get('dashboard.make_sure_1')
+    translatedGettingTheMostIntro() {
+      return this.$lang.get('dashboard.getting_the_most_intro')
     },
-    translatedMakeSure2() {
-      return this.$lang.get('dashboard.make_sure_2')
+    translatedGettingTheMostBullet1() {
+      return this.$lang.get('dashboard.getting_the_most_bullet1')
     },
-    translatedLearnMore1() {
-      return this.$lang.get('dashboard.learn_more_1')
+    translatedGettingTheMostBullet2() {
+      return this.$lang.get('dashboard.getting_the_most_bullet2')
     },
-    translatedLearnMore2() {
-      return this.$lang.get('dashboard.learn_more_2')
-    },
-    translatedSkills1() {
-      return this.$lang.get('dashboard.skills_1')
-    },
-    translatedSkills2() {
-      return this.$lang.get('dashboard.skills_2')
-    },
-    translatedSkills3() {
-      return this.$lang.get('dashboard.skills_3')
+    translatedGettingTheMostBullet3() {
+      return this.$lang.get('dashboard.getting_the_most_bullet3')
     },
   }
 }
@@ -98,7 +88,7 @@ export default {
   background-color: $brand-orange;
 }
 
-a {
+/deep/ a {
   color: unset;
   text-decoration: underline;
 }

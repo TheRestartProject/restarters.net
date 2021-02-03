@@ -5,12 +5,12 @@
       <h1 class="ml-2 mr-2 align-self-center">{{ translatedTitle }}</h1>
       <b-img-lazy fluid src="/images/confetti_doodle.svg" class="d-none d-md-block" />
     </div>
-    <div class="layout">
+    <div class="layout mt-4">
       <DashboardBanner class="banner" />
       <div class="yourgroups">
         <DashboardYourGroups />
       </div>
-      <DashboardRightSidebar class="sidebar" />
+      <DashboardRightSidebar class="sidebar pb-4" />
       <DiscourseDiscussion
           class="discourse"
           :topics="topics"
@@ -116,7 +116,7 @@ export default {
   }
 
   .banner {
-    grid-row: 1 / 2;
+    grid-row: 2 / 3;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(md) {
@@ -126,7 +126,7 @@ export default {
   }
 
   .yourgroups {
-    grid-row: 2 / 3;
+    grid-row: 3 / 4;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(md) {
@@ -136,7 +136,7 @@ export default {
   }
 
   .discourse {
-    grid-row: 3 / 4;
+    grid-row: 4 / 5;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(md) {
@@ -146,7 +146,7 @@ export default {
   }
 
   .sidebar {
-    grid-row: 4 / 5;
+    grid-row: 1 / 2;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(md) {
