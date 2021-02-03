@@ -166,6 +166,7 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard.index', [
+            'user' => $user,
             'groupsNearYou' => $groupsNearYou,
             'upcoming_events' => $upcoming_events,
             'topics' => $this->getDiscourseHotTopics()['talk_hot_topics'],
