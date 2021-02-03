@@ -32,7 +32,7 @@ export default {
       }
     },
     translatedModel() {
-      return this.$lang.get('devices.model_or_type')
+      return this.$lang.get('devices.device_model')
     },
     translatedTooltipModel() {
       return this.$lang.get('devices.tooltip_model')
