@@ -5,9 +5,12 @@
       <div class="pt-4 pl-4 pr-4 pb-2 greyish border border-dark border-bottom-0">
         <p class="font-weight-bold">
           <!--        eslint-disable-next-line-->
-          {{ translatedSidebarIntro1 }} <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">{{ translatedSidebarKit }}</a>
+          {{ translatedSidebarIntro1 }}
+          <span class="d-inline d-md-none">
+            {{ translatedSidebarKit1 }} <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">{{ translatedSidebarKit2 }}</a>
+          </span>
         </p>
-        <p>
+        <p class="d-block d-md-none">
           <!--        eslint-disable-next-line-->
           {{ translatedSidebarHelp }} <a href="https://talk.restarters.net/c/community-repair/5">{{ translatedSidebarLetUsKnow }}</a>.
         </p>
@@ -23,8 +26,12 @@
       <template slot="content">
         <div class="pl-2 pr-2">
           <div class="pl-3 pr-3">
-            <!--        eslint-disable-next-line-->
-            <p v-html="translatedGettingTheMostIntro" class="d-block d-md-none" />
+            <p>
+              <!--        eslint-disable-next-line-->
+              <span v-html="translatedGettingTheMostIntro" class="d-inline d-md-none" />
+              <!--        eslint-disable-next-line-->
+              <span v-html="translatedGettingTheMostKit" class="d-none d-md-inline" />
+            </p>
             <ul class="list-unstyled pt-3 pb-0 mt-0 content">
               <!--        eslint-disable-next-line-->
               <li v-html="translatedGettingTheMostBullet1" />
@@ -32,6 +39,8 @@
               <li v-html="translatedGettingTheMostBullet2" />
               <!--        eslint-disable-next-line-->
               <li v-html="translatedGettingTheMostBullet3" />
+              <!--        eslint-disable-next-line-->
+              <li v-html="translatedGettingTheMostBullet4" />
             </ul>
           </div>
         </div>
@@ -47,8 +56,11 @@ export default {
     translatedSidebarIntro1() {
       return this.$lang.get('dashboard.sidebar_intro_1')
     },
-    translatedSidebarKit() {
-      return this.$lang.get('dashboard.sidebar_kit')
+    translatedSidebarKit1() {
+      return this.$lang.get('dashboard.sidebar_kit2')
+    },
+    translatedSidebarKit2() {
+      return this.$lang.get('dashboard.sidebar_kit2')
     },
     translatedSidebarHelp() {
       return this.$lang.get('dashboard.sidebar_help')
@@ -62,6 +74,9 @@ export default {
     translatedGettingTheMostIntro() {
       return this.$lang.get('dashboard.getting_the_most_intro')
     },
+    translatedGettingTheMostKit() {
+      return this.$lang.get('dashboard.getting_the_most_kit')
+    },
     translatedGettingTheMostBullet1() {
       return this.$lang.get('dashboard.getting_the_most_bullet1')
     },
@@ -70,6 +85,9 @@ export default {
     },
     translatedGettingTheMostBullet3() {
       return this.$lang.get('dashboard.getting_the_most_bullet3')
+    },
+    translatedGettingTheMostBullet4() {
+      return this.$lang.get('dashboard.getting_the_most_bullet4')
     },
   }
 }
