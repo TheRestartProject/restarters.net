@@ -105,6 +105,11 @@ export default {
       required: false,
       default: false
     },
+    persist: {
+      type: String,
+      required: false,
+      default: null
+    }
   },
   data () {
     return {
@@ -113,10 +118,32 @@ export default {
   },
   mounted() {
     this.expanded = !this.collapsed
+
+    if (this.persist) {
+      try {
+        // We might have a stored state which overrides this.
+        const stored = localStorage.getItem('collapsible-' + this.persist)
+
+        if (stored !== null) {
+          this.expanded = stored === 'false' ? false : true
+        }
+      } catch (e) {
+        console.log("Get local failed", e)
+      }
+    }
   },
   methods: {
     toggle() {
       this.expanded = !this.expanded
+
+      if (this.persist) {
+        // Save state.
+        try {
+          localStorage.setItem('collapsible-' + this.persist, this.expanded)
+        } catch (e) {
+          console.log("Set local failed", e)
+        }
+      }
     }
   }
 }

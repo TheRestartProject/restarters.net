@@ -16,7 +16,7 @@
         </p>
       </div>
     </div>
-    <CollapsibleSection class="orange border border-dark" :show-horizontal-rule="false">
+    <CollapsibleSection class="orange border border-dark" :show-horizontal-rule="false" persist="dasbboard-sidebar">
       <template slot="title">
         <div class="d-flex">
           <span class="pl-4 pr-2 pt-4">{{ translatedGettingTheMost }}</span>
@@ -26,12 +26,12 @@
       <template slot="content">
         <div class="pl-2 pr-2">
           <div class="pl-3 pr-3">
-            <p>
+            <p class="d-none d-md-block">
               <!--        eslint-disable-next-line-->
               <span v-html="translatedGettingTheMostIntro" class="d-inline d-md-none" />
-              <!--        eslint-disable-next-line-->
-              <span v-html="translatedGettingTheMostKit" class="d-none d-md-inline" />
             </p>
+            <!--        eslint-disable-next-line-->
+            <p v-html="translatedSidebarIntro1" class="d-block d-md-none" />
             <ul class="list-unstyled pt-3 pb-0 mt-0 content">
               <!--        eslint-disable-next-line-->
               <li v-html="translatedGettingTheMostBullet1" />
@@ -73,9 +73,6 @@ export default {
     },
     translatedGettingTheMostIntro() {
       return this.$lang.get('dashboard.getting_the_most_intro')
-    },
-    translatedGettingTheMostKit() {
-      return this.$lang.get('dashboard.getting_the_most_kit')
     },
     translatedGettingTheMostBullet1() {
       return this.$lang.get('dashboard.getting_the_most_bullet1')
