@@ -7,12 +7,12 @@
           <!--        eslint-disable-next-line-->
           {{ translatedSidebarIntro1 }}
           <span class="d-inline d-md-none">
-            {{ translatedSidebarKit1 }} <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">{{ translatedSidebarKit2 }}</a>
+            {{ translatedSidebarKit1 }} <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">{{ translatedSidebarKit2 }}</a>
           </span>
         </p>
         <p class="d-block d-md-none">
           <!--        eslint-disable-next-line-->
-          {{ translatedSidebarHelp }} <a href="https://talk.restarters.net/c/community-repair/5">{{ translatedSidebarLetUsKnow }}</a>.
+          {{ translatedSidebarHelp }} <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/c/community-repair/5">{{ translatedSidebarLetUsKnow }}</a>.
         </p>
       </div>
     </div>

@@ -14,7 +14,7 @@
       </div>
 
       <div class="float-right mt-3 mt-sm-0">
-        <a href='https://talk.restarters.net/t/you-can-now-record-unpowered-items-in-the-fixometer/3388' class='btn btn-md btn-primary btn-block' title=''>Learn how here</a>
+        <a href='https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/you-can-now-record-unpowered-items-in-the-fixometer/3388' class='btn btn-md btn-primary btn-block' title=''>Learn how here</a>
       </div>
     </div>
   </b-alert>
