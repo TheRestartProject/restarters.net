@@ -1,5 +1,5 @@
 <template>
-    <CollapsibleSection id="volunteering" border-shadow class="p-4 lineheight" :show-horizontal-rule="false">
+    <CollapsibleSection border-shadow class="p-4 lineheight volunteering" :show-horizontal-rule="false">
         <template slot="title">
             {{ translatedTitle }}
         </template>
@@ -116,7 +116,7 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-#volunteering {
+.volunteering {
     background-color: $white;
     border: 1px solid $black;
 
