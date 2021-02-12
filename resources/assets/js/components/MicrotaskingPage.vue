@@ -11,7 +11,7 @@
 
     <div id="layout">
         <MicrotaskingCallToAction id="cta" />
-        <MicrotaskingVolunteering id="volunteering"
+        <MicrotaskingVolunteering
           :total-contributions="totalContributions"
           :current-user-quests="currentUserQuests"
           :current-user-contributions="currentUserContributions"

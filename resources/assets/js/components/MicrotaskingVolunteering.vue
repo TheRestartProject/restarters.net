@@ -1,5 +1,5 @@
 <template>
-    <CollapsibleSection border-shadow class="p-4 lineheight" :show-horizontal-rule="false">
+    <CollapsibleSection id="volunteering" border-shadow class="p-4 lineheight" :show-horizontal-rule="false">
         <template slot="title">
             {{ translatedTitle }}
         </template>
@@ -115,6 +115,15 @@ export default {
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
+
+#volunteering {
+    background-color: $white;
+    border: 1px solid $black;
+
+    @include media-breakpoint-up(md) {
+        box-shadow: 5px 5px $black;
+    }
+}
 
 .table td:first-child {
     padding-left: 0;
