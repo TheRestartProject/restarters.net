@@ -35,7 +35,7 @@ return array (
   'area_text_1' => 'Through this community, potential volunteers self-register and share their location. The platform is designed to connect organisers and fixers.',
   'area_text_2' => 'Through this community, potential volunteers self-register and share their location. Here\'s a list of potential volunteers near you',
   'upcoming_events' => 'Upcoming events',
-  'no_upcoming_events' => 'No upcoming Events',
+  'no_upcoming_events' => 'No Upcoming Events',
   'upcoming_events_text' => 'If possible, the best way to get involved is to go to an event, see how it works, and participate',
   'upcoming_events_text_2' => 'Find and attend events.  If you have entered your town/city in your profile, you will see the events nearest to you.',
   'host_getting_started_title' => 'Getting started in community repair',
