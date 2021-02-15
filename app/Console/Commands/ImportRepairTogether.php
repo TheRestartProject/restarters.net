@@ -34,16 +34,6 @@ class ImportRepairTogether extends Command
     protected $repairTogetherNetwork;
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed
@@ -67,7 +57,6 @@ class ImportRepairTogether extends Command
         $this->setupNetworkCoordinators();
         $this->importGroups();
         $this->importHosts();
-        //$this->pushUsersToDiscourseNetworkGroup();
     }
 
     public function assignExistingGroupsToRestartNetwork()
@@ -108,7 +97,7 @@ class ImportRepairTogether extends Command
         $csv->setHeaderOffset(0);
         $records = $csv->getRecords();
 
-        foreach ($records as $index => $row) {
+        foreach ($records as $row) {
             $name = trim($row['Group Name - Nom du Repair Café']);
             $website = trim($row['Website']);
             $facebook = trim($row['Facebook URL']);
@@ -152,7 +141,7 @@ class ImportRepairTogether extends Command
         $csv->setHeaderOffset(0);
         $records = $csv->getRecords();
 
-        foreach ($records as $index => $row) {
+        foreach ($records as $row) {
             $name = trim($row['Host name']);
             $email = trim($row['Host email']);
             $groupId = $row['Group ID'];

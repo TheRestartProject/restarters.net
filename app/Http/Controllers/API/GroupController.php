@@ -34,10 +34,8 @@ class GroupController extends Controller
         $groupChanges = [];
         foreach ($groupAudits as $groupAudit) {
             $group = Group::find($groupAudit->auditable_id);
-            if (! is_null($group) ) {
-                if ($group->changesShouldPushToZapier()) {
-                    $groupChanges[] = self::mapDetailsAndAuditToChange($group, $groupAudit);
-                }
+            if (! is_null($group) && $group->changesShouldPushToZapier()) {
+                $groupChanges[] = self::mapDetailsAndAuditToChange($group, $groupAudit);
             }
         }
 
@@ -114,7 +112,7 @@ class GroupController extends Controller
                 'updated_at' => $group->updated_at,
             ]);
 
-            foreach ($group->upcomingParties() as $key => $event) {
+            foreach ($group->upcomingParties() as $event) {
                 $upcoming_parties_collection->push([
                     'event_id' => $event->idevents,
                     'event_date' => $event->event_date,

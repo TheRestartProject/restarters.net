@@ -28,10 +28,12 @@ class SyncUserProperties
      */
     public function handle(UserUpdated $event)
     {
-        if ($event->user->isDirty('email'))
+        if ($event->user->isDirty('email')) {
             event(new UserEmailUpdated($event->user));
+        }
 
-        if ($event->user->isDirty('language'))
+        if ($event->user->isDirty('language')) {
             event(new UserLanguageUpdated($event->user));
+        }
     }
 }

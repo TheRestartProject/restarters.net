@@ -183,9 +183,6 @@ class GroupController extends Controller
 
                 if (is_numeric($idGroup) && $idGroup !== false) {
                     $idGroup = Group::find($idGroup);
-                    $lat1 = $idGroup->latitude;
-                    $lon1 = $idGroup->longitude;
-
                     $idGroup = $idGroup->idgroups;
 
                     $response['success'] = 'Group created correctly.';
@@ -284,9 +281,11 @@ class GroupController extends Controller
                     }
 
                     break;
-            }
 
-            // $this->set('response', $response);
+                default:
+                    $response['danger'] = 'Unexpected arguments';
+                    break;
+            }
         }
 
         $user = User::find(Auth::id());
@@ -305,14 +304,11 @@ class GroupController extends Controller
         }
 
         if ((isset($groupid) && is_numeric($groupid)) || in_array($groupid, $gids)) {
-            //$group = (object) array_fill_keys( array('idgroups') , $groupid);
             $group = Group::where('idgroups', $groupid)->first();
-        // $this->set('grouplist', $Group->findList());
         } else {
             $group = $groups[0];
             unset($groups[0]);
         }
-        // $this->set('userGroups', $groups);
 
         $groupStats = $group->getGroupStats($this->EmissionRatio);
         $allPastEvents = Party::pastEvents()
@@ -320,12 +316,9 @@ class GroupController extends Controller
         ->where('events.group', $group->idgroups)
         ->get();
 
-        // $this->set('pax', $participants);
-        // $this->set('hours', $hours_volunteered);
         $weights = $Device->getWeights($group->idgroups);
-        // $this->set('weights', $weights);
 
-        $devices = $Device->ofThisGroup($group->idgroups);
+        $Device->ofThisGroup($group->idgroups);
 
         // more stats...
 
@@ -357,7 +350,6 @@ class GroupController extends Controller
 
         for ($y = date('Y', time()); $y >= 2013; $y--) {
             for ($i = 1; $i <= 4; $i++) {
-                //$cluster = $Device->countByCluster($i, $group->idgroups);
                 $cluster = $Device->countByCluster($i, $group->idgroups, $y);
 
                 $total = 0;
@@ -641,6 +633,7 @@ class GroupController extends Controller
             }
 
             if (is_null($latitude) || is_null($longitude)) {
+                // TODO This case looks like it's worth considering.
                 //return redirect()->back()->with('error', 'Could not find group location - please try again!');
             }
 
@@ -682,7 +675,8 @@ class GroupController extends Controller
 
                 if (isset($_FILES['file']) && ! empty($_FILES['file']) && $_FILES['file']['error'] != 4) {
                     $existing_image = FixometerHelper::hasImage($id, 'groups', true);
-                    if (count($existing_image) > 0) {
+                    if (!empty($existing_image)) {
+                        // TODO This case looks like it's worth considering.
                         //$Group = new Group;
                       //$Group->removeImage($id, $existing_image[0]);
                     }
@@ -691,7 +685,7 @@ class GroupController extends Controller
                     $group_avatar = env('UPLOADS_URL').'mid_'.$group_avatar;
                 } else {
                     $existing_image = FixometerHelper::hasImage($id, 'groups', true);
-                    if (count($existing_image) > 0) {
+                    if (!empty($existing_image)) {
                         $group_avatar = env('UPLOADS_URL').'mid_'.$existing_image[0]->path;
                     } else {
                         $group_avatar = 'null';
@@ -741,6 +735,7 @@ class GroupController extends Controller
         $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
         $group_networks = Group::find($id)->networks->pluck('id')->toArray();
 
+        // TODO The return value is ignored, but this may be a bug.
         compact($audits = $Group->findOrFail($id)->audits);
 
         return view('group.edit', [
@@ -790,8 +785,6 @@ class GroupController extends Controller
 
     public static function stats($id, $format = 'row')
     {
-        $Device = new Device;
-
         $footprintRatioCalculator = new FootprintRatioCalculator();
         $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
@@ -805,8 +798,6 @@ class GroupController extends Controller
 
     public static function statsByGroupTag($group_tag_id, $format = 'row')
     {
-        $Device = new Device;
-
         $footprintRatioCalculator = new FootprintRatioCalculator();
         $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
@@ -858,7 +849,7 @@ class GroupController extends Controller
         }
 
         try {
-            $user_group = UserGroups::updateOrCreate([
+            UserGroups::updateOrCreate([
                 'user' => $user_id,
                 'group' => $group_id,
             ], [
@@ -904,7 +895,7 @@ class GroupController extends Controller
         try {
             if (isset($_FILES) && ! empty($_FILES)) {
                 $existing_image = FixometerHelper::hasImage($id, 'groups', true);
-                if (count($existing_image) > 0) {
+                if (!empty($existing_image)) {
                     $Group->removeImage($id, $existing_image[0]);
                 }
                 $file = new FixometerFile;
@@ -1008,9 +999,11 @@ class GroupController extends Controller
                     }
 
                     break;
+                default: {
+                    $response['danger'] = 'Unexpected arguments';
+                    break;
+                }
             }
-
-            // $this->set('response', $response);
         }
 
         $user = User::find(Auth::id());
@@ -1029,14 +1022,12 @@ class GroupController extends Controller
         }
 
         if ((isset($groupid) && is_numeric($groupid)) || in_array($groupid, $gids)) {
-            //$group = (object) array_fill_keys( array('idgroups') , $groupid);
             $group = Group::where('idgroups', $groupid)->first();
-        // $this->set('grouplist', $Group->findList());
         } else {
             $group = $groups[0];
             unset($groups[0]);
         }
-        // $this->set('userGroups', $groups);
+
         if ( ! is_null($group->latitude) && ! is_null($group->longitude)) {
             $restarters_nearby = User::nearbyRestarters($group->latitude, $group->longitude, 20)->orderBy('name', 'ASC')->get();
             foreach ($restarters_nearby as $restarter) {
@@ -1060,7 +1051,6 @@ class GroupController extends Controller
                      ->get();
 
         $weights = $Device->getWeights($group->idgroups);
-        $devices = $Device->ofThisGroup($group->idgroups);
 
         // more stats...
 
@@ -1096,7 +1086,6 @@ class GroupController extends Controller
 
         for ($y = date('Y', time()); $y >= 2013; $y--) {
             for ($i = 1; $i <= 4; $i++) {
-                //$cluster = $Device->countByCluster($i, $group->idgroups);
                 $cluster = $Device->countByCluster($i, $group->idgroups, $y);
 
                 $total = 0;
@@ -1265,7 +1254,7 @@ class GroupController extends Controller
         }
 
         // Create a new Invite record
-        $invite = Invite::create([
+        Invite::create([
             'record_id' => $group->idgroups,
             'email' => '',
             'hash' => $hash,
@@ -1315,7 +1304,7 @@ class GroupController extends Controller
         // New Collection Instance
         $collection = collect([]);
 
-        foreach ($group_tags_groups as $key => $group_tags_group) {
+        foreach ($group_tags_groups as $group_tags_group) {
             $group = $group_tags_group->theGroup;
             if ( ! empty($group)) {
                 $collection->push([
@@ -1415,7 +1404,7 @@ class GroupController extends Controller
         // If Event is found but is not the of the date specified
         $exclude_parties = [];
         if ( ! empty($date_from) && ! empty($date_to)) {
-            foreach ($group->parties as $key => $party) {
+            foreach ($group->parties as $party) {
                 if ( ! FixometerHelper::validateBetweenDates($party->event_date, $date_from, $date_to)) {
                     $exclude_parties[] = $party->idevents;
                 }

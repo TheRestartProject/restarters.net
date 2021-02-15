@@ -19,31 +19,29 @@ class MisccatController extends Controller {
             $user = Auth::user();
         } else {            
             $user = Microtask::getAnonUserCta($request);
-//            logger(print_r($user,1));
-            if ($user->action) {                
+            if ($user->action) {
                 return redirect()->action('MisccatController@cta');
             }
         }
 
-        if ($request->isMethod('post') && !empty($_POST)) {
-            if (isset($_POST['iddevices'])) {
-                $data = $_POST;
-                $Misccat = new Misccat;
-                $insert = [
-                    'iddevices' => $data['iddevices'],
-                    'category' => $data['category'],
-                    'eee' => $data['eee'],
-                    'user_id' => $user->id,
-                    'ip_address' => $_SERVER['REMOTE_ADDR'],
-                    'session_id' => session()->getId(),
-                ];
-                $success = $Misccat->create($insert);
-                if (!$success) {
-                    logger(htmlspecialchars(print_r($insert, 1)));
-                    logger('MiscCat error on insert.');
-                }
+        if ($request->isMethod('post') && !empty($_POST) && isset($_POST['iddevices'])) {
+            $data = $_POST;
+            $Misccat = new Misccat;
+            $insert = [
+                'iddevices' => $data['iddevices'],
+                'category' => $data['category'],
+                'eee' => $data['eee'],
+                'user_id' => $user->id,
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'session_id' => session()->getId(),
+            ];
+            $success = $Misccat->create($insert);
+            if (!$success) {
+                logger(htmlspecialchars(print_r($insert, 1)));
+                logger('MiscCat error on insert.');
             }
         }
+
         $Misccat = new Misccat;
         $misc = $Misccat->fetchMisc()[0];
         $misc->translate = rawurlencode($misc->problem);

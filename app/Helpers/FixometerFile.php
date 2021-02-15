@@ -55,30 +55,24 @@ class FixometerFile extends Model
         if ($error == UPLOAD_ERR_OK) {
             $filename = $this->filename($tmp_name);
             $this->file = $filename;
-            $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
-            if ( ! @move_uploaded_file($tmp_name, $path)) {
+            $lpath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
+            if ( ! @move_uploaded_file($tmp_name, $lpath)) {
                 return false;
             }
             $data = array();
-            $this->path = $path;
+            $this->path = $lpath;
             $data['path'] = $this->file;
 
             // Fix orientation
-            $image = Image::make($path)->orientate()->save($path);
+            Image::make($lpath)->orientate()->save($lpath);
 
             if ($type === 'image') {
                 $size = getimagesize($this->path);
                 $data['width'] = $size[0];
                 $data['height'] = $size[1];
 
-                if ($profile == true) {
+                if ($profile) {
                     $data['alt_text'] = 'Profile Picture';
-                }
-
-                if ($this->ext == 'jpg') {
-                    $profile_pic = imagecreatefromjpeg($this->path);
-                } elseif ($this->ext == 'png') {
-                    $profile_pic = imagecreatefrompng($this->path);
                 }
 
                 if ($data['width'] > $data['height']) {
@@ -89,19 +83,12 @@ class FixometerFile extends Model
                     $resize_height = false;
                 }
 
-                $cropPercent = 1;
-                $cropWidth = $biggestSide * $cropPercent;
-                $cropHeight = $biggestSide * $cropPercent;
-
-                //getting the top left coordinate
-                $c1 = array('x' => ($data['width'] - $cropWidth) / 2, 'y' => ($data['height'] - $cropHeight) / 2);
-
                 $thumbSize = 80;
                 $midSize = 260;
 
                 // Let's make images, which we will resize or crop
-                $thumb = Image::make($path);
-                $mid = Image::make($path);
+                $thumb = Image::make($lpath);
+                $mid = Image::make($lpath);
 
                 if ($resize_height) { // Resize before crop
                     $thumb->resize(null, $thumbSize, function ($constraint) {
@@ -135,7 +122,7 @@ class FixometerFile extends Model
                 $image = $Images->create($data)->id;
 
                 if (is_numeric($image) && ! is_null($reference) && ! is_null($referenceType)) {
-                    $xref = Xref::create([
+                    Xref::create([
                         'object' => $image,
                         'object_type' => env('TBL_IMAGES'),
                         'reference' => $reference,
@@ -156,7 +143,7 @@ class FixometerFile extends Model
     public function filename($tmp_name)
     {
         $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $ext = array_search(
+        $lext = array_search(
             $finfo->file($tmp_name),
             array(
                 'jpg' => 'image/jpeg',
@@ -166,13 +153,12 @@ class FixometerFile extends Model
             true
         );
 
-        if (empty($ext) || ! $ext || is_null($ext)) {
+        if (empty($lext) || ! $lext || is_null($lext)) {
             return false;
         }
-        $this->ext = $ext;
-        $filename = time().sha1_file($tmp_name).rand(1, 15000).'.'.$ext;
+        $this->ext = $lext;
 
-        return $filename;
+        return time().sha1_file($tmp_name).rand(1, 15000).'.'.$lext;
     }
 
     public function findImages($of_ref_type, $ref_id)
@@ -192,7 +178,7 @@ class FixometerFile extends Model
 
     public function deleteImage($id, $path)
     {
-        $del = unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.basename($path));
+        unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.basename($path));
 
         $sql = 'DELETE FROM `images` WHERE `idimages` = :id';
 
@@ -211,16 +197,16 @@ class FixometerFile extends Model
         }
     }
 
-    public function simpleUpload($file, $object = 'device', $object_id, $title = null)
+    public function simpleUpload($file, $object_id, $object = 'device', $title = null)
     {
         if ($file['error'] == 0) {
             $filename = $this->filename($file);
-            $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
+            $lpath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
 
-            if ( ! move_uploaded_file($file['tmp_name'], $path)) {
+            if ( ! move_uploaded_file($file['tmp_name'], $lpath)) {
                 return false;
             }
-            $size = getimagesize($path);
+            $size = getimagesize($lpath);
 
             $data['path'] = $filename;
             $data['width'] = $size[0];

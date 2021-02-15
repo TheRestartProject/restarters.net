@@ -24,16 +24,6 @@ class PopulateUniqueCodeToEventsAndGroups extends Command
     protected $description = 'Populate Shareable Code column on events and groups';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed
@@ -47,7 +37,7 @@ class PopulateUniqueCodeToEventsAndGroups extends Command
             $unique_shareable_code = FixometerHelper::generateUniqueShareableCode('App\Group', 'shareable_code');
 
             if (isset($unique_shareable_code) && ! empty($unique_shareable_code)) {
-                $update = Group::where('idgroups', $group->idgroups)->update([
+                Group::where('idgroups', $group->idgroups)->update([
                     'shareable_code' => $unique_shareable_code,
                 ]);
             }

@@ -40,9 +40,15 @@ class MicrotaskingController extends Controller
         $mobifixContributions = DB::select('select count(*) as total from devices_faults_mobiles_opinions where user_id = :userId', ['userId' => $userId])[0]->total;
 
         $quests = 0;
-        if ($faultCatContributions > 0) $quests++;
-        if ($miscCatContributions > 0) $quests++;
-        if ($mobifixContributions > 0) $quests++;
+        if ($faultCatContributions > 0) {
+            $quests++;
+        }
+        if ($miscCatContributions > 0) {
+            $quests++;
+        }
+        if ($mobifixContributions > 0) {
+            $quests++;
+        }
 
         return [
             'quests' => $quests,
@@ -61,8 +67,9 @@ class MicrotaskingController extends Controller
 
     private function getDiscussionTopics($tag, $numberOfTopics = null)
     {
-        if (!Auth::check())
+        if (!Auth::check()) {
             return [];
+        }
 
         $topics = [];
 

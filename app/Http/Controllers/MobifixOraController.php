@@ -28,8 +28,6 @@ class MobifixOraController extends Controller {
             }
         }
         if ($request->has('id-ords')) {
-            $foo = is_numeric($request->input('fault-type-id'));
-            $bar = $request->input('fault-type-id') > 0;
             if (!(is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
                 return redirect()->back()->withErrors(['Oops, there was an error, please try again, sorry! If this error persists please contact The Restart Project.']);
             }
@@ -117,7 +115,6 @@ class MobifixOraController extends Controller {
      */
     protected function _fetchRecord(Request $request) {
 
-//        $request->session()->flush();
         $result = FALSE;
         $partner = $request->input('partner', NULL);
         $exclusions = $request->session()->get('mobifixora.exclusions', []);

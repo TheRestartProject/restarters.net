@@ -24,22 +24,20 @@ class MobifixController extends Controller {
             }
         }
 
-        if ($request->isMethod('post') && !empty($_POST)) {
-            if (isset($_POST['iddevices'])) {
-                $data = $_POST;
-                $Mobifix = new Mobifix;
-                $insert = [
-                    'iddevices' => $data['iddevices'],
-                    'fault_type' => $data['fault_type'],
-                    'user_id' => $user->id,
-                    'ip_address' => $_SERVER['REMOTE_ADDR'],
-                    'session_id' => session()->getId(),
-                ];
-                $success = $Mobifix->create($insert);
-                if (!$success) {
-                    logger(htmlspecialchars(print_r($insert, 1)));
-                    logger('Mobifix error on insert.');
-                }
+        if ($request->isMethod('post') && !empty($_POST) && (isset($_POST['iddevices'])) {
+            $data = $_POST;
+            $Mobifix = new Mobifix;
+            $insert = [
+                'iddevices' => $data['iddevices'],
+                'fault_type' => $data['fault_type'],
+                'user_id' => $user->id,
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'session_id' => session()->getId(),
+            ];
+            $success = $Mobifix->create($insert);
+            if (!$success) {
+                logger(htmlspecialchars(print_r($insert, 1)));
+                logger('Mobifix error on insert.');
             }
         }
         $Mobifix = new Mobifix;

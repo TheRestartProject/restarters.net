@@ -30,16 +30,7 @@ class DashboardController extends Controller
         ]);
 
         $in_group = ! empty(UserGroups::where('user', Auth::id())->get()->toArray());
-        $has_skills = ! empty(UsersSkills::where('user', Auth::id())->get()->toArray());
         $in_event = ! empty(EventsUsers::where('user', Auth::id())->get()->toArray());
-
-        $userExistsInDiscourse = $user->existsOnDiscourse();
-
-        if ( ! is_null($user->idimages) && ! is_null($user->path)) {
-            $has_profile_pic = true;
-        } else {
-            $has_profile_pic = false;
-        }
 
         //See whether user has any events
         if ($in_event) {
@@ -133,26 +124,6 @@ class DashboardController extends Controller
 
         }
 
-        $rssRetriever = new CachingRssRetriever('https://therestartproject.org/feed');
-        $news_feed = $rssRetriever->getRSSFeed(3);
-
-        $wikiPagesRetriever = new CachingWikiPageRetriever(env('WIKI_URL').'/api.php');
-        $wiki_pages = $wikiPagesRetriever->getRandomWikiPages(5);
-
-        //Show onboarding modals on first login
-        if ($user->number_of_logins == 1) {
-            $onboarding = true;
-        } else {
-            $onboarding = false;
-        }
-
-        $devices_gateway = new Device;
-        $impact_stats = $devices_gateway->getWeights();
-
-        if ($user->hasRole('NetworkCoordinator')) {
-            $network = $user->networks;
-        }
-
         // Look for groups where user ID exists in pivot table.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
@@ -173,31 +144,6 @@ class DashboardController extends Controller
             'your_groups' => $your_groups,
             'seeAllTopicsLink' => env('DISCOURSE_URL') . "/latest"
         ]);
-
-        /*
-        $this->set('title', 'Dashboard');
-        $this->set('charts', true);
-
-        $Parties    = new Party;
-        $Devices    = new Device;
-        $Groups     = new Group;
-
-
-        $this->set('upcomingParties', $Parties->findNextParties());
-
-        $devicesByYear = array();
-        for( $i = 1; $i < 4; $i++ ){
-
-          $devices = $Devices->getByYears($i);
-          $deviceList = array();
-          foreach( $devices as $listed ) {
-              $deviceList[$listed->event_year] = $listed->total_devices;
-          }
-          $devicesByYear[$i] = $deviceList;
-
-        }
-        $this->set('devicesByYear', $devicesByYear);
-        */
     }
 
     public function getDiscourseHotTopics()

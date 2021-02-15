@@ -24,7 +24,7 @@ class ApiController extends Controller
         $participants = 0;
         $hours_volunteered = 0;
 
-        foreach ($allparties as $i => $party) {
+        foreach ($allparties as $party) {
             $participants += $party->pax;
 
             $hours_volunteered += $party->hoursVolunteered();
