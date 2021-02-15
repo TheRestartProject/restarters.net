@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  restarters:
+    build:
+      context: .
+      dockerfile: ./compose/local/Dockerfile
+    ports:
+      - "8000:8181"
+      - "8090:9000"
+    volumes:
+      - ./:/app
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+      - mailhog
+  db:
+    image: "mysql:5.7"
+    env_file: .env
+    volumes:
+      - "dbdata:/var/lib/mysql"
+    ports:
+      - "3306:3306"
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ../data/redis:/data
+    restart: always
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
+    logging:
+      driver: none
+
+volumes:
+  dbdata:
