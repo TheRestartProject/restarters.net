@@ -1,7 +1,7 @@
 <template>
     <b-tr class="topic">
         <b-td class="main-link"><a :href="url">{{ topic.title }}</a>
-            <div>
+            <div v-if="topic.category">
                 <a class="badge-wrapper" :href="categoryUrl">
                     <span class="badge-category-bg"
                           v-bind:style="{ backgroundColor: '#'+topic.category.color}"

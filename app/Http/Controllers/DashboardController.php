@@ -115,7 +115,7 @@ class DashboardController extends Controller
 
         //Get events nearest (or not) to you
         if ( ! is_null($user->latitude) && ! is_null($user->longitude)) { //Should the user have location info
-            $upcoming_events = Party::select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
+            $upcoming_events = Party::with('theGroup')->select(DB::raw('*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
             ->having('distance', '<=', 40)
               ->whereDate('event_date', '>=', date('Y-m-d'))
                 ->orderBy('event_date', 'ASC')
@@ -124,11 +124,13 @@ class DashboardController extends Controller
                       ->take(3)
                         ->get();
         } else { //Else show them the latest three
-            $upcoming_events = Party::whereDate('event_date', '>=', date('Y-m-d'))
+            $upcoming_events = Party::with('theGroup')->
+                                whereDate('event_date', '>=', date('Y-m-d'))
                                   ->select('events.*')
                                     ->orderBy('event_date', 'ASC')
                                       ->take(3)
                                         ->get();
+
         }
 
         $rssRetriever = new CachingRssRetriever('https://therestartproject.org/feed');
@@ -151,27 +153,25 @@ class DashboardController extends Controller
             $network = $user->networks;
         }
 
+        // Look for groups where user ID exists in pivot table.  We have to explicitly test on deleted_at because
+        // the normal filtering out of soft deletes won't happen for joins.
+        $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
+            ->where('users_groups.user', $user->id)
+            ->whereNull('users_groups.deleted_at')
+            ->orderBy('groups.name', 'ASC')
+            ->groupBy('groups.idgroups')
+            ->select([ 'groups.idgroups' , 'groups.name' ])
+            ->take(3)
+            ->get();
+
         return view('dashboard.index', [
-            'show_getting_started' => ! $userExistsInDiscourse || ! $has_profile_pic || ! $has_skills || ! $in_group || ! $in_event,
-            'gmaps' => true,
             'user' => $user,
-            'header' => true,
-            'user_exists_in_discourse' => $userExistsInDiscourse,
-            'in_group' => $in_group,
             'groupsNearYou' => $groupsNearYou,
-            'has_skills' => $has_skills,
-            'in_event' => $in_event,
-            'has_profile_pic' => $has_profile_pic,
-            'past_events' => $past_events,
             'upcoming_events' => $upcoming_events,
-            'outdated_groups' => $outdated_groups,
-            'inactive_groups' => $inactive_groups,
-            'news_feed' => $news_feed,
-            'all_groups' => $all_groups,
-            'onboarding' => $onboarding,
-            'impact_stats' => $impact_stats,
-            'wiki_pages' => $wiki_pages,
-            'hot_topics' => $this->getDiscourseHotTopics(),
+            'topics' => $this->getDiscourseHotTopics()['talk_hot_topics'],
+            'your_groups' => $your_groups,
+            'seeAllTopicsLink' => env('DISCOURSE_URL') . "/latest"
         ]);
 
         /*

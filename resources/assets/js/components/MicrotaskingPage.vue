@@ -11,13 +11,13 @@
 
     <div id="layout">
         <MicrotaskingCallToAction id="cta" />
-        <MicrotaskingVolunteering id="volunteering"
+        <MicrotaskingVolunteering
           :total-contributions="totalContributions"
           :current-user-quests="currentUserQuests"
           :current-user-contributions="currentUserContributions"
           :is-logged-in="isLoggedIn"
         />
-        <MicrotaskingDiscussion
+        <DiscourseDiscussion
           id="discussion"
           :topics="topics"
           :see-all-topics-link="seeAllTopicsLink"
@@ -32,12 +32,12 @@
 <script>
 import MicrotaskingCallToAction from './MicrotaskingCallToAction'
 import MicrotaskingVolunteering from './MicrotaskingVolunteering'
-import MicrotaskingDiscussion from './MicrotaskingDiscussion'
 import MicrotaskingNews from './MicrotaskingNews'
 import auth from '../mixins/auth'
+import DiscourseDiscussion from './DiscourseDiscussion'
 
 export default {
-  components: {MicrotaskingCallToAction, MicrotaskingVolunteering, MicrotaskingDiscussion, MicrotaskingNews},
+  components: {MicrotaskingCallToAction, MicrotaskingVolunteering, DiscourseDiscussion, MicrotaskingNews},
   mixins: [ auth ],
   props: {
     totalContributions: {
