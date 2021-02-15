@@ -1242,14 +1242,14 @@ class PartyController extends Controller
             return redirect('/party/view/'.$user_event->event);
         }
 
-        return redirect('/party/view/'.$event_id)->with('warning', 'Something went wrong - this invite is invalid or has expired');
+        return redirect('/party/view/'.intval($event_id))->with('warning', 'Something went wrong - this invite is invalid or has expired');
     }
 
     public function cancelInvite($event_id)
     {
         $user_event = EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->delete();
 
-        return redirect('/party/view/'.$event_id)->with('success', 'You are no longer attending this event.');
+        return redirect('/party/view/'.intval($event_id))->with('success', 'You are no longer attending this event.');
     }
 
     public function addVolunteer(Request $request)
@@ -1321,7 +1321,7 @@ class PartyController extends Controller
             ]));
         }
 
-        return redirect('/party/view/'.$event_id)->with('success', 'Volunteer has successfully been added to event');
+        return redirect('/party/view/'.intval($event_id))->with('success', 'Volunteer has successfully been added to event');
     }
 
     public function imageUpload(Request $request, $id)
@@ -1416,7 +1416,7 @@ class PartyController extends Controller
 
             Notification::send($all_restarters, new EventRepairs([
                 'event_name' => $event->getEventName(),
-                'event_url' => url('/party/view/'.$event_id.'#devices'),
+                'event_url' => url('/party/view/'.intval($event_id).'#devices'),
                 'preferences' => url('/profile/edit'),
             ]));
 

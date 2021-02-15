@@ -39,7 +39,7 @@ class MisccatController extends Controller {
                 ];
                 $success = $Misccat->create($insert);
                 if (!$success) {
-                    logger(print_r($insert, 1));
+                    logger(htmlspecialchars(print_r($insert, 1)));
                     logger('MiscCat error on insert.');
                 }
             }

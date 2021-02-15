@@ -192,7 +192,7 @@ class FixometerFile extends Model
 
     public function deleteImage($id, $path)
     {
-        $del = unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.$path);
+        $del = unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.basename($path));
 
         $sql = 'DELETE FROM `images` WHERE `idimages` = :id';
 

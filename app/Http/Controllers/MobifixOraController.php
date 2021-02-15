@@ -43,7 +43,7 @@ class MobifixOraController extends Controller {
             $MobifixOra = new MobifixOra;
             $success = $MobifixOra->create($insert);
             if (!$success) {
-                logger(print_r($insert, 1));
+                logger(htmlspecialchars(print_r($insert, 1)));
                 logger('MobifixOra error on insert.');
             }
         }

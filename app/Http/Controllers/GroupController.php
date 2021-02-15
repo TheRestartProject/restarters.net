@@ -542,7 +542,7 @@ class GroupController extends Controller
         // Find user/group relationship based on the invitation hash.
         $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
         if (empty($user_group)) {
-            return redirect('/group/view/'.$group_id)->with('warning', 'Something went wrong - this invite is invalid or has expired');
+            return redirect('/group/view/'.intval($group_id))->with('warning', 'Something went wrong - this invite is invalid or has expired');
         }
 
         // Set user as confirmed member of group.
@@ -1240,7 +1240,7 @@ class GroupController extends Controller
             $not_sent[] = $user->email;
         }
 
-        return redirect('/group/nearby/'.$groupId)->with('success', $user->name.' has been invited');
+        return redirect('/group/nearby/'.intval($groupId))->with('success', $user->name.' has been invited');
     }
 
     /**

@@ -37,7 +37,7 @@ class MobifixController extends Controller {
                 ];
                 $success = $Mobifix->create($insert);
                 if (!$success) {
-                    logger(print_r($insert, 1));
+                    logger(htmlspecialchars(print_r($insert, 1)));
                     logger('Mobifix error on insert.');
                 }
             }

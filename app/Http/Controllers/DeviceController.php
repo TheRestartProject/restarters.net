@@ -752,7 +752,7 @@ class DeviceController extends Controller
         $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
         if (FixometerHelper::hasRole($user, 'Administrator') || is_object($in_event)) {
             $Image = new FixometerFile;
-            $Image->deleteImage($id, $path);
+            $Image->deleteImage($id, basename($path));
 
             return redirect()->back()->with('message', 'Thank you, the image has been deleted');
         }
