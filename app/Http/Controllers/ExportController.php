@@ -55,7 +55,13 @@ class ExportController extends Controller
         // To not display column if the referring URL is therestartproject.org
         $host = parse_url(\Request::server('HTTP_REFERER'), PHP_URL_HOST);
 
-        $all_devices = app('App\Http\Controllers\DeviceController')->search($request, true);
+        $all_devices = Device::with([
+                                        'deviceCategory',
+                                        'deviceEvent'
+                                    ])
+        ->join('events', 'events.idevents', '=', 'devices.event')
+        ->join('groups', 'groups.idgroups', '=', 'events.group')
+        ->select('devices.*', 'groups.name AS group_name')->get();
 
         // Create CSV
         $filename = 'devices.csv';

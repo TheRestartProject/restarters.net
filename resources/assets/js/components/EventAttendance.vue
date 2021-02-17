@@ -197,7 +197,7 @@ export default {
       })
 
       if (ret && ret.data && ret.data.success) {
-        this.volunteerCount = val
+        this.event.volunteers = val
       }
     }
   }

@@ -1,5 +1,5 @@
 <template>
-  <b-tr v-if="event && stats" :class="{
+  <b-tr v-if="event" :class="{
     'text-center': true,
     attending: event.attending
     }">
@@ -72,19 +72,19 @@
         {{ translatedAddADevice}}
       </a>
     </b-td>
-    <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
+    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell">
       {{ Math.round(stats.ewaste) }} kg
     </b-td>
-    <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
+    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell">
       {{ Math.round(stats.co2) }} kg
     </b-td>
-    <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
+    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell">
       {{ stats.fixed_devices }}
     </b-td>
-    <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
+    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell">
       {{ stats.repairable_devices }}
     </b-td>
-    <b-td v-if="!upcoming && !noDevices" class="d-none d-md-table-cell">
+    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell">
       {{ stats.dead_devices }}
     </b-td>
   </b-tr>
