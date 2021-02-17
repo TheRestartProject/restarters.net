@@ -30,7 +30,7 @@
           </div>
           <div class="group-seeall">
             <div class="d-flex justify-content-end">
-              <a href="/groups" class="mr-1">
+              <a href="/group" class="mr-1">
                 {{ translatedSeeAll }}
               </a>
             </div>
