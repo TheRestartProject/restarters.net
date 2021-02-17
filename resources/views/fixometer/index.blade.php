@@ -28,3 +28,5 @@
 </section>
 
 @endsection
+
+@include('fixometer.add-data-modal')

@@ -49,8 +49,17 @@ class DeviceController extends Controller
                             ->homepage_data();
         $global_impact_data = $global_impact_data->getData();
 
+        $user_groups = [];
+
+        if ($user) {
+            foreach (UserGroups::where('user', $user->id)->pluck('group')->toArray() as $gid) {
+                $user_groups[] = Group::find($gid);
+            }
+        }
+
         return view('fixometer.index', [
             'user' => $user,
+            'user_groups' => $user_groups,
             'most_recent_finished_event' => $most_recent_finished_event,
             'impact_data' => $global_impact_data,
             'clusters' => $clusters,
