@@ -1,8 +1,7 @@
 <template>
   <div>
     <div class="d-flex">
-      <b-img-lazy :src="group.image" class="profile mr-2" @error.native="brokenProfileImage" v-if="group.image" />
-      <b-img-lazy :src="defaultProfile" class="profile mr-2" v-else />
+      <b-img-lazy :src="groupImage" class="profile mr-2" @error.native="brokenProfileImage" />
       <div class="d-flex flex-column justify-content-center">
         <a :href="'/group/view/' + group.idgroups">{{ group.name }}</a>
       </div>
@@ -23,6 +22,9 @@ export default {
   computed: {
     defaultProfile() {
       return DEFAULT_PROFILE
+    },
+    groupImage() {
+      return this.group && this.group.group_image && this.group.group_image.image ? ('/uploads/mid_' + this.group.group_image.image.path) : DEFAULT_PROFILE
     },
   },
   methods: {
