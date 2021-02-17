@@ -275,7 +275,6 @@ export default {
   },
   methods: {
     brokenProfileImage(event) {
-      console.log("Broken image", event)
       event.target.src = DEFAULT_PROFILE
     },
     toggleFilters() {

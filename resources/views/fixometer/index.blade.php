@@ -21,6 +21,7 @@
                     :clusters="{{ json_encode($clusters, JSON_INVALID_UTF8_IGNORE) }}"
                     :brands="{{ json_encode($brands, JSON_INVALID_UTF8_IGNORE) }}"
                     :barrier-list="{{ json_encode($barriers, JSON_INVALID_UTF8_IGNORE) }}"
+                    :is-admin="{{ FixometerHelper::hasRole($user, 'Administrator') ? 'true' : 'false' }}"
                 />
             </div>
         </div>
