@@ -165,6 +165,15 @@ class DashboardController extends Controller
             ->take(3)
             ->get();
 
+        $expanded = [];
+
+        foreach ($your_groups as $group) {
+            $group_image = $group->groupImage;
+            if (is_object($group_image) && is_object($group_image->image)) {
+                $group_image->image->path;
+            }
+        }
+
         return view('dashboard.index', [
             'user' => $user,
             'groupsNearYou' => $groupsNearYou,
