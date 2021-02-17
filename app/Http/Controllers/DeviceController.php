@@ -32,6 +32,7 @@ class DeviceController extends Controller
 {
     public function index($search = null)
     {
+        $user = User::getProfile(Auth::id());
         $clusters = Cluster::with(['categories'])->get()->all();
         $brands = Brands::orderBy('brand_name', 'asc')->get()->all();
 
@@ -49,6 +50,7 @@ class DeviceController extends Controller
         $global_impact_data = $global_impact_data->getData();
 
         return view('fixometer.index', [
+            'user' => $user,
             'most_recent_finished_event' => $most_recent_finished_event,
             'impact_data' => $global_impact_data,
             'clusters' => $clusters,
