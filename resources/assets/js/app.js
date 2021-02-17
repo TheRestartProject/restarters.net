@@ -999,17 +999,20 @@ function initAutocomplete() {
 
   jQuery(document).ready(function () {
     groupsMap();
-    gdprCookieNotice({
-      locale: 'en',
-      timeout: 500, //Time until the cookie bar appears
-      expiration: 30, //This is the default value, in days
-      domain: restarters.cookie_domain, //If you run the same cookie notice on all subdomains, define the main domain starting with a .
-      implicit: false, //Accept cookies on page scroll automatically
-      statement: '/about/cookie-policy', //Link to your cookie statement page
-      performace: ['DYNSRV'], //Cookies in the performance category.
-      analytics: ['_ga','_gat', '_gid'], //Cookies in the analytics category.
-      marketing: [] //Cookies in the marketing category.
-    });
+
+    if (window.gdprCookieNotice) {
+      gdprCookieNotice({
+        locale: 'en',
+        timeout: 500, //Time until the cookie bar appears
+        expiration: 30, //This is the default value, in days
+        domain: restarters.cookie_domain, //If you run the same cookie notice on all subdomains, define the main domain starting with a .
+        implicit: false, //Accept cookies on page scroll automatically
+        statement: '/about/cookie-policy', //Link to your cookie statement page
+        performace: ['DYNSRV'], //Cookies in the performance category.
+        analytics: ['_ga','_gat', '_gid'], //Cookies in the analytics category.
+        marketing: [] //Cookies in the marketing category.
+      });
+    }
 
       let hash = document.location.hash;
       if (hash) {
