@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DiscourseService;
 use Auth;
 use DB;
 use Illuminate\Http\Request;
@@ -9,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class MicrotaskingController extends Controller
 {
-    public function index()
+    public function index(DiscourseService $discourseService)
     {
         if (Auth::check()) {
             $currentUserId = Auth::user()->id;
@@ -28,7 +29,7 @@ class MicrotaskingController extends Controller
             'totalContributions' => $this->getTotalContributions(),
             'currentUserQuests' => $currentUserQuests,
             'currentUserContributions' => $currentUserContributions,
-            'topics' => $this->getDiscussionTopics($tag, 5),
+            'topics' => $discourseService->getDiscussionTopics($tag, 5),
             'seeAllTopicsLink' => env('DISCOURSE_URL') . "/tag/{$tag}/l/latest"
         ]);
     }
@@ -57,44 +58,5 @@ class MicrotaskingController extends Controller
         $mobifixContributions = DB::select('select count(*) as total from devices_faults_mobiles_opinions')[0]->total;
 
         return $faultCatContributions + $miscCatContributions + $mobifixContributions;
-    }
-
-    private function getDiscussionTopics($tag, $numberOfTopics = null)
-    {
-        if (!Auth::check())
-            return [];
-
-        $topics = [];
-
-        try {
-            $username = Auth::user()->username;
-            $client = app('discourse-client', ['username' => $username]);
-
-            $endpoint = "/tag/{$tag}/l/latest.json";
-            $response = $client->request('GET', $endpoint);
-            $discourseResult = json_decode($response->getBody());
-
-            $topics = $discourseResult->topic_list->topics;
-            if (!empty($numberOfTopics)) {
-                $topics = array_slice($topics, 0, $numberOfTopics, true);
-            }
-
-            $endpoint = "/site.json";
-            $response = $client->request('GET', $endpoint);
-            $discourseResult = json_decode($response->getBody());
-            $categories = $discourseResult->categories;
-
-            foreach ($topics as $topic) {
-                foreach ($categories as $category) {
-                    if ($topic->category_id == $category->id) {
-                        $topic->category = $category;
-                    }
-                }
-            }
-        } catch (\Exception $ex) {
-            Log::error("Error retrieving microtasking discussion topics for username '{$username}': " . $ex->getMessage());
-        }
-
-        return $topics;
     }
 }
