@@ -5,12 +5,13 @@
       <h1 class="ml-2 mr-2 align-self-center">{{ translatedTitle }}</h1>
       <b-img-lazy fluid src="/images/confetti_doodle.svg" class="d-none d-md-block" />
     </div>
-    <div class="layout mt-4">
+    <div class="layout mt-4 mb-4">
       <DashboardBanner class="banner" />
       <div class="yourgroups">
         <DashboardYourGroups />
       </div>
-      <DashboardRightSidebar class="sidebar pb-4" />
+      <DashboardAddData class="adddata justify-self-end" />
+      <DashboardRightSidebar class="sidebar" />
       <DiscourseDiscussion
           class="discourse"
           :topics="topics"
@@ -27,9 +28,10 @@ import DashboardBanner from './DashboardBanner'
 import DashboardYourGroups from './DashboardYourGroups'
 import DashboardRightSidebar from './DashboardRightSidebar'
 import DiscourseDiscussion from './DiscourseDiscussion'
+import DashboardAddData from './DashboardAddData'
 
 export default {
-  components: {DashboardYourGroups,DashboardRightSidebar,DashboardBanner,DiscourseDiscussion},
+  components: {DashboardAddData, DashboardYourGroups,DashboardRightSidebar,DashboardBanner,DiscourseDiscussion},
   mixins: [ auth ],
   props: {
     yourGroups: {
@@ -38,6 +40,11 @@ export default {
       default: null
     },
     upcomingEvents: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    pastEvents: {
       type: Array,
       required: false,
       default: null
@@ -85,6 +92,14 @@ export default {
       events[e.idevents] = e
       e.group = e.the_group
       delete e.the_group
+      e.upcoming = true
+    })
+
+    this.pastEvents.forEach(e => {
+      events[e.idevents] = e
+      e.group = e.the_group
+      delete e.the_group
+      e.attended = true
     })
 
     this.$store.dispatch('events/setList', {
@@ -110,13 +125,13 @@ export default {
   grid-template-columns: 1fr;
 
   @include media-breakpoint-up(md) {
-    grid-template-rows: auto auto 40px auto;
+    grid-template-rows: auto auto auto 40px auto;
     grid-column-gap: 20px;
     grid-template-columns: 2fr 1fr;
   }
 
   .banner {
-    grid-row: 2 / 3;
+    grid-row: 1 / 2;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(md) {
@@ -126,7 +141,7 @@ export default {
   }
 
   .yourgroups {
-    grid-row: 3 / 4;
+    grid-row: 2 / 3;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(md) {
@@ -135,22 +150,32 @@ export default {
     }
   }
 
-  .discourse {
-    grid-row: 4 / 5;
+  .adddata {
+    grid-row: 3 / 4;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(md) {
-      grid-row: 4 / 5;
+      grid-row: 3 / 4;
+      grid-column: 1 / 2;
+    }
+  }
+
+  .discourse {
+    grid-row: 5 / 6;
+    grid-column: 1 / 2;
+
+    @include media-breakpoint-up(md) {
+      grid-row: 5 / 6;
       grid-column: 1 / 3;
     }
   }
 
   .sidebar {
-    grid-row: 1 / 2;
+    grid-row: 1 / 4;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(md) {
-      grid-row: 2 / 3;
+      grid-row: 2 / 4;
       grid-column: 2 / 3;
     }
   }

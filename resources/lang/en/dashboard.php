@@ -43,5 +43,8 @@ return array (
   'getting_the_most_bullet4' => '<strong>Get analytical</strong>: see our impact in <a href="https://restarters.net/fixometer" target="_blank">the Fixometer</a>. Or <a href="https://restarters.net/workbench" target="_blank">join a data quest</a> to power up our Right to Repair advocacy (no expertise required).',
   'upcoming_events_title' => 'Upcoming events',
   'upcoming_events_subtitle' => 'Your groups\' upcoming events:',
-  'add_event' => 'Add'
+  'add_event' => 'Add',
+  'add_data_heading' => 'Add Data',
+  'see_your_impact' => 'And see your impact in the Fixometer',
+  'add_data_add' => 'Add'
 );

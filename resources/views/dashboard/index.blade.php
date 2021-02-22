@@ -47,6 +47,7 @@
             network-coordinator="{{ FixometerHelper::hasRole($user, 'NetworkCoordinator') ? 'true' : 'false'}}"
             :your-groups="{{ json_encode($your_groups, JSON_INVALID_UTF8_IGNORE) }}"
             :upcoming-events="{{ json_encode($upcoming_events, JSON_INVALID_UTF8_IGNORE) }}"
+            :past-events="{{ json_encode($past_events, JSON_INVALID_UTF8_IGNORE) }}"
             :topics="{{ json_encode($topics, JSON_INVALID_UTF8_IGNORE) }}"
             see-all-topics-link="{{ $seeAllTopicsLink }}"
             :is-logged-in="{{ Auth::check() ? 'true' : 'false'  }}"

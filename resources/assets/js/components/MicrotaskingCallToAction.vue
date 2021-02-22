@@ -48,7 +48,7 @@ export default {
 @import '~bootstrap/scss/mixins/_breakpoints';
 
 #cta {
-    background-color: #4aaebc;
+    background-color: $brand-light;
     border: 1px solid $black;
 
     @include media-breakpoint-up(md) {

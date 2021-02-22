@@ -16,7 +16,7 @@
         </p>
       </div>
     </div>
-    <CollapsibleSection class="orange border border-dark" :show-horizontal-rule="false" persist="dasbboard-sidebar">
+    <CollapsibleSection class="orange border border-dark" border-shadow :show-horizontal-rule="false" persist="dasbboard-sidebar">
       <template slot="title">
         <div class="d-flex">
           <span class="pl-4 pr-2 pt-4">{{ translatedGettingTheMost }}</span>

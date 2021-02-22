@@ -42,7 +42,7 @@ class DashboardController extends Controller
 
         //See whether user has any groups
         if ($in_group) {
-            $group_ids = UserGroups::where('user', Auth::id())->pluck('group')->toArray();
+            $group_ids = array_unique(UserGroups::where('user', Auth::id())->pluck('group')->toArray());
         }
 
         //If users has events, let's see whether they have any past events
@@ -50,11 +50,11 @@ class DashboardController extends Controller
             $past_events = Party::whereIn('idevents', $event_ids)
                 ->whereDate('event_date', '<', date('Y-m-d'))
                 ->join('groups', 'events.group', '=', 'idGroups')
-                ->select('events.*', 'groups.name')
+                ->select('events.*', 'groups.name', 'groups.idgroups')
                 ->orderBy('events.event_date', 'desc')
-                ->take(3)
                 ->get();
 
+            error_log(json_encode($past_events));
             if (empty($past_events->toArray())) {
                 $past_events = null;
             }
@@ -155,6 +155,7 @@ class DashboardController extends Controller
                 'user' => $user,
                 'groupsNearYou' => $groupsNearYou,
                 'upcoming_events' => $upcoming_events,
+                'past_events' => $past_events,
                 'topics' => $discourseService->getDiscussionTopics(),
                 'your_groups' => $your_groups,
                 'seeAllTopicsLink' => env('DISCOURSE_URL') . "/latest"

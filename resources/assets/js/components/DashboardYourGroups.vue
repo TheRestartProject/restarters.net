@@ -93,7 +93,7 @@ export default {
       })
     },
     events() {
-      return this.$store.getters['events/getByGroup'](null)
+      return this.$store.getters['events/getByGroup'](null).filter(e => e.upcoming)
     },
     translatedSeeAll() {
       return this.$lang.get('dashboard.see_all_groups')
