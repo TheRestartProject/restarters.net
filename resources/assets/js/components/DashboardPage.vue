@@ -8,7 +8,7 @@
     <div class="layout mt-4 mb-4">
       <DashboardBanner class="banner" />
       <div class="yourgroups">
-        <DashboardYourGroups />
+        <DashboardYourGroups :newGroups="newGroups" />
       </div>
       <DashboardAddData class="adddata justify-self-end" />
       <DashboardRightSidebar class="sidebar" />
@@ -63,6 +63,10 @@ export default {
     },
     discourseBaseUrl: {
       type: String,
+      required: true
+    },
+    newGroups: {
+      type: Number,
       required: true
     }
   },

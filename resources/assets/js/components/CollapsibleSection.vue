@@ -9,8 +9,8 @@
       'justify-content-between': true,
       }" @click="toggle">
       <div class="d-flex w-100 justify-content-between align-items-center">
-        <div class="d-flex flex-row">
-          <div class="d-flex flex-column justify-content-center">
+        <div class="d-flex flex-row w-100">
+          <div class="d-flex flex-column justify-content-center w-100">
             <slot name="title" />
           </div>
           <div v-if="count" :class="{

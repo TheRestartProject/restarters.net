@@ -46,5 +46,6 @@ return array (
   'add_event' => 'Add',
   'add_data_heading' => 'Add Data',
   'see_your_impact' => 'And see your impact in the Fixometer',
-  'add_data_add' => 'Add'
+  'add_data_add' => 'Add',
+  'newly_added' => 'Newly added: :count group in your area!|Newly added: :count groups in your area!'
 );

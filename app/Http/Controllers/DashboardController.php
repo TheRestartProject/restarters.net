@@ -54,7 +54,6 @@ class DashboardController extends Controller
                 ->orderBy('events.event_date', 'desc')
                 ->get();
 
-            error_log(json_encode($past_events));
             if (empty($past_events->toArray())) {
                 $past_events = null;
             }
@@ -107,6 +106,7 @@ class DashboardController extends Controller
             $all_groups = null;
         }
 
+        $new_groups = 0;
         //Get events nearest (or not) to you
         if (!is_null($user->latitude) && !is_null($user->longitude)) { //Should the user have location info
             $upcoming_events = Party::with('theGroup')->select(
@@ -121,6 +121,15 @@ class DashboardController extends Controller
                 ->orderBy('distance', 'ASC')
                 ->take(3)
                 ->get();
+
+            // Look for new nearby groups that we're not already a member of.  Eloquent is just getting in the way
+            // here so do a raw query.
+            $new_groups = DB::select(DB::raw("SELECT COUNT(*) AS count FROM groups 
+        LEFT JOIN users_groups ON groups.idgroups = users_groups.group AND users_groups.user = " . intval(Auth::id()) . "
+        WHERE users_groups.user IS NULL 
+            AND created_at >= '" . date('Y-m-d', strtotime('1 month ago')) . "'  
+            AND ( 6371 * acos( cos( radians(' . $user->latitude . ') ) * cos( radians( groups.latitude ) ) * cos( radians( groups.longitude ) - radians(' . $user->longitude . ') ) + sin( radians(' . $user->latitude . ') ) * sin( radians( groups.latitude ) ) ) ) < 40"))[0]->count;
+
         } else { //Else show them the latest three
             $upcoming_events = Party::with('theGroup')->
             whereDate('event_date', '>=', date('Y-m-d'))
@@ -158,7 +167,8 @@ class DashboardController extends Controller
                 'past_events' => $past_events,
                 'topics' => $discourseService->getDiscussionTopics(),
                 'your_groups' => $your_groups,
-                'seeAllTopicsLink' => env('DISCOURSE_URL') . "/latest"
+                'seeAllTopicsLink' => env('DISCOURSE_URL') . "/latest",
+                'new_groups' => $new_groups
             ]
         );
     }

@@ -142,7 +142,7 @@ a {
 
 .bg {
   background-color: $brand-light;
-  box-shadow: 5px 5px #222;
+  box-shadow: 5px 5px $black;
 }
 
 .layout {

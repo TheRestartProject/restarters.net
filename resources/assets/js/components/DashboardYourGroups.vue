@@ -1,16 +1,26 @@
 <template>
   <CollapsibleSection border-shadow class="p-3" :show-horizontal-rule="false" heading-class="">
     <template slot="title">
-      <div class="d-flex">
-        <div class="align-self-center">
-          {{ translatedYourGroupsHeading }}
+      <div class="d-flex justify-content-between flex-wrap">
+        <div class="d-flex">
+          <div class="align-self-center">
+            {{ translatedYourGroupsHeading }}
+          </div>
+          <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
         </div>
-        <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
+        <a href="/group/nearby" v-if="newGroups" class="added added-md d-none d-md-block pr-3">
+          <b-img src="/images/arrow-right-doodle-white.svg" />
+          {{ translatedNewlyAdded }}
+        </a>
       </div>
     </template>
 
     <template slot="content">
       <div class="content">
+        <a href="/group/nearby" v-if="newGroups" class="added added-xs d-block d-md-none pr-3 pt-3 pb-3 mb-2">
+          <b-img src="/images/arrow-right-doodle-white.svg" />
+          {{ translatedNewlyAdded }}
+        </a>
         <div class="layout">
           <div class="group-intro">
             <h3>
@@ -78,6 +88,12 @@ import CollapsibleSection from './CollapsibleSection'
 import DashboardEvent from './DashboardEvent'
 
 export default {
+  props: {
+    newGroups: {
+      type: Number,
+      required: true
+    }
+  },
   components: {DashboardEvent, CollapsibleSection, DashboardGroup},
   computed: {
     groups() {
@@ -118,6 +134,11 @@ export default {
     },
     translatedNoUpcomingEvents() {
       return this.$lang.get('events.no_upcoming_for_your_groups')
+    },
+    translatedNewlyAdded() {
+      return this.$lang.choice('dashboard.newly_added', this.newGroups, {
+        count: this.newGroups
+      })
     },
   },
 }
@@ -215,6 +236,22 @@ a {
       grid-row: 3 / 4;
       grid-column: 3 / 4;
     }
+  }
+}
+
+.added {
+  font-size: 75%;
+  background-color: $black;
+  color: white;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  align-self: center;
+  text-decoration: none;
+
+  &.added-md {
+    transform: translateX(1.1rem);
+    padding-left: 0px;
+    line-height: 3rem;
   }
 }
 </style>
