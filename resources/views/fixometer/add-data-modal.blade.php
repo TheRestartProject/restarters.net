@@ -32,7 +32,7 @@
                         <div class="flex-dynamic mb-20 mb-md-1">
                             <label for="items_cat" class="sr-only">@lang('devices.group'):<</label> <div class="form-control form-control__select">
                                     <select id="group" name="group" class="form-control select2 change-group" title="Choose group...">
-                                        @if( ! $user_groups->isEmpty() )
+                                        @if( !empty($user_groups) )
                                         @foreach($user_groups as $group)
                                         <option value="{{ $group->idgroups }}">
                                             {{ $group->name }}
