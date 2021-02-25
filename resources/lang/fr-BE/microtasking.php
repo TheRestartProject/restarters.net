@@ -25,10 +25,10 @@ return array (
                         </li>
                     </ul>',
   ),
-  'title' => 'En amont',
+  'title' => 'Atelier de données',
   'volunteering' => 
   array (
-    'all_volunteer_contributions' => 'Contributions volontaires en amont',
+    'all_volunteer_contributions' => 'Total des apports des volontaires',
     'join' => 'Rejoindre',
     'my_contributions' => 'Mes contributions',
     'number_of_tasks' => 'Nombre de tâches',
