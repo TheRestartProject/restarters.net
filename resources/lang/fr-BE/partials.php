@@ -109,7 +109,7 @@ return array (
   'no_weight' => ':value objet(s) divers ou objet(s) non-électriques sans poids estimé(s)',
   'please_confirm' => 'Veuillez confirmer que vous souhaitez continuer.',
   'skills' => 'Compétence(s)',
-  'something_wrong' => 'Quelque chose ne va paas',
+  'something_wrong' => 'Quelque chose ne va pas',
   'to_be_recycled' => ':value objet à recycler|:value objets à recycler',
   'to_be_repaired' => ':value objet à réparer|:value objets à réparer',
   'copied_to_clipboard' => 'Copié dans le presse-papier',
