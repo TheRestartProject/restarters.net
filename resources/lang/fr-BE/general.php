@@ -65,4 +65,5 @@ return array (
   'menu_fixometer' => 'Fixometer',
   'menu_events' => 'Événements',
   'menu_groups' => 'Repair Cafés',
+  'menu_workbench' => 'Atelier',
 );
