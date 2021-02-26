@@ -13,7 +13,7 @@
     <EventImages :images="images" v-if="images && images.length" />
     <div v-if="inProgress || finished">
       <EventStats :idevents="idevents" />
-      <EventDevices :idevents="idevents" :canedit="canedit" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
+      <EventDevices id="devices-section":idevents="idevents" :canedit="canedit" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
     </div>
   </div>
 </template>
@@ -128,6 +128,27 @@ export default {
         idevents: this.idevents,
         devices: this.devices
       })
+    }
+
+    if (window && window.location && window.location.hash) {
+      setTimeout(() => {
+        this.waitFor(window.location.hash.substring(1))()
+      }, 2000)
+    }
+  },
+  methods: {
+    waitFor(id) {
+      const self = this
+
+      return function() {
+        const elmnt = document.getElementById(id)
+
+        if (elmnt) {
+          elmnt.scrollIntoView()
+        } else {
+          setTimeout(self.waitFor(id), 100)
+        }
+      }
     }
   }
 }
