@@ -1,10 +1,10 @@
 <template>
     <CollapsibleSection class="p-3 p-md-0 lineheight">
         <template slot="title">
+          <div class="d-flex">
             {{ translatedTitle }}
-        </template>
-        <template slot="title-icon">
             <b-img class="icon ml-3 d-none d-md-block" src="/images/talk_doodle.svg" style="width:70px" />
+          </div>
         </template>
 
         <template slot="content">

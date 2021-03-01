@@ -143,6 +143,7 @@ a {
 .bg {
   background-color: $brand-light;
   box-shadow: 5px 5px $black;
+  border: 1px solid $black;
 }
 
 .layout {
