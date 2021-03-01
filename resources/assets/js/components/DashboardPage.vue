@@ -8,7 +8,7 @@
     <div class="layout mt-4 mb-4">
       <DashboardBanner class="banner" />
       <div class="yourgroups">
-        <DashboardYourGroups :newGroups="newGroups" />
+        <DashboardYourGroups :newGroups="newGroups" :nearbyGroups="nearbyGroups" />
       </div>
       <DashboardAddData class="adddata justify-self-end" />
       <DashboardRightSidebar class="sidebar" />
@@ -39,6 +39,11 @@ export default {
       required: false,
       default: null
     },
+    nearbyGroups: {
+      type: Array,
+      required: false,
+      default: null
+    },
     upcomingEvents: {
       type: Array,
       required: false,
@@ -51,7 +56,8 @@ export default {
     },
     topics: {
       type: Array,
-      required: true
+      required: false,
+      detault: null
     },
     seeAllTopicsLink: {
       type: String,
@@ -92,19 +98,23 @@ export default {
 
     let events = {}
 
-    this.upcomingEvents.forEach(e => {
-      events[e.idevents] = e
-      e.group = e.the_group
-      delete e.the_group
-      e.upcoming = true
-    })
+    if (this.upcomingEvents) {
+      this.upcomingEvents.forEach(e => {
+        events[e.idevents] = e
+        e.group = e.the_group
+        delete e.the_group
+        e.upcoming = true
+      })
+    }
 
-    this.pastEvents.forEach(e => {
-      events[e.idevents] = e
-      e.group = e.the_group
-      delete e.the_group
-      e.attended = true
-    })
+    if (this.pastEvents) {
+      this.pastEvents.forEach(e => {
+        events[e.idevents] = e
+        e.group = e.the_group
+        delete e.the_group
+        e.attended = true
+      })
+    }
 
     this.$store.dispatch('events/setList', {
       events: Object.values(events)
@@ -145,7 +155,7 @@ export default {
   }
 
   .yourgroups {
-    grid-row: 2 / 3;
+    grid-row: 3 / 4;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(md) {
@@ -155,7 +165,7 @@ export default {
   }
 
   .adddata {
-    grid-row: 3 / 4;
+    grid-row: 4 / 5;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(md) {
@@ -175,7 +185,7 @@ export default {
   }
 
   .sidebar {
-    grid-row: 1 / 4;
+    grid-row: 2 / 3;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(md) {

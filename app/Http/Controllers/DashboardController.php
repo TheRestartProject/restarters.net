@@ -96,10 +96,21 @@ class DashboardController extends Controller
         }
 
         $groupsNearYou = null;
+
         if ($in_group) {
             $all_groups = Group::whereIn('idgroups', $group_ids)->get();
         } else {
-            $groupsNearYou = $user->groupsNearby(150, 3);
+            $groups = $user->groupsNearby(150, 2);
+            $groupsNearYou = [];
+
+            foreach ($groups as $group) {
+                $group_image = $group->groupImage;
+                if (is_object($group_image) && is_object($group_image->image)) {
+                    $group_image->image->path;
+                }
+
+                $groupsNearYou[] = $group;
+            }
         }
 
         if (!isset($all_groups) || empty($all_groups->toArray())) {
@@ -162,13 +173,13 @@ class DashboardController extends Controller
             'dashboard.index',
             [
                 'user' => $user,
-                'groupsNearYou' => $groupsNearYou,
+                'groups_near_you' => $groupsNearYou,
                 'upcoming_events' => $upcoming_events,
                 'past_events' => $past_events,
                 'topics' => $discourseService->getDiscussionTopics(),
                 'your_groups' => $your_groups,
                 'seeAllTopicsLink' => env('DISCOURSE_URL') . "/latest",
-                'new_groups' => $new_groups
+                'new_groups' => $new_groups,
             ]
         );
     }

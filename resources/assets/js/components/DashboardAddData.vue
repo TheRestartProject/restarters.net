@@ -1,5 +1,5 @@
 <template>
-  <div class="bg">
+  <div class="bg" v-if="eventValue">
     <CollapsibleSection class="p-3" :show-horizontal-rule="false" heading-class="">
       <template slot="title">
         <div class="d-flex">

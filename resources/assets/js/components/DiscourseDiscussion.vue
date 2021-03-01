@@ -24,7 +24,7 @@
                     </b-th>
                     </b-tr>
                 </b-thead>
-                <b-tbody v-if="isLoggedIn">
+                <b-tbody v-if="isLoggedIn && topics">
                     <DiscourseTopic
                       v-for="topic in topics"
                       :topic="topic"

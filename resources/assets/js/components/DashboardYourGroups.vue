@@ -17,64 +17,67 @@
 
     <template slot="content">
       <div class="content">
-        <a href="/group/nearby" v-if="newGroups" class="added added-xs d-block d-md-none pr-3 pt-3 pb-3 mb-2">
-          <b-img src="/images/arrow-right-doodle-white.svg" />
-          {{ translatedNewlyAdded }}
-        </a>
-        <div class="layout">
-          <div class="group-intro">
-            <h3>
-              {{ translatedGroupsHeading }}
-            </h3>
-            <p>
-              {{ translatedCatchUp }}
-            </p>
-          </div>
-          <div class="group-list">
-            <p class="border border-dark border-top-0 border-left-0 border-right-0" />
-            <DashboardGroup
-                v-for="g in myGroups"
-                :group="g"
-                :key="g.idgroups"
-            />
-          </div>
-          <div class="group-seeall">
-            <div class="d-flex justify-content-end">
-              <a href="/group" class="mr-1">
-                {{ translatedSeeAll }}
-              </a>
+        <DashboardNoGroups v-if="!myGroups || !myGroups.length" :nearby-groups="nearbyGroups" />
+        <div v-else>
+          <a href="/group/nearby" v-if="newGroups" class="added added-xs d-block d-md-none pr-3 pt-3 pb-3 mb-2">
+            <b-img src="/images/arrow-right-doodle-white.svg" />
+            {{ translatedNewlyAdded }}
+          </a>
+          <div class="layout">
+            <div class="group-intro">
+              <h3>
+                {{ translatedGroupsHeading }}
+              </h3>
+              <p>
+                {{ translatedCatchUp }}
+              </p>
             </div>
-          </div>
-          <div class="group-spacer" />
-          <div class="event-intro">
-            <div class="d-flex justify-content-between">
-              <div>
-                <h3>
-                  {{ translatedUpcomingEventsTitle }}
-                </h3>
-                <p v-if="events.length">
-                  {{ translatedUpcomingEventsSubTitle }}
-                </p>
-                <p v-else>
-                  {{ translatedNoUpcomingEvents }}.
-                </p>
-              </div>
-              <div>
-                <b-btn variant="primary" href="/party/create" class="text-nowrap">
-                  {{ translatedAddEvent }}
-                </b-btn>
+            <div class="group-list">
+              <p class="border border-dark border-top-0 border-left-0 border-right-0" />
+              <DashboardGroup
+                  v-for="g in myGroups"
+                  :group="g"
+                  :key="g.idgroups"
+              />
+            </div>
+            <div class="group-seeall">
+              <div class="d-flex justify-content-end">
+                <a href="/group" class="mr-1">
+                  {{ translatedSeeAll }}
+                </a>
               </div>
             </div>
-          </div>
-          <div class="event-list">
-            <p class="border border-dark border-top-0 border-left-0 border-right-0" />
-            <DashboardEvent v-for="e in events" :key="'event-' + e.idevents" :idevents="e.idevents" class="ml-1" />
-          </div>
-          <div class="event-seeall">
-            <div class="d-flex justify-content-end">
-              <a href="/party" class="mr-1">
-                {{ translatedSeeAll }}
-              </a>
+            <div class="group-spacer" />
+            <div class="event-intro">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h3>
+                    {{ translatedUpcomingEventsTitle }}
+                  </h3>
+                  <p v-if="events.length">
+                    {{ translatedUpcomingEventsSubTitle }}
+                  </p>
+                  <p v-else>
+                    {{ translatedNoUpcomingEvents }}.
+                  </p>
+                </div>
+                <div>
+                  <b-btn variant="primary" href="/party/create" class="text-nowrap">
+                    {{ translatedAddEvent }}
+                  </b-btn>
+                </div>
+              </div>
+            </div>
+            <div class="event-list">
+              <p class="border border-dark border-top-0 border-left-0 border-right-0" />
+              <DashboardEvent v-for="e in events" :key="'event-' + e.idevents" :idevents="e.idevents" class="ml-1" />
+            </div>
+            <div class="event-seeall">
+              <div class="d-flex justify-content-end">
+                <a href="/party" class="mr-1">
+                  {{ translatedSeeAll }}
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -86,15 +89,21 @@
 import DashboardGroup from './DashboardGroup'
 import CollapsibleSection from './CollapsibleSection'
 import DashboardEvent from './DashboardEvent'
+import DashboardNoGroups from './DashboardNoGroups'
 
 export default {
   props: {
     newGroups: {
       type: Number,
       required: true
-    }
+    },
+    nearbyGroups: {
+      type: Array,
+      required: false,
+      default: null
+    },
   },
-  components: {DashboardEvent, CollapsibleSection, DashboardGroup},
+  components: {DashboardNoGroups, DashboardEvent, CollapsibleSection, DashboardGroup},
   computed: {
     groups() {
       let groups = this.$store.getters['groups/list']

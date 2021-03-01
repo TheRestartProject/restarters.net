@@ -47,5 +47,8 @@ return array (
   'add_data_heading' => 'Add Data',
   'see_your_impact' => 'And see your impact in the Fixometer',
   'add_data_add' => 'Add',
-  'newly_added' => 'Newly added: :count group in your area!|Newly added: :count groups in your area!'
+  'newly_added' => 'Newly added: :count group in your area!|Newly added: :count groups in your area!',
+  'no_groups' => '<strong>You aren\'t following any repair groups.</strong><br />You\'re welcome to <a href="/group/all">follow any group in the world</a>. And new groups pop up all the time, so do check back!',
+  'interested_starting' => 'Interested in starting a community repair group?',
+  'interested_details' => 'Anyone with interest and some skills in organising can start a group. Check out our event planning kit. Then join your region’s Talk group and invite others in your area for a chat! Or view our school   programme planning guide. When you’re ready to start a group, get in touch.'
 );
