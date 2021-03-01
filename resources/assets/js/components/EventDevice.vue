@@ -52,8 +52,11 @@
       <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
         {{ translatedSave }}
       </b-btn>
+      <b-btn variant="primary" class="mr-2" v-if="deleteButton" @click="deleteDevice">
+        {{ translatedDelete }}
+      </b-btn>
       <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2" />
-      <b-btn variant="tertiary" class="ml-2" @click="cancel">
+      <b-btn variant="tertiary" class="ml-2" @click="cancel" v-if="cancelButton">
         {{ translatedCancel }}
       </b-btn>
     </div>
@@ -110,6 +113,16 @@ export default {
       default: false
     },
     edit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    deleteButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    cancelButton: {
       type: Boolean,
       required: false,
       default: false
@@ -188,6 +201,9 @@ export default {
     },
     translatedSave() {
       return this.$lang.get('partials.save')
+    },
+    translatedDelete() {
+      return this.$lang.get('devices.delete_device')
     },
     translatedAddDevice() {
       return this.$lang.get('partials.add_device')

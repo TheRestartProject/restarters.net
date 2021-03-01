@@ -77,172 +77,42 @@ class DeviceController extends Controller
         $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
 
         $user = Auth::user();
+
         if (FixometerHelper::hasRole($user, 'Administrator') || ! empty($is_attending)) {
-            $is_host = FixometerHelper::userHasEditPartyPermission($device->event, $user->id);
-
             $Device = new Device;
-
-            if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)) {
-                $data = $_POST;
-                // remove the extra "files" field that Summernote generates -
-                unset($data['files']);
-                unset($data['users']);
-
-                $old_wiki = Device::find($id)->wiki;
-
-                if (isset($data['wiki'])) {
-                    $wiki = 1;
-                } else {
-                    $wiki = 0;
-                }
-
-                //Send Wiki Notification to Admins
-                if (env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
-                    $all_admins = User::where('role', 2)->get();
-                    $group_id = Party::find($data['event'])->group;
-
-                    $arr = [
-                        'group_url' => url('/group/view/'.$group_id),
-                        'preferences' => url('/profile/edit'),
-                    ];
-
-                    Notification::send($all_admins, new ReviewNotes($arr));
-                }
-
-                // formatting dates for the DB
-                //$data['event_date'] = dbDateNoTime($data['event_date']);
-
-                if (! isset($data['repair_more']) || empty($data['repair_more'])) { //Override
-                    $data['repair_more'] = 0;
-                }
-
-                if ($data['repair_status'] != 2) { //Override
-                    $data['repair_more'] = 0;
-                }
-
-                if ($data['repair_more'] == 1) {
-                    $more_time_needed = 1;
-                } else {
-                    $more_time_needed = 0;
-                }
-
-                if ($data['repair_more'] == 2) {
-                    $professional_help = 1;
-                } else {
-                    $professional_help = 0;
-                }
-
-                if ($data['repair_more'] == 3) {
-                    $do_it_yourself = 1;
-                } else {
-                    $do_it_yourself = 0;
-                }
-
-                if ($data['category'] == 46 && isset($data['weight'])) {
-                    $weight = $data['weight'];
-                } else {
-                    $weight = null;
-                }
-
-                // New logic Nov 2018
-                if ($data['spare_parts'] == 3) { // Third party
-                    $data['spare_parts'] = 1;
-                    $parts_provider = 2;
-                } elseif ($data['spare_parts'] == 1) { // Manufacturer
-                    $data['spare_parts'] = 1;
-                    $parts_provider = 1;
-                } elseif ($data['spare_parts'] == 2) { // Not needed
-                    $data['spare_parts'] = 2;
-                    $parts_provider = null;
-                } elseif ($data['spare_parts'] == 4) { // Historical data, resets spare parts to 1 but keeps parts provider as null
-                    $data['spare_parts'] = 1;
-                    $parts_provider = null;
-                } else {
-                    $parts_provider = null;
-                }
-
-                if (! isset($data['barrier'])) {
-                    $data['barrier'] = null;
-                } elseif (in_array(1, $data['barrier']) || in_array(2, $data['barrier'])) { // 'Spare parts not available' or 'spare parts too expensive' selected
-                    $data['spare_parts'] = 1;
-                } elseif (count($data['barrier']) > 0) {
-                    $data['spare_parts'] = 2;
-                }
-                // EO new logic Nov 2018
-
-                $update = array(
-                    'event' => $data['event'],
-                    'category' => $data['category'],
-                    'category_creation' => $data['category'],
-                    'estimate' => $weight,
-                    'repair_status' => $data['repair_status'],
-                    'spare_parts' => $data['spare_parts'],
-                    'parts_provider' => $parts_provider,
-                    'brand' => $data['brand'],
-                    'model' => $data['model'],
-                    'problem' => $data['problem'],
-                    'age' => $data['age'],
-                    'more_time_needed' => $more_time_needed,
-                    'professional_help' => $professional_help,
-                    'do_it_yourself' => $do_it_yourself,
-                    'wiki' => $wiki,
-                );
-
-                // $u = $Device->where('iddevices', $id)->update($update);
-                $u = Device::find($id)->update($update);
-
-                // Update barriers
-                if (isset($data['barrier']) && ! empty($data['barrier']) && $data['repair_status'] == 3) { // Only sync when repair status is end-of-life
-                      $device = Device::find($id)->barriers()->sync($data['barrier']);
-                } else {
-                    $device = Device::find($id)->barriers()->sync([]);
-                }
-
-                if (! $u) {
-                    $response['danger'] = 'Something went wrong. Please check the data and try again.';
-                } else {
-                    $response['success'] = 'Device updated!';
-
-                    /** let's create the image attachment! **/
-                    if (isset($_FILES) && ! empty($_FILES['files']['name'])) {
-                        $file = new FixometerFile;
-                        $file->upload('devicePhoto', 'image', $id, env('TBL_DEVICES'), true);
-                    }
-                }
-            }
-            $Events = new Party;
-            $Categories = new Category;
-            $File = new FixometerFile;
-
-            $UserEvents = $Events->findAll();
-
             $device = $Device->findOne($id);
 
-            if (! isset($response)) {
-                $response = null;
+            $device->category = $device->deviceCategory;
+            $device->shortProblem = $device->getShortProblem();
+            $device->urls;
+
+            $barriers = [];
+
+            foreach ($device->barriers as $barrier) {
+                $barriers[] = $barrier->id;
             }
 
-            $images = $File->findImages(env('TBL_DEVICES'), $id);
-
-            if (! isset($images)) {
-                $images = null;
-            }
+            $device->barrier = $barriers;
+            $device->images = $device->getImages();
 
             $brands = Brands::all();
+            $Categories = new Category;
 
-            $audits = Device::findOrFail($id)->audits;
+            foreach ($brands as $brand) {
+                $brand->brand_name;
+            }
+
+            $clusters = Cluster::all();
+
+            foreach ($clusters as $cluster) {
+                $cluster->categories;
+            }
 
             return view('fixometer.edit', [
-                'title' => 'Edit Device',
-                'response' => $response,
-                'categories' => $Categories->findAll(),
-                'events' => $UserEvents,
-                'formdata' => $device,
+                'device' => $device,
                 'brands' => $brands,
-                'user' => $user,
-                'is_host' => $is_host,
-                'images' => $images,
-                'audits' => $audits,
+                'clusters' => $clusters,
+                'categories' => $Categories->findAll(),
             ]);
         }
 
