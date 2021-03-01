@@ -103,13 +103,15 @@ class DashboardController extends Controller
             $groups = $user->groupsNearby(150, 2);
             $groupsNearYou = [];
 
-            foreach ($groups as $group) {
-                $group_image = $group->groupImage;
-                if (is_object($group_image) && is_object($group_image->image)) {
-                    $group_image->image->path;
-                }
+            if ($groups) {
+                foreach ($groups as $group) {
+                    $group_image = $group->groupImage;
+                    if (is_object($group_image) && is_object($group_image->image)) {
+                        $group_image->image->path;
+                    }
 
-                $groupsNearYou[] = $group;
+                    $groupsNearYou[] = $group;
+                }
             }
         }
 
