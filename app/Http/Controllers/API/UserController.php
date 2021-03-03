@@ -32,10 +32,8 @@ class UserController extends Controller
         $userChanges = [];
         foreach ($userAudits as $userAudit) {
             $user = User::withTrashed()->find($userAudit->auditable_id);
-            if ( ! is_null($user)) {
-                if ($user->changesShouldPushToZapier()) {
-                    $userChanges[] = self::mapUserAndAuditToUserChange($user, $userAudit);
-                }
+            if ( ! is_null($user) && $user->changesShouldPushToZapier()) {
+                $userChanges[] = self::mapUserAndAuditToUserChange($user, $userAudit);
             }
         }
 

@@ -31,27 +31,21 @@ class Microtask {
         $user->id = 0;
         $user->name = 'Guest';
         $user->action = 0;
-//        $request->session()->flush();
-//        logger(print_r($request->session()->all(), 1));
         $user = Microtask::initTaskSession($request, $user);
         if (!$user->cta) {
-//            logger('no cta');
             $request->session()->put('microtask.clicks', ++$user->clicks);
             if ($user->clicks % $clicks == 0) {
-//                logger('time for cta');
                 $request->session()->put('microtask.cta', 1);
                 $request->session()->put('microtask.sesh', Carbon::now()->timestamp);
                 $user->action = 1;
             }
         } else {
-//            logger('time elapsed since cta = ' . (Carbon::now()->timestamp - $user->sesh));
             if ((Carbon::now()->timestamp - $user->sesh) > $wait) {
-//                logger('cta expired');
                 Microtask::resetTaskSession($request, $user);
             }
         }
-        $user = Microtask::getTaskSession($request, $user);
-        return $user;
+
+        return Microtask::getTaskSession($request, $user);
     }
 
     protected static function initTaskSession(Request $request, $user) {

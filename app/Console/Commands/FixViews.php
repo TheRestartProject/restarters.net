@@ -23,16 +23,6 @@ class FixViews extends Command
     protected $description = 'Replace the hard-coded DEFINER that mysqldump includes in exports with the DB details from the .env file';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed

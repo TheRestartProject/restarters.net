@@ -54,10 +54,8 @@ class SendAdminModerateEventPhotosNotification
 
     protected function shouldSendNotification(User $user)
     {
-        if (self::IGNORE_SELF) {
-            if ($user->id == $this->event->auth_user_id) {
-                return false;
-            }
+        if (self::IGNORE_SELF && $user->id == $this->event->auth_user_id) {
+            return false;
         }
 
         $notifications = DB::table('notifications')->where([

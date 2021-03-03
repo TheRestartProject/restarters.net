@@ -70,8 +70,6 @@ class DeviceController extends Controller
 
     public function edit($id)
     {
-        // $this->set('title', 'Edit Device');
-
         $device = Device::find($id);
 
         $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
@@ -188,14 +186,13 @@ class DeviceController extends Controller
                     'wiki' => $wiki,
                 );
 
-                // $u = $Device->where('iddevices', $id)->update($update);
                 $u = Device::find($id)->update($update);
 
                 // Update barriers
                 if (isset($data['barrier']) && ! empty($data['barrier']) && $data['repair_status'] == 3) { // Only sync when repair status is end-of-life
-                      $device = Device::find($id)->barriers()->sync($data['barrier']);
+                      Device::find($id)->barriers()->sync($data['barrier']);
                 } else {
-                    $device = Device::find($id)->barriers()->sync([]);
+                    Device::find($id)->barriers()->sync([]);
                 }
 
                 if (! $u) {
@@ -371,8 +368,6 @@ class DeviceController extends Controller
 
     public function ajaxCreate(Request $request)
     {
-        $powered = NULL;
-
         $rules = [
             'category' => 'required|filled',
         ];
@@ -397,8 +392,6 @@ class DeviceController extends Controller
         $quantity = $request->input('quantity');
         $event_id = $request->input('event_id');
         $barrier = $request->input('barrier');
-        $useful_url = $request->input('url');
-        $useful_source = $request->input('source');
 
         // Get party for later
         $event = Party::find($event_id);
@@ -634,12 +627,6 @@ class DeviceController extends Controller
 
             $stats = $event->getEventStats($emissionRatio);
             $data['stats'] = $stats;
-
-            // if ($repair_status == 0) {
-            //   $data['error'] = "Device couldn't be updated - no repair details added";
-            //   return response()->json($data);
-            // }
-
             $data['success'] = 'Device updated!';
 
             // Expand a few things so that the devices are returned with the same information that existing
@@ -662,40 +649,6 @@ class DeviceController extends Controller
             $data['device'] = $device;
 
             return response()->json($data);
-
-            // } else {
-          //
-          //   Device::find($id)->update([
-          //     'category' => $category,
-          //     'category_creation' => $category,
-          //     'brand' => $brand,
-          //     'model' => $model,
-          //     'age' => $age,
-          //     'problem' => $problem,
-          //     'spare_parts' => $spare_parts,
-          //     'repair_status' => $repair_status,
-          //     'more_time_needed' => 0,
-          //     'professional_help' => 0,
-          //     'do_it_yourself' => 0,
-          //     'wiki' => $wiki,
-          //   ]);
-          //
-          //   $event = Party::find($event_id);
-          //
-          //   $Device = new Device;
-          //   $weights = $Device->getWeights();
-          //
-          //   $TotalWeight = $weights[0]->total_weights;
-          //   $TotalEmission = $weights[0]->total_footprints;
-          //   $EmissionRatio = $TotalEmission / $TotalWeight;
-          //   $stats = $event->getEventStats($EmissionRatio);
-          //   $data['stats'] = $stats;
-          //
-          //   $data['success'] = "Device updated!";
-          //
-          //   return response()->json($data);
-          //
-          // }
         }
     }
 
@@ -763,7 +716,7 @@ class DeviceController extends Controller
         $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
         if (FixometerHelper::hasRole($user, 'Administrator') || is_object($in_event)) {
             $Image = new FixometerFile;
-            $Image->deleteImage($id, $path);
+            $Image->deleteImage($id, basename($path));
 
             return redirect()->back()->with('message', 'Thank you, the image has been deleted');
         }
