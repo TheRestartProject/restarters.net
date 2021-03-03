@@ -18,12 +18,6 @@ class AjaxController extends Controller
 
     public function restarters_in_group()
     {
-
-        $user = Auth::user();
-        // $this->user = $user;
-        // $this->set('user', $user);
-        // $this->set('header', true);
-
         if (isset($_GET['group']) && is_numeric($_GET['group'])) {
             $group = (integer)$_GET['group'];
 

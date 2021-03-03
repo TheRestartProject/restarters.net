@@ -30,35 +30,6 @@ class Xref extends Model
     protected $fillable = ['object', 'object_type', 'reference', 'reference_type'];
 
     /**
-     * @ object -> can be image, link, or any other shared asset
-     * @ reference -> the main App Element that needs the object (user, event, device, group)
-     * */
-    // public function __construct($index, $object = null, $objectType = null, $reference = null, $referenceType = null){
-    //
-    //     parent::__construct();
-    //
-    //     $this->obj      = (integer)$object;
-    //     $this->ref      = (integer)$reference;
-    //     $this->objType  = (integer)$objectType;
-    //     $this->refType  = (integer)$referenceType;
-    //
-    //     $this->index    = ($index === 'object' || $index === 'reference') ? $index : false;
-    //     if($this->index === 'object'){
-    //         $this->search_id = $this->obj;
-    //         $this->search_type = $this->objType;
-    //     }
-    //     elseif($this->index === 'reference'){
-    //         $this->search_id = $this->ref;
-    //         $this->search_type = $this->refType;
-    //
-    //
-    //     }
-    //     else {
-    //         return new Error(500, 'Invalid Index in Xref search. (xref.class.php, line 32)');
-    //     }
-    // }
-
-    /**
      * returns object with cross-references to selected
      * ID and TABLE.
      * @ $index can be 'object' || 'reference'
@@ -89,7 +60,7 @@ class Xref extends Model
     public function createXref($clear = true)
     {
         if ($this->index !== false) {
-            if ($clear == true) {
+            if ($clear) {
                 self::deleteXref();
             }
             $sql = 'INSERT INTO `' . $this->table . '`(`object`, `object_type`, `reference`, `reference_type`) VALUES (:obj, :objType, :ref, :refType)';

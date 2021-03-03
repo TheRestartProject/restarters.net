@@ -1,4 +1,4 @@
-@include('layouts.header_plain', ['iframe' => true])
+@include('layouts.header_nocookie', ['iframe' => true])
 @yield('content')
 <div class="" id="party-headline-stats">
 

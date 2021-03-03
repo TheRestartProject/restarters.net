@@ -42,8 +42,6 @@ class ResetPassword extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        // $url = url('/reset');
-
         return (new MailMessage)
                     ->subject('Reset password')
                     ->greeting('Hello!')

@@ -73,7 +73,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(Geocoder::class, function ($app) {
+        $this->app->singleton(Geocoder::class, function () {
             return new Geocoder();
         });
     }

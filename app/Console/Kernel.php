@@ -31,10 +31,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->call(function () {
-        //   App\Http\Controllers\PartyController::emailHosts();
-        // })->dailyAt('11:00');
-
         $schedule->call(function () {
 
             $parties = Party::doesnthave('devices')

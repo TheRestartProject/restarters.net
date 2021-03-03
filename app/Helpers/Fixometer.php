@@ -100,10 +100,11 @@ class FixometerHelper
     public static function userHasEditPartyPermission($partyId, $userId = null)
     {
         if (is_null($userId)) {
-            if (empty(Auth::user()))
+            if (empty(Auth::user())) {
                 return false;
-            else
+            } else {
                 $userId = Auth::user()->id;
+            }
         }
 
         $user = User::find($userId);
@@ -248,9 +249,15 @@ class FixometerHelper
                     $icon = 'info';
 
                     break;
+
+                default:
+                    $icon = '';
+                    break;
             }
             echo '<div class="alert alert-'.$type;
-            if ($dismissible) echo '  alert-dismissible';
+            if ($dismissible) {
+                echo '  alert-dismissible';
+            }
             echo '" role="alert">
                   <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
                   <i class="fa fa-'.$icon.'"></i> '.$text.'
