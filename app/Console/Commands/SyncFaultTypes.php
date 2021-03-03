@@ -23,16 +23,6 @@ class SyncFaultTypes extends Command
     protected $description = 'Update devices table with fault types for given categories';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed

@@ -12,23 +12,6 @@ use FixometerHelper;
 
 class RoleController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    // public function __construct($model, $controller, $action)
-    // {
-    //     parent::__construct($model, $controller, $action);
-    //
-    //     $this->middleware('auth');
-    //
-    //     $user = Auth::getProfile();
-    //     $this->user = $user;
-    //     $this->set('user', $user);
-    //     $this->set('header', true);
-    // }
-
     //Custom Functions
     public function index()
     {
@@ -67,10 +50,7 @@ class RoleController extends Controller
                 } else {
                     $response['success'] = 'Permissions for this Role have been updated.';
                 }
-                // $this->set('response', $response);
             }
-
-            // $this->set('title', 'Edit <span class="orange">' . $role->role . '</span> Role');
 
             $permissionsList = $role->rolePermissions($role->idroles);
             $activePerms = array();

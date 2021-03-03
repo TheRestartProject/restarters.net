@@ -50,7 +50,7 @@ class EventController extends Controller
 
 
          $groups_array = collect([]);
-         foreach ($groups as $key => $group) {
+         foreach ($groups as $group) {
              $groupStats = $group->getGroupStats($emissionRatio);
            $groups_array->push([
                'id' => $group->idgroups,

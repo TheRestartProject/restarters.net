@@ -101,7 +101,7 @@ class SyncEvents extends Command
                 // We need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
                 $thePost = $this->wordpressClient->getPost($event->wordpress_post_id);
 
-                foreach ($thePost['custom_fields'] as $i => $field) {
+                foreach ($thePost['custom_fields'] as $field) {
                     foreach ($custom_fields as $k => $set_field) {
                         if ($field['key'] == $set_field['key']) {
                             $custom_fields[$k]['id'] = $field['id'];

@@ -32,7 +32,7 @@ class LanguageSwitcher
           // Check to see whether any default languages exist on browser
             if (!empty($agent->languages())) {
               // Loop through all languages until we hit a match
-                foreach ($agent->languages() as $language => $locale) {
+                foreach ($agent->languages() as $locale) {
                   // Check to see what supported languages there are before committing
                     if (in_array($locale, LaravelLocalization::getSupportedLanguagesKeys())) {
                         // Store in session

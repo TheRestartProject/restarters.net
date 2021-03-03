@@ -50,8 +50,6 @@ class ExportController extends Controller
 
     public function devices(Request $request)
     {
-        $Device = new Device;
-
         // To not display column if the referring URL is therestartproject.org
         $host = parse_url(\Request::server('HTTP_REFERER'), PHP_URL_HOST);
 
@@ -131,31 +129,10 @@ class ExportController extends Controller
         );
 
         return Response::download($filename, 'devices.csv', $headers);
-
-        // $header = array(
-        //             array(
-        //                 'Category',
-        //                 'Brand',
-        //                 'Model',
-        //                 'Comments',
-        //                 'Repair Status',
-        //                 'Spare parts (needed/used)',
-        //                 'Restart Party Location',
-        //                 'Restart Group',
-        //                 'Restart Party Date'
-        //                 )
-        //             );
-        // $data = array_merge($header, $data);
-        //
-        // return view('export.devices', [
-        //   'data' => $data,
-        // ]);
     }
 
     public function parties()
     {
-        $Groups = new Group;
-        $Parties = new Party;
         $Device = new Device;
         $Search = new Search;
         unset($_GET['url']);
@@ -200,9 +177,7 @@ class ExportController extends Controller
             $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags);
             $PartyArray = array();
             $need_attention = 0;
-            $participants = 0;
-            $hours_volunteered = 0;
-            $totalCO2 = 0;
+
             foreach ($PartyList as $i => $party) {
                 if ($party->device_count == 0) {
                     $need_attention++;
@@ -235,14 +210,14 @@ class ExportController extends Controller
                             break;
                         case 3:
                             $party->dead_devices++;
-
+                            break;
+                        default:
                             break;
                     }
                     if ($device->category == 46) {
                         $party->guesstimates = true;
                     }
                 }
-                $party->weight = $party->weight;
 
                 $totalCO2 += $party->co2;
 
@@ -274,7 +249,6 @@ class ExportController extends Controller
             fputcsv($file, $columns);
 
             foreach ($PartyArray as $d) {
-                //$d = array_filter((array) $d, 'utf8_encode');
                 fputcsv($file, $d);
             }
             fclose($file);
@@ -284,16 +258,6 @@ class ExportController extends Controller
             );
 
             return Response::download($filename, $filename, $headers);
-
-            /** lets format the array **/
-          // $headers = array(
-          //       "Date","Venue","Group","Participants","Volunteers","CO2 (kg)","Weight (kg)","Fixed","Repairable","Dead","Hours Volunteered"
-          // );
-          // $data = array_merge($columns, $PartyArray);
-
-          // return view('export.parties', [
-          //   'data' => $data,
-          // ]);
         }
         $data = array('No data to return');
 
@@ -303,7 +267,7 @@ class ExportController extends Controller
     }
 
     // TODO: why is this in ExportController?
-    public function getTimeVolunteered($search = null, $export = false, Request $request)
+    public function getTimeVolunteered(Request $request, $search = null, $export = false)
     {
         $user = Auth::user();
 
@@ -518,9 +482,9 @@ class ExportController extends Controller
     public function exportTimeVolunteered(Request $request)
     {
         if (! empty($request->all())) {
-            $data = $this->getTimeVolunteered(true, true, $request);
+            $data = $this->getTimeVolunteered($request, true, true);
         } else {
-            $data = $this->getTimeVolunteered(null, true, $request);
+            $data = $this->getTimeVolunteered($request, null, true);
         }
 
         //Creat new file and set headers

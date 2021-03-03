@@ -22,15 +22,6 @@ class SyncMobiFixOra extends Command {
     protected $description = 'Update devices_mobifix_ora table with winning fault types';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct() {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed

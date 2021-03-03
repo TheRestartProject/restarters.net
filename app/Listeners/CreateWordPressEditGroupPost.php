@@ -68,7 +68,7 @@ class CreateWordPressEditGroupPost
                     $existingPost = $this->wpClient->getPost($group->wordpress_post_id);
 
                     if ( isset($existingPost['custom_fields'])) {
-                        foreach ($existingPost['custom_fields'] as $i => $field) {
+                        foreach ($existingPost['custom_fields'] as $field) {
                             foreach ($custom_fields as $k => $set_field) {
                                 if ($field['key'] == $set_field['key']) {
                                     $custom_fields[$k]['id'] = $field['id'];

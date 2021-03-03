@@ -28,8 +28,9 @@ class AddUserToDiscourseGroup
      */
     public function handle(UserFollowedGroup $event)
     {
-        if ( ! config('restarters.features.discourse_integration'))
+        if ( ! config('restarters.features.discourse_integration')) {
             return;
+        }
 
         // add user to the network groups for the group the user followed.
         $repairGroup = $event->group;

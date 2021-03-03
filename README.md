@@ -41,7 +41,7 @@ electronic repairs. Please read more at http://rstrt.org/FAQ
 
 ## Specifications
 
-Compiled version of the specs is available at: https://therestartproject.github.io/restarters.net/Index.html
+Compiled version of the specs is available at: https://therestartproject.github.io/restarters.net/Index.html.
 
 ## Funding and future development
 

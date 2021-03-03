@@ -61,8 +61,6 @@ class CheckAuthService extends JsonResource
         $this->menu->get('general')->put(Lang::get('general.menu_help_feedback'), Lang::get('general.help_feedback_url'));
         $this->menu->get('general')->put(Lang::get('general.menu_faq'), Lang::get('general.faq_url'));
         $this->menu->get('general')->put(Lang::get('general.therestartproject'), Lang::get('general.restartproject_url'));
-
-        //$this->populateUserDropdownItems($user);
     }
 
     private function handle($email)
@@ -74,8 +72,6 @@ class CheckAuthService extends JsonResource
         }
 
         $this->authenticated = true;
-        //$this->is_admin = $this->user->getUserFromDiscourse()['user']['admin'];
-        //$this->is_host = $this->user->getUserFromDiscourse()['user']['moderator'];
         $this->edit_profile_link = $this->edit_profile_link.$this->user->id;
 
         if ($this->is_host || $this->is_admin) {
@@ -105,35 +101,5 @@ class CheckAuthService extends JsonResource
             'is_admin' => $this->is_admin,
             'menu' => $this->menu->toArray(),
         ];
-    }
-
-    private function populateUserDropdownItems($user)
-    {
-        $user_menu = $this->menu->get('user');
-
-        $user_menu->put(Lang::get('general.profile'), url('profile/edit/'.$user->id));
-
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
-            $user_menu->put('profile_spacer', 'spacer');
-            $user_menu->put('header', 'Administrator');
-            $user_menu->put('Brands', route('brands'));
-            $user_menu->put('Skills', route('skills'));
-            $user_menu->put('Group tags', route('tags'));
-            $user_menu->put('Categories', route('category'));
-            $user_menu->put('Users', route('users'));
-            $user_menu->put('Roles', route('roles'));
-
-            if (FixometerHelper::hasPermission('verify-translation-access', $user)) {
-                $user_menu->put('Translations', url('translations'));
-            }
-        }
-
-        if (FixometerHelper::hasPermission('repair-directory', $user)) {
-            $user_menu->put('Repair Directory', config('restarters.repairdirectory.base_url').'/admin');
-        }
-
-        $user_menu->put('logout_spacer', 'spacer');
-
-        $user_menu->put(Lang::get('general.logout'), url('logout'));
     }
 }

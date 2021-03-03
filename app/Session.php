@@ -51,7 +51,7 @@ class Session extends Model
         $sql = 'UPDATE `sessions` SET `session` = :session WHERE `user` = :user';
 
         try {
-            $q = DB::update(DB::raw($sql), array('session' => $sessionToken, 'user' => $user));
+            DB::update(DB::raw($sql), array('session' => $sessionToken, 'user' => $user));
 
             unset($_SESSION[env('APP_NAME')]);
             $_SESSION[env('APP_NAME')][env('APP_KEY')] = $sessionToken;//was $_SESSION[APPNAME][SESSIONKEY] will need a config file for SESSIONKEY
