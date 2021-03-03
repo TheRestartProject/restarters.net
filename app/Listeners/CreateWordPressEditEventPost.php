@@ -81,7 +81,7 @@ class CreateWordPressEditEventPost
                 $thePost = $this->wpClient->getPost($theParty->wordpress_post_id);
 
                 if ( isset($thPost['custom_fields'])) {
-                    foreach ($thePost['custom_fields'] as $i => $field) {
+                    foreach ($thePost['custom_fields'] as $field) {
                         foreach ($custom_fields as $k => $set_field) {
                             if ($field['key'] == $set_field['key']) {
                                     $custom_fields[$k]['id'] = $field['id'];

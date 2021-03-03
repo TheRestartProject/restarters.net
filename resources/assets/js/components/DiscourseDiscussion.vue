@@ -103,4 +103,9 @@ table th {
 .table-responsive {
     margin-bottom: 0;
 }
+
+a {
+  text-decoration: underline;
+  color: #222;
+}
 </style>

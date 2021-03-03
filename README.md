@@ -1,6 +1,6 @@
 # restarters.net
 
-restarters.net is a suite of software for the repair community.
+restarters.net is a suite of software for the repair community. 
 
 Restarters brings together community repair enthusiasts and activists from
 around the world, to engage in discussion and to organise local community repair

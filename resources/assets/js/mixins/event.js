@@ -8,7 +8,7 @@ export default {
       return this.$store.getters['events/get'](this.idevents)
     },
     volunteerCount() {
-      return this.event && this.event.volunteers ? this.event.volunteers.length : 0
+      return this.event && this.event.volunteers ? this.event.volunteers : 0
     },
     upcoming() {
       let ret = false;

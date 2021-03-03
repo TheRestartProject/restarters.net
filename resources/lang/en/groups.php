@@ -140,7 +140,6 @@ return array (
   'cars' => '{0}cars|{1}car|[2,*]cars',
   'days' => '{0}days|{1}day|[2,*]days',
   'host' => 'Host',
-  'see_all_groups' => 'See all groups',
   'follow_group' => 'Follow',
   'see_all_volunteers' => 'See all :count volunteer|See all :count volunteers',
   'no_volunteers' => 'There are no volunteers in this group',

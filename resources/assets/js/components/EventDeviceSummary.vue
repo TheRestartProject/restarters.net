@@ -80,6 +80,10 @@ export default {
   components: {EventDevice, ConfirmModal},
   mixins: [ event ],
   props: {
+    idevents: {
+      type: Number,
+      required: true
+    },
     device: {
       type: Object,
       required: true
@@ -93,7 +97,22 @@ export default {
       type: Boolean,
       required: false,
       default: true
-    }
+    },
+    clusters: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    brands: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    barrierList: {
+      type: Array,
+      required: false,
+      default: null
+    },
   },
   data () {
     return {

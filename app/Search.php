@@ -44,9 +44,7 @@ class Search extends Model
         $eventsQuery->orderBy('events.event_date', 'desc');
 
 
-        $parties = $eventsQuery->get();
-
-        return $parties;
+        return $eventsQuery->get();
     }
 
     public function deviceStatusCount($parties)

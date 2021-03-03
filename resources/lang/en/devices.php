@@ -96,6 +96,7 @@ return array (
   'repair_url' => 'URL for repair information',
   'tooltip_category' => 'Choose the category that best fits this item. <a target=\'_blank\' rel=\'noopener noreferrer\' href=\'https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--category\'>More information about these categories...</a>',
   'tooltip_model' => 'Add as much information about the specific item or model of device here as you can (e.g. `Denim jeans` or ‘Galaxy S10 5G’).',
+  'tooltip_type' => 'Add as much information about the type of item here as you can (e.g. `Denim jeans` or ‘Sofa’)',
   'tooltip_problem' => '<p>Please provide as much detail as you can about the problem with the device and what was done to repair it. For example:</p><ul><li>How did it break?</li><li>What, specifically, was broken?</li><li>What steps were taken to fix it and did they work?</li></ul><p><a href=\'https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--comments\' target=\'_blank\' rel=\'noopener nofollower\'>More information</a></p>',
   'tooltip_notes' => '<p>Add any additional detail here, for example:</p><ul><li>Did you encounter anything that made the repair more difficult?</li><li>Was the actual problem different to what the owner thought?</li></ul>',
   'placeholder_notes' => 'Notes.  Examples: repair difficulties, owner\'s perception of problem etc.',

@@ -23,8 +23,9 @@ class DiscourseUserEventSubscriber
         $user = $event->user;
 
         // Only sync if the email actually changed.
-        if ( ! $user->isDirty('email'))
+        if ( ! $user->isDirty('email')) {
             return;
+        }
 
         try {
             $this->syncSso($user);
@@ -38,8 +39,9 @@ class DiscourseUserEventSubscriber
         $user = $event->user;
 
         // Only sync if the language actually changed.
-        if ( ! $user->isDirty('language'))
+        if ( ! $user->isDirty('language')) {
             return;
+        }
 
         try {
             $endpoint = "/users/by-external/{$user->id}.json";
@@ -53,8 +55,9 @@ class DiscourseUserEventSubscriber
             }
 
             $json = json_decode($response->getBody()->getContents(), true);
-            if (empty($json['user']))
+            if (empty($json['user'])) {
                 throw new \Exception("User {$user->id} not found in Discourse");
+            }
 
             $userName = $json['user']['username'];
 

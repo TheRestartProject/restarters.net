@@ -117,11 +117,9 @@ class User extends Authenticatable implements Auditable
             $groupsNearbyQuery->whereNotIn('idgroups', $idsOfGroupsToIgnore);
         }
 
-        $groupsNearby = $groupsNearbyQuery->orderBy('distance', 'ASC')
+        return $groupsNearbyQuery->orderBy('distance', 'ASC')
             ->take($numberOfGroups)
             ->get();
-
-        return $groupsNearby;
     }
 
     public function preferences()
@@ -143,11 +141,6 @@ class User extends Authenticatable implements Auditable
             'preference_id' => $preference->getKey()
         ]);
     }
-
-    //
-    // public function sessions() {
-    //   return $this->hasMany('App\Session', 'user', 'id');
-    // }
 
     public function getRolePermissions($role)
     {
@@ -389,17 +382,14 @@ class User extends Authenticatable implements Auditable
      */
     public function getRepairNetwork($string = false, $slug = false)
     {
-        if ($string == true) {
-            switch ($this->repair_network) {
-                case 2:
-                    $network = 'Repair Share';
-
-                    break;
-                default:
-                    $network = 'Restarters';
+        if ($string) {
+            if ($this->repair_network === 2) {
+                $network = 'Repair Share';
+            } else {
+                $network = 'Restarters';
             }
 
-            if ($slug == true) {
+            if ($slug) {
                 return str_slug($network);
             }
 
@@ -510,7 +500,7 @@ class User extends Authenticatable implements Auditable
     {
         $network = Network::find($this->repair_network);
 
-        return ($network->include_in_zapier == true);
+        return $network->include_in_zapier;
     }
 
     public function networks()

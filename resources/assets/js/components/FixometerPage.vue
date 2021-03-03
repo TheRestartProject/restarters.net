@@ -8,7 +8,7 @@
       <h2 class>
         {{ translatedRestartRecords }}
       </h2>
-      <div>
+      <div v-if="isAdmin">
         <b-btn variant="primary" href="/export/devices/?">
           {{ translatedExportDeviceData}}
         </b-btn>
@@ -240,6 +240,10 @@ export default {
       type: Array,
       required: false,
       default: null
+    },
+    isAdmin: {
+      type: Boolean,
+      required: true
     }
   },
   data () {

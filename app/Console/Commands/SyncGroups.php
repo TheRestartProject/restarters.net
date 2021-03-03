@@ -73,7 +73,7 @@ class SyncGroups extends Command
                     // We need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
                     $existingPost = $this->wordpressClient->getPost($group->wordpress_post_id);
 
-                    foreach ($existingPost['custom_fields'] as $i => $field) {
+                    foreach ($existingPost['custom_fields'] as $field) {
                         foreach ($custom_fields as $k => $set_field) {
                             if ($field['key'] == $set_field['key']) {
                                 $custom_fields[$k]['id'] = $field['id'];

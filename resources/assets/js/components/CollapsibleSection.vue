@@ -1,10 +1,12 @@
 <template>
-  <div>
+  <div :class="{
+      'border-shadow': borderShadow
+  }">
     <component :is="headingLevel" :class="{
       'd-flex': true,
       'd-md-none': hideTitle,
-      'mb-3': true,
-      'justify-content-between': true
+      headingClass : true,
+      'justify-content-between': true,
       }" @click="toggle">
       <div class="d-flex w-100 justify-content-between align-items-center">
         <div class="d-flex flex-row">
@@ -88,10 +90,25 @@ export default {
       required: false,
       default: 'h2'
     },
+    headingClass: {
+      type: String,
+      required: false,
+      default: 'mb-3'
+    },
     showHorizontalRule: {
       type: Boolean,
       required: false,
       default: true
+    },
+    borderShadow: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    persist: {
+      type: String,
+      required: false,
+      default: null
     }
   },
   data () {
@@ -101,16 +118,41 @@ export default {
   },
   mounted() {
     this.expanded = !this.collapsed
+
+    if (this.persist) {
+      try {
+        // We might have a stored state which overrides this.
+        const stored = localStorage.getItem('collapsible-' + this.persist)
+
+        if (stored !== null) {
+          this.expanded = stored === 'false' ? false : true
+        }
+      } catch (e) {
+        console.log("Get local failed", e)
+      }
+    }
   },
   methods: {
     toggle() {
       this.expanded = !this.expanded
+
+      if (this.persist) {
+        // Save state.
+        try {
+          localStorage.setItem('collapsible-' + this.persist, this.expanded)
+        } catch (e) {
+          console.log("Set local failed", e)
+        }
+      }
     }
   }
 }
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 .icon {
   width: 30px;
@@ -118,5 +160,14 @@ export default {
 
 .count {
   color: $brand-light;
+}
+
+.border-shadow {
+  background-color: $white;
+  border: 1px solid $black;
+
+  @include media-breakpoint-up(md) {
+    box-shadow: 5px 5px $black;
+  }
 }
 </style>
