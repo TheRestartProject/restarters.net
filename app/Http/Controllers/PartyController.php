@@ -831,7 +831,6 @@ class PartyController extends Controller
                         if (FixometerHelper::featureIsEnabled(env('FEATURE__DEVICE_PHOTOS'))) {
                             if ($files[$i]['error'] == 0) {
                                 $File->simpleUpload($files[$i], 'device', $iddevice, 'Device S/N Image');
-                            }
                         }
                     } else {
                         //echo "creating---";
@@ -840,7 +839,6 @@ class PartyController extends Controller
                         if (FixometerHelper::featureIsEnabled(env('FEATURE__DEVICE_PHOTOS'))) {
                             if ($files[$i]['error'] == 0) {
                                 $File->simpleUpload($files[$i], 'device', $iddevice, 'Device S/N Image');
-                            }
                         }
                     }
 
