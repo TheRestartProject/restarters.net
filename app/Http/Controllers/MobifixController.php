@@ -24,7 +24,7 @@ class MobifixController extends Controller {
             }
         }
 
-        if ($request->isMethod('post') && !empty($_POST) && (isset($_POST['iddevices'])) {
+        if ($request->isMethod('post') && !empty($_POST) && (isset($_POST['iddevices']))) {
             $data = $_POST;
             $Mobifix = new Mobifix;
             $insert = [
@@ -41,7 +41,12 @@ class MobifixController extends Controller {
             }
         }
         $Mobifix = new Mobifix;
-        $fault = $Mobifix->fetchFault()[0];
+        $faultResult = $Mobifix->fetchFault();
+        if (!empty($faultResult)) {
+            $fault = $faultResult[0];
+        } else {
+            $fault = false;
+        }
         if (!$fault) {
             return redirect()->action('MobifixController@status');
         }
