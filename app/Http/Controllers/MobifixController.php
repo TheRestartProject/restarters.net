@@ -24,7 +24,7 @@ class MobifixController extends Controller {
             }
         }
 
-        if ($request->isMethod('post') && !empty($_POST) && (isset($_POST['iddevices'])) {
+        if ($request->isMethod('post') && !empty($_POST) && (isset($_POST['iddevices']))) {
             $data = $_POST;
             $Mobifix = new Mobifix;
             $insert = [

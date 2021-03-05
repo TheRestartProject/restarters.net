@@ -70,6 +70,7 @@ class DeviceController extends Controller
 
     public function edit($id)
     {
+        // This page now only exists to provide a kind of API for updating a device using POST.
         $device = Device::find($id);
 
         $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
@@ -77,8 +78,6 @@ class DeviceController extends Controller
         $user = Auth::user();
 
         if (FixometerHelper::hasRole($user, 'Administrator') || ! empty($is_attending)) {
-            $Device = new Device;
-
             if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)) {
                 $data = $_POST;
                 // remove the extra "files" field that Summernote generates -
@@ -105,9 +104,6 @@ class DeviceController extends Controller
 
                     Notification::send($all_admins, new ReviewNotes($arr));
                 }
-
-                // formatting dates for the DB
-                //$data['event_date'] = dbDateNoTime($data['event_date']);
 
                 if (! isset($data['repair_more']) || empty($data['repair_more'])) { //Override
                     $data['repair_more'] = 0;
@@ -141,7 +137,6 @@ class DeviceController extends Controller
                     $weight = null;
                 }
 
-                // New logic Nov 2018
                 if ($data['spare_parts'] == 3) { // Third party
                     $data['spare_parts'] = 1;
                     $parts_provider = 2;
@@ -165,7 +160,6 @@ class DeviceController extends Controller
                 } elseif (count($data['barrier']) > 0) {
                     $data['spare_parts'] = 2;
                 }
-                // EO new logic Nov 2018
 
                 $update = array(
                     'event' => $data['event'],
@@ -206,43 +200,6 @@ class DeviceController extends Controller
                     }
                 }
             }
-
-            $device = $Device->findOne($id);
-
-            if ($device) {
-                $device->category = $device->deviceCategory;
-                $device->shortProblem = $device->getShortProblem();
-                $device->urls;
-
-                $barriers = [];
-
-                foreach ($device->barriers as $barrier) {
-                    $barriers[] = $barrier->id;
-                }
-
-                $device->barrier = $barriers;
-                $device->images = $device->getImages();
-            }
-
-            $brands = Brands::all();
-            $Categories = new Category;
-
-            foreach ($brands as $brand) {
-                $brand->brand_name;
-            }
-
-            $clusters = Cluster::all();
-
-            foreach ($clusters as $cluster) {
-                $cluster->categories;
-            }
-
-            return view('fixometer.edit', [
-                'device' => $device,
-                'brands' => $brands,
-                'clusters' => $clusters,
-                'categories' => $Categories->findAll(),
-            ]);
         }
 
         return redirect('/user/forbidden');

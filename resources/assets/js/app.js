@@ -1551,7 +1551,6 @@ jQuery(document).ready(function () {
       components: {
         'dashboardpage': require('./components/DashboardPage.vue'),
         'eventpage': require('./components/EventPage.vue'),
-        'deviceeditpage' : require('./components/DeviceEditPage'),
         'fixometerpage': require('./components/FixometerPage.vue'),
         'groupspage': require('./components/GroupsPage.vue'),
         'grouppage': require('./components/GroupPage.vue'),

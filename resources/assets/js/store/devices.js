@@ -20,6 +20,10 @@ export default {
     }
   },
   mutations: {
+    clear(state) {
+      state.devices = {}
+      state.images = {}
+    },
     set (state, params) {
       Vue.set(state.devices, params.idevents, params.devices)
 
@@ -31,6 +35,10 @@ export default {
       let exists = false
 
       if (params.iddevices) {
+        if (!state.devices[params.idevents]) {
+          Vue.set(state.devices, params.idevents, [])
+        }
+
         state.devices[params.idevents].forEach((d, i) => {
           if (d.iddevices === params.iddevices) {
             // Found it there already.
@@ -108,6 +116,9 @@ export default {
     },
   },
   actions: {
+    clear({commit}) {
+      commit('clear')
+    },
     set ({commit}, params) {
       commit('set', params)
     },

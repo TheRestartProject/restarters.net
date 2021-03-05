@@ -315,18 +315,20 @@ export default {
       })
 
       // Now find any URLs which were present originally but are no longer present - these need to be deleted.
-      this.device.urls.forEach(async (u) => {
-        const present = this.currentDevice.urls.find(u2 => {
-          return u2.id === u.id
-        })
-
-        if (!present) {
-          await this.$store.dispatch('devices/deleteURL', {
-            iddevices: this.device.iddevices,
-            url: u
+      if (this.device.urls) {
+        this.device.urls.forEach(async (u) => {
+          const present = this.currentDevice.urls.find(u2 => {
+            return u2.id === u.id
           })
-        }
-      })
+
+          if (!present) {
+            await this.$store.dispatch('devices/deleteURL', {
+              iddevices: this.device.iddevices,
+              url: u
+            })
+          }
+        })
+      }
 
       this.$emit('close')
     },
