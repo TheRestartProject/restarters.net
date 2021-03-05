@@ -56,12 +56,14 @@ export default {
       }
     },
     remove (state, params) {
-      let newarr = state.devices[params.idevents].filter((a) => {
-        return a.iddevices !== params.iddevices
-      })
+      if (state.devices[params.idevents]) {
+        let newarr = state.devices[params.idevents].filter((a) => {
+          return a.iddevices !== params.iddevices
+        })
 
-      Vue.set(state.devices, params.idevents, newarr)
-      Vue.delete(state.images, params.iddevices)
+        Vue.set(state.devices, params.idevents, newarr)
+        Vue.delete(state.images, params.iddevices)
+      }
     },
     addURL(state, params) {
       // Fix the device.  This isn't very efficient but the numbers involved are never very large.

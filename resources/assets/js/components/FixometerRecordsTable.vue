@@ -4,7 +4,7 @@
     <div class="pl-md-3 pr-md-3">
       <b-table
           ref="table"
-          :id="'recordstable-' + powered"
+          :id="tableId"
           :fields="fields"
           :items="items"
           :per-page="perPage"
@@ -49,20 +49,15 @@
         <template slot="cell(device_event.event_date)" slot-scope="data">
           {{ formatDate(data) }}
         </template>
-        <template slot="cell(show_details)" slot-scope="device">
+        <template slot="cell(show_details)" slot-scope="row">
           <div v-if="isAdmin" class="text-right d-none d-md-table-cell">
-            <div class="d-flex">
-              <span class="pl-0 pl-md-2 pr-2 clickme" @click="device.toggleDetails">
-                <b-img class="icon" src="/icons/edit_ico_green.svg" />
-              </span>
-              <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
-                <b-img class="icon" src="/icons/delete_ico_red.svg" />
-              </span>
-            </div>
-            <ConfirmModal :key="'modal-' + device.iddevices" ref="confirmDelete" @confirm="deleteConfirmed(device)" :message="translatedConfirmDeleteDevice" />
+            <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
+              <b-img class="icon" src="/icons/edit_ico_green.svg" />
+            </span>
+            <ConfirmModal :key="'modal-' + row.item.iddevices" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="translatedConfirmDeleteDevice" />
           </div>
           <div v-else>
-            <span class="pl-0 pl-md-2 pr-2 clickme" @click="device.toggleDetails">
+            <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
               <b-img class="icon" src="/icons/info_ico_green.svg" />
             </span>
           </div>
@@ -73,6 +68,7 @@
               :powered="powered"
               :add="false"
               :edit="isAdmin"
+              :delete-button="true"
               :clusters="clusters"
               :idevents="row.item.event"
               :brands="brands"
@@ -198,6 +194,9 @@ export default {
     }
   },
   computed: {
+    tableId() {
+      return 'recordstable-' + this.powered
+    },
     fields () {
       let ret = [
         {
@@ -415,16 +414,19 @@ export default {
     deleteConfirm() {
       this.$refs.confirmDelete.show()
     },
-    deleteConfirmed(device) {
-      this.$store.dispatch('devices/delete', {
+    async deleteConfirmed(device) {
+      console.log("Delete", device)
+      await this.$store.dispatch('devices/delete', {
         iddevices: device.iddevices,
-        idevents: device.idevents
+        idevents: device.event
       })
+
+      this.$root.$emit('bv::refresh::table', this.tableId)
     },
     closed(row) {
       // We have saved/edited the device.  We want to refresh the table to any edited data is updated, and
       // close the details.
-      this.$root.$emit('bv::refresh::table', 'recordstable-' + this.powered)
+      this.$root.$emit('bv::refresh::table', this.tableId)
 
       row.toggleDetails()
     }
