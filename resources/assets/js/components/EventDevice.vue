@@ -52,7 +52,7 @@
       <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
         {{ translatedSave }}
       </b-btn>
-      <b-btn variant="primary" class="mr-2" v-if="deleteButton" @click="deleteDevice">
+      <b-btn variant="primary" class="mr-2" v-if="deleteButton" @click="confirmDeleteDevice">
         {{ translatedDelete }}
       </b-btn>
       <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2" />
@@ -60,6 +60,7 @@
         {{ translatedCancel }}
       </b-btn>
     </div>
+    <ConfirmModal @confirm="deleteDevice" ref="confirm" />
   </b-form>
 </template>
 <script>
@@ -85,9 +86,11 @@ import DeviceUsefulUrls from './DeviceUsefulUrls'
 import DeviceQuantity from './DeviceQuantity'
 import FileUploader from './FileUploader'
 import DeviceImages from './DeviceImages'
+import ConfirmModal from './ConfirmModal'
 
 export default {
   components: {
+    ConfirmModal,
     DeviceImages,
     FileUploader,
     DeviceQuantity,
@@ -347,6 +350,17 @@ export default {
       // is weak.
       image.iddevices = this.currentDevice.iddevices
       this.$store.dispatch('devices/deleteImage', image)
+    },
+    confirmDeleteDevice() {
+      this.$refs.confirm.show()
+    },
+    deleteDevice() {
+      this.$store.dispatch('devices/delete', {
+        iddevices: this.device.iddevices,
+        idevents: this.idevents
+      })
+
+      window.location = '/fixometer'
     }
   }
 }

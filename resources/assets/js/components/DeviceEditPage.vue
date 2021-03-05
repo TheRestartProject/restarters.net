@@ -58,14 +58,20 @@ export default {
     }
   },
   mounted () {
-    // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
-    // and so that as/when it changes then reactivity updates all the views.
-    //
-    // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
-    this.$store.dispatch('devices/set', {
-      idevents: this.initialDevice.event,
-      devices: [this.initialDevice]
-    })
+    if (!this.initialDevice) {
+      // Invalid device id.  Just go back to the Fixometer page.  This shouldn't happen so we don't need a pretty
+      // error.
+      window.location = '/fixometer'
+    } else {
+      // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
+      // and so that as/when it changes then reactivity updates all the views.
+      //
+      // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
+      this.$store.dispatch('devices/set', {
+        idevents: this.initialDevice.event,
+        devices: [this.initialDevice]
+      })
+    }
   },
   methods: {
     reload() {

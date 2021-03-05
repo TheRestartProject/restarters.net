@@ -206,26 +206,23 @@ class DeviceController extends Controller
                     }
                 }
             }
-            $Events = new Party;
-            $Categories = new Category;
-            $File = new FixometerFile;
-
-            $UserEvents = $Events->findAll();
 
             $device = $Device->findOne($id);
 
-            $device->category = $device->deviceCategory;
-            $device->shortProblem = $device->getShortProblem();
-            $device->urls;
+            if ($device) {
+                $device->category = $device->deviceCategory;
+                $device->shortProblem = $device->getShortProblem();
+                $device->urls;
 
-            $barriers = [];
+                $barriers = [];
 
-            foreach ($device->barriers as $barrier) {
-                $barriers[] = $barrier->id;
+                foreach ($device->barriers as $barrier) {
+                    $barriers[] = $barrier->id;
+                }
+
+                $device->barrier = $barriers;
+                $device->images = $device->getImages();
             }
-
-            $device->barrier = $barriers;
-            $device->images = $device->getImages();
 
             $brands = Brands::all();
             $Categories = new Category;
