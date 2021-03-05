@@ -68,7 +68,16 @@
           </div>
         </template>
         <template slot="row-details" slot-scope="row">
-          <EventDevice :device="row.item" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="row.item.event" :brands="brands" :barrier-list="barrierList" @close="row.toggleDetails" />
+          <EventDevice
+              :device="row.item"
+              :powered="powered"
+              :add="false"
+              :edit="isAdmin"
+              :clusters="clusters"
+              :idevents="row.item.event"
+              :brands="brands"
+              :barrier-list="barrierList"
+              @close="closed(row)" />
         </template>
       </b-table>
       <div class="d-flex justify-content-end" v-if="total > perPage">
@@ -412,6 +421,13 @@ export default {
         idevents: device.idevents
       })
     },
+    closed(row) {
+      // We have saved/edited the device.  We want to refresh the table to any edited data is updated, and
+      // close the details.
+      this.$root.$emit('bv::refresh::table', 'recordstable-' + this.powered)
+
+      row.toggleDetails()
+    }
   }
 }
 </script>
