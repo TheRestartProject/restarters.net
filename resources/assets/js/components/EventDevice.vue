@@ -52,7 +52,7 @@
       <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
         {{ translatedSave }}
       </b-btn>
-      <b-btn variant="primary" class="mr-2" v-if="deleteButton" @click="confirmDeleteDevice">
+      <b-btn variant="primary" class="mr-2" v-if="edit && deleteButton" @click="confirmDeleteDevice">
         {{ translatedDelete }}
       </b-btn>
       <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2" />
@@ -128,7 +128,7 @@ export default {
     cancelButton: {
       type: Boolean,
       required: false,
-      default: false
+      default: true
     },
     powered: {
       // The server might return a number rather than a boolean.
@@ -418,7 +418,7 @@ export default {
 h3 {
   font-size: $font-size-base;
   font-weight: bold;
-  color: #fff;
+  color: $brand-light;
 }
 
 .add-device {

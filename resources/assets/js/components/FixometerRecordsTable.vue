@@ -10,7 +10,6 @@
           :per-page="perPage"
           :current-page="currentPage"
           sort-null-last
-          tbody-tr-class="clickme"
       >
         <template slot="cell(shortProblem)" slot-scope="data">
           <div v-line-clamp="3">
@@ -73,6 +72,7 @@
               :idevents="row.item.event"
               :brands="brands"
               :barrier-list="barrierList"
+              :cancel-button="false"
               @close="closed(row)" />
         </template>
       </b-table>
