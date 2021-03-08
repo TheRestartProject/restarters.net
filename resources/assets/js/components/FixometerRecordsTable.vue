@@ -460,4 +460,8 @@ export default {
 /deep/ .table th {
   padding: 5px;
 }
+
+/deep/ tr.b-table-details td {
+  padding: 0px;
+}
 </style>
