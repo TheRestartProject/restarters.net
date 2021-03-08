@@ -85,14 +85,12 @@
         ></b-pagination>
       </div>
     </div>
-    <DeviceModal ref="modal" :device="device" v-if="device" />
   </div>
 </template>
 <script>
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 import moment from 'moment'
 import DeviceModel from './DeviceModel'
-import DeviceModal from './DeviceModal'
 import Vue       from 'vue'
 import lineClamp from 'vue-line-clamp'
 import ConfirmModal from './ConfirmModal'
@@ -105,7 +103,7 @@ Vue.use(lineClamp, {
 const bootaxios = require('axios')
 
 export default {
-  components: {EventDevice, ConfirmModal, DeviceModal, DeviceModel},
+  components: {EventDevice, ConfirmModal, DeviceModel},
   props: {
     isAdmin: {
       type: Boolean,
