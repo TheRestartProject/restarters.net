@@ -124,7 +124,7 @@
       }
 
       foreach ($upcoming_events_in_area as $event) {
-          $e = expandEvent($event, $group, $emissionRatio)
+          $e = expandEvent($event, $group, $emissionRatio);
           $e['nearby'] = TRUE;
           $expanded_events[] = $e;
       }
