@@ -297,7 +297,7 @@ export default {
     upcoming() {
       return this.events.filter(e => {
         const start = new moment(e.event_date + ' ' + e.start)
-        return start.isAfter()
+        return start.isAfter() && !e.nearby && !e.all
       })
     },
     upcomingToShow() {
