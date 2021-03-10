@@ -29,7 +29,7 @@
               </div>
             </template>
             <p v-if="!upcoming.length">
-              {{ translatedNoUpcoming }}.
+              {{ translatedNoUpcoming }}
             </p>
             <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
               <GroupEventsTableHeading />
@@ -79,81 +79,75 @@
         </b-tabs>
       </template>
     </CollapsibleSection>
-    <div class="d-block d-md-none">
-      <component :is="headingLevel" class="border-bottom-thick d-flex justify-content-between w-100 pt-2">
-        {{ translatedTitle }}
-        <b-btn v-if="calendarCopyUrl" class="ml-2" variant="primary" @click="showCalendar">
-          <b-img-lazy class="mobileicon" src="/images/subs_cal_ico.svg" />
-        </b-btn>
-        <b-btn variant="primary" href="/party/create" class="align-self-center">
-        <span class="d-block d-md-none">
-          {{ translatedAddEventMobile }}
-        </span>
-        </b-btn>
-      </component>
-      <CollapsibleSection class="lineheight" collapsed :heading-level="headingSubLevel">
-        <template slot="title">
-          <div class="d-flex flex-column justify-content-center lineheight">
-            <div class="text-uppercase fontsize">
-              <span class="font-weight-bold">{{ translatedUpcoming }}</span>
-              <span class="text-muted fontsize">({{ upcoming.length }})</span>
+    <CollapsibleSection class="lineheight d-none d-md-block mt-4" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel">
+      <template slot="title">
+        <div class="d-flex justify-content-between w-100">
+          <div>
+            <span v-if="group">{{ group.name }}</span> Other events
+          </div>
+        </div>
+      </template>
+      <template slot="content">
+        <b-tabs class="ourtabs w-100">
+          <b-tab active title-item-class="w-50" class="pt-2" lazy>
+            <template slot="title">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b>{{ translatedNearby }}</b> ({{ nearby.length }})
+                </div>
+              </div>
+            </template>
+            <p v-if="!nearby.length">
+              {{ translatedNoOther }}
+            </p>
+            <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+              <GroupEventsTableHeading />
+              <b-tbody class="table-height">
+                <GroupEventSummary v-for="e in nearbyToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
+                <infinite-loading @infinite="loadMoreNearby" :force-use-infinite-wrapper="true">
+                  <span slot="no-results" />
+                  <span slot="no-more" />
+                  <span slot="spinner" />
+                </infinite-loading>
+              </b-tbody>
+            </b-table-simple>
+            <div class="text-center" v-if="limit">
+              <b-btn variant="link" @click="showAllNearby">
+                {{ translatedSeeAll }}
+              </b-btn>
             </div>
-          </div>
-        </template>
-        <template slot="content">
-          <p v-if="!upcoming.length">
-            {{ translatedNoUpcoming }}.
-          </p>
-          <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
-            <GroupEventsTableHeading />
-            <b-tbody class="table-height">
-              <GroupEventSummary v-for="e in upcomingToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
-              <infinite-loading @infinite="loadMoreUpcoming" :force-use-infinite-wrapper="true">
-                <span slot="no-results" />
-                <span slot="no-more" />
-                <span slot="spinner" />
-              </infinite-loading>
-            </b-tbody>
-          </b-table-simple>
-          <div class="text-right" v-if="limit">
-            <b-btn variant="link" :href="'/party/group/' + idgroups">
-              {{ translatedSeeAll }}
-            </b-btn>
-          </div>
-        </template>
-      </CollapsibleSection>
-      <CollapsibleSection class="lineheight" collapsed :heading-level="headingSubLevel">
-        <template slot="title">
-          <div class="d-flex flex-column justify-content-center lineheight">
-            <div class="text-uppercase fontsize">
-              <span class="font-weight-bold">{{ translatedPast }}</span>
-              <span class="text-muted fontsize">({{ past.length }})</span>
+          </b-tab>
+          <b-tab title-item-class="w-50" class="pt-2" lazy>
+            <template slot="title">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b>{{ translatedAll }}</b> ({{ all.length }})
+                </div>
+              </div>
+            </template>
+            <p v-if="!all.length">
+              {{ translatedNoOther }}
+            </p>
+            <b-table-simple v-else responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+              <GroupEventsTableHeading />
+              <b-tbody class="table-height">
+                <GroupEventSummary v-for="e in allToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
+                <infinite-loading @infinite="loadMoreAll" :force-use-infinite-wrapper="true">
+                  <span slot="no-results" />
+                  <span slot="no-more" />
+                  <span slot="spinner" />
+                </infinite-loading>
+              </b-tbody>
+            </b-table-simple>
+            <div class="text-center" v-if="limit">
+              <b-btn variant="link" @click="showAllAll">
+                {{ translatedSeeAll }}
+              </b-btn>
             </div>
-          </div>
-        </template>
-        <template slot="content">
-          <p v-if="!past.length">
-            {{ translatedNoPastEvents }}
-          </p>
-          <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
-            <GroupEventsTableHeading past />
-            <b-tbody class="table-height">
-              <GroupEventSummary v-for="e in pastToShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
-              <infinite-loading @infinite="loadMorePast" :force-use-infinite-wrapper="true">
-                <span slot="no-results" />
-                <span slot="no-more" />
-                <span slot="spinner" />
-              </infinite-loading>
-            </b-tbody>
-          </b-table-simple>
-          <div class="text-right" v-if="limit">
-            <b-btn variant="link" :href="'/party/group/' + idgroups">
-              {{ translatedSeeAll }}
-            </b-btn>
-          </div>
-        </template>
-      </CollapsibleSection>
-    </div>
+          </b-tab>
+        </b-tabs>
+      </template>
+    </CollapsibleSection>
     <CalendarAddModal ref="calendar" :copy-url="calendarCopyUrl" :edit-url="calendarEditUrl" v-if="calendarCopyUrl">
       <template slot="title">
         {{ translatedCalendarTitle }}
@@ -229,7 +223,9 @@ export default {
   data () {
     return {
       showPast: 0,
-      showUpcoming: 0
+      showUpcoming: 0,
+      showNearby: 0,
+      showAll: 0
     }
   },
   computed: {
@@ -249,8 +245,17 @@ export default {
     translatedUpcoming() {
       return this.$lang.get('groups.upcoming_active')
     },
+    translatedNearby() {
+      return this.$lang.get('groups.nearby')
+    },
+    translatedAll() {
+      return this.$lang.get('groups.all')
+    },
     translatedNoUpcoming() {
       return this.$lang.get('groups.no_upcoming_events')
+    },
+    translatedNoOther() {
+      return this.$lang.get('groups.no_other_events')
     },
     translatedNoPastEvents() {
       return this.$lang.get('groups.no_past_events')
@@ -294,6 +299,18 @@ export default {
     },
     upcomingToShow() {
       return this.limit ? this.upcoming.slice(0, this.limit) : this.upcoming.slice(0, this.showUpcoming)
+    },
+    nearby() {
+      return this.events.filter(e => e.nearby)
+    },
+    nearbyToShow() {
+      return this.limit ? this.nearby.slice(0, this.limit) : this.nearby.slice(0, this.showNearby)
+    },
+    all() {
+      return this.events.filter(e => e.all)
+    },
+    allToShow() {
+      return this.limit ? this.all.slice(0, this.limit) : this.all.slice(0, this.showAll)
     }
   },
   methods: {
@@ -308,6 +325,14 @@ export default {
         $state.complete()
       }
     },
+    loadMoreNearby($state) {
+      if (this.showNearby < this.nearby.length) {
+        this.showNearby += 1
+        $state.loaded()
+      } else {
+        $state.complete()
+      }
+    },
     loadMorePast($state) {
       if (this.showPast < this.past.length) {
         this.showPast += 1
@@ -316,6 +341,20 @@ export default {
         $state.complete()
       }
     },
+    loadMoreAll($state) {
+      if (this.showAll < this.all.length) {
+        this.showAll += 1
+        $state.loaded()
+      } else {
+        $state.complete()
+      }
+    },
+    showAllNearby() {
+      this.limit = 0
+    },
+    showAllAll() {
+      this.limit = 0
+    }
   },
   mounted () {
     // Data can be passed from the blade template to us via props.
@@ -372,4 +411,7 @@ export default {
   font-size: 18px !important;
 }
 
+.w-33 {
+  width: 33% !important;
+}
 </style>
