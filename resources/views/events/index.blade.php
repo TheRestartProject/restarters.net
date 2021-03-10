@@ -79,26 +79,6 @@
       $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
       $emissionRatio = $footprintRatioCalculator->calculateRatio();
       $can_edit_group = Auth::user() && $group && (FixometerHelper::hasRole( Auth::user(), 'Administrator') || $isCoordinatorForGroup || $is_host_of_group);
-
-      foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-          $thisone = $event->getAttributes();
-          $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
-          $thisone['allinvitedcount'] = $event->allInvited->count();
-
-          // TODO LATER Consider whether these should be in the event or passed into the store.
-          $thisone['stats'] = $event->getEventStats($emissionRatio);
-          $thisone['participants_count'] = $event->participants;
-          $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
-
-          $thisone['isVolunteer'] = $event->isVolunteer();
-          $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
-          $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
-
-          $thisone['group'] = \App\Group::where('idgroups', $event->group)->first();
-
-          $expanded_events[] = $thisone;
-      }
-
       $showCalendar = Auth::check() && (!$group || ($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
       $calendar_copy_url = '';
       $calendar_edit_url = '';
@@ -144,13 +124,15 @@
       }
 
       foreach ($upcoming_events_in_area as $event) {
-          $event['nearby'] = TRUE;
-          $expanded_events[] = expandEvent($event, $group, $emissionRatio);
+          $e = expandEvent($event, $group, $emissionRatio)
+          $e['nearby'] = TRUE;
+          $expanded_events[] = $e;
       }
 
       foreach ($upcoming_events_all as $event) {
-          $event['all'] = TRUE;
-          $expanded_events[] = expandEvent($event, $group, $emissionRatio);
+          $e = expandEvent($event, $group, $emissionRatio);
+          $e['all'] = TRUE;
+          $expanded_events[] = $e;
       }
 
       ?>
