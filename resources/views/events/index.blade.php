@@ -115,7 +115,7 @@
 
       $expanded_events = [];
 
-      function expandEvent($event, $group) {
+      function expandEvent($event, $group, $emissionRatio) {
           $thisone = $event->getAttributes();
 
           if (is_null($group)) {
@@ -140,17 +140,17 @@
       }
 
       foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-          $expanded_events[] = expandEvent($event, $group);
+          $expanded_events[] = expandEvent($event, $group, $emissionRatio);
       }
 
       foreach ($upcoming_events_in_area as $event) {
           $event['nearby'] = TRUE;
-          $expanded_events[] = expandEvent($event, $group);
+          $expanded_events[] = expandEvent($event, $group, $emissionRatio);
       }
 
       foreach ($upcoming_events_all as $event) {
           $event['all'] = TRUE;
-          $expanded_events[] = expandEvent($event, $group);
+          $expanded_events[] = expandEvent($event, $group, $emissionRatio);
       }
 
       ?>
