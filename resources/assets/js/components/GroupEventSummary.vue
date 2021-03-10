@@ -45,6 +45,10 @@
           {{ translatedYoureGoing }}
         </span>
       </div>
+      <!-- "all" or "nearby" events are for ones where we're not a member, so should a join button. -->
+      <b-btn variant="primary" :href="'/group/join/' + event.group.idgroups" v-else-if="event.all || event.nearby">
+        {{ translatedJoinGroup }}
+      </b-btn>
       <!-- We can't RSVP if the event is starting soon. -->
       <b-btn variant="primary" :href="'/party/join/' + idevents" :disabled="startingSoon" v-else>
         {{ translatedRSVP }}
@@ -131,6 +135,9 @@ export default {
     },
     translatedRSVP() {
       return this.$lang.get('events.RSVP')
+    },
+    translatedJoinGroup() {
+      return this.$lang.get('groups.join_group_button')
     },
   }
 }

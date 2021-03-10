@@ -98,7 +98,7 @@
               </div>
             </template>
             <p v-if="!nearby.length">
-              {{ translatedNoOther }}
+              {{ translatedNoOtherNearby }}
             </p>
             <b-table-simple v-else sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
               <GroupEventsTableHeading />
@@ -256,6 +256,9 @@ export default {
     },
     translatedNoOther() {
       return this.$lang.get('groups.no_other_events')
+    },
+    translatedNoOtherNearby() {
+      return this.$lang.get('groups.no_other_nearby_events')
     },
     translatedNoPastEvents() {
       return this.$lang.get('groups.no_past_events')
