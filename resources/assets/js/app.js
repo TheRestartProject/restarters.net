@@ -1517,11 +1517,19 @@ function initAutocomplete() {
 jQuery(document).ready(function () {
   // Vue.
   //
-  // Create a mixin so that $lang is available in all components.
+  // Create a mixin for translation.
   Vue.mixin({
     computed: {
       $lang() {
+        // We want this to be available in all components.
         return Lang
+      }
+    },
+    methods: {
+      __(key) {
+        // This means we can use __('key') in Vue templates in the same way as we are used to in Laravel
+        // templates.
+        return this.$lang.get(key)
       }
     }
   })
