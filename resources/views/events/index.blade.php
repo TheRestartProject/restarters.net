@@ -152,6 +152,7 @@
             :add-button="false"
             :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
             add-group-name
+            show-other
         />
       </div>
       @else
