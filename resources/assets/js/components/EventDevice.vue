@@ -4,8 +4,8 @@
       'add-device': add
       }">
     <div class="device-info">
-      <div class="br d-flex flex-column">
-        <b-card no-body class="p-3 flex-grow-1 botwhite border-0">
+      <div class="br d-flex flex-column botwhite">
+        <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
           <DeviceCategorySelect :class="{
             'mb-2': true,

@@ -45,5 +45,7 @@ export default {
   padding: 5px;
   font-weight: bolder;
   border: 2px solid grey;
+  width: 30px;
+  height: 30px;
 }
 </style>
