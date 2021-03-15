@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-table-simple sticky-header="50vh" responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
-      <GroupEventsTableHeading />
+      <GroupEventsTableHeading :past="past" />
       <b-tbody class="table-height">
         <GroupEventSummary v-for="e in toShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
         <infinite-loading @infinite="loadMore">
