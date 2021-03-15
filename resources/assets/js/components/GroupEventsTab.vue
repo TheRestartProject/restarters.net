@@ -10,7 +10,7 @@
     <p v-if="!events.length">
       {{ translatedNoneMessage }}
     </p>
-    <GroupEventScrollTable v-else :limit="limit" :events="events" :canedit="canedit" :add-group-name="addGroupName" />
+    <GroupEventScrollTable v-else :limit="limit" :events="events" :canedit="canedit" :add-group-name="addGroupName" :past="past" />
   </b-tab>
 </template>
 <script>
