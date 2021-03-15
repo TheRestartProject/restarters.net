@@ -48,6 +48,11 @@ export default {
     noneMessage: {
       type: String,
       required: true
+    },
+    past: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {

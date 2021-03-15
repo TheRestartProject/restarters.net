@@ -51,19 +51,15 @@ export default {
   },
   computed: {
     toShow() {
-      console.log("To show", this.limit)
       return this.limit ? this.events.slice(0, this.limit) : this.events.slice(0, this.show)
     },
   },
   methods: {
     loadMore($state) {
-      console.log("Load more", this.show, this.events.length)
       if (this.show < this.events.length) {
         this.show++
-        console.log("Loaded")
         $state.loaded()
       } else {
-        console.log("Complete")
         $state.complete()
       }
     },
