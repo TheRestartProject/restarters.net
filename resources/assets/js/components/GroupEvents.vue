@@ -21,7 +21,7 @@
       <template slot="content">
         <b-tabs class="ourtabs w-100">
           <GroupEventsTab active :limit="limit" :events="upcoming" :canedit="canedit" :add-group-name="addGroupName" title="groups.upcoming_active" noneMessage="groups.no_upcoming_events" />
-          <GroupEventsTab :limit="limit" :events="past" :canedit="canedit" :add-group-name="addGroupName" title="groups.past" noneMessage="groups.no_past_events" />
+          <GroupEventsTab :limit="limit" :events="past" :canedit="canedit" :add-group-name="addGroupName" title="groups.past" noneMessage="groups.no_past_events" past />
         </b-tabs>
       </template>
     </CollapsibleSection>
