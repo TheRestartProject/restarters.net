@@ -4,7 +4,7 @@
       <GroupEventsTableHeading />
       <b-tbody class="table-height">
         <GroupEventSummary v-for="e in toShow" :key="'event-' + e.idevents" :idevents="e.idevents" :canedit="canedit" :add-group-name="addGroupName" />
-        <infinite-loading @infinite="loadMore" :force-use-infinite-wrapper="true">
+        <infinite-loading @infinite="loadMore">
           <span slot="no-results" />
           <span slot="no-more" />
           <span slot="spinner" />
@@ -60,8 +60,10 @@ export default {
       console.log("Load more", this.show, this.events.length)
       if (this.show < this.events.length) {
         this.show++
+        console.log("Loaded")
         $state.loaded()
       } else {
+        console.log("Complete")
         $state.complete()
       }
     },
