@@ -67,15 +67,19 @@ class MicrotaskingController extends Controller
 
     private function getDiscussionTopics($tag, $numberOfTopics = null)
     {
-        if (!Auth::check()) {
-            return [];
-        }
-
+        $loggedIn = Auth::check();
         $topics = [];
+        $username = 'Logged out';
 
         try {
-            $username = Auth::user()->username;
-            $client = app('discourse-client', ['username' => $username]);
+            if ($loggedIn) {
+                // Fetch as the logged in user,
+                $username = Auth::user()->username;
+                $client = app('discourse-client', ['username' => $username]);
+            } else {
+                // Fetch what we can see logged out.
+                $client = app('discourse-client-anonymous');
+            }
 
             $endpoint = "/tag/{$tag}/l/latest.json";
             $response = $client->request('GET', $endpoint);
