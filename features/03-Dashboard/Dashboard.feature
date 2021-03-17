@@ -13,6 +13,22 @@ Scenario: Latest Talk
   Given that I am any logged in user
   When I visit the dashboard
   Then I see the latest Discourse topics
+  
+# Groups section
+  
+Scenario: User has followed a group with an upcoming event
+  Given I am a user
+  And I have followed at least 1 group that has at least 1 upcoming event
+  Then I see a list of the group(s) I follow (orderered alphabetical in the MVP) and the upcoming events (ordered by soonest first) for that/those group(s) in the my groups
+
+Scenario: Host of a group with no upcoming events
+  Given I am a host of a group that has no upcoming events
+  Then I see a list of my groups and a message encouraging me to add events for my group(s)
+
+  
+Scenario: User that hasn't followed any groups
+  Given I am a user and I haven’t followed any groups yet
+  Then I see a message inviting me to find groups in my area
 
 # Add data section
 
