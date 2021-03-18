@@ -48,7 +48,7 @@ return array (
   'see_your_impact' => 'And see your impact in the Fixometer',
   'add_data_add' => 'Add',
   'newly_added' => 'Newly added: :count group in your area!|Newly added: :count groups in your area!',
-  'no_groups' => '<strong>You aren\'t following any repair groups.</strong><br />You\'re welcome to <a href="/group/all">follow any group in the world</a>. And new groups pop up all the time, so do check back!',
-  'interested_starting' => 'Interested in starting a community repair group?',
-  'interested_details' => 'Anyone with interest and some skills in organising can start a group. Check out our event planning kit. Then join your region’s Talk group and invite others in your area for a chat! Or view our school   programme planning guide. When you’re ready to start a group, get in touch.'
+  'no_groups' => '<strong>You don\'t follow any repair groups yet</strong><br />There are community <a href="/group/all">groups all over the world</a>. You\'re welcome to follow any group to get notified when they organise events.',
+  'interested_starting' => 'Want to start your own community repair group?',
+  'interested_details' => '<p>Anyone with interest and some skills in organising can start a community repair group. Check out our <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">event planning kit</a> or view our <a href="https://talk.restarters.net/c/community-repair/school">resources for schools</a>.</p><p>Once you\'re ready to start a group, simply create one on the <a href="/groups">Groups page</a>.  And if you\'d like some help, just ask over on the forum, <a href="https://talk.restarters.net/c/community-repair/5">Talk</a>.'
 );

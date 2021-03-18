@@ -13,6 +13,7 @@
       <DashboardAddData class="adddata justify-self-end" />
       <DashboardRightSidebar class="sidebar" />
       <DiscourseDiscussion
+          v-if="topics"
           class="discourse"
           :topics="topics"
           :see-all-topics-link="seeAllTopicsLink"

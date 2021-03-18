@@ -1,14 +1,23 @@
 <template>
-  <div class="layout">
-    <b-img-lazy src="/images/no_groups.png" class="pic w-100" />
-    <!-- eslint-disable-next-line -->
-    <div class="overlay p-2">
-      <div v-html="translatedNoGroups" class="text-center text-white" />
+  <div>
+    <div v-if="nearbyGroups.length" class="layout mb-2">
+      <div class="pic" />
+      <!-- eslint-disable-next-line -->
+      <div class="overlay">
+        <div v-html="translatedNoGroups" class="text-center text-white m-2" />
+      </div>
+      <div class="group p-2">
+        <h3>{{ translatedGroupsNearYou }}</h3>
+        <hr />
+        <DashboardGroup v-for="group in nearbyGroups" :key="'nearbygroup-' + group.idgroups" :group="group" />
+      </div>
     </div>
-    <div class="group p-2">
-      <h3>{{ translatedGroupsNearYou }}</h3>
-      <hr />
-      <DashboardGroup v-for="group in nearbyGroups" :key="'nearbygroup-' + group.idgroups" :group="group" />
+    <div v-else class="layout mb-2">
+      <b-img src="/images/no_groups.png" class="pic" />
+      <!-- eslint-disable-next-line -->
+      <div class="overlay">
+        <div v-html="translatedNoGroupsNearestNoLocation" class="text-center text-white m-2" />
+      </div>
     </div>
     <div class="text pr-2 pl-2 pb-2">
       <strong>{{ translatedInterestedStarting }}</strong>
@@ -31,6 +40,9 @@ export default {
   computed: {
     translatedNoGroups() {
       return this.$lang.get('dashboard.no_groups')
+    },
+    translatedNoGroupsNearestNoLocation() {
+      return this.$lang.get('groups.no_groups_nearest_no_location')
     },
     translatedInterestedStarting() {
       return this.$lang.get('dashboard.interested_starting')
@@ -89,6 +101,17 @@ export default {
       grid-column: 2 / 3;
     }
   }
+}
+
+.pic {
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-image: url('/images/no_groups.png');
+}
+
+.overlay {
+  background-color: rgba(0, 0, 0, 0.65);
 }
 
 /deep/ .overlay a {
