@@ -17,7 +17,7 @@
               {{ translatedGroupsHeading }}
             </h3>
             <p>
-              {{ translatedCatchUp }}
+              {{ __('dashboard.catch_up') }}
             </p>
           </div>
           <div class="group-list">
@@ -97,9 +97,6 @@ export default {
     },
     translatedSeeAll() {
       return this.$lang.get('dashboard.see_all_groups')
-    },
-    translatedCatchUp() {
-      return this.$lang.get('dashboard.catch_up')
     },
     translatedYourGroupsHeading() {
       return this.$lang.get('dashboard.your_groups_heading')

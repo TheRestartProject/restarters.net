@@ -189,5 +189,6 @@ return array (
   'RSVP' => 'RSVP',
   'form_error' => 'Please check the form above for errors.',
   'your_events' => 'Your events',
+  'other_events' => 'Other events',
   'validate_location' => 'Location must be present unless the event is online.'
 );
