@@ -540,6 +540,10 @@ h2 {
   }
 }
 
+.multiselect--disabled .multiselect__select {
+  display: none;
+}
+
 .multiselect__tags {
   border-bottom-left-radius:0px !important;
   border-bottom-right-radius:0px !important;

@@ -10,31 +10,31 @@
           <DeviceCategorySelect :class="{
             'mb-2': true,
             'border-thick': missingCategory
-            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" />
+            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
           <div v-if="powered">
-            <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" />
-            <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" />
+            <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled" />
+            <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
           </div>
-          <DeviceType class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" v-else />
-          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" />
-          <DeviceAge :age.sync="currentDevice.age" />
+          <DeviceType class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" v-else />
+          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" />
+          <DeviceAge :age.sync="currentDevice.age" :disabled="disabled" />
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" class="mt-2" @remove="removeImage($event)" />
         </b-card>
       </div>
       <div class="d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ translatedTitleRepair }}</h3>
-          <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.repair_details" :parts.sync="currentDevice.spare_parts" :barriers.sync="currentDevice.barrier" :barrierList="barrierList" />
+          <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.repair_details" :parts.sync="currentDevice.spare_parts" :barriers.sync="currentDevice.barrier" :barrierList="barrierList" :disabled="disabled" />
         </b-card>
       </div>
       <div class="bl d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ translatedTitleAssessment }}</h3>
-          <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" :icon-variant="add ? 'black' : 'brand'" />
-          <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4"  :icon-variant="add ? 'black' : 'brand'" />
-          <DeviceUsefulUrls :device="device" :urls.sync="currentDevice.urls" class="mb-2" />
+          <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
+          <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4"  :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
+          <DeviceUsefulUrls :device="device" :urls.sync="currentDevice.urls" class="mb-2" :disabled="disabled" />
           <div class="d-flex">
-            <b-form-checkbox v-model="wiki" class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" />
+            <b-form-checkbox v-model="wiki" class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" :disabled="disabled" />
             <label :for="'wiki-' + (add ? '' : device.iddevices)">
               {{ translatedCaseStudy }}
             </label>
@@ -167,6 +167,9 @@ export default {
     }
   },
   computed: {
+    disabled() {
+      return !this.edit && !this.add
+    },
     currentCategory() {
       return this.currentDevice ? this.currentDevice.category : null
     },
