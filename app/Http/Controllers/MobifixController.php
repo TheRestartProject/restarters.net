@@ -41,7 +41,12 @@ class MobifixController extends Controller {
             }
         }
         $Mobifix = new Mobifix;
-        $fault = $Mobifix->fetchFault()[0];
+        $faultResult = $Mobifix->fetchFault();
+        if (!empty($faultResult)) {
+            $fault = $faultResult[0];
+        } else {
+            $fault = false;
+        }
         if (!$fault) {
             return redirect()->action('MobifixController@status');
         }
