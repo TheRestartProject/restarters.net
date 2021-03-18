@@ -282,7 +282,7 @@ class Group extends Model implements Auditable
      */
     public function addVolunteer($volunteer)
     {
-        $user_group = UserGroups::updateOrCreate([
+        UserGroups::updateOrCreate([
             'user' => $volunteer->id,
             'group' => $this->idgroups,
         ], [
@@ -300,8 +300,9 @@ class Group extends Model implements Auditable
      */
     public function makeMemberAHost($groupMember)
     {
-        if (!$this->allVolunteers()->pluck('user')->contains($groupMember->id))
+        if (!$this->allVolunteers()->pluck('user')->contains($groupMember->id)) {
             throw new \Exception('Volunteer is not currently in this group.  Only existing group members can be made hosts.');
+        }
 
         $userGroupAssociation = UserGroups::where('user', $groupMember->id)
                                 ->where('group', $this->idgroups)->first();
@@ -399,7 +400,7 @@ class Group extends Model implements Auditable
     {
         $sum = 0;
 
-        foreach ($this->parties as $key => $party) {
+        foreach ($this->parties as $party) {
             $sum += $party->hours;
         }
 
@@ -463,7 +464,7 @@ class Group extends Model implements Auditable
     public function eventsShouldPushToWordpress()
     {
         foreach ($this->networks as $network) {
-            if ($network->events_push_to_wordpress == true) {
+            if ($network->events_push_to_wordpress) {
                 return true;
             }
         }
@@ -476,7 +477,7 @@ class Group extends Model implements Auditable
     public function changesShouldPushToZapier()
     {
         foreach ($this->networks as $network) {
-            if ($network->include_in_zapier == true) {
+            if ($network->include_in_zapier) {
                 return true;
             }
         }

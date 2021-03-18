@@ -11,21 +11,6 @@ use Request;
 
 class OutboundController extends Controller
 {
-  // public function __construct($model, $controller, $action){
-  //
-    //   parent::__construct($model, $controller, $action);
-  //
-    //   $this->groups = new Group;
-    //  $this->parties = new Party;
-    //  $this->devices = new Device;
-  //
-    //  $weights = $this->devices->getWeights();
-  //
-    //  $this->TotalWeight = $weights[0]->total_weights;
-    //  $this->TotalEmission = $weights[0]->total_footprints;
-    //  $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
-  // }
-
     /** type can be either party or group
      * id is id of group or party to display
      * */

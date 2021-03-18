@@ -60,8 +60,8 @@ LIMIT 1;
             $ids = implode("','", $exclusions);
             $and .= "\nAND d.`id_ords` NOT IN ('$ids')";
         }
-        $sql = sprintf($sql, $and);
-        return $sql;
+
+        return sprintf($sql, $and);
     }
 
     /**

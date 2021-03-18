@@ -23,10 +23,8 @@ class NetworkPolicy
             return true;
         }
 
-        if ($user->hasRole('NetworkCoordinator')) {
-            if ($user->networks->contains($network)) {
-                return true;
-            }
+        if ($user->hasRole('NetworkCoordinator') && $user->networks->contains($network)) {
+            return true;
         }
 
         return false;
@@ -52,7 +50,7 @@ class NetworkPolicy
      * @param  \App\Network  $network
      * @return mixed
      */
-    public function update(User $user, Network $network)
+    public function update(User $user)
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -65,7 +63,7 @@ class NetworkPolicy
      * @param  \App\User  $user
      * @return mixed
      */
-    public function associateGroups(User $user, Network $network)
+    public function associateGroups(User $user)
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -82,7 +80,7 @@ class NetworkPolicy
      */
     public function delete(User $user, Network $network)
     {
-        //
+        // TODO This looks worth considering.
     }
 
     /**
@@ -94,7 +92,7 @@ class NetworkPolicy
      */
     public function restore(User $user, Network $network)
     {
-        //
+        // TODO This looks worth considering.
     }
 
     /**

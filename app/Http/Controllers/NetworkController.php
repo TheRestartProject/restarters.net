@@ -119,7 +119,6 @@ class NetworkController extends Controller
         if ($request->hasFile('network_logo')) {
             $fileHelper = new FixometerFile;
             $networkLogoFilename = $fileHelper->upload('network_logo', 'image', $network->id, $this->crossReferenceTableId, false, false, false, false);
-            $networkLogoPath = env('UPLOADS_URL').'mid_'.$networkLogoFilename;
         }
 
         return redirect()->route('networks.edit', [$network]);

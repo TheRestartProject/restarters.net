@@ -46,16 +46,6 @@ use App\DripEvent;
 class UserController extends Controller
 {
   /**
-  * Create a new controller instance.
-  *
-  * @return void
-  */
-  // public function __construct()
-  // {
-  //     $this->middleware('auth');
-  // }
-
-  /**
   * Show the application dashboard.
   *
   * @return \Illuminate\Http\Response
@@ -184,7 +174,7 @@ class UserController extends Controller
             $id = Auth::id();
         }
 
-        $user = User::find($id)->update([
+        User::find($id)->update([
         'email'    => $request->input('email'),
         'name'     => $request->input('name'),
         'country'  => $request->input('country'),
@@ -238,7 +228,7 @@ class UserController extends Controller
             $user->setPassword(Hash::make($request->input('new-password')));
             $user->save();
 
-            $updateInfo = $user->update([
+            $user->update([
             'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
             'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
             ]);
@@ -319,8 +309,6 @@ class UserController extends Controller
         $user_id = $user->id;
 
         if ( $user->isDripSubscriber() ) {
-          //DripEvent::deleteSubscriber($user);
-          //$user->newsletter = 0;
           $user->drip_subscriber_id = null;
         }
 
@@ -343,19 +331,6 @@ class UserController extends Controller
         }
 
         $user = User::find($id);
-
-        // Subscriptions only happen at registration.
-        // Unsubscriptions only happen via links in newsletter.
-        /*if ( is_null(request()->input('newsletter')) ) {
-          $user->newsletter = 0;
-          $unsubscribe_user = DripEvent::unsubscribeSubscriberFromNewsletter($user);
-        } else {
-          $drip_subscribe_user = DripEvent::subscribeSubscriberToNewsletter($user);
-          if (!empty((array) $drip_subscribe_user)) {
-            $user->newsletter = 1;
-            $user->drip_subscriber_id = $drip_subscribe_user->id;
-          }
-        }*/
 
         if ($request->input('invites') !== null) :
             $user->invites = 1;
@@ -452,7 +427,7 @@ class UserController extends Controller
             ->withErrors('Incorrect old password - please try again');
         }
 
-        $validator = Validator::make($request->all(), [
+        Validator::make($request->all(), [
         'name' => 'required|max:255',
         'email' => 'required|unique:users,email,'.$user->id.'|max:255',
         'location' => 'max:191',
@@ -483,30 +458,17 @@ class UserController extends Controller
         $weights= $Device->getWeights();
         $devices= $Device->statusCount();
 
-      // $this->set('weights', $weights);
-      // $this->set('devices', $devices);
-      //
-      // $this->set('nextparties', $Party->findNextParties());
-      // $this->set('allparties', $Party->findAll());
-
         $co2_years = $Device->countCO2ByYear();
-      // $this->set('year_data', $co2_years);
         $stats = array();
         foreach ($co2_years as $year) {
             $stats[$year->year] = $year->co2;
         }
-      // $this->set('bar_chart_stats', array_reverse($stats, true));
 
         $waste_years = $Device->countWasteByYear();
-      // $this->set('waste_year_data', $waste_years);
         $wstats = array();
         foreach ($waste_years as $year) {
             $wstats[$year->year] = $year->waste;
         }
-      // $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
-
-      //Account recovery
-      // $this->set('title', 'Account recovery');
 
         if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST' && isset($_POST['email']) && !empty($_POST['email'])) {
             $email = $_POST['email'];
@@ -555,17 +517,11 @@ class UserController extends Controller
                       'url' => env('APP_URL') . "/user/reset?recovery=" . $data['recovery']
                     ]));
 
-                    // if(!$sender){
-                    //     $response['danger'] = 'Could not send email with reset instructions.';
-                    // }
-                    // else {
                     $response['success'] = 'Email Sent! Please check your inbox and follow instructions';
-                    //}
                 } else {
                     $response['danger'] = 'This email is not in our database.';
                 }
             }
-          // $this->set('response', $response);
 
             return view('auth.forgot-password', [//user.recover
             'weights' => $weights,
@@ -605,30 +561,17 @@ class UserController extends Controller
         $weights= $Device->getWeights();
         $devices= $Device->statusCount();
 
-      // $this->set('weights', $weights);
-      // $this->set('devices', $devices);
-      //
-      // $this->set('nextparties', $Party->findNextParties());
-      // $this->set('allparties', $Party->findAll());
-
         $co2_years = $Device->countCO2ByYear();
-      // $this->set('year_data', $co2_years);
         $stats = array();
         foreach ($co2_years as $year) {
             $stats[$year->year] = $year->co2;
         }
-      // $this->set('bar_chart_stats', array_reverse($stats, true));
 
         $waste_years = $Device->countWasteByYear();
-      // $this->set('waste_year_data', $waste_years);
         $wstats = array();
         foreach ($waste_years as $year) {
             $wstats[$year->year] = $year->waste;
         }
-      // $this->set('waste_bar_chart_stats', array_reverse($wstats, true));
-
-      //account recovery
-      // $this->set('title', 'Account recovery');
 
         if (!isset($_GET['recovery']) || empty($_GET['recovery'])) {
             $valid_code = false;
@@ -638,12 +581,10 @@ class UserController extends Controller
 
             if (is_object($user) && strtotime($user->recovery_expires) > time()) {
                 $valid_code = true;
-              // $this->set('recovery', $recovery);
             } else {
                 $valid_code = false;
             }
         }
-      // $this->set('valid_code', $valid_code);
 
         if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST' && isset($_POST['password']) && !empty($_POST['password']) && isset($_POST['confirm_password']) && !empty($_POST['confirm_password'])) {
             $recovery = $_POST['recovery'];
@@ -670,7 +611,6 @@ class UserController extends Controller
                 }
             }
         }
-      // $this->set('response', $response);
 
         if (!isset($recovery)) {
             $recovery = null;
@@ -714,9 +654,8 @@ class UserController extends Controller
             $User = new User;
             $userlist = $User->getUserList(true)->paginate(env('PAGINATE'));
 
-            $UserGroups = new UserGroups;
-          //get permissions and group_ids for every user
-            $userlist->map(function ($user) use ($User, $UserGroups) {
+            //get permissions and group_ids for every user
+            $userlist->map(function ($user) use ($User) {
                 $user['permissions'] = $User->getRolePermissions($user->role);
                 $user['groups'] = $user->groups;
                 $user['lastLogin'] = $user->lastLogin();
@@ -786,9 +725,8 @@ class UserController extends Controller
 
             $userlist = $userlist->paginate(env('PAGINATE'));
 
-            $UserGroups = new UserGroups;
-          //get permissions and group_ids for every user
-            $userlist->map(function ($user) use ($User, $UserGroups) {
+            //get permissions and group_ids for every user
+            $userlist->map(function ($user) use ($User) {
                 $user['permissions'] = $User->getRolePermissions($user->role);
                 $user['groups'] = $user->groups;
                 $user['lastLogin'] = $user->lastLogin();
@@ -835,8 +773,6 @@ class UserController extends Controller
               // We got data! Elaborate.
                 $name   =       $_POST['name'];
                 $email  =       $_POST['email'];
-              /*$pwd    =       $_POST['password'];
-              $cpwd   =       $_POST['c_password']; */
                 $role   =       $_POST['role'];
                 if (!isset($_POST['modal'])) {
                     $groups  =      $_POST['groups'];
@@ -894,9 +830,6 @@ class UserController extends Controller
                             $Usersgroups = new UserGroups;
                             $Usersgroups->createUsersGroups($idUser, $groups);
                         }
-
-                            //$Session = new Session;
-                            //$Session->createSession($idUser);
 
                         if (isset($_FILES) && !empty($_FILES)) {
                             $file = new FixometerFile;
@@ -991,10 +924,8 @@ class UserController extends Controller
                 $error = false;
                 // check for email in use
                 $editingUser = $User->find($id);
-                if ($editingUser->email !== $data['email']) {
-                    if (!$User->checkEmail($data['email'])) {
-                        $error['email'] = 'The email you entered is already in use in our database. Please use another one.';
-                    }
+                if ($editingUser->email !== $data['email'] && !$User->checkEmail($data['email'])) {
+                    $error['email'] = 'The email you entered is already in use in our database. Please use another one.';
                 }
 
 
@@ -1016,9 +947,6 @@ class UserController extends Controller
 
                 if (!is_array($error)) {
                     $u = $User->find($id)->update($data);
-
-                    $expire = time() + (60 * 60 * 24 * 365 * 10);
-                  // setcookie(env('LANGUAGE_COOKIE'), $data['language'], $time, '/', $_SERVER['HTTP_HOST']);
 
                     $ug = new UserGroups;
                     if (isset($sent_groups)) {
@@ -1169,20 +1097,19 @@ class UserController extends Controller
             $this->set('header', true);
 
       // Administrators can edit users.
-            if (FixometerHelper::hasRole($user, 'Administrator') || hasRole($user, 'Host')) {
-                if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
-                    $id = (int)$_POST['id'];
-                    $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
+            if ((FixometerHelper::hasRole($user, 'Administrator') || hasRole($user, 'Host') &&
+                $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST))) {
+                $id = (int)$_POST['id'];
+                $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
 
-                  // Delete Session
-                  //$session = new Session;
-                  //$session->destroySession($id);
+              // Delete Session
+              //$session = new Session;
+              //$session->destroySession($id);
 
-                    if ($this->User->delete($id)) {
-                          header('Location: /user/all?msg=ok');
-                    } else {
-                        header('Location: /user/all?msg=no');
-                    }
+                if ($this->User->delete($id)) {
+                      header('Location: /user/all?msg=ok');
+                } else {
+                    header('Location: /user/all?msg=no');
                 }
             }
         }
@@ -1193,7 +1120,7 @@ class UserController extends Controller
         global $fixometer_languages;
         if (in_array($lang, array_keys($fixometer_languages))) {
             $expire = time() + (60 * 60 * 24 * 365 * 10);
-            setcookie(LANGUAGE_COOKIE, $lang, $time, '/', $_SERVER['HTTP_HOST']);
+            setcookie(LANGUAGE_COOKIE, $lang, $expire, '/', $_SERVER['HTTP_HOST']);
             header('Location: /user/login');
         }
     }
@@ -1259,8 +1186,6 @@ class UserController extends Controller
   // try {
 
         if (Auth::check()) { //Existing users are to update
-            $user_id = Auth::user()->id;
-
             $user = User::find(Auth::user()->id);
             $user->country = $request->input('country');
             $user->location = $request->input('city');
@@ -1302,7 +1227,7 @@ class UserController extends Controller
         if (env('DRIP_API_TOKEN') !== null && env('DRIP_API_TOKEN') !== '') {
             $activeRepairNetworkId = session()->get('repair_network');
             $network = Network::find($activeRepairNetworkId);
-            if (! is_null($network) && $network->users_push_to_drip == true) {
+            if (! is_null($network) && $network->users_push_to_drip) {
 
                 $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
                 $user->drip_subscriber_id = $drip_subscribe_user->id;

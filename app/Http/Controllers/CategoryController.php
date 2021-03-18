@@ -12,27 +12,6 @@ use Illuminate\Support\Facades\Redirect;
 
 class CategoryController extends Controller
 {
-  // public function __construct($model, $controller, $action){
-  //     parent::__construct($model, $controller, $action);
-  //
-  //     $Auth = new Auth($url);
-  //     if(!$Auth->isLoggedIn()){
-  //         header('Location: /user/login');
-  //     }
-  //     else {
-  //
-  //         $user = $Auth->getProfile();
-  //         $this->user = $user;
-  //         $this->set('user', $user);
-  //         $this->set('header', true);
-  //
-  //         return view('category.index', [
-  //           'user' => $user,
-  //           'header' => true,
-  //         ]);
-  //     }
-  // }
-
     public function index()
     {
 
@@ -70,7 +49,6 @@ class CategoryController extends Controller
 
         try {
             $category = Category::find($id);
-          // dd($request->all());
             $category->update([
             'name' => $request->input('category_name'),
             'weight' => $request->input('weight'),

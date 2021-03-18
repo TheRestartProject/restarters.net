@@ -185,13 +185,7 @@ class DripEvent extends Model
     // First parameter is the Subscriber path, the second is the parameters,
     // in which non are required for this action and the last is to DELETE the
     // Subscriber
-    $request = Drip::makeRequest($url, [], 3);
-
-    // If the request status is true, then the Subscriber has already been
-    // deleted or does not exist.
-    // if ( $request['status']) {
-    //   return false;
-    // }
+    Drip::makeRequest($url, [], 3);
 
     return true;
   }

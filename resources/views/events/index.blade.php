@@ -79,26 +79,6 @@
       $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
       $emissionRatio = $footprintRatioCalculator->calculateRatio();
       $can_edit_group = Auth::user() && $group && (FixometerHelper::hasRole( Auth::user(), 'Administrator') || $isCoordinatorForGroup || $is_host_of_group);
-
-      foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-          $thisone = $event->getAttributes();
-          $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
-          $thisone['allinvitedcount'] = $event->allInvited->count();
-
-          // TODO LATER Consider whether these should be in the event or passed into the store.
-          $thisone['stats'] = $event->getEventStats($emissionRatio);
-          $thisone['participants_count'] = $event->participants;
-          $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
-
-          $thisone['isVolunteer'] = $event->isVolunteer();
-          $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
-          $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
-
-          $thisone['group'] = \App\Group::where('idgroups', $event->group)->first();
-
-          $expanded_events[] = $thisone;
-      }
-
       $showCalendar = Auth::check() && (!$group || ($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
       $calendar_copy_url = '';
       $calendar_edit_url = '';
@@ -115,7 +95,7 @@
 
       $expanded_events = [];
 
-      foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+      function expandEvent($event, $group, $emissionRatio) {
           $thisone = $event->getAttributes();
 
           if (is_null($group)) {
@@ -136,8 +116,25 @@
           $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
           $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
 
-          $expanded_events[] = $thisone;
+          return $thisone;
       }
+
+      foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+          $expanded_events[] = expandEvent($event, $group, $emissionRatio);
+      }
+
+      foreach ($upcoming_events_in_area as $event) {
+          $e = expandEvent($event, $group, $emissionRatio);
+          $e['nearby'] = TRUE;
+          $expanded_events[] = $e;
+      }
+
+      foreach ($upcoming_events_all as $event) {
+          $e = expandEvent($event, $group, $emissionRatio);
+          $e['all'] = TRUE;
+          $expanded_events[] = $e;
+      }
+
       ?>
 
     <div class="vue-placeholder vue-placeholder-large">
@@ -155,6 +152,7 @@
             :add-button="false"
             :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
             add-group-name
+            show-other
         />
       </div>
       @else
@@ -170,38 +168,7 @@
         />
       </div>
       @endif
-
-        @if( is_null($group) )
-        <section class="table-section upcoming_events_in_area mt-4" id="events-3">
-            <header>
-                <h2>@lang('events.other_events_near_you')</h2>
-                <p>@lang('events.no_events_near_you', ['url' => route('all-upcoming-events').'?online=1']).</p>
-            </header>
-            <div class="table-responsive">
-                <table class="table table-events table-striped" role="table">
-                    @include('events.tables.headers.head-events-upcoming-only', ['hide_invite' => false])
-                    <tbody>
-                        @if ( is_null(auth()->user()->latitude) && is_null(auth()->user()->longitude) )
-                            <tr>
-                                <td colspan="13" align="center" class="p-3">Your town/city has not been set.<br><a href="{{{ route('edit-profile', ['id' => auth()->id()]) }}}">Click here to set it and find events near you.</a></td>
-                            </tr>
-                        @elseif( !$upcoming_events_in_area->isEmpty() )
-                            @foreach($upcoming_events_in_area as $event)
-                                @include('partials.tables.row-events', ['show_invites_count' => true, 'EmissionRatio' => $EmissionRatio])
-                            @endforeach
-                        @else
-                            <tr>
-                                <td colspan="13" align="center" class="p-3">@lang('events.no_upcoming_near_you', ['resources_link' => env('DISCOURSE_URL' ).'/session/sso?return_path='.env('DISCOURSE_URL').'/t/how-to-power-up-community-repair-with-restarters-net/1228/'])</td>
-                            </tr>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-        </section>
-        @endif
-
       </div>
-    </div>
     {{-- END Events List --}}
 
 

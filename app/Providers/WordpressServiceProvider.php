@@ -26,7 +26,7 @@ class WordpressServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(WordpressClient::class, function ($app) {
+        $this->app->singleton(WordpressClient::class, function () {
             try {
                 $wpClient = new WordpressClient();
                 $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
