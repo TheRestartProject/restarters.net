@@ -82,21 +82,34 @@ class PartyController extends Controller
                 ->get();
 
             $group = Group::find($group_id);
-            $upcoming_events_in_area = null;
         } else {
             $upcoming_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
                 ->get();
 
             $past_events = Party::UsersPastEvents([auth()->id()])->get();
 
-            if ( ! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
-                $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())->take(3)->get();
-            } else {
-                $upcoming_events_in_area = null;
-            }
-
             $group = null;
         }
+
+        // We want the upcoming events in the area, and all upcoming events, irrespective of whether or not we're
+        // looking at a specific group.  We want to exclude any events we have already obtained.
+        $exclude = [];
+
+        foreach ($upcoming_events as $e) {
+            $exclude[] = $e->idevents;
+        }
+
+        foreach ($past_events as $e) {
+            $exclude[] = $e->idevents;
+        }
+
+        if ( ! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
+            $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())->whereNotIn('idevents', $exclude)->get();
+        } else {
+            $upcoming_events_in_area = null;
+        }
+
+        $upcoming_events_all = Party::upcomingEvents()->whereNotIn('idevents', $exclude)->get();
 
         //Looks to see whether user has a group already, if they do, they can create events
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
@@ -109,6 +122,7 @@ class PartyController extends Controller
             'upcoming_events' => $upcoming_events,
             'past_events' => $past_events,
             'upcoming_events_in_area' => $upcoming_events_in_area,
+            'upcoming_events_all' => $upcoming_events_all,
             'user_groups' => $user_groups,
             'EmissionRatio' => $this->EmissionRatio,
             'is_host_of_group' => $is_host_of_group,
