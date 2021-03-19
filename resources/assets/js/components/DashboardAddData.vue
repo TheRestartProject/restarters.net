@@ -16,6 +16,7 @@
           </p>
           <div class="layout">
             <multiselect
+                :multiple="false"
                 class="groups"
                 v-model="groupValue"
                 :options="groupOptions"
@@ -26,6 +27,7 @@
             >
             </multiselect>
             <multiselect
+                :multiple="false"
                 class="events"
                 v-model="eventValue"
                 :options="eventOptions"
@@ -80,13 +82,12 @@ export default {
 
     },
     groupOptions() {
-      // TODO Organising group?
       // We want to show the groups for events which we have attended.
       const ids = this.attendedEvents.map(e => e.idgroups)
       return this.groups.filter(g => ids.indexOf(g.idgroups) !== -1)
     },
     eventOptions() {
-      return this.groupEvents.map(e => {
+      return this.groupEvents.filter(e => e.idgroups === this.groupValue).map(e => {
         return {
           idevents: e.idevents,
           name: new moment(e.event_date).format('DD MMM YY') + ' @ ' + e.venue
