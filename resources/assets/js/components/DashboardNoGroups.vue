@@ -71,6 +71,8 @@ export default {
     grid-row: 2 / 3;
     grid-column: 1 / 2;
     height: 200px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
   }
 
   .overlay {
@@ -101,6 +103,8 @@ export default {
       grid-row: 1 / 1;
       grid-column: 2 / 3;
       height: unset;
+      margin-top: unset;
+      margin-bottom: unset;
     }
 
     .groups {
