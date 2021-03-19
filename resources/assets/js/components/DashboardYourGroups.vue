@@ -2,7 +2,7 @@
   <CollapsibleSection border-shadow class="p-3" :show-horizontal-rule="false" heading-class="">
     <template slot="title">
       <div class="d-flex justify-content-between flex-wrap">
-        <div class="d-flex">
+        <div class="d-flex w-100">
           <div class="align-self-center">
             {{ translatedYourGroupsHeading }}
           </div>
