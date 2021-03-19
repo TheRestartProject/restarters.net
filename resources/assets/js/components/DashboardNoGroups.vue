@@ -13,7 +13,7 @@
       </div>
     </div>
     <div v-else class="layout mb-2">
-      <b-img src="/images/no_groups.png" class="pic" />
+      <div class="pic" />
       <!-- eslint-disable-next-line -->
       <div class="overlay">
         <div v-html="translatedNoGroupsNearestNoLocation" class="m-2" />
