@@ -86,7 +86,7 @@ export default {
     },
     eventOptions() {
       console.log("Get events", this.groupEvents, this.groupValue, this.groupEvents.filter(e => e.idgroups === this.groupValue))
-      return this.groupEvents.filter(e => e.idgroups === this.groupValue).map(e => {
+      return this.groupEvents.filter(e => e.idgroups === this.groupValue.idgroups).map(e => {
         return {
           idevents: e.idevents,
           name: new moment(e.event_date).format('DD MMM YY') + ' @ ' + e.venue
