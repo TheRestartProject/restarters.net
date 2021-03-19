@@ -15,8 +15,8 @@
             </div>
         </b-td>
         <b-td></b-td>
-        <b-td class="text-center">{{ topic.posts_count }}</b-td>
-        <b-td class="text-center">{{ ago }}</b-td>
+        <b-td class="d-none d-md-table-cell text-center">{{ topic.posts_count }}</b-td>
+        <b-td class="d-none d-md-table-cell text-center">{{ ago }}</b-td>
     </b-tr>
 </template>
 
