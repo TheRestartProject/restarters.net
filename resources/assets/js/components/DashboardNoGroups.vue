@@ -4,9 +4,9 @@
       <div class="pic" />
       <!-- eslint-disable-next-line -->
       <div class="overlay">
-        <div v-html="translatedNoGroups" class="text-center text-white m-2" />
+        <div v-html="translatedNoGroups" class="m-2" />
       </div>
-      <div class="group p-2">
+      <div class="groups mt-2 p-2">
         <h3>{{ translatedGroupsNearYou }}</h3>
         <hr />
         <DashboardGroup v-for="group in nearbyGroups" :key="'nearbygroup-' + group.idgroups" :group="group" />
@@ -16,7 +16,7 @@
       <b-img src="/images/no_groups.png" class="pic" />
       <!-- eslint-disable-next-line -->
       <div class="overlay">
-        <div v-html="translatedNoGroupsNearestNoLocation" class="text-center text-white m-2" />
+        <div v-html="translatedNoGroupsNearestNoLocation" class="m-2" />
       </div>
     </div>
     <div class="text pr-2 pl-2 pb-2">
@@ -84,21 +84,26 @@ export default {
 
   @include media-breakpoint-up(md) {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
 
-    .pic, .overlay {
-      grid-row: 1 / 3;
+    .overlay {
+      grid-row: 1 / 1;
       grid-column: 1 / 2;
     }
 
-    .groups {
-      grid-row: 1 / 2;
+    .pic {
+      grid-row: 1 / 1;
       grid-column: 2 / 3;
     }
 
-    .text {
+    .groups {
       grid-row: 2 / 3;
-      grid-column: 2 / 3;
+      grid-column: 1 / 3;
+    }
+
+    .text {
+      grid-row: 3 / 4;
+      grid-column: 1 / 3;
     }
   }
 }
@@ -110,13 +115,8 @@ export default {
   background-image: url('/images/no_groups.png');
 }
 
-.overlay {
-  background-color: rgba(0, 0, 0, 0.65);
-}
-
 /deep/ .overlay a {
   text-decoration: underline;
-  color: white !important;
 }
 
 h3 {
