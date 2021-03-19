@@ -68,13 +68,13 @@ export default {
   grid-template-rows: auto auto auto auto;
 
   .pic {
-    grid-row: 1 / 2;
+    grid-row: 2 / 3;
     grid-column: 1 / 2;
     height: 200px;
   }
 
   .overlay {
-    grid-row: 2 / 3;
+    grid-row: 1 / 2;
     grid-column: 1 / 2;
   }
 
