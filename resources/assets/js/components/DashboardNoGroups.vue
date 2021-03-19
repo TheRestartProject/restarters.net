@@ -6,7 +6,7 @@
       <div class="overlay">
         <div v-html="translatedNoGroups" class="mt-2 m-md-2" />
       </div>
-      <div class="groups mt-2 p-md-2">
+      <div class="groups mt-2 p-0 p-md-2">
         <h3>{{ translatedGroupsNearYou }}</h3>
         <hr />
         <DashboardGroup v-for="group in nearbyGroups" :key="'nearbygroup-' + group.idgroups" :group="group" />
