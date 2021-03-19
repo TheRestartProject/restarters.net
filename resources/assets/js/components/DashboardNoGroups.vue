@@ -4,9 +4,9 @@
       <div class="pic" />
       <!-- eslint-disable-next-line -->
       <div class="overlay">
-        <div v-html="translatedNoGroups" class="m-2" />
+        <div v-html="translatedNoGroups" class="mt-2 m-md-2" />
       </div>
-      <div class="groups mt-2 p-2">
+      <div class="groups mt-2 p-md-2">
         <h3>{{ translatedGroupsNearYou }}</h3>
         <hr />
         <DashboardGroup v-for="group in nearbyGroups" :key="'nearbygroup-' + group.idgroups" :group="group" />
@@ -16,10 +16,10 @@
       <div class="pic" />
       <!-- eslint-disable-next-line -->
       <div class="overlay">
-        <div v-html="translatedNoGroupsNearestNoLocation" class="m-2" />
+        <div v-html="translatedNoGroupsNearestNoLocation" class="mt-2 m-md-2" />
       </div>
     </div>
-    <div class="text pr-2 pl-2 pb-2">
+    <div class="text pr-md-2 pl-md-2 pb-2">
       <strong>{{ translatedInterestedStarting }}</strong>
       <!-- eslint-disable-next-line -->
       <div v-html="translatedInterestedDetails" />
@@ -65,20 +65,26 @@ export default {
 .layout {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto auto auto auto;
 
-  .pic, .overlay {
+  .pic {
     grid-row: 1 / 2;
     grid-column: 1 / 2;
+    height: 200px;
   }
 
-  .groups {
+  .overlay {
     grid-row: 2 / 3;
     grid-column: 1 / 2;
   }
 
-  .text {
+  .groups {
     grid-row: 3 / 4;
+    grid-column: 1 / 2;
+  }
+
+  .text {
+    grid-row: 4 / 5;
     grid-column: 1 / 2;
   }
 
@@ -94,6 +100,7 @@ export default {
     .pic {
       grid-row: 1 / 1;
       grid-column: 2 / 3;
+      height: unset;
     }
 
     .groups {
