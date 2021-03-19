@@ -7,9 +7,11 @@
           <a :href="'/group/view/' + group.idgroups">{{ group.name }}</a>
         </div>
       </div>
-      <b-btn variant="primary" :href="'/group/join/' + group.idgroups">
-        {{ translatedFollowGroup }}
-      </b-btn>
+      <div>
+        <b-btn variant="primary" :href="'/group/join/' + group.idgroups">
+          {{ translatedFollowGroup }}
+        </b-btn>
+      </div>
     </div>
     <hr />
   </div>
