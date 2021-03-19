@@ -85,7 +85,6 @@ export default {
       return this.groups.filter(g => ids.indexOf(g.idgroups) !== -1)
     },
     eventOptions() {
-      console.log("Get events", this.groupEvents, this.groupValue, this.groupEvents.filter(e => e.idgroups === this.groupValue))
       return this.groupEvents.filter(e => e.idgroups === this.groupValue.idgroups).map(e => {
         return {
           idevents: e.idevents,
