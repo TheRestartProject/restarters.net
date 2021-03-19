@@ -79,6 +79,8 @@ return array (
   'add_data_button' => 'Add Data',
   'add_data_title' => 'Add Data',
   'add_data_description' => 'Adding repair data helps show the impact of repair.',
+  'add_data_group' => 'Please select a group',
+  'add_data_event' => 'Please select an event',
   'search_text' => 'Browse or search our global database of repairs.',
   'add_data_action_button' => 'Go to event',
   'images' => 'Images',
