@@ -16,7 +16,6 @@
           </p>
           <div class="layout">
             <multiselect
-                :multiple="false"
                 class="groups"
                 v-model="groupValue"
                 :options="groupOptions"
@@ -27,7 +26,6 @@
             >
             </multiselect>
             <multiselect
-                :multiple="false"
                 class="events"
                 v-model="eventValue"
                 :options="eventOptions"
@@ -113,9 +111,8 @@ export default {
         idevents: e.idevents,
         name: new moment(e.event_date).format('DD MMM YY') + ' @ ' + e.venue
       }
-      console.log("Event", this.eventValue)
 
-      this.groupValue = this.groups.find(g => g.idgroups = e.idgroups)
+      this.groupValue = this.groups.find(g => g.idgroups === e.idgroups)
     }
   }
 }
