@@ -1,9 +1,16 @@
 <template>
   <div>
-    <div class="d-flex">
-      <b-img-lazy :src="groupImage" class="profile mr-2" @error.native="brokenProfileImage" />
-      <div class="d-flex flex-column justify-content-center">
-        <a :href="'/group/view/' + group.idgroups">{{ group.name }}</a>
+    <div class="d-flex justify-content-between">
+      <div class="d-flex">
+        <b-img-lazy :src="groupImage" class="profile mr-2" @error.native="brokenProfileImage" />
+        <div class="d-flex flex-column justify-content-center">
+          <a :href="'/group/view/' + group.idgroups">{{ group.name }}</a>
+        </div>
+      </div>
+      <div>
+        <b-btn variant="primary" :href="'/group/join/' + group.idgroups">
+          {{ translatedFollowGroup }}
+        </b-btn>
       </div>
     </div>
     <hr />
@@ -26,6 +33,9 @@ export default {
     groupImage() {
       return this.group && this.group.group_image && this.group.group_image.image ? ('/uploads/mid_' + this.group.group_image.image.path) : DEFAULT_PROFILE
     },
+    translatedFollowGroup() {
+      return this.$lang.get('events.follow_group')
+    }
   },
   methods: {
     brokenProfileImage(event) {
