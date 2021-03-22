@@ -33,5 +33,15 @@ class DiscourseServiceProvider extends ServiceProvider
                 'http_errors' => false,
             ]);
         });
+
+        $this->app->bind('discourse-client-anonymous', function ($app, $parameters) {
+            return new Client([
+                                  'base_uri' => config('discourse-api.base_url'),
+                                  'headers' => [
+                                      'User-Agent' => 'restarters/1.0',
+                                  ],
+                                  'http_errors' => false,
+                              ]);
+        });
     }
 }

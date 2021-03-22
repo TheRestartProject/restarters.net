@@ -1,47 +1,43 @@
 <template>
     <CollapsibleSection class="pt-3 p-md-0 lineheight">
-        <template slot="title">
+    <template slot="title">
           <div class="d-flex">
-            {{ translatedTitle }}
-            <b-img class="icon ml-3 d-none d-md-block" src="/images/talk_doodle.svg" style="width:70px" />
+      {{ translatedTitle }}
+      <b-img class="icon ml-3 d-none d-md-block" src="/images/talk_doodle.svg" style="width:70px"/>
           </div>
-        </template>
+    </template>
 
-        <template slot="content">
+    <template slot="content">
 
-            <div class="content pt-2">
-            <b-table-simple v-if="isLoggedIn" responsive class="" table-class="m-0 leave-tables-alone">
+      <div class="content pt-2">
+        <b-table-simple responsive class="" table-class="m-0 leave-tables-alone">
+          <b-thead class="text-center">
+            <b-tr class="border-0">
+              <b-th></b-th>
+              <b-th class="d-none d-md-table-cell">
+                <b-img class="icon" src="/images/speech_bubble.svg" :title="translatedNumberOfComments"/>
+              </b-th>
+              <b-th class="d-none d-md-table-cell">
+                <b-img class="icon" height="28px" src="/images/clock.svg" :title="translatedTopicCreatedAt"/>
+              </b-th>
+            </b-tr>
+          </b-thead>
+          <b-tbody v-if="topics">
+            <DiscourseTopic
+                v-for="topic in topics"
+                :topic="topic"
+                :key="'topic' + topic.id"
+                :discourse-base-url="discourseBaseUrl"
+            />
+          </b-tbody>
+        </b-table-simple>
 
-                <b-thead class="text-center">
-                    <b-tr class="border-0">
-                      <b-th></b-th>
-                      <b-th class="d-none d-md-table-cell">
-                          <b-img class="icon" src="/images/speech_bubble.svg" :title="translatedNumberOfComments" />
-                      </b-th>
-                      <b-th class="d-none d-md-table-cell">
-                          <b-img class="icon" height="28px" src="/images/clock.svg" :title="translatedTopicCreatedAt" />
-                      </b-th>
-                    </b-tr>
-                </b-thead>
-                <b-tbody v-if="isLoggedIn && topics">
-                    <DiscourseTopic
-                      v-for="topic in topics"
-                      :topic="topic"
-                      :key="'topic' + topic.id"
-                      :discourse-base-url="discourseBaseUrl"
-                    />
-                </b-tbody>
-            </b-table-simple>
-            <div class="py-4" v-else>
-                Want to see the latest discussion?  <a class="btn btn-primary" href="/about">Join</a>
-            </div>
-
-            <div v-if="isLoggedIn" class="text-right pt-0 pb-2 pr-2">
-                <a :href="seeAllTopicsLink">{{ translatedSeeAll }}</a>
-            </div>
-            </div>
-        </template>
-    </CollapsibleSection>
+        <div class="text-right pt-0 pb-2 pr-2">
+          <a :href="seeAllTopicsLink">{{ translatedSeeAll }}</a>
+        </div>
+      </div>
+    </template>
+  </CollapsibleSection>
 </template>
 
 <script>
