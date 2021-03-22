@@ -1,10 +1,10 @@
 <template>
-    <CollapsibleSection class="p-3 p-md-0 lineheight">
+    <CollapsibleSection class="pt-3 p-md-0 lineheight">
         <template slot="title">
+          <div class="d-flex">
             {{ translatedTitle }}
-        </template>
-        <template slot="title-icon">
             <b-img class="icon ml-3 d-none d-md-block" src="/images/talk_doodle.svg" style="width:70px" />
+          </div>
         </template>
 
         <template slot="content">
@@ -14,17 +14,16 @@
 
                 <b-thead class="text-center">
                     <b-tr class="border-0">
-                    <b-th></b-th>
-                    <b-th></b-th>
-                    <b-th class="d-none d-md-table-cell">
-                        <b-img class="icon" src="/images/speech_bubble.svg" :title="translatedNumberOfComments" />
-                    </b-th>
-                    <b-th class="d-none d-md-table-cell">
-                        <b-img class="icon" height="28px" src="/images/clock.svg" :title="translatedTopicCreatedAt" />
-                    </b-th>
+                      <b-th></b-th>
+                      <b-th class="d-none d-md-table-cell">
+                          <b-img class="icon" src="/images/speech_bubble.svg" :title="translatedNumberOfComments" />
+                      </b-th>
+                      <b-th class="d-none d-md-table-cell">
+                          <b-img class="icon" height="28px" src="/images/clock.svg" :title="translatedTopicCreatedAt" />
+                      </b-th>
                     </b-tr>
                 </b-thead>
-                <b-tbody v-if="isLoggedIn">
+                <b-tbody v-if="isLoggedIn && topics">
                     <DiscourseTopic
                       v-for="topic in topics"
                       :topic="topic"
