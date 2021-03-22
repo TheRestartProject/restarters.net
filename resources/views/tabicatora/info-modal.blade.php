@@ -3,14 +3,14 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="tabicatoraModalLabel">About TabiCat:ORA</h5>
+                <h5 class="modal-title" id="tabicatoraModalLabel">About TabiCat</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <p>
-                    TabiCat:ORA is a web app to <strong>collaboratively categorise the type of faults in tablets brought to community events</strong> such as Restart Parties and Repair Cafés.
+                    TabiCat is a web app to <strong>collaboratively categorise the type of faults in tablets brought to community events</strong> such as Restart Parties and Repair Cafés.
                 </p>
                 <hr/>
                 <p>
@@ -23,7 +23,7 @@
                     To enable community repair to contribute to the current push for right to repair regulations for tablets, we want to see what types of faults are commonly encountered.
                 </p>
                 <p>
-                    So we’d like to analyse the data collected so far, to learn about key faults seen at repair events - and this is where you can help, by playing TabiCat:ORA!
+                    So we’d like to analyse the data collected so far, to learn about key faults seen at repair events - and this is where you can help, by playing TabiCat!
                 </p>
 
                 <hr/>

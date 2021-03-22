@@ -107,13 +107,13 @@ Route::prefix('mobifixora')->group(function () {
     Route::get('/status', 'MobifixOraController@status');
 });
 
-Route::prefix('TabiCatOra')->group(function () {
+Route::prefix('TabiCat')->group(function () {
     Route::get('/', 'TabicatOraController@index');
     Route::post('/', 'TabicatOraController@index');
     Route::get('/cta', 'TabicatOraController@cta');
     Route::get('/status', 'TabicatOraController@status');
 });
-Route::prefix('tabicatora')->group(function () {
+Route::prefix('tabicat')->group(function () {
     Route::get('/', 'TabicatOraController@index');
     Route::post('/', 'TabicatOraController@index');
     Route::get('/cta', 'TabicatOraController@cta');
