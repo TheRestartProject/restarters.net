@@ -3,7 +3,7 @@
     'text-center': true,
     attending: event.attending
     }">
-    <b-td class="datecell" width="76px">
+    <b-td class="datecell">
       <div class="datebox d-flex flex-column">
         <span class="day align-top">{{ dayofmonth }}</span>
         <span class="month">
@@ -25,10 +25,10 @@
         <a :href="'/group/view/' + event.group.idgroups">{{ event.group.name }}</a>
       </span>
     </b-td>
-    <b-td v-if="upcoming" class="d-none d-md-table-cell">
+    <b-td v-if="upcoming" class="d-none d-md-table-cell cell-number">
       {{ event.allinvitedcount }}
     </b-td>
-    <b-td v-if="upcoming" class="d-none d-md-table-cell">
+    <b-td v-if="upcoming" class="d-none d-md-table-cell cell-number">
       {{ event.volunteers }}
     </b-td>
     <b-td v-if="upcoming && event.requiresModeration" class="cell-warning">
@@ -39,12 +39,16 @@
         {{ translatedRequiresModerationByAnAdmin }}
       </span>
     </b-td>
-    <b-td v-else-if="upcoming">
-      <div v-if="event.attending" class="text-black font-weight-bold d-flex d-none d-md-table-cell">
+    <b-td v-else-if="upcoming" class="d-none d-md-table-cell">
+      <div v-if="event.attending" class="text-black font-weight-bold d-flex justify-content-around">
         <span>
           {{ translatedYoureGoing }}
         </span>
       </div>
+      <!-- "all" or "nearby" events are for ones where we're not a member, so should a join button. -->
+      <b-btn variant="primary" :href="'/group/join/' + event.group.idgroups" v-else-if="event.all || event.nearby">
+        {{ translatedJoinGroup }}
+      </b-btn>
       <!-- We can't RSVP if the event is starting soon. -->
       <b-btn variant="primary" :href="'/party/join/' + idevents" :disabled="startingSoon" v-else>
         {{ translatedRSVP }}
@@ -53,7 +57,8 @@
     <b-td v-if="!upcoming" :class="{
       'cell-danger': event.participants_count === 0,
       'd-none': true,
-      'd-md-table-cell': true
+      'd-md-table-cell': true,
+      'cell-number': true
     }
     ">
       {{ event.participants_count }}
@@ -61,7 +66,8 @@
     <b-td v-if="!upcoming" :class="{
       'cell-danger': event.volunteers_count <= 1,
       'd-none': true,
-      'd-md-table-cell': true
+      'd-md-table-cell': true,
+      'cell-number': true
     }
     ">
       {{ event.volunteers_count }}
@@ -72,19 +78,19 @@
         {{ translatedAddADevice}}
       </a>
     </b-td>
-    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell">
+    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell cell-number">
       {{ Math.round(stats.ewaste) }} kg
     </b-td>
-    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell">
+    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell cell-number">
       {{ Math.round(stats.co2) }} kg
     </b-td>
-    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell">
+    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell cell-number">
       {{ stats.fixed_devices }}
     </b-td>
-    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell">
+    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell cell-number">
       {{ stats.repairable_devices }}
     </b-td>
-    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell">
+    <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell cell-number">
       {{ stats.dead_devices }}
     </b-td>
   </b-tr>
@@ -130,6 +136,9 @@ export default {
     translatedRSVP() {
       return this.$lang.get('events.RSVP')
     },
+    translatedJoinGroup() {
+      return this.$lang.get('groups.join_group_button')
+    },
   }
 }
 </script>
@@ -161,6 +170,7 @@ export default {
     padding-right: 9px;
     text-align: center;
     background-color: $black;
+    width: 76px !important;
 
     .datebox {
       background-color: $black;
@@ -179,5 +189,9 @@ export default {
 
 .fullsize {
   font-size: 100%;
+}
+
+.cell-number {
+  width: 60px;
 }
 </style>

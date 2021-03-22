@@ -10,11 +10,10 @@
 
         <template slot="content">
             <div class="content pt-3">
-                <p>
-                    {{ translatedDescription }}
-                </p>
+                <div v-html="translatedDescription">
+                </div>
                 <div style="align-self:center; justify-self:right">
-                <a href="/mobifix" style="align-self: center" class="btn btn-primary pull-right">{{ translatedGetInvolved }}</a>
+                <a href="/mobifixora" style="align-self: center" class="btn btn-primary pull-right">{{ translatedGetInvolved }}</a>
                 </div>
             </div>
 
