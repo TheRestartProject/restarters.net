@@ -476,7 +476,7 @@ h3 {
   border: 3px solid red;
 }
 
-/deep/ input.disabled, textarea.disabled {
+/deep/ .card .form-control:disabled {
   // Disabled is what happens for the view that people get if they can't edit the device.
   background-color: white;
 }
