@@ -11,7 +11,7 @@
 <meta name="keywords" content="TabiCat:ORA, TabiCat, tablets, iPad, Kindle, Samsung, Amazon Fire, e-reader, satnav, TomTom, community events, Restart Parties, Repair Cafés, repair data, Right to Repair, Open Repair Alliance, The Restart Project, Open Repair Data">
 <meta property="og:title" content="TabiCat:ORA">
 <meta property="og:description" content="Help analyse faults in tablets and e-readers brought to events such as Repair Cafés and Restart Parties, and contribute to the current push for Right to Repair!">
-<meta property="og:image" content="{{ asset('/images/tabicat/og-tabicat-toolbox.png') }}">
+<meta property="og:image" content="{{ asset('/images/tabicatora/og-tabicat-toolbox.png') }}">
 <meta property="og:url" content="https://restarters.net/tabicatora/">
 @endsection
 
@@ -22,13 +22,13 @@
 @section('content')
 
 <section class="tabicat">
-    <div class="container mt-1">
+    <div class="container mt-1 mt-sm-4">
         <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>
         <div class="row row-compressed">
             <div class="col-6">
                 <h1 class="pull-left">TabiCat:ORA</h1>
             </div>
-            <div class="col-6">
+            <div class="col-6 pull-right">
                 <!--
             These images are licensed under the Creative Commons Attribution 4.0 International license.
             Attribution: Vincent Le Moign
@@ -57,14 +57,13 @@
                 ?>
                 <a id="btn-info-open"
                    data-toggle="modal" data-target="#tabicatoraInfoModal"
-                   class="btn btn-info btn-sm btn-rounded p-2">
+                   class="btn btn-info btn-sm btn-rounded p-2 pull-right">
                     <svg style="width:24px;height:24px;" viewBox="0 0 24 24">
                     <title>About TabiCat:ORA</title>
                     <path fill="#fff" d="M13.5,4A1.5,1.5 0 0,0 12,5.5A1.5,1.5 0 0,0 13.5,7A1.5,1.5 0 0,0 15,5.5A1.5,1.5 0 0,0 13.5,4M13.14,8.77C11.95,8.87 8.7,11.46 8.7,11.46C8.5,11.61 8.56,11.6 8.72,11.88C8.88,12.15 8.86,12.17 9.05,12.04C9.25,11.91 9.58,11.7 10.13,11.36C12.25,10 10.47,13.14 9.56,18.43C9.2,21.05 11.56,19.7 12.17,19.3C12.77,18.91 14.38,17.8 14.54,17.69C14.76,17.54 14.6,17.42 14.43,17.17C14.31,17 14.19,17.12 14.19,17.12C13.54,17.55 12.35,18.45 12.19,17.88C12,17.31 13.22,13.4 13.89,10.71C14,10.07 14.3,8.67 13.14,8.77Z"></path>
                     </svg></a>
-                @php( $back = '/tabicatora/status' . ($partner ? "?partner=$partner" : '') )
-                <a href="{{ $back }}">
-                    <img id="tabicat" class="pull-right" src="{{ asset('/images/tabicatora/'.$img) }}" alt="{{ $alt }}" width="48" height="48" />
+                <a href="{{ '/tabicatora/status' . ($partner ? '?partner=$partner' : '') }}" class="pull-right">
+                    <img id="tabicat" src="{{ asset('/images/tabicatora/'.$img) }}" alt="{{ $alt }}" width="48" height="48" />
                 </a>
             </div>
         </div>
