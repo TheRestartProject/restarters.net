@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="d-none d-md-block">
+    <div class="d-none d-md-block intro">
       <b-img-lazy fluid src="/images/dashboard_3.jpg" class="border border-dark border-bottom-0" />
       <div class="pt-4 pl-4 pr-4 pb-2 greyish border border-dark border-bottom-0">
         <p class="font-weight-bold">
@@ -16,7 +16,7 @@
         </p>
       </div>
     </div>
-    <CollapsibleSection class="orange border border-dark" :show-horizontal-rule="false" persist="dasbboard-sidebar">
+    <CollapsibleSection class="orange border border-dark" border-shadow :show-horizontal-rule="false" persist="dasbboard-sidebar">
       <template slot="title">
         <div class="d-flex">
           <span class="pl-4 pr-2 pt-4">{{ translatedGettingTheMost }}</span>
@@ -120,5 +120,11 @@ li::before {
 .hand {
   width: 70px;
   height: 86px;
+}
+
+.intro {
+  @include media-breakpoint-up(md) {
+    box-shadow: 5px 5px $black;
+  }
 }
 </style>
