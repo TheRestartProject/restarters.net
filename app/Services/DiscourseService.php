@@ -39,7 +39,7 @@ class DiscourseService {
                 }
             }
         } catch (\Exception $ex) {
-            Log::error("Error retrieving microtasking discussion topics" . $ex->getMessage());
+            Log::error("Error retrieving discussion topics" . $ex->getMessage());
         }
 
         return $topics;
