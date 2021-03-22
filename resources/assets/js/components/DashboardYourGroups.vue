@@ -1,70 +1,83 @@
 <template>
   <CollapsibleSection border-shadow class="p-3" :show-horizontal-rule="false" heading-class="">
     <template slot="title">
-      <div class="d-flex">
-        <div class="align-self-center">
-          {{ translatedYourGroupsHeading }}
+      <div class="d-flex justify-content-between flex-wrap">
+        <div class="d-flex w-100">
+          <div class="align-self-center">
+            {{ translatedYourGroupsHeading }}
+          </div>
+          <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
         </div>
-        <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
+        <a href="/group/nearby" v-if="newGroups" class="added added-md d-none d-md-block pr-3">
+          <b-img src="/images/arrow-right-doodle-white.svg" />
+          {{ translatedNewlyAdded }}
+        </a>
       </div>
     </template>
 
     <template slot="content">
       <div class="content">
-        <div class="layout">
-          <div class="group-intro">
-            <h3>
-              {{ translatedGroupsHeading }}
-            </h3>
-            <p>
+        <DashboardNoGroups v-if="!myGroups || !myGroups.length" :nearby-groups="nearbyGroups" />
+        <div v-else>
+          <a href="/group/nearby" v-if="newGroups" class="added added-xs d-block d-md-none pr-3 pt-3 pb-3 mb-2">
+            <b-img src="/images/arrow-right-doodle-white.svg" />
+            {{ translatedNewlyAdded }}
+          </a>
+          <div class="layout">
+            <div class="group-intro">
+              <h3>
+                {{ translatedGroupsHeading }}
+              </h3>
+              <p>
               {{ __('dashboard.catch_up') }}
-            </p>
-          </div>
-          <div class="group-list">
-            <p class="border border-dark border-top-0 border-left-0 border-right-0" />
-            <DashboardGroup
-                v-for="g in myGroups"
-                :group="g"
-                :key="g.idgroups"
-            />
-          </div>
-          <div class="group-seeall">
-            <div class="d-flex justify-content-end">
-              <a href="/group" class="mr-1">
-                {{ translatedSeeAll }}
-              </a>
+              </p>
             </div>
-          </div>
-          <div class="group-spacer" />
-          <div class="event-intro">
-            <div class="d-flex justify-content-between">
-              <div>
-                <h3>
-                  {{ translatedUpcomingEventsTitle }}
-                </h3>
-                <p v-if="events.length">
-                  {{ translatedUpcomingEventsSubTitle }}
-                </p>
-                <p v-else>
-                  {{ translatedNoUpcomingEvents }}.
-                </p>
-              </div>
-              <div>
-                <b-btn variant="primary" href="/party/create" class="text-nowrap">
-                  {{ translatedAddEvent }}
-                </b-btn>
+            <div class="group-list">
+              <p class="border border-dark border-top-0 border-left-0 border-right-0" />
+              <DashboardGroup
+                  v-for="g in myGroups"
+                  :group="g"
+                  :key="g.idgroups"
+              />
+            </div>
+            <div class="group-seeall">
+              <div class="d-flex justify-content-end">
+                <a href="/group" class="mr-1">
+                  {{ translatedSeeAll }}
+                </a>
               </div>
             </div>
-          </div>
-          <div class="event-list">
-            <p class="border border-dark border-top-0 border-left-0 border-right-0" />
-            <DashboardEvent v-for="e in events" :key="'event-' + e.idevents" :idevents="e.idevents" class="ml-1" />
-          </div>
-          <div class="event-seeall">
-            <div class="d-flex justify-content-end">
-              <a href="/party" class="mr-1">
-                {{ translatedSeeAll }}
-              </a>
+            <div class="group-spacer" />
+            <div class="event-intro">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h3>
+                    {{ translatedUpcomingEventsTitle }}
+                  </h3>
+                  <p v-if="events.length">
+                    {{ translatedUpcomingEventsSubTitle }}
+                  </p>
+                  <p v-else>
+                    {{ translatedNoUpcomingEvents }}.
+                  </p>
+                </div>
+                <div>
+                  <b-btn variant="primary" href="/party/create" class="text-nowrap">
+                    {{ translatedAddEvent }}
+                  </b-btn>
+                </div>
+              </div>
+            </div>
+            <div class="event-list">
+              <p class="border border-dark border-top-0 border-left-0 border-right-0" />
+              <DashboardEvent v-for="e in events" :key="'event-' + e.idevents" :idevents="e.idevents" class="ml-1" />
+            </div>
+            <div class="event-seeall">
+              <div class="d-flex justify-content-end">
+                <a href="/party" class="mr-1">
+                  {{ translatedSeeAll }}
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -76,9 +89,21 @@
 import DashboardGroup from './DashboardGroup'
 import CollapsibleSection from './CollapsibleSection'
 import DashboardEvent from './DashboardEvent'
+import DashboardNoGroups from './DashboardNoGroups'
 
 export default {
-  components: {DashboardEvent, CollapsibleSection, DashboardGroup},
+  props: {
+    newGroups: {
+      type: Number,
+      required: true
+    },
+    nearbyGroups: {
+      type: Array,
+      required: false,
+      default: null
+    },
+  },
+  components: {DashboardNoGroups, DashboardEvent, CollapsibleSection, DashboardGroup},
   computed: {
     groups() {
       let groups = this.$store.getters['groups/list']
@@ -93,7 +118,7 @@ export default {
       })
     },
     events() {
-      return this.$store.getters['events/getByGroup'](null)
+      return this.$store.getters['events/getByGroup'](null).filter(e => e.upcoming)
     },
     translatedSeeAll() {
       return this.$lang.get('dashboard.see_all_groups')
@@ -115,6 +140,11 @@ export default {
     },
     translatedNoUpcomingEvents() {
       return this.$lang.get('events.no_upcoming_for_your_groups')
+    },
+    translatedNewlyAdded() {
+      return this.$lang.choice('dashboard.newly_added', this.newGroups, {
+        count: this.newGroups
+      })
     },
   },
 }
@@ -212,6 +242,22 @@ a {
       grid-row: 3 / 4;
       grid-column: 3 / 4;
     }
+  }
+}
+
+.added {
+  font-size: 75%;
+  background-color: $black;
+  color: white;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  align-self: center;
+  text-decoration: none;
+
+  &.added-md {
+    transform: translateX(1.1rem);
+    padding-left: 0px;
+    line-height: 3rem;
   }
 }
 </style>
