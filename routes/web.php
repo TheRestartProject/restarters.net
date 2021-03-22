@@ -94,7 +94,6 @@ Route::prefix('mobifix')->group(function () {
     Route::get('/status', 'MobifixController@status');
 });
 
-
 Route::prefix('MobiFixOra')->group(function () {
     Route::get('/', 'MobifixOraController@index');
     Route::post('/', 'MobifixOraController@index');
@@ -106,6 +105,19 @@ Route::prefix('mobifixora')->group(function () {
     Route::post('/', 'MobifixOraController@index');
     Route::get('/cta', 'MobifixOraController@cta');
     Route::get('/status', 'MobifixOraController@status');
+});
+
+Route::prefix('TabiCatOra')->group(function () {
+    Route::get('/', 'TabicatOraController@index');
+    Route::post('/', 'TabicatOraController@index');
+    Route::get('/cta', 'TabicatOraController@cta');
+    Route::get('/status', 'TabicatOraController@status');
+});
+Route::prefix('tabicatora')->group(function () {
+    Route::get('/', 'TabicatOraController@index');
+    Route::post('/', 'TabicatOraController@index');
+    Route::get('/cta', 'TabicatOraController@cta');
+    Route::get('/status', 'TabicatOraController@status');
 });
 
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
