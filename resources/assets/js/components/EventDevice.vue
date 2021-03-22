@@ -475,4 +475,9 @@ h3 {
 .border-thick {
   border: 3px solid red;
 }
+
+/deep/ input.disabled, textarea.disabled {
+  // Disabled is what happens for the view that people get if they can't edit the device.
+  background-color: white;
+}
 </style>
