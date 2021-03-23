@@ -251,12 +251,11 @@ WHERE d.iddevices = t.iddevices;");
      */
     public function updateDevicesWithEmptyProblem() {
 
-        $result = DB::update("UPDATE devices d
+        return DB::update("UPDATE devices d
 SET d.fault_type = 'Unknown'
 WHERE d.category IN (11,15,16,17,26)
 AND LENGTH(d.problem) = 0
 ");
-        return $result;
     }
 
 }

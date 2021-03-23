@@ -23,20 +23,6 @@ class SearchController extends Controller
 
     public function __construct()
     {
- //($model, $controller, $action)
-    //     parent::__construct($model, $controller, $action);
-    //
-    //     $Auth = new Auth($url);
-    //     if(!$Auth->isLoggedIn() && $action != 'stats'){
-    //         header('Location: /user/login');
-    //     }
-    //     else {
-    //
-    //         $user = $Auth->getProfile();
-    //         $this->user = $user;
-    //         $this->set('user', $user);
-    //         $this->set('header', true);
-    //
           $Device = new Device;
           $weights = $Device->getWeights();
 
@@ -45,31 +31,15 @@ class SearchController extends Controller
 
           $footprintRatioCalculator = new FootprintRatioCalculator();
           $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
-
-    //
-    //         if(FixometerHelper::hasRole($this->user, 'Host')){
-    //             $User = new User;
-    //             $this->set('profile', $User->profilePage($this->user->id));
-    //         }
-    //     }
     }
 
     public function index($response = null)
     {
-
-      // $this->set('charts', true);
-      //
-      // $this->set('css', array('/components/perfect-scrollbar/css/perfect-scrollbar.min.css'));
-      // $this->set('js', array('foot' => array(
-      //   '/components/perfect-scrollbar/js/min/perfect-scrollbar.jquery.min.js',
-      // )));
-
         /** Init all needed classes **/
         $Groups = new Group;
         $Parties = new Party;
         $Device = new Device;
         $Search = new Search;
-        // $this->set('title', 'Filter Stats');
 
         $user = User::find(Auth::id());
 
@@ -103,9 +73,6 @@ class SearchController extends Controller
         foreach ($parties as $party) {
             $sorted_parties[$party->group_name][] = $party;
         }
-        // $this->set('sorted_parties', $sorted_parties);
-        // $this->set('parties', $parties);
-        // $this->set('groups', $groups);
 
         if (isset($_GET['fltr']) && !empty($_GET['fltr'])) {
             $searched_groups = null;
@@ -149,14 +116,12 @@ class SearchController extends Controller
 
             $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags, $allowedParties);
             if (count($PartyList) > 0) {
-              //dbga($PartyList[8]);
                 $partyIds = array();
                 $participants = 0;
                 $hours_volunteered = 0;
                 $totalCO2 = 0;
                 $totalWeight = 0;
-                $need_attention = 0;
-            //  dbga($PartyList[12]->devices);
+
                 foreach ($PartyList as $party) {
                     $partyIds[] = $party->idevents;
 
@@ -185,6 +150,8 @@ class SearchController extends Controller
                             case 3:
                                   $party->dead_devices++;
                                 break;
+                            default:
+                                break;
                         }
                     }
 
@@ -205,8 +172,6 @@ class SearchController extends Controller
                     $clusters['all'][$i] = $cluster;
                 }
 
-              // $this->set('clusters', $clusters);
-
               // most/least stats for clusters
                 $mostleast = array();
                 for ($i = 1; $i <= 4; $i++) {
@@ -214,17 +179,6 @@ class SearchController extends Controller
                     $mostleast[$i]['most_repaired'] = $Search->findMostSeen($partyIds, 1, $i);
                     $mostleast[$i]['least_repaired'] = $Search->findMostSeen($partyIds, 3, $i);
                 }
-
-              // $this->set('mostleast', $mostleast);
-
-
-              // $this->set('pax', $participants);
-              // $this->set('hours', $hours_volunteered);
-              // $this->set('totalWeight', $totalWeight);
-              // $this->set('totalCO2', $totalCO2);
-              // $this->set('device_count_status', $this->Search->deviceStatusCount($partyIds));
-              // $this->set('top', $this->Search->findMostSeen($partyIds, 1, null));
-              // $this->set('PartyList', $PartyList);
             } else {
                 $response['warning'] = 'No results for this set of parameters!';
             }

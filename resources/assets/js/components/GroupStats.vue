@@ -8,14 +8,20 @@
 <script>
 import GroupStatsFacts from './GroupStatsFacts'
 import StatsImpact from './StatsImpact'
+import group from '../mixins/group'
 
 export default {
-  components: {GroupStatsFacts, StatsImpact },
+  components: { GroupStatsFacts, StatsImpact },
+  mixins: [ group ],
   props: {
+    idgroups: {
+      type: Number,
+      required: true
+    },
     stats: {
       required: true,
       type: Object
-    }
+    },
   }
 }
 </script>

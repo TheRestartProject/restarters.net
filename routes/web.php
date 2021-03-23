@@ -64,6 +64,8 @@ Route::prefix('calendar')->group(function () {
     Route::get('/all-events/{hash_env}', 'CalendarEventsController@allEvents')->name('calendar-events-all');
 });
 
+Route::get('workbench', 'MicrotaskingController@index')->name('workbench');
+
 Route::prefix('faultcat')->group(function () {
     Route::get('/', 'FaultcatController@index');
     Route::post('/', 'FaultcatController@index');
@@ -122,6 +124,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::post('/edit-tags', 'UserController@postProfileTagsEdit');
         Route::post('/edit-photo', 'UserController@postProfilePictureEdit');
         Route::post('/edit-admin-settings', 'UserController@postAdminEdit');
+        Route::post('/edit-repair-directory', 'UserController@postProfileRepairDirectory');
     });
 
     Route::post('/edit-user', 'UserController@postEdit');
@@ -160,7 +163,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     Route::prefix('fixometer')->group(function () {
         Route::get('/', 'DeviceController@index')->name('devices');
-        Route::get('/search', 'DeviceController@search')->name('fixometer-search');
     });
 
     // TODO: the rest of these to be redirected properly.
@@ -196,10 +198,11 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/join/{id}', 'GroupController@getJoinGroup');
         Route::post('/image-upload/{id}', 'GroupController@imageUpload');
         Route::get('/image/delete/{idgroups}/{id}/{path}', 'GroupController@ajaxDeleteImage');
-        Route::get('/search/column', 'GroupController@searchColumn');
-        Route::get('/{all?}', 'GroupController@index')->name('groups');
-        Route::get('/all/search', 'GroupController@search');
-        Route::get('/search', 'GroupController@searchColumn');
+        Route::get('/', 'GroupController@mine')->name('groups');
+        Route::get('/all', 'GroupController@all');
+        Route::get('/mine', 'GroupController@mine');
+        Route::get('/nearby', 'GroupController@nearby');
+        Route::get('/network/{id}', 'GroupController@network');
         Route::get('/make-host/{group_id}/{user_id}', 'GroupController@getMakeHost');
         Route::get('/remove-volunteer/{group_id}/{user_id}', 'GroupController@getRemoveVolunteer');
         Route::get('/nearby/{id}', 'GroupController@volunteersNearby');

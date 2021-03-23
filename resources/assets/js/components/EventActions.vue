@@ -2,7 +2,7 @@
   <div>
     <b-dropdown variant="primary" :text="translatedEventActions" class="deepnowrap">
       <div v-if="canedit">
-        <b-dropdown-item :href="'/party/edit/' + eventId">
+        <b-dropdown-item :href="'/party/edit/' + idevents">
           {{ translatedEditEvent }}
         </b-dropdown-item>
         <b-dropdown-item @click="confirmDelete" v-if="!inProgress && !finished">
@@ -20,7 +20,7 @@
           <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="attending && upcoming">
             {{ translatedInviteVolunteers }}
           </b-dropdown-item>
-          <b-dropdown-item :href="'/party/join/' + eventId" v-else>
+          <b-dropdown-item :href="'/party/join/' + idevents" v-else>
             {{ translatedRSVP }}
           </b-dropdown-item>
         </div>
@@ -39,7 +39,7 @@
           <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="attending && upcoming">
             {{ translatedInviteVolunteers }}
           </b-dropdown-item>
-          <b-dropdown-item :href="'/party/join/' + eventId" v-else>
+          <b-dropdown-item :href="'/party/join/' + idevents" v-else>
             {{ translatedRSVP }}
           </b-dropdown-item>
         </div>
@@ -55,6 +55,27 @@ import ConfirmModal from './ConfirmModal'
 export default {
   components: {ConfirmModal},
   mixins: [ event ],
+  props: {
+    idevents: {
+      type: Number,
+      required: true
+    },
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    attending: {
+      type: Object,
+      required: false,
+      default: null
+    },
+    inGroup: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+  },
   computed: {
     translatedEventActions() {
       return this.$lang.get('events.event_actions').toUpperCase()
@@ -86,15 +107,11 @@ export default {
       this.$refs.confirmdelete.show()
     },
     async confirmedDelete() {
-      // TODO LATER When events move into the store this should become a store action.
-      let ret = await axios.post('/party/delete/' + this.eventId, {
-        id: this.eventId
-      }, {
-        headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
-        }
+      await this.$store.dispatch('events/delete', {
+        idevents: this.idevents
       })
 
+      // TODO LATER Assumes always works.
       window.location = '/party'
     }
   }

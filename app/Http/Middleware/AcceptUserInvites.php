@@ -28,7 +28,7 @@ class AcceptUserInvites
         }
 
         if ( ! empty($request->session()->get('groups'))) {
-            foreach ($request->session()->get('groups') as $group_code => $hashs) {
+            foreach ($request->session()->get('groups') as $hashs) {
                 foreach ($hashs as $hash) {
                     $acceptance = Invite::where('hash', $hash)->firstOrFail();
                     $group = $acceptance->group;
@@ -58,7 +58,7 @@ class AcceptUserInvites
         }
 
         if ( ! empty($request->session()->get('events'))) {
-            foreach ($request->session()->get('events') as $event_code => $hashs) {
+            foreach ($request->session()->get('events') as $hashs) {
                 foreach ($hashs as $hash) {
                     $acceptance = Invite::where('hash', $hash)->firstOrFail();
                     $event = $acceptance->event;

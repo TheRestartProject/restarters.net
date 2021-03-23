@@ -2,8 +2,8 @@
   <div>
     <h2 class="mt-2 mb-2">
       {{ translatedImpact }}
-      <span v-b-popover.html :title="translatedImpactCalculation">
-        <img class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg">
+      <span v-b-popover.html="translatedImpactCalculation">
+        <b-img class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg" />
       </span>
     </h2>
     <div class="impact-container">
@@ -138,7 +138,6 @@ export default {
     margin-left: 20px;
   }
 }
-
 
 .impact-notincluded-content {
   color: $brand-light;

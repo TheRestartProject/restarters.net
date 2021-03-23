@@ -57,11 +57,9 @@ class Network extends Model
     {
         $networkGroupsIds = $this->groups->pluck('idgroups')->toArray();
 
-        $groupsNotIn = Group::all()->filter(function ($group, $key) use($networkGroupsIds) {
+        return Group::all()->filter(function ($group) use($networkGroupsIds) {
             return !in_array($group->idgroups, $networkGroupsIds);
         });
-
-        return $groupsNotIn;
     }
 
     public function stats($emissionRatio)

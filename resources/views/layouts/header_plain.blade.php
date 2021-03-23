@@ -8,7 +8,6 @@
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <!--<title>{{ config('app.name', 'Laravel') }}</title>-->
         <title>
             @hasSection('title')
             @yield('title')
@@ -42,18 +41,26 @@
         @if( !empty(env('GOOGLE_ANALYTICS_TRACKING_ID')) )
             <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('GOOGLE_ANALYTICS_TRACKING_ID') }}"></script>
             <script>
-             if (restarters.analyticsCookieEnabled) {
-                 window.dataLayer = window.dataLayer || [];
-                 function gtag(){dataLayer.push(arguments);}
-                 gtag('js', new Date());
+            if (restarters.analyticsCookieEnabled) {
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
 
-                 gtag('config', '{{ env('GOOGLE_ANALYTICS_TRACKING_ID') }}');
+              gtag('config', '{{ env('GOOGLE_ANALYTICS_TRACKING_ID') }}');
 
-                 <!-- Google Tag Manager -->
-                 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src= 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                 })(window,document,'script','dataLayer', '{{ env('GOOGLE_TAG_MANAGER_ID') }}');
-                 <!-- End Google Tag Manager -->
-             }
+              <!-- Google Tag Manager -->
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src= 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer', '{{ env('GOOGLE_TAG_MANAGER_ID') }}');
+              <!-- End Google Tag Manager -->
+
+              <!-- Analytics to allow ga.send for custom events -->
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                                       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', '{{ env('GOOGLE_ANALYTICS_TRACKING_ID') }}', 'auto');
+            }
             </script>
         @endif
 
@@ -75,14 +82,14 @@
                     <div class="d-none d-sm-block navbar-brand">
                         @include('includes/logo')
                     </div>
-                    <div class="d-block d-md-none">
+                    <div class="d-block d-sm-none">
                         @include('includes/logo-plain')
                     </div>
 
                 <div id="navbarSupportedContent" class="collapse navbar-collapse">
                     <ul class="navbar-nav ml-auto">
-                        <li><a class="nav-link" href="/login">Sign in</a></li>
-                        <li><a class="nav-link" href="/about">Join Restarters</a></li>
+                        <li><a class="nav-link" href="/login">@lang('login.login_title')</a></li>
+                        <li><a class="nav-link" href="/about">@lang('login.join_title')</a></li>
                     </ul>
                 </div>
 

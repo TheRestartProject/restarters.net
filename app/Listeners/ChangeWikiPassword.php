@@ -53,7 +53,7 @@ class ChangeWikiPassword
                                    ->setParam('password', $this->request->input('new-password'))
                                    ->setParam('retype', $this->request->input('new-password'))
                                    ->setParam('changeauthtoken', $token);
-            $result = $api->postRequest($changePasswordRequest);
+            $api->postRequest($changePasswordRequest);
         } catch (\Exception $ex) {
             Log::error("Failed to changed password for user '" . $user->mediawiki . "' in mediawiki: " . $ex->getMessage());
         }

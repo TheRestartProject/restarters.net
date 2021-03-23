@@ -1,70 +1,40 @@
-// This mixin includes lots of function relating to events.
-// TODO LATER In due course the event will move into the store and we'll just pass the id.  All the other props will then
-// become computed data in here.
+// This mixin includes function relating to events.
 import { DATE_FORMAT, GUEST, HOST, RESTARTER } from '../constants'
 import moment from 'moment'
 
 export default {
-  props: {
-    eventId: {
-      type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
-      required: true
-    },
-    attendance:  {
-      type: Array,
-      required: false,
-      default: function () { return [] }
-    },
-    invitations:  {
-      type: Array,
-      required: false,
-      default: function () { return [] }
-    },
-    canedit: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    isAttending: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    attending: {
-      type: Object,
-      required: false,
-      default: null
-    },
-    inGroup: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
-  data () {
-    return {
-      volunteerCount: null
-    }
-  },
-  mounted() {
-    // TODO LATER this should be removed when the events are moved into a store.
-    this.volunteerCount = this.event.volunteers
-  },
   computed: {
+    event() {
+      return this.$store.getters['events/get'](this.idevents)
+    },
+    volunteerCount() {
+      return this.event && this.event.volunteers ? this.event.volunteers : 0
+    },
     upcoming() {
-      const start = new moment(this.event.event_date + ' ' + this.event.start)
-      return start.isAfter()
+      let ret = false;
+
+      if (this.event) {
+        const start = new moment(this.event.event_date + ' ' + this.event.start)
+        ret = start.isAfter()
+      }
+
+      return ret
     },
     finished() {
-      const end = new moment(this.event.event_date + ' ' + this.event.end)
-      return end.isBefore()
+      let ret = false;
+
+      if (this.event) {
+        const end = new moment(this.event.event_date + ' ' + this.event.end)
+        ret = end.isBefore()
+      }
+
+      return ret
     },
     inProgress() {
       return !this.upcoming && !this.finished
+    },
+    startingSoon() {
+      return this.upcoming && !this.finished && (new moment().isSame(this.event.event_date, 'day'))
     },
     start() {
       return this.event.start.substring(0, 5)
@@ -73,17 +43,17 @@ export default {
       return this.event.end.substring(0, 5)
     },
     date() {
-      return new moment(this.event.event_date).format(DATE_FORMAT)
+      return this.event ? (new moment(this.event.event_date).format(DATE_FORMAT)) : null
     },
     dayofmonth() {
-      return new moment(this.event.event_date).format('D')
+      return this.event ? (new moment(this.event.event_date).format('DD')) : null
     },
     month() {
-      return new moment(this.event.event_date).format('MMM').toUpperCase()
+      return this.event ? (new moment(this.event.event_date).format('MMM').toUpperCase()) : null
     },
     attendees() {
       // Everyone, both invited and confirmed.
-      return this.$store.getters['attendance/byEvent'](this.eventId)
+      return this.$store.getters['attendance/byEvent'](this.idevents)
     },
     confirmed() {
       return this.attendees.filter((a) => {

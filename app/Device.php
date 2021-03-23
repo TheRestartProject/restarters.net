@@ -17,7 +17,7 @@ class Device extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'item_type', 'model', 'age', 'problem', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type'];
+    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'item_type', 'model', 'age', 'problem', 'notes', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -91,7 +91,8 @@ class Device extends Model implements Auditable
         'SELECT
 
 sum(case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) as `total_weights`,
-
+sum(case when (categories.powered = 1) then (case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as ewaste,
+sum(case when (categories.powered = 0) then devices.estimate + 0.0 else 0 end) as unpowered_waste,
 sum(case when (devices.category = 46) then (devices.estimate + 0.0) * @ratio else (categories.footprint * @displacement) end) as `total_footprints`
 
 FROM devices, categories, events,
@@ -355,7 +356,7 @@ AND devices.event = events.idevents ';
                     ON `d`.`event` = `e`.`idevents`
                 INNER JOIN `categories` AS `c`
                     ON `d`.`category` = `c`.`idcategories`
-                WHERE 1=1 and `c`.`idcategories` <> '.env('MISC_CATEGORY_ID');
+                WHERE 1=1 and `c`.`powered` = 1 AND `c`.`idcategories` <> '.env('MISC_CATEGORY_ID');
 
         if ( ! is_null($status) && is_numeric($status)) {
             $sql .= ' AND `d`.`repair_status` = :status ';
@@ -624,5 +625,61 @@ AND devices.event = events.idevents ';
         $File = new \FixometerFile;
 
         return $File->findImages(env('TBL_DEVICES'), $this->iddevices);
+    }
+
+    public function fixedPoweredCount() {
+        // We want fixed devices with an powered category.
+        $count = Device::where('repair_status', '=', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function($query) {
+            $query->where('powered', 1);
+        }])->get();
+
+        $total = 0;
+        foreach ($count as $c) {
+            $total += $c->device_category_count;
+        }
+
+        return $total;
+    }
+
+    public function fixedUnpoweredCount() {
+        // We want fixed devices with an unpowered category.
+        $count = Device::where('repair_status', '=', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function($query) {
+            $query->where('powered', 0);
+        }])->get();
+
+        $total = 0;
+        foreach ($count as $c) {
+            $total += $c->device_category_count;
+        }
+
+        return $total;
+    }
+
+    public function unpoweredCount() {
+        // We want devices with an unpowered category.
+        $count = Device::withCount(['deviceCategory' => function($query) {
+            $query->where('powered', 0);
+        }])->get();
+
+        $total = 0;
+        foreach ($count as $c) {
+            $total += $c->device_category_count;
+        }
+
+        return $total;
+    }
+
+    public function poweredCount() {
+        // We want devices with an powered category.
+        $count = Device::withCount(['deviceCategory' => function($query) {
+            $query->where('powered', 1);
+        }])->get();
+
+        $total = 0;
+        foreach ($count as $c) {
+            $total += $c->device_category_count;
+        }
+
+        return $total;
     }
 }

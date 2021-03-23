@@ -1,4 +1,4 @@
-@if( Auth::guest() )
+@if( Auth::guest() && (!isset($show_navbar_to_anons) || !$show_navbar_to_anons))
   @include('layouts/header_plain')
 @else
   @include('layouts/header')

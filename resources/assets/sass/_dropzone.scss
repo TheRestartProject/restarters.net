@@ -1,51 +1,52 @@
-.dz-thumbnail {
-  min-height: revert;
-  width: 86px;
-  height: 86px;
-  padding: 0px;
+:not .leave-dropzone-alone {
+  .dz-thumbnail {
+    min-height: revert;
+    width: 86px;
+    height: 86px;
+    padding: 0px;
 
-  background-color: rgba(255, 255, 255, 0.2) !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
 
-  .dz-message {
-    background-image: url('../images/upload_ico_grey.svg') !important;
-    position: relative;
-    top: -10px;
+    .dz-message {
+      background-image: url('../images/upload_ico_grey.svg') !important;
+      position: relative;
+      top: -10px;
+    }
   }
-}
 
-.dz-clickable.dropzone {
-  border-style: dashed;
-  border-color: #BEC0C0;
-  border-radius: 3px;
-  background-color: #F8F8F8;
+  .dz-clickable.dropzone {
+    border-style: dashed;
+    border-color: #BEC0C0;
+    border-radius: 3px;
+    background-color: #F8F8F8;
 
-  .dz-message {
-    font-size: 16px;
-    color: #000;
-    font-family: $font-family-sans-serif;
-    background-repeat: no-repeat;
-    background-position: 50% 0;
-    background-image: url('../images/camera-upload.svg');
-    padding-top: 22px;
+    .dz-message {
+      font-size: 16px;
+      color: #000;
+      font-family: $font-family-sans-serif;
+      background-repeat: no-repeat;
+      background-position: 50% 0;
+      background-image: url('../images/camera-upload.svg');
+      padding-top: 22px;
 
-    small {
+      small {
         font-family: $font-family-second;
         font-size: 13px;
         display: block;
         padding-top: 15px;
         text-align: center;
         color: #5A5A5A;
+      }
     }
+
   }
 
-}
-
-.dz-started {
-  .dz-preview {
-    margin: auto;
-    display: block;
-    position: static;
-    .dz-remove {
+  .dz-started {
+    .dz-preview {
+      margin: auto;
+      display: block;
+      position: static;
+      .dz-remove {
         position: absolute;
         top: -33px;
         left: 80px;
@@ -56,81 +57,82 @@
         text-decoration: underline;
 
         &:hover {
-            text-decoration: none;
+          text-decoration: none;
         }
 
         &:before {
-            content:"╳";
-            position: relative;
+          content:"╳";
+          position: relative;
         }
+      }
     }
   }
-}
 
-.previews {
+  .previews {
     margin: 0 -5px;
     padding: 0;
     display: flex;
     flex-flow: row wrap;
 
     img {
-        width: 100% !important;
-        height: auto !important;
-        display: block !important;
-        border-radius: 3px;
-        background:#BEC0C0;
-        border: 2px solid #BEC0C0;
-        margin: auto;
+      width: 100% !important;
+      height: auto !important;
+      display: block !important;
+      border-radius: 3px;
+      background:#BEC0C0;
+      border: 2px solid #BEC0C0;
+      margin: auto;
     }
 
     > div {
-        padding: 0 5px;
-        margin: 0;
-        flex: 1 0 20%;
-        max-width: 20%;
-        min-width: 20%;
-        flex-direction: column;
+      padding: 0 5px;
+      margin: 0;
+      flex: 1 0 20%;
+      max-width: 20%;
+      min-width: 20%;
+      flex-direction: column;
     }
 
     .dz-preview,
     .dz-image {
-        position: relative;
-        z-index: 1;
+      position: relative;
+      z-index: 1;
     }
 
     .dz-remove {
-        text-indent: -9999px;
-        background-image: url('../images/remove.svg');
-        background-repeat: no-repeat;
-        background-position: 50% 50%;
-        width: 19px;
-        height: 19px;
-        display: block;
-        text-decoration: none;
-        position: absolute;
-        right: -7px;
-        top: -7px;
-        z-index: 2;
+      text-indent: -9999px;
+      background-image: url('../images/remove.svg');
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      width: 19px;
+      height: 19px;
+      display: block;
+      text-decoration: none;
+      position: absolute;
+      right: -7px;
+      top: -7px;
+      z-index: 2;
     }
 
     .dz-image {
-        margin-bottom: 5px;
+      margin-bottom: 5px;
     }
-}
+  }
 
-.previews, .dz-preview {
+  .previews, .dz-preview {
     .dz-success-mark,
     .dz-error-mark,
     .dz-error-message,
     .dz-filename,
     .dz-size {
-        display: none;
+      display: none;
     }
 
-}
+  }
 
-.dropzone.dz-clickable.dz-started {
+  .dropzone.dz-clickable.dz-started {
     background-color: #FFF;
     min-height: 0;
     padding: 30px;
+  }
 }

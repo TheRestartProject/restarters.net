@@ -51,7 +51,7 @@ class UserGroups extends Model implements Auditable
         } else {
             $sql = 'INSERT INTO `users_groups` (`user`, `group`) VALUES (:user, :group)';
 
-            foreach ($groups as $k => &$group) {
+            foreach ($groups as &$group) {
                 try {
                     DB::insert(DB::raw($sql), array('user' => $iduser, 'group' => $group));
                 } catch (\Illuminate\Database\QueryException $e) {

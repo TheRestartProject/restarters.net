@@ -1,29 +1,49 @@
 <template>
-  <div>
-    <h2 :class="{
+  <div :class="{
+      'border-shadow': borderShadow
+  }">
+    <component :is="headingLevel" :class="{
       'd-flex': true,
       'd-md-none': hideTitle,
-      'mb-3': true,
-      'justify-content-between': true
+      headingClass : true,
+      'justify-content-between': true,
       }" @click="toggle">
-      <span>
-        <slot name="title" />
-        <span v-if="count" class="d-inline d-md-none text-muted">
-          (<span class="count">{{ count }}</span>)
-        </span>
-      </span>
-      <span class="d-inline d-md-none">
+      <div class="d-flex w-100 justify-content-between align-items-center">
+        <div class="d-flex flex-row">
+          <div class="d-flex flex-column justify-content-center">
+            <slot name="title" />
+          </div>
+          <div v-if="count" :class="{
+          'd-inline' : true,
+          'd-md-none' : !alwaysShowCount,
+          'text-muted' : true,
+          'd-flex' : true,
+          'flex-column' : true,
+          'justify-content-center' : true
+        }">
+          <span v-if="countBadge">
+            &nbsp;<b-badge variant="primary" pill>{{ count }}</b-badge>
+          </span>
+            <span v-else>
+            &nbsp;<span :class="countClass">({{ count }})</span>
+          </span>
+          </div>
+          <slot name="title-icon" />
+        </div>
+        <slot name="title-right" />
+      </div>
+      <span class="d-inline d-md-none clickme d-flex flex-column justify-content-center">
         <img class="icon" v-if="expanded" src="/images/minus-icon.svg" alt="Collapse" />
         <img class="icon" v-else src="/images/add-icon.svg" alt="Expand" />
       </span>
-    </h2>
+    </component>
     <div :class="{
       'd-none': !expanded,
       'd-md-block': true
     }">
       <slot name="content" />
     </div>
-    <hr class="mt-0 d-md-none" />
+    <hr v-if="showHorizontalRule" class="mt-0 d-md-none" />
   </div>
 </template>
 <script>
@@ -49,6 +69,46 @@ export default {
       type: Number,
       required: false,
       default: null
+    },
+    alwaysShowCount: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    countBadge: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    countClass: {
+      type: String,
+      required: false,
+      default: 'count'
+    },
+    headingLevel: {
+      type: String,
+      required: false,
+      default: 'h2'
+    },
+    headingClass: {
+      type: String,
+      required: false,
+      default: 'mb-3'
+    },
+    showHorizontalRule: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    borderShadow: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    persist: {
+      type: String,
+      required: false,
+      default: null
     }
   },
   data () {
@@ -58,16 +118,41 @@ export default {
   },
   mounted() {
     this.expanded = !this.collapsed
+
+    if (this.persist) {
+      try {
+        // We might have a stored state which overrides this.
+        const stored = localStorage.getItem('collapsible-' + this.persist)
+
+        if (stored !== null) {
+          this.expanded = stored === 'false' ? false : true
+        }
+      } catch (e) {
+        console.log("Get local failed", e)
+      }
+    }
   },
   methods: {
     toggle() {
       this.expanded = !this.expanded
+
+      if (this.persist) {
+        // Save state.
+        try {
+          localStorage.setItem('collapsible-' + this.persist, this.expanded)
+        } catch (e) {
+          console.log("Set local failed", e)
+        }
+      }
     }
   }
 }
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 .icon {
   width: 30px;
@@ -77,7 +162,12 @@ export default {
   color: $brand-light;
 }
 
-.text-muted {
-  font-size: 28px;
+.border-shadow {
+  background-color: $white;
+  border: 1px solid $black;
+
+  @include media-breakpoint-up(md) {
+    box-shadow: 5px 5px $black;
+  }
 }
 </style>

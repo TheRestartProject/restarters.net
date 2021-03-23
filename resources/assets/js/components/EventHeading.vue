@@ -2,11 +2,11 @@
   <div>
     <div class="d-flex justify-content-between mb-3">
       <h1 class="d-block d-md-none">{{ translatedEvents }}</h1>
-      <EventActions v-bind="$props" class="d-block d-md-none" />
+      <EventActions :idevents="idevents" :canedit="canedit" :in-group="inGroup" :attending="attending" class="d-block d-md-none" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
-      <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
-        <div class="bord d-flex w-xs-100 w-md-50">
+      <div class="layout mt-4 mb-3 mb-md-3">
+        <div class="bord d-flex">
           <div class="datebox">
             <span class="day align-top">{{ dayofmonth }}</span> <br />
             <span>
@@ -22,12 +22,12 @@
             {{ event.venue ? event.venue : event.location }}
           </h2>
         </div>
-        <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
-          <div class="d-flex justify-content-between w-100 flex-wrap centreme">
+        <div class="pl-md-4 d-flex maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
+          <div class="d-flex justify-content-between w-100">
             <div class="d-flex mr-2" v-if="event.the_group">
               <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block" />
-              <div class="ml-md-2">
-                {{ translatedOrganised }}
+              <div class="d-flex flex-wrap ml-md-2">
+                {{ translatedOrganised }}&nbsp;
                 <br class="d-none d-md-block"/>
                 <b>
                   <a :href="'/group/view/' + event.the_group.idgroups">
@@ -36,7 +36,7 @@
                 </b>
               </div>
             </div>
-            <EventActions v-bind="$props" class="d-none d-md-block" />
+            <EventActions :idevents="idevents" :canedit="canedit" :in-group="inGroup" :attending="attending" class="d-none d-md-block" />
           </div>
         </div>
       </div>
@@ -52,6 +52,27 @@ import EventActions from './EventActions'
 export default {
   components: {EventActions},
   mixins: [event],
+  props: {
+    idevents: {
+      type: Number,
+      required: true
+    },
+    canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    attending: {
+      type: Object,
+      required: false,
+      default: null
+    },
+    inGroup: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+  },
   computed: {
     groupImage() {
       return this.event.the_group && this.event.the_group.group_image ? ('/uploads/mid_' + this.event.the_group.group_image.image.path) : DEFAULT_PROFILE
@@ -127,5 +148,16 @@ export default {
 .centreme {
   align-items: center;
   display: flex !important;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+  }
 }
 </style>

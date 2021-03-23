@@ -1,0 +1,281 @@
+<template>
+  <div>
+    <h1 class="d-flex justify-content-between">
+      <div class="d-flex">
+        <div class="mt-2">
+        {{ translatedTitle }}
+        </div>
+        <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
+      </div>
+      <div>
+        <b-btn variant="primary" href="/group/create" v-if="canCreate">
+          <span class="d-block d-lg-none">
+            {{ translatedAddNewGroupMobile }}
+          </span>
+          <span class="d-none d-lg-block">
+            {{ translatedAddNewGroup }}
+          </span>
+        </b-btn>
+      </div>
+    </h1>
+    <b-tabs class="ourtabs w-100 mt-4" justified v-model="currentTab">
+      <b-tab class="pt-2" lazy>
+        <template slot="title">
+          <b class="text-uppercase d-block d-md-none">{{ translatedYourGroupsMobile }}</b>
+          <b class="text-uppercase d-none d-md-block">{{ translatedYourGroups }}</b>
+        </template>
+        <div class="pt-2 pb-2">
+          <div v-if="myGroups && myGroups.length">
+            <GroupsTable
+                :groups="myGroups"
+                class="mt-3"
+                :tab="currentTab"
+                @nearest="currentTab = 1"
+                your-area="yourArea"
+            />
+          </div>
+          <div v-else class="mt-2 mb-2 text-center" v-html="translatedNoGroupsMine" />
+        </div>
+      </b-tab>
+      <b-tab class="pt-2" lazy>
+        <template slot="title">
+          <b class="text-uppercase d-block d-lg-none">{{ translatedNearestGroupsMobile }}</b>
+          <b class="text-uppercase d-none d-lg-block">{{ translatedNearestGroups }}</b>
+        </template>
+        <div v-if="nearbyGroups && nearbyGroups.length">
+          <GroupsTable
+              :groups="nearbyGroups"
+              class="mt-3"
+              :tab="currentTab"
+              @all="currentTab = 2"
+              your-area="yourArea"
+          />
+        </div>
+        <div v-else class="mt-2 mb-2 text-center">
+          <div v-if="yourArea" v-html=" translatedNoGroupsNearestWithLocation" />
+          <div v-else v-html="translatedNoGroupsNearestNoLocation" />
+        </div>
+      </b-tab>
+      <b-tab class="pt-2" lazy>
+        <template slot="title">
+          <b class="text-uppercase d-block d-md-none">{{ translatedAllGroupsMobile }}</b>
+          <b class="text-uppercase d-none d-md-block">{{ translatedAllGroups }}</b>
+        </template>
+        <GroupsTable
+            :groups="groups"
+            class="mt-3"
+            count
+            search
+            :networks="networks"
+            :network="network"
+            :all-group-tags="allGroupTags"
+            :show-tags="showTags"
+            :tab="currentTab"
+            your-area="yourArea"
+        />
+      </b-tab>
+    </b-tabs>
+  </div>
+</template>
+<script>
+import GroupsTable from './GroupsTable'
+import auth from '../mixins/auth'
+
+export default {
+  components: {GroupsTable},
+  mixins: [ auth ],
+  props: {
+    network: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    tab: {
+      type: String,
+      required: false,
+      default: 'mine'
+    },
+    allGroups: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    yourGroups: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    nearbyGroups: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    yourArea: {
+      type: String,
+      required: false,
+      default: null
+    },
+    userId: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    canCreate: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    showTags: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    networks: {
+      type: Array,
+      required: true
+    },
+    apiToken: {
+      type: String,
+      required: false,
+      default: null
+    },
+    allGroupTags: {
+      type: Array,
+      required: true
+    }
+  },
+  data () {
+    return {
+      currentTab: 0
+    }
+  },
+  computed: {
+    groups() {
+      let groups = this.$store.getters['groups/list']
+
+      return groups ? groups.sort((a, b) => {
+        return a.name.localeCompare(b.name)
+      }) : []
+    },
+    myGroups() {
+      return this.groups.filter(g => {
+        return g.ingroup
+      })
+    },
+    nearGroups() {
+      return this.groups.filter(g => {
+        return g.nearby
+      })
+    },
+    translatedTitle() {
+      return this.$lang.get('groups.groups')
+    },
+    translatedAddNewGroup() {
+      return this.$lang.get('groups.create_groups')
+    },
+    translatedAddNewGroupMobile() {
+      return this.$lang.get('groups.create_groups_mobile2')
+    },
+    translatedYourGroups() {
+      return this.$lang.get('groups.groups_title1')
+    },
+    translatedYourGroupsMobile() {
+      return this.$lang.get('groups.groups_title1_mobile')
+    },
+    translatedNoGroupsNearYou() {
+      return this.$lang.get('groups.no_groups_near_you', {
+        area: this.yourArea ? (this.yourArea.charAt(0).toUpperCase() + this.yourArea.slice(1)) : ''
+      })
+    },
+    translatedNoGroupsMine() {
+      return this.$lang.get('groups.no_groups_mine')
+    },
+    translatedNoGroupsNearestNoLocation() {
+      return this.$lang.get('groups.no_groups_nearest_no_location')
+    },
+    translatedNoGroupsNearestWithLocation() {
+      return this.$lang.get('groups.no_groups_nearest_with_location')
+    },
+    translatedNearestGroups() {
+      return this.$lang.get('groups.groups_title2')
+    },
+    translatedNearestGroupsMobile() {
+      return this.$lang.get('groups.groups_title2_mobile')
+    },
+    translatedAllGroups() {
+      return this.$lang.get('groups.all_groups')
+    },
+    translatedAllGroupsMobile() {
+      return this.$lang.get('groups.all_groups_mobile')
+    }
+  },
+  watch: {
+    currentTab(newVal) {
+      // We want to update the URL in the browser.  In a full app this would be done by the router, but hack it in
+      // here.
+      try {
+        let tag = '';
+
+        switch (newVal) {
+          case 1: tag = 'nearby'; break;
+          case 2: tag = 'all'; break;
+          default: tag = 'mine'; break;
+        }
+
+        if (!this.network) {
+          // If we are vieiwng a specific network, don't mess with the URL as it's confusing.
+          window.history.pushState(null, "Groups", "/group/" + tag);
+        }
+      } catch (e) {
+        console.error("Failed to update URL")
+      }
+    }
+  },
+  created() {
+    // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
+    // and so that as/when it changes then reactivity updates all the views.
+    //
+    // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
+    let groups = {}
+
+    this.allGroups.forEach(g => {
+      groups[g.idgroups] = g
+    })
+
+    if (this.yourGroups) {
+      this.yourGroups.forEach(g => {
+        groups[g.idgroups].ingroup = true
+      })
+    }
+
+    if (this.nearbyGroups) {
+      this.yourGroups.forEach(g => {
+        groups[g.idgroups].nearby = true
+      })
+    }
+
+    this.$store.dispatch('groups/setList', {
+      groups: Object.values(groups)
+    })
+
+    // We have three tabs, and might be asked to start on a specific one.
+    switch (this.tab) {
+      case 'nearby':
+        this.currentTab = 1;
+        break;
+      case 'all':
+      case 'network':
+        this.currentTab = 2;
+        break;
+      default:
+        this.currentTab = 0;
+        break;
+    }
+  }
+}
+</script>
+<style scoped lang="scss">
+.height {
+  height: 76px;
+}
+</style>

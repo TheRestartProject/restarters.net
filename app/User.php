@@ -27,6 +27,9 @@ class User extends Authenticatable implements Auditable
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
+    // Use the Authorizable trait so that we can call can() on a user to evaluation policies.
+    use \Illuminate\Foundation\Auth\Access\Authorizable;
+
     protected $table = 'users';
 
     /**
@@ -35,7 +38,7 @@ class User extends Authenticatable implements Auditable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash'
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role'
     ];
 
     /**
@@ -71,6 +74,11 @@ class User extends Authenticatable implements Auditable
     public function role()
     {
         return $this->hasOne('App\Role', 'idroles', 'role');
+    }
+
+    public function repairdir_role() {
+        // Make sure we don't return a null value.  The client select would struggle with null values.
+        return $this->repairdir_role ? $this->repairdir_role : Role::REPAIR_DIRECTORY_NONE;
     }
 
     public function userSkills()
@@ -109,11 +117,9 @@ class User extends Authenticatable implements Auditable
             $groupsNearbyQuery->whereNotIn('idgroups', $idsOfGroupsToIgnore);
         }
 
-        $groupsNearby = $groupsNearbyQuery->orderBy('distance', 'ASC')
+        return $groupsNearbyQuery->orderBy('distance', 'ASC')
             ->take($numberOfGroups)
             ->get();
-
-        return $groupsNearby;
     }
 
     public function preferences()
@@ -135,11 +141,6 @@ class User extends Authenticatable implements Auditable
             'preference_id' => $preference->getKey()
         ]);
     }
-
-    //
-    // public function sessions() {
-    //   return $this->hasMany('App\Session', 'user', 'id');
-    // }
 
     public function getRolePermissions($role)
     {
@@ -381,17 +382,14 @@ class User extends Authenticatable implements Auditable
      */
     public function getRepairNetwork($string = false, $slug = false)
     {
-        if ($string == true) {
-            switch ($this->repair_network) {
-                case 2:
-                    $network = 'Repair Share';
-
-                    break;
-                default:
-                    $network = 'Restarters';
+        if ($string) {
+            if ($this->repair_network === 2) {
+                $network = 'Repair Share';
+            } else {
+                $network = 'Restarters';
             }
 
-            if ($slug == true) {
+            if ($slug) {
                 return str_slug($network);
             }
 
@@ -441,6 +439,26 @@ class User extends Authenticatable implements Auditable
       return ! is_null($this->drip_subscriber_id);
     }
 
+    public function isRepairDirectoryNone()
+    {
+        return $this->repairdir_role == Role::REPAIR_DIRECTORY_NONE;
+    }
+
+    public function isRepairDirectorySuperAdmin()
+    {
+        return $this->repairdir_role == Role::REPAIR_DIRECTORY_SUPERADMIN;
+    }
+
+    public function isRepairDirectoryRegionalAdmin()
+    {
+        return $this->repairdir_role == Role::REPAIR_DIRECTORY_REGIONAL_ADMIN;
+    }
+
+    public function isRepairDirectoryEditor()
+    {
+        return $this->repairdir_role == Role::REPAIR_DIRECTORY_EDITOR;
+    }
+
     public function hasRole($roleName)
     {
         $usersRole = $this->role()->first()->role;
@@ -482,7 +500,7 @@ class User extends Authenticatable implements Auditable
     {
         $network = Network::find($this->repair_network);
 
-        return ($network->include_in_zapier == true);
+        return $network->include_in_zapier;
     }
 
     public function networks()
@@ -528,5 +546,18 @@ class User extends Authenticatable implements Auditable
         }
 
         return $groupsUserIsInChargeOf;
+    }
+
+    public function ensureAPIToken() {
+        # Generate an API token if we don't already have one.
+        $api_token = $this->api_token;
+
+        if (!$api_token) {
+            $api_token = \Illuminate\Support\Str::random(60);
+            $this->api_token = $api_token;
+            $this->save();
+        }
+
+        return $api_token;
     }
 }

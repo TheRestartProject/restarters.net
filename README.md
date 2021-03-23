@@ -1,6 +1,6 @@
 # restarters.net
 
-restarters.net is a suite of software for the repair community.
+restarters.net is a suite of software for the repair community. 
 
 Restarters brings together community repair enthusiasts and activists from
 around the world, to engage in discussion and to organise local community repair
@@ -32,71 +32,7 @@ we'll make sure it ends up in the right place.)
 
 ## Tech
 
-The core of the application is built using the Laravel framework. It integrates
-with Discourse for community discussion and with Mediawiki for the community
-knowledgebase.
-
-## Installation
-
-See Installation Guidelines in the wiki.
-
-### Basic setup
-
-This is currently assuming Debian / Ubuntu.  Get in touch if you're trying on a different OS!
-
-#### Prerequisites
-
-- php
-  - php-curl
-  - php-mysql
-  - php-xml
-  - php-xmlrpc
-  - php-intl
-- mysql/mariadb
-  - and create a database:
-    - CREATE DATABASE restarters_db_test
-  - add users:
-    - CREATE USER 'restarters'@'localhost' IDENTIFIED BY 's3cr3t'; 
-    - CREATE USER 'tester'@'localhost' IDENTIFIED BY 'tester';
-  - give users permissions:
-    - GRANT ALL PRIVILEGES ON restarters_db_test.* TO 'restarters'@'localhost';
-    - GRANT ALL PRIVILEGES ON restarters_db_test.* TO 'tester'@'localhost';
-- npm
-
-#### Install
-
-- Clone this repository
-`php composer.phar install`
-`npm install`
-- Copy .env.example -> .env
-- Edit .env
-  - update DB settings to match your local DB
-- Edit /etc/hosts -> 127.0.0.1 restarters.test talk.restarters.test
-
-- Generate an app key: `php artisan key:generate`
-
-- Initialise the DB:
-
-```
-$ php artisan migrate
-```
-
-- Create a first admin user
-
-```
-$ php artisan tinker
-> User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2]);
-```
-
-- Create a folder for image uploads:
-`mkdir public/uploads`
-- Run the app: 
-
-```
-$ php artisan serve --host=restarters.test
-```
-
-* Login!
+More details on the tech side of things in the [dev wiki](https://github.com/therestartproject/restarters.net/wiki).
 
 ## Methodology
 
@@ -105,7 +41,7 @@ electronic repairs. Please read more at http://rstrt.org/FAQ
 
 ## Specifications
 
-Compiled version of the specs is available at: https://therestartproject.github.io/restarters.net/Index.html
+Compiled version of the specs is available at: https://therestartproject.github.io/restarters.net/Index.html.
 
 ## Funding and future development
 

@@ -39,7 +39,7 @@ class Party extends Model implements Auditable
         'shareable_code',
         'online',
     ];
-    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'idevents', 'user_id', 'wordpress_post_id'];
+    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id'];
 
     // Append data to Model
     protected $appends = ['participants', 'ShareableLink'];
@@ -141,7 +141,7 @@ class Party extends Model implements Auditable
             return false;
         }
         $sql = 'INSERT INTO `events_users`(`event`, `user`) VALUES (:party, :user)';
-        foreach ($users as $k => &$user) {
+        foreach ($users as &$user) {
             try {
                 DB::insert(DB::raw($sql), array('party' => $party, 'user' => $user));
             } catch (\Illuminate\Database\QueryException $e) {
@@ -168,7 +168,7 @@ class Party extends Model implements Auditable
                     GROUP BY  `dv`.`event`
                 ) AS `d` ON `d`.`event` = `e`.`idevents`
                 WHERE `eu`.`user` = :id';
-        if ($only_past == true) {
+        if ($only_past) {
             $sql .= ' AND `e`.`event_date` < NOW()';
         }
         $sql .= ' ORDER BY `e`.`event_date` DESC';
@@ -214,7 +214,7 @@ class Party extends Model implements Auditable
             $sql .= ' WHERE `e`.`group` = :id ';
         }
 
-        if ($only_past == true) {
+        if ($only_past) {
             $sql .= ' AND TIMESTAMP(`e`.`event_date`, `e`.`start`) < NOW()';
         }
 
@@ -269,7 +269,7 @@ class Party extends Model implements Auditable
             $sql .= ' WHERE `e`.`group` IN ('.implode(', ', $groups).') ';
         }
 
-        if ($only_past == true) {
+        if ($only_past) {
             $sql .= ' AND TIMESTAMP(`e`.`event_date`, `e`.`start`) < NOW()';
         }
 
@@ -293,7 +293,7 @@ class Party extends Model implements Auditable
 
     public function ofThisGroup($group = 'admin', $only_past = false, $devices = false)
     {
-        $parties = Party::when($only_past, function($query) {
+        return Party::when($only_past, function($query) {
             # We only want the ones in the past.
             return $query->where(function ($query) {
                 # Before today, or before the start time.
@@ -307,8 +307,6 @@ class Party extends Model implements Auditable
             # For a specific group.  Note that 'admin' is not numeric so won't pass this test.
             return $query->where('group', $group);
         })->get();
-
-        return $parties;
     }
 
     public function findNextParties($group = null)
@@ -671,6 +669,8 @@ class Party extends Model implements Auditable
                     case 3:
                         $dead_devices++;
 
+                        break;
+                    default:
                         break;
                 }
 

@@ -33,7 +33,7 @@ class MediawikiServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->app->singleton(MediawikiFactory::class, function ($app) {
+        $this->app->singleton(MediawikiFactory::class, function () {
             try {
                 $api = new MediawikiApi(env('WIKI_URL').'/api.php');
                 $api->login(new ApiUser(env('WIKI_APIUSER'), env('WIKI_APIPASSWORD')));
