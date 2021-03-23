@@ -91,6 +91,42 @@
                 </div>
             </div>
         </div>
+        @endif
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
+            <div class="col">
+                <div class="row justify-content-center">
+                    <p><strong>@lang('tabicatora.status.items_with_majority_opinions') : @php( print($status['total_recats'][0]->total)) </strong></p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <div class="row badge-pill badge-light">
+                            <div class="col col-2">
+                                @lang('tabicatora.status.number_of_records')
+                            </div>
+                            <div class="col">
+                                @lang('tabicatora.status.winning_opinion')
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center small">
+                    <div class="col">
+                        @foreach($status['list_recats'] as $row)
+                        <div class="row border-grey">
+                            <div class="col col-2">
+                                @php( print($row->total) )
+                            </div>
+                            <div class="col">
+                                @php( print($row->winning_opinion) )
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        @if (!$complete)
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col">
                 <div class="row justify-content-center">
@@ -129,40 +165,6 @@
                             </div>
                             <div class="col">
                                 @php( print($row->problem) )
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
-            <div class="col">
-                <div class="row justify-content-center">
-                    <p><strong>@lang('tabicatora.status.items_with_majority_opinions') : @php( print($status['total_recats'][0]->total)) </strong></p>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="col">
-                        <div class="row badge-pill badge-light">
-                            <div class="col col-2">
-                                @lang('tabicatora.status.number_of_records')
-                            </div>
-                            <div class="col">
-                                @lang('tabicatora.status.winning_opinion')
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row justify-content-center small">
-                    <div class="col">
-                        @foreach($status['list_recats'] as $row)
-                        <div class="row border-grey">
-                            <div class="col col-2">
-                                @php( print($row->total) )
-                            </div>
-                            <div class="col">
-                                @php( print($row->winning_opinion) )
                             </div>
                         </div>
                         @endforeach
