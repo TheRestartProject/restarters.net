@@ -26,7 +26,7 @@ class TabicatOraController extends Controller {
         } else {
             $user = Microtask::getAnonUserCta($request);
             if ($user->action) {
-                return redirect()->action('TabicatOraController', ['partner' => $partner]);
+                return redirect()->action('TabicatOraController@cta', ['partner' => $partner]);
             }
         }
         $this->Model = new TabicatOra;
@@ -45,7 +45,7 @@ class TabicatOraController extends Controller {
             $success = $this->Model->create($insert);
             if (!$success) {
                 logger(print_r($insert, 1));
-                logger('TabiCat:ORA error on insert.');
+                logger('TabiCat error on insert.');
             }
         }
         $fault = $this->_fetchRecord($request);
@@ -64,7 +64,7 @@ class TabicatOraController extends Controller {
         // send non-suggested fault_types to view
         $fault->faulttypes = array_diff_key($fault_types, $fault->suggestions);
         return view('tabicatora.index', [
-            'title' => 'TabiCat:ORA',
+            'title' => 'TabiCat',
             'fault' => $fault,
             'user' => $user,
             'partner' => $partner,
@@ -100,7 +100,7 @@ class TabicatOraController extends Controller {
         $data = $this->Model->fetchStatus($partner);
         $complete = $data['total_opinions_2'][0]->total + $data['total_opinions_1'][0]->total + $data['total_opinions_0'][0]->total == 0;
         return view('tabicatora.status', [
-            'title' => 'TabiCat:ORA',
+            'title' => 'TabiCat',
             'status' => $data,
             'user' => $user,
             'complete' => $complete,
