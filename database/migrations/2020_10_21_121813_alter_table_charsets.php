@@ -84,24 +84,30 @@ class AlterTableCharsets extends Migration {
             ['Ã', 'à'],
         ];
 
-        $format = 'UPDATE `%1$s` SET `%2$s` = REPLACE(`%2$s`, "%3$s", "%4$s")';
+        // This would be for if we were using the character table above.
+        // However, it misses a lot of characters.
+        // $format = 'UPDATE `%1$s` SET `%2$s` = REPLACE(`%2$s`, "%3$s", "%4$s")';
+
+        // This converts are characters to utf8.
+        $format = 'UPDATE `%1$s` SET `%2$s`=convert(cast(convert(`%2$s` using latin1) as binary) using utf8)';
 
         foreach ($tables as $table => $fields) {
             $key = $fields['key'];
             foreach ($fields['fields'] as $field) {
-                foreach ($chars as $pair) {
-                    $qry = sprintf($format, $table, $field, $pair[0], $pair[1]);
-                    DB::statement($qry);
-                }
+                //foreach ($chars as $pair) {
+                $qry = sprintf($format, $table, $field, $pair[0], $pair[1]);
+                DB::statement($qry);
+                //}
             }
         }
 
-        $qry = 'UPDATE `groups` SET `name` = REPLACE(`name`, "Cafe", "Café")';
-        DB::statement($qry);
-        $qry = 'UPDATE `groups` SET `name` = REPLACE(`name`, "Cafes", "Cafés")';
-        DB::statement($qry);
-        $qry = 'UPDATE `groups` SET `name` = REPLACE(`name`, "cafe", "Café")';
-        DB::statement($qry);
+        // Don't change group names if they've chosen to create it without accent.
+        //$qry = 'UPDATE `groups` SET `name` = REPLACE(`name`, "Cafe", "Café")';
+        //DB::statement($qry);
+        //$qry = 'UPDATE `groups` SET `name` = REPLACE(`name`, "Cafes", "Cafés")';
+        //DB::statement($qry);
+        //$qry = 'UPDATE `groups` SET `name` = REPLACE(`name`, "cafe", "Café")';
+        //DB::statement($qry);
     }
 
     private function _alterTables() {
@@ -164,6 +170,8 @@ class AlterTableCharsets extends Migration {
                 'fields' => [
                     'name',
                     'username',
+                    'location',
+                    'mediawiki'
                 ],
             ],
         ];
@@ -181,7 +189,7 @@ class AlterTableCharsets extends Migration {
  o.`%2$s` AS `val`
  FROM `%1$s` o
  WHERE o.`%2$s` <> CONVERT(o.`%2$s` USING ASCII)
- ORDER BY `val` DESC';
+ ORDER BY o.`%3$s` asc';
         foreach ($tables as $table => $fields) {
             $key = $fields['key'];
             foreach ($fields['fields'] as $field) {
