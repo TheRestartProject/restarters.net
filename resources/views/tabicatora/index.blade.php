@@ -130,7 +130,8 @@
                                 <p class="title is-size-6-mobile is-size-6-tablet">@lang('tabicatora.task.suggestions')</p>
                                 <p>
                                     @foreach($fault->suggestions as $fault_type)
-                                    <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip"title="@php( print($fault_type->description) )"><span data-fid="@php( print($fault_type->id) )" >@lang($fault_type->title)</span></button>
+                                    <!--<button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip"title="@php( print($fault_type->description) )"><span data-fid="@php( print($fault_type->id) )" >@lang($fault_type->title)</span></button>-->
+                                    <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip" data-fid="@php( print($fault_type->id) )" title="@php( print($fault_type->description) )">@lang($fault_type->title)</button>
                                     @endforeach
                                 </p>
                             </div>
@@ -141,7 +142,7 @@
                                 </p>
                                 <div class="buttons">
                                     @foreach($fault->faulttypes as $fault_type)
-                                    <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" title="@php( print($fault_type->description) )"><span data-fid="@php( print($fault_type->id) )">@lang($fault_type->title)</span></button>
+                                    <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="@php( print($fault_type->id) )" title="@php( print($fault_type->description) )">@lang($fault_type->title)</button>
                                     @endforeach
                                 </div>
                             </div>
@@ -195,10 +196,9 @@
             }
         }, false);
         function doOption(e) {
-            document.querySelector('.confirm').classList.replace('hide', 'show');
-            console.log(e.target);
             document.getElementById('fault-type-new').innerText = e.target.innerText;
             document.getElementById('fault-type-new').dataset.fid = e.target.dataset.fid;
+            document.querySelector('.confirm').classList.replace('hide', 'show');
             document.getElementById('change').focus({
                 preventScroll: false
             });
@@ -215,10 +215,8 @@
             let fid = document.getElementById('fault-type-id').value;
             let oid = document.getElementById('id-ords').value;
             if (!fid) {
-                console.log('fid: ' + fid);
                 fetchNew();
             } else if (!oid) {
-                console.log('oid: ' + oid);
                 fetchNew();
             } else {
                 console.log('submitForm - id-ords ' + oid + ' / fault-type-id: ' + fid);
