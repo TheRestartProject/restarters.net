@@ -14,8 +14,8 @@ class AlterTableCharsets extends Migration {
      *
      * @return void
      */
-    public function up() {
-
+    public function up()
+    {
         Log::info('START MIGRATE AlterTableCharsets');
 
         $this->_report('DAT21_', '_a');
@@ -28,7 +28,6 @@ class AlterTableCharsets extends Migration {
 
         Log::info('== SEE ' . storage_path() . '/logs/DAT21*.log FOR RESULTS ===');
         Log::info('END MIGRATE AlterTableCharsets');
-
     }
 
     /**
@@ -36,7 +35,8 @@ class AlterTableCharsets extends Migration {
      *
      * @return void
      */
-    public function down() {
+    public function down()
+    {
         $tables = $this->_tableCharsets();
         foreach ($tables as $table) {
             $collate = $table['TABLE_COLLATION'];
@@ -52,67 +52,23 @@ class AlterTableCharsets extends Migration {
         }
     }
 
-    private function _fixData() {
-
+    private function _fixData()
+    {
         $tables = $this->_dataTables();
 
-        $chars = [
-            ['â€™', '\''],
-            ['â€ž', '\"'],
-            ['â€œ', '\"'],
-            ['â€', '\"'],
-            ['â€“', '-'],
-            ['â‚¬', '€'],
-            ['Ã©', 'é'],
-            ['Ã‰', 'É'],
-            ['Ã¨', 'è'],
-            ['Ã§', 'ç'],
-            ['Ãª', 'ê'],
-            ['Ã¢', 'â'],
-            ['Ã¥', 'å'],
-            ['Ã±', 'ñ'],
-            ['Ã³', 'ó'],
-            ['Ã¼', 'ü'],
-            ['Ã»', 'û'],
-            ['Ã¶', 'ö'],
-            ['Ã–', 'Ö'],
-            ['Ã¤', 'ä'],
-            ['ÃŸ', 'ß'],
-            ['Â£', '£'],
-            ['Ã«', 'ë'],
-            ['Ã´', 'ô'],
-            ['Ã', 'à'],
-        ];
-
-        // This would be for if we were using the character table above.
-        // However, it misses a lot of characters.
-        // $format = 'UPDATE `%1$s` SET `%2$s` = REPLACE(`%2$s`, "%3$s", "%4$s")';
-
-        // This converts are characters to utf8.
+        // This converts all characters to utf8.
         $format = 'UPDATE `%1$s` SET `%2$s`=convert(cast(convert(`%2$s` using latin1) as binary) using utf8)';
 
         foreach ($tables as $table => $fields) {
-            $key = $fields['key'];
             foreach ($fields['fields'] as $field) {
-                //foreach ($chars as $pair) {
-                $qry = sprintf($format, $table, $field, $pair[0], $pair[1]);
+                $qry = sprintf($format, $table, $field);
                 DB::statement($qry);
-                //}
             }
         }
-
-        // Don't change group names if they've chosen to create it without accent.
-        //$qry = 'UPDATE `groups` SET `name` = REPLACE(`name`, "Cafe", "Café")';
-        //DB::statement($qry);
-        //$qry = 'UPDATE `groups` SET `name` = REPLACE(`name`, "Cafes", "Cafés")';
-        //DB::statement($qry);
-        //$qry = 'UPDATE `groups` SET `name` = REPLACE(`name`, "cafe", "Café")';
-        //DB::statement($qry);
     }
 
-    private function _alterTables() {
-//        transaction appears to break test
-//        DB::beginTransaction();
+    private function _alterTables()
+    {
         try {
             $tables = $this->_tableCharsets();
             foreach ($tables as $table) {
@@ -122,10 +78,8 @@ class AlterTableCharsets extends Migration {
                     DB::statement("ALTER TABLE `$name` CONVERT TO CHARACTER SET $this->charset COLLATE $this->collate");
                 }
             }
-//            DB::commit();
         } catch (\Illuminate\Database\QueryException $e) {
             Log::info($e->getMessage());
-//            DB::rollback();
         }
     }
 
