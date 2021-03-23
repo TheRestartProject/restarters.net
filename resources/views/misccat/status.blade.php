@@ -1,4 +1,4 @@
-@extends('layouts.app', ['show_login_join_to_anons' => true])
+@extends('layouts.app', ['show_login_join_to_anons' => true], 'hide_language' => true])
 
 @section('extra-css')
 
@@ -14,7 +14,7 @@
         <div class="row row-compressed">
             <div class="col-6">
                 <h1 class="pull-left">MiscCat Status</h1>
-            </div>            
+            </div>
             <div class="col-6 pull-right">
                 <!--
             These images are licensed under the Creative Commons Attribution 4.0 International license.
@@ -61,9 +61,9 @@
                     </div>
                 </div>
             </div>
-        </div>        
+        </div>
         <?php
-            $summary = [                
+            $summary = [
                 'todo' => [
                     'status' => 'Items needing more opinions',
                     'total' => 0,
@@ -76,19 +76,19 @@
                     'status' => 'Items agreed as non-Misc',
                     'total' => 0,
                     ],
-            ];            
+            ];
         foreach ($status['status'] as $row) {
             switch ($row->code) {
                 case -1 :
                 case 5 :
                     $summary['done']['total'] += $row->total;
                     break;
-                case 0 : 
-                case 1 : 
-                case 2 : 
+                case 0 :
+                case 1 :
+                case 2 :
                     $summary['todo']['total'] += $row->total;
                     break;
-                case 4 : 
+                case 4 :
                     $summary['misc']['total'] += $row->total;
                     break;
             }
@@ -99,9 +99,9 @@
             <div class="col">
                 <div class="row justify-content-center">
                     <p><strong>@php( print($row['status']))  : @php( print($row['total'])) </strong></p>
-                </div>                                        
+                </div>
             </div>
-        </div>        
+        </div>
         @endforeach
         @if (count($status['list_splits']))
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
@@ -180,15 +180,15 @@
                         <?php $i = $i + $row->items; ?>
                         <div class="row border-grey">
                             <div class="col col-5 text-right">
-                                @php( print($row->items) )                                
+                                @php( print($row->items) )
                             </div>
                             <div class="col text-left">
                                 @php( print($row->top_opinion) )
                             </div>
                         </div>
                         @endforeach
-                        <div class="row border-grey">                            
-                            <div class="col col-5 text-right">                                
+                        <div class="row border-grey">
+                            <div class="col col-5 text-right">
                                 <strong><?php print($i); ?></strong>
                             </div>
                         </div>
