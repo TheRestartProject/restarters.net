@@ -91,6 +91,7 @@ class AlterTableCharsets extends Migration {
                     'name',
                     'location',
                     'free_text',
+                    'area',
                 ],
             ],
             'devices' => [
