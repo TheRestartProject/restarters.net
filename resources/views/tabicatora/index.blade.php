@@ -130,7 +130,7 @@
                                 <p class="title is-size-6-mobile is-size-6-tablet">@lang('tabicatora.task.suggestions')</p>
                                 <p>
                                     @foreach($fault->suggestions as $fault_type)
-                                    <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip"title="@php( print($fault_type->description) )"><span data-fid="@php( print($fault_type->id) )" >@php( print($fault_type->title))</span></button>
+                                    <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip"title="@php( print($fault_type->description) )"><span data-fid="@php( print($fault_type->id) )" >@lang($fault_type->title)</span></button>
                                     @endforeach
                                 </p>
                             </div>
@@ -141,7 +141,7 @@
                                 </p>
                                 <div class="buttons">
                                     @foreach($fault->faulttypes as $fault_type)
-                                    <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" title="@php( print($fault_type->description) )"><span data-fid="@php( print($fault_type->id) )">@php( print($fault_type->title))</span></button>
+                                    <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" title="@php( print($fault_type->description) )"><span data-fid="@php( print($fault_type->id) )">@lang($fault_type->title)</span></button>
                                     @endforeach
                                 </div>
                             </div>
