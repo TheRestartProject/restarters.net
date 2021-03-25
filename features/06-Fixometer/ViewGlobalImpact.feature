@@ -21,7 +21,7 @@ Scenario:
   Given a group has added items to the most recent event in the Fixometer
   Then the waste weight prevented by the event's fixed items is displayed in the Latest Data card
   And the figure includes both unpowered and powered items
-  And the text changes to '<group name> just prevented X kg of waste!'
+  And the text says '<group name> just prevented X kg of waste!'
   And clicking the group name goes to the group
   And clicking the figure for the weight goes to the event at which the waste was prevented
 
