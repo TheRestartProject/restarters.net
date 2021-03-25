@@ -28,3 +28,7 @@ Scenario: RSVPed to an event
   Given that I am a member who has RSVPd to an event
   When I go to the Events page, Your Events, Upcoming
   Then I should see a “You’re going” message and different event styling for the events I have RSVPed to
+  
+Scenario: Events calendar
+  Given that I am any user
+  Then I see a button that allows me to subscribe to my events calendar
