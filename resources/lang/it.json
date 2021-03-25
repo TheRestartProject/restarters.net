@@ -39,5 +39,8 @@
     "Access issue": "Problema di accesso",
     "Help/configuration": "Aiuto/configurazione",
     "Unknown": "Sconosciuto",
-    "Other": "Altro"
+    "Other": "Altro",    
+    "Fixed": "Fisso",
+    "Repairable": "Riparabile",
+    "End of life": "Fine della vita"
 }

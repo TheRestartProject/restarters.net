@@ -3,25 +3,27 @@
 return [
     'task' =>
     [
-        'where_is_the_main_fault' => 'Where is the main fault',
-        'fetch_another' => 'I don\'t know, fetch another repair',
+        'where_is_the_main_fault' => 'Où est le principal défaut',
+        'fetch_another' => 'Je ne sais pas, chercher une autre réparation',
         'suggestions' => 'Suggestions',
+        'translate' => 'Traduire',
+        'go_with' => 'Aller avec',
     ],
     'status' =>
     [
-        'status' => 'Status',
-        'items_opinions' => 'Items / opinions',
-        'items_with_split_opinions' => 'Items with split opinions',
-        'items_with_majority_opinions ' => 'Items with majority opinions',
-        'with_3_opinions' => 'with 3 opinions',
-        'with_2_opinions' => 'with 2 opinions',
-        'with_1_opinion' => 'with 1 opinion',
-        'with_0_opinions' => 'with 0 opinions',
-        'total' => 'Total',
-        'opinions' => 'Opinions',
-        'brand' => 'Brand',
-        'problem' => 'Problem',
-        'number_of_records' => 'Number of records',
-        'winning_opinion' => 'Winning opinion',
+        'status' => 'Statut',
+        'items_opinions' => 'Articles / opinions',
+        'items_with_split_opinions' => 'Articles avec des opinions partagées',
+        'items_with_majority_opinions ' => 'Articles avec des opinions majoritaires',
+        'with_3_opinions' => 'avec 3 avis',
+        'with_2_opinions' => 'avec 2 avis',
+        'with_1_opinion' => 'avec 1 avis',
+        'with_0_opinions' => 'avec 0 avis',
+        'total' => 'Totale',
+        'opinions' => 'Des avis',
+        'brand' => 'Marque',
+        'problem' => 'Problème',
+        'number_of_records' => 'Nombre d\'enregistrements',
+        'winning_opinion' => 'Opinion gagnante',
     ]
 ];

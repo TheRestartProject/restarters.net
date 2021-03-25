@@ -24,5 +24,8 @@
     "Access issue": "Toegang kwestie",
     "Help/configuration": "Help/configuratie",
     "Unknown": "Onbekend",
-    "Other": "Anders"
+    "Other": "Anders",    
+    "Fixed": "Gemaakt",
+    "Repairable": "Herstelbaar",
+    "End of life": "Einde van het leven"
 }

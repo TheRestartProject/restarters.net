@@ -95,5 +95,8 @@
     "Access issue": "problème d'accès",
     "Help/configuration": "Aide/configuration",
     "Unknown": "Inconnu",
-    "Other": "Autre"
+    "Other": "Autre",    
+    "Fixed": "Fixée",
+    "Repairable": "Réparable",
+    "End of life": "Fin de vie"
 }
