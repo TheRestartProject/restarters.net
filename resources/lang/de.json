@@ -24,5 +24,8 @@
     "Access issue": "Zugang ausgabe",
     "Help/configuration": "Hilfe/konfiguration",
     "Unknown": "Unbekannt",
-    "Other": "Andere"
+    "Other": "Andere",    
+    "Fixed": "Fest",
+    "Repairable": "Reparierbar",
+    "End of life": "Ende des lebens"
 }  

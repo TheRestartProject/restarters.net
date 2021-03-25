@@ -92,5 +92,8 @@
     "Access issue": "Access issue",
     "Help/configuration": "Help/configuration",
     "Unknown": "Unknown",
-    "Other": "Other"
+    "Other": "Other",    
+    "Fixed": "Fixed",
+    "Repairable": "Repairable",
+    "End of life": "End of life"
 }

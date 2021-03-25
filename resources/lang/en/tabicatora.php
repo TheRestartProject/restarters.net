@@ -6,6 +6,8 @@ return [
         'where_is_the_main_fault' => 'Where is the main fault',
         'fetch_another' => 'I don\'t know, fetch another repair',
         'suggestions' => 'Suggestions',
+        'translate' => 'Translate',
+        'go_with' => 'Go with',
     ],
     'status' =>
     [

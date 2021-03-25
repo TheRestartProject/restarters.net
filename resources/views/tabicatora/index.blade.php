@@ -85,7 +85,7 @@
                             <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@php( print($fault->brand))</span>
                             @endif
                             @if ($fault->repair_status !== 'Unknown')
-                            <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@php( print($fault->repair_status))</span>
+                            <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@lang($fault->repair_status)</span>
                             @endif
                         </p>
                     </div>
@@ -98,8 +98,9 @@
                     </div>
                     <div class="col-4 col-sm-2">
                         <button id="btn-translate" class="pull-right btn btn-md btn-dark px-3 py-1">
+
                             <a href="https://translate.google.com/#view=home&op=translate&sl=@php( print($fault->language))&tl=@php( print($locale))&text=@php( print($fault->translate))" target="_blank">
-                                Translate
+                                @lang('tabicatora.task.translate')
                             </a>
                         </button>
                     </div>
@@ -137,7 +138,7 @@
                             @endif
                             <div class="container options mb-3">
                                 <p class="confirm hide">
-                                    <button class="btn-md btn-info btn-rounded" id="change"><span class="underline">G</span>o with "<span id="fault-type-new" data-fid=""></span>"</button>
+                                    <button class="btn-md btn-info btn-rounded" id="change">@lang('tabicatora.task.go_with') "<span id="fault-type-new" data-fid=""></span>"</button>
                                 </p>
                                 <div class="buttons">
                                     @foreach($fault->faulttypes as $fault_type)

@@ -6,6 +6,8 @@ return [
         'where_is_the_main_fault' => 'Waar is de belangrijkste fout',
         'fetch_another' => 'Ik weet het niet, haal nog een reparatie',
         'suggestions' => 'Suggesties',
+        'translate' => 'Vertalen',
+        'go_with' => 'Ga mee',
     ],
     'status' =>
     [
