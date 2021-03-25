@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Auth;
+use App;
 use App\TabicatOra;
 use App\Helpers\Microtask;
 
@@ -44,8 +45,8 @@ class TabicatOraController extends Controller {
             $this->Model = new TabicatOra;
             $success = $this->Model->create($insert);
             if (!$success) {
-                logger(print_r($insert, 1));
                 logger('TabiCat error on insert.');
+                logger(print_r($insert, 1));
             }
         }
         $fault = $this->_fetchRecord($request);
@@ -68,6 +69,7 @@ class TabicatOraController extends Controller {
             'fault' => $fault,
             'user' => $user,
             'partner' => $partner,
+            'locale' => substr(App::getLocale(), 0, 2),
         ]);
     }
 
