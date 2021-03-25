@@ -98,8 +98,7 @@
                     </div>
                     <div class="col-4 col-sm-2">
                         <button id="btn-translate" class="pull-right btn btn-md btn-dark px-3 py-1">
-                            @php( $tl = 'en' )
-                            <a href="https://translate.google.com/#view=home&op=translate&sl=@php( print($fault->language))&tl=@php( print($tl))&text=@php( print($fault->translate))" target="_blank">
+                            <a href="https://translate.google.com/#view=home&op=translate&sl=@php( print($fault->language))&tl=@php( print($locale))&text=@php( print($fault->translate))" target="_blank">
                                 Translate
                             </a>
                         </button>
