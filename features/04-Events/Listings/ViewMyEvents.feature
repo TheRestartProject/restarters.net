@@ -6,9 +6,8 @@ Feature: View my events listings
 Scenario: Viewing events page as any user
   Given I am any user
   When I go to the Events page
-  Then I see two sections with two tabs each
-  And the first lists my events with two tabs: Upcoming and Past
-  And the second lists other events with two tabs: Nearby and All
+  Then I see a Your Events section with two tabs: Upcoming and Past
+  And an Other Events section with two tabs: Nearby and All
 
 Scenario: Viewing events moderation section as admin or network coordinator
   Given that I am an admin or network coordinator
