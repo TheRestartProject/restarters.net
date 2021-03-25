@@ -5,7 +5,7 @@ Feature: Dashboard
 Scenario: Intro text
   Given that I am any logged in user
   When I visit the dashboard
-  Then I see the 'Getting the most from…' info column on the right
+  Then I see the 'Getting started' info column on the right
   
 # Talk
 
