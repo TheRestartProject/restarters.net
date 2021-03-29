@@ -12,15 +12,12 @@ use Illuminate\Support\Str;
 
 class TabiCatOraTest extends TestCase {
 
-    // use RefreshDatabase;
-
     public function setUp() {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
         DB::table('devices_tabicat_ora')->truncate();
         DB::table('devices_faults_tablets_ora_opinions')->truncate();
         DB::table('devices_faults_tablets_ora_adjudicated')->truncate();
-        // TabiCatOra::truncate();
     }
 
     /** @test */
