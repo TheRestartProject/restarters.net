@@ -40,10 +40,12 @@ export default {
   top: 1px;
   border-radius: 50%;
   background-color: white;
-  font-size: 16px;
-  min-width: unset;
+  font-size: 16px !important;
+  min-width: unset !important;
   padding: 5px;
   font-weight: bolder;
   border: 2px solid grey;
+  width: 30px;
+  height: 30px;
 }
 </style>

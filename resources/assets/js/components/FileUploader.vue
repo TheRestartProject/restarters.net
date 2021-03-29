@@ -25,9 +25,6 @@ export default {
     vueDropzone: vue2Dropzone
   },
   computed: {
-    token() {
-      return $("input[name='_token']").val()
-    },
     dropzoneOptions () {
       return {
         url: this.url,
@@ -58,7 +55,7 @@ export default {
   methods: {
     sendingEvent (file, xhr, formData) {
       // Add the CSRF.
-      formData.append('_token', $("input[name='_token']").val());
+      formData.append('_token', this.$store.getters['auth/CSRF']);
     },
     success (files, response) {
       // We have uploaded some files.  Tell the parent; they will add them to the relevant place, and re-render
