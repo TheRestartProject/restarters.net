@@ -19,10 +19,10 @@
         <div class="vue-placeholder vue-placeholder-large">
             <div class="vue-placeholder-content">@lang('partials.loading')...</div>
         </div>
-
         <div class="vue">
             <MicrotaskingPage
               csrf="{{ csrf_token() }}"
+              active-quest="{{ $activeQuest }}"
               :total-contributions="{{ $totalContributions }}"
               :current-user-quests="{{ $currentUserQuests }}"
               :current-user-contributions="{{ $currentUserContributions }}"
