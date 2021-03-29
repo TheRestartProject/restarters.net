@@ -123,16 +123,20 @@
           $expanded_events[] = expandEvent($event, $group, $emissionRatio);
       }
 
-      foreach ($upcoming_events_in_area as $event) {
-          $e = expandEvent($event, $group, $emissionRatio);
-          $e['nearby'] = TRUE;
-          $expanded_events[] = $e;
+      if ($upcoming_events_in_area) {
+          foreach ($upcoming_events_in_area as $event) {
+              $e = expandEvent($event, $group, $emissionRatio);
+              $e['nearby'] = TRUE;
+              $expanded_events[] = $e;
+          }
       }
 
-      foreach ($upcoming_events_all as $event) {
-          $e = expandEvent($event, $group, $emissionRatio);
-          $e['all'] = TRUE;
-          $expanded_events[] = $e;
+      if ($upcoming_events_all) {
+          foreach ($upcoming_events_all as $event) {
+              $e = expandEvent($event, $group, $emissionRatio);
+              $e['all'] = TRUE;
+              $expanded_events[] = $e;
+          }
       }
 
       ?>
