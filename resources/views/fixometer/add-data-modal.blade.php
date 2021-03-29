@@ -30,7 +30,7 @@
 
                     <div class="flex-dynamic-row">
                         <div class="flex-dynamic mb-20 mb-md-1">
-                            <label for="items_cat" class="sr-only">@lang('devices.group'):<</label> <div class="form-control form-control__select">
+                            <label for="items_cat">@lang('devices.add_data_group'):</label> <div class="form-control form-control__select">
                                     <select id="group" name="group" class="form-control select2 change-group" title="Choose group...">
                                         @if( !empty($user_groups) )
                                         @foreach($user_groups as $group)
@@ -43,8 +43,8 @@
                         </div>
                     </div>
 
-                    <div class="flex-dynamic mb-20">
-                        <label for="items_cat" class="sr-only">@lang('devices.category'):</label>
+                    <div class="flex-dynamic mb-20 mt-2">
+                        <label for="items_cat">@lang('devices.add_data_event'):</label>
                         <div class="form-control form-control__select">
                             <select id="events" name="events" class="form-control select2 change-events" title="Choose event...">
                             </select>

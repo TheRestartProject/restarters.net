@@ -4,14 +4,12 @@
     <div class="pl-md-3 pr-md-3">
       <b-table
           ref="table"
-          :id="'recordstable-' + powered"
+          :id="tableId"
           :fields="fields"
           :items="items"
           :per-page="perPage"
           :current-page="currentPage"
           sort-null-last
-          tbody-tr-class="clickme"
-          @row-clicked="clicked"
       >
         <template slot="cell(shortProblem)" slot-scope="data">
           <div v-line-clamp="3">
@@ -50,6 +48,33 @@
         <template slot="cell(device_event.event_date)" slot-scope="data">
           {{ formatDate(data) }}
         </template>
+        <template slot="cell(show_details)" slot-scope="row">
+          <div v-if="isAdmin" class="text-right d-none d-md-table-cell">
+            <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
+              <b-img class="icon" src="/icons/edit_ico_green.svg" />
+            </span>
+            <ConfirmModal :key="'modal-' + row.item.iddevices" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="translatedConfirmDeleteDevice" />
+          </div>
+          <div v-else>
+            <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
+              <b-img class="icon" src="/icons/info_ico_green.svg" />
+            </span>
+          </div>
+        </template>
+        <template slot="row-details" slot-scope="row">
+          <EventDevice
+              :device="row.item"
+              :powered="powered"
+              :add="false"
+              :edit="isAdmin"
+              :delete-button="true"
+              :clusters="clusters"
+              :idevents="row.item.event"
+              :brands="brands"
+              :barrier-list="barrierList"
+              :cancel-button="false"
+              @close="closed(row)" />
+        </template>
       </b-table>
       <div class="d-flex justify-content-end" v-if="total > perPage">
         <b-pagination
@@ -60,16 +85,16 @@
         ></b-pagination>
       </div>
     </div>
-    <DeviceModal ref="modal" :device="device" v-if="device" />
   </div>
 </template>
 <script>
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 import moment from 'moment'
 import DeviceModel from './DeviceModel'
-import DeviceModal from './DeviceModal'
 import Vue       from 'vue'
 import lineClamp from 'vue-line-clamp'
+import ConfirmModal from './ConfirmModal'
+import EventDevice from './EventDevice'
 
 Vue.use(lineClamp, {
   textOverflow: 'ellipsis'
@@ -78,8 +103,13 @@ Vue.use(lineClamp, {
 const bootaxios = require('axios')
 
 export default {
-  components: {DeviceModal, DeviceModel},
+  components: {EventDevice, ConfirmModal, DeviceModel},
   props: {
+    isAdmin: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     powered: {
       type: Boolean,
       required: true
@@ -162,6 +192,9 @@ export default {
     }
   },
   computed: {
+    tableId() {
+      return 'recordstable-' + this.powered
+    },
     fields () {
       let ret = [
         {
@@ -197,6 +230,13 @@ export default {
         sortable: true
       })
 
+      // Bootstrap tables have a mechanism to show a details row.  This is exactly what we need to show the
+      // view/edit section for a device.
+      ret.push({
+        key: 'show_details',
+        label: '',
+      })
+
       return ret
     },
     translatedCategory () {
@@ -229,6 +269,9 @@ export default {
     translatedClose() {
       return this.$lang.get('partials.close')
     },
+    translatedConfirmDeleteDevice() {
+      return this.$lang.get('devices.confirm_delete')
+    }
   },
   watch: {
     powered(newVal) {
@@ -276,9 +319,10 @@ export default {
   },
   methods: {
     items (ctx, callback) {
-      // Don't use store - we don't need this to be reactive.
+      // We want to take advantage of the paging and sorting features of the table, and therefore we are using the
+      // table's async method of providing data.
+      //
       // Default sort is descending date order.
-      // The table will provide a full name in sortBy - we just want the last part.
       let sortBy = 'event_date'
       let sortDesc = ctx.sortBy ? (ctx.sortDesc ? 'DESC' : 'ASC') : 'DESC'
 
@@ -304,13 +348,32 @@ export default {
           wiki: this.wiki,
           group: this.group,
           from_date: this.from_date,
-          to_date: this.to_date
+          to_date: this.to_date,
+          _showDetails: true
         }
       })
           .then(ret => {
             this.total = ret.data.count
             this.weight = ret.data.weight
             this.co2 = ret.data.co2
+
+            this.$nextTick(async () => {
+              // Update the store to contain (just) the items we have returned.  They need to be in the store for
+              // other components (e.g. EventDevice) to work correctly.
+              //
+              // We do this in nextTick because the tables component doesn't support async/await.
+              await this.$store.dispatch('devices/clear')
+
+              ret.data.items.forEach(item => {
+                item.idevents = item.event
+
+                this.$store.dispatch('devices/set', {
+                  idevents: item.event,
+                  devices: [ item ]
+                })
+              })
+            })
+
             callback(ret.data.items)
           }).catch(() => {
         callback([])
@@ -346,11 +409,24 @@ export default {
     formatDate (data) {
       return new moment(data.item.device_event.event_date).format('DD/MM/YYYY')
     },
-    clicked (device) {
-      this.device = device
-      this.$nextTick(() => {
-        this.$refs.modal.show()
+    deleteConfirm() {
+      this.$refs.confirmDelete.show()
+    },
+    async deleteConfirmed(device) {
+      console.log("Delete", device)
+      await this.$store.dispatch('devices/delete', {
+        iddevices: device.iddevices,
+        idevents: device.event
       })
+
+      this.$root.$emit('bv::refresh::table', this.tableId)
+    },
+    closed(row) {
+      // We have saved/edited the device.  We want to refresh the table to any edited data is updated, and
+      // close the details.
+      this.$root.$emit('bv::refresh::table', this.tableId)
+
+      row.toggleDetails()
     }
   }
 }
@@ -381,5 +457,9 @@ export default {
 
 /deep/ .table th {
   padding: 5px;
+}
+
+/deep/ tr.b-table-details td {
+  padding: 0px;
 }
 </style>
