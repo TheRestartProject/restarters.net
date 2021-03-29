@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\MobifixOra;
+use App\TabiCatOra;
 use DB;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -10,27 +10,29 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class MobifixOraTest extends TestCase {
+class TabiCatOraTest extends TestCase {
 
-    use RefreshDatabase;
+    // use RefreshDatabase;
 
     public function setUp() {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
-        DB::table('devices_mobifix_ora')->truncate();
-        MobifixOra::truncate();
+        DB::table('devices_tabicat_ora')->truncate();
+        DB::table('devices_faults_tablets_ora_opinions')->truncate();
+        DB::table('devices_faults_tablets_ora_adjudicated')->truncate();
+        // TabiCatOra::truncate();
     }
 
     /** @test */
-    public function fetch_mobifixora_record() {
+    public function fetch_tabicatora_record() {
 
         $data = $this->_setup_devices();
-        $MobifixOra = new MobifixOra;
+        $TabiCatOra = new TabiCatOra;
 
-        $result = $MobifixOra->fetchFault();
-        $this->assertTrue(is_array($result), 'fetch_mobifixora_record: result is not array');
-        $this->assertEquals(1, count($result), 'fetch_mobifixora_record: wrong result count');
-        $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_mobifixora_record: id_ords is null');
+        $result = $TabiCatOra->fetchFault();
+        $this->assertTrue(is_array($result), 'fetch_tabicatora_record: result is not array');
+        $this->assertEquals(1, count($result), 'fetch_tabicatora_record: wrong result count');
+        $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_tabicatora_record: id_ords is null');
 
         // leave only 1 record
         $exclude = [];
@@ -38,11 +40,11 @@ class MobifixOraTest extends TestCase {
             $exclude[] = $v['id'];
         }
         $include = array_pop($exclude);
-        $result = $MobifixOra->fetchFault($exclude);
-        $this->assertTrue(is_array($result), 'fetch_mobifixora_record: result is not array');
-        $this->assertEquals(1, count($result), 'fetch_mobifixora_record: wrong result count');
-        $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_mobifixora_record: id_ords is null');
-        $this->assertEquals($include, $result[0]->id_ords, 'fetch_mobifixora_record: wrong value');
+        $result = $TabiCatOra->fetchFault($exclude);
+        $this->assertTrue(is_array($result), 'fetch_tabicatora_record: result is not array');
+        $this->assertEquals(1, count($result), 'fetch_tabicatora_record: wrong result count');
+        $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_tabicatora_record: id_ords is null');
+        $this->assertEquals($include, $result[0]->id_ords, 'fetch_tabicatora_record: wrong value');
 
         // exclude all records for one partner
         $exclude = [];
@@ -51,48 +53,48 @@ class MobifixOraTest extends TestCase {
                 $exclude[] = $v['id'];
             }
         }
-        $result = $MobifixOra->fetchFault($exclude, 'anstiftung');
-        $this->assertTrue(empty($result), 'fetch_mobifixora_record: result is not false');
+        $result = $TabiCatOra->fetchFault($exclude, 'anstiftung');
+        $this->assertTrue(empty($result), 'fetch_tabicatora_record: result is not false');
     }
 
     /** @test */
-    public function fetch_mobifixora_page() {
+    public function fetch_tabicatora_page() {
 
         $data = $this->_setup_devices();
         $this->withSession([]);
         $this->_bypass_cta();
         for ($i = 1; $i <= count($data); $i++) {
             // Illuminate\Foundation\Testing\TestResponse
-            $response = $this->get('/mobifixora');
-            $seshids = $this->app['session']->get('mobifixora.exclusions');
-            $this->assertEquals($i, count($seshids), 'mobifixora.exclusions wrong length');
+            $response = $this->get('/tabicatora');
+            $seshids = $this->app['session']->get('tabicatora.exclusions');
+            $this->assertEquals($i, count($seshids), 'tabicatora.exclusions wrong length');
             $response->assertSuccessful();
-            $response->assertViewIs('mobifixora.index');
+            $response->assertViewIs('tabicatora.index');
         }
         // No more records for this user
-        $response = $this->get('/mobifixora');
-        $response->assertSessionHas('mobifixora.exclusions');
+        $response = $this->get('/tabicatora');
+        $response->assertSessionHas('tabicatora.exclusions');
         $response->assertRedirect();
         $response->assertRedirect(url()->current() . '/status');
     }
 
     /** @test */
-    public function fetch_mobifixora_status() {
+    public function fetch_tabicatora_status() {
 
         $data = $this->_setup_devices();
         $opinions = $this->_setup_opinions($data);
-        $MobifixOra = new MobifixOra;
-        $result = $MobifixOra->fetchStatus();
+        $TabiCatOra = new TabiCatOra;
+        $result = $TabiCatOra->fetchStatus();
         $this->assertTrue(is_array($result));
         foreach ($opinions['status'] as $k => $v) {
-            $this->assertTrue(array_key_exists($k, $result), 'fetch_mobifixora_status: missing key - ' . $k);
+            $this->assertTrue(array_key_exists($k, $result), 'fetch_tabicatora_status: missing key - ' . $k);
             if (!is_array($v)) {
-                $this->assertEquals($v, $result[$k][0]->total, 'fetch_mobifixora_status: wrong ' . $k);
+                $this->assertEquals($v, $result[$k][0]->total, 'fetch_tabicatora_status: wrong ' . $k);
             } else {
-                $this->assertTrue(is_array($result[$k]), 'fetch_mobifixora_status: not array - ' . $k);
+                $this->assertTrue(is_array($result[$k]), 'fetch_tabicatora_status: not array - ' . $k);
                 foreach ($v[0] as $key => $val) {
-                    $this->assertTrue(array_key_exists($key, $result[$k][0]), 'fetch_mobifixora_status #' . $k . ': missing key - ' . $key);
-                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_mobifixora_status #' . $k . ': wrong ' . $key);
+                    $this->assertTrue(array_key_exists($key, $result[$k][0]), 'fetch_tabicatora_status #' . $k . ': missing key - ' . $key);
+                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_tabicatora_status #' . $k . ': wrong ' . $key);
                 }
             }
         }
@@ -107,11 +109,9 @@ class MobifixOraTest extends TestCase {
                 'country' => 'DEU',
                 'product_category' => 'Mobile',
                 'brand' => '',
-                'model' => 'Smartphone',
                 'year_of_manufacture' => '',
                 'repair_status' => 'Repairable',
-                'group_identifier' => '15886',
-                'date' => '2018-10-20',
+                'event_date' => '2018-10-20',
                 'problem' => 'startet nicht',
                 'translation' => 'does not start',
                 'language' => 'de',
@@ -122,11 +122,9 @@ class MobifixOraTest extends TestCase {
                 'country' => 'DEU',
                 'product_category' => 'Mobile',
                 'brand' => '',
-                'model' => 'Smartphone',
                 'year_of_manufacture' => '',
-                'repair_status' => 'Repairable',
-                'group_identifier' => '15886',
-                'date' => '2018-10-20',
+                'repair_status' => 'Repairable',                
+                'event_date' => '2018-10-20',
                 'problem' => 'Akku immer leer',
                 'translation' => 'Battery always empty',
                 'language' => 'de',
@@ -137,11 +135,9 @@ class MobifixOraTest extends TestCase {
                 'country' => 'DEU',
                 'product_category' => 'Mobile',
                 'brand' => '',
-                'model' => 'Smartphone',
                 'year_of_manufacture' => '',
-                'repair_status' => 'Fixed',
-                'group_identifier' => '15886',
-                'date' => '2018-10-20',
+                'repair_status' => 'Fixed',                
+                'event_date' => '2018-10-20',
                 'problem' => 'Lädt nicht auf',
                 'translation' => 'does not charge',
                 'language' => 'de',
@@ -151,11 +147,9 @@ class MobifixOraTest extends TestCase {
                 'country' => 'DEU',
                 'product_category' => 'Mobile',
                 'brand' => '',
-                'model' => 'Handy',
                 'year_of_manufacture' => '',
-                'repair_status' => 'Fixed',
-                'group_identifier' => '5457',
-                'date' => '2019-02-23',
+                'repair_status' => 'Fixed',                
+                'event_date' => '2019-02-23',
                 'problem' => 'defekt',
                 'translation' => 'malfunction',
                 'language' => 'de'
@@ -166,11 +160,9 @@ class MobifixOraTest extends TestCase {
                 'country' => 'NLD',
                 'product_category' => 'Mobile',
                 'brand' => '',
-                'model' => '',
                 'year_of_manufacture' => '2017',
-                'repair_status' => 'Fixed',
-                'group_identifier' => '0043',
-                'date' => '2018-08-03',
+                'repair_status' => 'Fixed',                
+                'event_date' => '2018-08-03',
                 'problem' => 'instellingen onjuist ~ geen toegang tot dropbox',
                 'translation' => 'incorrect settings ~ access to dropbox',
                 'language' => 'nl',
@@ -181,11 +173,9 @@ class MobifixOraTest extends TestCase {
                 'country' => 'NLD',
                 'product_category' => 'Mobile',
                 'brand' => 'Nokia',
-                'model' => '',
                 'year_of_manufacture' => '1990',
-                'repair_status' => 'Fixed',
-                'group_identifier' => '0024',
-                'date' => '2018-08-04',
+                'repair_status' => 'Fixed',                
+                'event_date' => '2018-08-04',
                 'problem' => 'Gaat niet aan na opladen',
                 'translation' => 'Does not turn on after charging',
                 'language' => 'nl',
@@ -196,11 +186,9 @@ class MobifixOraTest extends TestCase {
                 'country' => 'NLD',
                 'product_category' => 'Mobile',
                 'brand' => 'Apple',
-                'model' => '',
                 'year_of_manufacture' => '2013',
-                'repair_status' => 'Repairable',
-                'group_identifier' => '0017',
-                'date' => '2018-09-29',
+                'repair_status' => 'Repairable',                
+                'event_date' => '2018-09-29',
                 'problem' => 'Netwerkstoornis',
                 'translation' => 'network Disorder',
                 'language' => 'nl',
@@ -210,33 +198,29 @@ class MobifixOraTest extends TestCase {
                 'country' => 'GBR',
                 'product_category' => 'Mobile',
                 'brand' => 'Sony',
-                'model' => 'Xperia XA',
                 'year_of_manufacture' => '2015',
-                'repair_status' => 'Repairable',
-                'group_identifier' => '0042',
-                'date' => '2018-07-21',
+                'repair_status' => 'Repairable',                
+                'event_date' => '2018-07-21',
                 'problem' => 'broken screen ~ poorly maintained',
                 'translation' => 'broken screen ~ poorly maintained',
                 'language' => 'en'],
         ];
         foreach ($data as $k => $v) {
-            DB::table('devices_mobifix_ora')->insert([
+            DB::table('devices_tabicat_ora')->insert([
                 'id_ords' => $v['id'],
                 'data_provider' => $v['data_provider'],
                 'country' => $v['country'],
                 'product_category' => $v['product_category'],
                 'brand' => $v['brand'],
-                'model' => $v['model'],
                 'year_of_manufacture' => $v['year_of_manufacture'],
                 'repair_status' => $v['repair_status'],
-                'group_identifier' => $v['group_identifier'],
-                'date' => $v['date'],
+                'event_date' => $v['event_date'],
                 'problem' => $v['problem'],
                 'translation' => $v['translation'],
                 'language' => $v['language'],
                 'fault_type_id' => 0,
             ]);
-            $this->assertDatabaseHas('devices_mobifix_ora', [
+            $this->assertDatabaseHas('devices_tabicat_ora', [
                 'id_ords' => $v['id'],
             ]);
         }
@@ -275,7 +259,7 @@ class MobifixOraTest extends TestCase {
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 2);
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 25);
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 26);
-        DB::update("INSERT INTO devices_faults_mobiles_ora_adjudicated SET id_ords = '" . $data[3]['id'] . "', fault_type_id=2");
+        DB::update("INSERT INTO devices_faults_tablets_ora_adjudicated SET id_ords = '" . $data[3]['id'] . "', fault_type_id=2");
 
         // $devs[4] : 2 opinions with majority : recat
         $opinions[$data[4]['id']][] = $this->_insert_opinion($data[4]['id'], 2);
@@ -321,8 +305,8 @@ class MobifixOraTest extends TestCase {
             'id_ords' => $id_ords,
             'fault_type_id' => $fault_type_id,
         ];
-        DB::table('devices_faults_mobiles_ora_opinions')->insert($insert);
-        $this->assertDatabaseHas('devices_faults_mobiles_ora_opinions', [
+        DB::table('devices_faults_tablets_ora_opinions')->insert($insert);
+        $this->assertDatabaseHas('devices_faults_tablets_ora_opinions', [
             'id_ords' => $id_ords,
         ]);
         return $insert;
