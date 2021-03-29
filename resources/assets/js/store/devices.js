@@ -20,6 +20,10 @@ export default {
     }
   },
   mutations: {
+    clear(state) {
+      state.devices = {}
+      state.images = {}
+    },
     set (state, params) {
       Vue.set(state.devices, params.idevents, params.devices)
 
@@ -31,6 +35,10 @@ export default {
       let exists = false
 
       if (params.iddevices) {
+        if (!state.devices[params.idevents]) {
+          Vue.set(state.devices, params.idevents, [])
+        }
+
         state.devices[params.idevents].forEach((d, i) => {
           if (d.iddevices === params.iddevices) {
             // Found it there already.
@@ -48,12 +56,14 @@ export default {
       }
     },
     remove (state, params) {
-      let newarr = state.devices[params.idevents].filter((a) => {
-        return a.iddevices !== params.iddevices
-      })
+      if (state.devices[params.idevents]) {
+        let newarr = state.devices[params.idevents].filter((a) => {
+          return a.iddevices !== params.iddevices
+        })
 
-      Vue.set(state.devices, params.idevents, newarr)
-      Vue.delete(state.images, params.iddevices)
+        Vue.set(state.devices, params.idevents, newarr)
+        Vue.delete(state.images, params.iddevices)
+      }
     },
     addURL(state, params) {
       // Fix the device.  This isn't very efficient but the numbers involved are never very large.
@@ -108,6 +118,9 @@ export default {
     },
   },
   actions: {
+    clear({commit}) {
+      commit('clear')
+    },
     set ({commit}, params) {
       commit('set', params)
     },

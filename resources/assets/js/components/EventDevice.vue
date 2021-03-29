@@ -4,8 +4,8 @@
       'add-device': add
       }">
     <div class="device-info">
-      <div class="br d-flex flex-column">
-        <b-card no-body class="p-3 flex-grow-1 botwhite border-0">
+      <div class="br d-flex flex-column botwhite">
+        <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
           <DeviceCategorySelect :class="{
             'mb-2': true,
@@ -52,11 +52,15 @@
       <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
         {{ translatedSave }}
       </b-btn>
+      <b-btn variant="primary" class="mr-2" v-if="edit && deleteButton" @click="confirmDeleteDevice">
+        {{ translatedDelete }}
+      </b-btn>
       <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2" />
-      <b-btn variant="tertiary" class="ml-2" @click="cancel">
+      <b-btn variant="tertiary" class="ml-2" @click="cancel" v-if="cancelButton">
         {{ translatedCancel }}
       </b-btn>
     </div>
+    <ConfirmModal @confirm="deleteDevice" ref="confirm" />
   </b-form>
 </template>
 <script>
@@ -82,9 +86,11 @@ import DeviceUsefulUrls from './DeviceUsefulUrls'
 import DeviceQuantity from './DeviceQuantity'
 import FileUploader from './FileUploader'
 import DeviceImages from './DeviceImages'
+import ConfirmModal from './ConfirmModal'
 
 export default {
   components: {
+    ConfirmModal,
     DeviceImages,
     FileUploader,
     DeviceQuantity,
@@ -113,6 +119,16 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    deleteButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    cancelButton: {
+      type: Boolean,
+      required: false,
+      default: true
     },
     powered: {
       // The server might return a number rather than a boolean.
@@ -188,6 +204,9 @@ export default {
     },
     translatedSave() {
       return this.$lang.get('partials.save')
+    },
+    translatedDelete() {
+      return this.$lang.get('devices.delete_device')
     },
     translatedAddDevice() {
       return this.$lang.get('partials.add_device')
@@ -296,18 +315,20 @@ export default {
       })
 
       // Now find any URLs which were present originally but are no longer present - these need to be deleted.
-      this.device.urls.forEach(async (u) => {
-        const present = this.currentDevice.urls.find(u2 => {
-          return u2.id === u.id
-        })
-
-        if (!present) {
-          await this.$store.dispatch('devices/deleteURL', {
-            iddevices: this.device.iddevices,
-            url: u
+      if (this.device.urls) {
+        this.device.urls.forEach(async (u) => {
+          const present = this.currentDevice.urls.find(u2 => {
+            return u2.id === u.id
           })
-        }
-      })
+
+          if (!present) {
+            await this.$store.dispatch('devices/deleteURL', {
+              iddevices: this.device.iddevices,
+              url: u
+            })
+          }
+        })
+      }
 
       this.$emit('close')
     },
@@ -331,6 +352,17 @@ export default {
       // is weak.
       image.iddevices = this.currentDevice.iddevices
       this.$store.dispatch('devices/deleteImage', image)
+    },
+    confirmDeleteDevice() {
+      this.$refs.confirm.show()
+    },
+    deleteDevice() {
+      this.$store.dispatch('devices/delete', {
+        iddevices: this.device.iddevices,
+        idevents: this.idevents
+      })
+
+      window.location = '/fixometer'
     }
   }
 }
@@ -386,7 +418,7 @@ export default {
 h3 {
   font-size: $font-size-base;
   font-weight: bold;
-  color: #fff;
+  color: $brand-light;
 }
 
 .add-device {

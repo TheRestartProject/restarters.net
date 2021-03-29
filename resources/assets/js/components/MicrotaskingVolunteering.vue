@@ -105,7 +105,10 @@ export default {
     },
     translatedJoin() {
       return this.$lang.get('microtasking.volunteering.join')
-    }
+    },
+    translatedVolunteersConfirmed() {
+      return this.$lang.get('groups.volunteers_confirmed')
+    },
   }
 }
 </script>

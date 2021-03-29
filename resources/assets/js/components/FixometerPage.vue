@@ -73,6 +73,7 @@
           </template>
           <p class="pl-3" v-html="translatedDescriptionPowered" />
           <FixometerRecordsTable
+              :is-admin="isAdmin"
               :powered="true"
               :clusters="clusters"
               :brands="brands"
@@ -105,6 +106,7 @@
           </template>
           <p class="pl-3" v-html="translatedDescriptionUnpowered" />
           <FixometerRecordsTable
+              :is-admin="isAdmin"
               :powered="false"
               :clusters="clusters"
               :brands="brands"
@@ -149,6 +151,7 @@
         </template>
         <template slot="content">
           <FixometerRecordsTable
+              :is-admin="isAdmin"
               :powered="true"
               :clusters="clusters"
               :brands="brands"
@@ -185,6 +188,7 @@
         </template>
         <template slot="content">
           <FixometerRecordsTable
+              :is-admin="isAdmin"
               :powered="false"
               :clusters="clusters"
               :brands="brands"
