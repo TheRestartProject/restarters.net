@@ -5,7 +5,8 @@ namespace App\Services;
 use Illuminate\Support\Facades\Log;
 use Auth;
 
-class DiscourseService {
+class DiscourseService
+{
     public function getDiscussionTopics($tag = null, $numberOfTopics = 5)
     {
         if (!Auth::check()) {
@@ -43,5 +44,35 @@ class DiscourseService {
         }
 
         return $topics;
+    }
+
+    public function getUserIdsByBadge($badgeId)
+    {
+        $externalUserIds = [];
+
+        try {
+            $client = app('discourse-client');
+
+            $endpoint = "/user_badges.json?badge_id={$badgeId}";
+            $response = $client->request('GET', $endpoint);
+            $discourseResult = json_decode($response->getBody());
+
+            $users = $discourseResult->users;
+
+            foreach ($users as $user) {
+                $endpoint = "/admin/users/{$user->id}.json";
+                $response = $client->request('GET', $endpoint);
+                $discourseResult = json_decode($response->getBody());
+                $externalUserIds[] = [
+                    'external_id' => $discourseResult->single_sign_on_record->external_id,
+                    'username' => $discourseResult->single_sign_on_record->external_username,
+                ];
+                break;
+            }
+        } catch (\Exception $ex) {
+            Log::error("Error retrieving users by badge" . $ex->getMessage());
+        }
+
+        return $externalUserIds;
     }
 }

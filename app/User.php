@@ -88,6 +88,13 @@ class User extends Authenticatable implements Auditable
 
     public function skills()
     {
+        return $this->belongsToMany('App\Skills', 'users_skills', 'user', 'skill');
+    }
+
+    // This is an incorrect relationship, but leaving it here for now as it is used in a strange way in two legacy places and apparently working in those instances somehow.
+    // Use skills() for correct belongsToMany relationship.
+    public function skillsold()
+    {
         return $this->belongsToMany('App\UsersSkills', 'users_skills', 'user', 'skill');
     }
 
