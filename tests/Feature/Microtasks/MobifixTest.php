@@ -14,13 +14,12 @@ use Illuminate\Support\Str;
 
 class MobifixTest extends TestCase {
 
-    use RefreshDatabase;
-
     public function setUp() {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
         Device::truncate();
         Mobifix::truncate();
+        DB::table('devices_faults_mobiles_adjudicated')->truncate();
     }
 
     /** @test */
@@ -53,8 +52,9 @@ class MobifixTest extends TestCase {
                 $this->assertEquals($result[$k][0]->total, $v, 'fetch_mobifix_status: wrong ' . $k);
             } else {
                 $this->assertTrue(is_array($result[$k]), 'fetch_mobifix_status: not array - ' . $k);
+                logger(print_r($result,1));
                 foreach ($v[0] as $key => $val) {
-                    $this->assertTrue(array_key_exists($key, $result[$k][0]), 'fetch_mobifix_status: missing key - ' . $key);
+                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_mobifix_status: missing key - ' . $key);
                     $this->assertEquals($result[$k][0]->{$key}, $val, 'fetch_mobifix_status: wrong ' . $key);
                 }
             }
@@ -267,12 +267,14 @@ class MobifixTest extends TestCase {
                 [
                     'problem' => $problem,
                     'fault_type' => $fault_type,
+                    'repair_status' => 1,
                 ]
         );
         $this->assertDatabaseHas('devices', [
             'category' => $id,
             'problem' => $problem,
             'fault_type' => $fault_type,
+            'repair_status' => 1,
         ]);
         return $device->toArray()[0];
     }

@@ -12,13 +12,12 @@ use Illuminate\Support\Str;
 
 class MobifixOraTest extends TestCase {
 
-    use RefreshDatabase;
-
     public function setUp() {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
-        DB::table('devices_mobifix_ora')->truncate();
         MobifixOra::truncate();
+        DB::table('devices_mobifix_ora')->truncate();
+        DB::table('devices_faults_mobiles_ora_adjudicated')->truncate();
     }
 
     /** @test */
@@ -85,13 +84,13 @@ class MobifixOraTest extends TestCase {
         $result = $MobifixOra->fetchStatus();
         $this->assertTrue(is_array($result));
         foreach ($opinions['status'] as $k => $v) {
-            $this->assertTrue(array_key_exists($k, $result), 'fetch_mobifixora_status: missing key - ' . $k);
+            $this->assertTrue(isset($result, $k), 'fetch_mobifixora_status: missing key - ' . $k);
             if (!is_array($v)) {
                 $this->assertEquals($v, $result[$k][0]->total, 'fetch_mobifixora_status: wrong ' . $k);
             } else {
                 $this->assertTrue(is_array($result[$k]), 'fetch_mobifixora_status: not array - ' . $k);
                 foreach ($v[0] as $key => $val) {
-                    $this->assertTrue(array_key_exists($key, $result[$k][0]), 'fetch_mobifixora_status #' . $k . ': missing key - ' . $key);
+                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_mobifixora_status #' . $k . ': missing key - ' . $key);
                     $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_mobifixora_status #' . $k . ': wrong ' . $key);
                 }
             }

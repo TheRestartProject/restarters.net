@@ -15,8 +15,8 @@ class TabiCatOraTest extends TestCase {
     public function setUp() {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
+        TabicatOra::truncate();
         DB::table('devices_tabicat_ora')->truncate();
-        DB::table('devices_faults_tablets_ora_opinions')->truncate();
         DB::table('devices_faults_tablets_ora_adjudicated')->truncate();
     }
 
@@ -62,14 +62,15 @@ class TabiCatOraTest extends TestCase {
         $this->_bypass_cta();
         for ($i = 1; $i <= count($data); $i++) {
             // Illuminate\Foundation\Testing\TestResponse
-            $response = $this->get('/tabicatora');
+            $response = $this->get('/tabicat');
             $seshids = $this->app['session']->get('tabicatora.exclusions');
+            $this->assertTrue(is_array($seshids), 'tabicatora.exclusions not an array');
             $this->assertEquals($i, count($seshids), 'tabicatora.exclusions wrong length');
             $response->assertSuccessful();
             $response->assertViewIs('tabicatora.index');
         }
         // No more records for this user
-        $response = $this->get('/tabicatora');
+        $response = $this->get('/tabicat');
         $response->assertSessionHas('tabicatora.exclusions');
         $response->assertRedirect();
         $response->assertRedirect(url()->current() . '/status');
@@ -84,13 +85,13 @@ class TabiCatOraTest extends TestCase {
         $result = $TabiCatOra->fetchStatus();
         $this->assertTrue(is_array($result));
         foreach ($opinions['status'] as $k => $v) {
-            $this->assertTrue(array_key_exists($k, $result), 'fetch_tabicatora_status: missing key - ' . $k);
+            $this->assertTrue(isset($result, $k), 'fetch_tabicatora_status: missing key - ' . $k);
             if (!is_array($v)) {
                 $this->assertEquals($v, $result[$k][0]->total, 'fetch_tabicatora_status: wrong ' . $k);
             } else {
                 $this->assertTrue(is_array($result[$k]), 'fetch_tabicatora_status: not array - ' . $k);
                 foreach ($v[0] as $key => $val) {
-                    $this->assertTrue(array_key_exists($key, $result[$k][0]), 'fetch_tabicatora_status #' . $k . ': missing key - ' . $key);
+                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_tabicatora_status #' . $k . ': missing key - ' . $key);
                     $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_tabicatora_status #' . $k . ': wrong ' . $key);
                 }
             }
@@ -104,7 +105,7 @@ class TabiCatOraTest extends TestCase {
                 'id' => 'anstiftung_1647',
                 'data_provider' => 'anstiftung',
                 'country' => 'DEU',
-                'product_category' => 'Mobile',
+                'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '',
                 'repair_status' => 'Repairable',
@@ -117,7 +118,7 @@ class TabiCatOraTest extends TestCase {
                 'id' => 'anstiftung_1657',
                 'data_provider' => 'anstiftung',
                 'country' => 'DEU',
-                'product_category' => 'Mobile',
+                'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '',
                 'repair_status' => 'Repairable',                
@@ -130,7 +131,7 @@ class TabiCatOraTest extends TestCase {
                 'id' => 'anstiftung_1673',
                 'data_provider' => 'anstiftung',
                 'country' => 'DEU',
-                'product_category' => 'Mobile',
+                'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '',
                 'repair_status' => 'Fixed',                
@@ -142,7 +143,7 @@ class TabiCatOraTest extends TestCase {
             ['id' => 'anstiftung_2577',
                 'data_provider' => 'anstiftung',
                 'country' => 'DEU',
-                'product_category' => 'Mobile',
+                'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '',
                 'repair_status' => 'Fixed',                
@@ -155,7 +156,7 @@ class TabiCatOraTest extends TestCase {
                 'id' => 'repaircafe_8389',
                 'data_provider' => 'repaircafe',
                 'country' => 'NLD',
-                'product_category' => 'Mobile',
+                'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '2017',
                 'repair_status' => 'Fixed',                
@@ -168,7 +169,7 @@ class TabiCatOraTest extends TestCase {
                 'id' => 'repaircafe_8454',
                 'data_provider' => 'repaircafe',
                 'country' => 'NLD',
-                'product_category' => 'Mobile',
+                'product_category' => 'Tablet',
                 'brand' => 'Nokia',
                 'year_of_manufacture' => '1990',
                 'repair_status' => 'Fixed',                
@@ -181,7 +182,7 @@ class TabiCatOraTest extends TestCase {
                 'id' => 'repaircafe_9462',
                 'data_provider' => 'repaircafe',
                 'country' => 'NLD',
-                'product_category' => 'Mobile',
+                'product_category' => 'Tablet',
                 'brand' => 'Apple',
                 'year_of_manufacture' => '2013',
                 'repair_status' => 'Repairable',                
@@ -193,7 +194,7 @@ class TabiCatOraTest extends TestCase {
             ['id' => 'repaircafe_8243',
                 'data_provider' => 'repaircafe',
                 'country' => 'GBR',
-                'product_category' => 'Mobile',
+                'product_category' => 'Tablet',
                 'brand' => 'Sony',
                 'year_of_manufacture' => '2015',
                 'repair_status' => 'Repairable',                

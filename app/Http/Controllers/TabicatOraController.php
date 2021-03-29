@@ -51,7 +51,7 @@ class TabicatOraController extends Controller {
         }
         $fault = $this->_fetchRecord($request);
         if (!$fault) {
-            return redirect()->action('TabicatOraController')->withSuccess('done');
+            return redirect()->action('TabicatOraController@status')->withSuccess('done');
         }
         $fault->translate = rawurlencode($fault->problem);
         $fault_types = $this->Model->fetchFaultTypes();
