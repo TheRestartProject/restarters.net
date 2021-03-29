@@ -40,7 +40,11 @@ return [
             'title' => 'Help Now!  MobiFix:ORA',
             'description' => '<p>We see lots of smartphones at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with smartphones with MobiFix:ORA!</p>  <p>The repair data in MobiFix:ORA comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
             'get_involved' => 'Get involved',
-
+        ],
+        'mobifix' => [
+            'title' => 'Help Now!  MobiFix',
+            'description' => '<p>We see lots of smartphones at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with smartphones with MobiFix!</p>',
+            'get_involved' => 'Get involved',
         ]
     ],
     'discussion' => [
