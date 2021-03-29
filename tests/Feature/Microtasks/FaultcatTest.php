@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Device;
 use App\Category;
+use App\Group;
 use App\Faultcat;
 use DB;
 use Tests\TestCase;
@@ -14,13 +15,13 @@ use Illuminate\Support\Str;
 
 class FaultcatTest extends TestCase {
 
-    use RefreshDatabase;
-
     public function setUp() {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
+        Group::truncate();
         Device::truncate();
         Faultcat::truncate();
+        DB::table('devices_faults_adjudicated')->truncate();
     }
 
     /** @test */
@@ -315,12 +316,14 @@ class FaultcatTest extends TestCase {
                 [
                     'problem' => $problem,
                     'fault_type' => $fault_type,
+                    'repair_status' => 1,
                 ]
         );
         $this->assertDatabaseHas('devices', [
             'category' => $id,
             'problem' => $problem,
             'fault_type' => $fault_type,
+            'repair_status' => 1,
         ]);
         return $device->toArray()[0];
     }

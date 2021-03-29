@@ -1,4 +1,4 @@
-@extends('layouts.app', ['show_login_join_to_anons' => true])
+@extends('layouts.app', ['show_login_join_to_anons' => true, 'hide_language' => true])
 
 @section('extra-css')
 
@@ -13,7 +13,7 @@
         <div class="row row-compressed">
             <div class="col-6">
                 <h1 class="pull-left">FaultCat Status</h1>
-            </div>            
+            </div>
             <div class="col-6 pull-right">
                 <!--
             These images are licensed under the Creative Commons Attribution 4.0 International license.
