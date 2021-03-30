@@ -305,7 +305,7 @@ class MobifixOraTest extends TestCase {
                 0 => [
                     'id_ords' => $data[2]['id'],
                     'all_crowd_opinions_count' => 3,
-                    'opinions' => 'Screen,Unknown,Other',
+                    'opinions' => 'Other,Screen,Unknown',
                 ],
             ],
         ];
