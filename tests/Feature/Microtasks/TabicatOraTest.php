@@ -98,6 +98,29 @@ class TabiCatOraTest extends TestCase {
         }
     }
 
+    /** @test */
+    public function update_tabicatora_devices() {
+
+        $data = $this->_setup_devices();
+        $opinions = $this->_setup_opinions($data);
+        $TabiCatOra = new TabiCatOra;
+        $before = DB::select("SELECT id_ords, fault_type_id FROM devices_tabicat_ora");
+        foreach ($before as $k => $v) {
+            $this->assertEquals($v->fault_type_id, 0, 'update_tabicatora_devices: initial fault_type not 0: ' . $v->fault_type_id);
+        }        
+        $updated = $TabiCatOra->updateDevices();
+        $after = DB::select("SELECT id_ords, fault_type_id FROM devices_tabicat_ora");
+        $this->assertEquals($updated, count($opinions['updates']), 'update_tabicatora_devices: wrong number of records updated: ' . $updated);
+        foreach ($after as $k => $v) {
+            if (isset($opinions['updates'][$v->id_ords])) {
+                $this->assertEquals($v->fault_type_id, $opinions['updates'][$v->id_ords], 'update_tabicatora_devices: updated fault_type is wrong: ' . $v->id_ords . ' => ' . $v->fault_type_id);
+            } else {
+                $this->assertEquals($v->fault_type_id, 0, 'update_tabicatora_devices: fault_type should still be 0: ' . $v->fault_type_id);
+            }
+        }
+        
+    }
+
     protected function _setup_devices() {
 
         $data = [
@@ -238,15 +261,19 @@ class TabiCatOraTest extends TestCase {
 
         $opinions = [];
 
+        $updates = [];
+
         // $data[0] : 3 opinions with consensus : recat
         $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
         $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
         $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
+        $updates[$data[0]['id']] = 2;
 
         // $data[1] : 3 opinions with majority : recat
         $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 2);
         $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 2);
         $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 25);
+        $updates[$data[1]['id']] = 2;
 
         // $data[2] : 3 opinions split
         $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 2);
@@ -257,11 +284,13 @@ class TabiCatOraTest extends TestCase {
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 2);
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 25);
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 26);
-        DB::update("INSERT INTO devices_faults_tablets_ora_adjudicated SET id_ords = '" . $data[3]['id'] . "', fault_type_id=2");
+        DB::update("INSERT INTO devices_faults_tablets_ora_adjudicated SET id_ords = '" . $data[3]['id'] . "', fault_type_id=2");        
+        $updates[$data[3]['id']] = 2;
 
         // $devs[4] : 2 opinions with majority : recat
         $opinions[$data[4]['id']][] = $this->_insert_opinion($data[4]['id'], 2);
         $opinions[$data[4]['id']][] = $this->_insert_opinion($data[4]['id'], 2);
+        $updates[$data[4]['id']] = 2;
 
         // $devs[5] : 2 opinions split
         $opinions[$data[5]['id']][] = $this->_insert_opinion($data[5]['id'], 2);
@@ -291,10 +320,12 @@ class TabiCatOraTest extends TestCase {
                     'opinions' => 'Other,Screen,Unknown',
                 ],
             ],
-        ];
+        ];        
+
         return [
             'status' => $status,
             'opinions' => $opinions,
+            'updates' => $updates,
         ];
     }
 

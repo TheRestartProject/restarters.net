@@ -180,6 +180,7 @@ HAVING
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
 ");
         $result['total_splits'] = [json_decode(json_encode(['total' => count($result['list_splits'])]), FALSE)];
+
         return $result;
     }
 
@@ -191,26 +192,34 @@ HAVING
     public function updateDevices() {
 
         DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_tablets_ora_temporary` AS (
-SELECT
-d.id_ords,
-COALESCE(ANY_VALUE(a.fault_type_id),(SELECT o1.fault_type_id FROM devices_faults_tablets_ora_opinions o1 WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1)) AS winning_opinion_id,
-COALESCE(ANY_VALUE(fta.title),(SELECT fto.title FROM devices_faults_tablets_ora_opinions o1 JOIN fault_types_tablets fto ON fto.id = o1.fault_type_id WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1)) AS winning_opinion,
-ANY_VALUE(a.fault_type_id) AS adjudicated_opinion_id,
-ANY_VALUE(fta.title) AS adjudicated_opinion,
-(SELECT o2.fault_type_id FROM devices_faults_tablets_ora_opinions o2 WHERE o2.id_ords = o.id_ords GROUP BY o2.fault_type_id ORDER BY COUNT(o2.fault_type_id) DESC LIMIT 1) AS top_crowd_opinion,
-ROUND((SELECT COUNT(o3.fault_type_id) as top_crowd_opinion_count FROM devices_faults_tablets_ora_opinions o3 WHERE o3.id_ords = o.id_ords GROUP BY o3.fault_type_id ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
-(SELECT COUNT(o4.fault_type_id) as all_votes FROM devices_faults_tablets_ora_opinions o4 WHERE o4.id_ords = o.id_ords) * 100) AS top_crowd_opinion_percentage,
-COUNT(o.fault_type_id) AS all_crowd_opinions_count
-FROM `devices_tabicat_ora` d
-LEFT OUTER JOIN devices_faults_tablets_ora_opinions o ON o.id_ords = d.id_ords
-LEFT OUTER JOIN devices_faults_tablets_ora_adjudicated a ON a.id_ords = d.id_ords
-LEFT OUTER JOIN fault_types_tablets fta ON fta.id = a.fault_type_id
-GROUP BY d.id_ords
-HAVING
-(all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
-OR adjudicated_opinion_id IS NOT NULL
-ORDER BY NULL);");
-
+SELECT * 
+FROM 
+(SELECT 
+r2.id_ords,
+CASE
+        WHEN (r2.opinions<2) OR (r2.opinions=2 AND r2.opinions_distinct=2) THEN NULL
+        WHEN (r2.opinions_distinct=1 AND r2.opinions>1) THEN r2.faultnames
+        WHEN (r2.opinions_distinct=3) THEN ((SELECT a.fault_type_id FROM devices_faults_tablets_ora_adjudicated a WHERE a.id_ords = r2.id_ords))
+        ELSE (SELECT o.fault_type_id FROM devices_faults_tablets_ora_opinions o WHERE o.id_ords = r2.id_ords GROUP BY fault_type_id ORDER BY COUNT(*) DESC LIMIT 1)
+END AS winning_opinion_id
+FROM 
+(SELECT 
+r1.id_ords, 
+COUNT(r1.fault_type_id) as opinions,
+COUNT(DISTINCT r1.fault_type_id) as opinions_distinct,
+GROUP_CONCAT(DISTINCT r1.fault_type_id) as faultnames
+FROM 
+(SELECT
+o.id_ords,
+o.fault_type_id
+FROM devices_faults_tablets_ora_opinions o
+) AS r1
+GROUP BY r1.id_ords
+) AS r2
+) AS r3
+WHERE r3.winning_opinion_id IS NOT NULL
+)
+");
         DB::statement("ALTER TABLE `devices_faults_tablets_ora_temporary` ADD PRIMARY KEY(`id_ords`);");
 
         $result = DB::update("UPDATE devices_tabicat_ora d, devices_faults_tablets_ora_temporary t
@@ -223,4 +232,3 @@ WHERE d.id_ords = t.id_ords;");
     }
 
 }
-
