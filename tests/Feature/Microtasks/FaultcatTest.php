@@ -33,7 +33,7 @@ class FaultcatTest extends TestCase {
         for ($i = 0; $i < 101; $i++) {
             $result = $Faultcat->fetchFault();
             $this->assertTrue(is_array($result), 'fetch_faultcat_record: result is not array');
-            $this->assertEquals(count($result), 1, 'fetch_faultcat_record: wrong result count');
+            $this->assertEquals(1, count($result), 'fetch_faultcat_record: wrong result count');
             $this->assertGreaterThan(0, $result[0]->iddevices, 'fetch_faultcat_record: iddevices is 0 or null');
             $this->assertTrue(array_key_exists($result[0]->iddevices, $data['devices_include']), 'fetch_faultcat_record: result is not in list of inclusions');
             $this->assertFalse(array_key_exists($result[0]->iddevices, $data['devices_exclude']), 'fetch_faultcat_record: result is in list of exclusions');
@@ -44,19 +44,17 @@ class FaultcatTest extends TestCase {
     public function fetch_faultcat_status() {
 
         $data = $this->_setup_data();
-
         $Faultcat = new Faultcat;
         $result = $Faultcat->fetchStatus();
         $this->assertTrue(is_array($result));
         foreach ($data['status'] as $k => $v) {
             $this->assertTrue(array_key_exists($k, $result), 'fetch_faultcat_status: missing key - ' . $k);
             if (!is_array($v)) {
-                $this->assertEquals($result[$k][0]->total, $v, 'fetch_faultcat_status: wrong ' . $k);
+                $this->assertEquals($v, $result[$k][0]->total, 'fetch_faultcat_status: wrong ' . $k);
             } else {
-                $this->assertTrue(is_array($result[$k]), 'fetch_faultcat_status: not array - ' . $k);
                 foreach ($v[0] as $key => $val) {
-                    $this->assertTrue(array_key_exists($key, $result[$k][0]), 'fetch_faultcat_status: missing key - ' . $key);
-                    $this->assertEquals($result[$k][0]->{$key}, $val, 'fetch_faultcat_status: wrong ' . $key);
+                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_faultcat_status: missing key - ' . $key);
+                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_faultcat_status: wrong ' . $key);
                 }
             }
         }
