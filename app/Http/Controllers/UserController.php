@@ -354,7 +354,7 @@ class UserController extends Controller
         $user = User::find($id);
 
         $skills = $request->input('tags');
-        $user->skills()->sync($skills);
+        $user->skillsold()->sync($skills);
 
         $roleBasedOnSkills = FixometerHelper::skillsDetermineRole($skills);
 
@@ -1265,7 +1265,7 @@ class UserController extends Controller
 
       // Sync user skills
         if (!empty($skills)) {
-            User::find($user->id)->skills()->sync($skills);
+            User::find($user->id)->skillsold()->sync($skills);
         }
 
       // If this is an invite
