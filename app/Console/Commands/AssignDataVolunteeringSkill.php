@@ -10,7 +10,7 @@ use App\Skills;
 
 use Illuminate\Support\Facades\DB;
 
-class AssignDataVoluteeringSkill extends Command
+class AssignDataVolunteeringSkill extends Command
 {
     private $discourseService;
     private $dataBadges = [];
