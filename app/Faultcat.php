@@ -178,7 +178,7 @@ d.iddevices,
 ROUND((SELECT COUNT(o2.fault_type) as top_crowd_opinion_count FROM devices_faults_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.fault_type ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
 (SELECT COUNT(o2.fault_type) as all_votes FROM devices_faults_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
 COUNT(o.fault_type) AS all_crowd_opinions_count,
-GROUP_CONCAT(o.fault_type) as opinions,
+GROUP_CONCAT(o.fault_type ORDER BY o.fault_type) as opinions,
 TRIM(COALESCE(d.`brand`,'')) as brand,
 TRIM(COALESCE(d.`model`,'')) as model,
 TRIM(d.`problem`) as problem

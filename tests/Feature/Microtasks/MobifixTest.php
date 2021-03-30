@@ -31,7 +31,7 @@ class MobifixTest extends TestCase {
         for ($i = 0; $i < 101; $i++) {
             $result = $Mobifix->fetchFault();
             $this->assertTrue(is_array($result), 'fetch_mobifix_record: result is not array');
-            $this->assertEquals(count($result), 1, 'fetch_mobifix_record: wrong result count');
+            $this->assertEquals(1, count($result), 'fetch_mobifix_record: wrong result count');
             $this->assertGreaterThan(0, $result[0]->iddevices, 'fetch_mobifix_record: iddevices is 0 or null');
             $this->assertTrue(array_key_exists($result[0]->iddevices, $data['devices_include']), 'fetch_mobifix_record: result is not in list of inclusions');
             $this->assertFalse(array_key_exists($result[0]->iddevices, $data['devices_exclude']), 'fetch_mobifix_record: result is in list of exclusions');
@@ -49,13 +49,11 @@ class MobifixTest extends TestCase {
         foreach ($data['status'] as $k => $v) {
             $this->assertTrue(array_key_exists($k, $result), 'fetch_mobifix_status: missing key - ' . $k);
             if (!is_array($v)) {
-                $this->assertEquals($result[$k][0]->total, $v, 'fetch_mobifix_status: wrong ' . $k);
+                $this->assertEquals($v, $result[$k][0]->total, 'fetch_mobifix_status: wrong ' . $k);
             } else {
-                $this->assertTrue(is_array($result[$k]), 'fetch_mobifix_status: not array - ' . $k);
-                logger(print_r($result,1));
                 foreach ($v[0] as $key => $val) {
                     $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_mobifix_status: missing key - ' . $key);
-                    $this->assertEquals($result[$k][0]->{$key}, $val, 'fetch_mobifix_status: wrong ' . $key);
+                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_mobifix_status: wrong ' . $key);
                 }
             }
         }
