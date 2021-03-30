@@ -10,7 +10,10 @@
     </h1>
 
     <div id="layout">
-        <MicrotaskingCallToAction id="cta" />
+        <MicrotaskingCallToAction
+          id="cta"
+          :active-quest="activeQuest"
+        />
         <MicrotaskingVolunteering
           :total-contributions="totalContributions"
           :current-user-quests="currentUserQuests"
@@ -40,6 +43,10 @@ export default {
   components: {MicrotaskingCallToAction, MicrotaskingVolunteering, DiscourseDiscussion, MicrotaskingNews},
   mixins: [ auth ],
   props: {
+    activeQuest: {
+      type: String,
+      required: true
+    },
     totalContributions: {
       type: Number,
       required: true
