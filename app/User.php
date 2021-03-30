@@ -98,6 +98,18 @@ class User extends Authenticatable implements Auditable
         return $this->belongsToMany('App\UsersSkills', 'users_skills', 'user', 'skill');
     }
 
+    public function hasSkill($skill)
+    {
+        return $this->skills->contains($skill->id);
+    }
+
+    public function assignSkill($skill)
+    {
+        if (!$this->hasSkill($skill->id)) {
+            $this->skills()->attach($skill->id);
+        }
+    }
+
     public function groups()
     {
         return $this->belongsToMany('App\Group', 'users_groups', 'user', 'group');

@@ -55,6 +55,10 @@ class DiscourseService
 
             $endpoint = "/user_badges.json?badge_id={$badgeId}";
             $response = $client->request('GET', $endpoint);
+            if ($response->getStatusCode() == 404) {
+                Log::error("{$endpoint} not found");
+                throw new \Exception("{$endpoint} not found");
+            }
             $discourseResult = json_decode($response->getBody());
 
             $users = $discourseResult->users;
@@ -70,7 +74,7 @@ class DiscourseService
                 break;
             }
         } catch (\Exception $ex) {
-            Log::error("Error retrieving users by badge" . $ex->getMessage());
+            Log::error("Error retrieving users by badge: " . $ex->getMessage());
         }
 
         return $externalUserIds;
