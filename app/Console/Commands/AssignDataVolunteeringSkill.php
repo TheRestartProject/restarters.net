@@ -10,9 +10,11 @@ use App\Skills;
 
 use Illuminate\Support\Facades\DB;
 
-class UpdateDataVolunteers extends Command
+class AssignDataVoluteeringSkill extends Command
 {
     private $discourseService;
+    private $dataBadges = [];
+    private $quests = [];
 
     /**
      * The name and signature of the console command.
@@ -26,7 +28,7 @@ class UpdateDataVolunteers extends Command
      *
      * @var string
      */
-    protected $description = 'For those users with one of the data volunteering badges in Talk, give them the data volunteering skill in Restarters.';
+    protected $description = 'For those users with one of the data volunteering badges in Talk, or who have participated in a microtasking quest, give them the data volunteering skill in Restarters.';
 
     /**
      * Create a new command instance.
@@ -37,6 +39,20 @@ class UpdateDataVolunteers extends Command
     {
         parent::__construct();
         $this->discourseService = $discourseService;
+
+        // It might make sense to put all of this information into
+        // a 'quests' table, containing information about each quest
+        // and corresponding badges.
+        $this->dataBadges[] = ['name' => 'FaultCat', 'id' => 117];
+        $this->dataBadges[] = ['name' => 'MiscCat', 'id' => 118];
+        $this->dataBadges[] = ['name' => 'MobiFix', 'id' => 121];
+        $this->dataBadges[] = ['name' => 'DataDelver', 'id' => 106];
+
+        $this->quests[] = ['name' => 'FaultCat', 'opinions_table' => 'devices_faults_opinions'];
+        $this->quests[] = ['name' => 'MiscCat', 'opinions_table' => 'devices_misc_opinions'];
+        $this->quests[] = ['name' => 'MobiFix', 'opinions_table' => 'devices_faults_mobiles_opinions'];
+        $this->quests[] = ['name' => 'MobiFixOra', 'opinions_table' => 'devices_faults_mobiles_ora_opinions'];
+
     }
 
     /**
@@ -57,13 +73,7 @@ class UpdateDataVolunteers extends Command
 
     public function processDataBadgers($dataVolunteerSkill)
     {
-        $dataBadges = [];
-        $dataBadges[] = ['name' => 'FaultCat', 'id' => 117];
-        $dataBadges[] = ['name' => 'MiscCat', 'id' => 118];
-        $dataBadges[] = ['name' => 'MobiFix', 'id' => 121];
-        $dataBadges[] = ['name' => 'DataDelver', 'id' => 106];
-
-        foreach ($dataBadges as $dataBadge) {
+        foreach ($this->dataBadges as $dataBadge) {
             $badgeId = $dataBadge['id'];
             $badgeName = $dataBadge['name'];
 
@@ -80,20 +90,14 @@ class UpdateDataVolunteers extends Command
                     continue;
                 }
 
-                $this->assignSkillToUser($user, $dataVolunteerSkill);
+                $this->checkAndAssignSkillToUser($user, $dataVolunteerSkill);
             }
         }
     }
 
     public function processQuesters($dataVolunteerSkill)
     {
-        $quests = [];
-        $quests[] = ['name' => 'FaultCat', 'opinions_table' => 'devices_faults_opinions'];
-        $quests[] = ['name' => 'MiscCat', 'opinions_table' => 'devices_misc_opinions'];
-        $quests[] = ['name' => 'MobiFix', 'opinions_table' => 'devices_faults_mobiles_opinions'];
-        $quests[] = ['name' => 'MobiFixOra', 'opinions_table' => 'devices_faults_mobiles_ora_opinions'];
-
-        foreach ($quests as $quest) {
+        foreach ($this->quests as $quest) {
             $questName = $quest['name'];
             $questOpinionsTable = $quest['opinions_table'];
 

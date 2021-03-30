@@ -71,12 +71,20 @@ class DiscourseService
                     'external_id' => $discourseResult->single_sign_on_record->external_id,
                     'username' => $discourseResult->single_sign_on_record->external_username,
                 ];
-                break;
+                $this->avoidRateLimiting();
             }
         } catch (\Exception $ex) {
             Log::error("Error retrieving users by badge: " . $ex->getMessage());
         }
 
         return $externalUserIds;
+    }
+
+    protected function avoidRateLimiting()
+    {
+        // Sleep to avoid Discourse rate limiting of 60 requests per minute.
+        // See https://meta.discourse.org/t/global-rate-limits-and-throttling-in-discourse/78612
+        // There's probably a better way of doing this.
+        sleep(1);
     }
 }
