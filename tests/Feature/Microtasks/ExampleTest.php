@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Device;
 use App\Category;
 use App\Group;
+use App\Party;
 use DB;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -12,17 +13,60 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+/**
+ * Miscellaneous routines for checking stuff
+ * Do not run in suite as some are designed to fail
+ */
 class ExampleTest extends TestCase {
 
     public function setUp() {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
+        Party::truncate();
         Group::truncate();
-        Device::truncate();
+        Device::truncate();        
     }
 
     /** @test */
-    public function test_this_1() {
+    public function test_sql_not_in() {
+        // testing execution time with enormous "NOT IN" expression
+        DB::table('groups')->insert([
+            'name' => Str::random(40),
+        ]);
+        DB::table('events')->insert([
+            'group' => 1,
+        ]);        
+        for ($i=1;$i<=1000;$i++) {
+            DB::table('devices')->insert([
+                'event' => 1,
+                'category' => rand(1,46),
+                'problem' => Str::random(40),
+                'repair_status' => rand(1,3),
+            ]);
+        }
+        $x = array_keys(array_fill(1,1000,0));
+        shuffle($x);
+        $t = rand(1,999);
+        logger($t);
+        $r = str_replace("$t,", '', join(',', $x));
+        $sql = "SELECT iddevices FROM devices WHERE iddevices NOT IN ($r) ORDER BY rand() LIMIT 1";        
+        logger($sql);
+        for ($i=1;$i<=10;$i++) {            
+            $foo = DB::select($sql); // (0.03 seconds)
+            logger(print_r($foo,1));
+        }
+    }
+
+    /**
+     * The following prove an issue with Laravel DB::statement under MySQL 5.7
+     * when brackets enclose a complex SELECT statement in CREATE TABLE AS (SELECT...)
+     * create_table_2a will always fail under MySQL 5.7 but does not fail under MySQL 8.x
+     * create_table_3a is intended to fail under MySQL 5.7 but needs more complex query
+     * e.g. see MobifixOra->updateDevices();
+     */
+
+    /** @test */
+    public function create_table_1() {
 
         $data = $this->_setup_data();
 
@@ -55,7 +99,7 @@ HAVING
     }
 
     /** @test */
-    public function test_this_1a() {
+    public function create_table_1a() {
 
         $data = $this->_setup_data();
 
@@ -88,7 +132,7 @@ HAVING
     }
 
     /** @test */
-    public function test_this_2() {
+    public function create_table_2() {
 
         $data = $this->_setup_data();
 
@@ -130,7 +174,7 @@ HAVING
     }
 
     /** @test */
-    public function test_this_2a() {
+    public function create_table_2a() {
 
         $data = $this->_setup_data();
 
@@ -172,7 +216,7 @@ HAVING
     }
 
     /** @test */
-    public function test_this_3() {
+    public function create_table_3() {
 
         $data = $this->_setup_data();
 
@@ -220,7 +264,7 @@ HAVING
     }
 
     /** @test */
-    public function test_this_3a() {
+    public function create_table_3a() {
 
         $data = $this->_setup_data();
 
@@ -282,13 +326,13 @@ HAVING
         $devs = [];
         $i = 1;
         foreach ($cats as $cat => $id) {
-            $devs[$i++] = $this->_insert_device($cat, $id, Str::random(40), 1);
-            $devs[$i++] = $this->_insert_device($cat, $id, Str::random(40), 2);
-            $devs[$i++] = $this->_insert_device($cat, $id, Str::random(40), 3);
+            $devs[$i++] = $this->_insert_device($cat, Str::random(40), 1);
+            $devs[$i++] = $this->_insert_device($cat, Str::random(40), 2);
+            $devs[$i++] = $this->_insert_device($cat, Str::random(40), 3);
         }
     }
 
-    protected function _insert_device($cat, $id, $problem, $repair_status) {
+    protected function _insert_device($cat, $problem, $repair_status) {
         $device = factory(Device::class, 1)->states($cat)->create(
                 [
                     'problem' => $problem,
