@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\TabiCatOra;
+use App\TabicatOra;
 use DB;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class TabiCatOraTest extends TestCase {
+class TabicatOraTest extends TestCase {
 
     public function setUp() {
         parent::setUp();
@@ -24,9 +24,9 @@ class TabiCatOraTest extends TestCase {
     public function fetch_tabicatora_record() {
 
         $data = $this->_setup_devices();
-        $TabiCatOra = new TabiCatOra;
+        $TabicatOra = new TabicatOra;
 
-        $result = $TabiCatOra->fetchFault();
+        $result = $TabicatOra->fetchFault();
         $this->assertTrue(is_array($result), 'fetch_tabicatora_record: result is not array');
         $this->assertEquals(1, count($result), 'fetch_tabicatora_record: wrong result count');
         $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_tabicatora_record: id_ords is null');
@@ -37,7 +37,7 @@ class TabiCatOraTest extends TestCase {
             $exclude[] = $v['id'];
         }
         $include = array_pop($exclude);
-        $result = $TabiCatOra->fetchFault($exclude);
+        $result = $TabicatOra->fetchFault($exclude);
         $this->assertTrue(is_array($result), 'fetch_tabicatora_record: result is not array');
         $this->assertEquals(1, count($result), 'fetch_tabicatora_record: wrong result count');
         $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_tabicatora_record: id_ords is null');
@@ -50,7 +50,7 @@ class TabiCatOraTest extends TestCase {
                 $exclude[] = $v['id'];
             }
         }
-        $result = $TabiCatOra->fetchFault($exclude, 'anstiftung');
+        $result = $TabicatOra->fetchFault($exclude, 'anstiftung');
         $this->assertTrue(empty($result), 'fetch_tabicatora_record: result is not false');
     }
 
@@ -81,8 +81,8 @@ class TabiCatOraTest extends TestCase {
 
         $data = $this->_setup_devices();
         $opinions = $this->_setup_opinions($data);
-        $TabiCatOra = new TabiCatOra;
-        $result = $TabiCatOra->fetchStatus();
+        $TabicatOra = new TabicatOra;
+        $result = $TabicatOra->fetchStatus();
         $this->assertTrue(is_array($result));
         foreach ($opinions['status'] as $k => $v) {
             $this->assertTrue(isset($result, $k), 'fetch_tabicatora_status: missing key - ' . $k);
@@ -103,12 +103,12 @@ class TabiCatOraTest extends TestCase {
 
         $data = $this->_setup_devices();
         $opinions = $this->_setup_opinions($data);
-        $TabiCatOra = new TabiCatOra;
+        $TabicatOra = new TabicatOra;
         $before = DB::select("SELECT id_ords, fault_type_id FROM devices_tabicat_ora");
         foreach ($before as $k => $v) {
             $this->assertEquals($v->fault_type_id, 0, 'update_tabicatora_devices: initial fault_type not 0: ' . $v->fault_type_id);
-        }        
-        $updated = $TabiCatOra->updateDevices();
+        }
+        $updated = $TabicatOra->updateDevices();
         $after = DB::select("SELECT id_ords, fault_type_id FROM devices_tabicat_ora");
         $this->assertEquals($updated, count($opinions['updates']), 'update_tabicatora_devices: wrong number of records updated: ' . $updated);
         foreach ($after as $k => $v) {
@@ -118,7 +118,7 @@ class TabiCatOraTest extends TestCase {
                 $this->assertEquals($v->fault_type_id, 0, 'update_tabicatora_devices: fault_type should still be 0: ' . $v->fault_type_id);
             }
         }
-        
+
     }
 
     protected function _setup_devices() {
@@ -144,7 +144,7 @@ class TabiCatOraTest extends TestCase {
                 'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '',
-                'repair_status' => 'Repairable',                
+                'repair_status' => 'Repairable',
                 'event_date' => '2018-10-20',
                 'problem' => 'Akku immer leer',
                 'translation' => 'Battery always empty',
@@ -157,7 +157,7 @@ class TabiCatOraTest extends TestCase {
                 'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '',
-                'repair_status' => 'Fixed',                
+                'repair_status' => 'Fixed',
                 'event_date' => '2018-10-20',
                 'problem' => 'Lädt nicht auf',
                 'translation' => 'does not charge',
@@ -169,7 +169,7 @@ class TabiCatOraTest extends TestCase {
                 'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '',
-                'repair_status' => 'Fixed',                
+                'repair_status' => 'Fixed',
                 'event_date' => '2019-02-23',
                 'problem' => 'defekt',
                 'translation' => 'malfunction',
@@ -182,7 +182,7 @@ class TabiCatOraTest extends TestCase {
                 'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '2017',
-                'repair_status' => 'Fixed',                
+                'repair_status' => 'Fixed',
                 'event_date' => '2018-08-03',
                 'problem' => 'instellingen onjuist ~ geen toegang tot dropbox',
                 'translation' => 'incorrect settings ~ access to dropbox',
@@ -195,7 +195,7 @@ class TabiCatOraTest extends TestCase {
                 'product_category' => 'Tablet',
                 'brand' => 'Nokia',
                 'year_of_manufacture' => '1990',
-                'repair_status' => 'Fixed',                
+                'repair_status' => 'Fixed',
                 'event_date' => '2018-08-04',
                 'problem' => 'Gaat niet aan na opladen',
                 'translation' => 'Does not turn on after charging',
@@ -208,7 +208,7 @@ class TabiCatOraTest extends TestCase {
                 'product_category' => 'Tablet',
                 'brand' => 'Apple',
                 'year_of_manufacture' => '2013',
-                'repair_status' => 'Repairable',                
+                'repair_status' => 'Repairable',
                 'event_date' => '2018-09-29',
                 'problem' => 'Netwerkstoornis',
                 'translation' => 'network Disorder',
@@ -220,7 +220,7 @@ class TabiCatOraTest extends TestCase {
                 'product_category' => 'Tablet',
                 'brand' => 'Sony',
                 'year_of_manufacture' => '2015',
-                'repair_status' => 'Repairable',                
+                'repair_status' => 'Repairable',
                 'event_date' => '2018-07-21',
                 'problem' => 'broken screen ~ poorly maintained',
                 'translation' => 'broken screen ~ poorly maintained',
@@ -284,7 +284,7 @@ class TabiCatOraTest extends TestCase {
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 2);
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 25);
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 26);
-        DB::update("INSERT INTO devices_faults_tablets_ora_adjudicated SET id_ords = '" . $data[3]['id'] . "', fault_type_id=2");        
+        DB::update("INSERT INTO devices_faults_tablets_ora_adjudicated SET id_ords = '" . $data[3]['id'] . "', fault_type_id=2");
         $updates[$data[3]['id']] = 2;
 
         // $devs[4] : 2 opinions with majority : recat
@@ -320,7 +320,7 @@ class TabiCatOraTest extends TestCase {
                     'opinions' => 'Other,Screen,Unknown',
                 ],
             ],
-        ];        
+        ];
 
         return [
             'status' => $status,

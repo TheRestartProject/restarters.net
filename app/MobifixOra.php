@@ -216,7 +216,7 @@ a.id_ords,
 ANY_VALUE(a.fault_type_id) AS winning_opinion_id,
 100 AS top_crowd_opinion_percentage,
 3 AS all_crowd_opinions_count
-FROM devices_faults_mobiles_ora_adjudicated a 
+FROM devices_faults_mobiles_ora_adjudicated a
 ) AS result
 ");
 
@@ -239,7 +239,7 @@ a.id_ords,
 a.fault_type_id AS winning_opinion_id,
 100 AS top_crowd_opinion_percentage,
 3 AS all_crowd_opinions_count
-FROM devices_faults_mobiles_ora_adjudicated a 
+FROM devices_faults_mobiles_ora_adjudicated a
 ) AS result
 LEFT JOIN fault_types_mobiles fta ON fta.id = result.winning_opinion_id
 GROUP BY winning_opinion_id
@@ -275,10 +275,10 @@ HAVING
      */
     public function updateDevices() {
 
-        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_mobiles_ora_temporary` AS (
-SELECT * 
-FROM 
-(SELECT 
+        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_mobiles_ora_temporary` AS
+SELECT *
+FROM
+(SELECT
 r2.id_ords,
 CASE
         WHEN (r2.opinions<2) OR (r2.opinions=2 AND r2.opinions_distinct=2) THEN NULL
@@ -286,13 +286,13 @@ CASE
         WHEN (r2.opinions_distinct=3) THEN ((SELECT a.fault_type_id FROM devices_faults_mobiles_ora_adjudicated a WHERE a.id_ords = r2.id_ords))
         ELSE (SELECT o.fault_type_id FROM devices_faults_mobiles_ora_opinions o WHERE o.id_ords = r2.id_ords GROUP BY fault_type_id ORDER BY COUNT(*) DESC LIMIT 1)
 END AS winning_opinion_id
-FROM 
-(SELECT 
-r1.id_ords, 
+FROM
+(SELECT
+r1.id_ords,
 COUNT(r1.fault_type_id) as opinions,
 COUNT(DISTINCT r1.fault_type_id) as opinions_distinct,
 GROUP_CONCAT(DISTINCT r1.fault_type_id) as faultnames
-FROM 
+FROM
 (SELECT
 o.id_ords,
 o.fault_type_id
@@ -302,7 +302,6 @@ GROUP BY r1.id_ords
 ) AS r2
 ) AS r3
 WHERE r3.winning_opinion_id IS NOT NULL
-)
 ");
         DB::statement("ALTER TABLE `devices_faults_mobiles_ora_temporary` ADD PRIMARY KEY(`id_ords`);");
 

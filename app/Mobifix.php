@@ -100,7 +100,7 @@ o.iddevices,
 ROUND((SELECT COUNT(o2.fault_type) as top_crowd_opinion_count FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.fault_type ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
 (SELECT COUNT(o2.fault_type) as all_votes FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
 COUNT(o.fault_type) AS all_crowd_opinions_count
-FROM devices_faults_mobiles_opinions o 
+FROM devices_faults_mobiles_opinions o
 GROUP BY o.iddevices
 HAVING
 (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
@@ -123,7 +123,7 @@ o.iddevices,
 ROUND((SELECT COUNT(o2.fault_type) as top_crowd_opinion_count FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.fault_type ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
 (SELECT COUNT(o2.fault_type) as all_votes FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
 COUNT(o.fault_type) AS all_crowd_opinions_count
-FROM devices_faults_mobiles_opinions o 
+FROM devices_faults_mobiles_opinions o
 GROUP BY o.iddevices
 HAVING
 (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
@@ -170,14 +170,14 @@ HAVING
      */
     public function updateDevices() {
 
-        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_mobiles_temporary` AS (
+        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_mobiles_temporary` AS
 SELECT
 o.iddevices,
 (SELECT o1.fault_type FROM devices_faults_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.fault_type ORDER BY COUNT(o1.fault_type) DESC LIMIT 1) AS winning_opinion,
 ROUND((SELECT COUNT(o2.fault_type) as top_crowd_opinion_count FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.fault_type ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
 (SELECT COUNT(o2.fault_type) as all_votes FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
 COUNT(o.fault_type) AS all_crowd_opinions_count
-FROM devices_faults_mobiles_opinions o 
+FROM devices_faults_mobiles_opinions o
 GROUP BY o.iddevices
 HAVING
 (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
@@ -188,18 +188,17 @@ a.fault_type AS winning_opinion,
 'adj' AS top_crowd_opinion_percentage,
 'adj' AS all_crowd_opinions_count
 FROM devices_faults_mobiles_adjudicated a
-)
 ");
         DB::statement("ALTER TABLE `devices_faults_mobiles_temporary` ADD PRIMARY KEY(`iddevices`);");
 
-        $result = DB::update("UPDATE devices d, devices_faults_mobiles_temporary t
+        $result = DB::update("UPDATE devices d, `devices_faults_mobiles_temporary` t
 SET d.fault_type = t.winning_opinion
 WHERE d.iddevices = t.iddevices;");
 
         DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_faults_mobiles_temporary`");
 
         return $result;
-    }    
+    }
 
     /**
      * Write "Unknown" to `devices`.`fault_type` for records with empty problem.
