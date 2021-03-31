@@ -33,7 +33,7 @@ return [
     'cta' => [
         'tabicat' => [
             'title' => 'Help Now!  TabiCat',
-            'description' => '<p>We see lots of tablets at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with smartphones with TabiCat!</p>  <p>The repair data in TabiCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+            'description' => '<p>We see lots of tablets at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with tablets with TabiCat!</p>  <p>The repair data in TabiCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
             'get_involved' => 'Get involved',
         ],
         'mobifixora' => [
