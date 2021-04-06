@@ -2,17 +2,17 @@
 
 @section('extra-css')
 
-@include('tabicatora/shared-css')
+@include('printcatora/shared-css')
 
 @endsection
 
 @section('extra-meta')
-<meta name="description" content="Help analyse faults in tablets brought to events such as Repair Cafés and Restart Parties, and contribute to the current push for Right to Repair!">
-    <meta name="keywords" content="TabiCat, TabiCat, tablets, iPad, Kindle, Samsung, Amazon Fire, e-reader, satnav, TomTom, community events, Restart Parties, Repair Cafés, repair data, Right to Repair, Open Repair Alliance, The Restart Project, Open Repair Data">
-<meta property="og:title" content="TabiCat">
-<meta property="og:description" content="Help analyse faults in tablets and e-readers brought to events such as Repair Cafés and Restart Parties, and contribute to the current push for Right to Repair!">
-<meta property="og:image" content="{{ asset('/images/tabicatora/og-tabicat-toolbox.png') }}">
-<meta property="og:url" content="https://restarters.net/tabicat/">
+<meta name="description" content="Help analyse faults in printers brought to events such as Repair Cafés and Restart Parties, and contribute to the current push for Right to Repair!">
+<meta name="keywords" content="PrintCat, printers, scanners, laserjet, inkjet, community events, Restart Parties, Repair Cafés, repair data, Right to Repair, Open Repair Alliance, The Restart Project, Open Repair Data">
+<meta property="og:title" content="PrintCat">
+<meta property="og:description" content="Help analyse faults in printers  brought to events such as Repair Cafés and Restart Parties, and contribute to the current push for Right to Repair!">
+<meta property="og:image" content="{{ asset('/images/printcatora/og-printcat-toolbox.png') }}">
+<meta property="og:url" content="https://restarters.net/printcat/">
 @endsection
 
 @section('title')
@@ -21,7 +21,7 @@
 
 @section('content')
 
-<section class="tabicat">
+<section class="printcat">
     <div class="container mt-1 mt-sm-4">
         <div class="row row-compressed">
             <div class="col-6">
@@ -43,12 +43,12 @@
                 <a id="btn-info-open"
                    class="btn btn-info btn-sm btn-rounded p-2">
                     <svg style="width:24px;height:24px;" viewBox="0 0 24 24">
-                        <title>About TabiCat</title>
+                        <title>About PrintCat</title>
                         <path fill="#fff" d="M13.5,4A1.5,1.5 0 0,0 12,5.5A1.5,1.5 0 0,0 13.5,7A1.5,1.5 0 0,0 15,5.5A1.5,1.5 0 0,0 13.5,4M13.14,8.77C11.95,8.87 8.7,11.46 8.7,11.46C8.5,11.61 8.56,11.6 8.72,11.88C8.88,12.15 8.86,12.17 9.05,12.04C9.25,11.91 9.58,11.7 10.13,11.36C12.25,10 10.47,13.14 9.56,18.43C9.2,21.05 11.56,19.7 12.17,19.3C12.77,18.91 14.38,17.8 14.54,17.69C14.76,17.54 14.6,17.42 14.43,17.17C14.31,17 14.19,17.12 14.19,17.12C13.54,17.55 12.35,18.45 12.19,17.88C12,17.31 13.22,13.4 13.89,10.71C14,10.07 14.3,8.67 13.14,8.77Z"></path>
                     </svg>
                 </a>
                 <a href="#">
-                    <img id="tabicat" src="{{ asset('/images/tabicatora/099-smiling-cat-face-with-heart-eyes-64px.svg.png') }}" alt="Go to TabiCat" width="48" height="48" />
+                    <img id="printcat" src="{{ asset('/images/printcatora/099-smiling-cat-face-with-heart-eyes-64px.svg.png') }}" alt="Go to Cat" width="48" height="48" />
                 </a>
             </div>
         </div>

@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
 use App;
-use App\TabicatOra;
+use App\PrintcatOra;
 use App\Helpers\Microtask;
 
-class TabicatOraController extends Controller {
+class PrintcatOraController extends Controller {
 
     protected $Model;
 
@@ -27,10 +27,10 @@ class TabicatOraController extends Controller {
         } else {
             $user = Microtask::getAnonUserCta($request);
             if ($user->action) {
-                return redirect()->action('TabicatOraController@cta', ['partner' => $partner]);
+                return redirect()->action('PrintcatOraController@cta', ['partner' => $partner]);
             }
         }
-        $this->Model = new TabicatOra;
+        $this->Model = new PrintcatOra;
         if ($request->has('id-ords')) {
             if (!(is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
                 return redirect()->back()->withErrors(['Oops, there was an error, please try again, sorry! If this error persists please contact The Restart Project.']);
@@ -42,16 +42,16 @@ class TabicatOraController extends Controller {
                 'ip_address' => $_SERVER['REMOTE_ADDR'],
                 'session_id' => session()->getId(),
             ];
-            $this->Model = new TabicatOra;
+            $this->Model = new PrintcatOra;
             $success = $this->Model->create($insert);
             if (!$success) {
-                logger('TabiCat error on insert.');
+                logger('PrintCat error on insert.');
                 logger(print_r($insert, 1));
             }
         }
         $fault = $this->_fetchRecord($request);
         if (!$fault) {
-            return redirect()->action('TabicatOraController@status')->withSuccess('done');
+            return redirect()->action('PrintcatOraController@status')->withSuccess('done');
         }
         $fault->translate = rawurlencode($fault->problem);
         $fault_types = $this->Model->fetchFaultTypes();
@@ -64,8 +64,8 @@ class TabicatOraController extends Controller {
         }
         // send non-suggested fault_types to view
         $fault->faulttypes = array_diff_key($fault_types, $fault->suggestions);
-        return view('tabicatora.index', [
-            'title' => 'TabiCat',
+        return view('printcatora.index', [
+            'title' => 'PrintCat',
             'fault' => $fault,
             'user' => $user,
             'partner' => $partner,
@@ -98,11 +98,11 @@ class TabicatOraController extends Controller {
             $user = Microtask::getAnonUserCta($request);
         }
         $partner = $request->input('partner', NULL);
-        $this->Model = new TabicatOra;
+        $this->Model = new PrintcatOra;
         $data = $this->Model->fetchStatus($partner);
         $complete = $data['total_opinions_2'][0]->total + $data['total_opinions_1'][0]->total + $data['total_opinions_0'][0]->total == 0;
-        return view('tabicatora.status', [
-            'title' => 'TabiCat',
+        return view('printcatora.status', [
+            'title' => 'PrintCat',
             'status' => $data,
             'user' => $user,
             'complete' => $complete,
@@ -122,12 +122,12 @@ class TabicatOraController extends Controller {
 //        $request->session()->flush();
         $result = FALSE;
         $partner = $request->input('partner', NULL);
-        $exclusions = $request->session()->get('tabicatora.exclusions', []);
-        $this->Model = new TabicatOra;
+        $exclusions = $request->session()->get('printcatora.exclusions', []);
+        $this->Model = new PrintcatOra;
         $fault = $this->Model->fetchFault($exclusions, $partner);
         if ($fault) {
             $result = $fault[0];
-            $request->session()->push('tabicatora.exclusions', $result->id_ords);
+            $request->session()->push('printcatora.exclusions', $result->id_ords);
         }
         return $result;
     }
