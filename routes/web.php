@@ -120,6 +120,19 @@ Route::prefix('tabicat')->group(function () {
     Route::get('/status', 'TabicatOraController@status');
 });
 
+Route::prefix('PrintCat')->group(function () {
+    Route::get('/', 'PrintcatOraController@index');
+    Route::post('/', 'PrintcatOraController@index');
+    Route::get('/cta', 'PrintcatOraController@cta');
+    Route::get('/status', 'PrintcatOraController@status');
+});
+Route::prefix('printcat')->group(function () {
+    Route::get('/', 'PrintcatOraController@index');
+    Route::post('/', 'PrintcatOraController@index');
+    Route::get('/cta', 'PrintcatOraController@cta');
+    Route::get('/status', 'PrintcatOraController@status');
+});
+
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/', 'HomeController@index')->name('home');
 
