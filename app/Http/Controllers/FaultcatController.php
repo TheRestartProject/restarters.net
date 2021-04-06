@@ -131,7 +131,6 @@ class FaultcatController extends Controller {
 
         $Faultcat = new Faultcat;
         $data = $Faultcat->fetchStatus();
-        logger(print_r($data, 1));
         return view('faultcat.status', [
             'status' => $data,
             'user' => $user,
