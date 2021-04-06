@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Device;
+use App\Group;
 use App\Category;
 use App\Misccat;
 use DB;
@@ -13,14 +14,14 @@ use Illuminate\Support\Facades\Log;
 
 class MisccatTest extends TestCase {
 
-    use RefreshDatabase;
-
     public function setUp() {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
+        Group::truncate();
         Device::truncate();
         Category::truncate();
         Misccat::truncate();
+        DB::table('devices_misc_adjudicated')->truncate();
     }
 
     /** @test */
@@ -137,11 +138,13 @@ class MisccatTest extends TestCase {
             'problem' => 'category should be Cat1',
             'category' => 111,
             'category_creation' => 46,
+            'repair_status' => 1,
         ]);
         $this->assertDatabaseHas('devices', [
             'problem' => 'category should be Cat2',
             'category' => 222,
             'category_creation' => 46,
+            'repair_status' => 1,
         ]);
     }
 
@@ -181,6 +184,7 @@ class MisccatTest extends TestCase {
                     'iddevices' => ++$iddevices,
                     'category' => 25,
                     'category_creation' => 25,
+                    'repair_status' => 1,
                 ],
             ],
             'devices_misc_opinions' => [],
@@ -196,6 +200,7 @@ class MisccatTest extends TestCase {
                     'iddevices' => ++$iddevices,
                     'category' => 25,
                     'category_creation' => 46,
+                    'repair_status' => 1,
                 ]
             ],
             'devices_misc_opinions' => [
@@ -219,6 +224,7 @@ class MisccatTest extends TestCase {
                     'iddevices' => ++$iddevices,
                     'category' => 46,
                     'category_creation' => 46,
+                    'repair_status' => 1,
                 ],
             ],
             'devices_misc_opinions' => [],
@@ -233,6 +239,7 @@ class MisccatTest extends TestCase {
                     'iddevices' => ++$iddevices,
                     'category' => 46,
                     'category_creation' => 46,
+                    'repair_status' => 1,
                 ],
             ],
             'devices_misc_opinions' => [
@@ -252,6 +259,7 @@ class MisccatTest extends TestCase {
                     'iddevices' => ++$iddevices,
                     'category' => 46,
                     'category_creation' => 46,
+                    'repair_status' => 1,
                 ],
             ],
             'devices_misc_opinions' => [
@@ -275,6 +283,7 @@ class MisccatTest extends TestCase {
                     'iddevices' => ++$iddevices,
                     'category' => 46,
                     'category_creation' => 46,
+                    'repair_status' => 1,
                 ],
             ],
             'devices_misc_opinions' => [
@@ -307,6 +316,7 @@ class MisccatTest extends TestCase {
             'iddevices' => ++$iddevices,
             'category' => 46,
             'category_creation' => 46,
+            'repair_status' => 1,
         ];
         $result['4']['devices_misc_opinions'][] = [
             'iddevices' => $iddevices,
@@ -325,6 +335,7 @@ class MisccatTest extends TestCase {
             'iddevices' => ++$iddevices,
             'category' => 46,
             'category_creation' => 46,
+            'repair_status' => 1,
         ];
         $result['4']['devices_misc_opinions'][] = [
             'iddevices' => $iddevices,
@@ -343,6 +354,7 @@ class MisccatTest extends TestCase {
             'iddevices' => ++$iddevices,
             'category' => 46,
             'category_creation' => 46,
+            'repair_status' => 1,
         ];
         $result['4']['devices_misc_opinions'][] = [
             'iddevices' => $iddevices,
@@ -374,6 +386,7 @@ class MisccatTest extends TestCase {
             'iddevices' => ++$iddevices,
             'category' => 46,
             'category_creation' => 46,
+            'repair_status' => 1,
             'problem' => 'category should be Cat1',
         ];
         $result['5']['devices_misc_opinions'][] = [
@@ -393,6 +406,7 @@ class MisccatTest extends TestCase {
             'iddevices' => ++$iddevices,
             'category' => 46,
             'category_creation' => 46,
+            'repair_status' => 1,
             'problem' => 'category should be Cat2',
         ];
         $result['5']['devices_misc_opinions'][] = [
