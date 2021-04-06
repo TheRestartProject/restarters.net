@@ -16,7 +16,8 @@ return [
     ],
 
     'microtasking' => [
-        'discussion_tag' => env('MICROTASKING_DISCUSSION_TAG', 'open-data-dive')
+        'discussion_tag' => env('MICROTASKING_DISCUSSION_TAG', 'workbench'),
+        'active_quest' => env('MICROTASKING_ACTIVE_QUEST', 'mobifixora'),
     ],
 
     'xref_types' => [
