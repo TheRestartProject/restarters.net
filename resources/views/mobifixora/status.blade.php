@@ -123,19 +123,19 @@
                         @foreach($status['list_splits'] as $row)
                         <div class="row border-grey">
                             <div class="col col-1">
-                                @php( print($row->id_ords) )
+                                {{ $row->id_ords ?? "" }}
                             </div>
                             <div class="col col-3">
-                                @php( print($row->opinions) )
+                                {{ $row->opinions ?? "" }}
                             </div>
                             <div class="col col-2">
-                                @php( print($row->brand) )
+                                {{ $row->brand ?? "" }}
                             </div>
                             <div class="col col-2">
-                                @php( print($row->model) )
+                                {{ $row->model ?? "" }}
                             </div>
                             <div class="col">
-                                @php( print($row->problem) )
+                                {{ $row->problem ?? "" }}
                             </div>
                         </div>
                         @endforeach
