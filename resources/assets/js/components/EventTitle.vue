@@ -1,9 +1,7 @@
 <template>
   <component :is="component">
-    {{ event.venue ? event.venue : event.location }}
-    <b-badge v-if="event.online" variant="primary" pill>
-      {{ translatedOnline }}
-    </b-badge>
+    <!-- eslint-disable-next-line -->
+    {{ event.venue ? event.venue : event.location }}<b-badge v-if="event.online || true" variant="primary" pill class="nounderline">{{ translatedOnline }}</b-badge>
   </component>
 </template>
 <script>
@@ -28,3 +26,8 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+.nounderline {
+  text-decoration: none !important;
+}
+</style>
