@@ -147,6 +147,9 @@ export default {
     translatedOtherEvents() {
       return this.$lang.get('events.other_events')
     },
+    translatedAddEvent() {
+      return this.$lang.get('dashboard.add_event')
+    },
     translatedAddEventMobile() {
       return this.$lang.get('events.add_new_event_mobile')
     },
