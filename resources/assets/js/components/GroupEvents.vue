@@ -13,9 +13,9 @@
       </template>
       <template slot="title-right">
         <b-btn variant="primary" href="/party/create" class="align-self-center text-nowrap" v-if="addButton">
-            <span class="d-none d-md-block">
-              {{ translatedAddEvent }}
-            </span>
+          <span class="d-none d-md-block">
+            {{ translatedAddEvent }}
+          </span>
         </b-btn>
       </template>
       <template slot="content">
@@ -148,10 +148,7 @@ export default {
       return this.$lang.get('events.other_events')
     },
     translatedAddEvent() {
-      return this.$lang.get('dashboard.add_event')
-    },
-    translatedAddEventMobile() {
-      return this.$lang.get('events.add_new_event_mobile')
+      return this.$lang.get('events.add_new_event')
     },
     translatedSeeAll() {
       return this.$lang.get('events.event_all')
