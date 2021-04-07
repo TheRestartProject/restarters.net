@@ -5,24 +5,26 @@ namespace Tests\Feature;
 use App\PrintcatOra;
 use DB;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
-class PrintcatOraTest extends TestCase {
+class PrintcatOraTest extends TestCase
+{
 
-    public function setUp() {
+    public function setUp()
+    {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
         PrintcatOra::truncate();
         DB::table('devices_printcat_ora')->truncate();
         DB::table('devices_faults_printers_ora_adjudicated')->truncate();
+        DB::table('fault_types_printers')->truncate();
     }
 
     /** @test */
-    public function fetch_printcatora_record() {
+    public function fetch_printcatora_record()
+    {
 
+        $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $PrintcatOra = new PrintcatOra;
 
@@ -34,7 +36,7 @@ class PrintcatOraTest extends TestCase {
         // leave only 1 record
         $exclude = [];
         foreach ($data as $v) {
-            $exclude[] = $v['id'];
+            $exclude[] = $v['id_ords'];
         }
         $include = array_pop($exclude);
         $result = $PrintcatOra->fetchFault($exclude);
@@ -47,7 +49,7 @@ class PrintcatOraTest extends TestCase {
         $exclude = [];
         foreach ($data as $k => $v) {
             if ($v['data_provider'] == 'anstiftung') {
-                $exclude[] = $v['id'];
+                $exclude[] = $v['id_ords'];
             }
         }
         $result = $PrintcatOra->fetchFault($exclude, 'anstiftung');
@@ -55,8 +57,10 @@ class PrintcatOraTest extends TestCase {
     }
 
     /** @test */
-    public function fetch_printcatora_page() {
+    public function fetch_printcatora_page()
+    {
 
+        $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $this->withSession([]);
         $this->_bypass_cta();
@@ -77,8 +81,10 @@ class PrintcatOraTest extends TestCase {
     }
 
     /** @test */
-    public function fetch_printcatora_status() {
+    public function fetch_printcatora_status()
+    {
 
+        $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $opinions = $this->_setup_opinions($data);
         $PrintcatOra = new PrintcatOra;
@@ -99,8 +105,10 @@ class PrintcatOraTest extends TestCase {
     }
 
     /** @test */
-    public function update_printcatora_devices() {
+    public function update_printcatora_devices()
+    {
 
+        $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $opinions = $this->_setup_opinions($data);
         $PrintcatOra = new PrintcatOra;
@@ -118,119 +126,138 @@ class PrintcatOraTest extends TestCase {
                 $this->assertEquals($v->fault_type_id, 0, 'update_printcatora_devices: fault_type should still be 0: ' . $v->fault_type_id);
             }
         }
-
     }
 
-    protected function _setup_devices() {
-
+    protected function _setup_devices()
+    {
         $data = [
             [
-                'id' => 'anstiftung_1647',
-                'data_provider' => 'anstiftung',
-                'country' => 'DEU',
-                'product_category' => 'Tablet',
-                'brand' => '',
-                'year_of_manufacture' => '',
-                'repair_status' => 'Repairable',
-                'event_date' => '2018-10-20',
-                'problem' => 'startet nicht',
-                'translation' => 'does not start',
-                'language' => 'de',
-            ],
-            [
-                'id' => 'anstiftung_1657',
-                'data_provider' => 'anstiftung',
-                'country' => 'DEU',
-                'product_category' => 'Tablet',
-                'brand' => '',
-                'year_of_manufacture' => '',
-                'repair_status' => 'Repairable',
-                'event_date' => '2018-10-20',
-                'problem' => 'Akku immer leer',
-                'translation' => 'Battery always empty',
-                'language' => 'de',
-            ],
-            [
-                'id' => 'anstiftung_1673',
-                'data_provider' => 'anstiftung',
-                'country' => 'DEU',
-                'product_category' => 'Tablet',
-                'brand' => '',
-                'year_of_manufacture' => '',
-                'repair_status' => 'Fixed',
-                'event_date' => '2018-10-20',
-                'problem' => 'Lädt nicht auf',
-                'translation' => 'does not charge',
-                'language' => 'de',
-            ],
-            ['id' => 'anstiftung_2577',
-                'data_provider' => 'anstiftung',
-                'country' => 'DEU',
-                'product_category' => 'Tablet',
-                'brand' => '',
-                'year_of_manufacture' => '',
-                'repair_status' => 'Fixed',
-                'event_date' => '2019-02-23',
-                'problem' => 'defekt',
-                'translation' => 'malfunction',
-                'language' => 'de'
-            ],
-            [
-                'id' => 'repaircafe_8389',
-                'data_provider' => 'repaircafe',
-                'country' => 'NLD',
-                'product_category' => 'Tablet',
-                'brand' => '',
-                'year_of_manufacture' => '2017',
-                'repair_status' => 'Fixed',
-                'event_date' => '2018-08-03',
-                'problem' => 'instellingen onjuist ~ geen toegang tot dropbox',
-                'translation' => 'incorrect settings ~ access to dropbox',
-                'language' => 'nl',
-            ],
-            [
-                'id' => 'repaircafe_8454',
-                'data_provider' => 'repaircafe',
-                'country' => 'NLD',
-                'product_category' => 'Tablet',
-                'brand' => 'Nokia',
-                'year_of_manufacture' => '1990',
-                'repair_status' => 'Fixed',
-                'event_date' => '2018-08-04',
-                'problem' => 'Gaat niet aan na opladen',
-                'translation' => 'Does not turn on after charging',
-                'language' => 'nl',
-            ],
-            [
-                'id' => 'repaircafe_9462',
-                'data_provider' => 'repaircafe',
-                'country' => 'NLD',
-                'product_category' => 'Tablet',
-                'brand' => 'Apple',
-                'year_of_manufacture' => '2013',
-                'repair_status' => 'Repairable',
-                'event_date' => '2018-09-29',
-                'problem' => 'Netwerkstoornis',
-                'translation' => 'network Disorder',
-                'language' => 'nl',
-            ],
-            ['id' => 'repaircafe_8243',
-                'data_provider' => 'repaircafe',
+                'id_ords' => 'restart_2394',
+                'data_provider' => 'The Restart Project',
                 'country' => 'GBR',
-                'product_category' => 'Tablet',
-                'brand' => 'Sony',
-                'year_of_manufacture' => '2015',
+                'partner_product_category' => 'Printer/scanner',
+                'product_category' => 'Printer/scanner',
+                'brand' => 'Lexmark',
+                'year_of_manufacture' => '????',
                 'repair_status' => 'Repairable',
-                'event_date' => '2018-07-21',
-                'problem' => 'broken screen ~ poorly maintained',
-                'translation' => 'broken screen ~ poorly maintained',
-                'language' => 'en'],
+                'event_date' => '2016-03-12',
+                'problem' => 'Printer - Not connecting, needs testing',
+                'translation' => 'Printer - Not connecting, needs testing',
+                'language' => 'en',
+                'fault_type_id' => '0',
+            ],
+            [
+                'id_ords' => 'rcwales_310',
+                'data_provider' => 'Repair Cafe Wales',
+                'country' => 'GBR',
+                'partner_product_category' => 'IT/Phone ~ Printer',
+                'product_category' => 'Printer/scanner',
+                'brand' => 'Unknown',
+                 'year_of_manufacture' => '????',
+                'repair_status' => 'End of life',
+                'event_date' => '2018-03-01',
+                'problem' => 'Printer Doesnt work- major mechanical fault',
+                'translation' => 'Printer Doesnt work- major mechanical fault',
+                'language' => 'en',
+                'fault_type_id' => '0',
+            ],
+            [
+                'id_ords' => 'rcint_24791',
+                'data_provider' => 'Repair Café International',
+                'country' => 'NLD', 'partner_product_category' =>
+                'Computers/phones ~ Printer', 'product_category' =>
+                'Printer/scanner',
+                'brand' => 'Brother',
+                'year_of_manufacture' => '????',
+                'repair_status' => 'End of life',
+                'event_date' => '2019-11-09',
+                'problem' => 'Print niet meer, ondanks nieuwe cartridges.',
+                'translation' => 'Print no more, despite new cartridges.',
+                'language' => 'nl',
+                'fault_type_id' => '0',
+            ],
+            [
+                'id_ords' => 'anstiftung_819',
+                'data_provider' => 'anstiftung',
+                'country' => 'DEU',
+                'partner_product_category' => 'Elektro Sonstiges ~ Faxgerät',
+                'product_category' => 'Printer/scanner',
+                'brand' => 'Unknown',
+                'year_of_manufacture' => '????',
+                'repair_status' => 'Unknown', 
+                'event_date' => '2019-01-19',
+                'problem' => 'Ankommede Rufe funktionieren nicht',
+                'translation' => 'Ankommede calls do not work',
+                'language' => 'de',
+                'fault_type_id' => '0',
+            ],
+            [
+                'id_ords' => 'anstiftung_2077',
+                'data_provider' => 'anstiftung',
+                'country' => 'DEU',
+                'partner_product_category' => 'Computer ~ Drucker',
+                'product_category' => 'Printer/scanner',
+                'brand' => 'Canon',
+                'year_of_manufacture' => '????',
+                'repair_status' => 'Unknown', 
+                'event_date' => '2018-10-23',
+                'problem' => 'Zieht Papier nicht ein. Fehler der Ansteuerung nicht gefunden',
+                'translation' => 'Does not feed paper. Not Found error of control',
+                'language' => 'de',
+                'fault_type_id' => '0',
+            ],
+            [
+                'id_ords' => 'rcint_26214',
+                'data_provider' => 'Repair Café International',
+                'country' => 'NLD',
+                'partner_product_category' => 'Computers/phones ~ Printer',
+                'product_category' => 'Printer/scanner',
+                'brand' => 'HP',
+                'year_of_manufacture' => '2005',
+                'repair_status' => 'Repairable',
+                'event_date' => '2019-12-07',
+                'problem' => 'kliedert, en neemt meer bladen tegelijk',
+                'translation' => 'feeds more sheets at once',
+                'language' => 'nl', 'fault_type_id' => '0',
+            ],
+            [
+                'id_ords' => 'fixitclinic_118',
+                'data_provider' => 'Fixit Clinic',
+                'country' => 'USA',
+                'partner_product_category' => 'printer',
+                'product_category' => 'Printer/scanner',
+                'brand' => 'HP',
+                'year_of_manufacture' => '2010',
+                'repair_status' => 'Repairable',
+                'event_date' => '2018-04-26',
+                'problem' => 'printer ~ paper jam error with no paper jammed. ',
+                'translation' => 'printer ~ paper jam error with no paper jammed. ',
+                'language' => 'en',
+                'fault_type_id' => '0',
+            ],
+            [
+                'id_ords' => 'rcwales_299',
+                'data_provider' => 'Repair Cafe Wales',
+                'country' => 'GBR',
+                'partner_product_category' => 'IT/Phone ~ Printer',
+                'product_category' => 'Printer/scanner',
+                'brand' => 'Unknown',
+                'year_of_manufacture' => '????',
+                'repair_status' => 'Fixed',
+                'event_date' => '2017-12-01',
+                'problem' => 'Printer Thinks it doesn\'t have any ink in it- doesn\'t print',
+                'translation' => 'Printer Thinks it doesn\'t have any ink in it- doesn\'t print',
+                'language' => 'en',
+                'fault_type_id' => '0',
+            ],
         ];
+
         foreach ($data as $k => $v) {
             DB::table('devices_printcat_ora')->insert([
-                'id_ords' => $v['id'],
+                'id_ords' => $v['id_ords'],
                 'data_provider' => $v['data_provider'],
                 'country' => $v['country'],
+                'partner_product_category' => $v['partner_product_category'],
                 'product_category' => $v['product_category'],
                 'brand' => $v['brand'],
                 'year_of_manufacture' => $v['year_of_manufacture'],
@@ -239,10 +266,10 @@ class PrintcatOraTest extends TestCase {
                 'problem' => $v['problem'],
                 'translation' => $v['translation'],
                 'language' => $v['language'],
-                'fault_type_id' => 0,
+                'fault_type_id' => $v['fault_type_id'],
             ]);
             $this->assertDatabaseHas('devices_printcat_ora', [
-                'id_ords' => $v['id'],
+                'id_ords' => $v['id_ords'],
             ]);
         }
         return $data;
@@ -257,47 +284,48 @@ class PrintcatOraTest extends TestCase {
      *
      * @return array
      */
-    protected function _setup_opinions($data) {
+    protected function _setup_opinions($data)
+    {
 
         $opinions = [];
 
         $updates = [];
 
         // $data[0] : 3 opinions with consensus : recat
-        $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
-        $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
-        $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
-        $updates[$data[0]['id']] = 2;
+        $opinions[$data[0]['id_ords']][] = $this->_insert_opinion($data[0]['id_ords'], 2);
+        $opinions[$data[0]['id_ords']][] = $this->_insert_opinion($data[0]['id_ords'], 2);
+        $opinions[$data[0]['id_ords']][] = $this->_insert_opinion($data[0]['id_ords'], 2);
+        $updates[$data[0]['id_ords']] = 2;
 
         // $data[1] : 3 opinions with majority : recat
-        $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 2);
-        $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 2);
-        $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 25);
-        $updates[$data[1]['id']] = 2;
+        $opinions[$data[1]['id_ords']][] = $this->_insert_opinion($data[1]['id_ords'], 2);
+        $opinions[$data[1]['id_ords']][] = $this->_insert_opinion($data[1]['id_ords'], 2);
+        $opinions[$data[1]['id_ords']][] = $this->_insert_opinion($data[1]['id_ords'], 25);
+        $updates[$data[1]['id_ords']] = 2;
 
         // $data[2] : 3 opinions split
-        $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 2);
-        $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 25);
-        $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 26);
+        $opinions[$data[2]['id_ords']][] = $this->_insert_opinion($data[2]['id_ords'], 2);
+        $opinions[$data[2]['id_ords']][] = $this->_insert_opinion($data[2]['id_ords'], 25);
+        $opinions[$data[2]['id_ords']][] = $this->_insert_opinion($data[2]['id_ords'], 26);
 
         // $data[3] : 3 opinions adjudicated : recat
-        $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 2);
-        $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 25);
-        $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 26);
-        DB::update("INSERT INTO devices_faults_printers_ora_adjudicated SET id_ords = '" . $data[3]['id'] . "', fault_type_id=2");
-        $updates[$data[3]['id']] = 2;
+        $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 2);
+        $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 25);
+        $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 26);
+        DB::update("INSERT INTO devices_faults_printers_ora_adjudicated SET id_ords = '" . $data[3]['id_ords'] . "', fault_type_id=2");
+        $updates[$data[3]['id_ords']] = 2;
 
         // $devs[4] : 2 opinions with majority : recat
-        $opinions[$data[4]['id']][] = $this->_insert_opinion($data[4]['id'], 2);
-        $opinions[$data[4]['id']][] = $this->_insert_opinion($data[4]['id'], 2);
-        $updates[$data[4]['id']] = 2;
+        $opinions[$data[4]['id_ords']][] = $this->_insert_opinion($data[4]['id_ords'], 2);
+        $opinions[$data[4]['id_ords']][] = $this->_insert_opinion($data[4]['id_ords'], 2);
+        $updates[$data[4]['id_ords']] = 2;
 
         // $devs[5] : 2 opinions split
-        $opinions[$data[5]['id']][] = $this->_insert_opinion($data[5]['id'], 2);
-        $opinions[$data[5]['id']][] = $this->_insert_opinion($data[5]['id'], 25);
+        $opinions[$data[5]['id_ords']][] = $this->_insert_opinion($data[5]['id_ords'], 2);
+        $opinions[$data[5]['id_ords']][] = $this->_insert_opinion($data[5]['id_ords'], 25);
 
         // $devs[6] : 1 opinion
-        $opinions[$data[6]['id']][] = $this->_insert_opinion($data[6]['id'], 26);
+        $opinions[$data[6]['id_ords']][] = $this->_insert_opinion($data[6]['id_ords'], 26);
 
         $status = [
             'total_devices' => 8,
@@ -308,16 +336,16 @@ class PrintcatOraTest extends TestCase {
             'total_recats' => 4,
             'list_recats' => [
                 0 => [
-                    'winning_opinion' => 'Screen',
+                    'winning_opinion' => 'Display panel',
                     'total' => 4,
                 ],
             ],
             'total_splits' => 1,
             'list_splits' => [
                 0 => [
-                    'id_ords' => $data[2]['id'],
+                    'id_ords' => $data[2]['id_ords'],
                     'all_crowd_opinions_count' => 3,
-                    'opinions' => 'Other,Screen,Unknown',
+                    'opinions' => 'Display panel,Other,Unknown',
                 ],
             ],
         ];
@@ -329,7 +357,8 @@ class PrintcatOraTest extends TestCase {
         ];
     }
 
-    protected function _insert_opinion($id_ords, $fault_type_id) {
+    protected function _insert_opinion($id_ords, $fault_type_id)
+    {
         $insert = [
             'id_ords' => $id_ords,
             'fault_type_id' => $fault_type_id,
@@ -341,10 +370,53 @@ class PrintcatOraTest extends TestCase {
         return $insert;
     }
 
-    protected function _bypass_cta() {
+    protected function _bypass_cta()
+    {
         $this->app['session']->put('microtask.cta', 1);
         $this->app['session']->put('microtask.clicks', 5);
         $this->app['session']->put('microtask.sesh', \Carbon\Carbon::now()->timestamp);
     }
 
+    protected function _setup_fault_types()
+    {
+
+        $fault_types = [
+            1 => [
+                'id' => 1,
+                'title' => 'Power/battery',
+                'description' => '',
+                'regex' => 'batter|power|start',
+            ],
+            2 => [
+                'id' => 2,
+                'title' => 'Display panel',
+                'description' => 'LCD/LED screen problem',
+                'regex' => 'screen|display',
+            ],
+            3 => [
+                'id' => 3,
+                'title' => 'Stuck booting',
+                'description' => 'Powers on but OS does not load/errors',
+                'regex' => 'start|boot',
+            ],
+            25 => [
+                'id' => 25,
+                'title' => 'Unknown',
+                'description' => 'Not enough info to determine the main fault',
+                'regex' => '',
+            ],
+            26 => [
+                'id' => 26,
+                'title' => 'Other',
+                'description' => 'Main fault is known but there is no option for it',
+                'regex' => '',
+            ],
+        ];
+
+        foreach ($fault_types as $row) {
+            DB::table('fault_types_printers')->insert($row);
+            $this->assertDatabaseHas('fault_types_printers', ['id' => $row['id']]);
+        };
+        return $fault_types;
+    }
 }
