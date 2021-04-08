@@ -178,6 +178,10 @@ class ExportController extends Controller
             $PartyArray = array();
             $need_attention = 0;
 
+            $participants = 0;
+            $hours_volunteered = 0;
+            $totalCO2 = 0;
+
             foreach ($PartyList as $i => $party) {
                 if ($party->device_count == 0) {
                     $need_attention++;
