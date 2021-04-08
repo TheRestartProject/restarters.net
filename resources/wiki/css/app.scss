@@ -244,3 +244,20 @@ body {
     padding-bottom: 30px;
   }
 }
+
+.mw-babel-wrapper {
+  float: unset !important;
+  clear: unset !important;
+}
+
+.ext-translate-container .row .row {
+  width: inherit;
+}
+
+.uls-lcd-region-section .row .three {
+  width: inherit !important;
+}
+
+.uls-menu {
+  z-index: 10000 !important;
+}
