@@ -5,8 +5,8 @@
         {{ translatedImages }}
       </label>
       <div class="d-flex flex-wrap device-photos dropzone-previews">
-        <FileUploader :url="'/device/image-upload/' + device.iddevices" v-if="edit" previews-container=".device-photos" @uploaded="uploaded($event)" />
-        <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)" />
+        <FileUploader :url="'/device/image-upload/' + device.iddevices" v-if="edit && !disabled" previews-container=".device-photos" @uploaded="uploaded($event)" />
+        <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)" :disabled="disabled" />
       </div>
     </div>
     <p class="p-0" v-else>
@@ -39,7 +39,12 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   computed: {
     images() {

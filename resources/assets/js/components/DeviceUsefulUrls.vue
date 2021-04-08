@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DeviceUsefulUrl v-for="(url, ix) in currentURLs" :key="'useful-' + ix" :url="url" @update:url="update(ix, $event)" class="mb-2" @delete="remove(url)" />
+    <DeviceUsefulUrl v-for="(url, ix) in currentURLs" :key="'useful-' + ix" :url="url" @update:url="update(ix, $event)" class="mb-2" @delete="remove(url)" :disabled="disabled" />
   </div>
 </template>
 <script>
@@ -14,7 +14,12 @@ export default {
       type: Array,
       required: false,
       default: null
-    }
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   data () {
     return {

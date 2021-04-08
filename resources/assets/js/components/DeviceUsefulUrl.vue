@@ -1,15 +1,16 @@
 <template>
   <div>
     <div class="device-select-row mb-2 w-100">
-      <b-input v-model="urlValue" :placeholder="translatedRepairURL" size="lg" class="marg" />
+      <b-input v-model="urlValue" :placeholder="translatedRepairURL" size="lg" class="marg" :disabled="disabled" />
       <div>
-        <b-btn variant="none" @click="deleteMe" class="p-0 ml-3 mt-2" v-if="notBlank">
+        <b-btn variant="none" @click="deleteMe" class="p-0 ml-3 mt-2" v-if="notBlank && !disabled">
           <b-img src="/icons/cross_ico.svg" class="icon" />
         </b-btn>
       </div>
     </div>
     <div class="device-select-row mb-2 w-100">
       <multiselect
+          :disabled="disabled"
           v-model="sourceValue"
           :placeholder="translatedRepairSource"
           :options="statusOptions"
@@ -34,7 +35,12 @@ export default {
       type: Object,
       required: false,
       default: null
-    }
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   data () {
     return {
