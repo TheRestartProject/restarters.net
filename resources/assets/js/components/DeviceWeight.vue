@@ -3,7 +3,7 @@
     <label class="text-bold">
       {{ translatedWeight }}
     </label>
-    <b-input type="number" @change="$emit('update:weight', parseFloat($event))" size="lg" class="marg p-1 text-center"  min="0" step=".1" autocomplete="off" :value="weight" />
+    <b-input type="number" @change="$emit('update:weight', parseFloat($event))" size="lg" class="marg p-1 text-center"  min="0" step=".1" autocomplete="off" :value="weight" :disabled="disabled" />
     <span class="text-right mb-1">
       {{ translatedRequiredImpact }}
     </span>
@@ -22,7 +22,12 @@ export default {
       type: String,
       required: false,
       default: 'black'
-    }
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   data () {
     return {

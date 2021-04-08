@@ -1,6 +1,7 @@
 <template>
   <div class="w-100 device-select-row device-category">
     <multiselect
+      :disabled="disabled"
       v-model="categoryValue"
       :placeholder="translatedCategory"
       :options="categoryOptions"
@@ -55,7 +56,12 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   computed: {
     translatedRemove() {
@@ -132,5 +138,9 @@ export default {
 */
 .device-category .multiselect__content-wrapper {
   width: 360px !important;
+}
+
+/deep/ .multiselect__tags {
+  min-height: 43px;
 }
 </style>
