@@ -47,7 +47,7 @@
         </div>
         @if(session()->has('success'))
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
-            You've seen them all, thanks!
+            @lang('printcatora.status.task_completed')!
         </div>
         @endif
         @if (isset($status))
@@ -65,25 +65,25 @@
                         </p>
                     </div>
                     <div class="col">
-                        <p class="badge-pill badge-light"><span>@lang('printcatora.status.with_3_opinions')</span></p>
+                        <p class="badge-pill badge-light"><span>@lang('printcatora.status.items_3_opinions')</span></p>
                         <p>
                             @php( print($status['total_opinions_3'][0]->total))
                         </p>
                     </div>
                     <div class="col">
-                        <p class="badge-pill badge-light"><span>@lang('printcatora.status.with_2_opinions')</span></p>
+                        <p class="badge-pill badge-light"><span>@lang('printcatora.status.items_2_opinions')</span></p>
                         <p>
                             @php( print($status['total_opinions_2'][0]->total))
                         </p>
                     </div>
                     <div class="col">
-                        <p class="badge-pill badge-light"><span>@lang('printcatora.status.with_1_opinion')</span></p>
+                        <p class="badge-pill badge-light"><span>@lang('printcatora.status.items_1_opinion')</span></p>
                         <p>
                             @php( print($status['total_opinions_1'][0]->total))
                         </p>
                     </div>
                     <div class="col">
-                        <p class="badge-pill badge-light"><span>@lang('printcatora.status.with_0_opinions')</span></p>
+                        <p class="badge-pill badge-light"><span>@lang('printcatora.status.items_0_opinions')</span></p>
                         <p>
                             @php( print($status['total_opinions_0'][0]->total))
                         </p>
@@ -95,7 +95,7 @@
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col">
                 <div class="row justify-content-center">
-                    <p><strong>@lang('printcatora.status.items_with_majority_opinions') : @php( print($status['total_recats'][0]->total)) </strong></p>
+                    <p><strong>@lang('printcatora.status.items_majority_opinions') : @php( print($status['total_recats'][0]->total))</strong></p>
                 </div>
                 <div class="row justify-content-center">
                     <div class="col">
@@ -130,7 +130,7 @@
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col">
                 <div class="row justify-content-center">
-                    <p><strong>@lang('printcatora.status.items_with_split_opinions') : @php( print($status['total_splits'][0]->total))</strong></p>
+                    <p><strong>@lang('printcatora.status.items_split_opinions') : @php( print($status['total_splits'][0]->total))</strong></p>
                 </div>
                 <div class="row justify-content-center">
                     <div class="col">
