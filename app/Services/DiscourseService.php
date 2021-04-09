@@ -8,10 +8,6 @@ use Auth;
 class DiscourseService {
     public function getDiscussionTopics($tag = null, $numberOfTopics = 5)
     {
-        if (!Auth::check()) {
-            return [];
-        }
-
         $topics = [];
 
         try {
