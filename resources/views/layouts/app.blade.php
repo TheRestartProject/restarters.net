@@ -48,7 +48,7 @@
   </div>
 </div>
 
-@if(Auth::check() && !($hide_language ?? false))
+@if(!($hide_language ?? false))
 @include('partials.languages')
 @endif
 @include('layouts/footer')

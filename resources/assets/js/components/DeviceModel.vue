@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 device-select-row">
-    <b-input v-model="value" :placeholder="translatedModel" size="lg" class="marg" />
+    <b-input v-model="value" :placeholder="translatedModel" size="lg" class="marg" :disabled="disabled" />
     <div v-b-popover.html.left="translatedTooltipModel" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
@@ -20,7 +20,12 @@ export default {
       type: String,
       required: false,
       default: 'black'
-    }
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   computed: {
     value: {

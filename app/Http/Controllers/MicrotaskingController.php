@@ -23,6 +23,7 @@ class MicrotaskingController extends Controller
             $currentUserContributions = 0;
         }
 
+        $activeQuest = config('restarters.microtasking.active_quest');
         $tag = config('restarters.microtasking.discussion_tag');
 
         return view('microtasking.dashboard', [
@@ -30,7 +31,8 @@ class MicrotaskingController extends Controller
             'currentUserQuests' => $currentUserQuests,
             'currentUserContributions' => $currentUserContributions,
             'topics' => $discourseService->getDiscussionTopics($tag, 5),
-            'seeAllTopicsLink' => env('DISCOURSE_URL') . "/tag/{$tag}/l/latest"
+            'seeAllTopicsLink' => env('DISCOURSE_URL') . "/tag/{$tag}/l/latest",
+            'activeQuest' => $activeQuest,
         ]);
     }
 

@@ -12,13 +12,12 @@ use Illuminate\Support\Str;
 
 class MobifixOraTest extends TestCase {
 
-    use RefreshDatabase;
-
     public function setUp() {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
-        DB::table('devices_mobifix_ora')->truncate();
         MobifixOra::truncate();
+        DB::table('devices_mobifix_ora')->truncate();
+        DB::table('devices_faults_mobiles_ora_adjudicated')->truncate();
     }
 
     /** @test */
@@ -85,17 +84,40 @@ class MobifixOraTest extends TestCase {
         $result = $MobifixOra->fetchStatus();
         $this->assertTrue(is_array($result));
         foreach ($opinions['status'] as $k => $v) {
-            $this->assertTrue(array_key_exists($k, $result), 'fetch_mobifixora_status: missing key - ' . $k);
+            $this->assertTrue(isset($result, $k), 'fetch_mobifixora_status: missing key - ' . $k);
             if (!is_array($v)) {
                 $this->assertEquals($v, $result[$k][0]->total, 'fetch_mobifixora_status: wrong ' . $k);
             } else {
                 $this->assertTrue(is_array($result[$k]), 'fetch_mobifixora_status: not array - ' . $k);
                 foreach ($v[0] as $key => $val) {
-                    $this->assertTrue(array_key_exists($key, $result[$k][0]), 'fetch_mobifixora_status #' . $k . ': missing key - ' . $key);
+                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_mobifixora_status #' . $k . ': missing key - ' . $key);
                     $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_mobifixora_status #' . $k . ': wrong ' . $key);
                 }
             }
         }
+    }
+
+    /** @test */
+    public function update_mobifixora_devices() {
+
+        $data = $this->_setup_devices();
+        $opinions = $this->_setup_opinions($data);
+        $MobifixOra = new MobifixOra;
+        $before = DB::select("SELECT id_ords, fault_type_id FROM devices_mobifix_ora");
+        foreach ($before as $k => $v) {
+            $this->assertEquals($v->fault_type_id, 0, 'update_mobifixora_devices: initial fault_type not 0: ' . $v->fault_type_id);
+        }        
+        $updated = $MobifixOra->updateDevices();
+        $after = DB::select("SELECT id_ords, fault_type_id FROM devices_mobifix_ora");
+        $this->assertEquals($updated, count($opinions['updates']), 'update_mobifixora_devices: wrong number of records updated: ' . $updated);
+        foreach ($after as $k => $v) {
+            if (isset($opinions['updates'][$v->id_ords])) {
+                $this->assertEquals($v->fault_type_id, $opinions['updates'][$v->id_ords], 'update_mobifixora_devices: updated fault_type is wrong: ' . $v->id_ords . ' => ' . $v->fault_type_id);
+            } else {
+                $this->assertEquals($v->fault_type_id, 0, 'update_mobifixora_devices: fault_type should still be 0: ' . $v->fault_type_id);
+            }
+        }
+        
     }
 
     protected function _setup_devices() {
@@ -256,15 +278,19 @@ class MobifixOraTest extends TestCase {
 
         $opinions = [];
 
+        $updates = [];
+
         // $data[0] : 3 opinions with consensus : recat
         $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
         $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
         $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
+        $updates[$data[0]['id']] = 2;
 
         // $data[1] : 3 opinions with majority : recat
         $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 2);
         $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 2);
         $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 25);
+        $updates[$data[1]['id']] = 2;
 
         // $data[2] : 3 opinions split
         $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 2);
@@ -276,10 +302,12 @@ class MobifixOraTest extends TestCase {
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 25);
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 26);
         DB::update("INSERT INTO devices_faults_mobiles_ora_adjudicated SET id_ords = '" . $data[3]['id'] . "', fault_type_id=2");
+        $updates[$data[3]['id']] = 2;
 
         // $devs[4] : 2 opinions with majority : recat
         $opinions[$data[4]['id']][] = $this->_insert_opinion($data[4]['id'], 2);
         $opinions[$data[4]['id']][] = $this->_insert_opinion($data[4]['id'], 2);
+        $updates[$data[4]['id']] = 2;
 
         // $devs[5] : 2 opinions split
         $opinions[$data[5]['id']][] = $this->_insert_opinion($data[5]['id'], 2);
@@ -306,13 +334,14 @@ class MobifixOraTest extends TestCase {
                 0 => [
                     'id_ords' => $data[2]['id'],
                     'all_crowd_opinions_count' => 3,
-                    'opinions' => 'Screen,Unknown,Other',
+                    'opinions' => 'Other,Screen,Unknown',
                 ],
             ],
         ];
         return [
             'status' => $status,
             'opinions' => $opinions,
+            'updates' => $updates,
         ];
     }
 

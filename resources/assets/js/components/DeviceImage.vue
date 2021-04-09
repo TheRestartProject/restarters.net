@@ -1,7 +1,7 @@
 <template>
   <div class="position-relative">
     <b-img-lazy :src="'/uploads/' + image.path" class="align-self-start clickme" @click.native="zoom" />
-    <b-btn variant="none" class="remove align-content-center" @click="confirm">
+    <b-btn variant="none" class="remove align-content-center" @click="confirm" v-if="!disabled">
       ╳
     </b-btn>
     <ConfirmModal @confirm="remove" ref="confirm" />
@@ -17,7 +17,12 @@ export default {
     image: {
       type: Object,
       required: true
-    }
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   methods: {
     remove() {
