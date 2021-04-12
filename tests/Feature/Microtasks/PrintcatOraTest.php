@@ -23,17 +23,26 @@ class PrintcatOraTest extends TestCase
     /** @test */
     public function fetch_printcatora_record()
     {
-
         $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $PrintcatOra = new PrintcatOra;
 
+        // insert 8 records, no exclusions
         $result = $PrintcatOra->fetchFault();
         $this->assertTrue(is_array($result), 'fetch_printcatora_record: result is not array');
         $this->assertEquals(1, count($result), 'fetch_printcatora_record: wrong result count');
         $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_printcatora_record: id_ords is null');
 
-        // leave only 1 record
+        // exclude 8 records
+        $exclude = [];
+        foreach ($data as $v) {
+            $exclude[] = $v['id_ords'];
+        }
+        $result = $PrintcatOra->fetchFault($exclude);
+        $this->assertTrue(is_array($result), 'fetch_printcatora_record: result is not array');
+        $this->assertEquals(0, count($result), 'fetch_printcatora_record: wrong result count');
+
+        // exclude 7 records
         $exclude = [];
         foreach ($data as $v) {
             $exclude[] = $v['id_ords'];
@@ -44,16 +53,6 @@ class PrintcatOraTest extends TestCase
         $this->assertEquals(1, count($result), 'fetch_printcatora_record: wrong result count');
         $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_printcatora_record: id_ords is null');
         $this->assertEquals($include, $result[0]->id_ords, 'fetch_printcatora_record: wrong value');
-
-        // exclude all records for one partner
-        $exclude = [];
-        foreach ($data as $k => $v) {
-            if ($v['data_provider'] == 'anstiftung') {
-                $exclude[] = $v['id_ords'];
-            }
-        }
-        $result = $PrintcatOra->fetchFault($exclude, 'anstiftung');
-        $this->assertTrue(empty($result), 'fetch_printcatora_record: result is not false');
     }
 
     /** @test */
@@ -184,7 +183,7 @@ class PrintcatOraTest extends TestCase
                 'product_category' => 'Printer/scanner',
                 'brand' => 'Unknown',
                 'year_of_manufacture' => '????',
-                'repair_status' => 'Unknown', 
+                'repair_status' => 'Unknown',
                 'event_date' => '2019-01-19',
                 'problem' => 'Ankommede Rufe funktionieren nicht',
                 'translation' => 'Ankommede calls do not work',
@@ -199,7 +198,7 @@ class PrintcatOraTest extends TestCase
                 'product_category' => 'Printer/scanner',
                 'brand' => 'Canon',
                 'year_of_manufacture' => '????',
-                'repair_status' => 'Unknown', 
+                'repair_status' => 'Unknown',
                 'event_date' => '2018-10-23',
                 'problem' => 'Zieht Papier nicht ein. Fehler der Ansteuerung nicht gefunden',
                 'translation' => 'Does not feed paper. Not Found error of control',
