@@ -14,13 +14,9 @@
             </span>
           </div>
           <div class=" d-none d-md-block">
-            <h1 class="ml-3 mr-3 mb-0 centreme">
-              {{ event.venue ? event.venue : event.location }}
-            </h1>
+            <EventTitle :idevents="event.idevents" component="h1" class="ml-3 mr-3 mb-0 centreme" />
           </div>
-          <h2 class="ml-3 d-block d-md-none">
-            {{ event.venue ? event.venue : event.location }}
-          </h2>
+          <EventTitle :idevents="event.idevents" component="h2" class="ml-3 d-block d-md-none" />
         </div>
         <div class="pl-md-4 d-flex maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
           <div class="d-flex justify-content-between w-100">
@@ -48,9 +44,10 @@ import { DEFAULT_PROFILE } from '../constants'
 import event from '../mixins/event'
 import moment from 'moment'
 import EventActions from './EventActions'
+import EventTitle from './EventTitle'
 
 export default {
-  components: {EventActions},
+  components: {EventTitle, EventActions},
   mixins: [event],
   props: {
     idevents: {

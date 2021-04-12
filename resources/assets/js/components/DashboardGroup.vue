@@ -8,7 +8,7 @@
         </div>
       </div>
       <div>
-        <b-btn variant="primary" :href="'/group/join/' + group.idgroups">
+        <b-btn variant="primary" :href="'/group/join/' + group.idgroups" v-if="!group.ingroup">
           {{ translatedFollowGroup }}
         </b-btn>
       </div>

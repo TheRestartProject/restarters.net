@@ -389,7 +389,7 @@ export default {
       }
 
       if (this.group) {
-        ret += 'group=' + encodeURIComponent(this.groupd) + '&'
+        ret += 'group=' + encodeURIComponent(this.group) + '&'
       }
 
       if (this.from_date) {
