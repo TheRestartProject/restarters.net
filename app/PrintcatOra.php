@@ -29,12 +29,23 @@ class PrintcatOra extends Model {
      *
      * @return array
      */
-    public function fetchFault($exclusions = [], $partner = NULL) {
-        $sql = $this->_getSQL($exclusions, $partner);
-        return DB::select($sql);
+    public function fetchFault($exclusions = [], $locale = NULL) {
+        $result = [];
+        $records = DB::select("SELECT COUNT(*) as total FROM `devices_printcat_ora`");
+        if ($records[0]->total > count($exclusions)) {
+            // try once with locale, even if it is NULL
+            $sql = $this->_getSQL($exclusions, $locale);
+            $result = DB::select($sql);
+            if (!$result) {
+                // if no user-lang recs left, get one without locale
+                $sql = $this->_getSQL($exclusions);
+                $result = DB::select($sql);
+            }
+        }
+        return $result;
     }
 
-    protected function _getSQL($exclusions = [], $partner = NULL) {
+    protected function _getSQL($exclusions = [], $locale = NULL) {
         $sql = "SELECT
 d.`id_ords` as id_ords,
 d.`data_provider` as partner,
@@ -53,12 +64,12 @@ ORDER BY rand()
 LIMIT 1;
 ";
         $and = '';
-        if (!is_null($partner)) {
-            $and .= "\nAND d.`data_provider` = '$partner'";
-        }
         if (!empty($exclusions)) {
             $ids = implode("','", $exclusions);
             $and .= "\nAND d.`id_ords` NOT IN ('$ids')";
+        }
+        if (!is_null($locale)) {
+            $and .= "\nAND (d.`language` = '$locale')";
         }
         $sql = sprintf($sql, $and);
         return $sql;
@@ -83,7 +94,7 @@ LIMIT 1;
         $result = [];
 
         $result['total_devices'] = DB::select("
-SELECT COUNT(DISTINCT d.id_ords) AS total
+SELECT COUNT(*) AS total
 FROM `devices_printcat_ora` d
 ");
 
@@ -189,7 +200,7 @@ HAVING
      */
     public function updateDevices() {
 
-        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_printers_ora_temporary` AS 
+        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_printers_ora_temporary` AS
 SELECT *
 FROM
 (SELECT

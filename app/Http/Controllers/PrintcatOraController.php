@@ -69,8 +69,12 @@ class PrintcatOraController extends Controller {
             'fault' => $fault,
             'user' => $user,
             'partner' => $partner,
-            'locale' => substr(App::getLocale(), 0, 2),
+            'locale' => $this->_getUserLocale(),
         ]);
+    }
+
+    protected function _getUserLocale() {
+        return substr(App::getLocale(), 0, 2);
     }
 
     /**
@@ -124,7 +128,8 @@ class PrintcatOraController extends Controller {
         $partner = $request->input('partner', NULL);
         $exclusions = $request->session()->get('printcatora.exclusions', []);
         $this->Model = new PrintcatOra;
-        $fault = $this->Model->fetchFault($exclusions, $partner);
+        $locale = $this->_getUserLocale();
+        $fault = $this->Model->fetchFault($exclusions, $locale, $partner);
         if ($fault) {
             $result = $fault[0];
             $request->session()->push('printcatora.exclusions', $result->id_ords);
