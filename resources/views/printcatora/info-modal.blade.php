@@ -14,13 +14,13 @@
                 </p>
                 <hr/>
                 <p>
-                    The <a href="https://openrepair.org/about" target="_blank">Open Repair Alliance</a> was set up by anstiftung, Fixit Clinic, Repair Café Foundation, Repair Cafe Wales and The Restart Project to create a joint open standard to collect and share data from community repair activities.
+                    The <a href="https://openrepair.org/about" target="_blank">Open Repair Alliance</a> creates an open standard to collect and share data from community repair activities hosted by anstiftung, Fixit Clinic, Repair Café Foundation, Repair Cafe Wales and The Restart Project.
                 </p>
                 <p>
                     Volunteers collect data about the devices that are brought into our repair events. The data is uploaded to platforms like Restarters.net, Repair Monitor and Reparatur Initiativen and <a href="https://openrepair.org/open-data/data-downloads" target="_blank">aggregated as Open Data</a> by the Open Repair Alliance.
                 </p>
                 <p>
-                    To enable community repair to contribute to the current push for right to repair regulations for tablets, we want to see what types of faults are commonly encountered.
+                    To enable community repair to contribute to the current push for right to repair regulations for printers, we want to see what types of faults are commonly encountered.
                 </p>
                 <p>
                     So we’d like to analyse the data collected so far, to learn about key faults seen at repair events - and this is where you can help, by playing PrintCat!
