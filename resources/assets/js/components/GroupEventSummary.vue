@@ -16,10 +16,10 @@
       <br class="d-none d-md-block" />
       {{ start }} <span class="d-none d-md-inline">- {{ end }}</span>
       <br class="d-block d-md-none" />
-      <b class="d-block d-md-none"><a :href="'/party/view/' + idevents">{{ event.venue ? event.venue : event.location }}</a></b>
+      <b class="d-block d-md-none"><EventTitle :idevents="idevents" component="a" :href="'/party/view/' + idevents" /></b>
     </b-td>
     <b-td class="text-left d-none d-md-table-cell">
-      <b><a :href="'/party/view/' + idevents">{{ event.venue ? event.venue : event.location }}</a></b>
+      <b><EventTitle :idevents="idevents" component="a" :href="'/party/view/' + idevents" /></b>
       <span v-if="addGroupName" class="small">
         <br />
         <a :href="'/group/view/' + event.group.idgroups">{{ event.group.name }}</a>
@@ -97,8 +97,10 @@
 </template>
 <script>
 import event from '../mixins/event'
+import EventTitle from './EventTitle'
 
 export default {
+  components: {EventTitle},
   mixins: [ event ],
   props: {
     idevents: {
