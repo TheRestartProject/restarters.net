@@ -80,8 +80,8 @@
                 <div class="row">
                     <div class="col">
                         <p>
-                            <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@php( print($fault->partner))</span>
-                            @if (!empty($fault->brand))
+                            <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@lang('printcatora.task.source'): @php( print($fault->partner))</span>
+                            @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
                             <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@php( print($fault->brand))</span>
                             @endif
                             @if ($fault->repair_status !== 'Unknown')
@@ -105,15 +105,6 @@
                         </button>
                     </div>
                 </div>
-                <!--                @if (!($fault->language == 'en'))
-                                <div class="row translation">
-                    <div class="col-8 offset-sm-2">
-                        <p class="small">
-                            @php( print( $fault->translation))
-                        </p>
-                    </div>
-                </div>
-                                @endif-->
             </div>
         </div>
         <form id="log-task" action="" method="POST">
@@ -130,7 +121,6 @@
                                 <p class="title is-size-6-mobile is-size-6-tablet">@lang('printcatora.task.suggestions')</p>
                                 <p>
                                     @foreach($fault->suggestions as $fault_type)
-                                    <!--<button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip"title="@php( print($fault_type->description) )"><span data-fid="@php( print($fault_type->id) )" >@lang($fault_type->title)</span></button>-->
                                     <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip" data-fid="@php( print($fault_type->id) )" title="@php( print($fault_type->description) )">@lang($fault_type->title)</button>
                                     @endforeach
                                 </p>

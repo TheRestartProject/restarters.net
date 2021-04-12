@@ -8,6 +8,7 @@ return [
         'suggestions' => 'Suggestions',
         'translate' => 'Traduire',
         'go_with' => 'Aller avec',
+        'source' => 'La source',
     ],
     'status' =>
     [
