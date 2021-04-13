@@ -27,5 +27,9 @@ return [
         'number_of_records' => 'Number of records',
         'winning_opinion' => 'Winning opinion',
         'task_completed' => "You've seen them all, thanks",
+    ],
+    'branding' =>
+    [
+        'powered_by' => 'Powered by data from:'
     ]
 ];
