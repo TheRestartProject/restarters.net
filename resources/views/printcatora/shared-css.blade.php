@@ -86,5 +86,15 @@
         -webkit-box-shadow: 6px 6px 0 0 #000;
         box-shadow: 6px 6px 0 0 #eee;
     }
+ #ora-partnership hr {
+     width: 50%;
+ }
+ #ora-partnership p {
+     font-size: medium;
+     font-weight: bold;
+ }
+ #ora-partnership img {
+     width: 300px;
+ }
 
 </style>

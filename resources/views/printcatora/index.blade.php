@@ -146,6 +146,13 @@
         </button>
         @endif
     </div>
+    <div id="ora-partnership" class="mt-8 mb-4">
+        <hr />
+        <p class="mb-1">Powered by data from</p>
+        <a href="https://openrepair.org" target="_blank">
+            <img src="{{ asset('images/printcatora/ora-logo.png') }}" alt="Open Repair Alliance logo" />
+        </a>
+    </div>
     @include('printcatora/info-modal')
     @include('partials/task-cta-ora-modal')
 </section>
