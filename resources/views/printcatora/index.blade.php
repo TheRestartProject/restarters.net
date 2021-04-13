@@ -1,4 +1,4 @@
-@extends('layouts.app', ['show_login_join_to_anons' => true, 'hide_language' => false])
+@extends('layouts.app', ['show_navbar_to_anons' => true, 'show_login_join_to_anons' => true, 'hide_language' => false])
 
 @section('extra-css')
 
