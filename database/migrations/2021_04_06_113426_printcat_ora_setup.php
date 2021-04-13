@@ -100,143 +100,121 @@ class PrintcatOraSetup extends Migration {
     protected function _FaultTypes() {
         return [
             1 => [
-              'title' => 'Card reader',
-              'description' => '',
-              'regex' => 'card|sim|socket',
-              ],
-            2 => [
-              'title' => 'Cleaning',
-              'description' => '',
-              'regex' => 'dirt|clean|maintenance|clog|pollut',
-              ],
-            3 => [
-              'title' => 'Control buttons',
-              'description' => '',
-              'regex' => 'button|switch',
-              ],
-            4 => [
-              'title' => 'Display panel',
-              'description' => 'LCD/LED screen problem',
-              'regex' => 'screen|display|glass|lcd',
-              ],
-            5 => [
-              'title' => 'External damage',
-              'description' => 'Damage to the housing',
-              'regex' => 'case|shell|frame|hous|chass',
-              ],
-            6 => [
-              'title' => 'Help/configuration',
-              'description' => 'Advice, set up, tutoring...',
-              'regex' => 'advi[cs]e|help|config|setting|install|program|support|internet|wi-?fi',
-              ],
-            7 => [
-              'title' => 'Imaging unit / drum',
-              'description' => '',
-              'regex' => 'scan|drum',
-              ],
-            8 => [
-              'title' => 'Ink cartdridge cover',
-              'description' => '',
-              'regex' => 'cover|cartridge',
-              ],
-            9 => [
-              'title' => 'Ink cartridge',
-              'description' => '',
-              'regex' => 'ink|cartridge|leak',
-              ],
-            10 => [
-              'title' => 'Internal damage',
-              'description' => 'Problem with mechanisms such as gears',
-              'regex' => 'noise|rattle|loud|gear|clank|contact|circuit|solder',
-              ],
-            11 => [
-              'title' => 'Nozzles',
-              'description' => 'Nozzles broken or blocked',
-              'regex' => 'nozzle|block|clog',
-              ],
-            12 => [
-              'title' => 'Paper feed',
-              'description' => 'Won\'t feed paper ',
-              'regex' => 'paper|feed|stuck|tray|transport|load',
-              ],
-            13 => [
-              'title' => 'Paper output',
-              'description' => 'Paper jam',
-              'regex' => 'paper|jam|stuck|crease',
-              ],
-            14 => [
-              'title' => 'Performance',
-              'description' => 'Slow,
-               blurry,
-               wrong colours...',
-              'regex' => 'slow|blur|fuz|crash|stripe|lines|streak|unclear|smear|loud|quality|colou?r|gr[ea]y',
-              ],
-            15 => [
-              'title' => 'Power supply/connectors',
-              'description' => '',
-              'regex' => 'power|start|boot|switch|charg|plug|socket|current',
-              ],
-            16 => [
-              'title' => 'Printhead',
-              'description' => '',
-              'regex' => 'head',
-              ],
-            17 => [
-              'title' => 'Printing carriage',
-              'description' => '',
-              'regex' => 'carriage',
-              ],
-            18 => [
-              'title' => 'Scanner',
-              'description' => '',
-              'regex' => 'scan',
-              ],
-            19 => [
-              'title' => 'Software issue',
-              'description' => 'Driver,
-               app etc.',
-              'regex' => 'software|app|install|driver|program|error|version',
-              ],
-            20 => [
-              'title' => 'Software update',
-              'description' => 'Problem after update, lack of updates...',
-              'regex' => 'software|update',
-              ],
-            21 => [
-              'title' => 'USB port/cable',
-              'description' => 'Broken,
-               loose,
-               dirty...',
-              'regex' => 'cable|connector|port|usb',
-              ],
-            22 => [
-              'title' => 'Vendor lock-in',
-              'description' => 'Features disabled',
-              'regex' => 'subscription|lock',
-              ],
-            23 => [
-              'title' => 'Waste toner box',
-              'description' => '',
-              'regex' => 'toner|waste',
-              ],
-            24 => [
-              'title' => 'WiFi',
-              'description' => 'Not connecting...',
-              'regex' => 'wi-?fi|wireless|bluetooth',
-              ],
-            25 => [
-              'title' => 'Other',
-              'description' => 'Main fault is known but there is no option for it',
-              'regex' => '',
-              ],
-            26 => [
-              'title' => 'Unknown',
-              'description' => 'Not enough info to determine the main fault',
-              'regex' => '',
+                "title" => "Card reader",
+                "description" => "",
+                "regex" => "card|sim|socket"
             ],
-          ];
-          
-          
+            2 => [
+                "title" => "Configuration",
+                "description" => "Advice, set up, tutoring...",
+                "regex" => "advi[cs]e|help|config|setting|install|program|support|internet|wi-?fi"
+            ],
+            3 => [
+                "title" => "Control buttons",
+                "description" => "",
+                "regex" => "button|switch"
+            ],
+            4 => [
+                "title" => "Display panel",
+                "description" => "LCD/LED screen problem",
+                "regex" => "screen|display|glass|lcd"
+            ],
+            5 => [
+                "title" => "External damage",
+                "description" => "Damage to the housing",
+                "regex" => "case|shell|frame|hous|chass| cover"
+            ],
+            6 => [
+                "title" => "Imaging unit/drum",
+                "description" => "",
+                "regex" => "scan|drum"
+            ],
+            7 => [
+                "title" => "Ink cartridge",
+                "description" => "",
+                "regex" => "ink|cartridge|leak"
+            ],
+            8 => [
+                "title" => "Internal damage",
+                "description" => "Problem with mechanisms such as gears",
+                "regex" => "noise|rattle|loud|gear|clank|contact|circuit|solder"
+            ],
+            9 => [
+                "title" => "Paper feed",
+                "description" => "Won't feed paper ",
+                "regex" => "paper|feed|stuck|tray|carriage|transport|load"
+            ],
+            10 => [
+                "title" => "Paper output",
+                "description" => "Paper jammed, creased, skewed...",
+                "regex" => "paper|jam|stuck|output|crease"
+            ],
+            11 => [
+                "title" => "Power supply/connectors",
+                "description" => "",
+                "regex" => "power|start|boot|switch|charg|plug|cable|socket|current"
+            ],
+            12 => [
+                "title" => "Print quality",
+                "description" => "Blurry, stripes, faded...",
+                "regex" => "blur|fuz|stripe|lines|streak|unclear|smear|quality|colou?r|gr[ea]y"
+            ],
+            13 => [
+                "title" => "Printhead cleaning",
+                "description" => "",
+                "regex" => "dirt|clean|nozzle|block|clog|maintenance|pollut"
+            ],
+            14 => [
+                "title" => "Printhead failure",
+                "description" => "",
+                "regex" => "head"
+            ],
+            15 => [
+                "title" => "Scanner",
+                "description" => "",
+                "regex" => "scan"
+            ],
+            16 => [
+                "title" => "Software issue/update",
+                "description" => "Driver, app, update etc.",
+                "regex" => "software|crash|app|install|update|driver|program|error|version"
+            ],
+            17 => [
+                "title" => "Toner",
+                "description" => "",
+                "regex" => "toner|laser"
+            ],
+            18 => [
+                "title" => "USB port/cable",
+                "description" => "Broken, loose, dirty...",
+                "regex" => "cable|connector|port|usb"
+            ],
+            19 => [
+                "title" => "Vendor lock-in",
+                "description" => "Features disabled",
+                "regex" => "lock|subscription|vendor|manufact"
+            ],
+            20 => [
+                "title" => "Waste toner/ink box",
+                "description" => "",
+                "regex" => "toner|waste"
+            ],
+            21 => [
+                "title" => "WiFi",
+                "description" => "Not connecting...",
+                "regex" => "wi-?fi|wireless|bluetooth"
+            ],
+            22 => [
+                "title" => "Other",
+                "description" => "Main fault is known but there is no option for it",
+                "regex" => ""
+            ],
+            23 => [
+                "title" => "Unknown",
+                "description" => "Not enough info to determine the main fault",
+                "regex" => ""
+            ],
+        ];
     }
 
     /**
