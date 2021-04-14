@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="canedit">
-      <b-dropdown variant="primary" :text="translatedGroupActions" class="deepnowrap">
+      <b-dropdown variant="primary" :text="__('groups.group_actions')" class="deepnowrap">
         <b-dropdown-item :href="'/group/edit/' + idgroups" v-if="canedit">
           {{ __('groups.edit_group') }}
         </b-dropdown-item>

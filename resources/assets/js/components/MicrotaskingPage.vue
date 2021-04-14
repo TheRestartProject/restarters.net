@@ -21,6 +21,7 @@
           :is-logged-in="isLoggedIn"
         />
         <DiscourseDiscussion
+          v-if="topics"
           id="discussion"
           :topics="topics"
           :see-all-topics-link="seeAllTopicsLink"
@@ -61,7 +62,8 @@ export default {
     },
     topics: {
       type: Array,
-      required: true
+      required: false,
+      default: null
     },
     seeAllTopicsLink: {
       type: String,

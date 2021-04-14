@@ -3,7 +3,7 @@
     <template slot="title">
       <div class="d-flex justify-content-between">
         <div>
-          <b>{{ __this.$lang.get(this.title) }}</b> ({{ events.length }})
+          <b>{{ __(this.title) }}</b> ({{ events.length }})
         </div>
       </div>
     </template>

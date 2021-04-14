@@ -31,7 +31,7 @@
               <span v-html="__('dashboard.getting_the_most_intro')" class="d-inline d-md-none" />
             </p>
             <!--        eslint-disable-next-line-->
-            <p v-html="translatedSidebarIntro1" class="d-block d-md-none" />
+            <p v-html="__('dashboard.sidebar_intro_1')" class="d-block d-md-none" />
             <ul class="list-unstyled pt-3 pb-0 mt-0 content">
               <!--        eslint-disable-next-line-->
               <li v-html="__('dashboard.getting_the_most_bullet1')" />

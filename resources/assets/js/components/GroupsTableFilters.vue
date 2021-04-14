@@ -56,7 +56,7 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
-        :selectedLabel="translatedRemove"
+        :selectedLabel="__('partials.remove')"
     />
   </div>
 </template>
