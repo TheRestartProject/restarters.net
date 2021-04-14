@@ -1,12 +1,12 @@
 <template>
   <CollapsibleSection collapsed :count="attendees.length" class="width">
     <template slot="title">
-      {{ translatedTitle }}
+      {{ __('events.event_attendance') }}
     </template>
     <template slot="content">
       <div class="mt-2">
         <p v-if="!upcoming && volunteerCountMismatch" class="warningbox small text-danger p-1">
-          {{ translatedMismatch }}
+          {{ __('events.warning_volunteers_message') }}
         </p>
         <div :class="{
       attendance: true,
@@ -16,14 +16,14 @@
             <div v-if="!upcoming" class="count-participants">
               <b>
                 <b-img src="/icons/group_ico.svg" class="mr-2" />
-                {{ translatedParticipants }}
+                {{ __('events.stat-0') }}
               </b>
               <EventAttendanceCount :count="event.participants" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
             </div>
             <div v-if="!upcoming" class="count-volunteers">
               <b>
                 <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
-                {{ translatedVolunteers }}
+                {{ __('events.stat-2') }}
               </b>
               <EventAttendanceCount :count="event.volunteers" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
             </div>
@@ -33,50 +33,50 @@
             <b-tabs class="ourtabs attendance-tabs w-100">
               <b-tab active title-item-class="w-50" class="pt-2">
                 <template slot="title">
-                  <b>{{ translatedConfirmed }}</b> ({{ confirmed.length }})
+                  <b>{{ __('events.confirmed') }}</b> ({{ confirmed.length }})
                 </template>
                 <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
                   <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" :canedit="canedit" />
                 </div>
                 <p v-else>
-                  {{ translatedNoConfirmed }}
+                  {{ __('events.confirmed_none') }}
                 </p>
                 <hr />
                 <div v-if="upcoming" class="d-flex justify-content-end">
                   <!-- TODO LATER In due course these modals should become Vue components.-->
                   <a data-toggle="modal" data-target="#event-all-attended" href="#" class="mr-2">
-                    {{ translatedSeeAll }}
+                    {{ __('events.see_all') }}
                   </a>
                 </div>
                 <div v-else>
                   <div class="d-flex justify-content-between">
                     <b-btn variant="link" data-toggle="modal" data-target="#event-add-volunteer">
-                      {{ translatedAddVolunteer }}
+                      {{ __('events.add_volunteer_modal_heading') }}
                     </b-btn>
                   <b-btn variant="link" data-toggle="modal" data-target="#event-all-attended" href="#">
-                    {{ translatedSeeAll }}
+                    {{ __('events.see_all') }}
                     </b-btn>
                   </div>
                 </div>
               </b-tab>
               <b-tab title-item-class="w-50" class="pt-2">
                 <template slot="title">
-                  <b>{{ translatedInvited }}</b> ({{ invited.length }})
+                  <b>{{ __('events.invited') }}</b> ({{ invited.length }})
                 </template>
                 <div v-if="invited.length" class="maxheight">
                   <EventAttendee v-for="a in invited" :key="'eventattendee-' + a.idevents_users" :attendee="a" />
                 </div>
                 <p v-else>
-                  {{ translatedNoInvited }}
+                  {{ __('events.invited_none') }}
                 </p>
                 <hr />
                 <div v-if="upcoming" class="d-flex justify-content-between">
                   <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
                     <img class="icon" src="/images/add-icon.svg" />
-                    {{ translatedInviteToJoin }}
+                    {{ __('events.invite_to_join') }}
                   </a>
                   <a data-toggle="modal" data-target="#event-all-volunteers" href="#" class="mr-2" v-if="invited.length">
-                    {{ translatedSeeAll }}
+                    {{ __('events.see_all') }}
                   </a>
                 </div>
               </b-tab>
@@ -117,41 +117,6 @@ export default {
   },
   components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],
-  computed: {
-    translatedTitle() {
-      return this.$lang.get('events.event_attendance')
-    },
-    translatedVolunteers() {
-      return this.$lang.get('events.stat-2')
-    },
-    translatedParticipants() {
-      return this.$lang.get('events.stat-0')
-    },
-    translatedConfirmed() {
-      return this.$lang.get('events.confirmed')
-    },
-    translatedInvited() {
-      return this.$lang.get('events.invited')
-    },
-    translatedSeeAll() {
-      return this.$lang.get('events.see_all')
-    },
-    translatedNoConfirmed() {
-      return this.$lang.get('events.confirmed_none')
-    },
-    translatedNoInvited() {
-      return this.$lang.get('events.invited_none')
-    },
-    translatedInviteToJoin() {
-      return this.$lang.get('events.invite_to_join')
-    },
-    translatedMismatch() {
-      return this.$lang.get('events.warning_volunteers_message')
-    },
-    translatedAddVolunteer() {
-      return this.$lang.get('events.add_volunteer_modal_heading')
-    }
-  },
   created() {
     // The attendance is passed from the server to the client via a prop on this component.  When we are created
     // we put it in the store.  From then on we get the data from the store so that we get reactivity.

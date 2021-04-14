@@ -46,9 +46,6 @@ export default {
     },
   },
   computed: {
-    translatedRemove() {
-      return this.$lang.get('partials.remove')
-    },
     brandValue: {
       get() {
         let ret = null

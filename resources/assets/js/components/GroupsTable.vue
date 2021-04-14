@@ -17,10 +17,10 @@
     </div>
     <div class="d-block d-md-none" v-if="search">
       <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="!searchShow" @click="toggleFilters">
-        <a href="#">{{ translatedShowFilters }}</a>&nbsp;<b-img class="plusminusicon" src="/images/add-icon.svg" />
+        <a href="#">{{ __('groups.show_filters') }}</a>&nbsp;<b-img class="plusminusicon" src="/images/add-icon.svg" />
       </div>
       <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="searchShow" @click="toggleFilters">
-        <b-img class="plusminusicon" src="/images/minus-icon.svg" /><a href="#">&nbsp;{{ translatedHideFilters }}</a>
+        <b-img class="plusminusicon" src="/images/minus-icon.svg" /><a href="#">&nbsp;{{ __('groups.hide_filters') }}</a>
       </div>
       <GroupsTableFilters
           v-if="searchShow"
@@ -75,7 +75,7 @@
             {{ data.item.next_event }}
           </div>
           <div v-else>
-            {{ translatedNonePlanned}}
+            {{ __('groups.upcoming_none_planned') }}
           </div>
         </div>
       </template>
@@ -85,21 +85,21 @@
       <template slot="cell(follow)" slot-scope="data">
         <b-btn variant="primary" class="text-nowrap mr-2" v-if="data.item.follow" :to="'/group/join/' + data.item.idgroups">
           <span class="d-block d-md-none">
-            {{ translatedFollowMobile }}
+            {{ __('groups.join_group_button_mobile') }}
           </span>
           <span class="d-none d-md-block">
-            {{ translatedFollow }}
+            {{ __('groups.join_group_button') }}
           </span>
         </b-btn>
         <b-btn variant="primary" class="text-nowrap mr-2" v-else @click="leaveGroup(data.item.idgroups)">
           <span class="d-block d-md-none">
-            {{ translatedUnFollowMobile }}
+            {{ __('groups.leave_group_button_mobile') }}
           </span>
           <span class="d-none d-md-block">
-            {{ translatedUnFollow }}
+            {{ __('groups.leave_group_button') }}
           </span>
         </b-btn>
-        <ConfirmModal :key="'leavegroupmodal-' + data.item.idgroups" :ref="'confirmLeave-' + data.item.idgroups" @confirm="leaveConfirmed(data.item.idgroups)" :message="translatedConfirmLeaveGroup" />
+        <ConfirmModal :key="'leavegroupmodal-' + data.item.idgroups" :ref="'confirmLeave-' + data.item.idgroups" @confirm="leaveConfirmed(data.item.idgroups)" :message="__('groups.leave_group_confirm')" />
       </template>
     </b-table>
   </div>
@@ -236,35 +236,11 @@ export default {
     itemsToShow() {
       return this.items.slice(0, this.show)
     },
-    translatedNonePlanned() {
-      return this.$lang.get('groups.upcoming_none_planned')
-    },
     translatedGroupCount() {
       return this.$lang.choice('groups.group_count', this.filteredGroups.length, {
         count: this.filteredGroups.length
       })
     },
-    translatedFollow() {
-      return this.$lang.get('groups.join_group_button')
-    },
-    translatedFollowMobile() {
-      return this.$lang.get('groups.join_group_button_mobile')
-    },
-    translatedUnFollow() {
-      return this.$lang.get('groups.leave_group_button')
-    },
-    translatedUnFollowMobile() {
-      return this.$lang.get('groups.leave_group_button_mobile')
-    },
-    translatedShowFilters() {
-      return this.$lang.get('groups.show_filters')
-    },
-    translatedHideFilters() {
-      return this.$lang.get('groups.hide_filters')
-    },
-    translatedConfirmLeaveGroup() {
-      return this.$lang.get('groups.leave_group_confirm')
-    }
 },
   created() {
     // We might arrive on the page to filter by network.

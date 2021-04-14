@@ -6,15 +6,15 @@
 
     <div class="d-flex justify-content-between">
       <h2 class>
-        {{ translatedRestartRecords }}
+        {{ __('devices.repair_records') }}
       </h2>
       <div v-if="isAdmin">
         <b-btn variant="primary" href="/export/devices/?">
-          {{ translatedExportDeviceData}}
+          {{ __('devices.export_device_data') }}
         </b-btn>
       </div>
     </div>
-    <p>{{ translatedSearchText}}</p>
+    <p>{{ __('devices.search_text') }}</p>
     <div class="layout">
       <FixometerFilters
           v-show="tabIndex === 0"
@@ -57,7 +57,7 @@
           <template slot="title">
             <div class="d-flex justify-content-between">
               <div>
-                <b>{{ translatedPowered }}</b> ({{ powered_total.toLocaleString() }})
+                <b>{{ __('devices.title_powered') }}</b> ({{ powered_total.toLocaleString() }})
               </div>
               <div class="d-flex text-brand font-weight-bold">
                 <div class="mr-3 lower">
@@ -71,7 +71,7 @@
               </div>
             </div>
           </template>
-          <p class="pl-3" v-html="translatedDescriptionPowered" />
+          <p class="pl-3" v-html="__('devices.description_powered')" />
           <FixometerRecordsTable
               :is-admin="isAdmin"
               :powered="true"
@@ -96,7 +96,7 @@
           <template slot="title">
             <div class="d-flex justify-content-between">
               <div>
-                <b>{{ translatedUnpowered }}</b> ({{ unpowered_total.toLocaleString() }})
+                <b>{{ __('devices.title_unpowered') }}</b> ({{ unpowered_total.toLocaleString() }})
               </div>
               <div class="lower text-brand font-weight-bold">
                 <b-img src="/images/trash_brand.svg" class="icon" />
@@ -104,7 +104,7 @@
               </div>
             </div>
           </template>
-          <p class="pl-3" v-html="translatedDescriptionUnpowered" />
+          <p class="pl-3" v-html="__('devices.description_unpowered')" />
           <FixometerRecordsTable
               :is-admin="isAdmin"
               :powered="false"
@@ -129,7 +129,7 @@
     <div class="d-block d-md-none">
       <CollapsibleSection collapsed :count="powered_total" heading-level="h6" count-class="small">
         <template slot="title">
-          {{ translatedPowered }}
+          {{ __('devices.title_powered') }}
         </template>
         <template slot="title-right">
           <div class="small mt-2">
@@ -172,7 +172,7 @@
       </CollapsibleSection>
       <CollapsibleSection collapsed :count="unpowered_total" heading-level="h6" count-class="small">
         <template slot="title">
-          {{ translatedUnpowered }}
+          {{ __('devices.title_powered') }}
         </template>
         <template slot="title-right">
           <div class="small mt-2">
@@ -407,27 +407,6 @@ export default {
       }
 
       return ret
-    },
-    translatedRestartRecords() {
-      return this.$lang.get('devices.repair_records')
-    },
-    translatedSearchText() {
-      return this.$lang.get('devices.search_text')
-    },
-    translatedExportDeviceData() {
-      return this.$lang.get('devices.export_device_data')
-    },
-    translatedPowered() {
-      return this.$lang.get('devices.title_powered')
-    },
-    translatedUnpowered() {
-      return this.$lang.get('devices.title_unpowered')
-    },
-    translatedDescriptionPowered() {
-      return this.$lang.get('devices.description_powered')
-    },
-    translatedDescriptionUnpowered() {
-      return this.$lang.get('devices.description_unpowered')
     },
   }
 }

@@ -1,13 +1,13 @@
 <template>
   <CollapsibleSection class="lineheight no-explict-width" collapsed>
     <template slot="title">
-      {{ translatedAbout }}
+      {{ __('groups.about') }}
     </template>
     <template slot="content">
       <p v-if="!group.free_text" class="text-muted">
-        {{ translatedNoAbout}}
+        {{ __('groups.about_none') }}
       </p>
-      <read-more v-else :html="group.free_text" class="mt-2" :max-chars="440" :more-str="translatedReadMore" :less-str="translatedReadLess" />
+      <read-more v-else :html="group.free_text" class="mt-2" :max-chars="440" :more-str="__('groups.read_more')" :less-str="__('groups.read_less')" />
     </template>
   </CollapsibleSection>
 </template>
@@ -27,20 +27,6 @@ export default {
       required: true
     }
   },
-  computed: {
-    translatedNoAbout() {
-      return this.$lang.get('groups.about_none')
-    },
-    translatedAbout() {
-      return this.$lang.get('groups.about')
-    },
-    translatedReadMore() {
-      return this.$lang.get('groups.read_more')
-    },
-    translatedReadLess() {
-      return this.$lang.get('groups.read_less')
-    },
-  }
 }
 </script>
 <style scoped lang="scss">

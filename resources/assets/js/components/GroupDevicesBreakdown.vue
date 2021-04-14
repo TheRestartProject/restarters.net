@@ -1,28 +1,28 @@
 <template>
   <div>
-    <h2 class="mt-4">{{ translatedDeviceBreakdown }}</h2>
+    <h2 class="mt-4">{{ __('groups.device_breakdown') }}</h2>
     <b-tabs class="ourtabs w-100 mt-4 d-none d-md-block" justified>
       <b-tab active class="pt-2">
         <template slot="title">
-          <b>{{ translatedComputerAndHomeOffice }}</b>
+          <b>{{ __('strings.Computers and Home Office') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[1]" />
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b>{{ translatedElectronicGadget }}</b>
+          <b>{{ __('strings.Electronic Gadgets') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[2]" />
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b>{{ translatedHomeEntertainment }}</b>
+          <b>{{ __('strings.Home Entertainment') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[3]" />
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b>{{ translatedKitchenAndHouseholdItems }}</b>
+          <b>{{ __('strings.Kitchen and Household Items') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[4]" />
       </b-tab>
@@ -31,7 +31,7 @@
       <CollapsibleSection heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ translatedComputerAndHomeOffice }}
+            {{ __('strings.Computers and Home Office') }}
           </span>
         </template>
         <template slot="content">
@@ -41,7 +41,7 @@
       <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ translatedElectronicGadget }}
+            {{ __('strings.Electronic Gadgets') }}
           </span>
         </template>
         <template slot="content">
@@ -51,7 +51,7 @@
       <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ translatedHomeEntertainment }}
+            {{ __('strings.Home Entertainment') }}
           </span>
         </template>
         <template slot="content">
@@ -61,7 +61,7 @@
       <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ translatedKitchenAndHouseholdItems }}
+            {{ __('strings.Kitchen and Household Items') }}
           </span>
         </template>
         <template slot="content">
@@ -71,7 +71,7 @@
     </div>
     <div class="small mt-3">
       <p class="small text-brand">
-        {{ translatedNoUnpoweredStats }}
+        {{ __('groups.no_unpowered_stats') }}
       </p>
     </div>
   </div>
@@ -91,27 +91,6 @@ export default {
       required: true
     },
   },
-  computed: {
-    translatedDeviceBreakdown() {
-      return this.$lang.get('groups.device_breakdown')
-    },
-    // The cluster names are translated in the en.json file, or language variant.
-    translatedComputerAndHomeOffice() {
-      return this.$lang.get('strings.Computers and Home Office')
-    },
-    translatedElectronicGadget() {
-      return this.$lang.get('strings.Electronic Gadgets')
-    },
-    translatedHomeEntertainment() {
-      return this.$lang.get('strings.Home Entertainment')
-    },
-    translatedKitchenAndHouseholdItems() {
-      return this.$lang.get('strings.Kitchen and Household Items')
-    },
-    translatedNoUnpoweredStats() {
-      return this.$lang.get('groups.no_unpowered_stats')
-    }
-  }
 }
 </script>
 <style scoped lang="scss">

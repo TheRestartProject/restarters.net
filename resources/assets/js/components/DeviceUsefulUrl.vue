@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="device-select-row mb-2 w-100">
-      <b-input v-model="urlValue" :placeholder="translatedRepairURL" size="lg" class="marg" :disabled="disabled" />
+      <b-input v-model="urlValue" :placeholder="__('devices.useful_repair_urls_explanation')" size="lg" class="marg" :disabled="disabled" />
       <div>
         <b-btn variant="none" @click="deleteMe" class="p-0 ml-3 mt-2" v-if="notBlank && !disabled">
           <b-img src="/icons/cross_ico.svg" class="icon" />
@@ -12,7 +12,7 @@
       <multiselect
           :disabled="disabled"
           v-model="sourceValue"
-          :placeholder="translatedRepairSource"
+          :placeholder="__('devices.repair_source')"
           :options="statusOptions"
           track-by="id"
           label="text"
@@ -55,11 +55,11 @@ export default {
       return [
         {
           id: USEFUL_URL_SOURCE_MANUFACTURER,
-          text: this.translatedFromManufacturer
+          text: this.__('devices.from_manufacturer')
         },
         {
           id: USEFUL_URL_SOURCE_THIRD_PARTY,
-          text: this.translatedFromThirdParty
+          text: this.__('devices.from_third_party')
         }
       ]
     },
@@ -91,18 +91,6 @@ export default {
         })
       }
     },
-    translatedRepairSource() {
-      return this.$lang.get('devices.repair_source')
-    },
-    translatedRepairURL() {
-      return this.$lang.get('devices.useful_repair_urls_explanation')
-    },
-    translatedFromThirdParty() {
-      return this.$lang.get('devices.from_third_party')
-    },
-    translatedFromManufacturer() {
-      return this.$lang.get('devices.from_manufacturer')
-    }
   },
   methods: {
     deleteMe() {

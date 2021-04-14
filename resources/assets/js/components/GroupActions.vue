@@ -3,45 +3,45 @@
     <div v-if="canedit">
       <b-dropdown variant="primary" :text="translatedGroupActions" class="deepnowrap">
         <b-dropdown-item :href="'/group/edit/' + idgroups" v-if="canedit">
-          {{ translatedEditGroup }}
+          {{ __('groups.edit_group') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/party/create/' + idgroups" v-if="canedit">
-          {{ translatedAddEvent }}
+          {{ __('groups.add_event') }}
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#invite-to-group" v-if="canedit">
-          {{ translatedInviteVolunteers }}
+          {{ __('groups.invite_volunteers') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/group/nearby/' + idgroups" v-if="canedit">
-          {{ translatedVolunteersNearby }}
+          {{ __('groups.volunteers_nearby') }}
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats" v-if="canedit">
-          {{ translatedShareGroupStatus }}
+          {{ __('groups.share_group_stats') }}
         </b-dropdown-item>
         <b-dropdown-item data-toggle="modal" @click="leaveGroup" v-if="ingroup">
-          {{ translatedLeaveGroup }}
+          {{ __('groups.leave_group_button') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/group/join/' + idgroups" v-else>
-          {{ translatedJoinGroup }}
+          {{ __('groups.join_group_button') }}
         </b-dropdown-item>
       </b-dropdown>
     </div>
     <div v-else>
-      <b-dropdown variant="primary" :text="translatedGroupActions" class="deepnowrap">
+      <b-dropdown variant="primary" :text="__('groups.group_actions')" class="deepnowrap">
         <b-dropdown-item data-toggle="modal" data-target="#invite-to-group" v-if="ingroup">
-          {{ translatedInviteVolunteers }}
+          {{ __('groups.invite_volunteers') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/group/join/' + idgroups" v-else>
-          {{ translatedJoinGroup }}
+          {{ __('groups.join_group_button') }}
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats">
-          {{ translatedShareGroupStatus }}
+          {{ __('groups.share_group_stats') }}
         </b-dropdown-item>
         <b-dropdown-item data-toggle="modal" @click="leaveGroup" v-if="ingroup">
-          {{ translatedLeaveGroup}}
+          {{ __('groups.leave_group_button') }}
         </b-dropdown-item>
       </b-dropdown>
     </div>
-    <ConfirmModal :key="'leavegroupmodal-' + idgroups" ref="confirmLeave" @confirm="leaveConfirmed" :message="translatedConfirmLeaveGroup" />
+    <ConfirmModal :key="'leavegroupmodal-' + idgroups" ref="confirmLeave" @confirm="leaveConfirmed" :message="__('groups.leave_group_confirm')" />
   </div>
 </template>
 <script>
@@ -55,35 +55,6 @@ export default {
     idgroups: {
       type: Number,
       required: true
-    }
-  },
-  computed: {
-    translatedGroupActions() {
-      return this.$lang.get('groups.group_actions')
-    },
-    translatedEditGroup() {
-      return this.$lang.get('groups.edit_group')
-    },
-    translatedAddEvent() {
-      return this.$lang.get('groups.add_event')
-    },
-    translatedInviteVolunteers() {
-      return this.$lang.get('groups.invite_volunteers')
-    },
-    translatedVolunteersNearby() {
-      return this.$lang.get('groups.volunteers_nearby')
-    },
-    translatedShareGroupStatus() {
-      return this.$lang.get('groups.share_group_stats')
-    },
-    translatedJoinGroup() {
-      return this.$lang.get('groups.join_group_button')
-    },
-    translatedLeaveGroup() {
-      return this.$lang.get('groups.leave_group_button')
-    },
-    translatedConfirmLeaveGroup() {
-      return this.$lang.get('groups.leave_group_confirm')
     }
   },
   methods: {

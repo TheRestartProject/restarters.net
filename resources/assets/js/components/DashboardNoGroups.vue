@@ -4,10 +4,10 @@
       <div class="pic" />
       <!-- eslint-disable-next-line -->
       <div class="overlay">
-        <div v-html="translatedNoGroups" class="mt-2 m-md-2" />
+        <div v-html="__('dashboard.no_groups')" class="mt-2 m-md-2" />
       </div>
       <div class="groups mt-2 p-0 p-md-2">
-        <h3>{{ translatedGroupsNearYou }}</h3>
+        <h3>{{ __('dashboard.groups_near_you_header') }}</h3>
         <hr />
         <DashboardGroup v-for="group in nearbyGroups" :key="'nearbygroup-' + group.idgroups" :group="group" />
       </div>
@@ -16,13 +16,13 @@
       <div class="pic" />
       <!-- eslint-disable-next-line -->
       <div class="overlay">
-        <div v-html="translatedNoGroupsNearestNoLocation" class="mt-2 m-md-2" />
+        <div v-html="__('groups.no_groups_nearest_no_location')" class="mt-2 m-md-2" />
       </div>
     </div>
     <div class="text pr-md-2 pl-md-2 pb-2">
-      <strong>{{ translatedInterestedStarting }}</strong>
+      <strong>{{ __('dashboard.interested_starting') }}</strong>
       <!-- eslint-disable-next-line -->
-      <div v-html="translatedInterestedDetails" />
+      <div v-html="__('dashboard.interested_details')" />
     </div>
   </div>
 </template>
@@ -37,23 +37,6 @@ export default {
       default: null
     },
   },
-  computed: {
-    translatedNoGroups() {
-      return this.$lang.get('dashboard.no_groups')
-    },
-    translatedNoGroupsNearestNoLocation() {
-      return this.$lang.get('groups.no_groups_nearest_no_location')
-    },
-    translatedInterestedStarting() {
-      return this.$lang.get('dashboard.interested_starting')
-    },
-    translatedInterestedDetails() {
-      return this.$lang.get('dashboard.interested_details')
-    },
-    translatedGroupsNearYou() {
-      return this.$lang.get('dashboard.groups_near_you_header')
-    }
-  }
 }
 </script>
 <style scoped lang="scss">

@@ -3,7 +3,7 @@
     <template slot="title">
       <div class="d-flex justify-content-between">
         <div>
-          <b>{{ translatedTitle }}</b> ({{ events.length }})
+          <b>{{ __this.$lang.get(this.title) }}</b> ({{ events.length }})
         </div>
       </div>
     </template>
@@ -56,9 +56,6 @@ export default {
     }
   },
   computed: {
-    translatedTitle() {
-      return this.$lang.get(this.title)
-    },
     translatedNoneMessage() {
       return this.$lang.get(this.noneMessage)
     },

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="mt-2 mb-2">{{ translatedFacts }}</h2>
+    <h2 class="mt-2 mb-2">{{ __('groups.group_facts') }}</h2>
     <div class="items-container">
       <StatsValue :count="stats.parties" icon="coffee" size="md" variant="primary" title="groups.events" class="group-stat-events" />
       <div />
@@ -21,11 +21,6 @@ export default {
       type: Object
     }
   },
-  computed: {
-    translatedFacts() {
-      return this.$lang.get('groups.group_facts')
-    }
-  }
 }
 </script>
 <style scoped lang="scss">

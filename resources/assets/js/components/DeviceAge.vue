@@ -1,11 +1,11 @@
 <template>
   <div class="w-100 align-items-center device-field-row">
     <label class="text-bold">
-      {{ translatedAge }}
+      {{ __('devices.age') }}
     </label>
     <b-input type="number" @change="$emit('update:age', parseFloat($event))" size="lg" class="marg p-1 text-center"  min="0" step="0.5" autocomplete="off" :value="age" :disabled="disabled" />
     <span class="text-right mb-1">
-      {{ translatedAgeApprox }}
+      {{ __('devices.age_approx') }}
     </span>
   </div>
 </template>
@@ -35,14 +35,6 @@ export default {
       value: null
     }
   },
-  computed: {
-    translatedAge() {
-      return this.$lang.get('devices.age')
-    },
-    translatedAgeApprox() {
-      return this.$lang.get('devices.age_approx')
-    }
-  }
 }
 </script>
 <style scoped lang="scss">

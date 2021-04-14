@@ -4,7 +4,7 @@
       <div class="d-flex justify-content-between flex-wrap">
         <div class="d-flex w-100">
           <div class="align-self-center">
-            {{ translatedYourGroupsHeading }}
+            {{ __('dashboard.your_groups_heading') }}
           </div>
           <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
         </div>
@@ -26,7 +26,7 @@
           <div class="layout">
             <div class="group-intro">
               <h3>
-                {{ translatedGroupsHeading }}
+                {{ __('dashboard.groups_heading') }}
               </h3>
               <p>
               {{ __('dashboard.catch_up') }}
@@ -43,7 +43,7 @@
             <div class="group-seeall">
               <div class="d-flex justify-content-end">
                 <a href="/group" class="mr-1">
-                  {{ translatedSeeAll }}
+                  {{ __('dashboard.see_all_groups') }}
                 </a>
               </div>
             </div>
@@ -52,18 +52,18 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <h3>
-                    {{ translatedUpcomingEventsTitle }}
+                    {{ __('dashboard.upcoming_events_title') }}
                   </h3>
                   <p v-if="events.length">
-                    {{ translatedUpcomingEventsSubTitle }}
+                    {{ __('dashboard.upcoming_events_subtitle') }}
                   </p>
                   <p v-else>
-                    {{ translatedNoUpcomingEvents }}.
+                    {{ __('events.no_upcoming_for_your_groups') }}.
                   </p>
                 </div>
                 <div>
                   <b-btn variant="primary" href="/party/create" class="text-nowrap">
-                    {{ translatedAddEvent }}
+                    {{ __('dashboard.add_event') }}
                   </b-btn>
                 </div>
               </div>
@@ -75,7 +75,7 @@
             <div class="event-seeall">
               <div class="d-flex justify-content-end">
                 <a href="/party" class="mr-1">
-                  {{ translatedSeeAll }}
+                  {{ __('dashboard.see_all_groups') }}
                 </a>
               </div>
             </div>
@@ -119,27 +119,6 @@ export default {
     },
     events() {
       return this.$store.getters['events/getByGroup'](null).filter(e => e.upcoming)
-    },
-    translatedSeeAll() {
-      return this.$lang.get('dashboard.see_all_groups')
-    },
-    translatedYourGroupsHeading() {
-      return this.$lang.get('dashboard.your_groups_heading')
-    },
-    translatedGroupsHeading() {
-      return this.$lang.get('dashboard.groups_heading')
-    },
-    translatedUpcomingEventsTitle() {
-      return this.$lang.get('dashboard.upcoming_events_title')
-    },
-    translatedUpcomingEventsSubTitle() {
-      return this.$lang.get('dashboard.upcoming_events_subtitle')
-    },
-    translatedAddEvent() {
-      return this.$lang.get('dashboard.add_event')
-    },
-    translatedNoUpcomingEvents() {
-      return this.$lang.get('events.no_upcoming_for_your_groups')
     },
     translatedNewlyAdded() {
       return this.$lang.choice('dashboard.newly_added', this.newGroups, {

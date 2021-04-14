@@ -3,7 +3,7 @@
     <h1 class="d-flex justify-content-between">
         <div class="d-flex">
             <div class="mt-2">
-                {{ translatedTitle }}
+                {{ __('microtasking.title') }}
             </div>
             <b-img id="doodle" class="height ml-4" src="/images/workbench_doodle.svg" />
         </div>
@@ -74,11 +74,6 @@ export default {
     discourseBaseUrl: {
       type: String,
       required: true
-    }
-  },
-  computed: {
-    translatedTitle() {
-      return this.$lang.get('microtasking.title')
     }
   },
 }
