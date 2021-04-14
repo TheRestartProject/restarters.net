@@ -64,11 +64,10 @@
                             <div class="col">
                                 <h5>Want to keep up with our work?</h5>
                                 <p>
-                                    <a href="https://therestartproject.org/" target="_blank">The Restart Project</a> prototyped this app, you can follow and contribute to discussions on repair data from repair events on their <a href="https://talk.restarters.net/t/our-work-on-repair-data/1150" target="_blank">community platform</a>.
+                                    The <a href="https://openrepair.org/get-involved" target="_blank">Open Repair Alliance</a> collates data about repairs from community events around the world. This data helps us advocate for products that last longer and are easier to fix.
                                 </p>
                                 <p>
-                                    Sign up to the <a href="https://openrepair.org/get-involved" target="_blank">Open Repair Alliance</a> newsletter to get updates on our work on data.
-                                </p>
+                                    <a href="https://therestartproject.org/" target="_blank">The Restart Project</a> is a member of the Open Repair Alliance and made this app. You can join our community to learn more about community repair events and repair data by signing up below.</p>
                             </div>
                         </div>
                     </div>
@@ -87,8 +86,7 @@
 
             document.getElementById('btn-join').addEventListener('click', function (e) {
                 e.preventDefault();
-                window.open("https://openrepair.org/get-involved/", '_blank');
-                document.getElementById('btn-skip').click();
+                window.location.replace('{{ url('/user/register/') }}');
             }, true);
 
             document.getElementById('btn-skip').addEventListener('click', function (e) {
