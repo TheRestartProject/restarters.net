@@ -33,7 +33,7 @@
             Attribution: Vincent Le Moign
             https://commons.wikimedia.org/wiki/Category:SVG_emoji_smilies
                 -->
-                <img src="{{ asset('/images/printcatora/099-smiling-cat-face-with-heart-eyes-64px.svg.png') }}" alt="happy cat" width="48" height="48" />
+                <img src="{{ asset('/images/printcatora/paw-prints.png') }}" alt="paw prints" width="48" height="48" />
                 <p>
                     Find out more, and give us your feedback, in the <a href="https://talk.restarters.net/t/4664" target="_blank">PrintCat discussion</a>.
                 </p>
