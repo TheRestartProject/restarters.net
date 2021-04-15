@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'field_event_name_helper' => 'Name of the venue or neighbourhood',
     'field_venue_helper' => 'I.e. the place where the fixing happens!',
     'create_event' => 'Create event',
@@ -191,4 +191,4 @@ return array(
     'other_events' => 'Other events',
     'validate_location' => 'Location must be present unless the event is online.',
     'online' => 'Online',
-);
+];

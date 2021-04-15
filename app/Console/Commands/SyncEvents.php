@@ -76,27 +76,27 @@ class SyncEvents extends Command
 
                 $group = Group::where('idgroups', $event->group)->first();
 
-                $custom_fields = array(
-                    array('key' => 'party_grouphash', 'value' => $event->group),
-                    array('key' => 'party_groupcountry', 'value' => $group->country),
-                    array('key' => 'party_groupcity', 'value' => $group->area),
-                    array('key' => 'party_venue', 'value' => $event->venue),
-                    array('key' => 'party_location', 'value' => $event->location),
-                    array('key' => 'party_time', 'value' => $event->start.' - '.$event->end),
-                    array('key' => 'party_date', 'value' => $event->event_date),
-                    array('key' => 'party_timestamp', 'value' => $startTimestamp),
-                    array('key' => 'party_timestamp_end', 'value' => $endTimestamp),
-                    array('key' => 'party_stats', 'value' => $event->idevents),
-                    array('key' => 'party_lat', 'value' => $event->latitude),
-                    array('key' => 'party_lon', 'value' => $event->longitude),
-                );
+                $custom_fields = [
+                    ['key' => 'party_grouphash', 'value' => $event->group],
+                    ['key' => 'party_groupcountry', 'value' => $group->country],
+                    ['key' => 'party_groupcity', 'value' => $group->area],
+                    ['key' => 'party_venue', 'value' => $event->venue],
+                    ['key' => 'party_location', 'value' => $event->location],
+                    ['key' => 'party_time', 'value' => $event->start.' - '.$event->end],
+                    ['key' => 'party_date', 'value' => $event->event_date],
+                    ['key' => 'party_timestamp', 'value' => $startTimestamp],
+                    ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
+                    ['key' => 'party_stats', 'value' => $event->idevents],
+                    ['key' => 'party_lat', 'value' => $event->latitude],
+                    ['key' => 'party_lon', 'value' => $event->longitude],
+                ];
 
-                $content = array(
+                $content = [
                     'post_type' => 'party',
                     'post_title' => ! empty($event->venue) ? $event->venue : $event->location,
                     'post_content' => $event->free_text,
                     'custom_fields' => $custom_fields,
-                );
+                ];
 
                 // We need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
                 $thePost = $this->wordpressClient->getPost($event->wordpress_post_id);

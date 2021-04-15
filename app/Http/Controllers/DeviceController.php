@@ -158,7 +158,7 @@ class DeviceController extends Controller
                     $data['spare_parts'] = 2;
                 }
 
-                $update = array(
+                $update = [
                     'event' => $data['event'],
                     'category' => $data['category'],
                     'category_creation' => $data['category'],
@@ -174,7 +174,7 @@ class DeviceController extends Controller
                     'professional_help' => $professional_help,
                     'do_it_yourself' => $do_it_yourself,
                     'wiki' => $wiki,
-                );
+                ];
 
                 $u = Device::find($id)->update($update);
 
@@ -255,7 +255,7 @@ class DeviceController extends Controller
             $UserEvents = $Events->ofThisUser($user->id);
 
             if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST)) {
-                $error = array();
+                $error = [];
                 $data = array_filter($_POST);
                 $Device = new Device;
 
@@ -277,7 +277,7 @@ class DeviceController extends Controller
                     // add initial category (for backlogging upon revision)
                     $data['category_creation'] = $data['category'];
 
-                    $insert = array(
+                    $insert = [
                         'event' => $data['event'],
                         'category' => $data['category'],
                         'category_creation' => $data['category'],
@@ -287,7 +287,7 @@ class DeviceController extends Controller
                         'model' => $data['model'],
                         'problem' => $data['problem'],
                         'repaired_by' => $data['repaired_by'],
-                    );
+                    ];
 
                     // save this!
                     $insert = $Device->create($insert);

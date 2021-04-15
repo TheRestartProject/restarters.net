@@ -59,7 +59,7 @@ class FixometerFile extends Model
             if ( ! @move_uploaded_file($tmp_name, $lpath)) {
                 return false;
             }
-            $data = array();
+            $data = [];
             $this->path = $lpath;
             $data['path'] = $this->file;
 
@@ -145,11 +145,11 @@ class FixometerFile extends Model
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $lext = array_search(
             $finfo->file($tmp_name),
-            array(
+            [
                 'jpg' => 'image/jpeg',
                 'png' => 'image/png',
                 'gif' => 'image/gif',
-            ),
+            ],
             true
         );
 
@@ -170,7 +170,7 @@ class FixometerFile extends Model
                     `x`.`reference` = :refId';
 
         try {
-            return DB::select(DB::raw($sql), array('refType' => $of_ref_type, 'refId' => $ref_id));
+            return DB::select(DB::raw($sql), ['refType' => $of_ref_type, 'refId' => $ref_id]);
         } catch (\Illuminate\Database\QueryException $e) {
             return db($e);
         }
@@ -183,7 +183,7 @@ class FixometerFile extends Model
         $sql = 'DELETE FROM `images` WHERE `idimages` = :id';
 
         try {
-            return DB::delete(DB::raw($sql), array('id' => $id));
+            return DB::delete(DB::raw($sql), ['id' => $id]);
         } catch (\Illuminate\Database\QueryException $e) {
             return db($e);
         }
@@ -191,7 +191,7 @@ class FixometerFile extends Model
         $sql = 'DELETE FROM `xref` WHERE `object` = :id AND `object_type` = '.env('TBL_IMAGES');
 
         try {
-            return DB::delete(DB::raw($sql), array('id' => $id));
+            return DB::delete(DB::raw($sql), ['id' => $id]);
         } catch (\Illuminate\Database\QueryException $e) {
             return db($e);
         }

@@ -129,7 +129,7 @@ class GroupController extends Controller
         }
 
         if ($request->isMethod('post') && ! empty($request->post())) {
-            $error = array();
+            $error = [];
             $Group = new Group;
 
             // We got data! Elaborate. //NB:: Taken out frequency as it doesn't appear in the post data might be gmaps
@@ -165,7 +165,7 @@ class GroupController extends Controller
             }
 
             if (empty($error)) {
-                $data = array('name' => $name,
+                $data = ['name' => $name,
                     'website' => $website,
                     // 'frequency'     => $freq,
                     'location' => $location,
@@ -174,7 +174,7 @@ class GroupController extends Controller
                     'country' => $country,
                     'free_text' => $text,
                     'shareable_code' => FixometerHelper::generateUniqueShareableCode('App\Group', 'shareable_code'),
-                );
+                ];
 
                 $group = $Group->create($data);
                 $idGroup = $group->idgroups;
@@ -300,7 +300,7 @@ class GroupController extends Controller
         $groups = $Group->ofThisUser($user->id);
 
         // get list of ids to check in if condition
-        $gids = array();
+        $gids = [];
         foreach ($groups as $group) {
             $gids[] = $group->idgroups;
         }
@@ -326,19 +326,19 @@ class GroupController extends Controller
 
         /** co2 counters **/
         $co2_years = $Device->countCO2ByYear($group->idgroups);
-        $stats = array();
+        $stats = [];
         foreach ($co2_years as $year) {
             $stats[$year->year] = $year->co2;
         }
 
         $waste_years = $Device->countWasteByYear($group->idgroups);
 
-        $wstats = array();
+        $wstats = [];
         foreach ($waste_years as $year) {
             $wstats[$year->year] = $year->waste;
         }
 
-        $clusters = array();
+        $clusters = [];
 
         for ($i = 1; $i <= 4; $i++) {
             $cluster = $Device->countByCluster($i, $group->idgroups);
@@ -364,7 +364,7 @@ class GroupController extends Controller
         }
 
         // most/least stats for clusters
-        $mostleast = array();
+        $mostleast = [];
         for ($i = 1; $i <= 4; $i++) {
             $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i, $group->idgroups);
             $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i, $group->idgroups);
@@ -508,12 +508,12 @@ class GroupController extends Controller
                 $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
                 $url = url('/user/register/'.$hash);
 
-                $invite = Invite::create(array(
+                $invite = Invite::create([
                     'record_id' => $group_id,
                     'email' => $non_user,
                     'hash' => $hash,
                     'type' => 'group',
-                ));
+                ]);
 
                 Notification::send($invite, new JoinGroup([
                     'name' => $from->name,
@@ -639,7 +639,7 @@ class GroupController extends Controller
                 //return redirect()->back()->with('error', 'Could not find group location - please try again!');
             }
 
-            $update = array(
+            $update = [
                 'name' => $data['name'],
                 'website' => $data['website'],
                 'free_text' => $data['free_text'],
@@ -647,7 +647,7 @@ class GroupController extends Controller
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'country' => $country,
-            );
+            ];
 
             if ($user->hasRole('Administrator') || $user->hasRole('NetworkCoordinator')) {
                 $update['area'] = $data['area'];
@@ -1020,7 +1020,7 @@ class GroupController extends Controller
         $groups = $Group->ofThisUser($user->id);
 
         // get list of ids to check in if condition
-        $gids = array();
+        $gids = [];
         foreach ($groups as $group) {
             $gids[] = $group->idgroups;
         }
@@ -1060,14 +1060,14 @@ class GroupController extends Controller
 
         /** co2 counters **/
         $co2_years = $Device->countCO2ByYear($group->idgroups);
-        $stats = array();
+        $stats = [];
         foreach ($co2_years as $year) {
             $stats[$year->year] = $year->co2;
         }
 
         $waste_years = $Device->countWasteByYear($group->idgroups);
 
-        $wstats = array();
+        $wstats = [];
         foreach ($waste_years as $year) {
             $wstats[$year->year] = $year->waste;
         }
@@ -1076,7 +1076,7 @@ class GroupController extends Controller
 
         $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
 
-        $clusters = array();
+        $clusters = [];
 
         for ($i = 1; $i <= 4; $i++) {
             $cluster = $Device->countByCluster($i, $group->idgroups);
@@ -1102,7 +1102,7 @@ class GroupController extends Controller
         }
 
         // most/least stats for clusters
-        $mostleast = array();
+        $mostleast = [];
         for ($i = 1; $i <= 4; $i++) {
             $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i, $group->idgroups);
             $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i, $group->idgroups);

@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'skills' => 'Compétences',
     'my_skills' => 'Mes compétences',
     'biography' => 'Biographie',
@@ -16,4 +16,4 @@ return array(
     'profile_picture' => 'Photo de profil',
     'delete_account' => 'Supprimer compte',
     'delete_account_text' => 'Je comprends que la suppression de mon compte entraînera celle de mes données personnelles et que c\'est une action permanente.',
-);
+];

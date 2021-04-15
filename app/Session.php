@@ -35,7 +35,7 @@ class Session extends Model
         try {
             DB::insert(
                 DB::raw('INSERT INTO `sessions`(`session`, `user`, created_at) VALUES (:session, :user, :tm)'),
-                array('session' => $session, 'user' => $user, 'tm' => $created_at)
+                ['session' => $session, 'user' => $user, 'tm' => $created_at]
             );
         } catch (\Illuminate\Database\QueryException $e) {
             return false;
@@ -49,7 +49,7 @@ class Session extends Model
         $sql = 'UPDATE `sessions` SET `session` = :session WHERE `user` = :user';
 
         try {
-            DB::update(DB::raw($sql), array('session' => $sessionToken, 'user' => $user));
+            DB::update(DB::raw($sql), ['session' => $sessionToken, 'user' => $user]);
 
             unset($_SESSION[env('APP_NAME')]);
             $_SESSION[env('APP_NAME')][env('APP_KEY')] = $sessionToken;//was $_SESSION[APPNAME][SESSIONKEY] will need a config file for SESSIONKEY
@@ -80,7 +80,7 @@ class Session extends Model
               WHERE sessions.session = :session';
 
         try {
-            $objectUser = DB::select(DB::raw($sql), array('session' => $session));
+            $objectUser = DB::select(DB::raw($sql), ['session' => $session]);
 
             if (is_object($objectUser)) {
                 $User = new User;

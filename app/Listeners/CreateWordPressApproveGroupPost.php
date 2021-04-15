@@ -63,12 +63,12 @@ class CreateWordPressApproveGroupPost
                     ['key' => 'group_longitude', 'value' => $group->longitude],
                 ];
 
-                $content = array(
+                $content = [
                     'post_type' => 'group',
                     'post_title' => $group->name,
                     'post_content' => $group->free_text,
                     'custom_fields' => $custom_fields,
-                );
+                ];
 
                 $wpid = $this->wpClient->newPost($group->name, $data['free_text'], $content);
 

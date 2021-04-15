@@ -54,12 +54,12 @@ class CreateWordPressEditGroupPost
                     ['key' => 'group_longitude', 'value' => $data['longitude']],
                 ];
 
-                $content = array(
+                $content = [
                     'post_type' => 'group',
                     'post_title' => $data['name'],
                     'post_content' => $data['free_text'],
                     'custom_fields' => $custom_fields,
-                );
+                ];
 
                 if ( ! empty($group->wordpress_post_id)) {
                     // We need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.

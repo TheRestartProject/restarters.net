@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'devices_logged' => 'Appareils enregistrés',
     'getting_started_header' => 'Pour commencer',
     'getting_started_text' => 'Bienvenue dans l\'espace communautaire des Restarters. Voici quelques actions pour vous aider à démarrer:',
@@ -46,4 +46,4 @@ return array(
     'upcoming_events_subtitle' => 'Les événements à venir de vos Repair Cafés',
     'upcoming_events_title' => 'Evénements à venir',
     'your_groups_heading' => 'Vos Repair Cafés',
-);
+];

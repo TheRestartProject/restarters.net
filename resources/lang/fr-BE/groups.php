@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'group' => 'Repair Café',
     'groups' => 'Repair Cafés',
     'all_groups' => 'Tous les Repair Cafés',
@@ -177,4 +177,4 @@ return array(
     'search_name_placeholder' => 'Rechercher nom...',
     'search_tags_placeholder' => 'Tag',
     'show_filters' => 'Montrer les filtres',
-);
+];

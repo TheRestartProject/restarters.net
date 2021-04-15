@@ -49,7 +49,7 @@ class RoleController extends Controller
             }
 
             $permissionsList = $role->rolePermissions($role->idroles);
-            $activePerms = array();
+            $activePerms = [];
             foreach ($permissionsList as $p) {
                 $activePerms[] = $p->permission;
             }

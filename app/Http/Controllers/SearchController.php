@@ -53,7 +53,7 @@ class SearchController extends Controller
             }
         } elseif (FixometerHelper::hasRole($user, 'Host')) {
             $groups = $Groups->ofThisUser($user->id);
-            $groupIds = array();
+            $groupIds = [];
             foreach ($groups as $i => $group) {
                 $groups[$i]->id = $group->idgroups;
                 $groupIds[] = $group->idgroups;
@@ -68,7 +68,7 @@ class SearchController extends Controller
             }
         }
         /** set parties to be grouped by group **/
-        $sorted_parties = array();
+        $sorted_parties = [];
         foreach ($parties as $party) {
             $sorted_parties[$party->group_name][] = $party;
         }
@@ -114,7 +114,7 @@ class SearchController extends Controller
 
             $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags, $allowedParties);
             if (count($PartyList) > 0) {
-                $partyIds = array();
+                $partyIds = [];
                 $participants = 0;
                 $hours_volunteered = 0;
                 $totalCO2 = 0;
@@ -160,7 +160,7 @@ class SearchController extends Controller
                 }
 
                 /** Cluster dataviz **/
-                $clusters = array();
+                $clusters = [];
 
                 for ($i = 1; $i <= 4; $i++) {
                     $cluster = $Search->countByCluster($partyIds, $i);
@@ -173,7 +173,7 @@ class SearchController extends Controller
                 }
 
                 // most/least stats for clusters
-                $mostleast = array();
+                $mostleast = [];
                 for ($i = 1; $i <= 4; $i++) {
                     $mostleast[$i]['most_seen'] = $Search->findMostSeen($partyIds, null, $i);
                     $mostleast[$i]['most_repaired'] = $Search->findMostSeen($partyIds, 1, $i);

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Search extends Model
 {
-    public function parties($list = array(), $groups = array(), $from = null, $to = null, $group_tags = null, $allowedParties = null)
+    public function parties($list = [], $groups = [], $from = null, $to = null, $group_tags = null, $allowedParties = null)
     {
         $eventsQuery = Party::pastEvents()
                      ->with('devices.deviceCategory')
@@ -69,7 +69,7 @@ class Search extends Model
                 ';
 
         try {
-            return DB::select(DB::raw($sql), array('cluster' => $cluster));
+            return DB::select(DB::raw($sql), ['cluster' => $cluster]);
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
@@ -98,11 +98,11 @@ class Search extends Model
 
         try {
             if ( ! is_null($status) && is_numeric($status) && is_null($cluster)) {
-                return DB::select(DB::raw($sql), array('status' => $status));
+                return DB::select(DB::raw($sql), ['status' => $status]);
             } elseif ( ! is_null($cluster) && is_numeric($cluster) && is_null($status)) {
-                return DB::select(DB::raw($sql), array('cluster' => $cluster));
+                return DB::select(DB::raw($sql), ['cluster' => $cluster]);
             } elseif ( ! is_null($status) && is_numeric($status) && ! is_null($cluster) && is_numeric($cluster)) {
-                return DB::select(DB::raw($sql), array('status' => $status, 'cluster' => $cluster));
+                return DB::select(DB::raw($sql), ['status' => $status, 'cluster' => $cluster]);
             }
 
             return DB::select(DB::raw($sql));

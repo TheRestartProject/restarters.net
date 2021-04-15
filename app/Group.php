@@ -136,7 +136,7 @@ class Group extends Model implements Auditable
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
-                WHERE `id'.$this->table.'` = :id'), array('id' => $id));
+                WHERE `id'.$this->table.'` = :id'), ['id' => $id]);
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
@@ -166,7 +166,7 @@ class Group extends Model implements Auditable
                 ON `xi`.`reference` = `u`.`id`
 
                 WHERE `g`.`idgroups` = :id
-                AND `u`.`role` = 3'), array('id' => $id));
+                AND `u`.`role` = 3'), ['id' => $id]);
     }
 
     public function ofThisUser($id)
@@ -185,7 +185,7 @@ class Group extends Model implements Auditable
                 ON `xi`.`reference` = `g`.`idgroups`
 
                 WHERE `ug`.`user` = :id
-                ORDER BY `g`.`name` ASC'), array('id' => $id));
+                ORDER BY `g`.`name` ASC'), ['id' => $id]);
     }
 
     public function groupImage()

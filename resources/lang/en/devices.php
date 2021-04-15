@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'field_device_images' => 'Add device images here',
     'field_device_images_2' => 'Choose compelling images that show off your work',
     'useful_repair_urls_helper' => 'Enter URL here',
@@ -123,4 +123,4 @@ return array(
     'event_info' => 'Event Info',
     'search_assessment_comments' => 'Assessment',
     'interesting_case_study' => 'Interesting case study',
-);
+];

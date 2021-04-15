@@ -15,7 +15,7 @@ class ApiController extends Controller
 {
     public static function homepage_data()
     {
-        $result = array();
+        $result = [];
 
         $Device = new Device;
 

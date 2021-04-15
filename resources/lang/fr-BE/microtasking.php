@@ -1,18 +1,18 @@
 <?php
 
-return array(
-    'cta' => array(
+return [
+    'cta' => [
         'description' => 'Nous voyons beaucoup de smartphones lors d\'événements de réparation. Mais pourquoi cassent-ils si vite et qu\'est-ce qui pourrait les rendre plus facile à réparer? Aidez-nous à déterminer les problèmes les plus fréquents que l\'on peut rencontrer avec les smartphones avec MobiFix',
         'get_involved' => 'Participer',
         'title' => 'Aider maintenant! MobiFix',
-    ),
-    'discussion' => array(
+    ],
+    'discussion' => [
         'number_of_comments' => 'Nombre de commentaires',
         'see_all' => 'Voir tout',
         'title' => 'Que se passe-t-il',
         'topic_created_at' => 'Sujet créé',
-    ),
-    'news' => array(
+    ],
+    'news' => [
         'title' => 'Lire nos récents succès',
         'content' => 'Lors de notre recherche FaultCat , des centaines de bénévoles nous ont aidé à analyser nos données sur les ordinateurs.
                     <ul>
@@ -21,9 +21,9 @@ return array(
                             <a href="https://talk.restarters.net/t/repair-data-in-the-times-piece-on-e-waste/2501">Voir la visualisation des données</a> apparue dans le journal The Times.
                         </li>
                     </ul>',
-    ),
+    ],
     'title' => 'Atelier de données',
-    'volunteering' => array(
+    'volunteering' => [
         'all_volunteer_contributions' => 'Total des apports des volontaires',
         'join' => 'Rejoindre',
         'my_contributions' => 'Mes contributions',
@@ -36,5 +36,5 @@ return array(
         'all_quests' => '3 recherches',
         'number_of_quests' => 'Nombre de recherches',
         'my_quests' => ':value recherche(s)',
-    ),
-);
+    ],
+];

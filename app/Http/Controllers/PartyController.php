@@ -203,7 +203,7 @@ class PartyController extends Controller
                 ],
             ]);
 
-            $error = array();
+            $error = [];
 
             if ($request->filled('location')) {
                 try {
@@ -266,7 +266,7 @@ class PartyController extends Controller
                 $hours = $dtDiff->h;
 
                 // No errors. We can proceed and create the Party.
-                $data = array(
+                $data = [
                     'event_date' => $event_date,
                     'start' => $start,
                     'end' => $end,
@@ -283,7 +283,7 @@ class PartyController extends Controller
                     'created_at' => date('Y-m-d H:i:s'),
                     'shareable_code' => FixometerHelper::generateUniqueShareableCode('App\Party', 'shareable_code'),
                     'online' => $online,
-                );
+                ];
 
                 $party = Party::create($data);
                 $idParty = $party->idevents;
@@ -461,7 +461,7 @@ class PartyController extends Controller
             $data['latitude'] = $latitude;
             $data['longitude'] = $longitude;
 
-            $update = array(
+            $update = [
                 'event_date' => $data['event_date'],
                 'start' => $data['start'],
                 'end' => $data['end'],
@@ -472,7 +472,7 @@ class PartyController extends Controller
                 'location' => $data['location'],
                 'latitude' => $latitude,
                 'longitude' => $longitude,
-            );
+            ];
 
             $u = Party::findOrFail($id)->update($update);
 
@@ -842,32 +842,32 @@ class PartyController extends Controller
                 $Groups = new Group;
                 $Host = $Groups->findHost($party->group);
 
-                $custom_fields = array(
+                $custom_fields = [
                     //array('key' => 'party_host',            'value' => $Host->hostname),
                     //array('key' => 'party_hostavatarurl',   'value' => UPLOADS_URL . 'mid_' . $Host->path),
-                    array('key' => 'party_grouphash',       'value' => $party->group),
-                    array('key' => 'party_location',        'value' => $party->location),
-                    array('key' => 'party_time',            'value' => substr($party->start, 0, -3).' - '.substr($party->end, 0, -3)),
-                    array('key' => 'party_date',            'value' => date('d/m/Y', $party->event_date)),
-                    array('key' => 'party_timestamp',       'value' => $party->event_timestamp),
-                    array('key' => 'party_timestamp_end',   'value' => $party->event_end_timestamp),
-                    array('key' => 'party_stats',           'value' => $idparty),
-                    array('key' => 'party_lat',             'value' => $party->latitude),
-                    array('key' => 'party_lon',             'value' => $party->longitude),
+                    ['key' => 'party_grouphash',       'value' => $party->group],
+                    ['key' => 'party_location',        'value' => $party->location],
+                    ['key' => 'party_time',            'value' => substr($party->start, 0, -3).' - '.substr($party->end, 0, -3)],
+                    ['key' => 'party_date',            'value' => date('d/m/Y', $party->event_date)],
+                    ['key' => 'party_timestamp',       'value' => $party->event_timestamp],
+                    ['key' => 'party_timestamp_end',   'value' => $party->event_end_timestamp],
+                    ['key' => 'party_stats',           'value' => $idparty],
+                    ['key' => 'party_lat',             'value' => $party->latitude],
+                    ['key' => 'party_lon',             'value' => $party->longitude],
 
-                );
+                ];
 
                 /** Start WP XML-RPC **/
                 $wpClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
                 $wpClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));
 
                 $text = (empty($party->free_text) ? '...' : $party->free_text);
-                $content = array(
+                $content = [
                     'post_type' => 'party',
                     'post_title' => $party->location,
                     'post_content' => $text,
                     'custom_fields' => $custom_fields,
-                );
+                ];
 
                 // Check for WP existence in DB
                 // $theParty = $this->Party->findOne($idparty);
@@ -888,7 +888,7 @@ class PartyController extends Controller
                     $wpClient->editPost($party->wordpress_post_id, $content);
                 } else {
                     $returnId = $wpClient->newPost($Host->groupname, $text, $content);
-                    $this->Party->update(array('wordpress_post_id' => $returnId), $idparty);
+                    $this->Party->update(['wordpress_post_id' => $returnId], $idparty);
                 }
 
                 unset($party);
@@ -898,7 +898,7 @@ class PartyController extends Controller
 
         $party = $Party->findThis($id, true);
         $categories = $Category->listed();
-        $restarters = $User->find(array('idroles' => 4));
+        $restarters = $User->find(['idroles' => 4]);
 
         $party = $party[0];
 
@@ -1146,13 +1146,13 @@ class PartyController extends Controller
 
                     $event = Party::find($event_id);
 
-                    $arr = array(
+                    $arr = [
                         'name' => $from->name,
                         'group' => $group_name,
                         'url' => $url,
                         'message' => $message,
                         'event' => $event,
-                    );
+                    ];
 
                     // Get Creator of Event
                     if ( ! empty($userCreator = User::find($event->user_id))) {
@@ -1177,22 +1177,22 @@ class PartyController extends Controller
                     $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
                     $url = url('/user/register/'.$hash);
 
-                    $invite = Invite::create(array(
+                    $invite = Invite::create([
                         'record_id' => $event_id,
                         'email' => $non_user,
                         'hash' => $hash,
                         'type' => 'event',
-                    ));
+                    ]);
 
                     $event = Party::find($event_id);
 
-                    $arr = array(
+                    $arr = [
                         'name' => $from->name,
                         'group' => $group_name,
                         'url' => $url,
                         'message' => $message,
                         'event' => $event,
-                    );
+                    ];
 
                     Notification::send($invite, new JoinEvent($arr));
                 }

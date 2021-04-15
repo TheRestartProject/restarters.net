@@ -374,10 +374,10 @@ class FixometerHelper
 
             try {
                 if ($return_rows) {
-                    return DB::select(DB::raw($sql), array('id' => $id, 'object' => $object));
+                    return DB::select(DB::raw($sql), ['id' => $id, 'object' => $object]);
                 }
 
-                return (count(DB::select(DB::raw($sql), array('id' => $id, 'object' => $object))) > 0 ? true : false);
+                return (count(DB::select(DB::raw($sql), ['id' => $id, 'object' => $object])) > 0 ? true : false);
             } catch (\Illuminate\Database\QueryException $e) {
                 return db($e);
             }
@@ -423,12 +423,12 @@ class FixometerHelper
                   `xref`.`reference_type` = :object AND
                   `xref`.`reference` = :id ';
 
-            DB::delete(DB::raw($sql), array('id' => $id, 'object' => $object));
+            DB::delete(DB::raw($sql), ['id' => $id, 'object' => $object]);
 
             /** delete image from db **/
             $sql = 'DELETE FROM `images` WHERE `images`.`idimages` = :image';
 
-            DB::delete(DB::raw($sql), array('image' => $image->idimages));
+            DB::delete(DB::raw($sql), ['image' => $image->idimages]);
 
             /** delete image from disk **/
             unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.$image->path);
@@ -743,7 +743,7 @@ class FixometerHelper
 
     public static function getLatLongFromCityCountry($town_city = null, $country = null)
     {
-        $return = array();
+        $return = [];
         $query = '';
 
         // Try and get country long name to improve geocoding.
@@ -1035,10 +1035,10 @@ class FixometerHelper
      */
     public static function discourseAPICall($call, $parameters = [], $fallback = false)
     {
-        $data = array(
+        $data = [
             'api_key' => env('DISCOURSE_APIKEY'),
             // 'api_username' => env('DISCOURSE_APIUSER'),
-        );
+        ];
 
         try {
             return json_decode(

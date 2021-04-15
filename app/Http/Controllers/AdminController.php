@@ -100,13 +100,13 @@ class AdminController extends Controller
 
         /** co2 counters **/
         $co2_years = $Device->countCO2ByYear();
-        $stats = array();
+        $stats = [];
         foreach ($co2_years as $year) {
             $stats[$year->year] = $year->co2;
         }
 
         $waste_years = $Device->countWasteByYear();
-        $wstats = array();
+        $wstats = [];
         foreach ($waste_years as $year) {
             $wstats[$year->year] = $year->waste;
         }
@@ -116,7 +116,7 @@ class AdminController extends Controller
 
         $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
 
-        $clusters = array();
+        $clusters = [];
 
         for ($i = 1; $i <= 4; $i++) {
             $cluster = $Device->countByCluster($i);
@@ -142,7 +142,7 @@ class AdminController extends Controller
         }
 
         // most/least stats for clusters
-        $mostleast = array();
+        $mostleast = [];
         for ($i = 1; $i <= 4; $i++) {
             $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i);
             $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i);
@@ -164,7 +164,7 @@ class AdminController extends Controller
             'upcomingparties' => $Party->findNextParties(),
             'allparties' => $allparties,
             'devices' => $devices,
-            'weights' => array(0 => array('total_footprints' => $TotalEmission, 'total_weights' => $TotalWeight)),
+            'weights' => [0 => ['total_footprints' => $TotalEmission, 'total_weights' => $TotalWeight]],
             'device_count_status' => $Device->statusCount(),
             'year_data' => $co2_years,
             'bar_chart_stats' => array_reverse($stats, true),
@@ -273,13 +273,13 @@ class AdminController extends Controller
 
         /** co2 counters **/
         $co2_years = $Device->countCO2ByYear();
-        $stats = array();
+        $stats = [];
         foreach ($co2_years as $year) {
             $stats[$year->year] = $year->co2;
         }
 
         $waste_years = $Device->countWasteByYear();
-        $wstats = array();
+        $wstats = [];
         foreach ($waste_years as $year) {
             $wstats[$year->year] = $year->waste;
         }
@@ -289,7 +289,7 @@ class AdminController extends Controller
 
         $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
 
-        $clusters = array();
+        $clusters = [];
 
         for ($i = 1; $i <= 4; $i++) {
             $cluster = $Device->countByCluster($i);
@@ -315,7 +315,7 @@ class AdminController extends Controller
         }
 
         // most/least stats for clusters
-        $mostleast = array();
+        $mostleast = [];
         for ($i = 1; $i <= 4; $i++) {
             $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i);
             $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i);

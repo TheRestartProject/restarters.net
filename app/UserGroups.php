@@ -52,7 +52,7 @@ class UserGroups extends Model implements Auditable
 
         foreach ($groups as &$group) {
             try {
-                DB::insert(DB::raw($sql), array('user' => $iduser, 'group' => $group));
+                DB::insert(DB::raw($sql), ['user' => $iduser, 'group' => $group]);
             } catch (\Illuminate\Database\QueryException $e) {
                 if (env('APP_ENV') == 'local' || env('APP_ENV') == 'development') {
                     dd($e);
@@ -76,7 +76,7 @@ class UserGroups extends Model implements Auditable
         $sql = 'DELETE FROM `users_groups` WHERE `user` = :id';
 
         try {
-            DB::delete(DB::raw($sql), array('id' => $iduser));
+            DB::delete(DB::raw($sql), ['id' => $iduser]);
 
             return true;
         } catch (\Illuminate\Database\QueryException $e) {

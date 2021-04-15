@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'about_event_name_header' => 'A propos :event',
     'rsvp_message' => 'Super! Vous nous rejoignez pour cet événement',
     'rsvp_button' => 'Désolé, je ne peux plus participer',
@@ -190,4 +190,4 @@ return array(
     'form_error' => 'Veuillez vérifier que le formulaire ci-dessus ne contient pas d\'erreurs.',
     'your_events' => 'Vos événements',
     'validate_location' => 'La localisation doit être encodée sauf s\'il s\'agit d\'un événement en ligne',
-);
+];

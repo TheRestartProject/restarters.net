@@ -71,7 +71,7 @@ class Role extends Model
         return DB::select(DB::raw('SELECT * FROM `permissions`
                     INNER JOIN `roles_permissions` ON `roles_permissions`.`permission` = `permissions`.`idpermissions`
                     WHERE `roles_permissions`.`role` = :role
-                    ORDER BY `idpermissions` ASC'), array('role' => $role));
+                    ORDER BY `idpermissions` ASC'), ['role' => $role]);
     }
 
     public function edit($id, $data)
@@ -79,14 +79,14 @@ class Role extends Model
         //Tested!
 
         // delete permissions before updating references
-        DB::delete(DB::raw('DELETE FROM roles_permissions WHERE role = :role'), array('role' => $id));
+        DB::delete(DB::raw('DELETE FROM roles_permissions WHERE role = :role'), ['role' => $id]);
 
         // insert data here
         $sql = 'INSERT INTO roles_permissions(role, permission) VALUES (:role, :permission)';
 
         foreach ($data as &$p) {
             try {
-                DB::insert(DB::raw($sql), array('role' => $id, 'permission' => $p));
+                DB::insert(DB::raw($sql), ['role' => $id, 'permission' => $p]);
             } catch (\Illuminate\Database\QueryException $e) {
                 return false;
             }

@@ -165,7 +165,7 @@ class User extends Authenticatable implements Auditable
         return DB::select(DB::raw('SELECT p.idpermissions, p.permission, r.idroles, r.role FROM permissions AS p
                 INNER JOIN roles_permissions AS rp ON rp.permission = p.idpermissions
                 INNER JOIN roles AS r ON rp.role= r.idroles
-                WHERE r.role = :role'), array('role' => $role));
+                WHERE r.role = :role'), ['role' => $role]);
     }
 
     public function getUserGroups($user)
@@ -173,7 +173,7 @@ class User extends Authenticatable implements Auditable
         return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `u`
                 INNER JOIN `users_groups` AS `ug` ON `ug`.`user` = `u`.`id`
                 INNER JOIN `groups` AS `g` ON `ug`.`group` = `g`.`idgroups`
-                WHERE `u`.`id` = :id'), array('id' => $user));
+                WHERE `u`.`id` = :id'), ['id' => $user]);
     }
 
     // Setters
@@ -268,7 +268,7 @@ class User extends Authenticatable implements Auditable
                 WHERE users.role > 1
                     AND users.id IN
                         (SELECT `user` FROM users_groups WHERE `group` = :group)
-                ORDER BY users.name ASC'), array('group' => $group));
+                ORDER BY users.name ASC'), ['group' => $group]);
     }
 
     public function isInGroup($groupId)
@@ -285,7 +285,7 @@ class User extends Authenticatable implements Auditable
     {
         //Tested!
 
-        $r = DB::select(DB::raw('SELECT COUNT(id) AS emails FROM '.$this->table.' WHERE email = :email'), array('email' => $email));
+        $r = DB::select(DB::raw('SELECT COUNT(id) AS emails FROM '.$this->table.' WHERE email = :email'), ['email' => $email]);
 
         return ($r[0]->emails > 0) ? false : true;
     }

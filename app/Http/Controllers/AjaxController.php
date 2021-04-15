@@ -34,7 +34,7 @@ class AjaxController extends Controller
             $this->set('user', $user);
 
             $Users = new User;
-            $restarters = $Users->find(array('idroles' => 4));
+            $restarters = $Users->find(['idroles' => 4]);
 
             $response = '';
             foreach ($restarters as $c) {
@@ -58,7 +58,7 @@ class AjaxController extends Controller
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $party = $_GET['id'];
         } else {
-            echo json_encode(array('code' => 500, 'status' => 'danger', 'message' => 'Missing Parameter.'));
+            echo json_encode(['code' => 500, 'status' => 'danger', 'message' => 'Missing Parameter.']);
 
             return false;
         }

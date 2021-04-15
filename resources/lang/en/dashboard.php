@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'devices_logged' => 'devices logged',
     'getting_started_header' => 'Getting started',
     'getting_started_text' => 'Welcome to the Restarters community space!  Here are a few actions to get you started:',
@@ -51,4 +51,4 @@ return array(
     'no_groups' => '<strong>You don\'t follow any repair groups yet</strong><br />There are community <a href="/group/all">groups all over the world</a>. You\'re welcome to follow any group to get notified when they organise events.',
     'interested_starting' => 'Want to start your own community repair group?',
     'interested_details' => '<p>Anyone with interest and some skills in organising can start a community repair group. Check out our <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">event planning kit</a> or view our <a href="https://talk.restarters.net/c/community-repair/school">resources for schools</a>.</p><p>Once you\'re ready to start a group, simply create one on the <a href="/groups">Groups page</a>.  And if you\'d like some help, just ask over on the forum, <a href="https://talk.restarters.net/c/community-repair/5">Talk</a>.',
-);
+];

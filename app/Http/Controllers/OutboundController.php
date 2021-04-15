@@ -21,7 +21,7 @@ class OutboundController extends Controller
             abort(404);
         } else {
             // Define variables
-            $info = array();
+            $info = [];
             $co2 = 0;
             $id = (int) $id;
             $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);

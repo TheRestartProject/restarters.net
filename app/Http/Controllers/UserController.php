@@ -449,13 +449,13 @@ class UserController extends Controller
         $devices = $Device->statusCount();
 
         $co2_years = $Device->countCO2ByYear();
-        $stats = array();
+        $stats = [];
         foreach ($co2_years as $year) {
             $stats[$year->year] = $year->co2;
         }
 
         $waste_years = $Device->countWasteByYear();
-        $wstats = array();
+        $wstats = [];
         foreach ($waste_years as $year) {
             $wstats[$year->year] = $year->waste;
         }
@@ -469,7 +469,7 @@ class UserController extends Controller
 
                 if ( ! empty($user)) {
                     $id = $user->id;
-                    $data = array();
+                    $data = [];
 
                     // generate recovery code
                     $bytes = 32;
@@ -552,13 +552,13 @@ class UserController extends Controller
         $devices = $Device->statusCount();
 
         $co2_years = $Device->countCO2ByYear();
-        $stats = array();
+        $stats = [];
         foreach ($co2_years as $year) {
             $stats[$year->year] = $year->co2;
         }
 
         $waste_years = $Device->countWasteByYear();
-        $wstats = array();
+        $wstats = [];
         foreach ($waste_years as $year) {
             $wstats[$year->year] = $year->waste;
         }
@@ -587,9 +587,9 @@ class UserController extends Controller
             } else {
                 $user = $User->where('recovery', '=', $recovery)->first();
                 if ( ! empty($user)) {
-                    $data = array(
+                    $data = [
                         'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
-                    );
+                    ];
                     $update = $user->update($data);
                     if ($update) {
                         return redirect('login')->with('success', 'Password updated, please login to continue');
@@ -752,7 +752,7 @@ class UserController extends Controller
             $User = new User;
 
             if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST)) {
-                $error = array();
+                $error = [];
 
                 // We got data! Elaborate.
                 $name = $_POST['name'];
@@ -792,13 +792,13 @@ class UserController extends Controller
                     $pwd = bin2hex(openssl_random_pseudo_bytes(8));
 
                     // No errors. We can proceed and create the User.
-                    $data = array('name' => $name,
+                    $data = ['name' => $name,
                         'email' => $email,
                         'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
                         'role' => $role,
                         'calendar_hash' => str_random(15),
                         //'group'    => $group
-                    );
+                    ];
 
                     // add password recovery data
                     $bytes = 32;
@@ -946,7 +946,7 @@ class UserController extends Controller
 
                     $userdata = User::find($id);
 
-                    $usergroups = array();
+                    $usergroups = [];
                     $ugroups = $User->getUserGroups($id);
                     foreach ($ugroups as $g) {
                         $usergroups[] = $g->group;
@@ -967,7 +967,7 @@ class UserController extends Controller
                 }
                 $userdata = User::find($id);
 
-                $usergroups = array();
+                $usergroups = [];
                 $ugroups = $User->getUserGroups($id);
                 foreach ($ugroups as $g) {
                     $usergroups[] = $g->group;
@@ -989,7 +989,7 @@ class UserController extends Controller
 
             $userdata = User::find($id);
 
-            $usergroups = array();
+            $usergroups = [];
             $ugroups = $User->getUserGroups($id);
             foreach ($ugroups as $g) {
                 $usergroups[] = $g->group;

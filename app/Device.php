@@ -56,7 +56,7 @@ class Device extends Model implements Auditable
                 }
             }
 
-            $clauses = array();
+            $clauses = [];
 
             foreach ($params as $f => $v) {
                 if ($f == 'event_date') {
@@ -127,7 +127,7 @@ AND devices.event = events.idevents ';
             FROM `'.$this->table.'` AS `d`
             INNER JOIN `categories` AS `c` ON  `d`.`category` = `c`.`idcategories`
             INNER JOIN `events` AS `e` ON  `d`.`event` = `e`.`idevents`
-            WHERE `d`.`repair_status` = 1 AND `c`.`idcategories` != 46 AND `e`.`idevents` = :id'), array('id' => $party));
+            WHERE `d`.`repair_status` = 1 AND `c`.`idcategories` != 46 AND `e`.`idevents` = :id'), ['id' => $party]);
     }
 
     public function getCounts()
@@ -152,13 +152,13 @@ AND devices.event = events.idevents ';
                 INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`
                 WHERE `d`.`repair_status` = :rp
                 GROUP BY `event_year`
-                ORDER BY `event_year` ASC'), array('rp' => $repair_status));
+                ORDER BY `event_year` ASC'), ['rp' => $repair_status]);
     }
 
     public function ofThisUser($id)
     {
         //Tested
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` WHERE `repaired_by` = :id'), array('id' => $id));
+        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` WHERE `repaired_by` = :id'), ['id' => $id]);
     }
 
     public function ofThisEvent($event)
@@ -172,7 +172,7 @@ AND devices.event = events.idevents ';
                     WHERE object_type = '.env('TBL_IMAGES').' AND reference_type = '.env('TBL_DEVICES').'
                   ) AS i ON i.reference = d.iddevices
 
-                WHERE `event` = :event'), array('event' => $event));
+                WHERE `event` = :event'), ['event' => $event]);
     }
 
     public function ofThisGroup($group)
@@ -181,7 +181,7 @@ AND devices.event = events.idevents ';
         return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`
-                WHERE `group` = :group'), array('group' => $group));
+                WHERE `group` = :group'), ['group' => $group]);
     }
 
     public function ofAllGroups()
@@ -216,11 +216,11 @@ AND devices.event = events.idevents ';
         }
 
         if ( ! is_null($g) && is_numeric($g) && is_null($year)) {
-            return DB::select(DB::raw($sql), array('g' => $g));
+            return DB::select(DB::raw($sql), ['g' => $g]);
         } elseif ( ! is_null($year) && is_numeric($year) && is_null($g)) {
-            return DB::select(DB::raw($sql), array('year' => $year));
+            return DB::select(DB::raw($sql), ['year' => $year]);
         } elseif ( ! is_null($year) && is_numeric($year) && ! is_null($g) && is_numeric($g)) {
-            return DB::select(DB::raw($sql), array('year' => $year, 'g' => $g));
+            return DB::select(DB::raw($sql), ['year' => $year, 'g' => $g]);
         }
 
         return DB::select(DB::raw($sql));
@@ -239,7 +239,7 @@ AND devices.event = events.idevents ';
             $sql .= ' AND `event` = :event ';
         }
 
-        return DB::select(DB::raw($sql), array('event' => $event));
+        return DB::select(DB::raw($sql), ['event' => $event]);
     }
 
     public function countByCluster($cluster, $group = null, $year = null)
@@ -264,14 +264,14 @@ AND devices.event = events.idevents ';
 
         try {
             if ( ! is_null($group) && is_numeric($group) && is_null($year)) {
-                return DB::select(DB::raw($sql), array('group' => $group, 'cluster' => $cluster));
+                return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
             } elseif ( ! is_null($year) && is_numeric($year) && is_null($group)) {
-                return DB::select(DB::raw($sql), array('year' => $year, 'cluster' => $cluster));
+                return DB::select(DB::raw($sql), ['year' => $year, 'cluster' => $cluster]);
             } elseif ( ! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), array('year' => $year, 'group' => $group, 'cluster' => $cluster));
+                return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group, 'cluster' => $cluster]);
             }
 
-            return DB::select(DB::raw($sql), array('cluster' => $cluster));
+            return DB::select(DB::raw($sql), ['cluster' => $cluster]);
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
@@ -300,11 +300,11 @@ AND devices.event = events.idevents ';
 
         try {
             if ( ! is_null($group) && is_numeric($group) && is_null($year)) {
-                return DB::select(DB::raw($sql), array('group' => $group));
+                return DB::select(DB::raw($sql), ['group' => $group]);
             } elseif ( ! is_null($year) && is_numeric($year) && is_null($group)) {
-                return DB::select(DB::raw($sql), array('year' => $year));
+                return DB::select(DB::raw($sql), ['year' => $year]);
             } elseif ( ! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), array('year' => $year, 'group' => $group));
+                return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group]);
             }
 
             return DB::select(DB::raw($sql));
@@ -336,11 +336,11 @@ AND devices.event = events.idevents ';
 
         try {
             if ( ! is_null($group) && is_numeric($group) && is_null($year)) {
-                return DB::select(DB::raw($sql), array('group' => $group));
+                return DB::select(DB::raw($sql), ['group' => $group]);
             } elseif ( ! is_null($year) && is_numeric($year) && is_null($group)) {
-                return DB::select(DB::raw($sql), array('year' => $year));
+                return DB::select(DB::raw($sql), ['year' => $year]);
             } elseif ( ! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), array('year' => $year, 'group' => $group));
+                return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group]);
             }
 
             return DB::select(DB::raw($sql));
@@ -376,25 +376,25 @@ AND devices.event = events.idevents ';
         if ( ! is_null($cluster) && is_numeric($cluster)) {
             try {
                 if ( ! is_null($group) && is_numeric($group) && is_null($status)) {
-                    return DB::select(DB::raw($sql), array('group' => $group, 'cluster' => $cluster));
+                    return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
                 } elseif ( ! is_null($status) && is_numeric($status) && is_null($group)) {
-                    return DB::select(DB::raw($sql), array('status' => $status, 'cluster' => $cluster));
+                    return DB::select(DB::raw($sql), ['status' => $status, 'cluster' => $cluster]);
                 } elseif ( ! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
-                    return DB::select(DB::raw($sql), array('status' => $status, 'group' => $group, 'cluster' => $cluster));
+                    return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group, 'cluster' => $cluster]);
                 }
 
-                return DB::select(DB::raw($sql), array('cluster' => $cluster));
+                return DB::select(DB::raw($sql), ['cluster' => $cluster]);
             } catch (\Illuminate\Database\QueryException $e) {
                 dd($e);
             }
         } else {
             try {
                 if ( ! is_null($group) && is_numeric($group) && is_null($status)) {
-                    return DB::select(DB::raw($sql), array('group' => $group));
+                    return DB::select(DB::raw($sql), ['group' => $group]);
                 } elseif ( ! is_null($status) && is_numeric($status) && is_null($group)) {
-                    return DB::select(DB::raw($sql), array('status' => $status));
+                    return DB::select(DB::raw($sql), ['status' => $status]);
                 } elseif ( ! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
-                    return DB::select(DB::raw($sql), array('status' => $status, 'group' => $group));
+                    return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group]);
                 }
 
                 return DB::select(DB::raw($sql));
@@ -438,7 +438,7 @@ AND devices.event = events.idevents ';
                     ORDER BY cluster ASC, success_rate '.$direction.' LIMIT 1';
 
         if ( ! is_null($cluster)) {
-            return DB::select(DB::raw($sql), array('cluster' => $cluster));
+            return DB::select(DB::raw($sql), ['cluster' => $cluster]);
         }
 
         return DB::select(DB::raw($sql));

@@ -122,7 +122,7 @@ class Party extends Model implements Auditable
                 WHERE `e`.`idevents` = :id
                 ORDER BY `e`.`start` DESC';
 
-        $party = DB::select(DB::raw($sql), array('id' => $id));
+        $party = DB::select(DB::raw($sql), ['id' => $id]);
 
         if ($devices) {
             $devices = new Device;
@@ -141,7 +141,7 @@ class Party extends Model implements Auditable
         $sql = 'INSERT INTO `events_users`(`event`, `user`) VALUES (:party, :user)';
         foreach ($users as &$user) {
             try {
-                DB::insert(DB::raw($sql), array('party' => $party, 'user' => $user));
+                DB::insert(DB::raw($sql), ['party' => $party, 'user' => $user]);
             } catch (\Illuminate\Database\QueryException $e) {
                 dd($e);
             }
@@ -150,7 +150,7 @@ class Party extends Model implements Auditable
 
     public function deleteUserList($party)
     {
-        return DB::delete(DB::raw('DELETE FROM `events_users` WHERE `event` = :party'), array('party' => $party));
+        return DB::delete(DB::raw('DELETE FROM `events_users` WHERE `event` = :party'), ['party' => $party]);
     }
 
     public function ofThisUser($id, $only_past = false, $devices = false)
@@ -172,7 +172,7 @@ class Party extends Model implements Auditable
         $sql .= ' ORDER BY `e`.`event_date` DESC';
 
         try {
-            $parties = DB::select(DB::raw($sql), array('id' => $id));
+            $parties = DB::select(DB::raw($sql), ['id' => $id]);
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
@@ -220,7 +220,7 @@ class Party extends Model implements Auditable
 
         if (is_numeric($group) && $group != 'admin') {
             try {
-                $parties = DB::select(DB::raw($sql), array('id' => $group));
+                $parties = DB::select(DB::raw($sql), ['id' => $group]);
             } catch (\Illuminate\Database\QueryException $e) {
                 dd($e);
             }
@@ -334,7 +334,7 @@ class Party extends Model implements Auditable
 
         if ( ! is_null($group)) {
             try {
-                return DB::select(DB::raw($sql), array('group' => $group));
+                return DB::select(DB::raw($sql), ['group' => $group]);
             } catch (\Illuminate\Database\QueryException $e) {
                 dd($e);
             }
@@ -360,7 +360,7 @@ class Party extends Model implements Auditable
                     `e`.`longitude`
                 FROM `'.$this->table.'` AS `e`
                 ORDER BY `e`.`event_date` DESC
-                LIMIT :limit'), array('limit' => $limit));
+                LIMIT :limit'), ['limit' => $limit]);
     }
 
     public function attendees()
