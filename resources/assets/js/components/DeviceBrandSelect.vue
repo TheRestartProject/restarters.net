@@ -1,6 +1,7 @@
 <template>
   <div class="w-100 device-select-row">
     <multiselect
+        :disabled="disabled"
         v-model="brandValue"
         :placeholder="translatedBrand"
         :options="brandsPlusCustom"
@@ -37,7 +38,12 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   computed: {
     translatedRemove() {

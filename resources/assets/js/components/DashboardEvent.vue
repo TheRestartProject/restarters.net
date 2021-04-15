@@ -10,9 +10,7 @@
         </div>
       </div>
       <div class="ml-2 align-self-center flex-grow-1">
-        <div class="font-weight-bold">
-          {{ event.venue ? event.venue : event.location }}
-        </div>
+        <EventTitle :idevents="event.idevents" component="div" class="font-weight-bold" />
         <div class="small">
           {{ date }} {{ start }} <span class="d-none d-md-inline">- {{ end }}</span>
         </div>
@@ -29,8 +27,10 @@
 import event from '../mixins/event'
 import moment from 'moment'
 import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
+import EventTitle from './EventTitle'
 
 export default {
+  components: {EventTitle},
   mixins: [ event ],
   props: {
     idevents: {

@@ -1,6 +1,7 @@
 <template>
   <div class="mb-2">
     <multiselect
+        :disabled="disabled"
         v-model="statusValue"
         :placeholder="translatedRepairOutcome"
         :options="statusOptions"
@@ -13,6 +14,7 @@
         selectLabel=""
     />
     <multiselect
+        :disabled="disabled"
         v-if="showSteps"
         v-model="stepsValue"
         :placeholder="translatedNextSteps"
@@ -26,6 +28,7 @@
         selectLabel=""
     />
     <multiselect
+        :disabled="disabled"
         v-if="showParts"
         v-model="partsValue"
         :placeholder="translatedSpareParts"
@@ -39,6 +42,7 @@
         selectLabel=""
     />
     <multiselect
+        :disabled="disabled"
         v-if="showBarriers"
         v-model="barriersValue"
         :placeholder="translatedBarriers"
@@ -92,7 +96,12 @@ export default {
     barrierList: {
       type: Array,
       required: true
-    }
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   computed: {
     showSteps () {
