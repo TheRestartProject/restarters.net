@@ -28,7 +28,7 @@
             <div class="col-6">
                 <h1 class="pull-left">PrintCat</h1>
             </div>
-            <div class="col-6 pull-right">
+            <div class="col-6 text-right">
                 <!--
             These images are licensed under the Creative Commons Attribution 4.0 International license.
             Attribution: Vincent Le Moign

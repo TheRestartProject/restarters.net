@@ -1,4 +1,4 @@
-@extends('layouts.app', ['show_login_join_to_anons' => true, 'hide_language' => false])
+@extends('layouts.app', ['show_navbar_to_anons' => true, 'show_login_join_to_anons' => true, 'hide_language' => false])
 
 @section('extra-css')
 
@@ -27,7 +27,7 @@
             <div class="col-6">
                 <h1 class="pull-left">PrintCat @lang('printcatora.status.status')</h1>
             </div>
-            <div class="col-6 pull-right">
+            <div class="col-6 text-right">
                 <!--
             These images are licensed under the Creative Commons Attribution 4.0 International license.
             Attribution: Vincent Le Moign
