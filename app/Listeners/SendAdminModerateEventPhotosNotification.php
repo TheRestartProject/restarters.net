@@ -46,7 +46,7 @@ class SendAdminModerateEventPhotosNotification
                 Notification::send($user, new AdminModerationEventPhotos([
                     'event_id' => $this->party->idevents,
                     'event_venue' => $this->party->venue,
-                    'event_url' => url('/party/view/' . $this->party->idevents),
+                    'event_url' => url('/party/view/'.$this->party->idevents),
                 ]));
             }
         });
@@ -69,7 +69,7 @@ class SendAdminModerateEventPhotosNotification
         foreach ($notifications as $sent) {
             $data = json_decode($sent->data);
 
-            if (!empty($data->event_id) && $data->event_id == $this->party->idevents) {
+            if ( ! empty($data->event_id) && $data->event_id == $this->party->idevents) {
                 return false; // User just received a notification
             }
         }

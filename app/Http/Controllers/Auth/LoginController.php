@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Device;
-use App\Party;
 use App\Http\Controllers\Controller;
 use FixometerHelper;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -53,7 +49,6 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-
         $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -90,8 +85,8 @@ class LoginController extends Controller
         $this->validate($request, [
             $this->username() => 'required|email',
             'password' => 'required|string',
-            'my_name'   => 'honeypot',
-            'my_time'   => 'required|honeytime:1'
+            'my_name' => 'honeypot',
+            'my_time' => 'required|honeytime:1',
         ]);
     }
 
@@ -107,10 +102,10 @@ class LoginController extends Controller
         $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
 
         return view('auth.login', [
-          'co2Total' => $stats['co2Total'][0]->total_footprints,
-          'wasteTotal' => $stats['co2Total'][0]->total_weights,
-          'partiesCount' => count($stats['allparties']),
-          'deviceCount' => $deviceCount,
+            'co2Total' => $stats['co2Total'][0]->total_footprints,
+            'wasteTotal' => $stats['co2Total'][0]->total_weights,
+            'partiesCount' => count($stats['allparties']),
+            'deviceCount' => $deviceCount,
         ]);
     }
 }

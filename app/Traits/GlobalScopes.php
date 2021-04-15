@@ -2,8 +2,8 @@
 
 namespace App\Traits;
 
-use DB;
 use Carbon\Carbon;
+use DB;
 
 trait GlobalScopes
 {
@@ -15,8 +15,8 @@ trait GlobalScopes
     public function scopeCreatedWithinLastMonth($query)
     {
         return $query->whereBetween('created_at', [
-          Carbon::now()->submonth()->endOfMonth(),
-          Carbon::now(),
+            Carbon::now()->submonth()->endOfMonth(),
+            Carbon::now(),
         ]);
     }
 
@@ -30,9 +30,9 @@ trait GlobalScopes
         $latitude = auth()->user()->latitude;
         $longitude = auth()->user()->longitude;
 
-        if (! is_null($coordinates)) {
-          $latitude = $coordinates['latitude'];
-          $longitude = $coordinates['longitude'];
+        if ( ! is_null($coordinates)) {
+            $latitude = $coordinates['latitude'];
+            $longitude = $coordinates['longitude'];
         }
 
         return $query->select(DB::raw('`'.$this->getTable().'`.*, ( 6371 * acos( cos( radians('.$latitude.') ) * cos( radians( '.$this->getTable().'.latitude ) ) * cos( radians( '.$this->getTable().'.longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( '.$this->getTable().'.latitude ) ) ) ) AS distance'))

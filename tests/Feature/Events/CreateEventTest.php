@@ -4,18 +4,16 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
+use App\Helpers\Geocoder;
 use App\Network;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\User;
 use App\UserGroups;
-use App\Helpers\Geocoder;
-use App\Notifications\NotifyRestartersOfNewEvent;
 
 use DB;
-use Carbon\Carbon;
-use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class GeocoderMock extends Geocoder
 {
@@ -37,7 +35,7 @@ class CreateEventTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
         Group::truncate();
         Party::truncate();
@@ -45,7 +43,7 @@ class CreateEventTest extends TestCase
         UserGroups::truncate();
         DB::delete('delete from group_network');
         DB::delete('delete from user_network');
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
 
         $this->app->bind(Geocoder::class, function () {
             return new GeocoderMock();
@@ -63,7 +61,6 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party/create');
         $this->get('/party/create')->assertRedirect('/user/forbidden');
     }
-
 
     /** @test */
     public function a_host_with_a_group_can_create_an_event()
@@ -90,7 +87,6 @@ class CreateEventTest extends TestCase
         $this->assertDatabaseHas('events', $eventAttributes);
     }
 
-
     /** @test */
     public function emails_sent_when_created()
     {
@@ -105,7 +101,8 @@ class CreateEventTest extends TestCase
         $response->assertStatus(302);
 
         Notification::assertSentTo(
-           [$admins], AdminModerationEvent::class
+            [$admins],
+            AdminModerationEvent::class
         );
     }
 
@@ -125,7 +122,7 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $group->addVolunteer($restarter);
 
-        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1']);
+        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude' => '1', 'longitude' => '1']);
 
         // act
         $response = $this->post('/party/create/', $eventData);
@@ -137,10 +134,12 @@ class CreateEventTest extends TestCase
 
         // assert
         Notification::assertSentTo(
-            [$restarter], NotifyRestartersOfNewEvent::class
+            [$restarter],
+            NotifyRestartersOfNewEvent::class
         );
         Notification::assertNotSentTo(
-            [$host], NotifyRestartersOfNewEvent::class
+            [$host],
+            NotifyRestartersOfNewEvent::class
         );
     }
 
@@ -161,7 +160,7 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $group->addVolunteer($restarter);
 
-        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '1930-01-01', 'latitude'=>'1', 'longitude'=>'1']);
+        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '1930-01-01', 'latitude' => '1', 'longitude' => '1']);
 
         // act
         $response = $this->post('/party/create/', $eventData);
@@ -198,7 +197,8 @@ class CreateEventTest extends TestCase
 
         // assert
         Notification::assertSentTo(
-            [$coordinator], AdminModerationEvent::class
+            [$coordinator],
+            AdminModerationEvent::class
         );
     }
 
@@ -231,11 +231,11 @@ class CreateEventTest extends TestCase
         // Remove the host from the event
         $this->post('/party/remove-volunteer/', [
             'user_id' => $host->id,
-            'event_id' => $party->idevents
+            'event_id' => $party->idevents,
         ])->assertStatus(200);
 
         // Assert that we see the host in the list of volunteers to add to the event.
-        $this->get('/party/view/1')->assertSeeInOrder(['Group member', '<option value="' . $host->id . '">', '</div>']);
+        $this->get('/party/view/1')->assertSeeInOrder(['Group member', '<option value="'.$host->id.'">', '</div>']);
 
         // Assert we can add them back in.
 

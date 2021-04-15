@@ -2,10 +2,8 @@
 
 namespace App\Console;
 
-use App\Party;
-use App\Mail\NotifyAdminNoDevices;
 use App\Notifications\NotifyAdminNoDevices as Mail;
-use App\User;
+use App\Party;
 use Carbon\Carbon;
 use FixometerHelper;
 use Illuminate\Console\Scheduling\Schedule;
@@ -20,7 +18,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+
     ];
 
     /**
@@ -32,26 +30,25 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call(function () {
-
             $parties = Party::doesnthave('devices')
-            ->where('event_date', '>=', date("Y-m-d", strtotime(Carbon::now()->subDays(env('NO_DATA_ENTERED', 5)))))
-              ->where('event_date', '<=', date("Y-m-d", strtotime(Carbon::now())))
+            ->where('event_date', '>=', date('Y-m-d', strtotime(Carbon::now()->subDays(env('NO_DATA_ENTERED', 5)))))
+              ->where('event_date', '<=', date('Y-m-d', strtotime(Carbon::now())))
                 ->get();
 
             foreach ($parties as $party) {
                 $all_admins = FixometerHelper::usersWhoHavePreference('admin-no-devices');
                 Notification::send($all_admins, new Mail([
-                'event_venue' => $party->venue,
-                'event_url' => url('/party/edit/'.$party->idevents),
+                    'event_venue' => $party->venue,
+                    'event_url' => url('/party/edit/'.$party->idevents),
                 ]));
             }
         })->cron('0 0 */3 * *');
 
         $schedule->command('sync:discourseusernames')
             ->daily()
-            ->sendOutputTo(storage_path() . '/logs/discourse_usernames.log')
+            ->sendOutputTo(storage_path().'/logs/discourse_usernames.log')
             ->emailOutputTo(env('SEND_COMMAND_LOGS_TO'), 'tech@therestartproject.org');
-        
+
         $schedule->command('faultcat:sync')->daily();
     }
 

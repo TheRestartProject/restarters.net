@@ -19,7 +19,6 @@ class MediawikiServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
     }
 
     /**
@@ -40,7 +39,7 @@ class MediawikiServiceProvider extends ServiceProvider
 
                 return new MediawikiFactory($api);
             } catch (\Exception $ex) {
-                Log::error("Failed to instantiation Wiki API classes: " . $ex->getMessage());
+                Log::error('Failed to instantiation Wiki API classes: '.$ex->getMessage());
             }
         });
 

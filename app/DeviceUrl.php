@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class DeviceUrl extends Model
 {
-
     protected $table = 'devices_urls';
     protected $fillable = ['device_id', 'url', 'source'];
     protected $hidden = [];

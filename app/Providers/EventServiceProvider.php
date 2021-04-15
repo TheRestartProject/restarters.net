@@ -4,23 +4,17 @@ namespace App\Providers;
 
 use App\Events\EventDeleted;
 use App\Events\EventImagesUploaded;
+use App\Events\UserDeleted;
 use App\Events\UserFollowedGroup;
 use App\Events\UserUpdated;
-use App\Events\UserEmailUpdated;
-use App\Events\UserLanguageUpdated;
-use App\Events\UserRegistered;
-use App\Events\UserDeleted;
 use App\Listeners\AddUserToDiscourseGroup;
 use App\Listeners\AnonymiseSoftDeletedUser;
 use App\Listeners\DeleteEventFromWordPress;
 use App\Listeners\RemoveSoftDeletedUserFromAllGroups;
 use App\Listeners\SendAdminModerateEventPhotosNotification;
 use App\Listeners\SendAdminUserDeletedNotification;
-use App\Listeners\SyncUserProperties;
-use App\Listeners\SyncUserToDiscourse;
-use App\Listeners\SyncLanguageSettingsToDiscourse;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {

@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Events\ApproveEvent;
-use App\Events\EditEvent;
 use App\Group;
 use App\GroupNetwork;
 use App\Network;
@@ -12,13 +10,8 @@ use App\User;
 use App\UserGroups;
 
 use DB;
-use Carbon\Carbon;
-use Mockery;
-use Tests\TestCase;
-use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use Tests\TestCase;
 
 class ZapierNetworkTests extends TestCase
 {
@@ -26,7 +19,7 @@ class ZapierNetworkTests extends TestCase
     {
         parent::setUp();
 
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
         Group::truncate();
         Party::truncate();
@@ -34,7 +27,7 @@ class ZapierNetworkTests extends TestCase
         UserGroups::truncate();
         DB::statement('delete from audits');
         GroupNetwork::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     // New group is created as part of the network represented by the current domain.

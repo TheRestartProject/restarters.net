@@ -2,14 +2,12 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Notifications\AdminModerationEvent;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-
 use App\Party;
 use App\User;
+
+use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class ModerateEventEmailTest extends TestCase
 {
@@ -30,7 +28,8 @@ class ModerateEventEmailTest extends TestCase
         Notification::send($admins, new AdminModerationEvent($arr));
 
         Notification::assertSentTo(
-            [$admins], AdminModerationEvent::class
+            [$admins],
+            AdminModerationEvent::class
         );
     }
 }

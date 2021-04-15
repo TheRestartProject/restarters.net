@@ -7,20 +7,18 @@ use App\GroupTags;
 use App\User;
 
 use DB;
-use Carbon\Carbon;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class GroupEditTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Group::truncate();
         User::truncate();
         GroupTags::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */

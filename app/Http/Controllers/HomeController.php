@@ -3,11 +3,6 @@
 namespace App\Http\Controllers;
 
 use Auth;
-use App\Device;
-use App\Party;
-use App\Group;
-
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -25,8 +20,8 @@ class HomeController extends Controller
     {
         if (Auth::check()) {
             return redirect('/dashboard');
-        } else {
-            return redirect('/user/register');
         }
+
+        return redirect('/user/register');
     }
 }

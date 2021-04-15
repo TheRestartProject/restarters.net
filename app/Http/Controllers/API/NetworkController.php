@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Group;
+use App\Helpers\FootprintRatioCalculator;
+
+use App\Http\Controllers\Controller;
 use App\Network;
 
-use App\Helpers\FootprintRatioCalculator;
-use App\Http\Controllers\Controller;
-
 use Auth;
-use Illuminate\Http\Request;
 
 class NetworkController extends Controller
 {

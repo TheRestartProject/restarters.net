@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Services\DiscourseService;
 use Auth;
 use DB;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class MicrotaskingController extends Controller
 {
@@ -31,7 +29,7 @@ class MicrotaskingController extends Controller
             'currentUserQuests' => $currentUserQuests,
             'currentUserContributions' => $currentUserContributions,
             'topics' => $discourseService->getDiscussionTopics($tag, 5),
-            'seeAllTopicsLink' => env('DISCOURSE_URL') . "/tag/{$tag}/l/latest",
+            'seeAllTopicsLink' => env('DISCOURSE_URL')."/tag/{$tag}/l/latest",
             'activeQuest' => $activeQuest,
         ]);
     }
@@ -55,7 +53,7 @@ class MicrotaskingController extends Controller
 
         return [
             'quests' => $quests,
-            'contributions' => $faultCatContributions + $miscCatContributions + $mobifixContributions
+            'contributions' => $faultCatContributions + $miscCatContributions + $mobifixContributions,
         ];
     }
 

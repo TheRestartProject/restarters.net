@@ -4,9 +4,6 @@ namespace App;
 
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
-use App\Network;
-use App\UserGroups;
-use App\UsersPermissions;
 
 use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,7 +12,8 @@ use Illuminate\Notifications\Notifiable;
 
 use OwenIt\Auditing\Contracts\Auditable;
 
-class WikiSyncStatus {
+class WikiSyncStatus
+{
     const DoNotCreate = 0;
     const CreateAtLogin = 1;
     const Created = 2;
@@ -38,7 +36,7 @@ class User extends Authenticatable implements Auditable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role'
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role',
     ];
 
     /**
@@ -76,7 +74,8 @@ class User extends Authenticatable implements Auditable
         return $this->hasOne('App\Role', 'idroles', 'role');
     }
 
-    public function repairdir_role() {
+    public function repairdir_role()
+    {
         // Make sure we don't return a null value.  The client select would struggle with null values.
         return $this->repairdir_role ? $this->repairdir_role : Role::REPAIR_DIRECTORY_NONE;
     }
@@ -105,7 +104,7 @@ class User extends Authenticatable implements Auditable
 
     public function assignSkill($skill)
     {
-        if (!$this->hasSkill($skill->id)) {
+        if ( ! $this->hasSkill($skill->id)) {
             $this->skills()->attach($skill->id);
         }
     }
@@ -132,7 +131,7 @@ class User extends Authenticatable implements Auditable
             DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
         )->having('distance', '<=', $searchRadiusInMiles);
 
-        if (! is_null($idsOfGroupsToIgnore)) {
+        if ( ! is_null($idsOfGroupsToIgnore)) {
             $groupsNearbyQuery->whereNotIn('idgroups', $idsOfGroupsToIgnore);
         }
 
@@ -157,7 +156,7 @@ class User extends Authenticatable implements Auditable
         $preference = Preferences::where(['slug' => $slug])->first();
         UsersPreferences::create([
             'user_id' => $this->getKey(),
-            'preference_id' => $preference->getKey()
+            'preference_id' => $preference->getKey(),
         ]);
     }
 
@@ -272,7 +271,6 @@ class User extends Authenticatable implements Auditable
                 ORDER BY users.name ASC'), array('group' => $group));
     }
 
-
     public function isInGroup($groupId)
     {
         return UserGroups::where('user', $this->id)
@@ -359,7 +357,6 @@ class User extends Authenticatable implements Auditable
         return $nameParts[0];
     }
 
-
     public function existsOnDiscourse()
     {
         try {
@@ -374,7 +371,6 @@ class User extends Authenticatable implements Auditable
             return false;
         }
     }
-
 
     /**
      * Convert the user's role to be a Host.
@@ -418,12 +414,10 @@ class User extends Authenticatable implements Auditable
         return $this->repair_network;
     }
 
-
     public function groupTag()
     {
         return $this->hasOne(GroupTags::class, 'id', 'access_group_tag_id');
     }
-
 
     /**
      * Generate a username based on the user's name, and set it against this user.
@@ -433,7 +427,7 @@ class User extends Authenticatable implements Auditable
     public function generateAndSetUsername()
     {
         if (empty($this->name)) {
-            throw new \Exception("Name is empty");
+            throw new \Exception('Name is empty');
         }
 
         $name = $this->name;
@@ -442,9 +436,9 @@ class User extends Authenticatable implements Auditable
 
         $name_parts = explode(' ', $name);
 
-        $desired_username = implode("_", $name_parts);
+        $desired_username = implode('_', $name_parts);
 
-        if (!(User::where('username', '=', $desired_username)->exists())) {
+        if ( ! (User::where('username', '=', $desired_username)->exists())) {
             $username = $desired_username;
         } else { // someone already has the desired username
             $username = $desired_username.'_'.$this->id;
@@ -455,7 +449,7 @@ class User extends Authenticatable implements Auditable
 
     public function isDripSubscriber()
     {
-      return ! is_null($this->drip_subscriber_id);
+        return ! is_null($this->drip_subscriber_id);
     }
 
     public function isRepairDirectoryNone()
@@ -554,24 +548,25 @@ class User extends Authenticatable implements Auditable
                                     ->where('user', $this->id)
                                     ->where('role', 3)
                                     ->get();
-        } else if ($this->hasRole('NetworkCoordinator')) {
+        } elseif ($this->hasRole('NetworkCoordinator')) {
             foreach ($this->networks as $network) {
                 foreach ($network->groups as $group) {
                     $groupsUserIsInChargeOf->push($group);
                 }
             }
-        } else if ($this->hasRole('Administrator')) {
+        } elseif ($this->hasRole('Administrator')) {
             $groupsUserIsInChargeOf = Group::all();
         }
 
         return $groupsUserIsInChargeOf;
     }
 
-    public function ensureAPIToken() {
+    public function ensureAPIToken()
+    {
         # Generate an API token if we don't already have one.
         $api_token = $this->api_token;
 
-        if (!$api_token) {
+        if ( ! $api_token) {
             $api_token = \Illuminate\Support\Str::random(60);
             $this->api_token = $api_token;
             $this->save();

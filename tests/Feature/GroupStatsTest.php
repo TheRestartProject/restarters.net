@@ -7,8 +7,8 @@ use App\Party;
 
 use Carbon\Carbon;
 use DB;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class GroupStatsTest extends TestCase
 {
@@ -17,10 +17,10 @@ class GroupStatsTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Group::truncate();
         Party::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */
@@ -44,7 +44,7 @@ class GroupStatsTest extends TestCase
         $group = factory(Group::class)->create();
         $event = factory(Party::class)->states('moderated')->create([
             'event_date' => Carbon::yesterday(),
-            'group' => $group->idgroups
+            'group' => $group->idgroups,
         ]);
 
         $expectedStats = [

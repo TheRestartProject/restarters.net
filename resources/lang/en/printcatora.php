@@ -1,8 +1,7 @@
 <?php
 
 return [
-    'task' =>
-    [
+    'task' => [
         'where_is_the_main_fault' => 'Where is the main fault',
         'fetch_another' => 'I don\'t know, fetch another repair',
         'suggestions' => 'Suggestions',
@@ -10,8 +9,7 @@ return [
         'go_with' => 'Go with',
         'source' => 'Source',
     ],
-    'status' =>
-    [
+    'status' => [
         'status' => 'Status',
         'items_opinions' => 'Items / opinions',
         'items_split_opinions' => 'Items with split opinions',
@@ -28,8 +26,7 @@ return [
         'winning_opinion' => 'Winning opinion',
         'task_completed' => "You've seen them all, thanks",
     ],
-    'branding' =>
-    [
-        'powered_by' => 'Powered by data from:'
-    ]
+    'branding' => [
+        'powered_by' => 'Powered by data from:',
+    ],
 ];

@@ -102,9 +102,8 @@ class FixometerHelper
         if (is_null($userId)) {
             if (empty(Auth::user())) {
                 return false;
-            } else {
-                $userId = Auth::user()->id;
             }
+            $userId = Auth::user()->id;
         }
 
         $user = User::find($userId);
@@ -131,7 +130,6 @@ class FixometerHelper
 
         return false;
     }
-
 
     public static function userCanApproveEvent($eventId, $userId = null)
     {
@@ -179,7 +177,6 @@ class FixometerHelper
 
         return false;
     }
-
 
     public static function userCanCreateEvents($user)
     {
@@ -252,6 +249,7 @@ class FixometerHelper
 
                 default:
                     $icon = '';
+
                     break;
             }
             echo '<div class="alert alert-'.$type;

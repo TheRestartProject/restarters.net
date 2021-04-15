@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use Auth;
-use App\User;
 use Closure;
 
 class VerifyUserConsent
@@ -19,8 +18,8 @@ class VerifyUserConsent
     {
         if (Auth::check() && Auth::user()->hasUserGivenConsent()) {
             return $next($request);
-        } else {
-            return redirect('/user/register');
         }
+
+        return redirect('/user/register');
     }
 }

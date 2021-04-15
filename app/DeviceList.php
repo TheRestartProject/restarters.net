@@ -4,11 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-use DB;
-
 class DeviceList extends Model
 {
-
     protected $table = 'view_devices_list';
     /**
      * The attributes that are mass assignable.
@@ -26,14 +23,11 @@ class DeviceList extends Model
 
     //Table Relations
 
-
     // Setters
 
-
     //Getters
-    function getRepairStatus()
+    public function getRepairStatus()
     {
-
         switch ($this->repair_status) {
             case 1:
                 return 'Fixed';
@@ -46,9 +40,8 @@ class DeviceList extends Model
         }
     }
 
-    function getSpareParts()
+    public function getSpareParts()
     {
-
         return ($this->spare_parts == 1 ? 'Yes' : 'No');
     }
 }

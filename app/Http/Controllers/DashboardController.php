@@ -2,22 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Device;
 use App\EventsUsers;
 use App\Group;
-use App\Helpers\CachingRssRetriever;
-use App\Helpers\CachingWikiPageRetriever;
 use App\Helpers\FixometerHelper;
 use App\Party;
 use App\Services\DiscourseService;
 use App\User;
 use App\UserGroups;
-use App\UsersSkills;
 
 use Auth;
-use Cache;
 use DB;
-use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -32,8 +26,8 @@ class DashboardController extends Controller
             ]
         );
 
-        $in_group = !empty(UserGroups::where('user', Auth::id())->get()->toArray());
-        $in_event = !empty(EventsUsers::where('user', Auth::id())->get()->toArray());
+        $in_group = ! empty(UserGroups::where('user', Auth::id())->get()->toArray());
+        $in_event = ! empty(EventsUsers::where('user', Auth::id())->get()->toArray());
 
         //See whether user has any events
         if ($in_event) {
@@ -87,7 +81,7 @@ class DashboardController extends Controller
                     ->get();
             }
 
-            if (!isset($inactive_groups) || empty($inactive_groups->toArray())) {
+            if ( ! isset($inactive_groups) || empty($inactive_groups->toArray())) {
                 $inactive_groups = null;
             }
         } else {
@@ -115,16 +109,16 @@ class DashboardController extends Controller
             }
         }
 
-        if (!isset($all_groups) || empty($all_groups->toArray())) {
+        if ( ! isset($all_groups) || empty($all_groups->toArray())) {
             $all_groups = null;
         }
 
         $new_groups = 0;
         //Get events nearest (or not) to you
-        if (!is_null($user->latitude) && !is_null($user->longitude)) { //Should the user have location info
+        if ( ! is_null($user->latitude) && ! is_null($user->longitude)) { //Should the user have location info
             $upcoming_events = Party::with('theGroup')->select(
                 DB::raw(
-                    '*, ( 6371 * acos( cos( radians(' . $user->latitude . ') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(' . $user->longitude . ') ) + sin( radians(' . $user->latitude . ') ) * sin( radians( latitude ) ) ) ) AS distance'
+                    '*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'
                 )
             )
                 ->having('distance', '<=', 40)
@@ -137,12 +131,11 @@ class DashboardController extends Controller
 
             // Look for new nearby groups that we're not already a member of.  Eloquent is just getting in the way
             // here so do a raw query.
-            $new_groups = DB::select(DB::raw("SELECT COUNT(*) AS count FROM groups 
-        LEFT JOIN users_groups ON groups.idgroups = users_groups.group AND users_groups.user = " . intval(Auth::id()) . "
+            $new_groups = DB::select(DB::raw('SELECT COUNT(*) AS count FROM groups 
+        LEFT JOIN users_groups ON groups.idgroups = users_groups.group AND users_groups.user = '.intval(Auth::id())."
         WHERE users_groups.user IS NULL 
-            AND created_at >= '" . date('Y-m-d', strtotime('1 month ago')) . "'  
+            AND created_at >= '".date('Y-m-d', strtotime('1 month ago'))."'  
             AND ( 6371 * acos( cos( radians(' . $user->latitude . ') ) * cos( radians( groups.latitude ) ) * cos( radians( groups.longitude ) - radians(' . $user->longitude . ') ) + sin( radians(' . $user->latitude . ') ) * sin( radians( groups.latitude ) ) ) ) < 40"))[0]->count;
-
         } else { //Else show them the latest three
             $upcoming_events = Party::with('theGroup')->
             whereDate('event_date', '>=', date('Y-m-d'))
@@ -180,7 +173,7 @@ class DashboardController extends Controller
                 'past_events' => $past_events,
                 'topics' => $discourseService->getDiscussionTopics(),
                 'your_groups' => $your_groups,
-                'seeAllTopicsLink' => env('DISCOURSE_URL') . "/latest",
+                'seeAllTopicsLink' => env('DISCOURSE_URL').'/latest',
                 'new_groups' => $new_groups,
             ]
         );

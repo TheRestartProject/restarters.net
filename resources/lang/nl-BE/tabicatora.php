@@ -1,16 +1,14 @@
 <?php
 
 return [
-    'task' =>
-    [
+    'task' => [
         'where_is_the_main_fault' => 'Waar is de belangrijkste fout',
         'fetch_another' => 'Ik weet het niet, haal nog een reparatie',
         'suggestions' => 'Suggesties',
         'translate' => 'Vertalen',
         'go_with' => 'Ga mee',
     ],
-    'status' =>
-    [
+    'status' => [
         'status' => 'Toestand',
         'items_opinions' => 'Items / meningen',
         'items_with_split_opinions' => 'Items met verschillende meningen',
@@ -25,5 +23,5 @@ return [
         'problem' => 'Probleem',
         'number_of_records' => 'Aantal records',
         'winning_opinion' => 'Winnende mening',
-    ]
+    ],
 ];

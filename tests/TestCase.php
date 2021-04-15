@@ -17,8 +17,8 @@ abstract class TestCase extends BaseTestCase
         Network::truncate();
 
         $network = new Network();
-        $network->name = "Restarters";
-        $network->shortname = "restarters";
+        $network->name = 'Restarters';
+        $network->shortname = 'restarters';
         $network->save();
     }
 }

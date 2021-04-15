@@ -2,34 +2,30 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
 use App\Events\EventDeleted;
-use App\Listeners\DeleteEventFromWordPress;
+use App\EventsUsers;
 use App\Group;
+use App\Listeners\DeleteEventFromWordPress;
 use App\Network;
 use App\Notifications\DeleteEventFromWordpressFailed;
 use App\Party;
 use App\Preferences;
 use App\User;
 use App\UserGroups;
-use App\Helpers\Geocoder;
-use App\Notifications\NotifyRestartersOfNewEvent;
 
 use DB;
-use Carbon\Carbon;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Mockery;
-use Tests\TestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Tests\TestCase;
 
 class DeleteEventTests extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
         Group::truncate();
         Party::truncate();
@@ -38,7 +34,7 @@ class DeleteEventTests extends TestCase
         DB::delete('delete from users_preferences');
         DB::delete('delete from group_network');
         DB::delete('delete from user_network');
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */
@@ -74,7 +70,7 @@ class DeleteEventTests extends TestCase
         }));
 
         $network = factory(Network::class)->create([
-            'events_push_to_wordpress' => true
+            'events_push_to_wordpress' => true,
         ]);
         $group = factory(Group::class)->create();
         $network->addGroup($group);
@@ -86,7 +82,6 @@ class DeleteEventTests extends TestCase
         $handler = app(DeleteEventFromWordPress::class);
         $handler->handle(new EventDeleted($event));
     }
-
 
     /** @test */
     public function given_wordpress_deletion_failure()
@@ -104,7 +99,7 @@ class DeleteEventTests extends TestCase
         }));
 
         $network = factory(Network::class)->create([
-            'events_push_to_wordpress' => true
+            'events_push_to_wordpress' => true,
         ]);
         $group = factory(Group::class)->create();
         $network->addGroup($group);

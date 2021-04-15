@@ -6,22 +6,20 @@ use App\Events\UserRegistered;
 use App\Listeners\DiscourseUserEventSubscriber;
 use App\User;
 
-use DB;
-use Hash;
 use Carbon\Carbon;
+use DB;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class DiscourseAccountCreationTests extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */

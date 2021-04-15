@@ -50,7 +50,7 @@ class DiscourseUserEventSubscriber
                 $endpoint
             );
 
-            if ( $response->getStatusCode() !== 200) {
+            if ($response->getStatusCode() !== 200) {
                 Log::error('Could not sync '.$user->id.' language to Discourse: '.$response->getReasonPhrase());
             }
 
@@ -104,8 +104,8 @@ class DiscourseUserEventSubscriber
             'username' => $user->username,
             'name' => $user->name,
         ];
-        $sso_payload = base64_encode( http_build_query( $sso_params ) );
-        $sig = hash_hmac( 'sha256', $sso_payload, $sso_secret );
+        $sso_payload = base64_encode(http_build_query($sso_params));
+        $sig = hash_hmac('sha256', $sso_payload, $sso_secret);
 
         $response = $this->discourseClient->request(
             'POST',

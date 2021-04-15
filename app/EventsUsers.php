@@ -4,11 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-use DB;
-
 class EventsUsers extends Model
 {
-
     protected $table = 'events_users';
 
     protected $primaryKey = 'idevents_users';
@@ -42,11 +39,10 @@ class EventsUsers extends Model
 
     public function getFullName()
     {
-
-        if (!is_null($this->full_name)) {
+        if ( ! is_null($this->full_name)) {
             return $this->full_name;
-        } else {
-            return 'Anonymous';
         }
+
+        return 'Anonymous';
     }
 }

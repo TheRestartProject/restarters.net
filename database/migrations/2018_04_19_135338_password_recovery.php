@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class PasswordRecovery extends Migration
@@ -13,7 +11,8 @@ class PasswordRecovery extends Migration
      */
     public function up()
     {
-        DB::statement('ALTER TABLE `users`
+        DB::statement(
+            'ALTER TABLE `users`
                          ADD COLUMN `recovery` VARCHAR(45) NULL AFTER `role`,
                          ADD COLUMN `recovery_expires` TIMESTAMP NULL AFTER `recovery`;'
         );
@@ -26,6 +25,5 @@ class PasswordRecovery extends Migration
      */
     public function down()
     {
-        //
     }
 }

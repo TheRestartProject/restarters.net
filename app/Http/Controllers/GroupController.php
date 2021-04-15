@@ -7,7 +7,6 @@ use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Events\UserFollowedGroup;
 use App\Group;
-use App\GroupNetwork;
 use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\FootprintRatioCalculator;
@@ -41,12 +40,13 @@ class GroupController extends Controller
         $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
     }
 
-    private function indexVariations($tab, $network) {
+    private function indexVariations($tab, $network)
+    {
         //Get current logged in user
         $user = Auth::user();
 
         // We only need some attributes.
-        $group_atts = [ 'groups.idgroups' , 'groups.name', 'groups.location', 'groups.country' ];
+        $group_atts = ['groups.idgroups' , 'groups.name', 'groups.location', 'groups.country'];
 
         // Get all groups
         $groups = Group::with(['networks'])
@@ -74,7 +74,7 @@ class GroupController extends Controller
 
         //Assuming we have valid lat and long values, let's see what is nearest
         if ( ! is_null($user->latitude) && ! is_null($user->longitude)) {
-            $groups_near_you = Group::select(DB::raw(implode(',', $group_atts) . ', ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( groups.latitude ) ) * cos( radians( groups.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( groups.latitude ) ) ) ) AS distance'))
+            $groups_near_you = Group::select(DB::raw(implode(',', $group_atts).', ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( groups.latitude ) ) * cos( radians( groups.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( groups.latitude ) ) ) ) AS distance'))
                 ->having('distance', '<=', 150)
                 ->join('events', 'events.group', '=', 'groups.idgroups')
                 ->whereNotIn('groups.idgroups', $your_groups_uniques)
@@ -95,23 +95,23 @@ class GroupController extends Controller
             'tab' => $tab,
             'network' => $network,
             'networks' => $networks,
-            'all_group_tags' => $all_group_tags
+            'all_group_tags' => $all_group_tags,
         ]);
     }
 
     public function all()
     {
-        return $this->indexVariations('all', NULL);
+        return $this->indexVariations('all', null);
     }
 
     public function mine()
     {
-        return $this->indexVariations('mine', NULL);
+        return $this->indexVariations('mine', null);
     }
 
     public function nearby()
     {
-        return $this->indexVariations('nearby', NULL);
+        return $this->indexVariations('nearby', null);
     }
 
     public function network($id)
@@ -141,17 +141,18 @@ class GroupController extends Controller
             if (empty($name)) {
                 $error['name'] = 'Please input a name.';
             }
-            
+
             if ( ! empty($location)) {
                 $lat_long = FixometerHelper::getLatLongFromCityCountry($location);
 
-                if ( empty($lat_long) ) {
-                  $response['danger'] = 'Group could not be created. Address not found.';
-                  return view('group.create', [
-                      'title' => 'New Group',
-                      'gmaps' => true,
-                      'response' => $response,
-                  ]);
+                if (empty($lat_long)) {
+                    $response['danger'] = 'Group could not be created. Address not found.';
+
+                    return view('group.create', [
+                        'title' => 'New Group',
+                        'gmaps' => true,
+                        'response' => $response,
+                    ]);
                 }
 
                 $latitude = $lat_long[0];
@@ -284,6 +285,7 @@ class GroupController extends Controller
 
                 default:
                     $response['danger'] = 'Unexpected arguments';
+
                     break;
             }
         }
@@ -589,31 +591,31 @@ class GroupController extends Controller
             if ( ! empty($data['location'])) {
                 $lat_long = FixometerHelper::getLatLongFromCityCountry($data['location']);
 
-                if ( empty($lat_long) ) {
-                  $response['danger'] = 'Group could not be saved. Address not found.';
-                  $group = Group::find($id);
-                  $images = $File->findImages(env('TBL_GROUPS'), $id);
-                  $tags = GroupTags::all();
-                  $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
-                  $group_networks = $group->networks->pluck('id')->toArray();
+                if (empty($lat_long)) {
+                    $response['danger'] = 'Group could not be saved. Address not found.';
+                    $group = Group::find($id);
+                    $images = $File->findImages(env('TBL_GROUPS'), $id);
+                    $tags = GroupTags::all();
+                    $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
+                    $group_networks = $group->networks->pluck('id')->toArray();
 
-                  if ( ! isset($images)) {
-                      $images = null;
-                  }
+                    if ( ! isset($images)) {
+                        $images = null;
+                    }
 
-                  return view('group.edit', [
-                      'response' => $response,
-                      'gmaps' => true,
-                      'title' => 'Edit Group '.$group->name,
-                      'formdata' => $group,
-                      'user' => $user,
-                      'images' => $images,
-                      'tags' => $tags,
-                      'group_tags' => $group_tags,
-                      'networks' => $networks,
-                      'group_networks' => $group_networks,
-                      'audits' => $group->audits,
-                  ]);
+                    return view('group.edit', [
+                        'response' => $response,
+                        'gmaps' => true,
+                        'title' => 'Edit Group '.$group->name,
+                        'formdata' => $group,
+                        'user' => $user,
+                        'images' => $images,
+                        'tags' => $tags,
+                        'group_tags' => $group_tags,
+                        'networks' => $networks,
+                        'group_networks' => $group_networks,
+                        'audits' => $group->audits,
+                    ]);
                 }
 
                 $latitude = $lat_long[0];
@@ -675,7 +677,7 @@ class GroupController extends Controller
 
                 if (isset($_FILES['file']) && ! empty($_FILES['file']) && $_FILES['file']['error'] != 4) {
                     $existing_image = FixometerHelper::hasImage($id, 'groups', true);
-                    if (!empty($existing_image)) {
+                    if ( ! empty($existing_image)) {
                         // TODO This case looks like it's worth considering.
                         //$Group = new Group;
                       //$Group->removeImage($id, $existing_image[0]);
@@ -685,7 +687,7 @@ class GroupController extends Controller
                     $group_avatar = env('UPLOADS_URL').'mid_'.$group_avatar;
                 } else {
                     $existing_image = FixometerHelper::hasImage($id, 'groups', true);
-                    if (!empty($existing_image)) {
+                    if ( ! empty($existing_image)) {
                         $group_avatar = env('UPLOADS_URL').'mid_'.$existing_image[0]->path;
                     } else {
                         $group_avatar = 'null';
@@ -845,6 +847,7 @@ class GroupController extends Controller
 
         if ($alreadyInGroup) {
             $response['warning'] = 'You are already part of this group';
+
             return redirect()->back()->with('response', $response)->with('warning', 'You are already part of this group');
         }
 
@@ -880,9 +883,8 @@ class GroupController extends Controller
                     ->back()
                     ->with('success', __('groups.now_following', [
                         'name' => $group->name,
-                        'link' => url('/group/view/'.$group->idgroups)
+                        'link' => url('/group/view/'.$group->idgroups),
                     ]));
-
         } catch (\Exception $e) {
             $response['danger'] = 'Failed to follow this group';
 
@@ -895,7 +897,7 @@ class GroupController extends Controller
         try {
             if (isset($_FILES) && ! empty($_FILES)) {
                 $existing_image = FixometerHelper::hasImage($id, 'groups', true);
-                if (!empty($existing_image)) {
+                if ( ! empty($existing_image)) {
                     $Group->removeImage($id, $existing_image[0]);
                 }
                 $file = new FixometerFile;
@@ -955,8 +957,9 @@ class GroupController extends Controller
             //Let's delete the user
             $userGroupAssociation = UserGroups::where('user', $user_id)->where('group', $group_id)->first();
 
-            if ( !is_null($userGroupAssociation)) {
+            if ( ! is_null($userGroupAssociation)) {
                 $userGroupAssociation->delete();
+
                 return redirect()->back()->with('success', 'We have removed '.$user->name.' from this group');
             }
 
@@ -1001,6 +1004,7 @@ class GroupController extends Controller
                     break;
                 default: {
                     $response['danger'] = 'Unexpected arguments';
+
                     break;
                 }
             }

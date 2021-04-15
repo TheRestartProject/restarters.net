@@ -6,7 +6,6 @@ use App\User;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class SetRepairTogetherPasswords extends Command
 {
@@ -31,13 +30,12 @@ class SetRepairTogetherPasswords extends Command
      */
     public function handle()
     {
-        $users = User::where('repair_network',3)
+        $users = User::where('repair_network', 3)
                ->where('password', '')
                ->orderBy('name');
 
         $fp = fopen('file.csv', 'w');
         foreach ($users->get() as $user) {
-
             $password = str_random(8);
 
             // write out the email and password

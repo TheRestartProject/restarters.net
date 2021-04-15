@@ -5,15 +5,13 @@ namespace Tests\Feature;
 use App\PrintcatOra;
 use DB;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Log;
 
 class PrintcatOraTest extends TestCase
 {
-
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         PrintcatOra::truncate();
         DB::table('devices_printcat_ora')->truncate();
         DB::table('devices_faults_printers_ora_adjudicated')->truncate();
@@ -31,7 +29,7 @@ class PrintcatOraTest extends TestCase
         $result = $PrintcatOra->fetchFault();
         $this->assertTrue(is_array($result), 'fetch_printcatora_record: result is not array');
         $this->assertEquals(1, count($result), 'fetch_printcatora_record: wrong result count');
-        $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_printcatora_record: id_ords is null');
+        $this->assertGreaterThan(0, ! is_null($result[0]->id_ords), 'fetch_printcatora_record: id_ords is null');
 
         // exclude 8 records
         $exclude = [];
@@ -51,14 +49,13 @@ class PrintcatOraTest extends TestCase
         $result = $PrintcatOra->fetchFault($exclude);
         $this->assertTrue(is_array($result), 'fetch_printcatora_record: result is not array');
         $this->assertEquals(1, count($result), 'fetch_printcatora_record: wrong result count');
-        $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_printcatora_record: id_ords is null');
+        $this->assertGreaterThan(0, ! is_null($result[0]->id_ords), 'fetch_printcatora_record: id_ords is null');
         $this->assertEquals($include, $result[0]->id_ords, 'fetch_printcatora_record: wrong value');
     }
 
     /** @test */
     public function fetch_printcatora_page()
     {
-
         $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $this->withSession([]);
@@ -76,13 +73,12 @@ class PrintcatOraTest extends TestCase
         $response = $this->get('/printcat');
         $response->assertSessionHas('printcatora.exclusions');
         $response->assertRedirect();
-        $response->assertRedirect(url()->current() . '/status');
+        $response->assertRedirect(url()->current().'/status');
     }
 
     /** @test */
     public function fetch_printcatora_status()
     {
-
         $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $opinions = $this->_setup_opinions($data);
@@ -90,14 +86,14 @@ class PrintcatOraTest extends TestCase
         $result = $PrintcatOra->fetchStatus();
         $this->assertTrue(is_array($result));
         foreach ($opinions['status'] as $k => $v) {
-            $this->assertTrue(isset($result, $k), 'fetch_printcatora_status: missing key - ' . $k);
-            if (!is_array($v)) {
-                $this->assertEquals($v, $result[$k][0]->total,   'fetch_printcatora_status: wrong ' . $k);
+            $this->assertTrue(isset($result, $k), 'fetch_printcatora_status: missing key - '.$k);
+            if ( ! is_array($v)) {
+                $this->assertEquals($v, $result[$k][0]->total, 'fetch_printcatora_status: wrong '.$k);
             } else {
-                $this->assertTrue(is_array($result[$k]), 'fetch_printcatora_status: not array - ' . $k);
+                $this->assertTrue(is_array($result[$k]), 'fetch_printcatora_status: not array - '.$k);
                 foreach ($v[0] as $key => $val) {
-                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_printcatora_status #' . $k . ': missing key - ' . $key);
-                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_printcatora_status #' . $k . ': wrong ' . $key);
+                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_printcatora_status #'.$k.': missing key - '.$key);
+                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_printcatora_status #'.$k.': wrong '.$key);
                 }
             }
         }
@@ -106,23 +102,22 @@ class PrintcatOraTest extends TestCase
     /** @test */
     public function update_printcatora_devices()
     {
-
         $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $opinions = $this->_setup_opinions($data);
         $PrintcatOra = new PrintcatOra;
-        $before = DB::select("SELECT id_ords, fault_type_id FROM devices_printcat_ora");
+        $before = DB::select('SELECT id_ords, fault_type_id FROM devices_printcat_ora');
         foreach ($before as $k => $v) {
-            $this->assertEquals($v->fault_type_id, 0, 'update_printcatora_devices: initial fault_type not 0: ' . $v->fault_type_id);
+            $this->assertEquals($v->fault_type_id, 0, 'update_printcatora_devices: initial fault_type not 0: '.$v->fault_type_id);
         }
         $updated = $PrintcatOra->updateDevices();
-        $after = DB::select("SELECT id_ords, fault_type_id FROM devices_printcat_ora");
-        $this->assertEquals($updated, count($opinions['updates']), 'update_printcatora_devices: wrong number of records updated: ' . $updated);
+        $after = DB::select('SELECT id_ords, fault_type_id FROM devices_printcat_ora');
+        $this->assertEquals($updated, count($opinions['updates']), 'update_printcatora_devices: wrong number of records updated: '.$updated);
         foreach ($after as $k => $v) {
             if (isset($opinions['updates'][$v->id_ords])) {
-                $this->assertEquals($v->fault_type_id, $opinions['updates'][$v->id_ords], 'update_printcatora_devices: updated fault_type is wrong: ' . $v->id_ords . ' => ' . $v->fault_type_id);
+                $this->assertEquals($v->fault_type_id, $opinions['updates'][$v->id_ords], 'update_printcatora_devices: updated fault_type is wrong: '.$v->id_ords.' => '.$v->fault_type_id);
             } else {
-                $this->assertEquals($v->fault_type_id, 0, 'update_printcatora_devices: fault_type should still be 0: ' . $v->fault_type_id);
+                $this->assertEquals($v->fault_type_id, 0, 'update_printcatora_devices: fault_type should still be 0: '.$v->fault_type_id);
             }
         }
     }
@@ -152,7 +147,7 @@ class PrintcatOraTest extends TestCase
                 'partner_product_category' => 'IT/Phone ~ Printer',
                 'product_category' => 'Printer/scanner',
                 'brand' => 'Unknown',
-                 'year_of_manufacture' => '????',
+                'year_of_manufacture' => '????',
                 'repair_status' => 'End of life',
                 'event_date' => '2018-03-01',
                 'problem' => 'Printer Doesnt work- major mechanical fault',
@@ -163,9 +158,7 @@ class PrintcatOraTest extends TestCase
             [
                 'id_ords' => 'rcint_24791',
                 'data_provider' => 'Repair Café International',
-                'country' => 'NLD', 'partner_product_category' =>
-                'Computers/phones ~ Printer', 'product_category' =>
-                'Printer/scanner',
+                'country' => 'NLD', 'partner_product_category' => 'Computers/phones ~ Printer', 'product_category' => 'Printer/scanner',
                 'brand' => 'Brother',
                 'year_of_manufacture' => '????',
                 'repair_status' => 'End of life',
@@ -271,6 +264,7 @@ class PrintcatOraTest extends TestCase
                 'id_ords' => $v['id_ords'],
             ]);
         }
+
         return $data;
     }
 
@@ -285,7 +279,6 @@ class PrintcatOraTest extends TestCase
      */
     protected function _setup_opinions($data)
     {
-
         $opinions = [];
 
         $updates = [];
@@ -311,7 +304,7 @@ class PrintcatOraTest extends TestCase
         $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 2);
         $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 25);
         $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 26);
-        DB::update("INSERT INTO devices_faults_printers_ora_adjudicated SET id_ords = '" . $data[3]['id_ords'] . "', fault_type_id=2");
+        DB::update("INSERT INTO devices_faults_printers_ora_adjudicated SET id_ords = '".$data[3]['id_ords']."', fault_type_id=2");
         $updates[$data[3]['id_ords']] = 2;
 
         // $devs[4] : 2 opinions with majority : recat
@@ -366,6 +359,7 @@ class PrintcatOraTest extends TestCase
         $this->assertDatabaseHas('devices_faults_printers_ora_opinions', [
             'id_ords' => $id_ords,
         ]);
+
         return $insert;
     }
 
@@ -378,7 +372,6 @@ class PrintcatOraTest extends TestCase
 
     protected function _setup_fault_types()
     {
-
         $fault_types = [
             1 => [
                 'id' => 1,
@@ -415,7 +408,8 @@ class PrintcatOraTest extends TestCase
         foreach ($fault_types as $row) {
             DB::table('fault_types_printers')->insert($row);
             $this->assertDatabaseHas('fault_types_printers', ['id' => $row['id']]);
-        };
+        }
+
         return $fault_types;
     }
 }

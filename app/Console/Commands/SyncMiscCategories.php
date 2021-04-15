@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Misccat;
+use Illuminate\Console\Command;
 
 class SyncMiscCategories extends Command
 {
@@ -31,7 +31,7 @@ class SyncMiscCategories extends Command
         $Misccat = new Misccat;
         $result = $Misccat->updateDevices();
         if ($result) {
-            $this->info($result . ' rows updated');
+            $this->info($result.' rows updated');
         } else {
             $this->info('0 rows updated');
         }

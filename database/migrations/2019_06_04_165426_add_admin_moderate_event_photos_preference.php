@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class AddAdminModerateEventPhotosPreference extends Migration
@@ -15,7 +13,7 @@ class AddAdminModerateEventPhotosPreference extends Migration
     {
         DB::table('preferences')->insert([
             'name' => 'Admin Moderate Event Photos',
-            'purpose' => NULL,
+            'purpose' => null,
             'slug' => 'admin-moderate-event-photos',
         ]);
     }

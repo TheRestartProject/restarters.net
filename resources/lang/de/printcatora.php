@@ -1,8 +1,7 @@
 <?php
 
 return [
-    'task' =>
-    [
+    'task' => [
         'where_is_the_main_fault' => 'Wo ist der hauptfehler',
         'fetch_another' => 'Ich weiß nicht, holen sie eine weitere reparatur',
         'suggestions' => 'Vorschläge',
@@ -10,8 +9,7 @@ return [
         'go_with' => 'Geh mit',
         'source' => 'Quelle',
     ],
-    'status' =>
-    [
+    'status' => [
         'status' => 'Status',
         'items_opinions' => 'Artikel / meinungen',
         'items_split_opinions' => 'Artikel mit geteilten meinungen',
@@ -26,7 +24,6 @@ return [
         'problem' => 'Problem',
         'number_of_records' => 'Anzahl der datensätze',
         'winning_opinion' => 'Gewinnende meinung',
-        'task_completed' => "Sie haben sie alle gesehen, danke",
-    ]
+        'task_completed' => 'Sie haben sie alle gesehen, danke',
+    ],
 ];
-

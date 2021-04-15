@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
-use Auth;
 
 class DiscourseService
 {
@@ -14,16 +13,16 @@ class DiscourseService
         try {
             $client = app('discourse-client');
 
-            $endpoint = $tag ? "/tag/{$tag}/l/latest.json" : "/latest.json";
+            $endpoint = $tag ? "/tag/{$tag}/l/latest.json" : '/latest.json';
             $response = $client->request('GET', $endpoint);
             $discourseResult = json_decode($response->getBody());
 
             $topics = $discourseResult->topic_list->topics;
-            if (!empty($numberOfTopics)) {
+            if ( ! empty($numberOfTopics)) {
                 $topics = array_slice($topics, 0, $numberOfTopics, true);
             }
 
-            $endpoint = "/site.json";
+            $endpoint = '/site.json';
             $response = $client->request('GET', $endpoint);
             $discourseResult = json_decode($response->getBody());
             $categories = $discourseResult->categories;
@@ -36,7 +35,7 @@ class DiscourseService
                 }
             }
         } catch (\Exception $ex) {
-            Log::error("Error retrieving discussion topics" . $ex->getMessage());
+            Log::error('Error retrieving discussion topics'.$ex->getMessage());
         }
 
         return $topics;
@@ -53,6 +52,7 @@ class DiscourseService
             $response = $client->request('GET', $endpoint);
             if ($response->getStatusCode() == 404) {
                 Log::error("{$endpoint} not found");
+
                 throw new \Exception("{$endpoint} not found");
             }
             $discourseResult = json_decode($response->getBody());
@@ -70,7 +70,7 @@ class DiscourseService
                 $this->avoidRateLimiting();
             }
         } catch (\Exception $ex) {
-            Log::error("Error retrieving users by badge: " . $ex->getMessage());
+            Log::error('Error retrieving users by badge: '.$ex->getMessage());
         }
 
         return $externalUserIds;

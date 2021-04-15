@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AllowNullLocationDetails extends Migration
 {
@@ -17,7 +17,6 @@ class AllowNullLocationDetails extends Migration
             $table->string('location', 255)->nullable()->change();
             $table->float('latitude')->nullable()->change();
             $table->float('longitude')->nullable()->change();
-            //
         });
     }
 

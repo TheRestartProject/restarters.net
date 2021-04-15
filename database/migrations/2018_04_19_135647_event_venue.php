@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class EventVenue extends Migration
@@ -13,7 +11,8 @@ class EventVenue extends Migration
      */
     public function up()
     {
-        DB::statement('ALTER TABLE `events`
+        DB::statement(
+            'ALTER TABLE `events`
                         ADD COLUMN `venue` VARCHAR(255) NULL AFTER `end`;'
         );
     }
@@ -25,6 +24,5 @@ class EventVenue extends Migration
      */
     public function down()
     {
-        //
     }
 }

@@ -50,12 +50,12 @@ return [
             'title' => 'Help Now!  MobiFix',
             'description' => '<p>We see lots of smartphones at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with smartphones with MobiFix!</p>',
             'get_involved' => 'Get involved',
-        ]
+        ],
     ],
     'discussion' => [
         'title' => 'What\'s happening',
         'number_of_comments' => 'Number of comments',
         'topic_created_at' => 'Topic created',
         'see_all' => 'see all',
-    ]
+    ],
 ];

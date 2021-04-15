@@ -21,9 +21,10 @@ class CachingWikiPageRetriever
             return Cache::get($this->cacheKey);
         }
 
-        $endpoint = $this->apiEndpointBase . '?action=query&rnnamespace=0&list=random&rnlimit=' . $numPages . '&format=json';
+        $endpoint = $this->apiEndpointBase.'?action=query&rnnamespace=0&list=random&rnlimit='.$numPages.'&format=json';
 
         $pages_json = [];
+
         try {
             $raw_json = file_get_contents($endpoint);
             $decoded_json = json_decode($raw_json);

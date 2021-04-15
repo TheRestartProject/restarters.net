@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class GroupCountryField extends Migration
 {
@@ -22,22 +22,17 @@ class GroupCountryField extends Migration
                         ->whereNotNull('longitude')
                           ->get();
 
-        foreach( $groups as $group ) {
+        foreach ($groups as $group) {
+            $lat_long = FixometerHelper::getLatLongFromCityCountry($group->latitude, $group->longitude);
 
-          $lat_long = FixometerHelper::getLatLongFromCityCountry($group->latitude, $group->longitude);
+            if (isset($lat_long[2]) && ! empty($lat_long[2])) {
+                $update = DB::table('groups')->where('idgroups', $group->idgroups)->update([
+                    'country' => $lat_long[2],
+                ]);
 
-          if( isset($lat_long[2]) && !empty($lat_long[2]) ) {
-
-            $update = DB::table('groups')->where('idgroups', $group->idgroups)->update([
-              'country' => $lat_long[2]
-            ]);
-
-            usleep(250000);
-
-          }
-
+                usleep(250000);
+            }
         }
-
     }
 
     /**

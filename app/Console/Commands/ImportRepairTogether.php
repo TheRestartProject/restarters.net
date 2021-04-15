@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Group;
-use App\GroupTags;
 use App\Helpers\FixometerHelper;
 use App\Network;
 use App\Role;
@@ -45,12 +44,12 @@ class ImportRepairTogether extends Command
 
         $this->restartersNetwork = Network::find($restartersNetworkId);
         if (is_null($this->restartersNetwork)) {
-            throw new \Exception("Could not find Restarters network in the database.");
+            throw new \Exception('Could not find Restarters network in the database.');
         }
 
         $this->repairTogetherNetwork = Network::find($repairTogetherNetworkId);
         if (is_null($this->repairTogetherNetwork)) {
-            throw new \Exception("Could not find Repair Together network in the database.");
+            throw new \Exception('Could not find Repair Together network in the database.');
         }
 
         $this->assignExistingGroupsToRestartNetwork();
@@ -62,10 +61,9 @@ class ImportRepairTogether extends Command
     public function assignExistingGroupsToRestartNetwork()
     {
         $groupIds = Group::all()->pluck('idgroups');
-        foreach ($groupIds as $groupId)
-        {
+        foreach ($groupIds as $groupId) {
             DB::table('group_network')->insert([
-                ['group_id' => $groupId, 'network_id' => $this->restartersNetwork->id]
+                ['group_id' => $groupId, 'network_id' => $this->restartersNetwork->id],
             ]);
         }
     }
@@ -83,6 +81,7 @@ class ImportRepairTogether extends Command
             $coordinator = User::where('email', $coordinatorEmail)->first();
             if (is_null($coordinator)) {
                 $this->error("Couldn't find user with email: ".$coordinatorEmail);
+
                 break;
             }
             $coordinator->role = Role::NETWORK_COORDINATOR;

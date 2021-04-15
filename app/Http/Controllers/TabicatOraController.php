@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
 use App;
-use App\TabicatOra;
 use App\Helpers\Microtask;
+use App\TabicatOra;
+use Auth;
+use Illuminate\Http\Request;
 
-class TabicatOraController extends Controller {
-
+class TabicatOraController extends Controller
+{
     protected $Model;
 
     /**
@@ -20,8 +20,9 @@ class TabicatOraController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request) {
-        $partner = $request->input('partner', NULL);
+    public function index(Request $request)
+    {
+        $partner = $request->input('partner', null);
         if (Auth::check()) {
             $user = Auth::user();
         } else {
@@ -32,7 +33,7 @@ class TabicatOraController extends Controller {
         }
         $this->Model = new TabicatOra;
         if ($request->has('id-ords')) {
-            if (!(is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
+            if ( ! (is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
                 return redirect()->back()->withErrors(['Oops, there was an error, please try again, sorry! If this error persists please contact The Restart Project.']);
             }
             $insert = [
@@ -44,13 +45,13 @@ class TabicatOraController extends Controller {
             ];
             $this->Model = new TabicatOra;
             $success = $this->Model->create($insert);
-            if (!$success) {
+            if ( ! $success) {
                 logger('TabiCat error on insert.');
                 logger(print_r($insert, 1));
             }
         }
         $fault = $this->_fetchRecord($request);
-        if (!$fault) {
+        if ( ! $fault) {
             return redirect()->action('TabicatOraController@status')->withSuccess('done');
         }
         $fault->translate = rawurlencode($fault->problem);
@@ -58,12 +59,13 @@ class TabicatOraController extends Controller {
         $fault->suggestions = [];
         // match problem terms with suggestions
         foreach ($fault_types as $k => $v) {
-            if (!empty($v->regex) && preg_match('/' . $v->regex . '/', strtolower($fault->translation), $matches)) {
+            if ( ! empty($v->regex) && preg_match('/'.$v->regex.'/', strtolower($fault->translation), $matches)) {
                 $fault->suggestions[$k] = $fault_types[$k];
             }
         }
         // send non-suggested fault_types to view
         $fault->faulttypes = array_diff_key($fault_types, $fault->suggestions);
+
         return view('tabicatora.index', [
             'title' => 'TabiCat',
             'fault' => $fault,
@@ -80,7 +82,8 @@ class TabicatOraController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function cta(Request $request) {
+    public function cta(Request $request)
+    {
         return $this->index($request);
     }
 
@@ -91,22 +94,24 @@ class TabicatOraController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function status(Request $request) {
+    public function status(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
             $user = Microtask::getAnonUserCta($request);
         }
-        $partner = $request->input('partner', NULL);
+        $partner = $request->input('partner', null);
         $this->Model = new TabicatOra;
         $data = $this->Model->fetchStatus($partner);
         $complete = $data['total_opinions_2'][0]->total + $data['total_opinions_1'][0]->total + $data['total_opinions_0'][0]->total == 0;
+
         return view('tabicatora.status', [
             'title' => 'TabiCat',
             'status' => $data,
             'user' => $user,
             'complete' => $complete,
-            'partner' => $request->input('partner', NULL),
+            'partner' => $request->input('partner', null),
         ]);
     }
 
@@ -117,11 +122,12 @@ class TabicatOraController extends Controller {
      *
      * @return object
      */
-    protected function _fetchRecord(Request $request) {
+    protected function _fetchRecord(Request $request)
+    {
 
 //        $request->session()->flush();
-        $result = FALSE;
-        $partner = $request->input('partner', NULL);
+        $result = false;
+        $partner = $request->input('partner', null);
         $exclusions = $request->session()->get('tabicatora.exclusions', []);
         $this->Model = new TabicatOra;
         $fault = $this->Model->fetchFault($exclusions, $partner);
@@ -129,7 +135,7 @@ class TabicatOraController extends Controller {
             $result = $fault[0];
             $request->session()->push('tabicatora.exclusions', $result->id_ords);
         }
+
         return $result;
     }
-
 }

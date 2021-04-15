@@ -38,7 +38,8 @@ class Handler extends ExceptionHandler
         if ($request->wantsJson()) {
             return response()->json(
                 ['message' => $exception->getMessage()],
-                method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 500);
+                method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 500
+            );
         }
 
         return parent::render($request, $exception);

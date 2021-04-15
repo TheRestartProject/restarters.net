@@ -30,7 +30,6 @@ use App\Session;
 use App\User;
 use App\UserGroups;
 
-use Lang;
 use Auth;
 use DateTime;
 use DB;
@@ -38,6 +37,7 @@ use FixometerFile;
 use FixometerHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Lang;
 use Notification;
 use Spatie\CalendarLinks\Link;
 
@@ -138,9 +138,9 @@ class PartyController extends Controller
         $past_events = $past_events->paginate(env('PAGINATE'));
 
         return view('events.all-past', [
-          'past_events' => $past_events,
-          'past_events_count' => $past_events_count,
-          'EmissionRatio' => $this->EmissionRatio,
+            'past_events' => $past_events,
+            'past_events_count' => $past_events_count,
+            'EmissionRatio' => $this->EmissionRatio,
         ]);
     }
 
@@ -195,12 +195,12 @@ class PartyController extends Controller
                 'start' => 'required',
                 'end' => 'required',
                 'location' => [
-                    function ($attribute, $value, $fail) use ($request){
-                        if (!$request->filled('online') && !$value) {
+                    function ($attribute, $value, $fail) use ($request) {
+                        if ( ! $request->filled('online') && ! $value) {
                             $fail(__('events.validate_location'));
                         }
-                    }
-                ]
+                    },
+                ],
             ]);
 
             $error = array();
@@ -209,8 +209,9 @@ class PartyController extends Controller
                 try {
                     $results = $this->geocoder->geocode($request->get('location'));
 
-                    if ( empty($results) ) {
+                    if (empty($results)) {
                         $response['danger'] = 'Party could not be created. Address not found.';
+
                         return view('events.create', [
                             'response' => $response,
                             'title' => 'New Party',
@@ -225,7 +226,7 @@ class PartyController extends Controller
                     $latitude = $results['latitude'];
                     $longitude = $results['longitude'];
                 } catch (\Exception $ex) {
-                    Log::error('An error occurred during geocoding: ' . $ex->getMessage());
+                    Log::error('An error occurred during geocoding: '.$ex->getMessage());
                 }
             } else {
                 $latitude = null;
@@ -425,28 +426,28 @@ class PartyController extends Controller
                 $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($data['location']).'&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE');
                 $json = json_decode($json);
 
-                if ( empty($json->results) ) {
-                  $response['danger'] = 'Party could not be saved. Address not found.';
-                  $party = $Party->findThis($id)[0];
-                  $audits = Party::findOrFail($id)->audits;
+                if (empty($json->results)) {
+                    $response['danger'] = 'Party could not be saved. Address not found.';
+                    $party = $Party->findThis($id)[0];
+                    $audits = Party::findOrFail($id)->audits;
 
-                  return view('events.edit', [ //party.edit
-                      'gmaps' => true,
-                      'images' => $images,
-                      'title' => 'Edit Party',
-                      'allGroups' => $allGroups,
-                      'formdata' => $party,
-                      'remotePost' => null,
-                      'grouplist' => $Groups->findList(),
-                      'user' => Auth::user(),
-                      'co2Total' => $co2Total[0]->total_footprints,
-                      'wasteTotal' => $co2Total[0]->total_weights,
-                      'device_count_status' => $device_count_status,
-                      'user_groups' => $groupsUserIsInChargeOf,
-                      'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-                      'audits' => $audits,
-                      'response' => $response,
-                  ]);
+                    return view('events.edit', [ //party.edit
+                        'gmaps' => true,
+                        'images' => $images,
+                        'title' => 'Edit Party',
+                        'allGroups' => $allGroups,
+                        'formdata' => $party,
+                        'remotePost' => null,
+                        'grouplist' => $Groups->findList(),
+                        'user' => Auth::user(),
+                        'co2Total' => $co2Total[0]->total_footprints,
+                        'wasteTotal' => $co2Total[0]->total_weights,
+                        'device_count_status' => $device_count_status,
+                        'user_groups' => $groupsUserIsInChargeOf,
+                        'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+                        'audits' => $audits,
+                        'response' => $response,
+                    ]);
                 }
 
                 if (is_object($json) && ! empty($json->{'results'})) {
@@ -600,7 +601,7 @@ class PartyController extends Controller
         $images = $File->findImages(env('TBL_EVENTS'), $id);
         $party = $Party->findThis($id, true)[0];
 
-        // status is a string, so using 'like' rather than = otherwise 
+        // status is a string, so using 'like' rather than = otherwise
         // those with an invite string starting with '1' are included.
         $hosts = EventsUsers::where('event', $id)->where('role', 3)->where('status', 'like', '1')->get();
 
@@ -611,7 +612,7 @@ class PartyController extends Controller
         }
 
         //Info for attendance tabs
-        // status is a string, so using 'like' rather than = otherwise 
+        // status is a string, so using 'like' rather than = otherwise
         // those with an invite string starting with '1' are included.
         $attendees = EventsUsers::where('event', $id)->where('status', 'like', '1');
         $attended = clone $attendees->get();
@@ -720,7 +721,7 @@ class PartyController extends Controller
                 $event->increment('volunteers');
 
                 $flashData = [];
-                if (! Auth::user()->isInGroup($event->theGroup->idgroups)) {
+                if ( ! Auth::user()->isInGroup($event->theGroup->idgroups)) {
                     $flashData['prompt-follow-group'] = true;
                 }
 
@@ -729,10 +730,12 @@ class PartyController extends Controller
                 return redirect()->back()->with($flashData);
             } catch (\Exception $e) {
                 $flashData['danger'] = 'Failed to join this event';
+
                 return redirect()->back()->with($flashData);
             }
         } else {
             $flashData['warning'] = 'You are already part of this event';
+
             return redirect()->back()->with($flashData);
         }
     }
@@ -818,13 +821,13 @@ class PartyController extends Controller
                     if ($method == 'update') {
                         $Device->update($device, $iddevice);
                         if (FixometerHelper::featureIsEnabled(env('FEATURE__DEVICE_PHOTOS')) && $files[$i]['error'] == 0) {
-                                $File->simpleUpload($files[$i], $iddevice, 'device', 'Device S/N Image');
+                            $File->simpleUpload($files[$i], $iddevice, 'device', 'Device S/N Image');
                         }
                     } else {
                         $device['category_creation'] = $device['category'];
                         $iddevice = $Device->create($device);
                         if (FixometerHelper::featureIsEnabled(env('FEATURE__DEVICE_PHOTOS')) && $files[$i]['error'] == 0) {
-                                $File->simpleUpload($files[$i], $iddevice, 'device', 'Device S/N Image');
+                            $File->simpleUpload($files[$i], $iddevice, 'device', 'Device S/N Image');
                         }
                     }
 
@@ -1308,7 +1311,7 @@ class PartyController extends Controller
     public function imageUpload(Request $request, $id)
     {
         try {
-            if (empty($_FILES) && !empty($request->files)) {
+            if (empty($_FILES) && ! empty($request->files)) {
                 // Shim to handle uploads from Tests
                 $file = $request->file('file');
                 $_FILES['file'] = [
@@ -1320,7 +1323,7 @@ class PartyController extends Controller
                 ];
             }
 
-            if (!empty($_FILES)) {
+            if ( ! empty($_FILES)) {
                 $file = new FixometerFile;
                 $file->upload('file', 'image', $id, env('TBL_EVENTS'), true, false, true);
 
@@ -1329,7 +1332,8 @@ class PartyController extends Controller
 
             return 'success - image uploaded';
         } catch (\Exception $e) {
-            Log::info('An exception occurred when uploading image: ' . $e->getMessage());
+            Log::info('An exception occurred when uploading image: '.$e->getMessage());
+
             return response()->json('An error occurred', 400);
         }
     }
@@ -1407,7 +1411,6 @@ class PartyController extends Controller
         return redirect()->back()->with('warning', 'Sorry - you do not have the correct permissions for this action');
     }
 
-
     /**
      * Called via AJAX.
      * @param id The event id.
@@ -1419,7 +1422,7 @@ class PartyController extends Controller
 
         Log::info("User {$user->id} attempting to delete event {$id}");
 
-        if (! FixometerHelper::userHasEditPartyPermission($id) &&
+        if ( ! FixometerHelper::userHasEditPartyPermission($id) &&
             ! FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id)) {
             return redirect()->back()->with('warning', 'You do not have permission to delete this event');
         }
@@ -1433,7 +1436,7 @@ class PartyController extends Controller
 
         event(new EventDeleted($event));
 
-        Log::info("Event deleted");
+        Log::info('Event deleted');
 
         return redirect('/party')->with('success', 'Event has been deleted');
     }
@@ -1489,102 +1492,100 @@ class PartyController extends Controller
      * @param   [type]     $api_token
      * @return  [type]
      */
-     public function getEventsByKey(Request $request, $api_token, $date_from = null, $date_to = null)
-     {
-         $user = User::where('api_token', $api_token)->first();
+    public function getEventsByKey(Request $request, $api_token, $date_from = null, $date_to = null)
+    {
+        $user = User::where('api_token', $api_token)->first();
 
-         $parties = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+        $parties = Party::join('groups', 'groups.idgroups', '=', 'events.group')
          ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
          ->join('group_tags', 'group_tags.id', '=', 'grouptags_groups.group_tag')
          ->join('users', 'users.access_group_tag_id', '=', 'group_tags.id');
 
-         if ( ! empty($date_from) && ! empty($date_to)) {
-           $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
+        if ( ! empty($date_from) && ! empty($date_to)) {
+            $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
            ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
-         }
+        }
 
-         $parties = $parties->where([
-             ['users.api_token', $user->api_token],
-             ['users.access_group_tag_id', $user->access_group_tag_id]
-         ])
+        $parties = $parties->where([
+            ['users.api_token', $user->api_token],
+            ['users.access_group_tag_id', $user->access_group_tag_id],
+        ])
          ->select('events.*')
          ->get();
 
-         // If no parties are found, through 404 error
-         if (empty($parties)) {
-           return abort(404, 'No Events found.');
-         }
+        // If no parties are found, through 404 error
+        if (empty($parties)) {
+            return abort(404, 'No Events found.');
+        }
 
-         // Get Emission Ratio
-         $footprintRatioCalculator = new FootprintRatioCalculator();
-         $emissionRatio = $footprintRatioCalculator->calculateRatio();
+        // Get Emission Ratio
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-
-         $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
+        $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
          ->where('group_tag', $user->access_group_tag_id)->get();
 
-         $groups_array = collect([]);
-         foreach ($groups as $group) {
-           $groups_array->push([
-               'id' => $group->idgroups,
-               'name' => $group->name,
-               'description' => $group->free_text,
-               'image_url' => $group->groupImagePath(),
-               'volunteers' => $group->volunteers,
-               'participants' => $group->getGroupStats($emissionRatio)['pax'],
-               'hours_volunteered' => $group->getGroupStats($emissionRatio)['hours'],
-               'parties_thrown' => $group->getGroupStats($emissionRatio)['parties'],
-               'waste_prevented' => $group->getGroupStats($emissionRatio)['waste'],
-               'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
-           ]);
-         }
+        $groups_array = collect([]);
+        foreach ($groups as $group) {
+            $groups_array->push([
+                'id' => $group->idgroups,
+                'name' => $group->name,
+                'description' => $group->free_text,
+                'image_url' => $group->groupImagePath(),
+                'volunteers' => $group->volunteers,
+                'participants' => $group->getGroupStats($emissionRatio)['pax'],
+                'hours_volunteered' => $group->getGroupStats($emissionRatio)['hours'],
+                'parties_thrown' => $group->getGroupStats($emissionRatio)['parties'],
+                'waste_prevented' => $group->getGroupStats($emissionRatio)['waste'],
+                'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
+            ]);
+        }
 
-         $collection = collect([]);
-         foreach ($parties as $key => $party) {
+        $collection = collect([]);
+        foreach ($parties as $key => $party) {
+            $group = $groups_array->filter(function ($group) use ($party) {
+                return $group['id'] == $party->group;
+            })->first();
 
-           $group = $groups_array->filter(function ($group) use($party) {
-             return $group['id'] == $party->group;
-           })->first();
+            // Push Party to Collection
+            $collection->push([
+                'id' => $party->idevents,
+                'group' => [$group],
+                'event_date' => $party->event_date,
+                'start_time' => $party->start,
+                'end_time' => $party->end,
+                'name' => $party->venue,
+                'location' => [
+                    'value' => $party->location,
+                    'latitude' => $party->latitude,
+                    'longitude' => $party->longitude,
+                ],
+                'description' => $party->free_text,
+                'user' => $party_user = collect(),
+                'impact' => [
+                    'participants' => $party->pax,
+                    'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
+                    'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
+                    'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
+                    'devices_fixed' => $party->getEventStats($emissionRatio)['fixed_devices'],
+                    'devices_repairable' => $party->getEventStats($emissionRatio)['repairable_devices'],
+                    'devices_dead' => $party->getEventStats($emissionRatio)['dead_devices'],
+                ],
+                'widgets' => [
+                    'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
+                    'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
+                ],
+                'hours_volunteered' => $party->hoursVolunteered(),
+            ]);
 
-           // Push Party to Collection
-           $collection->push([
-             'id' => $party->idevents,
-             'group' => [$group],
-             'event_date' => $party->event_date,
-             'start_time' => $party->start,
-             'end_time' => $party->end,
-             'name' => $party->venue,
-             'location' => [
-                 'value' => $party->location,
-                 'latitude' => $party->latitude,
-                 'longitude' => $party->longitude,
-             ],
-             'description' => $party->free_text,
-             'user' => $party_user = collect(),
-             'impact' => [
-                 'participants' => $party->pax,
-                 'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
-                 'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
-                 'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
-                 'devices_fixed' => $party->getEventStats($emissionRatio)['fixed_devices'],
-                 'devices_repairable' => $party->getEventStats($emissionRatio)['repairable_devices'],
-                 'devices_dead' => $party->getEventStats($emissionRatio)['dead_devices'],
-             ],
-             'widgets' => [
-                 'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
-                 'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
-             ],
-             'hours_volunteered' => $party->hoursVolunteered(),
-           ]);
+            if ( ! empty($party->owner)) {
+                $party_user->put('id', $party->owner->id);
+                $party_user->put('name', $party->owner->name);
+            }
+        }
 
-           if ( ! empty($party->owner)) {
-             $party_user->put('id', $party->owner->id);
-             $party_user->put('name', $party->owner->name);
-           }
-         }
-
-         return $collection;
-     }
+        return $collection;
+    }
 
     /**
      * [getEventByKeyAndId description]

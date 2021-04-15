@@ -2,14 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Category;
 use App\Device;
 use App\Group;
 use App\Party;
 
 use DB;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class EventStatsTest extends TestCase
 {
@@ -18,11 +17,11 @@ class EventStatsTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         Group::truncate();
         Party::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */

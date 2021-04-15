@@ -7,8 +7,6 @@ use App\Notifications\DeleteEventFromWordpressFailed;
 use FixometerHelper;
 
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 use Notification;
 
@@ -39,11 +37,11 @@ class DeleteEventFromWordPress
         $repairEvent = $event->repairEvent;
 
         try {
-            if ($repairEvent->shouldPushToWordPress() && !empty($repairEvent->wordpress_post_id)) {
+            if ($repairEvent->shouldPushToWordPress() && ! empty($repairEvent->wordpress_post_id)) {
                 $this->wpClient->deletePost($repairEvent->wordpress_post_id);
             }
         } catch (\Exception $ex) {
-            Log::error("An error occurred during Wordpress event deletion: " . $ex->getMessage());
+            Log::error('An error occurred during Wordpress event deletion: '.$ex->getMessage());
 
             $usersToNotify = FixometerHelper::usersWhoHavePreference('delete-event-notification');
 

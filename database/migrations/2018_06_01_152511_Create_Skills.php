@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateSkills extends Migration
 {
@@ -13,15 +13,15 @@ class CreateSkills extends Migration
      */
     public function up()
     {
-      Schema::create('skills', function (Blueprint $table) {
-          $table->increments('id');
-          $table->string('skill_name');
-          $table->string('description');
-          $table->timestamps();
-      });
-      Schema::table('users', function (Blueprint $table) {
-          $table->string('skills');
-      });
+        Schema::create('skills', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('skill_name');
+            $table->string('description');
+            $table->timestamps();
+        });
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('skills');
+        });
     }
 
     /**
@@ -31,9 +31,9 @@ class CreateSkills extends Migration
      */
     public function down()
     {
-      Schema::dropIfExists('skills');
-      Schema::table('users', function (Blueprint $table) {
-          $table->dropColumn('skills');
-      });
+        Schema::dropIfExists('skills');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('skills');
+        });
     }
 }

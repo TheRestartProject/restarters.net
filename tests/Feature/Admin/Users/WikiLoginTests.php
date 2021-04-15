@@ -2,19 +2,16 @@
 
 namespace Tests\Feature;
 
-use App\Listeners\LogInToWiki;
 use App\Listeners\ChangeWikiPassword;
 use App\User;
 use App\WikiSyncStatus;
 
 use DB;
-use Carbon\Carbon;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Msurguy\Honeypot\HoneypotFacade as Honeypot;
-use Mockery;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Mediawiki\Api\Service\UserCreator;
+use Mockery;
+use Msurguy\Honeypot\HoneypotFacade as Honeypot;
+use Tests\TestCase;
 
 class WikiLoginTests extends TestCase
 {
@@ -23,9 +20,9 @@ class WikiLoginTests extends TestCase
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */
@@ -44,7 +41,7 @@ class WikiLoginTests extends TestCase
         $user->save();
 
         // When user logs in
-        $response = $this->post('/login', ['email' => $user->email, 'password'=> 'secret', 'my_name' => 'foo', 'my_time' => 1]);
+        $response = $this->post('/login', ['email' => $user->email, 'password' => 'secret', 'my_name' => 'foo', 'my_time' => 1]);
 
         // Then the user should be created on the wiki
         $user = User::find($user->id);
@@ -68,7 +65,7 @@ class WikiLoginTests extends TestCase
         $user->save();
 
         // When user logs in
-        $response = $this->post('/login', ['email' => $user->email, 'password'=> 'secret', 'my_name' => 'foo', 'my_time' => 1]);
+        $response = $this->post('/login', ['email' => $user->email, 'password' => 'secret', 'my_name' => 'foo', 'my_time' => 1]);
 
         // Then the user should still be marked as DoNotCreate
         $user = User::find($user->id);
@@ -92,14 +89,13 @@ class WikiLoginTests extends TestCase
         $user->save();
 
         // When user logs in
-        $response = $this->post('/login', ['email' => $user->email, 'password'=> 'secret', 'my_name' => 'foo', 'my_time' => 1]);
+        $response = $this->post('/login', ['email' => $user->email, 'password' => 'secret', 'my_name' => 'foo', 'my_time' => 1]);
 
         // Then the user should still be marked as Created
         $user = User::find($user->id);
         $this->assertEquals('', $user->mediawiki);
         $this->assertEquals(WikiSyncStatus::Created, $user->wiki_sync_status);
     }
-
 
     /** @test */
     public function if_wiki_user_changes_password()

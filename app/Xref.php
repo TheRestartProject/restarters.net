@@ -2,13 +2,12 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-
 use DB;
+
+use Illuminate\Database\Eloquent\Model;
 
 class Xref extends Model
 {
-
     protected $table = 'xref';
 
     public $timestamps = false;
@@ -38,9 +37,9 @@ class Xref extends Model
     public function findXref()
     {
         if ($this->index !== false) {
-            $sql = 'SELECT * FROM `' . $this->table . '`
-                    WHERE `' . $this->index . '` = :id
-                    AND `' . $this->index . '_type` = :type';
+            $sql = 'SELECT * FROM `'.$this->table.'`
+                    WHERE `'.$this->index.'` = :id
+                    AND `'.$this->index.'_type` = :type';
 
             try {
                 return DB::select(DB::raw($sql), array('id' => $this->search_id, 'type' => $this->search_type));
@@ -63,7 +62,7 @@ class Xref extends Model
             if ($clear) {
                 self::deleteXref();
             }
-            $sql = 'INSERT INTO `' . $this->table . '`(`object`, `object_type`, `reference`, `reference_type`) VALUES (:obj, :objType, :ref, :refType)';
+            $sql = 'INSERT INTO `'.$this->table.'`(`object`, `object_type`, `reference`, `reference_type`) VALUES (:obj, :objType, :ref, :refType)';
 
             try {
                 return DB::insert(DB::raw($sql), array('obj' => $this->obj, 'objType' => $this->objType, 'ref' => $this->ref, 'refType' => $this->refType));
@@ -77,9 +76,8 @@ class Xref extends Model
 
     public function deleteXref()
     {
-
         if ($this->index !== false) {
-            $sql = 'DELETE FROM `' . $this->table . '` WHERE `reference` = :id AND `reference_type` = :type AND `object_type` = :objectType';
+            $sql = 'DELETE FROM `'.$this->table.'` WHERE `reference` = :id AND `reference_type` = :type AND `object_type` = :objectType';
 
             try {
                 return DB::delete(DB::raw($sql), array('id' => $this->ref, 'type' => $this->refType, 'objectType' => $this->objType));
@@ -93,7 +91,7 @@ class Xref extends Model
 
     public function deleteObjectXref()
     {
-            $sql = 'DELETE FROM `' . $this->table . '` WHERE `object` = :id AND `object_type` = :type';
+        $sql = 'DELETE FROM `'.$this->table.'` WHERE `object` = :id AND `object_type` = :type';
 
         try {
             return DB::delete(DB::raw($sql), array('id' => $this->obj, 'type' => $this->objType));

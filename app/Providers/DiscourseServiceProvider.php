@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
-use Auth;
 
 class DiscourseServiceProvider extends ServiceProvider
 {
@@ -36,12 +35,12 @@ class DiscourseServiceProvider extends ServiceProvider
 
         $this->app->bind('discourse-client-anonymous', function ($app, $parameters) {
             return new Client([
-                                  'base_uri' => config('discourse-api.base_url'),
-                                  'headers' => [
-                                      'User-Agent' => 'restarters/1.0',
-                                  ],
-                                  'http_errors' => false,
-                              ]);
+                'base_uri' => config('discourse-api.base_url'),
+                'headers' => [
+                    'User-Agent' => 'restarters/1.0',
+                ],
+                'http_errors' => false,
+            ]);
         });
     }
 }

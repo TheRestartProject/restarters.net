@@ -4,11 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-use DB;
-
 class UsersSkills extends Model
 {
-
     protected $table = 'users_skills';
     /**
      * The attributes that are mass assignable.

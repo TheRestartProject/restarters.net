@@ -4,17 +4,13 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
-use App\Helpers\FixometerHelper;
-use Illuminate\Http\UploadedFile;
-use Tests\TestCase;
-use App\Notifications\AdminModerationEvent;
 use App\Notifications\AdminModerationEventPhotos;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-
 use App\Party;
 use App\User;
+use Illuminate\Http\UploadedFile;
+
+use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class ModerateEventPhotosNotificationTest extends TestCase
 {
@@ -42,7 +38,7 @@ class ModerateEventPhotosNotificationTest extends TestCase
     {
         parent::setUp();
 
-        \DB::statement("SET foreign_key_checks=0");
+        \DB::statement('SET foreign_key_checks=0');
 
         User::truncate();
         Group::truncate();
@@ -50,7 +46,7 @@ class ModerateEventPhotosNotificationTest extends TestCase
         EventsUsers::truncate();
         \DB::table('notifications')->truncate();
 
-        \DB::statement("SET foreign_key_checks=1");
+        \DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */
@@ -65,13 +61,14 @@ class ModerateEventPhotosNotificationTest extends TestCase
         $file = UploadedFile::fake()->image('avatar.jpg');
 
         $response = $this->actingAs($this->restarter)
-                         ->json('POST','/party/image-upload/' . $this->event->getKey(), [
-                             'file' => $file
+                         ->json('POST', '/party/image-upload/'.$this->event->getKey(), [
+                             'file' => $file,
                          ]);
         $response->assertOk();
 
         Notification::assertSentTo(
-            $this->admins, AdminModerationEventPhotos::class
+            $this->admins,
+            AdminModerationEventPhotos::class
         );
     }
 
@@ -87,7 +84,7 @@ class ModerateEventPhotosNotificationTest extends TestCase
         $this->restarter = factory(User::class)->states('Restarter')->create();
         $this->group = factory(Group::class)->create();
         $this->event = factory(Party::class)->create([
-            'group' => $this->group->getKey()
+            'group' => $this->group->getKey(),
         ]);
 
         $this->group->addVolunteer($this->restarter);

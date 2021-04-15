@@ -8,8 +8,6 @@ use App\Notifications\AdminWordPressCreateGroupFailure;
 use FixometerHelper;
 
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Notification;
 
@@ -38,13 +36,14 @@ class CreateWordPressApproveGroupPost
 
         $group = Group::find($id);
 
-        if (!empty($group)) {
-            Log::error("Group not found");
+        if ( ! empty($group)) {
+            Log::error('Group not found');
         }
 
         if ( ! $group->eventsShouldPushToWordpress()) {
             $group->update(['wordpress_post_id' => '99999']);
-            Log::info("Approved - but groups in this network are not published to WordPress");
+            Log::info('Approved - but groups in this network are not published to WordPress');
+
             return;
         }
 
@@ -68,7 +67,7 @@ class CreateWordPressApproveGroupPost
                     'post_type' => 'group',
                     'post_title' => $group->name,
                     'post_content' => $group->free_text,
-                    'custom_fields' => $custom_fields
+                    'custom_fields' => $custom_fields,
                 );
 
                 $wpid = $this->wpClient->newPost($group->name, $data['free_text'], $content);
@@ -76,12 +75,12 @@ class CreateWordPressApproveGroupPost
                 $group->update(['wordpress_post_id' => $wpid]);
             }
         } catch (\Exception $e) {
-            Log::error("An error occurred during Wordpress group creation: " . $e->getMessage());
+            Log::error('An error occurred during Wordpress group creation: '.$e->getMessage());
 
             $notify_users = FixometerHelper::usersWhoHavePreference('admin-approve-wordpress-group-failure');
             Notification::send($notify_users, new AdminWordPressCreateGroupFailure([
-            'group_name' => $group->name,
-            'group_url' => url('/group/edit/'.$group->idgroups),
+                'group_name' => $group->name,
+                'group_url' => url('/group/edit/'.$group->idgroups),
             ]));
         }
     }

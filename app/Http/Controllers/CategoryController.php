@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
-use App\User;
 use App\Category;
+use Auth;
 use FixometerHelper;
 
 use Illuminate\Http\Request;
@@ -14,18 +13,17 @@ class CategoryController extends Controller
 {
     public function index()
     {
-
         $Category = new Category;
 
         return view('category.index', [
-        'list' => $Category->findAll(),
-        'categories'  => $Category->listed()
+            'list' => $Category->findAll(),
+            'categories' => $Category->listed(),
         ]);
     }
 
     public function getEditCategory($id)
     {
-        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if ( ! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -35,26 +33,26 @@ class CategoryController extends Controller
         $categories = $c->listed();
 
         return view('category.edit', [
-        'title' => 'Edit Category',
-        'category'   => $category,
-        'categories'  => $categories
+            'title' => 'Edit Category',
+            'category' => $category,
+            'categories' => $categories,
         ]);
     }
 
     public function postEditCategory($id, Request $request)
     {
-        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if ( ! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
         try {
             $category = Category::find($id);
             $category->update([
-            'name' => $request->input('category_name'),
-            'weight' => $request->input('weight'),
-            'footprint' => $request->input('co2_footprint'),
-            'footprint_reliability' => $request->input('reliability'),
-            'cluster' => $request->input('category_cluster'),
+                'name' => $request->input('category_name'),
+                'weight' => $request->input('weight'),
+                'footprint' => $request->input('co2_footprint'),
+                'footprint_reliability' => $request->input('reliability'),
+                'cluster' => $request->input('category_cluster'),
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('danger', 'Category could not be updated!');

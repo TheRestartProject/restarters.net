@@ -23,14 +23,15 @@ class CachingRssRetriever
         }
 
         $news_feed = [];
+
         try {
             $xml = new SimpleXMLElement(file_get_contents($this->feedLocation));
             $i = 0;
 
             foreach ($xml->channel->item as $xml_item) {
                 $newsItem = new \stdClass;
-                $newsItem->link = (string)($xml_item->link);
-                $newsItem->title = (string)($xml_item->title);
+                $newsItem->link = (string) ($xml_item->link);
+                $newsItem->title = (string) ($xml_item->title);
                 $news_feed[$i] = $newsItem;
 
                 $i += 1;

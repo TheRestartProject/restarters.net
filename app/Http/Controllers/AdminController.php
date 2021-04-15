@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
-use App\User;
-use App\Group;
-use App\Party;
 use App\Device;
-
+use App\Group;
 use App\Helpers\FootprintRatioCalculator;
+use App\Party;
 
-use FixometerHelper;
+use App\User;
+
 use Auth;
 
 class AdminController extends Controller
@@ -77,12 +73,15 @@ class AdminController extends Controller
                     case 1:
                         $party->co2 += $device->co2Diverted($EmissionRatio, $Device->displacement);
                         $party->fixed_devices++;
+
                         break;
                     case 2:
                         $party->repairable_devices++;
+
                         break;
                     case 3:
                         $party->dead_devices++;
+
                         break;
                     default:
                         break;
@@ -129,8 +128,7 @@ class AdminController extends Controller
             $clusters['all'][$i] = $cluster;
         }
 
-
-        for ($y = date('Y', time()); $y>=2013; $y--) {
+        for ($y = date('Y', time()); $y >= 2013; $y--) {
             for ($i = 1; $i <= 4; $i++) {
                 $cluster = $Device->countByCluster($i, null, $y);
 
@@ -154,31 +152,31 @@ class AdminController extends Controller
         $user = User::find(Auth::id());
 
         return view('admin.stats', [
-        'section' => $section,
-        'paragraph_only' => $paragraph_only,
-        'grouplist' => $Group->findList(),
-        'pax' => $participants,
-        'hours' => $hours_volunteered,
-        'showbadges' => $Device->guesstimates(),
-        'need_attention' => $need_attention,
-        'user' => $user,
-        // 'profile' => $user->getProfile($user->id),
-        'upcomingparties' => $Party->findNextParties(),
-        'allparties' => $allparties,
-        'devices' => $devices,
-        'weights' => array(0 => array('total_footprints' => $TotalEmission, 'total_weights' => $TotalWeight)),
-        'device_count_status' => $Device->statusCount(),
-        'year_data' => $co2_years,
-        'bar_chart_stats' => array_reverse($stats, true),
-        'waste_year_data' => $waste_years,
-        'waste_bar_chart_stats' => array_reverse($wstats, true),
-        'co2Total' => $co2Total[0]->total_footprints,
-        'co2ThisYear' => $co2ThisYear[0]->co2,
-        'wasteTotal' => $co2Total[0]->total_weights,
-        'wasteThisYear' => $wasteThisYear[0]->waste,
-        'clusters' => $clusters,
-        'mostleast' => $mostleast,
-        'top' => $Device->findMostSeen(1, null, null),
+            'section' => $section,
+            'paragraph_only' => $paragraph_only,
+            'grouplist' => $Group->findList(),
+            'pax' => $participants,
+            'hours' => $hours_volunteered,
+            'showbadges' => $Device->guesstimates(),
+            'need_attention' => $need_attention,
+            'user' => $user,
+            // 'profile' => $user->getProfile($user->id),
+            'upcomingparties' => $Party->findNextParties(),
+            'allparties' => $allparties,
+            'devices' => $devices,
+            'weights' => array(0 => array('total_footprints' => $TotalEmission, 'total_weights' => $TotalWeight)),
+            'device_count_status' => $Device->statusCount(),
+            'year_data' => $co2_years,
+            'bar_chart_stats' => array_reverse($stats, true),
+            'waste_year_data' => $waste_years,
+            'waste_bar_chart_stats' => array_reverse($wstats, true),
+            'co2Total' => $co2Total[0]->total_footprints,
+            'co2ThisYear' => $co2ThisYear[0]->co2,
+            'wasteTotal' => $co2Total[0]->total_weights,
+            'wasteThisYear' => $wasteThisYear[0]->waste,
+            'clusters' => $clusters,
+            'mostleast' => $mostleast,
+            'top' => $Device->findMostSeen(1, null, null),
         ]);
     }
 
@@ -190,12 +188,15 @@ class AdminController extends Controller
             switch ($actn) {
                 case 'gu':
                     $response['success'] = 'Group updated.';
+
                     break;
                 case 'pe':
                     $response['success'] = 'Party updated.';
+
                     break;
                 case 'pc':
                     $response['success'] = 'Party created.';
+
                     break;
                 case 'ue':
                     $response['success'] = 'Profile updated.';
@@ -207,7 +208,6 @@ class AdminController extends Controller
         $User = new User;
         $Party = new Party;
         $Device = new Device;
-
 
         $allparties = $Party->ofThisGroup2('admin', true, true);
 
@@ -237,20 +237,23 @@ class AdminController extends Controller
             }
 
             $participants += $party->pax;
-            $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
+            $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12) + 9);
 
             foreach ($party->devices as $device) {
                 switch ($device->repair_status) {
                     case 1:
-                        $party->co2 += (!empty($device->estimate) && $device->category == 46 && is_numeric($device->estimate) ? ($device->estimate * $lEmissionRatio) : $device->footprint);
-                        $party->ewaste  += (!empty($device->estimate) && $device->category==46 && is_numeric($device->estimate) ? $device->estimate : $device->weight);
+                        $party->co2 += ( ! empty($device->estimate) && $device->category == 46 && is_numeric($device->estimate) ? ($device->estimate * $lEmissionRatio) : $device->footprint);
+                        $party->ewaste += ( ! empty($device->estimate) && $device->category == 46 && is_numeric($device->estimate) ? $device->estimate : $device->weight);
                         $party->fixed_devices++;
+
                         break;
                     case 2:
                         $party->repairable_devices++;
+
                         break;
                     case 3:
                         $party->dead_devices++;
+
                         break;
                     default:
                         break;
@@ -281,7 +284,6 @@ class AdminController extends Controller
             $wstats[$year->year] = $year->waste;
         }
 
-
         $co2Total = $Device->getWeights();
         $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
 
@@ -299,8 +301,7 @@ class AdminController extends Controller
             $clusters['all'][$i] = $cluster;
         }
 
-
-        for ($y = date('Y', time()); $y>=2013; $y--) {
+        for ($y = date('Y', time()); $y >= 2013; $y--) {
             for ($i = 1; $i <= 4; $i++) {
                 $cluster = $Device->countByCluster($i, null, $y);
 
@@ -322,31 +323,31 @@ class AdminController extends Controller
         }
 
         return view('admin.eventsCsv', [//csv
-        'title' => 'Administrator Dashboard',
-        'charts' => true,
-        'response' => $response,
-        'grouplist' => $Group->findList(),
-        'pax' => $participants,
-        'hours' => $hours_volunteered,
-        'showbadges' => $Device->guesstimates(),
-        'need_attention' => $need_attention,
-        'profile' => $User->profilePage($user->id),
-        'upcomingparties' => $Party->findNextParties(),
-        'allparties' => $allparties,
-        'devices' => $devices,
-        'weights' => $weights,
-        'device_count_status' => $Device->statusCount(),
-        'year_data' => $co2_years,
-        'bar_chart_stats' => array_reverse($stats, true),
-        'waste_year_data' => $waste_years,
-        'waste_bar_chart_stats' => array_reverse($wstats, true),
-        'co2Total' => $co2Total[0]->total_footprints,
-        'co2ThisYear' => $co2ThisYear[0]->co2,
-        'wasteTotal' => $co2Total[0]->total_weights,
-        'wasteThisYear' => $wasteThisYear[0]->waste,
-        'clusters' => $clusters,
-        'mostleast' => $mostleast,
-        'top' => $Device->findMostSeen(1, null, null),
+            'title' => 'Administrator Dashboard',
+            'charts' => true,
+            'response' => $response,
+            'grouplist' => $Group->findList(),
+            'pax' => $participants,
+            'hours' => $hours_volunteered,
+            'showbadges' => $Device->guesstimates(),
+            'need_attention' => $need_attention,
+            'profile' => $User->profilePage($user->id),
+            'upcomingparties' => $Party->findNextParties(),
+            'allparties' => $allparties,
+            'devices' => $devices,
+            'weights' => $weights,
+            'device_count_status' => $Device->statusCount(),
+            'year_data' => $co2_years,
+            'bar_chart_stats' => array_reverse($stats, true),
+            'waste_year_data' => $waste_years,
+            'waste_bar_chart_stats' => array_reverse($wstats, true),
+            'co2Total' => $co2Total[0]->total_footprints,
+            'co2ThisYear' => $co2ThisYear[0]->co2,
+            'wasteTotal' => $co2Total[0]->total_weights,
+            'wasteThisYear' => $wasteThisYear[0]->waste,
+            'clusters' => $clusters,
+            'mostleast' => $mostleast,
+            'top' => $Device->findMostSeen(1, null, null),
         ]);
     }
 }

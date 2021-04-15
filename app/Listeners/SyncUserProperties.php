@@ -2,11 +2,9 @@
 
 namespace App\Listeners;
 
-use App\Events\UserUpdated;
 use App\Events\UserEmailUpdated;
 use App\Events\UserLanguageUpdated;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Events\UserUpdated;
 
 class SyncUserProperties
 {
@@ -17,7 +15,6 @@ class SyncUserProperties
      */
     public function __construct()
     {
-        //
     }
 
     /**

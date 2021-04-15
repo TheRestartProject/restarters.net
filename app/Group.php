@@ -2,11 +2,8 @@
 
 namespace App;
 
-use App\Network;
-
 use DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
 
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -58,7 +55,6 @@ class Group extends Model implements Auditable
             $builder->withCount('allRestarters');
         });
     }
-
 
     public function addTag($tag)
     {
@@ -197,7 +193,6 @@ class Group extends Model implements Auditable
         return $this->hasOne('App\Xref', 'reference', 'idgroups')->where('reference_type', env('TBL_GROUPS'))->where('object_type', 5);
     }
 
-
     public function allHosts()
     {
         return $this->hasMany('App\UserGroups', 'group', 'idgroups')->where('role', 3);
@@ -252,7 +247,7 @@ class Group extends Model implements Auditable
             $eventStats = $event->getEventStats($emissionRatio);
 
             foreach ($eventStats as $statKey => $statValue) {
-                if (! array_key_exists($statKey, $groupStats)) {
+                if ( ! array_key_exists($statKey, $groupStats)) {
                     $groupStats[$statKey] = 0;
                 }
                 $groupStats[$statKey] += $statValue;
@@ -300,7 +295,7 @@ class Group extends Model implements Auditable
      */
     public function makeMemberAHost($groupMember)
     {
-        if (!$this->allVolunteers()->pluck('user')->contains($groupMember->id)) {
+        if ( ! $this->allVolunteers()->pluck('user')->contains($groupMember->id)) {
             throw new \Exception('Volunteer is not currently in this group.  Only existing group members can be made hosts.');
         }
 
@@ -326,7 +321,7 @@ class Group extends Model implements Auditable
      * @param int|null $user_id
      * @return bool
      */
-    public function isVolunteer($user_id = NULL)
+    public function isVolunteer($user_id = null)
     {
         $attributes = ['user' => $user_id ?: auth()->id()];
 
@@ -418,24 +413,24 @@ class Group extends Model implements Auditable
 
     public function getNextUpcomingEvent()
     {
-      $event = $this->parties()
+        $event = $this->parties()
              ->whereNotNull('wordpress_post_id')
              ->whereDate('event_date', '>=', date('Y-m-d'))
              ->orderBy('event_date', 'asc');
 
-      if ( ! $event->count() ) {
-          return null;
-      }
+        if ( ! $event->count()) {
+            return null;
+        }
 
-      return $event->first();
+        return $event->first();
     }
 
     public function userEvents()
     {
-      return $this->parties()
+        return $this->parties()
       ->join('events_users', 'events.idevents', '=', 'events_users.event')
-      ->where(function($query) {
-        $query->where('events.group', $this->idgroups)
+      ->where(function ($query) {
+          $query->where('events.group', $this->idgroups)
         ->where('events_users.user', auth()->id());
       })
       ->select('events.*')
@@ -446,7 +441,7 @@ class Group extends Model implements Auditable
 
     public function getApprovedAttribute()
     {
-        return !is_null($this->wordpress_post_id);
+        return ! is_null($this->wordpress_post_id);
     }
 
     public function networks()

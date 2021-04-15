@@ -2,11 +2,11 @@
 
 namespace App;
 
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use OwenIt\Auditing\Contracts\Auditable;
 
-use DB;
+use OwenIt\Auditing\Contracts\Auditable;
 
 class UserGroups extends Model implements Auditable
 {
@@ -35,7 +35,6 @@ class UserGroups extends Model implements Auditable
 
     //Table Relations
 
-
     // Setters
     /**
      * create associations
@@ -46,26 +45,25 @@ class UserGroups extends Model implements Auditable
      * */
     public function createUsersGroups($iduser, $groups)
     {
-        if (!self::deleteUsersGroups($iduser)) {
+        if ( ! self::deleteUsersGroups($iduser)) {
             return false;
-        } else {
-            $sql = 'INSERT INTO `users_groups` (`user`, `group`) VALUES (:user, :group)';
-
-            foreach ($groups as &$group) {
-                try {
-                    DB::insert(DB::raw($sql), array('user' => $iduser, 'group' => $group));
-                } catch (\Illuminate\Database\QueryException $e) {
-                    if (env('APP_ENV') == "local" || env('APP_ENV') == "development") {
-                        dd($e);
-                    }
-                    return false;
-                }
-            }
-
-            return true;
         }
-    }
+        $sql = 'INSERT INTO `users_groups` (`user`, `group`) VALUES (:user, :group)';
 
+        foreach ($groups as &$group) {
+            try {
+                DB::insert(DB::raw($sql), array('user' => $iduser, 'group' => $group));
+            } catch (\Illuminate\Database\QueryException $e) {
+                if (env('APP_ENV') == 'local' || env('APP_ENV') == 'development') {
+                    dd($e);
+                }
+
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     //Getters
     /**
@@ -76,13 +74,16 @@ class UserGroups extends Model implements Auditable
     public function deleteUsersGroups($iduser)
     {
         $sql = 'DELETE FROM `users_groups` WHERE `user` = :id';
+
         try {
             DB::delete(DB::raw($sql), array('id' => $iduser));
+
             return true;
         } catch (\Illuminate\Database\QueryException $e) {
-            if (env('APP_ENV') == "local" || env('APP_ENV') == "development") {
+            if (env('APP_ENV') == 'local' || env('APP_ENV') == 'development') {
                 dd($e);
             }
+
             return false;
         }
     }
@@ -95,7 +96,7 @@ class UserGroups extends Model implements Auditable
 
     public function isConfirmed()
     {
-        return $this->status == "1";
+        return $this->status == '1';
     }
 
     public function scopeConfirmedInvitation($query)

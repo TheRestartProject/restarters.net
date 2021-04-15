@@ -55,6 +55,7 @@ class SyncNetworkUsersToDiscourseGroup extends Command
         // Run the sync_sso method with them.
         foreach ($users as $index => $user) {
             $index++;
+
             try {
                 $this->info("{$index}: Syncing {$user->name}");
                 $this->syncUserToGroup($user, $discourseGroupName);
@@ -84,8 +85,8 @@ class SyncNetworkUsersToDiscourseGroup extends Command
             'name' => $user->name,
             'add_groups' => $groupName,
         ];
-        $sso_payload = base64_encode( http_build_query( $sso_params ) );
-        $sig = hash_hmac( 'sha256', $sso_payload, $sso_secret );
+        $sso_payload = base64_encode(http_build_query($sso_params));
+        $sig = hash_hmac('sha256', $sso_payload, $sso_secret);
 
         $response = $this->discourseClient->request(
             'POST',

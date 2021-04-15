@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class Website extends Migration
@@ -13,7 +11,8 @@ class Website extends Migration
      */
     public function up()
     {
-        DB::statement('ALTER TABLE `groups`
+        DB::statement(
+            'ALTER TABLE `groups`
                          ADD COLUMN `website` TEXT NULL DEFAULT NULL AFTER `free_text`;'
         );
     }
@@ -25,6 +24,5 @@ class Website extends Migration
      */
     public function down()
     {
-        //
     }
 }

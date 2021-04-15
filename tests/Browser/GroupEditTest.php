@@ -10,23 +10,22 @@ use App\User;
 use App\UserGroups;
 
 use DB;
-use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Tests\DuskTestCase;
 
 class GroupEditTest extends DuskTestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Group::truncate();
         User::truncate();
         GroupTags::truncate();
         GrouptagsGroups::truncate();
         Party::truncate();
         UserGroups::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */

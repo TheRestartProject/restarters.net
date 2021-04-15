@@ -30,7 +30,7 @@ class Device extends Model implements Auditable
     {
         parent::boot();
 
-        static::deleting(function($device) {
+        static::deleting(function ($device) {
             $device->barriers()->detach();
             $device->urls()->delete();
         });
@@ -627,9 +627,10 @@ AND devices.event = events.idevents ';
         return $File->findImages(env('TBL_DEVICES'), $this->iddevices);
     }
 
-    public function fixedPoweredCount() {
+    public function fixedPoweredCount()
+    {
         // We want fixed devices with an powered category.
-        $count = Device::where('repair_status', '=', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function($query) {
+        $count = Device::where('repair_status', '=', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function ($query) {
             $query->where('powered', 1);
         }])->get();
 
@@ -641,9 +642,10 @@ AND devices.event = events.idevents ';
         return $total;
     }
 
-    public function fixedUnpoweredCount() {
+    public function fixedUnpoweredCount()
+    {
         // We want fixed devices with an unpowered category.
-        $count = Device::where('repair_status', '=', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function($query) {
+        $count = Device::where('repair_status', '=', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function ($query) {
             $query->where('powered', 0);
         }])->get();
 
@@ -655,9 +657,10 @@ AND devices.event = events.idevents ';
         return $total;
     }
 
-    public function unpoweredCount() {
+    public function unpoweredCount()
+    {
         // We want devices with an unpowered category.
-        $count = Device::withCount(['deviceCategory' => function($query) {
+        $count = Device::withCount(['deviceCategory' => function ($query) {
             $query->where('powered', 0);
         }])->get();
 
@@ -669,9 +672,10 @@ AND devices.event = events.idevents ';
         return $total;
     }
 
-    public function poweredCount() {
+    public function poweredCount()
+    {
         // We want devices with an powered category.
-        $count = Device::withCount(['deviceCategory' => function($query) {
+        $count = Device::withCount(['deviceCategory' => function ($query) {
             $query->where('powered', 1);
         }])->get();
 

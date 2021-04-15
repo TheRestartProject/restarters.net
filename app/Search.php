@@ -2,11 +2,9 @@
 
 namespace App;
 
-use App\Device;
+use DB;
 
 use Illuminate\Database\Eloquent\Model;
-
-use DB;
 
 class Search extends Model
 {
@@ -16,33 +14,32 @@ class Search extends Model
                      ->with('devices.deviceCategory')
                      ->leftJoin('grouptags_groups as gtag', 'events.group', 'gtag.group');
 
-        if (!empty($list)) {
+        if ( ! empty($list)) {
             $eventsQuery->whereIn('events.idevents', $list);
         }
 
-        if (!is_null($groups)) {
+        if ( ! is_null($groups)) {
             $eventsQuery->whereIn('events.group', $groups);
         }
 
-        if (!is_null($from)) {
-            $eventsQuery->whereRaw('UNIX_TIMESTAMP(event_date) >= ' . $from);
+        if ( ! is_null($from)) {
+            $eventsQuery->whereRaw('UNIX_TIMESTAMP(event_date) >= '.$from);
         }
 
-        if (!is_null($to)) {
-            $eventsQuery->whereRaw('UNIX_TIMESTAMP(event_date) <= ' . $to);
+        if ( ! is_null($to)) {
+            $eventsQuery->whereRaw('UNIX_TIMESTAMP(event_date) <= '.$to);
         }
 
-        if (!is_null($group_tags)) {
+        if ( ! is_null($group_tags)) {
             $eventsQuery->whereIn('gtag.group_tag', $group_tags);
         }
 
-        if (!is_null($allowedParties)) {
+        if ( ! is_null($allowedParties)) {
             $eventsQuery->whereIn('events.idevents', $allowedParties);
         }
 
         $eventsQuery->groupBy('events.idevents');
         $eventsQuery->orderBy('events.event_date', 'desc');
-
 
         return $eventsQuery->get();
     }
@@ -52,7 +49,7 @@ class Search extends Model
         $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
                 FROM `devices` AS `d`';
         $sql .= ' WHERE `repair_status` > 0 ';
-        $sql .= ' AND `d`.`event` IN (' . implode(', ', $parties). ')';
+        $sql .= ' AND `d`.`event` IN ('.implode(', ', $parties).')';
         $sql .= ' GROUP BY `status`';
 
         return DB::select(DB::raw($sql));
@@ -66,10 +63,11 @@ class Search extends Model
                 INNER JOIN `categories` AS `c`
                     ON `d`.`category` = `c`.`idcategories`
                 WHERE `c`.`cluster` = :cluster AND `d`.`repair_status` > 0 ';
-        $sql .= ' AND `d`.`event` IN (' . implode(', ', $parties) . ') ';
-        $sql.= '  GROUP BY `repair_status`
+        $sql .= ' AND `d`.`event` IN ('.implode(', ', $parties).') ';
+        $sql .= '  GROUP BY `repair_status`
                   ORDER BY `repair_status` ASC
                 ';
+
         try {
             return DB::select(DB::raw($sql), array('cluster' => $cluster));
         } catch (\Illuminate\Database\QueryException $e) {
@@ -84,31 +82,30 @@ class Search extends Model
                     ON `d`.`event` = `e`.`idevents`
                 INNER JOIN `categories` AS `c`
                     ON `d`.`category` = `c`.`idcategories`
-                WHERE 1=1 and `c`.`idcategories` <> ' . env('MISC_CATEGORY_ID');
-        $sql .= ' AND `d`.`event` IN (' . implode(', ', $parties) . ')';
+                WHERE 1=1 and `c`.`idcategories` <> '.env('MISC_CATEGORY_ID');
+        $sql .= ' AND `d`.`event` IN ('.implode(', ', $parties).')';
 
-
-        if (!is_null($status) && is_numeric($status)) {
+        if ( ! is_null($status) && is_numeric($status)) {
             $sql .= ' AND `d`.`repair_status` = :status ';
         }
-        if (!is_null($cluster) && is_numeric($cluster)) {
+        if ( ! is_null($cluster) && is_numeric($cluster)) {
             $sql .= ' AND `c`.`cluster` = :cluster ';
         }
 
-        $sql.= ' GROUP BY `d`.`category`
+        $sql .= ' GROUP BY `d`.`category`
                 ORDER BY `counter` DESC';
-        $sql .= (!is_null($cluster) ? '  LIMIT 1' : '');
+        $sql .= ( ! is_null($cluster) ? '  LIMIT 1' : '');
 
         try {
-            if (!is_null($status) && is_numeric($status) && is_null($cluster)) {
+            if ( ! is_null($status) && is_numeric($status) && is_null($cluster)) {
                 return DB::select(DB::raw($sql), array('status' => $status));
-            } elseif (!is_null($cluster) && is_numeric($cluster) && is_null($status)) {
+            } elseif ( ! is_null($cluster) && is_numeric($cluster) && is_null($status)) {
                 return DB::select(DB::raw($sql), array('cluster' => $cluster));
-            } elseif (!is_null($status) && is_numeric($status) && !is_null($cluster) && is_numeric($cluster)) {
+            } elseif ( ! is_null($status) && is_numeric($status) && ! is_null($cluster) && is_numeric($cluster)) {
                 return DB::select(DB::raw($sql), array('status' => $status, 'cluster' => $cluster));
-            } else {
-                return DB::select(DB::raw($sql));
             }
+
+            return DB::select(DB::raw($sql));
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }

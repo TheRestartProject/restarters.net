@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Group;
 use App\Network;
+use Auth;
+
 use FixometerFile;
 
 use Illuminate\Http\Request;
-
-use Auth;
 use Lang;
 
 class NetworkController extends Controller
@@ -29,7 +29,7 @@ class NetworkController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->hasRole('NetworkCoordinator') && ! $user->hasRole('Administrator')) {
+        if ( ! $user->hasRole('NetworkCoordinator') && ! $user->hasRole('Administrator')) {
             abort(403);
         }
 
@@ -54,7 +54,6 @@ class NetworkController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
@@ -65,7 +64,6 @@ class NetworkController extends Controller
      */
     public function store(Request $request)
     {
-        //
     }
 
     /**
@@ -100,7 +98,7 @@ class NetworkController extends Controller
         // TODO: authorisation?
 
         return view('networks.edit', [
-            'network' => $network
+            'network' => $network,
         ]);
     }
 
@@ -114,7 +112,6 @@ class NetworkController extends Controller
     public function update(Request $request, Network $network)
     {
         // TODO: authorisation?
-
 
         if ($request->hasFile('network_logo')) {
             $fileHelper = new FixometerFile;
@@ -150,7 +147,6 @@ class NetworkController extends Controller
         return redirect()->route('networks.show', [$network])->withSuccess(Lang::get('networks.show.add_groups_success', ['number' => $numberOfGroups]));
     }
 
-
     /**
      * Remove the specified resource from storage.
      *
@@ -159,6 +155,5 @@ class NetworkController extends Controller
      */
     public function destroy(Network $network)
     {
-        //
     }
 }

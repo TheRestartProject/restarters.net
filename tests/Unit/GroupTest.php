@@ -11,23 +11,20 @@ use App\UserGroups;
 
 use DB;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class GroupTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
         Group::truncate();
         GrouptagsGroups::truncate();
         Network::truncate();
         UserGroups::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
-
 
     /** @test */
     public function can_add_volunteer_to_a_group()
@@ -70,7 +67,6 @@ class GroupTest extends TestCase
         $this->assertEquals($host->role, Role::HOST);
     }
 
-
     /** @test */
     public function it_can_set_a_restarter_group_member_as_host()
     {
@@ -103,10 +99,10 @@ class GroupTest extends TestCase
     public function given_a_network_that_should_push_then_group_should_push()
     {
         $network1 = factory(Network::class)->create([
-            'events_push_to_wordpress' => true
+            'events_push_to_wordpress' => true,
         ]);
         $network2 = factory(Network::class)->create([
-            'events_push_to_wordpress' => false
+            'events_push_to_wordpress' => false,
         ]);
 
         $group = factory(Group::class)->create();
@@ -122,10 +118,10 @@ class GroupTest extends TestCase
     public function given_no_network_that_should_push_then_group_should_not_push()
     {
         $network1 = factory(Network::class)->create([
-            'events_push_to_wordpress' => false
+            'events_push_to_wordpress' => false,
         ]);
         $network2 = factory(Network::class)->create([
-            'events_push_to_wordpress' => false
+            'events_push_to_wordpress' => false,
         ]);
 
         $group = factory(Group::class)->create();

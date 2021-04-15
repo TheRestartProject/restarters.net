@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class LangPref extends Migration
@@ -13,7 +11,8 @@ class LangPref extends Migration
      */
     public function up()
     {
-        DB::statement('ALTER TABLE `users`
+        DB::statement(
+            'ALTER TABLE `users`
                          ADD COLUMN `language` VARCHAR(2) NOT NULL DEFAULT "en" AFTER `recovery_expires`;'
         );
     }
@@ -25,6 +24,5 @@ class LangPref extends Migration
      */
     public function down()
     {
-        //
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class DeviceWikiColumn extends Migration
 {
@@ -13,9 +13,9 @@ class DeviceWikiColumn extends Migration
      */
     public function up()
     {
-      Schema::table('devices', function (Blueprint $table) {
-          $table->integer('wiki')->after('repaired_by')->nullable();
-      });
+        Schema::table('devices', function (Blueprint $table) {
+            $table->integer('wiki')->after('repaired_by')->nullable();
+        });
     }
 
     /**
@@ -25,8 +25,8 @@ class DeviceWikiColumn extends Migration
      */
     public function down()
     {
-      Schema::table('devices', function (Blueprint $table) {
-          $table->dropColumn('wiki');
-      });
+        Schema::table('devices', function (Blueprint $table) {
+            $table->dropColumn('wiki');
+        });
     }
 }

@@ -1,16 +1,14 @@
 <?php
 
 return [
-    'task' =>
-    [
+    'task' => [
         'where_is_the_main_fault' => 'Wo ist der hauptfehler',
         'fetch_another' => 'Ich weiß nicht, holen sie eine weitere reparatur',
         'suggestions' => 'Vorschläge',
         'translate' => 'Übersetzen',
         'go_with' => 'Geh mit',
     ],
-    'status' =>
-    [
+    'status' => [
         'status' => 'Status',
         'items_opinions' => 'Artikel / meinungen',
         'items_with_split_opinions' => 'Artikel mit geteilten meinungen',
@@ -25,6 +23,5 @@ return [
         'problem' => 'Problem',
         'number_of_records' => 'Anzahl der datensätze',
         'winning_opinion' => 'Gewinnende meinung',
-    ]
+    ],
 ];
-

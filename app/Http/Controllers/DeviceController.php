@@ -7,8 +7,6 @@ use App\Brands;
 use App\Category;
 use App\Cluster;
 use App\Device;
-use App\DeviceList;
-use App\DeviceUrl;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\FootprintRatioCalculator;
@@ -24,7 +22,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Lang;
 use Notification;
 use View;
 
@@ -64,7 +61,7 @@ class DeviceController extends Controller
             'impact_data' => $global_impact_data,
             'clusters' => $clusters,
             'barriers' => \App\Helpers\FixometerHelper::allBarriers(),
-            'brands' => $brands
+            'brands' => $brands,
         ]);
     }
 
@@ -105,7 +102,7 @@ class DeviceController extends Controller
                     Notification::send($all_admins, new ReviewNotes($arr));
                 }
 
-                if (! isset($data['repair_more']) || empty($data['repair_more'])) { //Override
+                if ( ! isset($data['repair_more']) || empty($data['repair_more'])) { //Override
                     $data['repair_more'] = 0;
                 }
 
@@ -153,7 +150,7 @@ class DeviceController extends Controller
                     $parts_provider = null;
                 }
 
-                if (! isset($data['barrier'])) {
+                if ( ! isset($data['barrier'])) {
                     $data['barrier'] = null;
                 } elseif (in_array(1, $data['barrier']) || in_array(2, $data['barrier'])) { // 'Spare parts not available' or 'spare parts too expensive' selected
                     $data['spare_parts'] = 1;
@@ -188,7 +185,7 @@ class DeviceController extends Controller
                     Device::find($id)->barriers()->sync([]);
                 }
 
-                if (! $u) {
+                if ( ! $u) {
                     $response['danger'] = 'Something went wrong. Please check the data and try again.';
                 } else {
                     $response['success'] = 'Device updated!';
@@ -231,7 +228,7 @@ class DeviceController extends Controller
             $data = $_POST;
             $u = $this->Device->update($data, $id);
 
-            if (! $u) {
+            if ( ! $u) {
                 $response['response_type'] = 'danger';
                 $response['message'] = 'Something went wrong. Please check the data and try again.';
             } else {
@@ -262,17 +259,17 @@ class DeviceController extends Controller
                 $data = array_filter($_POST);
                 $Device = new Device;
 
-                if (! FixometerHelper::verify($data['event'])) {
+                if ( ! FixometerHelper::verify($data['event'])) {
                     $error['event'] = 'Please select a Restart party.';
                 }
-                if (! FixometerHelper::verify($data['category'])) {
+                if ( ! FixometerHelper::verify($data['category'])) {
                     $error['category'] = 'Please select a category for this device';
                 }
-                if (! FixometerHelper::verify($data['repair_status'])) {
+                if ( ! FixometerHelper::verify($data['repair_status'])) {
                     $error['repair_status'] = 'Please select a repair status.';
                 }
 
-                if (! empty($error)) {
+                if ( ! empty($error)) {
                     $response['danger'] = 'The device repair has <strong>not</strong> been saved.';
                 } else {
                     // add user id
@@ -294,7 +291,7 @@ class DeviceController extends Controller
 
                     // save this!
                     $insert = $Device->create($insert);
-                    if (! $insert) {
+                    if ( ! $insert) {
                         $response['danger'] = 'Error while saving the device to the DB.';
                     } else {
                         $response['success'] = 'Device saved!';
@@ -302,15 +299,15 @@ class DeviceController extends Controller
                 }
             }
 
-            if (! isset($error)) {
+            if ( ! isset($error)) {
                 $error = null;
             }
 
-            if (! isset($response)) {
+            if ( ! isset($response)) {
                 $response = null;
             }
 
-            if (! isset($data)) {
+            if ( ! isset($data)) {
                 $data = null;
             }
 
@@ -401,7 +398,7 @@ class DeviceController extends Controller
                 $parts_provider = null;
             }
 
-            if (! isset($barrier)) {
+            if ( ! isset($barrier)) {
                 $barrier = null;
             } elseif (in_array(1, $barrier) || in_array(2, $barrier)) { // 'Spare parts not available' or 'spare parts too expensive' selected
                 $spare_parts = 1;
@@ -544,7 +541,7 @@ class DeviceController extends Controller
                 $parts_provider = null;
             }
 
-            if (! isset($barrier)) {
+            if ( ! isset($barrier)) {
                 $barrier = null;
             } elseif (in_array(1, $barrier) || in_array(2, $barrier)) { // 'Spare parts not available' or 'spare parts too expensive' selected
                 $spare_parts = 1;
@@ -569,7 +566,7 @@ class DeviceController extends Controller
                 'do_it_yourself' => $professional_help,
                 'professional_help' => $do_it_yourself,
                 'wiki' => $wiki,
-                'estimate' => $estimate
+                'estimate' => $estimate,
             ]);
 
             // Update barriers
@@ -629,7 +626,7 @@ class DeviceController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'stats' => $stats
+                    'stats' => $stats,
                 ]);
             }
 
@@ -655,12 +652,11 @@ class DeviceController extends Controller
                 $images = $device->getImages();
             }
 
-
             // Return the current set of images for this device so that the client doesn't need to merge.
             return response()->json([
                 'success' => true,
                 'iddevices' => $id,
-                'images' => $images
+                'images' => $images,
             ]);
         } catch (\Exception $e) {
             return 'fail - image could not be uploaded';
