@@ -20,13 +20,21 @@ class LanguageSwitcher
      */
     public function handle($request, Closure $next)
     {
-        // Check to see whether locale session already exists
-        if (session('locale')) {
-          // If it does, continue to maintian that locale
+        // A query string parameter of locale overrides all other places to attempt to determine the locale.
+        if ($request->exists('locale')) {
+            $locale = $request->get('locale');
+
+            if (in_array($locale, LaravelLocalization::getSupportedLanguagesKeys())) {
+                $this->setLocale($locale);
+            }
+        } else if (session('locale')) {
+            // Otherwise, check if locale session already exists.
+            // If it does, continue to maintian that locale.
             App::setLocale(session('locale'));
             LaravelLocalization::setLocale(session('locale'));
         } else {
-          // First visit, let's see what languages are behind the scenes
+            // OK, we know nothing about preferred locale.
+            // Check if anything provided by the browser.
             $agent = new Agent();
 
           // Check to see whether any default languages exist on browser
@@ -35,22 +43,7 @@ class LanguageSwitcher
                 foreach ($agent->languages() as $locale) {
                   // Check to see what supported languages there are before committing
                     if (in_array($locale, LaravelLocalization::getSupportedLanguagesKeys())) {
-                        // Store in session
-                        session()->put('locale', $locale);
-
-                        // Set locale on web app
-                        App::setLocale($locale);
-
-                        // Set locale on localisation package
-                        LaravelLocalization::setLocale($locale);
-
-                        // Set in database
-                        if (!Auth::guest()) {
-                            Auth::user()->update([
-                            'language' => $locale
-                            ]);
-                        }
-
+                        $this->setLocale($locale);
                         // Break loop and continue with next request
                         return $next($request);
                     }
@@ -58,6 +51,25 @@ class LanguageSwitcher
             }
         }
         return $next($request);
+    }
+
+    protected function setLocale($locale)
+    {
+        // Store in session
+        session()->put('locale', $locale);
+
+        // Set locale on web app
+        App::setLocale($locale);
+
+        // Set locale on localisation package
+        LaravelLocalization::setLocale($locale);
+
+        // Set in database
+        if (!Auth::guest()) {
+            Auth::user()->update([
+                'language' => $locale
+            ]);
+        }
     }
 
 
