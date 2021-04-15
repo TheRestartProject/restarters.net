@@ -281,7 +281,7 @@ class PartyController extends Controller
                     // 'volunteers'    => $volunteers,
                     'user_id' => $user_id,
                     'created_at' => date('Y-m-d H:i:s'),
-                    'shareable_code' => FixometerHelper::generateUniqueShareableCode('App\Party', 'shareable_code'),
+                    'shareable_code' => FixometerHelper::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
                     'online' => $online,
                 ];
 
@@ -1429,7 +1429,7 @@ class PartyController extends Controller
 
         $event = Party::findOrFail($id);
 
-        Audits::where('auditable_type', 'App\Party')->where('auditable_id', $id)->delete();
+        Audits::where('auditable_type', \App\Party::class)->where('auditable_id', $id)->delete();
         Device::where('event', $id)->delete();
         EventsUsers::where('event', $id)->delete();
         $event->delete();

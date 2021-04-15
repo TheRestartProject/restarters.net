@@ -91,7 +91,7 @@ class UserGroups extends Model implements Auditable
     //Table Relations
     public function volunteer()
     {
-        return $this->hasOne('App\User', 'id', 'user');
+        return $this->hasOne(\App\User::class, 'id', 'user');
     }
 
     public function isConfirmed()

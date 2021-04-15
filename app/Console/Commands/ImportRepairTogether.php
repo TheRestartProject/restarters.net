@@ -118,7 +118,7 @@ class ImportRepairTogether extends Command
                 'longitude' => $longitude,
                 'country' => $country,
                 'free_text' => $free_text,
-                'shareable_code' => FixometerHelper::generateUniqueShareableCode('App\Group', 'shareable_code'),
+                'shareable_code' => FixometerHelper::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
                 //'network_id' => $repairTogetherNetworkId,
                 'external_id' => $external_id,
             ];

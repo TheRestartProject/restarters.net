@@ -25,35 +25,35 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         'Illuminate\Auth\Events\Login' => [
-            'App\Listeners\LogSuccessfulLogin',
+            \App\Listeners\LogSuccessfulLogin::class,
         ],
 
-        'App\Events\ApproveEvent' => [
-            'App\Listeners\CreateWordPressApproveEventPost',
+        \App\Events\ApproveEvent::class => [
+            \App\Listeners\CreateWordPressApproveEventPost::class,
         ],
 
-        'App\Events\EditEvent' => [
-            'App\Listeners\CreateWordPressEditEventPost',
+        \App\Events\EditEvent::class => [
+            \App\Listeners\CreateWordPressEditEventPost::class,
         ],
 
         EventDeleted::class => [
             DeleteEventFromWordPress::class,
         ],
 
-        'App\Events\ApproveGroup' => [
-            'App\Listeners\CreateWordPressApproveGroupPost',
+        \App\Events\ApproveGroup::class => [
+            \App\Listeners\CreateWordPressApproveGroupPost::class,
         ],
 
-        'App\Events\EditGroup' => [
-            'App\Listeners\CreateWordPressEditGroupPost',
+        \App\Events\EditGroup::class => [
+            \App\Listeners\CreateWordPressEditGroupPost::class,
         ],
 
-        'App\Events\PasswordChanged' => [
-            'App\Listeners\ChangeWikiPassword',
+        \App\Events\PasswordChanged::class => [
+            \App\Listeners\ChangeWikiPassword::class,
         ],
 
         UserUpdated::class => [
-            'App\Listeners\SyncUserProperties',
+            \App\Listeners\SyncUserProperties::class,
         ],
 
         UserFollowedGroup::class => [
@@ -82,7 +82,7 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $subscribe = [
-        'App\Listeners\DiscourseUserEventSubscriber',
+        \App\Listeners\DiscourseUserEventSubscriber::class,
     ];
 
     /**
@@ -95,7 +95,7 @@ class EventServiceProvider extends ServiceProvider
         parent::boot();
 
         if (env('FEATURE__WIKI_INTEGRATION') === true) {
-            Event::listen('Illuminate\Auth\Events\Login', 'App\Listeners\LogInToWiki');
+            Event::listen('Illuminate\Auth\Events\Login', \App\Listeners\LogInToWiki::class);
         }
     }
 }

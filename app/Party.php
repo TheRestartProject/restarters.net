@@ -480,12 +480,12 @@ class Party extends Model implements Auditable
 
     public function allDevices()
     {
-        return $this->hasMany('App\Device', 'event', 'idevents')->join('categories', 'categories.idcategories', '=', 'devices.category');
+        return $this->hasMany(\App\Device::class, 'event', 'idevents')->join('categories', 'categories.idcategories', '=', 'devices.category');
     }
 
     public function allInvited()
     {
-        return $this->hasMany('App\EventsUsers', 'event', 'idevents')->where('status', '!=', 1);
+        return $this->hasMany(\App\EventsUsers::class, 'event', 'idevents')->where('status', '!=', 1);
     }
 
     public function allConfirmedVolunteers()
@@ -499,13 +499,13 @@ class Party extends Model implements Auditable
 
     public function host()
     {
-        return $this->hasOne('App\Host', 'idgroups', 'group');
+        return $this->hasOne(\App\Host::class, 'idgroups', 'group');
     }
 
     // Doesn't work if called 'group' - I guess because a reserved SQL keyword.
     public function theGroup()
     {
-        return $this->hasOne('App\Group', 'idgroups', 'group');
+        return $this->hasOne(\App\Group::class, 'idgroups', 'group');
     }
 
     public function getEventDate($format = 'd/m/Y')
@@ -696,7 +696,7 @@ class Party extends Model implements Auditable
 
     public function devices()
     {
-        return $this->hasMany('App\Device', 'event', 'idevents');
+        return $this->hasMany(\App\Device::class, 'event', 'idevents');
     }
 
     public function hoursVolunteered()

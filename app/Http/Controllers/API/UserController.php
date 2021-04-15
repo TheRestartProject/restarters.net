@@ -42,7 +42,7 @@ class UserController extends Controller
 
     protected static function getUserAudits($dateFrom = null)
     {
-        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\User');
+        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\User::class);
 
         if ( ! is_null($dateFrom)) {
             $query->where('created_at', '>=', $dateFrom);
