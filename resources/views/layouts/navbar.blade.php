@@ -66,7 +66,7 @@
     </a>
     </li>
 
-    <li class="@if(str_contains(url()->current(), route('workbench')) || str_contains(url()->current(), '/mobifix') || str_contains(url()->current(), '/misccat') || str_contains(url()->current(), '/faultcat')) active @endif" style="flex-basis: 100%;">
+    <li class="@if(str_contains(url()->current(), route('workbench')) || str_contains(url()->current(), '/mobifix') || str_contains(url()->current(), '/misccat') || str_contains(url()->current(), '/faultcat') || str_contains(url()->current(), '/printcat')) active @endif" style="flex-basis: 100%;">
         <a href="{{ route('workbench') }}" rel="noopener noreferrer">
             @include('svgs/navigation/workbench-icon')
             <span>@lang('general.menu_workbench')</span>
