@@ -15,7 +15,7 @@
             <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled" />
             <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
           </div>
-          <DeviceType class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" v-else />
+          <DeviceType class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" />
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled" />
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled" class="mt-2" @remove="removeImage($event)" />
@@ -150,7 +150,12 @@ export default {
       type: Array,
       required: false,
       default: null
-    }
+    },
+    itemTypes: {
+      type: Array,
+      required: false,
+      default: null
+    },
   },
   data () {
     return {

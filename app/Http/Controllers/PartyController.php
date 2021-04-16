@@ -127,7 +127,7 @@ class PartyController extends Controller
             'EmissionRatio' => $this->EmissionRatio,
             'is_host_of_group' => $is_host_of_group,
             'isCoordinatorForGroup' => $isCoordinatorForGroup,
-            'group' => $group,
+            'group' => $group
         ]);
     }
 
@@ -666,6 +666,7 @@ class PartyController extends Controller
             'device_images' => $device_images,
             'group_volunteers' => $group_volunteers,
             'calendar_links' => $this->generateAddToCalendarLinks($event),
+            'item_types' => Device::getItemTypes()
         ]);
     }
 
