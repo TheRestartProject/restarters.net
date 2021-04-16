@@ -15,7 +15,7 @@
             <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled" />
             <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
           </div>
-          <DeviceType class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled" :suppress-type-warning="suppressTypeWarning" />
+          <DeviceType v-if="!powered || aggregate" class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled" :suppress-type-warning="suppressTypeWarning" />
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" />
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled" />
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled" class="mt-2" @remove="removeImage($event)" />
@@ -177,6 +177,25 @@ export default {
     },
     currentCategory() {
       return this.currentDevice ? this.currentDevice.category : null
+    },
+    aggregate() {
+      if (!this.currentCategory) {
+        return false
+      }
+
+      let ret = false
+
+      this.clusters.forEach((cluster) => {
+        let categories = []
+
+        cluster.categories.forEach((c) => {
+          if (this.currentCategory === c.idcategories) {
+            ret = c.aggregate
+          }
+        })
+      })
+
+      return ret
     },
     sparePartsNeeded() {
       return this.device.spare_parts === SPARE_PARTS_MANUFACTURER || this.device.spare_parts === SPARE_PARTS_THIRD_PARTY

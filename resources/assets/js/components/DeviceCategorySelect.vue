@@ -90,16 +90,7 @@ export default {
         let categories = []
 
         cluster.categories.forEach((c) => {
-          if (this.powered && c.powered) {
-            // For powered items we only want to show aggregate categories.
-            if (c.aggregate) {
-              categories.push({
-                name: this.$lang.get('strings.' + c.name),
-                value: c.idcategories
-              })
-            }
-          } else if (!this.powered && !c.powered) {
-            // Unpowered items show all categories.
+          if ((this.powered && c.powered) || (!this.powered && !c.powered)) {
             categories.push({
               name: this.$lang.get('strings.' + c.name),
               value: c.idcategories
