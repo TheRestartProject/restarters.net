@@ -1,6 +1,6 @@
 <style>
     /*
-       this is css shared between the main mobifix view,
+       this is css shared between the main printcat view,
     and the demographics view.  should be moved to a shared layout,
     or into sass.  just putting it here for now to remove duplication
     between the files.
@@ -15,7 +15,7 @@
         float: left; /* bootstrap pull-left class working locally but not on server!  falling back on this. */
     }
 
-    img#mobifix {
+    img#printcat {
         width: 48px;
         height: 48px;
         float: right; /* bootstrap pull-right class working locally but not on server!  falling back on this. */
@@ -56,8 +56,8 @@
     }
 
     #btn-info-open {
-        float:right;
-        cursor:pointer;
+        float: right;
+        cursor: pointer;
     }
 
     #btn-translate a {

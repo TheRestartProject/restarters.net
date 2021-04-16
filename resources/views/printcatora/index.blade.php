@@ -23,7 +23,6 @@
 
 <section class="printcat">
     <div class="container mt-1 mt-sm-4">
-        <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>
         <div class="row row-compressed">
             <div class="col-6">
                 <h1 class="pull-left">PrintCat</h1>
@@ -41,7 +40,13 @@
                     <img id="printcat" src="{{ asset('/images/printcatora/paw-prints.png') }}" alt="PrintCat status" width="48" height="48" />
                 </a>
             </div>
+            <div class="col-12">
+                <p>@lang('printcatora.task.strapline')
+                    <a href="javascript:void(0);" id="a-info-open" data-toggle="modal" data-target="#printcatoraInfoModal">@lang('printcatora.task.learn_more')</a>
+                </p>
+            </div>
         </div>
+        <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>
 
         @if($errors->any())
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">

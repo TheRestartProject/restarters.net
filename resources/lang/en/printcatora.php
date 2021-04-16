@@ -9,6 +9,8 @@ return [
         'translate' => 'Translate',
         'go_with' => 'Go with',
         'source' => 'Source',
+        'strapline' => 'Simply read the information about the broken printer and select the type of fault described from the list underneath.',
+        'learn_more' => 'Learn more',
     ],
     'status' =>
     [
