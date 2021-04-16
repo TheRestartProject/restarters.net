@@ -1,7 +1,7 @@
 <template>
   <CollapsibleSection class="lineheight">
     <template slot="title">
-      {{ translatedEventDetails }}
+      {{ __('events.event_details') }}
     </template>
     <template slot="content">
       <div class="border-top-thick d-flex pt-1 pb-1">
@@ -14,10 +14,10 @@
           </div>
           <div v-if="upcoming">
             <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" text="Add to calendar" variant="white" class="linkdrop" no-caret>
-              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.google">{{ translatedCalendarGoogle }}</b-dropdown-item>
-              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.webOutlook">{{ translatedCalendarOutlook }}</b-dropdown-item>
-              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.ics">{{ translatedCalendariCal }}</b-dropdown-item>
-              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.yahoo">{{ translatedCalendarYahoo }}</b-dropdown-item>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.google">{{ __('events.calendar_google') }}</b-dropdown-item>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.webOutlook">{{ __('events.calendar_outlook') }}</b-dropdown-item>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.ics">{{ __('events.calendar_ical') }}</b-dropdown-item>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.yahoo">{{ __('events.calendar_yahoo') }}</b-dropdown-item>
             </b-dropdown>
           </div>
         </div>
@@ -49,7 +49,7 @@
             {{ event.location}}
           </div>
           <ExternalLink :href="'https://www.openstreetmap.org/?mlat=' + event.latitude + '&mlon=' + event.longitude + '#map=20/' + event.latitude + '/' + event.longitude" class="text-nowrap">
-            {{ translatedViewMap }}
+            {{ __('events.view_map') }}
           </ExternalLink>
         </div>
       </div>
@@ -89,26 +89,6 @@ export default {
       required: false
     }
   },
-  computed: {
-    translatedEventDetails() {
-      return this.$lang.get('events.event_details')
-    },
-    translatedViewMap() {
-      return this.$lang.get('events.view_map')
-    },
-    translatedCalendarGoogle() {
-      return this.$lang.get('events.calendar_google')
-    },
-    translatedCalendarOutlook() {
-      return this.$lang.get('events.calendar_outlook')
-    },
-    translatedCalendariCal() {
-      return this.$lang.get('events.calendar_ical')
-    },
-    translatedCalendarYahoo() {
-      return this.$lang.get('events.calendar_yahoo')
-    }
-  }
 }
 </script>
 <style scoped lang="scss">

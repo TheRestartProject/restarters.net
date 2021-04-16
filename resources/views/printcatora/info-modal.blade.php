@@ -35,7 +35,7 @@
                 -->
                 <img src="{{ asset('/images/printcatora/099-smiling-cat-face-with-heart-eyes-64px.svg.png') }}" alt="happy cat" width="48" height="48" />
                 <p>
-                    Find out more, and give us your feedback, in the <a href="https://talk.restarters.net/t/get-involved-in-open-repair-data-with-printcat-ora/3273" target="_blank">PrintCat discussion</a>.
+                    Find out more, and give us your feedback, in the <a href="https://talk.restarters.net/t/4664" target="_blank">PrintCat discussion</a>.
                 </p>
             </div>
         </div>

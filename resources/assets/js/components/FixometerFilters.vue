@@ -10,7 +10,7 @@
       }" @click="toggleItems">
         <div class="flex-grow-1">
           <h3 class="text-uppercase header pl-2 mt-3 font-weight-bold text-center">
-            {{ translatedItemAndRepairInfo }}
+            {{ __('devices.item_and_repair_info') }}
           </h3>
         </div>
         <b-btn variant="link" class="pr-1 pl-0">
@@ -21,20 +21,20 @@
       <b-collapse id="collapse-item" v-model="expandedItems">
         <b-card no-body>
           <b-card-body class="p-2">
-            <b-form-group :label="translatedCategory">
+            <b-form-group :label="__('devices.category')">
               <DeviceCategorySelect :category.sync="current_category" :clusters="clusters" :powered="powered" allow-empty />
             </b-form-group>
-            <b-form-group v-if="powered" :label="translatedModel">
+            <b-form-group v-if="powered" :label="__('devices.model')">
               <DeviceModel :model.sync="current_model" />
             </b-form-group>
-            <b-form-group  v-if="powered" :label="translatedBrand">
+            <b-form-group  v-if="powered" :label="__('devices.brand')">
               <DeviceBrandSelect :brand.sync="current_brand" :brands="brands" allow-empty />
             </b-form-group>
-            <b-form-group v-if="!powered" :label="translatedModelOrType">
+            <b-form-group v-if="!powered" :label="__('devices.model_or_type')">
               <DeviceModel :model.sync="current_item_type" />
             </b-form-group>
             <div class="w-100 device-select-row">
-              <b-form-group :label="translatedStatus">
+              <b-form-group :label="__('devices.status')">
                 <multiselect
                     v-model="current_status"
                     :options="statusOptions"
@@ -45,13 +45,13 @@
                     selectLabel=""
                     deselect-label=""
                     :taggable="false"
-                    :selectedLabel="translatedRemove"
+                    :selectedLabel="__('partials.remove')"
                 />
               </b-form-group>
               <div />
             </div>
             <div class="w-100 device-select-row">
-              <b-form-group :label="translatedSearchAssessmentComments">
+              <b-form-group :label="__('devices.search_assessment_comments')">
                 <b-input v-model="current_comments" />
               </b-form-group>
               <div />
@@ -59,7 +59,7 @@
             <div class="w-100 device-select-row">
               <div class="d-flex">
                 <b-form-checkbox v-model="current_wiki" size="lg" />
-                <label class="mt-1">{{ translatedInterestingCaseStudy }}</label>
+                <label class="mt-1">{{ __('devices.interesting_case_study') }}</label>
               </div>
               <div />
             </div>
@@ -77,7 +77,7 @@
       }" @click="toggleEvents">
         <div class="flex-grow-1">
           <h3 class="text-uppercase header pl-2 mt-3 font-weight-bold text-center">
-            {{ translatedEventInfo }}
+            {{ __('devices.event_info') }}
           </h3>
         </div>
         <b-btn variant="link" class="pr-1 pl-0">
@@ -88,13 +88,13 @@
       <b-collapse id="collapse-item" v-model="expandedEvents">
         <b-card no-body>
           <b-card-body class="p-2">
-            <b-form-group :label="translatedGroup">
+            <b-form-group :label="__('devices.group')">
               <b-input v-model="current_group" />
             </b-form-group>
-            <b-form-group :label="translatedFromDate">
+            <b-form-group :label="__('devices.from_date')">
               <b-form-datepicker class="datepicker" v-model="current_from_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
             </b-form-group>
-            <b-form-group :label="translatedToDate">
+            <b-form-group :label="__('devices.to_date')">
               <b-form-datepicker class="datepicker" v-model="current_to_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
             </b-form-group>
           </b-card-body>
@@ -219,45 +219,6 @@ export default {
       set(newVal) {
         this.$emit('update:comments', newVal)
       }
-    },
-    translatedRemove() {
-      return this.$lang.get('partials.remove')
-    },
-    translatedItemAndRepairInfo() {
-      return this.$lang.get('devices.item_and_repair_info')
-    },
-    translatedEventInfo() {
-      return this.$lang.get('devices.event_info')
-    },
-    translatedCategory() {
-      return this.$lang.get('devices.category')
-    },
-    translatedBrand() {
-      return this.$lang.get('devices.brand')
-    },
-    translatedModel() {
-      return this.$lang.get('devices.model')
-    },
-    translatedModelOrType() {
-      return this.$lang.get('devices.model_or_type')
-    },
-    translatedStatus() {
-      return this.$lang.get('devices.status')
-    },
-    translatedSearchAssessmentComments() {
-      return this.$lang.get('devices.search_assessment_comments')
-    },
-    translatedInterestingCaseStudy() {
-      return this.$lang.get('devices.interesting_case_study')
-    },
-    translatedGroup() {
-      return this.$lang.get('devices.group')
-    },
-    translatedFromDate() {
-      return this.$lang.get('devices.from_date')
-    },
-    translatedToDate() {
-      return this.$lang.get('devices.to_date')
     },
     statusOptions () {
       return [

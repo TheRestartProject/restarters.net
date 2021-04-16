@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 device-select-row">
-    <vue-typeahead-bootstrap v-model="currentType" :data="suggestions" :minMatchingChars="1" size="lg" inputClass="marg form-control-lg" :disabled="disabled" :placeholder="translatedType" @input="input" />
-    <div v-b-popover.html.left="translatedTooltipType" class="ml-3 mt-2">
+    <b-input @change="$emit('update:type', $event)" :placeholder="__('devices.model_or_type')" size="lg" class="marg" :value="type" :disabled="disabled" />
+    <div v-b-popover.html.left="__('devices.tooltip_type')" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else />
     </div>
@@ -43,12 +43,6 @@ export default {
     }
   },
   computed: {
-    translatedType() {
-      return this.$lang.get('devices.model_or_type')
-    },
-    translatedTooltipType() {
-      return this.$lang.get('devices.tooltip_type')
-    },
     suggestions() {
       return this.itemTypes.map(i => i.item_type)
     },

@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex justify-content-center align-content-center">
       <b-img-lazy fluid src="/images/arrows_doodle.svg" class="d-none d-md-block" />
-      <h1 class="ml-2 mr-2 align-self-center">{{ translatedTitle }}</h1>
+      <h1 class="ml-2 mr-2 align-self-center">{{ __('dashboard.title') }}</h1>
       <b-img-lazy fluid src="/images/confetti_doodle.svg" class="d-none d-md-block" />
     </div>
     <div class="layout mt-4 mb-4">
@@ -120,11 +120,6 @@ export default {
     this.$store.dispatch('events/setList', {
       events: Object.values(events)
     })
-  },
-  computed: {
-    translatedTitle() {
-      return this.$lang.get('dashboard.title')
-    },
   },
 }
 </script>

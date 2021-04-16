@@ -60,7 +60,7 @@
             <b-img class="icon" src="/icons/delete_ico_red.svg" />
           </span>
         </div>
-        <ConfirmModal :key="'modal-' + device.iddevices" ref="confirmDelete" @confirm="deleteConfirmed" :message="translatedConfirmDeleteDevice" />
+        <ConfirmModal :key="'modal-' + device.iddevices" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('devices.confirm_delete')" />
       </b-td>
     </b-tr>
     <b-tr v-else :key="'editing-' + device.iddevices">
@@ -155,9 +155,6 @@ export default {
     sparePartsNeeded() {
       return this.device.spare_parts === SPARE_PARTS_MANUFACTURER || this.device.spare_parts === SPARE_PARTS_THIRD_PARTY
     },
-    translatedConfirmDeleteDevice() {
-      return this.$lang.get('devices.confirm_delete')
-    }
   },
   methods: {
     deleteConfirm() {

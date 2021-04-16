@@ -15,7 +15,7 @@
               {{ attendee.volunteer.name }}
             </span>
               <span class="host" v-if="host">
-              {{ translatedHost }}
+              {{ __('partials.host') }}
             </span>
             </div>
           <div :id="'skills-' + attendee.volunteer.id" data-toggle="popover" data-placement="top" :data-content="skillList" :class="{
@@ -38,7 +38,7 @@
       </b-btn>
     </div>
     <b-alert variant="danger" v-if="error">
-      {{ translatedSomethingWrong }}: {{ error }}
+      {{ __('partials.something_wrong') }}: {{ error }}
     </b-alert>
     <ConfirmModal @confirm="remove" ref="confirm" />
   </div>
@@ -95,12 +95,6 @@ export default {
       }
 
       return ret
-    },
-    translatedHost() {
-      return this.$lang.get('partials.host')
-    },
-    translatedSomethingWrong() {
-      return this.$lang.get('partials.something_wrong')
     },
   },
   methods: {

@@ -40,11 +40,6 @@ export default {
     }
   },
   components: {FixometerLatestData, StatsValue},
-  computed: {
-    translatedFixometer() {
-      return this.$lang.get('devices.fixometer')
-    },
-  }
 }
 </script>
 <style scoped lang="scss">
