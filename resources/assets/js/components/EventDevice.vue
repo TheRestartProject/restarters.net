@@ -10,7 +10,7 @@
           <DeviceCategorySelect :class="{
             'mb-2': true,
             'border-thick': missingCategory
-            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
+            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" @changed="categoryChange" />
           <div v-if="powered">
             <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled" />
             <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
@@ -345,6 +345,10 @@ export default {
       })
 
       window.location = '/fixometer'
+    },
+    categoryChange() {
+      // Any item type we might have is no longer value.
+      this.currentDevice.item_type = null
     }
   }
 }
