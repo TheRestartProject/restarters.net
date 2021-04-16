@@ -127,7 +127,7 @@ class PartyController extends Controller
             'EmissionRatio' => $this->EmissionRatio,
             'is_host_of_group' => $is_host_of_group,
             'isCoordinatorForGroup' => $isCoordinatorForGroup,
-            'group' => $group
+            'group' => $group,
         ]);
     }
 
