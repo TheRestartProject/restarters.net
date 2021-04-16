@@ -169,6 +169,13 @@
         </div>
         @endif
     </div>
+    <div id="ora-partnership" class="mt-8 mb-4">
+        <hr />
+        <p class="mb-1">@lang('printcatora.branding.powered_by')</p>
+        <a href="https://openrepair.org" target="_blank">
+            <img src="{{ asset('images/printcatora/ora-logo.png') }}" alt="Open Repair Alliance logo" />
+        </a>
+    </div>
     @include('printcatora/info-modal')
 </section>
 
