@@ -9,7 +9,7 @@
     </template>
     <template slot="modal-footer" slot-scope="{ cancel }">
       <b-button variant="primary" @click="cancel">
-        {{ translatedClose }}
+        {{ __('partials.close') }}
       </b-button>
     </template>
   </b-modal>
@@ -28,11 +28,6 @@ export default {
     return {
       showModal: false
     }
-  },
-  computed: {
-    translatedClose() {
-      return this.$lang.get('partials.close')
-    },
   },
   methods: {
     show() {

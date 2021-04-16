@@ -6,7 +6,7 @@
     <div class="device-info">
       <div class="br d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
-          <h3 class="mt-2 mb-4">{{ translatedTitleItems }}</h3>
+          <h3 class="mt-2 mb-4">{{ __('devices.title_items') }}</h3>
           <DeviceCategorySelect :class="{
             'mb-2': true,
             'border-thick': missingCategory
@@ -23,41 +23,41 @@
       </div>
       <div class="d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
-          <h3 class="mt-2 mb-4">{{ translatedTitleRepair }}</h3>
+          <h3 class="mt-2 mb-4">{{ __('devices.title_repair') }}</h3>
           <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.repair_details" :parts.sync="currentDevice.spare_parts" :barriers.sync="currentDevice.barrier" :barrierList="barrierList" :disabled="disabled" />
         </b-card>
       </div>
       <div class="bl d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
-          <h3 class="mt-2 mb-4">{{ translatedTitleAssessment }}</h3>
+          <h3 class="mt-2 mb-4">{{ __('devices.title_assessment') }}</h3>
           <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
           <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4"  :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
           <DeviceUsefulUrls :device="device" :urls.sync="currentDevice.urls" class="mb-2" :disabled="disabled" />
           <div class="d-flex">
             <b-form-checkbox v-model="wiki" class="form-check form-check-large ml-4" :id="'wiki-' + (add ? '' : device.iddevices)" :disabled="disabled" />
             <label :for="'wiki-' + (add ? '' : device.iddevices)">
-              {{ translatedCaseStudy }}
+              {{ __('partials.solution_text2') }}
             </label>
           </div>
         </b-card>
       </div>
     </div>
     <b-alert :show="missingCategory" variant="danger">
-      <p>{{ translatedError }}</p>
+      <p>{{ __('events.form_error') }}</p>
     </b-alert>
     <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
       <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
-        {{ translatedAddDevice }}
+        {{ __('partials.add_device') }}
       </b-btn>
       <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
-        {{ translatedSave }}
+        {{ __('partials.save') }}
       </b-btn>
       <b-btn variant="primary" class="mr-2" v-if="edit && deleteButton" @click="confirmDeleteDevice">
-        {{ translatedDelete }}
+        {{ __('devices.delete_device') }}
       </b-btn>
       <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2" />
       <b-btn variant="tertiary" class="ml-2" @click="cancel" v-if="cancelButton">
-        {{ translatedCancel }}
+        {{ __('partials.cancel') }}
       </b-btn>
     </div>
     <ConfirmModal @confirm="deleteDevice" ref="confirm" />
@@ -190,36 +190,6 @@ export default {
         this.currentDevice.wiki = newval
       }
     },
-    translatedTitleItems() {
-      return this.$lang.get('devices.title_items')
-    },
-    translatedTitleRepair() {
-      return this.$lang.get('devices.title_repair')
-    },
-    translatedTitleAssessment() {
-      return this.$lang.get('devices.title_assessment')
-    },
-    translatedCategory() {
-      return this.$lang.get('devices.category')
-    },
-    translatedCaseStudy() {
-      return this.$lang.get('partials.solution_text2')
-    },
-    translatedSave() {
-      return this.$lang.get('partials.save')
-    },
-    translatedDelete() {
-      return this.$lang.get('devices.delete_device')
-    },
-    translatedAddDevice() {
-      return this.$lang.get('partials.add_device')
-    },
-    translatedCancel() {
-      return this.$lang.get('partials.cancel')
-    },
-    translatedError() {
-      return this.$lang.get('events.form_error')
-    }
   },
   created() {
     // We take a copy of what's passed in so that we can then edit it in here before saving or cancelling.  We need

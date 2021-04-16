@@ -3,7 +3,7 @@
     <multiselect
       :disabled="disabled"
       v-model="categoryValue"
-      :placeholder="translatedCategory"
+      :placeholder="__('devices.category')"
       :options="categoryOptions"
       track-by="value"
       label="name"
@@ -11,16 +11,16 @@
       group-values="categories"
       :multiple="false"
       :allow-empty="allowEmpty"
-      :deselect-label="allowEmpty ? translatedRemove : null"
+      :deselect-label="allowEmpty ? __('partials.remove') : null"
       :group-select="false"
       :taggable="false"
       selectLabel=""
       ref="multiselect"
       @select=""
-      :selectedLabel="allowEmpty ? translatedRemove : null"
+      :selectedLabel="allowEmpty ? __('partials.remove') : null"
     >
     </multiselect>
-    <div v-b-popover.html.left="translatedTooltipCategory" class="ml-3 mt-2">
+    <div v-b-popover.html.left="__('devices.tooltip_category')" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
     </div>
@@ -64,9 +64,6 @@ export default {
     },
   },
   computed: {
-    translatedRemove() {
-      return this.$lang.get('partials.remove')
-    },
     categoryValue: {
       get() {
         let ret = null
@@ -122,12 +119,6 @@ export default {
 
       return ret
     },
-    translatedCategory() {
-      return this.$lang.get('devices.category')
-    },
-    translatedTooltipCategory() {
-      return this.$lang.get('devices.tooltip_category')
-    }
   }
 }
 </script>

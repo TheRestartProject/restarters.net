@@ -3,7 +3,7 @@
     <multiselect
         :disabled="disabled"
         v-model="brandValue"
-        :placeholder="translatedBrand"
+        :placeholder="__('devices.brand')"
         :options="brandsPlusCustom"
         track-by="id"
         label="brand_name"
@@ -15,8 +15,8 @@
         @select="selected"
         @search-change="input"
         :showNoResults="false"
-        :deselect-label="allowEmpty ? translatedRemove : null"
-        :selectedLabel="allowEmpty ? translatedRemove : null"
+        :deselect-label="allowEmpty ? __('partials.remove') : null"
+        :selectedLabel="allowEmpty ? __('partials.remove') : null"
     />
     <div />
   </div>
@@ -46,9 +46,6 @@ export default {
     },
   },
   computed: {
-    translatedRemove() {
-      return this.$lang.get('partials.remove')
-    },
     brandValue: {
       get() {
         let ret = null
@@ -88,9 +85,6 @@ export default {
       })
 
       return ret
-    },
-    translatedBrand() {
-      return this.$lang.get('devices.brand')
     },
   },
   methods: {

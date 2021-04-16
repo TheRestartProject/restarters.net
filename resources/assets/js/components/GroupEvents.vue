@@ -13,7 +13,7 @@
       </template>
       <template slot="title-right">
         <b-btn variant="primary" href="/party/create" class="align-self-center text-nowrap" v-if="addButton">
-          {{ translatedAddEvent }}
+          {{ __('events.add_new_event') }}
         </b-btn>
       </template>
       <template slot="content">
@@ -27,7 +27,7 @@
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
           <div>
-            <span v-if="group">{{ group.name }}</span> {{ translatedOtherEvents}}
+            <span v-if="group">{{ group.name }}</span> {{ __('events.other_events') }}
           </div>
         </div>
       </template>
@@ -141,15 +141,6 @@ export default {
 
       ret = ret.charAt(0).toUpperCase() + ret.slice(1)
       return ret
-    },
-    translatedOtherEvents() {
-      return this.$lang.get('events.other_events')
-    },
-    translatedAddEvent() {
-      return this.$lang.get('events.add_new_event')
-    },
-    translatedSeeAll() {
-      return this.$lang.get('events.event_all')
     },
     translatedCalendarTitle() {
       return this.$lang.get('groups.calendar_copy_title', {

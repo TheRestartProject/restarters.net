@@ -20,25 +20,25 @@
     </b-input-group>
     <b-alert v-if="failed" show variant="danger" class="mt-2 mb-2">
       <p class="m-0">
-        {{ translatedSomethingWrong }}
+        {{ __('partials.something_wrong') }}
       </p>
     </b-alert>
     <b-alert v-if="copied" show variant="info" class="mt-2 mb-2">
       <p class="m-0">
-        {{ translatedCopied }}
+        {{ __('partials.copied_to_clipboard') }}
       </p>
     </b-alert>
     <div class="d-flex justify-content-between flex-wrap mt-4 mb-4">
       <b-btn variant="link" href="https://talk.restarters.net/t/fixometer-how-to-add-repair-events-to-your-calendar-application/1770">
-        {{ translatedFindOutMore}}
+        {{ __('calendars.find_out_more')}}
       </b-btn>
       <b-btn variant="link" :href="editUrl">
-        {{ translatedSeeAll }}
+        {{ __('calendars.see_all_calendars') }}
       </b-btn>
     </div>
     <template slot="modal-footer" slot-scope="{ cancel }">
       <b-button variant="primary" @click="cancel">
-        {{ translatedClose }}
+        {{ __('partials.close') }}
       </b-button>
     </template>
   </b-modal>
@@ -66,23 +66,6 @@ export default {
       showModal: false,
       failed: false,
       copied: false
-    }
-  },
-  computed: {
-    translatedSomethingWrong() {
-      return this.$lang.get('partials.something_wrong')
-    },
-    translatedCopied() {
-      return this.$lang.get('partials.copied_to_clipboard')
-    },
-    translatedClose() {
-      return this.$lang.get('partials.close')
-    },
-    translatedFindOutMore() {
-      return this.$lang.get('calendars.find_out_more')
-    },
-    translatedSeeAll() {
-      return this.$lang.get('calendars.see_all_calendars')
     }
   },
   methods: {

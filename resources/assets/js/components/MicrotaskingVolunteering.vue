@@ -1,11 +1,11 @@
 <template>
     <CollapsibleSection border-shadow class="p-4 lineheight volunteering" :show-horizontal-rule="false">
         <template slot="title">
-            {{ translatedTitle }}
+            {{ __('microtasking.volunteering.title') }}
         </template>
 
         <template slot="content">
-            <div v-html="translatedContent" class="content pt-3">
+            <div v-html="__('microtasking.volunteering.content')" class="content pt-3">
             </div>
 
             <b-table-simple sticky-header="50vh" responsive class="pl-0 pr-0 pb-2 mb-2" table-class="m-0 leave-tables-alone">
@@ -14,10 +14,10 @@
                     <b-th> </b-th>
                     <b-th> </b-th>
                     <b-th class="d-table-cell">
-                        <b-img class="icon" src="/images/gauge_ico.svg" :title="translatedNumberOfTasks" />
+                        <b-img class="icon" src="/images/gauge_ico.svg" :title="__('microtasking.volunteering.number_of_tasks')" />
                     </b-th>
                     <b-th class="d-table-cell">
-                        <b-img class="icon" src="/images/thumbs-up_ico.svg" :title="translatedNumberOfQuests" />
+                        <b-img class="icon" src="/images/thumbs-up_ico.svg" :title="__('microtasking.volunteering.number_of_quests')" />
                     </b-th>
                     </b-tr>
                 </b-thead>
@@ -28,24 +28,24 @@
                             <b-img class="icon" src="/images/participants.svg" />
                         </b-td>
                         <b-td>
-                            {{ translatedAllContributions }}
+                            {{ __('microtasking.volunteering.all_volunteer_contributions') }}
                         </b-td>
                         <b-td class="text-center">{{ totalContributions.toLocaleString() }}</b-td>
-                        <b-td class="text-center">{{ translatedAllQuests }}</b-td>
+                        <b-td class="text-center">{{ __('microtasking.volunteering.all_quests') }}</b-td>
                     </b-tr>
                     <b-tr>
                         <b-td class="text-center">
-                        <b-img class="icon" src="/images/user_ico.svg" :title="translatedVolunteersConfirmed" />
+                        <b-img class="icon" src="/images/user_ico.svg" :title="__('groups.volunteers_confirmed')" />
                         </b-td>
                         <b-td>
-                        {{ translatedMyContributions }}
+                        {{ __('microtasking.volunteering.my_contributions') }}
                         </b-td>
                         <template v-if="isLoggedIn">
                             <b-td class="text-center">{{ currentUserContributions }}</b-td>
                             <b-td class="text-center">{{ translatedMyQuests }}</b-td>
                         </template>
                         <template v-else>
-                            <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/about">{{ translatedJoin }}</a></b-td>
+                            <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/about">{{ __('microtasking.volunteering.join') }}</a></b-td>
                         </template>
                     </b-tr>
                 </b-tbody>
@@ -79,35 +79,8 @@ export default {
     }
   },
   computed: {
-    translatedTitle() {
-      return this.$lang.get('microtasking.volunteering.title')
-    },
-    translatedContent() {
-      return this.$lang.get('microtasking.volunteering.content')
-    },
-    translatedNumberOfTasks() {
-      return this.$lang.get('microtasking.volunteering.number_of_tasks')
-    },
-    translatedNumberOfQuests() {
-      return this.$lang.get('microtasking.volunteering.number_of_quests')
-    },
-    translatedAllContributions() {
-      return this.$lang.get('microtasking.volunteering.all_volunteer_contributions')
-    },
-    translatedAllQuests() {
-      return this.$lang.get('microtasking.volunteering.all_quests')
-    },
-    translatedMyContributions() {
-      return this.$lang.get('microtasking.volunteering.my_contributions')
-    },
     translatedMyQuests() {
       return this.$lang.get('microtasking.volunteering.my_quests', { value: this.currentUserQuests })
-    },
-    translatedJoin() {
-      return this.$lang.get('microtasking.volunteering.join')
-    },
-    translatedVolunteersConfirmed() {
-      return this.$lang.get('groups.volunteers_confirmed')
     },
   }
 }

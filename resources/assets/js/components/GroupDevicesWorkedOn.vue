@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="mt-2 mb-2">{{ translatedDevicesWorkedOn }}</h2>
+    <h2 class="mt-2 mb-2">{{ __('groups.total_devices') }}</h2>
     <div class="items-container text-lowercase">
       <StatsValue :count="stats.fixed + stats.repairable + stats.dead" icon="drill" :icon-width="50" size="md" variant="brand" title="partials.total" class="group-stat-total height" />
       <div />
@@ -27,11 +27,6 @@ export default {
       type: Object
     }
   },
-  computed: {
-    translatedDevicesWorkedOn() {
-      return this.$lang.get('groups.total_devices')
-    }
-  }
 }
 </script>
 <style scoped lang="scss">

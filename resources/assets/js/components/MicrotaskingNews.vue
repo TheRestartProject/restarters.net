@@ -7,7 +7,7 @@
 
         <template slot="title">
             <div class="mt-2">
-            {{ translatedTitle }}
+            {{ __('microtasking.news.title') }}
             </div>
         </template>
 
@@ -16,7 +16,7 @@
         </template>
 
         <template slot="content">
-            <div v-html="translatedContent" class="pt-3 content" />
+            <div v-html="__('microtasking.news.content')" class="pt-3 content" />
         </template>
     </CollapsibleSection>
     </div>
@@ -27,14 +27,6 @@ import CollapsibleSection from './CollapsibleSection'
 
 export default {
     components: {CollapsibleSection},
-    computed: {
-      translatedTitle() {
-        return this.$lang.get('microtasking.news.title')
-      },
-      translatedContent() {
-        return this.$lang.get('microtasking.news.content')
-      }
-    },
 }
 </script>
 

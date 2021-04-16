@@ -1,7 +1,7 @@
 <template>
   <CollapsibleSection :count="images.length" collapsed>
     <template slot="title">
-      {{ translatedEventPhotos }}
+      {{ __('events.event_photos') }}
     </template>
     <template slot="content">
       <div class="d-flex flex-wrap">
@@ -22,10 +22,5 @@ export default {
       required: true
     }
   },
-  computed: {
-    translatedEventPhotos() {
-      return this.$lang.get('events.event_photos')
-    },
-  }
 }
 </script>

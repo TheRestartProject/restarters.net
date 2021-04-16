@@ -1,7 +1,7 @@
 <template>
   <div class="layout md-primary-black">
     <div class="title mb-2 ml-3">
-      {{ translatedLatestData }}
+      {{ __('devices.latest_data') }}
       <span class="icon mt-2 mb-2">
         <b-img src="/images/clap_doodle.svg" class="img" />
       </span>
@@ -21,9 +21,6 @@ export default {
     }
   },
   computed: {
-    translatedLatestData() {
-      return this.$lang.get('devices.latest_data')
-    },
     translatedWastePrevented() {
       return this.$lang.get('devices.group_prevented', {
         idevents: this.latestData.id_events,

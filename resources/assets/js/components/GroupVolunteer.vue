@@ -15,7 +15,7 @@
               {{ volunteer.volunteer.name }}
             </span>
               <span class="host" v-if="host">
-              {{ translatedHost }}
+              {{ __('partials.host') }}
             </span>
             </div>
             <div :id="'skills-' + volunteer.volunteer.id" :class="{
@@ -36,13 +36,13 @@
         </div>
       </div>
       <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown">
-        <b-dropdown-item :href="'/group/make-host/' + idgroups + '/' + volunteer.user" v-if="volunteer.role === restarter">{{ translatedMakeHost }}</b-dropdown-item>
-        <b-dropdown-item target="_blank" rel="noopener" :href="'/group/remove-volunteer/' + idgroups + '/' + volunteer.user">{{ translatedRemoveVolunteer }}</b-dropdown-item>
+        <b-dropdown-item :href="'/group/make-host/' + idgroups + '/' + volunteer.user" v-if="volunteer.role === restarter">{{ __('groups.make_host') }}</b-dropdown-item>
+        <b-dropdown-item target="_blank" rel="noopener" :href="'/group/remove-volunteer/' + idgroups + '/' + volunteer.user">{{ __('groups.remove_volunteer') }}</b-dropdown-item>
       </b-dropdown>
       <button class="dropdown-toggle d-none" />
     </div>
     <b-alert variant="danger" v-if="error">
-      {{ translatedSomethingWrong }}: {{ error }}
+      {{ __('partials.something_wrong') }}: {{ error }}
     </b-alert>
     <ConfirmModal @confirm="remove" ref="confirm" />
   </div>
@@ -107,18 +107,6 @@ export default {
 
       return ret
     },
-    translatedHost() {
-      return this.$lang.get('partials.host')
-    },
-    translatedSomethingWrong() {
-      return this.$lang.get('partials.something_wrong')
-    },
-    translatedRemoveVolunteer() {
-      return this.$lang.get('groups.remove_volunteer')
-    },
-    translatedMakeHost() {
-      return this.$lang.get('groups.make_host')
-    }
   },
   methods: {
     brokenProfileImage(event) {
