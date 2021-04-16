@@ -54,7 +54,7 @@ export default {
       let ret = true
 
       this.itemTypes.forEach(t => {
-        if (t.item_type.toLowerCase().indexOf(this.currentType.toLowerCase()) !== -1) {
+        if (t.item_type === this.currentType) {
           ret = false
         }
       })
