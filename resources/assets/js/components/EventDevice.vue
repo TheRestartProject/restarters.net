@@ -183,12 +183,17 @@ export default {
         return false
       }
 
+      if (this.powered && this.currentCategory === CATEGORY_MISC) {
+        return true
+      }
+
       let ret = false
 
       this.clusters.forEach((cluster) => {
         let categories = []
 
         cluster.categories.forEach((c) => {
+          console.log("Check category", this.currentCategory, c.idcategories, c.aggregate, c)
           if (this.currentCategory === c.idcategories) {
             ret = c.aggregate
           }
