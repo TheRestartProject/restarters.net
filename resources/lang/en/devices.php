@@ -122,5 +122,6 @@ return array (
   'item_and_repair_info' => 'Item & Repair Info',
   'event_info' => 'Event Info',
   'search_assessment_comments' => 'Assessment',
-  'interesting_case_study' => 'Interesting case study'
+  'interesting_case_study' => 'Interesting case study',
+  'unknown_item_type' => 'You’re creating a new item type. Are you sure?'
 );
