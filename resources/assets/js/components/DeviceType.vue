@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 device-select-row">
-    <b-input @change="$emit('update:type', $event)" :placeholder="__('devices.model_or_type')" size="lg" class="marg" :value="type" :disabled="disabled" />
+    <vue-typeahead-bootstrap v-model="currentType" :maxMatches="5" :data="suggestions" :minMatchingChars="1" size="lg" inputClass="marg form-control-lg" :disabled="disabled" :placeholder="__('devices.model_or_type')" @input="input" />
     <div v-b-popover.html.left="__('devices.tooltip_type')" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else />
