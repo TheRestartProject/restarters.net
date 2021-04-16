@@ -112,13 +112,16 @@ export default {
   },
   computed: {
     events() {
-      return this.$store.getters['events/getByGroup'](this.idgroups)
+      return this.$store.getters['events/getByGroup'](this.idgroups).sort((a,b) => new moment(a.event_date).format('YYYYMMDD') - new moment(b.event_date).format('YYYYMMDD'))
+    },
+    reverse() {
+      return this.$store.getters['events/getByGroup'](this.idgroups).sort((a,b) => new moment(b.event_date).format('YYYYMMDD') - new moment(a.event_date).format('YYYYMMDD'))
     },
     past() {
-      return this.events.filter(e => {
+      return this.reverse.filter(e => {
         const start = new moment(e.event_date + ' ' + e.start)
         return start.isBefore()
-      }).sort((a,b) => new moment(b.event_date).format('YYYYMMDD') - new moment(a.event_date).format('YYYYMMDD'))
+      })
     },
     upcoming() {
       return this.events.filter(e => {
