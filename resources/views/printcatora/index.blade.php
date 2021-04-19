@@ -40,7 +40,7 @@
                     <img id="printcat" src="{{ asset('/images/printcatora/paw-prints.png') }}" alt="PrintCat status" width="48" height="48" />
                 </a>
             </div>
-            <div class="col-12">
+            <div class="col-12 text-left">
                 <p>@lang('printcatora.task.strapline')
                     <a href="javascript:void(0);" id="a-info-open" data-toggle="modal" data-target="#printcatoraInfoModal">@lang('printcatora.task.learn_more')</a>
                 </p>
