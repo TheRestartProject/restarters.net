@@ -17,7 +17,7 @@
                 <p>@lang('printcatora.info.body-s2-p1')</p>
                 <hr>
                 <h5>@lang('printcatora.info.body-s3-header')</h5>
-                <p>@lang('printcatora.info.body-s3-p1')</p>
+                <p>@lang('printcatora.info.body-s3-p1', ['url' => 'https://openrepair.org/about/'])</p>
                 <hr>
                 <h5>@lang('printcatora.info.body-s4-header')</h5>
                 <p>@lang('printcatora.info.body-s4-p1', ['url' => 'https://talk.restarters.net/t/4664'])</p>
