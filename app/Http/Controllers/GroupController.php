@@ -1310,6 +1310,7 @@ class GroupController extends Controller
                 $collection->push([
                     'id' => $group->idgroups,
                     'name' => $group->name,
+                    'area' => $group->area,
                     'location' => [
                         'value' => $group->location,
                         'country' => $group->country,
@@ -1419,6 +1420,7 @@ class GroupController extends Controller
         $collection = collect([
             'id' => $group->idgroups,
             'name' => $group->name,
+            'area' => $group->area,
             'location' => [
                 'value' => $group->location,
                 'country' => $group->country,
