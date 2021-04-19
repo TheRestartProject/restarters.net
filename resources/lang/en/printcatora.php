@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'about' => 'About',
     'task' =>
     [
         'where_is_the_main_fault' => 'Where is the main fault',

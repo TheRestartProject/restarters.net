@@ -18,7 +18,8 @@
     img#printcat {
         width: 48px;
         height: 48px;
-        float: right; /* bootstrap pull-right class working locally but not on server!  falling back on this. */
+        float: right;
+        margin-left: 10px;
     }
 
 
@@ -96,5 +97,4 @@
  #ora-partnership img {
      width: 300px;
  }
-
 </style>

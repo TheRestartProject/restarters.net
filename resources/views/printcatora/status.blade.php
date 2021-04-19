@@ -22,22 +22,21 @@
 @section('content')
 
 <section class="printcat">
-    <div class="container mt-1 mt-sm-4">
-        <div class="row row-compressed">
-            <div class="col-6">
-                <h1 class="pull-left">PrintCat @lang('printcatora.status.status')</h1>
+    <div class="container mt-1 mt-sm-2">
+        <div class="row row-compressed align-items-center">
+            <div class="col-5">
+                <h1 class="pull-left">PrintCat @lang('printcatora.status.status')
+                    <img id="printcat" class="pull-left d-none d-lg-block" src="{{ asset('/images/printcatora/paw-prints.png') }}" alt="PrintCat status" />
+                </h1>
             </div>
-            <div class="col-6 text-right">
+            <div class="col-7 text-right">
                 <a id="btn-info-open"
                    data-toggle="modal" data-target="#printcatoraInfoModal"
-                   class="btn btn-info btn-sm btn-rounded p-2 ml-2">
-                    <svg style="width:24px;height:24px;" viewBox="0 0 24 24">
-                    <title>About PrintCat</title>
-                    <path fill="#fff" d="M13.5,4A1.5,1.5 0 0,0 12,5.5A1.5,1.5 0 0,0 13.5,7A1.5,1.5 0 0,0 15,5.5A1.5,1.5 0 0,0 13.5,4M13.14,8.77C11.95,8.87 8.7,11.46 8.7,11.46C8.5,11.61 8.56,11.6 8.72,11.88C8.88,12.15 8.86,12.17 9.05,12.04C9.25,11.91 9.58,11.7 10.13,11.36C12.25,10 10.47,13.14 9.56,18.43C9.2,21.05 11.56,19.7 12.17,19.3C12.77,18.91 14.38,17.8 14.54,17.69C14.76,17.54 14.6,17.42 14.43,17.17C14.31,17 14.19,17.12 14.19,17.12C13.54,17.55 12.35,18.45 12.19,17.88C12,17.31 13.22,13.4 13.89,10.71C14,10.07 14.3,8.67 13.14,8.77Z"></path>
-                    </svg>
+                   class="btn btn-primary ml-2">
+                    @lang('printcatora.about')
                 </a>
-                <a href="{{ '/printcat' . ($partner ? '?partner=$partner' : '') }}">
-                    <img id="printcat" src="{{ asset('/images/printcatora/paw-prints.png') }}" alt="Go to PrintCat" width="48" height="48" />
+                <a class="btn btn-primary" href="{{ '/printcat' . ($partner ? '?partner=$partner' : '') }}">
+                    @lang('microtasking.cta.printcat.get_involved')
                 </a>
             </div>
         </div>
