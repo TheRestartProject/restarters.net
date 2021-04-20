@@ -25,7 +25,6 @@ return array (
   'join_group_restarter' => 'Suivre un Repair Café',
   'log_devices' => 'Connecter un appareil',
   'networks_you_coordinate' => 'Voici le réseau que vous coordonnez :',
-  'subtitle' => 'Restez informé des dernières activités de la communauté Repair!',
   'title' => 'Tableau de bord',
   'your_networks' => 'Vos réseaux',
   'add_event' => 'Ajouter',

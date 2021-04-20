@@ -1,7 +1,7 @@
 <?php
 
 return array (
-  'title' => 'Upstream',
+  'title' => 'Data Workbench',
   'news' => 
   array (
     'title' => 'Read about our recent success',
@@ -25,7 +25,7 @@ return array (
 ',
     'number_of_tasks' => 'Number of tasks',
     'number_of_quests' => 'Number of quests',
-    'all_volunteer_contributions' => 'Upstream volunteer contributions',
+    'all_volunteer_contributions' => 'Total volunteer contributions',
     'all_quests' => '3 quests',
     'my_contributions' => 'My contributions',
     'my_quests' => ':value quests',
