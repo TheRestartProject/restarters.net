@@ -110,7 +110,7 @@ return array (
   'group_events' => 'Group events',
   'upcoming_active' => 'Upcoming & Active',
   'past' => 'Past',
-  'no_upcoming_events' => 'There are currently no upcoming events for this group',
+  'no_upcoming_events' => 'There are currently no upcoming events.',
   'no_past_events' => 'There are currently no past events for this group',
   'see_all_events' => 'See all events',
   'environmental_impact' => 'Environmental impact',
