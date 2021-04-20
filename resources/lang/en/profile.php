@@ -22,8 +22,6 @@ return array (
   'profile' => 'Profile',
   'account' => 'Account',
   'email_preferences' => 'Email preferences',
-  'calendars' => 'Calendars',
-  'notifications' => 'Notifications',
   'calendars' => 
   array (
     'title' => 'Calendars',
@@ -45,5 +43,5 @@ return array (
   'repair_dir_none' => 'No access',
   'repair_dir_editor' => 'Editor',
   'repair_dir_regional_admin' => 'Regional Admin',
-  'repair_dir_superadmin' => 'SuperAdmin'
+  'repair_dir_superadmin' => 'SuperAdmin',
 );
