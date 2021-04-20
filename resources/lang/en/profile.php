@@ -9,7 +9,10 @@ return array (
   'edit_user' => 'Edit user',
   'panel_title_1' => 'Basic profile',
   'panel_title_2' => 'Emails & alerts',
+  'panel_content_1' => 'Lorem ipsum dolor sit amet, consectetur adip iscing elit. Praesent commodo cursus magna.',
+  'panel_content_2' => 'Lorem ipsum dolor sit amet, consectetur adip iscing elit. Praesent commodo cursus magna.',
   'change_photo' => 'Change my photo',
+  'change_photo_text' => 'Lorem ipsum dolor sit amet, consectetur adip iscing elit. Praesent commodo cursus magna.',
   'profile_picture' => 'Profile picture',
   'delete_account' => 'Delete account',
   'delete_account_text' => 'I understand that deleting my account will remove all of my personal data and this is a permanent action.',
@@ -22,8 +25,6 @@ return array (
   'profile' => 'Profile',
   'account' => 'Account',
   'email_preferences' => 'Email preferences',
-  'calendars' => 'Calendars',
-  'notifications' => 'Notifications',
   'calendars' => 
   array (
     'title' => 'Calendars',
@@ -45,5 +46,5 @@ return array (
   'repair_dir_none' => 'No access',
   'repair_dir_editor' => 'Editor',
   'repair_dir_regional_admin' => 'Regional Admin',
-  'repair_dir_superadmin' => 'SuperAdmin'
+  'repair_dir_superadmin' => 'SuperAdmin',
 );

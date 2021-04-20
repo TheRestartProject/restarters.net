@@ -46,4 +46,6 @@ return array (
   'upcoming_events_subtitle' => 'Les événements à venir de vos Repair Cafés',
   'upcoming_events_title' => 'Evénements à venir',
   'your_groups_heading' => 'Vos Repair Cafés',
+  'see_your_impact' => 'Et regardez votre impact sur le Fixometer',
+  'add_data_add' => 'Ajouter',
 );

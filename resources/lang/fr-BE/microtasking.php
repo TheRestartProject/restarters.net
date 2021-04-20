@@ -6,12 +6,27 @@ return array (
     'description' => 'Nous voyons beaucoup de smartphones lors d\'événements de réparation. Mais pourquoi cassent-ils si vite et qu\'est-ce qui pourrait les rendre plus facile à réparer? Aidez-nous à déterminer les problèmes les plus fréquents que l\'on peut rencontrer avec les smartphones avec MobiFix',
     'get_involved' => 'Participer',
     'title' => 'Aider maintenant! MobiFix',
+    'mobifix' => 
+    array (
+      'get_involved' => 'S\'impliquer',
+      'title' => 'Aider maintenant! MobiFix',
+    ),
+    'mobifixora' => 
+    array (
+      'get_involved' => 'S\'impliquer',
+      'title' => 'Aidez maintenant! MobiFix:ORA',
+    ),
+    'tabicat' => 
+    array (
+      'title' => 'Aider maintenant! TabiCat',
+      'get_involved' => 'S\'impliquer',
+    ),
   ),
   'discussion' => 
   array (
     'number_of_comments' => 'Nombre de commentaires',
     'see_all' => 'Voir tout',
-    'title' => 'Que se passe-t-il',
+    'title' => 'Que se passe-t-il?',
     'topic_created_at' => 'Sujet créé',
   ),
   'news' => 
