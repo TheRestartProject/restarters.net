@@ -177,4 +177,5 @@ return array (
   'search_name_placeholder' => 'Rechercher nom...',
   'search_tags_placeholder' => 'Tag',
   'show_filters' => 'Montrer les filtres',
+  'all' => 'Tous',
 );
