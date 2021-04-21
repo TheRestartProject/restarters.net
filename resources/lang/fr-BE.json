@@ -20,7 +20,6 @@
     "Reset Password": "Réinitialiser mot de passe",
     "Send Password Reset Link": "Envoyer lien de réinitialisation de mot de passe",
     "Technical skills": "Compétences techniques",
-    "test": "Test",
     "Using a multimeter": "Utiliser un multimètre",
     "Whoops!": "Oups!",
     "All rights reserved.": "Tous droits réservés.",
@@ -42,7 +41,7 @@
     "Electronic Gadgets": "Gadgets électroniques",
     "Home Entertainment": "Divertissement domestique",
     "Kitchen and Household Items": "Objets de cuisine et de ménage",
-    "Non-Powered Items": "Non-Powered Items",
+    "Non-Powered Items": "Articles non alimentés",
     "Desktop computer": "Ordinateur de bureau",
     "Flat screen 15-17\"": "Ecran plat 15-17",
     "Flat screen 19-20\"": "Ecran plat 19-20",
@@ -119,7 +118,7 @@
     "Ink cartridge": "Cartouche d'encre",
     "Paper feed": "Alimentation papier",
     "Paper output": "Sortie papier",
-    "Power supply\/connectors": "Alimentation\/connecteurs",
+    "Power supply\/connectors": "Alimentation\/batterie",
     "Print quality": "Qualité d'impression",
     "Printhead cleaning": "Nettoyage de la tête d'impression",
     "Printhead failure": "Échec de la tête d'impression",
@@ -129,5 +128,6 @@
     "USB port\/cable": "Port ou câble USB",
     "Vendor lock-in": "Vendor lock-in",
     "Waste toner box": "Bac de récupération de toner",
-    "WiFi": "Connexion sans fil"
+    "WiFi": "Connexion sans fil",
+    "Storage Storage": "Stockage"
 }
