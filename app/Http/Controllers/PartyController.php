@@ -1616,6 +1616,7 @@ class PartyController extends Controller
             'group' => [
                 'id' => $party->theGroup->idgroups,
                 'name' => $party->theGroup->name,
+                'area' => $party->theGroup->area,
                 'description' => $party->theGroup->free_text,
                 'image_url' => $party->theGroup->groupImagePath(),
                 'volunteers' => $party->theGroup->volunteers,
@@ -1629,6 +1630,7 @@ class PartyController extends Controller
             'start_time' => $party->start,
             'end_time' => $party->end,
             'name' => $party->venue,
+            'area' => $party->theGroup->area,
             'location' => [
                 'value' => $party->location,
                 'latitude' => $party->latitude,

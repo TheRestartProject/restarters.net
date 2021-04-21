@@ -55,6 +55,7 @@ class EventController extends Controller
            $groups_array->push([
                'id' => $group->idgroups,
                'name' => $group->name,
+               'area' => $group->area,
                'description' => $group->free_text,
                'image_url' => $group->groupImagePath(),
                'volunteers' => $group->volunteers,
@@ -78,6 +79,7 @@ class EventController extends Controller
            $collection->push([
              'id' => $party->idevents,
              'group' => [$group],
+             'area' => $group['area'],
              'event_date' => $party->event_date,
              'start_time' => $party->start,
              'end_time' => $party->end,
