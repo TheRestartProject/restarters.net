@@ -31,7 +31,7 @@
     "Electronic Gadgets": "Gadgets électroniques",
     "Home Entertainment": "Divertissement domestique",
     "Kitchen and Household Items": "Objets de cuisine et de ménage",
-    "Non-Powered Items": "Non-Powered Items",
+    "Non-Powered Items": "Articles non alimentés",
     "Desktop computer": "Ordinateur de bureau",
     "Flat screen 15-17\"": "Ecran plat 15-17",
     "Flat screen 19-20\"": "Ecran plat 19-20",
@@ -107,7 +107,7 @@
     "Ink cartridge": "Cartouche d'encre",
     "Paper feed": "Alimentation papier",
     "Paper output": "Sortie papier",
-    "Power supply\/connectors": "Alimentation\/connecteurs",
+    "Power supply\/connectors": "Alimentation\/batterie",
     "Print quality": "Qualité d'impression",
     "Printhead cleaning": "Nettoyage de la tête d'impression",
     "Printhead failure": "Échec de la tête d'impression",
@@ -117,5 +117,13 @@
     "USB port\/cable": "Port ou câble USB",
     "Vendor lock-in": "Vendor lock-in",
     "Waste toner box": "Bac de récupération de toner",
-    "WiFi": "Connexion sans fil"
+    "WiFi": "Connexion sans fil",
+    "NetworkCoordinator": "Coordinateur du réseau",
+    "No way to open the product": "Impossible d'ouvrir l'appareil",
+    "Regards": "Salutations",
+    "Repair information not available": "Informations de réparation non disponibles",
+    "Restarter": "Réparateur",
+    "Spare parts not available": "Pièces détachées non disponibles",
+    "Spare parts too expensive": "Pièces détachées trop coûteuses",
+    "Storage Storage": "Stockage"
 }
