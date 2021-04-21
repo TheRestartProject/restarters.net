@@ -45,7 +45,7 @@ return array (
     'body-s3-header' => 'Dove prende PrintCat i dati sulle stampanti guaste?',
     'body-s3-p1' => 'PrintCat utilizza le informazioni della <a href=":url" target="_blank">Open Repair Alliance</a>, che raccoglie dati sui dispositivi rotti che persone in tutto il mondo hanno cercato di riparare durante gli eventi della comunità, come i Repair Café e i Restart Party.',
     'body-s4-header' => 'Altre domande?',
-    'body-s4-p1' => 'Scopri di più, fai domande e dacci il tuo feedback nella <a href=“:url” target="_blank">conversazione su PrintCat</a>.',
+    'body-s4-p1' => 'Scopri di più, fai domande e dacci il tuo feedback nella <a href=":url" target="_blank">conversazione su PrintCat</a>.',
     'title' => 'Grazie per aver provato PrintCat',
   ),
 );
