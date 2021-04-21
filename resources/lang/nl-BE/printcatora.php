@@ -44,7 +44,7 @@ return array (
     'body-s3-header' => 'Hoe komt PrintCat aan gegevens over defecte printers?',
     'body-s3-p1' => 'PrintCat gebruikt informatie van de <a href=":url" target="_blank">Open Repair Alliance</a>, die gegevens verzamelt over kapotte apparaten die echte mensen over de hele wereld hebben proberen te repareren op community-evenementen, zoals Repair Cafés en Restart Parties.',
     'body-s4-header' => 'Meer vragen?',
-    'body-s4-p1' => 'Kom meer te weten, stel vragen en geef ons uw feedback, in <a href=“:url” target="_blank">de PrintCat discussie</a>.',
+    'body-s4-p1' => 'Kom meer te weten, stel vragen en geef ons uw feedback, in <a href=":url" target="_blank">de PrintCat discussie</a>.',
     'title' => 'Bedankt om PrintCat te proberen',
   ),
   'about' => 'Meer informatie',

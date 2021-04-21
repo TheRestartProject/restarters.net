@@ -44,7 +44,7 @@ return array (
     'body-s3-header' => '¿De dónde obtiene PrintCat los datos sobre impresoras averiadas?',
     'body-s3-p1' => 'PrintCat utiliza información obtenida por <a href=":url" target="_blank">Open Repair Alliance</a>, que recopila datos sobre dispositivos rotos que personas reales de todo el mundo han intentado reparar en eventos comunitarios, como Repair Cafés y Restart Parties.',
     'body-s4-header' => '¿Más preguntas?',
-    'body-s4-p1' => 'Obtenga más información, haga preguntas y envíenos sus comentarios en <a href=“:url” target="_blank">el post sobre PrintCat</a>.',
+    'body-s4-p1' => 'Obtenga más información, haga preguntas y envíenos sus comentarios en <a href=":url" target="_blank">el post sobre PrintCat</a>.',
     'title' => 'Gracias por probar PrintCat',
   ),
   'about' => 'Más información',
