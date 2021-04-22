@@ -59,7 +59,6 @@
     "Toner": "Toner",
     "USB port\/cable": "Porta USB\/cavo",
     "Vendor lock-in": "Vendor lock-in",
-    "Waste toner\/ink box": "Vaschetta di recupero toner",
     "WiFi": "Wifi",
     "Administrator": "Amministratore",
     "Aircon\/Dehumidifier": "Aria condizionata \/ deumidificatore",
@@ -129,5 +128,6 @@
     "Toy": "Giocattolo",
     "TV and gaming-related accessories": "Accessori relativi a TV e videogiochi",
     "Using a multimeter": "Usando un multimetro",
-    "Vacuum": "Aspirapolvere"
+    "Vacuum": "Aspirapolvere",
+    "Waste toner\/ink box": "Vaschetta di recupero toner"
 }

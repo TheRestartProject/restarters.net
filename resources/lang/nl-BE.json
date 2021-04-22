@@ -45,7 +45,6 @@
     "Toner": "Toner",
     "USB port\/cable": "USB-poort\/kabel",
     "Vendor lock-in": "Vendor lock-in",
-    "Waste toner\/ink box": "Toneroverloopbak",
     "WiFi": "Wifi",
     "Administrator": "Admin",
     "Aircon\/Dehumidifier": "Airco\/ontvochtiger",
@@ -129,5 +128,6 @@
     "TV and gaming-related accessories": "TV- en spelgerelateerde accessoires",
     "Using a multimeter": "Gebruik van een multimeter",
     "Vacuum": "Stofzuiger",
-    "Whoops!": "Oeps!"
+    "Whoops!": "Oeps!",
+    "Waste toner\/ink box": "Toneroverloopbak"
 }
