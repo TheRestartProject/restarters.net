@@ -45,7 +45,6 @@
     "Toner": "Toner",
     "USB port\/cable": "USB-Anschluss\/Kabel",
     "Vendor lock-in": "Vendor Lock-in",
-    "Waste toner\/ink box": "Tonerabfallbox",
     "WiFi": "W-lan",
     "Administrator": "Administrator",
     "Aircon\/Dehumidifier": "Klimaanlage \/ Luftentfeuchter",
@@ -129,5 +128,6 @@
     "TV and gaming-related accessories": "TV- und Gamingaccessoires",
     "Using a multimeter": "Benutzung eines Multimeter",
     "Vacuum": "Staubsauger",
-    "Whoops!": "Ups!"
+    "Whoops!": "Ups!",
+    "Waste toner\/ink box": "Tonerabfallbox"
 }
