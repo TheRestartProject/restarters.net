@@ -116,7 +116,6 @@
     "Toner": "Toner",
     "USB port\/cable": "Port ou câble USB",
     "Vendor lock-in": "Vendor lock-in",
-    "Waste toner\/ink box": "Bac de récupération de toner",
     "WiFi": "Connexion sans fil",
     "NetworkCoordinator": "Coordinateur du réseau",
     "No way to open the product": "Impossible d'ouvrir l'appareil",
@@ -125,5 +124,6 @@
     "Restarter": "Réparateur",
     "Spare parts not available": "Pièces détachées non disponibles",
     "Spare parts too expensive": "Pièces détachées trop coûteuses",
-    "Storage Storage": "Stockage"
+    "Storage Storage": "Stockage",
+    "Waste toner\/ink box": "Bac de récupération de toner"
 }
