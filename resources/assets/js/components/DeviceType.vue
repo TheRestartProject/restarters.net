@@ -5,7 +5,7 @@
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else />
     </div>
-    <p v-if="!suppressTypeWarning && notASuggestion" class="pl-0 text-danger">
+    <p v-if="!suppressTypeWarning && notASuggestion" class="pl-0">
       {{ __('devices.unknown_item_type' )}}
     </p>
   </div>
