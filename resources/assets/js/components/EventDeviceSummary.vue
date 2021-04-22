@@ -12,6 +12,9 @@
           <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon" />
         </div>
       </b-td>
+      <b-td class="d-none d-md-table-cell" v-if="powered">
+          {{ device.brand }}
+      </b-td>
       <b-td v-if="powered">
         {{ device.model }}
         <div class="d-block d-md-none">
@@ -22,9 +25,6 @@
             <b-img class="icon" src="/icons/delete_ico_red.svg" />
           </span>
         </div>
-      </b-td>
-      <b-td class="d-none d-md-table-cell" v-if="powered">
-        {{ device.brand }}
       </b-td>
       <b-td v-if="!powered">
         {{ device.item_type }}
