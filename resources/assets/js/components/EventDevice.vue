@@ -11,11 +11,11 @@
             'mb-2': true,
             'border-thick': missingCategory
             }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" @changed="categoryChange" />
+          <DeviceType v-if="!powered || aggregate" class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled" :suppress-type-warning="suppressTypeWarning" :powered="powered" />
           <div v-if="powered">
             <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled" />
             <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
           </div>
-          <DeviceType v-if="!powered || aggregate" class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled" :suppress-type-warning="suppressTypeWarning" />
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" />
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled" />
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled" class="mt-2" @remove="removeImage($event)" />

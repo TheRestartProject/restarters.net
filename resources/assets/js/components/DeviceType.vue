@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 device-select-row">
-    <vue-typeahead-bootstrap v-model="currentType" :maxMatches="5" :data="suggestions" :minMatchingChars="1" size="lg" inputClass="marg form-control-lg" :disabled="disabled" :placeholder="__('devices.model_or_type')" @input="input" />
-    <div v-b-popover.html.left="__('devices.tooltip_type')" class="ml-3 mt-2">
+    <vue-typeahead-bootstrap v-model="currentType" :maxMatches="5" :data="suggestions" :minMatchingChars="1" size="lg" inputClass="marg form-control-lg" :disabled="disabled" :placeholder="__('devices.item_type')" @input="input" />
+    <div v-b-popover.html.left="translatedTooltip" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else />
     </div>
@@ -40,6 +40,12 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    powered: {
+      // The server might return a number rather than a boolean.
+      type: [ Boolean, Number ],
+      required: false,
+      default: false
     }
   },
   computed: {
@@ -60,6 +66,13 @@ export default {
       })
 
       return ret
+    },
+    translatedTooltip() {
+      if (this.powered) {
+        return this.$lang.get('devices.tooltip_type_powered')
+      } else {
+        return this.$lang.get('devices.tooltip_type_unpowered')
+      }
     }
   },
   data () {
