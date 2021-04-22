@@ -487,4 +487,8 @@ h3 {
   // Disabled is what happens for the view that people get if they can't edit the device.
   background-color: white;
 }
+
+/deep/ .form-text {
+    line-height: 1rem;
+}
 </style>

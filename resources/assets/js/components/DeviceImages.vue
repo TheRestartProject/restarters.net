@@ -9,7 +9,7 @@
         <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)" :disabled="disabled" />
       </div>
     </div>
-    <p class="p-0" v-else>
+    <p class="p-1 form-text" v-else>
       {{ __('devices.images_on_edit') }}
     </p>
   </div>
