@@ -106,4 +106,14 @@ export default {
 /deep/ .input-group > .form-control {
   width: 100%;
 }
+
+/deep/ span {
+  font-size: 16px;
+}
+
+/deep/ .vbst-item {
+  div {
+    line-height: 16px;
+  }
+}
 </style>
