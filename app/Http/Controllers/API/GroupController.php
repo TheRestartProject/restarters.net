@@ -85,12 +85,12 @@ class GroupController extends Controller
             $collection->push([
                 'id' => $group->idgroups,
                 'name' => $group->name,
-                'area' => $group->area,
                 'location' => [
                     'value' => $group->location,
                     'country' => $group->country,
                     'latitude' => $group->latitude,
                     'longitude' => $group->longitude,
+                    'area' => $group->area,
                 ],
                 'website' => $group->website,
                 'facebook' => $group->facebook,
