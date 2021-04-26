@@ -80,6 +80,7 @@ export default {
       },
       set(newval) {
         this.$emit('update:category', newval ? newval.value : null)
+        this.$emit('changed')
       }
     },
     categoryOptions() {
