@@ -261,3 +261,17 @@ body {
 .uls-menu {
   z-index: 10000 !important;
 }
+
+.tux-grouplist__item__icon {
+  display: none !important;
+}
+
+.uls-search-input-wrapper {
+  width: 200px;
+}
+
+.tux-grouplist__item__label {
+  width: 100% !important;
+  font-size: 90% !important;
+  min-width: 157px !important;
+}

@@ -19,7 +19,7 @@
         color: white;
     }
     #btn-skip {
-        background-color: #white;
+        background-color: white;
         border: 2px solid #0faca9;
         color: #0faca9;
     }
@@ -28,54 +28,51 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content microtask">
             <div class="modal-header">
-                <h5 class="modal-title" style="width:100%" id="taskctaModalLabel">Thank you for your help!</h5>
+                <h5 class="modal-title" style="width:100%" id="taskctaModalLabel">@lang('microtask-ora.cta.header')</h5>
             </div>
             <div class="modal-body">
                 <div class="row text-center">
                     <div class="col">
                         <div class="row">
                             <div class="col">
-                                <p>Each item you're seeing was brought to a repair event to be fixed rather than thrown away.</p>
-                                <p><strong>What do we do with this data?</strong></p>
+                                <p>@lang('microtask-ora.cta.body-s1-p1')</p>
+                                <p><strong>@lang('microtask-ora.cta.body-s1-p2')</strong></p>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-12 col-lg-4 mb-2 mb-lg-0">
                                 <div class="use-case">
-                                    <h5>Share repair skills</h5>
-                                    <p>By learning why items break and how to fix them, we can share this knowledge with the world.</p>
+                                    <h5>@lang('microtask-ora.cta.body-s2-header')</h5>
+                                    <p>@lang('microtask-ora.cta.body-s2-p1')</p>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-4 mb-2 mb-lg-0">
                                 <div class="use-case">
-                                    <h5>Showcase the benefits of repair</h5>
-                                    <p>We help groups understand their impact, motivate their community, and support funding bids.</p>
+                                    <h5>@lang('microtask-ora.cta.body-s3-header')</h5>
+                                    <p>@lang('microtask-ora.cta.body-s3-p1')</p>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-4 mb-2 mb-lg-0">
                                 <div class="use-case">
-                                    <h5>Campaign for change</h5>
-                                    <p>Repair data supports policy on the Right to Repair, making products more repairable, and reducing the environmental impact of electronics.</p>
+                                    <h5>@lang('microtask-ora.cta.body-s4-header')</h5>
+                                    <p>@lang('microtask-ora.cta.body-s4-p1')</p>
                                 </div>
                             </div>
                         </div>
                         <hr/>
                         <div class="row">
                             <div class="col">
-                                <h5>Want to keep up with our work?</h5>
-                                <p>
-                                    The <a href="https://openrepair.org/get-involved" target="_blank">Open Repair Alliance</a> collates data about repairs from community events around the world. This data helps us advocate for products that last longer and are easier to fix.
-                                </p>
-                                <p>
-                                    <a href="https://therestartproject.org/" target="_blank">The Restart Project</a> is a member of the Open Repair Alliance and made this app. You can join our community to learn more about community repair events and repair data by signing up below.</p>
+                                <h5>@lang('microtask-ora.cta.body-s5-header')</h5>
+                                <p>The <a href="https://openrepair.org/get-involved" target="_blank">Open Repair Alliance</a> @lang('microtask-ora.cta.body-whois-ora')</p>
+                                <p><a href="https://therestartproject.org/" target="_blank">The Restart Project</a> @lang('microtask-ora.cta.body-whois-trp')</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer justify-content-center">
                     <p class="buttons">
-                        <a href="javascript:void(0);" id="btn-join" class="btn btn-md btn-rounded" target="_blank">Sign up</a>
-                        <button id="btn-skip" type="button" class="btn btn-md btn-rounded">Not now</button>
+                        <a href="javascript:void(0);" id="btn-join" class="btn btn-md btn-rounded" target="_blank">@lang('microtask-ora.cta.btn-signup')</a>
+                        <button id="btn-skip" type="button" class="btn btn-md btn-rounded">@lang('microtask-ora.cta.btn-notnow')</button>
                     </p>
                 </div>
             </div>
