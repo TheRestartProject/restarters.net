@@ -193,7 +193,6 @@ export default {
         let categories = []
 
         cluster.categories.forEach((c) => {
-          console.log("Check category", this.currentCategory, c.idcategories, c.aggregate, c)
           if (this.currentCategory === c.idcategories) {
             ret = c.aggregate
           }
@@ -371,7 +370,7 @@ export default {
       window.location = '/fixometer'
     },
     categoryChange() {
-      // Any item type we might have is no longer value.
+      // Any item type we might have is no longer valid.
       this.currentDevice.item_type = null
     }
   }
