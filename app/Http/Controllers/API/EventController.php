@@ -87,7 +87,7 @@ class EventController extends Controller
                  'value' => $party->location,
                  'latitude' => $party->latitude,
                  'longitude' => $party->longitude,
-                 'area' => $group->area,
+                 'area' => $group['area'],
              ],
              'description' => $party->free_text,
              'user' => $party_user = collect(),
