@@ -78,6 +78,7 @@ class EventController extends Controller
            $collection->push([
              'id' => $party->idevents,
              'group' => [$group],
+             'area' => $group['area'],
              'event_date' => $party->event_date,
              'start_time' => $party->start,
              'end_time' => $party->end,
@@ -86,6 +87,7 @@ class EventController extends Controller
                  'value' => $party->location,
                  'latitude' => $party->latitude,
                  'longitude' => $party->longitude,
+                 'area' => $group->area,
              ],
              'description' => $party->free_text,
              'user' => $party_user = collect(),
