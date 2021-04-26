@@ -108,6 +108,14 @@
                           <input type="hidden" id="administrative_area_level_1" disabled>
                           <input type="hidden" id="postal_code" disabled>
                           <input type="hidden" id="country" disabled>
+                          <div class="form-group">
+                            <label for="postcode">@lang('groups.postcode'):</label>
+                            <input type="text" id="postcode" placeholder="Enter your address" name="postcode" class="form-control field" aria-describedby="postcodeHelpBlock" value="{{ $formdata->postcode }}" />
+
+                            <small id="postcodeHelpBlock" class="form-text text-muted">
+                              @lang('groups.groups_postcode_small')
+                            </small>
+                          </div>
                         </div>
 
                         <div class="col-lg-5">

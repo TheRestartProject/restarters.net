@@ -29,6 +29,7 @@ return array (
   'groups_group_small' => 'A couple of examples include \'Restarters Torino\' or \'Nottingham Fixers\'',
   'groups_location' => 'Location',
   'location' => 'Group location',
+  'postcode' => 'Group postcode',
   'area' => 'Area',
   'groups_frequency' => 'Frequency',
   'groups_hosts' => 'Hosts',

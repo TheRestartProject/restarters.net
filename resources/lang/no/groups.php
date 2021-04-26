@@ -63,6 +63,7 @@ return array (
   'edit_group_save_changes' => 'Save changes',
   'edit_group_text' => 'Go ahead and change or improve your group\'s profile.',
   'groups_location_small' => 'I.e the place where the fixing happens!',
+  'groups_postcode_small' => '(Optional)',
   'field_group_images' => 'Add group image here',
   'field_group_images_2' => 'Choose an image for your group',
   'group_image' => 'Group image',
