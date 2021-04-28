@@ -1,10 +1,10 @@
 <template>
   <CollapsibleSection class="lineheight no-explict-width" collapsed hide-title>
     <template slot="title">
-      {{ translatedDescription }}
+      {{ __('events.event_description') }}
     </template>
     <template slot="content">
-      <read-more :html="event.free_text" class="mt-2 readmore small" :max-chars="440" :more-str="translatedReadMore" :less-str="translatedReadLess" />
+      <read-more :html="event.free_text" class="mt-2 readmore small" :max-chars="440" :more-str="__('events.read_more')" :less-str="__('events.read_less')" />
     </template>
   </CollapsibleSection>
 </template>
@@ -24,17 +24,6 @@ export default {
       required: true
     },
   },
-  computed: {
-    translatedDescription() {
-      return this.$lang.get('events.event_description')
-    },
-    translatedReadMore() {
-      return this.$lang.get('events.read_more')
-    },
-    translatedReadLess() {
-      return this.$lang.get('events.read_less')
-    }
-  }
 }
 </script>
 <style scoped lang="scss">

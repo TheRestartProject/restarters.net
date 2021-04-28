@@ -3,17 +3,17 @@
     <h1 class="d-flex justify-content-between">
       <div class="d-flex">
         <div class="mt-2">
-        {{ translatedTitle }}
+        {{ __('groups.groups') }}
         </div>
         <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
       </div>
       <div>
         <b-btn variant="primary" href="/group/create" v-if="canCreate">
           <span class="d-block d-lg-none">
-            {{ translatedAddNewGroupMobile }}
+            {{ __('groups.create_groups_mobile2') }}
           </span>
           <span class="d-none d-lg-block">
-            {{ translatedAddNewGroup }}
+            {{ __('groups.create_groups') }}
           </span>
         </b-btn>
       </div>
@@ -21,8 +21,8 @@
     <b-tabs class="ourtabs w-100 mt-4" justified v-model="currentTab">
       <b-tab class="pt-2" lazy>
         <template slot="title">
-          <b class="text-uppercase d-block d-md-none">{{ translatedYourGroupsMobile }}</b>
-          <b class="text-uppercase d-none d-md-block">{{ translatedYourGroups }}</b>
+          <b class="text-uppercase d-block d-md-none">{{ __('groups.groups_title1_mobile') }}</b>
+          <b class="text-uppercase d-none d-md-block">{{ __('groups.groups_title1') }}</b>
         </template>
         <div class="pt-2 pb-2">
           <div v-if="myGroups && myGroups.length">
@@ -34,13 +34,13 @@
                 your-area="yourArea"
             />
           </div>
-          <div v-else class="mt-2 mb-2 text-center" v-html="translatedNoGroupsMine" />
+          <div v-else class="mt-2 mb-2 text-center" v-html="__('groups.no_groups_mine')" />
         </div>
       </b-tab>
       <b-tab class="pt-2" lazy>
         <template slot="title">
-          <b class="text-uppercase d-block d-lg-none">{{ translatedNearestGroupsMobile }}</b>
-          <b class="text-uppercase d-none d-lg-block">{{ translatedNearestGroups }}</b>
+          <b class="text-uppercase d-block d-lg-none">{{ __('groups.groups_title2_mobile') }}</b>
+          <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>
         </template>
         <div v-if="nearbyGroups && nearbyGroups.length">
           <GroupsTable
@@ -52,14 +52,14 @@
           />
         </div>
         <div v-else class="mt-2 mb-2 text-center">
-          <div v-if="yourArea" v-html=" translatedNoGroupsNearestWithLocation" />
-          <div v-else v-html="translatedNoGroupsNearestNoLocation" />
+          <div v-if="yourArea" v-html="__('groups.no_groups_nearest_with_location')" />
+          <div v-else v-html="__('groups.no_groups_nearest_no_location')" />
         </div>
       </b-tab>
       <b-tab class="pt-2" lazy>
         <template slot="title">
-          <b class="text-uppercase d-block d-md-none">{{ translatedAllGroupsMobile }}</b>
-          <b class="text-uppercase d-none d-md-block">{{ translatedAllGroups }}</b>
+          <b class="text-uppercase d-block d-md-none">{{ __('groups.all_groups_mobile') }}</b>
+          <b class="text-uppercase d-none d-md-block">{{ __('groups.all_groups') }}</b>
         </template>
         <GroupsTable
             :groups="groups"
@@ -167,47 +167,6 @@ export default {
         return g.nearby
       })
     },
-    translatedTitle() {
-      return this.$lang.get('groups.groups')
-    },
-    translatedAddNewGroup() {
-      return this.$lang.get('groups.create_groups')
-    },
-    translatedAddNewGroupMobile() {
-      return this.$lang.get('groups.create_groups_mobile2')
-    },
-    translatedYourGroups() {
-      return this.$lang.get('groups.groups_title1')
-    },
-    translatedYourGroupsMobile() {
-      return this.$lang.get('groups.groups_title1_mobile')
-    },
-    translatedNoGroupsNearYou() {
-      return this.$lang.get('groups.no_groups_near_you', {
-        area: this.yourArea ? (this.yourArea.charAt(0).toUpperCase() + this.yourArea.slice(1)) : ''
-      })
-    },
-    translatedNoGroupsMine() {
-      return this.$lang.get('groups.no_groups_mine')
-    },
-    translatedNoGroupsNearestNoLocation() {
-      return this.$lang.get('groups.no_groups_nearest_no_location')
-    },
-    translatedNoGroupsNearestWithLocation() {
-      return this.$lang.get('groups.no_groups_nearest_with_location')
-    },
-    translatedNearestGroups() {
-      return this.$lang.get('groups.groups_title2')
-    },
-    translatedNearestGroupsMobile() {
-      return this.$lang.get('groups.groups_title2_mobile')
-    },
-    translatedAllGroups() {
-      return this.$lang.get('groups.all_groups')
-    },
-    translatedAllGroupsMobile() {
-      return this.$lang.get('groups.all_groups_mobile')
-    }
   },
   watch: {
     currentTab(newVal) {

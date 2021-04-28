@@ -3,7 +3,7 @@
     <multiselect
         :disabled="disabled"
         v-model="statusValue"
-        :placeholder="translatedRepairOutcome"
+        :placeholder="__('devices.repair_outcome')"
         :options="statusOptions"
         track-by="id"
         label="text"
@@ -17,7 +17,7 @@
         :disabled="disabled"
         v-if="showSteps"
         v-model="stepsValue"
-        :placeholder="translatedNextSteps"
+        :placeholder="__('devices.repair_details')"
         :options="stepsOptions"
         :multiple="false"
         :allow-empty="false"
@@ -31,7 +31,7 @@
         :disabled="disabled"
         v-if="showParts"
         v-model="partsValue"
-        :placeholder="translatedSpareParts"
+        :placeholder="__('devices.spare_parts')"
         :options="partsOptions"
         :multiple="false"
         :allow-empty="false"
@@ -45,7 +45,7 @@
         :disabled="disabled"
         v-if="showBarriers"
         v-model="barriersValue"
-        :placeholder="translatedBarriers"
+        :placeholder="__('partials.choose_barriers')"
         :options="barrierList"
         :multiple="true"
         :allow-empty="false"
@@ -206,27 +206,6 @@ export default {
         // We have an array of options we want to emit as an array of ids.
         this.$emit('update:barriers', newval.map(o => o.id))
       }
-    },
-    translatedRepairOutcome () {
-      return this.$lang.get('devices.repair_outcome')
-    },
-    translatedNextSteps () {
-      return this.$lang.get('devices.repair_details')
-    },
-    translatedSpareParts() {
-      return this.$lang.get('devices.spare_parts')
-    },
-    translatedMoreTime () {
-      return this.$lang.get('partials.more_time')
-    },
-    translatedProfessionalHelp () {
-      return this.$lang.get('partials.professional_help')
-    },
-    translatedDIY () {
-      return this.$lang.get('partials.diy')
-    },
-    translatedBarriers() {
-      return this.$lang.get('partials.choose_barriers')
     },
   }
 }

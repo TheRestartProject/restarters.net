@@ -12,6 +12,9 @@
           <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon" />
         </div>
       </b-td>
+      <b-td class="d-none d-md-table-cell" v-if="powered">
+          {{ device.brand }}
+      </b-td>
       <b-td v-if="powered">
         {{ device.model }}
         <div class="d-block d-md-none">
@@ -22,9 +25,6 @@
             <b-img class="icon" src="/icons/delete_ico_red.svg" />
           </span>
         </div>
-      </b-td>
-      <b-td class="d-none d-md-table-cell" v-if="powered">
-        {{ device.brand }}
       </b-td>
       <b-td v-if="!powered">
         {{ device.item_type }}
@@ -60,12 +60,12 @@
             <b-img class="icon" src="/icons/delete_ico_red.svg" />
           </span>
         </div>
-        <ConfirmModal :key="'modal-' + device.iddevices" ref="confirmDelete" @confirm="deleteConfirmed" :message="translatedConfirmDeleteDevice" />
+        <ConfirmModal :key="'modal-' + device.iddevices" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('devices.confirm_delete')" />
       </b-td>
     </b-tr>
     <b-tr v-else :key="'editing-' + device.iddevices">
       <b-td colspan="8" class="p-0">
-        <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="close" />
+        <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" @close="close" />
       </b-td>
     </b-tr>
   </transition>
@@ -113,6 +113,11 @@ export default {
       required: false,
       default: null
     },
+    itemTypes: {
+      type: Array,
+      required: false,
+      default: null
+    },
   },
   data () {
     return {
@@ -150,9 +155,6 @@ export default {
     sparePartsNeeded() {
       return this.device.spare_parts === SPARE_PARTS_MANUFACTURER || this.device.spare_parts === SPARE_PARTS_THIRD_PARTY
     },
-    translatedConfirmDeleteDevice() {
-      return this.$lang.get('devices.confirm_delete')
-    }
   },
   methods: {
     deleteConfirm() {

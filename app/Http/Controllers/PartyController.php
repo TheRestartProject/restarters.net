@@ -666,6 +666,7 @@ class PartyController extends Controller
             'device_images' => $device_images,
             'group_volunteers' => $group_volunteers,
             'calendar_links' => $this->generateAddToCalendarLinks($event),
+            'item_types' => Device::getItemTypes()
         ]);
     }
 
@@ -1633,6 +1634,7 @@ class PartyController extends Controller
                 'value' => $party->location,
                 'latitude' => $party->latitude,
                 'longitude' => $party->longitude,
+                'area' => $party->theGroup->area,
             ],
             'description' => $party->free_text,
             'user' => $party_user = collect(),

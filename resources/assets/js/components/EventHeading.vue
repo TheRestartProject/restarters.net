@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-flex justify-content-between mb-3">
-      <h1 class="d-block d-md-none">{{ translatedEvents }}</h1>
+      <h1 class="d-block d-md-none">{{ __('events.events') }}</h1>
       <EventActions :idevents="idevents" :canedit="canedit" :in-group="inGroup" :attending="attending" class="d-block d-md-none" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
@@ -73,9 +73,6 @@ export default {
   computed: {
     groupImage() {
       return this.event.the_group && this.event.the_group.group_image ? ('/uploads/mid_' + this.event.the_group.group_image.image.path) : DEFAULT_PROFILE
-    },
-    translatedEvents() {
-      return this.$lang.get('events.events')
     },
     translatedOrganised() {
       // Existing translations may have a :group parameter, so set that empty so that it doesn't appear in the result.
