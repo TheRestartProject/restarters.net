@@ -5,37 +5,61 @@ namespace Tests\Feature;
 use App\TabicatOra;
 use DB;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
-class TabicatOraTest extends TestCase {
+class TabicatOraTest extends TestCase
+{
 
-    public function setUp() {
+    public function setUp()
+    {
         parent::setUp();
         DB::statement("SET foreign_key_checks=0");
         TabicatOra::truncate();
         DB::table('devices_tabicat_ora')->truncate();
         DB::table('devices_faults_tablets_ora_adjudicated')->truncate();
+        DB::table('fault_types_mobiles')->truncate();
     }
 
     /** @test */
-    public function fetch_tabicatora_record() {
-
+    public function fetch_tabicatora_record()
+    {
+        $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $TabicatOra = new TabicatOra;
 
+        // insert 8 records, no exclusions
+        // expects any record
         $result = $TabicatOra->fetchFault();
         $this->assertTrue(is_array($result), 'fetch_tabicatora_record: result is not array');
         $this->assertEquals(1, count($result), 'fetch_tabicatora_record: wrong result count');
         $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_tabicatora_record: id_ords is null');
 
-        // leave only 1 record
+        // use locale, no exclusions
+        // expects a record with language matching locale
+        // except for invalid language where any record returned
         $exclude = [];
-        foreach ($data as $v) {
-            $exclude[] = $v['id'];
+        $locales = ['de', 'nl', 'en', 'foo'];
+        foreach ($locales as $locale) {
+            $result = $TabicatOra->fetchFault($exclude, $locale);
+            $this->assertTrue(is_array($result), 'fetch_tabicatora_record: result is not array');
+            $this->assertEquals(1, count($result), 'fetch_tabicatora_record: wrong result count');
+            $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_tabicatora_record: id_ords is null');
+            if ($locale !== 'foo') {
+                $this->assertEquals($locale, $result[0]->language, 'fetch_tabicatora_record: wrong language');
+            }
         }
+
+        // exclude 8 records
+        // expects no records returned
+        foreach ($data as $v) {
+            $exclude[] = $v['id_ords'];
+        }
+        $result = $TabicatOra->fetchFault($exclude);
+        $this->assertTrue(is_array($result), 'fetch_tabicatora_record: result is not array');
+        $this->assertEquals(0, count($result), 'fetch_tabicatora_record: wrong result count');
+
+        // exclude 7 records
+        // expects only the leftover/included record
         $include = array_pop($exclude);
         $result = $TabicatOra->fetchFault($exclude);
         $this->assertTrue(is_array($result), 'fetch_tabicatora_record: result is not array');
@@ -43,20 +67,31 @@ class TabicatOraTest extends TestCase {
         $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_tabicatora_record: id_ords is null');
         $this->assertEquals($include, $result[0]->id_ords, 'fetch_tabicatora_record: wrong value');
 
-        // exclude all records for one partner
-        $exclude = [];
-        foreach ($data as $k => $v) {
-            if ($v['data_provider'] == 'anstiftung') {
-                $exclude[] = $v['id'];
-            }
+        // use locale, exclude 7 records
+        // expects the same record regardless of locale
+        foreach ($locales as $locale) {
+            $result = $TabicatOra->fetchFault($exclude, $locale);
+            $this->assertTrue(is_array($result), 'fetch_tabicatora_record: result is not array');
+            $this->assertEquals(1, count($result), 'fetch_tabicatora_record: wrong result count');
+            $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_tabicatora_record: id_ords is null');
+            $this->assertEquals($include, $result[0]->id_ords, 'fetch_tabicatora_record: wrong value');
         }
-        $result = $TabicatOra->fetchFault($exclude, 'anstiftung');
-        $this->assertTrue(empty($result), 'fetch_tabicatora_record: result is not false');
+
+        // no exclusions, opinions exist
+        // expects 1 of the 3 records with not enough opinions
+        $exclude = [];
+        $opinions = $this->_setup_opinions($data);
+        $expect = ['rcint_8243', 'rcint_9462', 'fixitclinic_141'];
+        $this->assertTrue(is_array($result), 'fetch_tabicatora_record: result is not array');
+        $this->assertEquals(1, count($result), 'fetch_tabicatora_record: wrong result count');
+        $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_tabicatora_record: id_ords is null');
+        $this->assertTrue(in_array($result[0]->id_ords, $expect), 'fetch_tabicatora_record: invalid id_ords');
     }
 
     /** @test */
-    public function fetch_tabicatora_page() {
-
+    public function fetch_tabicatora_page()
+    {
+        $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $this->withSession([]);
         $this->_bypass_cta();
@@ -77,8 +112,9 @@ class TabicatOraTest extends TestCase {
     }
 
     /** @test */
-    public function fetch_tabicatora_status() {
-
+    public function fetch_tabicatora_status()
+    {
+        $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $opinions = $this->_setup_opinions($data);
         $TabicatOra = new TabicatOra;
@@ -99,8 +135,9 @@ class TabicatOraTest extends TestCase {
     }
 
     /** @test */
-    public function update_tabicatora_devices() {
-
+    public function update_tabicatora_devices()
+    {
+        $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
         $opinions = $this->_setup_opinions($data);
         $TabicatOra = new TabicatOra;
@@ -118,16 +155,16 @@ class TabicatOraTest extends TestCase {
                 $this->assertEquals($v->fault_type_id, 0, 'update_tabicatora_devices: fault_type should still be 0: ' . $v->fault_type_id);
             }
         }
-
     }
 
-    protected function _setup_devices() {
-
+    protected function _setup_devices()
+    {
         $data = [
             [
-                'id' => 'anstiftung_1647',
+                'id_ords' => 'anstiftung_1647',
                 'data_provider' => 'anstiftung',
                 'country' => 'DEU',
+                'partner_product_category' => 'Handy / Smartphone / Tablet ~ Tablet',
                 'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '',
@@ -136,11 +173,13 @@ class TabicatOraTest extends TestCase {
                 'problem' => 'startet nicht',
                 'translation' => 'does not start',
                 'language' => 'de',
+                'fault_type_id' => '0',
             ],
             [
-                'id' => 'anstiftung_1657',
+                'id_ords' => 'anstiftung_1657',
                 'data_provider' => 'anstiftung',
                 'country' => 'DEU',
+                'partner_product_category' => 'Handy / Smartphone / Tablet ~ Tablet',
                 'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '',
@@ -149,23 +188,13 @@ class TabicatOraTest extends TestCase {
                 'problem' => 'Akku immer leer',
                 'translation' => 'Battery always empty',
                 'language' => 'de',
+                'fault_type_id' => '0',
             ],
             [
-                'id' => 'anstiftung_1673',
+                'id_ords' => 'anstiftung_2577',
                 'data_provider' => 'anstiftung',
                 'country' => 'DEU',
-                'product_category' => 'Tablet',
-                'brand' => '',
-                'year_of_manufacture' => '',
-                'repair_status' => 'Fixed',
-                'event_date' => '2018-10-20',
-                'problem' => 'Lädt nicht auf',
-                'translation' => 'does not charge',
-                'language' => 'de',
-            ],
-            ['id' => 'anstiftung_2577',
-                'data_provider' => 'anstiftung',
-                'country' => 'DEU',
+                'partner_product_category' => 'Handy / Smartphone / Tablet ~ Tablet',
                 'product_category' => 'Tablet',
                 'brand' => '',
                 'year_of_manufacture' => '',
@@ -173,25 +202,29 @@ class TabicatOraTest extends TestCase {
                 'event_date' => '2019-02-23',
                 'problem' => 'defekt',
                 'translation' => 'malfunction',
-                'language' => 'de'
+                'language' => 'de',
+                'fault_type_id' => '0',
             ],
             [
-                'id' => 'repaircafe_8389',
-                'data_provider' => 'repaircafe',
-                'country' => 'NLD',
+                'id_ords' => 'rcwales_1316',
+                'data_provider' => 'Repair Cafe Wales',
+                'country' => 'GBR',
+                'partner_product_category' => 'Electrical ~ acer tablet',
                 'product_category' => 'Tablet',
-                'brand' => '',
-                'year_of_manufacture' => '2017',
-                'repair_status' => 'Fixed',
-                'event_date' => '2018-08-03',
-                'problem' => 'instellingen onjuist ~ geen toegang tot dropbox',
-                'translation' => 'incorrect settings ~ access to dropbox',
-                'language' => 'nl',
+                'brand' => 'acer tablet',
+                'year_of_manufacture' => '????',
+                'repair_status' => 'End of life',
+                'event_date' => '2019-06-01',
+                'problem' => 'acer tablet won\'t stay on',
+                'translation' => 'acer tablet won\'t stay on',
+                'language' => 'en',
+                'fault_type_id' => '0',
             ],
             [
-                'id' => 'repaircafe_8454',
-                'data_provider' => 'repaircafe',
+                'id_ords' => 'rcint_8454',
+                'data_provider' => 'Repair Café International',
                 'country' => 'NLD',
+                'partner_product_category' => 'Computers/phones ~ Tablet',
                 'product_category' => 'Tablet',
                 'brand' => 'Nokia',
                 'year_of_manufacture' => '1990',
@@ -200,11 +233,13 @@ class TabicatOraTest extends TestCase {
                 'problem' => 'Gaat niet aan na opladen',
                 'translation' => 'Does not turn on after charging',
                 'language' => 'nl',
+                'fault_type_id' => '0',
             ],
             [
-                'id' => 'repaircafe_9462',
-                'data_provider' => 'repaircafe',
+                'id_ords' => 'rcint_9462',
+                'data_provider' => 'Repair Café International',
                 'country' => 'NLD',
+                'partner_product_category' => 'Computers/phones ~ Tablet',
                 'product_category' => 'Tablet',
                 'brand' => 'Apple',
                 'year_of_manufacture' => '2013',
@@ -213,10 +248,13 @@ class TabicatOraTest extends TestCase {
                 'problem' => 'Netwerkstoornis',
                 'translation' => 'network Disorder',
                 'language' => 'nl',
+                'fault_type_id' => '0',
             ],
-            ['id' => 'repaircafe_8243',
-                'data_provider' => 'repaircafe',
+            [
+                'id_ords' => 'rcint_8243',
+                'data_provider' => 'Repair Café International',
                 'country' => 'GBR',
+                'partner_product_category' => 'Computers/phones ~ Tablet',
                 'product_category' => 'Tablet',
                 'brand' => 'Sony',
                 'year_of_manufacture' => '2015',
@@ -224,13 +262,31 @@ class TabicatOraTest extends TestCase {
                 'event_date' => '2018-07-21',
                 'problem' => 'broken screen ~ poorly maintained',
                 'translation' => 'broken screen ~ poorly maintained',
-                'language' => 'en'],
+                'language' => 'en',
+                'fault_type_id' => '0',
+            ],
+            [
+                'id_ords' => 'fixitclinic_141',
+                'data_provider' => 'Fixit Clinic',
+                'country' => 'USA',
+                'partner_product_category' => 'tablet',
+                'product_category' => 'Tablet',
+                'brand' => 'android nexus',
+                'year_of_manufacture' => '2014',
+                'repair_status' => 'Repairable',
+                'event_date' => '2018-07-01',
+                'problem' => 'tablet ~ Broken screen',
+                'translation' => 'tablet ~ Broken screen',
+                'language' => 'en',
+                'fault_type_id' => '0',
+            ],
         ];
         foreach ($data as $k => $v) {
             DB::table('devices_tabicat_ora')->insert([
-                'id_ords' => $v['id'],
+                'id_ords' => $v['id_ords'],
                 'data_provider' => $v['data_provider'],
                 'country' => $v['country'],
+                'partner_product_category' => $v['partner_product_category'],
                 'product_category' => $v['product_category'],
                 'brand' => $v['brand'],
                 'year_of_manufacture' => $v['year_of_manufacture'],
@@ -242,7 +298,7 @@ class TabicatOraTest extends TestCase {
                 'fault_type_id' => 0,
             ]);
             $this->assertDatabaseHas('devices_tabicat_ora', [
-                'id_ords' => $v['id'],
+                'id_ords' => $v['id_ords'],
             ]);
         }
         return $data;
@@ -257,47 +313,46 @@ class TabicatOraTest extends TestCase {
      *
      * @return array
      */
-    protected function _setup_opinions($data) {
-
+    protected function _setup_opinions($data)
+    {
         $opinions = [];
-
         $updates = [];
 
         // $data[0] : 3 opinions with consensus : recat
-        $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
-        $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
-        $opinions[$data[0]['id']][] = $this->_insert_opinion($data[0]['id'], 2);
-        $updates[$data[0]['id']] = 2;
+        $opinions[$data[0]['id_ords']][] = $this->_insert_opinion($data[0]['id_ords'], 2);
+        $opinions[$data[0]['id_ords']][] = $this->_insert_opinion($data[0]['id_ords'], 2);
+        $opinions[$data[0]['id_ords']][] = $this->_insert_opinion($data[0]['id_ords'], 2);
+        $updates[$data[0]['id_ords']] = 2;
 
         // $data[1] : 3 opinions with majority : recat
-        $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 2);
-        $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 2);
-        $opinions[$data[1]['id']][] = $this->_insert_opinion($data[1]['id'], 25);
-        $updates[$data[1]['id']] = 2;
+        $opinions[$data[1]['id_ords']][] = $this->_insert_opinion($data[1]['id_ords'], 2);
+        $opinions[$data[1]['id_ords']][] = $this->_insert_opinion($data[1]['id_ords'], 2);
+        $opinions[$data[1]['id_ords']][] = $this->_insert_opinion($data[1]['id_ords'], 25);
+        $updates[$data[1]['id_ords']] = 2;
 
         // $data[2] : 3 opinions split
-        $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 2);
-        $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 25);
-        $opinions[$data[2]['id']][] = $this->_insert_opinion($data[2]['id'], 26);
+        $opinions[$data[2]['id_ords']][] = $this->_insert_opinion($data[2]['id_ords'], 2);
+        $opinions[$data[2]['id_ords']][] = $this->_insert_opinion($data[2]['id_ords'], 25);
+        $opinions[$data[2]['id_ords']][] = $this->_insert_opinion($data[2]['id_ords'], 26);
 
         // $data[3] : 3 opinions adjudicated : recat
-        $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 2);
-        $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 25);
-        $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 26);
-        DB::update("INSERT INTO devices_faults_tablets_ora_adjudicated SET id_ords = '" . $data[3]['id'] . "', fault_type_id=2");
-        $updates[$data[3]['id']] = 2;
+        $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 2);
+        $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 25);
+        $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 26);
+        DB::update("INSERT INTO devices_faults_tablets_ora_adjudicated SET id_ords = '" . $data[3]['id_ords'] . "', fault_type_id=2");
+        $updates[$data[3]['id_ords']] = 2;
 
         // $devs[4] : 2 opinions with majority : recat
-        $opinions[$data[4]['id']][] = $this->_insert_opinion($data[4]['id'], 2);
-        $opinions[$data[4]['id']][] = $this->_insert_opinion($data[4]['id'], 2);
-        $updates[$data[4]['id']] = 2;
+        $opinions[$data[4]['id_ords']][] = $this->_insert_opinion($data[4]['id_ords'], 2);
+        $opinions[$data[4]['id_ords']][] = $this->_insert_opinion($data[4]['id_ords'], 2);
+        $updates[$data[4]['id_ords']] = 2;
 
         // $devs[5] : 2 opinions split
-        $opinions[$data[5]['id']][] = $this->_insert_opinion($data[5]['id'], 2);
-        $opinions[$data[5]['id']][] = $this->_insert_opinion($data[5]['id'], 25);
+        $opinions[$data[5]['id_ords']][] = $this->_insert_opinion($data[5]['id_ords'], 2);
+        $opinions[$data[5]['id_ords']][] = $this->_insert_opinion($data[5]['id_ords'], 25);
 
         // $devs[6] : 1 opinion
-        $opinions[$data[6]['id']][] = $this->_insert_opinion($data[6]['id'], 26);
+        $opinions[$data[6]['id_ords']][] = $this->_insert_opinion($data[6]['id_ords'], 26);
 
         $status = [
             'total_devices' => 8,
@@ -315,7 +370,7 @@ class TabicatOraTest extends TestCase {
             'total_splits' => 1,
             'list_splits' => [
                 0 => [
-                    'id_ords' => $data[2]['id'],
+                    'id_ords' => $data[2]['id_ords'],
                     'all_crowd_opinions_count' => 3,
                     'opinions' => 'Other,Screen,Unknown',
                 ],
@@ -329,7 +384,8 @@ class TabicatOraTest extends TestCase {
         ];
     }
 
-    protected function _insert_opinion($id_ords, $fault_type_id) {
+    protected function _insert_opinion($id_ords, $fault_type_id)
+    {
         $insert = [
             'id_ords' => $id_ords,
             'fault_type_id' => $fault_type_id,
@@ -341,10 +397,53 @@ class TabicatOraTest extends TestCase {
         return $insert;
     }
 
-    protected function _bypass_cta() {
+    protected function _bypass_cta()
+    {
         $this->app['session']->put('microtask.cta', 1);
         $this->app['session']->put('microtask.clicks', 5);
         $this->app['session']->put('microtask.sesh', \Carbon\Carbon::now()->timestamp);
     }
 
+    protected function _setup_fault_types()
+    {
+
+        $fault_types = [
+            1 => [
+                'id' => 1,
+                'title' => 'Power/battery',
+                'description' => '',
+                'regex' => 'batter|power|start',
+            ],
+            2 => [
+                'id' => 2,
+                'title' => 'Screen',
+                'description' => 'LCD/LED screen problem',
+                'regex' => 'screen|display',
+            ],
+            3 => [
+                'id' => 3,
+                'title' => 'Stuck booting',
+                'description' => 'Powers on but OS does not load/errors',
+                'regex' => 'start|boot',
+            ],
+            25 => [
+                'id' => 25,
+                'title' => 'Unknown',
+                'description' => 'Not enough info to determine the main fault',
+                'regex' => '',
+            ],
+            26 => [
+                'id' => 26,
+                'title' => 'Other',
+                'description' => 'Main fault is known but there is no option for it',
+                'regex' => '',
+            ],
+        ];
+
+        foreach ($fault_types as $row) {
+            DB::table('fault_types_mobiles')->insert($row);
+            $this->assertDatabaseHas('fault_types_mobiles', ['id' => $row['id']]);
+        };
+        return $fault_types;
+    }
 }
