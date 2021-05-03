@@ -86,6 +86,10 @@ class TabicatOraTest extends TestCase {
         $this->assertTrue(is_array($result));
         foreach ($opinions['status'] as $k => $v) {
             $this->assertTrue(isset($result, $k), 'fetch_tabicatora_status: missing key - ' . $k);
+            if ($k == 'progress') {
+                $this->assertEquals($v,$result['progress']);
+                continue;
+            }
             if (!is_array($v)) {
                 $this->assertEquals($v, $result[$k][0]->total,   'fetch_tabicatora_status: wrong ' . $k);
             } else {
@@ -320,6 +324,7 @@ class TabicatOraTest extends TestCase {
                     'opinions' => 'Other,Screen,Unknown',
                 ],
             ],
+            'progress' => 63,
         ];
 
         return [
