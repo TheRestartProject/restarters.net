@@ -1,7 +1,7 @@
 <?php
 
 return array (
-  'task' => 
+  'task' =>
   array (
     'where_is_the_main_fault' => 'Where is the main fault',
     'fetch_another' => 'I don\'t know, fetch another repair',
@@ -9,7 +9,7 @@ return array (
     'translate' => 'Translate',
     'go_with' => 'Go with',
   ),
-  'status' => 
+  'status' =>
   array (
     'status' => 'Status',
     'items_opinions' => 'Items / opinions',
@@ -25,5 +25,6 @@ return array (
     'problem' => 'Problem',
     'number_of_records' => 'Number of records',
     'winning_opinion' => 'Winning opinion',
+    'progress' => 'complete',
   ),
 );
