@@ -41,8 +41,7 @@
             </div>
             <div class="col-12 text-left">
                 @if (!$signpost)
-                <p class="alert information-alert banner alert-secondary">@lang('tabicatora.task.strapline')
-                    <span class="action-text-left">i</span>
+                <p>@lang('tabicatora.task.strapline')
                     <a href="javascript:void(0);" id="a-info-open" data-toggle="modal" data-target="#tabicatoraInfoModal">@lang('tabicatora.task.learn_more')</a>
                 </p>
                 @else
