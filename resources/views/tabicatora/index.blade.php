@@ -35,14 +35,19 @@
                    class="btn btn-primary ml-2">
                     @lang('tabicatora.about')
                 </a>
-                <a class="btn btn-primary " href="{{ '/tabicat/status' . ($partner ? '?partner=$partner' : '') }}">
+                <a class="btn btn-primary " href="{{ '/tabicat/status' }}">
                     @lang('tabicatora.status.status')
                 </a>
             </div>
             <div class="col-12 text-left">
-                <p>@lang('tabicatora.task.strapline')
+                @if (!$signpost)
+                <p class="alert information-alert banner alert-secondary">@lang('tabicatora.task.strapline')
+                    <span class="action-text-left">i</span>
                     <a href="javascript:void(0);" id="a-info-open" data-toggle="modal" data-target="#tabicatoraInfoModal">@lang('tabicatora.task.learn_more')</a>
                 </p>
+                @else
+                <p class="alert information-alert banner alert-secondary">@lang('tabicatora.task.signpost_' . $signpost)</p>
+                @endif
             </div>
         </div>
         <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>

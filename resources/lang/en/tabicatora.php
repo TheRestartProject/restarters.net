@@ -12,6 +12,11 @@ return array (
     'source' => 'Source',
     'strapline' => 'Simply read the information about the broken device and select the type of fault described from the list underneath.',
     'learn_more' => 'Learn more',
+    'signpost_1' => '#1: LCA stat (e.g.: Did you know…? Making one new tablet produces over 100 kg of CO2? / Over its whole life, an average tablet produces nearly 150 kg of CO2. But over 80% of that impact occurs before it’s switched on for the first time.)',
+    'signpost_2' => '#2: Why tablets?',
+    'signpost_3' => '#3: Why now? (new EU regulation on smartphones/tablets in development, likely to inform UK approach as well)',
+    'signpost_4' => '#4: Why community data is useful (perhaps mentioning an interesting finding from MobiFix TBC)',
+
   ),
   'status' =>
   array (

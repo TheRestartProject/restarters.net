@@ -21,13 +21,13 @@ class TabicatOraController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
-        $partner = $request->input('partner', NULL);
+        $signpost = FALSE;
         if (Auth::check()) {
             $user = Auth::user();
         } else {
             $user = Microtask::getAnonUserCta($request);
             if ($user->action) {
-                return redirect()->action('TabicatOraController@cta', ['partner' => $partner]);
+                return redirect()->action('TabicatOraController@cta');
             }
         }
         $this->Model = new TabicatOra;
@@ -47,6 +47,13 @@ class TabicatOraController extends Controller {
             if (!$success) {
                 logger('TabiCat error on insert.');
                 logger(print_r($insert, 1));
+            }
+            // show signposts after each submit up to 4 times
+            $signpost = $request->session()->get('microtask.sp', 0);
+            if ($signpost < 4) {
+                $request->session()->put('microtask.sp', ++$signpost);
+            } else {
+                $signpost = FALSE;
             }
         }
         $fault = $this->_fetchRecord($request);
@@ -68,7 +75,7 @@ class TabicatOraController extends Controller {
             'title' => 'TabiCat',
             'fault' => $fault,
             'user' => $user,
-            'partner' => $partner,
+            'signpost' => $signpost,
             'locale' => $this->_getUserLocale(),
         ]);
     }
@@ -125,7 +132,6 @@ class TabicatOraController extends Controller {
 
 //        $request->session()->flush();
         $result = FALSE;
-        $partner = $request->input('partner', NULL);
         $exclusions = $request->session()->get('tabicatora.exclusions', []);
         $this->Model = new TabicatOra;
         $locale = $this->_getUserLocale();
