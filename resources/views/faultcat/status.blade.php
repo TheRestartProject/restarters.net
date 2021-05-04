@@ -32,6 +32,11 @@
                 </a>
             </div>
         </div>
+        @if(session()->has('success'))
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
+            FaultCat is now closed, thanks to everyone who helped!
+        </div>
+        @endif
         @if (isset($status))
             <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
                 <div class="col">
