@@ -182,6 +182,9 @@
                       </div>
                     </div>
 
+                    <a href="/party/duplicate/{{ $formdata->id }}" class="btn btn-primary btn-md mb-4">
+                      {{ __('events.duplicate_event') }}
+                    </a>
                     @if( FixometerHelper::userCanApproveEvent($formdata->id) && is_null($formdata->wordpress_post_id) )
                     <div class="form-group">
                       <div class="row">
