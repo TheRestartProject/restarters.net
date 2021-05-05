@@ -41,15 +41,17 @@
             </div>
             <div class="col-12 text-left">
                 @if (!$signpost)
-                <p>@lang('tabicatora.task.strapline')
+                <p class="strapline_0">@lang('tabicatora.task.strapline')
                     <a href="javascript:void(0);" id="a-info-open" data-toggle="modal" data-target="#tabicatoraInfoModal">@lang('tabicatora.task.learn_more')</a>
                 </p>
                 @else
-                <p class="alert information-alert banner alert-secondary">@lang('tabicatora.task.signpost_' . $signpost)</p>
+                <p class="alert information-alert banner alert-secondary strapline_{{ $signpost }}">@lang('tabicatora.task.signpost_' . $signpost)</p>
                 @endif
             </div>
         </div>
-        <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>
+
+        <a id="btn-cta-open" data-toggle="modal" data-target="#taskctaModal" class="hide">cta</a>
+        <a id="btn-survey-open" data-toggle="modal" data-target="#tasksurveyModal" class="hide">survey</a>
 
         @if($errors->any())
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
@@ -137,6 +139,7 @@
         </a>
     </div>
     @include('tabicatora/info-modal')
+    @include('tabicatora/task-survey-modal')
     @include('partials/task-cta-ora-modal')
 </section>
 
@@ -170,9 +173,6 @@
             } else if (e.code == 'KeyI') {
                 e.preventDefault();
                 document.getElementById('btn-info-open').click();
-            } else if (e.code == 'KeyC') {
-                e.preventDefault();
-                document.getElementById('btn-cta-open').click();
             }
         }, false);
         function doOption(e) {
@@ -209,6 +209,10 @@
 
         if (window.location.href.indexOf('cta') != -1) {
             document.getElementById('btn-cta-open').click();
+        }
+
+        if (window.location.href.indexOf('survey') != -1) {
+            document.getElementById('btn-survey-open').click();
         }
 
     }, false);</script>

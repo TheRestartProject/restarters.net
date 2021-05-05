@@ -16,6 +16,7 @@ return array (
     'signpost_2' => '#2: Why tablets?',
     'signpost_3' => '#3: Why now? (new EU regulation on smartphones/tablets in development, likely to inform UK approach as well)',
     'signpost_4' => '#4: Why community data is useful (perhaps mentioning an interesting finding from MobiFix TBC)',
+    'signpost_5' => '#5: Thank you and please take our <a href="https://restarters.net/survey" target="_blank">survey</a>',
 
   ),
   'status' =>
@@ -52,5 +53,20 @@ return array (
     'body-s3-p1' => 'TabiCat uses information from the <a href=":url" target="_blank">Open Repair Alliance</a>, which collects data about broken devices that real people around the world have tried to fix at community events, such as Repair Cafés and Restart Parties.',
     'body-s4-header' => 'More questions?',
     'body-s4-p1' => 'Find out more, and give us your feedback, in the <a href=":url" target="_blank">TabiCat discussion</a>.',
+  ),
+  'survey' =>
+  array (
+    'header' => 'Survey',
+    'q1' => 'TabiCat has increased my interest in repairing',
+    'q2' => 'TabiCat has made me think more about electronic waste',
+    'q3' => 'TabiCat has changed how I think about buying electronics',
+    'q4' => 'TabiCat has changed my view of the importance of repair',
+    'a1' => 'Strongly disagree',
+    'a2' => 'Disagree',
+    'a3' => 'Neutral',
+    'a4' => 'Agree',
+    'a5' => 'Strongly agree',
+    'send' => 'Send',
+    'skip' => 'Skip',
   ),
 );

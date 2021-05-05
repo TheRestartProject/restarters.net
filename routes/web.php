@@ -112,12 +112,14 @@ Route::prefix('TabiCat')->group(function () {
     Route::post('/', 'TabicatOraController@index');
     Route::get('/cta', 'TabicatOraController@cta');
     Route::get('/status', 'TabicatOraController@status');
+    Route::get('/survey', 'TabicatOraController@survey');
 });
 Route::prefix('tabicat')->group(function () {
     Route::get('/', 'TabicatOraController@index');
     Route::post('/', 'TabicatOraController@index');
     Route::get('/cta', 'TabicatOraController@cta');
     Route::get('/status', 'TabicatOraController@status');
+    Route::get('/survey', 'TabicatOraController@survey');
 });
 
 Route::prefix('PrintCat')->group(function () {
