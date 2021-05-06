@@ -28,6 +28,8 @@ return array(
     'App\\Console\\Commands\\SyncMiscCategories' => $baseDir . '/app/Console/Commands/SyncMiscCategories.php',
     'App\\Console\\Commands\\SyncMobiFixOra' => $baseDir . '/app/Console/Commands/SyncMobiFixOra.php',
     'App\\Console\\Commands\\SyncNetworkUsersToDiscourseGroup' => $baseDir . '/app/Console/Commands/SyncNetworkUsersToDiscourseGroup.php',
+    'App\\Console\\Commands\\SyncPrintCatOra' => $baseDir . '/app/Console/Commands/SyncPrintCatOra.php',
+    'App\\Console\\Commands\\SyncTabiCatOra' => $baseDir . '/app/Console/Commands/SyncTabiCatOra.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Dashboard' => $baseDir . '/app/Dashboard.php',
     'App\\Device' => $baseDir . '/app/Device.php',
