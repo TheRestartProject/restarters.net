@@ -16,7 +16,7 @@
 @endsection
 
 @section('title')
-<?php echo $title; ?>
+    {{ $title }}
 @endsection
 
 @section('content')
@@ -65,9 +65,9 @@
                 <div class="row">
                     <div class="col">
                         <p>
-                            <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@lang('tabicatora.task.source'): @php( print($fault->partner))</span>
+                            <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@lang('tabicatora.task.source'): {{ $fault->partner }}</span>
                             @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
-                            <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@php( print($fault->brand))</span>
+                            <span class="btn btn-md py-1 py-sm-2 btn-fault-info">{{ $fault->brand }}</span>
                             @endif
                             @if ($fault->repair_status !== 'Unknown')
                             <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@lang($fault->repair_status)</span>
@@ -77,14 +77,11 @@
                 </div>
                 <div class="row">
                     <div class="col-8 offset-sm-2">
-                        <p class="subtitle">
-                            @php( print( $fault->problem))
-                        </p>
+                        <p class="subtitle">{{ $fault->problem }}</p>
                     </div>
                     <div class="col-4 col-sm-2">
                         <button id="btn-translate" class="pull-right btn btn-md btn-dark px-3 py-1">
-
-                            <a href="https://translate.google.com/#view=home&op=translate&sl=@php( print($fault->language))&tl=@php( print($locale))&text=@php( print($fault->translate))" target="_blank">
+                            <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text=@{{ $fault->translate }}" target="_blank">
                                 @lang('tabicatora.task.translate')
                             </a>
                         </button>
@@ -99,14 +96,14 @@
                     <div class="col panel p-3">
                         <p><span class="question">@lang('tabicatora.task.where_is_the_main_fault')?</span></p>
                         <div class="container">
-                            <input type="hidden" id="id-ords" name="id-ords" value="@php( print($fault->id_ords))">
+                            <input type="hidden" id="id-ords" name="id-ords" value="{{ $fault->id_ords }}">
                             <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
                             @if (count($fault->suggestions))
                             <div class="buttons suggestions">
                                 <p class="title is-size-6-mobile is-size-6-tablet">@lang('tabicatora.task.suggestions')</p>
                                 <p>
                                     @foreach($fault->suggestions as $fault_type)
-                                    <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip" data-fid="@php( print($fault_type->id) )">@lang($fault_type->title)</button>
+                                    <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
                                     @endforeach
                                 </p>
                             </div>
@@ -117,7 +114,7 @@
                                 </p>
                                 <div class="buttons">
                                     @foreach($fault->faulttypes as $fault_type)
-                                    <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="@php( print($fault_type->id) )">@lang($fault_type->title)</button>
+                                    <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
                                     @endforeach
                                 </div>
                             </div>
