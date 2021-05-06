@@ -29,36 +29,49 @@ class TabicatOra extends Model {
      *
      * @return array
      */
-    public function fetchFault($exclusions = [], $partner = NULL) {
-        $sql = $this->_getSQL($exclusions, $partner);
-        return DB::select($sql);
+    public function fetchFault($exclusions = [], $locale = NULL) {
+        $result = [];
+        $records = DB::select("SELECT COUNT(*) as total FROM `devices_tabicat_ora`");
+        if ($records[0]->total > count($exclusions)) {
+            // try once with locale, even if it is NULL
+            $sql = $this->_getSQL($exclusions, $locale);
+            $result = DB::select($sql);
+            if (!$result) {
+                // if no user-lang recs left, get one without locale
+                $sql = $this->_getSQL($exclusions);
+                $result = DB::select($sql);
+            }
+        }
+        return $result;
     }
 
-    protected function _getSQL($exclusions = [], $partner = NULL) {
-        $sql = "SELECT
+    protected function _getSQL($exclusions = [], $locale = NULL) {
+         $sql = "SELECT
+COUNT(o.fault_type_id) AS opinions,
+COUNT(DISTINCT o.fault_type_id) AS fault_types,
+GROUP_CONCAT(COALESCE(o.fault_type_id,0)) AS fault_type_id,
 d.`id_ords` as id_ords,
 d.`data_provider` as partner,
 TRIM(d.`brand`) as brand,
 d.`repair_status` as repair_status,
 TRIM(d.`problem`) as problem,
 d.`language` as language,
-TRIM(d.`translation`) as translation,
-COUNT(o.`id_ords`) as opinions_count
-FROM `devices_tabicat_ora` d
-LEFT JOIN `devices_faults_tablets_ora_opinions` o ON o.`id_ords` = d.`id_ords`
+TRIM(d.`translation`) as translation
+FROM devices_tabicat_ora d
+LEFT OUTER JOIN devices_faults_tablets_ora_opinions o ON o.id_ords = d.id_ords
 WHERE 1 %s
-GROUP BY d.`id_ords`
-HAVING opinions_count < 3
+GROUP BY d.id_ords
+HAVING (opinions < 2) OR (opinions = 2 AND fault_types = 2)
 ORDER BY rand()
 LIMIT 1;
 ";
         $and = '';
-        if (!is_null($partner)) {
-            $and .= "\nAND d.`data_provider` = '$partner'";
-        }
         if (!empty($exclusions)) {
             $ids = implode("','", $exclusions);
             $and .= "\nAND d.`id_ords` NOT IN ('$ids')";
+        }
+        if (!is_null($locale)) {
+            $and .= "\nAND (d.`language` = '$locale')";
         }
         $sql = sprintf($sql, $and);
         return $sql;

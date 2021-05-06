@@ -1,25 +1,50 @@
 <?php
 
 return array (
-  'task' => 
+  'task' =>
   array (
-    'where_is_the_main_fault' => 'Wo ist der hauptfehler',
-    'go_with' => 'Geh mit',
+    'where_is_the_main_fault' => 'Was ist der Hauptfehler',
+    'fetch_another' => 'Ich weiß es nicht, zeig eine andere Reparatur',
+    'suggestions' => 'Vorschläge',
+    'translate' => 'Übersetzen',
+    'go_with' => 'Wähle',
+    'source' => 'Quelle',
+    'strapline' => 'Lesen Sie einfach die Informationen über den defekten Drucker und wählen Sie die Art des beschriebenen Fehlers aus der Liste darunter aus.',
   ),
-  'status' => 
+  'status' =>
   array (
     'status' => 'Status',
-    'items_opinions' => 'Artikel / meinungen',
-    'items_with_split_opinions' => 'Artikel mit geteilten meinungen',
-    'items_with_majority_opinions ' => 'Artikel mit mehrheitsmeinungen',
-    'with_3_opinions' => 'mit 3 meinungen',
-    'with_2_opinions' => 'mit 2 meinungen',
-    'with_1_opinion' => 'mit 1 meinung',
-    'with_0_opinions' => 'mit 0 meinungen',
+    'items_opinions' => 'Artikel / Meinungen',
+    'items_split_opinions' => 'Artikel mit geteilten Meinungen',
+    'items_majority_opinions' => 'Artikel mit Mehrheitsmeinungen',
+    'items_3_opinions' => 'mit 3 Meinungen',
+    'items_2_opinions' => 'mit 2 Meinungen',
+    'items_1_opinion' => 'mit 1 Meinung',
+    'items_0_opinions' => 'mit 0 Meinungen',
     'total' => 'Gesamt',
     'opinions' => 'Meinungen',
     'brand' => 'Marke',
     'problem' => 'Problem',
-    'winning_opinion' => 'Gewinnende meinung',
+    'number_of_records' => 'Anzahl der Einträge',
+    'winning_opinion' => 'Siegermeinung',
+    'task_completed' => 'Du hast alle Einträge gesehen, danke',
   ),
+  'info' =>
+  array (
+    'body-s1-header' => 'Was ist TabiCat?',
+    'body-s1-p1' => 'Drucker können frustrierend sein, leicht kaputt gehen und sind oft schwer zu reparieren. Wir wollen verstehen, warum Drucker ausfallen, damit wir Entscheidungsträgern mitteilen können, wie zukünftige Modelle einfacher zu reparieren sind. Reparatur vermeidet Abfall und schont die Ressourcen unseres Planeten.',
+    'body-s1-p2' => 'Mit TabiCat können Sie sich an unserer Untersuchung beteiligen. Wir haben Informationen zu über 800 defekten Druckern gesammelt und brauchen Ihre Hilfe, um diese zu kategorisieren.',
+    'body-s2-header' => 'Was muss ich tun?',
+    'body-s2-p1' => 'Lesen Sie einfach die Informationen über den defekten Drucker und wählen Sie die Art des beschriebenen Fehlers aus der Liste darunter aus. Wenn Sie sich nicht sicher sind, wählen Sie unten einfach "Ich weiß nicht". Sobald Sie eine Option ausgewählt haben, zeigen wir Ihnen einen anderen Drucker. Je mehr Druckerfehler Sie kategorisieren können, desto mehr lernen wir! TabiCat zeigt jeden Drucker 3 Personen, die helfen, die richtige Kategorie zu bestätigen.',
+    'body-s3-header' => 'Woher bekommt TabiCat Daten über defekte Drucker?',
+    'body-s3-p1' => 'TabiCat verwendet Informationen von der <a href=":url" target="_blank">Open Repair Alliance</a>, die Daten über kaputte Geräte sammelt, die echte Menschen auf der ganzen Welt bei Reparaturveranstaltungen wie Repair Cafés und Restart-Partys zu reparieren versucht haben.',
+    'body-s4-header' => 'Noch Fragen?',
+    'body-s4-p1' => 'Erfahren Sie mehr, stellen Sie Fragen und geben Sie uns Ihr Feedback, in der <a href=":url" target="_blank">TabiCat-Diskussion</a>.',
+    'title' => 'Danke, dass Sie TabiCat ausprobiert haben',
+  ),
+  'branding' =>
+  array (
+    'powered_by' => 'Unter Verwendung von Daten aus:',
+  ),
+  'about' => 'Mehr Informationen',
 );
