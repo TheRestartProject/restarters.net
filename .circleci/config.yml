@@ -4,7 +4,7 @@ jobs:
   build:
     branches:
       only:
-        - DOT-1440_circle_ci # temp
+        - circleci-project-setup # temp
     docker:
       - image: circleci/php:7.4-node-browsers
         environment:
