@@ -96,11 +96,7 @@
                         <div class="col-lg-7">
                           <div class="form-group">
                             <label for="autocomplete">@lang('groups.location'):</label>
-                            <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ $formdata->location }}"
-                            @if( !Auth::user()->hasRole('Administrator') && !Auth::user()->hasRole('NetworkCoordinator') )
-                               readonly
-                            @endif
-                            />
+                            <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ $formdata->location }}" />
 
                             <small id="locationHelpBlock" class="form-text text-muted">
                               @lang('groups.groups_location_small')
