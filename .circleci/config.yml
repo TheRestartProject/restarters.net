@@ -12,6 +12,7 @@ jobs:
     branches:
       only:
         - develop
+        - circleci-project-setup
     docker:
       - image: circleci/php:7.4-node-browsers
         name: restarters.test
@@ -46,3 +47,5 @@ jobs:
 
       # Run just one test for now.
       - run: ./phpunit --bootstrap vendor/autoload.php tests/Unit/UsernameGeneratorTest.php
+
+      - run: php composer/vendor/bin/php-coveralls -v
