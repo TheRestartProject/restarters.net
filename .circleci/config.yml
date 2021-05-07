@@ -11,7 +11,7 @@ jobs:
   build:
     branches:
       only:
-        - circleci-project-setup # temp
+        - develop
     docker:
       - image: circleci/php:7.4-node-browsers
         name: restarters.test
