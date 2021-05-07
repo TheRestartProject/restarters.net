@@ -48,4 +48,4 @@ jobs:
       # Run just one test for now.
       - run: ./phpunit --bootstrap vendor/autoload.php tests/Unit/UsernameGeneratorTest.php
 
-      - run: php composer/vendor/bin/php-coveralls -v
+      - run: php vendor/bin/php-coveralls -v
