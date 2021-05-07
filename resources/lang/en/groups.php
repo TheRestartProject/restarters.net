@@ -77,6 +77,7 @@ return array (
   'edit_group_save_changes' => 'Save changes',
   'edit_group_text' => 'Go ahead and change or improve your group\'s profile.',
   'groups_location_small' => 'I.e the place where the fixing happens!',
+  'groups_postcode_small' => '(Optional)',
   'group_image' => 'Group image',
   'tag-1' => 'Tag 1',
   'tag-2' => 'Tag 2',

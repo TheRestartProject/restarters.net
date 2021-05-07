@@ -96,7 +96,11 @@
                         <div class="col-lg-7">
                           <div class="form-group">
                             <label for="autocomplete">@lang('groups.location'):</label>
-                            <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ $formdata->location }}" />
+                            <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ $formdata->location }}"
+                            @if( !Auth::user()->hasRole('Administrator') && !Auth::user()->hasRole('NetworkCoordinator') )
+                               readonly
+                            @endif
+                            />
 
                             <small id="locationHelpBlock" class="form-text text-muted">
                               @lang('groups.groups_location_small')
@@ -110,7 +114,11 @@
                           <input type="hidden" id="country" disabled>
                           <div class="form-group">
                             <label for="postcode">@lang('groups.postcode'):</label>
-                            <input type="text" id="postcode" placeholder="Enter your address" name="postcode" class="form-control field" aria-describedby="postcodeHelpBlock" value="{{ $formdata->postcode }}" />
+                            <input type="text" id="postcode" name="postcode" class="form-control field" aria-describedby="postcodeHelpBlock" value="{{ $formdata->postcode }}"
+                            @if( !Auth::user()->hasRole('Administrator') && !Auth::user()->hasRole('NetworkCoordinator') )
+                              readonly
+                            @endif
+                            />
 
                             <small id="postcodeHelpBlock" class="form-text text-muted">
                               @lang('groups.groups_postcode_small')
