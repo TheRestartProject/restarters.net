@@ -48,4 +48,4 @@ jobs:
       # Run just one test for now.
       - run: export XDEBUG_MODE=coverage;./phpunit --bootstrap vendor/autoload.php -dxdebug.coverage_enable=1 --coverage-clover tests/clover.xml tests/Unit/UsernameGeneratorTest.php
 
-      - run: php vendor/bin/php-coveralls -v tests/clover.xml
+      - run: php vendor/bin/php-coveralls -v
