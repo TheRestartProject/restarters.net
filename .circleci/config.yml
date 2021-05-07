@@ -6,6 +6,7 @@ jobs:
       only:
         - circleci-project-setup # temp
     docker:
+      - name: restarters.test
       - image: circleci/php:7.4-node-browsers
         environment:
           - DB_CONNECTION: mysql
@@ -25,7 +26,6 @@ jobs:
       - run: sudo apt update
       - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev
       - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl
-      - run: sudo echo "127.0.0.1 restarters.test talk.restarters.test" >> /etc/hosts
       - run: cp .env.example .env
 
       # TODO Cache dependencies?
@@ -35,3 +35,5 @@ jobs:
       # prepare the database
       - run: php artisan key:generate
       - run: php artisan migrate -v1
+
+      - run: ping restarters.test
