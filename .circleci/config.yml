@@ -46,6 +46,6 @@ jobs:
       - run: wget -O phpunit https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
 
       # Run just one test for now.
-      - run: ./phpunit --bootstrap vendor/autoload.php tests/Unit/UsernameGeneratorTest.php
+      - run: ./phpunit --bootstrap vendor/autoload.php -dxdebug.coverage_enable=1 --coverage-clover tests/clover.xml tests/Unit/UsernameGeneratorTest.php
 
-      - run: php vendor/bin/php-coveralls -v
+      - run: php vendor/bin/php-coveralls -v tests/clover.xml
