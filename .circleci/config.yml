@@ -1,5 +1,12 @@
 version: 2
 
+dependencies:
+  pre:
+    - curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    - sudo dpkg -i google-chrome.deb
+    - sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
+    - rm google-chrome.deb
+    -
 jobs:
   build:
     branches:
@@ -17,6 +24,7 @@ jobs:
           - DB_PASSWORD: s3cr3t
       - image: circleci/mysql:5.7.33
         environment:
+          # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
           - MYSQL_ROOT_PASSWORD: s3cr3t
           - MYSQL_DATABASE: restarters_db
           - MYSQL_USER: restarters
@@ -24,15 +32,17 @@ jobs:
     steps:
       - checkout
       - run: sudo apt update
-      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev
+      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim
       - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl
       - run: cp .env.example .env
 
-      # TODO Cache dependencies?
-      - run: wget https://getcomposer.org/composer-1.phar; php composer-1.phar install --no-dev
+      - run: wget https://getcomposer.org/composer-1.phar; php composer-1.phar install
       - run: npm install
 
       - run: php artisan key:generate
       - run: php artisan migrate
 
-      - run: ping restarters.test
+      - run: wget -O phpunit https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
+
+      # Run just one test for now.
+      - run: ./phpunit --bootstrap vendor/autoload.php tests/Unit/UsernameGeneratorTest.php
