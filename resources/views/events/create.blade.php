@@ -136,7 +136,7 @@
                         <label for="field_event_time">@lang('events.field_event_time'):</label>
                         @if ($agent->browser() == 'Safari' && $agent->isDesktop())
                             <div class="vue">
-                                <EventTimeRangePicker />
+                              <EventTimeRangePicker starttimeinit=" {{ old('start') }} " endtimeinit=" {{ old('end') }} " />
                             </div>
                             @if($errors->has('start')) 
                                 <p class="text-danger">{{ $errors->first('start') }}</p>
