@@ -32,8 +32,7 @@ jobs:
       - run: wget https://getcomposer.org/composer-1.phar; php composer-1.phar install --no-dev
       - run: npm install
 
-      # prepare the database
       - run: php artisan key:generate
-      - run: php artisan migrate -v1
+      - run: php artisan migrate
 
       - run: ping restarters.test
