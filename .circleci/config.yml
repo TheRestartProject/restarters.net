@@ -23,7 +23,7 @@ jobs:
     steps:
       - checkout
       - run: sudo apt update
-      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl-devel
+      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev
       - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl
 
       # TODO Cache dependencies?
