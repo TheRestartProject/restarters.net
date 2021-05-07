@@ -6,8 +6,8 @@ jobs:
       only:
         - circleci-project-setup # temp
     docker:
-      - name: restarters.test
       - image: circleci/php:7.4-node-browsers
+        name: restarters.test
         environment:
           - DB_CONNECTION: mysql
           - DB_HOST: 127.0.0.1
