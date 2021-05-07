@@ -104,12 +104,11 @@ class TabicatOraController extends Controller {
         $partner = $request->input('partner', NULL);
         $this->Model = new TabicatOra;
         $data = $this->Model->fetchStatus($partner);
-        logger(print_r($data,1));
         return view('tabicatora.status', [
             'title' => 'TabiCat',
             'status' => $data,
             'user' => $user,
-            'complete' => ($data['progress'][0]->percent == 100),
+            'complete' => ($data['progress']->percent == 100),
             'partner' => $request->input('partner', NULL),
         ]);
     }
