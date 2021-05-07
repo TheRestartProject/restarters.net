@@ -1,58 +1,39 @@
-# PHP CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-php/ for more details
-#
 version: 2
+
 jobs:
   build:
+    branches:
+      only:
+        - DOT-1440_circle_ci # temp
     docker:
-      # Specify the version you desire here
-      - image: circleci/php:7.1-node-browsers
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # Using the RAM variation mitigates I/O contention
-      # for database intensive operations.
-      # - image: circleci/mysql:5.7-ram
-      #
-      # - image: redis:2.8.19
-
+      - image: circleci/php:7.4-node-browsers
+        environment:
+          - DB_CONNECTION: mysql
+          - DB_HOST: 127.0.0.1
+          - DB_PORT: 3306
+          - DB_DATABASE: restarters_db
+          - DB_USERNAME: restarters
+          - DB_PASSWORD: s3cr3t
+      - image: circleci/mysql:5.7.33
+        environment:
+          - MYSQL_ROOT_PASSWORD: s3cr3t
+          - MYSQL_DATABASE: restarters_db
+          - MYSQL_USER: restarters
+          - MYSQL_PASSWORD: s3cr3t
     steps:
       - checkout
+      - run: sudo apt update
+      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev
+      - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl
 
-      - run: sudo apt update # PHP CircleCI 2.0 Configuration File# PHP CircleCI 2.0 Configuration File sudo apt install zlib1g-dev libsqlite3-dev
-      - run: sudo docker-php-ext-install zip
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            # "composer.lock" can be used if it is committed to the repo
-            - v1-dependencies-{{ checksum "composer.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
-      - run: composer install -n --prefer-dist
-
-      - save_cache:
-          key: v1-dependencies-{{ checksum "composer.json" }}
-          paths:
-            - ./vendor
-      - restore_cache:
-          keys:
-            - node-v1-{{ checksum "package.json" }}
-            - node-v1-
-      - run: yarn install
-      - save_cache:
-          key: node-v1-{{ checksum "package.json" }}
-          paths:
-            - node_modules
+      # TODO Cache dependencies?
+      - run: wget https://getcomposer.org/composer-1.phar; php composer-1.phar install
+      - run: npm install
+      - run:
+          name: Setup testing .env
+          command: cp ./compose/test/env .env
 
       # prepare the database
-      - run: touch storage/testing.sqlite
-      - run: php artisan migrate --env=testing --database=sqlite_testing --force
-
-      # run tests with phpunit or codecept
-      #- run: ./vendor/bin/phpunit
-      - run: ./vendor/bin/codecept build
-      - run: ./vendor/bin/codecept run
+      - run:
+          name: Migrate Database
+          command: php artisan migrate -v1
