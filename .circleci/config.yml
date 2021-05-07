@@ -25,16 +25,13 @@ jobs:
       - run: sudo apt update
       - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev
       - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl
-
-      - run:
-          name: Setup testing .env
-          command: cp ./compose/test/env .env
+      - run: echo "127.0.0.1 restarters.test talk.restarters.test" >> /etc/hosts
+      - run: cp .env.example .env
 
       # TODO Cache dependencies?
       - run: wget https://getcomposer.org/composer-1.phar; php composer-1.phar install --no-dev
       - run: npm install
 
       # prepare the database
-      - run:
-          name: Migrate Database
-          command: php artisan migrate -v1
+      - run: php artisan key:generate
+      - run: php artisan migrate -v1
