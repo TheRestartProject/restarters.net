@@ -173,7 +173,7 @@ HAVING
         DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_mobiles_temporary` AS
 SELECT
 o.iddevices,
-(SELECT o1.fault_type FROM devices_faults_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.fault_type ORDER BY COUNT(o1.fault_type) DESC LIMIT 1) AS winning_opinion,
+(SELECT o1.fault_type FROM devices_faults_mobiles_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.fault_type ORDER BY COUNT(o1.fault_type) DESC LIMIT 1) AS winning_opinion,
 ROUND((SELECT COUNT(o2.fault_type) as top_crowd_opinion_count FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.fault_type ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
 (SELECT COUNT(o2.fault_type) as all_votes FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
 COUNT(o.fault_type) AS all_crowd_opinions_count
