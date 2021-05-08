@@ -217,8 +217,11 @@ GROUP BY d.id_ords
 HAVING
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
 ");
-        $result['total_splits'] = [json_decode(json_encode(['total' => count($result['list_splits'])]), FALSE)];
-        $result['progress'] = round((($result['total_recats'][0]->total+$result['total_splits'][0]->total)/$result['total_devices'][0]->total)*100);
+
+        $total_splits = count($result['list_splits']);
+        $result['total_splits'] = [json_decode(json_encode(['total' => $total_splits]), FALSE)];
+        $progress = round((($result['total_recats'][0]->total+$result['total_splits'][0]->total)/$result['total_devices'][0]->total)*100);
+        $result['progress'] = [json_decode(json_encode(['total' => $progress]), FALSE)];
         return $result;
     }
 

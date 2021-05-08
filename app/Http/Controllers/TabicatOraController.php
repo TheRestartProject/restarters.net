@@ -108,7 +108,7 @@ class TabicatOraController extends Controller {
             'title' => 'TabiCat',
             'status' => $data,
             'user' => $user,
-            'complete' => ($data['progress']->percent == 100),
+            'complete' => ($data['progress'][0]->total == 100),
             'partner' => $request->input('partner', NULL),
         ]);
     }

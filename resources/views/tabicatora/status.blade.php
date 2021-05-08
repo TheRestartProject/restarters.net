@@ -89,7 +89,7 @@
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col">
                 <div class="row justify-content-center">
-                    <p><strong>@php( print($status['progress']))% @lang('tabicatora.status.progress')</strong></p>
+                    <p><strong>@php( print($status['progress'][0]->total))% @lang('tabicatora.status.progress')</strong></p>
                 </div>
              </div>
         </div>

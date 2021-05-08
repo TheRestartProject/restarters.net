@@ -119,21 +119,20 @@ class TabicatOraTest extends TestCase
         $opinions = $this->_setup_opinions($data);
         $TabicatOra = new TabicatOra;
         $result = $TabicatOra->fetchStatus();
-        $this->assertTrue(is_array($result));
+        $this->assertTrue(is_array($result), 'fetch_tabicatora_status: result is not array');
         foreach ($opinions['status'] as $k => $v) {
             $this->assertTrue(isset($result, $k), 'fetch_tabicatora_status: missing key - ' . $k);
-            if ($k == 'progress') {
-                $this->assertEquals($v,$result['progress']);
-                continue;
-            }
-            if (!is_array($v)) {
-                $this->assertEquals($v, $result[$k][0]->total,   'fetch_tabicatora_status: wrong ' . $k);
-            } else {
+            if ($k == 'list_recats' || $k == 'list_splits') {
                 $this->assertTrue(is_array($result[$k]), 'fetch_tabicatora_status: not array - ' . $k);
                 foreach ($v[0] as $key => $val) {
                     $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_tabicatora_status #' . $k . ': missing key - ' . $key);
                     $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_tabicatora_status #' . $k . ': wrong ' . $key);
                 }
+            } else {
+                $this->assertEquals(1, count($result[$k]),   'fetch_tabicatora_status: wrong array count ' . $k);
+                $this->assertTrue(is_object($result[$k][0]), 'fetch_tabicatora_status: not object ' . $k);
+                $this->assertTrue(property_exists($result[$k][0], 'total'), 'fetch_tabicatora_status #' . $k . ': missing key - total');
+                $this->assertEquals($v, $result[$k][0]->total,   'fetch_tabicatora_status: wrong total for ' . $k);
             }
         }
     }
