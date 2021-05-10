@@ -1,6 +1,6 @@
 <style>
     /*
-       this is css shared between the main mobifix view,
+       this is css shared between the main tabicat view,
     and the demographics view.  should be moved to a shared layout,
     or into sass.  just putting it here for now to remove duplication
     between the files.
@@ -15,10 +15,11 @@
         float: left; /* bootstrap pull-left class working locally but not on server!  falling back on this. */
     }
 
-    img#mobifix {
+    img#tabicat {
         width: 48px;
         height: 48px;
-        float: right; /* bootstrap pull-right class working locally but not on server!  falling back on this. */
+        float: right;
+        margin-left: 10px;
     }
 
 
@@ -56,8 +57,8 @@
     }
 
     #btn-info-open {
-        float:right;
-        cursor:pointer;
+        float: right;
+        cursor: pointer;
     }
 
     #btn-translate a {
@@ -86,5 +87,14 @@
         -webkit-box-shadow: 6px 6px 0 0 #000;
         box-shadow: 6px 6px 0 0 #eee;
     }
-
+ #ora-partnership hr {
+     width: 50%;
+ }
+ #ora-partnership p {
+     font-size: medium;
+     font-weight: bold;
+ }
+ #ora-partnership img {
+     width: 300px;
+ }
 </style>

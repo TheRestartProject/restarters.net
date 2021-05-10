@@ -26,6 +26,7 @@ class Group extends Model implements Auditable
         'website',
         'area',
         'location',
+        'postcode',
         'latitude',
         'longitude',
         'country',
@@ -86,6 +87,7 @@ class Group extends Model implements Auditable
                     `g`.`longitude` AS `longitude`,
                     `g`.`free_text` AS `free_text`,
                     `g`.`area` AS `area`,
+                    `g`.`postcode` AS `postcode`,
                     `g`.`frequency` AS `frequency`,
                     GROUP_CONCAT(`u`.`name` ORDER BY `u`.`name` ASC SEPARATOR ", "  )  AS `user_list`
                 FROM `'.$this->table.'` AS `g`
@@ -106,6 +108,7 @@ class Group extends Model implements Auditable
                 `g`.`name` AS `name`,
                 `g`.`location` AS `location`,
                 `g`.`area` AS `area`,
+                `g`.`postcode` AS `postcode`,
                 `xi`.`path` AS `path`
 
             FROM `'.$this->table.'` AS `g`

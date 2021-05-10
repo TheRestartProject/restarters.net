@@ -69,8 +69,12 @@ class TabicatOraController extends Controller {
             'fault' => $fault,
             'user' => $user,
             'partner' => $partner,
-            'locale' => substr(App::getLocale(), 0, 2),
+            'locale' => $this->_getUserLocale(),
         ]);
+    }
+
+    protected function _getUserLocale() {
+        return substr(App::getLocale(), 0, 2);
     }
 
     /**
@@ -100,12 +104,11 @@ class TabicatOraController extends Controller {
         $partner = $request->input('partner', NULL);
         $this->Model = new TabicatOra;
         $data = $this->Model->fetchStatus($partner);
-        $complete = $data['total_opinions_2'][0]->total + $data['total_opinions_1'][0]->total + $data['total_opinions_0'][0]->total == 0;
         return view('tabicatora.status', [
             'title' => 'TabiCat',
             'status' => $data,
             'user' => $user,
-            'complete' => $complete,
+            'complete' => ($data['progress'][0]->total == 100),
             'partner' => $request->input('partner', NULL),
         ]);
     }
@@ -124,7 +127,8 @@ class TabicatOraController extends Controller {
         $partner = $request->input('partner', NULL);
         $exclusions = $request->session()->get('tabicatora.exclusions', []);
         $this->Model = new TabicatOra;
-        $fault = $this->Model->fetchFault($exclusions, $partner);
+        $locale = $this->_getUserLocale();
+        $fault = $this->Model->fetchFault($exclusions, $locale);
         if ($fault) {
             $result = $fault[0];
             $request->session()->push('tabicatora.exclusions', $result->id_ords);
