@@ -108,6 +108,22 @@
                           <input type="hidden" id="administrative_area_level_1" disabled>
                           <input type="hidden" id="postal_code" disabled>
                           <input type="hidden" id="country" disabled>
+                          <div class="form-group
+                                      @if( !Auth::user()->hasRole('Administrator') && !Auth::user()->hasRole('NetworkCoordinator') )
+                                      d-none
+                                      @endif
+                                      ">
+                            <label for="postcode">@lang('groups.postcode'):</label>
+                            <input type="text" id="postcode" name="postcode" class="form-control field" aria-describedby="postcodeHelpBlock" value="{{ $formdata->postcode }}"
+                            @if( !Auth::user()->hasRole('Administrator') && !Auth::user()->hasRole('NetworkCoordinator') )
+                              readonly
+                            @endif
+                            />
+
+                            <small id="postcodeHelpBlock" class="form-text text-muted">
+                              @lang('groups.groups_postcode_small')
+                            </small>
+                          </div>
                         </div>
 
                         <div class="col-lg-5">

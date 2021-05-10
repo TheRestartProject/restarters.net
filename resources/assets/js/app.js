@@ -314,6 +314,15 @@ function initAutocomplete() {
       if (componentForm[addressType]) {
         var val = place.address_components[i][componentForm[addressType]];
         document.getElementById(addressType).value = val;
+
+        if (addressType === 'postal_code') {
+          // We have a postcode field which is editable.  If we have no existing postcode and we've just geocoded, then
+          // set up any postcode we have returned as a sensible default.
+          var postcode = document.getElementById('postcode')
+          if (val && !postcode.value) {
+            postcode.value = val;
+          }
+        }
       }
     }
 
