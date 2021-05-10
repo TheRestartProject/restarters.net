@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <section class="groups">
-
+{{--  Dummy--}}
   <div class="container">
 
         @if (\Session::has('success'))
