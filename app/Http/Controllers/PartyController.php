@@ -666,6 +666,7 @@ class PartyController extends Controller
             'device_images' => $device_images,
             'group_volunteers' => $group_volunteers,
             'calendar_links' => $this->generateAddToCalendarLinks($event),
+            'item_types' => Device::getItemTypes()
         ]);
     }
 

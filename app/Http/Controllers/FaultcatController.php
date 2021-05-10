@@ -16,6 +16,9 @@ class FaultcatController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
+
+        return redirect()->action('FaultcatController@status')->withSuccess('done');
+
         if (Auth::check()) {
             $user = Auth::user();
         } else {

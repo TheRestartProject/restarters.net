@@ -10,12 +10,12 @@
           <DeviceCategorySelect :class="{
             'mb-2': true,
             'border-thick': missingCategory
-            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
+            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" @changed="categoryChange" />
+          <DeviceType v-if="!powered || aggregate" class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled" :suppress-type-warning="suppressTypeWarning" :powered="powered" />
           <div v-if="powered">
             <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled" />
             <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
           </div>
-          <DeviceType class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" v-else />
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" />
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled" />
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled" class="mt-2" @remove="removeImage($event)" />
@@ -150,7 +150,12 @@ export default {
       type: Array,
       required: false,
       default: null
-    }
+    },
+    itemTypes: {
+      type: Array,
+      required: false,
+      default: null
+    },
   },
   data () {
     return {
@@ -173,6 +178,29 @@ export default {
     currentCategory() {
       return this.currentDevice ? this.currentDevice.category : null
     },
+    aggregate() {
+      if (!this.currentCategory) {
+        return false
+      }
+
+      if (this.powered && this.currentCategory === CATEGORY_MISC) {
+        return true
+      }
+
+      let ret = false
+
+      this.clusters.forEach((cluster) => {
+        let categories = []
+
+        cluster.categories.forEach((c) => {
+          if (this.currentCategory === c.idcategories) {
+            ret = c.aggregate
+          }
+        })
+      })
+
+      return ret
+    },
     sparePartsNeeded() {
       return this.device.spare_parts === SPARE_PARTS_MANUFACTURER || this.device.spare_parts === SPARE_PARTS_THIRD_PARTY
     },
@@ -189,6 +217,10 @@ export default {
       set(newval) {
         this.currentDevice.wiki = newval
       }
+    },
+    suppressTypeWarning() {
+      // We don't want to show the warning if we have not changed the type since it was last saved.
+      return this.currentDevice && this.device && this.device.item_type === this.currentDevice.item_type
     },
   },
   created() {
@@ -336,6 +368,10 @@ export default {
       })
 
       window.location = '/fixometer'
+    },
+    categoryChange() {
+      // Any item type we might have is no longer valid.
+      this.currentDevice.item_type = null
     }
   }
 }
@@ -449,5 +485,9 @@ h3 {
 /deep/ .card .form-control:disabled {
   // Disabled is what happens for the view that people get if they can't edit the device.
   background-color: white;
+}
+
+/deep/ .form-text {
+    line-height: 1rem;
 }
 </style>

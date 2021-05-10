@@ -64,7 +64,8 @@ class DeviceController extends Controller
             'impact_data' => $global_impact_data,
             'clusters' => $clusters,
             'barriers' => \App\Helpers\FixometerHelper::allBarriers(),
-            'brands' => $brands
+            'brands' => $brands,
+            'item_types' => Device::getItemTypes()
         ]);
     }
 
