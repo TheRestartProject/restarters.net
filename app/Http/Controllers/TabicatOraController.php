@@ -61,6 +61,16 @@ class TabicatOraController extends Controller
                 }
             }
         }
+        // final "thank you" signpost after survey whether submitted or not
+        if ($request->session()->get('tabicatora.redirected_from_survey', FALSE)) {
+            $request->session()->put('tabicatora.redirected_from_survey', FALSE);
+            $signpost = 6;
+        }
+        // no signpost when showing survey
+        if ($request->session()->get('tabicatora.redirect_to_survey', FALSE)) {
+            $request->session()->put('tabicatora.redirect_to_survey', FALSE);
+            $request->session()->put('tabicatora.redirected_from_survey', TRUE);
+        }
         $fault = $this->_fetchRecord($request);
         if (!$fault) {
             return redirect()->action('TabicatOraController@status')->withSuccess('done');
@@ -132,6 +142,7 @@ class TabicatOraController extends Controller
      */
     public function survey(Request $request)
     {
+        $request->session()->put('tabicatora.redirect_to_survey', TRUE);
         return $this->index($request);
     }
 

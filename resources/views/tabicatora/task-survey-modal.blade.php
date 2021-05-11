@@ -96,6 +96,9 @@
 
         document.getElementById('btn-send-survey').addEventListener('click', function(e) {
             // to do: write submit function
+            // placeholder action:
+            e.preventDefault();
+            window.location.replace(window.location.href.replace('/survey', '/'));
         }, true);
 
         document.getElementById('btn-skip-survey').addEventListener('click', function(e) {
