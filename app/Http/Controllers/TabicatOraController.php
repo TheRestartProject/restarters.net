@@ -111,13 +111,12 @@ class TabicatOraController extends Controller
             $user = $this->_anon();
         }
         $this->Model = new TabicatOra;
-        $data = $this->Model->fetchStatus($partner);
+        $data = $this->Model->fetchStatus();
         return view('tabicatora.status', [
             'title' => 'TabiCat',
             'status' => $data,
             'user' => $user,
             'complete' => ($data['progress'][0]->total == 100),
-            'partner' => $request->input('partner', NULL),
         ]);
     }
 

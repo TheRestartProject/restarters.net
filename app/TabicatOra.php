@@ -89,7 +89,7 @@ LIMIT 1;
      *
      * @return mixed
      */
-    public function fetchStatus($partner = NULL) {
+    public function fetchStatus() {
 
         $result = [];
 
