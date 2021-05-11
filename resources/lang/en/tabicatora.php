@@ -17,7 +17,7 @@ return array (
     'signpost_3' => '#3: Why now? (new EU regulation on smartphones/tablets in development, likely to inform UK approach as well)',
     'signpost_4' => '#4: Why community data is useful (perhaps mentioning an interesting finding from MobiFix TBC)',
     'signpost_5' => '#5: Thank you and please take our <a href="https://restarters.net/survey" target="_blank">survey</a>',
-    'signpost_6' => '#6: Thank you! Please join our <a href="https://restarters.net/cta" target="_blank">community</a>',
+    'signpost_6' => '#6: Thank you! Please join our <a href="/tabicat/cta" target="_blank">community</a>',
 
   ),
   'status' =>
