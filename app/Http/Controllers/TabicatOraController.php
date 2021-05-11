@@ -30,7 +30,7 @@ class TabicatOraController extends Controller
         }
         $this->Model = new TabicatOra;
         $signpost = FALSE;
-        // if opinion submission
+        // if opinion is being submitted
         if ($request->has('id-ords')) {
             if (!(is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
                 return redirect()->back()->withErrors(['Oops, there was an error, please try again, sorry! If this error persists please contact The Restart Project.']);
@@ -48,9 +48,19 @@ class TabicatOraController extends Controller
                 logger('TabiCat error on insert.');
                 logger(print_r($insert, 1));
             }
-            $signpost = $this->_getSignpost($request, $user);
+            $submits = $this->_getSubmits($request, $user);
+            if ($submits < 5) {
+                $signpost = $submits;
+            } else if ($submits == 5) {
+                if ($user->id == 0) {
+                    // guest is redirected to modal survey
+                    return redirect()->action('TabicatOraController@survey');
+                } else {
+                    // logged-in user gets an extra signpost
+                    $signpost = $submits;
+                }
+            }
         }
-
         $fault = $this->_fetchRecord($request);
         if (!$fault) {
             return redirect()->action('TabicatOraController@status')->withSuccess('done');
@@ -132,29 +142,11 @@ class TabicatOraController extends Controller
      *
      * @return integer
      */
-    protected function _getSignpost($request, $user)
+    protected function _getSubmits($request)
     {
-        $signpost = FALSE;
         $submits = $request->session()->get('tabicatora.submits', 0);
         $request->session()->put('tabicatora.submits', ++$submits);
-        logger('submits=' . $submits);
-        if ($submits == 5) {
-            if ($user->id == 0) {
-                // guest is redirected to modal survey
-                logger('redirecting to survey');
-                return redirect()->action('TabicatOraController@survey');
-            } else {
-                // logged-in user gets an extra signpost
-                logger('extra signpost');
-                $signpost = $submits;
-            }
-        } else if ($submits < 5) {
-            // any user gets up to 4 default signposts
-            logger('default signpost');
-            $signpost = $submits;
-        }
-        logger('signpost ' . $signpost);
-        return $signpost;
+        return $submits;
     }
 
     /**

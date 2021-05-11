@@ -41,11 +41,11 @@
             </div>
             <div class="col-12 text-left">
                 @if (!$signpost)
-                <p class="strapline_0">@lang('tabicatora.task.strapline')
+                <p>@lang('tabicatora.task.strapline')
                     <a href="javascript:void(0);" id="a-info-open" data-toggle="modal" data-target="#tabicatoraInfoModal">@lang('tabicatora.task.learn_more')</a>
                 </p>
                 @else
-                <p class="alert information-alert banner alert-secondary strapline_{{ $signpost }}">@lang('tabicatora.task.signpost_' . $signpost)</p>
+                <p class="information-alert banner alert-secondary">@lang('tabicatora.task.signpost_' . $signpost)</p>
                 @endif
             </div>
         </div>
