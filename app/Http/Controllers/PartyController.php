@@ -1635,6 +1635,7 @@ class PartyController extends Controller
                 'latitude' => $party->latitude,
                 'longitude' => $party->longitude,
                 'area' => $party->theGroup->area,
+                'postcode' => $party->theGroup->postcode,
             ],
             'description' => $party->free_text,
             'user' => $party_user = collect(),

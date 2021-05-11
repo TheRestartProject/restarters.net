@@ -35,6 +35,7 @@ return array (
     'problem' => 'Problem',
     'number_of_records' => 'Number of records',
     'winning_opinion' => 'Winning opinion',
+    'progress' => 'complete',
     'task_completed' => 'You\'ve seen them all, thanks',
   ),
   'branding' =>
