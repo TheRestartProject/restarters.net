@@ -5,6 +5,9 @@
         <b-dropdown-item :href="'/party/edit/' + idevents">
           {{ __('events.edit_event') }}
         </b-dropdown-item>
+        <b-dropdown-item :href="'/party/duplicate/' + idevents">
+          {{ __('events.duplicate_event') }}
+        </b-dropdown-item>
         <b-dropdown-item @click="confirmDelete" v-if="!inProgress && !finished">
           {{ __('events.delete_event') }}
         </b-dropdown-item>
