@@ -82,9 +82,8 @@
         text-transform: uppercase;
     }
     .signpost {
-        padding: 0;
-        padding-top: 5px;
-        margin-bottom: 5px;
+        padding: 1em 1em 0 0;
+        margin: 1em auto;
     }
     .signpost div,
     .signpost p {
