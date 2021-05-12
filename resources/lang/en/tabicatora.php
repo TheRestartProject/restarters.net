@@ -12,13 +12,13 @@ return array (
     'source' => 'Source',
     'strapline' => 'Simply read the information about the broken device and select the type of fault described from the list underneath.',
     'learn_more' => 'Learn more',
+    'did_you_know' => 'Did you know?',
     'signpost_1' => '#1: LCA stat (e.g.: Did you know…? Making one new tablet produces over 100 kg of CO2? / Over its whole life, an average tablet produces nearly 150 kg of CO2. But over 80% of that impact occurs before it’s switched on for the first time.)',
     'signpost_2' => '#2: Why tablets?',
     'signpost_3' => '#3: Why now? (new EU regulation on smartphones/tablets in development, likely to inform UK approach as well)',
     'signpost_4' => '#4: Why community data is useful (perhaps mentioning an interesting finding from MobiFix TBC)',
     'signpost_5' => '#5: Thank you and please take our <a href="https://restarters.net/survey" target="_blank">survey</a>',
     'signpost_6' => '#6: Thank you! Please join our <a href="/tabicat/cta" target="_blank">community</a>',
-
   ),
   'status' =>
   array (

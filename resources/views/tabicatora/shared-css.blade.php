@@ -53,7 +53,7 @@
         background-color: #FFF;
     }
 
-    .mobifix .btn {
+    .tabicat .btn {
         font-family: 'Open Sans';
     }
 
@@ -80,6 +80,25 @@
         font-size: 1rem;
         font-weight: bold;
         text-transform: uppercase;
+    }
+    .signpost {
+        padding: 0;
+        padding-top: 5px;
+        margin-bottom: 5px;
+    }
+    .signpost div,
+    .signpost p {
+        padding: 0;
+    }
+    .signpost img {
+        display: inline-block;
+        margin: auto;
+        max-width: 36px;
+    }
+    .signpost h5 {
+        display: inline-block;
+        font-size: 1rem;
+        font-weight: bold;
     }
 
     .translation {

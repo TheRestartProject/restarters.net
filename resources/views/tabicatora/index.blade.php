@@ -16,7 +16,7 @@
 @endsection
 
 @section('title')
-    {{ $title }}
+{{ $title }}
 @endsection
 
 @section('content')
@@ -30,31 +30,45 @@
                 </h1>
             </div>
             <div class="col-7 text-right">
-                <a id="btn-info-open"
-                   data-toggle="modal" data-target="#tabicatoraInfoModal"
-                   class="btn btn-primary ml-2">
+                <a id="btn-info-open" data-toggle="modal" data-target="#tabicatoraInfoModal" class="btn btn-primary ml-2">
                     @lang('tabicatora.about')
                 </a>
                 <a class="btn btn-primary " href="{{ '/tabicat/status' }}">
                     @lang('tabicatora.status.status')
                 </a>
             </div>
-            <div class="col-12 text-left">
-                @if (!$signpost)
+        </div>
+        @if (!$signpost)
+        <div class="row row-compressed align-items-left">
+            <div class="col-12 text-left strapline">
                 <p>@lang('tabicatora.task.strapline')
                     <a href="javascript:void(0);" id="a-info-open" data-toggle="modal" data-target="#tabicatoraInfoModal">@lang('tabicatora.task.learn_more')</a>
                 </p>
-                @else
-                <p class="information-alert banner alert-secondary">@lang('tabicatora.task.signpost_' . $signpost)</p>
-                @endif
             </div>
         </div>
+        @elseif ($signpost < 5)
+        <div class="row row-compressed information-alert banner alert-secondary align-items-left signpost">
+            <div class="col-1 text-left">
+                <img class="d-none d-sm-block" src="{{ asset('/images/tabicatora/signpost.png') }}" alt="i"/>
+            </div>
+            <div class="col-11 text-left">
+                <h5>@lang('tabicatora.task.did_you_know')</h5>
+                <p>@lang('tabicatora.task.signpost_' . $signpost)</p>
+            </div>
+        </div>
+        @else
+        <div class="row row-compressed align-items-left">
+            <div class="col-12 text-center">
+                <p>@lang('tabicatora.task.signpost_' . $signpost)</p>
+            </div>
+        </div>
+        @endif
 
         <a id="btn-cta-open" data-toggle="modal" data-target="#taskctaModal" class="hide">cta</a>
         <a id="btn-survey-open" data-toggle="modal" data-target="#tasksurveyModal" class="hide">survey</a>
 
         @if($errors->any())
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 text-center">
             {{$errors->first()}}
         </div>
         @endif
@@ -147,20 +161,20 @@
     document.addEventListener(`DOMContentLoaded`, async () => {
 
         [...document.querySelectorAll('.btn-fault-option, .btn-fault-suggestion')].forEach(elem => {
-            elem.addEventListener('click', function (e) {
+            elem.addEventListener('click', function(e) {
                 e.preventDefault();
                 doOption(e);
             });
         });
-        document.getElementById('change').addEventListener('click', function (e) {
+        document.getElementById('change').addEventListener('click', function(e) {
             e.preventDefault();
             doChange();
         }, false);
-        document.getElementById('fetch').addEventListener('click', function (e) {
+        document.getElementById('fetch').addEventListener('click', function(e) {
             e.preventDefault();
             fetchNew();
         }, false);
-        document.addEventListener("keypress", function (e) {
+        document.addEventListener("keypress", function(e) {
             if (e.code == 'KeyF') {
                 e.preventDefault();
                 document.getElementById('fetch').click();
@@ -172,6 +186,7 @@
                 document.getElementById('btn-info-open').click();
             }
         }, false);
+
         function doOption(e) {
             document.getElementById('fault-type-new').innerText = e.target.innerText;
             document.getElementById('fault-type-new').dataset.fid = e.target.dataset.fid;
@@ -200,6 +215,7 @@
                 document.forms['log-task'].submit();
             }
         }
+
         function fetchNew() {
             window.location.replace(window.location.href);
         }
@@ -212,6 +228,7 @@
             document.getElementById('btn-survey-open').click();
         }
 
-    }, false);</script>
+    }, false);
+</script>
 
 @endsection
