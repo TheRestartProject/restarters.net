@@ -209,12 +209,15 @@
               </div>
 
               <div class="button-group row">
-                  <div class="offset-lg-3 col-lg-7 d-flex align-items-right justify-content-end text-right">
+                  <div class="offset-lg-3 col-lg-5 d-flex align-items-right justify-content-end text-right">
                       @if( is_null($formdata->wordpress_post_id) )
                         <span class="button-group__notice text-right">@lang('events.before_submit_text')</span>
                       @endif
                   </div>
-                  <div class="col-lg-2 d-flex align-items-center justify-content-end">
+                  <div class="col-lg-4 d-flex align-items-center justify-content-end">
+                      <a href="/party/duplicate/{{ $formdata->id }}" class="btn btn-primary btn-md mr-2">
+                        {{ __('events.duplicate_event') }}
+                      </a>
                       <input type="submit" class="btn btn-primary" id="create-event" value="@lang('events.save_event')">
                   </div>
               </div>

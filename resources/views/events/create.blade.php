@@ -105,7 +105,7 @@
 
               <div class="form-group">
                 <label for="event_desc">@lang('events.field_event_desc'):</label>
-                <div class="rte" name="description" id="description"></div>
+                <textarea class="rte" name="description" id="description">{!! old('free_text') !!}</textarea>
               </div>
 
               <input type="hidden" name="free_text" id="free_text" value="{{ old('free_text') }}">
@@ -136,7 +136,7 @@
                         <label for="field_event_time">@lang('events.field_event_time'):</label>
                         @if ($agent->browser() == 'Safari' && $agent->isDesktop())
                             <div class="vue">
-                                <EventTimeRangePicker />
+                              <EventTimeRangePicker starttimeinit=" {{ old('start') }} " endtimeinit=" {{ old('end') }} " />
                             </div>
                             @if($errors->has('start')) 
                                 <p class="text-danger">{{ $errors->first('start') }}</p>
@@ -148,11 +148,11 @@
                             <div class="row">
 
                                 <div class="col-6">
-                                    <input type="time" id="start-time" name="start" class="form-control field" required>
+                                    <input type="time" id="start-time" name="start" class="form-control field" required value="{{ old('start') }}">
                                 </div>
 
                                 <div class="col-6">
-                                    <input type="time" id="end-time" name="end" class="form-control field" required>
+                                    <input type="time" id="end-time" name="end" class="form-control field" required value="{{ old('end') }}">
                                 </div>
 
                             </div>

@@ -70,6 +70,7 @@ return array (
   'by_group' => 'By group',
   'create_new_event' => 'Create new event',
   'edit_event' => 'Edit event',
+  'duplicate_event' => 'Duplicate event',
   'edit_event_content' => 'You can keep your event details up-to-date here.',
   'past_events' => 'Past events',
   'upcoming_events' => 'Upcoming events',

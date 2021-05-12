@@ -585,6 +585,57 @@ class PartyController extends Controller
         ]);
     }
 
+    public function duplicate($id, Request $request)
+    {
+        $user = Auth::user();
+
+        if ( ! FixometerHelper::userHasEditPartyPermission($id, $user->id)) {
+            return redirect('/user/forbidden');
+        }
+
+        $File = new FixometerFile;
+        $Party = new Party;
+        $Device = new Device;
+
+        $groupsUserIsInChargeOf = $user->groupsInChargeOf();
+        $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
+
+        $images = $File->findImages(env('TBL_EVENTS'), $id);
+
+        if ( ! isset($images)) {
+            $images = null;
+        }
+
+        $allGroups = Group::orderBy('name')->get();
+
+        $images = $File->findImages(env('TBL_EVENTS'), $id);//NB: File facade can't find findImages may need to add
+
+        if ( ! isset($images)) {
+            $images = null;
+        }
+
+        $party = $Party->findThis($id)[0];
+        $remotePost = null;
+
+        // Put the values we want to preserve into the session, to be picked up by the blade template's use of old().
+        $request->session()->put('_old_input.venue', $party->venue);
+        $request->session()->put('_old_input.online', $party->online);
+        $request->session()->put('_old_input.free_text', $party->free_text);
+        $request->session()->put('_old_input.location', $party->location);
+        $request->session()->put('_old_input.start', $party->start);
+        $request->session()->put('_old_input.end', $party->end);
+
+        return view('events.create', [
+            'title' => 'Duplicate Party',
+            'gmaps' => true,
+            'allGroups' => $allGroups,
+            'user' => Auth::user(),
+            'user_groups' => $groupsUserIsInChargeOf,
+            'selected_group_id' => $party->group,
+            'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+        ]);
+    }
+
     public function view($id)
     {
         $File = new FixometerFile;
@@ -1635,6 +1686,7 @@ class PartyController extends Controller
                 'latitude' => $party->latitude,
                 'longitude' => $party->longitude,
                 'area' => $party->theGroup->area,
+                'postcode' => $party->theGroup->postcode,
             ],
             'description' => $party->free_text,
             'user' => $party_user = collect(),
