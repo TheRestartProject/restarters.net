@@ -49,4 +49,22 @@ return array (
     'body-s4-header' => 'More questions?',
     'body-s4-p1' => 'Find out more, and give us your feedback, in the <a href=":url" target="_blank">TabiCat discussion</a>.',
   ),
+  'survey' =>
+  array (
+    'header1' => 'Thank you for helping us learn why tablets break.',
+    'header2' => 'We are already planning future quests, just like this one. To make the next one even better, we have some quick questions for you.',
+    'q1' => 'TabiCat has increased my interest in repairing',
+    'q2' => 'TabiCat has made me think more about electronic waste',
+    'q3' => 'TabiCat has changed how I think about buying electronics',
+    'q4' => 'TabiCat has changed my view of the importance of repair',
+    'a1' => 'Strongly disagree',
+    'a2' => 'Disagree',
+    'a3' => 'Neutral',
+    'a4' => 'Agree',
+    'a5' => 'Strongly agree',
+    'send' => 'Send',
+    'skip' => 'Skip',
+    'invalid' => 'Please select from each of the questions',
+    'footer' => 'Pressing either button will take you back to TabiCat',
+  ),
 );
