@@ -9,6 +9,7 @@ use App\Cluster;
 use App\Device;
 use App\DeviceList;
 use App\DeviceUrl;
+use App\Events\DeviceCreatedOrUpdated;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\FootprintRatioCalculator;
