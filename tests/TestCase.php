@@ -49,4 +49,10 @@ abstract class TestCase extends BaseTestCase
 
         return $userAttributes;
     }
+
+    public function loginAsTestUser() {
+        $response = $this->post('/user/register/',  $this->userAttributes());
+        $response->assertStatus(302);
+        $response->assertRedirect('dashboard');
+    }
 }
