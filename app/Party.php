@@ -38,8 +38,9 @@ class Party extends Model implements Auditable
         'updated_at',
         'shareable_code',
         'online',
+        'devices_updated_at'
     ];
-    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id'];
+    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'devices_updated_at'];
 
     // Append data to Model
     protected $appends = ['participants', 'ShareableLink'];

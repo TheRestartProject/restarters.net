@@ -36,6 +36,7 @@ class Group extends Model implements Auditable
         'shareable_code',
         'network_id',
         'external_id',
+        'devices_updated_at'
     ];
 
     protected $appends = ['ShareableLink', 'approved'];
