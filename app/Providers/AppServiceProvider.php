@@ -40,7 +40,11 @@ class AppServiceProvider extends ServiceProvider
         view()->composer('layouts.header', function ($view) {
             if (Auth::check()) {
                 if (Cache::has('talk_notification_'.Auth::user()->username)) {
-                    $total_talk_notifications = Cache::get('talk_notification_'.Auth::user()->username);
+                    $total_talk_notifications = Cache::get('talk_notification_' . Auth::user()->username);
+                } else if ( ! config('restarters.features.discourse_integration')) {
+                    // If we don't have Discourse integration, we will still render the badge, but always have no
+                    // notifications.
+                    $total_talk_notifications = 0;
                 } else {
                     $client = app('discourse-client');
                     $response = $client->request('GET', '/notifications.json?username='.Auth::user()->username);
