@@ -39,6 +39,9 @@ abstract class TestCase extends BaseTestCase
         $this->withoutExceptionHandling();
         app('honeypot')->disable();
 
+        // We don't yet have a Discourse test environment.
+        config(['restarters.features.discourse_integration' => false]);
+
         // Create the jane@bloggs.net user which is commonly used in dev environments.  This means that
         // we don't have to manually recreate it after we run a test in dev.
         $this->createJane();
