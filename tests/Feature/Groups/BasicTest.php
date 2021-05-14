@@ -12,7 +12,7 @@ class BasicTest extends TestCase {
         // Test the dashboard page loads.  Most of the work is done inside Vue, so a basic test is just that the
         // Vue component exists.
         $this->loginAsTestUser();
-        $response = $this->get('/groups');
+        $response = $this->get('/group');
         $content = $response->getContent();
 
         $this->assertNotFalse(strpos($content, '<GroupsPage'));
