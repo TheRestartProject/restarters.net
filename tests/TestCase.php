@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Group;
 use App\Network;
 
 use App\Role;
@@ -10,12 +11,14 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use DB;
 use Hash;
+use Auth;
 
 abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 
     private $userCount = 0;
+    private $groupCount = 0;
 
     public function setUp()
     {
@@ -23,7 +26,9 @@ abstract class TestCase extends BaseTestCase
 
         DB::statement("SET foreign_key_checks=0");
         Network::truncate();
+        Group::truncate();
         User::truncate();
+        DB::statement("TRUNCATE group_network");
         DB::statement("SET foreign_key_checks=1");
 
         $network = new Network();
@@ -55,10 +60,31 @@ abstract class TestCase extends BaseTestCase
         return $userAttributes;
     }
 
-    public function loginAsTestUser() {
-        $response = $this->post('/user/register/',  $this->userAttributes());
+    public function loginAsTestUser($role = Role::RESTARTER) {
+        // This is testing the external interface, whereas actingAs() wouldn't be.
+        $response = $this->post('/user/register/',  $this->userAttributes($role));
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
+
+        // Set the role.
+        Auth::user()->role = $role;
+    }
+
+    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.') {
+        $response = $this->post('/group/create',  [
+            'name' => $name . $this->groupCount++,
+            'website' => $website,
+            'location' => $location,
+            'free_text' => $text
+        ]);
+
+        $this->assertTrue($response->isRedirection());
+        $redirectTo = $response->getTargetUrl();
+        $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
+        $p = strrpos($redirectTo, '/');
+        $idgroups = substr($redirectTo, $p + 1);
+
+        return $idgroups;
     }
 
     public function createJane() {
