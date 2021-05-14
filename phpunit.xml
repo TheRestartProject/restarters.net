@@ -12,6 +12,9 @@
 <!--        We have lots of tests which exist but don't run yet.  So we only run a subset of them here. -->
         <testsuite name="Feature">
             <directory suffix=".php">./tests/Feature/Users/Registration</directory>
+            <directory suffix=".php">./tests/Feature/Users/Dashboard</directory>
+            <directory suffix=".php">./tests/Feature/Users/Fixometer</directory>
+            <file>./tests/Feature/Groups/BasicTest</file>
         </testsuite>
 
         <testsuite name="Unit">

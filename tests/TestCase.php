@@ -4,6 +4,7 @@ namespace Tests;
 
 use App\Network;
 
+use App\Role;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -32,6 +33,10 @@ abstract class TestCase extends BaseTestCase
 
         $this->withoutExceptionHandling();
         app('honeypot')->disable();
+
+        // Create the jane@bloggs.net user which is commonly used in dev environments.  This means that
+        // we don't have to manually recreate it after we run a test in dev.
+        $this->createJane();
     }
 
     public function userAttributes() {
@@ -54,5 +59,16 @@ abstract class TestCase extends BaseTestCase
         $response = $this->post('/user/register/',  $this->userAttributes());
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
+    }
+
+    public function createJane() {
+        $user = factory(User::class)->create();
+        $user->name = 'Jane Bloggs';
+        $user->email = 'jane@bloggs.net';
+        $user->password = Hash::make('passw0rd');
+        $user->role = Role::ADMINISTRATOR;
+        $user->consent_gdpr = true;
+        $user->consent_future_data = true;
+        $user->save();
     }
 }
