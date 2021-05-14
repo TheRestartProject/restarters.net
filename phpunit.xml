@@ -15,6 +15,7 @@
             <directory suffix=".php">./tests/Feature/Users/Dashboard</directory>
             <directory suffix=".php">./tests/Feature/Users/Fixometer</directory>
             <file>./tests/Feature/Groups/BasicTest</file>
+            <file>./tests/Feature/Groups/GroupCreateTest</file>
             <file>./tests/Feature/Microtasks/BasicTest</file>
         </testsuite>
 
