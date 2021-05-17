@@ -98,6 +98,7 @@ abstract class TestCase extends BaseTestCase
         $user->role = Role::ADMINISTRATOR;
         $user->consent_gdpr = true;
         $user->consent_future_data = true;
+        $user->repairdir_role = Role::REPAIR_DIRECTORY_SUPERADMIN;
         $user->save();
     }
 }
