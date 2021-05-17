@@ -66,10 +66,10 @@ class SetPostcodes extends Command
                     }
 
                     if (!$found) {
-                        $this->error($group->idgroups . " " . $group->name . " couldn't geocode");
+                        $this->error($group->id . " " . $group->name . " couldn't geocode");
                     }
                 } else {
-                    $this->error($group->idgroups . " " . $group->name . " has no lat/lng");
+                    $this->error($group->id . " " . $group->name . " has no lat/lng");
                 }
             }
         }
