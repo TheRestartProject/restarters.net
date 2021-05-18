@@ -102,23 +102,4 @@
     #ora-partnership img {
         width: 300px;
     }
-
-    .survey ul {
-        display: flex;
-        align-items: stretch;
-        justify-content: space-between;
-        width: 98%;
-        margin: 0;
-        padding: 0 1%;
-    }
-
-    .survey li {
-        display: block;
-        flex: 0 1 auto;
-        list-style-type: none;
-    }
-
-    .survey .error {
-        border: 1px solid lightpink;
-    }
 </style>

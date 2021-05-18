@@ -1,9 +1,28 @@
 <!-- Modal -->
 <style>
+    .survey ul {
+        display: flex;
+        align-items: stretch;
+        justify-content: space-between;
+        width: 98%;
+        margin: 0;
+        padding: 0 1%;
+    }
+
+    .survey li {
+        display: block;
+        flex: 0 1 auto;
+        list-style-type: none;
+    }
+
+    .survey .error {
+        border: 1px solid lightpink;
+    }
+
     .survey-question {
         background-color: #f7f5ed;
         border: 5px solid #ddd;
-        padding: 15px 0 0 15px;
+        padding: 15px;
         border-radius: 10px;
     }
 
@@ -17,6 +36,11 @@
         display: inline;
         font-size: smaller;
         font-weight: normal;
+    }
+
+    .survey-question li,
+    .survey-question input {
+        cursor: pointer;
     }
 
     #btn-send-survey {
@@ -103,6 +127,16 @@
     document.addEventListener(`DOMContentLoaded`, async () => {
 
         let submit = [];
+
+        [...document.querySelectorAll('.survey-question li')].forEach(elem => {
+            elem.addEventListener('click', function(e) {
+                if (e.srcElement.nodeName == 'LI') {
+                    e.srcElement.firstChild.checked = true;
+                    document.getElementById(e.srcElement.firstChild.name).classList.remove('error');
+                    document.getElementById('error').classList.add('hide');
+                }
+            });
+        });
 
         [...document.querySelectorAll('.survey-question input')].forEach(elem => {
             elem.addEventListener('change', function(e) {
