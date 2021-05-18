@@ -1,7 +1,7 @@
 <template>
     <div id="news">
         <div class="d-none d-sm-block text-center">
-            <b-img id="news-image" src="/images/times-chart.jpg" />
+            <b-img id="news-image" src="/images/mobifix-whale.png" width="200" />
         </div>
     <CollapsibleSection class="collapsible px-4 pb-4 pt-0 lineheight" :show-horizontal-rule="false">
 
@@ -12,7 +12,7 @@
         </template>
 
         <template slot="title-right">
-            <b-img class="d-none d-sm-block ml-auto mt-2 doodle" src="/images/laptop.svg" />
+            <b-img class="d-none d-sm-block ml-auto mt-2 doodle" src="/images/phone.svg" />
         </template>
 
         <template slot="content">
@@ -45,7 +45,7 @@ export default {
 }
 
 #news-image {
-    width: 450px;
+    width: 300px;
 }
 
 .collapsible {

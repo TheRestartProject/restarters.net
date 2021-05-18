@@ -5,11 +5,11 @@ return array (
   'news' => 
   array (
     'title' => 'Read about our recent success',
-    'content' => 'Through our FaultCat quest, hundreds of volunteers helped us analyse our laptop data.
+    'content' => 'Through our MobiFix quest, hundreds of volunteers helped us analyse Open Repair Alliance data on mobiles.
                     <ul>
-                        <li><a href="https://ecostandard.org/publications/long-live-the-machine-how-ecodesign-energy-labelling-can-prevent-premature-obsolescence-of-laptops/" target="_blank" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'Long live the machine report\')">Read the results</a> as they went into this policy paper on laptop lifetimes.</li>
+                        <li><a href="https://openrepair.org/open-data/insights/mobiles" target="_blank" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'mobifix-openrepair-insights\')">Read the analysis</a> as prepared for a policy paper on smartphone lifetimes, and download the results yourself!</li>
                         <li>
-                            <a href="https://talk.restarters.net/t/repair-data-in-the-times-piece-on-e-waste/2501?utm_source=restarters" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'Repair data in the times\')">Check out the data visualisation</a> featured in The Times newspaper.
+                            <a href="https://talk.restarters.net/t/repair-data-in-the-times-piece-on-e-waste/2501?utm_source=restarters" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'mobifix-discussion\')">Join the discussion</a> on the barriers to smartphone repair and what these results show.
                         </li>
                     </ul>
         ',
