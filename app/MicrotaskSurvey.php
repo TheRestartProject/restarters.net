@@ -16,5 +16,5 @@ class MicrotaskSurvey extends Model
      *
      * @var array
      */
-    protected $fillable = ['session_id', 'ip_address', 'task', 'question', 'order', 'score'];
+    protected $fillable = ['session_id', 'ip_address', 'user_id', 'task', 'payload'];
 }

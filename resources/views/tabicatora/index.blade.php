@@ -46,101 +46,100 @@
                 </p>
             </div>
         </div>
-        @elseif ($signpost < 5)
-        <div class="row row-compressed information-alert banner alert-secondary align-items-left signpost">
+        @elseif ($signpost < 5) <div class="row row-compressed information-alert banner alert-secondary align-items-left signpost">
             <div class="col-1 text-left">
-                <img class="d-none d-sm-block" src="{{ asset('/images/tabicatora/signpost.png') }}" alt="i"/>
+                <img class="d-none d-sm-block" src="{{ asset('/images/tabicatora/signpost.png') }}" alt="i" />
             </div>
             <div class="col-11 text-left">
                 <h5>@lang('tabicatora.task.did_you_know')</h5>
                 <p>@lang('tabicatora.task.signpost_' . $signpost)</p>
             </div>
+    </div>
+    @else
+    <div class="row row-compressed align-items-left">
+        <div class="col-12 text-center">
+            <p>@lang('tabicatora.task.signpost_' . $signpost)</p>
         </div>
-        @else
-        <div class="row row-compressed align-items-left">
-            <div class="col-12 text-center">
-                <p>@lang('tabicatora.task.signpost_' . $signpost)</p>
-            </div>
-        </div>
-        @endif
+    </div>
+    @endif
 
-        <a id="btn-cta-open" data-toggle="modal" data-target="#taskctaModal" class="hide">cta</a>
-        <a id="btn-survey-open" data-toggle="modal" data-target="#tasksurveyModal" class="hide">survey</a>
+    <a id="btn-cta-open" data-toggle="modal" data-target="#taskctaModal" class="hide">cta</a>
+    <a id="btn-survey-open" data-toggle="modal" data-target="#tasksurveyModal" class="hide">survey</a>
 
-        @if($errors->any())
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 text-center">
-            {{$errors->first()}}
-        </div>
-        @endif
+    @if($errors->any())
+    <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 text-center">
+        {{$errors->first()}}
+    </div>
+    @endif
 
-        @if ($fault)
-        <div class="row problem panel p-3 mb-4 mx-1 mx-sm-0 notification">
-            <div class="col">
-                <div class="row">
-                    <div class="col">
-                        <p>
-                            <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@lang('tabicatora.task.source'): {{ $fault->partner }}</span>
-                            @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
-                            <span class="btn btn-md py-1 py-sm-2 btn-fault-info">{{ $fault->brand }}</span>
-                            @endif
-                            @if ($fault->repair_status !== 'Unknown')
-                            <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@lang($fault->repair_status)</span>
-                            @endif
-                        </p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-8 offset-sm-2">
-                        <p class="subtitle">{{ $fault->problem }}</p>
-                    </div>
-                    <div class="col-4 col-sm-2">
-                        <button id="btn-translate" class="pull-right btn btn-md btn-dark px-3 py-1">
-                            <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text=@{{ $fault->translate }}" target="_blank">
-                                @lang('tabicatora.task.translate')
-                            </a>
-                        </button>
-                    </div>
+    @if ($fault)
+    <div class="row problem panel p-3 mb-4 mx-1 mx-sm-0 notification">
+        <div class="col">
+            <div class="row">
+                <div class="col">
+                    <p>
+                        <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@lang('tabicatora.task.source'): {{ $fault->partner }}</span>
+                        @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
+                        <span class="btn btn-md py-1 py-sm-2 btn-fault-info">{{ $fault->brand }}</span>
+                        @endif
+                        @if ($fault->repair_status !== 'Unknown')
+                        <span class="btn btn-md py-1 py-sm-2 btn-fault-info">@lang($fault->repair_status)</span>
+                        @endif
+                    </p>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-8 offset-sm-2">
+                    <p class="subtitle">{{ $fault->problem }}</p>
+                </div>
+                <div class="col-4 col-sm-2">
+                    <button id="btn-translate" class="pull-right btn btn-md btn-dark px-3 py-1">
+                        <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text=@{{ $fault->translate }}" target="_blank">
+                            @lang('tabicatora.task.translate')
+                        </a>
+                    </button>
+                </div>
+            </div>
         </div>
-        <form id="log-task" action="" method="POST">
-            @csrf
-            <div class="container fault-type">
-                <div class="row">
-                    <div class="col panel p-3">
-                        <p><span class="question">@lang('tabicatora.task.where_is_the_main_fault')?</span></p>
-                        <div class="container">
-                            <input type="hidden" id="id-ords" name="id-ords" value="{{ $fault->id_ords }}">
-                            <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
-                            @if (count($fault->suggestions))
-                            <div class="buttons suggestions">
-                                <p class="title is-size-6-mobile is-size-6-tablet">@lang('tabicatora.task.suggestions')</p>
-                                <p>
-                                    @foreach($fault->suggestions as $fault_type)
-                                    <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
-                                    @endforeach
-                                </p>
-                            </div>
-                            @endif
-                            <div class="container options mb-3">
-                                <p class="confirm hide">
-                                    <button class="btn-md btn-info btn-rounded" id="change">@lang('tabicatora.task.go_with') "<span id="fault-type-new" data-fid=""></span>"</button>
-                                </p>
-                                <div class="buttons">
-                                    @foreach($fault->faulttypes as $fault_type)
-                                    <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
-                                    @endforeach
-                                </div>
+    </div>
+    <form id="log-task" action="" method="POST">
+        @csrf
+        <div class="container fault-type">
+            <div class="row">
+                <div class="col panel p-3">
+                    <p><span class="question">@lang('tabicatora.task.where_is_the_main_fault')?</span></p>
+                    <div class="container">
+                        <input type="hidden" id="id-ords" name="id-ords" value="{{ $fault->id_ords }}">
+                        <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
+                        @if (count($fault->suggestions))
+                        <div class="buttons suggestions">
+                            <p class="title is-size-6-mobile is-size-6-tablet">@lang('tabicatora.task.suggestions')</p>
+                            <p>
+                                @foreach($fault->suggestions as $fault_type)
+                                <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
+                                @endforeach
+                            </p>
+                        </div>
+                        @endif
+                        <div class="container options mb-3">
+                            <p class="confirm hide">
+                                <button class="btn-md btn-info btn-rounded" id="change">@lang('tabicatora.task.go_with') "<span id="fault-type-new" data-fid=""></span>"</button>
+                            </p>
+                            <div class="buttons">
+                                @foreach($fault->faulttypes as $fault_type)
+                                <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
+                                @endforeach
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </form>
-        <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded my-4">
-            <span class="">@lang('tabicatora.task.fetch_another')</span>
-        </button>
-        @endif
+        </div>
+    </form>
+    <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded my-4">
+        <span class="">@lang('tabicatora.task.fetch_another')</span>
+    </button>
+    @endif
     </div>
     <div id="ora-partnership" class="mt-8 mb-4">
         <hr />

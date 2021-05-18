@@ -17,8 +17,8 @@ return array (
     'signpost_2' => 'Repairing a device extends its life, reduces its overall environmental impact and lowers demand for new products. In fact, if we used every computer in Europe for one year longer, we could save the equivalent of 3 million tonnes of CO2.',
     'signpost_3' => 'The European Union is planning to include tablets and smartphones in Ecodesign rules by 2022. This will give us the chance to call for the Right to Repair these devices. Rules decided by the EU could also be used to influence laws in other places, including the UK.',
     'signpost_4' => 'We want to tell policymakers why tablets break and how they could be made easier to fix. Community repair groups around the world have been recording this information, and by trying TabiCat, you are helping us analyse it.',
-    'signpost_5' => 'Thank you and please take our <a href="https://restarters.net/survey" target="_blank">survey</a>',
-    'signpost_6' => 'Thank you! Please join our <a href="/tabicat/cta" target="_blank">community</a>',
+    'signpost_5' => 'Thank you and please take our <a href="https://restarters.net/survey">survey</a>',
+    'signpost_6' => 'Thank you! Please join our <a href="/tabicat/cta">community</a>',
   ),
   'status' =>
   array (
@@ -58,7 +58,8 @@ return array (
   ),
   'survey' =>
   array (
-    'header' => 'Survey',
+    'header1' => 'Thank you for helping us learn why tablets break.',
+    'header2' => 'We are already planning future quests, just like this one. To make the next one even better, we have some quick questions for you.',
     'q1' => 'TabiCat has increased my interest in repairing',
     'q2' => 'TabiCat has made me think more about electronic waste',
     'q3' => 'TabiCat has changed how I think about buying electronics',
@@ -70,5 +71,7 @@ return array (
     'a5' => 'Strongly agree',
     'send' => 'Send',
     'skip' => 'Skip',
+    'invalid' => 'Please select from each of the questions',
+    'footer' => 'Pressing either button will take you back to TabiCat',
   ),
 );

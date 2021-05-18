@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Auth;
 use App;
 use App\TabicatOra;
-// use App\Helpers\Microtask;
+use App\MicrotaskSurvey;
 
 class TabicatOraController extends Controller
 {
@@ -28,6 +28,27 @@ class TabicatOraController extends Controller
         } else {
             $user = $this->_anon();
         }
+        // if survey is being submitted
+        if ($request->has('task-survey')) {
+            $inputs = $request->all();
+            unset($inputs['_token']);
+            unset($inputs['task-survey']);
+            $payload = json_encode($inputs);
+            $insert = [
+                'task' => 'TabiCat',
+                'payload' => $payload,
+                'user_id' => $user->id,
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'session_id' => session()->getId(),
+            ];
+            $MicrotaskSurvey = new MicrotaskSurvey;
+            $success = $MicrotaskSurvey->create($insert);
+            if (!$success) {
+                logger('MicrotaskSurvey error on insert.');
+                logger(print_r($insert, 1));
+            }
+        }
+
         $this->Model = new TabicatOra;
         $signpost = FALSE;
         // if opinion is being submitted
@@ -146,7 +167,7 @@ class TabicatOraController extends Controller
     }
 
     /**
-     * Fetch signpost.
+     * Fetch random record.
      *
      * @param Illuminate\Http\Request $request
      *
