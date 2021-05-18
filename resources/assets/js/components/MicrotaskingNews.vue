@@ -1,7 +1,7 @@
 <template>
     <div id="news">
         <div class="d-none d-sm-block text-center">
-            <b-img id="news-image" src="/images/mobifix-whale.png" width="200" />
+            <b-img id="news-image" src="/images/mobifix-treemap.png" />
         </div>
     <CollapsibleSection class="collapsible px-4 pb-4 pt-0 lineheight" :show-horizontal-rule="false">
 
@@ -45,7 +45,7 @@ export default {
 }
 
 #news-image {
-    width: 300px;
+    width: 400px;
 }
 
 .collapsible {
