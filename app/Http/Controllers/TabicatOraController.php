@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Auth;
 use App;
 use App\TabicatOra;
+use App\MicrotaskSurvey;
 use App\Helpers\Microtask;
 
 class TabicatOraController extends Controller {
@@ -30,7 +31,29 @@ class TabicatOraController extends Controller {
                 return redirect()->action('TabicatOraController@cta', ['partner' => $partner]);
             }
         }
+        // if survey is being submitted
+        if ($request->has('task-survey')) {
+            $inputs = $request->all();
+            unset($inputs['_token']);
+            unset($inputs['task-survey']);
+            $payload = json_encode($inputs);
+            $insert = [
+                'task' => 'TabiCat',
+                'payload' => $payload,
+                'user_id' => $user->id,
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'session_id' => session()->getId(),
+            ];
+            $MicrotaskSurvey = new MicrotaskSurvey;
+            $success = $MicrotaskSurvey->create($insert);
+            if (!$success) {
+                logger('MicrotaskSurvey error on insert.');
+                logger(print_r($insert, 1));
+            }
+        }
+
         $this->Model = new TabicatOra;
+        // if opinion is being submitted
         if ($request->has('id-ords')) {
             if (!(is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
                 return redirect()->back()->withErrors(['Oops, there was an error, please try again, sorry! If this error persists please contact The Restart Project.']);
@@ -111,6 +134,19 @@ class TabicatOraController extends Controller {
             'complete' => ($data['progress'][0]->total == 100),
             'partner' => $request->input('partner', NULL),
         ]);
+    }
+
+    /**
+     * Fetch survey modal.
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function survey(Request $request)
+    {
+        $request->session()->put('tabicatora.redirect_to_survey', TRUE);
+        return $this->index($request);
     }
 
     /**
