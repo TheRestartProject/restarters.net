@@ -46,6 +46,7 @@
             </div>
         </div>
         <a id="btn-cta-open"data-toggle="modal" data-target="#taskctaModal"class="hide">cta</a>
+        <a id="btn-survey-open" data-toggle="modal" data-target="#tasksurveyModal" class="hide">survey</a>
 
         @if($errors->any())
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
@@ -133,6 +134,7 @@
         </a>
     </div>
     @include('tabicatora/info-modal')
+    @include('tabicatora/task-survey-modal')
     @include('partials/task-cta-ora-modal')
 </section>
 
@@ -205,6 +207,10 @@
 
         if (window.location.href.indexOf('cta') != -1) {
             document.getElementById('btn-cta-open').click();
+        }
+
+        if (window.location.href.indexOf('survey') != -1) {
+            document.getElementById('btn-survey-open').click();
         }
 
     }, false);</script>
