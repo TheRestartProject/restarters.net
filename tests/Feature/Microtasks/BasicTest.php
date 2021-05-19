@@ -15,6 +15,6 @@ class BasicTest extends TestCase {
         $response = $this->get('/workbench');
         $content = $response->getContent();
 
-        $this->assertNotFalse(strpos($content, '<MicrotaskingPage'));
+        $response->assertSee('<MicrotaskingPage');
     }
 }

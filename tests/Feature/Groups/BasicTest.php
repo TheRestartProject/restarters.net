@@ -15,6 +15,6 @@ class BasicTest extends TestCase {
         $response = $this->get('/group');
         $content = $response->getContent();
 
-        $this->assertNotFalse(strpos($content, '<GroupsPage'));
+        $response->assertSee('<GroupsPage');
     }
 }

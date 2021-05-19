@@ -91,14 +91,16 @@ abstract class TestCase extends BaseTestCase
     }
 
     public function createJane() {
-        $user = factory(User::class)->create();
-        $user->name = 'Jane Bloggs';
-        $user->email = 'jane@bloggs.net';
-        $user->password = Hash::make('passw0rd');
-        $user->role = Role::ADMINISTRATOR;
-        $user->consent_gdpr = true;
-        $user->consent_future_data = true;
-        $user->repairdir_role = Role::REPAIR_DIRECTORY_SUPERADMIN;
+        $user = factory(User::class)->create([
+            'name' => 'Jane Bloggs',
+            'email' => 'jane@bloggs.net',
+            'password' => Hash::make('passw0rd'),
+            'role' => Role::ADMINISTRATOR,
+            'consent_gdpr' => true,
+            'consent_future_data' => true,
+            'repairdir_role' => Role::REPAIR_DIRECTORY_SUPERADMIN
+        ]);
+        
         $user->save();
     }
 }

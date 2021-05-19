@@ -15,6 +15,6 @@ class BasicTest extends TestCase {
         $response = $this->get('/dashboard');
         $content = $response->getContent();
 
-        $this->assertNotFalse(strpos($content, '<DashboardPage'));
+        $response->assertSee('<DashboardPage');
     }
 }

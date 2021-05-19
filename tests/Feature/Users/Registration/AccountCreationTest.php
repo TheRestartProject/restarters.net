@@ -9,10 +9,14 @@ use Tests\TestCase;
 
 class AccountCreationTests extends TestCase {
     public function testRegister() {
-        $response = $this->post('/user/register/',  $this->userAttributes());
+        $userAttributes = $this->userAttributes();
+        $response = $this->post('/user/register/',  $userAttributes);
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
+        $this->assertDatabaseHas('users', [
+            'email' => $userAttributes['email']
+        ]);
     }
 
     public function testRegisterAgain() {

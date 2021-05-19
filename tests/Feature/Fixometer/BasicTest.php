@@ -15,6 +15,6 @@ class BasicTest extends TestCase {
         $response = $this->get('/fixometer');
         $content = $response->getContent();
 
-        $this->assertNotFalse(strpos($content, '<FixometerPage'));
+        $response->assertSee('<FixometerPage');
     }
 }
