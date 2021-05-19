@@ -42,8 +42,10 @@ class DeviceController extends Controller
         ->orderBy('event_date', 'DESC')
         ->first();
 
-        $most_recent_finished_event['id_events'] = $most_recent_finished_event->idevents;
-        $most_recent_finished_event['waste_prevented'] = $most_recent_finished_event->WastePrevented;
+        if ($most_recent_finished_event) {
+            $most_recent_finished_event['id_events'] = $most_recent_finished_event->idevents;
+            $most_recent_finished_event['waste_prevented'] = $most_recent_finished_event->WastePrevented;
+        }
 
         $global_impact_data = app('App\Http\Controllers\ApiController')
                             ->homepage_data();

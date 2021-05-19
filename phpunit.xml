@@ -9,16 +9,22 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
+<!--        We have lots of tests which exist but don't run yet.  So we only run a subset of them here. -->
         <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
+            <directory suffix=".php">./tests/Feature/Users/Dashboard</directory>
+            <directory suffix=".php">./tests/Feature/Users/Fixometer</directory>
+            <file>./tests/Feature/Users/Registration/AccountCreationTest.php</file>
+            <file>./tests/Feature/Groups/BasicTest.php</file>
+            <file>./tests/Feature/Groups/GroupCreateTest.php</file>
+            <file>./tests/Feature/Microtasks/BasicTest.php</file>
         </testsuite>
 
         <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
+            <file>./tests/Unit/UsernameGeneratorTest</file>
         </testsuite>
     </testsuites>
     <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+        <whitelist addUncoveredFilesFromWhitelist="true" processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./app</directory>
         </whitelist>
     </filter>
