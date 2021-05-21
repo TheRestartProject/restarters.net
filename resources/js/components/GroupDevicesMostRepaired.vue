@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column h-100">
-    <h2 class="mt-2 mb-4">{{ translatedMostRepairedDevices }}</h2>
+    <h2 class="mt-2 mb-4">{{ __('groups.most_repaired_devices') }}</h2>
     <div class=" d-none d-md-block">
       <div class="podia">
         <GroupDeviceRepairPodium v-if="devices.length >= 2" :position="2" :device="devices[1]" />
@@ -34,11 +34,6 @@ export default {
       required: true
     }
   },
-  computed: {
-    translatedMostRepairedDevices() {
-      return this.$lang.get('groups.most_repaired_devices')
-    }
-  }
 }
 </script>
 <style scoped lang="scss">

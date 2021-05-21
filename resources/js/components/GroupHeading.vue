@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-flex justify-content-between mb-3">
-      <h1 class="d-block d-md-none">{{ translatedGroups }}</h1>
+      <h1 class="d-block d-md-none">{{ __('groups.groups') }}</h1>
       <GroupActions :idgroups="idgroups" class="d-block d-md-none" @left="$emit('left')" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
@@ -16,7 +16,7 @@
           <div class="d-flex justify-content-between w-100">
             <div class="flex-wrap">
               <b>{{ group.location }}</b> <br />
-              <ExternalLink v-if="group.website" :href="group.website">{{ translatedWebsite }}</ExternalLink>
+              <ExternalLink v-if="group.website" :href="group.website">{{ __('groups.website') }}</ExternalLink>
             </div>
             <GroupActions :idgroups="idgroups" class="d-none d-md-block" @left="$emit('left')" />
           </div>
@@ -44,12 +44,6 @@ export default {
     groupImage() {
       return this.group && this.group.group_image && this.group.group_image.image ? ('/uploads/mid_' + this.group.group_image.image.path) : DEFAULT_PROFILE
     },
-    translatedGroups() {
-      return this.$lang.get('groups.groups')
-    },
-    translatedWebsite() {
-      return this.$lang.get('groups.website')
-    }
   },
   methods: {
     brokenGroupImage(event) {

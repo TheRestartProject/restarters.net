@@ -87,6 +87,8 @@ class GroupController extends Controller
                     'country' => $group->country,
                     'latitude' => $group->latitude,
                     'longitude' => $group->longitude,
+                    'area' => $group->area,
+                    'postcode' => $group->postcode
                 ],
                 'website' => $group->website,
                 'facebook' => $group->facebook,

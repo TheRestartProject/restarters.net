@@ -14,5 +14,4 @@ Ga onmiddellijk naar:',
     'devices_logged' => 'Ingegeven toestellen',
     'title' => 'Dashboard',
     'log_devices' => 'Herstellingen bijhouden',
-    'subtitle' => 'Repair&Share gebruikt het Restarters platform voor gegevensuitwisseling tussen en over Repair Café\'s. Fijn dat je meedoet!',
-];
+);

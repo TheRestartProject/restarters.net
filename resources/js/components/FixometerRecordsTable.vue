@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-brand small pl-3">{{ translatedTableIntro }}</p>
+    <p class="text-brand small pl-3">{{ __('devices.table_intro') }}</p>
     <div class="pl-md-3 pr-md-3">
       <b-table
           ref="table"
@@ -53,7 +53,7 @@
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
               <b-img class="icon" src="/icons/edit_ico_green.svg" />
             </span>
-            <ConfirmModal :key="'modal-' + row.item.iddevices" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="translatedConfirmDeleteDevice" />
+            <ConfirmModal :key="'modal-' + row.item.iddevices" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="__('devices.confirm_delete')" />
           </div>
           <div v-else>
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
@@ -72,6 +72,7 @@
               :idevents="row.item.event"
               :brands="brands"
               :barrier-list="barrierList"
+              :itemTypes="itemTypes"
               :cancel-button="false"
               @close="closed(row)" />
         </template>
@@ -125,6 +126,11 @@ export default {
       default: null
     },
     barrierList: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    itemTypes: {
       type: Array,
       required: false,
       default: null
@@ -199,7 +205,7 @@ export default {
       let ret = [
         {
           key: 'device_category.name',
-          label: this.translatedCategory,
+          label: this.__('devices.category'),
           thClass: 'width20 pl-0 pl-md-3',
           tdClass: 'width20 pl-0 pl-md-3',
           sortable: true
@@ -207,24 +213,24 @@ export default {
       ]
 
       if (this.powered) {
-        ret.push({key: 'model', label: this.translatedModel, sortable: true})
-        ret.push({key: 'brand', label: this.translatedBrand, sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
+        ret.push({key: 'model', label: this.__('devices.model'), sortable: true})
+        ret.push({key: 'brand', label: this.__('devices.brand'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
       } else {
-        ret.push({key: 'item_type', label: this.translatedModelOrType, sortable: true, tdClass: 'pl-0 pl-md-3'})
+        ret.push({key: 'item_type', label: this.__('devices.model_or_type'), sortable: true, tdClass: 'pl-0 pl-md-3'})
       }
 
-      ret.push({key: 'shortProblem', label: this.translatedAssessment, thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})
-      ret.push({key: 'device_event.the_group.name', label: this.translatedGroup, sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
+      ret.push({key: 'shortProblem', label: this.__('devices.assessment'), thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})
+      ret.push({key: 'device_event.the_group.name', label: this.__('devices.group'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
       ret.push({
         key: 'repair_status',
-        label: this.translatedStatus,
+        label: this.__('devices.status'),
         thClass: 'width90px',
         tdClass: 'width90px',
         sortable: true
       })
       ret.push({
         key: 'device_event.event_date',
-        label: this.translatedDevicesDate,
+        label: this.__('devices.devices_date'),
         thClass: 'width90px',
         tdClass: 'width90px',
         sortable: true
@@ -239,39 +245,6 @@ export default {
 
       return ret
     },
-    translatedCategory () {
-      return this.$lang.get('devices.category')
-    },
-    translatedBrand () {
-      return this.$lang.get('devices.brand')
-    },
-    translatedModel () {
-      return this.$lang.get('devices.model')
-    },
-    translatedModelOrType () {
-      return this.$lang.get('devices.model_or_type')
-    },
-    translatedAssessment () {
-      return this.$lang.get('devices.assessment')
-    },
-    translatedGroup () {
-      return this.$lang.get('devices.group')
-    },
-    translatedStatus () {
-      return this.$lang.get('devices.status')
-    },
-    translatedDevicesDate () {
-      return this.$lang.get('devices.devices_date')
-    },
-    translatedTableIntro () {
-      return this.$lang.get('devices.table_intro')
-    },
-    translatedClose() {
-      return this.$lang.get('partials.close')
-    },
-    translatedConfirmDeleteDevice() {
-      return this.$lang.get('devices.confirm_delete')
-    }
   },
   watch: {
     powered(newVal) {

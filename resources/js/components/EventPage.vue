@@ -13,7 +13,7 @@
     <EventImages :images="images" v-if="images && images.length" />
     <div v-if="inProgress || finished">
       <EventStats :idevents="idevents" />
-      <EventDevices id="devices-section":idevents="idevents" :canedit="canedit" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
+      <EventDevices id="devices-section":idevents="idevents" :canedit="canedit" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" />
     </div>
   </div>
 </template>
@@ -85,6 +85,11 @@ export default {
       default: null
     },
     barrierList: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    itemTypes: {
       type: Array,
       required: false,
       default: null

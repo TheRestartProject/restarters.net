@@ -62,6 +62,7 @@ class DeviceController extends Controller
             'clusters' => $clusters,
             'barriers' => \App\Helpers\FixometerHelper::allBarriers(),
             'brands' => $brands,
+            'item_types' => Device::getItemTypes()
         ]);
     }
 

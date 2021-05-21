@@ -9,7 +9,7 @@
       </div>
       <div>
         <b-btn variant="primary" :href="'/group/join/' + group.idgroups" v-if="!group.ingroup">
-          {{ translatedFollowGroup }}
+          {{ __('events.follow_group') }}
         </b-btn>
       </div>
     </div>
@@ -33,9 +33,6 @@ export default {
     groupImage() {
       return this.group && this.group.group_image && this.group.group_image.image ? ('/uploads/mid_' + this.group.group_image.image.path) : DEFAULT_PROFILE
     },
-    translatedFollowGroup() {
-      return this.$lang.get('events.follow_group')
-    }
   },
   methods: {
     brokenProfileImage(event) {

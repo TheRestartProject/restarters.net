@@ -4,36 +4,36 @@
       <b-thead>
         <b-tr>
           <b-th>
-            {{ translatedCategory }}
-          </b-th>
-          <b-th v-if="powered">
-            {{ translatedModel }}
+            {{ __('devices.category') }}
           </b-th>
           <b-th v-if="powered" class="d-none d-md-table-cell">
-            {{ translatedBrand }}
+              {{ __('devices.brand') }}
+          </b-th>
+          <b-th v-if="powered">
+            {{ __('devices.model') }}
           </b-th>
           <b-th v-if="!powered">
-            {{ translatedModelOrType }}
+            {{ __('devices.item_type') }}
           </b-th>
           <b-td v-if="!powered" class="d-table-cell d-md-none" />
           <b-th class="d-none d-md-table-cell">
-            {{ translatedAge }}
+            {{ __('devices.age') }}
           </b-th>
           <b-th class="d-none d-md-table-cell">
-            {{ translatedDescription }}
+            {{ __('devices.devices_description') }}
           </b-th>
           <b-th class="d-none d-md-table-cell">
-            {{ translatedStatus }}
+            {{ __('devices.status') }}
           </b-th>
           <b-th class="d-none d-md-table-cell">
-            {{ translatedSpareParts }}
+            {{ __('devices.spare_parts') }}
           </b-th>
           <b-th v-if="canedit" class="d-none d-md-table-cell">
           </b-th>
         </b-tr>
       </b-thead>
       <b-tbody class="borders">
-        <EventDeviceSummary v-for="device in devices" :key="'device-' + device.iddevices" :device="device" :canedit="canedit" :powered="powered" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
+        <EventDeviceSummary v-for="device in devices" :key="'device-' + device.iddevices" :device="device" :canedit="canedit" :powered="powered" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" :clusters="clusters" />
       </b-tbody>
     </b-table-simple>
   </div>
@@ -75,37 +75,16 @@ export default {
       default: null
     },
     barrierList: {
-          type: Array,
-          required: false,
-          default: null
-    }
+      type: Array,
+      required: false,
+      default: null
+    },
+    itemTypes: {
+      type: Array,
+      required: false,
+      default: null
+    },
   },
-  computed: {
-    translatedCategory() {
-      return this.$lang.get('devices.category')
-    },
-    translatedBrand() {
-      return this.$lang.get('devices.brand')
-    },
-    translatedModel() {
-      return this.$lang.get('devices.model')
-    },
-    translatedModelOrType() {
-      return this.$lang.get('devices.model_or_type')
-    },
-    translatedAge() {
-      return this.$lang.get('devices.age')
-    },
-    translatedDescription() {
-      return this.$lang.get('devices.devices_description')
-    },
-    translatedStatus() {
-      return this.$lang.get('devices.status')
-    },
-    translatedSpareParts() {
-      return this.$lang.get('devices.spare_parts')
-    },
-  }
 }
 </script>
 <style scoped lang="scss">

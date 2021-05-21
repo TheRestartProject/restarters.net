@@ -24,5 +24,4 @@ return [
     'join_group_link_restarter' => 'Trova un gruppo',
     'join_group_restarter' => 'Segui un gruppo di riparazione',
     'log_devices' => 'Registra dispositivi',
-    'subtitle' => 'Tieniti aggiornato con le ultime attività nella community dei riparatori.',
-];
+);

@@ -33,25 +33,25 @@
     </b-td>
     <b-td v-if="upcoming && event.requiresModeration" class="cell-warning">
       <span v-if="event.canModerate">
-        <a :href="'/party/edit/' + idevents">{{ translatedRequiresModeration }}</a>
+        <a :href="'/party/edit/' + idevents">{{ __('partials.event_requires_moderation') }}</a>
       </span>
       <span v-else>
-        {{ translatedRequiresModerationByAnAdmin }}
+        {{ __('partials.event_requires_moderation_by_an_admin') }}
       </span>
     </b-td>
     <b-td v-else-if="upcoming" class="d-none d-md-table-cell">
       <div v-if="event.attending" class="text-black font-weight-bold d-flex justify-content-around">
         <span>
-          {{ translatedYoureGoing }}
+          {{ __('events.youre_going') }}
         </span>
       </div>
       <!-- "all" or "nearby" events are for ones where we're not a member, so should a join button. -->
       <b-btn variant="primary" :href="'/group/join/' + event.group.idgroups" v-else-if="event.all || event.nearby">
-        {{ translatedJoinGroup }}
+        {{ __('groups.join_group_button') }}
       </b-btn>
       <!-- We can't RSVP if the event is starting soon. -->
       <b-btn variant="primary" :href="'/party/join/' + idevents" :disabled="startingSoon" v-else>
-        {{ translatedRSVP }}
+        {{ __('events.RSVP') }}
       </b-btn>
     </b-td>
     <b-td v-if="!upcoming" :class="{
@@ -73,9 +73,9 @@
       {{ event.volunteers_count }}
     </b-td>
     <b-td colspan="5" v-if="noDevices" class="cell-danger text-center d-none d-md-table-cell">
-      {{ translatedNoDevices }}
+      {{ __('partials.no_devices_added') }}
       <a :href="'/party/view/' + this.idevents">
-        {{ translatedAddADevice}}
+        {{ __('partials.add_a_device') }}
       </a>
     </b-td>
     <b-td v-if="!upcoming && !noDevices && stats" class="d-none d-md-table-cell cell-number">
@@ -119,27 +119,6 @@ export default {
     noDevices() {
       // Whether there are no devices at this event, and we have permissions to do something about that.
       return this.event && this.stats && (this.stats.fixed_devices + this.stats.repairable_devices + this.stats.dead_devices === 0) && this.canedit && this.finished
-    },
-    translatedRequiresModeration() {
-      return this.$lang.get('partials.event_requires_moderation')
-    },
-    translatedRequiresModerationByAnAdmin() {
-      return this.$lang.get('partials.event_requires_moderation_by_an_admin')
-    },
-    translatedNoDevices() {
-      return this.$lang.get('partials.no_devices_added')
-    },
-    translatedAddADevice() {
-      return this.$lang.get('partials.add_a_device')
-    },
-    translatedYoureGoing() {
-      return this.$lang.get('events.youre_going')
-    },
-    translatedRSVP() {
-      return this.$lang.get('events.RSVP')
-    },
-    translatedJoinGroup() {
-      return this.$lang.get('groups.join_group_button')
     },
   }
 }

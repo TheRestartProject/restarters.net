@@ -1,8 +1,8 @@
 <template>
   <div>
     <h2 class="mt-2 mb-2">
-      {{ translatedImpact }}
-      <span v-b-popover.html="translatedImpactCalculation">
+      {{ __('events.environmental_impact') }}
+      <span v-b-popover.html="__('events.impact_calculation')">
         <b-img class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg" />
       </span>
     </h2>
@@ -37,12 +37,6 @@ export default {
     }
   },
   computed: {
-    translatedImpact() {
-      return this.$lang.get('events.environmental_impact')
-    },
-    translatedImpactCalculation() {
-      return this.$lang.get('events.impact_calculation')
-    },
     notincluded() {
       const langSource = this.statsEntity + 's'; // which lang file to look in, i.e. events or groups.
       let ret = []

@@ -1,7 +1,7 @@
 <template>
   <CollapsibleSection collapsed :count="volunteers.length">
     <template slot="title">
-      {{ translatedTitle }}
+      {{ __('groups.volunteers') }}
     </template>
     <template slot="content">
       <div class="mt-2">
@@ -11,7 +11,7 @@
           </div>
           <div class="d-flex justify-content-between">
             <a class="justify-content-end" href="#" data-toggle="modal" data-target="#invite-to-group">
-              {{ translatedInviteToGroup }}
+              {{ __('groups.invite_to_group') }}
             </a>
             <a class="justify-content-end" href="#" data-toggle="modal" data-target="#group-volunteers">
               {{ translatedSeeAll }}
@@ -19,7 +19,7 @@
           </div>
         </div>
         <p v-else>
-          {{ translatedNoVolunteers }}.
+          {{ __('groups.no_volunteers') }}.
         </p>
       </div>
     </template>
@@ -41,20 +41,11 @@ export default {
     }
   },
   computed: {
-    translatedTitle() {
-      return this.$lang.get('groups.volunteers')
-    },
     translatedSeeAll() {
       return this.$lang.choice('groups.see_all_volunteers', this.volunteers.length, {
         count: this.volunteers.length
       })
     },
-    translatedNoVolunteers() {
-      return this.$lang.get('groups.no_volunteers')
-    },
-    translatedInviteToGroup() {
-      return this.$lang.get('groups.invite_to_group');
-    }
   },
   created() {
     // The list of volunteers is passed from the server to the client via a prop on this component.  When we are created

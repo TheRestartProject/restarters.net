@@ -25,7 +25,6 @@ return [
     'join_group_restarter' => 'Suivre un Repair Café',
     'log_devices' => 'Connecter un appareil',
     'networks_you_coordinate' => 'Voici le réseau que vous coordonnez :',
-    'subtitle' => 'Restez informé des dernières activités de la communauté Repair!',
     'title' => 'Tableau de bord',
     'your_networks' => 'Vos réseaux',
     'add_event' => 'Ajouter',
@@ -46,4 +45,6 @@ return [
     'upcoming_events_subtitle' => 'Les événements à venir de vos Repair Cafés',
     'upcoming_events_title' => 'Evénements à venir',
     'your_groups_heading' => 'Vos Repair Cafés',
-];
+    'see_your_impact' => 'Et regardez votre impact sur le Fixometer',
+    'add_data_add' => 'Ajouter',
+);

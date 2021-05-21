@@ -2,15 +2,15 @@
   <div>
     <div class="device-photo-layout" v-if="!add">
       <label v-if="!add">
-        {{ translatedImages }}
+        {{ __('devices.images') }}
       </label>
       <div class="d-flex flex-wrap device-photos dropzone-previews">
         <FileUploader :url="'/device/image-upload/' + device.iddevices" v-if="edit && !disabled" previews-container=".device-photos" @uploaded="uploaded($event)" />
         <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)" :disabled="disabled" />
       </div>
     </div>
-    <p class="p-0" v-else>
-      {{ translatedExcuse }}
+    <p class="p-1 form-text" v-else>
+      {{ __('devices.images_on_edit') }}
     </p>
   </div>
 </template>
@@ -56,12 +56,6 @@ export default {
         return []
       }
     },
-    translatedImages() {
-      return this.$lang.get('devices.images')
-    },
-    translatedExcuse() {
-      return this.$lang.get('devices.images_on_edit')
-    }
   },
   methods: {
     uploaded(images) {

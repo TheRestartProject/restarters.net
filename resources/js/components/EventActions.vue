@@ -1,46 +1,49 @@
 <template>
   <div>
-    <b-dropdown variant="primary" :text="translatedEventActions" class="deepnowrap">
+    <b-dropdown variant="primary" :text="__('events.event_actions').toUpperCase()" class="deepnowrap">
       <div v-if="canedit">
         <b-dropdown-item :href="'/party/edit/' + idevents">
-          {{ translatedEditEvent }}
+          {{ __('events.edit_event') }}
+        </b-dropdown-item>
+        <b-dropdown-item :href="'/party/duplicate/' + idevents">
+          {{ __('events.duplicate_event') }}
         </b-dropdown-item>
         <b-dropdown-item @click="confirmDelete" v-if="!inProgress && !finished">
-          {{ translatedDeleteEvent }}
+          {{ __('events.delete_event') }}
         </b-dropdown-item>
         <div v-if="finished">
           <b-dropdown-item data-toggle="modal" data-target="#event-request-review">
-            {{ translatedRequestReview }}
+            {{ __('events.request_review') }}
           </b-dropdown-item>
           <b-dropdown-item data-toggle="modal" data-target="#event-share-stats">
-            {{ translatedShareEventStats }}
+            {{ __('events.share_event_stats') }}
           </b-dropdown-item>
         </div>
         <div v-else>
           <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="attending && upcoming">
-            {{ translatedInviteVolunteers }}
+            {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
           <b-dropdown-item :href="'/party/join/' + idevents" v-else>
-            {{ translatedRSVP }}
+            {{ __('events.RSVP') }}
           </b-dropdown-item>
         </div>
         <b-dropdown-item :href="'/group/join/' + event.the_group.idgroups" v-if="!inGroup">
-          {{ translatedFollowGroup }}
+          {{ __('events.follow_group') }}
         </b-dropdown-item>
       </div>
       <div v-else>
         <b-dropdown-item data-toggle="modal" data-target="#event-share-stats" v-if="finished">
-          {{ translatedShareEventStats }}
+          {{ __('events.share_event_stats') }}
         </b-dropdown-item>
         <div v-else>
           <b-dropdown-item :href="'/group/join/' + event.the_group.idgroups" v-if="!inGroup">
-            {{ translatedFollowGroup }}
+            {{ __('events.follow_group') }}
           </b-dropdown-item>
           <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="attending && upcoming">
-            {{ translatedInviteVolunteers }}
+            {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
           <b-dropdown-item :href="'/party/join/' + idevents" v-else>
-            {{ translatedRSVP }}
+            {{ __('events.RSVP') }}
           </b-dropdown-item>
         </div>
       </div>
@@ -75,32 +78,6 @@ export default {
       required: false,
       default: false
     },
-  },
-  computed: {
-    translatedEventActions() {
-      return this.$lang.get('events.event_actions').toUpperCase()
-    },
-    translatedEditEvent() {
-      return this.$lang.get('events.edit_event')
-    },
-    translatedDeleteEvent() {
-      return this.$lang.get('events.delete_event')
-    },
-    translatedRequestReview() {
-      return this.$lang.get('events.request_review')
-    },
-    translatedShareEventStats() {
-      return this.$lang.get('events.share_event_stats')
-    },
-    translatedInviteVolunteers() {
-      return this.$lang.get('events.invite_volunteers')
-    },
-    translatedRSVP() {
-      return this.$lang.get('events.RSVP')
-    },
-    translatedFollowGroup() {
-      return this.$lang.get('events.follow_group')
-    }
   },
   methods: {
     confirmDelete() {

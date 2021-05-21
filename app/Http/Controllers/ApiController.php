@@ -102,7 +102,7 @@ class ApiController extends Controller
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
                 ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
                   ->where('grouptags_groups.group_tag', $group_tag_id)
-                    ->select('events.*')
+                    ->select('events.*', 'groups.area')
                       ->get();
 
         return response()->json($events, 200);

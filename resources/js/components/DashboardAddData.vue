@@ -4,7 +4,7 @@
       <template slot="title">
         <div class="d-flex">
           <div class="align-self-center">
-            {{ translatedAddDataHeading }}
+            {{ __('dashboard.add_data_heading') }}
           </div>
           <b-img src="/images/fixometer_doodle.svg" class="ml-4 d-none d-md-block" />
         </div>
@@ -12,7 +12,7 @@
       <template slot="content">
         <div class="content">
           <p>
-            {{ translatedSeeYourImpact }}:
+            {{ __('dashboard.see_your_impact') }}:
           </p>
           <div class="layout">
             <multiselect
@@ -38,7 +38,7 @@
             <div class="addbutton d-flex justify-content-md-end">
               <div>
                 <b-btn variant="primary" :href="'/party/view/' + eventValue.idevents + '#devices-section'">
-                  {{ translatedAddDataAdd }}
+                  {{ __('dashboard.add_data_add') }}
                 </b-btn>
               </div>
             </div>
@@ -91,15 +91,6 @@ export default {
           name: new moment(e.event_date).format('DD MMM YY') + ' @ ' + e.venue
         }
       })
-    },
-    translatedAddDataHeading() {
-      return this.$lang.get('dashboard.add_data_heading')
-    },
-    translatedSeeYourImpact() {
-      return this.$lang.get('dashboard.see_your_impact')
-    },
-    translatedAddDataAdd() {
-      return this.$lang.get('dashboard.add_data_add')
     },
   },
   mounted() {

@@ -651,6 +651,7 @@ class GroupController extends Controller
 
             if ($user->hasRole('Administrator') || $user->hasRole('NetworkCoordinator')) {
                 $update['area'] = $data['area'];
+                $update['postcode'] = $data['postcode'];
             }
 
             $u = Group::findOrFail($id)->update($update);
@@ -1319,6 +1320,8 @@ class GroupController extends Controller
                         'country' => $group->country,
                         'latitude' => $group->latitude,
                         'longitude' => $group->longitude,
+                        'area' => $group->area,
+                        'postcode' => $group->postcode,
                     ],
                     'website' => $group->website,
                     'facebook' => $group->facebook,
@@ -1428,6 +1431,8 @@ class GroupController extends Controller
                 'country' => $group->country,
                 'latitude' => $group->latitude,
                 'longitude' => $group->longitude,
+                'area' => $group->area,
+                'postcode' => $group->postcode,
             ],
             'website' => $group->website,
             'description' => $group->free_text,

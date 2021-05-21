@@ -3,13 +3,13 @@
     <b-form-input
         v-model="searchName"
         type="search"
-        :placeholder="translatedSearchNamePlaceholder"
+        :placeholder="__('groups.search_name_placeholder')"
         class="mb-1 mb-md-0"
     />
     <multiselect
         v-if="showTags"
         v-model="searchTags"
-        :placeholder="translatedSearchTagsPlaceholder"
+        :placeholder="__('groups.search_tags_placeholder')"
         :options="allGroupTags"
         track-by="id"
         label="tag_name"
@@ -20,17 +20,17 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
-        :selectedLabel="translatedRemove"
+        :selectedLabel="__('partials.remove')"
     />
     <b-form-input
         v-model="searchLocation"
         type="search"
-        :placeholder="translatedSearchLocationPlaceholder"
+        :placeholder="__('groups.search_location_placeholder')"
         class="mb-1 mb-md-0"
     />
     <multiselect
         v-model="searchCountry"
-        :placeholder="translatedCountries"
+        :placeholder="__('groups.search_country_placeholder')"
         :options="countryOptions"
         track-by="country"
         label="country"
@@ -41,11 +41,11 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
-        :selectedLabel="translatedRemove"
+        :selectedLabel="__('partials.remove')"
     />
     <multiselect
         v-model="searchNetwork"
-        :placeholder="translatedNetworks"
+        :placeholder="__('networks.network')"
         :options="networkOptions"
         track-by="id"
         label="name"
@@ -56,7 +56,7 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
-        :selectedLabel="translatedRemove"
+        :selectedLabel="__('partials.remove')"
     />
   </div>
 </template>
@@ -143,24 +143,6 @@ export default {
         return a.country.localeCompare(b.country)
       })
     },
-    translatedRemove() {
-      return this.$lang.get('partials.remove')
-    },
-    translatedNetworks() {
-      return this.$lang.get('networks.network')
-    },
-    translatedCountries() {
-      return this.$lang.get('groups.search_country_placeholder')
-    },
-    translatedSearchNamePlaceholder() {
-      return this.$lang.get('groups.search_name_placeholder')
-    },
-    translatedSearchLocationPlaceholder() {
-      return this.$lang.get('groups.search_location_placeholder')
-    },
-    translatedSearchTagsPlaceholder() {
-      return this.$lang.get('groups.search_tags_placeholder')
-    }
   },
   created() {
     // Multiselect's v-model uses the options object, so find the relevant one.
