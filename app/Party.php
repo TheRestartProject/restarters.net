@@ -888,4 +888,8 @@ class Party extends Model implements Auditable
 
         return $coordinators;
     }
+
+    public function getMaxUpdatedAtDevicesUpdatedAtAttribute() {
+        return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
+    }
 }

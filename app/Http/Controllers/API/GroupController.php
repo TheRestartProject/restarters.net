@@ -111,7 +111,7 @@ class GroupController extends Controller
                     'co2_equivalence_visualisation' => url("/outbound/info/group/{$group->idgroups}/manufacture"),
                 ],
                 'created_at' => $group->created_at,
-                'updated_at' => $group->updated_at,
+                'updated_at' => $group->max_updated_at_devices_updated_at,
             ]);
 
             foreach ($group->upcomingParties() as $event) {
