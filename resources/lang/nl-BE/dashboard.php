@@ -14,4 +14,4 @@ Ga onmiddellijk naar:',
     'devices_logged' => 'Ingegeven toestellen',
     'title' => 'Dashboard',
     'log_devices' => 'Herstellingen bijhouden',
-);
+];

@@ -193,4 +193,4 @@ return [
     'validate_location' => 'Location must be present unless the event is online.',
     'other_events' => 'Other events',
     'online' => 'Online',
-);
+];

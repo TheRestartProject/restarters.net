@@ -18,4 +18,4 @@ return [
     'login_title' => 'Sign in',
     'join_title' => 'Join Restarters',
   'join_title_short' => 'Join',
-);
+];

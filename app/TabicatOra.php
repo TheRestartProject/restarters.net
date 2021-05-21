@@ -62,7 +62,7 @@ GROUP BY d.id_ords
 HAVING (opinions < 2) OR (opinions = 2 AND fault_types = 2)
 ORDER BY rand()
 LIMIT 1;
-';
+";
         $and = '';
         if ( ! empty($exclusions)) {
             $ids = implode("','", $exclusions);
@@ -72,7 +72,6 @@ LIMIT 1;
             $and .= "\nAND (d.`language` = '$locale')";
         }
         $sql = sprintf($sql, $and);
-
         return $sql;
     }
 
@@ -152,7 +151,7 @@ This is how to get progress with SQL but quicker code used below
 // ) AS r2
 // ");
 
-        $result['total_recats'] = DB::select("
+        $result['total_recats'] = DB::select('
 SELECT COUNT(*) AS total FROM (
 SELECT
 o.id_ords,
@@ -216,7 +215,7 @@ WHERE (SELECT a.id_ords FROM devices_faults_tablets_ora_adjudicated a WHERE a.id
 GROUP BY d.id_ords
 HAVING
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
-");
+');
 
         $total_splits = count($result['list_splits']);
         $result['total_splits'] = [json_decode(json_encode(['total' => $total_splits]), FALSE)];

@@ -178,4 +178,4 @@ return [
     'search_tags_placeholder' => 'Tag',
     'show_filters' => 'Montrer les filtres',
     'all' => 'Tous',
-);
+];

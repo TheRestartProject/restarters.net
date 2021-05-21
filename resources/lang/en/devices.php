@@ -122,4 +122,4 @@ return [
     'tooltip_type' => 'Add as much information about the type of item here as you can (e.g. `Denim jeans` or ‘Sofa’)',
     'add_data_group' => 'Please select a group',
     'add_data_event' => 'Please select an event',
-);
+];

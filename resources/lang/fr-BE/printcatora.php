@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'task' => [
     'where_is_the_main_fault' => 'Où se trouve le principal défaut?',
     'fetch_another' => 'Je ne sais pas, chercher une autre réparation',
@@ -44,4 +44,4 @@ return array (
     'body-s4-p1' => 'Pour en savoir plus, posez nous des questions et faites nous part de <a href=":url" target="_blank">vos commentaires dans le forum PrintCat</a>.',
     'title' => 'Merci d’avoir essayé PrintCat',
   ],
-);
+];
