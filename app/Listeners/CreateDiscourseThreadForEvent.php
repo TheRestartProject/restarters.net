@@ -80,7 +80,7 @@ class CreateDiscourseThreadForEvent
 
             // We want to save the discourse thread id in the event, so that we can invite people to it later
             // when they RSVP.
-            $json = json_decode($response->getBody()->getContents(), true);
+            $json = json_decode($response->getBody(), true);
             if (empty($json['topic_id'])) {
                 throw new \Exception("Topic id not found in create response");
             }
