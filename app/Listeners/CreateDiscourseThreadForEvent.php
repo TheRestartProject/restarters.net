@@ -5,6 +5,8 @@ namespace App\Listeners;
 use App\Events\ApproveEvent;
 use App\Events\UserFollowedGroup;
 use App\Party;
+use App\User;
+use App\EventsUsers;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -34,13 +36,13 @@ class CreateDiscourseThreadForEvent
             return;
         }
 
-        // Get the user who created the event.
-        $user = $event->user;
-
         // Get the event.
         $partyId = $event->party->idevents;
 
         $theParty = Party::find($partyId);
+
+        // Get the user who created the event.
+        $host = User::find(EventsUsers::where('event', $partyId)->get()[0]->user);
 
         if (empty($theParty)) {
             Log::error("Event not found");
@@ -51,30 +53,22 @@ class CreateDiscourseThreadForEvent
         try {
             $client = app('discourse-client');
 
-            // see https://meta.discourse.org/t/sync-sso-user-data-with-the-sync-sso-route/84398 for details on the sync_sso route.
-            $sso_secret = config('discourse-api.sso_secret');
-
             // See https://meta.discourse.org/t/private-message-send-api/27593/21.
             $params = [
                 'raw' => $theParty->venue,
                 'title' => $theParty->venue,
-                'target_usernames' => $user->name,
+                'target_usernames' => $host->username,
                 'archetype' => 'private_message'
             ];
-            $sso_payload = base64_encode(http_build_query($params));
-            $sig = hash_hmac( 'sha256', $sso_payload, $sso_secret );
 
-            $endpoint = '/posts';
+            $endpoint = '/posts.json';
 
             Log::info('Creating event thread: ' . json_encode($params));
             $response = $client->request(
                 'POST',
                 $endpoint,
                 [
-                    'form_params' => [
-                        'sso' => $sso_payload,
-                        'sig' => $sig,
-                    ],
+                    'form_params' => $params
                 ]
             );
 
