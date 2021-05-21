@@ -83,4 +83,36 @@ class DiscourseService
         // There's probably a better way of doing this.
         sleep(1);
     }
+
+
+    public function addUserToPrivateMessage($threadid, $addBy, $addUser) {
+        Log::info("Add user to private message $threadid, $addBy, $addUser");
+
+        $client = app('discourse-client', [
+            'username' => $addBy
+        ]);
+
+        $params = [
+            'user' => $addUser,
+            'custom_message' => ''
+        ];
+
+        $endpoint = "t/$threadid/invite";
+
+        Log::info('Adding to private message: ' . json_encode($params));
+        $response = $client->request(
+            'POST',
+            $endpoint,
+            [
+                'form_params' => $params
+            ]
+        );
+
+        Log::info('Response status: ' . $response->getStatusCode());
+        Log::info('Response body: ' . $response->getBody());
+
+        if ( ! $response->getStatusCode() === 200) {
+            Log::error("Could not add to private message ($threadid, $addBy, $addUser:" . $response->getReasonPhrase());
+        }
+    }
 }
