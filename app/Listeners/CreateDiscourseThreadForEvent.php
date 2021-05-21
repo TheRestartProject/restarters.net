@@ -58,7 +58,7 @@ class CreateDiscourseThreadForEvent
 
             // See https://meta.discourse.org/t/private-message-send-api/27593/21.
             $params = [
-                'raw' => $theParty->venue,
+                'raw' => __('events.discourse_thread'),
                 'title' => $theParty->venue . ' ' . $theParty->event_date,
                 'target_usernames' => $host->username,
                 'archetype' => 'private_message'

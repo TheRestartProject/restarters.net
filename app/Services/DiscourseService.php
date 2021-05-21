@@ -94,7 +94,7 @@ class DiscourseService
 
         $params = [
             'user' => $addUser,
-            'custom_message' => ''
+            'custom_message' => __('events.discourse_invite')
         ];
 
         $endpoint = "t/$threadid/invite";

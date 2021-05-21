@@ -825,9 +825,24 @@ class PartyController extends Controller
 
     public function addToDiscourseThread($event, $user) {
         if ($event->discourse_thread) {
-            // We want the host of the event to add the user to the thread.
-            $host = (new Group)->findHost($event->group);
-            $this->discourseService->addUserToPrivateMessage($event->discourse_thread, $host->username, $user->username);
+            // We want a host of the event to add the user to the thread.
+            try {
+                $hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
+                    ->where('events_users.event', $event->idevents)
+                    ->where('events_users.role', 3)
+                    ->select('users.*')
+                    ->get();
+            } catch (\Exception $e) {
+                $hosts = null;
+            }
+
+            if (!is_null($hosts) && count($hosts)) {
+                $this->discourseService->addUserToPrivateMessage(
+                    $event->discourse_thread,
+                    $hosts[0]->username,
+                    $user->username
+                );
+            }
         }
     }
 
