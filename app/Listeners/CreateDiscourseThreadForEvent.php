@@ -49,9 +49,12 @@ class CreateDiscourseThreadForEvent
             return;
         }
 
-        // add user to the network groups for the group the user followed.
         try {
-            $client = app('discourse-client');
+            // We want the host to create the message, so use their username.  The API key should
+            // allow us to do this - see https://meta.discourse.org/t/how-can-an-api-user-create-posts-as-another-user/45968/3.
+            $client = app('discourse-client', [
+                'username' => $host->username
+            ]);
 
             // See https://meta.discourse.org/t/private-message-send-api/27593/21.
             $params = [
