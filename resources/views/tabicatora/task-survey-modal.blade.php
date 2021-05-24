@@ -126,8 +126,6 @@
 <script>
     document.addEventListener(`DOMContentLoaded`, async () => {
 
-        let submit = [];
-
         [...document.querySelectorAll('.survey-question li')].forEach(elem => {
             elem.addEventListener('click', function(e) {
                 if (e.srcElement.nodeName == 'LI') {
@@ -147,6 +145,7 @@
 
         document.getElementById('btn-send-survey').addEventListener('click', function(e) {
             e.preventDefault();
+            let submit = [];
             for (let i = 1; i < 5; i++) {
                 let q = 'q' + i;
                 let elem = document.querySelector('input[name="' + q + '"]:checked');
