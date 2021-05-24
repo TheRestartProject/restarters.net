@@ -110,9 +110,10 @@ class GroupController extends Controller
                     'headline_stats' => url("/group/stats/{$group->idgroups}"),
                     'co2_equivalence_visualisation' => url("/outbound/info/group/{$group->idgroups}/manufacture"),
                 ],
-                'created_at' => $group->created_at,
-                'updated_at' => $group->updated_at,
-            ]);
+                'created_at' => new \Carbon\Carbon($group->created_at),
+                'updated_at' => new \Carbon\Carbon($group->max_updated_at_devices_updated_at)
+
+              ]);
 
             foreach ($group->upcomingParties() as $event) {
                 $upcoming_parties_collection->push([
