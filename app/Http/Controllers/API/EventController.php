@@ -109,8 +109,8 @@ class EventController extends Controller
                  'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
              ],
              'hours_volunteered' => $party->hoursVolunteered(),
-             'created_at' => $party->created_at,
-             'updated_at' => $party->max_updated_at_devices_updated_at,
+             'created_at' => new \Carbon\Carbon($party->created_at),
+             'updated_at' => new \Carbon\Carbon($party->max_updated_at_devices_updated_at)
            ]);
 
            if ( ! empty($party->owner)) {
