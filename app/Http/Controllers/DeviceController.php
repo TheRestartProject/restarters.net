@@ -9,6 +9,7 @@ use App\Cluster;
 use App\Device;
 use App\DeviceList;
 use App\DeviceUrl;
+use App\Events\DeviceCreatedOrUpdated;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\FootprintRatioCalculator;
@@ -202,6 +203,8 @@ class DeviceController extends Controller
                         $file->upload('devicePhoto', 'image', $id, env('TBL_DEVICES'), true);
                     }
                 }
+
+                event(new DeviceCreatedOrUpdated(Device::find($id)));
             }
         }
 
@@ -218,6 +221,8 @@ class DeviceController extends Controller
             $this->set('title', 'Edit Device');
             $this->set('categories', $Categories->listed());
             $this->set('formdata', $Device);
+
+            event(new DeviceCreatedOrUpdated($Device));
 
             return view('device.edit', [
                 'title' => 'Edit Device',
@@ -243,6 +248,8 @@ class DeviceController extends Controller
                 $response['data'] = $data;
                 $response['id'] = $id;
             }
+
+            event(new DeviceCreatedOrUpdated($this->Device));
 
             echo json_encode($response);
         }
@@ -301,6 +308,7 @@ class DeviceController extends Controller
                         $response['danger'] = 'Error while saving the device to the DB.';
                     } else {
                         $response['success'] = 'Device saved!';
+                        event(new DeviceCreatedOrUpdated($insert));
                     }
                 }
             }
@@ -418,6 +426,8 @@ class DeviceController extends Controller
             $device[$i]->repaired_by = Auth::id();
 
             $device[$i]->save();
+
+            event(new DeviceCreatedOrUpdated($device[$i]));
 
             // Update barriers
             if (isset($barrier) && ! empty($barrier) && $repair_status == 3) { // Only sync when repair status is end-of-life
@@ -555,7 +565,9 @@ class DeviceController extends Controller
                 $spare_parts = 2;
             }
 
-            Device::find($id)->update([
+            $Device = Device::find($id);
+
+            $Device->update([
                 'category' => $category,
                 'category_creation' => $category,
                 'estimate' => $weight,
@@ -577,12 +589,13 @@ class DeviceController extends Controller
 
             // Update barriers
             if (isset($barrier) && ! empty($barrier) && $repair_status == 3) { // Only sync when repair status is end-of-life
-                  $device = Device::find($id)->barriers()->sync($barrier);
+                  $Device->barriers()->sync($barrier);
             } else {
-                $device = Device::find($id)->barriers()->sync([]);
+                $Device->barriers()->sync([]);
             }
 
             $event = Party::find($event_id);
+            event(new DeviceCreatedOrUpdated($Device));
 
             $footprintRatioCalculator = new FootprintRatioCalculator();
             $emissionRatio = $footprintRatioCalculator->calculateRatio();
