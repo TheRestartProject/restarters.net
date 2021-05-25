@@ -1,17 +1,5 @@
 <!-- Modal -->
 <style>
-    .survey ul {
-        display: flex;
-        align-items: stretch;
-        justify-content: space-between;
-        width: 98%;
-        margin: 0;
-        padding: 0 1%;
-    }
-    .survey .error {
-        border: 1px solid lightpink;
-    }
-
     .survey-question {
         background-color: #f7f5ed;
         border: 5px solid #ddd;
@@ -19,26 +7,36 @@
         border-radius: 10px;
     }
 
+    .survey-question ul {
+        display: flex;
+        align-items: stretch;
+        justify-content: space-between;
+        width: 98%;
+        margin: 0;
+        padding: 0 1%;
+    }
+
     .survey-question h5 {
-        text-align: center;
         font-size: smaller;
-        font-weight: bolder;
+        padding-left: 15px;
     }
 
     .survey-question li {
         display: block;
         flex: 0 1 auto;
-        text-align: center;
     }
 
     .survey-question li label {
-        font-weight: normal;
         font-size: smaller;
     }
 
     .survey-question li,
     .survey-question input {
         cursor: pointer;
+    }
+
+    .survey .error {
+        border: 1px solid lightpink;
     }
 
     #btn-send-survey {
@@ -63,47 +61,47 @@
                 <input type="hidden" name="task-survey" value="">
                 <div class="modal-body">
                     <p class="modal-subtitle" style="width:100%" id="tasksurveyModalLabel">@lang('tabicatora.survey.header2')</p>
-                    <div class="row text-center">
+                    <div class="row">
                         <div class="col survey">
                             <p id="error" class="hide alert information-alert banner alert-secondary">@lang('tabicatora.survey.invalid')</p>
                             <div id="q1" class="row mb-3 survey-question">
-                                <h5>@lang('tabicatora.survey.q1')</h5>
+                                <h5 class="text-center font-weight-bolder">@lang('tabicatora.survey.q1')</h5>
                                 <ul class="list-inline">
-                                    <li class="list-inline-item"><input type="radio" name="q1" value="1">&nbsp;<label>@lang('tabicatora.survey.a1')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q1" value="2">&nbsp;<label>@lang('tabicatora.survey.a2')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q1" value="3">&nbsp;<label>@lang('tabicatora.survey.a3')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q1" value="4">&nbsp;<label>@lang('tabicatora.survey.a4')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q1" value="5">&nbsp;<label>@lang('tabicatora.survey.a5')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q1" value="1">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a1')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q1" value="2">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a2')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q1" value="3">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a3')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q1" value="4">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a4')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q1" value="5">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a5')</label></li>
                                 </ul>
                             </div>
                             <div id="q2" class="row mb-3 survey-question">
-                                <h5>@lang('tabicatora.survey.q2')</h5>
+                                <h5 class="text-center font-weight-bolder">@lang('tabicatora.survey.q2')</h5>
                                 <ul class="list-inline">
-                                    <li class="list-inline-item"><input type="radio" name="q2" value="1">&nbsp;<label>@lang('tabicatora.survey.a1')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q2" value="2">&nbsp;<label>@lang('tabicatora.survey.a2')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q2" value="3">&nbsp;<label>@lang('tabicatora.survey.a3')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q2" value="4">&nbsp;<label>@lang('tabicatora.survey.a4')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q2" value="5">&nbsp;<label>@lang('tabicatora.survey.a5')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q2" value="1">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a1')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q2" value="2">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a2')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q2" value="3">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a3')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q2" value="4">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a4')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q2" value="5">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a5')</label></li>
                                 </ul>
                             </div>
                             <div id="q3" class="row mb-3 survey-question">
-                                <h5>@lang('tabicatora.survey.q3')</h5>
+                                <h5 class="text-center font-weight-bolder">@lang('tabicatora.survey.q3')</h5>
                                 <ul class="list-inline">
-                                    <li class="list-inline-item"><input type="radio" name="q3" value="1">&nbsp;<label>@lang('tabicatora.survey.a1')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q3" value="2">&nbsp;<label>@lang('tabicatora.survey.a2')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q3" value="3">&nbsp;<label>@lang('tabicatora.survey.a3')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q3" value="4">&nbsp;<label>@lang('tabicatora.survey.a4')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q3" value="5">&nbsp;<label>@lang('tabicatora.survey.a5')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q3" value="1">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a1')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q3" value="2">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a2')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q3" value="3">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a3')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q3" value="4">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a4')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q3" value="5">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a5')</label></li>
                                 </ul>
                             </div>
                             <div id="q4" class="row mb-3 survey-question">
-                                <h5>@lang('tabicatora.survey.q4')</h5>
+                                <h5 class="text-center font-weight-bolder">@lang('tabicatora.survey.q4')</h5>
                                 <ul class="list-inline">
-                                    <li class="list-inline-item"><input type="radio" name="q4" value="1">&nbsp;<label>@lang('tabicatora.survey.a1')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q4" value="2">&nbsp;<label>@lang('tabicatora.survey.a2')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q4" value="3">&nbsp;<label>@lang('tabicatora.survey.a3')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q4" value="4">&nbsp;<label>@lang('tabicatora.survey.a4')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q4" value="5">&nbsp;<label>@lang('tabicatora.survey.a5')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q4" value="1">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a1')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q4" value="2">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a2')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q4" value="3">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a3')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q4" value="4">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a4')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q4" value="5">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a5')</label></li>
                                 </ul>
                             </div>
                         </div>
