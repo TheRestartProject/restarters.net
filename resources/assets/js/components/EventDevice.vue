@@ -71,7 +71,9 @@ import {
   END_OF_LIFE,
   SPARE_PARTS_MANUFACTURER,
   SPARE_PARTS_THIRD_PARTY,
-  CATEGORY_MISC, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME
+  CATEGORY_MISC, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME,
+    PARTS_PROVIDER_MANUFACTURER,
+    PARTS_PROVIDER_THIRD_PARTY
 } from '../constants'
 import DeviceCategorySelect from './DeviceCategorySelect'
 import DeviceBrandSelect from './DeviceBrandSelect'
@@ -252,6 +254,7 @@ export default {
       this.currentDevice.estimate = parseFloat(this.currentDevice.estimate)
 
       this.nextSteps()
+      this.partsProvider()
     }
   },
   methods: {
@@ -268,6 +271,12 @@ export default {
         this.currentDevice.repair_details = NEXT_STEPS_MORE_TIME
       } else {
         this.currentDevice.repair_details = null
+      }
+    },
+    partsProvider() {
+      // Third part parts are indicated via the parts provider field.
+      if (this.currentDevice.spare_parts === SPARE_PARTS_MANUFACTURER && this.currentDevice.parts_provider === PARTS_PROVIDER_THIRD_PARTY) {
+        this.currentDevice.spare_parts = SPARE_PARTS_THIRD_PARTY
       }
     },
     async addDevice() {
