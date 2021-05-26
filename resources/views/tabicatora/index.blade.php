@@ -129,6 +129,7 @@
                                 @foreach($fault->faulttypes as $fault_type)
                                 <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
                                 @endforeach
+                                <button id="btn-poordata" class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="{{ $poor_data[0]->id }}">@lang($poor_data[0]->title)</button>
                             </div>
                         </div>
                     </div>

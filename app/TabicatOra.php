@@ -76,12 +76,21 @@ LIMIT 1;
     }
 
     /**
-     * Fetch all fault_type_ids for tabicat
+     * Fetch all fault_type_ids except id=25 ("Poor data") for tabicat
      *
      * @return array
      */
     public function fetchFaultTypes() {
-        return DB::select("SELECT * FROM `fault_types_tablets`");
+        return DB::select("SELECT * FROM `fault_types_tablets` WHERE `id`<>25");
+    }
+
+    /**
+     * Fetch id=25 ("Poor data") for tabicat
+     *
+     * @return array
+     */
+    public function fetchFaultTypePoorData() {
+        return DB::select("SELECT * FROM `fault_types_tablets` WHERE `id`=25");
     }
 
     /**
