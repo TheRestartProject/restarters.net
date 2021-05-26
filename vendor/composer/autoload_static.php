@@ -7,8 +7,8 @@ namespace Composer\Autoload;
 class ComposerStaticInit82587c9947f0c277da993ca59a480583
 {
     public static $files = array (
-        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
@@ -499,6 +499,7 @@ class ComposerStaticInit82587c9947f0c277da993ca59a480583
         'App\\Console\\Commands\\FixViews' => __DIR__ . '/../..' . '/app/Console/Commands/FixViews.php',
         'App\\Console\\Commands\\ImportRepairTogether' => __DIR__ . '/../..' . '/app/Console/Commands/ImportRepairTogether.php',
         'App\\Console\\Commands\\PopulateUniqueCodeToEventsAndGroups' => __DIR__ . '/../..' . '/app/Console/Commands/PopulateUniqueCodeToEventsAndGroups.php',
+        'App\\Console\\Commands\\SetPostcodes' => __DIR__ . '/../..' . '/app/Console/Commands/SetPostcodes.php',
         'App\\Console\\Commands\\SetRepairTogetherPasswords' => __DIR__ . '/../..' . '/app/Console/Commands/SetRepairTogetherPasswords.php',
         'App\\Console\\Commands\\SyncDiscourseUsernames' => __DIR__ . '/../..' . '/app/Console/Commands/SyncDiscourseUsernames.php',
         'App\\Console\\Commands\\SyncEvents' => __DIR__ . '/../..' . '/app/Console/Commands/SyncEvents.php',
@@ -519,6 +520,7 @@ class ComposerStaticInit82587c9947f0c277da993ca59a480583
         'App\\EventsUsers' => __DIR__ . '/../..' . '/app/EventsUsers.php',
         'App\\Events\\ApproveEvent' => __DIR__ . '/../..' . '/app/Events/ApproveEvent.php',
         'App\\Events\\ApproveGroup' => __DIR__ . '/../..' . '/app/Events/ApproveGroup.php',
+        'App\\Events\\DeviceCreatedOrUpdated' => __DIR__ . '/../..' . '/app/Events/DeviceCreatedOrUpdated.php',
         'App\\Events\\EditEvent' => __DIR__ . '/../..' . '/app/Events/EditEvent.php',
         'App\\Events\\EditGroup' => __DIR__ . '/../..' . '/app/Events/EditGroup.php',
         'App\\Events\\EventDeleted' => __DIR__ . '/../..' . '/app/Events/EventDeleted.php',
@@ -610,6 +612,7 @@ class ComposerStaticInit82587c9947f0c277da993ca59a480583
         'App\\Listeners\\CreateWordPressEditEventPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressEditEventPost.php',
         'App\\Listeners\\CreateWordPressEditGroupPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressEditGroupPost.php',
         'App\\Listeners\\DeleteEventFromWordPress' => __DIR__ . '/../..' . '/app/Listeners/DeleteEventFromWordPress.php',
+        'App\\Listeners\\DeviceUpdatedAt' => __DIR__ . '/../..' . '/app/Listeners/DeviceUpdatedAt.php',
         'App\\Listeners\\DiscourseUserEventSubscriber' => __DIR__ . '/../..' . '/app/Listeners/DiscourseUserEventSubscriber.php',
         'App\\Listeners\\LogInToWiki' => __DIR__ . '/../..' . '/app/Listeners/LogInToWiki.php',
         'App\\Listeners\\LogOutOfWiki' => __DIR__ . '/../..' . '/app/Listeners/LogOutOfWiki.php',
