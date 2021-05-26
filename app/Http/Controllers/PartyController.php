@@ -182,7 +182,7 @@ class PartyController extends Controller
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
 
-        // Then let's redirect users away if they are a restarter or a host with no groups
+        // Show an error page if they are a restarter or a host with no groups
         if (FixometerHelper::hasRole(Auth::user(), 'Restarter') || (count($groupsUserIsInChargeOf) == 0 && FixometerHelper::hasRole(Auth::user(), 'Host'))) {
             return view('events.cantcreate');
         }
