@@ -35,7 +35,7 @@
                    class="btn btn-primary ml-2">
                     @lang('tabicatora.about')
                 </a>
-                <a class="btn btn-primary" href="{{ '/tabicat' . ($partner ? '?partner=$partner' : '') }}">
+                <a class="btn btn-primary" href="{{ '/tabicat' }}">
                     @lang('microtasking.cta.tabicat.get_involved')
                 </a>
             </div>
