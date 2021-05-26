@@ -10,6 +10,7 @@ require('./bootstrap-sortable.js');
 require('select2');
 require('slick-carousel');
 require('summernote');
+require('summernote-cleaner');
 require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
