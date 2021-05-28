@@ -65,7 +65,7 @@
         <?php
           // We need to expand a lot of event information to pass to the client.  In due course this will be replaced
           // by an API call to get the event details, and/or server-side rendering.
-          function expandVolunteer($volunteers) {
+          $expandVolunteerEvent = function($volunteers) {
             $ret = [];
 
             foreach ($volunteers as $volunteer) {
@@ -91,11 +91,11 @@
             }
 
             return $ret;
-          }
+          };
 
-          $expanded_attended = expandVolunteer($attended);
-          $expanded_invited = expandVolunteer($invited);
-          $expanded_hosts = expandVolunteer($hosts);
+          $expanded_attended = $expandVolunteerEvent($attended);
+          $expanded_invited = $expandVolunteerEvent($invited);
+          $expanded_hosts = $expandVolunteerEvent($hosts);
 
           // Trigger expansion of group.
           $group_image = $event->theGroup->groupImage;
