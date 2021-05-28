@@ -111,6 +111,9 @@
                     <div class="container">
                         <input type="hidden" id="id-ords" name="id-ords" value="{{ $fault->id_ords }}">
                         <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
+                        <p class="confirm hide">
+                            <button class="btn-md btn-info btn-rounded" id="change">@lang('tabicatora.task.go_with') "<span id="fault-type-new" data-fid=""></span>"</button>
+                        </p>
                         @if (count($fault->suggestions))
                         <div class="buttons suggestions">
                             <p class="title is-size-6-mobile is-size-6-tablet">@lang('tabicatora.task.suggestions')</p>
@@ -122,9 +125,6 @@
                         </div>
                         @endif
                         <div class="container options mb-3">
-                            <p class="confirm hide">
-                                <button class="btn-md btn-info btn-rounded" id="change">@lang('tabicatora.task.go_with') "<span id="fault-type-new" data-fid=""></span>"</button>
-                            </p>
                             <div class="buttons">
                                 @foreach($fault->faulttypes as $fault_type)
                                 <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
