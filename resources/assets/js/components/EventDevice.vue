@@ -72,8 +72,8 @@ import {
   SPARE_PARTS_MANUFACTURER,
   SPARE_PARTS_THIRD_PARTY,
   CATEGORY_MISC, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME,
-    PARTS_PROVIDER_MANUFACTURER,
-    PARTS_PROVIDER_THIRD_PARTY
+  PARTS_PROVIDER_MANUFACTURER,
+  PARTS_PROVIDER_THIRD_PARTY, SPARE_PARTS_NOT_NEEDED
 } from '../constants'
 import DeviceCategorySelect from './DeviceCategorySelect'
 import DeviceBrandSelect from './DeviceBrandSelect'
@@ -275,7 +275,7 @@ export default {
     },
     partsProvider() {
       // Third part parts are indicated via the parts provider field.
-      if (this.currentDevice.spare_parts === SPARE_PARTS_MANUFACTURER && this.currentDevice.parts_provider === PARTS_PROVIDER_THIRD_PARTY) {
+      if (this.currentDevice.spare_parts === SPARE_PARTS_NOT_NEEDED && this.currentDevice.parts_provider === PARTS_PROVIDER_THIRD_PARTY) {
         this.currentDevice.spare_parts = SPARE_PARTS_THIRD_PARTY
       }
     },
