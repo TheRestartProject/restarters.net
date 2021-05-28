@@ -155,7 +155,7 @@
                     <div class="col">
                         @foreach($status['list_splits'] as $row)
                         <div class="row border border-grey">
-                            <div class="col col-7 text-small text-wrap text-break">
+                            <div class="col col-7 text-small text-wrap">
                                 @php($tmp = explode(',',$row->opinions))
                                 @foreach($tmp as $opinion)
                                 @lang($opinion)<br>
