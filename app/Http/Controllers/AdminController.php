@@ -237,7 +237,7 @@ class AdminController extends Controller
             }
 
             $participants += $party->pax;
-            $hours_volunteered += $party->hoursVolunteer();
+            $hours_volunteered += $party->hoursVolunteered();
 
             foreach ($party->devices as $device) {
                 switch ($device->repair_status) {
