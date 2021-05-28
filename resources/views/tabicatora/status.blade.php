@@ -156,19 +156,15 @@
                         <div class="row border-grey">
                             <div class="col col-1">
                                 {{ $row->id_ords }}
-                                <!-- @php( print($row->id_ords) ) -->
                             </div>
                             <div class="col col-3">
                                 {{ $row->opinions }}
-                                <!-- @php( print($row->opinions) ) -->
                             </div>
                             <div class="col col-2">
                                 {{ $row->brand }}
-                                <!-- @php( print($row->brand) ) -->
                             </div>
                             <div class="col">
                                 {{ $row->problem }}
-                                <!-- @php( print($row->problem) ) -->
                             </div>
                         </div>
                         @endforeach
