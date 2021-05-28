@@ -18,7 +18,14 @@
 @section('title')
 <?php echo $title; ?>
 @endsection
-
+<style>
+/* .row :nth-child(even){
+  background-color: #dcdcdc;
+}
+.row :nth-child(odd){
+  background-color: #aaaaaa;
+} */
+</style>
 @section('content')
 
 <section class="tabicat">
@@ -100,7 +107,7 @@
                 <div class="row justify-content-center">
                     <div class="col">
                         <div class="row badge-pill badge-light">
-                            <div class="col col-2">
+                            <div class="col col-3">
                                 @lang('tabicatora.status.number_of_records')
                             </div>
                             <div class="col">
@@ -112,8 +119,8 @@
                 <div class="row justify-content-center small">
                     <div class="col">
                         @foreach($status['list_recats'] as $row)
-                        <div class="row border-grey">
-                            <div class="col col-2">
+                        <div class="row border border-grey">
+                            <div class="col col-3">
                                 {{ $row->total }}
                             </div>
                             <div class="col">
@@ -135,10 +142,7 @@
                 <div class="row justify-content-center">
                     <div class="col">
                         <div class="row badge-pill badge-light">
-                            <div class="col col-1">
-                                ID
-                            </div>
-                            <div class="col col-3">
+                            <div class="col col-5">
                                 @lang('tabicatora.status.opinions')
                             </div>
                             <div class="col col-2">
@@ -153,17 +157,17 @@
                 <div class="row justify-content-center small">
                     <div class="col">
                         @foreach($status['list_splits'] as $row)
-                        <div class="row border-grey">
-                            <div class="col col-1">
-                                {{ $row->id_ords }}
+                        <div class="row border border-grey">
+                            <div class="col col-5 text-wrap">
+                            @php($tmp = explode(',',$row->opinions))
+                            @foreach($tmp as $opinion)
+                                @lang($opinion)<br>
+                            @endforeach
                             </div>
-                            <div class="col col-3">
-                                {{ $row->opinions }}
-                            </div>
-                            <div class="col col-2">
+                            <div class="col col-2 text-wrap">
                                 {{ $row->brand }}
                             </div>
-                            <div class="col">
+                            <div class="col text-wrap">
                                 {{ $row->problem }}
                             </div>
                         </div>
