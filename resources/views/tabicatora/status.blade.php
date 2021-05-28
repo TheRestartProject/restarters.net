@@ -142,7 +142,7 @@
                 <div class="row justify-content-center">
                     <div class="col">
                         <div class="row badge-pill badge-light">
-                            <div class="col col-6">
+                            <div class="col col-7">
                                 @lang('tabicatora.status.opinions')
                             </div>
                             <div class="col">
@@ -155,7 +155,7 @@
                     <div class="col">
                         @foreach($status['list_splits'] as $row)
                         <div class="row border border-grey">
-                            <div class="col col-6 text-small text-wrap">
+                            <div class="col col-7 text-small text-wrap">
                                 @php($tmp = explode(',',$row->opinions))
                                 @foreach($tmp as $opinion)
                                 @lang($opinion)<br>
