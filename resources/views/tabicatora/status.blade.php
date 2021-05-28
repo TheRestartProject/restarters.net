@@ -19,12 +19,12 @@
 <?php echo $title; ?>
 @endsection
 <style>
-/* .row :nth-child(even){
-  background-color: #dcdcdc;
-}
-.row :nth-child(odd){
-  background-color: #aaaaaa;
-} */
+    .text-small {
+        font-size: small;
+    }
+    .text-smaller {
+        font-size: smaller;
+    }
 </style>
 @section('content')
 
@@ -54,6 +54,13 @@
         @if (!$complete)
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col">
+                <div class="row justify-content-center">
+                    <strong>{{ $status['progress'][0]->total }}% @lang('tabicatora.status.progress')</strong>
+                </div>
+            </div>
+        </div>
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
+            <div class="col text-smaller">
                 <div class="row justify-content-center">
                     <p><strong>@lang('tabicatora.status.items_opinions')</strong></p>
                 </div>
@@ -91,16 +98,9 @@
                 </div>
             </div>
         </div>
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
-            <div class="col">
-                <div class="row justify-content-center">
-                    <p><strong>{{ $status['progress'][0]->total }}% @lang('tabicatora.status.progress')</strong></p>
-                </div>
-            </div>
-        </div>
         @endif
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
-            <div class="col">
+            <div class="col text-smaller">
                 <div class="row justify-content-center">
                     <p><strong>@lang('tabicatora.status.items_majority_opinions') : {{ $status['total_recats'][0]->total }} </strong></p>
                 </div>
@@ -116,7 +116,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row justify-content-center small">
+                <div class="row justify-content-center">
                     <div class="col">
                         @foreach($status['list_recats'] as $row)
                         <div class="row border border-grey">
@@ -135,7 +135,7 @@
         @endif
         @if (!$complete)
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
-            <div class="col">
+            <div class="col text-smaller">
                 <div class="row justify-content-center">
                     <p><strong>@lang('tabicatora.status.items_split_opinions') : {{ $status['total_splits'][0]->total }}</strong></p>
                 </div>
@@ -158,16 +158,16 @@
                     <div class="col">
                         @foreach($status['list_splits'] as $row)
                         <div class="row border border-grey">
-                            <div class="col col-5 text-wrap">
-                            @php($tmp = explode(',',$row->opinions))
-                            @foreach($tmp as $opinion)
+                            <div class="col col-5 text-small text-wrap">
+                                @php($tmp = explode(',',$row->opinions))
+                                @foreach($tmp as $opinion)
                                 @lang($opinion)<br>
-                            @endforeach
+                                @endforeach
                             </div>
-                            <div class="col col-2 text-wrap">
+                            <div class="col col-2 text-small text-wrap">
                                 {{ $row->brand }}
                             </div>
-                            <div class="col text-wrap">
+                            <div class="col text-small text-wrap">
                                 {{ $row->problem }}
                             </div>
                         </div>
