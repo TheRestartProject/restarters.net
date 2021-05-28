@@ -89,16 +89,22 @@
                 </div>
             </div>
             <div class="row">
+                @if ($fault->language == $locale )
+                <div class="col-12">
+                    <p class="subtitle">{{ $fault->problem }}</p>
+                </div>
+                @else
                 <div class="col-8 offset-sm-2">
                     <p class="subtitle">{{ $fault->problem }}</p>
                 </div>
                 <div class="col-4 col-sm-2">
                     <button id="btn-translate" class="pull-right btn btn-md btn-dark px-3 py-1">
-                        <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text=@{{ $fault->translate }}" target="_blank">
+                        <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text={{ $fault->translate }}" target="_blank">
                             @lang('tabicatora.task.translate')
                         </a>
                     </button>
                 </div>
+                @endif
             </div>
         </div>
     </div>
