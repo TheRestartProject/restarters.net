@@ -119,7 +119,7 @@
                                 @php( print($row->total) )
                             </div>
                             <div class="col">
-                                @php( print($row->winning_opinion) )
+                                @lang($row->winning_opinion)
                             </div>
                         </div>
                         @endforeach
