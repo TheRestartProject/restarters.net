@@ -97,7 +97,7 @@ class DiscourseService
             'custom_message' => __('events.discourse_invite')
         ];
 
-        $endpoint = "t/$threadid/invite";
+        $endpoint = "/t/$threadid/invite";
 
         Log::info('Adding to private message: ' . json_encode($params));
         $response = $client->request(
