@@ -10,12 +10,14 @@
             <hr>
             <h2>{{ __('microtasking.volunteering.open_quests') }}</h2>
 
-            <div v-for="quest in openQuests">
-                <h3>{{ quest.name }} {{ quest.emoji }}</h3>
-                <div class="try-open-quest">
-                    <a :href="quest.slug" class="btn btn-primary btn-open-quest pull-right" >{{__('microtasking.volunteering.try_quest', { questname: quest.name })}}</a>
-                </div>
+            <div class="open-quests" v-for="quest in openQuests">
+            <h3>{{ quest.name }} {{ quest.emoji }}</h3>
+            <div class="open-quest">
                 <p>{{ quest.shortintro }}</p>
+                <div class="try-open-quest">
+                    <a :href="quest.slug" class="btn btn-primary btn-open-quest" >{{__('microtasking.volunteering.try_quest', { questname: quest.name })}}</a>
+                </div>
+            </div>
             </div>
 
             <hr>
@@ -130,12 +132,22 @@ export default {
     font-weight: bold;
 }
 
-/deep/ .try-open-quest {
-    place-self: center right;
-    float: right;
+/deep/ .open-quest {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
 
-    a {
-        align-self: center;
+    @include media-breakpoint-up(md) {
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: 1fr;
+    }
+
+    .try-open-quest {
+        place-self: start right;
+
+        a {
+            align-self: center;
+        }
     }
 }
 
