@@ -13,8 +13,18 @@ class BasicTest extends TestCase {
         // Vue component exists.
         $this->loginAsTestUser();
         $response = $this->get('/workbench');
-        $content = $response->getContent();
 
-        $response->assertSee('<MicrotaskingPage');
+        $this->assertVueProperties($response, [
+            [
+                // Can't assert on total-contributions dev systems might have varying info.
+                'active-quest' => 'mobifixora',
+                ':current-user-quests' => '0',
+                ':current-user-contributions' => '0',
+                ':topics' => '[]',
+                'see-all-topics-link' => 'https://talk.restarters.net/tag/workbench/l/latest',
+                ':is-logged-in' => 'true',
+                'discourse-base-url' => 'https://talk.restarters.net',
+            ]
+        ]);
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use DB;
 use Hash;
 use Auth;
+use Symfony\Component\DomCrawler\Crawler;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -19,6 +20,7 @@ abstract class TestCase extends BaseTestCase
 
     private $userCount = 0;
     private $groupCount = 0;
+    private $DOM = null;
 
     public function setUp()
     {
@@ -102,5 +104,60 @@ abstract class TestCase extends BaseTestCase
         ]);
         
         $user->save();
+    }
+
+    public function getVueProperties($response) {
+        $crawler = new Crawler($response->getContent());
+
+        $props = [];
+
+        $classname="vue";
+        $vues = $crawler->filterXPath("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]")->each(function (Crawler $node, $i) {
+            return $node;
+        });
+
+        foreach ($vues as $vue) {
+            foreach ($vue->children() as $child) {
+                $dom = simplexml_import_dom($child);
+
+                $props[] = current($dom->attributes());
+            }
+        }
+
+        return $props;
+    }
+
+    private function canonicalise($val) {
+        // Sinple code to filter out timestamps.
+        if ($val && is_string($val)) {
+            $val = preg_replace('/"created_at":".*"/', '"created_at":"TIMESTAMP"', $val);
+            $val = preg_replace('/"updated_at":".*"/', '"updated_at":"TIMESTAMP"', $val);
+        }
+    }
+
+    private function canonicaliseAndAssertSame($val1, $val2) {
+        $val1 = $this->canonicalise($val1);
+        $val2 = $this->canonicalise($val2);
+        $this->assertSame($val1, $val2);
+    }
+
+    public function assertVueProperties($response, $expected) {
+        // Assert that the returned response has some properties passed to our Vue components.
+        //
+        // phpunit has assertArraySubset, but this is controversially being removed in later versions so don't rely
+        // on it.
+        $props = $this->getVueProperties($response);
+        error_log(var_export($props, TRUE));
+        $foundSome = FALSE;
+
+        for ($i = 0; $i < count($expected); $i++) {
+            foreach ($expected[$i] as $key => $value) {
+                $this->assertArrayHasKey($key, $props[$i]);
+                $this->canonicaliseAndAssertSame($value, $props[$i][$key]);
+                $foundSome = TRUE;
+            }
+        }
+
+        $this->assertTrue($foundSome);
     }
 }
