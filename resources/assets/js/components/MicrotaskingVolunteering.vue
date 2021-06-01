@@ -7,6 +7,18 @@
         <template slot="content">
             <div v-html="__('microtasking.volunteering.content')" class="content pt-3">
             </div>
+            <hr>
+            <h2>{{ __('microtasking.volunteering.open_quests') }}</h2>
+
+            <div v-for="quest in openQuests">
+                <h3>{{ quest.name }} {{ quest.emoji }}</h3>
+                <div class="try-open-quest">
+                    <a :href="quest.slug" class="btn btn-primary btn-open-quest pull-right" >{{__('microtasking.volunteering.try_quest', { questname: quest.name })}}</a>
+                </div>
+                <p>{{ quest.shortintro }}</p>
+            </div>
+
+            <hr>
 
             <b-table-simple sticky-header="50vh" responsive class="pl-0 pr-0 pb-2 mb-2" table-class="m-0 leave-tables-alone">
                 <b-thead class="text-center">
@@ -82,6 +94,18 @@ export default {
     translatedMyQuests() {
       return this.$lang.get('microtasking.volunteering.my_quests', { value: this.currentUserQuests })
     },
+    openQuests: function () {
+      // Note: if we continue with more quests, and open/closed quests,
+      // we will likely have a 'quests' table.
+      return [
+        {
+          name: 'PrintCat',
+          emoji: '🐾',
+          slug: 'printcat',
+          shortintro: this.$lang.get('microtasking.cta.printcat.short_description')
+        }
+      ]
+    }
   }
 }
 </script>
@@ -98,6 +122,20 @@ export default {
 
     @include media-breakpoint-up(md) {
         box-shadow: 5px 5px $black;
+    }
+}
+
+/deep/ h3 {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+/deep/ .try-open-quest {
+    place-self: center right;
+    float: right;
+
+    a {
+        align-self: center;
     }
 }
 
