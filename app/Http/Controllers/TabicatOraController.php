@@ -108,9 +108,13 @@ class TabicatOraController extends Controller
         }
         // send non-suggested fault_types to view
         $fault->faulttypes = array_diff_key($fault_types, $fault->suggestions);
+        // send the "poor data" fault_type to view
+        $poor_data = $this->Model->fetchFaultTypePoorData();
+        logger(print_r($poor_data,1));
         return view('tabicatora.index', [
             'title' => 'TabiCat',
             'fault' => $fault,
+            'poor_data' => $poor_data,
             'user' => $user,
             'signpost' => $signpost,
             'locale' => $this->_getUserLocale(),

@@ -67,6 +67,9 @@
         text-decoration: underline;
     }
 
+    #btn-poordata {
+        background-color: #F45B69;
+    }
     #fetch {
         margin-bottom: 2px;
     }
