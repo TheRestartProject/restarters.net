@@ -38,6 +38,7 @@ class EventServiceProvider extends ServiceProvider
 
         'App\Events\ApproveEvent' => [
             'App\Listeners\CreateWordPressApproveEventPost',
+            'App\Listeners\CreateDiscourseThreadForEvent',
         ],
 
         'App\Events\EditEvent' => [
