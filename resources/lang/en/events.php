@@ -70,7 +70,6 @@ return array (
   'by_group' => 'By group',
   'create_new_event' => 'Create new event',
   'edit_event' => 'Edit event',
-  'duplicate_event' => 'Duplicate event',
   'edit_event_content' => 'You can keep your event details up-to-date here.',
   'past_events' => 'Past events',
   'upcoming_events' => 'Upcoming events',
@@ -193,5 +192,6 @@ return array (
   'validate_location' => 'Location must be present unless the event is online.',
   'other_events' => 'Other events',
   'online' => 'Online',
-  'discourse_invite' => 'We\'ve added you to a thread for this event.'
+  'duplicate_event' => 'Duplicate event',
+  'discourse_invite' => 'We\'ve added you to a thread for this event.',
 );

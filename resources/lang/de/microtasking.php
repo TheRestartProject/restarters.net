@@ -5,7 +5,7 @@ return array (
   array (
     'tabicat' => 
     array (
-      'description' => '<p>Wir sehen bei Reparaturveranstaltungen viele Tablets. Aber warum gehen diese kaputt und was könnte sie leichter reparierbar machen? Hilf uns, mit TabiCat die häufigsten Defekte zu finden, die wir bei Tablets sehen.</p><p>Die Reparaturdaten in TabiCat kommen aus der ganzen Welt, von Partnern der <a target="_blank" style="color:#212529;text-decoration:underline" href=“:url”>Open Repair Aliance</a>.</p>',
+      'description' => '<p>Wir sehen bei Reparaturveranstaltungen viele Tablets. Aber warum gehen diese kaputt und was könnte sie leichter reparierbar machen? Hilf uns, mit TabiCat die häufigsten Defekte zu finden, die wir bei Tablets sehen.</p><p>Die Reparaturdaten in TabiCat kommen aus der ganzen Welt, von Partnern der <a target="_blank" style="color:#212529;text-decoration:underline" href=“:url”>Open Repair Alliance</a>.</p>',
       'get_involved' => 'Mach mit',
       'title' => 'Hilf jetzt! TabiCat',
     ),
