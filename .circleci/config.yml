@@ -37,7 +37,7 @@ jobs:
       - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl
       - run: cp .env.example .env
 
-      - run: wget https://getcomposer.org/composer-1.phar; php composer-1.phar install
+      - run: wget https://getcomposer.org/composer-1.phar; rm -rf vendor; php composer-1.phar install
       - run: npm install
 
       - run: php artisan key:generate
