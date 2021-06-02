@@ -13,6 +13,7 @@
 <meta property="og:description" content="Help analyse faults in tablets and e-readers brought to events such as Repair Cafés and Restart Parties, and contribute to the current push for Right to Repair!">
 <meta property="og:image" content="{{ asset('/images/tabicatora/og-tabicat-toolbox.png') }}">
 <meta property="og:url" content="https://restarters.net/tabicat/">
+<meta property="og:type" content="website">
 @endsection
 
 @section('title')
