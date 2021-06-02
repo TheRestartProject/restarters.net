@@ -19,6 +19,8 @@ return array (
     'title' => 'Volunteer from anywhere',
     'content' => '<p>We collect data at community events.  But the raw data needs your help to become strong evidence for better products.  With your help, we can change the system.</p>
 <p>This is an easy way to make a difference, whether or not you can join us at our repair events.  Join us, and contribute as little or as much time and brain-power you can.  Most of the tasks here are OK for non-technical people.  And we\'re always here to help.',
+    'open_quests' => 'Open quests',
+    'try_quest' => 'Try :questname',
     'number_of_tasks' => 'Number of tasks',
     'number_of_quests' => 'Number of quests',
     'all_volunteer_contributions' => 'Total volunteer contributions',
@@ -55,6 +57,7 @@ return array (
       'title' => 'Help Now!  PrintCat',
       'description' => '<p>We see lots of printers at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with printers with PrintCat!</p>  <p>The repair data in PrintCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href=“:url”>Open Repair Alliance</a>.</p>',
       'get_involved' => 'Get involved',
+      'short_description' => 'Help us figure out the most common issues we see with printers with PrintCat!'
     ),
   ),
   'discussion' => 

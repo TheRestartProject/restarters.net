@@ -13,7 +13,7 @@
             }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" @changed="categoryChange" />
           <DeviceType v-if="!powered || aggregate" class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled" :suppress-type-warning="suppressTypeWarning" :powered="powered" />
           <div v-if="powered">
-            <DeviceBrandSelect class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled" />
+            <DeviceBrand class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled" :suppress-brand-warning="suppressBrandWarning" />
             <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" />
           </div>
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" />
@@ -74,7 +74,7 @@ import {
   CATEGORY_MISC, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME
 } from '../constants'
 import DeviceCategorySelect from './DeviceCategorySelect'
-import DeviceBrandSelect from './DeviceBrandSelect'
+import DeviceBrand from './DeviceBrand'
 import DeviceModel from './DeviceModel'
 import DeviceWeight from './DeviceWeight'
 import DeviceAge from './DeviceAge'
@@ -98,7 +98,7 @@ export default {
     DeviceNotes,
     DeviceProblem,
     DeviceRepairStatus,
-    DeviceType, DeviceAge, DeviceWeight, DeviceModel, DeviceBrandSelect, DeviceCategorySelect},
+    DeviceType, DeviceAge, DeviceWeight, DeviceModel, DeviceBrand, DeviceCategorySelect},
   mixins: [ event ],
   props: {
     device: {
@@ -221,6 +221,10 @@ export default {
     suppressTypeWarning() {
       // We don't want to show the warning if we have not changed the type since it was last saved.
       return this.currentDevice && this.device && this.device.item_type === this.currentDevice.item_type
+    },
+    suppressBrandWarning() {
+      // We don't want to show the warning if we have not changed the brand since it was last saved.
+      return this.currentDevice && this.device && this.device.brand === this.currentDevice.brand
     },
   },
   created() {
