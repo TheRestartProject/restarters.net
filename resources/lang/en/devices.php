@@ -119,6 +119,7 @@ return array (
   'search_assessment_comments' => 'Assessment',
   'interesting_case_study' => 'Interesting case study',
   'unknown_item_type' => 'You\'re creating a new item type. Are you sure an existing item type is not suitable?',
+  'unknown_brand' => 'You\'re creating a new brand. Are you sure an existing brand is not suitable?',
   'tooltip_type' => 'Add as much information about the type of item here as you can (e.g. `Denim jeans` or ‘Sofa’)',
   'add_data_group' => 'Please select a group',
   'add_data_event' => 'Please select an event',
