@@ -11,7 +11,7 @@ return array (
     ),
     'tabicat' => 
     array (
-      'description' => '<p>Vediamo molte tablet agli eventi di riparazione della comunità. Ma perché si rompono e cosa potrebbe renderle più facili da riparare? Aiutaci a capire i problemi più comuni che vediamo con i tablet con TabiCat!</p> <p>I dati di riparazione in TabiCat provengono da tutto il mondo, attraverso i partner della <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'description' => '<p>Vediamo molti tablet agli eventi di riparazione comunitaria. Ma perché si rompono e cosa potrebbe renderli più facili da riparare? Aiutaci a capire i problemi più comuni che vediamo con i tablet con TabiCat!</p> <p>I dati di riparazione provengono da tutto il mondo, attraverso i partner della <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Partecipa',
       'title' => 'Aiutaci adesso! TabiCat',
     ),

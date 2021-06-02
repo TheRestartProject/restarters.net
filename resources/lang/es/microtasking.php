@@ -12,7 +12,7 @@ return array (
     ),
     'tabicat' => 
     array (
-      'description' => '<p>Vemos muchas tabletas en los eventos de reparación. Pero, ¿qué está provocando que se rompan y qué podría facilitar su reparación? ¡Ayúdenos a descubrir los problemas más comunes que nos encontramos con las tabletas con TabiCat!</p><p>Los datos de reparación en TabiCat provienen de todo el mundo, a través de socios del <a target="_ blank" style="color: # 212529; text-decoration: underline" href =":url">Open Repair Alliance</a>.</p>',
+      'description' => '<p>Nos llegan muchas tabletas en los eventos de reparación. Pero, ¿qué está provocando que se rompan y cómo se podría facilitar su reparación? ¡Ayúdanos a descubrir los problemas más comunes que afectan a las tabletas con TabiCat!</p><p>Los datos de reparación en TabiCat provienen de todo el mundo, a través de socios del <a target="_ blank" style="color: # 212529; text-decoration: underline" href =":url">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Participa',
       'title' => '¡Colabora! TabiCat',
     ),
