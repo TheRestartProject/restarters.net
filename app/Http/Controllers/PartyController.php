@@ -26,6 +26,7 @@ use App\Notifications\NotifyHostRSVPInvitesMade;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
+use App\Services\DiscourseService;
 use App\Session;
 use App\User;
 use App\UserGroups;
@@ -44,12 +45,13 @@ use Spatie\CalendarLinks\Link;
 class PartyController extends Controller
 {
     protected $geocoder;
+    protected $discourseService;
 
     public $TotalWeight;
     public $TotalEmission;
     public $EmissionRatio;
 
-    public function __construct(Geocoder $geocoder)
+    public function __construct(Geocoder $geocoder, DiscourseService $discourseService)
     {
         $Device = new Device;
         $weights = $Device->getWeights();
@@ -61,6 +63,7 @@ class PartyController extends Controller
         $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
 
         $this->geocoder = $geocoder;
+        $this->discourseService = $discourseService;
     }
 
     public function index($group_id = null)
@@ -777,6 +780,7 @@ class PartyController extends Controller
                 }
 
                 $this->notifyHostsOfRsvp($user_event, $event_id);
+                $this->addToDiscourseThread($event, Auth::user());
 
                 return redirect()->back()->with($flashData);
             } catch (\Exception $e) {
@@ -815,6 +819,29 @@ class PartyController extends Controller
                 ]));
             } catch (\Exception $ex) {
                 Log::error('An error occurred when trying to notify host of invitation confirmation: '.$ex->getMessage());
+            }
+        }
+    }
+
+    public function addToDiscourseThread($event, $user) {
+        if ($event->discourse_thread) {
+            // We want a host of the event to add the user to the thread.
+            try {
+                $hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
+                    ->where('events_users.event', $event->idevents)
+                    ->where('events_users.role', 3)
+                    ->select('users.*')
+                    ->get();
+            } catch (\Exception $e) {
+                $hosts = null;
+            }
+
+            if (!is_null($hosts) && count($hosts)) {
+                $this->discourseService->addUserToPrivateMessage(
+                    $event->discourse_thread,
+                    $hosts[0]->username,
+                    $user->username
+                );
             }
         }
     }
@@ -1268,9 +1295,11 @@ class PartyController extends Controller
             ]);
 
             // Increment volunteers column to include latest invite
-            Party::find($event_id)->increment('volunteers');
+            $event = Party::find($event_id);
+            $event->increment('volunteers');
 
             $this->notifyHostsOfRsvp($user_event, $event_id);
+            $this->addToDiscourseThread($event, Auth::user());
 
             return redirect('/party/view/'.$user_event->event);
         }
