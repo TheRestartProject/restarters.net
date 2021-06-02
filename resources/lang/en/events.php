@@ -193,5 +193,6 @@ return array (
   'validate_location' => 'Location must be present unless the event is online.',
   'other_events' => 'Other events',
   'online' => 'Online',
-  'discourse_invite' => 'We\'ve added you to a thread for this event.'
+  'discourse_invite' => 'We\'ve added you to a thread for this event.',
+  'search_name_placeholder' => 'Event name'
 );
