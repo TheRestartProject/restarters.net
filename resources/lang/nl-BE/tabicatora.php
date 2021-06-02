@@ -1,51 +1,84 @@
 <?php
 
 return array (
-  'task' =>
+  'task' => 
   array (
     'where_is_the_main_fault' => 'Waar is de belangrijkste fout',
-    'fetch_another' => 'Ik weet het niet. Laat me een andere reparatie zien',
+    'fetch_another' => 'Ik weet het niet, haal nog een reparatie',
     'suggestions' => 'Suggesties',
     'translate' => 'Vertalen',
     'go_with' => 'Ga mee',
     'source' => 'Bron',
-    'strapline' => 'Lees gewoon de informatie over de kapotte printer en selecteer het beschreven type fout uit de lijst eronder.',
+    'strapline' => 'Lees de informatie over het kapotte toestel en selecteer het type fout uit de lijst eronder.',
     'learn_more' => 'Lees meer',
+    'did_you_know' => 'Wist u dat?',
+    'signpost_1' => 'Een gemiddelde tablet produceert tijdens zijn levensduur het equivalent van 150 kg CO2. Omdat het maken van nieuwe tablets veel kostbare materialen en intensieve productieprocessen vraagt, vindt meer dan 75% van die impact plaats voordat hij een eerste keer wordt aangezet.',
+    'signpost_2' => 'Repareren verlengt de levensduur van toestellen, vermindert hun totale milieu-impact en verlaagt de vraag naar nieuwe producten. Als we elke computer in Europa een jaar langer zouden gebruiken, zouden we het equivalent van 3 miljoen ton CO2 kunnen uitsparen.',
+    'signpost_3' => 'De Europese Unie is van plan om tegen 2020 regelgeving in te voeren die tablets en smartphones ecologischer moet maken. Wij willen deze kans grijpen om op te roepen voor het recht op repareren. Europese regelgeving kan ook een invloed hebben op landen buiten de EU, zoals het VK.',
+    'signpost_4' => '"We willen beleidsmakers vertellen waarom tablets stuk gaan en hoe ze 
+makkerlijker herstelbaar kunnen worden. Repair groepen over de hele wereld hebben deze informatie ingevoerd. Door TabiCat te gebruiken, helpt u ons ze te analyseren."',
+    'signpost_5' => 'Bedankt!',
+    'signpost_6' => 'Bedankt voor uw hulp! Elke fout die u categoriseert maakt de gegevens nuttiger. <a href="../">Waarom wordt u ook geen lid van onze community</a>?',
   ),
-  'status' =>
+  'status' => 
   array (
-    'status' => 'Status',
+    'status' => 'Toestand',
     'items_opinions' => 'Items / meningen',
-    'items_split_opinions' => 'Items met verschillende meningen',
-    'items_majority_opinions' => 'Items met een meerderheid van stemmen',
-    'items_3_opinions' => 'met 3 meningen',
-    'items_2_opinions' => 'met 2 meningen',
-    'items_1_opinion' => 'met 1 mening',
-    'items_0_opinions' => 'met 0 meningen',
+    'items_with_split_opinions' => 'Items met verschillende meningen',
+    'items_with_majority_opinions ' => 'Items met een meerderheid van stemmen',
+    'with_3_opinions' => 'met 3 meningen',
+    'with_2_opinions' => 'met 2 meningen',
+    'with_1_opinion' => 'met 1 mening',
+    'with_0_opinions' => 'met 0 meningen',
     'total' => 'Totaal',
     'opinions' => 'Meningen',
     'brand' => 'Merk',
     'problem' => 'Probleem',
     'number_of_records' => 'Aantal records',
     'winning_opinion' => 'Winnende mening',
+    'items_split_opinions' => 'Items met verschillende meningen',
+    'items_majority_opinions' => 'Items met een meerderheid van stemmen',
+    'items_3_opinions' => 'met 3 meningen',
+    'items_2_opinions' => 'met 2 meningen',
+    'items_1_opinion' => 'met 1 mening',
+    'items_0_opinions' => 'met 0 meningen',
     'task_completed' => 'Je hebt ze allemaal gezien, bedankt',
+    'progress' => 'volledig',
   ),
-  'branding' =>
+  'branding' => 
   array (
     'powered_by' => 'Gebruik van gegevens van:',
   ),
-  'info' =>
+  'info' => 
   array (
     'body-s1-header' => 'Wat is TabiCat?',
-    'body-s1-p1' => 'Printers kunnen frustrerend zijn, gaan makkelijk stuk en zijn moeilijk te repareren. Wij willen begrijpen waarom printers stuk gaan, zodat we beleidsmakers kunnen vertellen hoe toekomstige modellen eenvoudiger te repareren kunnen worden gemaakt. Reparatie vermindert afval en legt minder beslag op de grondstoffen van onze planeet.',
-    'body-s1-p2' => 'Met TabiCat kunt u deelnemen aan ons onderzoek. We hebben informatie verzameld over meer dan 800 kapotte printers en we hebben uw hulp nodig om ze te categoriseren.',
+    'body-s1-p1' => 'Tablets kunnen frustrerend zijn: ze gaan makkelijk stuk en zijn moeilijk te repareren. Wij willen begrijpen waarom tablets stuk gaan, zodat we beleidsmakers kunnen vertellen hoe toekomstige modellen zo kunnen worden gemaakt dat ze beter herstelbaar zijn. Repareren vermindert afval en legt minder beslag op de grondstoffen van onze planeet.',
+    'body-s1-p2' => 'Met TabiCat kunt u deelnemen aan ons onderzoek. We hebben informatie verzameld over meer dan 900 kapotte apparaten en we hebben uw hulp nodig om ze te categoriseren.',
     'body-s2-header' => 'Wat moet ik doen?',
-    'body-s2-p1' => 'Lees gewoon de informatie over de kapotte printer en selecteer het beschreven type fout uit de lijst eronder. Als u het niet zeker weet, selecteert u onderaan \'Weet ik niet\'. Als u een optie hebt gekozen, laten wij u een andere printer zien. Hoe meer printerfouten u kunt categoriseren, hoe meer we leren! TabiCat laat elke printer aan 3 personen zien om te helpen de juiste categorie te bevestigen.',
-    'body-s3-header' => 'Hoe komt TabiCat aan gegevens over defecte printers?',
-    'body-s3-p1' => 'TabiCat gebruikt informatie van de <a href=":url" target="_blank">Open Repair Alliance</a>, die gegevens verzamelt over kapotte apparaten die echte mensen over de hele wereld hebben proberen te repareren op community-evenementen, zoals Repair Cafés en Restart Parties.',
-    'body-s4-header' => 'Meer vragen?',
+    'body-s2-p1' => 'Lees de informatie over het kapotte toestel en selecteer het type fout uit de lijst eronder. Als u het niet zeker weet, selecteert u onderaan \'Weet ik niet\'. Als u een optie hebt gekozen, krijgt u een volgend toestel zien. Hoe meer fouten u kunt categoriseren, hoe meer we leren!',
+    'body-s3-header' => 'Hoe komt TabiCat aan gegevens over defecte tablets?',
+    'body-s3-p1' => 'TabiCat gebruikt informatie van de <a href=":url" target="_blank">Open Repair Alliance</a>, die gegevens verzamelt over kapotte apparaten die mensen over de hele wereld hebben proberen te repareren op activiteiten zoals Repair Cafés en Restart Parties.',
+    'body-s4-header' => 'Nog vragen?',
     'body-s4-p1' => 'Kom meer te weten, stel vragen en geef ons uw feedback, in <a href=":url" target="_blank">de TabiCat discussie</a>.',
     'title' => 'Bedankt om TabiCat te proberen',
   ),
   'about' => 'Meer informatie',
+  'survey' => 
+  array (
+    'a1' => 'Sterk mee oneens',
+    'a2' => 'Oneens',
+    'a3' => 'Neutraal',
+    'a4' => 'Mee eens',
+    'a5' => 'Sterk mee eens',
+    'footer' => 'Als u op een van deze knoppen drukt, keert u terug naar TabiCat',
+    'header1' => 'Bedankt om ons te helpen begrijpen waarom tabletten kapot gaan.',
+    'header2' => 'We plannen al toekomstige quests, net als deze. Om de volgende nog beter te maken, hebben we een paar korte vragen voor je.',
+    'invalid' => 'Maak een keuze uit elk van de vragen',
+    'q1' => 'TabiCat heeft mijn interesse in repareren vergroot',
+    'q2' => 'TabiCat heeft me meer doen nadenken over e-waste',
+    'q3' => 'TabiCat heeft mijn manier van denken over het kopen van elektronica veranderd',
+    'q4' => 'TabiCat heeft mijn kijk op het belang van reparatie veranderd',
+    'send' => 'Verzenden',
+    'skip' => 'Overslaan',
+  ),
 );

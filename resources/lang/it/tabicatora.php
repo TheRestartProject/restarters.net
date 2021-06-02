@@ -1,51 +1,84 @@
 <?php
 
 return array (
-  'task' =>
+  'task' => 
   array (
     'where_is_the_main_fault' => 'Qual è il guasto principale?',
-    'fetch_another' => 'Non lo so, mostrami un\'altra riparazione',
+    'fetch_another' => 'Non lo so, vai a prendere un\'altra riparazione',
     'suggestions' => 'Suggerimenti',
     'translate' => 'Tradurre',
-    'go_with' => 'Scegli',
+    'go_with' => 'Vai con',
     'source' => 'Fonte',
     'learn_more' => 'Più informazioni',
-    'strapline' => 'Basta leggere le informazioni sulla stampante rotta e selezionare il tipo di guasto descritto dalla lista sottostante.',
+    'strapline' => 'Basta leggere le informazioni sul dispositivo rotto e selezionare il tipo di guasto descritto dalla lista sottostante.',
+    'did_you_know' => 'Lo sapevi?',
+    'signpost_1' => 'Un tablet medio produce l\'equivalente di 150 kg di CO2 durante la sua vita. Ma poiché ci vogliono molti materiali preziosi e una produzione intensiva per fare ogni tablet, oltre il 75% di questo impatto si verifica prima che sia acceso per la prima volta.',
+    'signpost_2' => 'Riparare un dispositivo ne prolunga la vita, riduce il suo impatto ambientale complessivo e diminuisce la domanda di nuovi prodotti. Infatti, se usassimo ogni computer in Europa per un anno in più, potremmo risparmiare 3 milioni di tonnellate di CO2e.',
+    'signpost_3' => 'L\'Unione Europea includerà tablet e smartphone nelle regole di Ecodesign entro il 2022. Questo ci darà la possibilità di chiedere il Diritto alla Riparazione di questi dispositivi. Le regole decise dall\'UE potrebbero anche essere usate per influenzare le leggi in altri luoghi, compreso il Regno Unito.',
+    'signpost_4' => '"Vogliamo dire ai legislatori perché i tablet si rompono e come potrebbero essere resi più facili da riparare. I gruppi di riparazione comunitaria in tutto il mondo hanno 
+registrato queste informazioni, e provando TabiCat, ci stai aiutando ad analizzarle."',
+    'signpost_5' => 'Grazie!',
+    'signpost_6' => 'Grazie per il tuo aiuto! Ogni difetto che classifichi rende questi dati più utili. Perché non ti <a href="../">unisci anche tu alla nostra comunità</a>?',
   ),
-  'status' =>
+  'status' => 
   array (
     'status' => 'Stato',
     'items_opinions' => 'Articoli / opinioni',
+    'items_with_split_opinions' => 'Articoli con opinioni divise',
+    'items_with_majority_opinions ' => 'Articoli con opinioni maggioritarie',
+    'with_3_opinions' => 'con 3 opinioni',
+    'with_2_opinions' => 'con 2 opinioni',
+    'with_1_opinion' => 'con 1 opinione',
+    'with_0_opinions' => 'con 0 opinioni',
+    'total' => 'Totale',
+    'opinions' => 'Opinioni',
+    'brand' => 'Marca',
+    'problem' => 'Problema',
+    'number_of_records' => 'Numero di record',
+    'winning_opinion' => 'Opinione vincente',
     'items_split_opinions' => 'Articoli con opinioni divise',
     'items_majority_opinions' => 'Articoli con opinioni maggioritarie',
     'items_3_opinions' => 'con 3 opinioni',
     'items_2_opinions' => 'con 2 opinioni',
     'items_1_opinion' => 'con 1 opinione',
     'items_0_opinions' => 'con 0 opinioni',
-    'total' => 'Totale',
-    'opinions' => 'Opinioni',
-    'brand' => 'Marca',
-    'problem' => 'Problema',
-    'number_of_records' => 'Numero di voci',
-    'winning_opinion' => 'Opinione vincente',
     'task_completed' => 'Li hai visti tutti, grazie',
+    'progress' => 'completo',
   ),
   'about' => 'Più informazioni',
-  'branding' =>
+  'branding' => 
   array (
     'powered_by' => 'Utilizzando i dati di:',
   ),
-  'info' =>
+  'info' => 
   array (
     'body-s1-header' => 'Cos\'è TabiCat?',
-    'body-s1-p1' => 'Le stampanti possono essere frustranti, facili da rompere e difficili da riparare. Vogliamo capire perché le stampanti si guastano, così possiamo dire ai legislatori come i modelli futuri possono essere resi più facili da riparare. La riparazione riduce i rifiuti e diminuisce la pressione sulle risorse del nostro pianeta.',
-    'body-s1-p2' => 'Con TabiCat, puoi unirti alla nostra indagine. Abbiamo raccolto informazioni su oltre 800 stampanti rotte e abbiamo bisogno del tuo aiuto per classificarle.',
+    'body-s1-p1' => 'I tablet possono rompersi facilmente ed essere difficili da riparare. Vogliamo capire perché i tablet si guastano, per poter dire ai legislatori come rendere i modelli futuri più facili da riparare. Riparare riduce i rifiuti e diminuisce la pressione sulle risorse del nostro pianeta.',
+    'body-s1-p2' => 'Con TabiCat, puoi unirti alla nostra indagine. Abbiamo raccolto informazioni su oltre 900 dispositivi rotti e abbiamo bisogno del tuo aiuto per classificarli.',
     'body-s2-header' => 'Cosa devo fare?',
-    'body-s2-p1' => 'Basta leggere le informazioni sulla stampante rotta e selezionare il tipo di guasto descritto dalla lista sottostante. Se non sei sicuro, seleziona "Non lo so" in basso. Una volta che hai selezionato un\'opzione, ti mostreremo un\'altra stampante. Più difetti di stampante riesci a classificare, più impariamo! TabiCat mostra ogni stampante a 3 persone per aiutare a confermare la giusta categoria.',
-    'body-s3-header' => 'Dove prende TabiCat i dati sulle stampanti guaste?',
-    'body-s3-p1' => 'TabiCat utilizza le informazioni della <a href=":url" target="_blank">Open Repair Alliance</a>, che raccoglie dati sui dispositivi rotti che persone in tutto il mondo hanno cercato di riparare durante gli eventi della comunità, come i Repair Café e i Restart Party.',
-    'body-s4-header' => 'Altre domande?',
+    'body-s2-p1' => 'Basta leggere le informazioni sul dispositivo rotto e selezionare il tipo di guasto descritto dalla lista sottostante. Se non sei sicuro, seleziona "Non lo so" in basso. Una volta che hai selezionato un\'opzione, ti mostreremo un altro dispositivo. Più difetti riesci a classificare, più impariamo!',
+    'body-s3-header' => 'Da dove prende TabiCat i dati sui dispositivi rotti?',
+    'body-s3-p1' => 'TabiCat utilizza le informazioni della <a href=":url" target="_blank">Open Repair Alliance</a>, che raccoglie dati sui dispositivi rotti che persone in tutto il mondo hanno cercato di riparare durante eventi comunitari, come i Repair Café e i Restart Party.',
+    'body-s4-header' => 'Hai altre domande?',
     'body-s4-p1' => 'Scopri di più, fai domande e dacci il tuo feedback nella <a href=":url" target="_blank">conversazione su TabiCat</a>.',
     'title' => 'Grazie per aver provato TabiCat',
+  ),
+  'survey' => 
+  array (
+    'a1' => 'Fortemente in disaccordo',
+    'a2' => 'In disaccordo',
+    'a3' => 'Neutro',
+    'a4' => 'D\'accordo',
+    'a5' => 'Fortemente d\'accordo',
+    'footer' => 'Premendo uno dei due pulsanti si torna a TabiCat',
+    'header1' => 'Grazie per averci aiutato a capire perché i tablet si rompono.',
+    'header2' => 'Stiamo pianificando missioni future, proprio come questa. Per renderle ancora migliori, abbiamo alcune domande.',
+    'invalid' => 'Si prega di rispondere a ognuna delle domande',
+    'q1' => 'TabiCat ha aumentato il mio interesse nella riparazione',
+    'q2' => 'TabiCat mi ha fatto pensare di più ai rifiuti elettronici',
+    'q3' => 'TabiCat ha cambiato il mio modo di pensare all\'acquisto di prodotti elettronici',
+    'q4' => 'TabiCat ha cambiato la mia visione dell\'importanza della riparazione',
+    'send' => 'Invia',
+    'skip' => 'Salta',
   ),
 );

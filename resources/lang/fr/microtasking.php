@@ -11,7 +11,7 @@ return array (
     ),
     'tabicat' => 
     array (
-      'description' => '<p>Nous voyons beaucoup de tablettes lors des Repair Café. Mais qu\'est-ce qui les fait tomber en panne et qu\'est-ce qui pourrait les rendre plus faciles à réparer ? Aidez-nous à comprendre les problèmes les plus courants que nous rencontrons avec les tablettes grâce à TabiCat !</p> <p>Les données de réparation dans TabiCat proviennent du monde entier, via les partenaires de l\' <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'description' => '<p>Nous voyons beaucoup de tablettes lors des Repair Café. Mais qu\'est-ce qui les fait tomber en panne et qu\'est-ce qui pourrait les rendre plus faciles à réparer? Aidez-nous à comprendre les problèmes les plus courants que nous rencontrons avec les tablettes grâce à TabiCat!</p> <p>Les données de réparation dans TabiCat proviennent du monde entier, via les partenaires de l\'<a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Participer',
       'title' => 'Aider maintenant! TabiCat',
     ),

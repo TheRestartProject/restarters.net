@@ -190,4 +190,7 @@ return array (
   'form_error' => 'Veuillez vérifier que le formulaire ci-dessus ne contient pas d\'erreurs.',
   'your_events' => 'Vos événements',
   'validate_location' => 'La localisation doit être encodée sauf s\'il s\'agit d\'un événement en ligne',
+  'online' => 'En ligne',
+  'other_events' => 'Autres événements',
+  'duplicate_event' => 'Dupliquer événement',
 );
