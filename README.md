@@ -51,6 +51,6 @@ Defra-funded and administered by WRAP. Subsequent development has been financed
 by the Shuttleworth Foundation, and by Nesta and the Department for Digital,
 Culture, Media & Sport.
 
-[![CircleCI](https://circleci.com/gh/TheRestartProject/restarters.net/tree/teesloane-patch-5.svg?style=svg)](https://circleci.com/gh/circleci/circleci-docs/?branch=develop)
+[![CircleCI](https://circleci.com/gh/TheRestartProject/restarters.net/tree/develop.svg?style=svg)](https://circleci.com/gh/TheRestartProject/restarters.net/?branch=develop)
 
 [![Coverage Status](https://coveralls.io/repos/github/TheRestartProject/restarters.net/badge.svg?branch=develop)](https://coveralls.io/github/TheRestartProject/restarters.net?branch=develop)

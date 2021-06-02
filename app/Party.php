@@ -38,9 +38,10 @@ class Party extends Model implements Auditable
         'updated_at',
         'shareable_code',
         'online',
-        'discourse_thread'
+        'discourse_thread',
+        'devices_updated_at'
     ];
-    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id'];
+    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'devices_updated_at'];
 
     // Append data to Model
     protected $appends = ['participants', 'ShareableLink'];
@@ -890,5 +891,9 @@ class Party extends Model implements Auditable
         }
 
         return $coordinators;
+    }
+
+    public function getMaxUpdatedAtDevicesUpdatedAtAttribute() {
+        return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 }

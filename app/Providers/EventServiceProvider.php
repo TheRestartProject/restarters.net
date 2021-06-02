@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Events\DeviceCreatedOrUpdated;
 use App\Events\EventDeleted;
 use App\Events\EventImagesUploaded;
 use App\Events\UserFollowedGroup;
@@ -13,6 +14,7 @@ use App\Events\UserDeleted;
 use App\Listeners\AddUserToDiscourseGroup;
 use App\Listeners\AnonymiseSoftDeletedUser;
 use App\Listeners\DeleteEventFromWordPress;
+use App\Listeners\DeviceUpdatedAt;
 use App\Listeners\RemoveSoftDeletedUserFromAllGroups;
 use App\Listeners\SendAdminModerateEventPhotosNotification;
 use App\Listeners\SendAdminUserDeletedNotification;
@@ -81,6 +83,9 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\LogOutOfWiki::class,
         ],
 
+        DeviceCreatedOrUpdated::class => [
+            DeviceUpdatedAt::class
+        ]
     ];
 
     /**

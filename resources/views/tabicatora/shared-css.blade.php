@@ -12,7 +12,8 @@
     h1 {
         font-family: 'Asap' !important;
         font-weight: bold !important;
-        float: left; /* bootstrap pull-left class working locally but not on server!  falling back on this. */
+        float: left;
+        /* bootstrap pull-left class working locally but not on server!  falling back on this. */
     }
 
     img#tabicat {
@@ -52,7 +53,7 @@
         background-color: #FFF;
     }
 
-    .mobifix .btn {
+    .tabicat .btn {
         font-family: 'Open Sans';
     }
 
@@ -66,6 +67,9 @@
         text-decoration: underline;
     }
 
+    #btn-poordata {
+        background-color: #F45B69;
+    }
     #fetch {
         margin-bottom: 2px;
     }
@@ -74,10 +78,29 @@
         margin-bottom: 3px;
     }
 
-    .question, .statement {
+    .question,
+    .statement {
         font-size: 1rem;
         font-weight: bold;
         text-transform: uppercase;
+    }
+    .signpost {
+        padding: 1em 1em 0 0;
+        margin: 1em auto;
+    }
+    .signpost div,
+    .signpost p {
+        padding: 0;
+    }
+    .signpost img {
+        display: inline-block;
+        margin: auto;
+        max-width: 36px;
+    }
+    .signpost h5 {
+        display: inline-block;
+        font-size: 1rem;
+        font-weight: bold;
     }
 
     .translation {
@@ -87,14 +110,17 @@
         -webkit-box-shadow: 6px 6px 0 0 #000;
         box-shadow: 6px 6px 0 0 #eee;
     }
- #ora-partnership hr {
-     width: 50%;
- }
- #ora-partnership p {
-     font-size: medium;
-     font-weight: bold;
- }
- #ora-partnership img {
-     width: 300px;
- }
+
+    #ora-partnership hr {
+        width: 50%;
+    }
+
+    #ora-partnership p {
+        font-size: medium;
+        font-weight: bold;
+    }
+
+    #ora-partnership img {
+        width: 300px;
+    }
 </style>

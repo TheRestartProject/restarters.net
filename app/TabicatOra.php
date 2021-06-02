@@ -4,8 +4,6 @@ namespace App;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 class TabicatOra extends Model {
 
@@ -78,12 +76,21 @@ LIMIT 1;
     }
 
     /**
-     * Fetch all fault_type_ids for tabicat
+     * Fetch all fault_type_ids except id=25 ("Poor data") for tabicat
      *
      * @return array
      */
     public function fetchFaultTypes() {
-        return DB::select("SELECT * FROM `fault_types_tablets`");
+        return DB::select("SELECT * FROM `fault_types_tablets` WHERE `id`<>25");
+    }
+
+    /**
+     * Fetch id=25 ("Poor data") for tabicat
+     *
+     * @return array
+     */
+    public function fetchFaultTypePoorData() {
+        return DB::select("SELECT * FROM `fault_types_tablets` WHERE `id`=25");
     }
 
     /**
@@ -91,7 +98,7 @@ LIMIT 1;
      *
      * @return mixed
      */
-    public function fetchStatus($partner = NULL) {
+    public function fetchStatus() {
 
         $result = [];
 

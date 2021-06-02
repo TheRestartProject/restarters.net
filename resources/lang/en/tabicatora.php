@@ -12,6 +12,13 @@ return array (
     'source' => 'Source',
     'strapline' => 'Simply read the information about the broken device and select the type of fault described from the list underneath.',
     'learn_more' => 'Learn more',
+    'did_you_know' => 'Did you know?',
+    'signpost_1' => 'An average tablet produces the equivalent of 150 kg of CO2 during its life. But because it takes lots of precious materials and intensive manufacturing to make each tablet, over 75% of that impact occurs before it’s switched on for the first time.',
+    'signpost_2' => 'Repairing a device extends its life, reduces its overall environmental impact and lowers demand for new products. In fact, if we used every computer in Europe for one year longer, we could save the equivalent of 3 million tonnes of CO2.',
+    'signpost_3' => 'The European Union is planning to include tablets and smartphones in Ecodesign rules by 2022. This will give us the chance to call for the Right to Repair these devices. Rules decided by the EU could also be used to influence laws in other places, including the UK.',
+    'signpost_4' => 'We want to tell policymakers why tablets break and how they could be made easier to fix. Community repair groups around the world have been recording this information, and by trying TabiCat, you are helping us analyse it.',
+    'signpost_5' => 'Thank you and please take our <a href="https://restarters.net/survey">survey</a>',
+    'signpost_6' => 'Thank you! Please join our <a href="/tabicat/cta">community</a>',
   ),
   'status' =>
   array (
@@ -48,5 +55,23 @@ return array (
     'body-s3-p1' => 'TabiCat uses information from the <a href=":url" target="_blank">Open Repair Alliance</a>, which collects data about broken devices that real people around the world have tried to fix at community events, such as Repair Cafés and Restart Parties.',
     'body-s4-header' => 'More questions?',
     'body-s4-p1' => 'Find out more, and give us your feedback, in the <a href=":url" target="_blank">TabiCat discussion</a>.',
+  ),
+  'survey' =>
+  array (
+    'header1' => 'Thank you for helping us learn why tablets break.',
+    'header2' => 'We are already planning future quests, just like this one. To make the next one even better, we have some quick questions for you.',
+    'q1' => 'TabiCat has increased my interest in repairing',
+    'q2' => 'TabiCat has made me think more about electronic waste',
+    'q3' => 'TabiCat has changed how I think about buying electronics',
+    'q4' => 'TabiCat has changed my view of the importance of repair',
+    'a1' => 'Strongly disagree',
+    'a2' => 'Disagree',
+    'a3' => 'Neutral',
+    'a4' => 'Agree',
+    'a5' => 'Strongly agree',
+    'send' => 'Send',
+    'skip' => 'Skip',
+    'invalid' => 'Please select from each of the questions',
+    'footer' => 'Pressing either button will take you back to TabiCat',
   ),
 );
