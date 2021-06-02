@@ -128,6 +128,7 @@ return array(
     'App\\Listeners\\AddUserToDiscourseGroup' => $baseDir . '/app/Listeners/AddUserToDiscourseGroup.php',
     'App\\Listeners\\AnonymiseSoftDeletedUser' => $baseDir . '/app/Listeners/AnonymiseSoftDeletedUser.php',
     'App\\Listeners\\ChangeWikiPassword' => $baseDir . '/app/Listeners/ChangeWikiPassword.php',
+    'App\\Listeners\\CreateDiscourseThreadForEvent' => $baseDir . '/app/Listeners/CreateDiscourseThreadForEvent.php',
     'App\\Listeners\\CreateWordPressApproveEventPost' => $baseDir . '/app/Listeners/CreateWordPressApproveEventPost.php',
     'App\\Listeners\\CreateWordPressApproveGroupPost' => $baseDir . '/app/Listeners/CreateWordPressApproveGroupPost.php',
     'App\\Listeners\\CreateWordPressEditEventPost' => $baseDir . '/app/Listeners/CreateWordPressEditEventPost.php',

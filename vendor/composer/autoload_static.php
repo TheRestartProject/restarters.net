@@ -607,6 +607,7 @@ class ComposerStaticInit82587c9947f0c277da993ca59a480583
         'App\\Listeners\\AddUserToDiscourseGroup' => __DIR__ . '/../..' . '/app/Listeners/AddUserToDiscourseGroup.php',
         'App\\Listeners\\AnonymiseSoftDeletedUser' => __DIR__ . '/../..' . '/app/Listeners/AnonymiseSoftDeletedUser.php',
         'App\\Listeners\\ChangeWikiPassword' => __DIR__ . '/../..' . '/app/Listeners/ChangeWikiPassword.php',
+        'App\\Listeners\\CreateDiscourseThreadForEvent' => __DIR__ . '/../..' . '/app/Listeners/CreateDiscourseThreadForEvent.php',
         'App\\Listeners\\CreateWordPressApproveEventPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressApproveEventPost.php',
         'App\\Listeners\\CreateWordPressApproveGroupPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressApproveGroupPost.php',
         'App\\Listeners\\CreateWordPressEditEventPost' => __DIR__ . '/../..' . '/app/Listeners/CreateWordPressEditEventPost.php',
