@@ -9,6 +9,7 @@ return array (
       'description' => '<p>Vemos muchas impresoras en los eventos de reparación de la comunidad. Pero, ¿qué está provocando que se rompan y qué podría facilitar su reparación? ¡Ayúdenos a descubrir los problemas más comunes que nos encontramos en las impresoras con PrintCat!</p><p>Los datos de reparación en PrintCat provienen de todo el mundo, a través de socios del <a target = "_ blank" style = "color: # 212529; text-decoration: underline "href =":url"> Open Repair Alliance </a>.</p>',
       'get_involved' => 'Participa',
       'title' => '¡Colabora! PrintCat',
+      'short_description' => '¡Ayúdenos a descubrir los problemas más comunes que nos encontramos en las impresoras con PrintCat!',
     ),
     'tabicat' => 
     array (

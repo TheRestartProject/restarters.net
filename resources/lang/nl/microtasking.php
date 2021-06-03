@@ -8,6 +8,7 @@ return array (
       'description' => '<p>We zien veel printers bij Repair Cafés. Maar waardoor gaan ze kapot en wat zou ze makkelijker te repareren kunnen maken? Help ons met PrintCat de meest voorkomende problemen met printers te achterhalen! </p> <p>De reparatiegegevens in PrintCat komen van over de hele wereld, via partners van de <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Doe mee',
       'title' => 'Help Nu! PrintCat',
+      'short_description' => 'Help ons met PrintCat de meest voorkomende problemen met printers te achterhalen!',
     ),
     'tabicat' => 
     array (
