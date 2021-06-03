@@ -8,10 +8,11 @@ return array (
       'description' => '<p>Vediamo molte stampanti agli eventi di riparazione della comunità. Ma perché si rompono e cosa potrebbe renderle più facili da riparare? Aiutaci a capire i problemi più comuni che vediamo con le stampanti con PrintCat!</p> <p>I dati di riparazione in PrintCat provengono da tutto il mondo, attraverso i partner della <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Partecipa',
       'title' => 'Aiutaci adesso! PrintCat',
+      'short_description' => 'Aiutaci a capire i problemi più comuni che vediamo con le stampanti con PrintCat!',
     ),
     'tabicat' => 
     array (
-      'description' => '<p>Vediamo molte tablet agli eventi di riparazione della comunità. Ma perché si rompono e cosa potrebbe renderle più facili da riparare? Aiutaci a capire i problemi più comuni che vediamo con i tablet con TabiCat!</p> <p>I dati di riparazione in TabiCat provengono da tutto il mondo, attraverso i partner della <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'description' => '<p>Vediamo molti tablet agli eventi di riparazione comunitaria. Ma perché si rompono e cosa potrebbe renderli più facili da riparare? Aiutaci a capire i problemi più comuni che vediamo con i tablet con TabiCat!</p> <p>I dati di riparazione provengono da tutto il mondo, attraverso i partner della <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Partecipa',
       'title' => 'Aiutaci adesso! TabiCat',
     ),
@@ -26,7 +27,10 @@ return array (
   ),
   'news' => 
   array (
-    'content' => 'Attraverso la nostra ricerca su FaultCat, centinaia di volontari ci hanno aiutato ad analizzare i nostri dati sui laptop.<ul> <li> <a href = "https://ecostandard.org/publications/long-live-the-machine-how-ecodesign-energy-labelling-can-prevent-premature-obsolescence-of-laptops/" >Leggi i risultati</a> che sono stati pubblicati in questo documento politico sulla durata dei laptop.</li> <li><a href = "https://talk.restarters.net/t/repair-data-in-the -times-piece-on-e-waste / 2501 ">Dai un\'occhiata alla visualizzazione dei dati </a> pubblicata sul quotidiano britannico The Times.</li></ul>',
+    'content' => 'Con la nostra ricerca MobiFix, i volontari di tutto il mondo ci hanno aiutato ad analizzare i dati di Open Repair Alliance sugli smartphone.
+                    <ul>
+                        <li><a href="https://openrepair.org/open-data/insights/mobiles" target="_blank" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'mobifix-openrepair-insights\')">Leggi l\'analisi</a> preparata per un documento politico sulla durata della vita degli smartphone, e scarica tu stesso i risultati!
+                    </ul>',
     'title' => 'Leggi il nostro recente successo',
   ),
   'title' => 'banco di lavoro',

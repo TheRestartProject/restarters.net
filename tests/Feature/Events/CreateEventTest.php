@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\EventsUsers;
 use App\Group;
 use App\Network;
+use App\Notifications\AdminModerationEvent;
 use App\Party;
 use App\User;
 use App\UserGroups;
@@ -61,7 +62,7 @@ class CreateEventTest extends TestCase
         $this->actingAs($host);
 
         $response = $this->get('/party/create');
-        $this->get('/party/create')->assertRedirect('/user/forbidden');
+        $response->assertSee('You need to be a host of a group in order to create a new event listing');
     }
 
 
@@ -97,13 +98,29 @@ class CreateEventTest extends TestCase
         $this->withoutExceptionHandling();
         Notification::fake();
 
+        // Create some admins.
         $admins = factory(User::class, 5)->states('Administrator')->create();
 
-        // When we create an event
+        // Create a network with a group.
+        $network = factory(Network::class)->create();
+        $group = factory(Group::class)->create();
+        $network->addGroup($group);
+
+        // Make these admins coordinators of the network, so that they should get notified.
+        foreach ($admins as $admin) {
+            $network->addCoordinator($admin);
+        }
+
+        // Log in so that we can create an event.
+        $this->actingAs($admins[0]);
+
+        // Create an event.
         $event = factory(Party::class)->raw();
+        $event['group'] = $group->idgroups;
         $response = $this->post('/party/create/', $event);
         $response->assertStatus(302);
 
+        // Should have been sent to the admins.
         Notification::assertSentTo(
            [$admins], AdminModerationEvent::class
         );

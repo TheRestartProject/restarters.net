@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Events\DeviceCreatedOrUpdated;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -37,6 +38,16 @@ class Device extends Model implements Auditable
      * @var array
      */
     protected $hidden = [];
+
+    /**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+        'updated' => DeviceCreatedOrUpdated::class,
+        'created' => DeviceCreatedOrUpdated::class,
+    ];
 
     public static function boot()
     {
