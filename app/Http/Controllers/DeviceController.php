@@ -390,15 +390,17 @@ class DeviceController extends Controller
                 $device[$i]->do_it_yourself = 0;
             }
 
-            // New logic Nov 2018
-            if ($spare_parts == 3) { // Third party
-                $spare_parts = 1;
-                $parts_provider = 2;
-            } elseif ($spare_parts == 1) { // Manufacturer
-                $spare_parts = 1;
-                $parts_provider = 1;
-            } elseif ($spare_parts == 2) { // Not needed
-                $spare_parts = 2;
+            // $spare_parts as input comes from a single dropdown with three options.
+            // This is mapped to corresponding DB values
+            // for spare_parts and parts_provider columns.
+            if ($spare_parts == 3) { // Input option was 'Third party'
+                $spare_parts = Device::SPARE_PARTS_NEEDED;
+                $parts_provider = Device::PARTS_PROVIDER_THIRD_PARTY;
+            } elseif ($spare_parts == 1) { // Input option was 'Manufacturer'
+                $spare_parts = Device::SPARE_PARTS_NEEDED;
+                $parts_provider = Device::PARTS_PROVIDER_MANUFACTURER;
+            } elseif ($spare_parts == 2) { // Input option was 'Not needed'
+                $spare_parts = Device::SPARE_PARTS_NOT_NEEDED;
                 $parts_provider = null;
             } else {
                 $parts_provider = null;
@@ -421,7 +423,7 @@ class DeviceController extends Controller
 
             // Update barriers
             if (isset($barrier) && ! empty($barrier) && $repair_status == 3) { // Only sync when repair status is end-of-life
-                Device::find($device[$i]->iddevices)->barriers()->sync($barrier);
+               Device::find($device[$i]->iddevices)->barriers()->sync($barrier);
             } else {
                 Device::find($device[$i]->iddevices)->barriers()->sync([]);
             }

@@ -8,6 +8,13 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Device extends Model implements Auditable
 {
+    const SPARE_PARTS_NEEDED = 1;
+    const SPARE_PARTS_NOT_NEEDED = 2;
+
+    const PARTS_PROVIDER_MANUFACTURER = 1;
+    const PARTS_PROVIDER_THIRD_PARTY = 2;
+
+
     use \OwenIt\Auditing\Auditable;
     protected $table = 'devices';
     public $displacement = 0.5;

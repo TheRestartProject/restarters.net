@@ -12,7 +12,7 @@ jobs:
     branches:
       only:
         - develop
-        - DOT-1446_regression
+        - DOT-1449_device_part_provider
     docker:
       - image: circleci/php:7.4-node-browsers
         name: restarters.test
