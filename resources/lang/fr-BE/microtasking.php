@@ -27,6 +27,7 @@ return array (
       'description' => '<p>Nous voyons beaucoup d\'imprimantes dans les Repair Cafés. Mais qu\'est-ce qui les fait tomber en panne et qu\'est-ce qui pourrait les rendre plus faciles à réparer? Aidez-nous à déterminer les problèmes les plus courants que nous rencontrons avec les imprimantes grâce à PrintCat!</p> <p>Les données de réparation dans PrintCat proviennent du monde entier, via des partenaires de la <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Participer',
       'title' => 'Aider maintenant! PrintCat',
+      'short_description' => 'Aidez-nous à déterminer les problèmes les plus courants que nous rencontrons avec les imprimantes grâce à PrintCat!',
     ),
   ),
   'discussion' => 

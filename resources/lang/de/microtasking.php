@@ -23,9 +23,10 @@ return array (
     'title' => 'Hilf jetzt! MobiFix',
     'printcat' => 
     array (
-      'description' => 'Wir sehen bei Reparaturveranstaltungen viele Drucker. Aber warum gehen diese kaputt und was könnte sie leichter reparierbar machen? Hilf uns, mit MobiFix die häufigsten Defekte zu finden, die wir bei Druckern sehen!',
+      'description' => 'Wir sehen bei Reparaturveranstaltungen viele Drucker. Aber warum gehen diese kaputt und was könnte sie leichter reparierbar machen? Hilf uns, mit PrintCat die häufigsten Defekte zu finden, die wir bei Druckern sehen!',
       'get_involved' => 'Mach mit',
       'title' => 'Hilf jetzt! PrintCat',
+      'short_description' => 'Hilf uns, mit PrintCat die häufigsten Defekte zu finden, die wir bei Druckern sehen!',
     ),
   ),
   'discussion' => 
