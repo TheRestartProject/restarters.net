@@ -8,8 +8,13 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Device extends Model implements Auditable
 {
+    const REPAIR_STATUS_FIXED = 1;
+    const REPAIR_STATUS_REPAIRABLE = 2;
+    const REPAIR_STATUS_ENDOFLIFE = 3;
+
     const SPARE_PARTS_NEEDED = 1;
     const SPARE_PARTS_NOT_NEEDED = 2;
+    const SPARE_PARTS_UNKNOWN = 0;
 
     const PARTS_PROVIDER_MANUFACTURER = 1;
     const PARTS_PROVIDER_THIRD_PARTY = 2;

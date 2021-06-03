@@ -21,7 +21,7 @@ class SparePartsTest extends TestCase
         DB::statement("SET foreign_key_checks=1");
 
         $event = factory(Party::class)->create();
-        $this->device_inputs = factory(Device::class)->state('fixed')->raw([
+        $this->device_inputs = factory(Device::class)->raw([
             'event_id' => $event->idevents,
             'quantity' => 1,
         ]);
@@ -39,6 +39,7 @@ class SparePartsTest extends TestCase
     /** @test */
     public function recording_spare_parts_from_manufacturer()
     {
+        $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_FIXED;
         $this->device_inputs['spare_parts'] = $this->input_spare_parts_from_manufacturer;
         $response = $this->post('/device/create', $this->device_inputs);
 
@@ -50,6 +51,7 @@ class SparePartsTest extends TestCase
     /** @test */
     public function recording_spare_parts_from_third_party()
     {
+        $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_FIXED;
         $this->device_inputs['spare_parts'] = $this->input_spare_parts_from_third_party;
 
         $response = $this->post('/device/create', $this->device_inputs);
@@ -62,7 +64,34 @@ class SparePartsTest extends TestCase
     /** @test */
     public function recording_no_spare_parts_needed()
     {
+        $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_FIXED;
         $this->device_inputs['spare_parts'] = $this->input_no_spare_parts_needed;
+
+        $response = $this->post('/device/create', $this->device_inputs);
+
+        $device = Device::find(1);
+        $this->assertEquals(Device::SPARE_PARTS_NOT_NEEDED, $device->spare_parts);
+        $this->assertNull($device->parts_provider);
+    }
+
+    /** @test */
+    public function recording_spare_parts_related_barrier()
+    {
+        $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_ENDOFLIFE;
+        $this->device_inputs['barrier'] = [1];
+
+        $response = $this->post('/device/create', $this->device_inputs);
+
+        $device = Device::find(1);
+        $this->assertEquals(Device::SPARE_PARTS_NEEDED, $device->spare_parts);
+        $this->assertNull($device->parts_provider);
+    }
+
+    /** @test */
+    public function recording_no_spare_parts_related_barrier()
+    {
+        $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_ENDOFLIFE;
+        $this->device_inputs['barrier'] = [4];
 
         $response = $this->post('/device/create', $this->device_inputs);
 

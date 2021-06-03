@@ -409,12 +409,12 @@ class DeviceController extends Controller
             if (! isset($barrier)) {
                 $barrier = null;
             } elseif (in_array(1, $barrier) || in_array(2, $barrier)) { // 'Spare parts not available' or 'spare parts too expensive' selected
-                $spare_parts = 1;
+                $spare_parts = Device::SPARE_PARTS_NEEDED;
             } elseif (count($barrier) > 0) {
-                $spare_parts = 2;
+                $spare_parts = Device::SPARE_PARTS_NOT_NEEDED;
             }
 
-            $device[$i]->spare_parts = isset($spare_parts) ? $spare_parts : 0;
+            $device[$i]->spare_parts = isset($spare_parts) ? $spare_parts : Device::SPARE_PARTS_UNKNOWN;
             $device[$i]->parts_provider = $parts_provider;
             $device[$i]->event = $event_id;
             $device[$i]->repaired_by = Auth::id();
