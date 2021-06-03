@@ -38,9 +38,10 @@ return array (
   ),
   'news' => 
   array (
-    'content' => 'In unserem FaultCat Project haben uns hunderte Freiwillige bei der Analyse unserer Daten zu Laptops geholfen.
-Schau dir die Ergebniße in diesem Bericht zur Lebensdaür von Laptops an.
-Die Grafiken der Zeitung "The Times" findest du hier.',
+    'content' => 'Bei unserer MobiFix-Suche haben uns Freiwillige auf der ganzen Welt geholfen, Daten der Open Repair Alliance zu Smartphones zu analysieren.
+                    <ul>
+                        <li><a href="https://openrepair.org/open-data/insights/mobiles" target="_blank" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'mobifix-openrepair-insights\')">Lesen Sie die Analyse</a>, die für ein Strategiepapier zur Lebensdauer von Smartphones erstellt wurde, und laden Sie die Ergebnisse selbst herunter!</li>
+                    </ul>',
     'title' => 'Lies mehr über unsere letzten Erfolge.',
   ),
   'title' => 'Werkbank',
