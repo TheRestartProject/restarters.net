@@ -27,7 +27,10 @@ return array (
   ),
   'news' => 
   array (
-    'content' => 'Attraverso la nostra ricerca su FaultCat, centinaia di volontari ci hanno aiutato ad analizzare i nostri dati sui laptop.<ul> <li> <a href = "https://ecostandard.org/publications/long-live-the-machine-how-ecodesign-energy-labelling-can-prevent-premature-obsolescence-of-laptops/" >Leggi i risultati</a> che sono stati pubblicati in questo documento politico sulla durata dei laptop.</li> <li><a href = "https://talk.restarters.net/t/repair-data-in-the -times-piece-on-e-waste / 2501 ">Dai un\'occhiata alla visualizzazione dei dati </a> pubblicata sul quotidiano britannico The Times.</li></ul>',
+    'content' => 'Con la nostra ricerca MobiFix, i volontari di tutto il mondo ci hanno aiutato ad analizzare i dati di Open Repair Alliance sugli smartphone.
+                    <ul>
+                        <li><a href="https://openrepair.org/open-data/insights/mobiles" target="_blank" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'mobifix-openrepair-insights\')">Leggi l\'analisi</a> preparata per un documento politico sulla durata della vita degli smartphone, e scarica tu stesso i risultati!
+                    </ul>',
     'title' => 'Leggi il nostro recente successo',
   ),
   'title' => 'banco di lavoro',

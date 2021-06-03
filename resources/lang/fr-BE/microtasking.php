@@ -40,12 +40,9 @@ return array (
   'news' => 
   array (
     'title' => 'Lire nos récents succès',
-    'content' => 'Lors de notre recherche FaultCat , des centaines de bénévoles nous ont aidé à analyser nos données sur les ordinateurs.
+    'content' => 'Grâce à notre quête MobiFix, des volontaires du monde entier nous ont aidés à analyser les données de l\'Open Repair Alliance sur les smartphones.
                     <ul>
-                        <li><a href="https://ecostandard.org/publications/long-live-the-machine-how-ecodesign-energy-labelling-can-prevent-premature-obsolescence-of-laptops/">Lire les résultats</a> dans le cadre de ce document politique sur la durée de vie des ordinateurs portables.</li>
-                        <li>
-                            <a href="https://talk.restarters.net/t/repair-data-in-the-times-piece-on-e-waste/2501">Voir la visualisation des données</a> apparue dans le journal The Times.
-                        </li>
+                        <li><a href="https://openrepair.org/open-data/insights/mobiles" target="_blank" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'mobifix-openrepair-insights\')">Lisez l\'analyse</a> telle qu\'elle a été préparée pour un document d\'orientation sur la durée de vie des smartphones, et téléchargez vous-même les résultats!</li>
                     </ul>',
   ),
   'title' => 'Atelier de données',

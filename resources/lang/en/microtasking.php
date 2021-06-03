@@ -8,11 +8,7 @@ return array (
     'content' => 'Through our MobiFix quest, volunteers around the world helped us analyse Open Repair Alliance data on mobiles.
                     <ul>
                         <li><a href="https://openrepair.org/open-data/insights/mobiles" target="_blank" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'mobifix-openrepair-insights\')">Read the analysis</a> as prepared for a policy paper on smartphone lifetimes, and download the results yourself!</li>
-                        <!--<li>
-                            <a href="https://talk.restarters.net/t/repair-data-in-the-times-piece-on-e-waste/2501?utm_source=restarters" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'mobifix-discussion\')">Join the discussion</a> on the barriers to smartphone repair and what these results show.
-                        </li>-->
-                    </ul>
-        ',
+                    </ul>',
   ),
   'volunteering' => 
   array (
