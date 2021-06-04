@@ -144,7 +144,6 @@
   </div>
 </template>
 <script>
-import GroupEventsTableHeading from './GroupEventsTableHeading'
 import InfiniteLoading from 'vue-infinite-loading'
 import GroupEventsScrollTableFilters from './GroupEventsScrollTableFilters'
 import GroupEventsScrollTableDateShort from './GroupEventsScrollTableDateShort'
@@ -162,7 +161,6 @@ export default {
     GroupEventsScrollTableDateLong,
     GroupEventsScrollTableDateShort,
     GroupEventsScrollTableFilters,
-    GroupEventsTableHeading,
     InfiniteLoading
   },
   props: {
