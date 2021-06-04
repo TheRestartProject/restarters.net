@@ -314,6 +314,16 @@ export default {
     stats(event) {
       return this.$store.getters['events/getStats'](event.idevents)
     },
+    finished(event) {
+      let ret = false;
+
+      if (event) {
+        const end = new moment(event.event_date + ' ' + event.end)
+        ret = end.isBefore()
+      }
+
+      return ret
+    },
     noDevices(event) {
       const stats = this.stats(event)
 
