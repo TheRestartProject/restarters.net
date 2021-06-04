@@ -1,9 +1,16 @@
 <template>
   <div>
-    <GroupEventsScrollTableFilters v-if="filters" />
+    <GroupEventsScrollTableFilters
+        v-if="filters"
+        :events="events"
+        :title.sync="searchTitle"
+        :country.sync="searchCountry"
+        :start.sync="searchStart"
+        :end.sync="searchEnd"
+    />
     <b-table
         :fields="fields"
-        :items="items"
+        :items="filteredItems"
         sort-null-last
         :sort-compare="sortCompare"
         sticky-header="50vh"
@@ -41,7 +48,7 @@
 
       <template slot="head(invited)">
         <div class="hidecell text-center">
-          <b-img class="icon" src="/images/mail_ico.svg" :title="__('groups.volunteers_invited')" />
+          <b-img class="icon mt-3" src="/images/mail_ico.svg" :title="__('groups.volunteers_invited')" />
         </div>
       </template>
       <template slot="cell(invited)" slot-scope="data">
@@ -50,7 +57,7 @@
 
       <template slot="head(volunteers)">
         <div class="hidecell text-center">
-          <b-img class="icon" src="/images/participants.svg" :title="__('groups.volunteers_confirmed')" />
+          <b-img class="icon mt-3" src="/images/participants.svg" :title="__('groups.volunteers_confirmed')" />
         </div>
       </template>
       <template slot="cell(volunteers)" slot-scope="data">
@@ -66,7 +73,7 @@
 
       <template slot="head(participants_count)">
         <div class="hidecell text-center">
-          <b-img class="icon" src="/images/participants.svg" :title="__('groups.participants_attended')" />
+          <b-img class="icon mt-3" src="/images/participants.svg" :title="__('groups.participants_attended')" />
         </div>
       </template>
       <template slot="cell(participants_count)" slot-scope="data">
@@ -75,7 +82,7 @@
 
       <template slot="head(volunteers_count)">
         <div class="hidecell text-center">
-          <b-img class="icon" src="/icons/volunteer_ico-thick.svg" :title="__('groups.volunteers_attended')" />
+          <b-img class="icon mt-3" src="/icons/volunteer_ico-thick.svg" :title="__('groups.volunteers_attended')" />
         </div>
       </template>
       <template slot="cell(volunteers_count)" slot-scope="data">
@@ -84,7 +91,7 @@
 
       <template slot="head(ewaste)">
         <div class="hidecell text-center">
-          <b-img class="icon" src="/images/trash.svg" :title="__('groups.waste_prevented')" />
+          <b-img class="icon mt-3" src="/images/trash.svg" :title="__('groups.waste_prevented')" />
         </div>
       </template>
       <template slot="cell(ewaste)" slot-scope="data" v-bind="stats">
@@ -99,7 +106,7 @@
 
       <template slot="head(co2)">
         <div class="hidecell text-center">
-          <b-img class="icon" src="/images/cloud_empty.svg" :title="__('groups.co2_emissions_prevented')" />
+          <b-img class="icon mt-3" src="/images/cloud_empty.svg" :title="__('groups.co2_emissions_prevented')" />
         </div>
       </template>
       <template slot="cell(co2)" slot-scope="data" v-bind="stats">
@@ -108,7 +115,7 @@
 
       <template slot="head(fixed_devices)">
         <div class="hidecell text-center">
-          <b-img class="icon" src="/images/fixed.svg" :title="__('groups.fixed_items')" />
+          <b-img class="icon mt-3" src="/images/fixed.svg" :title="__('groups.fixed_items')" />
         </div>
       </template>
       <template slot="cell(fixed_devices)" slot-scope="data" v-bind="stats">
@@ -117,7 +124,7 @@
 
       <template slot="head(repairable_devices)">
         <div class="hidecell text-center">
-          <b-img class="icon" src="/images/repairable_ico.svg" :title="__('groups.repairable_items')" />
+          <b-img class="icon mt-3" src="/images/repairable_ico.svg" :title="__('groups.repairable_items')" />
         </div>
       </template>
       <template slot="cell(repairable_devices)" slot-scope="data" v-bind="stats">
@@ -126,7 +133,7 @@
 
       <template slot="head(dead_devices)">
         <div class="hidecell text-center">
-          <b-img class="icon" src="/images/dead_ico.svg" :title="__('groups.end_of_life_items')" />
+          <b-img class="icon mt-3" src="/images/dead_ico.svg" :title="__('groups.end_of_life_items')" />
         </div>
       </template>
       <template slot="cell(dead_devices)" slot-scope="data" v-bind="stats">
@@ -191,6 +198,10 @@ export default {
   },
   data () {
     return {
+      searchTitle: null,
+      searchCountry: null,
+      searchStart: null,
+      searchEnd: null
     }
   },
   computed: {
@@ -250,6 +261,38 @@ export default {
         })
       }
     },
+    filteredItems() {
+      return this.items.filter(item => {
+        // Any of the fields contains the event.
+        const event = item.title
+
+        let match = true
+
+        if (this.searchTitle) {
+          const title = event.venue ? event.venue : event.location
+          match &= title.toLowerCase().indexOf(this.searchTitle.toLowerCase()) !== -1
+        }
+
+        if (this.searchCountry) {
+          match &= event.group.country && event.group.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
+        }
+
+        if (this.searchStart || this.searchEnd) {
+          // Either or both can be set.  This allows searching for all past or all future.
+          const date = new moment(event.event_date)
+
+          if (this.searchStart && this.searchEnd) {
+            match &= date.isBetween(new moment(this.searchStart), new moment(this.searchEnd), undefined, '[]')
+          } else if (this.searchStart) {
+            match &= date.isSameOrAfter(new moment(this.searchStart))
+          } else {
+            match &= date.isSameOrBefore(new moment(this.searchEnd))
+          }
+        }
+
+        return match
+      })
+    }
   },
   methods: {
     sortCompare(aRow, bRow, key, sortDesc, formatter, compareOptions, compareLocale) {
@@ -355,6 +398,7 @@ export default {
 
 /deep/ .icon {
   width: 30px;
+  height: 30px;
 }
 
 /deep/ {
@@ -362,6 +406,10 @@ export default {
     width: 87px;
     min-height: 87px;
   }
+}
+
+/deep/ .table.b-table > thead > tr {
+  background-position-x: center !important;
 }
 
 /deep/ .attending {
@@ -378,6 +426,25 @@ export default {
         color: $white;
       }
     }
+  }
+}
+
+// The multiselect is used in a few places, and we have some inconsistencies in styling.  Here we force it to match
+// the behaviour of the inputs.
+/deep/ .multiselect {
+  &.multiselect--active {
+    border: 0 !important;
+
+    input {
+      margin-left: 6px;
+      margin-top: 2px;
+      margin-bottom: 4px;
+    }
+  }
+
+  .multiselect__tags {
+    padding: 2px 40px 3px 12px !important;
+    border: 2px solid #222 !important;
   }
 }
 </style>

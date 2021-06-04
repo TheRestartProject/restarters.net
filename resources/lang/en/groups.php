@@ -169,7 +169,7 @@ return array (
   'group_count' => 'There is <b>:count group</b>.|There are <b>:count groups</b>.',
   'search_name_placeholder' => 'Search name...',
   'search_location_placeholder' => 'Search location...',
-  'search_country_placeholder' => 'Country',
+  'search_country_placeholder' => 'Country...',
   'search_tags_placeholder' => 'Tag',
   'show_filters' => 'Show Filters',
   'hide_filters' => 'Hide Filters',
