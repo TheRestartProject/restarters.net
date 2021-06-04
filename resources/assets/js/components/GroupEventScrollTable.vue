@@ -112,7 +112,13 @@
         </div>
       </template>
       <template slot="cell(ewaste)" slot-scope="data" v-bind="stats">
-        <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.ewaste).ewaste)" units="kg" />
+        <div v-if="noDevices(data.item.ewaste)" class="d-none d-md-block">
+          {{ __('partials.no_devices_added') }}
+          <a :href="'/party/view/' + data.item.ewaste.idevents">
+            {{ __('partials.add_a_device') }}
+          </a>
+        </div>
+        <GroupEventsScrollTableNumber v-else :value="Math.round(stats(data.item.ewaste).ewaste)" units="kg" />
       </template>
 
       <template slot="head(co2)">
@@ -151,14 +157,10 @@
         <GroupEventsScrollTableNumber :value="stats(data.item.dead_devices).dead_devices" v-if="stats(data.item.dead_devices)" />
       </template>
 
-      <!--      TODO No devices warning -->
-      <!--      TODO Sorting-->
-
     </b-table>
   </div>
 </template>
 <script>
-import GroupEventSummary from './GroupEventSummary'
 import GroupEventsTableHeading from './GroupEventsTableHeading'
 import InfiniteLoading from 'vue-infinite-loading'
 import GroupEventsScrollTableFilters from './GroupEventsScrollTableFilters'
@@ -176,7 +178,10 @@ export default {
     GroupEventsScrollTableDateLong,
     GroupEventsScrollTableDateShort,
     GroupEventTableDate,
-    GroupEventsScrollTableFilters, GroupEventsTableHeading, GroupEventSummary, InfiniteLoading},
+    GroupEventsScrollTableFilters,
+    GroupEventsTableHeading,
+    InfiniteLoading
+  },
   props: {
     events: {
       type: Array,
@@ -214,13 +219,13 @@ export default {
     fields() {
       if (this.past) {
         return [
-          { key: 'date_short', label: 'Short Date', sortable: true },
+          { key: 'date_short', label: 'Short Date', sortable: true, tdClass: 'p-0 datetd' },
           { key: 'date_long', label: 'Long Date', sortable: true },
           { key: 'title', label: 'Event Title', sortable: true },
           { key: 'actions', label: 'Actions', },
           { key: 'participants_count', label: 'Participants', sortable: true, tdClass: this.dangerIfZero},
           { key: 'volunteers_count', label: 'Volunteers', sortable: true, tdClass: this.dangerIfZero},
-          { key: 'ewaste', label: 'ewaste', sortable: true},
+          { key: 'ewaste', label: 'ewaste', sortable: true, tdClass: this.noDevicesError},
           { key: 'co2', label: 'co2', sortable: true},
           { key: 'fixed_devices', label: 'Fixed Devices', sortable: true},
           { key: 'repairable_devices', label: 'Repairable Devices', sortable: true},
@@ -228,7 +233,7 @@ export default {
         ]
       } else {
         return [
-          { key: 'date_short', label: 'Short Date', sortable: true },
+          { key: 'date_short', label: 'Short Date', sortable: true, tdClass: 'pl-0 datetd' },
           { key: 'date_long', label: 'Long Date', sortable: true },
           { key: 'title', label: 'Event Title', sortable: true },
           { key: 'invited', label: 'Invited', sortable: true },
@@ -268,22 +273,23 @@ export default {
       }
     },
   },
-  mounted() {
-    // We have some classes which we want to apply to the table cells to colour the background.  The use of slots
-    // and the way b-table works precludes us from applying them to the TD directly.  There are CSS attempts to do this
-    // which don't work very well, and CSS has:() isn't supported yet.  So we have to hack this via JS - look for
-    // the relevant classes and apply them to the parent too.
-    this.$nextTick(() => {
-      // this.$el.querySelector()
-    })
-  },
   methods: {
     sortCompare(aRow, bRow, key, sortDesc, formatter, compareOptions, compareLocale) {
+      console.log("sort", aRow, bRow, key)
       const a = aRow[key]
       const b = bRow[key]
 
-      if (key === 'date_short' || key === 'date_long') {
-          return new moment(aRow.start).unix() - new moment(bRow.start).unix()
+      const numeric = !isNaN(a[key]) && !isNaN(b[key])
+
+
+      if (numeric) {
+        return parseInt(a[key]) - parseInt(b[key])
+      } else if (key === 'date_short' || key === 'date_long') {
+        return new moment(b.event_date + ' ' + b.start).unix() - new moment(a.event_date + ' ' + a.start).unix()
+      } else if (key === 'title') {
+        const atitle = a.venue ? a.venue : a.location
+        const btitle = b.venue ? b.venue : b.location
+        return atitle.toLowerCase().localeCompare(btitle.toLowerCase())
       } else {
         return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
       }
@@ -317,6 +323,11 @@ export default {
     stats(event) {
       return this.$store.getters['events/getStats'](event.idevents)
     },
+    noDevices(event) {
+      const stats = this.stats(event)
+
+      return stats && (stats.fixed_devices + stats.repairable_devices + stats.dead_devices === 0) && this.canedit && this.finished(event) || true
+    },
     rowClass(item) {
       // This gets called to supply a class for the tr of the table.  We want to highlight the rows where we are
       // attending.
@@ -335,8 +346,14 @@ export default {
     },
     dangerIfZero(event, key, item) {
       // We want to flag some cells if they contain zero values.
-      return event[key] <= 0 ? 'cell-danger': ''
-    }
+      return event[key] <= 0 ? 'cell-danger': ''    },
+    noDevicesError(event, key, item) {
+      // We want to flag if there are no devices when there should be.
+      //
+      // We can't use colspan in b-table, so this warning will get squeezed into this cell rather than replacing
+      // all the stats as it used to.
+      return this.noDevices(event) ? 'cell-danger' : ''
+    },
   }
 }
 </script>
@@ -345,10 +362,6 @@ export default {
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
-
-.fullsize {
-  font-size: 100%;
-}
 
 /deep/ .hidecell {
   display: none;
@@ -366,21 +379,26 @@ export default {
   width: 30px;
 }
 
+/deep/ {
+  .datetd {
+    width: 87px;
+    min-height: 87px;
+  }
+}
+
 /deep/ .attending {
   background-color: $brand-grey;
 
-  &.datecell {
-    padding-top: 9px;
-    padding-bottom: 9px;
-    padding-left: 9px;
-    padding-right: 9px;
-    text-align: center;
+  .datetd {
     background-color: $black;
-    width: 76px !important;
 
-    .datebox {
+    .datecell {
       background-color: $black;
-      color: $white;
+
+      .datebox {
+        background-color: $black;
+        color: $white;
+      }
     }
   }
 }
