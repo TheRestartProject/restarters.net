@@ -44,23 +44,4 @@ export default {
     line-height: 1rem;
   }
 }
-
-.attending {
-  background-color: $brand-grey;
-
-  &.datecell {
-    padding-top: 9px;
-    padding-bottom: 9px;
-    padding-left: 9px;
-    padding-right: 9px;
-    text-align: center;
-    background-color: $black;
-    width: 76px !important;
-
-    .datebox {
-      background-color: $black;
-      color: $white;
-    }
-  }
-}
 </style>

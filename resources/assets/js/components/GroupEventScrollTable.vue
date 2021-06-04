@@ -1,45 +1,41 @@
 <template>
   <div>
     <GroupEventsScrollTableFilters v-if="filters" />
-    <b-table :fields="fields" :items="items" sort-null-last :sort-compare="sortCompare" sticky-header="50vh" responsive class="mt-2 pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+    <b-table
+        :fields="fields"
+        :items="items"
+        sort-null-last
+        :sort-compare="sortCompare"
+        sticky-header="50vh"
+        responsive
+        class="mt-2 pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2"
+        table-class="m-0 leave-tables-alone"
+        :tbody-tr-class="rowClass"
+    >
 
       <template slot="head(date_short)">
         <span />
       </template>
       <template slot="cell(date_short)" slot-scope="data">
-        <div :class="{
-          attending: data.item.date_short.attending
-             }">
-          <GroupEventsScrollTableDateShort :idevents="data.item.date_short.idevents" />
-        </div>
+        <GroupEventsScrollTableDateShort :idevents="data.item.date_short.idevents" />
       </template>
 
       <template slot="head(date_long)">
         <span />
       </template>
       <template slot="cell(date_long)" slot-scope="data">
-        <div :class="{
-          attending: data.item.date_long.attending
-             }">
-          <GroupEventsScrollTableDateLong :idevents="data.item.date_long.idevents" />
-        </div>
+        <GroupEventsScrollTableDateLong :idevents="data.item.date_long.idevents" />
       </template>
 
       <template slot="head(title)">
         <span />
       </template>
       <template slot="cell(title)" slot-scope="data" v-bind:addGroupName="addGroupName">
-        <div :class="{
-          attending: data.item.title.attending
-             }">
-          <b><EventTitle :idevents="data.item.title.idevents" component="a" :href="'/party/view/' + data.item.title.idevents" :class="{
-            attending: data.item.title.attending
-          }"/></b>
-          <div class="hidecell">
-            <span v-if="addGroupName" class="small">
-              <a :href="'/group/view/' + data.item.title.group.idgroups">{{ data.item.title.group.name }}</a>
-            </span>
-          </div>
+        <b><EventTitle :idevents="data.item.title.idevents" component="a" :href="'/party/view/' + data.item.title.idevents" /></b>
+        <div class="hidecell">
+          <span v-if="addGroupName" class="small">
+            <a :href="'/group/view/' + data.item.title.group.idgroups">{{ data.item.title.group.name }}</a>
+          </span>
         </div>
       </template>
 
@@ -49,11 +45,7 @@
         </div>
       </template>
       <template slot="cell(invited)" slot-scope="data">
-        <div :class="{
-          attending: data.item.invited.attending
-             }">
-          <GroupEventsScrollTableNumber :value="data.item.invited.attending" />
-        </div>
+        <GroupEventsScrollTableNumber :value="data.item.invited.allinvitedcount" />
       </template>
 
       <template slot="head(volunteers)">
@@ -62,44 +54,36 @@
         </div>
       </template>
       <template slot="cell(volunteers)" slot-scope="data">
-        <div :class="{
-          attending: data.item.volunteers.attending
-             }">
-          <GroupEventsScrollTableNumber :value="data.item.volunteers.volunteers" />
-        </div>
+        <GroupEventsScrollTableNumber :value="data.item.volunteers.volunteers" />
       </template>
 
       <template slot="head(actions)">
         <span />
       </template>
       <template slot="cell(actions)" slot-scope="data" v-bind:upcoming="upcoming">
-        <div :class="{
-          attending: data.item.actions.attending
-        }">
-          <div v-if="upcoming(data.item.actions)">
-            <div v-if="data.item.actions.requiresModeration" class="cell-warning">
-              <span v-if="data.item.actions.canModerate">
-                <a :href="'/party/edit/' + data.item.actions.idevents">{{ __('partials.event_requires_moderation') }}</a>
-              </span>
-              <span v-else>
-                {{ __('partials.event_requires_moderation_by_an_admin') }}
+        <div v-if="upcoming(data.item.actions)">
+          <div v-if="data.item.actions.requiresModeration" class="cell-warning">
+            <span v-if="data.item.actions.canModerate">
+              <a :href="'/party/edit/' + data.item.actions.idevents">{{ __('partials.event_requires_moderation') }}</a>
+            </span>
+            <span v-else>
+              {{ __('partials.event_requires_moderation_by_an_admin') }}
+            </span>
+          </div>
+          <div v-else class="hidecell">
+            <div v-if="data.item.actions.attending" class="text-black font-weight-bold d-flex justify-content-around">
+              <span>
+                {{ __('events.youre_going') }}
               </span>
             </div>
-            <div v-else class="hidecell">
-              <div v-if="data.item.actions.attending" class="text-black font-weight-bold d-flex justify-content-around">
-                <span>
-                  {{ __('events.youre_going') }}
-                </span>
-              </div>
-              <!-- "all" or "nearby" events are for ones where we're not a member, so show a join button. -->
-              <b-btn variant="primary" :href="'/group/join/' + data.item.actions.group.idgroups" v-else-if="data.item.actions.all || data.item.actions.nearby">
-                {{ __('groups.join_group_button') }}
-              </b-btn>
-              <!-- We can't RSVP if the event is starting soon. -->
-              <b-btn variant="primary" :href="'/party/join/' + data.item.actions.idevents" :disabled="startingSoon(data.item.actions)" v-else>
-                {{ __('events.RSVP') }}
-              </b-btn>
-            </div>
+            <!-- "all" or "nearby" events are for ones where we're not a member, so show a join button. -->
+            <b-btn variant="primary" :href="'/group/join/' + data.item.actions.group.idgroups" v-else-if="data.item.actions.all || data.item.actions.nearby">
+              {{ __('groups.join_group_button') }}
+            </b-btn>
+            <!-- We can't RSVP if the event is starting soon. -->
+            <b-btn variant="primary" :href="'/party/join/' + data.item.actions.idevents" :disabled="startingSoon(data.item.actions)" v-else>
+              {{ __('events.RSVP') }}
+            </b-btn>
           </div>
         </div>
       </template>
@@ -110,11 +94,7 @@
         </div>
       </template>
       <template slot="cell(participants_count)" slot-scope="data">
-        <div :class="{
-          attending: data.item.participants_count.attending
-             }">
-          <GroupEventsScrollTableNumber :value="data.item.participants_count.participants_count" danger-if-zero />
-        </div>
+        <GroupEventsScrollTableNumber :value="data.item.participants_count.participants_count" danger-if-zero />
       </template>
 
       <template slot="head(volunteers_count)">
@@ -123,11 +103,7 @@
         </div>
       </template>
       <template slot="cell(volunteers_count)" slot-scope="data">
-        <div :class="{
-          attending: data.item.volunteers_count.attending
-             }">
-          <GroupEventsScrollTableNumber :value="data.item.volunteers_count.volunteers_count" danger-if-zero />
-        </div>
+        <GroupEventsScrollTableNumber :value="data.item.volunteers_count.volunteers_count" danger-if-zero />
       </template>
 
       <template slot="head(ewaste)">
@@ -136,11 +112,7 @@
         </div>
       </template>
       <template slot="cell(ewaste)" slot-scope="data" v-bind="stats">
-        <div :class="{
-          attending: data.item.ewaste.attending
-             }">
-          <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.ewaste).ewaste)" units="kg" />
-        </div>
+        <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.ewaste).ewaste)" units="kg" />
       </template>
 
       <template slot="head(co2)">
@@ -149,11 +121,7 @@
         </div>
       </template>
       <template slot="cell(co2)" slot-scope="data" v-bind="stats">
-        <div :class="{
-          attending: data.item.co2.attending
-             }">
-          <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.co2).co2)" units="kg" />
-        </div>
+        <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.co2).co2)" units="kg" />
       </template>
 
       <template slot="head(fixed_devices)">
@@ -162,13 +130,7 @@
         </div>
       </template>
       <template slot="cell(fixed_devices)" slot-scope="data" v-bind="stats">
-        <div :class="{
-          attending: data.item.fixed_devices.attending
-             }"
-             v-if="stats(data.item.fixed_devices)"
-        >
-          <GroupEventsScrollTableNumber :value="stats(data.item.fixed_devices).fixed_devices" />
-        </div>
+        <GroupEventsScrollTableNumber :value="stats(data.item.fixed_devices).fixed_devices" v-if="stats(data.item.fixed_devices)" />
       </template>
 
       <template slot="head(repairable_devices)">
@@ -177,13 +139,7 @@
         </div>
       </template>
       <template slot="cell(repairable_devices)" slot-scope="data" v-bind="stats">
-        <div :class="{
-          attending: data.item.repairable_devices.attending
-             }"
-             v-if="stats(data.item.repairable_devices)"
-        >
-          <GroupEventsScrollTableNumber :value="stats(data.item.repairable_devices).repairable_devices" />
-        </div>
+        <GroupEventsScrollTableNumber :value="stats(data.item.repairable_devices).repairable_devices" v-if="stats(data.item.repairable_devices)" />
       </template>
 
       <template slot="head(dead_devices)">
@@ -192,17 +148,10 @@
         </div>
       </template>
       <template slot="cell(dead_devices)" slot-scope="data" v-bind="stats">
-        <div :class="{
-          attending: data.item.dead_devices.attending
-             }"
-             v-if="stats(data.item.dead_devices)"
-        >
-          <GroupEventsScrollTableNumber :value="stats(data.item.dead_devices).dead_devices" />
-        </div>
+        <GroupEventsScrollTableNumber :value="stats(data.item.dead_devices).dead_devices" v-if="stats(data.item.dead_devices)" />
       </template>
 
       <!--      TODO No devices warning -->
-      <!--      TODO Row highlighting-->
       <!--      TODO Sorting-->
 
     </b-table>
@@ -213,8 +162,6 @@ import GroupEventSummary from './GroupEventSummary'
 import GroupEventsTableHeading from './GroupEventsTableHeading'
 import InfiniteLoading from 'vue-infinite-loading'
 import GroupEventsScrollTableFilters from './GroupEventsScrollTableFilters'
-import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
-import moment from 'moment'
 import GroupEventTableDate from './GroupEventTableDate'
 import GroupEventsScrollTableDateShort from './GroupEventsScrollTableDateShort'
 import GroupEventsScrollTableDateLong from './GroupEventsScrollTableDateLong'
@@ -369,6 +316,22 @@ export default {
     stats(event) {
       return this.$store.getters['events/getStats'](event.idevents)
     },
+    rowClass(item) {
+      // This gets called to supply a class for the tr of the table.  We want to highlight the rows where we are
+      // attending.
+      //
+      // The data structure is confusing; the parameter here is the data structure for the whole row, which
+      // contains properties for each field.  We set each of those up in items() to be the event, so we can just
+      // pick any property (title, say) to get access to the event.
+      let ret = ''
+
+      if (item && item.title && item.title.attending) {
+        // Highlight rows where we are attending
+        ret = 'attending'
+      }
+
+      return ret
+    }
   }
 }
 </script>
@@ -396,5 +359,24 @@ export default {
 
 /deep/ .icon {
   width: 30px;
+}
+
+/deep/ .attending {
+  background-color: $brand-grey;
+
+  &.datecell {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    padding-left: 9px;
+    padding-right: 9px;
+    text-align: center;
+    background-color: $black;
+    width: 76px !important;
+
+    .datebox {
+      background-color: $black;
+      color: $white;
+    }
+  }
 }
 </style>
