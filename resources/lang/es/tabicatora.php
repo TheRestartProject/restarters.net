@@ -1,7 +1,7 @@
 <?php
 
 return array (
-  'status' =>
+  'status' => 
   array (
     'brand' => 'Marca',
     'items_0_opinions' => 'con 0 opiniones',
@@ -18,8 +18,13 @@ return array (
     'task_completed' => 'Ya los has visto todos, gracias',
     'total' => 'Total',
     'winning_opinion' => 'Opinión mayoritaria',
+    'progress' => 'completo',
+    'with_0_opinions' => 'con 0 opiniones',
+    'with_1_opinion' => 'con 1 opinión',
+    'with_2_opinions' => 'con 2 opiniones',
+    'with_3_opinions' => 'con 3 opiniones',
   ),
-  'task' =>
+  'task' => 
   array (
     'fetch_another' => 'No lo sé. Mostrar otra reparación',
     'go_with' => 'Elegir',
@@ -27,25 +32,50 @@ return array (
     'suggestions' => 'Sugerencias',
     'translate' => 'Traducir',
     'where_is_the_main_fault' => '¿Dónde está el fallo principal?',
-    'strapline' => 'Simplemente lea la información sobre la impresora averiada y seleccione el tipo de problema que se describe en la lista a continuación.',
+    'strapline' => 'Simplemente lee la información sobre la tableta averiada y selecciona el tipo de problema que se describe en la lista a continuación.',
     'learn_more' => 'Más información',
+    'did_you_know' => '¿Sabías que?',
+    'signpost_1' => 'Una tableta media produce el equivalente a 150 kg de CO2 durante su vida útil. Pero como se necesitan muchos materiales preciosos y una fabricación intensiva para fabricar cada tableta, más del 75% de ese impacto se produce antes de que se encienda por primera vez.',
+    'signpost_2' => 'Reparar un dispositivo prolonga su vida útil, reduce su impacto medioambiental global y disminuye la demanda de nuevos productos. De hecho, si utilizáramos cada ordenador en Europa durante un año más, podríamos ahorrar el equivalente a 3 millones de toneladas de CO2.',
+    'signpost_3' => 'La Unión Europea tiene previsto incluir las tabletas y los smartphone en las normas de Ecodesign para finales de 2022. Esto nos da la oportunidad de reclamar el derecho a reparar estos dispositivos. Las normas decididas por la UE también podrían utilizarse para influir en las leyes de otros lugares, incluido el Reino Unido.',
+    'signpost_4' => 'Queremos demonstrar a los políticos por qué se rompen las tabletas y cómo se podrían diseñar para que sean más fáciles de reparar. Los grupos de reparación comunitarios de todo el mundo han estado recopilando esta información. Usando TabiCat, nos ayudas a analizarla.',
+    'signpost_5' => 'Gracias!',
+    'signpost_6' => 'Gracias por su ayuda! Cada avería que clasificas hace que estos datos sean más útiles. ¿Has pensado en <a href="../">unirte a nuestra comunidad</a>?',
   ),
-  'branding' =>
+  'branding' => 
   array (
     'powered_by' => 'Utilizando datos de:',
   ),
-  'info' =>
+  'info' => 
   array (
     'body-s1-header' => '¿Qué es TabiCat?',
-    'body-s1-p1' => 'Las impresoras pueden resultar frustrantes, fáciles de romper y difíciles de reparar. Queremos entender por qué fallan las impresoras para poder informar a los legisladores de cómo se pueden hacer más fáciles de reparar los futuros modelos. La reparación reduce el desperdicio y disminuye nuestro impacto en el planeta.',
-    'body-s1-p2' => 'Con TabiCat, puede unirse a nuestra investigación. Hemos recopilado información sobre más de 800 impresoras averiadas y necesitamos su ayuda para clasificarlas.',
+    'body-s1-p1' => 'Las tabletas pueden resultar fáciles de romper y difíciles de reparar. Queremos entender por qué fallan las tabletas para poder informar a los legisladores de cómo hacerlas más fáciles de reparar. La reparación reduce el desperdicio y disminuye nuestro impacto en el planeta.',
+    'body-s1-p2' => 'Con TabiCat, puede unirse a nuestra investigación. Hemos recopilado información sobre más de 900 dispositivos averiados y necesitamos su ayuda para clasificarlos.',
     'body-s2-header' => '¿Qué necesito hacer?',
-    'body-s2-p1' => 'Simplemente lea la información sobre la impresora averiada y seleccione el tipo de problema que se describe en la lista a continuación. Si no está seguro, seleccione "No lo sé" en la parte inferior. Una vez que haya seleccionado una opción, le mostraremos otra impresora. ¡Cuantas más problemas en impresoras pueda clasificar, más aprenderemos! TabiCat muestra cada impresora a 3 personas para ayudar a confirmar la categoría correcta.',
-    'body-s3-header' => '¿De dónde obtiene TabiCat los datos sobre impresoras averiadas?',
-    'body-s3-p1' => 'TabiCat utiliza información obtenida por <a href=":url" target="_blank">Open Repair Alliance</a>, que recopila datos sobre dispositivos rotos que personas reales de todo el mundo han intentado reparar en eventos comunitarios, como Repair Cafés y Restart Parties.',
-    'body-s4-header' => '¿Más preguntas?',
-    'body-s4-p1' => 'Obtenga más información, haga preguntas y envíenos sus comentarios en <a href=":url" target="_blank">el post sobre TabiCat</a>.',
-    'title' => 'Gracias por probar TabiCat',
+    'body-s2-p1' => 'Simplemente lee la información sobre la tableta averiada y seleccione el tipo de problema descrito en la lista a continuación. Si no estas seguro/a, selecciona "No lo sé" en la parte inferior. Una vez que hayas seleccionado una opción, te mostraremos otra tableta. ¡Cuantos más problemas en tabletas pueda clasificar, más aprenderemos!',
+    'body-s3-header' => '¿De dónde obtiene TabiCat los datos sobre tabletas averiadas?',
+    'body-s3-p1' => 'TabiCat utiliza datos recopilados por <a href=":url" target="_blank">Open Repair Alliance</a>. Estos datos dan información sobre dispositivos rotos que personas reales de todo el mundo han intentado reparar en eventos comunitarios, como Repair Café y Restart Parties.',
+    'body-s4-header' => '¿Tienes más preguntas?',
+    'body-s4-p1' => 'Obtenga más información y envíenos sus preguntas o comentarios en <a href=":url" target="_blank">el post sobre TabiCat</a>.',
+    'title' => 'Gracias por usar TabiCat',
   ),
   'about' => 'Más información',
+  'survey' => 
+  array (
+    'a1' => 'Muy en desacuerdo',
+    'a2' => 'En desacuerdo',
+    'a3' => 'Neutral',
+    'a4' => 'De acuerdo',
+    'a5' => 'Muy de acuerdo',
+    'footer' => 'Pulsando cualquiera de los dos botones volveras a TabiCat',
+    'header1' => 'Gracias por ayudarnos a saber por qué se rompen las tabletas.',
+    'header2' => 'Estamos planeando futuras encuestas, como ésta. Para que la próxima sea aún mejor, tenemos algunas preguntas breves.',
+    'invalid' => 'Por favor, elige una respuesta para cada una de las preguntas',
+    'q1' => 'TabiCat ha aumentado mi interés por la reparación',
+    'q2' => 'TabiCat me ha hecho pensar más en los residuos electrónicos',
+    'q3' => 'TabiCat ha cambiado mi forma de pensar sobre la compra de productos electrónicos',
+    'q4' => 'TabiCat ha cambiado mi opinión sobre la importancia de la reparación',
+    'send' => 'Enviar',
+    'skip' => 'Cerrar',
+  ),
 );
