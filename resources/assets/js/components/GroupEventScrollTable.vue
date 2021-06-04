@@ -61,31 +61,7 @@
         <span />
       </template>
       <template slot="cell(actions)" slot-scope="data" v-bind:upcoming="upcoming">
-        <div v-if="upcoming(data.item.actions)">
-          <div v-if="data.item.actions.requiresModeration" class="cell-warning">
-            <span v-if="data.item.actions.canModerate">
-              <a :href="'/party/edit/' + data.item.actions.idevents">{{ __('partials.event_requires_moderation') }}</a>
-            </span>
-            <span v-else>
-              {{ __('partials.event_requires_moderation_by_an_admin') }}
-            </span>
-          </div>
-          <div v-else class="hidecell">
-            <div v-if="data.item.actions.attending" class="text-black font-weight-bold d-flex justify-content-around">
-              <span>
-                {{ __('events.youre_going') }}
-              </span>
-            </div>
-            <!-- "all" or "nearby" events are for ones where we're not a member, so show a join button. -->
-            <b-btn variant="primary" :href="'/group/join/' + data.item.actions.group.idgroups" v-else-if="data.item.actions.all || data.item.actions.nearby">
-              {{ __('groups.join_group_button') }}
-            </b-btn>
-            <!-- We can't RSVP if the event is starting soon. -->
-            <b-btn variant="primary" :href="'/party/join/' + data.item.actions.idevents" :disabled="startingSoon(data.item.actions)" v-else>
-              {{ __('events.RSVP') }}
-            </b-btn>
-          </div>
-        </div>
+        <GroupEventsScrollTableActions :idevents="data.item.actions.idevents" />
       </template>
 
       <template slot="head(participants_count)">
@@ -170,9 +146,11 @@ import GroupEventsScrollTableDateLong from './GroupEventsScrollTableDateLong'
 import EventTitle from './EventTitle'
 import GroupEventsScrollTableNumber from './GroupEventsScrollTableNumber'
 import moment from 'moment'
+import GroupEventsScrollTableActions from './GroupEventsScrollTableActions'
 
 export default {
   components: {
+    GroupEventsScrollTableActions,
     GroupEventsScrollTableNumber,
     EventTitle,
     GroupEventsScrollTableDateLong,
