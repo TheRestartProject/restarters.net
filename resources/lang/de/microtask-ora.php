@@ -5,7 +5,7 @@ return array (
   array (
     'body-s1-p1' => 'Jeder Gegenstand, den du siehst, wurde zu einer Reparaturveranstaltung gebracht, um repariert und nicht weggeworfen zu werden.',
     'body-s1-p2' => 'Was machen wir mit diesen Daten?',
-    'body-s2-header' => 'Reparaturfähigkeiten teilen',
+    'body-s2-header' => 'Reparatur-fähigkeiten teilen',
     'body-s2-p1' => 'Indem wir lernen, warum Gegenstände kaputt gehen und wie man sie repariert, können wir dieses Wissen mit der Welt teilen.',
     'body-s3-header' => 'Die Vorteile der Reparatur aufzeigen',
     'body-s3-p1' => 'Wir helfen Gruppen dabei, ihren Einfluss zu verstehen, ihre Gemeinschaft zu motivieren und Finanzierungsanträge zu unterstützen.',

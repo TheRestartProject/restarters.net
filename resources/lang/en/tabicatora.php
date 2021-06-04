@@ -1,8 +1,7 @@
 <?php
 
 return array (
-  'about' => 'About',
-  'task' =>
+  'task' => 
   array (
     'where_is_the_main_fault' => 'Where is the main fault',
     'fetch_another' => 'I don\'t know, fetch another repair',
@@ -12,44 +11,59 @@ return array (
     'source' => 'Source',
     'strapline' => 'Simply read the information about the broken device and select the type of fault described from the list underneath.',
     'learn_more' => 'Learn more',
+    'did_you_know' => 'Did you know?',
+    'signpost_1' => 'An average tablet produces the equivalent of 150 kg of CO2 during its life. But because it takes lots of precious materials and intensive manufacturing to make each tablet, over 75% of that impact occurs before it’s switched on for the first time.',
+    'signpost_2' => 'Repairing a device extends its life, reduces its overall environmental impact and lowers demand for new products. In fact, if we used every computer in Europe for one year longer, we could divert 3 million tonnes of CO2e.',
+    'signpost_3' => 'The European Union is planning to include tablets and smartphones in Ecodesign rules by 2022. This will give us the chance to call for the Right to Repair these devices. Rules decided by the EU could also be used to influence laws in other places, including the UK.',
+    'signpost_4' => '"We want to tell policymakers why tablets break and how they could be made easier to fix. Community repair groups around the world have been recording this information, and by trying TabiCat, you are helping us 
+analyse it."',
+    'signpost_5' => 'Thank you!',
+    'signpost_6' => 'Thank you for helping! Every fault you categorise makes this data more useful. Why not <a href="../">join our community</a> too?',
   ),
-  'status' =>
+  'status' => 
   array (
     'status' => 'Status',
     'items_opinions' => 'Items / opinions',
-    'items_split_opinions' => 'Items with split opinions',
-    'items_majority_opinions' => 'Items with majority opinions',
-    'items_3_opinions' => 'with 3 opinions',
-    'items_2_opinions' => 'with 2 opinions',
-    'items_1_opinion' => 'with 1 opinion',
-    'items_0_opinions' => 'with 0 opinions',
+    'items_with_split_opinions' => 'Items with split opinions',
+    'items_with_majority_opinions' => 'Items with majority opinions',
+    'with_3_opinions' => 'with 3 opinions',
+    'with_2_opinions' => 'with 2 opinions',
+    'with_1_opinion' => 'with 1 opinion',
+    'with_0_opinions' => 'with 0 opinions',
     'total' => 'Total',
     'opinions' => 'Opinions',
     'brand' => 'Brand',
     'problem' => 'Problem',
     'number_of_records' => 'Number of records',
     'winning_opinion' => 'Winning opinion',
-    'progress' => 'complete',
+    'items_split_opinions' => 'Items with split opinions',
+    'items_majority_opinions' => 'Items with majority opinions',
+    'items_3_opinions' => 'with 3 opinions',
+    'items_2_opinions' => 'with 2 opinions',
+    'items_1_opinion' => 'with 1 opinion',
+    'items_0_opinions' => 'with 0 opinions',
     'task_completed' => 'You\'ve seen them all, thanks',
+    'progress' => 'complete',
   ),
-  'branding' =>
+  'about' => 'About',
+  'branding' => 
   array (
     'powered_by' => 'Powered by data from:',
   ),
-  'info' =>
+  'info' => 
   array (
     'title' => 'Thank you for trying TabiCat',
     'body-s1-header' => 'What is TabiCat?',
     'body-s1-p1' => 'We want to understand why tablets and e-readers fail so that we can tell policymakers how future models can be made easier to repair. Repair reduces waste and lessens the strain on our planet’s resources.',
-    'body-s1-p2' => 'With TabiCat, you can join our investigation. We’ve collected information on over 800 broken devices and we need your help to categorise them.',
+    'body-s1-p2' => 'With TabiCat, you can join our investigation. We’ve collected information on over 900 broken devices and we need your help to categorise them.',
     'body-s2-header' => 'What do do I need to do?',
-    'body-s2-p1' => 'Simply read the information about the broken device and select the type of fault described from the list underneath. If you’re not sure, just select ‘I don’t know’ at the bottom. Once you’ve selected an option, we’ll show you another device. The more device faults you can categorise, the more we learn!.',
+    'body-s2-p1' => 'Simply read the information about the broken device and select the type of fault described from the list underneath. If you’re not sure, just select ‘I don’t know’ at the bottom. Once you’ve selected an option, we’ll show you another device. The more device faults you can categorise, the more we learn!',
     'body-s3-header' => 'Where does TabiCat get data about broken devices?',
     'body-s3-p1' => 'TabiCat uses information from the <a href=":url" target="_blank">Open Repair Alliance</a>, which collects data about broken devices that real people around the world have tried to fix at community events, such as Repair Cafés and Restart Parties.',
     'body-s4-header' => 'More questions?',
     'body-s4-p1' => 'Find out more, and give us your feedback, in the <a href=":url" target="_blank">TabiCat discussion</a>.',
   ),
-  'survey' =>
+  'survey' => 
   array (
     'header1' => 'Thank you for helping us learn why tablets break.',
     'header2' => 'We are already planning future quests, just like this one. To make the next one even better, we have some quick questions for you.',
@@ -64,7 +78,7 @@ return array (
     'a5' => 'Strongly agree',
     'send' => 'Send',
     'skip' => 'Skip',
-    'invalid' => 'Please select from each of the questions',
+    'invalid' => 'Please answer all of the questions',
     'footer' => 'Pressing either button will take you back to TabiCat',
   ),
 );

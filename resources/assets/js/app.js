@@ -1539,6 +1539,9 @@ jQuery(document).ready(function () {
         // This means we can use __('key') in Vue templates in the same way as we are used to in Laravel
         // templates.
         return this.$lang.get(key)
+      },
+      __(key, values) {
+        return this.$lang.get(key, values)
       }
     }
   })

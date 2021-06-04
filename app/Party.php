@@ -38,8 +38,10 @@ class Party extends Model implements Auditable
         'updated_at',
         'shareable_code',
         'online',
+        'discourse_thread',
+        'devices_updated_at'
     ];
-    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled'];
+    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
     // Append data to Model
     protected $appends = ['participants', 'ShareableLink'];
@@ -62,6 +64,7 @@ class Party extends Model implements Auditable
                     `e`.`free_text`,
                     `e`.`hours`,
                     `e`.`wordpress_post_id`,
+                    `e`.`discourse_thread`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
                 FROM `events` AS `e`
@@ -85,6 +88,7 @@ class Party extends Model implements Auditable
                     `e`.`pax`,
                     `e`.`free_text`,
                     `e`.`hours`,
+                    `e`.`discourse_thread`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
                 FROM `events` AS `e`
@@ -115,6 +119,7 @@ class Party extends Model implements Auditable
                     `e`.`free_text`,
                     `e`.`wordpress_post_id`,
                     `e`.`online`,
+                    `e`.`discourse_thread`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
 
@@ -891,5 +896,9 @@ class Party extends Model implements Auditable
         }
 
         return $coordinators;
+    }
+
+    public function getMaxUpdatedAtDevicesUpdatedAtAttribute() {
+        return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 }

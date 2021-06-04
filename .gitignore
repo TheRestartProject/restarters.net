@@ -30,6 +30,8 @@ vendor/squizlabs/
 vendor/theseer/
 vendor/webmozart/
 vendor/composer/
+vendor/php-coveralls/
+vendor/bin/php-coveralls
 *GTAGS
 *GRTAGS
 *GPATH

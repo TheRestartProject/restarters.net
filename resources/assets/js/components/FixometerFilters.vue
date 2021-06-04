@@ -28,7 +28,7 @@
               <DeviceModel :model.sync="current_model" />
             </b-form-group>
             <b-form-group  v-if="powered" :label="__('devices.brand')">
-              <DeviceBrandSelect :brand.sync="current_brand" :brands="brands" allow-empty />
+              <DeviceBrand :brand.sync="current_brand" :brands="brands" allow-empty suppress-brand-warning />
             </b-form-group>
             <b-form-group v-if="!powered" :label="__('devices.model_or_type')">
               <DeviceModel :model.sync="current_item_type" />
@@ -106,11 +106,11 @@
 <script>
 import DeviceCategorySelect from './DeviceCategorySelect'
 import DeviceModel from './DeviceModel'
-import DeviceBrandSelect from './DeviceBrandSelect'
+import DeviceBrand from './DeviceBrand'
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 
 export default {
-  components: {DeviceBrandSelect, DeviceModel, DeviceCategorySelect},
+  components: {DeviceBrand, DeviceModel, DeviceCategorySelect},
   props: {
     clusters: {
       type: Array,

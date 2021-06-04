@@ -7,9 +7,9 @@ use Auth;
 use App;
 use App\TabicatOra;
 use App\MicrotaskSurvey;
-use App\Helpers\Microtask;
 
-class TabicatOraController extends Controller {
+class TabicatOraController extends Controller
+{
 
     protected $Model;
 
@@ -21,15 +21,12 @@ class TabicatOraController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request) {
-        $partner = $request->input('partner', NULL);
+    public function index(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
-            $user = Microtask::getAnonUserCta($request);
-            if ($user->action) {
-                return redirect()->action('TabicatOraController@cta', ['partner' => $partner]);
-            }
+            $user = $this->_anon();
         }
         // if survey is being submitted
         if ($request->has('task-survey')) {
@@ -53,6 +50,7 @@ class TabicatOraController extends Controller {
         }
 
         $this->Model = new TabicatOra;
+        $signpost = FALSE;
         // if opinion is being submitted
         if ($request->has('id-ords')) {
             if (!(is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
@@ -71,11 +69,34 @@ class TabicatOraController extends Controller {
                 logger('TabiCat error on insert.');
                 logger(print_r($insert, 1));
             }
+            $submits = $this->_getSubmits($request, $user);
+            if ($submits < 5) {
+                $signpost = $submits;
+            } else if ($submits == 5) {
+                if ($user->id == 0) {
+                    // guest is redirected to modal survey
+                    return redirect()->action('TabicatOraController@survey');
+                } else {
+                    // logged-in user gets an extra signpost
+                    $signpost = $submits;
+                }
+            }
+        }
+        // final "thank you" signpost after survey whether submitted or not
+        if ($request->session()->get('tabicatora.redirected_from_survey', FALSE)) {
+            $request->session()->put('tabicatora.redirected_from_survey', FALSE);
+            $signpost = 6;
+        }
+        // no signpost when showing survey
+        if ($request->session()->get('tabicatora.redirect_to_survey', FALSE)) {
+            $request->session()->put('tabicatora.redirect_to_survey', FALSE);
+            $request->session()->put('tabicatora.redirected_from_survey', TRUE);
         }
         $fault = $this->_fetchRecord($request);
         if (!$fault) {
             return redirect()->action('TabicatOraController@status')->withSuccess('done');
         }
+
         $fault->translate = rawurlencode($fault->problem);
         $fault_types = $this->Model->fetchFaultTypes();
         $fault->suggestions = [];
@@ -87,17 +108,41 @@ class TabicatOraController extends Controller {
         }
         // send non-suggested fault_types to view
         $fault->faulttypes = array_diff_key($fault_types, $fault->suggestions);
+        // send the "poor data" fault_type to view
+        $poor_data = $this->Model->fetchFaultTypePoorData();
+        logger(print_r($poor_data,1));
         return view('tabicatora.index', [
             'title' => 'TabiCat',
             'fault' => $fault,
+            'poor_data' => $poor_data,
             'user' => $user,
-            'partner' => $partner,
+            'signpost' => $signpost,
             'locale' => $this->_getUserLocale(),
         ]);
     }
 
-    protected function _getUserLocale() {
-        return substr(App::getLocale(), 0, 2);
+    /**
+     * Fetch current task statistics.
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function status(Request $request)
+    {
+        if (Auth::check()) {
+            $user = Auth::user();
+        } else {
+            $user = $this->_anon();
+        }
+        $this->Model = new TabicatOra;
+        $data = $this->Model->fetchStatus();
+        return view('tabicatora.status', [
+            'title' => 'TabiCat',
+            'status' => $data,
+            'user' => $user,
+            'complete' => ($data['progress'][0]->total == 100),
+        ]);
     }
 
     /**
@@ -107,33 +152,9 @@ class TabicatOraController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function cta(Request $request) {
+    public function cta(Request $request)
+    {
         return $this->index($request);
-    }
-
-    /**
-     * Fetch current task statistics with optional partner filter.
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function status(Request $request) {
-        if (Auth::check()) {
-            $user = Auth::user();
-        } else {
-            $user = Microtask::getAnonUserCta($request);
-        }
-        $partner = $request->input('partner', NULL);
-        $this->Model = new TabicatOra;
-        $data = $this->Model->fetchStatus($partner);
-        return view('tabicatora.status', [
-            'title' => 'TabiCat',
-            'status' => $data,
-            'user' => $user,
-            'complete' => ($data['progress'][0]->total == 100),
-            'partner' => $request->input('partner', NULL),
-        ]);
     }
 
     /**
@@ -150,17 +171,53 @@ class TabicatOraController extends Controller {
     }
 
     /**
-     * Fetch random record with optional partner filter and exclusions.
+     * Fetch random record.
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return integer
+     */
+    protected function _getSubmits($request)
+    {
+        $submits = $request->session()->get('tabicatora.submits', 0);
+        $request->session()->put('tabicatora.submits', ++$submits);
+        return $submits;
+    }
+
+    /**
+     * Fetch mock user record for anonymous user.
+     *
+     * @return object
+     */
+    protected function _anon()
+    {
+        $user = new \stdClass();
+        $user->id = 0;
+        $user->name = 'Guest';
+        return $user;
+    }
+
+    /**
+     * Fetch user locale string.
+     *
+     * @return string
+     */
+    protected function _getUserLocale()
+    {
+        return substr(App::getLocale(), 0, 2);
+    }
+
+    /**
+     * Fetch random record.
      *
      * @param Illuminate\Http\Request $request
      *
      * @return object
      */
-    protected function _fetchRecord(Request $request) {
-
-//        $request->session()->flush();
+    protected function _fetchRecord(Request $request)
+    {
+        // $request->session()->flush();
         $result = FALSE;
-        $partner = $request->input('partner', NULL);
         $exclusions = $request->session()->get('tabicatora.exclusions', []);
         $this->Model = new TabicatOra;
         $locale = $this->_getUserLocale();
@@ -171,5 +228,4 @@ class TabicatOraController extends Controller {
         }
         return $result;
     }
-
 }
