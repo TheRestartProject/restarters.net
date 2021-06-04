@@ -147,7 +147,6 @@
 import GroupEventsTableHeading from './GroupEventsTableHeading'
 import InfiniteLoading from 'vue-infinite-loading'
 import GroupEventsScrollTableFilters from './GroupEventsScrollTableFilters'
-import GroupEventTableDate from './GroupEventTableDate'
 import GroupEventsScrollTableDateShort from './GroupEventsScrollTableDateShort'
 import GroupEventsScrollTableDateLong from './GroupEventsScrollTableDateLong'
 import EventTitle from './EventTitle'
@@ -162,7 +161,6 @@ export default {
     EventTitle,
     GroupEventsScrollTableDateLong,
     GroupEventsScrollTableDateShort,
-    GroupEventTableDate,
     GroupEventsScrollTableFilters,
     GroupEventsTableHeading,
     InfiniteLoading
