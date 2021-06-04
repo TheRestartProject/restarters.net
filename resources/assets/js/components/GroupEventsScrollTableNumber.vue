@@ -1,10 +1,5 @@
 <template>
-  <div :class="{
-    hidecell: true,
-    'cell-number': true,
-    'text-center': true,
-    'cell-danger': !value && dangerIfZero,
-    }">
+  <div class="hidecell cell-number text-center">
     {{ value || '0' }}
     <span v-if="units">
       {{ units}}
@@ -17,11 +12,6 @@ export default {
     value: {
       type: Number,
       required: true
-    },
-    dangerIfZero: {
-      type: Boolean,
-      required: false,
-      default: false
     },
     units: {
       type: String,

@@ -94,7 +94,7 @@
         </div>
       </template>
       <template slot="cell(participants_count)" slot-scope="data">
-        <GroupEventsScrollTableNumber :value="data.item.participants_count.participants_count" danger-if-zero />
+        <GroupEventsScrollTableNumber :value="data.item.participants_count.participants_count" />
       </template>
 
       <template slot="head(volunteers_count)">
@@ -103,7 +103,7 @@
         </div>
       </template>
       <template slot="cell(volunteers_count)" slot-scope="data">
-        <GroupEventsScrollTableNumber :value="data.item.volunteers_count.volunteers_count" danger-if-zero />
+        <GroupEventsScrollTableNumber :value="data.item.volunteers_count.volunteers_count" />
       </template>
 
       <template slot="head(ewaste)">
@@ -167,6 +167,7 @@ import GroupEventsScrollTableDateShort from './GroupEventsScrollTableDateShort'
 import GroupEventsScrollTableDateLong from './GroupEventsScrollTableDateLong'
 import EventTitle from './EventTitle'
 import GroupEventsScrollTableNumber from './GroupEventsScrollTableNumber'
+import moment from 'moment'
 
 export default {
   components: {
@@ -217,8 +218,8 @@ export default {
           { key: 'date_long', label: 'Long Date', sortable: true },
           { key: 'title', label: 'Event Title', sortable: true },
           { key: 'actions', label: 'Actions', },
-          { key: 'participants_count', label: 'Participants', sortable: true},
-          { key: 'volunteers_count', label: 'Volunteers', sortable: true},
+          { key: 'participants_count', label: 'Participants', sortable: true, tdClass: this.dangerIfZero},
+          { key: 'volunteers_count', label: 'Volunteers', sortable: true, tdClass: this.dangerIfZero},
           { key: 'ewaste', label: 'ewaste', sortable: true},
           { key: 'co2', label: 'co2', sortable: true},
           { key: 'fixed_devices', label: 'Fixed Devices', sortable: true},
@@ -331,6 +332,10 @@ export default {
       }
 
       return ret
+    },
+    dangerIfZero(event, key, item) {
+      // We want to flag some cells if they contain zero values.
+      return event[key] <= 0 ? 'cell-danger': ''
     }
   }
 }
