@@ -211,7 +211,7 @@ export default {
           { key: 'title', label: 'Event Title', sortable: true },
           { key: 'actions', label: 'Actions', },
           { key: 'participants_count', label: 'Participants', sortable: true, tdClass: this.dangerIfZero},
-          { key: 'volunteers_count', label: 'Volunteers', sortable: true, tdClass: this.dangerIfZero},
+          { key: 'volunteers_count', label: 'Volunteers', sortable: true, tdClass: this.dangerIfOne},
           { key: 'ewaste', label: 'ewaste', sortable: true, tdClass: this.noDevicesError},
           { key: 'co2', label: 'co2', sortable: true},
           { key: 'fixed_devices', label: 'Fixed Devices', sortable: true},
@@ -366,6 +366,9 @@ export default {
     dangerIfZero(event, key, item) {
       // We want to flag some cells if they contain zero values.
       return event[key] <= 0 ? 'cell-danger': ''    },
+    dangerIfOne(event, key, item) {
+      // We want to flag some cells if they contain one or less.
+      return event[key] <= 1 ? 'cell-danger': ''    },
     noDevicesError(event, key, item) {
       // We want to flag if there are no devices when there should be.
       //
