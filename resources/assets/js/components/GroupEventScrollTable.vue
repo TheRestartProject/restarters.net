@@ -1,98 +1,78 @@
 <template>
   <div>
     <GroupEventsScrollTableFilters v-if="filters" />
-    <b-table :fields="fields" :items="items" sort-null-last :sort-compare="sortCompare" sticky-header="50vh" responsive class="text-center mt-2 pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+    <b-table :fields="fields" :items="items" sort-null-last :sort-compare="sortCompare" sticky-header="50vh" responsive class="mt-2 pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+
       <template slot="head(date_short)">
         <span />
       </template>
-      <template slot="cell(date_short)" slot-scope="data" v-bind:attending="attending" v-bind:dayofmonth="dayofmonth" v-bind:month="month">
+      <template slot="cell(date_short)" slot-scope="data">
         <div :class="{
-          datecell: true,
           attending: data.item.date_short.attending
-        }">
-          <div class="datebox d-flex flex-column">
-            <span class="day align-top">{{ dayofmonth(data.item.date_short) }}</span>
-            <span class="month">
-              {{ month(data.item.date_short) }}
-            </span>
-          </div>
+             }">
+          <GroupEventsScrollTableDateShort :idevents="data.item.date_short.idevents" />
         </div>
       </template>
 
       <template slot="head(date_long)">
         <span />
       </template>
-      <template slot="cell(date_long)" slot-scope="data" v-bind:attending="attending" v-bind:date="date" v-bind:start="start" v-bind:end="end" v-bind:addGroupName="addGroupName">
+      <template slot="cell(date_long)" slot-scope="data">
         <div :class="{
-          date: true,
-          'text-left': true,
-          'pl-3': true,
-          'w-100': true,
           attending: data.item.date_long.attending
-        }">
-          {{ date(data.item.date_short) }}
-          <br class="hidecell" />
-          {{ start(data.item.date_short) }} <span class="d-none d-md-inline">- {{ end(data.item.date_short) }}</span>
-          <br class="d-block d-md-none" />
-        </div>
-        <div :class="{
-          'text-left': true,
-          'hidecell': true,
-          'pl-3': true,
-           attending: data.item.date_long.attending
-        }">
-          <span v-if="addGroupName" class="small">
-            <a :href="'/group/view/' + data.item.date_short.group.idgroups">{{ data.item.date_short.group.name }}</a>
-          </span>
+             }">
+          <GroupEventsScrollTableDateLong :idevents="data.item.date_long.idevents" />
         </div>
       </template>
 
       <template slot="head(title)">
         <span />
       </template>
-      <template slot="cell(title)" slot-scope="data" v-bind:attending="attending">
-        <a :class="{
+      <template slot="cell(title)" slot-scope="data" v-bind:addGroupName="addGroupName">
+        <div :class="{
           attending: data.item.title.attending
-        }">
-          <!-- eslint-disable-next-line -->
-          <b>{{ data.item.title.venue ? data.item.title.venue : data.item.title.location }}<b-badge v-if="data.item.title.online" variant="primary" pill class="nounderline">{{ __('events.online') }}</b-badge></b>
-        </a>
+             }">
+          <b><EventTitle :idevents="data.item.title.idevents" component="a" :href="'/party/view/' + data.item.title.idevents" :class="{
+            attending: data.item.title.attending
+          }"/></b>
+          <div class="hidecell">
+            <span v-if="addGroupName" class="small">
+              <a :href="'/group/view/' + data.item.title.group.idgroups">{{ data.item.title.group.name }}</a>
+            </span>
+          </div>
+        </div>
       </template>
 
       <template slot="head(invited)">
-        <div class="hidecell">
+        <div class="hidecell text-center">
           <b-img class="icon" src="/images/mail_ico.svg" :title="__('groups.volunteers_invited')" />
         </div>
       </template>
-      <template slot="cell(invited)" slot-scope="data" v-bind:attending="attending">
+      <template slot="cell(invited)" slot-scope="data">
         <div :class="{
-          'hidecell': true,
-          'cell-number': true,
           attending: data.item.invited.attending
-        }">
-          {{ data.item.invited.invited || '0' }}
+             }">
+          <GroupEventsScrollTableNumber :value="data.item.invited.attending" />
         </div>
       </template>
 
       <template slot="head(volunteers)">
-        <div class="hidecell">
+        <div class="hidecell text-center">
           <b-img class="icon" src="/images/participants.svg" :title="__('groups.volunteers_confirmed')" />
         </div>
       </template>
-      <template slot="cell(volunteers)" slot-scope="data" v-bind:attending="attending">
+      <template slot="cell(volunteers)" slot-scope="data">
         <div :class="{
-          'hidecell': true,
-          'cell-number': true,
           attending: data.item.volunteers.attending
-        }">
-          {{ data.item.volunteers.volunteers || '0' }}
+             }">
+          <GroupEventsScrollTableNumber :value="data.item.volunteers.volunteers" />
         </div>
       </template>
 
       <template slot="head(actions)">
         <span />
       </template>
-      <template slot="cell(actions)" slot-scope="data" v-bind:attending="attending" v-bind:upcoming="upcoming">
+      <template slot="cell(actions)" slot-scope="data" v-bind:upcoming="upcoming">
         <div :class="{
           attending: data.item.actions.attending
         }">
@@ -125,123 +105,105 @@
       </template>
 
       <template slot="head(participants_count)">
-        <div class="hidecell">
+        <div class="hidecell text-center">
           <b-img class="icon" src="/images/participants.svg" :title="__('groups.participants_attended')" />
         </div>
       </template>
-      <template slot="cell(participants_count)" slot-scope="data" v-bind:attending="attending">
+      <template slot="cell(participants_count)" slot-scope="data">
         <div :class="{
-          'hidecell': true,
-          'cell-number': true,
-          'cell-danger': data.item.participants_count.participants_count === 0,
           attending: data.item.participants_count.attending
-        }">
-          {{ data.item.participants_count.participants_count || '0' }}
+             }">
+          <GroupEventsScrollTableNumber :value="data.item.participants_count.participants_count" danger-if-zero />
         </div>
       </template>
 
       <template slot="head(volunteers_count)">
-        <div class="hidecell">
+        <div class="hidecell text-center">
           <b-img class="icon" src="/icons/volunteer_ico-thick.svg" :title="__('groups.volunteers_attended')" />
         </div>
       </template>
-      <template slot="cell(volunteers_count)" slot-scope="data" v-bind:attending="attending">
+      <template slot="cell(volunteers_count)" slot-scope="data">
         <div :class="{
-          'hidecell': true,
-          'cell-number': true,
-          'cell-danger': data.item.volunteers_count.volunteers_count === 0,
           attending: data.item.volunteers_count.attending
-        }">
-          {{ data.item.volunteers_count.volunteers_count || '0' }}
+             }">
+          <GroupEventsScrollTableNumber :value="data.item.volunteers_count.volunteers_count" danger-if-zero />
         </div>
       </template>
 
       <template slot="head(ewaste)">
-        <div class="hidecell">
+        <div class="hidecell text-center">
           <b-img class="icon" src="/images/trash.svg" :title="__('groups.waste_prevented')" />
         </div>
       </template>
-      <template slot="cell(ewaste)" slot-scope="data" v-bind:attending="attending" v-bind="stats">
+      <template slot="cell(ewaste)" slot-scope="data" v-bind="stats">
         <div :class="{
-          'hidecell': true,
-          'cell-number': true,
           attending: data.item.ewaste.attending
-        }"
-         v-if="stats(data.item.ewaste)"
-        >
-          {{ Math.round(stats(data.item.ewaste).ewaste) }} kg
+             }">
+          <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.ewaste).ewaste)" units="kg" />
         </div>
       </template>
 
       <template slot="head(co2)">
-        <div class="hidecell">
+        <div class="hidecell text-center">
           <b-img class="icon" src="/images/cloud_empty.svg" :title="__('groups.co2_emissions_prevented')" />
         </div>
       </template>
-      <template slot="cell(co2)" slot-scope="data" v-bind:attending="attending" v-bind="stats">
+      <template slot="cell(co2)" slot-scope="data" v-bind="stats">
         <div :class="{
-          'hidecell': true,
-          'cell-number': true,
           attending: data.item.co2.attending
-        }"
-         v-if="stats(data.item.co2)"
-        >
-          {{ Math.round(stats(data.item.co2)).co2 }} kg
+             }">
+          <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.co2).co2)" units="kg" />
         </div>
       </template>
 
       <template slot="head(fixed_devices)">
-        <div class="hidecell">
+        <div class="hidecell text-center">
           <b-img class="icon" src="/images/fixed.svg" :title="__('groups.fixed_items')" />
         </div>
       </template>
-      <template slot="cell(fixed_devices)" slot-scope="data" v-bind:attending="attending" v-bind="stats">
+      <template slot="cell(fixed_devices)" slot-scope="data" v-bind="stats">
         <div :class="{
-          'hidecell': true,
-          'cell-number': true,
           attending: data.item.fixed_devices.attending
-        }"
-         v-if="stats(data.item.fixed_devices)"
+             }"
+             v-if="stats(data.item.fixed_devices)"
         >
-          {{ stats(data.item.fixed_devices).fixed_devices || '0'}}
+          <GroupEventsScrollTableNumber :value="stats(data.item.fixed_devices).fixed_devices" />
         </div>
       </template>
 
       <template slot="head(repairable_devices)">
-        <div class="hidecell">
+        <div class="hidecell text-center">
           <b-img class="icon" src="/images/repairable_ico.svg" :title="__('groups.repairable_items')" />
         </div>
       </template>
-      <template slot="cell(repairable_devices)" slot-scope="data" v-bind:attending="attending" v-bind="stats">
+      <template slot="cell(repairable_devices)" slot-scope="data" v-bind="stats">
         <div :class="{
-          'hidecell': true,
-          'cell-number': true,
           attending: data.item.repairable_devices.attending
-        }"
-         v-if="stats(data.item.repairable_devices)"
+             }"
+             v-if="stats(data.item.repairable_devices)"
         >
-          {{ stats(data.item.repairable_devices).repairable_devices || '0' }}
+          <GroupEventsScrollTableNumber :value="stats(data.item.repairable_devices).repairable_devices" />
         </div>
       </template>
 
       <template slot="head(dead_devices)">
-        <div class="hidecell">
+        <div class="hidecell text-center">
           <b-img class="icon" src="/images/dead_ico.svg" :title="__('groups.end_of_life_items')" />
         </div>
       </template>
-      <template slot="cell(dead_devices)" slot-scope="data" v-bind:attending="attending" v-bind="stats">
+      <template slot="cell(dead_devices)" slot-scope="data" v-bind="stats">
         <div :class="{
-          'hidecell': true,
-          'cell-number': true,
           attending: data.item.dead_devices.attending
-        }"
-           v-if="stats(data.item.dead_devices)"
+             }"
+             v-if="stats(data.item.dead_devices)"
         >
-          {{ stats(data.item.dead_devices).dead_devices || '0' }}
+          <GroupEventsScrollTableNumber :value="stats(data.item.dead_devices).dead_devices" />
         </div>
       </template>
 
       <!--      TODO No devices warning -->
+      <!--      TODO Row highlighting-->
+      <!--      TODO Sorting-->
 
     </b-table>
   </div>
@@ -254,9 +216,17 @@ import GroupEventsScrollTableFilters from './GroupEventsScrollTableFilters'
 import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
 import moment from 'moment'
 import GroupEventTableDate from './GroupEventTableDate'
+import GroupEventsScrollTableDateShort from './GroupEventsScrollTableDateShort'
+import GroupEventsScrollTableDateLong from './GroupEventsScrollTableDateLong'
+import EventTitle from './EventTitle'
+import GroupEventsScrollTableNumber from './GroupEventsScrollTableNumber'
 
 export default {
   components: {
+    GroupEventsScrollTableNumber,
+    EventTitle,
+    GroupEventsScrollTableDateLong,
+    GroupEventsScrollTableDateShort,
     GroupEventTableDate,
     GroupEventsScrollTableFilters, GroupEventsTableHeading, GroupEventSummary, InfiniteLoading},
   props: {
@@ -396,26 +366,7 @@ export default {
     startingSoon(event) {
       return this.upcoming(event) && !this.finished(event) && (new moment().isSame(event.event_date, 'day'))
     },
-    date(event) {
-      return event ? (new moment(event.event_date).format(DATE_FORMAT)) : null
-    },
-    dayofmonth(event) {
-      return event ? (new moment(event.event_date).format('DD')) : null
-    },
-    month(event) {
-      return event ? (new moment(event.event_date).format('MMM').toUpperCase()) : null
-    },
-    start(event) {
-      return event ? event.start.substring(0, 5) : null
-    },
-    end(event) {
-      return event ? event.end.substring(0, 5) : null
-    },
-    volunteerCount(event) {
-      return event && event.volunteers ? event.volunteers : 0
-    },
     stats(event) {
-      console.log("Stats", event, this.$store.getters['events/getStats'](event.idevents))
       return this.$store.getters['events/getStats'](event.idevents)
     },
   }
@@ -427,54 +378,8 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-.datebox {
-  text-align: center;
-  padding-top: 8px;
-  font-weight: bold;
-
-  .day {
-    font-size: 1.7rem;
-    line-height: 1.7rem;
-  }
-
-  .month {
-    line-height: 1rem;
-  }
-}
-
-.attending {
-  background-color: $brand-grey;
-
-  &.datecell {
-    padding-top: 9px;
-    padding-bottom: 9px;
-    padding-left: 9px;
-    padding-right: 9px;
-    text-align: center;
-    background-color: $black;
-    width: 76px !important;
-
-    .datebox {
-      background-color: $black;
-      color: $white;
-    }
-  }
-}
-
-.date {
-  line-height: 1.3rem;
-  text-align: center;
-  padding-top: 13px;
-  width: 150px;
-  font-size: 15px;
-}
-
 .fullsize {
   font-size: 100%;
-}
-
-.cell-number {
-  width: 60px;
 }
 
 /deep/ .hidecell {
