@@ -311,32 +311,6 @@ export default {
         return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
       }
     },
-    upcoming(event) {
-      let ret = false;
-
-      if (event) {
-        const start = new moment(event.event_date + ' ' + event.start)
-        ret = start.isAfter()
-      }
-
-      return ret
-    },
-    finished(event) {
-      let ret = false;
-
-      if (event) {
-        const end = new moment(event.event_date + ' ' + event.end)
-        ret = end.isBefore()
-      }
-
-      return ret
-    },
-    inProgress(event) {
-      return !this.upcoming(event) && !this.finished(event)
-    },
-    startingSoon(event) {
-      return this.upcoming(event) && !this.finished(event) && (new moment().isSame(event.event_date, 'day'))
-    },
     stats(event) {
       return this.$store.getters['events/getStats'](event.idevents)
     },
