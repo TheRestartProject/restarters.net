@@ -197,7 +197,7 @@ export default {
     fields() {
       if (this.past) {
         return [
-          { key: 'date_short', label: 'Short Date', sortable: true, tdClass: 'p-0 datetd' },
+          { key: 'date_short', label: 'Short Date', sortable: true, tdClass: 'pl-0 pr-0 datetd' },
           { key: 'date_long', label: 'Long Date', sortable: true },
           { key: 'title', label: 'Event Title', sortable: true },
           { key: 'actions', label: 'Actions', },
@@ -211,7 +211,7 @@ export default {
         ]
       } else {
         return [
-          { key: 'date_short', label: 'Short Date', sortable: true, tdClass: 'pl-0 datetd' },
+          { key: 'date_short', label: 'Short Date', sortable: true, tdClass: 'pl-0 pr-0 datetd' },
           { key: 'date_long', label: 'Long Date', sortable: true },
           { key: 'title', label: 'Event Title', sortable: true },
           { key: 'invited', label: 'Invited', sortable: true },

@@ -1,5 +1,5 @@
 <template>
-  <div class="hidecell cell-number text-center">
+  <div class="hidecell cell-number w-100 d-flex justify-content-around pr-3">
     {{ value || '0' }}
     <span v-if="units">
       {{ units}}
