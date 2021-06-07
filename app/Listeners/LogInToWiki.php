@@ -100,8 +100,10 @@ class LogInToWiki
             Log::info("Got query response " . var_export($response, TRUE));
 
             if ($response && array_key_exists('query', $response) && array_key_exists('tokens', $response['query']) && array_key_exists('logintoken', $response['query']['tokens'])) {
-                session(['mediawiki_token', $response['tokens']['query']['logintoken']]);
-                Log::info("Got token " . session('mediawiki_token'));
+                $token = $response['tokens']['query']['logintoken']];
+                Log::info("Got token " . $token);
+                session(['mediawiki_token' => $token]);
+                Log::info("Retrieved " . session('mediawiki_token'));
             }
         } catch (\Exception $ex) {
             Log::error("Failed to log user '" . $wikiUsername . "' in to mediawiki: " . $ex->getMessage());
