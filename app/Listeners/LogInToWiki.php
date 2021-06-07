@@ -16,6 +16,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\ApiUser;
 use Mediawiki\Api\Service\UserCreator;
+use Mediawiki\Api\SimpleRequest;
 
 class LogInToWiki
 {
@@ -91,6 +92,11 @@ class LogInToWiki
 
             // Store the Mediawiki token in the Laravel session, so that we can use it later (e.g. to set
             // language.
+            $response = $api->getRequest(new SimpleRequest( 'query', [
+                'meta' => 'tokens',
+                'type' => 'login'
+            ]));
+            Log::info("Got query response " . var_export($response, TRUE));
             session(['mediawiki_token', $api->getToken('login')]);
             Log::info("Got token " . session('mediawiki_token'));
         } catch (\Exception $ex) {
