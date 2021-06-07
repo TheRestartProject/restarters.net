@@ -9,11 +9,6 @@ dependencies:
     -
 jobs:
   build:
-    branches:
-      only:
-        - develop
-        - DOT-1449_device_part_provider
-        - DOT-1450_automated_tests
     docker:
       - image: circleci/php:7.4-node-browsers
         name: restarters.test
