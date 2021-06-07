@@ -88,6 +88,10 @@ class LogInToWiki
                     Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
                 }
             }
+
+            // Store the Mediawiki session in the Laravel session, so that we can use it later (e.g. to set
+            // language.
+            session(['mediawiki_session', $api]);
         } catch (\Exception $ex) {
             Log::error("Failed to log user '" . $wikiUsername . "' in to mediawiki: " . $ex->getMessage());
         }

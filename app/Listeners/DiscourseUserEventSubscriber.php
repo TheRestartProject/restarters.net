@@ -79,20 +79,21 @@ class DiscourseUserEventSubscriber
 
             // Also sync to wiki, which doesn't have fr-BE either.
             try{
-                $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
+                Log::info("Check MW session");
+                $api = session('mediawiki_session');
 
-                // We can only change the password of the currently logged in user.  Fortunately we logged in to the
-                // wiki when we logged in to Laravel.  That's just as well, since the password is hashed and not
-                // accessible.
-                $token = $api->getToken('csrf');
+                if ($api) {
+                    Log::info("Got MW session");
+                    $token = $api->getToken('csrf');
 
-                $changeLanguageRequest = FluentRequest::factory()
-                    ->setAction('options')
-                    ->setParam('token', $token)
-                    ->setParam('optionname', 'language')
-                    ->setParam('optionvalue', $locale);
-                $api->postRequest($changeLanguageRequest);
-                Log::info("Changed language for user '$userName' in mediawiki to $locale");
+                    $changeLanguageRequest = FluentRequest::factory()
+                        ->setAction('options')
+                        ->setParam('token', $token)
+                        ->setParam('optionname', 'language')
+                        ->setParam('optionvalue', $locale);
+                    $api->postRequest($changeLanguageRequest);
+                    Log::info("Changed language for user '$userName' in mediawiki to $locale");
+                }
             } catch (\Exception $ex) {
                 Log::error("Failed to change language for user '$userName' in mediawiki to $locale: " . $ex->getMessage());
             }
