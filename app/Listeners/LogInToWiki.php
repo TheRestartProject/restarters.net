@@ -100,9 +100,10 @@ class LogInToWiki
             Log::info("Got query response " . var_export($response, TRUE));
 
             if ($response && array_key_exists('query', $response) && array_key_exists('tokens', $response['query']) && array_key_exists('logintoken', $response['query']['tokens'])) {
-                $token = $response['tokens']['query']['logintoken']];
+                $token = $response['query']['tokens']['logintoken'];
                 Log::info("Got token " . $token);
                 session(['mediawiki_token' => $token]);
+                session(['mediawiki_password' => $password]);
                 Log::info("Retrieved " . session('mediawiki_token'));
             }
         } catch (\Exception $ex) {

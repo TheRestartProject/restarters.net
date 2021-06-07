@@ -87,7 +87,8 @@ class DiscourseUserEventSubscriber
                 // MediawikiApi doesn't expose logging in via a token, but we can do this via a post.
                 $result = $api->postRequest( new SimpleRequest( 'login', [
                     'lgname' => $userName,
-                    'lgtoken' => $token
+                    'lgpassword' => session('mediawiki_password'),
+                    'lgtoken' => $api->getToken('login')
                 ]));
 
                 Log::info("Login returned " . var_export($result, TRUE));
