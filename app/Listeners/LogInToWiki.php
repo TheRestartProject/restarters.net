@@ -74,6 +74,7 @@ class LogInToWiki
     protected function logUserIn($wikiUsername, $password)
     {
         try {
+            Log::info("Log user in $wikiUsername, $password");
             $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
             $api->login(new ApiUser($wikiUsername, $password));
 
@@ -90,22 +91,10 @@ class LogInToWiki
                 }
             }
 
-            // Store the Mediawiki token in the Laravel session, so that we can use it later (e.g. to set
-            // language.
-            $response = $api->getRequest(new SimpleRequest( 'query', [
-                'meta' => 'tokens',
-                'type' => 'login'
-            ]));
-
-            Log::info("Got query response " . var_export($response, TRUE));
-
-            if ($response && array_key_exists('query', $response) && array_key_exists('tokens', $response['query']) && array_key_exists('logintoken', $response['query']['tokens'])) {
-                $token = $response['query']['tokens']['logintoken'];
-                Log::info("Got token " . $token);
-                session(['mediawiki_token' => $token]);
-                session(['mediawiki_password' => $password]);
-                Log::info("Retrieved " . session('mediawiki_token'));
-            }
+            // Store the password in the Laravel session so that we can log in to Mediawiki later, e.g. for changing
+            // passwords.
+            session(['mediawiki_username' => $wikiUsername]);
+            session(['mediawiki_password' => $password]);
         } catch (\Exception $ex) {
             Log::error("Failed to log user '" . $wikiUsername . "' in to mediawiki: " . $ex->getMessage());
         }

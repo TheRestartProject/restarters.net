@@ -78,35 +78,32 @@ class DiscourseUserEventSubscriber
                 ]]
             );
 
-            // Also sync to wiki, which doesn't have fr-BE either.
-            try{
-                $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
-                $token = session('mediawiki_token');
-                Log::info("Got MW token $token");
+            if (array_key_exists('mediawiki', $json['user'])) {
+                // Also sync to wiki, which doesn't have fr-BE either.
+                try{
+                    $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
+                    $mwuser = session('mediawiki_user');
+                    $mwpass = session('mediawiki_password');
 
-                // MediawikiApi doesn't expose logging in via a token, but we can do this via a post.
-                $result = $api->postRequest( new SimpleRequest( 'login', [
-                    'lgname' => $userName,
-                    'lgpassword' => session('mediawiki_password'),
-                    'lgtoken' => $api->getToken('login')
-                ]));
+                    Log::info("Try to log in to Mediawiki as $mwuser");
 
-                Log::info("Login returned " . var_export($result, TRUE));
+                    if ($mwuser) {
+                        $api->login(new ApiUser($mwuser, $mwpass));
+                        $token = $api->getToken('csrf');
 
-                // We can only change the password of the currently logged in user.  Fortunately we logged in to the
-                // wiki when we logged in to Laravel.  That's just as well, since the password is hashed and not
-                // accessible.
-                $token = $api->getToken('csrf');
-
-                $changeLanguageRequest = FluentRequest::factory()
-                    ->setAction('options')
-                    ->setParam('token', $token)
-                    ->setParam('optionname', 'language')
-                    ->setParam('optionvalue', $locale);
-                $api->postRequest($changeLanguageRequest);
-                Log::info("Changed language for user '$userName' in mediawiki to $locale");
-            } catch (\Exception $ex) {
-                Log::error("Failed to change language for user '$userName' in mediawiki to $locale: " . $ex->getMessage());
+                        $changeLanguageRequest = FluentRequest::factory()
+                            ->setAction('options')
+                            ->setParam('token', $token)
+                            ->setParam('optionname', 'language')
+                            ->setParam('optionvalue', $locale);
+                        $api->postRequest($changeLanguageRequest);
+                        Log::info("Changed language for user '$userName' in mediawiki to $locale");
+                    }
+                } catch (\Exception $ex) {
+                    Log::error("Failed to change language for user '$userName' in mediawiki to $locale: " . $ex->getMessage());
+                }
+            } else {
+                Log::info('No MW user');
             }
         } catch (\Exception $ex) {
             Log::error('Could not sync '.$user->id.' language to Discourse: '.$ex->getMessage());
