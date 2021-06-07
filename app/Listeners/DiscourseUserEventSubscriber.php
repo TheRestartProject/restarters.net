@@ -7,6 +7,9 @@ use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
 
 use Illuminate\Support\Facades\Log;
+use Mediawiki\Api\ApiUser;
+use Mediawiki\Api\FluentRequest;
+use Mediawiki\Api\MediawikiApi;
 
 class DiscourseUserEventSubscriber
 {
@@ -44,6 +47,7 @@ class DiscourseUserEventSubscriber
         }
 
         try {
+            // Sync to Discourse.
             $endpoint = "/users/by-external/{$user->id}.json";
             $response = $this->discourseClient->request(
                 'GET',
@@ -61,17 +65,37 @@ class DiscourseUserEventSubscriber
 
             $userName = $json['user']['username'];
 
-            // TODO: Discourse doesn't have e.g. fr-BE, so just going with main locale.
+            // Discourse doesn't have e.g. fr-BE, so just going with main locale.
             $locale = explode('-', $user->language)[0];
 
             $endpoint = "/u/{$userName}.json";
-            $response = $this->discourseClient->request(
+            $this->discourseClient->request(
                 'PUT',
                 $endpoint,
                 ['form_params' => [
                     'locale' => $locale,
                 ]]
             );
+
+            // Also sync to wiki, which doesn't have fr-BE either.
+            try{
+                $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
+
+                // We can only change the password of the currently logged in user.  Fortunately we logged in to the
+                // wiki when we logged in to Laravel.  That's just as well, since the password is hashed and not
+                // accessible.
+                $token = $api->getToken('csrf');
+
+                $changeLanguageRequest = FluentRequest::factory()
+                    ->setAction('options')
+                    ->setParam('token', $token)
+                    ->setParam('optionname', 'language')
+                    ->setParam('optionvalue', $locale);
+                $api->postRequest($changeLanguageRequest);
+                Log::info("Changed language for user '$userName' in mediawiki to $locale");
+            } catch (\Exception $ex) {
+                Log::error("Failed to change language for user '$userName' in mediawiki to $locale: " . $ex->getMessage());
+            }
         } catch (\Exception $ex) {
             Log::error('Could not sync '.$user->id.' language to Discourse: '.$ex->getMessage());
         }
