@@ -16,7 +16,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\ApiUser;
 use Mediawiki\Api\Service\UserCreator;
-use Mediawiki\Api\SimpleRequest;
 
 class LogInToWiki
 {
@@ -74,7 +73,6 @@ class LogInToWiki
     protected function logUserIn($wikiUsername, $password)
     {
         try {
-            Log::info("Log user in $wikiUsername, $password");
             $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
             $api->login(new ApiUser($wikiUsername, $password));
 
@@ -90,11 +88,6 @@ class LogInToWiki
                     Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
                 }
             }
-
-            // Store the password in the Laravel session so that we can log in to Mediawiki later, e.g. for changing
-            // passwords.
-            session(['mediawiki_username' => $wikiUsername]);
-            session(['mediawiki_password' => $password]);
         } catch (\Exception $ex) {
             Log::error("Failed to log user '" . $wikiUsername . "' in to mediawiki: " . $ex->getMessage());
         }
