@@ -17,7 +17,7 @@ return array (
   'notifications' => 'Notifications',
   'language_panel_title' => 'Language settings',
   'preferred_language' => 'Preferred language',
-  'language_updated' => 'Languaged preference updated',
+  'language_updated' => 'Language preference updated',
   'page_title' => 'Profile & Preferences',
   'profile' => 'Profile',
   'account' => 'Account',
