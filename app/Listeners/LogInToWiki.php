@@ -89,9 +89,10 @@ class LogInToWiki
                 }
             }
 
-            // Store the Mediawiki session in the Laravel session, so that we can use it later (e.g. to set
+            // Store the Mediawiki token in the Laravel session, so that we can use it later (e.g. to set
             // language.
-            session(['mediawiki_session', $api]);
+            session(['mediawiki_token', $api->getToken('login')]);
+            Log::info("Got token " . session('mediawiki_token'));
         } catch (\Exception $ex) {
             Log::error("Failed to log user '" . $wikiUsername . "' in to mediawiki: " . $ex->getMessage());
         }
