@@ -20,7 +20,7 @@ return array (
   'current_password' => 'Mot de passe actuel',
   'new_password' => 'Nouveau mot de passe',
   'new_repeat_password' => 'Répétez le nouveau mot de passe',
-  'login' => 'Se connecter',
+  'login' => 'Connexion',
   'delete_account' => 'Effacer compte',
   'delete_account_text' => 'J\'accepte que le fait d\'effacer mon compte supprimera toutes mes données personnelles et que ceci constitue une action permanente',
   'save_preferences' => 'Sauvegarder les préférences',
