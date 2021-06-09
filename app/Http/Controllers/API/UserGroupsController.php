@@ -47,7 +47,7 @@ class UserGroupsController extends Controller
 
     protected static function getUserGroupAudits($dateFrom = null)
     {
-        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\UserGroups');
+        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\UserGroups::class);
 
         if (! is_null($dateFrom)) {
             $query->where('created_at', '>=', $dateFrom);

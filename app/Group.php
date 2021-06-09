@@ -68,7 +68,7 @@ class Group extends Model implements Auditable
     // It's on a group, the group_ prefix is superfluous.
     public function group_tags()
     {
-        return $this->belongsToMany('App\GroupTags', 'grouptags_groups', 'group', 'group_tag');
+        return $this->belongsToMany(\App\GroupTags::class, 'grouptags_groups', 'group', 'group_tag');
     }
 
     // Setters
@@ -195,22 +195,22 @@ class Group extends Model implements Auditable
 
     public function groupImage()
     {
-        return $this->hasOne('App\Xref', 'reference', 'idgroups')->where('reference_type', env('TBL_GROUPS'))->where('object_type', 5);
+        return $this->hasOne(\App\Xref::class, 'reference', 'idgroups')->where('reference_type', env('TBL_GROUPS'))->where('object_type', 5);
     }
 
     public function allHosts()
     {
-        return $this->hasMany('App\UserGroups', 'group', 'idgroups')->where('role', 3);
+        return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', 3);
     }
 
     public function allRestarters()
     {
-        return $this->hasMany('App\UserGroups', 'group', 'idgroups')->where('role', 4);
+        return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', 4);
     }
 
     public function allVolunteers()
     {
-        return $this->hasMany('App\UserGroups', 'group', 'idgroups')->orderBy('role', 'ASC');
+        return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->orderBy('role', 'ASC');
     }
 
     public function allConfirmedHosts()

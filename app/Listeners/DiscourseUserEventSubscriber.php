@@ -131,17 +131,17 @@ class DiscourseUserEventSubscriber
     {
         if (config('restarters.features.discourse_integration') === true) {
             $events->listen(
-                'App\Events\UserEmailUpdated',
+                \App\Events\UserEmailUpdated::class,
                 'App\Listeners\DiscourseUserEventSubscriber@onUserEmailUpdated'
             );
 
             $events->listen(
-                'App\Events\UserLanguageUpdated',
+                \App\Events\UserLanguageUpdated::class,
                 'App\Listeners\DiscourseUserEventSubscriber@onUserLanguageUpdated'
             );
 
             $events->listen(
-                'App\Events\UserRegistered',
+                \App\Events\UserRegistered::class,
                 'App\Listeners\DiscourseUserEventSubscriber@onUserRegistered'
             );
         }

@@ -47,7 +47,7 @@ class DeviceController extends Controller
             $most_recent_finished_event['waste_prevented'] = $most_recent_finished_event->WastePrevented;
         }
 
-        $global_impact_data = app('App\Http\Controllers\ApiController')
+        $global_impact_data = app(\App\Http\Controllers\ApiController::class)
                             ->homepage_data();
         $global_impact_data = $global_impact_data->getData();
 

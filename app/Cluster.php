@@ -25,6 +25,6 @@ class Cluster extends Model
 
     public function categories()
     {
-        return $this->hasMany('App\Category', 'cluster', 'idclusters');
+        return $this->hasMany(\App\Category::class, 'cluster', 'idclusters');
     }
 }
