@@ -194,4 +194,5 @@ return array (
   'online' => 'Online',
   'duplicate_event' => 'Duplicate event',
   'discourse_invite' => 'We\'ve added you to a thread for this event.',
+  'talk_thread' => 'View event conversation'
 );

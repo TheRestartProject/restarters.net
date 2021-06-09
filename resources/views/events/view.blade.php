@@ -163,7 +163,7 @@
             :devices="{{ json_encode($expanded_devices, JSON_INVALID_UTF8_IGNORE) }}"
             :initial-event="{{ json_encode($event, JSON_INVALID_UTF8_IGNORE) }}"
             :is-attending="{{ $is_attending ? 'true' : 'false' }}"
-            discourse-thread="{{ $disccourseThread }}
+            discourse-thread="{{ $discourseThread }}"
             :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
             :in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}"
             :hosts="{{ json_encode($expanded_hosts, JSON_INVALID_UTF8_IGNORE) }}"

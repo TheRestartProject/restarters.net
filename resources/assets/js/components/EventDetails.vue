@@ -35,7 +35,7 @@
           <b-img-lazy src="/icons/talk_ico.svg" class="icon" />
         </div>
         <div>
-          {{ discourseThread }}
+          <a :href="discourseThread">{{ __('events.talk_thread') }}</a>
         </div>
       </div>
       <div class="border-top-thin d-flex pt-1 pb-1">
