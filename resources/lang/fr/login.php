@@ -15,5 +15,5 @@ return array (
   'stat_3' => 'Déchets<br>évités',
   'stat_4' => 'Événements<br>réalisés',
   'lead' => 'Bienvenue dans la communauté',
-  'login_title' => 'Se connecter',
+  'login_title' => 'Connexion',
 );
