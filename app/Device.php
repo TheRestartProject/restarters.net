@@ -711,4 +711,9 @@ AND devices.event = events.idevents ';
         $types = DB::table('devices')->whereNotNull('item_type')->select('item_type', DB::raw('COUNT(*) as count'))->groupBy('item_type')->orderBy('count', 'desc')->get()->toArray();
         return $types;
     }
+
+    public function setProblemAttribute($value) {
+        // Map null values to empty strings to avoid Metabase problems.
+        $this->attributes['problem'] = $value === NULL ? '' : $value;
+    }
 }
