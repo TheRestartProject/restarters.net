@@ -1,4 +1,3 @@
-<?php
 
 return array (
   'message_example_text' => '<add a custom message here if required>',

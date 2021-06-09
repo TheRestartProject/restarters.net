@@ -11,6 +11,8 @@
         :end.sync="searchEnd"
         @calendarOpen="minHeight = true"
         @calendarClose="minHeight = false"
+        @countryOpen="minHeight = true"
+        @countryClose="minHeight = false"
     />
     <b-table
         :fields="fields"
@@ -32,7 +34,9 @@
       </template>
 
       <template slot="head(date_long)">
-        <span />
+        <div class="text-left">
+          <b-img class="icon mt-3 ml-3" src="/images/clock.svg" />
+        </div>
       </template>
       <template slot="cell(date_long)" slot-scope="data">
         <GroupEventsScrollTableDateLong :idevents="data.item.date_long.idevents" />
@@ -209,7 +213,7 @@ export default {
     fields() {
       if (this.past) {
         return [
-          { key: 'date_short', label: 'Short Date', sortable: true, tdClass: 'pl-0 pr-0 datetd' },
+          { key: 'date_short', label: 'Short Date', tdClass: 'pl-0 pr-0 datetd' },
           { key: 'date_long', label: 'Long Date', sortable: true },
           { key: 'title', label: 'Event Title', sortable: true },
           { key: 'actions', label: 'Actions', },
@@ -223,7 +227,7 @@ export default {
         ]
       } else {
         return [
-          { key: 'date_short', label: 'Short Date', sortable: true, tdClass: 'pl-0 pr-0 datetd' },
+          { key: 'date_short', label: 'Short Date', tdClass: 'pl-0 pr-0 datetd' },
           { key: 'date_long', label: 'Long Date', sortable: true },
           { key: 'title', label: 'Event Title', sortable: true },
           { key: 'invited', label: 'Invited', sortable: true },

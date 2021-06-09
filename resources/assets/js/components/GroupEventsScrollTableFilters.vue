@@ -20,6 +20,10 @@
         class="m-0 mb-1 mb-md-0"
         allow-empty
         :selectedLabel="__('partials.remove')"
+        @open="$emit('countryOpen')"
+        @close="$emit('countryClose')"
+        :limit="5"
+        open-direction="bottom"
     />
     <b-form-datepicker class="datepicker" v-model="searchStart" :placeholder="__('events.search_start_placeholder')" @shown="$emit('calendarOpen')" @hidden="$emit('calendarClose')"></b-form-datepicker>
     <b-form-datepicker class="datepicker" v-model="searchEnd" :placeholder="__('events.search_end_placeholder')" @shown="$emit('calendarOpen')" @hidden="$emit('calendarClose')"></b-form-datepicker>
