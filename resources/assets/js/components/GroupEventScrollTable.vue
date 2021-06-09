@@ -327,7 +327,7 @@ export default {
     noDevices(event) {
       const stats = this.stats(event)
 
-      return stats && (stats.fixed_devices + stats.repairable_devices + stats.dead_devices === 0) && this.canedit && this.finished(event) || true
+      return stats && (stats.fixed_devices + stats.repairable_devices + stats.dead_devices === 0) && this.canedit && this.finished(event)
     },
     rowClass(item) {
       // This gets called to supply a class for the tr of the table.  We want to highlight the rows where we are
