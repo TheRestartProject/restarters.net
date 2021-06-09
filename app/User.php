@@ -142,12 +142,12 @@ class User extends Authenticatable implements Auditable
 
     public function preferences()
     {
-        return $this->belongsToMany(\App\User::class, 'users_preferences', 'user_id', 'preference_id');
+        return $this->belongsToMany(self::class, 'users_preferences', 'user_id', 'preference_id');
     }
 
     public function permissions()
     {
-        return $this->belongsToMany(\App\User::class, 'users_permissions', 'user_id', 'permission_id');
+        return $this->belongsToMany(self::class, 'users_permissions', 'user_id', 'permission_id');
     }
 
     public function addPreference($slug)
