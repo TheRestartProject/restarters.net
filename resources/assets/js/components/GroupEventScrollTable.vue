@@ -1,6 +1,6 @@
 <template>
   <div :class="{
-    minHeight: filters
+    minHeight: minHeight
 }">
     <GroupEventsScrollTableFilters
         v-if="filters"
@@ -9,6 +9,8 @@
         :country.sync="searchCountry"
         :start.sync="searchStart"
         :end.sync="searchEnd"
+        @calendarOpen="minHeight = true"
+        @calendarClose="minHeight = false"
     />
     <b-table
         :fields="fields"
@@ -199,7 +201,8 @@ export default {
       searchTitle: null,
       searchCountry: null,
       searchStart: null,
-      searchEnd: null
+      searchEnd: null,
+      minHeight: false
     }
   },
   computed: {
@@ -434,6 +437,6 @@ export default {
 }
 
 .minHeight {
-  min-height: 400px;
+  min-height: 330px;
 }
 </style>

@@ -21,8 +21,8 @@
         allow-empty
         :selectedLabel="__('partials.remove')"
     />
-    <b-form-datepicker class="datepicker" v-model="searchStart" :placeholder="__('events.search_start_placeholder')"></b-form-datepicker>
-    <b-form-datepicker class="datepicker" v-model="searchEnd" :placeholder="__('events.search_end_placeholder')"></b-form-datepicker>
+    <b-form-datepicker class="datepicker" v-model="searchStart" :placeholder="__('events.search_start_placeholder')" @shown="$emit('calendarOpen')" @hidden="$emit('calendarClose')"></b-form-datepicker>
+    <b-form-datepicker class="datepicker" v-model="searchEnd" :placeholder="__('events.search_end_placeholder')" @shown="$emit('calendarOpen')" @hidden="$emit('calendarClose')"></b-form-datepicker>
   </div>
 </template>
 <script>
