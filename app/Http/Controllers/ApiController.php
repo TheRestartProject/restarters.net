@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
-use App\Group;
-use App\Party;
 use App\Device;
-use App\User;
+use App\Group;
 use App\Helpers\FootprintRatioCalculator;
-use Illuminate\Http\Request;
+use App\Party;
+use App\User;
+use Auth;
 use DB;
+use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
     public static function homepage_data()
     {
-        $result = array();
+        $result = [];
 
         $Device = new Device;
 
@@ -52,7 +52,7 @@ class ApiController extends Controller
 
     public static function partyStats($partyId)
     {
-        $emissionRatio = ApiController::getEmissionRatio();
+        $emissionRatio = self::getEmissionRatio();
 
         $event = Party::where('idevents', $partyId)->first();
 
@@ -75,7 +75,7 @@ class ApiController extends Controller
 
     public static function groupStats($groupId)
     {
-        $emissionRatio = ApiController::getEmissionRatio();
+        $emissionRatio = self::getEmissionRatio();
 
         $group = Group::where('idgroups', $groupId)->first();
         $groupStats = $group->getGroupStats($emissionRatio);
@@ -99,7 +99,6 @@ class ApiController extends Controller
 
     public static function getEventsByGroupTag($group_tag_id)
     {
-
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
                 ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
                   ->where('grouptags_groups.group_tag', $group_tag_id)
@@ -123,6 +122,7 @@ class ApiController extends Controller
         $users = User::whereNull('deleted_at')
                ->orderBy('created_at', 'desc')
                ->get();
+
         return response()->json($users);
     }
 
@@ -132,7 +132,8 @@ class ApiController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public static function getDevices(Request $request, $page, $size) {
+    public static function getDevices(Request $request, $page, $size)
+    {
         $powered = $request->input('powered');
         $sortBy = $request->input('sortBy');
         $sortDesc = $request->input('sortDesc');
@@ -152,46 +153,46 @@ class ApiController extends Controller
         ];
 
         if ($category) {
-            $wheres[] = [ 'idcategories', '=' , $category ];
+            $wheres[] = ['idcategories', '=', $category];
         }
 
         if ($brand) {
-            $wheres[] = [ 'devices.brand', 'LIKE', '%' . $brand . '%'];
+            $wheres[] = ['devices.brand', 'LIKE', '%'.$brand.'%'];
         }
 
         if ($model) {
-            $wheres[] = [ 'devices.model', 'LIKE', '%' . $model . '%'];
+            $wheres[] = ['devices.model', 'LIKE', '%'.$model.'%'];
         }
 
         if ($item_type) {
-            $wheres[] = [ 'devices.item_type', 'LIKE', '%' . $item_type . '%'];
+            $wheres[] = ['devices.item_type', 'LIKE', '%'.$item_type.'%'];
         }
 
         if ($comments) {
-            $wheres[] = [ 'devices.problem', 'LIKE', '%' . $comments . '%'];
+            $wheres[] = ['devices.problem', 'LIKE', '%'.$comments.'%'];
         }
 
         if ($wiki) {
-            $wheres[] = [ 'devices.wiki', '=', 1 ];
+            $wheres[] = ['devices.wiki', '=', 1];
         }
 
         if ($status) {
-            $wheres[] = [ 'repair_status', '=', $status ];
+            $wheres[] = ['repair_status', '=', $status];
         }
 
         if ($group) {
-            $wheres[] = [ 'groups.name', 'LIKE', '%' . $group . '%'];
+            $wheres[] = ['groups.name', 'LIKE', '%'.$group.'%'];
         }
 
         if ($from_date) {
-            $wheres[] = [ 'events.event_date', '>=', $from_date ];
+            $wheres[] = ['events.event_date', '>=', $from_date];
         }
 
         if ($to_date) {
-            $wheres[] = [ 'events.event_date', '<=', $to_date ];
+            $wheres[] = ['events.event_date', '<=', $to_date];
         }
 
-        # Get the items we want for this page.
+        // Get the items we want for this page.
         $query = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
         ->join('events', 'events.idevents', '=', 'devices.event')
         ->join('groups', 'events.group', '=', 'groups.idgroups')
@@ -199,7 +200,7 @@ class ApiController extends Controller
         ->where($wheres)
         ->orderBy($sortBy, $sortDesc);
 
-        # Get total info across all pages.
+        // Get total info across all pages.
         $count = $query->count();
 
         $items = $query->skip(($page - 1) * $size)
@@ -212,19 +213,18 @@ class ApiController extends Controller
             $item['category'] = $item['deviceCategory'];
         }
 
-
         if ($status && $status !== env('DEVICE_FIXED')) {
-            # We only count savings from fixed items.  So if we are filtering on repair status other than fixed, then
-            # there can be no savings to return, so don't bother querying.
+            // We only count savings from fixed items.  So if we are filtering on repair status other than fixed, then
+            // there can be no savings to return, so don't bother querying.
             $weight = 0;
             $co2 = 0;
         } else {
-            # We need the total weight/CO2 impact for this filtering.
+            // We need the total weight/CO2 impact for this filtering.
             $d = new Device();
 
             DB::enableQueryLog();
 
-            $wheres[] = [ 'repair_status', '=', env('DEVICE_FIXED') ];
+            $wheres[] = ['repair_status', '=', env('DEVICE_FIXED')];
 
             // We select the powered and unpowered weights separately and then add them afterwards just because
             // this keeps the logic separate and is easier to compare with other code.
@@ -254,7 +254,7 @@ class ApiController extends Controller
             'count' => $count,
             'weight' => $weight,
             'co2' => $co2,
-            'items' => $items
+            'items' => $items,
         ]);
     }
 }

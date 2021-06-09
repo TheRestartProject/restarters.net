@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'devices_logged' => 'Appareils enregistrés',
   'getting_started_header' => 'Pour commencer',
   'getting_started_text' => 'Bienvenue dans l\'espace communautaire des Restarters. Voici quelques actions pour vous aider à démarrer:',
@@ -47,4 +47,4 @@ return array (
   'your_groups_heading' => 'Vos Repair Cafés',
   'see_your_impact' => 'Et regardez votre impact sur le Fixometer',
   'add_data_add' => 'Ajouter',
-);
+];

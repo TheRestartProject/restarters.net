@@ -2,29 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
-use App\Misccat;
 use App\Helpers\Microtask;
+use App\Misccat;
+use Auth;
+use Illuminate\Http\Request;
 
-class MisccatController extends Controller {
-
+class MisccatController extends Controller
+{
     /**
      * Fetch / post random misc.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
-        } else {            
+        } else {
             $user = Microtask::getAnonUserCta($request);
             if ($user->action) {
                 return redirect()->action('MisccatController@cta');
             }
         }
 
-        if ($request->isMethod('post') && !empty($_POST) && isset($_POST['iddevices'])) {
+        if ($request->isMethod('post') && ! empty($_POST) && isset($_POST['iddevices'])) {
             $data = $_POST;
             $Misccat = new Misccat;
             $insert = [
@@ -36,7 +37,7 @@ class MisccatController extends Controller {
                 'session_id' => session()->getId(),
             ];
             $success = $Misccat->create($insert);
-            if (!$success) {
+            if (! $success) {
                 logger(print_r($insert, 1));
                 logger('MiscCat error on insert.');
             }
@@ -52,11 +53,13 @@ class MisccatController extends Controller {
         ]);
     }
 
-    public function cta(Request $request) {
+    public function cta(Request $request)
+    {
         return $this->index($request);
     }
-    
-    public function status(Request $request) {
+
+    public function status(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
@@ -65,10 +68,10 @@ class MisccatController extends Controller {
 
         $Misccat = new Misccat;
         $data = $Misccat->fetchStatus();
+
         return view('misccat.status', [
             'status' => $data,
             'user' => $user,
         ]);
     }
-    
 }

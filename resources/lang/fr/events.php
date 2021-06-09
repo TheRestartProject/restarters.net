@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'about_event_name_header' => 'A propos :event',
   'rsvp_message' => 'Super! Vous nous rejoignez pour cet événement',
   'rsvp_button' => 'Désolé, je ne peux plus participer',
@@ -115,4 +115,4 @@ return array (
   'category' => 'Catégorie',
   'see_all_attended' => 'Voir tous les participants',
   'add_new_event' => 'Ajouter un nouvel événément',
-);
+];

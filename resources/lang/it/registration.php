@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'age' => 'Anno di nascita',
   'age_help' => 'Per aiutare a diffondere la riparazione comunitaria, abbiamo bisogno di maggiori approfondimenti sulle dinamiche intergenerazionali.',
   'age_validation' => 'Per favore aggiungi il tuo anno di nascita.',
@@ -38,4 +38,4 @@ return array (
   'step-3' => 'Passo 3 di 4',
   'step-4' => 'Passo 4 di 4',
   'reg-step-3-2b' => 'Dopo registrato, riceverai delle emails di benvenuto. Puoi anche scegliere l\'opzione per altre comunicazioni sotto',
-);
+];

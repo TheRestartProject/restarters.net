@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Group;
 use App\Helpers\FootprintRatioCalculator;
 use App\Http\Controllers\Controller;
-
 use Auth;
 use Illuminate\Http\Request;
 
@@ -22,14 +21,13 @@ class GroupController extends Controller
     public static function getGroupChanges(Request $request)
     {
         $authenticatedUser = Auth::user();
-        if ( ! $authenticatedUser->hasRole('Administrator')) {
+        if (! $authenticatedUser->hasRole('Administrator')) {
             return abort(403, 'The authenticated user is not authorized to access this resource');
         }
 
         $dateFrom = $request->input('date_from', null);
 
         $groupAudits = self::getGroupAudits($dateFrom);
-
 
         $groupChanges = [];
         foreach ($groupAudits as $groupAudit) {
@@ -42,13 +40,11 @@ class GroupController extends Controller
         return response()->json($groupChanges);
     }
 
-
     /**
      * To provide a more uniform API, this is just a wrapper around
      * the method in the GroupController for now.
      *
      * That method should be moved out of the controller.
-     *
      */
     public static function getGroupsByUserGroupTag(Request $request)
     {
@@ -60,7 +56,6 @@ class GroupController extends Controller
 
         return response()->json($groups);
     }
-
 
     public static function getGroupsByUsersNetworks(Request $request)
     {
@@ -91,7 +86,7 @@ class GroupController extends Controller
                     'latitude' => $group->latitude,
                     'longitude' => $group->longitude,
                     'area' => $group->area,
-                    'postcode' => $group->postcode
+                    'postcode' => $group->postcode,
                 ],
                 'website' => $group->website,
                 'facebook' => $group->facebook,
@@ -111,7 +106,7 @@ class GroupController extends Controller
                     'co2_equivalence_visualisation' => url("/outbound/info/group/{$group->idgroups}/manufacture"),
                 ],
                 'created_at' => new \Carbon\Carbon($group->created_at),
-                'updated_at' => new \Carbon\Carbon($group->max_updated_at_devices_updated_at)
+                'updated_at' => new \Carbon\Carbon($group->max_updated_at_devices_updated_at),
 
               ]);
 
@@ -153,16 +148,14 @@ class GroupController extends Controller
         return response()->json($collection);
     }
 
-
     /**
      * Get all of the audits related to groups from the audits table.
-     *
      */
     public static function getGroupAudits($dateFrom = null)
     {
         $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\Group');
 
-        if (!is_null($dateFrom)) {
+        if (! is_null($dateFrom)) {
             $query->where('created_at', '>=', $dateFrom);
         }
 
@@ -171,7 +164,6 @@ class GroupController extends Controller
 
         return $query->get();
     }
-
 
     /**
      * Map from the group and audit information as recorded by the audits library,
@@ -184,7 +176,7 @@ class GroupController extends Controller
 
         // Zapier makes use of this unique hash as an id for the change for deduplication.
         $auditCreatedAtAsString = $groupAudit->created_at->toDateTimeString();
-        $groupChange['id'] = md5($group->idgroups . $auditCreatedAtAsString);
+        $groupChange['id'] = md5($group->idgroups.$auditCreatedAtAsString);
         $groupChange['group_id'] = $group->idgroups;
         $groupChange['change_occurred_at'] = $auditCreatedAtAsString;
         $groupChange['change_type'] = $groupAudit->event;
@@ -192,19 +184,17 @@ class GroupController extends Controller
         return $groupChange;
     }
 
-
     public static function getGroupList()
     {
         $groups = Group::orderBy('created_at', 'desc');
 
         $groups = $groups->get();
         foreach ($groups as $group) {
-                mb_convert_encoding($group, 'UTF-8', 'UTF-8');
+            mb_convert_encoding($group, 'UTF-8', 'UTF-8');
         }
 
         return response()->json($groups);
     }
-
 
     public static function getEventsForGroup(Request $request, Group $group)
     {
@@ -213,7 +203,7 @@ class GroupController extends Controller
         $events = $group->parties->sortByDesc('event_date');
 
         if ($request->has('format') && $request->input('format') == 'location') {
-            $events = $events->map(function($event) {
+            $events = $events->map(function ($event) {
                 return (object) [
                     'id' => $event->idevents,
                     'location' => $event->FriendlyLocation,

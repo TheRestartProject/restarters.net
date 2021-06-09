@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Device;
-use App\Party;
 use App\Http\Controllers\Controller;
+use App\Party;
 use FixometerHelper;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -53,7 +53,6 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-
         $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -91,7 +90,7 @@ class LoginController extends Controller
             $this->username() => 'required|email',
             'password' => 'required|string',
             'my_name'   => 'honeypot',
-            'my_time'   => 'required|honeytime:1'
+            'my_time'   => 'required|honeytime:1',
         ]);
     }
 

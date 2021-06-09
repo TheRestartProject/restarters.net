@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'skills' => 'Skills',
   'my_skills' => 'My skills',
   'biography' => 'Biography',
@@ -13,4 +13,4 @@ return array (
   'profile_picture' => 'Profile picture',
   'delete_account' => 'Delete account',
   'delete_account_text' => 'I understand that deleting my account will remove all of my personal data and this is a permanent action.',
-);
+];

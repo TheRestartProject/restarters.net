@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'slide1_heading' => 'Welcome!',
   'slide1_content' => '<p>Thank you for being a part of our community space.</p><p>And <strong>thank you</strong> for being a beta tester!  With your feedback we can help improve the platform for everyone.</p>',
   'slide2_heading' => 'Your gateway to community repair',
@@ -10,4 +10,4 @@ return array (
   'finishing_action' => 'To the dashboard',
   'previous' => 'Previous',
   'next' => 'Next',
-);
+];

@@ -4,25 +4,24 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
+use App\Helpers\Geocoder;
 use App\Network;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\User;
 use App\UserGroups;
-use App\Helpers\Geocoder;
-use App\Notifications\NotifyRestartersOfNewEvent;
-
-use DB;
 use Carbon\Carbon;
-use Tests\TestCase;
-use Illuminate\Support\Facades\Notification;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class OnlineEventsTests extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
         Group::truncate();
         Party::truncate();
@@ -30,7 +29,7 @@ class OnlineEventsTests extends TestCase
         UserGroups::truncate();
         DB::delete('delete from group_network');
         DB::delete('delete from user_network');
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
 
         $this->app->bind(Geocoder::class, function () {
             return new GeocoderMock();

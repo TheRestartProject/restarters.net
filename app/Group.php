@@ -3,11 +3,9 @@
 namespace App;
 
 use App\Network;
-
 use DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
-
+use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Group extends Model implements Auditable
@@ -36,7 +34,7 @@ class Group extends Model implements Auditable
         'shareable_code',
         'network_id',
         'external_id',
-        'devices_updated_at'
+        'devices_updated_at',
     ];
 
     protected $appends = ['ShareableLink', 'approved'];
@@ -60,7 +58,6 @@ class Group extends Model implements Auditable
             $builder->withCount('allRestarters');
         });
     }
-
 
     public function addTag($tag)
     {
@@ -144,12 +141,12 @@ class Group extends Model implements Auditable
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
-                WHERE `id'.$this->table.'` = :id'), array('id' => $id));
+                WHERE `id'.$this->table.'` = :id'), ['id' => $id]);
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
 
-        if ( ! empty($group)) {
+        if (! empty($group)) {
             return $group[0];
         }
     }
@@ -174,7 +171,7 @@ class Group extends Model implements Auditable
                 ON `xi`.`reference` = `u`.`id`
 
                 WHERE `g`.`idgroups` = :id
-                AND `u`.`role` = 3'), array('id' => $id));
+                AND `u`.`role` = 3'), ['id' => $id]);
     }
 
     public function ofThisUser($id)
@@ -193,14 +190,13 @@ class Group extends Model implements Auditable
                 ON `xi`.`reference` = `g`.`idgroups`
 
                 WHERE `ug`.`user` = :id
-                ORDER BY `g`.`name` ASC'), array('id' => $id));
+                ORDER BY `g`.`name` ASC'), ['id' => $id]);
     }
 
     public function groupImage()
     {
         return $this->hasOne('App\Xref', 'reference', 'idgroups')->where('reference_type', env('TBL_GROUPS'))->where('object_type', 5);
     }
-
 
     public function allHosts()
     {
@@ -304,7 +300,7 @@ class Group extends Model implements Auditable
      */
     public function makeMemberAHost($groupMember)
     {
-        if (!$this->allVolunteers()->pluck('user')->contains($groupMember->id)) {
+        if (! $this->allVolunteers()->pluck('user')->contains($groupMember->id)) {
             throw new \Exception('Volunteer is not currently in this group.  Only existing group members can be made hosts.');
         }
 
@@ -319,7 +315,7 @@ class Group extends Model implements Auditable
 
     public function getShareableLinkAttribute()
     {
-        if ( ! empty($this->shareable_code)) {
+        if (! empty($this->shareable_code)) {
             return url("group/invite/{$this->shareable_code}");
         }
 
@@ -330,7 +326,7 @@ class Group extends Model implements Auditable
      * @param int|null $user_id
      * @return bool
      */
-    public function isVolunteer($user_id = NULL)
+    public function isVolunteer($user_id = null)
     {
         $attributes = ['user' => $user_id ?: auth()->id()];
 
@@ -359,7 +355,7 @@ class Group extends Model implements Auditable
     {
         $from = date('Y-m-d');
 
-        if ( ! empty($exclude_parties)) {
+        if (! empty($exclude_parties)) {
             return $this->parties()
                 ->where('event_date', '>=', $from)
                 ->whereNotIn('idevents', $exclude_parties)
@@ -381,7 +377,7 @@ class Group extends Model implements Auditable
      */
     public function pastParties($exclude_parties = [])
     {
-        if ( ! empty($exclude_parties)) {
+        if (! empty($exclude_parties)) {
             return $this->parties()
                           ->where('event_date', '<', date('Y-m-d'))
                             ->whereNotIn('idevents', $exclude_parties)
@@ -422,24 +418,24 @@ class Group extends Model implements Auditable
 
     public function getNextUpcomingEvent()
     {
-      $event = $this->parties()
+        $event = $this->parties()
              ->whereNotNull('wordpress_post_id')
              ->whereDate('event_date', '>=', date('Y-m-d'))
              ->orderBy('event_date', 'asc');
 
-      if ( ! $event->count() ) {
-          return null;
-      }
+        if (! $event->count()) {
+            return null;
+        }
 
-      return $event->first();
+        return $event->first();
     }
 
     public function userEvents()
     {
-      return $this->parties()
+        return $this->parties()
       ->join('events_users', 'events.idevents', '=', 'events_users.event')
-      ->where(function($query) {
-        $query->where('events.group', $this->idgroups)
+      ->where(function ($query) {
+          $query->where('events.group', $this->idgroups)
         ->where('events_users.user', auth()->id());
       })
       ->select('events.*')
@@ -450,7 +446,7 @@ class Group extends Model implements Auditable
 
     public function getApprovedAttribute()
     {
-        return !is_null($this->wordpress_post_id);
+        return ! is_null($this->wordpress_post_id);
     }
 
     public function networks()
@@ -489,7 +485,8 @@ class Group extends Model implements Auditable
         return false;
     }
 
-    public function getMaxUpdatedAtDevicesUpdatedAtAttribute() {
+    public function getMaxUpdatedAtDevicesUpdatedAtAttribute()
+    {
         return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 }

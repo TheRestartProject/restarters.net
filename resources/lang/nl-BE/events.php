@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'embed_code_header' => 'Code embedden',
   'about_event_name_header' => 'Over :event',
   'add_an_event' => 'Een activiteit toevoegen',
@@ -92,4 +92,4 @@ return array (
   'warning_volunteers_message' => 'Opgelet, het aantal vrijwilligers komt niet overeen met het aantal deelnemers. Misschien moet je vrijwilligers toevoegen of verwijderen?',
   'type_email_addresses_message' => 'Tip: je kunt hier ook andere e-mailadressen toevoegen. Zet een tab, enter of komma na elke e-mailadres dat je toevoegt.',
   'share_stats_message' => 'Goed gedaan! Tijdens :event_name op :date werden <strong>:number_devices toestellen </strong> gerepareerd. Help ons dit nieuws te verspreiden door je milieu-impact op je eigen website te delen.',
-);
+];

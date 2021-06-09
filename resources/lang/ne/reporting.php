@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'age_range' => 'Leeftijdscategorie',
   'average_age' => 'Gemiddelde leeftijd',
   'birth_year' => 'Geboortejaar',
@@ -42,4 +42,4 @@ return array (
   'total_number_of_users' => 'Totaal aantal gebruikers',
   'town_city_name' => 'Naam van de stad of gemeente',
   'yes' => 'Ja',
-);
+];

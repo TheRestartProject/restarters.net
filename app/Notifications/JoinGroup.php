@@ -49,7 +49,7 @@ class JoinGroup extends Notification implements ShouldQueue
         $actionText = 'Click to follow group';
         $ignoreLine = 'If you think this invitation was not intended for you, please disregard this email.';
 
-        if ( ! is_null($this->user)) { // user is already on the platform
+        if (! is_null($this->user)) { // user is already on the platform
             if ($this->user->invites == 1) { // user has opted in to receive emails
                 $mail = (new MailMessage)
                       ->subject($subject)
@@ -57,7 +57,7 @@ class JoinGroup extends Notification implements ShouldQueue
                       ->line($introLine)
                       ->line('');
 
-                if ( ! is_null($this->arr['message'])) { // host has added a message
+                if (! is_null($this->arr['message'])) { // host has added a message
                     $mail->line($this->arr['name'].' attached this message with the invite:')
                          ->line('')
                          ->line('"'.$this->arr['message'].'"')
@@ -78,7 +78,7 @@ class JoinGroup extends Notification implements ShouldQueue
                     ->line($introLine)
                     ->line('');
 
-            if ( ! is_null($this->arr['message'])) { // host has added a message
+            if (! is_null($this->arr['message'])) { // host has added a message
                 $mail->line($this->arr['name'].' attached this message with the invite:')
                      ->line('')
                      ->line('"'.$this->arr['message'].'"')

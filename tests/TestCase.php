@@ -4,14 +4,13 @@ namespace Tests;
 
 use App\Group;
 use App\Network;
-
 use App\Role;
 use App\User;
+use Auth;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use DB;
 use Hash;
-use Auth;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 
 abstract class TestCase extends BaseTestCase
@@ -26,16 +25,16 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Network::truncate();
         Group::truncate();
         User::truncate();
-        DB::statement("TRUNCATE group_network");
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('TRUNCATE group_network');
+        DB::statement('SET foreign_key_checks=1');
 
         $network = new Network();
-        $network->name = "Restarters";
-        $network->shortname = "restarters";
+        $network->name = 'Restarters';
+        $network->shortname = 'restarters';
         $network->save();
 
         $this->withoutExceptionHandling();
@@ -49,10 +48,11 @@ abstract class TestCase extends BaseTestCase
         $this->createJane();
     }
 
-    public function userAttributes() {
+    public function userAttributes()
+    {
         // Return a test user.
         $userAttributes = [];
-        $userAttributes['name'] = "Test" . $this->userCount++;
+        $userAttributes['name'] = 'Test'.$this->userCount++;
         $userAttributes['email'] = $userAttributes['name'].'@restarters.dev';
         $userAttributes['age'] = '1982';
         $userAttributes['country'] = 'GBR';
@@ -65,9 +65,10 @@ abstract class TestCase extends BaseTestCase
         return $userAttributes;
     }
 
-    public function loginAsTestUser($role = Role::RESTARTER) {
+    public function loginAsTestUser($role = Role::RESTARTER)
+    {
         // This is testing the external interface, whereas actingAs() wouldn't be.
-        $response = $this->post('/user/register/',  $this->userAttributes($role));
+        $response = $this->post('/user/register/', $this->userAttributes($role));
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
 
@@ -75,12 +76,13 @@ abstract class TestCase extends BaseTestCase
         Auth::user()->role = $role;
     }
 
-    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.') {
-        $response = $this->post('/group/create',  [
-            'name' => $name . $this->groupCount++,
+    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.')
+    {
+        $response = $this->post('/group/create', [
+            'name' => $name.$this->groupCount++,
             'website' => $website,
             'location' => $location,
-            'free_text' => $text
+            'free_text' => $text,
         ]);
 
         $this->assertTrue($response->isRedirection());
@@ -92,7 +94,8 @@ abstract class TestCase extends BaseTestCase
         return $idgroups;
     }
 
-    public function createJane() {
+    public function createJane()
+    {
         $user = factory(User::class)->create([
             'name' => 'Jane Bloggs',
             'email' => 'jane@bloggs.net',
@@ -100,18 +103,19 @@ abstract class TestCase extends BaseTestCase
             'role' => Role::ADMINISTRATOR,
             'consent_gdpr' => true,
             'consent_future_data' => true,
-            'repairdir_role' => Role::REPAIR_DIRECTORY_SUPERADMIN
+            'repairdir_role' => Role::REPAIR_DIRECTORY_SUPERADMIN,
         ]);
-        
+
         $user->save();
     }
 
-    public function getVueProperties($response) {
+    public function getVueProperties($response)
+    {
         $crawler = new Crawler($response->getContent());
 
         $props = [];
 
-        $classname="vue";
+        $classname = 'vue';
         $vues = $crawler->filterXPath("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]")->each(function (Crawler $node, $i) {
             return $node;
         });
@@ -127,7 +131,8 @@ abstract class TestCase extends BaseTestCase
         return $props;
     }
 
-    private function canonicalise($val) {
+    private function canonicalise($val)
+    {
         // Sinple code to filter out timestamps.
         if ($val && is_string($val)) {
             $val = preg_replace('/"created_at":".*"/', '"created_at":"TIMESTAMP"', $val);
@@ -135,26 +140,28 @@ abstract class TestCase extends BaseTestCase
         }
     }
 
-    private function canonicaliseAndAssertSame($val1, $val2) {
+    private function canonicaliseAndAssertSame($val1, $val2)
+    {
         $val1 = $this->canonicalise($val1);
         $val2 = $this->canonicalise($val2);
         $this->assertSame($val1, $val2);
     }
 
-    public function assertVueProperties($response, $expected) {
+    public function assertVueProperties($response, $expected)
+    {
         // Assert that the returned response has some properties passed to our Vue components.
         //
         // phpunit has assertArraySubset, but this is controversially being removed in later versions so don't rely
         // on it.
         $props = $this->getVueProperties($response);
-        error_log(var_export($props, TRUE));
-        $foundSome = FALSE;
+        error_log(var_export($props, true));
+        $foundSome = false;
 
         for ($i = 0; $i < count($expected); $i++) {
             foreach ($expected[$i] as $key => $value) {
                 $this->assertArrayHasKey($key, $props[$i]);
                 $this->canonicaliseAndAssertSame($value, $props[$i][$key]);
-                $foundSome = TRUE;
+                $foundSome = true;
             }
         }
 

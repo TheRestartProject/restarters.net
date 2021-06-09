@@ -1,18 +1,18 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class MobifixOraSetup extends Migration {
-
+class MobifixOraSetup extends Migration
+{
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up() {
-
+    public function up()
+    {
         Schema::create('devices_faults_mobiles_ora_opinions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('id_ords', 16)->index();
@@ -77,9 +77,9 @@ class MobifixOraSetup extends Migration {
             $table->collation = 'utf8mb4_unicode_ci';
         });
 
-        $data = base_path() . '/database/data_updates/devices_mobifix_ora.php';
+        $data = base_path().'/database/data_updates/devices_mobifix_ora.php';
         if (file_exists($data)) {
-            include($data);
+            include $data;
             foreach ($mobifixora_data as $k => $v) {
                 DB::table('devices_mobifix_ora')->insert([
                     'id_ords' => $v['id'],
@@ -100,12 +100,13 @@ class MobifixOraSetup extends Migration {
         }
     }
 
-    protected function _FaultTypes() {
+    protected function _FaultTypes()
+    {
         return [
             1 => [
                 'title' => 'Power/battery',
                 'description' => '',
-                'regex' => 'batter|power|start|boot|switch|charg|plug|bricked'
+                'regex' => 'batter|power|start|boot|switch|charg|plug|bricked',
             ],
             2 => [
                 'title' => 'Screen',
@@ -240,11 +241,11 @@ class MobifixOraSetup extends Migration {
      *
      * @return void
      */
-    public function down() {
+    public function down()
+    {
         Schema::dropIfExists('devices_faults_mobiles_ora_adjudicated');
         Schema::dropIfExists('devices_faults_mobiles_ora_opinions');
         Schema::dropIfExists('fault_types_mobiles');
         Schema::dropIfExists('devices_mobifix_ora');
     }
-
 }

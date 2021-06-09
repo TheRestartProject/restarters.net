@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'field_event_name_helper' => 'Name of the venue or neighbourhood',
   'field_venue_helper' => 'I.e. the place where the fixing happens!',
   'create_event' => 'Create event',
@@ -194,4 +194,4 @@ return array (
   'online' => 'Online',
   'duplicate_event' => 'Duplicate event',
   'discourse_invite' => 'We\'ve added you to a thread for this event.',
-);
+];

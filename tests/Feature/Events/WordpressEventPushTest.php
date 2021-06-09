@@ -9,27 +9,26 @@ use App\GroupNetwork;
 use App\Network;
 use App\Party;
 use App\User;
-
-use DB;
 use Carbon\Carbon;
+use DB;
+use HieuLe\WordpressXmlrpcClient\WordpressClient;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Mockery;
 use Tests\TestCase;
-use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class WordpressPushTest extends TestCase
+class WordpressEventPushTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
         Group::truncate();
         Party::truncate();
         Network::truncate();
         GroupNetwork::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */
@@ -41,7 +40,7 @@ class WordpressPushTest extends TestCase
 
         $restart = factory(Network::class)->create([
             'name' => 'Restart',
-            'events_push_to_wordpress' => true
+            'events_push_to_wordpress' => true,
         ]);
         $group = factory(Group::class)->create();
         $restart->addGroup($group);
@@ -55,7 +54,6 @@ class WordpressPushTest extends TestCase
         event(new ApproveEvent($event, $eventData));
     }
 
-
     /** @test */
     public function given_nonrestart_network_when_event_approved_then_not_pushed_to_wordpress()
     {
@@ -64,7 +62,7 @@ class WordpressPushTest extends TestCase
         }));
 
         $repairTogether = factory(Network::class)->create([
-            'name' => 'Repair Together'
+            'name' => 'Repair Together',
         ]);
         $group = factory(Group::class)->create();
         $repairTogether->addGroup($group);
@@ -88,7 +86,7 @@ class WordpressPushTest extends TestCase
 
         $restart = factory(Network::class)->create([
             'name' => 'Restart',
-            'events_push_to_wordpress' => true
+            'events_push_to_wordpress' => true,
         ]);
         $group = factory(Group::class)->create();
         $restart->addGroup($group);
@@ -114,7 +112,7 @@ class WordpressPushTest extends TestCase
 
         $repairTogether = factory(Network::class)->create([
             'name' => 'Repair Together',
-            'events_push_to_wordpress' => false
+            'events_push_to_wordpress' => false,
         ]);
         $group = factory(Group::class)->create();
         $repairTogether->addGroup($group);

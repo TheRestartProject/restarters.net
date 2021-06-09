@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'message_example_text' => '<add a custom message here if required>',
   'headline_stats_dropdown' => 'Headline stats',
   'co2_equivalence_visualisation_dropdown' => 'CO<sub>2</sub> equivalence visualisation',
@@ -182,4 +182,4 @@ return array (
   'no_other_nearby_events' => 'There are currently no other upcoming nearby events.',
   'postcode' => 'Group postcode',
   'groups_postcode_small' => '(Optional)',
-);
+];

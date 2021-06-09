@@ -16,10 +16,9 @@ use Auth;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-
 use Request;
 
-class FixometerHelper
+class Fixometer
 {
     public static function allAges($range = false)
     {
@@ -109,10 +108,10 @@ class FixometerHelper
 
         $user = User::find($userId);
 
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
+        if (self::hasRole($user, 'Administrator')) {
             return true;
         }
-        if (FixometerHelper::hasRole($user, 'NetworkCoordinator')) {
+        if (self::hasRole($user, 'NetworkCoordinator')) {
             $group = Party::find($partyId)->theGroup;
             foreach ($group->networks as $network) {
                 if ($network->coordinators->contains($user)) {
@@ -120,9 +119,9 @@ class FixometerHelper
                 }
             }
         }
-        if (FixometerHelper::hasRole($user, 'Host')) {
+        if (self::hasRole($user, 'Host')) {
             $group_id_of_event = Party::where('idevents', $partyId)->value('group');
-            if (FixometerHelper::userIsHostOfGroup($group_id_of_event, $userId)) {
+            if (self::userIsHostOfGroup($group_id_of_event, $userId)) {
                 return true;
             } elseif (empty(DB::table('events_users')->where('event', $partyId)->where('user', $user->id)->first())) {
                 return false;
@@ -132,7 +131,6 @@ class FixometerHelper
         return false;
     }
 
-
     public static function userCanApproveEvent($eventId, $userId = null)
     {
         if (is_null($userId)) {
@@ -140,10 +138,10 @@ class FixometerHelper
         }
         $user = User::find($userId);
 
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
+        if (self::hasRole($user, 'Administrator')) {
             return true;
         }
-        if (FixometerHelper::hasRole($user, 'NetworkCoordinator')) {
+        if (self::hasRole($user, 'NetworkCoordinator')) {
             $group = Party::find($eventId)->theGroup;
             foreach ($group->networks as $network) {
                 if ($network->coordinators->contains($user)) {
@@ -162,13 +160,13 @@ class FixometerHelper
         }
 
         // Admins can do anything.
-        if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (self::hasRole(Auth::user(), 'Administrator')) {
             return true;
         }
 
         // Hosts of a group can do anything with events from that group.
         $group_id_of_event = Party::where('idevents', $partyId)->value('group');
-        if (FixometerHelper::userIsHostOfGroup($group_id_of_event, $userId)) {
+        if (self::userIsHostOfGroup($group_id_of_event, $userId)) {
             return true;
         }
 
@@ -179,7 +177,6 @@ class FixometerHelper
 
         return false;
     }
-
 
     public static function userCanCreateEvents($user)
     {
@@ -217,7 +214,7 @@ class FixometerHelper
                                 ->where('role', 3)
                                 ->first();
 
-        if ( ! empty($user_group_association)) {
+        if (! empty($user_group_association)) {
             return true;
         }
 
@@ -272,7 +269,7 @@ class FixometerHelper
      * */
     public static function verify($var, $strict = false, $type = 'string')
     {
-        if ( ! isset($var) || empty($var) || is_null($var)) {
+        if (! isset($var) || empty($var) || is_null($var)) {
             return false;
         }
         if ($strict) {
@@ -376,10 +373,10 @@ class FixometerHelper
 
             try {
                 if ($return_rows) {
-                    return DB::select(DB::raw($sql), array('id' => $id, 'object' => $object));
+                    return DB::select(DB::raw($sql), ['id' => $id, 'object' => $object]);
                 }
 
-                return (count(DB::select(DB::raw($sql), array('id' => $id, 'object' => $object))) > 0 ? true : false);
+                return count(DB::select(DB::raw($sql), ['id' => $id, 'object' => $object])) > 0 ? true : false;
             } catch (\Illuminate\Database\QueryException $e) {
                 return db($e);
             }
@@ -418,19 +415,18 @@ class FixometerHelper
 
         if ($object) {
             /** delete cross references **/
-
             $sql = 'DELETE FROM `xref`
                   WHERE
                   `xref`.`object_type` = 5 AND
                   `xref`.`reference_type` = :object AND
                   `xref`.`reference` = :id ';
 
-            DB::delete(DB::raw($sql), array('id' => $id, 'object' => $object));
+            DB::delete(DB::raw($sql), ['id' => $id, 'object' => $object]);
 
             /** delete image from db **/
             $sql = 'DELETE FROM `images` WHERE `images`.`idimages` = :image';
 
-            DB::delete(DB::raw($sql), array('image' => $image->idimages));
+            DB::delete(DB::raw($sql), ['image' => $image->idimages]);
 
             /** delete image from disk **/
             unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.$image->path);
@@ -699,7 +695,7 @@ class FixometerHelper
 
     public static function getCountryFromCountryCode($countryCode)
     {
-        $countriesArray = FixometerHelper::getAllCountries();
+        $countriesArray = self::getAllCountries();
 
         if (array_key_exists($countryCode, $countriesArray)) {
             return $countriesArray[$countryCode];
@@ -745,19 +741,19 @@ class FixometerHelper
 
     public static function getLatLongFromCityCountry($town_city = null, $country = null)
     {
-        $return = array();
+        $return = [];
         $query = '';
 
         // Try and get country long name to improve geocoding.
-        if ( ! is_null($country) && array_key_exists($country, FixometerHelper::getAllCountries())) {
-            $country = FixometerHelper::getAllCountries()[$country];
+        if (! is_null($country) && array_key_exists($country, self::getAllCountries())) {
+            $country = self::getAllCountries()[$country];
         }
 
-        if ( ! is_null($town_city)) {
+        if (! is_null($town_city)) {
             $query .= $town_city;
         }
 
-        if ( ! is_null($country)) {
+        if (! is_null($country)) {
             $query .= ','.$country;
         }
 
@@ -1011,12 +1007,12 @@ class FixometerHelper
      * Simplifies the logic in the blade templates around display device columns
      * @param  string $column           checks to see whether column exists in session array
      * @param  array $user_preferences array from session
-     * @return boolean                   true or false!
+     * @return bool                   true or false!
      * @author Dean Appleton-Claydon
      */
     public static function checkColumn($column, $user_preferences)
     {
-        if ( ! is_null($user_preferences) && is_array($user_preferences)) {
+        if (! is_null($user_preferences) && is_array($user_preferences)) {
             if (in_array($column, $user_preferences)) {
                 return true;
             }

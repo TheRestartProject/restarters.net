@@ -53,7 +53,6 @@ Route::get('/party/view/{id}', 'PartyController@view');
 // so we allow anonymous access.
 Route::get('/export/devices', 'ExportController@devices');
 
-
 // Calendar routes do not require authentication.
 // (You would not be able to subscribe from a calendar application if they did.)
 Route::prefix('calendar')->group(function () {
@@ -194,7 +193,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     // TODO: the rest of these to be redirected properly.
     Route::prefix('device')->group(function () {
-        Route::get('/', function() {
+        Route::get('/', function () {
             return redirect('/fixometer');
         });
         Route::get('/search', 'DeviceController@search');
@@ -317,7 +316,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/export/time-volunteered', 'ExportController@exportTimeVolunteered');
     Route::get('/reporting/time-volunteered', 'ExportController@getTimeVolunteered');
     Route::get('/reporting/time-volunteered/{search}', 'ExportController@getTimeVolunteered');
-
 });
 
 Route::get('/party/invite/{code}', 'PartyController@confirmCodeInvite');
@@ -356,7 +354,7 @@ Route::get('/party/stats/{id}/wide', function ($id) {
     return App\Http\Controllers\PartyController::stats($id);
 });
 
-Route::get('markAsRead/{id?}', function ($id = NULL) {
+Route::get('markAsRead/{id?}', function ($id = null) {
     $notifications = auth()->user()->unReadNotifications;
 
     if ($id) {

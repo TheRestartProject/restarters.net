@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'field_device_images' => 'Add device images here',
   'field_device_images_2' => 'Choose compelling images that show off your work',
   'useful_repair_urls_helper' => 'Enter URL here',
@@ -123,4 +123,4 @@ return array (
   'tooltip_type_unpowered' => 'Add as much information about the type of item here as you can (e.g. \'Sofa\' or \'Denim jeans\')',
   'unknown_item_type' => 'You\'re creating a new item type. Are you sure an existing item type is not suitable?',
   'unknown_brand' => 'You\'re creating a new brand. Are you sure an existing brand is not suitable?',
-);
+];

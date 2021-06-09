@@ -31,7 +31,7 @@ class MicrotaskingController extends Controller
             'currentUserQuests' => $currentUserQuests,
             'currentUserContributions' => $currentUserContributions,
             'topics' => $discourseService->getDiscussionTopics($tag, 5),
-            'seeAllTopicsLink' => env('DISCOURSE_URL') . "/tag/{$tag}/l/latest",
+            'seeAllTopicsLink' => env('DISCOURSE_URL')."/tag/{$tag}/l/latest",
             'activeQuest' => $activeQuest,
         ]);
     }
@@ -55,7 +55,7 @@ class MicrotaskingController extends Controller
 
         return [
             'quests' => $quests,
-            'contributions' => $faultCatContributions + $miscCatContributions + $mobifixContributions
+            'contributions' => $faultCatContributions + $miscCatContributions + $mobifixContributions,
         ];
     }
 

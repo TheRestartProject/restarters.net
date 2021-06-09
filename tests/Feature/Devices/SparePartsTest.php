@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Device;
 use App\Party;
 use App\User;
-
 use DB;
 use Tests\TestCase;
 
@@ -14,11 +13,11 @@ class SparePartsTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
         Party::truncate();
         Device::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
 
         $event = factory(Party::class)->create();
         $this->device_inputs = factory(Device::class)->raw([

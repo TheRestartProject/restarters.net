@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\TabicatOra;
+use Illuminate\Console\Command;
 
-class SyncTabiCatOra extends Command {
-
+class SyncTabiCatOra extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -26,15 +26,15 @@ class SyncTabiCatOra extends Command {
      *
      * @return mixed
      */
-    public function handle() {
+    public function handle()
+    {
         $this->info('Updating devices_tabicat_ora with winning fault types');
         $TabicatOra = new TabicatOra;
         $result = $TabicatOra->updateDevices();
         if ($result) {
-            $this->info($result . ' rows updated');
+            $this->info($result.' rows updated');
         } else {
             $this->info('0 rows updated');
         }
     }
-
 }
