@@ -191,7 +191,7 @@ export default {
 
 .ourtabs {
   max-height: 600px;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 .border-bottom-thick {
