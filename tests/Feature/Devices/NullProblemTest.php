@@ -36,7 +36,7 @@ class NullProblemTest extends TestCase
     public function null_problem_mapped_to_empty_string()
     {
         $this->device_inputs['problem'] = NULL;
-        $response = $this->post('/device/create', $this->device_inputs);
+        $this->post('/device/create', $this->device_inputs);
 
         $device = Device::find(1);
         $this->assertEquals('', $device->problem);
