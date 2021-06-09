@@ -106,6 +106,8 @@
           $can_edit_event = ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($event->idevents, Auth::user()->id) ) );
           $is_attending = is_object($is_attending) && $is_attending->status == 1;
 
+          $discourseThread = $is_attending ? (env('DISCOURSE_URL') . '/t/' . $event->discourse_thread) : null;
+
           $collected_images = [];
 
           $stats = [
@@ -161,6 +163,7 @@
             :devices="{{ json_encode($expanded_devices, JSON_INVALID_UTF8_IGNORE) }}"
             :initial-event="{{ json_encode($event, JSON_INVALID_UTF8_IGNORE) }}"
             :is-attending="{{ $is_attending ? 'true' : 'false' }}"
+            discourse-thread="{{ $disccourseThread }}
             :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
             :in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}"
             :hosts="{{ json_encode($expanded_hosts, JSON_INVALID_UTF8_IGNORE) }}"
