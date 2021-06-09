@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <div :class="{
+    minHeight: filters
+}">
     <GroupEventsScrollTableFilters
         v-if="filters"
         :events="events"
@@ -429,5 +431,9 @@ export default {
     padding: 2px 40px 3px 12px !important;
     border: 2px solid #222 !important;
   }
+}
+
+.minHeight {
+  min-height: 400px;
 }
 </style>
