@@ -34,9 +34,11 @@
                                     <select id="group" name="group" class="form-control select2 change-group" title="Choose group...">
                                         @if( !empty($user_groups) )
                                         @foreach($user_groups as $group)
+                                        @if($group)
                                         <option value="{{ $group->idgroups }}">
                                             {{ $group->name }}
                                         </option>
+                                        @endif
                                         @endforeach
                                         @endif
                                     </select>

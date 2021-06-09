@@ -5,7 +5,7 @@ return array (
   array (
     'body-s1-p1' => 'Elk item dat je ziet is naar een reparatie evenement gebracht om gerepareerd te worden in plaats van weggegooid te worden.',
     'body-s1-p2' => 'Wat doen we met deze gegevens?',
-    'body-s2-header' => 'Reparatievaardigheden delen',
+    'body-s2-header' => 'Reparatie-vaardigheden delen',
     'body-s2-p1' => 'Door te leren waarom voorwerpen stuk gaan en hoe ze te repareren, kunnen we deze kennis met de wereld delen.',
     'body-s3-header' => 'De voordelen van reparatie laten zien',
     'body-s3-p1' => 'We helpen groepen hun impact te begrijpen, hun gemeenschap te motiveren en financieringsaanvragen te ondersteunen.',

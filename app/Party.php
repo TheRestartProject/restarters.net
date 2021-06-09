@@ -38,9 +38,10 @@ class Party extends Model implements Auditable
         'updated_at',
         'shareable_code',
         'online',
+        'discourse_thread',
         'devices_updated_at'
     ];
-    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'devices_updated_at'];
+    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
     // Append data to Model
     protected $appends = ['participants', 'ShareableLink'];
@@ -63,6 +64,7 @@ class Party extends Model implements Auditable
                     `e`.`free_text`,
                     `e`.`hours`,
                     `e`.`wordpress_post_id`,
+                    `e`.`discourse_thread`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
                 FROM `events` AS `e`
@@ -86,6 +88,7 @@ class Party extends Model implements Auditable
                     `e`.`pax`,
                     `e`.`free_text`,
                     `e`.`hours`,
+                    `e`.`discourse_thread`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
                 FROM `events` AS `e`
@@ -116,6 +119,7 @@ class Party extends Model implements Auditable
                     `e`.`free_text`,
                     `e`.`wordpress_post_id`,
                     `e`.`online`,
+                    `e`.`discourse_thread`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
 
@@ -706,16 +710,21 @@ class Party extends Model implements Auditable
 
     public function hoursVolunteered()
     {
-        $lengthOfEventInHours = 3;
-        $extraHostHours = 9;
-        $hoursIfNoVolunteersRecorded = 12;
+        if (!$this->cancelled) {
+            $lengthOfEventInHours = 3;
+            $extraHostHours = 9;
+            $hoursIfNoVolunteersRecorded = 12;
 
-        $hoursVolunteered = $extraHostHours;
+            $hoursVolunteered = $extraHostHours;
 
-        if ($this->volunteers > 0) {
-            $hoursVolunteered += $this->volunteers * $lengthOfEventInHours;
+            if ($this->volunteers > 0) {
+                $hoursVolunteered += $this->volunteers * $lengthOfEventInHours;
+            } else {
+                $hoursVolunteered += $hoursIfNoVolunteersRecorded;
+            }
         } else {
-            $hoursVolunteered += $hoursIfNoVolunteersRecorded;
+            // Cancelled events are assumed to take 3 hours.
+            $hoursVolunteered = 3;
         }
 
         return $hoursVolunteered;

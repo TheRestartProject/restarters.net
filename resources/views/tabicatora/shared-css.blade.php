@@ -53,7 +53,7 @@
         background-color: #FFF;
     }
 
-    .mobifix .btn {
+    .tabicat .btn {
         font-family: 'Open Sans';
     }
 
@@ -67,6 +67,9 @@
         text-decoration: underline;
     }
 
+    #btn-poordata {
+        background-color: #F45B69;
+    }
     #fetch {
         margin-bottom: 2px;
     }
@@ -80,6 +83,24 @@
         font-size: 1rem;
         font-weight: bold;
         text-transform: uppercase;
+    }
+    .signpost {
+        padding: 1em 1em 0 0;
+        margin: 1em auto;
+    }
+    .signpost div,
+    .signpost p {
+        padding: 0;
+    }
+    .signpost img {
+        display: inline-block;
+        margin: auto;
+        max-width: 36px;
+    }
+    .signpost h5 {
+        display: inline-block;
+        font-size: 1rem;
+        font-weight: bold;
     }
 
     .translation {

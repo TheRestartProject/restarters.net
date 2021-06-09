@@ -237,7 +237,7 @@ class AdminController extends Controller
             }
 
             $participants += $party->pax;
-            $hours_volunteered += (($party->volunteers > 0 ? $party->volunteers * 3 : 12 ) + 9);
+            $hours_volunteered += $party->hoursVolunteered();
 
             foreach ($party->devices as $device) {
                 switch ($device->repair_status) {

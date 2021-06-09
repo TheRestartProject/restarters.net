@@ -178,4 +178,6 @@ return array (
   'search_tags_placeholder' => 'Tag',
   'show_filters' => 'Montrer les filtres',
   'all' => 'Tous',
+  'no_other_events' => 'Il n\'y a actuellement aucun autre événement à venir',
+  'no_other_nearby_events' => 'Il n\'y a actuellement aucun autre événement proche de chez vous',
 );

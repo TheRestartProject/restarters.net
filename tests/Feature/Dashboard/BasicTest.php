@@ -13,8 +13,23 @@ class BasicTest extends TestCase {
         // Vue component exists.
         $this->loginAsTestUser();
         $response = $this->get('/dashboard');
-        $content = $response->getContent();
 
-        $response->assertSee('<DashboardPage');
+        $this->assertVueProperties($response, [
+            [
+                'administrator' => 'false',
+                'host' => 'false',
+                'restarter' => 'true',
+                'network-coordinator' => 'false',
+                ':your-groups' => '[]',
+                ':nearby-groups' => 'null',
+                ':upcoming-events' => '[]',
+                ':past-events' => 'null',
+                ':topics' => '[]',
+                'see-all-topics-link' => 'https://talk.restarters.net/latest',
+                ':is-logged-in' => 'true',
+                'discourse-base-url' => 'https://talk.restarters.net',
+                ':new-groups' => '0',
+            ]
+        ]);
     }
 }
