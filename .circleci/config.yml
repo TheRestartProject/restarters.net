@@ -29,7 +29,8 @@ jobs:
     steps:
       - checkout
       - run: sudo apt update
-      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo libjpeg-turbo-dev
+      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg62-turbo-dev
+      - run: sudo docker-php-ext-configure gd  --with-jpeg-dir=/usr/include/
       - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl gd zlib jpeg png
       - run: cp .env.example .env
 
