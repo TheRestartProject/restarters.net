@@ -13,6 +13,7 @@
         <testsuite name="Feature">
             <directory suffix=".php">./tests/Feature/Users/Dashboard</directory>
             <directory suffix=".php">./tests/Feature/Users/Fixometer</directory>
+            <directory suffix=".php">./tests/Feature/Devices</directory>
             <file>./tests/Feature/Users/Registration/AccountCreationTest.php</file>
             <file>./tests/Feature/Events/CreateEventTest.php</file>
             <file>./tests/Feature/Groups/BasicTest.php</file>

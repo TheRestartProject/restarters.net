@@ -32,7 +32,7 @@ return array (
   'time_reporting' => 'Heures de bénévolat',
   'party_reporting' => 'Rapports d’événements',
   'signmeup' => 'Enregistrez‐moi!',
-  'register-signin' => 'S\'enregistrer/Se connecter',
+  'register-signin' => 'S\'enregistrer/Connexion',
   'introduction_message' => 'Nous sommes une communauté de bénévoles à travers le monde qui aident les gens à réparer leurs appareils électroniques lors d\'événements communautaires. Rejoignez‐nous !',
   'your_name' => 'Votre nom',
   'your_name_validation' => 'Svp tapez une adresse courriel valide',
