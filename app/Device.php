@@ -714,6 +714,6 @@ AND devices.event = events.idevents ';
 
     public function setProblemAttribute($value) {
         // Map null values to empty strings to avoid Metabase problems.
-        $this->attributes['problem'] = $value === NULL ? '' : $value;
+        $this->attributes['problem'] = $value ?? '';
     }
 }
