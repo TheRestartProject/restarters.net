@@ -29,8 +29,8 @@ jobs:
     steps:
       - checkout
       - run: sudo apt update
-      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libjpeg62-turbo-dev libgmp-dev
-      - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl gd
+      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo libjpeg-turbo-dev
+      - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl gd zlib jpeg png
       - run: cp .env.example .env
 
       - run: wget https://getcomposer.org/composer-1.phar; rm -rf vendor; php composer-1.phar install
