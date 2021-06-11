@@ -106,9 +106,6 @@ export default {
       required: false,
       default: null
     },
-  },
-  mounted() {
-    console.log("Event", this.event.confirmed)
   }
 }
 </script>
