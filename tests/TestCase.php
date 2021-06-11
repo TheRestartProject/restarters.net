@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\Audits;
+use App\Device;
 use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
@@ -39,6 +40,7 @@ abstract class TestCase extends BaseTestCase
         EventsUsers::truncate();
         Party::truncate();
         UserGroups::truncate();
+        Device::truncate();
         GroupNetwork::truncate();
         DB::delete('delete from user_network');
         DB::table('notifications')->truncate();
