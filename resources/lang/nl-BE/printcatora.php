@@ -1,7 +1,8 @@
 <?php
 
-return [
-  'task' => [
+return array (
+  'task' => 
+  array (
     'where_is_the_main_fault' => 'Waar is de belangrijkste fout',
     'fetch_another' => 'Ik weet het niet. Laat me een andere reparatie zien',
     'suggestions' => 'Suggesties',
@@ -10,8 +11,9 @@ return [
     'source' => 'Bron',
     'strapline' => 'Lees gewoon de informatie over de kapotte printer en selecteer het beschreven type fout uit de lijst eronder.',
     'learn_more' => 'Lees meer',
-  ],
-  'status' => [
+  ),
+  'status' => 
+  array (
     'status' => 'Status',
     'items_opinions' => 'Items / meningen',
     'items_split_opinions' => 'Items met verschillende meningen',
@@ -27,11 +29,13 @@ return [
     'number_of_records' => 'Aantal records',
     'winning_opinion' => 'Winnende mening',
     'task_completed' => 'Je hebt ze allemaal gezien, bedankt',
-  ],
-  'branding' => [
+  ),
+  'branding' => 
+  array (
     'powered_by' => 'Gebruik van gegevens van:',
-  ],
-  'info' => [
+  ),
+  'info' => 
+  array (
     'body-s1-header' => 'Wat is PrintCat?',
     'body-s1-p1' => 'Printers kunnen frustrerend zijn, gaan makkelijk stuk en zijn moeilijk te repareren. Wij willen begrijpen waarom printers stuk gaan, zodat we beleidsmakers kunnen vertellen hoe toekomstige modellen eenvoudiger te repareren kunnen worden gemaakt. Reparatie vermindert afval en legt minder beslag op de grondstoffen van onze planeet.',
     'body-s1-p2' => 'Met PrintCat kunt u deelnemen aan ons onderzoek. We hebben informatie verzameld over meer dan 800 kapotte printers en we hebben uw hulp nodig om ze te categoriseren.',
@@ -42,6 +46,6 @@ return [
     'body-s4-header' => 'Meer vragen?',
     'body-s4-p1' => 'Kom meer te weten, stel vragen en geef ons uw feedback, in <a href=":url" target="_blank">de PrintCat discussie</a>.',
     'title' => 'Bedankt om PrintCat te proberen',
-  ],
+  ),
   'about' => 'Meer informatie',
-];
+);

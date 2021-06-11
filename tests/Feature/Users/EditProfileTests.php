@@ -4,20 +4,21 @@ namespace Tests\Feature;
 
 use App\Events\UserUpdated;
 use App\User;
-use Carbon\Carbon;
-use DB;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
-use Tests\TestCase;
 
-class EditProfileTests extends TestCase
+use DB;
+use Carbon\Carbon;
+use Tests\TestCase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class NetworkTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
+        DB::statement("SET foreign_key_checks=0");
         User::truncate();
-        DB::statement('SET foreign_key_checks=1');
+        DB::statement("SET foreign_key_checks=1");
     }
 
     /** @test */
@@ -64,8 +65,7 @@ class EditProfileTests extends TestCase
 
     /** test */
     // Check that we can have three digit lat/lngs.
-    public function test_three_digit_lat_lng()
-    {
+    public function test_three_digit_lat_lng() {
         $this->withoutExceptionHandling();
 
         $user = factory(User::class)->create();

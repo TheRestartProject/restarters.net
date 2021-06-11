@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class AddPreferences extends Migration
 {
@@ -16,54 +16,54 @@ class AddPreferences extends Migration
         // Additional preferences
         DB::table('preferences')->insert([
           'name' => 'Admin New User',
-          'purpose' => null,
+          'purpose' => NULL,
           'slug' => 'admin-new-user',
         ]);
         DB::table('preferences')->insert([
           'name' => 'Admin Moderate Event',
-          'purpose' => null,
+          'purpose' => NULL,
           'slug' => 'admin-moderate-event',
         ]);
         DB::table('preferences')->insert([
           'name' => 'Admin Moderate Group',
-          'purpose' => null,
+          'purpose' => NULL,
           'slug' => 'admin-moderate-group',
         ]);
         DB::table('preferences')->insert([
           'name' => 'Admin Abnormal Devices',
-          'purpose' => null,
+          'purpose' => NULL,
           'slug' => 'admin-abnormal-devices',
         ]);
         DB::table('preferences')->insert([
           'name' => 'Admin Approve WordPress Event Failure',
-          'purpose' => null,
+          'purpose' => NULL,
           'slug' => 'admin-approve-wordpress-event-failure',
         ]);
         DB::table('preferences')->insert([
           'name' => 'Admin Edit WordPress Event Failure',
-          'purpose' => null,
+          'purpose' => NULL,
           'slug' => 'admin-edit-wordpress-event-failure',
         ]);
         DB::table('preferences')->insert([
           'name' => 'Admin Approve WordPress Group Failure',
-          'purpose' => null,
+          'purpose' => NULL,
           'slug' => 'admin-approve-wordpress-group-failure',
         ]);
         DB::table('preferences')->insert([
           'name' => 'Admin Edit WordPress Group Failure',
-          'purpose' => null,
+          'purpose' => NULL,
           'slug' => 'admin-edit-wordpress-group-failure',
         ]);
         DB::table('preferences')->insert([
           'name' => 'Admin No Devices',
-          'purpose' => null,
+          'purpose' => NULL,
           'slug' => 'admin-no-devices',
         ]);
 
         // Additional permission
         DB::table('permissions')->insert([
           'permission' => 'Verify Translation Access',
-          'purpose' => null,
+          'purpose' => NULL,
           'slug' => 'verify-translation-access',
         ]);
     }

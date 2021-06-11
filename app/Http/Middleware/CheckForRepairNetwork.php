@@ -6,8 +6,8 @@ use App;
 use App\Network;
 use Auth;
 use Closure;
-use Illuminate\Support\Str;
 use LaravelLocalization;
+use Illuminate\Support\Str;
 
 class CheckForRepairNetwork
 {

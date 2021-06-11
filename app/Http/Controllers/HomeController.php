@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Device;
-use App\Group;
-use App\Party;
 use Auth;
+use App\Device;
+use App\Party;
+use App\Group;
+
 use Illuminate\Http\Request;
 
 class HomeController extends Controller

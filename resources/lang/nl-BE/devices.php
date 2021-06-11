@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'by_date' => 'Op datum',
   'age' => 'Leeftijd',
   'brand' => 'Merk',
@@ -67,4 +67,4 @@ return [
   'age_approx' => 'years - approximate, if known',
   'repair_source' => 'Source of repair information',
   'repair_url' => 'URL for repair information',
-];
+);

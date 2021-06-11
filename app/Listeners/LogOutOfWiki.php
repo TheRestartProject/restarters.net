@@ -4,15 +4,18 @@ namespace App\Listeners;
 
 use App\User;
 use App\WikiSyncStatus;
+
 use Cookie;
+
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\Request;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Queue\InteractsWithQueue;
 
 class LogOutOfWiki
 {
+
     /**
      * Create the event listener.
      *
@@ -39,7 +42,7 @@ class LogOutOfWiki
                 \Cookie::queue(\Cookie::forget($cookieFullName));
             }
         } catch (\Exception $ex) {
-            Log::error("Failed to log user '".$user->mediawiki."' out of mediawiki: ".$ex->getMessage());
+            Log::error("Failed to log user '" . $user->mediawiki . "' out of mediawiki: " . $ex->getMessage());
         }
     }
 

@@ -6,21 +6,22 @@ use App\Group;
 use App\Network;
 use App\Party;
 use App\User;
+use FixometerHelper;
+
 use Carbon\Carbon;
 use DB;
-use FixometerHelper;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class EventStateTests extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
+        DB::statement("SET foreign_key_checks=0");
         Party::truncate();
-        DB::statement('SET foreign_key_checks=1');
+        DB::statement("SET foreign_key_checks=1");
     }
 
     /** @test */
@@ -51,7 +52,6 @@ class EventStateTests extends TestCase
 
     // This is just temporary for Repair Together, until we have
     // proper timezone support.
-
     /** @test */
     public function it_is_active_an_hour_before_the_start_time()
     {

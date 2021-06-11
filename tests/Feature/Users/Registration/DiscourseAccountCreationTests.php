@@ -5,11 +5,12 @@ namespace Tests\Feature;
 use App\Events\UserRegistered;
 use App\Listeners\DiscourseUserEventSubscriber;
 use App\User;
+
 use DB;
 use Hash;
-use Illuminate\Support\Facades\Event;
 use Mockery;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Event;
 
 class DiscourseAccountCreationTests extends TestCase
 {
@@ -35,7 +36,7 @@ class DiscourseAccountCreationTests extends TestCase
 
         config(['restarters.features.discourse_integration' => true]);
 
-        $response = $this->post('/user/register/', $this->userAttributes());
+        $response = $this->post('/user/register/',  $this->userAttributes());
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');

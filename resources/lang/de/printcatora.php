@@ -1,7 +1,8 @@
 <?php
 
-return [
-  'task' => [
+return array (
+  'task' => 
+  array (
     'where_is_the_main_fault' => 'Was ist der Hauptfehler',
     'fetch_another' => 'Ich weiß es nicht, zeig eine andere Reparatur',
     'suggestions' => 'Vorschläge',
@@ -9,8 +10,9 @@ return [
     'go_with' => 'Wähle',
     'source' => 'Quelle',
     'strapline' => 'Lesen Sie einfach die Informationen über den defekten Drucker und wählen Sie die Art des beschriebenen Fehlers aus der Liste darunter aus.',
-  ],
-  'status' => [
+  ),
+  'status' => 
+  array (
     'status' => 'Status',
     'items_opinions' => 'Artikel / Meinungen',
     'items_split_opinions' => 'Artikel mit geteilten Meinungen',
@@ -26,8 +28,9 @@ return [
     'number_of_records' => 'Anzahl der Einträge',
     'winning_opinion' => 'Siegermeinung',
     'task_completed' => 'Du hast alle Einträge gesehen, danke',
-  ],
-  'info' => [
+  ),
+  'info' => 
+  array (
     'body-s1-header' => 'Was ist PrintCat?',
     'body-s1-p1' => 'Drucker können frustrierend sein, leicht kaputt gehen und sind oft schwer zu reparieren. Wir wollen verstehen, warum Drucker ausfallen, damit wir Entscheidungsträgern mitteilen können, wie zukünftige Modelle einfacher zu reparieren sind. Reparatur vermeidet Abfall und schont die Ressourcen unseres Planeten.',
     'body-s1-p2' => 'Mit PrintCat können Sie sich an unserer Untersuchung beteiligen. Wir haben Informationen zu über 800 defekten Druckern gesammelt und brauchen Ihre Hilfe, um diese zu kategorisieren.',
@@ -38,9 +41,10 @@ return [
     'body-s4-header' => 'Noch Fragen?',
     'body-s4-p1' => 'Erfahren Sie mehr, stellen Sie Fragen und geben Sie uns Ihr Feedback, in der <a href=":url" target="_blank">PrintCat-Diskussion</a>.',
     'title' => 'Danke, dass Sie PrintCat ausprobiert haben',
-  ],
-  'branding' => [
+  ),
+  'branding' => 
+  array (
     'powered_by' => 'Unter Verwendung von Daten aus:',
-  ],
+  ),
   'about' => 'Mehr Informationen',
-];
+);

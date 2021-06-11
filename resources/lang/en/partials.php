@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'est_weight' => 'Est. weight',
   'category' => 'Category',
   'brand' => 'Brand',
@@ -116,4 +116,4 @@ return [
   'copied_to_clipboard' => 'Copied to clipboard.',
   'total' => 'total',
   'remove' => 'remove',
-];
+);

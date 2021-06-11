@@ -4,14 +4,17 @@ namespace App\Listeners;
 
 use App\User;
 use App\WikiSyncStatus;
+
 use Cookie;
+
 use Illuminate\Auth\Events\Login;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\Request;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
-use Mediawiki\Api\ApiUser;
+use Illuminate\Queue\InteractsWithQueue;
+
 use Mediawiki\Api\MediawikiApi;
+use Mediawiki\Api\ApiUser;
 use Mediawiki\Api\Service\UserCreator;
 
 class LogInToWiki
@@ -46,7 +49,7 @@ class LogInToWiki
             $this->createUserInWiki($user, $this->request->input('password'));
         }
 
-        if (! is_null($user->mediawiki) && ! empty($user->mediawiki) &&
+        if (!is_null($user->mediawiki) && !empty($user->mediawiki) &&
             $user->wiki_sync_status == WikiSyncStatus::Created) {
             $this->logUserIn($user->mediawiki, $this->request->input('password'));
         }
@@ -56,14 +59,14 @@ class LogInToWiki
     {
         try {
             // Mediawiki does strange things with underscores.
-            $mediawikiUsername = str_replace('_', '-', $user->username);
+            $mediawikiUsername = str_replace("_", "-", $user->username);
             $this->wikiUserCreator->create($mediawikiUsername, $password, $user->email);
 
             $user->wiki_sync_status = WikiSyncStatus::Created;
             $user->mediawiki = $mediawikiUsername;
             $user->save();
         } catch (\Exception $ex) {
-            Log::error("Failed to create new account for user '".$user->username."' in mediawiki: ".$ex->getMessage());
+            Log::error("Failed to create new account for user '" . $user->username . "' in mediawiki: " . $ex->getMessage());
         }
     }
 
@@ -80,13 +83,13 @@ class LogInToWiki
             $cookieJar = $api->getClient()->getConfig('cookies');
             $cookieJarArray = $cookieJar->toArray();
 
-            if (! empty($cookieJarArray)) {
+            if (!empty($cookieJarArray)) {
                 foreach ($cookieJarArray as $cookie) {
                     Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
                 }
             }
         } catch (\Exception $ex) {
-            Log::error("Failed to log user '".$wikiUsername."' in to mediawiki: ".$ex->getMessage());
+            Log::error("Failed to log user '" . $wikiUsername . "' in to mediawiki: " . $ex->getMessage());
         }
     }
 }

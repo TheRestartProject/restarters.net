@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+
 use Mediawiki\Api\ApiUser;
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\MediawikiFactory;
@@ -39,7 +40,7 @@ class MediawikiServiceProvider extends ServiceProvider
 
                 return new MediawikiFactory($api);
             } catch (\Exception $ex) {
-                Log::error('Failed to instantiation Wiki API classes: '.$ex->getMessage());
+                Log::error("Failed to instantiation Wiki API classes: " . $ex->getMessage());
             }
         });
 

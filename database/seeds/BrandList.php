@@ -11,14 +11,20 @@ class BrandList extends Seeder
      */
     public function run()
     {
-        DB::table('brands')->truncate();
 
-        if (($handle = fopen(base_path().'/csv/brands.csv', 'r')) !== false) {
-            while (($row = fgetcsv($handle, 0, ',')) !== false) {
-                DB::table('brands')->insert([
-              'brand_name' => $row[0],
+      DB::table('brands')->truncate();
+
+      if ( ( $handle = fopen( base_path().'/csv/brands.csv', "r") ) !== false ) {
+
+          while ( ( $row = fgetcsv($handle, 0, ",")) !== false ) {
+
+            DB::table('brands')->insert([
+              'brand_name' => $row[0]
             ]);
-            }
-        }
+
+          }
+
+      }
+
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'top_item1' => 'Événements',
   'top_item2' => 'Appareils',
   'top_item3' => 'Groupes',
@@ -65,4 +65,4 @@ return [
   'menu_fixometer' => 'Fixometer',
   'menu_events' => 'Événements',
   'menu_groups' => 'Groupes',
-];
+);

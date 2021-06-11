@@ -1,7 +1,8 @@
 <?php
 
-return [
-  'task' => [
+return array (
+  'task' => 
+  array (
     'where_is_the_main_fault' => 'Waar is de belangrijkste fout',
     'fetch_another' => 'Ik weet het niet, haal nog een reparatie',
     'suggestions' => 'Suggesties',
@@ -18,8 +19,9 @@ return [
 makkerlijker herstelbaar kunnen worden. Repair groepen over de hele wereld hebben deze informatie ingevoerd. Door TabiCat te gebruiken, helpt u ons ze te analyseren."',
     'signpost_5' => 'Bedankt!',
     'signpost_6' => 'Bedankt voor uw hulp! Elke fout die u categoriseert maakt de gegevens nuttiger. <a href="../">Waarom wordt u ook geen lid van onze community</a>?',
-  ],
-  'status' => [
+  ),
+  'status' => 
+  array (
     'status' => 'Toestand',
     'items_opinions' => 'Items / meningen',
     'items_with_split_opinions' => 'Items met verschillende meningen',
@@ -42,11 +44,13 @@ makkerlijker herstelbaar kunnen worden. Repair groepen over de hele wereld hebbe
     'items_0_opinions' => 'met 0 meningen',
     'task_completed' => 'Je hebt ze allemaal gezien, bedankt',
     'progress' => 'volledig',
-  ],
-  'branding' => [
+  ),
+  'branding' => 
+  array (
     'powered_by' => 'Gebruik van gegevens van:',
-  ],
-  'info' => [
+  ),
+  'info' => 
+  array (
     'body-s1-header' => 'Wat is TabiCat?',
     'body-s1-p1' => 'Tablets kunnen frustrerend zijn: ze gaan makkelijk stuk en zijn moeilijk te repareren. Wij willen begrijpen waarom tablets stuk gaan, zodat we beleidsmakers kunnen vertellen hoe toekomstige modellen zo kunnen worden gemaakt dat ze beter herstelbaar zijn. Repareren vermindert afval en legt minder beslag op de grondstoffen van onze planeet.',
     'body-s1-p2' => 'Met TabiCat kunt u deelnemen aan ons onderzoek. We hebben informatie verzameld over meer dan 900 kapotte apparaten en we hebben uw hulp nodig om ze te categoriseren.',
@@ -57,9 +61,10 @@ makkerlijker herstelbaar kunnen worden. Repair groepen over de hele wereld hebbe
     'body-s4-header' => 'Nog vragen?',
     'body-s4-p1' => 'Kom meer te weten, stel vragen en geef ons uw feedback, in <a href=":url" target="_blank">de TabiCat discussie</a>.',
     'title' => 'Bedankt om TabiCat te proberen',
-  ],
+  ),
   'about' => 'Meer informatie',
-  'survey' => [
+  'survey' => 
+  array (
     'a1' => 'Sterk mee oneens',
     'a2' => 'Oneens',
     'a3' => 'Neutraal',
@@ -75,5 +80,5 @@ makkerlijker herstelbaar kunnen worden. Repair groepen over de hele wereld hebbe
     'q4' => 'TabiCat heeft mijn kijk op het belang van reparatie veranderd',
     'send' => 'Verzenden',
     'skip' => 'Overslaan',
-  ],
-];
+  ),
+);

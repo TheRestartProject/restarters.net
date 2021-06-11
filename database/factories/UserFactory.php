@@ -31,7 +31,7 @@ $factory->define(User::class, function (Faker $faker) {
         'country' => $faker->countryCode,
         'role' => Role::RESTARTER,
         'invites' => 1,
-        'repairdir_role' => Role::REPAIR_DIRECTORY_NONE,
+        'repairdir_role' => Role::REPAIR_DIRECTORY_NONE
     ];
 });
 

@@ -2,11 +2,13 @@
 
 namespace App;
 
-use DB;
 use Illuminate\Database\Eloquent\Model;
+
+use DB;
 
 class Brands extends Model
 {
+
     protected $table = 'brands';
     /**
      * The attributes that are mass assignable.
@@ -24,7 +26,9 @@ class Brands extends Model
 
     //Table Relations
 
+
     // Setters
+
 
     //Getters
 }

@@ -40,3 +40,4 @@ $factory->state(App\Category::class, 'Cat3', function (Faker $faker) {
         'name' => 'Cat3',
     ];
 });
+

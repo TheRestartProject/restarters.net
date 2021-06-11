@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App;
-use App\MicrotaskSurvey;
-use App\TabicatOra;
-use Auth;
 use Illuminate\Http\Request;
+use Auth;
+use App;
+use App\TabicatOra;
+use App\MicrotaskSurvey;
 
 class TabicatOraController extends Controller
 {
+
     protected $Model;
 
     /**
@@ -42,17 +43,17 @@ class TabicatOraController extends Controller
             ];
             $MicrotaskSurvey = new MicrotaskSurvey;
             $success = $MicrotaskSurvey->create($insert);
-            if (! $success) {
+            if (!$success) {
                 logger('MicrotaskSurvey error on insert.');
                 logger(print_r($insert, 1));
             }
         }
 
         $this->Model = new TabicatOra;
-        $signpost = false;
+        $signpost = FALSE;
         // if opinion is being submitted
         if ($request->has('id-ords')) {
-            if (! (is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
+            if (!(is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
                 return redirect()->back()->withErrors(['Oops, there was an error, please try again, sorry! If this error persists please contact The Restart Project.']);
             }
             $insert = [
@@ -64,14 +65,14 @@ class TabicatOraController extends Controller
             ];
             $this->Model = new TabicatOra;
             $success = $this->Model->create($insert);
-            if (! $success) {
+            if (!$success) {
                 logger('TabiCat error on insert.');
                 logger(print_r($insert, 1));
             }
             $submits = $this->_getSubmits($request, $user);
             if ($submits < 5) {
                 $signpost = $submits;
-            } elseif ($submits == 5) {
+            } else if ($submits == 5) {
                 if ($user->id == 0) {
                     // guest is redirected to modal survey
                     return redirect()->action('TabicatOraController@survey');
@@ -82,17 +83,17 @@ class TabicatOraController extends Controller
             }
         }
         // final "thank you" signpost after survey whether submitted or not
-        if ($request->session()->get('tabicatora.redirected_from_survey', false)) {
-            $request->session()->put('tabicatora.redirected_from_survey', false);
+        if ($request->session()->get('tabicatora.redirected_from_survey', FALSE)) {
+            $request->session()->put('tabicatora.redirected_from_survey', FALSE);
             $signpost = 6;
         }
         // no signpost when showing survey
-        if ($request->session()->get('tabicatora.redirect_to_survey', false)) {
-            $request->session()->put('tabicatora.redirect_to_survey', false);
-            $request->session()->put('tabicatora.redirected_from_survey', true);
+        if ($request->session()->get('tabicatora.redirect_to_survey', FALSE)) {
+            $request->session()->put('tabicatora.redirect_to_survey', FALSE);
+            $request->session()->put('tabicatora.redirected_from_survey', TRUE);
         }
         $fault = $this->_fetchRecord($request);
-        if (! $fault) {
+        if (!$fault) {
             return redirect()->action('TabicatOraController@status')->withSuccess('done');
         }
 
@@ -101,7 +102,7 @@ class TabicatOraController extends Controller
         $fault->suggestions = [];
         // match problem terms with suggestions
         foreach ($fault_types as $k => $v) {
-            if (! empty($v->regex) && preg_match('/'.$v->regex.'/', strtolower($fault->translation), $matches)) {
+            if (!empty($v->regex) && preg_match('/' . $v->regex . '/', strtolower($fault->translation), $matches)) {
                 $fault->suggestions[$k] = $fault_types[$k];
             }
         }
@@ -109,8 +110,7 @@ class TabicatOraController extends Controller
         $fault->faulttypes = array_diff_key($fault_types, $fault->suggestions);
         // send the "poor data" fault_type to view
         $poor_data = $this->Model->fetchFaultTypePoorData();
-        logger(print_r($poor_data, 1));
-
+        logger(print_r($poor_data,1));
         return view('tabicatora.index', [
             'title' => 'TabiCat',
             'fault' => $fault,
@@ -137,7 +137,6 @@ class TabicatOraController extends Controller
         }
         $this->Model = new TabicatOra;
         $data = $this->Model->fetchStatus();
-
         return view('tabicatora.status', [
             'title' => 'TabiCat',
             'status' => $data,
@@ -167,8 +166,7 @@ class TabicatOraController extends Controller
      */
     public function survey(Request $request)
     {
-        $request->session()->put('tabicatora.redirect_to_survey', true);
-
+        $request->session()->put('tabicatora.redirect_to_survey', TRUE);
         return $this->index($request);
     }
 
@@ -177,13 +175,12 @@ class TabicatOraController extends Controller
      *
      * @param Illuminate\Http\Request $request
      *
-     * @return int
+     * @return integer
      */
     protected function _getSubmits($request)
     {
         $submits = $request->session()->get('tabicatora.submits', 0);
         $request->session()->put('tabicatora.submits', ++$submits);
-
         return $submits;
     }
 
@@ -197,7 +194,6 @@ class TabicatOraController extends Controller
         $user = new \stdClass();
         $user->id = 0;
         $user->name = 'Guest';
-
         return $user;
     }
 
@@ -221,7 +217,7 @@ class TabicatOraController extends Controller
     protected function _fetchRecord(Request $request)
     {
         // $request->session()->flush();
-        $result = false;
+        $result = FALSE;
         $exclusions = $request->session()->get('tabicatora.exclusions', []);
         $this->Model = new TabicatOra;
         $locale = $this->_getUserLocale();
@@ -230,7 +226,6 @@ class TabicatOraController extends Controller
             $result = $fault[0];
             $request->session()->push('tabicatora.exclusions', $result->id_ords);
         }
-
         return $result;
     }
 }

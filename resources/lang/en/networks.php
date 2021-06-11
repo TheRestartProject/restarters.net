@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'networks' => 'Networks',
   'network' => 'Network',
   'yourNetworks' => 'Your networks',
@@ -11,12 +11,14 @@ return [
   'allNetworksExplainer' => 'All networks in the system (admin-only).',
   'allNetworksNoNetworks' => 'There are no networks in the system.',
   'aboutNetworkHeader' => 'About :name',
-  'general' => [
+  'general' => 
+  array (
     'networks' => 'Networks',
     'network' => 'Network',
     'particular_network' => ':networkName network',
-  ],
-  'index' => [
+  ),
+  'index' => 
+  array (
     'your_networks' => 'Your networks',
     'your_networks_explainer' => 'These are the networks for which you are a coordinator.',
     'your_networks_no_networks' => 'You are not a coordinator of any networks.',
@@ -24,8 +26,9 @@ return [
     'all_networks_explainer' => 'All networks in the system (admin-only).',
     'all_networks_no_networks' => 'There are no networks in the system.',
     'description' => 'Description',
-  ],
-  'show' => [
+  ),
+  'show' => 
+  array (
     'about_modal_header' => 'About :name',
     'add_groups_menuitem' => 'Add groups',
     'add_groups_modal_header' => 'Add groups to :name',
@@ -34,9 +37,10 @@ return [
     'add_groups_warning_none_selected' => 'No groups selected.',
     'add_groups_success' => ':number group(s) added.',
     'view_groups_menuitem' => 'View groups',
-  ],
-  'edit' => [
+  ),
+  'edit' => 
+  array (
     'label_logo' => 'Network logo',
     'button_save' => 'Save changes',
-  ],
-];
+  ),
+);

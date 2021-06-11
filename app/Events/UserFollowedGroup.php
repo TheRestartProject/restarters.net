@@ -4,6 +4,7 @@ namespace App\Events;
 
 use App\Group;
 use App\User;
+
 use Illuminate\Queue\SerializesModels;
 
 class UserFollowedGroup

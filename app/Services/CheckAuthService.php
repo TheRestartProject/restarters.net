@@ -16,7 +16,7 @@ class CheckAuthService extends JsonResource
     private $menu;
 
     /**
-     * @var bool
+     * @var boolean
      */
     private $authenticated = null;
 
@@ -31,12 +31,12 @@ class CheckAuthService extends JsonResource
     private $edit_profile_link = '';
 
     /**
-     * @var bool
+     * @var boolean
      */
     private $is_admin = null;
 
     /**
-     * @var bool
+     * @var boolean
      */
     private $is_host = null;
 
@@ -67,7 +67,7 @@ class CheckAuthService extends JsonResource
     {
         $this->user = User::where('email', $email)->first();
 
-        if (! $this->user) {
+        if ( ! $this->user) {
             return false;
         }
 
@@ -88,11 +88,11 @@ class CheckAuthService extends JsonResource
     }
 
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
+      * Transform the resource into an array.
+      *
+      * @param  \Illuminate\Http\Request  $request
+      * @return array
+      */
     public function toArray($request)
     {
         return [

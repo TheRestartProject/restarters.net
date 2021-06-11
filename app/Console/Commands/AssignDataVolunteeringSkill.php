@@ -2,11 +2,12 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Command;
 use App\Services\DiscourseService;
-use App\Skills;
 use App\User;
 use App\UsersSkills;
-use Illuminate\Console\Command;
+use App\Skills;
+
 use Illuminate\Support\Facades\DB;
 
 class AssignDataVolunteeringSkill extends Command
@@ -51,6 +52,7 @@ class AssignDataVolunteeringSkill extends Command
         $this->quests[] = ['name' => 'MiscCat', 'opinions_table' => 'devices_misc_opinions'];
         $this->quests[] = ['name' => 'MobiFix', 'opinions_table' => 'devices_faults_mobiles_opinions'];
         $this->quests[] = ['name' => 'MobiFixOra', 'opinions_table' => 'devices_faults_mobiles_ora_opinions'];
+
     }
 
     /**
@@ -117,9 +119,9 @@ class AssignDataVolunteeringSkill extends Command
     {
         $this->info("Checking #{$user->id} ({$user->username})...");
         if ($user->hasSkill($dataVolunteerSkill)) {
-            $this->warn('Already has data volunteering skill.');
+            $this->warn("Already has data volunteering skill.");
         } else {
-            $this->info('Attaching data volunteering skill');
+            $this->info("Attaching data volunteering skill");
             $user->assignSkill($dataVolunteerSkill);
         }
     }

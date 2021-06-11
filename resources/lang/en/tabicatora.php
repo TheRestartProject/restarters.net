@@ -1,7 +1,8 @@
 <?php
 
-return [
-  'task' => [
+return array (
+  'task' => 
+  array (
     'where_is_the_main_fault' => 'Where is the main fault',
     'fetch_another' => 'I don\'t know, fetch another repair',
     'suggestions' => 'Suggestions',
@@ -18,8 +19,9 @@ return [
 analyse it."',
     'signpost_5' => 'Thank you!',
     'signpost_6' => 'Thank you for helping! Every fault you categorise makes this data more useful. Why not <a href="../">join our community</a> too?',
-  ],
-  'status' => [
+  ),
+  'status' => 
+  array (
     'status' => 'Status',
     'items_opinions' => 'Items / opinions',
     'items_with_split_opinions' => 'Items with split opinions',
@@ -42,12 +44,14 @@ analyse it."',
     'items_0_opinions' => 'with 0 opinions',
     'task_completed' => 'You\'ve seen them all, thanks',
     'progress' => 'complete',
-  ],
+  ),
   'about' => 'About',
-  'branding' => [
+  'branding' => 
+  array (
     'powered_by' => 'Powered by data from:',
-  ],
-  'info' => [
+  ),
+  'info' => 
+  array (
     'title' => 'Thank you for trying TabiCat',
     'body-s1-header' => 'What is TabiCat?',
     'body-s1-p1' => 'We want to understand why tablets and e-readers fail so that we can tell policymakers how future models can be made easier to repair. Repair reduces waste and lessens the strain on our planet’s resources.',
@@ -58,8 +62,9 @@ analyse it."',
     'body-s3-p1' => 'TabiCat uses information from the <a href=":url" target="_blank">Open Repair Alliance</a>, which collects data about broken devices that real people around the world have tried to fix at community events, such as Repair Cafés and Restart Parties.',
     'body-s4-header' => 'More questions?',
     'body-s4-p1' => 'Find out more, and give us your feedback, in the <a href=":url" target="_blank">TabiCat discussion</a>.',
-  ],
-  'survey' => [
+  ),
+  'survey' => 
+  array (
     'header1' => 'Thank you for helping us learn why tablets break.',
     'header2' => 'We are already planning future quests, just like this one. To make the next one even better, we have some quick questions for you.',
     'q1' => 'TabiCat has increased my interest in repairing',
@@ -75,5 +80,5 @@ analyse it."',
     'skip' => 'Skip',
     'invalid' => 'Please answer all of the questions',
     'footer' => 'Pressing either button will take you back to TabiCat',
-  ],
-];
+  ),
+);

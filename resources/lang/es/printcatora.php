@@ -1,7 +1,8 @@
 <?php
 
-return [
-  'status' => [
+return array (
+  'status' => 
+  array (
     'brand' => 'Marca',
     'items_0_opinions' => 'con 0 opiniones',
     'items_1_opinion' => 'con 1 opinión',
@@ -17,8 +18,9 @@ return [
     'task_completed' => 'Ya los has visto todos, gracias',
     'total' => 'Total',
     'winning_opinion' => 'Opinión mayoritaria',
-  ],
-  'task' => [
+  ),
+  'task' => 
+  array (
     'fetch_another' => 'No lo sé. Mostrar otra reparación',
     'go_with' => 'Elegir',
     'source' => 'Fuente',
@@ -27,11 +29,13 @@ return [
     'where_is_the_main_fault' => '¿Dónde está el fallo principal?',
     'strapline' => 'Simplemente lea la información sobre la impresora averiada y seleccione el tipo de problema que se describe en la lista a continuación.',
     'learn_more' => 'Más información',
-  ],
-  'branding' => [
+  ),
+  'branding' => 
+  array (
     'powered_by' => 'Utilizando datos de:',
-  ],
-  'info' => [
+  ),
+  'info' => 
+  array (
     'body-s1-header' => '¿Qué es PrintCat?',
     'body-s1-p1' => 'Las impresoras pueden resultar frustrantes, fáciles de romper y difíciles de reparar. Queremos entender por qué fallan las impresoras para poder informar a los legisladores de cómo se pueden hacer más fáciles de reparar los futuros modelos. La reparación reduce el desperdicio y disminuye nuestro impacto en el planeta.',
     'body-s1-p2' => 'Con PrintCat, puede unirse a nuestra investigación. Hemos recopilado información sobre más de 800 impresoras averiadas y necesitamos su ayuda para clasificarlas.',
@@ -42,6 +46,6 @@ return [
     'body-s4-header' => '¿Más preguntas?',
     'body-s4-p1' => 'Obtenga más información, haga preguntas y envíenos sus comentarios en <a href=":url" target="_blank">el post sobre PrintCat</a>.',
     'title' => 'Gracias por probar PrintCat',
-  ],
+  ),
   'about' => 'Más información',
-];
+);

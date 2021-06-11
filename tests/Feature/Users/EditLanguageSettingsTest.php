@@ -6,20 +6,21 @@ use App\Events\UserLanguageUpdated;
 use App\Events\UserUpdated;
 use App\Listeners\SyncUserProperties;
 use App\User;
-use Carbon\Carbon;
-use DB;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
-use Tests\TestCase;
 
-class EditLanguageSettingsTest extends TestCase
+use DB;
+use Carbon\Carbon;
+use Tests\TestCase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class EditLanguageSettingsTests extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
+        DB::statement("SET foreign_key_checks=0");
         User::truncate();
-        DB::statement('SET foreign_key_checks=1');
+        DB::statement("SET foreign_key_checks=1");
     }
 
     /** @test */

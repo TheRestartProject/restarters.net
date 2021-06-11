@@ -7,24 +7,25 @@ use App\Events\EditGroup;
 use App\Group;
 use App\Party;
 use App\User;
-use Carbon\Carbon;
+
 use DB;
-use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Notification;
+use Carbon\Carbon;
 use Mockery;
 use Tests\TestCase;
+use HieuLe\WordpressXmlrpcClient\WordpressClient;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class WordpressGroupPushTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
+        DB::statement("SET foreign_key_checks=0");
         User::truncate();
         Group::truncate();
         Party::truncate();
-        DB::statement('SET foreign_key_checks=1');
+        DB::statement("SET foreign_key_checks=1");
     }
 
     /** @test */

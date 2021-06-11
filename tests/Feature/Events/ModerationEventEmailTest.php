@@ -2,15 +2,16 @@
 
 namespace Tests\Feature;
 
+use Tests\TestCase;
 use App\Notifications\AdminModerationEvent;
-use App\Party;
-use App\User;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Support\Facades\Notification;
-use Tests\TestCase;
 
-class ModerationEventEmailTest extends TestCase
+use App\Party;
+use App\User;
+
+class ModerateEventEmailTest extends TestCase
 {
     /** @test */
     public function a_moderation_email_is_sent_to_admins_when_an_event_is_created()

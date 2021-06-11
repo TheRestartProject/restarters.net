@@ -3,24 +3,25 @@
 namespace Tests\Feature;
 
 use App\Group;
-use App\Helpers\RepairNetworkService;
 use App\Network;
 use App\Role;
 use App\User;
-use Carbon\Carbon;
+use App\Helpers\RepairNetworkService;
+
 use DB;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Carbon\Carbon;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class NetworkTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
+        DB::statement("SET foreign_key_checks=0");
         Network::truncate();
         DB::delete('delete from user_network');
-        DB::statement('SET foreign_key_checks=1');
+        DB::statement("SET foreign_key_checks=1");
 
         $this->networkService = new RepairNetworkService();
     }

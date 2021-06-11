@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Microtask;
-use App\Mobifix;
-use Auth;
 use Illuminate\Http\Request;
+use Auth;
+use App\Mobifix;
+use App\Helpers\Microtask;
 
-class MobifixController extends Controller
-{
+class MobifixController extends Controller {
+
     /**
      * Fetch / post random misc.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
@@ -25,7 +24,7 @@ class MobifixController extends Controller
             }
         }
 
-        if ($request->isMethod('post') && ! empty($_POST) && (isset($_POST['iddevices']))) {
+        if ($request->isMethod('post') && !empty($_POST) && (isset($_POST['iddevices']))) {
             $data = $_POST;
             $Mobifix = new Mobifix;
             $insert = [
@@ -36,19 +35,19 @@ class MobifixController extends Controller
                 'session_id' => session()->getId(),
             ];
             $success = $Mobifix->create($insert);
-            if (! $success) {
+            if (!$success) {
                 logger(print_r($insert, 1));
                 logger('Mobifix error on insert.');
             }
         }
         $Mobifix = new Mobifix;
         $faultResult = $Mobifix->fetchFault();
-        if (! empty($faultResult)) {
+        if (!empty($faultResult)) {
             $fault = $faultResult[0];
         } else {
             $fault = false;
         }
-        if (! $fault) {
+        if (!$fault) {
             return redirect()->action('MobifixController@status');
         }
         $fault->translate = rawurlencode($fault->problem);
@@ -65,20 +64,17 @@ class MobifixController extends Controller
         }
         // send non-suggested fault_types to view
         $fault->faulttypes = $fault_types;
-
         return view('mobifix.index', [
             'fault' => $fault,
             'user' => $user,
         ]);
     }
 
-    public function cta(Request $request)
-    {
+    public function cta(Request $request) {
         return $this->index($request);
     }
 
-    public function status(Request $request)
-    {
+    public function status(Request $request) {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
@@ -88,7 +84,6 @@ class MobifixController extends Controller
         $Mobifix = new Mobifix;
         $data = $Mobifix->fetchStatus();
         $complete = $data['total_opinions_2'][0]->total + $data['total_opinions_1'][0]->total + $data['total_opinions_0'][0]->total == 0;
-
         return view('mobifix.status', [
             'status' => $data,
             'user' => $user,
@@ -96,8 +91,7 @@ class MobifixController extends Controller
         ]);
     }
 
-    protected function _faulttypes()
-    {
+    protected function _faulttypes() {
         return [
             'Power/battery',
             'Screen',
@@ -121,8 +115,7 @@ class MobifixController extends Controller
         ];
     }
 
-    protected function _faultdescs()
-    {
+    protected function _faultdescs() {
         return [
             'Power/battery' => '',
             'Screen' => 'Fault involves screen assembly - glass, touch, LCD...',
@@ -146,8 +139,7 @@ class MobifixController extends Controller
         ];
     }
 
-    protected function _suggestions()
-    {
+    protected function _suggestions() {
         return [
             'battery|power' => [
                 'Power/battery',
@@ -183,7 +175,7 @@ class MobifixController extends Controller
                 'Stuck booting',
             ],
             'storage|space|full' => [
-                'Storage problem',
+                'Storage problem'
             ],
             'charg|plug' => [
                 'Charger',
@@ -227,4 +219,5 @@ class MobifixController extends Controller
             ],
         ];
     }
+
 }

@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'change_password' => 'Paswoord wijzigen',
   'change_password_text' => 'Hou je account veilig en wijzig regelmatig je paswoord.',
   'create_account' => 'Account maken',
@@ -30,4 +30,4 @@ return [
   'user_role' => 'Gebruikersrol',
   'failed' => 'Dit komt niet overeen met onze gegevens.',
   'assigned_groups' => 'Toegekend aan groepen',
-];
+);

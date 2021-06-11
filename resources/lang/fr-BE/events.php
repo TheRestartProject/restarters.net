@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'about_event_name_header' => 'A propos :event',
   'rsvp_message' => 'Super! Vous nous rejoignez pour cet événement',
   'rsvp_button' => 'Désolé, je ne peux plus participer',
@@ -193,4 +193,4 @@ return [
   'online' => 'En ligne',
   'other_events' => 'Autres événements',
   'duplicate_event' => 'Dupliquer événement',
-];
+);

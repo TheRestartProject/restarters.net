@@ -7,14 +7,15 @@ use App\Events\UserUpdated;
 use App\Network;
 use App\UserGroups;
 use App\UsersPermissions;
+
 use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+
 use OwenIt\Auditing\Contracts\Auditable;
 
-class WikiSyncStatus
-{
+class WikiSyncStatus {
     const DoNotCreate = 0;
     const CreateAtLogin = 1;
     const Created = 2;
@@ -25,6 +26,7 @@ class User extends Authenticatable implements Auditable
     use Notifiable;
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
+
     // Use the Authorizable trait so that we can call can() on a user to evaluation policies.
     use \Illuminate\Foundation\Auth\Access\Authorizable;
 
@@ -36,7 +38,7 @@ class User extends Authenticatable implements Auditable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role',
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role'
     ];
 
     /**
@@ -74,8 +76,7 @@ class User extends Authenticatable implements Auditable
         return $this->hasOne(\App\Role::class, 'idroles', 'role');
     }
 
-    public function repairdir_role()
-    {
+    public function repairdir_role() {
         // Make sure we don't return a null value.  The client select would struggle with null values.
         return $this->repairdir_role ? $this->repairdir_role : Role::REPAIR_DIRECTORY_NONE;
     }
@@ -104,7 +105,7 @@ class User extends Authenticatable implements Auditable
 
     public function assignSkill($skill)
     {
-        if (! $this->hasSkill($skill->id)) {
+        if (!$this->hasSkill($skill->id)) {
             $this->skills()->attach($skill->id);
         }
     }
@@ -156,7 +157,7 @@ class User extends Authenticatable implements Auditable
         $preference = Preferences::where(['slug' => $slug])->first();
         UsersPreferences::create([
             'user_id' => $this->getKey(),
-            'preference_id' => $preference->getKey(),
+            'preference_id' => $preference->getKey()
         ]);
     }
 
@@ -165,7 +166,7 @@ class User extends Authenticatable implements Auditable
         return DB::select(DB::raw('SELECT p.idpermissions, p.permission, r.idroles, r.role FROM permissions AS p
                 INNER JOIN roles_permissions AS rp ON rp.permission = p.idpermissions
                 INNER JOIN roles AS r ON rp.role= r.idroles
-                WHERE r.role = :role'), ['role' => $role]);
+                WHERE r.role = :role'), array('role' => $role));
     }
 
     public function getUserGroups($user)
@@ -173,7 +174,7 @@ class User extends Authenticatable implements Auditable
         return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `u`
                 INNER JOIN `users_groups` AS `ug` ON `ug`.`user` = `u`.`id`
                 INNER JOIN `groups` AS `g` ON `ug`.`group` = `g`.`idgroups`
-                WHERE `u`.`id` = :id'), ['id' => $user]);
+                WHERE `u`.`id` = :id'), array('id' => $user));
     }
 
     // Setters
@@ -188,7 +189,7 @@ class User extends Authenticatable implements Auditable
         //Tested!
 
         try {
-            return self::where('users.id', '=', $id)
+            return User::where('users.id', '=', $id)
                 ->leftJoin('images', function ($join) use ($id) {
                     $join->join('xref', 'xref.object', '=', 'images.idimages')
                          ->where('xref.object_type', '=', 5)
@@ -223,19 +224,19 @@ class User extends Authenticatable implements Auditable
     {
         //Tested!
 
-        if (! $eloquent) {
+        if ( ! $eloquent) {
             $Users = DB::select(DB::raw('SELECT users.id AS id, users.name, users.email, roles.role FROM users
                   INNER JOIN roles ON roles.idroles = users.role WHERE users.deleted_at IS NULL
                   ORDER BY users.id ASC')); //INNER JOIN sessions ON sessions.user = users.id, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at
 
             if (is_array($Users)) {
-                $User = new self;
+                $User = new User;
                 foreach ($Users as $key => $user) {
                     $Users[$key]->permissions = $User->getRolePermissions($user->role);
                 }
             }
         } else {
-            $Users = self::join('roles', 'users.role', '=', 'roles.idroles');
+            $Users = User::join('roles', 'users.role', '=', 'roles.idroles');
         }
 
         return $Users;
@@ -268,8 +269,9 @@ class User extends Authenticatable implements Auditable
                 WHERE users.role > 1
                     AND users.id IN
                         (SELECT `user` FROM users_groups WHERE `group` = :group)
-                ORDER BY users.name ASC'), ['group' => $group]);
+                ORDER BY users.name ASC'), array('group' => $group));
     }
+
 
     public function isInGroup($groupId)
     {
@@ -285,7 +287,7 @@ class User extends Authenticatable implements Auditable
     {
         //Tested!
 
-        $r = DB::select(DB::raw('SELECT COUNT(id) AS emails FROM '.$this->table.' WHERE email = :email'), ['email' => $email]);
+        $r = DB::select(DB::raw('SELECT COUNT(id) AS emails FROM '.$this->table.' WHERE email = :email'), array('email' => $email));
 
         return ($r[0]->emails > 0) ? false : true;
     }
@@ -357,6 +359,7 @@ class User extends Authenticatable implements Auditable
         return $nameParts[0];
     }
 
+
     public function existsOnDiscourse()
     {
         try {
@@ -371,6 +374,7 @@ class User extends Authenticatable implements Auditable
             return false;
         }
     }
+
 
     /**
      * Convert the user's role to be a Host.
@@ -391,8 +395,8 @@ class User extends Authenticatable implements Auditable
      * NOT IN USE, decided on a more straightforward approach could be useful in the future
      * @author Dean Appleton-Claydon
      * @date   2019-03-22
-     * @param  bool $string
-     * @param  bool $slug
+     * @param  boolean $string
+     * @param  boolean $slug
      * @return mixed either string or int
      */
     public function getRepairNetwork($string = false, $slug = false)
@@ -414,10 +418,12 @@ class User extends Authenticatable implements Auditable
         return $this->repair_network;
     }
 
+
     public function groupTag()
     {
         return $this->hasOne(GroupTags::class, 'id', 'access_group_tag_id');
     }
+
 
     /**
      * Generate a username based on the user's name, and set it against this user.
@@ -427,7 +433,7 @@ class User extends Authenticatable implements Auditable
     public function generateAndSetUsername()
     {
         if (empty($this->name)) {
-            throw new \Exception('Name is empty');
+            throw new \Exception("Name is empty");
         }
 
         $name = $this->name;
@@ -436,9 +442,9 @@ class User extends Authenticatable implements Auditable
 
         $name_parts = explode(' ', $name);
 
-        $desired_username = implode('_', $name_parts);
+        $desired_username = implode("_", $name_parts);
 
-        if (! (self::where('username', '=', $desired_username)->exists())) {
+        if (!(User::where('username', '=', $desired_username)->exists())) {
             $username = $desired_username;
         } else { // someone already has the desired username
             $username = $desired_username.'_'.$this->id;
@@ -449,7 +455,7 @@ class User extends Authenticatable implements Auditable
 
     public function isDripSubscriber()
     {
-        return ! is_null($this->drip_subscriber_id);
+      return ! is_null($this->drip_subscriber_id);
     }
 
     public function isRepairDirectoryNone()
@@ -548,25 +554,24 @@ class User extends Authenticatable implements Auditable
                                     ->where('user', $this->id)
                                     ->where('role', 3)
                                     ->get();
-        } elseif ($this->hasRole('NetworkCoordinator')) {
+        } else if ($this->hasRole('NetworkCoordinator')) {
             foreach ($this->networks as $network) {
                 foreach ($network->groups as $group) {
                     $groupsUserIsInChargeOf->push($group);
                 }
             }
-        } elseif ($this->hasRole('Administrator')) {
+        } else if ($this->hasRole('Administrator')) {
             $groupsUserIsInChargeOf = Group::all();
         }
 
         return $groupsUserIsInChargeOf;
     }
 
-    public function ensureAPIToken()
-    {
-        // Generate an API token if we don't already have one.
+    public function ensureAPIToken() {
+        # Generate an API token if we don't already have one.
         $api_token = $this->api_token;
 
-        if (! $api_token) {
+        if (!$api_token) {
             $api_token = \Illuminate\Support\Str::random(60);
             $this->api_token = $api_token;
             $this->save();

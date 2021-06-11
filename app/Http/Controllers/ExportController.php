@@ -13,11 +13,14 @@ use App\Party;
 use App\Search;
 use App\User;
 use App\UserGroups;
+
 use Auth;
+
 use DateTime;
 use DB;
 use FixometerHelper;
 use Illuminate\Http\Request;
+
 use Response;
 
 class ExportController extends Controller
@@ -52,7 +55,7 @@ class ExportController extends Controller
 
         $all_devices = Device::with([
                                         'deviceCategory',
-                                        'deviceEvent',
+                                        'deviceEvent'
                                     ])
         ->join('events', 'events.idevents', '=', 'devices.event')
         ->join('groups', 'groups.idgroups', '=', 'events.group')
@@ -64,7 +67,7 @@ class ExportController extends Controller
 
         // Do not include model column
         if ($host == 'therestartproject.org') {
-            $columns = [
+            $columns = array(
                 'Product Category',
                 'Brand',
                 'Comments',
@@ -73,7 +76,7 @@ class ExportController extends Controller
                 'Event',
                 'Group',
                 'Date',
-            ];
+            );
 
             fputcsv($file, $columns);
 
@@ -90,7 +93,7 @@ class ExportController extends Controller
                 ]);
             }
         } else {
-            $columns = [
+            $columns = array(
                 'Product Category',
                 'Brand',
                 'Model',
@@ -100,7 +103,7 @@ class ExportController extends Controller
                 'Event',
                 'Group',
                 'Date',
-            ];
+            );
 
             fputcsv($file, $columns);
 
@@ -121,9 +124,9 @@ class ExportController extends Controller
 
         fclose($file);
 
-        $headers = [
+        $headers = array(
             'Content-Type' => 'text/csv',
-        ];
+        );
 
         return Response::download($filename, 'devices.csv', $headers);
     }
@@ -172,7 +175,7 @@ class ExportController extends Controller
             }
 
             $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags);
-            $PartyArray = [];
+            $PartyArray = array();
             $need_attention = 0;
 
             $participants = 0;
@@ -224,7 +227,7 @@ class ExportController extends Controller
 
                 $partyName = ! is_null($party->venue) ? $party->venue : $party->location;
                 $groupName = $party->name; // because of the way the join in the query works
-                $PartyArray[$i] = [
+                $PartyArray[$i] = array(
                     date('d/m/Y', strtotime($party->event_date)),
                     $partyName,
                     $groupName,
@@ -236,13 +239,13 @@ class ExportController extends Controller
                     ($party->repairable_devices > 0 ? $party->repairable_devices : 0),
                     ($party->dead_devices > 0 ? $party->dead_devices : 0),
                     ($party->hours_volunteered > 0 ? $party->hours_volunteered : 0),
-                ];
+                );
             }
 
             /** lets format the array **/
-            $columns = [
+            $columns = array(
                 'Date', 'Venue', 'Group', 'Participants', 'Volunteers', 'CO2 (kg)', 'Weight (kg)', 'Fixed', 'Repairable', 'Dead', 'Hours Volunteered',
-            ];
+            );
 
             $filename = 'parties.csv';
 
@@ -254,13 +257,13 @@ class ExportController extends Controller
             }
             fclose($file);
 
-            $headers = [
+            $headers = array(
                 'Content-Type' => 'text/csv',
-            ];
+            );
 
             return Response::download($filename, $filename, $headers);
         }
-        $data = ['No data to return'];
+        $data = array('No data to return');
 
         return view('export.parties', [
             'data' => $data,
@@ -350,8 +353,8 @@ class ExportController extends Controller
             } elseif ($request->input('to_date') !== null && $request->input('from_date') == null) {
                 $user_events = $user_events->whereDate('events.event_date', '<', $request->input('to_date'));
             } elseif ($request->input('to_date') !== null && $request->input('from_date') !== null) {
-                $user_events = $user_events->whereBetween('events.event_date', [$request->input('from_date'),
-                    $request->input('to_date'), ]);
+                $user_events = $user_events->whereBetween('events.event_date', array($request->input('from_date'),
+                    $request->input('to_date'), ));
             }
 
             //By location
@@ -465,7 +468,7 @@ class ExportController extends Controller
             ]);
         }
 
-        return [
+        return array(
             'user' => $user,
             'user_events' => $user_events,
             'all_groups' => $all_groups,
@@ -477,7 +480,7 @@ class ExportController extends Controller
             'average_age' => number_format($average_age, 1),
             'country_hours_completed' => $country_hours_completed,
             'city_hours_completed' => $city_hours_completed,
-        ];
+        );
     }
 
     public function exportTimeVolunteered(Request $request)
@@ -491,20 +494,20 @@ class ExportController extends Controller
         //Creat new file and set headers
         $file_name = 'time_reporting.csv';
         $file = fopen($file_name, 'w+');
-        $file_headers = [
+        $file_headers = array(
             'Content-type' => 'text/csv',
-        ];
+        );
 
         //Put stats in csv
-        $stats_headers = ['Hours Volunteered', 'Average age', 'Number of groups', 'Total number of users', 'Number of anonymous users'];
-        fputcsv($file, ['Overall Stats:']);
+        $stats_headers = array('Hours Volunteered', 'Average age', 'Number of groups', 'Total number of users', 'Number of anonymous users');
+        fputcsv($file, array('Overall Stats:'));
         fputcsv($file, $stats_headers);
-        fputcsv($file, [$data['hours_completed'], $data['average_age'], $data['group_count'], $data['total_users'], $data['anonymous_users']]);
-        fputcsv($file, []);
+        fputcsv($file, array($data['hours_completed'], $data['average_age'], $data['group_count'], $data['total_users'], $data['anonymous_users']));
+        fputcsv($file, array());
 
         //Put breakdown by country in csv
-        $country_headers = ['Country name', 'Total hours'];
-        fputcsv($file, ['Breakdown by country:']);
+        $country_headers = array('Country name', 'Total hours');
+        fputcsv($file, array('Breakdown by country:'));
         fputcsv($file, $country_headers);
         foreach ($data['country_hours_completed'] as $country_hours) {
             if (! is_null($country_hours->country)) {
@@ -512,13 +515,13 @@ class ExportController extends Controller
             } else {
                 $country = 'N/A';
             }
-            fputcsv($file, [$country, substr($country_hours->event_hours, 0, -4)]);
+            fputcsv($file, array($country, substr($country_hours->event_hours, 0, -4)));
         }
-        fputcsv($file, []);
+        fputcsv($file, array());
 
         //Put breakdown by city in csv
-        $city_headers = ['Town/city name', 'Total hours'];
-        fputcsv($file, ['Breakdown by city:']);
+        $city_headers = array('Town/city name', 'Total hours');
+        fputcsv($file, array('Breakdown by city:'));
         fputcsv($file, $city_headers);
         foreach ($data['city_hours_completed'] as $city_hours) {
             if (! is_null($city_hours->location)) {
@@ -526,21 +529,21 @@ class ExportController extends Controller
             } else {
                 $city = 'N/A';
             }
-            fputcsv($file, [$city, substr($city_hours->event_hours, 0, -4)]);
+            fputcsv($file, array($city, substr($city_hours->event_hours, 0, -4)));
         }
-        fputcsv($file, []);
+        fputcsv($file, array());
 
         //Put users in csv
-        $users_headers = ['#', 'Hours', 'Event date', 'Restart group', 'Location'];
-        fputcsv($file, ['Results:']);
+        $users_headers = array('#', 'Hours', 'Event date', 'Restart group', 'Location');
+        fputcsv($file, array('Results:'));
         fputcsv($file, $users_headers);
         foreach ($data['user_events'] as $ue) {
             $start_time = new DateTime($ue->start);
             $diff = $start_time->diff(new DateTime($ue->end));
-            fputcsv($file, [$ue->idevents, $diff->h.'.'.sprintf('%02d', $diff->i / 60 * 100),
-                date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location, ]);
+            fputcsv($file, array($ue->idevents, $diff->h.'.'.sprintf('%02d', $diff->i / 60 * 100),
+                date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location, ));
         }
-        fputcsv($file, []);
+        fputcsv($file, array());
 
         //close file
         fclose($file);

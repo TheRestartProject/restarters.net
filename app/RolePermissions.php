@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RolePermissions extends Model
 {
+
     protected $table = 'roles_permissions';
     /**
      * The attributes that are mass assignable.
@@ -22,8 +23,10 @@ class RolePermissions extends Model
     protected $hidden = [];
 
     //Table Relations
+    
 
     // Setters
+
 
     //Getters
 }

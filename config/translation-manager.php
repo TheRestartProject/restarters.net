@@ -14,15 +14,15 @@ return [
         'prefix'     => 'translations',
         'middleware' => [
                 'web',
-                  'auth',
-                  'translation',
-              ],
+      	        'auth',
+      	        'translation',
+		      ],
     ],
 
     /**
      * Enable deletion of translations
      *
-     * @type bool
+     * @type boolean
      */
     'delete_enabled' => true,
 

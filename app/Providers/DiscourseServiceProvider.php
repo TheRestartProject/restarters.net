@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use Auth;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
+use Auth;
 
 class DiscourseServiceProvider extends ServiceProvider
 {

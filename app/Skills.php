@@ -2,11 +2,13 @@
 
 namespace App;
 
-use DB;
 use Illuminate\Database\Eloquent\Model;
+
+use DB;
 
 class Skills extends Model
 {
+
     protected $table = 'skills';
     /**
      * The attributes that are mass assignable.
@@ -24,7 +26,9 @@ class Skills extends Model
 
     //Table Relations
 
+
     // Setters
+
 
     //Getters
 }

@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'brand' => 'Marque',
   'brand-name' => 'Nom de la marque',
   'brand_modal_title' => 'Ajouter une nouvelle marque',
@@ -44,4 +44,4 @@ return [
   'edit-group-tag' => 'Editer l\'étiquette du groupe',
   'edit-group-tag-content' => 'Editer le contenu de l\'étiquette du groupe',
   'edit-brand-content' => 'Editer le contenu de la marque',
-];
+);

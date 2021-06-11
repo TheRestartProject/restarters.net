@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Brands;
 use Auth;
+use App\Brands;
 use FixometerHelper;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
 class BrandsController extends Controller
 {
+
     public function index()
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -20,13 +23,14 @@ class BrandsController extends Controller
 
         return view('brands.index', [
         'title' => 'Brands',
-        'brands' => $all_brands,
+        'brands' => $all_brands
         ]);
     }
 
     public function getCreateBrand()
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -37,12 +41,13 @@ class BrandsController extends Controller
 
     public function postCreateBrand(Request $request)
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
         $brand = Brands::create([
-        'brand_name' => $request->input('brand_name'),
+        'brand_name' => $request->input('brand_name')
         ]);
 
         return Redirect::to('brands/edit/'.$brand->id)->with('success', 'Brand successfully created!');
@@ -50,7 +55,8 @@ class BrandsController extends Controller
 
     public function getEditBrand($id)
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -64,12 +70,13 @@ class BrandsController extends Controller
 
     public function postEditBrand($id, Request $request)
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
         Brands::find($id)->update([
-        'brand_name' => $request->input('brand-name'),
+        'brand_name' => $request->input('brand-name')
         ]);
 
         return Redirect::back()->with('success', 'Brand successfully updated!');
@@ -77,7 +84,8 @@ class BrandsController extends Controller
 
     public function getDeleteBrand($id)
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+
+        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 

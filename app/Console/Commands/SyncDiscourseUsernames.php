@@ -76,7 +76,7 @@ class SyncDiscourseUsernames extends Command
             foreach ($usersFromDiscourse as $discourseUser) {
                 $user = User::where('email', $discourseUser->email)->first();
 
-                if (! is_null($user)) {
+                if ( ! is_null($user)) {
                     $usersFoundInRestarters++;
 
                     if ($user->username == $discourseUser->username) {

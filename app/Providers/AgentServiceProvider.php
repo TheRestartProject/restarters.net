@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Jenssegers\Agent\Agent;
 use View;
+use Jenssegers\Agent\Agent;
+use Illuminate\Support\ServiceProvider;
 
 class AgentServiceProvider extends ServiceProvider
 {

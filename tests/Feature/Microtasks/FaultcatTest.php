@@ -2,23 +2,22 @@
 
 namespace Tests\Feature;
 
-use App\Category;
 use App\Device;
-use App\Faultcat;
+use App\Category;
 use App\Group;
+use App\Faultcat;
 use DB;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Tests\TestCase;
 
-class FaultcatTest extends TestCase
-{
-    public function setUp()
-    {
+class FaultcatTest extends TestCase {
+
+    public function setUp() {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
+        DB::statement("SET foreign_key_checks=0");
         Group::truncate();
         Device::truncate();
         Faultcat::truncate();
@@ -26,8 +25,8 @@ class FaultcatTest extends TestCase
     }
 
     /** @test */
-    public function fetch_faultcat_record()
-    {
+    public function fetch_faultcat_record() {
+
         $data = $this->_setup_data();
         $Faultcat = new Faultcat;
 
@@ -42,28 +41,28 @@ class FaultcatTest extends TestCase
     }
 
     /** @test */
-    public function fetch_faultcat_status()
-    {
+    public function fetch_faultcat_status() {
+
         $data = $this->_setup_data();
         $Faultcat = new Faultcat;
         $result = $Faultcat->fetchStatus();
         $this->assertTrue(is_array($result));
         foreach ($data['status'] as $k => $v) {
-            $this->assertTrue(array_key_exists($k, $result), 'fetch_faultcat_status: missing key - '.$k);
-            if (! is_array($v)) {
-                $this->assertEquals($v, $result[$k][0]->total, 'fetch_faultcat_status: wrong '.$k);
+            $this->assertTrue(array_key_exists($k, $result), 'fetch_faultcat_status: missing key - ' . $k);
+            if (!is_array($v)) {
+                $this->assertEquals($v, $result[$k][0]->total, 'fetch_faultcat_status: wrong ' . $k);
             } else {
                 foreach ($v[0] as $key => $val) {
-                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_faultcat_status: missing key - '.$key);
-                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_faultcat_status: wrong '.$key);
+                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_faultcat_status: missing key - ' . $key);
+                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_faultcat_status: wrong ' . $key);
                 }
             }
         }
     }
 
     /** @test */
-    public function update_faultcat_devices()
-    {
+    public function update_faultcat_devices() {
+
         $this->_setup_data();
 
         $Faultcat = new Faultcat;
@@ -87,8 +86,8 @@ class FaultcatTest extends TestCase
     }
 
     /** @test */
-    public function update_faultcat_empty_problem()
-    {
+    public function update_faultcat_empty_problem() {
+
         $this->_setup_data();
 
         $Faultcat = new Faultcat;
@@ -125,8 +124,7 @@ class FaultcatTest extends TestCase
      *
      * @return array
      */
-    protected function _setup_data()
-    {
+    protected function _setup_data() {
         $cats_in = [
             'desktop' => 11,
             'laptop large' => 15,
@@ -214,7 +212,7 @@ class FaultcatTest extends TestCase
                     'fault_type' => 'fault_type_3',
                 ]
         );
-        DB::update('INSERT INTO devices_faults_adjudicated SET iddevices = '.$devs[3].", fault_type='fault_type_1'");
+        DB::update("INSERT INTO devices_faults_adjudicated SET iddevices = " . $devs[3] . ", fault_type='fault_type_1'");
         // iddevices = 6 : 4 opinions with majority
         factory(Faultcat::class, 3)->create(
                 [
@@ -302,7 +300,6 @@ class FaultcatTest extends TestCase
                 ],
             ],
         ];
-
         return [
             'categories_include' => $cats_in,
             'categories_exclude' => $cats_ex,
@@ -312,8 +309,7 @@ class FaultcatTest extends TestCase
         ];
     }
 
-    protected function _insert_faultcat_device($cat, $id, $problem, $fault_type = '')
-    {
+    protected function _insert_faultcat_device($cat, $id, $problem, $fault_type = '') {
         $device = factory(Device::class, 1)->states($cat)->create(
                 [
                     'problem' => $problem,
@@ -327,7 +323,7 @@ class FaultcatTest extends TestCase
             'fault_type' => $fault_type,
             'repair_status' => 1,
         ]);
-
         return $device->toArray()[0];
     }
+
 }

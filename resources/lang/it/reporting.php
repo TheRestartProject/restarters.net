@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'search-all-time-volunteered' => 'Cerca ore di volontariato',
   'by_users' => 'Per volontatio',
   'by_location' => 'Per luogo',
@@ -42,4 +42,4 @@ return [
   'event_name' => 'Evento',
   'restart_group' => 'Gruppo',
   'export_csv' => 'Esporta in CSV',
-];
+);

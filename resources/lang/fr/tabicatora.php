@@ -1,7 +1,8 @@
 <?php
 
-return [
-  'task' => [
+return array (
+  'task' => 
+  array (
     'where_is_the_main_fault' => 'Où se trouve le principal défaut?',
     'fetch_another' => 'Je ne sais pas, chercher une autre réparation',
     'suggestions' => 'Suggestions',
@@ -17,8 +18,9 @@ return [
     'signpost_4' => 'Nous voulons expliquer aux décideurs politiques pourquoi les tablettes se cassent et comment il serait plus facile de les réparer. Les groupes de réparation communautaires du monde entier ont enregistré ces informations, et en essayant TabiCat, vous nous aidez à les analyser.',
     'signpost_5' => 'Merci!',
     'signpost_6' => 'Merci de votre aide ! Chaque défaut que vous catégorisez rend ces données plus utiles. Pourquoi ne pas <a href="../">rejoindre notre communauté</a>?',
-  ],
-  'status' => [
+  ),
+  'status' => 
+  array (
     'status' => 'Statut',
     'items_opinions' => 'Articles / opinions',
     'items_with_majority_opinions ' => 'Articles avec des opinions majoritaires',
@@ -40,8 +42,9 @@ return [
     'items_0_opinions' => 'avec 0 avis',
     'task_completed' => 'Vous les avez tous vus, mercis',
     'progress' => 'complet',
-  ],
-  'info' => [
+  ),
+  'info' => 
+  array (
     'body-s1-header' => 'Qu’est-ce que TabiCat?',
     'body-s1-p1' => 'Les tablettes peuvent être faciles à casser et difficiles à réparer. Nous voulons comprendre pourquoi les tablettes tombent en panne afin de pouvoir indiquer aux décideurs politiques comment les futurs modèles peuvent être plus faciles à réparer. La réparation réduit les déchets et diminue la pression sur les ressources de notre planète.',
     'body-s1-p2' => 'Avec TabiCat, vous pouvez participer à notre enquête. Nous avons recueilli des informations sur plus de 900 appareils en panne et nous avons besoin de votre aide pour les classer.',
@@ -52,12 +55,14 @@ return [
     'body-s4-header' => 'Vous avez d’autres questions?',
     'body-s4-p1' => 'Pour en savoir plus, posez nous des questions et faites nous part de <a href=":url" target="_blank">vos commentaires dans le forum TabiCat</a>.',
     'title' => 'Merci d’avoir essayé TabiCat',
-  ],
-  'branding' => [
+  ),
+  'branding' => 
+  array (
     'powered_by' => 'Utilisation de données provenant de:',
-  ],
+  ),
   'about' => 'Plus d\'informations',
-  'survey' => [
+  'survey' => 
+  array (
     'a1' => 'Pas du tout d\'accord',
     'a2' => 'Pas d\'accord',
     'a3' => 'Neutre',
@@ -73,5 +78,5 @@ return [
     'q4' => 'TabiCat a changé ma vision de l\'importance de la réparation.',
     'send' => 'Envoyer',
     'skip' => 'Passez à',
-  ],
-];
+  ),
+);

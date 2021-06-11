@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'community_news' => 'Nouvelles de la communauté',
   'community_news_text' => 'Les dernières nouvelles de notre blog communautaire ‐ nous sommes constamment à la recherche de sujets, envoyez vos idées à <a href="mailto:janet@therestartproject.org">janet@therestartproject.org</a>',
   'see_more_posts' => 'Lire d’autres articles',
@@ -116,4 +116,4 @@ return [
   'event_requires_moderation' => 'L\'événement nécessite une approbation',
   'remove' => 'Supprimer',
   'total' => 'total',
-];
+);

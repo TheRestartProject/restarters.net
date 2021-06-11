@@ -7,36 +7,32 @@ use Hash;
 use Mockery;
 use Tests\TestCase;
 
-class AccountCreationTest extends TestCase
-{
-    public function testRegister()
-    {
+class AccountCreationTests extends TestCase {
+    public function testRegister() {
         $userAttributes = $this->userAttributes();
-        $response = $this->post('/user/register/', $userAttributes);
+        $response = $this->post('/user/register/',  $userAttributes);
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
         $this->assertDatabaseHas('users', [
-            'email' => $userAttributes['email'],
+            'email' => $userAttributes['email']
         ]);
     }
 
-    public function testRegisterAgain()
-    {
-        $response = $this->post('/user/register/', $this->userAttributes());
+    public function testRegisterAgain() {
+        $response = $this->post('/user/register/',  $this->userAttributes());
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
 
-        $response = $this->post('/user/register/', $this->userAttributes());
+        $response = $this->post('/user/register/',  $this->userAttributes());
 
         $response->assertStatus(302);
         $response->assertRedirect('');
     }
 
-    public function testLogout()
-    {
-        $response = $this->post('/user/register/', $this->userAttributes());
+    public function testLogout() {
+        $response = $this->post('/user/register/',  $this->userAttributes());
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
@@ -47,10 +43,9 @@ class AccountCreationTest extends TestCase
         $response->assertRedirect('login');
     }
 
-    public function testLogoutAndBackIn()
-    {
+    public function testLogoutAndBackIn() {
         $userAttributes = $this->userAttributes();
-        $response = $this->post('/user/register/', $userAttributes);
+        $response = $this->post('/user/register/',  $userAttributes);
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
@@ -60,10 +55,10 @@ class AccountCreationTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect('login');
 
-        $response = $this->post('/login', [
+        $response = $this->post('/login',  [
             'email' => $userAttributes['email'],
             'password' => $userAttributes['password'],
-            'my_time' => time(),
+            'my_time' => time()
         ]);
 
         $response->assertStatus(302);

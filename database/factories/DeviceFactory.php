@@ -2,6 +2,7 @@
 
 use App\Category;
 use App\Party;
+
 use Faker\Generator as Faker;
 
 $factory->define(App\Device::class, function (Faker $faker, $attributes) {
@@ -48,6 +49,6 @@ $factory->state(App\Device::class, 'misccat', function (Faker $faker) {
     return [
         'category' => 46,
         'category_creation' => 46,
-        'problem' => $faker->sentence(6, true),
+        'problem' => $faker->sentence(6, TRUE)
     ];
 });

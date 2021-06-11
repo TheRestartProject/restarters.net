@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'lead' => 'Welkom bij de Restart community',
   'login_title' => 'Inloggen',
   'more' => 'Meer weten',
@@ -15,4 +15,4 @@ return [
                                 <li>Organiseer Repair Cafés</li>
                                 <li>Toon de impact van Repair Cafés</li>
                                 <li>Maak herstellen toegankelijk voor iedereen</li></ul>',
-];
+);

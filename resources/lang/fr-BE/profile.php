@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'skills' => 'Compétences',
   'my_skills' => 'Mes compétences',
   'biography' => 'Biographie',
@@ -18,7 +18,8 @@ return [
   'preferred_language' => 'Langue de préférence',
   'skills_updated' => 'Compétences mises à jour!',
   'account' => 'Compte',
-  'calendars' => [
+  'calendars' => 
+  array (
     'all_events' => 'Tous les événements (administrateurs seulement)',
     'copy_link' => 'Copier lien',
     'events_by_area' => 'Evénements par région',
@@ -27,7 +28,7 @@ return [
     'group_calendars' => 'Calendriers des Repair Cafés',
     'my_events' => 'Mes événements',
     'title' => 'Calendriers',
-  ],
+  ),
   'country' => 'Pays',
   'email_address' => 'Adresse e-mail',
   'email_preferences' => 'Préférences E-mail',
@@ -43,4 +44,4 @@ return [
   'repair_dir_regional_admin' => 'Administrateur régional',
   'repair_dir_role' => 'Rôle du répertoire de réparation',
   'repair_dir_superadmin' => 'Super admin',
-];
+);

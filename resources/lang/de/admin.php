@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'categories' => 'Categories',
   'skills' => 'Skills',
   'brand' => 'Brand',
@@ -44,4 +44,4 @@ return [
   'edit-group-tag' => 'Edit group tag',
   'edit-group-tag-content' => '',
   'edit-brand-content' => '',
-];
+);

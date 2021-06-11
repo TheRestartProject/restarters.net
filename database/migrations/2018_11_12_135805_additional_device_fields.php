@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class AdditionalDeviceFields extends Migration
 {
@@ -51,6 +51,7 @@ class AdditionalDeviceFields extends Migration
         DB::table('barriers')->insert([
           'barrier' => 'Lack of equipment',
         ]);
+
     }
 
     /**

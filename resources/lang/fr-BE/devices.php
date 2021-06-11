@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array (
   'devices' => 'Appareils',
   'edit_devices' => 'Editer l\'appareil',
   'edit_devices_details' => 'Editer les détails de l\'appareil',
@@ -116,4 +116,4 @@ return [
   'search_assessment_comments' => 'Evaluation',
   'table_intro' => 'Cliquez sur la ligne pour plus de détails.  Cliquez sur l\'en-tête d\'une colonne pour trier par cette colonne - cliquez à nouveau pour inverser l\'ordre de tri.',
   'tooltip_type' => 'Ajoutez autant d\'informations que possible sur le type d\'objet (ex: "Jeans Denim", ou "divan")',
-];
+);

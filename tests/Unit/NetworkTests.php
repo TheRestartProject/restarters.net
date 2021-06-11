@@ -6,24 +6,26 @@ use App\Group;
 use App\Network;
 use App\Party;
 use App\User;
+
 use DB;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class NetworkTests extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
+        DB::statement("SET foreign_key_checks=0");
         User::truncate();
         Group::truncate();
         Party::truncate();
         Network::truncate();
         DB::delete('delete from group_network');
-        DB::statement('SET foreign_key_checks=1');
+        DB::statement("SET foreign_key_checks=1");
     }
+
 
     /** @test */
     public function it_can_return_events_requiring_moderation()
@@ -47,4 +49,5 @@ class NetworkTests extends TestCase
         $this->assertContains($event1->idevents, $ids);
         $this->assertNotContains($event2->idevents, $ids);
     }
+
 }

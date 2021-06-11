@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class AddAdminUserDeletedPreference extends Migration
 {
@@ -15,7 +15,7 @@ class AddAdminUserDeletedPreference extends Migration
     {
         DB::table('preferences')->insert([
             'name' => 'Admin User Deleted',
-            'purpose' => null,
+            'purpose' => NULL,
             'slug' => 'admin-user-deleted',
         ]);
     }

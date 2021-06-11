@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use App\User;
+use App\Http\Controllers\Controller;
+
 use Auth;
 use Illuminate\Http\Request;
 
@@ -20,7 +21,7 @@ class UserController extends Controller
     public static function changes(Request $request)
     {
         $authenticatedUser = Auth::user();
-        if (! $authenticatedUser->hasRole('Administrator')) {
+        if ( ! $authenticatedUser->hasRole('Administrator')) {
             return abort(403, 'The authenticated user is not authorized to access this resource');
         }
 
@@ -31,7 +32,7 @@ class UserController extends Controller
         $userChanges = [];
         foreach ($userAudits as $userAudit) {
             $user = User::withTrashed()->find($userAudit->auditable_id);
-            if (! is_null($user) && $user->changesShouldPushToZapier()) {
+            if ( ! is_null($user) && $user->changesShouldPushToZapier()) {
                 $userChanges[] = self::mapUserAndAuditToUserChange($user, $userAudit);
             }
         }
@@ -43,7 +44,7 @@ class UserController extends Controller
     {
         $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\User::class);
 
-        if (! is_null($dateFrom)) {
+        if (!is_null($dateFrom)) {
             $query->where('created_at', '>=', $dateFrom);
         }
 
@@ -79,7 +80,7 @@ class UserController extends Controller
         $auditCreatedAtAsString = $audit->created_at->toDateTimeString();
 
         $userChange['user_id'] = $user->id;
-        $userChange['id'] = md5($user->id.$auditCreatedAtAsString);
+        $userChange['id'] = md5($user->id . $auditCreatedAtAsString);
         $userChange['role'] = $user->role()->first()->role;
 
         $userChange['change_occurred_at'] = $auditCreatedAtAsString;
@@ -98,13 +99,13 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $authenticatedUser = Auth::user();
-        if (! $authenticatedUser->hasRole('Administrator')) {
+        if ( ! $authenticatedUser->hasRole('Administrator')) {
             return abort(403, 'The authenticated user is not authorized to update this resource');
         }
 
         $user = User::find($id);
         if ($user === null) {
-            abort(404, 'Resource not found');
+            abort(404, "Resource not found");
         }
 
         $changesMade = false;

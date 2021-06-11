@@ -6,18 +6,19 @@ use App\Group;
 use App\Network;
 use App\Party;
 use App\User;
-use DB;
 use FixometerHelper;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+
+use DB;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PermissionsTests extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
+        DB::statement("SET foreign_key_checks=0");
         User::truncate();
         Group::truncate();
         Network::truncate();
@@ -25,14 +26,13 @@ class PermissionsTests extends TestCase
         DB::delete('delete from users_groups');
         DB::delete('delete from group_network');
         DB::delete('delete from user_network');
-        DB::statement('SET foreign_key_checks=1');
+        DB::statement("SET foreign_key_checks=1");
     }
 
     // edit event permissions
     // Admins - can edit all events
     // Network Coords - can edit all events from groups in their network
     // Hosts - can edit all events in their groups
-
     /** @test */
     public function it_can_check_if_admin_can_edit_all()
     {
