@@ -301,23 +301,29 @@ export default {
   },
   methods: {
     sortCompare(aRow, bRow, key, sortDesc, formatter, compareOptions, compareLocale) {
-      console.log("sort", aRow, bRow, key)
       const a = aRow[key]
       const b = bRow[key]
 
-      const numeric = !isNaN(a[key]) && !isNaN(b[key])
-
-
-      if (numeric) {
-        return parseInt(a[key]) - parseInt(b[key])
-      } else if (key === 'date_short' || key === 'date_long') {
-        return new moment(b.event_date + ' ' + b.start).unix() - new moment(a.event_date + ' ' + a.start).unix()
-      } else if (key === 'title') {
-        const atitle = a.venue ? a.venue : a.location
-        const btitle = b.venue ? b.venue : b.location
-        return atitle.toLowerCase().localeCompare(btitle.toLowerCase())
-      } else {
-        return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
+      switch (key) {
+        case 'date_short':
+        case 'date_long':
+          return new moment(b.event_date + ' ' + b.start).unix() - new moment(a.event_date + ' ' + a.start).unix()
+        case 'title':
+          const atitle = a.venue ? a.venue : a.location
+          const btitle = b.venue ? b.venue : b.location
+          return atitle.toLowerCase().localeCompare(btitle.toLowerCase())
+        case 'participants_count':
+        case 'volunteers_count':
+        case 'ewaste':
+        case 'co2':
+        case 'fixed_devices':
+        case 'repairable_devices':
+        case 'dead_devices':
+        case 'invited':
+        case 'volunteers':
+          return parseInt(a['stats'][key]) - parseInt(b['stats'][key])
+        default:
+          return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
       }
     },
     stats(event) {
