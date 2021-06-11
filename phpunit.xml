@@ -11,14 +11,18 @@
     <testsuites>
 <!--        We have lots of tests which exist but don't run yet.  So we only run a subset of them here. -->
         <testsuite name="Feature">
-            <directory suffix=".php">./tests/Feature/Users/Dashboard</directory>
-            <directory suffix=".php">./tests/Feature/Users/Fixometer</directory>
+            <directory suffix=".php">./tests/Feature/Dashboard</directory>
+            <directory suffix=".php">./tests/Feature/Fixometer</directory>
             <directory suffix=".php">./tests/Feature/Devices</directory>
             <directory suffix=".php">./tests/Feature/Events</directory>
+            <directory suffix=".php">./tests/Feature/Networks</directory>
             <file>./tests/Feature/Users/Registration/AccountCreationTest.php</file>
             <file>./tests/Feature/Groups/BasicTest.php</file>
             <file>./tests/Feature/Groups/GroupCreateTest.php</file>
+            <file>./tests/Feature/Groups/GroupNetworkCreateTest.php</file>
             <file>./tests/Feature/Microtasks/BasicTest.php</file>
+            <file>./tests/Feature/Microtasks/MobifixTest.php</file>
+            <file>./tests/Feature/EventStatsTest.php</file>
         </testsuite>
 
         <testsuite name="Unit">
