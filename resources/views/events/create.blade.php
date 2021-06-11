@@ -165,24 +165,9 @@
 
                       <div class="row">
                           <div class="col-lg-7">
-                            <div class="form-group">
-                              <label for="autocomplete">@lang('events.field_event_venue'):</label>
-                              <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ old('location') }}">
-                              @if($errors->has('location'))
-                                <p class="text-danger">{{ $errors->first('location') }}</p>
-                              @endif
-
-                              <small id="locationHelpBlock" class="form-text text-muted">
-                                @lang('events.field_venue_helper')
-                              </small>
-
-                              <input type="hidden" id="street_number" disabled="true">
-                              <input type="hidden" id="route" disabled="true">
-                              <input type="hidden" id="locality" disabled="true">
-                              <input type="hidden" id="administrative_area_level_1" disabled="true">
-                              <input type="hidden" id="postal_code" disabled="true">
-                              <input type="hidden" id="country" disabled="true">
-
+                            <div class="vue">
+                              @php($locationError = $errors->has('location') ?? $errors->first('location'))
+                              <VenueAddress error="{{ $locationError }}" value="{{ old('location') }}" />
                             </div>
                           </div>
                           <div class="col-lg-5">
