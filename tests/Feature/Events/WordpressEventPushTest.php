@@ -23,13 +23,6 @@ class WordpressPushTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
-        User::truncate();
-        Group::truncate();
-        Party::truncate();
-        Network::truncate();
-        GroupNetwork::truncate();
-        DB::statement("SET foreign_key_checks=1");
     }
 
     /** @test */

@@ -1397,7 +1397,7 @@ class PartyController extends Controller
                     'type' => $file->getMimeType(),
                     'size' => $file->getSize(),
                     'tmp_name' => $file->getRealPath(),
-                    'error' => $file->getError(),
+                    'error' => [ $file->getError() ],
                 ];
             }
 
