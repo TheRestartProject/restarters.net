@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 use FixometerHelper;
+use Auth;
 
 class Party extends Model implements Auditable
 {
@@ -382,10 +383,16 @@ class Party extends Model implements Auditable
 
     public function scopeUpcomingEvents($query, $by_event = false)
     {
+      // We want to show approved events (wordpress_post_id IS NOT NULL) or where we are a host (e.g. because
+      // we created it.
       if( $by_event ) {
         return $this->join('groups', 'groups.idgroups', '=', 'events.group')
                      ->join('events_users', 'events_users.event', '=', 'events.idevents')
-                     ->whereNotNull('events.wordpress_post_id')
+                     ->where(function($query) {
+                         $query
+                         ->whereNotNull('events.wordpress_post_id')
+                         ->orWhere('events_users.role', '=', Role::HOST);
+                     })
                      ->whereDate('event_date', '>=', date('Y-m-d'))
                      ->select('events.*')
                      ->groupBy('idevents')
@@ -394,7 +401,15 @@ class Party extends Model implements Auditable
 
       return $this->join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-            ->whereNotNull('events.wordpress_post_id')
+            ->leftJoin('events_users', function($join) {
+                $join->on('events_users.event', '=', 'events.idevents');
+                $join->where('events_users.user', '=', Auth::User()->id);
+            })
+            ->where(function($query) {
+              $query
+                  ->whereNotNull('events.wordpress_post_id')
+                  ->orWhere('events_users.role', '=', Role::HOST);
+             })
             ->whereDate('event_date', '>=', date('Y-m-d'))
             ->select('events.*')
             ->groupBy('idevents')
