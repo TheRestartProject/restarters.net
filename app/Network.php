@@ -30,7 +30,7 @@ class Network extends Model
 
     public function addCoordinator($coordinator)
     {
-        $this->coordinators()->attach($coordinator->id);
+        $this->coordinators()->syncWithoutDetaching($coordinator->id);
     }
 
     public function eventsRequiringModeration()
