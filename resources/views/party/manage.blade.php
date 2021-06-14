@@ -125,7 +125,7 @@
 
                             <div class="stat double">
                                 <div class="col">
-                                    <img class="" alt="The Restart Project: Logo" src="/assets/images/logo_mini.png">
+                                    <img class="" alt="The Restart Project: Logo" src="/images/logo_mini.png">
                                     <span class="subtext">restarters</span>
                                 </div>
                                 <div class="col">

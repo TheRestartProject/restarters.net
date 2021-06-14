@@ -3,7 +3,7 @@
 @section('content')
 <div class="login-form">
     <div class="text-center">
-        <img src="/assets/images/logo_mini.png" alt="The Restart Project">
+        <img src="/images/logo_mini.png" alt="The Restart Project">
     </div>
     <p class="login-text"><span class=\"patua-blue\">Welcome to our community space,</span> where you can share upcoming Restart Parties and track their social and environmental impact. By doing so, we can empower and motivate at a local level, but also build global momentum for a change.</p>
     @if(isset($response))

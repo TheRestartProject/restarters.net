@@ -1562,7 +1562,7 @@ jQuery(document).ready(function () {
   // Initialising multiple instances is a bit more expensive, but not much.
   //
   // We need to list all the top-level components we will use in blades here; they are stored in
-  // resources/assets/js/components.  Lower level components can be included from within those as normal;
+  // resources/js/components.  Lower level components can be included from within those as normal;
   // they don't need listing here.
   $(".vue").each(function(index) {
     new Vue({

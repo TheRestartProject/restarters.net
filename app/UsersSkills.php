@@ -29,6 +29,6 @@ class UsersSkills extends Model
     //Table Relations
     public function skillName()
     {
-        return $this->hasOne('App\Skills', 'id', 'skill');
+        return $this->hasOne(\App\Skills::class, 'id', 'skill');
     }
 }
