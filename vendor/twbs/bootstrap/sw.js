@@ -1,5 +1,5 @@
 /* global workbox:false */
 
-self.importScripts('/js/vendor/{fileName}')
+self.importScripts('/assets/js/vendor/{fileName}')
 
 workbox.precaching.precacheAndRoute([])
