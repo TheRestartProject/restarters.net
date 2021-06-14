@@ -47,7 +47,7 @@ php artisan lang:js
 ### Specifying a custom target
 
 ```shell
-php artisan lang:js public/assets/dist/lang.dist.js
+php artisan lang:js public/dist/lang.dist.js
 ```
 
 ### Compressing the JS file
@@ -59,7 +59,7 @@ php artisan lang:js -c
 ### Specifying a custom source folder
 
 ```shell
-php artisan lang:js public/assets/dist/lang.dist.js -s themes/default/lang
+php artisan lang:js public/dist/lang.dist.js -s themes/default/lang
 ```
 
 ### Output a JSON file instead.

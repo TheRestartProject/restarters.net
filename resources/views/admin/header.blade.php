@@ -3,7 +3,7 @@
 
         <div class="col-md-1">
             <a href="/admin">
-                <img class="img-responsive" alt="The Restart Project: Logo" src="/assets/images/logo_mini.png">
+                <img class="img-responsive" alt="The Restart Project: Logo" src="/images/logo_mini.png">
             </a>
         </div>
 
@@ -20,7 +20,7 @@
             <div class="dropdown">
                 <button class="btn btn-default dropdown-toggle" type="button" id="profileDropDown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                     <?php if(empty($profile->path)){ ?>
-                    <img src="/assets/images/logo_mini.png" alt="<?php echo $profile->name; ?> Image" class="profile-pic" width="40" height="40" />
+                    <img src="/images/logo_mini.png" alt="<?php echo $profile->name; ?> Image" class="profile-pic" width="40" height="40" />
                     <?php } else { ?>
                     <img src="/uploads/thumbnail_<?php echo $profile->path; ?>" width="40" height="40" alt="<?php echo $profile->name; ?> Image" class="profile-pic" />
                     <?php } ?>
