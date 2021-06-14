@@ -158,7 +158,7 @@
                           <div class="row">
                               <div class="col-md-7">
                                 <div class="vue">
-                                  <VenueAddress value="{{ $formdata->location }}" />
+                                  <VenueAddress value="{{ $formdata->location }}" group-location="{{ $groupLocation }}" />
                                 </div>
                               </div>
                               <div class="col-lg-5">
