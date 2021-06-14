@@ -77,7 +77,7 @@ class LanguageSync extends Command
 
                             if (strcmp($prop['up_value'], $locale)) {
                                 $this->info("Update preference $locale for {$user->mediawiki} ");
-                                $mwdb->exec("UPDATE mw_user_properties SET language = " . $mwdb->quote($locale) . " WHERE up_user = {$user['user_id']} AND up_property = 'language';");
+                                $mwdb->exec("UPDATE mw_user_properties SET up_value = " . $mwdb->quote($locale) . " WHERE up_user = {$mwuser['user_id']} AND up_property = 'language';");
                             }
                         }
 
