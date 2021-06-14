@@ -39,7 +39,7 @@ return array (
     'signpost_2' => 'Reparar un dispositivo prolonga su vida útil, reduce su impacto medioambiental global y disminuye la demanda de nuevos productos. De hecho, si utilizáramos cada ordenador en Europa durante un año más, podríamos ahorrar el equivalente a 3 millones de toneladas de CO2.',
     'signpost_3' => 'La Unión Europea tiene previsto incluir las tabletas y los smartphone en las normas de Ecodesign para finales de 2022. Esto nos da la oportunidad de reclamar el derecho a reparar estos dispositivos. Las normas decididas por la UE también podrían utilizarse para influir en las leyes de otros lugares, incluido el Reino Unido.',
     'signpost_4' => 'Queremos demonstrar a los políticos por qué se rompen las tabletas y cómo se podrían diseñar para que sean más fáciles de reparar. Los grupos de reparación comunitarios de todo el mundo han estado recopilando esta información. Usando TabiCat, nos ayudas a analizarla.',
-    'signpost_5' => 'Gracias!',
+    'signpost_5' => 'Gracias! Por favor, <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">participa en nuestra encuesta</a>',
     'signpost_6' => 'Gracias por su ayuda! Cada avería que clasificas hace que estos datos sean más útiles. ¿Has pensado en <a href="../">unirte a nuestra comunidad</a>?',
   ),
   'branding' => 
