@@ -45,7 +45,7 @@
                             {{ __('microtasking.volunteering.all_volunteer_contributions') }}
                         </b-td>
                         <b-td class="text-center">{{ totalContributions.toLocaleString() }}</b-td>
-                        <b-td class="text-center">{{ __('microtasking.volunteering.all_quests') }}</b-td>
+                        <b-td class="text-center">{{ __('microtasking.volunteering.my_quests', { value: totalQuests }) }}</b-td>
                     </b-tr>
                     <b-tr>
                         <b-td class="text-center">
@@ -56,7 +56,7 @@
                         </b-td>
                         <template v-if="isLoggedIn">
                             <b-td class="text-center">{{ currentUserContributions }}</b-td>
-                            <b-td class="text-center">{{ translatedMyQuests }}</b-td>
+                            <b-td class="text-center">{{ __('microtasking.volunteering.my_quests', { value: currentUserQuests }) }}</b-td>
                         </template>
                         <template v-else>
                             <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/about">{{ __('microtasking.volunteering.join') }}</a></b-td>
@@ -75,6 +75,10 @@ import CollapsibleSection from './CollapsibleSection'
 export default {
   components: {CollapsibleSection},
   props: {
+    totalQuests: {
+      type: Number,
+      required: true
+    },
     totalContributions: {
       type: Number,
       required: true
@@ -93,9 +97,6 @@ export default {
     }
   },
   computed: {
-    translatedMyQuests() {
-      return this.$lang.get('microtasking.volunteering.my_quests', { value: this.currentUserQuests })
-    },
     openQuests: function () {
       // Note: if we continue with more quests, and open/closed quests,
       // we will likely have a 'quests' table.

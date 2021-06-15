@@ -2,6 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Faultcat;
+use App\Misccat;
+use App\Mobifix;
+use App\MobifixOra;
+use App\PrintcatOra;
+use App\TabicatOra;
+
 use App\Services\DiscourseService;
 use Auth;
 use DB;
@@ -10,6 +17,20 @@ use Illuminate\Support\Facades\Log;
 
 class MicrotaskingController extends Controller
 {
+    protected $quests;
+
+    public function __construct()
+    {
+        $this->quests = [
+            new Faultcat,
+            new Misccat,
+            new Mobifix,
+            new MobifixOra,
+            new PrintcatOra,
+            new TabicatOra
+        ];
+    }
+
     public function index(DiscourseService $discourseService)
     {
         if (Auth::check()) {
@@ -27,7 +48,8 @@ class MicrotaskingController extends Controller
         $tag = config('restarters.microtasking.discussion_tag');
 
         return view('microtasking.dashboard', [
-            'totalContributions' => $this->getTotalContributions(),
+            'totalQuests' => $this->getTotalContributions()['quests'],
+            'totalContributions' => $this->getTotalContributions()['contributions'],
             'currentUserQuests' => $currentUserQuests,
             'currentUserContributions' => $currentUserContributions,
             'topics' => $discourseService->getDiscussionTopics($tag, 5),
@@ -38,33 +60,36 @@ class MicrotaskingController extends Controller
 
     private function getUserContributions($userId)
     {
-        $faultCatContributions = DB::select('select count(*) as total from devices_faults_opinions where user_id = :userId', ['userId' => $userId])[0]->total;
-        $miscCatContributions = DB::select('select count(*) as total from devices_misc_opinions where user_id = :userId', ['userId' => $userId])[0]->total;
-        $mobifixContributions = DB::select('select count(*) as total from devices_faults_mobiles_opinions where user_id = :userId', ['userId' => $userId])[0]->total;
+        $userQuests = 0;
+        $userContributions = 0;
 
-        $quests = 0;
-        if ($faultCatContributions > 0) {
-            $quests++;
-        }
-        if ($miscCatContributions > 0) {
-            $quests++;
-        }
-        if ($mobifixContributions > 0) {
-            $quests++;
+        foreach ($this->quests as $quest) {
+            $questContributions = $quest->where('user_id', $userId)->count();
+            if ($questContributions > 0) {
+                $userQuests++;
+                $userContributions += $questContributions;
+            }
         }
 
         return [
-            'quests' => $quests,
-            'contributions' => $faultCatContributions + $miscCatContributions + $mobifixContributions
+            'quests' => $userQuests,
+            'contributions' => $userContributions
         ];
     }
 
     private function getTotalContributions()
     {
-        $faultCatContributions = DB::select('select count(*) as total from devices_faults_opinions')[0]->total;
-        $miscCatContributions = DB::select('select count(*) as total from devices_misc_opinions')[0]->total;
-        $mobifixContributions = DB::select('select count(*) as total from devices_faults_mobiles_opinions')[0]->total;
+        $quests = 0;
+        $contributions = 0;
 
-        return $faultCatContributions + $miscCatContributions + $mobifixContributions;
+        foreach ($this->quests as $quest) {
+            $quests++;
+            $contributions += $quest->count();
+        }
+
+        return [
+            'quests' => $quests,
+            'contributions' => $contributions
+        ];
     }
 }
