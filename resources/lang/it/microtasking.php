@@ -36,12 +36,12 @@ return array (
   'title' => 'banco di lavoro',
   'volunteering' => 
   array (
-    'all_quests' => '3 missioni',
+    'all_quests' => ':value missioni',
     'all_volunteer_contributions' => 'Contributi di volontari del banco di lavoro',
     'content' => '<p>Raccogliamo dati in occasione di eventi della comunità. Ma i dati grezzi hanno bisogno del tuo aiuto per diventare una prova forte per prodotti migliori. Con il tuo aiuto possiamo cambiare il sistema.</p><p>Questo è un modo semplice per fare la differenza, indipendentemente dal fatto che tu possa unirti a noi ai nostri eventi di riparazione. Unisciti a noi e dedica il minor o il maggior numero possibile di tempo e cervello. La maggior parte delle attività qui sono OK per le persone non tecniche. E siamo sempre qui per aiutarti.',
     'join' => 'Unirsi',
     'my_contributions' => 'I miei contributi',
-    'my_quests' => ':value quests',
+    'my_quests' => ':value missioni',
     'number_of_quests' => 'Numero di missioni',
     'number_of_tasks' => 'Numero di attività',
     'title' => 'Volontariato da qualsiasi luogo',

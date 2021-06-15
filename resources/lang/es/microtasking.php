@@ -47,12 +47,12 @@ return array (
   'title' => 'Banco de trabajo',
   'volunteering' => 
   array (
-    'all_quests' => '3 misiones',
+    'all_quests' => ':value misiones',
     'all_volunteer_contributions' => 'Contribuciones de los voluntarios',
     'content' => '<p>Recopilamos datos en eventos comunitarios. Pero los datos sin procesar necesitan su ayuda para convertirse en pruebas sólidas que utilizar para obtener mejores productos. Con su ayuda, podemos cambiar el sistema.</p><p>Esta es una manera fácil de marcar la diferencia, sin importar si le es posible participar en nuestros eventos de reparación o no. Únase a nosotros y contribuya con el tiempo y conocimientos que tenga a su disposición. No es necesario tener conocimientos técnicos para completar la mayoría de las tareas disponibles. Y siempre estamos aquí para ayudar.',
     'join' => 'Únase a',
     'my_contributions' => 'Mis contribuciones',
-    'my_quests' => ':value quests',
+    'my_quests' => ':value misiones',
     'number_of_quests' => 'Número de misiones',
     'number_of_tasks' => 'Número de tareas',
     'title' => 'Ayúdenos desde cualquier lugar',
