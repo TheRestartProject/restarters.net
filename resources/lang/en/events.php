@@ -194,4 +194,8 @@ return array (
   'online' => 'Online',
   'duplicate_event' => 'Duplicate event',
   'discourse_invite' => 'We\'ve added you to a thread for this event.',
+    'search_title_placeholder' => 'Search title...',
+    'search_country_placeholder' => 'Country...',
+    'search_start_placeholder' => 'From...',
+    'search_end_placeholder' => 'To...',
 );

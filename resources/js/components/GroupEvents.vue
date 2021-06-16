@@ -34,7 +34,7 @@
       <template slot="content">
         <b-tabs class="ourtabs w-100">
           <GroupEventsTab active :limit="limit" :events="nearby" :canedit="canedit" :add-group-name="addGroupName" title="groups.nearby" noneMessage="groups.no_other_nearby_events" />
-          <GroupEventsTab :limit="limit" :events="all" :canedit="canedit" :add-group-name="addGroupName" title="groups.all" noneMessage="groups.no_other_events" />
+          <GroupEventsTab :limit="limit" :events="all" :canedit="canedit" :add-group-name="addGroupName" title="groups.all" noneMessage="groups.no_other_events" filters />
         </b-tabs>
       </template>
     </CollapsibleSection>
@@ -191,7 +191,7 @@ export default {
 
 .ourtabs {
   max-height: 600px;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 .border-bottom-thick {
