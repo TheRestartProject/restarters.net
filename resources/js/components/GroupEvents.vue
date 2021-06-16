@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CollapsibleSection class="lineheight d-none d-md-block" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel">
+    <CollapsibleSection class="lineheight" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel">
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
         <div>
@@ -23,7 +23,7 @@
         </b-tabs>
       </template>
     </CollapsibleSection>
-    <CollapsibleSection class="lineheight d-none d-md-block mt-4" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel" v-if="showOther">
+    <CollapsibleSection class="lineheight mt-4" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel" v-if="showOther">
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
           <div>

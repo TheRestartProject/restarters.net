@@ -30,7 +30,7 @@ class Network extends Model
 
     public function addCoordinator($coordinator)
     {
-        $this->coordinators()->attach($coordinator->id);
+        $this->coordinators()->syncWithoutDetaching($coordinator->id);
     }
 
     public function eventsRequiringModeration()
@@ -48,7 +48,7 @@ class Network extends Model
 
     public function logo()
     {
-        return $this->hasOne('App\Xref', 'reference', 'id')
+        return $this->hasOne(\App\Xref::class, 'reference', 'id')
                     ->where('reference_type', config('restarters.xref_types.networks'))
                     ->where('object_type', 5);
     }

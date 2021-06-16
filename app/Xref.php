@@ -104,6 +104,6 @@ class Xref extends Model
 
     public function image()
     {
-        return $this->hasOne('App\Images', 'idimages', 'object');
+        return $this->hasOne(\App\Images::class, 'idimages', 'object');
     }
 }

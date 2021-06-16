@@ -24,7 +24,7 @@ class GroupTags extends Model
     //Table Relations
     public function group_tags()
     {
-        return $this->belongsToMany('App\GrouptagsGroups');
+        return $this->belongsToMany(\App\GrouptagsGroups::class);
     }
 
     //Table Relations
