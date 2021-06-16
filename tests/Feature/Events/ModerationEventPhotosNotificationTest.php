@@ -38,21 +38,6 @@ class ModerateEventPhotosNotificationTest extends TestCase
      */
     protected $group;
 
-    public function setUp()
-    {
-        parent::setUp();
-
-        \DB::statement("SET foreign_key_checks=0");
-
-        User::truncate();
-        Group::truncate();
-        Party::truncate();
-        EventsUsers::truncate();
-        \DB::table('notifications')->truncate();
-
-        \DB::statement("SET foreign_key_checks=1");
-    }
-
     /** @test */
     public function a_moderation_notification_is_sent_to_admins_when_event_photos_are_uploaded()
     {

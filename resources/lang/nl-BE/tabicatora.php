@@ -17,7 +17,7 @@ return array (
     'signpost_3' => 'De Europese Unie is van plan om tegen 2020 regelgeving in te voeren die tablets en smartphones ecologischer moet maken. Wij willen deze kans grijpen om op te roepen voor het recht op repareren. Europese regelgeving kan ook een invloed hebben op landen buiten de EU, zoals het VK.',
     'signpost_4' => '"We willen beleidsmakers vertellen waarom tablets stuk gaan en hoe ze 
 makkerlijker herstelbaar kunnen worden. Repair groepen over de hele wereld hebben deze informatie ingevoerd. Door TabiCat te gebruiken, helpt u ons ze te analyseren."',
-    'signpost_5' => 'Bedankt!',
+    'signpost_5' => 'Bedankt! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Vul onze enquête in</a>',
     'signpost_6' => 'Bedankt voor uw hulp! Elke fout die u categoriseert maakt de gegevens nuttiger. <a href="../">Waarom wordt u ook geen lid van onze community</a>?',
   ),
   'status' => 

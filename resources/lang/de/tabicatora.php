@@ -16,7 +16,7 @@ return array (
     'signpost_2' => 'Die Reparatur eines Geräts verlängert seine Lebensdauer, reduziert die Gesamtumweltbelastung und senkt die Nachfrage nach neuen Produkten. Wenn wir jeden Computer in Europa ein Jahr länger nutzen würden, könnten wir das Äquivalent von 3 Millionen Tonnen CO2 einsparen.',
     'signpost_3' => 'Die Europäische Union plant, Tablets und Smartphones bis 2022 in die Ökodesign-Regeln aufzunehmen. Dies wird uns die Möglichkeit geben, das Recht auf Reparatur dieser Geräte einzufordern. Regeln, die von der EU beschlossen werden, könnten auch genutzt werden, um Gesetze an anderen Orten zu beeinflussen, auch in Großbritannien.',
     'signpost_4' => 'Wir wollen den politischen Entscheidungsträgern sagen, warum Tablets kaputt gehen und wie sie einfacher zu reparieren sind. Community-Reparaturgruppen auf der ganzen Welt haben dazu Daten gesammelt. Sie helfen uns, diese Informationen zu analysieren, indem sie TabiCat ausprobieren.',
-    'signpost_5' => 'Vielen Dank an Sie!',
+    'signpost_5' => 'Vielen Dank an Sie! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Bitte nehmen Sie an unserer Umfrage teil</a>',
     'signpost_6' => 'Vielen Dank für Ihre Hilfe! Jeder Fehler, den Sie kategorisieren, macht diese Daten noch nützlicher. <a href="../">Werden Sie doch auch Mitglied unserer Community</a>.',
   ),
   'status' => 
