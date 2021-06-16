@@ -13,15 +13,23 @@ class Geocoder
     {
         $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($location)."&key=" . env('GOOGLE_API_CONSOLE_KEY'));
 
-        $decoded = json_decode($json)->results[0];
+        if ($json) {
+            $res = json_decode($json);
 
-        $latitude = $decoded->{'geometry'}->{'location'}->lat;
-        $longitude = $decoded->{'geometry'}->{'location'}->lng;
+            if ($res && $res->results && count($res->results)) {
+                $decoded = json_decode($json)->results[0];
 
-        return [
-            'latitude' => $latitude,
-            'longitude' => $longitude,
-        ];
+                $latitude = $decoded->{'geometry'}->{'location'}->lat;
+                $longitude = $decoded->{'geometry'}->{'location'}->lng;
+
+                return [
+                    'latitude' => $latitude,
+                    'longitude' => $longitude,
+                ];
+            }
+        }
+
+        return FALSE;
     }
 
     public function reverseGeocode($lat, $lng)
