@@ -163,17 +163,11 @@
                   </div>
                   <div class="col-12">
 
-                      <div class="row">
-                          <div class="col-lg-7">
-                            <div class="vue">
-                              @php($locationError = $errors->has('location') ?? $errors->first('location'))
-                              <VenueAddress error="{{ $locationError }}" value="{{ old('location') }}" />
-                            </div>
-                          </div>
-                          <div class="col-lg-5">
-                            <div id="map-plugin" class="events__map"></div>
-                          </div>
-                      </div>
+                    @php($locationError = $errors->has('location') ?? $errors->first('location'))
+
+                    <div class="vue">
+                      <VenueAddress error="{{ $locationError }}" value="{{ old('location') }}" :all-groups="{{ json_encode($allGroups, JSON_INVALID_UTF8_IGNORE) }}" />
+                    </div>
 
                   </div>
                 </div>

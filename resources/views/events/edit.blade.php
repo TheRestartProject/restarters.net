@@ -155,16 +155,9 @@
                       </div>
                       <div class="col-12">
 
-                          <div class="row">
-                              <div class="col-md-7">
-                                <div class="vue">
-                                  <VenueAddress value="{{ $formdata->location }}" group-location="{{ $groupLocation }}" />
-                                </div>
-                              </div>
-                              <div class="col-lg-5">
-                                <div id="map-plugin" class="map events__map" data-latitude="{{ $formdata->latitude }}" data-longitude="{{ $formdata->longitude }}" data-zoom="14"></div>
-                              </div>
-                          </div>
+                        <div class="vue">
+                          <VenueAddress value="{{ $formdata->location }}" :all-groups="{{ json_encode($allGroups, JSON_INVALID_UTF8_IGNORE) }}" />
+                        </div>
 
                       </div>
                     </div>
