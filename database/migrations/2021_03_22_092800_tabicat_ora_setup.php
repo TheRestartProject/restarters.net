@@ -13,86 +13,88 @@ class TabicatOraSetup extends Migration {
      */
     public function up() {
 
-        Schema::create('devices_faults_tablets_ora_opinions', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('id_ords', 16)->index();
-            $table->unsignedInteger('fault_type_id')->index();
-            $table->string('session_id', 191);
-            $table->ipAddress('ip_address');
-            $table->unsignedInteger('user_id')->nullable();
-            $table->timestamps();
-            $table->charset = 'utf8mb4';
-            $table->collation = 'utf8mb4_unicode_ci';
-        });
+        if (!Schema::hasTable('devices_faults_tablets_ora_opinions')) {
+            Schema::create('devices_faults_tablets_ora_opinions', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('id_ords', 16)->index();
+                $table->unsignedInteger('fault_type_id')->index();
+                $table->string('session_id', 191);
+                $table->ipAddress('ip_address');
+                $table->unsignedInteger('user_id')->nullable();
+                $table->timestamps();
+                $table->charset = 'utf8mb4';
+                $table->collation = 'utf8mb4_unicode_ci';
+            });
 
-        Schema::create('devices_faults_tablets_ora_adjudicated', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('id_ords', 16)->index();
-            $table->unsignedInteger('fault_type_id')->index();
-            $table->timestamps();
-            $table->charset = 'utf8mb4';
-            $table->collation = 'utf8mb4_unicode_ci';
-        });
+            Schema::create('devices_faults_tablets_ora_adjudicated', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('id_ords', 16)->index();
+                $table->unsignedInteger('fault_type_id')->index();
+                $table->timestamps();
+                $table->charset = 'utf8mb4';
+                $table->collation = 'utf8mb4_unicode_ci';
+            });
 
-        Schema::create('fault_types_tablets', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('title', 255)->index();
-            $table->text('description')->default('');
-            $table->string('regex', 255);
-            $table->timestamps();
-            $table->charset = 'utf8mb4';
-            $table->collation = 'utf8mb4_unicode_ci';
-        });
-        DB::table('fault_types_tablets')->truncate();
+            Schema::create('fault_types_tablets', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('title', 255)->index();
+                $table->text('description')->default('');
+                $table->string('regex', 255);
+                $table->timestamps();
+                $table->charset = 'utf8mb4';
+                $table->collation = 'utf8mb4_unicode_ci';
+            });
+            DB::table('fault_types_tablets')->truncate();
 
-        $fault_types = $this->_FaultTypes();
+            $fault_types = $this->_FaultTypes();
 
-        foreach ($fault_types as $k => $v) {
-            DB::table('fault_types_tablets')->insert([
-                'id' => $k,
-                'title' => $v['title'],
-                'description' => $v['description'],
-                'regex' => $v['regex'],
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ]);
-        }
-        Schema::create('devices_tabicat_ora', function (Blueprint $table) {
-            $table->string('id_ords', 16)->primary();
-            $table->string('data_provider', 32)->index();
-            $table->string('country', 3);
-            $table->string('partner_product_category', 128);
-            $table->string('product_category', 16);
-            $table->string('brand', 32)->default('');
-            $table->string('year_of_manufacture', 4)->default('');
-            $table->string('repair_status', 12)->default('');
-            $table->string('event_date', 10);
-            $table->string('problem', 1024);
-            $table->string('translation', 1024);
-            $table->string('language', 2);
-            $table->unsignedInteger('fault_type_id')->index();
-            $table->charset = 'utf8mb4';
-            $table->collation = 'utf8mb4_unicode_ci';
-        });
+            foreach ($fault_types as $k => $v) {
+                DB::table('fault_types_tablets')->insert([
+                                                             'id' => $k,
+                                                             'title' => $v['title'],
+                                                             'description' => $v['description'],
+                                                             'regex' => $v['regex'],
+                                                             'created_at' => date('Y-m-d H:i:s'),
+                                                             'updated_at' => date('Y-m-d H:i:s'),
+                                                         ]);
+            }
+            Schema::create('devices_tabicat_ora', function (Blueprint $table) {
+                $table->string('id_ords', 16)->primary();
+                $table->string('data_provider', 32)->index();
+                $table->string('country', 3);
+                $table->string('partner_product_category', 128);
+                $table->string('product_category', 16);
+                $table->string('brand', 32)->default('');
+                $table->string('year_of_manufacture', 4)->default('');
+                $table->string('repair_status', 12)->default('');
+                $table->string('event_date', 10);
+                $table->string('problem', 1024);
+                $table->string('translation', 1024);
+                $table->string('language', 2);
+                $table->unsignedInteger('fault_type_id')->index();
+                $table->charset = 'utf8mb4';
+                $table->collation = 'utf8mb4_unicode_ci';
+            });
 
-        $data = base_path() . '/database/data_updates/devices_tabicat_ora.php';
-        if (file_exists($data)) {
-            include($data);
-            foreach ($devices_tabicat_ora as $k => $v) {
-                DB::table('devices_tabicat_ora')->insert([
-                    'id_ords' => $v['id_ords'],
-                    'data_provider' => $v['data_provider'],
-                    'country' => $v['country'],
-                    'partner_product_category' => $v['partner_product_category'],
-                    'product_category' => $v['product_category'],
-                    'brand' => $v['brand'],
-                    'year_of_manufacture' => $v['year_of_manufacture'],
-                    'repair_status' => $v['repair_status'],
-                    'event_date' => $v['event_date'],
-                    'problem' => $v['problem'],
-                    'translation' => $v['translation'],
-                    'language' => $v['language'],
-                ]);
+            $data = base_path() . '/database/data_updates/devices_tabicat_ora.php';
+            if (file_exists($data)) {
+                include($data);
+                foreach ($devices_tabicat_ora as $k => $v) {
+                    DB::table('devices_tabicat_ora')->insert([
+                                                                 'id_ords' => $v['id_ords'],
+                                                                 'data_provider' => $v['data_provider'],
+                                                                 'country' => $v['country'],
+                                                                 'partner_product_category' => $v['partner_product_category'],
+                                                                 'product_category' => $v['product_category'],
+                                                                 'brand' => $v['brand'],
+                                                                 'year_of_manufacture' => $v['year_of_manufacture'],
+                                                                 'repair_status' => $v['repair_status'],
+                                                                 'event_date' => $v['event_date'],
+                                                                 'problem' => $v['problem'],
+                                                                 'translation' => $v['translation'],
+                                                                 'language' => $v['language'],
+                                                             ]);
+                }
             }
         }
     }

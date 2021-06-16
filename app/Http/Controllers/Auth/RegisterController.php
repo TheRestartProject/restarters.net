@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use App\Session;
-use App\User;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
 {
@@ -66,28 +65,14 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        //Old Laravel
-        // $user = User::create([
-        //     'name' => $data['name'],
-        //     'email' => $data['email'],
-        //     'password' => Hash::make($data['password']),
-        //     'role' => 4,
-        //     'recovery' => substr( bin2hex(openssl_random_pseudo_bytes(32)), 0, 24 ),
-        //     'recovery_expires' => strftime( '%Y-%m-%d %X', time() + (24 * 60 * 60)),
-        // ]);
-        //
-        // Session::createSession($user->id);
-        //
-        // return $user;
-
         $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+                                'name' => $data['name'],
+                                'email' => $data['email'],
+                                'password' => Hash::make($data['password']),
             'role' => 4,
             'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
             'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
-        ]);
+                            ]);
 
         Session::createSession($user->id);
 

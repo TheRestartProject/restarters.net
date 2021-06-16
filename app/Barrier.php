@@ -14,6 +14,6 @@ class Barrier extends Model
 
     public function barriers()
     {
-        return $this->belongsToMany('App\Device', 'devices_barriers', 'barrier_id', 'device_id');
+        return $this->belongsToMany(\App\Device::class, 'devices_barriers', 'barrier_id', 'device_id');
     }
 }

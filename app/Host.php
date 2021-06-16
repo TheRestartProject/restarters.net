@@ -12,7 +12,7 @@ class Host extends Model
 
     public function hostImage()
     {
-        return $this->hasOne('App\Xref', 'reference', 'idgroups')->where('object_type', 5);
+        return $this->hasOne(\App\Xref::class, 'reference', 'idgroups')->where('object_type', 5);
     }
 
     public function getGroupName()

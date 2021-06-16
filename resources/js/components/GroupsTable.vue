@@ -267,7 +267,6 @@ export default {
       const a = aRow[key]
       const b = bRow[key]
 
-      console.log("Sort", key, a, b)
       if (key === 'group_name') {
         // We need a custom sort because we are putting a link into the group field.
         return b.name.localeCompare(a.name, compareLocale, compareOptions)

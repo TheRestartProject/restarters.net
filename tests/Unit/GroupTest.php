@@ -32,8 +32,8 @@ class GroupTest extends TestCase
     /** @test */
     public function can_add_volunteer_to_a_group()
     {
-        $group = factory('App\Group')->create();
-        $volunteer = factory('App\User')->create();
+        $group = factory(\App\Group::class)->create();
+        $volunteer = factory(\App\User::class)->create();
 
         $group->addVolunteer($volunteer);
 
@@ -58,8 +58,8 @@ class GroupTest extends TestCase
     /** @test */
     public function it_can_set_a_host_group_member_as_host()
     {
-        $group = factory('App\Group')->create();
-        $host = factory('App\User')->states('Host')->create();
+        $group = factory(\App\Group::class)->create();
+        $host = factory(\App\User::class)->states('Host')->create();
 
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
@@ -74,8 +74,8 @@ class GroupTest extends TestCase
     /** @test */
     public function it_can_set_a_restarter_group_member_as_host()
     {
-        $group = factory('App\Group')->create();
-        $restarter = factory('App\User')->states('Restarter')->create();
+        $group = factory(\App\Group::class)->create();
+        $restarter = factory(\App\User::class)->states('Restarter')->create();
 
         $group->addVolunteer($restarter);
         $group->makeMemberAHost($restarter);
@@ -89,8 +89,8 @@ class GroupTest extends TestCase
     /** @test */
     public function it_can_have_a_tag_added()
     {
-        $group = factory('App\Group')->create();
-        $tag1 = factory('App\GroupTags')->create();
+        $group = factory(\App\Group::class)->create();
+        $tag1 = factory(\App\GroupTags::class)->create();
 
         $group->addTag($tag1);
 
