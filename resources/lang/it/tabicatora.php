@@ -17,7 +17,7 @@ return array (
     'signpost_3' => 'L\'Unione Europea includerà tablet e smartphone nelle regole di Ecodesign entro il 2022. Questo ci darà la possibilità di chiedere il Diritto alla Riparazione di questi dispositivi. Le regole decise dall\'UE potrebbero anche essere usate per influenzare le leggi in altri luoghi, compreso il Regno Unito.',
     'signpost_4' => '"Vogliamo dire ai legislatori perché i tablet si rompono e come potrebbero essere resi più facili da riparare. I gruppi di riparazione comunitaria in tutto il mondo hanno 
 registrato queste informazioni, e provando TabiCat, ci stai aiutando ad analizzarle."',
-    'signpost_5' => 'Grazie!',
+    'signpost_5' => 'Grazie! Per favore, <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">partecipa al nostro sondaggio</a>',
     'signpost_6' => 'Grazie per il tuo aiuto! Ogni difetto che classifichi rende questi dati più utili. Perché non ti <a href="../">unisci anche tu alla nostra comunità</a>?',
   ),
   'status' => 
