@@ -3,7 +3,7 @@
     <EventHeading :idevents="idevents" :canedit="canedit" :in-group="inGroup" :attending="attending" />
     <div class="layout">
       <div>
-        <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" />
+        <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" :is-attending="isAttending" :discourse-thread="discourseThread" />
         <EventDescription class="pr-md-3" :idevents="idevents" />
       </div>
       <div>
@@ -58,6 +58,16 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    isAttending: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    discourseThread: {
+      type: String,
+      required: false,
+      default: null
     },
     attending: {
       type: Object,

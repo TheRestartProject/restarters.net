@@ -30,6 +30,14 @@
           {{ start }}-{{ end }}
         </div>
       </div>
+      <div class="border-top-thin d-flex pt-1 pb-1" v-if="isAttending && discourseThread">
+        <div class="mr-2">
+          <b-img-lazy src="/icons/talk_ico.svg" class="icon" />
+        </div>
+        <div>
+          <a :href="discourseThread">{{ __('events.talk_thread') }}</a>
+        </div>
+      </div>
       <div class="border-top-thin d-flex pt-1 pb-1">
         <div class="mr-2">
           <b-img-lazy src="/icons/host_ico.svg" class="icon" />
@@ -87,8 +95,18 @@ export default {
     calendarLinks: {
       type: Object,
       required: false
-    }
-  },
+    },
+    isAttending: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    discourseThread: {
+      type: String,
+      required: false,
+      default: null
+    },
+  }
 }
 </script>
 <style scoped lang="scss">
