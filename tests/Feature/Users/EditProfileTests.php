@@ -11,7 +11,7 @@ use Tests\TestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class NetworkTest extends TestCase
+class EditProfileTests extends TestCase
 {
     public function setUp()
     {
