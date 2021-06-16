@@ -11,13 +11,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class DeviceStatsTest extends TestCase
 {
-    public function setUp()
-    {
-        parent::setUp();
-        factory(Category::class, 1)->states('Cat1')->create();
-
-    }
-
     /** @test */
     public function a_fixed_device_has_co2_diverted()
     {

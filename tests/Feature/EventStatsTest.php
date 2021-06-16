@@ -18,7 +18,6 @@ class EventStatsTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        factory(Category::class, 1)->states('Mobile')->create();
     }
 
     /** @test */

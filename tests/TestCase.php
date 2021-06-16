@@ -58,6 +58,14 @@ abstract class TestCase extends BaseTestCase
 
         // We don't yet have a Discourse test environment.
         config(['restarters.features.discourse_integration' => false]);
+
+        factory(Category::class, 1)->states('Cat1')->create();
+        factory(Category::class, 1)->states('Cat2')->create();
+        factory(Category::class, 1)->states('Cat3')->create();
+        factory(Category::class, 1)->states('Mobile')->create();
+        factory(Category::class, 1)->states('Misc')->create();
+        factory(Category::class, 1)->states('Desktop computer')->create();
+
     }
 
     public function userAttributes() {

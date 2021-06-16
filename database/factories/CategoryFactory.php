@@ -14,6 +14,14 @@ $factory->state(App\Category::class, 'Misc', function (Faker $faker) {
     ];
 });
 
+$factory->state(App\Category::class, 'Desktop computer', function (Faker $faker) {
+    return [
+        'idcategories' => 11,
+        'name' => 'Desktop computer',
+        'revision' => 1
+    ];
+});
+
 $factory->state(App\Category::class, 'Mobile', function (Faker $faker) {
     return [
         'idcategories' => 25,
