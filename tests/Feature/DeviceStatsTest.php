@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Category;
 use App\Device;
 
 use DB;
@@ -13,9 +14,8 @@ class DeviceStatsTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
-        Device::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        factory(Category::class, 1)->states('Cat1')->create();
+
     }
 
     /** @test */

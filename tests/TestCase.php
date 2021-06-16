@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\Audits;
+use App\Category;
 use App\Device;
 use App\EventsUsers;
 use App\Group;
@@ -42,6 +43,7 @@ abstract class TestCase extends BaseTestCase
         UserGroups::truncate();
         Device::truncate();
         GroupNetwork::truncate();
+        Category::truncate();
         DB::delete('delete from user_network');
         DB::table('notifications')->truncate();
         DB::statement("SET foreign_key_checks=1");
