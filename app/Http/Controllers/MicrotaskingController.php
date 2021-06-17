@@ -79,17 +79,17 @@ class MicrotaskingController extends Controller
 
     private function getTotalContributions()
     {
-        $quests = 0;
-        $contributions = 0;
+        $totalQuests = 0;
+        $totalContributions = 0;
 
         foreach ($this->quests as $quest) {
-            $quests++;
-            $contributions += $quest->count();
+            $totalQuests++;
+            $totalContributions += $quest->count();
         }
 
         return [
-            'quests' => $quests,
-            'contributions' => $contributions
+            'quests' => $totalQuests,
+            'contributions' => $totalContributions
         ];
     }
 }
