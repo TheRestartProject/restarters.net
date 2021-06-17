@@ -45,7 +45,7 @@
                             {{ __('microtasking.volunteering.all_volunteer_contributions') }}
                         </b-td>
                         <b-td class="text-center">{{ totalContributions.toLocaleString() }}</b-td>
-                        <b-td class="text-center">{{ __('microtasking.volunteering.my_quests', { value: totalQuests }) }}</b-td>
+                        <b-td class="text-center">{{ __('microtasking.volunteering.all_quests', { value: totalQuests }) }}</b-td>
                     </b-tr>
                     <b-tr>
                         <b-td class="text-center">
