@@ -66,12 +66,27 @@ Route::prefix('calendar')->group(function () {
 
 Route::get('workbench', 'MicrotaskingController@index')->name('workbench');
 
+Route::prefix('FaultCat')->group(function () {
+    Route::get('/', 'FaultcatController@index');
+    Route::post('/', 'FaultcatController@index');
+    Route::get('/status', 'FaultcatController@status');
+    Route::get('/demographics', 'FaultcatController@demographics');
+    Route::post('/demographics', 'FaultcatController@storeDemographics');
+});
+
 Route::prefix('faultcat')->group(function () {
     Route::get('/', 'FaultcatController@index');
     Route::post('/', 'FaultcatController@index');
     Route::get('/status', 'FaultcatController@status');
     Route::get('/demographics', 'FaultcatController@demographics');
     Route::post('/demographics', 'FaultcatController@storeDemographics');
+});
+
+Route::prefix('MiscCat')->group(function () {
+    Route::get('/', 'MisccatController@index');
+    Route::post('/', 'MisccatController@index');
+    Route::get('/cta', 'MisccatController@cta');
+    Route::get('/status', 'MisccatController@status');
 });
 
 Route::prefix('misccat')->group(function () {

@@ -33,133 +33,16 @@
                 </a>
             </div>
         </div>
-        @if (isset($status))
-
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0">
-            <div class="col">
-                <div class="row justify-content-center">
-                    <p><strong>Items by EEE Status</strong></p>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="col">
-                        <p class="badge-pill badge-light"><span>EEE</span></p>
-                        <p>
-                            @php( print($status['total_eee'][0]->total))
-                        </p>
-                    </div>
-                    <div class="col">
-                        <p class="badge-pill badge-light"><span>Non-EEE</span></p>
-                        <p>
-                            @php( print($status['total_non_eee'][0]->total))
-                        </p>
-                    </div>
-                    <div class="col">
-                        <p class="badge-pill badge-light"><span>Not sure</span></p>
-                        <p>
-                            @php( print($status['total_not_sure'][0]->total))
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <?php
-            $summary = [
-                'todo' => [
-                    'status' => 'Items needing more opinions',
-                    'total' => 0,
-                    ],
-                'misc' => [
-                    'status' => 'Items agreed as Misc',
-                    'total' => 0,
-                    ],
-                'done' => [
-                    'status' => 'Items agreed as non-Misc',
-                    'total' => 0,
-                    ],
-            ];
-        foreach ($status['status'] as $row) {
-            switch ($row->code) {
-                case -1 :
-                case 5 :
-                    $summary['done']['total'] += $row->total;
-                    break;
-                case 0 :
-                case 1 :
-                case 2 :
-                    $summary['todo']['total'] += $row->total;
-                    break;
-                case 4 :
-                    $summary['misc']['total'] += $row->total;
-                    break;
-            }
-        }
-        ?>
-        @foreach ($summary as $k => $row)
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0">
-            <div class="col">
-                <div class="row justify-content-center">
-                    <p><strong>@php( print($row['status']))  : @php( print($row['total'])) </strong></p>
-                </div>
-            </div>
-        </div>
-        @endforeach
-        @if (count($status['list_splits']))
+        @if(session()->has('success'))
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
-            <div class="col">
-                <div class="row justify-content-center">
-                    <p><strong>Items with split opinions : @php( print(count($status['list_splits'])))</strong></p>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="col">
-                        <div class="row badge-pill badge-light">
-                            <div class="col col-1">
-                                ID
-                            </div>
-                            <div class="col col-3">
-                                Opinions
-                            </div>
-                            <div class="col col-2">
-                                Brand
-                            </div>
-                            <div class="col col-2">
-                                Model
-                            </div>
-                            <div class="col">
-                                Problem
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row justify-content-center small">
-                    <div class="col">
-                        @foreach($status['list_splits'] as $row)
-                        <div class="row border-grey">
-                            <div class="col col-1">
-                                @php( print($row->iddevices) )
-                            </div>
-                            <div class="col col-3">
-                                @php( print($row->opinions) )
-                            </div>
-                            <div class="col col-2">
-                                @php( print($row->brand) )
-                            </div>
-                            <div class="col col-2">
-                                @php( print($row->model) )
-                            </div>
-                            <div class="col">
-                                @php( print($row->problem) )
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
+            You've seen them all, thanks!
         </div>
         @endif
+        @if (isset($status))
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0">
             <div class="col">
                 <div class="row justify-content-center">
-                    <p><strong>Items with category changed or changing from "Misc"</strong></p>
+                    <p><strong>Items with category changed from "Misc"</strong></p>
                 </div>
                 <div class="row justify-content-center">
                     <div class="col">
