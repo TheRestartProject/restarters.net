@@ -152,23 +152,23 @@
   </div>
 </template>
 <script>
-import InfiniteLoading from 'vue-infinite-loading'
-import GroupEventsScrollTableFilters from './GroupEventsScrollTableFilters'
-import GroupEventsScrollTableDateShort from './GroupEventsScrollTableDateShort'
-import GroupEventsScrollTableDateLong from './GroupEventsScrollTableDateLong'
-import EventTitle from './EventTitle'
-import GroupEventsScrollTableNumber from './GroupEventsScrollTableNumber'
 import moment from 'moment'
-import GroupEventsScrollTableActions from './GroupEventsScrollTableActions'
+import InfiniteLoading from 'vue-infinite-loading'
+import GroupEventsScrollTableDateShort from '../../assets/js/components/GroupEventsScrollTableDateShort'
+import GroupEventsScrollTableDateLong from '../../assets/js/components/GroupEventsScrollTableDateLong'
+import GroupEventsScrollTableNumber from '../../assets/js/components/GroupEventsScrollTableNumber'
+import GroupEventsScrollTableActions from '../../assets/js/components/GroupEventsScrollTableActions'
+import GroupEventsScrollTableFilters from '../../assets/js/components/GroupEventsScrollTableFilters'
+import EventTitle from './EventTitle'
 
 export default {
   components: {
+    EventTitle,
+    GroupEventsScrollTableFilters,
     GroupEventsScrollTableActions,
     GroupEventsScrollTableNumber,
-    EventTitle,
     GroupEventsScrollTableDateLong,
     GroupEventsScrollTableDateShort,
-    GroupEventsScrollTableFilters,
     InfiniteLoading
   },
   props: {
