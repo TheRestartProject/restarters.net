@@ -25,7 +25,6 @@
             <file>./tests/Feature/Groups/GroupEditTest.php</file>
             <file>./tests/Feature/Groups/GroupNetworkCreateTest.php</file>
             <file>./tests/Feature/Microtasks/BasicTest.php</file>
-            <file>./tests/Feature/Microtasks/FaultcatTest.php</file>
             <file>./tests/Feature/Microtasks/MobifixOraTest.php</file>
             <file>./tests/Feature/Microtasks/MobifixTest.php</file>
             <file>./tests/Feature/Microtasks/PrintcatOraTest.php</file>
