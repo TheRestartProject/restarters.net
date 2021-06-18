@@ -153,7 +153,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function postProfileInfoEdit(Request $request)
+    public function postProfileInfoEdit(Request $request, App\Helpers\Geocoder $geocoder)
     {
         $rules = [
         'name'            => 'required|string|max:255',
@@ -191,10 +191,10 @@ class UserController extends Controller
         }
 
         if (!empty($user->location)) {
-            $lat_long = FixometerHelper::getLatLongFromCityCountry($user->location, $user->country);
-            if (!empty($lat_long)) {
-                $user->latitude = $lat_long[0];
-                $user->longitude = $lat_long[1];
+            $geocoded = $geocoder->geocode("{$user->location}, {$user->country}");
+            if (!empty($geocoded)) {
+                $user->latitude = $geocoded['latitude'];
+                $user->longitude = $geocoded['longitude'];
             } else {
                 $user->latitude = null;
                 $user->longitude = null;
@@ -1148,7 +1148,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function postRegister(Request $request, $hash = null)
+    public function postRegister(Request $request, $hash = null, App\Helpers\Geocoder $geocoder)
     {
         if (Auth::check()) { //Existing users don't need all the same rules
             $rules = [
@@ -1239,12 +1239,12 @@ class UserController extends Controller
             $user->invites = 1;
         }
 
-  // Now determine lat and long values from location field (if provided)
+        // Now determine lat and long values from location field (if provided)
         if (!is_null($request->input('city'))) {
-            $lat_long = FixometerHelper::getLatLongFromCityCountry($request->input('city'), $request->input('country'));
-            if (!empty($lat_long)) {
-                $user->latitude = $lat_long[0];
-                $user->longitude = $lat_long[1];
+            $geocoded = $geocoder->geocode("{$request->input('city')}, {$request->input('country')}");
+            if (!empty($geocoded)) {
+                $user->latitude = $geocoded['latitude'];
+                $user->longitude = $geocoded['longitude'];
             }
         }
 

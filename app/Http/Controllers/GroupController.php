@@ -11,6 +11,7 @@ use App\GroupNetwork;
 use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\Geocoder;
 use App\Invite;
 use App\Network;
 use App\Notifications\AdminModerationGroup;
@@ -119,7 +120,7 @@ class GroupController extends Controller
         return $this->indexVariations('all', $id);
     }
 
-    public function create(Request $request, $networkId = null)
+    public function create(Request $request, $networkId = null, Geocoder $geocoder)
     {
         $user = User::find(Auth::id());
 
@@ -143,9 +144,9 @@ class GroupController extends Controller
             }
 
             if ( ! empty($location)) {
-                $lat_long = FixometerHelper::getLatLongFromCityCountry($location);
+                $geocoded = $geocoder->geocode($location);
 
-                if ( empty($lat_long) ) {
+                if ( empty($geocoded) ) {
                   $response['danger'] = 'Group could not be created. Address not found.';
                   return view('group.create', [
                       'title' => 'New Group',
@@ -154,9 +155,9 @@ class GroupController extends Controller
                   ]);
                 }
 
-                $latitude = $lat_long[0];
-                $longitude = $lat_long[1];
-                $country = $lat_long[2];
+                $latitude = $geocoded['latitude'];
+                $longitude = $geocoded['longitude'];
+                $country = $geocoded['country'];
             } else {
                 $latitude = null;
                 $longitude = null;
@@ -563,7 +564,7 @@ class GroupController extends Controller
         return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
     }
 
-    public function edit(Request $request, $id)
+    public function edit(Request $request, $id, Geocoder $geocoder)
     {
         $user = Auth::user();
         $Group = new Group;
@@ -587,9 +588,9 @@ class GroupController extends Controller
             unset($data['image']);
 
             if ( ! empty($data['location'])) {
-                $lat_long = FixometerHelper::getLatLongFromCityCountry($data['location']);
+                $geocoded = $geocoder->geocode($data['location']);
 
-                if ( empty($lat_long) ) {
+                if ( empty($geocoded) ) {
                   $response['danger'] = 'Group could not be saved. Address not found.';
                   $group = Group::find($id);
                   $images = $File->findImages(env('TBL_GROUPS'), $id);
@@ -616,9 +617,9 @@ class GroupController extends Controller
                   ]);
                 }
 
-                $latitude = $lat_long[0];
-                $longitude = $lat_long[1];
-                $country = $lat_long[2];
+                $latitude = $geocoded['latitude'];
+                $longitude = $geocoded['longitude'];
+                $country = $geocoded['country'];
             } else {
                 $latitude = null;
                 $longitude = null;

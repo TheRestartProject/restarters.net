@@ -22,9 +22,16 @@ class Geocoder
                 $latitude = $decoded->{'geometry'}->{'location'}->lat;
                 $longitude = $decoded->{'geometry'}->{'location'}->lng;
 
+                foreach ($decoded->{'address_components'} as $component) {
+                    if ($component->types && count($component->types) && $component->types[0] === 'country') {
+                        $country = $component->long_name;
+                    }
+                }
+
                 return [
                     'latitude' => $latitude,
                     'longitude' => $longitude,
+                    'country' => $country
                 ];
             }
         }

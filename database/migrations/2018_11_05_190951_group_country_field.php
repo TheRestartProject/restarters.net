@@ -24,12 +24,13 @@ class GroupCountryField extends Migration
 
         foreach( $groups as $group ) {
 
-          $lat_long = FixometerHelper::getLatLongFromCityCountry($group->latitude, $group->longitude);
+          $geocode = new \App\Helpers\Geocoder();
+          $geocoded = $geocode->geocode("$group->latitude, $group->longitude");
 
-          if( isset($lat_long[2]) && !empty($lat_long[2]) ) {
+          if(!empty($geocoded)) {
 
             $update = DB::table('groups')->where('idgroups', $group->idgroups)->update([
-              'country' => $lat_long[2]
+              'country' => $geocoded['country']
             ]);
 
             usleep(250000);
