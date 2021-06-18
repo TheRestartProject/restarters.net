@@ -22,6 +22,9 @@
             <file>./tests/Feature/Groups/GroupCreateTest.php</file>
             <file>./tests/Feature/Groups/GroupNetworkCreateTest.php</file>
             <file>./tests/Feature/Microtasks/BasicTest.php</file>
+            <file>./tests/Feature/Microtasks/DeviceStatsTest.php</file>
+            <file>./tests/Feature/Microtasks/EventStatsTest.php</file>
+            <file>./tests/Feature/Microtasks/GroupStatsTest.php</file>
         </testsuite>
 
         <testsuite name="Unit">

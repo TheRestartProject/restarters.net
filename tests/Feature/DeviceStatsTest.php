@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Category;
 use App\Device;
 
 use DB;
@@ -10,14 +11,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class DeviceStatsTest extends TestCase
 {
-    public function setUp()
-    {
-        parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
-        Device::truncate();
-        DB::statement("SET foreign_key_checks=1");
-    }
-
     /** @test */
     public function a_fixed_device_has_co2_diverted()
     {

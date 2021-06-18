@@ -168,12 +168,6 @@ class MisccatTest extends TestCase {
 
     protected function _get_setup_data() {
 
-        factory(Category::class, 1)->states('Misc')->create();
-        factory(Category::class, 1)->states('Mobile')->create();
-        factory(Category::class, 1)->states('Cat1')->create();
-        factory(Category::class, 1)->states('Cat2')->create();
-        factory(Category::class, 1)->states('Cat3')->create();
-
         $iddevices = 0;
         $result = [];
 

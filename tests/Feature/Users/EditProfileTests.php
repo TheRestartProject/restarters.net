@@ -11,7 +11,7 @@ use Tests\TestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class NetworkTest extends TestCase
+class EditProfileTests extends TestCase
 {
     public function setUp()
     {
@@ -42,7 +42,7 @@ class NetworkTest extends TestCase
         Event::assertDispatched(UserUpdated::class);
     }
 
-    /** @test */
+    /** TODO test */
     // The assertion just tells us that the event is dispatched, not much else.
     // In order to actually check it worked, we need to look at Discourse.
     public function other_updates_dont_trigger_discourse_sync()

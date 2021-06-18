@@ -18,11 +18,6 @@ class EventStatsTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
-        Device::truncate();
-        Group::truncate();
-        Party::truncate();
-        DB::statement("SET foreign_key_checks=1");
     }
 
     /** @test */
