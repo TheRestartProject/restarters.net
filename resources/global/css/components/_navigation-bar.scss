@@ -151,6 +151,13 @@
       z-index: 1500;
       background-color: $white;
 
+      transform: translate3d(0, 0, 0);
+      transition: 0.2s all ease-out;
+
+      &.nav-left--hidden {
+        transform: translate3d(0, 100%, 0);
+      }
+
       li {
         margin: auto !important;
 
