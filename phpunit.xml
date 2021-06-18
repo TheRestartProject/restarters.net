@@ -9,32 +9,19 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-<!--
-We have lots of tests which exist but don't run yet.  So we only run a subset of them here.  If you see a <file>,
-it means that there is some other test in that directory which doesn't run yet.
--->
         <testsuite name="Feature">
-            <directory suffix=".php">./tests/Feature/Admin</directory>
+            <directory suffix=".php">./tests/Feature</directory>
             <exclude>./tests/Feature/Admin/Users/WikiLoginTests.php</exclude>
-            <directory suffix=".php">./tests/Feature/Dashboard</directory>
-            <directory suffix=".php">./tests/Feature/Devices</directory>
-            <directory suffix=".php">./tests/Feature/Events</directory>
-            <directory suffix=".php">./tests/Feature/Fixometer</directory>
-            <directory suffix=".php">./tests/Feature/Groups</directory>
             <exclude>./tests/Feature/Groups/WordpressGroupPushTest.php</exclude>
-            <directory suffix=".php">./tests/Feature/Microtasks/</directory>
             <exclude>./tests/Feature/Microtasks/ExampleTest.php</exclude>
             <exclude>./tests/Feature/Microtasks/MisccatTest.php</exclude>
-            <directory suffix=".php">./tests/Feature/Networks</directory>
-            <directory suffix=".php">./tests/Feature/Users</directory>
-            <file>./tests/Feature/DeviceStatsTest.php</file>
-            <file>./tests/Feature/EventStatsTest.php</file>
-            <file>./tests/Feature/GroupStatsTest.php</file>
+            <exclude>./tests/Feature/Zapier/ZapierNetworkTests.php</exclude>
         </testsuite>
 
         <testsuite name="Unit">
             <directory suffix=".php">./tests/Unit</directory>
             <exclude>./tests/Unit/CharsetTest.php</exclude>
+            <exclude>./tests/Unit/WikiPageRetriever.php</exclude>
         </testsuite>
     </testsuites>
     <filter>
