@@ -29,7 +29,7 @@
 @endif
 
 {{-- Left side of the Navigation --}}
-<ul class="nav-left d-flex justify-content-between w-100 pr-md-3">
+<ul class="nav-left d-flex justify-content-between w-100 pr-md-3" id="nav-left">
     <li style="flex-basis: 100%;">
 
         <a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}" rel="noopener noreferrer">

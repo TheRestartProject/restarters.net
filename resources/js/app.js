@@ -1524,6 +1524,32 @@ function initAutocomplete() {
   });
 
 jQuery(document).ready(function () {
+  // Make navbar hide on mobile scroll.
+  var showNavbar = true;
+  var lastScrollPosition = true;
+
+  window.addEventListener('scroll', function() {
+    // Get the current scroll position
+    const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop
+
+    // Because of momentum scrolling on mobiles, we shouldn't continue if it is less than zero
+    if (currentScrollPosition < 0) {
+      return
+    }
+
+    // Here we determine whether we need to show or hide the navbar
+    showNavbar = currentScrollPosition < lastScrollPosition
+
+    if (showNavbar) {
+      $('#nav-left').removeClass('nav-left--hidden')
+    } else {
+      $('#nav-left').addClass('nav-left--hidden')
+    }
+
+    // Set the current scroll position as the last scroll position
+    lastScrollPosition = currentScrollPosition
+  })
+
   // Vue.
   //
   // Create a mixin for translation.
@@ -1562,7 +1588,7 @@ jQuery(document).ready(function () {
   // Initialising multiple instances is a bit more expensive, but not much.
   //
   // We need to list all the top-level components we will use in blades here; they are stored in
-  // resources/assets/js/components.  Lower level components can be included from within those as normal;
+  // resources/js/components.  Lower level components can be included from within those as normal;
   // they don't need listing here.
   $(".vue").each(function(index) {
     new Vue({

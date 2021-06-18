@@ -7,7 +7,7 @@
                 <div class="row" >
                     <div class="col-md-1">
                          <a class="brand" href="/">
-                            <img class="img-responsive" alt="The Restart Project: Logo" src="/assets/images/logo_mini.png">
+                            <img class="img-responsive" alt="The Restart Project: Logo" src="/images/logo_mini.png">
                         </a>
                     </div>
 

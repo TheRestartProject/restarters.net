@@ -7,7 +7,7 @@
         <div class="col-md-1">
             <?php $home_url = (hasRole($user, 'Administrator') ? '/admin' : '/host'); ?>
             <a href="<?php echo $home_url; ?>">
-                <img class="img-responsive" alt="The Restart Project: Logo" src="/assets/images/logo_mini.png">
+                <img class="img-responsive" alt="The Restart Project: Logo" src="/images/logo_mini.png">
             </a>
         </div>
 

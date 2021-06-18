@@ -57,8 +57,8 @@ return array (
             </p>
             <p>
                C\'est un moyen facile de faire changer les choses, que vous puissiez nous rejoindre lors d\'événements de réparation ou non. Rejoignez-nous, et contribuez en consacrant autant de temps et de ressources intellectuelles que vous pouvez. La plupart des tâches sont accessibles pour les personnes n\'ayant pas de bagage technique. Et nous sommes là pour vous aider.',
-    'all_quests' => '3 recherches',
+    'all_quests' => ':value recherches',
     'number_of_quests' => 'Nombre de recherches',
-    'my_quests' => ':value quests',
+    'my_quests' => ':value recherches',
   ),
 );
