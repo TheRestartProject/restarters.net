@@ -15,6 +15,7 @@
           :active-quest="activeQuest"
         />
         <MicrotaskingVolunteering
+          :total-quests="totalQuests"
           :total-contributions="totalContributions"
           :current-user-quests="currentUserQuests"
           :current-user-contributions="currentUserContributions"
@@ -46,6 +47,10 @@ export default {
   props: {
     activeQuest: {
       type: String,
+      required: true
+    },
+    totalQuests: {
+      type: Number,
       required: true
     },
     totalContributions: {

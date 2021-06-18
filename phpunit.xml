@@ -16,7 +16,8 @@
             <directory suffix=".php">./tests/Feature/Devices</directory>
             <directory suffix=".php">./tests/Feature/Events</directory>
             <directory suffix=".php">./tests/Feature/Networks</directory>
-            <directory suffix=".php">./tests/Feature/Users</directory>
+            <directory suffix=".php">./tests/Feature/Microtasks/Workbench</directory>
+            <file>./tests/Feature/Users/Registration/AccountCreationTest.php</file>
             <file>./tests/Feature/Groups/BasicTest.php</file>
             <file>./tests/Feature/Groups/GroupCreateTest.php</file>
             <file>./tests/Feature/Groups/GroupNetworkCreateTest.php</file>
@@ -48,4 +49,3 @@
         <env name="DB_TEST_PASSWORD" value="s3cr3t"/>
     </php>
 </phpunit>
-
