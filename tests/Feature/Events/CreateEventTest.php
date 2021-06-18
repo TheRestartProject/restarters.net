@@ -2,21 +2,17 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
 use App\Group;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Party;
 use App\User;
-use App\UserGroups;
 use App\Helpers\Geocoder;
 use App\Notifications\NotifyRestartersOfNewEvent;
 
 use DB;
-use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class GeocoderMock extends Geocoder
 {
@@ -78,7 +74,7 @@ class CreateEventTest extends TestCase
         $response = $this->post('/party/create/', $eventAttributes);
 
         // assert
-        $this->get('/party/view/1')->assertSee($eventAttributes['venue']);
+        $this->get('/party/view/' . Party::latest()->first()->idevents)->assertSee($eventAttributes['venue']);
         $this->assertDatabaseHas('events', $eventAttributes);
     }
 
@@ -133,7 +129,7 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $group->addVolunteer($restarter);
 
-        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1']);
+        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1' ]);
 
         // act
         $response = $this->post('/party/create/', $eventData);
@@ -234,7 +230,7 @@ class CreateEventTest extends TestCase
         $response = $this->post('/party/create/', $eventAttributes);
 
         // Find the event id
-        $party = $group->parties()->first();
+        $party = $group->parties()->latest()->first();
 
         // Remove the host from the event
         $this->post('/party/remove-volunteer/', [
@@ -243,7 +239,7 @@ class CreateEventTest extends TestCase
         ])->assertStatus(200);
 
         // Assert that we see the host in the list of volunteers to add to the event.
-        $this->get('/party/view/1')->assertSeeInOrder(['Group member', '<option value="' . $host->id . '">', '</div>']);
+        $this->get('/party/view/' . $party->idevents)->assertSeeInOrder(['Group member', '<option value="' . $host->id . '">', '</div>']);
 
         // Assert we can add them back in.
 

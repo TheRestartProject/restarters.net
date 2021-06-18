@@ -10,7 +10,7 @@
     <p v-if="!events.length">
       {{ translatedNoneMessage }}
     </p>
-    <GroupEventScrollTable v-else :limit="limit" :events="events" :canedit="canedit" :add-group-name="addGroupName" :past="past" />
+    <GroupEventScrollTable v-else :limit="limit" :events="events" :canedit="canedit" :add-group-name="addGroupName" :past="past" :filters="filters" />
   </b-tab>
 </template>
 <script>
@@ -50,6 +50,11 @@ export default {
       required: true
     },
     past: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    filters: {
       type: Boolean,
       required: false,
       default: false

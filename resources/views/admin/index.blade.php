@@ -135,7 +135,7 @@
                 <div class="col-md-6">
                     <div class="media">
                         <div class="media-left">
-                            <img class="media-object" alt="The Restart Project: Logo" src="/assets/images/logo_mini.png">
+                            <img class="media-object" alt="The Restart Project: Logo" src="/images/logo_mini.png">
                         </div>
                         <div class="media-body">
                             <div class="body">
@@ -183,32 +183,32 @@
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_pax.png" alt="Participants" class="header-icon">
+                        <img src="/icons/icon_pax.png" alt="Participants" class="header-icon">
                         <span class="icon-label">Participants</span>
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_volunters.png" alt="Restarters" class="header-icon">
+                        <img src="/icons/icon_volunters.png" alt="Restarters" class="header-icon">
                         <span class="icon-label">Restarters</span>
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_emissions.png" alt="CO2 Emissions Prevented" class="header-icon">
+                        <img src="/icons/icon_emissions.png" alt="CO2 Emissions Prevented" class="header-icon">
                         <span class="icon-label">CO<sub>2</sub> Emissions prevented</span>
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_fixed.png" alt="Fixed" class="header-icon">
+                        <img src="/icons/icon_fixed.png" alt="Fixed" class="header-icon">
                         <span class="icon-label">Fixed</span>
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_repairable.png" alt="Repairable" class="header-icon">
+                        <img src="/icons/icon_repairable.png" alt="Repairable" class="header-icon">
                         <span class="icon-label">Repairable</span>
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_dead.png" alt="Dead" class="header-icon">
+                        <img src="/icons/icon_dead.png" alt="Dead" class="header-icon">
                         <span class="icon-label">Dead</span>
                     </div>
 
@@ -332,7 +332,7 @@
         <div role="tabpanel" class="tab-pane" id="impact-tab">
             <section class="row" id="impact-header">
                 <div class="col-sm-12 text-center">
-                    <img src="/assets/images/logo.png" >
+                    <img src="/images/logo.png" >
                     <h2>The Restart Project</h2>
 
                     <p class="big">
@@ -348,19 +348,19 @@
                 <div class="col-md-6 col-md-offset-3  text-center">
 
                     <div class="impact-devices-1">
-                        <img src="/assets/icons/impact_device_1.jpg" class="" width="200">
+                        <img src="/icons/impact_device_1.jpg" class="" width="200">
                         <span class="title"><?php echo (int)$device_count_status[0]->counter;?></span>
                         <span class="legend">were fixed</span>
                     </div>
 
                     <div class="impact-devices-2">
-                        <img src="/assets/icons/impact_device_2.jpg" class="" width="200">
+                        <img src="/icons/impact_device_2.jpg" class="" width="200">
                         <span class="title"><?php echo (int)$device_count_status[1]->counter;?></span>
                         <span class="legend">were still repairable</span>
                     </div>
 
                     <div class="impact-devices-3">
-                        <img src="/assets/icons/impact_device_3.jpg" class="" width="200">
+                        <img src="/icons/impact_device_3.jpg" class="" width="200">
                         <span class="title"><?php echo (int)$device_count_status[2]->counter;?></span>
                         <span class="legend">were dead</span>
                     </div>
@@ -416,7 +416,7 @@
                     ?>
 
                     <div class="di_consume <?php echo $consume_class; ?>">
-                        <img src="/assets/icons/<?php echo $consume_image; ?>" class="img-responsive">
+                        <img src="/icons/<?php echo $consume_image; ?>" class="img-responsive">
                         <div class="text">
                             <div class="blue"><?php echo $consume_label; ?></div>
                             <div class="consume"><?php echo $consume_eql_to; ?></div>
@@ -427,11 +427,11 @@
                         <div class="col-md-12 text-center"><div class="lightblue"><?php echo $manufacture_label; ?></div></div>
                         <?php for($i = 1; $i<= 0/*$manufacture_eql_to*/; $i++){ ?>
                             <div class="col-md-3 text-center">
-                                <img src="/assets/icons/<?php echo $manufacture_img; ?>" class="img-responsive">
+                                <img src="/icons/<?php echo $manufacture_img; ?>" class="img-responsive">
                             </div>
                         <?php } ?>
                         <div class="col-md-12 text-center">
-                            <div class="legend">1 <img src="/assets/icons/<?php echo $manufacture_img; ?>"> = <?php echo $manufacture_legend; ?> (approximately)</div>
+                            <div class="legend">1 <img src="/icons/<?php echo $manufacture_img; ?>"> = <?php echo $manufacture_legend; ?> (approximately)</div>
 
                         </div>
                     </div>
@@ -518,7 +518,7 @@
                     <div class="row">
                         <div class="col-md-4 count">
                             <div class="col">
-                                <img src="/assets/icons/fixed_circle.jpg">
+                                <img src="/icons/fixed_circle.jpg">
                             </div>
                             <div class="col">
                                 <span class="status_title">Fixed</span>
@@ -530,7 +530,7 @@
                         </div>
                         <div class="col-md-4 count">
                             <div class="col repairable">
-                                <img src="/assets/icons/repairable_circle.jpg">
+                                <img src="/icons/repairable_circle.jpg">
                             </div>
                             <div class="col">
                                 <span class="status_title">Repairable</span>
@@ -543,7 +543,7 @@
                         </div>
                         <div class="col-md-4 count">
                             <div class="col dead">
-                                <img src="/assets/icons/dead_circle.jpg">
+                                <img src="/icons/dead_circle.jpg">
                             </div>
                             <div class="col">
                                 <span class="status_title">Dead</span>
@@ -570,15 +570,15 @@
                     <div class="col-md-2">&nbsp;</div>
                     <div class="col-md-4">
                         <div class="col3">
-                            <img src="/assets/icons/icon_fixed.png" title="fixed items" alt="Fixed Items icon">
+                            <img src="/icons/icon_fixed.png" title="fixed items" alt="Fixed Items icon">
                             <span class="subtext">fixed</span>
                         </div>
                         <div class="col3 no-brd">
-                            <img src="/assets/icons/icon_repairable.png" title="repairable items" alt="repairable Items icon">
+                            <img src="/icons/icon_repairable.png" title="repairable items" alt="repairable Items icon">
                             <span class="subtext">repairable</span>
                         </div>
                         <div class="col3">
-                            <img src="/assets/icons/icon_dead.png" title="dead items" alt="dead Items icon">
+                            <img src="/icons/icon_dead.png" title="dead items" alt="dead Items icon">
                             <span class="subtext">dead</span>
                         </div>
                     </div>

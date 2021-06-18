@@ -16,11 +16,15 @@
             <directory suffix=".php">./tests/Feature/Devices</directory>
             <directory suffix=".php">./tests/Feature/Events</directory>
             <directory suffix=".php">./tests/Feature/Networks</directory>
+            <directory suffix=".php">./tests/Feature/Microtasks/Workbench</directory>
             <file>./tests/Feature/Users/Registration/AccountCreationTest.php</file>
             <file>./tests/Feature/Groups/BasicTest.php</file>
             <file>./tests/Feature/Groups/GroupCreateTest.php</file>
             <file>./tests/Feature/Groups/GroupNetworkCreateTest.php</file>
             <file>./tests/Feature/Microtasks/BasicTest.php</file>
+            <file>./tests/Feature/Microtasks/DeviceStatsTest.php</file>
+            <file>./tests/Feature/Microtasks/EventStatsTest.php</file>
+            <file>./tests/Feature/Microtasks/GroupStatsTest.php</file>
         </testsuite>
 
         <testsuite name="Unit">
@@ -37,7 +41,7 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_DRIVER" value="array"/>
         <env name="SESSION_DRIVER" value="array"/>
-        <env name="QUEUE_DRIVER" value="sync"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="MAIL_DRIVER" value="array"/>
         <env name="DB_CONNECTION" value="mysql_testing"/>
         <env name="DB_TEST_DATABASE" value="restarters_db"/>

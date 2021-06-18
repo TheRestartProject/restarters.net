@@ -23,6 +23,7 @@
             <MicrotaskingPage
               csrf="{{ csrf_token() }}"
               active-quest="{{ $activeQuest }}"
+              :total-quests="{{ $totalQuests }}"
               :total-contributions="{{ $totalContributions }}"
               :current-user-quests="{{ $currentUserQuests }}"
               :current-user-contributions="{{ $currentUserContributions }}"

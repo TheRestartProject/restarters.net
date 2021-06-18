@@ -47,13 +47,13 @@ return array (
   'title' => 'Werkbank',
   'volunteering' => 
   array (
-    'all_quests' => '3 Projekte',
+    'all_quests' => ':value Projekte',
     'all_volunteer_contributions' => 'Freiwillige Beiträge insgesamt',
     'content' => '<p>Wir sammeln bei Reparaturveranstaltungen Daten. Aber wir brauchen deine Hilfe, um aus den Rohdaten starke Argumente für beßere Produkte zu machen. Mit deiner Hilfe können wir das System verändern.</p><p>
 Dies ist ein einfacher Weg, um Gutes zu tun, ganz egal ob du bei Reparaturveranstaltungen dabei sein kannst. Mach mit, und investiere so viel Zeit und Aufmerksamkeit wie du möchtest. Die meisten Aufgaben sind auch für technisch nicht versierte Menschen machbar. Und wir können euch jederzeit unterstützen.',
     'join' => 'Mitmachen',
     'my_contributions' => 'Meine Beiträge',
-    'my_quests' => ':value quests',
+    'my_quests' => ':value Projekte',
     'number_of_quests' => 'Anzahl der Herausforderungen',
     'number_of_tasks' => 'Anzahl der Aufgaben',
     'title' => 'Hilf von überall mit',

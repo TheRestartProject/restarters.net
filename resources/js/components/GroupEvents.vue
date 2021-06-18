@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CollapsibleSection class="lineheight d-none d-md-block" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel">
+    <CollapsibleSection class="lineheight" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel">
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
         <div>
@@ -23,7 +23,7 @@
         </b-tabs>
       </template>
     </CollapsibleSection>
-    <CollapsibleSection class="lineheight d-none d-md-block mt-4" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel" v-if="showOther">
+    <CollapsibleSection class="lineheight mt-4" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel" v-if="showOther">
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
           <div>
@@ -34,7 +34,7 @@
       <template slot="content">
         <b-tabs class="ourtabs w-100">
           <GroupEventsTab active :limit="limit" :events="nearby" :canedit="canedit" :add-group-name="addGroupName" title="groups.nearby" noneMessage="groups.no_other_nearby_events" />
-          <GroupEventsTab :limit="limit" :events="all" :canedit="canedit" :add-group-name="addGroupName" title="groups.all" noneMessage="groups.no_other_events" />
+          <GroupEventsTab :limit="limit" :events="all" :canedit="canedit" :add-group-name="addGroupName" title="groups.all" noneMessage="groups.no_other_events" filters />
         </b-tabs>
       </template>
     </CollapsibleSection>
@@ -191,7 +191,7 @@ export default {
 
 .ourtabs {
   max-height: 600px;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 .border-bottom-thick {

@@ -160,7 +160,7 @@ class GroupController extends Controller
      */
     public static function getGroupAudits($dateFrom = null)
     {
-        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', 'App\\Group');
+        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\Group::class);
 
         if (!is_null($dateFrom)) {
             $query->where('created_at', '>=', $dateFrom);
