@@ -11,23 +11,31 @@
     <testsuites>
 <!--        We have lots of tests which exist but don't run yet.  So we only run a subset of them here. -->
         <testsuite name="Feature">
+            <file>./tests/Feature/Admin/Users/UserDeletedNotificationTest.php</file>
+            <file>./tests/Feature/Admin/Users/ViewUsersTest.php</file>
+
             <directory suffix=".php">./tests/Feature/Dashboard</directory>
             <directory suffix=".php">./tests/Feature/Devices</directory>
             <directory suffix=".php">./tests/Feature/Events</directory>
             <directory suffix=".php">./tests/Feature/Fixometer</directory>
-            <directory suffix=".php">./tests/Feature/Microtasks/Workbench</directory>
-            <directory suffix=".php">./tests/Feature/Networks</directory>
-            <file>./tests/Feature/Users/Registration/AccountCreationTest.php</file>
-            <file>./tests/Feature/Admin/Users/UserDeletedNotificationTest.php</file>
-            <file>./tests/Feature/Admin/Users/ViewUsersTest.php</file>
+
             <file>./tests/Feature/Groups/BasicTest.php</file>
             <file>./tests/Feature/Groups/GroupCreateTest.php</file>
             <file>./tests/Feature/Groups/GroupEditTest.php</file>
             <file>./tests/Feature/Groups/GroupNetworkCreateTest.php</file>
+
+            <directory suffix=".php">./tests/Feature/Microtasks/Workbench</directory>
             <file>./tests/Feature/Microtasks/BasicTest.php</file>
             <file>./tests/Feature/Microtasks/MobifixOraTest.php</file>
             <file>./tests/Feature/Microtasks/PrintcatOraTest.php</file>
             <file>./tests/Feature/Microtasks/TabicatOraTest.php</file>
+
+            <directory suffix=".php">./tests/Feature/Networks</directory>
+
+            <file>./tests/Feature/Users/Registration/AccountCreationTest.php</file>
+            <file>./tests/Feature/Users//EditLanguageSettingsTest.php</file>
+            <file>./tests/Feature/Users//EditProfileTest.php</file>
+
             <file>./tests/Feature/DeviceStatsTest.php</file>
             <file>./tests/Feature/EventStatsTest.php</file>
             <file>./tests/Feature/GroupStatsTest.php</file>
