@@ -31,13 +31,13 @@ class EventsUsers extends Model
     //Table Relations
     public function role()
     {
-        return $this->hasOne('App\Role', 'role', 'role');
+        return $this->hasOne(\App\Role::class, 'role', 'role');
     }
 
     //Table Relations
     public function volunteer()
     {
-        return $this->hasOne('App\User', 'id', 'user');
+        return $this->hasOne(\App\User::class, 'id', 'user');
     }
 
     public function getFullName()

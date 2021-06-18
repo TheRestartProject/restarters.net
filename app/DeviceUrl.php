@@ -14,6 +14,6 @@ class DeviceUrl extends Model
 
     public function device()
     {
-        return $this->hasOne('App\Device', 'iddevices', 'device_id');
+        return $this->hasOne(\App\Device::class, 'iddevices', 'device_id');
     }
 }

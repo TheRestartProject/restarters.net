@@ -14,7 +14,7 @@ mix.webpackConfig({
     plugins: [
         new webpack.IgnorePlugin(/^codemirror$/),
         // Build a JS translation file that corresponds to our PHP lang/ folder.
-        new WebpackShellPlugin({onBuildStart:['php artisan lang:js --no-lib --quiet resources/assets/js/translations.js'], onBuildEnd:[]})
+        new WebpackShellPlugin({onBuildStart:['php artisan lang:js --no-lib --quiet resources/js/translations.js'], onBuildEnd:[]})
     ]
 });
 /*
@@ -30,13 +30,13 @@ mix.webpackConfig({
 
 // mix.scripts([
 //     'node_modules/js-cookie/src/js.cookie.js',
-//     'resources/assets/js/gdpr-cookie-notice/templates.js',
-//     'resources/assets/js/gdpr-cookie-notice/script.js',
-//     'resources/assets/js/gdpr-cookie-notice/en.js'
+//     'resources/js/gdpr-cookie-notice/templates.js',
+//     'resources/js/gdpr-cookie-notice/script.js',
+//     'resources/js/gdpr-cookie-notice/en.js'
 // ], 'public/js/gdpr-cookie-notice.js');
 
-mix.js('resources/assets/js/app.js', 'public/js')
-   .sass('resources/assets/sass/app.scss', 'public/css')
+mix.js('resources/js/app.js', 'public/js')
+   .sass('resources/sass/app.scss', 'public/css')
    .browserSync({
         proxy: 'https://restarters.test'
     });

@@ -28,6 +28,10 @@ class EditLanguageSettingsTests extends TestCase
     // In order to actually check it worked, we need to look at Discourse.
     public function user_language_update_triggers_language_sync()
     {
+        Event::fake([
+                        UserLanguageUpdated::class
+                    ]);
+
         // arrange
         config(['restarters.features.discourse_integration' => true]);
         config(['discourse-api.base_url' => 'https://talk.restarters.dev']);
@@ -41,6 +45,6 @@ class EditLanguageSettingsTests extends TestCase
         $user->save();
 
         // assert
-        //Event::assertDispatched(UserLanguageUpdated::class);
+        Event::assertDispatched(UserLanguageUpdated::class);
     }
 }

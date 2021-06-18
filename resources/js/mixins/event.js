@@ -7,6 +7,9 @@ export default {
     event() {
       return this.$store.getters['events/get'](this.idevents)
     },
+    attending() {
+      return this.event ? this.event.attending : false
+    },
     volunteerCount() {
       return this.event && this.event.volunteers ? this.event.volunteers : 0
     },

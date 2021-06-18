@@ -175,7 +175,7 @@
                 <div class="col-md-6">
                     <div class="media">
                         <div class="media-left">
-                            <img class="media-object" alt="The Restart Project: Logo" src="/assets/images/logo_mini.png">
+                            <img class="media-object" alt="The Restart Project: Logo" src="/images/logo_mini.png">
                         </div>
                         <div class="media-body">
                             <div class="body">
@@ -214,32 +214,32 @@
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_pax.png" alt="Participants" class="header-icon">
+                        <img src="/icons/icon_pax.png" alt="Participants" class="header-icon">
                         <span class="icon-label">Participants</span>
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_volunters.png" alt="Restarters" class="header-icon">
+                        <img src="/icons/icon_volunters.png" alt="Restarters" class="header-icon">
                         <span class="icon-label">Restarters</span>
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_emissions.png" alt="CO2 Emissions Prevented" class="header-icon">
+                        <img src="/icons/icon_emissions.png" alt="CO2 Emissions Prevented" class="header-icon">
                         <span class="icon-label">CO<sub>2</sub>Emissions prevented</span>
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_fixed.png" alt="Fixed" class="header-icon">
+                        <img src="/icons/icon_fixed.png" alt="Fixed" class="header-icon">
                         <span class="icon-label">Fixed</span>
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_repairable.png" alt="Repairable" class="header-icon">
+                        <img src="/icons/icon_repairable.png" alt="Repairable" class="header-icon">
                         <span class="icon-label">Repairable</span>
                     </div>
 
                     <div class="header-col">
-                        <img src="/assets/icons/icon_dead.png" alt="Dead" class="header-icon">
+                        <img src="/icons/icon_dead.png" alt="Dead" class="header-icon">
                         <span class="icon-label">Dead</span>
                     </div>
 
@@ -382,7 +382,7 @@
                 <div class="col-md-6 col-md-offset-3  text-center">
 
                     <div class="impact-devices-1">
-                        <img src="/assets/icons/impact_device_1.jpg" class="" width="200">
+                        <img src="/icons/impact_device_1.jpg" class="" width="200">
                         @if ( isset( $group_device_count_status[0] ) )
                           <span class="title"><?php echo (int)$group_device_count_status[0]->counter;?></span>
                         @else
@@ -392,7 +392,7 @@
                     </div>
 
                     <div class="impact-devices-2">
-                        <img src="/assets/icons/impact_device_2.jpg" class="" width="200">
+                        <img src="/icons/impact_device_2.jpg" class="" width="200">
                         @if ( isset( $group_device_count_status[1] ) )
                           <span class="title"><?php echo (int)$group_device_count_status[1]->counter;?></span>
                         @else
@@ -402,7 +402,7 @@
                     </div>
 
                     <div class="impact-devices-3">
-                        <img src="/assets/icons/impact_device_3.jpg" class="" width="200">
+                        <img src="/icons/impact_device_3.jpg" class="" width="200">
                         @if ( isset( $group_device_count_status[1] ) )
                           <span class="title"><?php echo (int)$group_device_count_status[2]->counter;?></span>
                         @else
@@ -477,7 +477,7 @@
                     ?>
 
                     <div class="di_consume <?php echo $consume_class; ?>">
-                        <img src="/assets/icons/<?php echo $consume_image; ?>" class="img-responsive">
+                        <img src="/icons/<?php echo $consume_image; ?>" class="img-responsive">
                         <div class="text">
                             <div class="blue"><?php echo $consume_label; ?></div>
                             <div class="consume"><?php echo $consume_eql_to; ?></div>
@@ -488,11 +488,11 @@
                         <div class="col-md-12 text-center"><div class="lightblue"><?php echo $manufacture_label; ?></div></div>
                         @for($i = 1; $i<= $manufacture_eql_to; $i++)
                             <div class="col-md-3 text-center">
-                                <img src="/assets/icons/<?php echo $manufacture_img; ?>" class="img-responsive">
+                                <img src="/icons/<?php echo $manufacture_img; ?>" class="img-responsive">
                             </div>
                         @endfor
                         <div class="col-md-12 text-center">
-                            <div class="legend">1 <img src="/assets/icons/<?php echo $manufacture_img; ?>"> = <?php echo $manufacture_legend; ?> (approximately)</div>
+                            <div class="legend">1 <img src="/icons/<?php echo $manufacture_img; ?>"> = <?php echo $manufacture_legend; ?> (approximately)</div>
 
                         </div>
                     </div>
@@ -582,7 +582,7 @@
                 <div class="row">
                     <div class="col-md-4 count">
                         <div class="col">
-                            <img src="/assets/icons/fixed_circle.jpg">
+                            <img src="/icons/fixed_circle.jpg">
                         </div>
                         <div class="col">
                             <span class="status_title">Fixed</span>
@@ -599,7 +599,7 @@
 
                     <div class="col-md-4 count">
                         <div class="col repairable">
-                            <img src="/assets/icons/repairable_circle.jpg">
+                            <img src="/icons/repairable_circle.jpg">
                         </div>
                         <div class="col">
                             <span class="status_title">Repairable</span>
@@ -617,7 +617,7 @@
 
                     <div class="col-md-4 count">
                         <div class="col dead">
-                            <img src="/assets/icons/dead_circle.jpg">
+                            <img src="/icons/dead_circle.jpg">
                         </div>
                         <div class="col">
                             <span class="status_title">Dead</span>
@@ -648,15 +648,15 @@
                 <div class="col-md-2">&nbsp;</div>
                 <div class="col-md-4 category-table">
                     <div class="col3">
-                        <img src="/assets/icons/icon_fixed.png" title="fixed items" alt="Fixed Items icon">
+                        <img src="/icons/icon_fixed.png" title="fixed items" alt="Fixed Items icon">
                         <span class="subt</span>
                     </div>
                     <div class="col3 no-brd">
-                        <img src="/assets/icons/icon_repairable.png" title="repairable items" alt="repairable Items icon">
+                        <img src="/icons/icon_repairable.png" title="repairable items" alt="repairable Items icon">
                         <span class="subtext"></span>
                     </div>
                     <div class="col3">
-                        <img src="/assets/icons/icon_dead.png" title="dead items" alt="dead Items icon">
+                        <img src="/icons/icon_dead.png" title="dead items" alt="dead Items icon">
                         <span class="sub</span>
                     </div>
                 </div>
@@ -664,7 +664,7 @@
             </div>
             <div class="row">
                 <div class="col-md-2  text-center">
-                    <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-01.png">
+                    <img class="cluster big img-responsive" src="/icons/Category_Icons-01.png">
                     <!-- <i class="cluster big cluster-1"></i>                -->
                 </div>
                 <div class="col-md-4">
@@ -743,7 +743,7 @@
 
             <div class="row">
                 <div class="col-md-2  text-center">
-                    <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-02.png">
+                    <img class="cluster big img-responsive" src="/icons/Category_Icons-02.png">
                     <!-- <i class="cluster big cluster-2"></i>                -->
 
                 </div>
@@ -821,7 +821,7 @@
 
             <div class="row">
                 <div class="col-md-2  text-center">
-                    <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-03.png">
+                    <img class="cluster big img-responsive" src="/icons/Category_Icons-03.png">
                     <!-- <i class="cluster big cluster-3"></i>                -->
                 </div>
                 <div class="col-md-4">
@@ -896,7 +896,7 @@
             </div>
             <div class="row">
                 <div class="col-md-2 text-center">
-                    <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-04.png">
+                    <img class="cluster big img-responsive" src="/icons/Category_Icons-04.png">
                     <!-- <i class="cluster big cluster-4"></i>                -->
                 </div>
                 <div class="col-md-4">
@@ -988,7 +988,7 @@
                     @for ($i = 1; $i <= 2; $i++)
                     <div class="col-md-2">
                         <!-- <span class="cluster big cluster-1"></span> -->
-                        <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-0<?php echo $i ?>.png">
+                        <img class="cluster big img-responsive" src="/icons/Category_Icons-0<?php echo $i ?>.png">
                     </div>
                     <div class="col-md-4">
                         @if (array_key_exists(0, $cluster[$i]))
@@ -1015,7 +1015,7 @@
                     @for ($i = 3; $i <= 4; $i++)
                     <div class="col-md-2">
                         <!-- <span class="cluster big cluster-3"></span> -->
-                        <img class="cluster big img-responsive" src="/assets/icons/Category_Icons-0<?php echo $i ?>.png">
+                        <img class="cluster big img-responsive" src="/icons/Category_Icons-0<?php echo $i ?>.png">
                     </div>
                     <div class="col-md-4">
                         @if (array_key_exists(0, $cluster[$i]))
