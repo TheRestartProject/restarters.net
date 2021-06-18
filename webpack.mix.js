@@ -47,4 +47,4 @@ mix.js('resources/global/js/app.js', 'public/global/js')
 mix.js('resources/wiki/js/wiki.js', 'public/js/wiki.js')
   .sass('resources/wiki/css/app.scss', 'public/css/wiki.css');
 
-mix.scripts(['resources/talk/js/app.js','resources/talk/js/check-auth.js', 'resources/talk/js/notifications.js'], 'public/js/talk.js')
+mix.js('resources/talk/js/app.js','resources/talk/js/check-auth.js', 'resources/talk/js/notifications.js', 'public/js/talk.js')
