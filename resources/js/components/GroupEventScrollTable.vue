@@ -154,11 +154,11 @@
 <script>
 import moment from 'moment'
 import InfiniteLoading from 'vue-infinite-loading'
-import GroupEventsScrollTableDateShort from '../../assets/js/components/GroupEventsScrollTableDateShort'
-import GroupEventsScrollTableDateLong from '../../assets/js/components/GroupEventsScrollTableDateLong'
-import GroupEventsScrollTableNumber from '../../assets/js/components/GroupEventsScrollTableNumber'
-import GroupEventsScrollTableActions from '../../assets/js/components/GroupEventsScrollTableActions'
-import GroupEventsScrollTableFilters from '../../assets/js/components/GroupEventsScrollTableFilters'
+import GroupEventsScrollTableDateShort from './GroupEventsScrollTableDateShort'
+import GroupEventsScrollTableDateLong from './GroupEventsScrollTableDateLong'
+import GroupEventsScrollTableNumber from './GroupEventsScrollTableNumber'
+import GroupEventsScrollTableActions from './GroupEventsScrollTableActions'
+import GroupEventsScrollTableFilters from './GroupEventsScrollTableFilters'
 import EventTitle from './EventTitle'
 
 export default {
