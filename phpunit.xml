@@ -9,40 +9,32 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-<!--        We have lots of tests which exist but don't run yet.  So we only run a subset of them here. -->
+<!--
+We have lots of tests which exist but don't run yet.  So we only run a subset of them here.  If you see a <file>,
+it means that there is some other test in that directory which doesn't run yet.
+-->
         <testsuite name="Feature">
-            <file>./tests/Feature/Admin/Users/UserDeletedNotificationTest.php</file>
-            <file>./tests/Feature/Admin/Users/ViewUsersTest.php</file>
-
+            <directory suffix=".php">./tests/Feature/Admin</directory>
+            <exclude>./tests/Feature/Admin/Users/WikiLoginTests.php</exclude>
             <directory suffix=".php">./tests/Feature/Dashboard</directory>
             <directory suffix=".php">./tests/Feature/Devices</directory>
             <directory suffix=".php">./tests/Feature/Events</directory>
             <directory suffix=".php">./tests/Feature/Fixometer</directory>
-
-            <file>./tests/Feature/Groups/BasicTest.php</file>
-            <file>./tests/Feature/Groups/GroupCreateTest.php</file>
-            <file>./tests/Feature/Groups/GroupEditTest.php</file>
-            <file>./tests/Feature/Groups/GroupNetworkCreateTest.php</file>
-
-            <directory suffix=".php">./tests/Feature/Microtasks/Workbench</directory>
-            <file>./tests/Feature/Microtasks/BasicTest.php</file>
-            <file>./tests/Feature/Microtasks/MobifixOraTest.php</file>
-            <file>./tests/Feature/Microtasks/PrintcatOraTest.php</file>
-            <file>./tests/Feature/Microtasks/TabicatOraTest.php</file>
-
+            <directory suffix=".php">./tests/Feature/Groups</directory>
+            <exclude>./tests/Feature/Groups/WordpressGroupPushTest.php</exclude>
+            <directory suffix=".php">./tests/Feature/Microtasks/</directory>
+            <exclude>./tests/Feature/Microtasks/ExampleTest.php</exclude>
+            <exclude>./tests/Feature/Microtasks/MisccatTest.php</exclude>
             <directory suffix=".php">./tests/Feature/Networks</directory>
-
-            <file>./tests/Feature/Users/Registration/AccountCreationTest.php</file>
-            <file>./tests/Feature/Users//EditLanguageSettingsTest.php</file>
-            <file>./tests/Feature/Users//EditProfileTest.php</file>
-
+            <directory suffix=".php">./tests/Feature/Users</directory>
             <file>./tests/Feature/DeviceStatsTest.php</file>
             <file>./tests/Feature/EventStatsTest.php</file>
             <file>./tests/Feature/GroupStatsTest.php</file>
         </testsuite>
 
         <testsuite name="Unit">
-            <file>./tests/Unit/UsernameGeneratorTest</file>
+            <directory suffix=".php">./tests/Unit</directory>
+            <exclude>./tests/Unit/CharsetTest.php</exclude>
         </testsuite>
     </testsuites>
     <filter>
