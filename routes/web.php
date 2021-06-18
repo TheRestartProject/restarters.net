@@ -247,8 +247,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/group/{group_id?}', 'PartyController@index')->name('group-events');
         Route::get('/create/{group_id?}', 'PartyController@create');
         Route::post('/create', 'PartyController@create');
-        Route::get('/manage/{id}', 'PartyController@manage');
-        Route::post('/manage/{id}', 'PartyController@manage');
         Route::get('/edit/{id}', 'PartyController@edit');
         Route::post('/edit/{id}', 'PartyController@edit');
         Route::get('/duplicate/{id}', 'PartyController@duplicate');
