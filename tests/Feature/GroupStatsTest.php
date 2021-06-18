@@ -34,6 +34,11 @@ class GroupStatsTest extends TestCase
             'parties' => 0,
             'co2' => 0,
             'waste' => 0,
+            'ewaste' => 0,
+            'unpowered_waste' => 0,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 0
         ];
         $this->assertEquals($expectedStats, $group->getGroupStats(0.5));
     }
@@ -53,6 +58,11 @@ class GroupStatsTest extends TestCase
             'parties' => 1,
             'co2' => 0,
             'waste' => 0,
+            'unpowered_waste' => 0,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 0,
+            'ewaste' => 0
         ];
         $this->assertEquals($expectedStats, $group->getGroupStats(0.5));
     }
