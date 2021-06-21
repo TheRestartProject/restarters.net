@@ -13,16 +13,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class GroupEditTest extends TestCase
 {
-    public function setUp()
-    {
-        parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
-        Group::truncate();
-        User::truncate();
-        GroupTags::truncate();
-        DB::statement("SET foreign_key_checks=1");
-    }
-
     /** @test */
     public function group_tags_retained_after_edited_by_host()
     {
@@ -33,6 +23,18 @@ class GroupEditTest extends TestCase
         $group->addTag($tag);
 
         $host = factory(User::class)->states('Host')->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
         $this->actingAs($host);
+
+        $response = $this->post('/group/edit/'.$group->idgroups, [
+            [
+                'description' => 'Test'
+            ]
+        ]);
+
+        $this->assertEquals(1, count($group->group_tags));
+        $this->assertEquals($tag->tag_name, $group->group_tags[0]->tag_name);
     }
 }
