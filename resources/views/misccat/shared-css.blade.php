@@ -1,5 +1,5 @@
 <style>
-    
+
     body {
         text-align: center !important;
     }
@@ -23,17 +23,17 @@
     .underline {
         text-decoration: underline;
     }
-    
+
     .radio {
         padding: 0 5px;
     }
 
     .options {
         background-color: #FFF;
-        color: #000;        
+        color: #000;
         padding: 5px;
     }
-    
+
     .options div {
         padding: 3px 0;
     }
@@ -47,17 +47,27 @@
         font-family: 'Open Sans';
     }
 
+    .msg-closed {
+        background: #E3FCEF;
+    }
+    .msg-closed li {
+        list-style-type: disc;
+    }
+    /* .msg-closed a {
+        color: #5D99FB;
+    } */
+
     #btn-info-open {
         float:right;
         cursor:pointer;
     }
     #btn-translate a {
-        color: #FFF;        
+        color: #FFF;
         text-decoration: underline;
     }
     #btn-translate {
         background-color: #000 !important;
-    }    
+    }
     .cat-is-unselected {
         background-color: #FFDD57 !important;
         color: #000 !important;
@@ -76,12 +86,12 @@
         font-weight: bold;
         text-transform: uppercase;
     }
-    
+
     .text-is-italic {
         font-style: italic;
     }
-    
-    .border-grey {        
+
+    .border-grey {
         border: 1px solid #EEE;
     }
 </style>
