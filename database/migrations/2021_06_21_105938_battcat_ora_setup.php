@@ -71,7 +71,7 @@ class BattcatOraSetup extends Migration
             $table->string('data_provider', 32)->index();
             $table->string('country', 3);
             $table->string('partner_product_category', 128);
-            $table->string('product_category', 16);
+            $table->string('product_category', 64);
             $table->string('brand', 32)->default('');
             $table->string('year_of_manufacture', 4)->default('');
             $table->string('repair_status', 12)->default('');
