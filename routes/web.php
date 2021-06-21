@@ -135,6 +135,19 @@ Route::prefix('printcat')->group(function () {
     Route::get('/status', 'PrintcatOraController@status');
 });
 
+Route::prefix('BattCat')->group(function () {
+    Route::get('/', 'BattcatOraController@index');
+    Route::post('/', 'BattcatOraController@index');
+    Route::get('/survey', 'BattcatOraController@survey');
+    Route::get('/status', 'BattcatOraController@status');
+});
+Route::prefix('battcat')->group(function () {
+    Route::get('/', 'BattcatOraController@index');
+    Route::post('/', 'BattcatOraController@index');
+    Route::get('/survey', 'BattcatOraController@survey');
+    Route::get('/status', 'BattcatOraController@status');
+});
+
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/', 'HomeController@index')->name('home');
 
