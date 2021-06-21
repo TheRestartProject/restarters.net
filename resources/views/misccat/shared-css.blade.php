@@ -47,14 +47,14 @@
         font-family: 'Open Sans';
     }
 
-    .msg-closed {
-        background: #E3FCEF;
+    /* .msg-closed {
+        background: #4AAEBC;
     }
     .msg-closed li {
         list-style-type: disc;
     }
-    /* .msg-closed a {
-        color: #5D99FB;
+    .msg-closed a {
+        color: #111;
     } */
 
     #btn-info-open {

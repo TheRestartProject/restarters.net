@@ -31,9 +31,9 @@
                 </a> -->
             </div>
         </div>
-        <div class="row p-2 mb-4 mx-1 mx-sm-0 msg-closed">
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0">
             <div class="col text-left">
-                <h2>This quest is complete 🎉</h2>
+                <h4 class="">This quest is complete 🎉</h4>
                 <p>
                     Thank you for your interest in this quest.
                     We have now received enough responses.
