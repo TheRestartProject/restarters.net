@@ -1,5 +1,4 @@
 <style>
-
     body {
         text-align: center !important;
     }
@@ -7,13 +6,15 @@
     h1 {
         font-family: 'Asap' !important;
         font-weight: bold !important;
-        float: left; /* bootstrap pull-left class working locally but not on server!  falling back on this. */
+        float: left;
+        /* bootstrap pull-left class working locally but not on server!  falling back on this. */
     }
 
     img#misccat {
         width: 48px;
         height: 48px;
-        float: right; /* bootstrap pull-right class working locally but not on server!  falling back on this. */
+        float: right;
+        /* bootstrap pull-right class working locally but not on server!  falling back on this. */
     }
 
     .hide {
@@ -48,22 +49,26 @@
     }
 
     #btn-info-open {
-        float:right;
-        cursor:pointer;
+        float: right;
+        cursor: pointer;
     }
+
     #btn-translate a {
         color: #FFF;
         text-decoration: underline;
     }
+
     #btn-translate {
         background-color: #000 !important;
     }
+
     .cat-is-unselected {
         background-color: #FFDD57 !important;
         color: #000 !important;
         font-weight: 500;
         margin: 3px 0;
     }
+
     .cat-is-selected {
         background-color: #17A2B8 !important;
         color: #FFF !important;
@@ -71,7 +76,8 @@
         margin: 3px 0;
     }
 
-    .question, .statement {
+    .question,
+    .statement {
         font-size: 1rem;
         font-weight: bold;
         text-transform: uppercase;
@@ -83,5 +89,20 @@
 
     .border-grey {
         border: 1px solid #EEE;
+    }
+
+    .misccat div.quest-closed {
+        background-color:#4aaebc;
+    }
+
+    .misccat .quest-closed a {
+        color: #111;
+        text-decoration: underline;
+    }
+
+    .misccat .quest-closed a:hover {
+        color: #111;
+        text-decoration: none;
+        font-weight: 600;
     }
 </style>
