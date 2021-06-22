@@ -44,7 +44,7 @@
                 @endif -->
             </div>
         </div>
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0">
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 quest-closed">
             <div class="col text-left">
                 <h4 class="">This quest is complete 🎉</h4>
                 <p>

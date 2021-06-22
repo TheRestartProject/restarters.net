@@ -58,7 +58,7 @@
     .mobifix .btn {
         font-family: 'Open Sans';
     }
-    
+
     #btn-info-open {
         float:right;
         cursor:pointer;
@@ -72,16 +72,16 @@
     #fetch {
         margin-bottom: 2px;
     }
-    
+
     .btn-fault-suggestion {
         background-colour: pink !important;
     }
-    
+
     .text-is-italic {
         font-style: italic;
     }
-    
-    .border-grey {        
+
+    .border-grey {
         border: 1px solid #EEE;
     }
 
@@ -90,5 +90,24 @@
      font-weight: bold;
      text-transform: uppercase;
     }
-    
+
+    .mobifix div.quest-closed {
+        background-color:#4aaebc;
+    }
+
+    .mobifix .quest-closed li {
+        list-style-type: disc;
+    }
+
+    .mobifix .quest-closed a {
+        color: #111;
+        text-decoration: underline;
+    }
+
+    .mobifix .quest-closed a:hover {
+        color: #111;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
 </style>
