@@ -95,6 +95,10 @@
         background-color:#4aaebc;
     }
 
+    .misccat .quest-closed li {
+        list-style-type: disc;
+    }
+
     .misccat .quest-closed a {
         color: #111;
         text-decoration: underline;
