@@ -19,7 +19,7 @@
         <small id="locationHelpBlock" class="form-text text-muted">
           {{ __('events.field_venue_helper') }}
         </small>
-        <b-btn variant="link" size="sm" v-if="groupLocation && !online" @click="useGroup" class="pl-0" :disabled="currentValue === groupLocation">
+        <b-btn variant="primary" size="sm" v-if="groupLocation && !online" @click="useGroup" class="mt-2" :disabled="currentValue === groupLocation">
           {{ __('events.field_venue_use_group') }}
         </b-btn>
       </div>
