@@ -406,6 +406,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 .badge {
   width: 90px;
@@ -432,7 +435,26 @@ export default {
   padding: 5px;
 }
 
+
+@include media-breakpoint-down(sm) {
+  /deep/ .table {
+    tr {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid black;
+    }
+
+    th, td {
+      width: 100%;
+      border-bottom: none !important;
+      padding-left: 0px;
+      padding-bottom: 0px;
+    }
+  }
+}
+
 /deep/ tr.b-table-details td {
   padding: 0px;
 }
+
 </style>
