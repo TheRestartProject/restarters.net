@@ -63,7 +63,7 @@ class ViewUsersTest extends TestCase
         $response = $this->get('/user/all');
 
         // Then we should see the last login date for that user
-        $response->assertSeeText($lastLogin->diffForHumans());
+        $response->assertSeeText($lastLogin->diffForHumans(null, true));
     }
 
     /** @test */
@@ -79,7 +79,7 @@ class ViewUsersTest extends TestCase
         $response = $this->get('/user/all/search?name=' . $user->name);
 
         // Then we should see the last login date for that user
-        $response->assertSeeText($lastLogin->diffForHumans());
+        $response->assertSeeText($lastLogin->diffForHumans(null, true));
     }
 
     /** @test */
@@ -90,25 +90,25 @@ class ViewUsersTest extends TestCase
         $dateOfLeastRecentLogin = new Carbon('-1 year');
 
         $userWithMostRecentLogin = factory(User::class)->create([
-            'updated_at' => $dateOfMostRecentLogin,
+            'last_login_at' => $dateOfMostRecentLogin,
         ]);
         $otherUsers = factory(User::class, 42)->create([
-            'updated_at' => new Carbon('-1 month'),
+            'last_login_at' => new Carbon('-1 month'),
         ]);
         $userWithLeastRecentLogin = factory(User::class)->create([
-            'updated_at' => $dateOfLeastRecentLogin,
+            'last_login_at' => $dateOfLeastRecentLogin,
         ]);
 
         // When we visit the list of users and sort it by last login descending
-        $response = $this->get('/user/all/search?sort=lastlogin&sortdir=desc');
+        $response = $this->get('/user/all/search?sort=last_login_at&sortdir=desc');
 
         // Then the first result is the most recent login
-        $response->assertSeeText($dateOfMostRecentLogin->diffForHumans());
+        $response->assertSeeText($dateOfMostRecentLogin->diffForHumans(null, true));
 
         // When we visit the list of users and sort it by last login descending
-        $response = $this->get('/user/all/search?sort=lastlogin&sortdir=asc');
+        $response = $this->get('/user/all/search?sort=last_login_at&sortdir=asc');
 
         // Then the first result is the most recent login
-        $response->assertSeeText($dateOfLeastRecentLogin->diffForHumans());
+        $response->assertSeeText($dateOfLeastRecentLogin->diffForHumans(null, true));
     }
 }

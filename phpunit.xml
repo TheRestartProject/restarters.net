@@ -9,26 +9,21 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-<!--        We have lots of tests which exist but don't run yet.  So we only run a subset of them here. -->
         <testsuite name="Feature">
-            <directory suffix=".php">./tests/Feature/Dashboard</directory>
-            <directory suffix=".php">./tests/Feature/Fixometer</directory>
-            <directory suffix=".php">./tests/Feature/Devices</directory>
-            <directory suffix=".php">./tests/Feature/Events</directory>
-            <directory suffix=".php">./tests/Feature/Networks</directory>
-            <directory suffix=".php">./tests/Feature/Microtasks/Workbench</directory>
-            <file>./tests/Feature/Users/Registration/AccountCreationTest.php</file>
-            <file>./tests/Feature/Groups/BasicTest.php</file>
-            <file>./tests/Feature/Groups/GroupCreateTest.php</file>
-            <file>./tests/Feature/Groups/GroupNetworkCreateTest.php</file>
-            <file>./tests/Feature/Microtasks/BasicTest.php</file>
-            <file>./tests/Feature/Microtasks/DeviceStatsTest.php</file>
-            <file>./tests/Feature/Microtasks/EventStatsTest.php</file>
-            <file>./tests/Feature/Microtasks/GroupStatsTest.php</file>
+            <directory suffix=".php">./tests/Feature</directory>
+            <exclude>./tests/Feature/Admin/Users/WikiLoginTests.php</exclude>
+            <exclude>./tests/Feature/Groups/WordpressGroupPushTest.php</exclude>
+            <exclude>./tests/Feature/Microtasks/ExampleTest.php</exclude>
+            <exclude>./tests/Feature/Microtasks/FaultcatTest.php</exclude>
+            <exclude>./tests/Feature/Microtasks/MisccatTest.php</exclude>
+            <exclude>./tests/Feature/Microtasks/MobifixTest.php</exclude>
+            <exclude>./tests/Feature/Zapier/ZapierNetworkTests.php</exclude>
         </testsuite>
 
         <testsuite name="Unit">
-            <file>./tests/Unit/UsernameGeneratorTest</file>
+            <directory suffix=".php">./tests/Unit</directory>
+            <exclude>./tests/Unit/CharsetTest.php</exclude>
+            <exclude>./tests/Unit/WikiPageRetrieverTest.php</exclude>
         </testsuite>
     </testsuites>
     <filter>
