@@ -8,7 +8,7 @@ return array (
     'question-repairable' => 'What are the next steps?',
     'fetch_another' => 'I don\'t know',
     'translate' => 'Translate',
-    'go_with' => 'Confirm',
+    'go_with' => 'Go with',
     'source' => 'Source',
     'strapline' => 'Simply read the information about the broken device and select the type of fault described from the list underneath.',
     'learn_more' => 'Learn more',

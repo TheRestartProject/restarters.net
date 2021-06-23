@@ -59,7 +59,7 @@
                 </div>
             </div>
         </div>
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
+        <!-- <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col text-smaller">
                 <div class="row justify-content-center">
                     <p><strong>@lang('battcatora.status.items_opinions')</strong></p>
@@ -97,9 +97,9 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         @endif
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
+        <!-- <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col text-smaller">
                 <div class="row justify-content-center">
                     <p><strong>@lang('battcatora.status.items_majority_opinions') : {{ $status['total_recats'][0]->total }} </strong></p>
@@ -131,10 +131,10 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         @endif
         @if (!$complete)
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
+        <!-- <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col text-smaller">
                 <div class="row justify-content-center">
                     <p><strong>@lang('battcatora.status.items_split_opinions') : {{ $status['total_splits'][0]->total }}</strong></p>
@@ -169,7 +169,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         @endif
     </div>
     <div id="ora-partnership" class="mt-8 mb-4">

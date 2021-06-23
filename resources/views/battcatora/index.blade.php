@@ -79,29 +79,37 @@
         <div class="col-12">
             <div class="row device">
                 <div class="device-meta col-4">
-                    <p><span class="source">@lang('battcatora.task.source'): {{ $fault->partner }}</span></p>
-                    <p><span class="category">{{ $fault->product_category }}</span></p>
+                    <ul>
+                    <li><span class="source">@lang('battcatora.task.source'): {{ $fault->partner }}</span></li>
+                    <li><span class="category">{{ $fault->product_category }}</span></li>
                     @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
-                    <p><span class="brand">{{ $fault->brand }}</span></p>
+                    <li><span class="brand">{{ $fault->brand }}</span></li>
                     @endif
                     @if ($fault->repair_status == "Repairable")
-                    <p><span class="repair-status btn-warning">@lang($fault->repair_status)</span></p>
+                    <li><span class="repair-status span-repairable">@lang($fault->repair_status)</span></li>
                     @else
-                    <p><span class="repair-status btn-danger">@lang($fault->repair_status)</span></p>
+                    <li><span class="repair-status span-endoflife">@lang($fault->repair_status)</span></li>
                     @endif
+                    </ul>
                 </div>
+                @if ($fault->language == $locale )
                 <div class="device-problem col-8">
                     <p class="text-center">{{ $fault->problem }}</p>
-                    @if ($fault->language !== $locale )
+                </div>
+                @else
+                <div class="device-problem col-7">
+                    <p class="text-center">{{ $fault->problem }}</p>
+                </div>
+                <div class="device-problem col-1">
                     <p>
-                        <button id="btn-translate" class="btn-md btn-outline-light">
+                        <button id="btn-translate" class="btn-sm btn-outline-light">
                             <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text={{ $fault->translate }}" target="_blank">
                                 @lang('battcatora.task.translate')
                             </a>
                         </button>
                     </p>
-                    @endif
                 </div>
+                @endif
             </div>
             <form id="log-task" action="" method="POST">
                 @csrf
@@ -125,7 +133,7 @@
                                         @if ($fault_type->title !== "Poor data")
                                         <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
                                         @else
-                                        <button id="btn-poordata" class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
+                                        <button class="btn btn-sm btn-fault-option btn-fault-poordata btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
                                         @endif
                                         @endforeach
                                     </div>
@@ -187,6 +195,12 @@
         }, false);
 
         function doOption(e) {
+            [...document.querySelectorAll('.btn-fault-option')].forEach(elem => {
+                elem.classList.remove('btn-fault-selected');
+
+            });
+            document.querySelector('.btn-fault-poordata').classList.remove('btn-fault-selected');
+            e.target.classList.add('btn-fault-selected');
             document.getElementById('fault-type-new').innerText = e.target.innerText;
             document.getElementById('fault-type-new').dataset.fid = e.target.dataset.fid;
             document.querySelector('.confirm').classList.replace('hide', 'show');
