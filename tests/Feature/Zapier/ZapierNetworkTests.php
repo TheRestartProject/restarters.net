@@ -52,7 +52,7 @@ class ZapierNetworkTests extends TestCase
         $this->actingAs($admin);
 
         $network = factory(Network::class)->create([
-            'shortname' => 'restart',
+            'shortname' => 'restarters',
             'include_in_zapier' => true,
         ]);
 
@@ -82,7 +82,7 @@ class ZapierNetworkTests extends TestCase
         $this->actingAs($admin);
 
         $network = factory(Network::class)->create([
-            'shortname' => 'restart',
+            'shortname' => 'restarters',
             'include_in_zapier' => false,
         ]);
 
