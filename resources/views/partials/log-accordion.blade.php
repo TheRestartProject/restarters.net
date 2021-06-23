@@ -15,6 +15,8 @@
                     <tbody>
                       @foreach ($audit->getModified() as $attribute => $modified)
                           <tr>
+                            {{-- Some updated data is an array. --}}
+                            @php($modified['new'] = is_array($modified['new']) ? json_encode($modified['new']) : $modified['new'])
                             <td>@lang($type.'.'.$audit->event.'.modified.'.$attribute, $modified)</td>
                           </tr>
                       @endforeach
