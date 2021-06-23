@@ -259,7 +259,5 @@
 @endsection
 
 @section('scripts')
-  @include('includes/gmap', [
-      'key' => $key
-  ])
+@include('includes/gmap')
 @endsection

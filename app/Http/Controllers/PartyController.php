@@ -222,7 +222,6 @@ class PartyController extends Controller
                             'user' => Auth::user(),
                             'user_groups' => $groupsUserIsInChargeOf,
                             'selected_group_id' => $group_id,
-                            'key' => env('GOOGLE_API_CONSOLE_KEY')
                         ]);
                     }
 
@@ -347,7 +346,6 @@ class PartyController extends Controller
                 'user_groups' => $groupsUserIsInChargeOf,
                 'selected_group_id' => $group_id,
                 'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-                'key' => env('GOOGLE_API_CONSOLE_KEY')
             ]);
         }
 
@@ -359,7 +357,6 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'selected_group_id' => $group_id,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-            'key' => env('GOOGLE_API_CONSOLE_KEY')
         ]);
     }
 
@@ -452,7 +449,6 @@ class PartyController extends Controller
                       'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
                       'audits' => $audits,
                       'response' => $response,
-                      'key' => env('GOOGLE_API_CONSOLE_KEY')
                   ]);
                 }
 
@@ -560,7 +556,6 @@ class PartyController extends Controller
                 'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
                 'images' => $images,
                 'audits' => $audits,
-                'key' => env('GOOGLE_API_CONSOLE_KEY')
             ]);
         }
 
@@ -590,7 +585,6 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
             'audits' => $audits,
-            'key' => env('GOOGLE_API_CONSOLE_KEY')
         ]);
     }
 
