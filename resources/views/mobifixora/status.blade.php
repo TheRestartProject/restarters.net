@@ -55,7 +55,7 @@
                     Instead, why not see what we learned or try another quest?
                 </p>
                 <ul>
-                    <li><a href="https://talk.restarters.net/t/help-us-understand-why-smartphones-break-with-mobifix-ora-edition/4553">Discover what we learned</a></li>
+                    <li><a href="https://openrepair.org/open-data/insights/mobiles/">Discover what we learned and download the data</a></li>
                     <li><a href="https://restarters.net/workbench">See our other quests</a></li>
                 </ul>
             </div>
