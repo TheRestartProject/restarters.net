@@ -222,6 +222,7 @@ class PartyController extends Controller
                             'user' => Auth::user(),
                             'user_groups' => $groupsUserIsInChargeOf,
                             'selected_group_id' => $group_id,
+                            'key' => env('GOOGLE_API_CONSOLE_KEY')
                         ]);
                     }
 
@@ -346,6 +347,7 @@ class PartyController extends Controller
                 'user_groups' => $groupsUserIsInChargeOf,
                 'selected_group_id' => $group_id,
                 'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+                'key' => env('GOOGLE_API_CONSOLE_KEY')
             ]);
         }
 
@@ -357,6 +359,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'selected_group_id' => $group_id,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+            'key' => env('GOOGLE_API_CONSOLE_KEY')
         ]);
     }
 
@@ -425,7 +428,7 @@ class PartyController extends Controller
             $data['event_date'] = FixometerHelper::dbDateNoTime($data['event_date']);
 
             if ( ! empty($data['location'])) {
-                $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($data['location']).'&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE');
+                $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($data['location']).'&key='.env('GOOGLE_API_CONSOLE_KEY'));
                 $json = json_decode($json);
 
                 if ( empty($json->results) ) {
@@ -449,6 +452,7 @@ class PartyController extends Controller
                       'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
                       'audits' => $audits,
                       'response' => $response,
+                      'key' => env('GOOGLE_API_CONSOLE_KEY')
                   ]);
                 }
 
@@ -556,6 +560,7 @@ class PartyController extends Controller
                 'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
                 'images' => $images,
                 'audits' => $audits,
+                'key' => env('GOOGLE_API_CONSOLE_KEY')
             ]);
         }
 
@@ -585,6 +590,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
             'audits' => $audits,
+            'key' => env('GOOGLE_API_CONSOLE_KEY')
         ]);
     }
 

@@ -151,6 +151,7 @@ class GroupController extends Controller
                       'title' => 'New Group',
                       'gmaps' => true,
                       'response' => $response,
+                      'key' => env('GOOGLE_API_CONSOLE_KEY')
                   ]);
                 }
 
@@ -238,6 +239,7 @@ class GroupController extends Controller
                 'error' => $error,
                 'udata' => $udata,
                 'selectedNetworkId' => $networkId,
+                'key' => env('GOOGLE_API_CONSOLE_KEY')
             ]);
         }
 
@@ -245,6 +247,7 @@ class GroupController extends Controller
             'title' => 'New Group',
             'gmaps' => true,
             'selectedNetworkId' => $networkId,
+            'key' => env('GOOGLE_API_CONSOLE_KEY')
         ]);
     }
 

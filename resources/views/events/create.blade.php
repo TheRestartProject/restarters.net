@@ -217,5 +217,7 @@
 @endsection
 
 @section('scripts')
-@include('includes/gmap')
+@include('includes/gmap', [
+    'key' => $key
+])
 @endsection
