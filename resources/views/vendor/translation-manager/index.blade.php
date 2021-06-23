@@ -172,7 +172,7 @@
         </div>
     </form>
     <?php if($group): ?>
-        <form action="<?php echo action('\Barryvdh\TranslationManager\Controller@postAdd', array($group)) ?>" method="POST"  role="form">
+        <form action="<?php echo action('\Barryvdh\TranslationManager\Controller@postAdd', [$group]) ?>" method="POST"  role="form">
             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
             <div class="form-group">
                 <label>Add new keys to this group</label>

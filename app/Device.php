@@ -509,22 +509,22 @@ AND devices.event = events.idevents ';
 
     public function deviceCategory()
     {
-        return $this->hasOne('App\Category', 'idcategories', 'category');
+        return $this->hasOne(\App\Category::class, 'idcategories', 'category');
     }
 
     public function deviceEvent()
     {
-        return $this->hasOne('App\Party', 'idevents', 'event');
+        return $this->hasOne(\App\Party::class, 'idevents', 'event');
     }
 
     public function urls()
     {
-        return $this->hasMany('App\DeviceUrl', 'device_id', 'iddevices');
+        return $this->hasMany(\App\DeviceUrl::class, 'device_id', 'iddevices');
     }
 
     public function barriers()
     {
-        return $this->belongsToMany('App\Barrier', 'devices_barriers', 'device_id', 'barrier_id');
+        return $this->belongsToMany(\App\Barrier::class, 'devices_barriers', 'device_id', 'barrier_id');
     }
 
     public function co2Diverted($emissionRatio, $displacementFactor)
@@ -710,5 +710,10 @@ AND devices.event = events.idevents ';
         // List the item types
         $types = DB::table('devices')->whereNotNull('item_type')->select('item_type', DB::raw('COUNT(*) as count'))->groupBy('item_type')->orderBy('count', 'desc')->get()->toArray();
         return $types;
+    }
+
+    public function setProblemAttribute($value) {
+        // Map null values to empty strings to avoid Metabase problems.
+        $this->attributes['problem'] = $value ?? '';
     }
 }

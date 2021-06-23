@@ -18,7 +18,7 @@ return array (
     'number_of_tasks' => 'Number of tasks',
     'number_of_quests' => 'Number of quests',
     'all_volunteer_contributions' => 'Total volunteer contributions',
-    'all_quests' => '3 quests',
+    'all_quests' => ':value quests',
     'my_contributions' => 'My contributions',
     'my_quests' => ':value quests',
     'join' => 'Join',

@@ -2,11 +2,20 @@
 
 namespace Tests;
 
+use App\Audits;
+use App\Brands;
+use App\Category;
+use App\Device;
+use App\EventsUsers;
 use App\Group;
+use App\GroupNetwork;
+use App\GroupTags;
 use App\Network;
 
+use App\Party;
 use App\Role;
 use App\User;
+use App\UserGroups;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use DB;
@@ -30,7 +39,18 @@ abstract class TestCase extends BaseTestCase
         Network::truncate();
         Group::truncate();
         User::truncate();
-        DB::statement("TRUNCATE group_network");
+        Audits::truncate();
+        EventsUsers::truncate();
+        Party::truncate();
+        UserGroups::truncate();
+        Device::truncate();
+        GroupNetwork::truncate();
+        Category::truncate();
+        Brands::truncate();
+        GroupTags::truncate();
+        DB::delete('delete from user_network');
+        DB::delete('delete from grouptags_groups');
+        DB::table('notifications')->truncate();
         DB::statement("SET foreign_key_checks=1");
 
         $network = new Network();
@@ -44,9 +64,13 @@ abstract class TestCase extends BaseTestCase
         // We don't yet have a Discourse test environment.
         config(['restarters.features.discourse_integration' => false]);
 
-        // Create the jane@bloggs.net user which is commonly used in dev environments.  This means that
-        // we don't have to manually recreate it after we run a test in dev.
-        $this->createJane();
+        factory(Category::class, 1)->states('Cat1')->create();
+        factory(Category::class, 1)->states('Cat2')->create();
+        factory(Category::class, 1)->states('Cat3')->create();
+        factory(Category::class, 1)->states('Mobile')->create();
+        factory(Category::class, 1)->states('Misc')->create();
+        factory(Category::class, 1)->states('Desktop computer')->create();
+
     }
 
     public function userAttributes() {

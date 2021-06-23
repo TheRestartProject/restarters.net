@@ -34,7 +34,8 @@ class ApiController extends Controller
 
         $result['participants'] = $participants;
         $result['hours_volunteered'] = $hours_volunteered;
-        $result['items_fixed'] = $Device->statusCount()[0]->counter;
+        $fixed = $Device->statusCount();
+        $result['items_fixed'] = count($fixed) ? $fixed[0]->counter : 0;
         $result['weights'] = round($co2Total[0]->total_weights);
         $result['ewaste'] = round($co2Total[0]->ewaste);
         $result['unpowered_waste'] = round($co2Total[0]->unpowered_waste);

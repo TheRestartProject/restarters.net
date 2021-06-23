@@ -17,7 +17,7 @@ return array (
     'signpost_3' => 'The European Union is planning to include tablets and smartphones in Ecodesign rules by 2022. This will give us the chance to call for the Right to Repair these devices. Rules decided by the EU could also be used to influence laws in other places, including the UK.',
     'signpost_4' => '"We want to tell policymakers why tablets break and how they could be made easier to fix. Community repair groups around the world have been recording this information, and by trying TabiCat, you are helping us 
 analyse it."',
-    'signpost_5' => 'Thank you!',
+    'signpost_5' => 'Thank you! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Please take our survey</a>',
     'signpost_6' => 'Thank you for helping! Every fault you categorise makes this data more useful. Why not <a href="../">join our community</a> too?',
   ),
   'status' => 

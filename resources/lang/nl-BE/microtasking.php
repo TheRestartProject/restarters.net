@@ -36,7 +36,7 @@ return array (
   'title' => 'Werkbank',
   'volunteering' => 
   array (
-    'all_quests' => '3 quests',
+    'all_quests' => ':value quests',
     'all_volunteer_contributions' => 'Werkbank vrijwilligersbijdragen',
     'content' => '<p>Wij verzamelen gegevens tijdens gemeenschapsevenementen. Maar de ruwe gegevens hebben uw hulp nodig om sterk bewijs voor betere producten te worden. Met uw hulp kunnen we het systeem veranderen. </p> <p>Dit is een eenvoudige manier om een verschil te maken, of u nu wel of niet bij onze reparatie-evenementen aanwezig kunt zijn. Doe mee, en draag zo veel of zo weinig tijd en denkkracht bij als je kunt. De meeste van de taken hier zijn OK voor niet-technische mensen. En we zijn er altijd om te helpen.',
     'join' => 'Word lid',

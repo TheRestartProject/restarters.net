@@ -9,20 +9,21 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-<!--        We have lots of tests which exist but don't run yet.  So we only run a subset of them here. -->
         <testsuite name="Feature">
-            <directory suffix=".php">./tests/Feature/Users/Dashboard</directory>
-            <directory suffix=".php">./tests/Feature/Users/Fixometer</directory>
-            <directory suffix=".php">./tests/Feature/Devices</directory>
-            <file>./tests/Feature/Users/Registration/AccountCreationTest.php</file>
-            <file>./tests/Feature/Events/CreateEventTest.php</file>
-            <file>./tests/Feature/Groups/BasicTest.php</file>
-            <file>./tests/Feature/Groups/GroupCreateTest.php</file>
-            <file>./tests/Feature/Microtasks/BasicTest.php</file>
+            <directory suffix=".php">./tests/Feature</directory>
+            <exclude>./tests/Feature/Admin/Users/WikiLoginTests.php</exclude>
+            <exclude>./tests/Feature/Groups/WordpressGroupPushTest.php</exclude>
+            <exclude>./tests/Feature/Microtasks/ExampleTest.php</exclude>
+            <exclude>./tests/Feature/Microtasks/FaultcatTest.php</exclude>
+            <exclude>./tests/Feature/Microtasks/MisccatTest.php</exclude>
+            <exclude>./tests/Feature/Microtasks/MobifixTest.php</exclude>
+            <exclude>./tests/Feature/Zapier/ZapierNetworkTests.php</exclude>
         </testsuite>
 
         <testsuite name="Unit">
-            <file>./tests/Unit/UsernameGeneratorTest</file>
+            <directory suffix=".php">./tests/Unit</directory>
+            <exclude>./tests/Unit/CharsetTest.php</exclude>
+            <exclude>./tests/Unit/WikiPageRetrieverTest.php</exclude>
         </testsuite>
     </testsuites>
     <filter>
@@ -35,7 +36,7 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_DRIVER" value="array"/>
         <env name="SESSION_DRIVER" value="array"/>
-        <env name="QUEUE_DRIVER" value="sync"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="MAIL_DRIVER" value="array"/>
         <env name="DB_CONNECTION" value="mysql_testing"/>
         <env name="DB_TEST_DATABASE" value="restarters_db"/>
