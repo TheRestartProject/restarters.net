@@ -74,13 +74,13 @@ class BattcatOraSetup extends Migration
             $table->string('product_category', 64);
             $table->string('brand', 32)->default('');
             $table->string('year_of_manufacture', 4)->default('');
-            $table->string('repair_status', 12)->default('');
+            $table->string('repair_status', 12)->default('')->index();
             $table->string('event_date', 10);
             $table->string('problem', 1024);
             $table->string('language', 2);
             $table->string('translation', 1024);
             $table->unsignedInteger('fault_type_id')->index();
-            $table->string('fault_type', 255);
+            $table->string('fault_type', 255)->index();
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';
         });

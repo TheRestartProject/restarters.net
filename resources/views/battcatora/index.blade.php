@@ -80,16 +80,16 @@
             <div class="row device">
                 <div class="device-meta col-4">
                     <ul>
-                    <li><span class="source">@lang('battcatora.task.source'): {{ $fault->partner }}</span></li>
-                    <li><span class="category">{{ $fault->product_category }}</span></li>
-                    @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
-                    <li><span class="brand">{{ $fault->brand }}</span></li>
-                    @endif
-                    @if ($fault->repair_status == "Repairable")
-                    <li><span class="repair-status span-repairable">@lang($fault->repair_status)</span></li>
-                    @else
-                    <li><span class="repair-status span-endoflife">@lang($fault->repair_status)</span></li>
-                    @endif
+                        <li><span class="source">@lang('battcatora.task.source'): {{ $fault->partner }}</span></li>
+                        <li><span class="category">{{ $fault->product_category }}</span></li>
+                        @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
+                        <li><span class="brand">{{ $fault->brand }}</span></li>
+                        @endif
+                        @if ($fault->repair_status == "Repairable")
+                        <li><span class="repair-status span-repairable">@lang($fault->repair_status)</span></li>
+                        @else
+                        <li><span class="repair-status span-endoflife">@lang($fault->repair_status)</span></li>
+                        @endif
                     </ul>
                 </div>
                 @if ($fault->language == $locale )

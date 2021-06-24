@@ -97,24 +97,10 @@ class BattcatOraController extends Controller
             return redirect()->action('BattcatOraController@status')->withSuccess('done');
         }
 
-        $fault->translate = rawurlencode($fault->problem);
-        $fault_types = $this->Model->fetchFaultTypes($fault->repair_status);
-        $fault->suggestions = [];
-        // match problem terms with suggestions
-        foreach ($fault_types as $k => $v) {
-            if (!empty($v->regex) && preg_match('/' . $v->regex . '/', strtolower($fault->translation), $matches)) {
-                $fault->suggestions[$k] = $fault_types[$k];
-            }
-        }
-        // send non-suggested fault_types to view
-        $fault->faulttypes = array_diff_key($fault_types, $fault->suggestions);
-        // send the "poor data" fault_type to view
-        // $poor_data = $this->Model->fetchFaultType();
-        logger(print_r($poor_data,1));
+        $fault->faulttypes = $this->Model->fetchFaultTypes($fault->repair_status);
         return view('battcatora.index', [
             'title' => 'BattCat',
             'fault' => $fault,
-            // 'poor_data' => $poor_data,
             'user' => $user,
             'signpost' => $signpost,
             'locale' => $this->_getUserLocale(),
@@ -141,7 +127,7 @@ class BattcatOraController extends Controller
             'title' => 'BattCat',
             'status' => $data,
             'user' => $user,
-            'complete' => FALSE, // ($data['progress'][0]->total == 100),
+            'complete' => ($data['progress'][0]->total == 100),
         ]);
     }
 
