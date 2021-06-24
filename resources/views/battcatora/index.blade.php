@@ -81,7 +81,7 @@
                 <div class="device-meta col-4">
                     <ul>
                         <li><span class="source">@lang('battcatora.task.source'): {{ $fault->partner }}</span></li>
-                        <li><span class="category">{{ $fault->product_category }}</span></li>
+                        <li><span class="category">@lang($fault->product_category)</span></li>
                         @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
                         <li><span class="brand">{{ $fault->brand }}</span></li>
                         @endif
