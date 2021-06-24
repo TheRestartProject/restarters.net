@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\User;
 use DB;
 use Hash;
 use Mockery;
@@ -16,6 +17,26 @@ class AccountCreationTests extends TestCase {
         $response->assertRedirect('dashboard');
         $this->assertDatabaseHas('users', [
             'email' => $userAttributes['email']
+        ]);
+
+        $user = User::latest()->first();
+        $this->assertEquals(51.5073509, $user->latitude);
+        $this->assertEquals(-0.1277583, $user->longitude);
+    }
+
+    public function testRegisterInvalidAddress() {
+        $userAttributes = $this->userAttributes();
+
+        // Specify an invalid city
+        $userAttributes['city'] = 'zzzzzzz';
+        $response = $this->post('/user/register/',  $userAttributes);
+
+        $response->assertStatus(302);
+        $response->assertRedirect('dashboard');
+        $this->assertDatabaseHas('users', [
+            'email' => $userAttributes['email'],
+            'latitude' => null,
+            'longitude' => null
         ]);
     }
 

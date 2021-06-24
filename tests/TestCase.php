@@ -30,6 +30,7 @@ abstract class TestCase extends BaseTestCase
     private $userCount = 0;
     private $groupCount = 0;
     private $DOM = null;
+    public $lastResponse = null;
 
     public function setUp()
     {
@@ -85,6 +86,7 @@ abstract class TestCase extends BaseTestCase
         $userAttributes['my_time'] = Carbon::now();
         $userAttributes['consent_gdpr'] = true;
         $userAttributes['consent_future_data'] = true;
+        $userAttributes['city'] = 'London';
 
         return $userAttributes;
     }
@@ -99,19 +101,23 @@ abstract class TestCase extends BaseTestCase
         Auth::user()->role = $role;
     }
 
-    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.') {
-        $response = $this->post('/group/create',  [
+    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true) {
+        $idgroups = null;
+
+        $this->lastResponse = $this->post('/group/create',  [
             'name' => $name . $this->groupCount++,
             'website' => $website,
             'location' => $location,
             'free_text' => $text
         ]);
 
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
-        $p = strrpos($redirectTo, '/');
-        $idgroups = substr($redirectTo, $p + 1);
+        if ($assert) {
+            $this->assertTrue($this->lastResponse->isRedirection());
+            $redirectTo = $this->lastResponse->getTargetUrl();
+            $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
+            $p = strrpos($redirectTo, '/');
+            $idgroups = substr($redirectTo, $p + 1);
+        }
 
         return $idgroups;
     }
