@@ -80,6 +80,7 @@ class BattcatOraSetup extends Migration
             $table->string('language', 2);
             $table->string('translation', 1024);
             $table->unsignedInteger('fault_type_id')->index();
+            $table->string('fault_type', 255);
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';
         });
@@ -87,9 +88,9 @@ class BattcatOraSetup extends Migration
         $data = base_path() . '/database/data_updates/devices_battcat_ora.php';
         if (file_exists($data)) {
             include($data);
-            foreach ($devices_Battcat_ora as $k => $v) {
+            foreach ($devices_battcat_ora as $k => $v) {
                 DB::table('devices_battcat_ora')->insert([
-                    'id_ords' => $v['id_ords'],
+                    'id_ords' => $v['id'],
                     'data_provider' => $v['data_provider'],
                     'country' => $v['country'],
                     'partner_product_category' => $v['partner_product_category'],
@@ -101,6 +102,8 @@ class BattcatOraSetup extends Migration
                     'problem' => $v['problem'],
                     'language' => $v['language'],
                     'translation' => $v['translation'],
+                    'fault_type_id' => $v['fault_type_id'],
+                    'fault_type' => $v['fault_type'],
                 ]);
             }
         }
