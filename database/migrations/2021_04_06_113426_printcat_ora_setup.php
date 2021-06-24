@@ -13,7 +13,7 @@ class PrintcatOraSetup extends Migration {
      */
     public function up() {
 
-        if (!Schema::hasTable('devices_faults_tablets_ora_opinions')) {
+        if (!Schema::hasTable('devices_faults_printers_ora_opinions')) {
             Schema::create('devices_faults_printers_ora_opinions', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('id_ords', 16)->index();
