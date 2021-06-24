@@ -130,9 +130,7 @@ class GroupController extends Controller
 
         if ($request->isMethod('post') && ! empty($request->post())) {
             $error = array();
-            $Group = new Group;
 
-            // We got data! Elaborate. //NB:: Taken out frequency as it doesn't appear in the post data might be gmaps
             $name = $request->input('name');
             $website = $request->input('website');
             $location = $request->input('location');
@@ -164,18 +162,18 @@ class GroupController extends Controller
             }
 
             if (empty($error)) {
-                $data = array('name' => $name,
+                $data = [
+                    'name' => $name,
                     'website' => $website,
-                    // 'frequency'     => $freq,
                     'location' => $location,
                     'latitude' => $latitude,
                     'longitude' => $longitude,
                     'country' => $country,
                     'free_text' => $text,
                     'shareable_code' => FixometerHelper::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
-                );
+                ];
 
-                $group = $Group->create($data);
+                $group = Group::create($data);
                 $idGroup = $group->idgroups;
 
                 $network = Network::find(session()->get('repair_network'));
