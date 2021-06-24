@@ -127,8 +127,46 @@ class BattcatOraController extends Controller
             'title' => 'BattCat',
             'status' => $data,
             'user' => $user,
+            'categories' => $this->getCategories(),
             'complete' => ($data['progress'][0]->total == 100),
         ]);
+    }
+
+    protected function getCategories() {
+        return [
+            'Battery/charger/adapter',
+            'Decorative or safety lights',
+            'Desktop computer',
+            'Digital compact camera',
+            'DSLR/video camera',
+            'Flat screen',
+            'Food processor',
+            'Games console',
+            'Hair & beauty item',
+            'Handheld entertainment device',
+            'Headphones',
+            'Hi-Fi integrated',
+            'Hi-Fi separates',
+            'Lamp',
+            'Laptop',
+            'Large home electrical',
+            'Misc',
+            'Mobile',
+            'Musical instrument',
+            'PC accessory',
+            'Portable radio',
+            'Power tool',
+            'Printer/scanner',
+            'Projector',
+            'Sewing machine',
+            'Small home electrical',
+            'Small kitchen item',
+            'Tablet',
+            'Toy',
+            'TV and gaming-related accessories',
+            'Vacuum',
+            'Watch/clock',
+        ];
     }
 
     /**
