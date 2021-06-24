@@ -216,7 +216,9 @@ class GroupController extends Controller
                 } catch (QueryException $e){
                     $errorCode = $e->errorInfo[1];
                     if ($errorCode == 1062){
-                        $response['danger'] = __('groups.duplicate');
+                        $response['danger'] = __('groups.duplicate', [
+                            'name' => $name
+                        ]);
                     } else {
                         $response['danger'] = __('groups.database_error');
                     }
