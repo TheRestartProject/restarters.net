@@ -24,6 +24,6 @@ class GroupCreateTest extends TestCase {
             'free_text' => 'Some text.'
         ]);
 
-        $this->assertContains('That group name already exists', $response->getContent());
+        $this->assertContains('That group name (Test Group0) already exists', $response->getContent());
     }
 }
