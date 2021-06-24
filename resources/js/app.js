@@ -1560,6 +1560,13 @@ jQuery(document).ready(function () {
 
     // We are low traffic, so we can capture all performance events.
     tracesSampleRate: 1.0,
+
+    beforeSend(event) {
+      // Suppress development logs..
+      if (process.env.NODE_ENV === 'development') {
+        return null
+      }
+    }
   });
 
   // Vue.
@@ -1623,3 +1630,4 @@ jQuery(document).ready(function () {
   })
   $(".vue-placeholder-large").hide()
 })
+
