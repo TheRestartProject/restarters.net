@@ -103,7 +103,7 @@
                 <div class="device-problem col-1">
                     <p>
                         <button id="btn-translate" class="btn-sm btn-outline-light">
-                            <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text={{ $fault->translate }}" target="_blank">
+                            <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text={{ $fault->problem }}" target="_blank">
                                 @lang('battcatora.task.translate')
                             </a>
                         </button>
