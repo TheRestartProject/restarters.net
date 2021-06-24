@@ -42,5 +42,6 @@
         <env name="DB_TEST_DATABASE" value="restarters_db"/>
         <env name="DB_TEST_USERNAME" value="restarters"/>
         <env name="DB_TEST_PASSWORD" value="s3cr3t"/>
+        <env name="AUDIT_CONSOLE_EVENTS" value="true"/>
     </php>
 </phpunit>
