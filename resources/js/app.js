@@ -29,6 +29,8 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
+import * as Sentry from "@sentry/vue";
+import { Integrations } from "@sentry/tracing";
 
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
@@ -1550,6 +1552,23 @@ jQuery(document).ready(function () {
     lastScrollPosition = currentScrollPosition
   })
 
+  // Sentry error
+  Sentry.init({
+    Vue,
+    dsn: "https://50fd2fa440af4bb4a230f40ca8d8cf90@o879179.ingest.sentry.io/5831645",
+    integrations: [new Integrations.BrowserTracing()],
+
+    // We are low traffic, so we can capture all performance events.
+    tracesSampleRate: 1.0,
+
+    beforeSend(event) {
+      // Suppress development logs..
+      if (process.env.NODE_ENV === 'development') {
+        return null
+      }
+    }
+  });
+
   // Vue.
   //
   // Create a mixin for translation.
@@ -1612,3 +1631,4 @@ jQuery(document).ready(function () {
   })
   $(".vue-placeholder-large").hide()
 })
+

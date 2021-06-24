@@ -26,6 +26,8 @@
         "webpack-shell-plugin": "^0.5.0"
     },
     "dependencies": {
+        "@sentry/tracing": "^6.7.2",
+        "@sentry/vue": "^6.7.2",
         "ajv": "^6.5.4",
         "bootstrap-fileinput": "^4.4.9",
         "bootstrap-select": "^1.13.17",
