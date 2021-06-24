@@ -99,7 +99,7 @@ export default {
 // Some card styles are getting in the way.
 /deep/ .marg {
   margin: 2px !important;
-  font-size: 15px;
+  font-size: 15px !important;
   flex-shrink: 0;
 }
 
@@ -116,4 +116,5 @@ export default {
     line-height: 16px;
   }
 }
+
 </style>
