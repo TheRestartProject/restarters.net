@@ -18,8 +18,8 @@ class BasicTest extends TestCase {
             [
                 // Can't assert on total-contributions dev systems might have varying info.
                 'active-quest' => 'mobifixora',
-                ':current-user-quests' => '3',
-                ':current-user-contributions' => '3',
+                ':current-user-quests' => '0',
+                ':current-user-contributions' => '0',
                 ':topics' => '[]',
                 'see-all-topics-link' => 'https://talk.restarters.net/tag/workbench/l/latest',
                 ':is-logged-in' => 'true',
