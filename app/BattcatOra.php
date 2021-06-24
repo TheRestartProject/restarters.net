@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 // use Illuminate\Support\Facades\Schema;
 // use Illuminate\Database\Schema\Blueprint;
 
-class BattcatOra extends Model {
+class BattcatOra extends Model
+{
 
     protected $table = 'devices_faults_batteries_ora_opinions';
     protected $dateFormat = 'Y-m-d H:i';
@@ -29,7 +30,8 @@ class BattcatOra extends Model {
      *
      * @return array
      */
-    public function fetchFault($exclusions = [], $locale = NULL) {
+    public function fetchFault($exclusions = [], $locale = NULL)
+    {
         $result = [];
         $records = DB::select("SELECT COUNT(*) as total FROM `devices_battcat_ora`");
         if ($records[0]->total > count($exclusions)) {
@@ -45,7 +47,8 @@ class BattcatOra extends Model {
         return $result;
     }
 
-    protected function _getSQL($exclusions = [], $locale = NULL) {
+    protected function _getSQL($exclusions = [], $locale = NULL)
+    {
         $sql = "SELECT
 d.`id_ords` as `id_ords`,
 d.`data_provider` as `partner`,
@@ -73,6 +76,7 @@ LIMIT 1;
             $and .= "\nAND (d.`language` = '$locale')";
         }
         $sql = sprintf($sql, $and);
+        logger($sql);
         return $sql;
     }
 
@@ -81,8 +85,10 @@ LIMIT 1;
      *
      * @return array
      */
-    public function fetchFaultTypes($repair_status) {
+    public function fetchFaultTypes($repair_status)
+    {
         $sql = "SELECT * FROM `fault_types_batteries` WHERE `repair_status` = '$repair_status'";
+        logger($sql);
         return DB::select($sql);
     }
 
@@ -91,12 +97,13 @@ LIMIT 1;
      *
      * @return mixed
      */
-    public function fetchStatus() {
+    public function fetchStatus()
+    {
 
         $result = [];
 
         $result['total_devices'] = DB::select("
-SELECT COUNT(*) AS total
+SELECT COUNT(DISTINCT d.id_ords) AS total
 FROM `devices_battcat_ora` d
 ");
 
@@ -124,6 +131,33 @@ FROM devices_battcat_ora d
 LEFT JOIN devices_faults_batteries_ora_opinions o ON o.id_ords = d.id_ords
 WHERE o.id_ords IS NULL
 ");
+
+        /*
+This is how to get progress with SQL but quicker code used below
+*/
+        // $result['progress'] = DB::select("
+        // SELECT
+        // ROUND((r2.opinions/r2.batteries)*100) as percent
+        // FROM (
+        // SELECT
+        // COUNT(*) AS opinions,
+        // (SELECT COUNT(*) FROM devices_battcat_ora) as batteries
+        // FROM (
+        // SELECT
+        // o.id_ords,
+        // (SELECT o1.fault_type_id FROM devices_faults_batteries_ora_opinions o1 WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1) AS winning_opinion_id,
+        // ROUND((SELECT COUNT(o3.fault_type_id) as top_crowd_opinion_count FROM devices_faults_batteries_ora_opinions o3 WHERE o3.id_ords = o.id_ords GROUP BY o3.fault_type_id ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
+        // (SELECT COUNT(o4.fault_type_id) as all_votes FROM devices_faults_batteries_ora_opinions o4 WHERE o4.id_ords = o.id_ords) * 100) AS top_crowd_opinion_percentage,
+        // COUNT(o.fault_type_id) AS all_crowd_opinions_count
+        // FROM devices_faults_batteries_ora_opinions o
+        // GROUP BY o.id_ords
+        // HAVING
+        // (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
+        // OR
+        // (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
+        // ) AS r1
+        // ) AS r2
+        // ");
 
         $result['total_recats'] = DB::select("
 SELECT COUNT(*) AS total FROM (
@@ -190,8 +224,11 @@ GROUP BY d.id_ords
 HAVING
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
 ");
-        $result['total_splits'] = [json_decode(json_encode(['total' => count($result['list_splits'])]), FALSE)];
 
+        $total_splits = count($result['list_splits']);
+        $result['total_splits'] = [json_decode(json_encode(['total' => $total_splits]), FALSE)];
+        $progress = round((($result['total_recats'][0]->total + $result['total_splits'][0]->total) / $result['total_devices'][0]->total) * 100);
+        $result['progress'] = [json_decode(json_encode(['total' => $progress]), FALSE)];
         return $result;
     }
 
@@ -200,7 +237,8 @@ HAVING
      *
      * @return mixed
      */
-    public function updateDevices() {
+    public function updateDevices()
+    {
 
         DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_batteries_ora_temporary` AS
 SELECT *
@@ -240,5 +278,4 @@ WHERE d.id_ords = t.id_ords;");
 
         return $result;
     }
-
 }
