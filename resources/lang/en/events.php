@@ -3,6 +3,8 @@
 return array (
   'field_event_name_helper' => 'Name of the venue or neighbourhood',
   'field_venue_helper' => 'I.e. the place where the fixing happens!',
+  'field_venue_placeholder' => 'Enter your address',
+  'field_venue_use_group' => 'Use group location',
   'create_event' => 'Create event',
   'warning_volunteers_message' => 'Please note that the number of volunteers does not match the attendance record.  Do you need to add or remove volunteers?',
   'events_title_admin' => 'Events to moderate',
