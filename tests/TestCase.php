@@ -30,6 +30,7 @@ abstract class TestCase extends BaseTestCase
     private $userCount = 0;
     private $groupCount = 0;
     private $DOM = null;
+    public $lastResponse = null;
 
     public function setUp()
     {
@@ -85,6 +86,7 @@ abstract class TestCase extends BaseTestCase
         $userAttributes['my_time'] = Carbon::now();
         $userAttributes['consent_gdpr'] = true;
         $userAttributes['consent_future_data'] = true;
+        $userAttributes['city'] = 'London';
 
         return $userAttributes;
     }
@@ -99,19 +101,23 @@ abstract class TestCase extends BaseTestCase
         Auth::user()->role = $role;
     }
 
-    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.') {
-        $response = $this->post('/group/create',  [
+    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true) {
+        $idgroups = null;
+
+        $this->lastResponse = $this->post('/group/create',  [
             'name' => $name . $this->groupCount++,
             'website' => $website,
             'location' => $location,
             'free_text' => $text
         ]);
 
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
-        $p = strrpos($redirectTo, '/');
-        $idgroups = substr($redirectTo, $p + 1);
+        if ($assert) {
+            $this->assertTrue($this->lastResponse->isRedirection());
+            $redirectTo = $this->lastResponse->getTargetUrl();
+            $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
+            $p = strrpos($redirectTo, '/');
+            $idgroups = substr($redirectTo, $p + 1);
+        }
 
         return $idgroups;
     }
@@ -157,12 +163,29 @@ abstract class TestCase extends BaseTestCase
             $val = preg_replace('/"created_at":".*"/', '"created_at":"TIMESTAMP"', $val);
             $val = preg_replace('/"updated_at":".*"/', '"updated_at":"TIMESTAMP"', $val);
         }
+
+        return $val;
     }
 
-    private function canonicaliseAndAssertSame($val1, $val2) {
+//    private function isJson($string) {
+//        json_decode($string);
+//        return json_last_error() === JSON_ERROR_NONE;
+//    }
+//
+    private function canonicaliseAndAssertSame($val1, $val2, $name) {
         $val1 = $this->canonicalise($val1);
         $val2 = $this->canonicalise($val2);
-        $this->assertSame($val1, $val2);
+
+        if ($this->isJson($val1) && $this->isJson($val2)) {
+            // We get nicer mismatch display if we compare the decoded JSON object rather than comparing the
+            // string encoding.
+            $dec1 = json_decode($val1, TRUE);
+            $dec2 = json_decode($val2, TRUE);
+
+            $this->assertSame($dec1, $dec2, $name);
+        } else {
+            $this->assertSame($val1, $val2, $name);
+        }
     }
 
     public function assertVueProperties($response, $expected) {
@@ -171,13 +194,12 @@ abstract class TestCase extends BaseTestCase
         // phpunit has assertArraySubset, but this is controversially being removed in later versions so don't rely
         // on it.
         $props = $this->getVueProperties($response);
-        error_log(var_export($props, TRUE));
         $foundSome = FALSE;
 
         for ($i = 0; $i < count($expected); $i++) {
             foreach ($expected[$i] as $key => $value) {
                 $this->assertArrayHasKey($key, $props[$i]);
-                $this->canonicaliseAndAssertSame($value, $props[$i][$key]);
+                $this->canonicaliseAndAssertSame($value, $props[$i][$key], $key);
                 $foundSome = TRUE;
             }
         }
