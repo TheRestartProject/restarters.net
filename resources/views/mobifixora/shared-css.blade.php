@@ -86,5 +86,23 @@
         -webkit-box-shadow: 6px 6px 0 0 #000;
         box-shadow: 6px 6px 0 0 #eee;
     }
+    .mobifix div.quest-closed {
+        background-color:#4aaebc;
+    }
+
+    .mobifix .quest-closed li {
+        list-style-type: disc;
+    }
+
+    .mobifix .quest-closed a {
+        color: #111;
+        text-decoration: underline;
+    }
+
+    .mobifix .quest-closed a:hover {
+        color: #111;
+        text-decoration: none;
+        font-weight: 600;
+    }
 
 </style>
