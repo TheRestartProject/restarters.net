@@ -76,7 +76,7 @@ LIMIT 1;
             $and .= "\nAND (d.`language` = '$locale')";
         }
         $sql = sprintf($sql, $and);
-        logger($sql);
+        // logger($sql);
         return $sql;
     }
 
@@ -88,7 +88,7 @@ LIMIT 1;
     public function fetchFaultTypes($repair_status)
     {
         $sql = "SELECT * FROM `fault_types_batteries` WHERE `repair_status` = '$repair_status'";
-        logger($sql);
+        // logger($sql);
         return DB::select($sql);
     }
 
