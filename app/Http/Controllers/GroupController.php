@@ -177,7 +177,7 @@ class GroupController extends Controller
                 ];
 
                 try {
-                    $group = $Group->create($data);
+                    $group = Group::create($data);
                     $idGroup = $group->idgroups;
 
                     $network = Network::find(session()->get('repair_network'));
