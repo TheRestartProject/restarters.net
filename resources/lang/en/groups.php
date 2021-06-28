@@ -167,7 +167,7 @@ return array (
   'group_count' => 'There is <b>:count group</b>.|There are <b>:count groups</b>.',
   'search_name_placeholder' => 'Search name...',
   'search_location_placeholder' => 'Search location...',
-  'search_country_placeholder' => 'Country',
+  'search_country_placeholder' => 'Country...',
   'search_tags_placeholder' => 'Tag',
   'show_filters' => 'Show Filters',
   'hide_filters' => 'Hide Filters',
@@ -182,4 +182,7 @@ return array (
   'no_other_nearby_events' => 'There are currently no other upcoming nearby events.',
   'postcode' => 'Group postcode',
   'groups_postcode_small' => '(Optional)',
+  'duplicate' => 'That group name (:name) already exists.  If it\'s yours, please go to the Groups page using the menu and edit it.',
+  'database_error' => 'Group could <strong>not</strong> be created. Something went wrong with the database.',
+  'create_failed' => 'Group could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.'
 );

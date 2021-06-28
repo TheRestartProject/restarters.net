@@ -29,18 +29,24 @@ $factory->state(App\Device::class, 'mobile', function (Faker $faker) {
 
 $factory->state(App\Device::class, 'fixed', function (Faker $faker) {
     return [
+        'category' => 111,
+        'category_creation' => 111,
         'repair_status' => 1,
     ];
 });
 
 $factory->state(App\Device::class, 'repairable', function (Faker $faker) {
     return [
+        'category' => 111,
+        'category_creation' => 111,
         'repair_status' => 2,
     ];
 });
 
 $factory->state(App\Device::class, 'end', function (Faker $faker) {
     return [
+        'category' => 111,
+        'category_creation' => 111,
         'repair_status' => 2,
     ];
 });

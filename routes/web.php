@@ -34,7 +34,7 @@ Auth::routes();
 // NGM: We are not using Laravel's default registration methods.
 // So we redirect /register to /user/register.
 // TODO: are we actually using anything out of Auth::routes()?  Do we need it?
-Route::redirect('register', '/user/register', 301);
+Route::redirect('register', '/user/register');
 Route::get('/logout', 'UserController@logout');
 
 Route::get('/about', 'AboutController@index')->name('features');
@@ -66,12 +66,27 @@ Route::prefix('calendar')->group(function () {
 
 Route::get('workbench', 'MicrotaskingController@index')->name('workbench');
 
+Route::prefix('FaultCat')->group(function () {
+    Route::get('/', 'FaultcatController@index');
+    Route::post('/', 'FaultcatController@index');
+    Route::get('/status', 'FaultcatController@status');
+    Route::get('/demographics', 'FaultcatController@demographics');
+    Route::post('/demographics', 'FaultcatController@storeDemographics');
+});
+
 Route::prefix('faultcat')->group(function () {
     Route::get('/', 'FaultcatController@index');
     Route::post('/', 'FaultcatController@index');
     Route::get('/status', 'FaultcatController@status');
     Route::get('/demographics', 'FaultcatController@demographics');
     Route::post('/demographics', 'FaultcatController@storeDemographics');
+});
+
+Route::prefix('MiscCat')->group(function () {
+    Route::get('/', 'MisccatController@index');
+    Route::post('/', 'MisccatController@index');
+    Route::get('/cta', 'MisccatController@cta');
+    Route::get('/status', 'MisccatController@status');
 });
 
 Route::prefix('misccat')->group(function () {
@@ -133,6 +148,19 @@ Route::prefix('printcat')->group(function () {
     Route::post('/', 'PrintcatOraController@index');
     Route::get('/cta', 'PrintcatOraController@cta');
     Route::get('/status', 'PrintcatOraController@status');
+});
+
+Route::prefix('BattCat')->group(function () {
+    Route::get('/', 'BattcatOraController@index');
+    Route::post('/', 'BattcatOraController@index');
+    Route::get('/survey', 'BattcatOraController@survey');
+    Route::get('/status', 'BattcatOraController@status');
+});
+Route::prefix('battcat')->group(function () {
+    Route::get('/', 'BattcatOraController@index');
+    Route::post('/', 'BattcatOraController@index');
+    Route::get('/survey', 'BattcatOraController@survey');
+    Route::get('/status', 'BattcatOraController@status');
 });
 
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
@@ -247,8 +275,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/group/{group_id?}', 'PartyController@index')->name('group-events');
         Route::get('/create/{group_id?}', 'PartyController@create');
         Route::post('/create', 'PartyController@create');
-        Route::get('/manage/{id}', 'PartyController@manage');
-        Route::post('/manage/{id}', 'PartyController@manage');
         Route::get('/edit/{id}', 'PartyController@edit');
         Route::post('/edit/{id}', 'PartyController@edit');
         Route::get('/duplicate/{id}', 'PartyController@duplicate');
