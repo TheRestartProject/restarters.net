@@ -375,7 +375,7 @@ class TabicatOraTest extends TestCase
                 0 => [
                     'id_ords' => $data[2]['id_ords'],
                     'all_crowd_opinions_count' => 3,
-                    'opinions' => 'Other,Screen,Unknown',
+                    'opinions' => 'Other,Poor data,Screen',
                 ],
             ],
             'progress' => 63,
