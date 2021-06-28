@@ -82,7 +82,7 @@ class CreateEventTest extends TestCase
         $this->post('/party/create/', $eventAttributes);
         $this->assertDatabaseHas('events', $eventAttributes);
 
-        // Check that we can view the event, and that it shows the creation success.
+        // Check that we can view the event, and that it shows the creation success message.
         $this->get('/party/view/' . Party::latest()->first()->idevents)->
             assertSee($eventAttributes['venue'])->
             assertSee(__('events.created_success_message'));

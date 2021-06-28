@@ -260,6 +260,29 @@ class GroupController extends Controller
         ]);
     }
 
+    private function expandVolunteers($volunteers) {
+        $ret = [];
+
+        foreach ($volunteers as $volunteer) {
+            $volunteer['volunteer'] = $volunteer->volunteer;
+
+            if ($volunteer['volunteer']) {
+                $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+
+                foreach ($volunteer['userSkills'] as $skill) {
+                    // Force expansion
+                    $skill->skillName->skill_name;
+                }
+
+                $volunteer['fullName'] = $volunteer->name;
+                $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                $ret[] = $volunteer;
+            }
+        }
+
+        return $ret;
+    }
+
     public function view($groupid)
     {
         if (isset($_GET['action']) && isset($_GET['code'])) {
@@ -407,6 +430,7 @@ class GroupController extends Controller
 
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
         $view_group = Group::find($groupid);
+        $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers);
 
         $hasPendingInvite = ! empty(UserGroups::where('group', $groupid)
         ->where('user', $user->id)

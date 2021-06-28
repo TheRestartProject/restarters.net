@@ -95,37 +95,13 @@
 
       $expanded_events = [];
 
-      function expandEvent($event, $group, $emissionRatio) {
-          $thisone = $event->getAttributes();
-
-          if (is_null($group)) {
-              // We are showing events for multiple groups and so we need to pass the relevant group, in order that
-              // we can show the group name and link to it.
-              $thisone['group'] = \App\Group::find($event->group);
-          }
-
-          $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
-          $thisone['allinvitedcount'] = $event->allInvited->count();
-
-          // TODO LATER Consider whether these stats should be in the event or passed into the store.
-          $thisone['stats'] = $event->getEventStats($emissionRatio);
-          $thisone['participants_count'] = $event->participants;
-          $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
-
-          $thisone['isVolunteer'] = $event->isVolunteer();
-          $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
-          $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
-
-          return $thisone;
-      }
-
       foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-          $expanded_events[] = expandEvent($event, $group, $emissionRatio);
+          $expanded_events[] = \App\Http\Controllers\GroupController::expandEvent($event, $group, $emissionRatio);
       }
 
       if ($upcoming_events_in_area) {
         foreach ($upcoming_events_in_area as $event) {
-            $e = expandEvent($event, $group, $emissionRatio);
+            $e = \App\Http\Controllers\GroupController::expandEvent($event, $group, $emissionRatio);
             $e['nearby'] = TRUE;
             $expanded_events[] = $e;
         }
@@ -133,7 +109,7 @@
 
       if ($upcoming_events_all) {
         foreach ($upcoming_events_all as $event) {
-            $e = expandEvent($event, $group, $emissionRatio);
+            $e = \App\Http\Controllers\GroupController::expandEvent($event, $group, $emissionRatio);
             $e['all'] = TRUE;
             $expanded_events[] = $e;
         }
