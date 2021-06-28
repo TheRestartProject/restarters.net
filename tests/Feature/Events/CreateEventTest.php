@@ -97,7 +97,6 @@ class CreateEventTest extends TestCase
 
         // Check both the group page, and the top-level events page.
         foreach (['/group/view/' . $group->idgroups, '/party'] as $url) {
-            error_log("Fetch $url");
             $response = $this->get($url);
 
             if ($seeEvent) {
