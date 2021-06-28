@@ -17,7 +17,6 @@
             <exclude>./tests/Feature/Microtasks/FaultcatTest.php</exclude>
             <exclude>./tests/Feature/Microtasks/MisccatTest.php</exclude>
             <exclude>./tests/Feature/Microtasks/MobifixTest.php</exclude>
-            <exclude>./tests/Feature/Zapier/ZapierNetworkTests.php</exclude>
         </testsuite>
 
         <testsuite name="Unit">
