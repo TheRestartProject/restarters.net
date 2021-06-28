@@ -97,6 +97,7 @@ class CreateEventTest extends TestCase
 
         // Check both the group page, and the top-level events page.
         foreach (['/group/view/' . $group->idgroups, '/party'] as $url) {
+            error_log("Fetch $url");
             $response = $this->get($url);
 
             if ($seeEvent) {
@@ -122,10 +123,16 @@ class CreateEventTest extends TestCase
 
     public function roles() {
         return [
+            // Hosts can see but not moderate.
             [ [ 'Host', TRUE, FALSE ] ],
+
+            // Nobody else can see the event in the list of events.
+            //
+            // Administrators and NetworkCoordinators arguably should be able to, but that's the current function.
+            // They will see it in the lists of events to moderate, but that's not what we are testing here.
             [ [ 'Restarter', FALSE, FALSE  ] ],
-            [ [ 'Administrator', TRUE, TRUE  ] ],
-            [ [ 'NetworkCoordinator', TRUE, TRUE  ] ]
+            [ [ 'Administrator', FALSE, FALSE  ] ],
+            [ [ 'NetworkCoordinator', FALSE, FALSE  ] ]
         ];
     }
 
