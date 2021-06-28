@@ -42,7 +42,7 @@
 
           $can_edit_group = FixometerHelper::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
 
-          function expandVolunteer($volunteers) {
+          $expanded_volunteers = (function($volunteers) {
               $ret = [];
 
               foreach ($volunteers as $volunteer) {
@@ -63,9 +63,7 @@
               }
 
               return $ret;
-          }
-
-          $expanded_volunteers = expandVolunteer($view_group->allConfirmedVolunteers);
+          })($view_group->allConfirmedVolunteers);
 
           $expanded_events = [];
 

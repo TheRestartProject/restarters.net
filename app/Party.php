@@ -383,8 +383,6 @@ class Party extends Model implements Auditable
 
     public function scopeUpcomingEvents($query, $by_event = false)
     {
-      // We want to show approved events (wordpress_post_id IS NOT NULL) or where we are a host (e.g. because
-      // we created it.
       if( $by_event ) {
         return $this->join('groups', 'groups.idgroups', '=', 'events.group')
                      ->join('events_users', 'events_users.event', '=', 'events.idevents')
@@ -399,11 +397,13 @@ class Party extends Model implements Auditable
                      ->orderBy('event_date', 'ASC');
       }
 
-      return $this->join('groups', 'groups.idgroups', '=', 'events.group')
+      // We want to show approved events (wordpress_post_id IS NOT NULL) or where we are a host (e.g. because
+      // we created it.
+      $ret = $this->join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events_users', function($join) {
                 $join->on('events_users.event', '=', 'events.idevents');
-                $join->where('events_users.user', '=', Auth::User()->id);
+                $join->where('events_users.user', '=', Auth::user()->id);
             })
             ->where(function($query) {
               $query
@@ -414,6 +414,9 @@ class Party extends Model implements Auditable
             ->select('events.*')
             ->groupBy('idevents')
             ->orderBy('event_date', 'ASC');
+
+        #error_log("Query " . $ret->toSql() . " with " . Auth::user()->id . " and " . date('Y-m-d'));
+        return $ret;
     }
 
     /**
