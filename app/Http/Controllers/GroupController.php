@@ -24,6 +24,7 @@ use Auth;
 use DB;
 use FixometerFile;
 use FixometerHelper;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Notification;
@@ -121,6 +122,8 @@ class GroupController extends Controller
 
     public function create(Request $request, $networkId = null)
     {
+        $idGroup = false;
+
         $user = User::find(Auth::id());
 
         // Only administrators can add groups
@@ -130,9 +133,7 @@ class GroupController extends Controller
 
         if ($request->isMethod('post') && ! empty($request->post())) {
             $error = array();
-            $Group = new Group;
 
-            // We got data! Elaborate. //NB:: Taken out frequency as it doesn't appear in the post data might be gmaps
             $name = $request->input('name');
             $website = $request->input('website');
             $location = $request->input('location');
@@ -164,53 +165,64 @@ class GroupController extends Controller
             }
 
             if (empty($error)) {
-                $data = array('name' => $name,
+                $data = [
+                    'name' => $name,
                     'website' => $website,
-                    // 'frequency'     => $freq,
                     'location' => $location,
                     'latitude' => $latitude,
                     'longitude' => $longitude,
                     'country' => $country,
                     'free_text' => $text,
                     'shareable_code' => FixometerHelper::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
-                );
+                ];
 
-                $group = $Group->create($data);
-                $idGroup = $group->idgroups;
+                try {
+                    $group = Group::create($data);
+                    $idGroup = $group->idgroups;
 
-                $network = Network::find(session()->get('repair_network'));
-                $network->addGroup($group);
+                    $network = Network::find(session()->get('repair_network'));
+                    $network->addGroup($group);
 
-                if (is_numeric($idGroup) && $idGroup !== false) {
-                    $idGroup = Group::find($idGroup);
-                    $idGroup = $idGroup->idgroups;
+                    if (is_numeric($idGroup) && $idGroup !== false) {
+                        $idGroup = Group::find($idGroup);
+                        $idGroup = $idGroup->idgroups;
 
-                    $response['success'] = 'Group created correctly.';
+                        $response['success'] = 'Group created correctly.';
 
-                    //Associate current logged in user as a host
-                    UserGroups::create([
-                        'user' => Auth::user()->id,
-                        'group' => $idGroup,
-                        'status' => 1,
-                        'role' => 3,
-                    ]);
+                        //Associate current logged in user as a host
+                        UserGroups::create([
+                                               'user' => Auth::user()->id,
+                                               'group' => $idGroup,
+                                               'status' => 1,
+                                               'role' => 3,
+                                           ]);
 
-                    // Notify relevant admins
-                    $notify_admins = FixometerHelper::usersWhoHavePreference('admin-moderate-group');
-                    Notification::send($notify_admins, new AdminModerationGroup([
-                        'group_name' => $name,
-                        'group_url' => url('/group/edit/'.$idGroup),
-                    ]));
+                        // Notify relevant admins
+                        $notify_admins = FixometerHelper::usersWhoHavePreference('admin-moderate-group');
+                        Notification::send($notify_admins, new AdminModerationGroup([
+                                                                                        'group_name' => $name,
+                                                                                        'group_url' => url('/group/edit/'.$idGroup),
+                                                                                    ]));
 
-                    if (isset($_FILES) && ! empty($_FILES)) {
-                        $file = new FixometerFile;
-                        $file->upload('file', 'image', $idGroup, env('TBL_GROUPS'), false, true);
+                        if (isset($_FILES) && ! empty($_FILES)) {
+                            $file = new FixometerFile;
+                            $file->upload('file', 'image', $idGroup, env('TBL_GROUPS'), false, true);
+                        }
+                    } else {
+                        $response['danger'] = 'Group could <strong>not</strong> be created. Something went wrong with the database.';
                     }
-                } else {
-                    $response['danger'] = 'Group could <strong>not</strong> be created. Something went wrong with the database.';
+                } catch (QueryException $e){
+                    $errorCode = $e->errorInfo[1];
+                    if ($errorCode == 1062){
+                        $response['danger'] = __('groups.duplicate', [
+                            'name' => $name
+                        ]);
+                    } else {
+                        $response['danger'] = __('groups.database_error');
+                    }
                 }
             } else {
-                $response['danger'] = 'Group could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.';
+                $response['danger'] = __('groups.create_failed');
             }
 
             if ( ! isset($response)) {

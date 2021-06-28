@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 
-class ZapierNetworkTests extends TestCase
+class GroupNetworkCreateTest extends TestCase
 {
     public function setUp()
     {

@@ -129,7 +129,7 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $group->addVolunteer($restarter);
 
-        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1']);
+        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1' ]);
 
         // act
         $response = $this->post('/party/create/', $eventData);
