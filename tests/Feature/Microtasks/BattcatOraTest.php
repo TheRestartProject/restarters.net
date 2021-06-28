@@ -82,7 +82,7 @@ class BattcatOraTest extends TestCase
         $exclude = [];
         $locale = '';
         $opinions = $this->_setup_opinions($data);
-        $expect = ['restart_10452', 'restart_11931', 'restart_17002'];
+        $expect = ['restart_9918', 'restart_17002', 'rcint_3689'];
         $result = $BattcatOra->fetchFault($exclude, $locale);
         $this->assertTrue(is_array($result), 'fetch_battcatora_record: result is not array');
         $this->assertEquals(1, count($result), 'fetch_battcatora_record: wrong result count');
@@ -121,12 +121,10 @@ class BattcatOraTest extends TestCase
         $opinions = $this->_setup_opinions($data);
         $BattcatOra = new BattcatOra;
         $result = $BattcatOra->fetchStatus();
-        logger(print_r($opinions,1));
-        logger(print_r($result,1));
         $this->assertTrue(is_array($result), 'fetch_battcatora_status: result is not array');
         foreach ($opinions['status'] as $k => $v) {
             $this->assertTrue(isset($result, $k), 'fetch_battcatora_status: missing key - ' . $k);
-            if ($k == 'list_recats' || $k == 'list_splits') {
+            if ($k == 'list_recats') {
                 $this->assertTrue(is_array($result[$k]), 'fetch_battcatora_status: not array - ' . $k);
                 foreach ($v[0] as $key => $val) {
                     $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_battcatora_status #' . $k . ': missing key - ' . $key);
@@ -199,22 +197,6 @@ AND LENGTH(problem) < 20
                 'fault_type' => ''
             ],
             [
-                'id_ords' => 'anstiftung_5424',
-                'data_provider' => 'anstiftung',
-                'country' => 'DEU',
-                'partner_product_category' => 'Computer ~ Laptop',
-                'product_category' => 'Laptop',
-                'brand' => 'Unknown',
-                'year_of_manufacture' => '????',
-                'repair_status' => 'End of life',
-                'event_date' => '2020-07-05',
-                'problem' => 'akku kaput',
-                'language' => 'de',
-                'translation' => 'battery kaput',
-                'fault_type_id' => '0',
-                'fault_type' => ''
-            ],
-            [
                 'id_ords' => 'rcint_7168',
                 'data_provider' => 'Repair Café International',
                 'country' => 'NLD',
@@ -227,22 +209,6 @@ AND LENGTH(problem) < 20
                 'problem' => 'Accu vermoeid',
                 'language' => 'nl',
                 'translation' => 'battery exhausted',
-                'fault_type_id' => '0',
-                'fault_type' => ''
-            ],
-            [
-                'id_ords' => 'rcint_3689',
-                'data_provider' => 'Repair Café International',
-                'country' => 'NLD',
-                'partner_product_category' => 'Computers/phones ~ Laptop',
-                'product_category' => 'Laptop',
-                'brand' => 'Siemens',
-                'year_of_manufacture' => '2007',
-                'repair_status' => 'End of life',
-                'event_date' => '2017-12-02',
-                'problem' => 'Batterij defect',
-                'language' => 'nl',
-                'translation' => 'battery failure',
                 'fault_type_id' => '0',
                 'fault_type' => ''
             ],
@@ -275,6 +241,38 @@ AND LENGTH(problem) < 20
                 'problem' => 'battery dead',
                 'language' => 'en',
                 'translation' => 'battery dead',
+                'fault_type_id' => '0',
+                'fault_type' => ''
+            ],
+            [
+                'id_ords' => 'anstiftung_5424',
+                'data_provider' => 'anstiftung',
+                'country' => 'DEU',
+                'partner_product_category' => 'Computer ~ Laptop',
+                'product_category' => 'Laptop',
+                'brand' => 'Unknown',
+                'year_of_manufacture' => '????',
+                'repair_status' => 'End of life',
+                'event_date' => '2020-07-05',
+                'problem' => 'akku kaput',
+                'language' => 'de',
+                'translation' => 'battery kaput',
+                'fault_type_id' => '0',
+                'fault_type' => ''
+            ],
+            [
+                'id_ords' => 'rcint_3689',
+                'data_provider' => 'Repair Café International',
+                'country' => 'NLD',
+                'partner_product_category' => 'Computers/phones ~ Laptop',
+                'product_category' => 'Laptop',
+                'brand' => 'Siemens',
+                'year_of_manufacture' => '2007',
+                'repair_status' => 'End of life',
+                'event_date' => '2017-12-02',
+                'problem' => 'Batterij defect',
+                'language' => 'nl',
+                'translation' => 'battery failure',
                 'fault_type_id' => '0',
                 'fault_type' => ''
             ],
@@ -350,48 +348,56 @@ AND LENGTH(problem) < 20
         $opinions = [];
         $updates = [];
 
-        // $data[0] : 3 eol opinions with consensus : recat
+        // $data[0] : 3 rep opinions with consensus : recat
         $opinions[$data[0]['id_ords']][] = $this->_insert_opinion($data[0]['id_ords'], 4);
         $opinions[$data[0]['id_ords']][] = $this->_insert_opinion($data[0]['id_ords'], 4);
         $opinions[$data[0]['id_ords']][] = $this->_insert_opinion($data[0]['id_ords'], 4);
         $updates[$data[0]['id_ords']] = 4;
 
-        // $data[1] : 3 eol opinions with majority : recat
+        // $data[1] : 3 rep opinions with majority : recat
         $opinions[$data[1]['id_ords']][] = $this->_insert_opinion($data[1]['id_ords'], 4);
         $opinions[$data[1]['id_ords']][] = $this->_insert_opinion($data[1]['id_ords'], 4);
         $opinions[$data[1]['id_ords']][] = $this->_insert_opinion($data[1]['id_ords'], 7);
         $updates[$data[1]['id_ords']] = 4;
 
-        // $data[2] : 3 eol opinions split
+        // $data[2] : 3 rep opinions split
         $opinions[$data[2]['id_ords']][] = $this->_insert_opinion($data[2]['id_ords'], 4);
         $opinions[$data[2]['id_ords']][] = $this->_insert_opinion($data[2]['id_ords'], 7);
         $opinions[$data[2]['id_ords']][] = $this->_insert_opinion($data[2]['id_ords'], 8);
 
-        // $data[3] : 3 eol opinions adjudicated : recat
+        // $data[3] : 3 rep opinions adjudicated : recat
         $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 4);
         $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 7);
         $opinions[$data[3]['id_ords']][] = $this->_insert_opinion($data[3]['id_ords'], 8);
         DB::update("INSERT INTO devices_faults_batteries_ora_adjudicated SET id_ords = '" . $data[3]['id_ords'] . "', fault_type_id=4");
         $updates[$data[3]['id_ords']] = 4;
 
-        // $devs[4] : 2 rep opinions with majority : recat
+        // $data[4] : 2 eol opinions with majority : recat
         $opinions[$data[4]['id_ords']][] = $this->_insert_opinion($data[4]['id_ords'], 9);
         $opinions[$data[4]['id_ords']][] = $this->_insert_opinion($data[4]['id_ords'], 9);
         $updates[$data[4]['id_ords']] = 9;
 
-        // $devs[5] : 2 rep opinions split
+        // $data[5] : 2 eol opinions split
         $opinions[$data[5]['id_ords']][] = $this->_insert_opinion($data[5]['id_ords'], 9);
         $opinions[$data[5]['id_ords']][] = $this->_insert_opinion($data[5]['id_ords'], 17);
 
-        // $devs[6] : 1 rep opinion
+        // $data[6] : 1 eol opinion
         $opinions[$data[6]['id_ords']][] = $this->_insert_opinion($data[6]['id_ords'], 18);
 
+        // $data[7] : no opinions
+
+        /*
+        % progress towards completion
+        total number of opinions given (this replaces the current ‘Items / opinions’ section
+        a table of items with majority opinions for each of end-of-life and repairable statuses
+        */
         $status = [
             'total_devices' => 8,
-            'total_opinions_3' => 4,
-            'total_opinions_2' => 2,
-            'total_opinions_1' => 1,
-            'total_opinions_0' => 1,
+            'total_opinions' => 17,
+            // 'total_opinions_3' => 4,
+            // 'total_opinions_2' => 2,
+            // 'total_opinions_1' => 1,
+            // 'total_opinions_0' => 1,
             'total_recats' => 4,
             'list_recats' => [
                 0 => [
@@ -403,14 +409,14 @@ AND LENGTH(problem) < 20
                     'total' => 1,
                 ],
             ],
-            'total_splits' => 1,
-            'list_splits' => [
-                0 => [
-                    'id_ords' => $data[2]['id_ords'],
-                    'all_crowd_opinions_count' => 3,
-                    'opinions' => 'Other,Poor data,Replace with new battery',
-                ],
-            ],
+            // 'total_splits' => 1,
+            // 'list_splits' => [
+            //     0 => [
+            //         'id_ords' => $data[2]['id_ords'],
+            //         'all_crowd_opinions_count' => 3,
+            //         'opinions' => 'Other,Poor data,Replace with new battery',
+            //     ],
+            // ],
             'progress' => 63,
         ];
 
