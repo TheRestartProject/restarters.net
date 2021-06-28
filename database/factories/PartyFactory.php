@@ -5,8 +5,10 @@ use App\Group;
 use Faker\Generator as Faker;
 
 $factory->define(App\Party::class, function (Faker $faker) {
+    // Need to force the location otherwise the random one may not be geocodable and therefore the event may not
+    // get created.
     return [
-        'location' => $faker->address,
+        'location' => 'International House, 3Space, 6 Canterbury Cres, London SW9 7QD',
         'group' => function () {
             return factory(Group::class)->create()->idgroups;
         },

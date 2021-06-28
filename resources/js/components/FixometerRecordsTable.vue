@@ -49,13 +49,13 @@
           {{ formatDate(data) }}
         </template>
         <template slot="cell(show_details)" slot-scope="row">
-          <div v-if="isAdmin" class="text-right d-none d-md-table-cell">
+          <div v-if="isAdmin" class="text-md-right">
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
               <b-img class="icon" src="/icons/edit_ico_green.svg" />
             </span>
             <ConfirmModal :key="'modal-' + row.item.iddevices" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="__('devices.confirm_delete')" />
           </div>
-          <div v-else>
+          <div v-else class="text-md-right">
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
               <b-img class="icon" src="/icons/info_ico_green.svg" />
             </span>
@@ -406,6 +406,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 .badge {
   width: 90px;
@@ -432,7 +435,32 @@ export default {
   padding: 5px;
 }
 
+
+@include media-breakpoint-down(sm) {
+  /deep/ .table {
+    tr {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid black;
+      padding-bottom: 5px;
+    }
+
+    th, td {
+      width: 100%;
+      border-bottom: none !important;
+      padding-left: 0px;
+      padding-bottom: 0px;
+    }
+
+    th {
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
+  }
+}
+
 /deep/ tr.b-table-details td {
   padding: 0px;
 }
+
 </style>

@@ -3,11 +3,13 @@
 namespace Tests;
 
 use App\Audits;
+use App\Brands;
 use App\Category;
 use App\Device;
 use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
+use App\GroupTags;
 use App\Network;
 
 use App\Party;
@@ -44,7 +46,10 @@ abstract class TestCase extends BaseTestCase
         Device::truncate();
         GroupNetwork::truncate();
         Category::truncate();
+        Brands::truncate();
+        GroupTags::truncate();
         DB::delete('delete from user_network');
+        DB::delete('delete from grouptags_groups');
         DB::table('notifications')->truncate();
         DB::statement("SET foreign_key_checks=1");
 
@@ -139,7 +144,9 @@ abstract class TestCase extends BaseTestCase
             foreach ($vue->children() as $child) {
                 $dom = simplexml_import_dom($child);
 
-                $props[] = current($dom->attributes());
+                $props[] = array_merge(current($dom->attributes()), [
+                    'VueComponent' => $vue->children()->first()->nodeName()
+                ]);
             }
         }
 
@@ -166,7 +173,6 @@ abstract class TestCase extends BaseTestCase
         // phpunit has assertArraySubset, but this is controversially being removed in later versions so don't rely
         // on it.
         $props = $this->getVueProperties($response);
-        error_log(var_export($props, TRUE));
         $foundSome = FALSE;
 
         for ($i = 0; $i < count($expected); $i++) {

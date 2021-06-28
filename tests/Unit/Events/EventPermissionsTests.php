@@ -13,7 +13,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class PermissionsTests extends TestCase
+class EventPermissionsTests extends TestCase
 {
     public function setUp()
     {
