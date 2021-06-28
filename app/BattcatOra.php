@@ -4,8 +4,6 @@ namespace App;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Support\Facades\Schema;
-// use Illuminate\Database\Schema\Blueprint;
 
 class BattcatOra extends Model
 {
@@ -14,6 +12,8 @@ class BattcatOra extends Model
     protected $dateFormat = 'Y-m-d H:i';
     protected $dates = ['created_at', 'updated_at'];
     protected $primaryKey = 'id';
+
+    protected $sql;
 
     /**
      * The attributes that are mass assignable.
@@ -76,7 +76,6 @@ LIMIT 1;
             $and .= "\nAND (d.`language` = '$locale')";
         }
         $sql = sprintf($sql, $and);
-        logger($sql);
         return $sql;
     }
 
@@ -88,7 +87,6 @@ LIMIT 1;
     public function fetchFaultTypes($repair_status)
     {
         $sql = "SELECT * FROM `fault_types_batteries` WHERE `repair_status` = '$repair_status'";
-        logger($sql);
         return DB::select($sql);
     }
 
@@ -107,57 +105,34 @@ SELECT COUNT(DISTINCT d.id_ords) AS total
 FROM `devices_battcat_ora` d
 ");
 
-        $result['total_opinions_3'] = DB::select("
-SELECT COUNT(DISTINCT o.id_ords) AS total
+        $result['total_opinions'] = DB::select("
+SELECT COUNT(*) AS total
 FROM devices_faults_batteries_ora_opinions o
-WHERE (SELECT COUNT(o2.id_ords) FROM devices_faults_batteries_ora_opinions o2 WHERE o2.id_ords = o.id_ords GROUP BY o2.id_ords) = 3
 ");
 
-        $result['total_opinions_2'] = DB::select("
-SELECT COUNT(DISTINCT o.id_ords) AS total
+        $result['progress'] = DB::select("
+SELECT
+ROUND((r2.opinions/r2.batteries)*100) as total
+FROM (
+SELECT
+COUNT(*) AS opinions,
+(SELECT COUNT(*) FROM devices_battcat_ora) as batteries
+FROM (
+SELECT
+o.id_ords,
+(SELECT o1.fault_type_id FROM devices_faults_batteries_ora_opinions o1 WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1) AS winning_opinion_id,
+ROUND((SELECT COUNT(o3.fault_type_id) as top_crowd_opinion_count FROM devices_faults_batteries_ora_opinions o3 WHERE o3.id_ords = o.id_ords GROUP BY o3.fault_type_id ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
+(SELECT COUNT(o4.fault_type_id) as all_votes FROM devices_faults_batteries_ora_opinions o4 WHERE o4.id_ords = o.id_ords) * 100) AS top_crowd_opinion_percentage,
+COUNT(o.fault_type_id) AS all_crowd_opinions_count
 FROM devices_faults_batteries_ora_opinions o
-WHERE (SELECT COUNT(o2.id_ords) FROM devices_faults_batteries_ora_opinions o2 WHERE o2.id_ords = o.id_ords GROUP BY o2.id_ords) = 2
+GROUP BY o.id_ords
+HAVING
+(all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
+OR
+(all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
+) AS r1
+) AS r2
 ");
-
-        $result['total_opinions_1'] = DB::select("
-SELECT COUNT(DISTINCT o.id_ords) AS total
-FROM devices_faults_batteries_ora_opinions o
-WHERE (SELECT COUNT(o2.id_ords) FROM devices_faults_batteries_ora_opinions o2 WHERE o2.id_ords = o.id_ords GROUP BY o2.id_ords) = 1
-");
-
-        $result['total_opinions_0'] = DB::select("
-SELECT COUNT(d.id_ords) AS total
-FROM devices_battcat_ora d
-LEFT JOIN devices_faults_batteries_ora_opinions o ON o.id_ords = d.id_ords
-WHERE o.id_ords IS NULL
-");
-
-        /*
-This is how to get progress with SQL but quicker code used below
-*/
-        // $result['progress'] = DB::select("
-        // SELECT
-        // ROUND((r2.opinions/r2.batteries)*100) as percent
-        // FROM (
-        // SELECT
-        // COUNT(*) AS opinions,
-        // (SELECT COUNT(*) FROM devices_battcat_ora) as batteries
-        // FROM (
-        // SELECT
-        // o.id_ords,
-        // (SELECT o1.fault_type_id FROM devices_faults_batteries_ora_opinions o1 WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1) AS winning_opinion_id,
-        // ROUND((SELECT COUNT(o3.fault_type_id) as top_crowd_opinion_count FROM devices_faults_batteries_ora_opinions o3 WHERE o3.id_ords = o.id_ords GROUP BY o3.fault_type_id ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
-        // (SELECT COUNT(o4.fault_type_id) as all_votes FROM devices_faults_batteries_ora_opinions o4 WHERE o4.id_ords = o.id_ords) * 100) AS top_crowd_opinion_percentage,
-        // COUNT(o.fault_type_id) AS all_crowd_opinions_count
-        // FROM devices_faults_batteries_ora_opinions o
-        // GROUP BY o.id_ords
-        // HAVING
-        // (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
-        // OR
-        // (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
-        // ) AS r1
-        // ) AS r2
-        // ");
 
         $result['total_recats'] = DB::select("
 SELECT COUNT(*) AS total FROM (
@@ -182,53 +157,39 @@ FROM devices_faults_batteries_ora_adjudicated a
 ");
 
         $result['list_recats'] = DB::select("
-SELECT result.winning_opinion_id, fta.title as winning_opinion, COUNT(*) AS total FROM (
+SELECT
+result.winning_opinion_id,
+fta.title as winning_opinion,
+result.repair_status,
+COUNT(*) AS total
+FROM (
 SELECT
 o.id_ords,
+d.repair_status,
 (SELECT o1.fault_type_id FROM devices_faults_batteries_ora_opinions o1 WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1) AS winning_opinion_id,
 ROUND((SELECT COUNT(o3.fault_type_id) as top_crowd_opinion_count FROM devices_faults_batteries_ora_opinions o3 WHERE o3.id_ords = o.id_ords GROUP BY o3.fault_type_id ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
 (SELECT COUNT(o4.fault_type_id) as all_votes FROM devices_faults_batteries_ora_opinions o4 WHERE o4.id_ords = o.id_ords) * 100) AS top_crowd_opinion_percentage,
 COUNT(o.fault_type_id) AS all_crowd_opinions_count
 FROM devices_faults_batteries_ora_opinions o
-GROUP BY o.id_ords
+JOIN devices_battcat_ora d ON d.id_ords = o.id_ords
+GROUP BY o.id_ords, d.repair_status
 HAVING
 (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
 UNION
 SELECT
 a.id_ords,
+d.repair_status,
 a.fault_type_id AS winning_opinion_id,
 100 AS top_crowd_opinion_percentage,
 3 AS all_crowd_opinions_count
 FROM devices_faults_batteries_ora_adjudicated a
+JOIN devices_battcat_ora d ON d.id_ords = a.id_ords
 ) AS result
-LEFT JOIN fault_types_batteries fta ON fta.id = result.winning_opinion_id
-GROUP BY winning_opinion_id
+JOIN fault_types_batteries fta ON fta.id = result.winning_opinion_id
+GROUP BY result.repair_status, result.winning_opinion_id
 ORDER BY total DESC
 ");
 
-        $result['list_splits'] = DB::select("
-SELECT
-d.id_ords,
-(SELECT o1.fault_type_id FROM devices_faults_batteries_ora_opinions o1 WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1) AS winning_opinion_id,
-ROUND((SELECT COUNT(o3.fault_type_id) as top_crowd_opinion_count FROM devices_faults_batteries_ora_opinions o3 WHERE o3.id_ords = o.id_ords GROUP BY o3.fault_type_id ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
-(SELECT COUNT(o4.fault_type_id) as all_votes FROM devices_faults_batteries_ora_opinions o4 WHERE o4.id_ords = o.id_ords) * 100) AS top_crowd_opinion_percentage,
-COUNT(o.fault_type_id) AS all_crowd_opinions_count,
-GROUP_CONCAT(ft.title ORDER BY ft.title) as opinions,
-d.brand as brand,
-d.problem as problem
-FROM `devices_battcat_ora` d
-LEFT OUTER JOIN devices_faults_batteries_ora_opinions o ON o.id_ords = d.id_ords
-LEFT OUTER JOIN fault_types_batteries ft ON ft.id = o.fault_type_id
-WHERE (SELECT a.id_ords FROM devices_faults_batteries_ora_adjudicated a WHERE a.id_ords = d.id_ords) IS NULL
-GROUP BY d.id_ords
-HAVING
-(all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
-");
-
-        $total_splits = count($result['list_splits']);
-        $result['total_splits'] = [json_decode(json_encode(['total' => $total_splits]), FALSE)];
-        $progress = round((($result['total_recats'][0]->total + $result['total_splits'][0]->total) / $result['total_devices'][0]->total) * 100);
-        $result['progress'] = [json_decode(json_encode(['total' => $progress]), FALSE)];
         return $result;
     }
 
