@@ -85,6 +85,16 @@ export default {
       required: false,
       default: false
     },
+    canSeeDelete: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    canPerformDelete: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     ingroup: {
       type: Boolean,
       required: false,

@@ -41,6 +41,8 @@
           }
 
           $can_edit_group = FixometerHelper::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
+          $can_see_delete = FixometerHelper::hasRole( $user, 'Administrator');
+          $can_perform_delete = $can_see_delete && $group->canDelete();
 
           $expanded_events = [];
 
@@ -162,11 +164,12 @@
               :events="{{ json_encode($expanded_events, JSON_INVALID_UTF8_IGNORE) }}"
               :volunteers="{{ json_encode($view_group->allConfirmedVolunteers, JSON_INVALID_UTF8_IGNORE) }}"
               :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+              :can-see-delete="{{ $can_see_delete ? 'true' : 'false' }}"
+              :can-perform-delete="{{ $can_perform_delete ? 'true' : 'false' }}"
               calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
               calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
               :ingroup="{{ $in_group ? 'true' : 'false' }}"
               api-token="{{ $api_token }}"
-              :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
           />
       </div>
   </div>
