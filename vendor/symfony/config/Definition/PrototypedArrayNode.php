@@ -37,8 +37,10 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Sets the minimum number of elements that a prototype based node must
      * contain. By default this is zero, meaning no elements.
+     *
+     * @param int $number
      */
-    public function setMinNumberOfElements(int $number)
+    public function setMinNumberOfElements($number)
     {
         $this->minNumberOfElements = $number;
     }
@@ -67,7 +69,7 @@ class PrototypedArrayNode extends ArrayNode
      * @param string $attribute The name of the attribute which value is to be used as a key
      * @param bool   $remove    Whether or not to remove the key
      */
-    public function setKeyAttribute(string $attribute, bool $remove = true)
+    public function setKeyAttribute($attribute, $remove = true)
     {
         $this->keyAttribute = $attribute;
         $this->removeKeyAttribute = $remove;
@@ -85,9 +87,17 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Sets the default value of this node.
+     *
+     * @param string $value
+     *
+     * @throws \InvalidArgumentException if the default value is not an array
      */
-    public function setDefaultValue(array $value)
+    public function setDefaultValue($value)
     {
+        if (!\is_array($value)) {
+            throw new \InvalidArgumentException($this->getPath().': the default value of an array node has to be an array.');
+        }
+
         $this->defaultValue = $value;
     }
 
@@ -163,12 +173,19 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * {@inheritdoc}
+     * Finalizes the value of this node.
+     *
+     * @param mixed $value
+     *
+     * @return mixed The finalized value
+     *
+     * @throws UnsetKeyException
+     * @throws InvalidConfigurationException if the node doesn't have enough children
      */
     protected function finalizeValue($value)
     {
         if (false === $value) {
-            throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: %s.', $this->getPath(), json_encode($value)));
+            throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: "%s".', $this->getPath(), json_encode($value)));
         }
 
         foreach ($value as $k => $v) {
@@ -191,8 +208,13 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * {@inheritdoc}
+     * Normalizes the value.
      *
+     * @param mixed $value The value to normalize
+     *
+     * @return mixed The normalized value
+     *
+     * @throws InvalidConfigurationException
      * @throws DuplicateKeyException
      */
     protected function normalizeValue($value)
@@ -203,11 +225,11 @@ class PrototypedArrayNode extends ArrayNode
 
         $value = $this->remapXml($value);
 
-        $isList = array_is_list($value);
+        $isAssoc = array_keys($value) !== range(0, \count($value) - 1);
         $normalized = [];
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && \is_array($v)) {
-                if (!isset($v[$this->keyAttribute]) && \is_int($k) && $isList) {
+                if (!isset($v[$this->keyAttribute]) && \is_int($k) && !$isAssoc) {
                     $ex = new InvalidConfigurationException(sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath()));
                     $ex->setPath($this->getPath());
 
@@ -249,7 +271,7 @@ class PrototypedArrayNode extends ArrayNode
             }
 
             $prototype = $this->getPrototypeForChild($k);
-            if (null !== $this->keyAttribute || !$isList) {
+            if (null !== $this->keyAttribute || $isAssoc) {
                 $normalized[$k] = $prototype->normalize($v);
             } else {
                 $normalized[] = $prototype->normalize($v);
@@ -260,7 +282,15 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * {@inheritdoc}
+     * Merges values together.
+     *
+     * @param mixed $leftSide  The left side to merge
+     * @param mixed $rightSide The right side to merge
+     *
+     * @return mixed The merged values
+     *
+     * @throws InvalidConfigurationException
+     * @throws \RuntimeException
      */
     protected function mergeValues($leftSide, $rightSide)
     {
@@ -274,10 +304,9 @@ class PrototypedArrayNode extends ArrayNode
             return $rightSide;
         }
 
-        $isList = array_is_list($rightSide);
         foreach ($rightSide as $k => $v) {
-            // prototype, and key is irrelevant there are no named keys, append the element
-            if (null === $this->keyAttribute && $isList) {
+            // prototype, and key is irrelevant, append the element
+            if (null === $this->keyAttribute) {
                 $leftSide[] = $v;
                 continue;
             }

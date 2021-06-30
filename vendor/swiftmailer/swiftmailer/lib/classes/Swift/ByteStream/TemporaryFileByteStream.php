@@ -39,14 +39,4 @@ class Swift_ByteStream_TemporaryFileByteStream extends Swift_ByteStream_FileByte
             @unlink($this->getPath());
         }
     }
-
-    public function __sleep()
-    {
-        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
-    }
-
-    public function __wakeup()
-    {
-        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-    }
 }

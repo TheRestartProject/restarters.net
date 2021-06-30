@@ -140,13 +140,11 @@ HELP
         } else {
             $type = $input->getOption('no-numbers') ? 0 : ShellOutput::NUMBER_LINES;
             if (!$highlighted) {
-                $type = $type | OutputInterface::OUTPUT_RAW;
+                $type = $type | ShellOutput::OUTPUT_RAW;
             }
 
             $output->page($highlighted ?: $history, $type);
         }
-
-        return 0;
     }
 
     /**

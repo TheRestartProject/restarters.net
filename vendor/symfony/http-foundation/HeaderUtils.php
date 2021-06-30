@@ -62,7 +62,7 @@ class HeaderUtils
                 \s*
                 (?<separator>['.$quotedSeparators.'])
                 \s*
-            /x', trim($header), $matches, \PREG_SET_ORDER);
+            /x', trim($header), $matches, PREG_SET_ORDER);
 
         return self::groupParts($matches, $separators);
     }
@@ -146,7 +146,7 @@ class HeaderUtils
     }
 
     /**
-     * Generates an HTTP Content-Disposition field-value.
+     * Generates a HTTP Content-Disposition field-value.
      *
      * @param string $disposition      One of "inline" or "attachment"
      * @param string $filename         A unicode string
@@ -193,23 +193,17 @@ class HeaderUtils
         return $disposition.'; '.self::toString($params, ';');
     }
 
-    private static function groupParts(array $matches, string $separators, bool $first = true): array
+    private static function groupParts(array $matches, string $separators): array
     {
         $separator = $separators[0];
         $partSeparators = substr($separators, 1);
 
         $i = 0;
         $partMatches = [];
-        $previousMatchWasSeparator = false;
         foreach ($matches as $match) {
-            if (!$first && $previousMatchWasSeparator && isset($match['separator']) && $match['separator'] === $separator) {
-                $previousMatchWasSeparator = true;
-                $partMatches[$i][] = $match;
-            } elseif (isset($match['separator']) && $match['separator'] === $separator) {
-                $previousMatchWasSeparator = true;
+            if (isset($match['separator']) && $match['separator'] === $separator) {
                 ++$i;
             } else {
-                $previousMatchWasSeparator = false;
                 $partMatches[$i][] = $match;
             }
         }
@@ -217,18 +211,11 @@ class HeaderUtils
         $parts = [];
         if ($partSeparators) {
             foreach ($partMatches as $matches) {
-                $parts[] = self::groupParts($matches, $partSeparators, false);
+                $parts[] = self::groupParts($matches, $partSeparators);
             }
         } else {
             foreach ($partMatches as $matches) {
                 $parts[] = self::unquote($matches[0][0]);
-            }
-
-            if (!$first && 2 < \count($parts)) {
-                $parts = [
-                    $parts[0],
-                    implode($separator, \array_slice($parts, 1)),
-                ];
             }
         }
 

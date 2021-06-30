@@ -129,16 +129,4 @@ class RollbarHandler extends AbstractProcessingHandler
     {
         $this->flush();
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function reset()
-    {
-        $this->flush();
-
-        parent::reset();
-    }
-
-
 }

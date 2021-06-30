@@ -3,10 +3,9 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Contracts\Cache\Lock as LockContract;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 
-abstract class Lock implements LockContract
+abstract class Lock
 {
     use InteractsWithTime;
 
@@ -45,13 +44,6 @@ abstract class Lock implements LockContract
     abstract public function acquire();
 
     /**
-     * Release the lock.
-     *
-     * @return void
-     */
-    abstract public function release();
-
-    /**
      * Attempt to acquire the lock.
      *
      * @param  callable|null  $callback
@@ -76,7 +68,6 @@ abstract class Lock implements LockContract
      * @param  int  $seconds
      * @param  callable|null  $callback
      * @return bool
-     *
      * @throws \Illuminate\Contracts\Cache\LockTimeoutException
      */
     public function block($seconds, $callback = null)

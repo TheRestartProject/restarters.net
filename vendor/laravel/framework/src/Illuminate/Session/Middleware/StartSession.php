@@ -154,10 +154,7 @@ class StartSession
      */
     protected function storeCurrentUrl(Request $request, $session)
     {
-        if ($request->method() === 'GET' &&
-            $request->route() &&
-            ! $request->ajax() &&
-            ! $request->prefetch()) {
+        if ($request->method() === 'GET' && $request->route() && ! $request->ajax()) {
             $session->setPreviousUrl($request->fullUrl());
         }
     }

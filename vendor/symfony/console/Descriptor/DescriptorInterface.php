@@ -23,7 +23,9 @@ interface DescriptorInterface
     /**
      * Describes an object if supported.
      *
-     * @param object $object
+     * @param OutputInterface $output
+     * @param object          $object
+     * @param array           $options
      */
-    public function describe(OutputInterface $output, $object, array $options = []);
+    public function describe(OutputInterface $output, $object, array $options = array());
 }

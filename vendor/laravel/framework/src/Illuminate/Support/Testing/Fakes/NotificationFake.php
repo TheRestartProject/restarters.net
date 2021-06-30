@@ -5,7 +5,6 @@ namespace Illuminate\Support\Testing\Fakes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
-use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 
@@ -17,13 +16,6 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      * @var array
      */
     protected $notifications = [];
-
-    /**
-     * Locale used when sending notifications.
-     *
-     * @var string|null
-     */
-    public $locale;
 
     /**
      * Assert if a notification was sent based on a truth-test callback.
@@ -211,11 +203,6 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
                 'notification' => $notification,
                 'channels' => $notification->via($notifiable),
                 'notifiable' => $notifiable,
-                'locale' => $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
-                    if ($notifiable instanceof HasLocalePreference) {
-                        return $notifiable->preferredLocale();
-                    }
-                }),
             ];
         }
     }
@@ -229,18 +216,5 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     public function channel($name = null)
     {
         //
-    }
-
-    /**
-     * Set the locale of notifications.
-     *
-     * @param  string  $locale
-     * @return $this
-     */
-    public function locale($locale)
-    {
-        $this->locale = $locale;
-
-        return $this;
     }
 }

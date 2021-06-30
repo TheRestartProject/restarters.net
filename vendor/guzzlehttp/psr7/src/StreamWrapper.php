@@ -1,13 +1,10 @@
 <?php
-
 namespace GuzzleHttp\Psr7;
 
 use Psr\Http\Message\StreamInterface;
 
 /**
  * Converts Guzzle streams into PHP stream resources.
- *
- * @final
  */
 class StreamWrapper
 {
@@ -26,7 +23,6 @@ class StreamWrapper
      * @param StreamInterface $stream The stream to get a resource for
      *
      * @return resource
-     *
      * @throws \InvalidArgumentException if stream is not readable or writable
      */
     public static function getResource(StreamInterface $stream)
@@ -42,21 +38,9 @@ class StreamWrapper
                 . 'writable, or both.');
         }
 
-        return fopen('guzzle://stream', $mode, null, self::createStreamContext($stream));
-    }
-
-    /**
-     * Creates a stream context that can be used to open a stream as a php stream resource.
-     *
-     * @param StreamInterface $stream
-     *
-     * @return resource
-     */
-    public static function createStreamContext(StreamInterface $stream)
-    {
-        return stream_context_create([
+        return fopen('guzzle://stream', $mode, null, stream_context_create([
             'guzzle' => ['stream' => $stream]
-        ]);
+        ]));
     }
 
     /**
@@ -110,21 +94,12 @@ class StreamWrapper
         return true;
     }
 
-    public function stream_cast($cast_as)
-    {
-        $stream = clone($this->stream);
-
-        return $stream->detach();
-    }
-
     public function stream_stat()
     {
         static $modeMap = [
             'r'  => 33060,
-            'rb' => 33060,
             'r+' => 33206,
-            'w'  => 33188,
-            'wb' => 33188
+            'w'  => 33188
         ];
 
         return [
@@ -136,25 +111,6 @@ class StreamWrapper
             'gid'     => 0,
             'rdev'    => 0,
             'size'    => $this->stream->getSize() ?: 0,
-            'atime'   => 0,
-            'mtime'   => 0,
-            'ctime'   => 0,
-            'blksize' => 0,
-            'blocks'  => 0
-        ];
-    }
-
-    public function url_stat($path, $flags)
-    {
-        return [
-            'dev'     => 0,
-            'ino'     => 0,
-            'mode'    => 0,
-            'nlink'   => 0,
-            'uid'     => 0,
-            'gid'     => 0,
-            'rdev'    => 0,
-            'size'    => 0,
             'atime'   => 0,
             'mtime'   => 0,
             'ctime'   => 0,

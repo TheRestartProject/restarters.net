@@ -27,7 +27,8 @@ class Swift_AddressEncoder_IdnAddressEncoder implements Swift_AddressEncoder
     /**
      * Encodes the domain part of an address using IDN.
      *
-     * @throws Swift_AddressEncoderException If local-part contains non-ASCII characters
+     * @throws Swift_AddressEncoderException If local-part contains non-ASCII characters,
+     *                                       or if no suitable IDN encoder is installed.
      */
     public function encodeString(string $address): string
     {
@@ -41,10 +42,28 @@ class Swift_AddressEncoder_IdnAddressEncoder implements Swift_AddressEncoder
             }
 
             if (preg_match('/[^\x00-\x7F]/', $domain)) {
-                $address = sprintf('%s@%s', $local, idn_to_ascii($domain, 0, INTL_IDNA_VARIANT_UTS46));
+                $address = sprintf('%s@%s', $local, $this->idnToAscii($domain));
             }
         }
 
         return $address;
+    }
+
+    /**
+     * IDN-encodes a UTF-8 string to ASCII.
+     */
+    protected function idnToAscii(string $string): string
+    {
+        if (function_exists('idn_to_ascii')) {
+            return idn_to_ascii($string, 0, INTL_IDNA_VARIANT_UTS46);
+        }
+
+        if (class_exists('TrueBV\Punycode')) {
+            $punycode = new \TrueBV\Punycode();
+
+            return $punycode->encode($string);
+        }
+
+        throw new Swift_AddressEncoderException('Non-ASCII characters in address, but no IDN encoder found (install the intl extension or the true/punycode package)', $string);
     }
 }

@@ -23,10 +23,6 @@ class NumericNode extends ScalarNode
     protected $min;
     protected $max;
 
-    /**
-     * @param int|float|null $min
-     * @param int|float|null $max
-     */
     public function __construct(?string $name, NodeInterface $parent = null, $min = null, $max = null, string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR)
     {
         parent::__construct($name, $parent, $pathSeparator);

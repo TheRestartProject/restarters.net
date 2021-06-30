@@ -14,8 +14,6 @@ trait ValidatesRequests
      * @param  \Illuminate\Contracts\Validation\Validator|array  $validator
      * @param  \Illuminate\Http\Request|null  $request
      * @return array
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function validateWith($validator, Request $request = null)
     {
@@ -25,7 +23,9 @@ trait ValidatesRequests
             $validator = $this->getValidationFactory()->make($request->all(), $validator);
         }
 
-        return $validator->validate();
+        $validator->validate();
+
+        return $this->extractInputFromRules($request, $validator->getRules());
     }
 
     /**
@@ -36,15 +36,29 @@ trait ValidatesRequests
      * @param  array  $messages
      * @param  array  $customAttributes
      * @return array
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function validate(Request $request, array $rules,
                              array $messages = [], array $customAttributes = [])
     {
-        return $this->getValidationFactory()->make(
-            $request->all(), $rules, $messages, $customAttributes
-        )->validate();
+        $this->getValidationFactory()
+             ->make($request->all(), $rules, $messages, $customAttributes)
+             ->validate();
+
+        return $this->extractInputFromRules($request, $rules);
+    }
+
+    /**
+     * Get the request input based on the given validation rules.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $rules
+     * @return array
+     */
+    protected function extractInputFromRules(Request $request, array $rules)
+    {
+        return $request->only(collect($rules)->keys()->map(function ($rule) {
+            return explode('.', $rule)[0];
+        })->unique()->toArray());
     }
 
     /**

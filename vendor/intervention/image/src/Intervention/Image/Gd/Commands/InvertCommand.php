@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Gd\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class InvertCommand extends AbstractCommand
+class InvertCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Inverts colors of an image

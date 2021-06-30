@@ -82,8 +82,6 @@ HELP
 
         // Set some magic local variables
         $this->setCommandScopeVariables($reflector);
-
-        return 0;
     }
 
     private function getManualDoc($reflector)

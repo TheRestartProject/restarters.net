@@ -2,8 +2,6 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Support\Arr;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 use Illuminate\Foundation\Testing\Constraints\SoftDeletedInDatabase;
@@ -49,17 +47,13 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has been deleted.
      *
-     * @param  string|\Illuminate\Database\Eloquent\Model  $table
+     * @param  string  $table
      * @param  array  $data
      * @param  string  $connection
      * @return $this
      */
-    protected function assertSoftDeleted($table, array $data = [], $connection = null)
+    protected function assertSoftDeleted($table, array $data, $connection = null)
     {
-        if ($table instanceof Model) {
-            return $this->assertSoftDeleted($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName());
-        }
-
         $this->assertThat(
             $table, new SoftDeletedInDatabase($this->getConnection($connection), $data)
         );
@@ -85,14 +79,12 @@ trait InteractsWithDatabase
     /**
      * Seed a given database connection.
      *
-     * @param  array|string  $class
+     * @param  string  $class
      * @return $this
      */
     public function seed($class = 'DatabaseSeeder')
     {
-        foreach (Arr::wrap($class) as $class) {
-            $this->artisan('db:seed', ['--class' => $class, '--no-interaction' => true]);
-        }
+        $this->artisan('db:seed', ['--class' => $class]);
 
         return $this;
     }

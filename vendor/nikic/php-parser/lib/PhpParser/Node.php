@@ -95,6 +95,8 @@ interface Node
     /**
      * Gets the doc comment of the node.
      *
+     * The doc comment has to be the last comment associated with the node.
+     *
      * @return null|Comment\Doc Doc comment object or null
      */
     public function getDocComment();

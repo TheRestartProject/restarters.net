@@ -22,15 +22,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @see https://www.php-fig.org/psr/psr-3/
+ * @see http://www.php-fig.org/psr/psr-3/
  */
 class ConsoleLogger extends AbstractLogger
 {
-    public const INFO = 'info';
-    public const ERROR = 'error';
+    const INFO = 'info';
+    const ERROR = 'error';
 
     private $output;
-    private $verbosityLevelMap = [
+    private $verbosityLevelMap = array(
         LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
         LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
         LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
@@ -39,8 +39,8 @@ class ConsoleLogger extends AbstractLogger
         LogLevel::NOTICE => OutputInterface::VERBOSITY_VERBOSE,
         LogLevel::INFO => OutputInterface::VERBOSITY_VERY_VERBOSE,
         LogLevel::DEBUG => OutputInterface::VERBOSITY_DEBUG,
-    ];
-    private $formatLevelMap = [
+    );
+    private $formatLevelMap = array(
         LogLevel::EMERGENCY => self::ERROR,
         LogLevel::ALERT => self::ERROR,
         LogLevel::CRITICAL => self::ERROR,
@@ -49,10 +49,10 @@ class ConsoleLogger extends AbstractLogger
         LogLevel::NOTICE => self::INFO,
         LogLevel::INFO => self::INFO,
         LogLevel::DEBUG => self::INFO,
-    ];
+    );
     private $errored = false;
 
-    public function __construct(OutputInterface $output, array $verbosityLevelMap = [], array $formatLevelMap = [])
+    public function __construct(OutputInterface $output, array $verbosityLevelMap = array(), array $formatLevelMap = array())
     {
         $this->output = $output;
         $this->verbosityLevelMap = $verbosityLevelMap + $this->verbosityLevelMap;
@@ -61,10 +61,8 @@ class ConsoleLogger extends AbstractLogger
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = array())
     {
         if (!isset($this->verbosityLevelMap[$level])) {
             throw new InvalidArgumentException(sprintf('The log level "%s" does not exist.', $level));
@@ -108,7 +106,7 @@ class ConsoleLogger extends AbstractLogger
             return $message;
         }
 
-        $replacements = [];
+        $replacements = array();
         foreach ($context as $key => $val) {
             if (null === $val || is_scalar($val) || (\is_object($val) && method_exists($val, '__toString'))) {
                 $replacements["{{$key}}"] = $val;

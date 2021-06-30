@@ -3,7 +3,7 @@
 @if (! empty($greeting))
 # {{ $greeting }}
 @else
-@if ($level === 'error')
+@if ($level == 'error')
 # @lang('Whoops!')
 @else
 # @lang('Hello!')
@@ -21,11 +21,13 @@
 <?php
     switch ($level) {
         case 'success':
+            $color = 'green';
+            break;
         case 'error':
-            $color = $level;
+            $color = 'red';
             break;
         default:
-            $color = 'primary';
+            $color = 'blue';
     }
 ?>
 @component('mail::button', ['url' => $actionUrl, 'color' => $color])
@@ -51,12 +53,12 @@
 @component('mail::subcopy')
 @lang(
     "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
-    'into your web browser: [:actionURL](:actionURL)',
+    'into your web browser: ',
     [
-        'actionText' => $actionText,
-        'actionURL' => $actionUrl,
+        'actionText' => $actionText
     ]
 )
+[{{ $actionUrl }}]({!! $actionUrl !!})
 @endcomponent
 @endisset
 @endcomponent

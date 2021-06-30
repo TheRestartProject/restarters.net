@@ -2,10 +2,9 @@
 
 namespace Intervention\Image\Gd\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
 use Intervention\Image\Size;
 
-class GetSizeCommand extends AbstractCommand
+class GetSizeCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Reads size of given image instance in pixels

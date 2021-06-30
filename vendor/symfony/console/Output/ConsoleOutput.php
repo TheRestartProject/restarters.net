@@ -30,7 +30,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 {
     private $stderr;
-    private $consoleSectionOutputs = [];
+    private $consoleSectionOutputs = array();
 
     /**
      * @param int                           $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
@@ -40,13 +40,6 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     public function __construct(int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = null, OutputFormatterInterface $formatter = null)
     {
         parent::__construct($this->openOutputStream(), $verbosity, $decorated, $formatter);
-
-        if (null === $formatter) {
-            // for BC reasons, stdErr has it own Formatter only when user don't inject a specific formatter.
-            $this->stderr = new StreamOutput($this->openErrorStream(), $verbosity, $decorated);
-
-            return;
-        }
 
         $actualDecorated = $this->isDecorated();
         $this->stderr = new StreamOutput($this->openErrorStream(), $verbosity, $decorated, $this->getFormatter());
@@ -132,14 +125,16 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Checks if current executing environment is IBM iSeries (OS400), which
      * doesn't properly convert character-encodings between ASCII to EBCDIC.
+     *
+     * @return bool
      */
-    private function isRunningOS400(): bool
+    private function isRunningOS400()
     {
-        $checks = [
+        $checks = array(
             \function_exists('php_uname') ? php_uname('s') : '',
             getenv('OSTYPE'),
-            \PHP_OS,
-        ];
+            PHP_OS,
+        );
 
         return false !== stripos(implode(';', $checks), 'OS400');
     }

@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Gd\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class BrightnessCommand extends AbstractCommand
+class BrightnessCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Changes image brightness

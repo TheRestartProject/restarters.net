@@ -42,7 +42,6 @@ class EngineResolver
      *
      * @param  string  $engine
      * @return \Illuminate\Contracts\View\Engine
-     *
      * @throws \InvalidArgumentException
      */
     public function resolve($engine)

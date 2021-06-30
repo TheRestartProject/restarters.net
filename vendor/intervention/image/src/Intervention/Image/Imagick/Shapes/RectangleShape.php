@@ -2,11 +2,10 @@
 
 namespace Intervention\Image\Imagick\Shapes;
 
-use Intervention\Image\AbstractShape;
 use Intervention\Image\Image;
 use Intervention\Image\Imagick\Color;
 
-class RectangleShape extends AbstractShape
+class RectangleShape extends \Intervention\Image\AbstractShape
 {
     /**
      * X-Coordinate of top-left point

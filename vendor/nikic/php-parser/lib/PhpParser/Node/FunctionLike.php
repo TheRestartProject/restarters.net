@@ -16,28 +16,21 @@ interface FunctionLike extends Node
     /**
      * List of parameters
      *
-     * @return Param[]
+     * @return Node\Param[]
      */
     public function getParams() : array;
 
     /**
      * Get the declared return type or null
      *
-     * @return null|Identifier|Name|NullableType|UnionType
+     * @return null|Identifier|Node\Name|Node\NullableType
      */
     public function getReturnType();
 
     /**
      * The function body
      *
-     * @return Stmt[]|null
+     * @return Node\Stmt[]|null
      */
     public function getStmts();
-
-    /**
-     * Get PHP attribute groups.
-     *
-     * @return AttributeGroup[]
-     */
-    public function getAttrGroups() : array;
 }

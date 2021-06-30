@@ -6,7 +6,7 @@ use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Queue\QueueableEntity;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Support\Collection as BaseCollection;
 
@@ -64,38 +64,6 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Load a set of relationship counts onto the collection.
-     *
-     * @param  array|string  $relations
-     * @return $this
-     */
-    public function loadCount($relations)
-    {
-        if ($this->isEmpty()) {
-            return $this;
-        }
-
-        $models = $this->first()->newModelQuery()
-            ->whereKey($this->modelKeys())
-            ->select($this->first()->getKeyName())
-            ->withCount(...func_get_args())
-            ->get();
-
-        $attributes = Arr::except(
-            array_keys($models->first()->getAttributes()),
-            $models->first()->getKeyName()
-        );
-
-        $models->each(function ($model) use ($attributes) {
-            $this->find($model->getKey())->forceFill(
-                Arr::only($model->getAttributes(), $attributes)
-            )->syncOriginalAttributes($attributes);
-        });
-
-        return $this;
-    }
-
-    /**
      * Load a set of relationships onto the collection if they are not already eager loaded.
      *
      * @param  array|string  $relations
@@ -118,14 +86,10 @@ class Collection extends BaseCollection implements QueueableCollection
                 $segments[count($segments) - 1] .= ':'.explode(':', $key)[1];
             }
 
-            $path = [];
-
-            foreach ($segments as $segment) {
-                $path[] = [$segment => $segment];
-            }
+            $path = array_combine($segments, $segments);
 
             if (is_callable($value)) {
-                $path[count($segments) - 1][end($segments)] = $value;
+                $path[end($segments)] = $value;
             }
 
             $this->loadMissingRelation($this, $path);
@@ -141,9 +105,9 @@ class Collection extends BaseCollection implements QueueableCollection
      * @param  array  $path
      * @return void
      */
-    protected function loadMissingRelation(self $models, array $path)
+    protected function loadMissingRelation(Collection $models, array $path)
     {
-        $relation = array_shift($path);
+        $relation = array_splice($path, 0, 1);
 
         $name = explode(':', key($relation))[0];
 
@@ -182,8 +146,12 @@ class Collection extends BaseCollection implements QueueableCollection
             ->groupBy(function ($model) {
                 return get_class($model);
             })
+            ->filter(function ($models, $className) use ($relations) {
+                return Arr::has($relations, $className);
+            })
             ->each(function ($models, $className) use ($relations) {
-                static::make($models)->load($relations[$className] ?? []);
+                $className::with($relations[$className])
+                    ->eagerLoadRelations($models->all());
             });
 
         return $this;
@@ -510,7 +478,6 @@ class Collection extends BaseCollection implements QueueableCollection
      * Get the type of the entities being queued.
      *
      * @return string|null
-     *
      * @throws \LogicException
      */
     public function getQueueableClass()
@@ -541,7 +508,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return [];
         }
 
-        return $this->first() instanceof QueueableEntity
+        return $this->first() instanceof Pivot
                     ? $this->map->getQueueableId()->all()
                     : $this->modelKeys();
     }
@@ -560,7 +527,6 @@ class Collection extends BaseCollection implements QueueableCollection
      * Get the connection of the entities being queued.
      *
      * @return string|null
-     *
      * @throws \LogicException
      */
     public function getQueueableConnection()

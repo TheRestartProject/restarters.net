@@ -1,83 +1,78 @@
 <?php
+/*
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the MIT license. For more information, see
+ * <http://www.doctrine-project.org>.
+ */
 
 namespace Doctrine\DBAL\Event;
 
 use Doctrine\Common\EventArgs;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\Deprecations\Deprecation;
 
 /**
- * Event Arguments used when a Driver connection is established inside {@link Connection}.
+ * Event Arguments used when a Driver connection is established inside Doctrine\DBAL\Connection.
+ *
+ * @link   www.doctrine-project.org
+ * @since  1.0
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class ConnectionEventArgs extends EventArgs
 {
-    /** @var Connection */
-    private $connection;
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    private $_connection;
 
+    /**
+     * @param \Doctrine\DBAL\Connection $connection
+     */
     public function __construct(Connection $connection)
     {
-        $this->connection = $connection;
+        $this->_connection = $connection;
     }
 
     /**
-     * @return Connection
+     * @return \Doctrine\DBAL\Connection
      */
     public function getConnection()
     {
-        return $this->connection;
+        return $this->_connection;
     }
 
     /**
-     * @deprecated Use ConnectionEventArgs::getConnection() and Connection::getDriver() instead.
-     *
-     * @return Driver
+     * @return \Doctrine\DBAL\Driver
      */
     public function getDriver()
     {
-        Deprecation::trigger(
-            'doctrine/dbal',
-            'https://github.com/doctrine/dbal/issues/3580',
-            'ConnectionEventArgs::getDriver() is deprecated, ' .
-            'use ConnectionEventArgs::getConnection()->getDriver() instead.'
-        );
-
-        return $this->connection->getDriver();
+        return $this->_connection->getDriver();
     }
 
     /**
-     * @deprecated Use ConnectionEventArgs::getConnection() and Connection::getDatabasePlatform() instead.
-     *
-     * @return AbstractPlatform
+     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
      */
     public function getDatabasePlatform()
     {
-        Deprecation::trigger(
-            'doctrine/dbal',
-            'https://github.com/doctrine/dbal/issues/3580',
-            'ConnectionEventArgs::getDatabasePlatform() is deprecated, ' .
-            'use ConnectionEventArgs::getConnection()->getDatabasePlatform() instead.'
-        );
-
-        return $this->connection->getDatabasePlatform();
+        return $this->_connection->getDatabasePlatform();
     }
 
     /**
-     * @deprecated Use ConnectionEventArgs::getConnection() and Connection::getSchemaManager() instead.
-     *
-     * @return AbstractSchemaManager
+     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
      */
     public function getSchemaManager()
     {
-        Deprecation::trigger(
-            'doctrine/dbal',
-            'https://github.com/doctrine/dbal/issues/3580',
-            'ConnectionEventArgs::getSchemaManager() is deprecated, ' .
-            'use ConnectionEventArgs::getConnection()->getSchemaManager() instead.'
-        );
-
-        return $this->connection->getSchemaManager();
+        return $this->_connection->getSchemaManager();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Mediawiki\Api\Service;
+namespace MediaWiki\Api\Service;
 
 use Mediawiki\Api\MediawikiApi;
 

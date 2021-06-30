@@ -2,13 +2,11 @@
 
 namespace Intervention\Image\Imagick\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Image;
-use Intervention\Image\Imagick\Color;
 use Intervention\Image\Imagick\Decoder;
+use Intervention\Image\Imagick\Color;
 
-class FillCommand extends AbstractCommand
+class FillCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Fills image with color or pattern
@@ -29,7 +27,7 @@ class FillCommand extends AbstractCommand
             $source = new Decoder;
             $filling = $source->init($filling);
 
-        } catch (NotReadableException $e) {
+        } catch (\Intervention\Image\Exception\NotReadableException $e) {
 
             // set solid color filling
             $filling = new Color($filling);

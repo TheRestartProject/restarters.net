@@ -1,8 +1,25 @@
 <?php
+/*
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the MIT license. For more information, see
+ * <http://www.doctrine-project.org>.
+ */
 
 namespace Doctrine\DBAL\Platforms;
 
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ColumnDiff;
@@ -13,21 +30,16 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\DBAL\TransactionIsolationLevel;
-use Doctrine\Deprecations\Deprecation;
-use InvalidArgumentException;
-
 use function array_merge;
 use function array_unique;
 use function array_values;
-use function assert;
 use function count;
 use function explode;
 use function func_get_args;
 use function get_class;
 use function implode;
 use function is_string;
-use function preg_match;
-use function sprintf;
+use function preg_replace;
 use function strlen;
 use function strpos;
 use function strtoupper;
@@ -37,14 +49,28 @@ use function substr;
  * The SQLAnywherePlatform provides the behavior, features and SQL dialect of the
  * SAP Sybase SQL Anywhere 10 database platform.
  *
- * @deprecated Use SQLAnywhere 16 or newer
+ * @author Steve Müller <st.mueller@dzh-online.de>
+ * @link   www.doctrine-project.org
+ * @since  2.5
  */
 class SQLAnywherePlatform extends AbstractPlatform
 {
-    public const FOREIGN_KEY_MATCH_SIMPLE        = 1;
-    public const FOREIGN_KEY_MATCH_FULL          = 2;
-    public const FOREIGN_KEY_MATCH_SIMPLE_UNIQUE = 129;
-    public const FOREIGN_KEY_MATCH_FULL_UNIQUE   = 130;
+    /**
+     * @var int
+     */
+    const FOREIGN_KEY_MATCH_SIMPLE = 1;
+    /**
+     * @var int
+     */
+    const FOREIGN_KEY_MATCH_FULL = 2;
+    /**
+     * @var int
+     */
+    const FOREIGN_KEY_MATCH_SIMPLE_UNIQUE = 129;
+    /**
+     * @var int
+     */
+    const FOREIGN_KEY_MATCH_FULL_UNIQUE = 130;
 
     /**
      * {@inheritdoc}
@@ -53,7 +79,7 @@ class SQLAnywherePlatform extends AbstractPlatform
     {
         switch (true) {
             case $lockMode === LockMode::NONE:
-                return $fromClause;
+                return $fromClause . ' WITH (NOLOCK)';
 
             case $lockMode === LockMode::PESSIMISTIC_READ:
                 return $fromClause . ' WITH (UPDLOCK)';
@@ -73,12 +99,6 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function fixSchemaElementName($schemaElementName)
     {
-        Deprecation::trigger(
-            'doctrine/dbal',
-            'https://github.com/doctrine/dbal/pull/4132',
-            'AbstractPlatform::fixSchemaElementName is deprecated with no replacement and removed in DBAL 3.0'
-        );
-
         $maxIdentifierLength = $this->getMaxIdentifierLength();
 
         if (strlen($schemaElementName) > $maxIdentifierLength) {
@@ -101,15 +121,15 @@ class SQLAnywherePlatform extends AbstractPlatform
 
         $query .= parent::getAdvancedForeignKeyOptionsSQL($foreignKey);
 
-        if ($foreignKey->hasOption('check_on_commit') && (bool) $foreignKey->getOption('check_on_commit')) {
+        if ($foreignKey->hasOption('check_on_commit') && (boolean) $foreignKey->getOption('check_on_commit')) {
             $query .= ' CHECK ON COMMIT';
         }
 
-        if ($foreignKey->hasOption('clustered') && (bool) $foreignKey->getOption('clustered')) {
+        if ($foreignKey->hasOption('clustered') && (boolean) $foreignKey->getOption('clustered')) {
             $query .= ' CLUSTERED';
         }
 
-        if ($foreignKey->hasOption('for_olap_workload') && (bool) $foreignKey->getOption('for_olap_workload')) {
+        if ($foreignKey->hasOption('for_olap_workload') && (boolean) $foreignKey->getOption('for_olap_workload')) {
             $query .= ' FOR OLAP WORKLOAD';
         }
 
@@ -127,6 +147,7 @@ class SQLAnywherePlatform extends AbstractPlatform
         $tableSql     = [];
         $alterClauses = [];
 
+        /** @var \Doctrine\DBAL\Schema\Column $column */
         foreach ($diff->addedColumns as $column) {
             if ($this->onSchemaAlterTableAddColumn($column, $diff, $columnSql)) {
                 continue;
@@ -136,17 +157,16 @@ class SQLAnywherePlatform extends AbstractPlatform
 
             $comment = $this->getColumnComment($column);
 
-            if ($comment === null || $comment === '') {
-                continue;
+            if (null !== $comment && '' !== $comment) {
+                $commentsSQL[] = $this->getCommentOnColumnSQL(
+                    $diff->getName($this)->getQuotedName($this),
+                    $column->getQuotedName($this),
+                    $comment
+                );
             }
-
-            $commentsSQL[] = $this->getCommentOnColumnSQL(
-                $diff->getName($this)->getQuotedName($this),
-                $column->getQuotedName($this),
-                $comment
-            );
         }
 
+        /** @var \Doctrine\DBAL\Schema\Column $column */
         foreach ($diff->removedColumns as $column) {
             if ($this->onSchemaAlterTableRemoveColumn($column, $diff, $columnSql)) {
                 continue;
@@ -155,6 +175,7 @@ class SQLAnywherePlatform extends AbstractPlatform
             $alterClauses[] = $this->getAlterTableRemoveColumnClause($column);
         }
 
+        /** @var \Doctrine\DBAL\Schema\ColumnDiff $columnDiff */
         foreach ($diff->changedColumns as $columnDiff) {
             if ($this->onSchemaAlterTableChangeColumn($columnDiff, $diff, $columnSql)) {
                 continue;
@@ -162,21 +183,19 @@ class SQLAnywherePlatform extends AbstractPlatform
 
             $alterClause = $this->getAlterTableChangeColumnClause($columnDiff);
 
-            if ($alterClause !== null) {
+            if (null !== $alterClause) {
                 $alterClauses[] = $alterClause;
             }
 
-            if (! $columnDiff->hasChanged('comment')) {
-                continue;
+            if ($columnDiff->hasChanged('comment')) {
+                $column = $columnDiff->column;
+
+                $commentsSQL[] = $this->getCommentOnColumnSQL(
+                    $diff->getName($this)->getQuotedName($this),
+                    $column->getQuotedName($this),
+                    $this->getColumnComment($column)
+                );
             }
-
-            $column = $columnDiff->column;
-
-            $commentsSQL[] = $this->getCommentOnColumnSQL(
-                $diff->getName($this)->getQuotedName($this),
-                $column->getQuotedName($this),
-                $this->getColumnComment($column)
-            );
         }
 
         foreach ($diff->renamedColumns as $oldColumnName => $column) {
@@ -188,18 +207,16 @@ class SQLAnywherePlatform extends AbstractPlatform
                 $this->getAlterTableRenameColumnClause($oldColumnName, $column);
         }
 
-        if (! $this->onSchemaAlterTable($diff, $tableSql)) {
-            if (! empty($alterClauses)) {
-                $sql[] = $this->getAlterTableClause($diff->getName($this)) . ' ' . implode(', ', $alterClauses);
+        if ( ! $this->onSchemaAlterTable($diff, $tableSql)) {
+            if ( ! empty($alterClauses)) {
+                $sql[] = $this->getAlterTableClause($diff->getName($this)) . ' ' . implode(", ", $alterClauses);
             }
 
             $sql = array_merge($sql, $commentsSQL);
 
-            $newName = $diff->getNewName();
-
-            if ($newName !== false) {
+            if ($diff->newName !== false) {
                 $sql[] = $this->getAlterTableClause($diff->getName($this)) . ' ' .
-                    $this->getAlterTableRenameTableClause($newName);
+                    $this->getAlterTableRenameTableClause($diff->getNewName());
             }
 
             $sql = array_merge(
@@ -260,7 +277,7 @@ class SQLAnywherePlatform extends AbstractPlatform
     {
         $oldColumnName = new Identifier($oldColumnName);
 
-        return 'RENAME ' . $oldColumnName->getQuotedName($this) . ' TO ' . $column->getQuotedName($this);
+        return 'RENAME ' . $oldColumnName->getQuotedName($this) .' TO ' . $column->getQuotedName($this);
     }
 
     /**
@@ -290,11 +307,11 @@ class SQLAnywherePlatform extends AbstractPlatform
         $column = $columnDiff->column;
 
         // Do not return alter clause if only comment has changed.
-        if (! ($columnDiff->hasChanged('comment') && count($columnDiff->changedProperties) === 1)) {
+        if ( ! ($columnDiff->hasChanged('comment') && count($columnDiff->changedProperties) === 1)) {
             $columnAlterationClause = 'ALTER ' .
                 $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
 
-            if ($columnDiff->hasChanged('default') && $column->getDefault() === null) {
+            if ($columnDiff->hasChanged('default') && null === $column->getDefault()) {
                 $columnAlterationClause .= ', ALTER ' . $column->getQuotedName($this) . ' DROP DEFAULT';
             }
 
@@ -307,11 +324,11 @@ class SQLAnywherePlatform extends AbstractPlatform
     /**
      * {@inheritdoc}
      */
-    public function getBigIntTypeDeclarationSQL(array $column)
+    public function getBigIntTypeDeclarationSQL(array $columnDef)
     {
-        $column['integer_type'] = 'BIGINT';
+        $columnDef['integer_type'] = 'BIGINT';
 
-        return $this->_getCommonIntegerTypeDeclarationSQL($column);
+        return $this->_getCommonIntegerTypeDeclarationSQL($columnDef);
     }
 
     /**
@@ -333,7 +350,7 @@ class SQLAnywherePlatform extends AbstractPlatform
     /**
      * {@inheritdoc}
      */
-    public function getBlobTypeDeclarationSQL(array $column)
+    public function getBlobTypeDeclarationSQL(array $field)
     {
         return 'LONG BINARY';
     }
@@ -346,9 +363,9 @@ class SQLAnywherePlatform extends AbstractPlatform
      * Otherwise by just omitting the NOT NULL clause,
      * SQL Anywhere will declare them NOT NULL nonetheless.
      */
-    public function getBooleanTypeDeclarationSQL(array $column)
+    public function getBooleanTypeDeclarationSQL(array $columnDef)
     {
-        $nullClause = isset($column['notnull']) && (bool) $column['notnull'] === false ? ' NULL' : '';
+        $nullClause = isset($columnDef['notnull']) && (boolean) $columnDef['notnull'] === false ? ' NULL' : '';
 
         return 'BIT' . $nullClause;
     }
@@ -356,7 +373,7 @@ class SQLAnywherePlatform extends AbstractPlatform
     /**
      * {@inheritdoc}
      */
-    public function getClobTypeDeclarationSQL(array $column)
+    public function getClobTypeDeclarationSQL(array $field)
     {
         return 'TEXT';
     }
@@ -366,16 +383,12 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getCommentOnColumnSQL($tableName, $columnName, $comment)
     {
-        $tableName  = new Identifier($tableName);
+        $tableName = new Identifier($tableName);
         $columnName = new Identifier($columnName);
-        $comment    = $comment === null ? 'NULL' : $this->quoteStringLiteral($comment);
+        $comment = $comment === null ? 'NULL' : $this->quoteStringLiteral($comment);
 
-        return sprintf(
-            'COMMENT ON COLUMN %s.%s IS %s',
-            $tableName->getQuotedName($this),
-            $columnName->getQuotedName($this),
-            $comment
-        );
+        return "COMMENT ON COLUMN " . $tableName->getQuotedName($this) . '.' . $columnName->getQuotedName($this) .
+            " IS $comment";
     }
 
     /**
@@ -383,7 +396,7 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getConcatExpression()
     {
-        return 'STRING(' . implode(', ', func_get_args()) . ')';
+        return 'STRING(' . implode(', ', (array) func_get_args()) . ')';
     }
 
     /**
@@ -420,7 +433,7 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getCreateIndexSQL(Index $index, $table)
     {
-        return parent::getCreateIndexSQL($index, $table) . $this->getAdvancedIndexOptionsSQL($index);
+        return parent::getCreateIndexSQL($index, $table). $this->getAdvancedIndexOptionsSQL($index);
     }
 
     /**
@@ -482,7 +495,7 @@ class SQLAnywherePlatform extends AbstractPlatform
     {
         $factorClause = '';
 
-        if ($operator === '-') {
+        if ('-' === $operator) {
             $factorClause = '-1 * ';
         }
 
@@ -508,7 +521,7 @@ class SQLAnywherePlatform extends AbstractPlatform
     /**
      * {@inheritdoc}
      */
-    public function getDateTimeTypeDeclarationSQL(array $column)
+    public function getDateTimeTypeDeclarationSQL(array $fieldDeclaration)
     {
         return 'DATETIME';
     }
@@ -524,7 +537,7 @@ class SQLAnywherePlatform extends AbstractPlatform
     /**
      * {@inheritdoc}
      */
-    public function getDateTypeDeclarationSQL(array $column)
+    public function getDateTypeDeclarationSQL(array $fieldDeclaration)
     {
         return 'DATE';
     }
@@ -556,13 +569,14 @@ class SQLAnywherePlatform extends AbstractPlatform
             $index = $index->getQuotedName($this);
         }
 
-        if (! is_string($index)) {
-            throw new InvalidArgumentException(
-                __METHOD__ . '() expects $index parameter to be string or ' . Index::class . '.'
+        if ( ! is_string($index)) {
+            throw new \InvalidArgumentException(
+                'SQLAnywherePlatform::getDropIndexSQL() expects $index parameter to be string or ' .
+                '\Doctrine\DBAL\Schema\Index.'
             );
         }
 
-        if (! isset($table)) {
+        if ( ! isset($table)) {
             return 'DROP INDEX ' . $index;
         }
 
@@ -570,9 +584,10 @@ class SQLAnywherePlatform extends AbstractPlatform
             $table = $table->getQuotedName($this);
         }
 
-        if (! is_string($table)) {
-            throw new InvalidArgumentException(
-                __METHOD__ . '() expects $table parameter to be string or ' . Index::class . '.'
+        if ( ! is_string($table)) {
+            throw new \InvalidArgumentException(
+                'SQLAnywherePlatform::getDropIndexSQL() expects $table parameter to be string or ' .
+                '\Doctrine\DBAL\Schema\Table.'
             );
         }
 
@@ -598,23 +613,23 @@ class SQLAnywherePlatform extends AbstractPlatform
         $foreignColumns   = $foreignKey->getQuotedForeignColumns($this);
         $foreignTableName = $foreignKey->getQuotedForeignTableName($this);
 
-        if (! empty($foreignKeyName)) {
+        if ( ! empty($foreignKeyName)) {
             $sql .= 'CONSTRAINT ' . $foreignKey->getQuotedName($this) . ' ';
         }
 
         if (empty($localColumns)) {
-            throw new InvalidArgumentException("Incomplete definition. 'local' required.");
+            throw new \InvalidArgumentException("Incomplete definition. 'local' required.");
         }
 
         if (empty($foreignColumns)) {
-            throw new InvalidArgumentException("Incomplete definition. 'foreign' required.");
+            throw new \InvalidArgumentException("Incomplete definition. 'foreign' required.");
         }
 
         if (empty($foreignTableName)) {
-            throw new InvalidArgumentException("Incomplete definition. 'foreignTable' required.");
+            throw new \InvalidArgumentException("Incomplete definition. 'foreignTable' required.");
         }
 
-        if ($foreignKey->hasOption('notnull') && (bool) $foreignKey->getOption('notnull')) {
+        if ($foreignKey->hasOption('notnull') && (boolean) $foreignKey->getOption('notnull')) {
             $sql .= 'NOT NULL ';
         }
 
@@ -631,25 +646,24 @@ class SQLAnywherePlatform extends AbstractPlatform
      *
      * @return string
      *
-     * @throws InvalidArgumentException If unknown match type given.
+     * @throws \InvalidArgumentException if unknown match type given
      */
     public function getForeignKeyMatchClauseSQL($type)
     {
         switch ((int) $type) {
             case self::FOREIGN_KEY_MATCH_SIMPLE:
                 return 'SIMPLE';
-
+                break;
             case self::FOREIGN_KEY_MATCH_FULL:
                 return 'FULL';
-
+                break;
             case self::FOREIGN_KEY_MATCH_SIMPLE_UNIQUE:
                 return 'UNIQUE SIMPLE';
-
+                break;
             case self::FOREIGN_KEY_MATCH_FULL_UNIQUE:
                 return 'UNIQUE FULL';
-
             default:
-                throw new InvalidArgumentException('Invalid foreign key match type: ' . $type);
+                throw new \InvalidArgumentException('Invalid foreign key match type: ' . $type);
         }
     }
 
@@ -687,7 +701,7 @@ class SQLAnywherePlatform extends AbstractPlatform
     /**
      * {@inheritdoc}
      */
-    public function getGuidTypeDeclarationSQL(array $column)
+    public function getGuidTypeDeclarationSQL(array $field)
     {
         return 'UNIQUEIDENTIFIER';
     }
@@ -698,17 +712,17 @@ class SQLAnywherePlatform extends AbstractPlatform
     public function getIndexDeclarationSQL($name, Index $index)
     {
         // Index declaration in statements like CREATE TABLE is not supported.
-        throw Exception::notSupported(__METHOD__);
+        throw DBALException::notSupported(__METHOD__);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getIntegerTypeDeclarationSQL(array $column)
+    public function getIntegerTypeDeclarationSQL(array $columnDef)
     {
-        $column['integer_type'] = 'INT';
+        $columnDef['integer_type'] = 'INT';
 
-        return $this->_getCommonIntegerTypeDeclarationSQL($column);
+        return $this->_getCommonIntegerTypeDeclarationSQL($columnDef);
     }
 
     /**
@@ -727,33 +741,26 @@ class SQLAnywherePlatform extends AbstractPlatform
         $user = 'USER_NAME()';
 
         if (strpos($table, '.') !== false) {
-            [$user, $table] = explode('.', $table);
-            $user           = $this->quoteStringLiteral($user);
+            list($user, $table) = explode('.', $table);
+            $user = $this->quoteStringLiteral($user);
         }
 
-        return sprintf(
-            <<<'SQL'
-SELECT    col.column_name,
-          COALESCE(def.user_type_name, def.domain_name) AS 'type',
-          def.declared_width AS 'length',
-          def.scale,
-          CHARINDEX('unsigned', def.domain_name) AS 'unsigned',
-          IF col.nulls = 'Y' THEN 0 ELSE 1 ENDIF AS 'notnull',
-          col."default",
-          def.is_autoincrement AS 'autoincrement',
-          rem.remarks AS 'comment'
-FROM      sa_describe_query('SELECT * FROM "%s"') AS def
-JOIN      SYS.SYSTABCOL AS col
-ON        col.table_id = def.base_table_id AND col.column_id = def.base_column_id
-LEFT JOIN SYS.SYSREMARK AS rem
-ON        col.object_id = rem.object_id
-WHERE     def.base_owner_name = %s
-ORDER BY  def.base_column_id ASC
-SQL
-            ,
-            $table,
-            $user
-        );
+        return "SELECT    col.column_name,
+                          COALESCE(def.user_type_name, def.domain_name) AS 'type',
+                          def.declared_width AS 'length',
+                          def.scale,
+                          CHARINDEX('unsigned', def.domain_name) AS 'unsigned',
+                          IF col.nulls = 'Y' THEN 0 ELSE 1 ENDIF AS 'notnull',
+                          col.\"default\",
+                          def.is_autoincrement AS 'autoincrement',
+                          rem.remarks AS 'comment'
+                FROM      sa_describe_query('SELECT * FROM \"$table\"') AS def
+                JOIN      SYS.SYSTABCOL AS col
+                ON        col.table_id = def.base_table_id AND col.column_id = def.base_column_id
+                LEFT JOIN SYS.SYSREMARK AS rem
+                ON        col.object_id = rem.object_id
+                WHERE     def.base_owner_name = $user
+                ORDER BY  def.base_column_id ASC";
     }
 
     /**
@@ -766,25 +773,18 @@ SQL
         $user = '';
 
         if (strpos($table, '.') !== false) {
-            [$user, $table] = explode('.', $table);
-            $user           = $this->quoteStringLiteral($user);
-            $table          = $this->quoteStringLiteral($table);
+            list($user, $table) = explode('.', $table);
+            $user = $this->quoteStringLiteral($user);
+            $table = $this->quoteStringLiteral($table);
         } else {
             $table = $this->quoteStringLiteral($table);
         }
 
-        return sprintf(
-            <<<'SQL'
-SELECT con.*
-FROM   SYS.SYSCONSTRAINT AS con
-JOIN   SYS.SYSTAB AS tab ON con.table_object_id = tab.object_id
-WHERE  tab.table_name = %s
-AND    tab.creator = USER_ID(%s)
-SQL
-            ,
-            $table,
-            $user
-        );
+        return "SELECT con.*
+                FROM   SYS.SYSCONSTRAINT AS con
+                JOIN   SYS.SYSTAB AS tab ON con.table_object_id = tab.object_id
+                WHERE  tab.table_name = $table
+                AND    tab.creator = USER_ID($user)";
     }
 
     /**
@@ -795,149 +795,135 @@ SQL
         $user = '';
 
         if (strpos($table, '.') !== false) {
-            [$user, $table] = explode('.', $table);
-            $user           = $this->quoteStringLiteral($user);
-            $table          = $this->quoteStringLiteral($table);
+            list($user, $table) = explode('.', $table);
+            $user = $this->quoteStringLiteral($user);
+            $table = $this->quoteStringLiteral($table);
         } else {
             $table = $this->quoteStringLiteral($table);
         }
 
-        return sprintf(
-            <<<'SQL'
-SELECT    fcol.column_name AS local_column,
-          ptbl.table_name AS foreign_table,
-          pcol.column_name AS foreign_column,
-          idx.index_name,
-          IF fk.nulls = 'N'
-              THEN 1
-              ELSE NULL
-          ENDIF AS notnull,
-          CASE ut.referential_action
-              WHEN 'C' THEN 'CASCADE'
-              WHEN 'D' THEN 'SET DEFAULT'
-              WHEN 'N' THEN 'SET NULL'
-              WHEN 'R' THEN 'RESTRICT'
-              ELSE NULL
-          END AS  on_update,
-          CASE dt.referential_action
-              WHEN 'C' THEN 'CASCADE'
-              WHEN 'D' THEN 'SET DEFAULT'
-              WHEN 'N' THEN 'SET NULL'
-              WHEN 'R' THEN 'RESTRICT'
-              ELSE NULL
-          END AS on_delete,
-          IF fk.check_on_commit = 'Y'
-              THEN 1
-              ELSE NULL
-          ENDIF AS check_on_commit, -- check_on_commit flag
-          IF ftbl.clustered_index_id = idx.index_id
-              THEN 1
-              ELSE NULL
-          ENDIF AS 'clustered', -- clustered flag
-          IF fk.match_type = 0
-              THEN NULL
-              ELSE fk.match_type
-          ENDIF AS 'match', -- match option
-          IF pidx.max_key_distance = 1
-              THEN 1
-              ELSE NULL
-          ENDIF AS for_olap_workload -- for_olap_workload flag
-FROM      SYS.SYSFKEY AS fk
-JOIN      SYS.SYSIDX AS idx
-ON        fk.foreign_table_id = idx.table_id
-AND       fk.foreign_index_id = idx.index_id
-JOIN      SYS.SYSPHYSIDX pidx
-ON        idx.table_id = pidx.table_id
-AND       idx.phys_index_id = pidx.phys_index_id
-JOIN      SYS.SYSTAB AS ptbl
-ON        fk.primary_table_id = ptbl.table_id
-JOIN      SYS.SYSTAB AS ftbl
-ON        fk.foreign_table_id = ftbl.table_id
-JOIN      SYS.SYSIDXCOL AS idxcol
-ON        idx.table_id = idxcol.table_id
-AND       idx.index_id = idxcol.index_id
-JOIN      SYS.SYSTABCOL AS pcol
-ON        ptbl.table_id = pcol.table_id
-AND       idxcol.primary_column_id = pcol.column_id
-JOIN      SYS.SYSTABCOL AS fcol
-ON        ftbl.table_id = fcol.table_id
-AND       idxcol.column_id = fcol.column_id
-LEFT JOIN SYS.SYSTRIGGER ut
-ON        fk.foreign_table_id = ut.foreign_table_id
-AND       fk.foreign_index_id = ut.foreign_key_id
-AND       ut.event = 'C'
-LEFT JOIN SYS.SYSTRIGGER dt
-ON        fk.foreign_table_id = dt.foreign_table_id
-AND       fk.foreign_index_id = dt.foreign_key_id
-AND       dt.event = 'D'
-WHERE     ftbl.table_name = %s
-AND       ftbl.creator = USER_ID(%s)
-ORDER BY  fk.foreign_index_id ASC, idxcol.sequence ASC
-SQL
-            ,
-            $table,
-            $user
-        );
+        return "SELECT    fcol.column_name AS local_column,
+                          ptbl.table_name AS foreign_table,
+                          pcol.column_name AS foreign_column,
+                          idx.index_name,
+                          IF fk.nulls = 'N'
+                              THEN 1
+                              ELSE NULL
+                          ENDIF AS notnull,
+                          CASE ut.referential_action
+                              WHEN 'C' THEN 'CASCADE'
+                              WHEN 'D' THEN 'SET DEFAULT'
+                              WHEN 'N' THEN 'SET NULL'
+                              WHEN 'R' THEN 'RESTRICT'
+                              ELSE NULL
+                          END AS  on_update,
+                          CASE dt.referential_action
+                              WHEN 'C' THEN 'CASCADE'
+                              WHEN 'D' THEN 'SET DEFAULT'
+                              WHEN 'N' THEN 'SET NULL'
+                              WHEN 'R' THEN 'RESTRICT'
+                              ELSE NULL
+                          END AS on_delete,
+                          IF fk.check_on_commit = 'Y'
+                              THEN 1
+                              ELSE NULL
+                          ENDIF AS check_on_commit, -- check_on_commit flag
+                          IF ftbl.clustered_index_id = idx.index_id
+                              THEN 1
+                              ELSE NULL
+                          ENDIF AS 'clustered', -- clustered flag
+                          IF fk.match_type = 0
+                              THEN NULL
+                              ELSE fk.match_type
+                          ENDIF AS 'match', -- match option
+                          IF pidx.max_key_distance = 1
+                              THEN 1
+                              ELSE NULL
+                          ENDIF AS for_olap_workload -- for_olap_workload flag
+                FROM      SYS.SYSFKEY AS fk
+                JOIN      SYS.SYSIDX AS idx
+                ON        fk.foreign_table_id = idx.table_id
+                AND       fk.foreign_index_id = idx.index_id
+                JOIN      SYS.SYSPHYSIDX pidx
+                ON        idx.table_id = pidx.table_id
+                AND       idx.phys_index_id = pidx.phys_index_id
+                JOIN      SYS.SYSTAB AS ptbl
+                ON        fk.primary_table_id = ptbl.table_id
+                JOIN      SYS.SYSTAB AS ftbl
+                ON        fk.foreign_table_id = ftbl.table_id
+                JOIN      SYS.SYSIDXCOL AS idxcol
+                ON        idx.table_id = idxcol.table_id
+                AND       idx.index_id = idxcol.index_id
+                JOIN      SYS.SYSTABCOL AS pcol
+                ON        ptbl.table_id = pcol.table_id
+                AND       idxcol.primary_column_id = pcol.column_id
+                JOIN      SYS.SYSTABCOL AS fcol
+                ON        ftbl.table_id = fcol.table_id
+                AND       idxcol.column_id = fcol.column_id
+                LEFT JOIN SYS.SYSTRIGGER ut
+                ON        fk.foreign_table_id = ut.foreign_table_id
+                AND       fk.foreign_index_id = ut.foreign_key_id
+                AND       ut.event = 'C'
+                LEFT JOIN SYS.SYSTRIGGER dt
+                ON        fk.foreign_table_id = dt.foreign_table_id
+                AND       fk.foreign_index_id = dt.foreign_key_id
+                AND       dt.event = 'D'
+                WHERE     ftbl.table_name = $table
+                AND       ftbl.creator = USER_ID($user)
+                ORDER BY  fk.foreign_index_id ASC, idxcol.sequence ASC";
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getListTableIndexesSQL($table, $database = null)
+    public function getListTableIndexesSQL($table, $currentDatabase = null)
     {
         $user = '';
 
         if (strpos($table, '.') !== false) {
-            [$user, $table] = explode('.', $table);
-            $user           = $this->quoteStringLiteral($user);
-            $table          = $this->quoteStringLiteral($table);
+            list($user, $table) = explode('.', $table);
+            $user = $this->quoteStringLiteral($user);
+            $table = $this->quoteStringLiteral($table);
         } else {
             $table = $this->quoteStringLiteral($table);
         }
 
-        return sprintf(
-            <<<'SQL'
-SELECT   idx.index_name AS key_name,
-         IF idx.index_category = 1
-             THEN 1
-             ELSE 0
-         ENDIF AS 'primary',
-         col.column_name,
-         IF idx."unique" IN(1, 2, 5)
-             THEN 0
-             ELSE 1
-         ENDIF AS non_unique,
-         IF tbl.clustered_index_id = idx.index_id
-             THEN 1
-             ELSE NULL
-         ENDIF AS 'clustered', -- clustered flag
-         IF idx."unique" = 5
-             THEN 1
-             ELSE NULL
-         ENDIF AS with_nulls_not_distinct, -- with_nulls_not_distinct flag
-         IF pidx.max_key_distance = 1
-              THEN 1
-              ELSE NULL
-          ENDIF AS for_olap_workload -- for_olap_workload flag
-FROM     SYS.SYSIDX AS idx
-JOIN     SYS.SYSPHYSIDX pidx
-ON       idx.table_id = pidx.table_id
-AND      idx.phys_index_id = pidx.phys_index_id
-JOIN     SYS.SYSIDXCOL AS idxcol
-ON       idx.table_id = idxcol.table_id AND idx.index_id = idxcol.index_id
-JOIN     SYS.SYSTABCOL AS col
-ON       idxcol.table_id = col.table_id AND idxcol.column_id = col.column_id
-JOIN     SYS.SYSTAB AS tbl
-ON       idx.table_id = tbl.table_id
-WHERE    tbl.table_name = %s
-AND      tbl.creator = USER_ID(%s)
-AND      idx.index_category != 2 -- exclude indexes implicitly created by foreign key constraints
-ORDER BY idx.index_id ASC, idxcol.sequence ASC
-SQL
-            ,
-            $table,
-            $user
-        );
+        return "SELECT   idx.index_name AS key_name,
+                         IF idx.index_category = 1
+                             THEN 1
+                             ELSE 0
+                         ENDIF AS 'primary',
+                         col.column_name,
+                         IF idx.\"unique\" IN(1, 2, 5)
+                             THEN 0
+                             ELSE 1
+                         ENDIF AS non_unique,
+                         IF tbl.clustered_index_id = idx.index_id
+                             THEN 1
+                             ELSE NULL
+                         ENDIF AS 'clustered', -- clustered flag
+                         IF idx.\"unique\" = 5
+                             THEN 1
+                             ELSE NULL
+                         ENDIF AS with_nulls_not_distinct, -- with_nulls_not_distinct flag
+                         IF pidx.max_key_distance = 1
+                              THEN 1
+                              ELSE NULL
+                          ENDIF AS for_olap_workload -- for_olap_workload flag
+                FROM     SYS.SYSIDX AS idx
+                JOIN     SYS.SYSPHYSIDX pidx
+                ON       idx.table_id = pidx.table_id
+                AND      idx.phys_index_id = pidx.phys_index_id
+                JOIN     SYS.SYSIDXCOL AS idxcol
+                ON       idx.table_id = idxcol.table_id AND idx.index_id = idxcol.index_id
+                JOIN     SYS.SYSTABCOL AS col
+                ON       idxcol.table_id = col.table_id AND idxcol.column_id = col.column_id
+                JOIN     SYS.SYSTAB AS tbl
+                ON       idx.table_id = tbl.table_id
+                WHERE    tbl.table_name = $table
+                AND      tbl.creator = USER_ID($user)
+                AND      idx.index_category != 2 -- exclude indexes implicitly created by foreign key constraints
+                ORDER BY idx.index_id ASC, idxcol.sequence ASC";
     }
 
     /**
@@ -984,7 +970,7 @@ SQL
      */
     public function getLocateExpression($str, $substr, $startPos = false)
     {
-        if ($startPos === false) {
+        if ($startPos == false) {
             return 'LOCATE(' . $str . ', ' . $substr . ')';
         }
 
@@ -1004,7 +990,7 @@ SQL
      */
     public function getMd5Expression($column)
     {
-        return 'HASH(' . $column . ", 'MD5')";
+        return "HASH(" . $column . ", 'MD5')";
     }
 
     /**
@@ -1024,12 +1010,12 @@ SQL
      *
      * @return string DBMS specific SQL code portion needed to set a primary key
      *
-     * @throws InvalidArgumentException If the given index is not a primary key.
+     * @throws \InvalidArgumentException if the given index is not a primary key.
      */
     public function getPrimaryKeyDeclarationSQL(Index $index, $name = null)
     {
-        if (! $index->isPrimary()) {
-            throw new InvalidArgumentException(
+        if ( ! $index->isPrimary()) {
+            throw new \InvalidArgumentException(
                 'Can only create primary key declarations with getPrimaryKeyDeclarationSQL()'
             );
         }
@@ -1048,11 +1034,11 @@ SQL
     /**
      * {@inheritdoc}
      */
-    public function getSmallIntTypeDeclarationSQL(array $column)
+    public function getSmallIntTypeDeclarationSQL(array $columnDef)
     {
-        $column['integer_type'] = 'SMALLINT';
+        $columnDef['integer_type'] = 'SMALLINT';
 
-        return $this->_getCommonIntegerTypeDeclarationSQL($column);
+        return $this->_getCommonIntegerTypeDeclarationSQL($columnDef);
     }
 
     /**
@@ -1097,13 +1083,13 @@ SQL
     /**
      * {@inheritdoc}
      */
-    public function getSubstringExpression($string, $start, $length = null)
+    public function getSubstringExpression($value, $from, $length = null)
     {
-        if ($length === null) {
-            return 'SUBSTRING(' . $string . ', ' . $start . ')';
+        if (null === $length) {
+            return 'SUBSTRING(' . $value . ', ' . $from . ')';
         }
 
-        return 'SUBSTRING(' . $string . ', ' . $start . ', ' . $length . ')';
+        return 'SUBSTRING(' . $value . ', ' . $from . ', ' . $length . ')';
     }
 
     /**
@@ -1125,7 +1111,7 @@ SQL
     /**
      * {@inheritdoc}
      */
-    public function getTimeTypeDeclarationSQL(array $column)
+    public function getTimeTypeDeclarationSQL(array $fieldDeclaration)
     {
         return 'TIME';
     }
@@ -1133,34 +1119,30 @@ SQL
     /**
      * {@inheritdoc}
      */
-    public function getTrimExpression($str, $mode = TrimMode::UNSPECIFIED, $char = false)
+    public function getTrimExpression($str, $pos = TrimMode::UNSPECIFIED, $char = false)
     {
-        if (! $char) {
-            switch ($mode) {
+        if ( ! $char) {
+            switch ($pos) {
                 case TrimMode::LEADING:
                     return $this->getLtrimExpression($str);
-
                 case TrimMode::TRAILING:
                     return $this->getRtrimExpression($str);
-
                 default:
                     return 'TRIM(' . $str . ')';
             }
         }
 
-        $pattern = "'%[^' + " . $char . " + ']%'";
+        $pattern = "'%[^' + $char + ']%'";
 
-        switch ($mode) {
+        switch ($pos) {
             case TrimMode::LEADING:
                 return 'SUBSTR(' . $str . ', PATINDEX(' . $pattern . ', ' . $str . '))';
-
             case TrimMode::TRAILING:
                 return 'REVERSE(SUBSTR(REVERSE(' . $str . '), PATINDEX(' . $pattern . ', REVERSE(' . $str . '))))';
-
             default:
-                return 'REVERSE(SUBSTR(REVERSE(SUBSTR(' . $str . ', PATINDEX(' . $pattern . ', ' . $str . '))), ' .
-                    'PATINDEX(' . $pattern . ', ' .
-                    'REVERSE(SUBSTR(' . $str . ', PATINDEX(' . $pattern . ', ' . $str . '))))))';
+                return
+                    'REVERSE(SUBSTR(REVERSE(SUBSTR(' . $str . ', PATINDEX(' . $pattern . ', ' . $str . '))), ' .
+                    'PATINDEX(' . $pattern . ', REVERSE(SUBSTR(' . $str . ', PATINDEX(' . $pattern . ', ' . $str . '))))))';
         }
     }
 
@@ -1180,13 +1162,13 @@ SQL
     public function getUniqueConstraintDeclarationSQL($name, Index $index)
     {
         if ($index->isPrimary()) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 'Cannot create primary key constraint declarations with getUniqueConstraintDeclarationSQL().'
             );
         }
 
-        if (! $index->isUnique()) {
-            throw new InvalidArgumentException(
+        if ( ! $index->isUnique()) {
+            throw new \InvalidArgumentException(
                 'Can only create unique constraint declarations, no common index declarations with ' .
                 'getUniqueConstraintDeclarationSQL().'
             );
@@ -1246,56 +1228,55 @@ SQL
     /**
      * {@inheritdoc}
      */
-    protected function _getCommonIntegerTypeDeclarationSQL(array $column)
+    protected function _getCommonIntegerTypeDeclarationSQL(array $columnDef)
     {
-        $unsigned      = ! empty($column['unsigned']) ? 'UNSIGNED ' : '';
-        $autoincrement = ! empty($column['autoincrement']) ? ' IDENTITY' : '';
+        $unsigned      = ! empty($columnDef['unsigned']) ? 'UNSIGNED ' : '';
+        $autoincrement = ! empty($columnDef['autoincrement']) ? ' IDENTITY' : '';
 
-        return $unsigned . $column['integer_type'] . $autoincrement;
+        return $unsigned . $columnDef['integer_type'] . $autoincrement;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function _getCreateTableSQL($name, array $columns, array $options = [])
+    protected function _getCreateTableSQL($tableName, array $columns, array $options = [])
     {
         $columnListSql = $this->getColumnDeclarationListSQL($columns);
-        $indexSql      = [];
+        $indexSql = [];
 
-        if (! empty($options['uniqueConstraints'])) {
+        if ( ! empty($options['uniqueConstraints'])) {
             foreach ((array) $options['uniqueConstraints'] as $name => $definition) {
                 $columnListSql .= ', ' . $this->getUniqueConstraintDeclarationSQL($name, $definition);
             }
         }
 
-        if (! empty($options['indexes'])) {
+        if ( ! empty($options['indexes'])) {
+            /** @var \Doctrine\DBAL\Schema\Index $index */
             foreach ((array) $options['indexes'] as $index) {
-                assert($index instanceof Index);
-                $indexSql[] = $this->getCreateIndexSQL($index, $name);
+                $indexSql[] = $this->getCreateIndexSQL($index, $tableName);
             }
         }
 
-        if (! empty($options['primary'])) {
+        if ( ! empty($options['primary'])) {
             $flags = '';
 
             if (isset($options['primary_index']) && $options['primary_index']->hasFlag('clustered')) {
                 $flags = ' CLUSTERED ';
             }
 
-            $columnListSql .= ', PRIMARY KEY' . $flags
-                . ' (' . implode(', ', array_unique(array_values((array) $options['primary']))) . ')';
+            $columnListSql .= ', PRIMARY KEY' . $flags . ' (' . implode(', ', array_unique(array_values((array) $options['primary']))) . ')';
         }
 
-        if (! empty($options['foreignKeys'])) {
+        if ( ! empty($options['foreignKeys'])) {
             foreach ((array) $options['foreignKeys'] as $definition) {
                 $columnListSql .= ', ' . $this->getForeignKeyDeclarationSQL($definition);
             }
         }
 
-        $query = 'CREATE TABLE ' . $name . ' (' . $columnListSql;
+        $query = 'CREATE TABLE ' . $tableName . ' (' . $columnListSql;
         $check = $this->getCheckDeclarationSQL($columns);
 
-        if (! empty($check)) {
+        if ( ! empty($check)) {
             $query .= ', ' . $check;
         }
 
@@ -1311,19 +1292,15 @@ SQL
     {
         switch ($level) {
             case TransactionIsolationLevel::READ_UNCOMMITTED:
-                return '0';
-
+                return 0;
             case TransactionIsolationLevel::READ_COMMITTED:
-                return '1';
-
+                return 1;
             case TransactionIsolationLevel::REPEATABLE_READ:
-                return '2';
-
+                return 2;
             case TransactionIsolationLevel::SERIALIZABLE:
-                return '3';
-
+                return 3;
             default:
-                throw new InvalidArgumentException('Invalid isolation level:' . $level);
+                throw new \InvalidArgumentException('Invalid isolation level:' . $level);
         }
     }
 
@@ -1332,26 +1309,25 @@ SQL
      */
     protected function doModifyLimitQuery($query, $limit, $offset)
     {
-        $limitOffsetClause = $this->getTopClauseSQL($limit, $offset);
+        $limitOffsetClause = '';
 
-        if ($limitOffsetClause === '') {
-            return $query;
+        if ($limit > 0) {
+            $limitOffsetClause = 'TOP ' . $limit . ' ';
         }
 
-        if (! preg_match('/^\s*(SELECT\s+(DISTINCT\s+)?)(.*)/i', $query, $matches)) {
-            return $query;
-        }
-
-        return $matches[1] . $limitOffsetClause . ' ' . $matches[3];
-    }
-
-    private function getTopClauseSQL(?int $limit, ?int $offset): string
-    {
         if ($offset > 0) {
-            return sprintf('TOP %s START AT %d', $limit ?? 'ALL', $offset + 1);
+            if ($limit == 0) {
+                $limitOffsetClause = 'TOP ALL ';
+            }
+
+            $limitOffsetClause .= 'START AT ' . ($offset + 1) . ' ';
         }
 
-        return $limit === null ? '' : 'TOP ' . $limit;
+        if ($limitOffsetClause) {
+            return preg_replace('/^\s*(SELECT\s+(DISTINCT\s+)?)/i', '\1' . $limitOffsetClause, $query);
+        }
+
+        return $query;
     }
 
     /**
@@ -1366,7 +1342,7 @@ SQL
     {
         $sql = '';
 
-        if (! $index->isPrimary() && $index->hasFlag('for_olap_workload')) {
+        if ( ! $index->isPrimary() && $index->hasFlag('for_olap_workload')) {
             $sql .= ' FOR OLAP WORKLOAD';
         }
 
@@ -1391,7 +1367,7 @@ SQL
      *
      * @return string
      *
-     * @throws InvalidArgumentException If the given table constraint type is not supported by this method.
+     * @throws \InvalidArgumentException if the given table constraint type is not supported by this method.
      */
     protected function getTableConstraintDeclarationSQL(Constraint $constraint, $name = null)
     {
@@ -1399,27 +1375,27 @@ SQL
             return $this->getForeignKeyDeclarationSQL($constraint);
         }
 
-        if (! $constraint instanceof Index) {
-            throw new InvalidArgumentException('Unsupported constraint type: ' . get_class($constraint));
+        if ( ! $constraint instanceof Index) {
+            throw new \InvalidArgumentException('Unsupported constraint type: ' . get_class($constraint));
         }
 
-        if (! $constraint->isPrimary() && ! $constraint->isUnique()) {
-            throw new InvalidArgumentException(
-                'Can only create primary, unique or foreign key constraint declarations, no common index declarations'
-                    . ' with getTableConstraintDeclarationSQL().'
+        if ( ! $constraint->isPrimary() && ! $constraint->isUnique()) {
+            throw new \InvalidArgumentException(
+                'Can only create primary, unique or foreign key constraint declarations, no common index declarations ' .
+                'with getTableConstraintDeclarationSQL().'
             );
         }
 
         $constraintColumns = $constraint->getQuotedColumns($this);
 
         if (empty($constraintColumns)) {
-            throw new InvalidArgumentException("Incomplete definition. 'columns' required.");
+            throw new \InvalidArgumentException("Incomplete definition. 'columns' required.");
         }
 
         $sql   = '';
         $flags = '';
 
-        if (! empty($name)) {
+        if ( ! empty($name)) {
             $name = new Identifier($name);
             $sql .= 'CONSTRAINT ' . $name->getQuotedName($this) . ' ';
         }
@@ -1429,11 +1405,10 @@ SQL
         }
 
         if ($constraint->isPrimary()) {
-            return $sql . 'PRIMARY KEY ' . $flags
-                . '(' . $this->getIndexFieldDeclarationListSQL($constraintColumns) . ')';
+            return $sql . 'PRIMARY KEY ' . $flags . '('. $this->getIndexFieldDeclarationListSQL($constraintColumns) . ')';
         }
 
-        return $sql . 'UNIQUE ' . $flags . '(' . $this->getIndexFieldDeclarationListSQL($constraintColumns) . ')';
+        return $sql . 'UNIQUE ' . $flags . '('. $this->getIndexFieldDeclarationListSQL($constraintColumns) . ')';
     }
 
     /**
@@ -1462,7 +1437,9 @@ SQL
      */
     protected function getRenameIndexSQL($oldIndexName, Index $index, $tableName)
     {
-        return ['ALTER INDEX ' . $oldIndexName . ' ON ' . $tableName . ' RENAME TO ' . $index->getQuotedName($this)];
+        return [
+            'ALTER INDEX ' . $oldIndexName . ' ON ' . $tableName . ' RENAME TO ' . $index->getQuotedName($this)
+        ];
     }
 
     /**
@@ -1510,9 +1487,9 @@ SQL
             'unsigned int' => 'integer',
             'numeric' => 'decimal',
             'smallint' => 'smallint',
-            'unsigned smallint' => 'smallint',
+            'unsigned smallint', 'smallint',
             'tinyint' => 'smallint',
-            'unsigned tinyint' => 'smallint',
+            'unsigned tinyint', 'smallint',
             'money' => 'decimal',
             'smallmoney' => 'decimal',
             'long varbit' => 'text',

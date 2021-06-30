@@ -22,9 +22,9 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
  */
 class MetadataBag implements SessionBagInterface
 {
-    public const CREATED = 'c';
-    public const UPDATED = 'u';
-    public const LIFETIME = 'l';
+    const CREATED = 'c';
+    const UPDATED = 'u';
+    const LIFETIME = 'l';
 
     /**
      * @var string

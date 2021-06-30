@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Imagick\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class ResizeCommand extends AbstractCommand
+class ResizeCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Resizes image dimensions

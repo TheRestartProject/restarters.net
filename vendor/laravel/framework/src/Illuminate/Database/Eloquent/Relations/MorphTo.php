@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ */
 class MorphTo extends BelongsTo
 {
     /**
@@ -79,6 +82,16 @@ class MorphTo extends BelongsTo
                 $this->dictionary[$model->{$this->morphType}][$model->{$this->foreignKey}][] = $model;
             }
         }
+    }
+
+    /**
+     * Get the results of the relationship.
+     *
+     * @return mixed
+     */
+    public function getResults()
+    {
+        return $this->ownerKey ? parent::getResults() : null;
     }
 
     /**
@@ -217,9 +230,27 @@ class MorphTo extends BelongsTo
      */
     public function touch()
     {
-        if (! is_null($this->child->{$this->foreignKey})) {
+        if (! is_null($this->ownerKey)) {
             parent::touch();
         }
+    }
+
+    /**
+     * Remove all or passed registered global scopes.
+     *
+     * @param  array|null  $scopes
+     * @return $this
+     */
+    public function withoutGlobalScopes(array $scopes = null)
+    {
+        $this->getQuery()->withoutGlobalScopes($scopes);
+
+        $this->macroBuffer[] = [
+            'method' => __FUNCTION__,
+            'parameters' => [$scopes],
+        ];
+
+        return $this;
     }
 
     /**
@@ -267,13 +298,7 @@ class MorphTo extends BelongsTo
     public function __call($method, $parameters)
     {
         try {
-            $result = parent::__call($method, $parameters);
-
-            if (in_array($method, ['select', 'selectRaw', 'selectSub', 'addSelect', 'withoutGlobalScopes'])) {
-                $this->macroBuffer[] = compact('method', 'parameters');
-            }
-
-            return $result;
+            return parent::__call($method, $parameters);
         }
 
         // If we tried to call a method that does not exist on the parent Builder instance,

@@ -2,10 +2,9 @@
 
 namespace Intervention\Image\Gd\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
 use Intervention\Image\Gd\Color;
 
-class PickColorCommand extends AbstractCommand
+class PickColorCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Read color information from a certain position

@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Imagick\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class GreyscaleCommand extends AbstractCommand
+class GreyscaleCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Turns an image into a greyscale version

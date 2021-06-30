@@ -43,7 +43,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Create a new response instance.
+     * Return a new response from the application.
      *
      * @param  string  $content
      * @param  int  $status
@@ -56,19 +56,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Create a new "no content" response.
-     *
-     * @param  int  $status
-     * @param  array  $headers
-     * @return \Illuminate\Http\Response
-     */
-    public function noContent($status = 204, array $headers = [])
-    {
-        return $this->make('', $status, $headers);
-    }
-
-    /**
-     * Create a new response for a given view.
+     * Return a new view response from the application.
      *
      * @param  string  $view
      * @param  array  $data
@@ -82,7 +70,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Create a new JSON response instance.
+     * Return a new JSON response from the application.
      *
      * @param  mixed  $data
      * @param  int  $status
@@ -96,7 +84,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Create a new JSONP response instance.
+     * Return a new JSONP response from the application.
      *
      * @param  string  $callback
      * @param  mixed  $data
@@ -111,7 +99,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Create a new streamed response instance.
+     * Return a new streamed response from the application.
      *
      * @param  \Closure  $callback
      * @param  int  $status
@@ -124,7 +112,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Create a new streamed response instance as a file download.
+     * Return a new streamed response as a file download from the application.
      *
      * @param  \Closure  $callback
      * @param  string|null  $name

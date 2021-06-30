@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Gd\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class SharpenCommand extends AbstractCommand
+class SharpenCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Sharpen image

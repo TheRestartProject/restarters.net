@@ -5,12 +5,9 @@ namespace PhpParser;
 class Comment implements \JsonSerializable
 {
     protected $text;
-    protected $startLine;
-    protected $startFilePos;
-    protected $startTokenPos;
-    protected $endLine;
-    protected $endFilePos;
-    protected $endTokenPos;
+    protected $line;
+    protected $filePos;
+    protected $tokenPos;
 
     /**
      * Constructs a comment node.
@@ -21,17 +18,12 @@ class Comment implements \JsonSerializable
      * @param int    $startTokenPos Token offset the comment started on
      */
     public function __construct(
-        string $text,
-        int $startLine = -1, int $startFilePos = -1, int $startTokenPos = -1,
-        int $endLine = -1, int $endFilePos = -1, int $endTokenPos = -1
+        string $text, int $startLine = -1, int $startFilePos = -1, int $startTokenPos = -1
     ) {
         $this->text = $text;
-        $this->startLine = $startLine;
-        $this->startFilePos = $startFilePos;
-        $this->startTokenPos = $startTokenPos;
-        $this->endLine = $endLine;
-        $this->endFilePos = $endFilePos;
-        $this->endTokenPos = $endTokenPos;
+        $this->line = $startLine;
+        $this->filePos = $startFilePos;
+        $this->tokenPos = $startTokenPos;
     }
 
     /**
@@ -46,88 +38,28 @@ class Comment implements \JsonSerializable
     /**
      * Gets the line number the comment started on.
      *
-     * @return int Line number (or -1 if not available)
-     */
-    public function getStartLine() : int {
-        return $this->startLine;
-    }
-
-    /**
-     * Gets the file offset the comment started on.
-     *
-     * @return int File offset (or -1 if not available)
-     */
-    public function getStartFilePos() : int {
-        return $this->startFilePos;
-    }
-
-    /**
-     * Gets the token offset the comment started on.
-     *
-     * @return int Token offset (or -1 if not available)
-     */
-    public function getStartTokenPos() : int {
-        return $this->startTokenPos;
-    }
-
-    /**
-     * Gets the line number the comment ends on.
-     *
-     * @return int Line number (or -1 if not available)
-     */
-    public function getEndLine() : int {
-        return $this->endLine;
-    }
-
-    /**
-     * Gets the file offset the comment ends on.
-     *
-     * @return int File offset (or -1 if not available)
-     */
-    public function getEndFilePos() : int {
-        return $this->endFilePos;
-    }
-
-    /**
-     * Gets the token offset the comment ends on.
-     *
-     * @return int Token offset (or -1 if not available)
-     */
-    public function getEndTokenPos() : int {
-        return $this->endTokenPos;
-    }
-
-    /**
-     * Gets the line number the comment started on.
-     *
-     * @deprecated Use getStartLine() instead
-     *
      * @return int Line number
      */
     public function getLine() : int {
-        return $this->startLine;
+        return $this->line;
     }
 
     /**
      * Gets the file offset the comment started on.
-     *
-     * @deprecated Use getStartFilePos() instead
      *
      * @return int File offset
      */
     public function getFilePos() : int {
-        return $this->startFilePos;
+        return $this->filePos;
     }
 
     /**
      * Gets the token offset the comment started on.
      *
-     * @deprecated Use getStartTokenPos() instead
-     *
      * @return int Token offset
      */
     public function getTokenPos() : int {
-        return $this->startTokenPos;
+        return $this->tokenPos;
     }
 
     /**
@@ -227,13 +159,9 @@ class Comment implements \JsonSerializable
         return [
             'nodeType' => $type,
             'text' => $this->text,
-            // TODO: Rename these to include "start".
-            'line' => $this->startLine,
-            'filePos' => $this->startFilePos,
-            'tokenPos' => $this->startTokenPos,
-            'endLine' => $this->endLine,
-            'endFilePos' => $this->endFilePos,
-            'endTokenPos' => $this->endTokenPos,
+            'line' => $this->line,
+            'filePos' => $this->filePos,
+            'tokenPos' => $this->tokenPos,
         ];
     }
 }

@@ -4,9 +4,6 @@ namespace PhpParser\Builder;
 
 use PhpParser;
 use PhpParser\BuilderHelpers;
-use PhpParser\Node\Identifier;
-use PhpParser\Node\Name;
-use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt;
 
 class Property implements PhpParser\Builder
@@ -16,9 +13,6 @@ class Property implements PhpParser\Builder
     protected $flags = 0;
     protected $default = null;
     protected $attributes = [];
-
-    /** @var null|Identifier|Name|NullableType */
-    protected $type;
 
     /**
      * Creates a property builder.
@@ -102,19 +96,6 @@ class Property implements PhpParser\Builder
     }
 
     /**
-     * Sets the property type for PHP 7.4+.
-     *
-     * @param string|Name|NullableType|Identifier $type
-     *
-     * @return $this
-     */
-    public function setType($type) {
-        $this->type = BuilderHelpers::normalizeType($type);
-
-        return $this;
-    }
-
-    /**
      * Returns the built class node.
      *
      * @return Stmt\Property The built property node
@@ -125,8 +106,7 @@ class Property implements PhpParser\Builder
             [
                 new Stmt\PropertyProperty($this->name, $this->default)
             ],
-            $this->attributes,
-            $this->type
+            $this->attributes
         );
     }
 }

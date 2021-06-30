@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Imagick\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class InterlaceCommand extends AbstractCommand
+class InterlaceCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Toggles interlaced encoding mode

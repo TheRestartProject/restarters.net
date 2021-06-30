@@ -3,7 +3,6 @@
 namespace Intervention\Image\Gd;
 
 use Intervention\Image\AbstractColor;
-use Intervention\Image\Exception\NotSupportedException;
 
 class Color extends AbstractColor
 {
@@ -135,7 +134,7 @@ class Color extends AbstractColor
      */
     public function initFromObject($value)
     {
-        throw new NotSupportedException(
+        throw new \Intervention\Image\Exception\NotSupportedException(
             "GD colors cannot init from ImagickPixel objects."
         );
     }

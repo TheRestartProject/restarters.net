@@ -99,7 +99,7 @@ trait BuildsQueries
     /**
      * Pass the query to a given callback.
      *
-     * @param  callable  $callback
+     * @param  \Closure  $callback
      * @return \Illuminate\Database\Query\Builder
      */
     public function tap($callback)

@@ -33,7 +33,7 @@ class ListCommand extends Command
         $this
             ->setName('list')
             ->setDefinition($this->createDefinition())
-            ->setDescription('List commands')
+            ->setDescription('Lists commands')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command lists all commands:
 
@@ -69,21 +69,22 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $helper = new DescriptorHelper();
-        $helper->describe($output, $this->getApplication(), [
+        $helper->describe($output, $this->getApplication(), array(
             'format' => $input->getOption('format'),
             'raw_text' => $input->getOption('raw'),
             'namespace' => $input->getArgument('namespace'),
-        ]);
-
-        return 0;
+        ));
     }
 
-    private function createDefinition(): InputDefinition
+    /**
+     * {@inheritdoc}
+     */
+    private function createDefinition()
     {
-        return new InputDefinition([
+        return new InputDefinition(array(
             new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
             new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
             new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
-        ]);
+        ));
     }
 }

@@ -24,7 +24,7 @@ use Monolog\Logger;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class IntrospectionProcessor implements ProcessorInterface
+class IntrospectionProcessor
 {
     private $level;
 

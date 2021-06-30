@@ -2,6 +2,7 @@
 
 namespace Dotenv;
 
+use Dotenv\Exception\InvalidFileException;
 use Dotenv\Exception\InvalidPathException;
 
 /**
@@ -52,7 +53,6 @@ class Loader
      * Set immutable value.
      *
      * @param bool $immutable
-     *
      * @return $this
      */
     public function setImmutable($immutable = false)
@@ -74,8 +74,6 @@ class Loader
 
     /**
      * Load `.env` file in given directory.
-     *
-     * @throws \Dotenv\Exception\InvalidPathException|\Dotenv\Exception\InvalidFileException
      *
      * @return array
      */
@@ -120,8 +118,6 @@ class Loader
      * @param string $name
      * @param string $value
      *
-     * @throws \Dotenv\Exception\InvalidFileException
-     *
      * @return array
      */
     protected function normaliseEnvironmentVariable($name, $value)
@@ -140,8 +136,6 @@ class Loader
      *
      * @param string $name
      * @param string $value
-     *
-     * @throws \Dotenv\Exception\InvalidFileException
      *
      * @return array
      */
@@ -235,7 +229,42 @@ class Loader
             return array($name, $value);
         }
 
-        return array($name, Parser::parseValue($value));
+        if ($this->beginsWithAQuote($value)) { // value starts with a quote
+            $quote = $value[0];
+            $regexPattern = sprintf(
+                '/^
+                %1$s           # match a quote at the start of the value
+                (              # capturing sub-pattern used
+                 (?:           # we do not need to capture this
+                  [^%1$s\\\\]* # any character other than a quote or backslash
+                  |\\\\\\\\    # or two backslashes together
+                  |\\\\%1$s    # or an escaped quote e.g \"
+                 )*            # as many characters that match the previous rules
+                )              # end of the capturing sub-pattern
+                %1$s           # and the closing quote
+                .*$            # and discard any string after the closing quote
+                /mx',
+                $quote
+            );
+            $value = preg_replace($regexPattern, '$1', $value);
+            $value = str_replace("\\$quote", $quote, $value);
+            $value = str_replace('\\\\', '\\', $value);
+        } else {
+            $parts = explode(' #', $value, 2);
+            $value = trim($parts[0]);
+
+            // Unquoted values cannot contain whitespace
+            if (preg_match('/\s+/', $value) > 0) {
+                // Check if value is a comment (usually triggered when empty value with comment)
+                if (preg_match('/^#/', $value) > 0) {
+                    $value = '';
+                } else {
+                    throw new InvalidFileException('Dotenv values containing spaces must be surrounded by quotes.');
+                }
+            }
+        }
+
+        return array($name, trim($value));
     }
 
     /**
@@ -279,7 +308,21 @@ class Loader
      */
     protected function sanitiseVariableName($name, $value)
     {
-        return array(Parser::parseName($name), $value);
+        $name = trim(str_replace(array('export ', '\'', '"'), '', $name));
+
+        return array($name, $value);
+    }
+
+    /**
+     * Determine if the given string begins with a quote.
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
+    protected function beginsWithAQuote($value)
+    {
+        return isset($value[0]) && ($value[0] === '"' || $value[0] === '\'');
     }
 
     /**
@@ -298,7 +341,6 @@ class Loader
                 return $_SERVER[$name];
             default:
                 $value = getenv($name);
-
                 return $value === false ? null : $value; // switch getenv default to null
         }
     }
@@ -316,8 +358,6 @@ class Loader
      * @param string      $name
      * @param string|null $value
      *
-     * @throws \Dotenv\Exception\InvalidFileException
-     *
      * @return void
      */
     public function setEnvironmentVariable($name, $value = null)
@@ -334,7 +374,7 @@ class Loader
 
         // If PHP is running as an Apache module and an existing
         // Apache environment variable exists, overwrite it
-        if (function_exists('apache_getenv') && function_exists('apache_setenv') && apache_getenv($name) !== false) {
+        if (function_exists('apache_getenv') && function_exists('apache_setenv') && apache_getenv($name)) {
             apache_setenv($name, $value);
         }
 

@@ -29,8 +29,9 @@ class EventArgs
      * The benefit from this is that only one empty instance is instantiated and shared
      * (otherwise there would be instances for every dispatched in the abovementioned form).
      *
-     * @link https://msdn.microsoft.com/en-us/library/system.eventargs.aspx
      * @see EventManager::dispatchEvent
+     *
+     * @link https://msdn.microsoft.com/en-us/library/system.eventargs.aspx
      *
      * @return EventArgs
      */

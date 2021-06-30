@@ -30,25 +30,34 @@ class CombinationExtension extends AbstractExtension
      */
     public function getCombinationTranslators(): array
     {
-        return [
-            ' ' => [$this, 'translateDescendant'],
-            '>' => [$this, 'translateChild'],
-            '+' => [$this, 'translateDirectAdjacent'],
-            '~' => [$this, 'translateIndirectAdjacent'],
-        ];
+        return array(
+            ' ' => array($this, 'translateDescendant'),
+            '>' => array($this, 'translateChild'),
+            '+' => array($this, 'translateDirectAdjacent'),
+            '~' => array($this, 'translateIndirectAdjacent'),
+        );
     }
 
+    /**
+     * @return XPathExpr
+     */
     public function translateDescendant(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
         return $xpath->join('/descendant-or-self::*/', $combinedXpath);
     }
 
-    public function translateChild(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
+    /**
+     * @return XPathExpr
+     */
+    public function translateChild(XPathExpr $xpath, XPathExpr $combinedXpath)
     {
         return $xpath->join('/', $combinedXpath);
     }
 
-    public function translateDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
+    /**
+     * @return XPathExpr
+     */
+    public function translateDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath)
     {
         return $xpath
             ->join('/following-sibling::', $combinedXpath)
@@ -56,7 +65,10 @@ class CombinationExtension extends AbstractExtension
             ->addCondition('position() = 1');
     }
 
-    public function translateIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
+    /**
+     * @return XPathExpr
+     */
+    public function translateIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath)
     {
         return $xpath->join('/following-sibling::', $combinedXpath);
     }
@@ -64,7 +76,7 @@ class CombinationExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
+    public function getName()
     {
         return 'combination';
     }

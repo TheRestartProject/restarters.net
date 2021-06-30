@@ -6,7 +6,6 @@ interface DripInterface
     public function getCampaigns($params);
 	public function fetchCampaign($params);
 	public function getAccounts();
-	public function deleteSubscriber($params);
 	public function createOrUpdateSubscriber($params);
 	public function fetchSubscriber($params);
 	public function subscribeSubscriber($params);

@@ -58,12 +58,10 @@ trait AuthenticatesUsers
      *
      * @param  \Illuminate\Http\Request  $request
      * @return void
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     protected function validateLogin(Request $request)
     {
-        $request->validate([
+        $this->validate($request, [
             $this->username() => 'required|string',
             'password' => 'required|string',
         ]);

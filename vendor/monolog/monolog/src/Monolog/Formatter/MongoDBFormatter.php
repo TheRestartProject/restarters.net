@@ -11,8 +11,6 @@
 
 namespace Monolog\Formatter;
 
-use Monolog\Utils;
-
 /**
  * Formats a record for use with the MongoDBHandler.
  *
@@ -77,7 +75,7 @@ class MongoDBFormatter implements FormatterInterface
     protected function formatObject($value, $nestingLevel)
     {
         $objectVars = get_object_vars($value);
-        $objectVars['class'] = Utils::getClass($value);
+        $objectVars['class'] = get_class($value);
 
         return $this->formatArray($objectVars, $nestingLevel);
     }
@@ -85,9 +83,9 @@ class MongoDBFormatter implements FormatterInterface
     protected function formatException(\Exception $exception, $nestingLevel)
     {
         $formattedException = array(
-            'class' => Utils::getClass($exception),
+            'class' => get_class($exception),
             'message' => $exception->getMessage(),
-            'code' => (int) $exception->getCode(),
+            'code' => $exception->getCode(),
             'file' => $exception->getFile() . ':' . $exception->getLine(),
         );
 

@@ -3,7 +3,7 @@
 namespace Mediawiki\Api\Guzzle;
 
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -35,7 +35,7 @@ class MiddlewareFactory implements LoggerAwareInterface {
 	}
 
 	/**
-	 * @private
+	 * @access private
 	 *
 	 * @param bool $delay default to true, can be false to speed up tests
 	 *
@@ -67,7 +67,7 @@ class MiddlewareFactory implements LoggerAwareInterface {
 					return 1000 * $retryAfter;
 				}
 
-				if ( $retryAfter !== '' ) {
+				if ( $retryAfter ) {
 					$seconds = strtotime( $retryAfter ) - time();
 					return 1000 * max( 1, $seconds );
 				}
@@ -85,7 +85,7 @@ class MiddlewareFactory implements LoggerAwareInterface {
 			$retries,
 			Request $request,
 			Response $response = null,
-			TransferException $exception = null
+			RequestException $exception = null
 		) {
 			// Don't retry if we have run out of retries
 			if ( $retries >= 5 ) {
@@ -99,7 +99,7 @@ class MiddlewareFactory implements LoggerAwareInterface {
 				$shouldRetry = true;
 			}
 
-			if ( $response !== null ) {
+			if ( $response ) {
 				$data = json_decode( $response->getBody(), true );
 
 				// Retry on server errors
@@ -108,11 +108,10 @@ class MiddlewareFactory implements LoggerAwareInterface {
 				}
 
 				foreach ( $response->getHeader( 'Mediawiki-Api-Error' ) as $mediawikiApiErrorHeader ) {
-					$RetryAfterResponseHeaderLine = $response->getHeaderLine( 'Retry-After' );
 					if (
 						// Retry if the API explicitly tells us to:
 						// https://www.mediawiki.org/wiki/Manual:Maxlag_parameter
-						$RetryAfterResponseHeaderLine
+						$response->getHeaderLine( 'Retry-After' )
 						||
 						// Retry if we have a response with an API error worth retrying
 						in_array(
@@ -146,7 +145,7 @@ class MiddlewareFactory implements LoggerAwareInterface {
 						$request->getMethod(),
 						$request->getUri(),
 						$retries + 1,
-						$response !== null ? 'status code: ' . $response->getStatusCode() :
+						$response ? 'status code: ' . $response->getStatusCode() :
 							$exception->getMessage()
 					)
 				);

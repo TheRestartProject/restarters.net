@@ -22,7 +22,6 @@ class SessionCookieJar extends CookieJar
      */
     public function __construct($sessionKey, $storeSessionCookies = false)
     {
-        parent::__construct();
         $this->sessionKey = $sessionKey;
         $this->storeSessionCookies = $storeSessionCookies;
         $this->load();

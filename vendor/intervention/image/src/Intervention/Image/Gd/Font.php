@@ -2,7 +2,6 @@
 
 namespace Intervention\Image\Gd;
 
-use Intervention\Image\Exception\NotSupportedException;
 use Intervention\Image\Image;
 
 class Font extends \Intervention\Image\AbstractFont
@@ -28,7 +27,7 @@ class Font extends \Intervention\Image\AbstractFont
         $internalfont = is_numeric($internalfont) ? $internalfont : false;
 
         if ( ! in_array($internalfont, [1, 2, 3, 4, 5])) {
-            throw new NotSupportedException(
+            throw new \Intervention\Image\Exception\NotSupportedException(
                 sprintf('Internal GD font (%s) not available. Use only 1-5.', $internalfont)
             );
         }

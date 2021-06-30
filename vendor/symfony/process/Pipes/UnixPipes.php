@@ -35,16 +35,6 @@ class UnixPipes extends AbstractPipes
         parent::__construct($input);
     }
 
-    public function __sleep()
-    {
-        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
-    }
-
-    public function __wakeup()
-    {
-        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-    }
-
     public function __destruct()
     {
         $this->close();
@@ -53,69 +43,69 @@ class UnixPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function getDescriptors(): array
+    public function getDescriptors()
     {
         if (!$this->haveReadSupport) {
             $nullstream = fopen('/dev/null', 'c');
 
-            return [
-                ['pipe', 'r'],
+            return array(
+                array('pipe', 'r'),
                 $nullstream,
                 $nullstream,
-            ];
+            );
         }
 
         if ($this->ttyMode) {
-            return [
-                ['file', '/dev/tty', 'r'],
-                ['file', '/dev/tty', 'w'],
-                ['file', '/dev/tty', 'w'],
-            ];
+            return array(
+                array('file', '/dev/tty', 'r'),
+                array('file', '/dev/tty', 'w'),
+                array('file', '/dev/tty', 'w'),
+            );
         }
 
         if ($this->ptyMode && Process::isPtySupported()) {
-            return [
-                ['pty'],
-                ['pty'],
-                ['pty'],
-            ];
+            return array(
+                array('pty'),
+                array('pty'),
+                array('pty'),
+            );
         }
 
-        return [
-            ['pipe', 'r'],
-            ['pipe', 'w'], // stdout
-            ['pipe', 'w'], // stderr
-        ];
+        return array(
+            array('pipe', 'r'),
+            array('pipe', 'w'), // stdout
+            array('pipe', 'w'), // stderr
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFiles(): array
+    public function getFiles()
     {
-        return [];
+        return array();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function readAndWrite(bool $blocking, bool $close = false): array
+    public function readAndWrite($blocking, $close = false)
     {
         $this->unblock();
         $w = $this->write();
 
-        $read = $e = [];
+        $read = $e = array();
         $r = $this->pipes;
         unset($r[0]);
 
         // let's have a look if something changed in streams
-        set_error_handler([$this, 'handleError']);
+        set_error_handler(array($this, 'handleError'));
         if (($r || $w) && false === stream_select($r, $w, $e, 0, $blocking ? Process::TIMEOUT_PRECISION * 1E6 : 0)) {
             restore_error_handler();
             // if a system call has been interrupted, forget about it, let's try again
             // otherwise, an error occurred, let's reset pipes
             if (!$this->hasSystemCallBeenInterrupted()) {
-                $this->pipes = [];
+                $this->pipes = array();
             }
 
             return $read;
@@ -128,7 +118,7 @@ class UnixPipes extends AbstractPipes
             $read[$type = array_search($pipe, $this->pipes, true)] = '';
 
             do {
-                $data = @fread($pipe, self::CHUNK_SIZE);
+                $data = fread($pipe, self::CHUNK_SIZE);
                 $read[$type] .= $data;
             } while (isset($data[0]) && ($close || isset($data[self::CHUNK_SIZE - 1])));
 
@@ -148,7 +138,7 @@ class UnixPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function haveReadSupport(): bool
+    public function haveReadSupport()
     {
         return $this->haveReadSupport;
     }
@@ -156,7 +146,7 @@ class UnixPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function areOpen(): bool
+    public function areOpen()
     {
         return (bool) $this->pipes;
     }

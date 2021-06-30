@@ -2,10 +2,9 @@
 
 namespace Intervention\Image\Imagick\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
 use Intervention\Image\Imagick\Color;
 
-class TrimCommand extends AbstractCommand
+class TrimCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Trims away parts of an image

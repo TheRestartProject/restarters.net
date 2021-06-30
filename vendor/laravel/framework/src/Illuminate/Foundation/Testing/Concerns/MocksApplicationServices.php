@@ -98,7 +98,7 @@ trait MocksApplicationServices
     {
         $mock = Mockery::mock(EventsDispatcherContract::class)->shouldIgnoreMissing();
 
-        $mock->shouldReceive('dispatch')->andReturnUsing(function ($called) {
+        $mock->shouldReceive('fire', 'dispatch')->andReturnUsing(function ($called) {
             $this->firedEvents[] = $called;
         });
 
@@ -175,7 +175,7 @@ trait MocksApplicationServices
      */
     protected function withoutJobs()
     {
-        $mock = Mockery::mock(BusDispatcherContract::class)->shouldIgnoreMissing();
+        $mock = Mockery::mock(BusDispatcherContract::class);
 
         $mock->shouldReceive('dispatch', 'dispatchNow')->andReturnUsing(function ($dispatched) {
             $this->dispatchedJobs[] = $dispatched;

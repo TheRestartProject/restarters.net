@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Auth\Authenticatable;
-use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Foundation\Auth\Access\Authorizable;
@@ -16,5 +15,5 @@ class User extends Model implements
     AuthorizableContract,
     CanResetPasswordContract
 {
-    use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail;
+    use Authenticatable, Authorizable, CanResetPassword;
 }

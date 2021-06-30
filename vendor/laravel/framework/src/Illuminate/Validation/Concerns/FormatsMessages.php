@@ -377,7 +377,7 @@ trait FormatsMessages
      */
     protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters, $validator)
     {
-        [$class, $method] = Str::parseCallback($callback, 'replace');
+        list($class, $method) = Str::parseCallback($callback, 'replace');
 
         return call_user_func_array([$this->container->make($class), $method], array_slice(func_get_args(), 1));
     }

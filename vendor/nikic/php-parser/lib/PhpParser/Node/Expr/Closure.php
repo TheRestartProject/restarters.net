@@ -16,12 +16,10 @@ class Closure extends Expr implements FunctionLike
     public $params;
     /** @var ClosureUse[] use()s */
     public $uses;
-    /** @var null|Node\Identifier|Node\Name|Node\NullableType|Node\UnionType Return type */
+    /** @var null|Node\Identifier|Node\Name|Node\NullableType Return type */
     public $returnType;
     /** @var Node\Stmt[] Statements */
     public $stmts;
-    /** @var Node\AttributeGroup[] PHP attribute groups */
-    public $attrGroups;
 
     /**
      * Constructs a lambda function node.
@@ -33,11 +31,10 @@ class Closure extends Expr implements FunctionLike
      *                          'uses'       => array(): use()s
      *                          'returnType' => null   : Return type
      *                          'stmts'      => array(): Statements
-     *                          'attrGroups' => array(): PHP attributes groups
      * @param array $attributes Additional attributes
      */
     public function __construct(array $subNodes = [], array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->static = $subNodes['static'] ?? false;
         $this->byRef = $subNodes['byRef'] ?? false;
         $this->params = $subNodes['params'] ?? [];
@@ -45,11 +42,10 @@ class Closure extends Expr implements FunctionLike
         $returnType = $subNodes['returnType'] ?? null;
         $this->returnType = \is_string($returnType) ? new Node\Identifier($returnType) : $returnType;
         $this->stmts = $subNodes['stmts'] ?? [];
-        $this->attrGroups = $subNodes['attrGroups'] ?? [];
     }
 
     public function getSubNodeNames() : array {
-        return ['attrGroups', 'static', 'byRef', 'params', 'uses', 'returnType', 'stmts'];
+        return ['static', 'byRef', 'params', 'uses', 'returnType', 'stmts'];
     }
 
     public function returnsByRef() : bool {
@@ -68,11 +64,7 @@ class Closure extends Expr implements FunctionLike
     public function getStmts() : array {
         return $this->stmts;
     }
-
-    public function getAttrGroups() : array {
-        return $this->attrGroups;
-    }
-
+    
     public function getType() : string {
         return 'Expr_Closure';
     }

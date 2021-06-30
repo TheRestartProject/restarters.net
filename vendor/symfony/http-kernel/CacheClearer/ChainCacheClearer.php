@@ -22,7 +22,7 @@ class ChainCacheClearer implements CacheClearerInterface
 {
     private $clearers;
 
-    public function __construct(iterable $clearers = [])
+    public function __construct(iterable $clearers = array())
     {
         $this->clearers = $clearers;
     }

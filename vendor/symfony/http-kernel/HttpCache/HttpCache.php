@@ -32,22 +32,15 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private $request;
     private $surrogate;
     private $surrogateCacheStrategy;
-    private $options = [];
-    private $traces = [];
+    private $options = array();
+    private $traces = array();
 
     /**
      * Constructor.
      *
      * The available options are:
      *
-     *   * debug                  If true, exceptions are thrown when things go wrong. Otherwise, the cache
-     *                            will try to carry on and deliver a meaningful response.
-     *
-     *   * trace_level            May be one of 'none', 'short' and 'full'. For 'short', a concise trace of the
-     *                            master request will be added as an HTTP header. 'full' will add traces for all
-     *                            requests (including ESI subrequests). (default: 'full' if in debug; 'none' otherwise)
-     *
-     *   * trace_header           Header name to use for traces. (default: X-Symfony-Cache)
+     *   * debug:                 If true, the traces are added as a HTTP header to ease debugging
      *
      *   * default_ttl            The number of seconds that a cache entry should be considered
      *                            fresh when no explicit freshness information is provided in
@@ -77,36 +70,30 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *                            This setting is overridden by the stale-if-error HTTP Cache-Control extension
      *                            (see RFC 5861).
      */
-    public function __construct(HttpKernelInterface $kernel, StoreInterface $store, SurrogateInterface $surrogate = null, array $options = [])
+    public function __construct(HttpKernelInterface $kernel, StoreInterface $store, SurrogateInterface $surrogate = null, array $options = array())
     {
         $this->store = $store;
         $this->kernel = $kernel;
         $this->surrogate = $surrogate;
 
         // needed in case there is a fatal error because the backend is too slow to respond
-        register_shutdown_function([$this->store, 'cleanup']);
+        register_shutdown_function(array($this->store, 'cleanup'));
 
-        $this->options = array_merge([
+        $this->options = array_merge(array(
             'debug' => false,
             'default_ttl' => 0,
-            'private_headers' => ['Authorization', 'Cookie'],
+            'private_headers' => array('Authorization', 'Cookie'),
             'allow_reload' => false,
             'allow_revalidate' => false,
             'stale_while_revalidate' => 2,
             'stale_if_error' => 60,
-            'trace_level' => 'none',
-            'trace_header' => 'X-Symfony-Cache',
-        ], $options);
-
-        if (!isset($options['trace_level'])) {
-            $this->options['trace_level'] = $this->options['debug'] ? 'full' : 'none';
-        }
+        ), $options);
     }
 
     /**
      * Gets the current store.
      *
-     * @return StoreInterface A StoreInterface instance
+     * @return StoreInterface $store A StoreInterface instance
      */
     public function getStore()
     {
@@ -123,23 +110,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         return $this->traces;
     }
 
-    private function addTraces(Response $response)
-    {
-        $traceString = null;
-
-        if ('full' === $this->options['trace_level']) {
-            $traceString = $this->getLog();
-        }
-
-        if ('short' === $this->options['trace_level'] && $masterId = array_key_first($this->traces)) {
-            $traceString = implode('/', $this->traces[$masterId]);
-        }
-
-        if (null !== $traceString) {
-            $response->headers->add([$this->options['trace_header'] => $traceString]);
-        }
-    }
-
     /**
      * Returns a log message for the events of the last request processing.
      *
@@ -147,7 +117,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     public function getLog()
     {
-        $log = [];
+        $log = array();
         foreach ($this->traces as $request => $traces) {
             $log[] = sprintf('%s: %s', $request, implode(', ', $traces));
         }
@@ -194,7 +164,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     {
         // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-in error page mechanism
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
-            $this->traces = [];
+            $this->traces = array();
             // Keep a clone of the original request for surrogates so they can access it.
             // We must clone here to get a separate instance because the application will modify the request during
             // the application flow (we know it always does because we do ourselves by setting REMOTE_ADDR to 127.0.0.1
@@ -205,9 +175,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             }
         }
 
-        $this->traces[$this->getTraceKey($request)] = [];
+        $this->traces[$this->getTraceKey($request)] = array();
 
-        if (!$request->isMethodSafe()) {
+        if (!$request->isMethodSafe(false)) {
             $response = $this->invalidate($request, $catch);
         } elseif ($request->headers->has('expect') || !$request->isMethodCacheable()) {
             $response = $this->pass($request, $catch);
@@ -224,8 +194,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         $this->restoreResponseBody($request, $response);
 
-        if (HttpKernelInterface::MASTER_REQUEST === $type) {
-            $this->addTraces($response);
+        if (HttpKernelInterface::MASTER_REQUEST === $type && $this->options['debug']) {
+            $response->headers->set('X-Symfony-Cache', $this->getLog());
         }
 
         if (null !== $this->surrogate) {
@@ -256,7 +226,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Forwards the Request to the backend without storing the Response in the cache.
      *
-     * @param bool $catch Whether to process exceptions
+     * @param Request $request A Request instance
+     * @param bool    $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      */
@@ -270,7 +241,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Invalidates non-safe methods (like POST, PUT, and DELETE).
      *
-     * @param bool $catch Whether to process exceptions
+     * @param Request $request A Request instance
+     * @param bool    $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      *
@@ -288,9 +260,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
                 $this->store->invalidate($request);
 
                 // As per the RFC, invalidate Location and Content-Location URLs if present
-                foreach (['Location', 'Content-Location'] as $header) {
+                foreach (array('Location', 'Content-Location') as $header) {
                     if ($uri = $response->headers->get($header)) {
-                        $subRequest = Request::create($uri, 'get', [], [], [], $request->server->all());
+                        $subRequest = Request::create($uri, 'get', array(), array(), array(), $request->server->all());
 
                         $this->store->invalidate($subRequest);
                     }
@@ -318,7 +290,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * the backend using conditional GET. When no matching cache entry is found,
      * it triggers "miss" processing.
      *
-     * @param bool $catch Whether to process exceptions
+     * @param Request $request A Request instance
+     * @param bool    $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      *
@@ -350,10 +323,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             return $this->validate($request, $entry, $catch);
         }
 
-        if ($entry->headers->hasCacheControlDirective('no-cache')) {
-            return $this->validate($request, $entry, $catch);
-        }
-
         $this->record($request, 'fresh');
 
         $entry->headers->set('Age', $entry->getAge());
@@ -367,7 +336,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * The original request is used as a template for a conditional
      * GET request with the backend.
      *
-     * @param bool $catch Whether to process exceptions
+     * @param Request  $request A Request instance
+     * @param Response $entry   A Response instance to validate
+     * @param bool     $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      */
@@ -381,14 +352,12 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         }
 
         // add our cached last-modified validator
-        if ($entry->headers->has('Last-Modified')) {
-            $subRequest->headers->set('if_modified_since', $entry->headers->get('Last-Modified'));
-        }
+        $subRequest->headers->set('if_modified_since', $entry->headers->get('Last-Modified'));
 
         // Add our cached etag validator to the environment.
         // We keep the etags from the client to handle the case when the client
         // has a different private valid entry which is not cached here.
-        $cachedEtags = $entry->getEtag() ? [$entry->getEtag()] : [];
+        $cachedEtags = $entry->getEtag() ? array($entry->getEtag()) : array();
         $requestEtags = $request->getETags();
         if ($etags = array_unique(array_merge($cachedEtags, $requestEtags))) {
             $subRequest->headers->set('if_none_match', implode(', ', $etags));
@@ -408,7 +377,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $entry = clone $entry;
             $entry->headers->remove('Date');
 
-            foreach (['Date', 'Expires', 'Cache-Control', 'ETag', 'Last-Modified'] as $name) {
+            foreach (array('Date', 'Expires', 'Cache-Control', 'ETag', 'Last-Modified') as $name) {
                 if ($response->headers->has($name)) {
                     $entry->headers->set($name, $response->headers->get($name));
                 }
@@ -430,7 +399,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Unconditionally fetches a fresh response from the backend and
      * stores it in the cache if is cacheable.
      *
-     * @param bool $catch Whether to process exceptions
+     * @param Request $request A Request instance
+     * @param bool    $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      */
@@ -462,8 +432,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * All backend requests (cache passes, fetches, cache validations)
      * run through this method.
      *
-     * @param bool          $catch Whether to catch exceptions or not
-     * @param Response|null $entry A Response instance (the stale entry if present, null otherwise)
+     * @param Request  $request A Request instance
+     * @param bool     $catch   Whether to catch exceptions or not
+     * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
      *
      * @return Response A Response instance
      */
@@ -476,37 +447,13 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         // always a "master" request (as the real master request can be in cache)
         $response = SubRequestHandler::handle($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $catch);
 
-        /*
-         * Support stale-if-error given on Responses or as a config option.
-         * RFC 7234 summarizes in Section 4.2.4 (but also mentions with the individual
-         * Cache-Control directives) that
-         *
-         *      A cache MUST NOT generate a stale response if it is prohibited by an
-         *      explicit in-protocol directive (e.g., by a "no-store" or "no-cache"
-         *      cache directive, a "must-revalidate" cache-response-directive, or an
-         *      applicable "s-maxage" or "proxy-revalidate" cache-response-directive;
-         *      see Section 5.2.2).
-         *
-         * https://tools.ietf.org/html/rfc7234#section-4.2.4
-         *
-         * We deviate from this in one detail, namely that we *do* serve entries in the
-         * stale-if-error case even if they have a `s-maxage` Cache-Control directive.
-         */
-        if (null !== $entry
-            && \in_array($response->getStatusCode(), [500, 502, 503, 504])
-            && !$entry->headers->hasCacheControlDirective('no-cache')
-            && !$entry->mustRevalidate()
-        ) {
+        // we don't implement the stale-if-error on Requests, which is nonetheless part of the RFC
+        if (null !== $entry && \in_array($response->getStatusCode(), array(500, 502, 503, 504))) {
             if (null === $age = $entry->headers->getCacheControlDirective('stale-if-error')) {
                 $age = $this->options['stale_if_error'];
             }
 
-            /*
-             * stale-if-error gives the (extra) time that the Response may be used *after* it has become stale.
-             * So we compare the time the $entry has been sitting in the cache already with the
-             * time it was fresh plus the allowed grace period.
-             */
-            if ($entry->getAge() <= $entry->getMaxAge() + $age) {
+            if (abs($entry->getTtl()) < $age) {
                 $this->record($request, 'stale-if-error');
 
                 return $entry;
@@ -665,8 +612,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Checks if the Request includes authorization or other sensitive information
      * that should cause the Response to be considered private by default.
+     *
+     * @return bool true if the Request is private, false otherwise
      */
-    private function isPrivateRequest(Request $request): bool
+    private function isPrivateRequest(Request $request)
     {
         foreach ($this->options['private_headers'] as $key) {
             $key = strtolower(str_replace('HTTP_', '', $key));

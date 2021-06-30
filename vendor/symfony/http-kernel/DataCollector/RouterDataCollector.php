@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
+ * RouterDataCollector.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouterDataCollector extends DataCollector
@@ -33,12 +35,8 @@ class RouterDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
-     *
-     * @param \Throwable|null $exception
-     *
-     * @final since Symfony 4.4
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         if ($response instanceof RedirectResponse) {
             $this->data['redirect'] = true;
@@ -56,11 +54,11 @@ class RouterDataCollector extends DataCollector
     {
         $this->controllers = new \SplObjectStorage();
 
-        $this->data = [
+        $this->data = array(
             'redirect' => false,
             'url' => null,
             'route' => null,
-        ];
+        );
     }
 
     protected function guessRoute(Request $request, $controller)
@@ -70,8 +68,6 @@ class RouterDataCollector extends DataCollector
 
     /**
      * Remembers the controller associated to each request.
-     *
-     * @final since Symfony 4.3
      */
     public function onKernelController(FilterControllerEvent $event)
     {

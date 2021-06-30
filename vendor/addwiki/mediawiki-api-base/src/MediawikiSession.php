@@ -103,7 +103,7 @@ class MediawikiSession implements LoggerAwareInterface {
 		// If mw<1.25 (no new module)
 		$metaWarning = "Unrecognized value for parameter 'meta': tokens";
 		if ( isset( $result['warnings']['query']['*'] )
-			&& strpos( $result['warnings']['query']['*'], $metaWarning ) !== false ) {
+			&& false !== strpos( $result['warnings']['query']['*'], $metaWarning ) ) {
 			$this->usePre125TokensModule = true;
 			$this->logger->log( LogLevel::DEBUG, 'Falling back to pre 1.25 token system' );
 			$this->tokens[$type] = $this->reallyGetPre125Token( $type );
@@ -141,13 +141,16 @@ class MediawikiSession implements LoggerAwareInterface {
 	/**
 	 * Tries to guess an old token type from a new token type
 	 *
-	 * @param string $type
+	 * @param $type
 	 *
 	 * @return string
 	 */
 	private function getOldTokenType( $type ) {
-		if ( $type === 'csrf' ) {
-			return 'edit';
+		switch ( $type ) {
+			// Guess that we want an edit token, this may not always work as we might be trying to
+			// use it for something else...
+			case 'csrf':
+				return 'edit';
 		}
 		return $type;
 	}

@@ -43,11 +43,11 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
     protected function write(array $record)
     {
         // Accumulate records
-        static::$records[] = $record;
+        self::$records[] = $record;
 
         // Register shutdown handler if not already done
-        if (!static::$initialized) {
-            static::$initialized = true;
+        if (!self::$initialized) {
+            self::$initialized = true;
             $this->registerShutdownFunction();
         }
     }
@@ -58,37 +58,27 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
      */
     public static function send()
     {
-        $format = static::getResponseFormat();
+        $format = self::getResponseFormat();
         if ($format === 'unknown') {
             return;
         }
 
-        if (count(static::$records)) {
+        if (count(self::$records)) {
             if ($format === 'html') {
-                static::writeOutput('<script>' . static::generateScript() . '</script>');
+                self::writeOutput('<script>' . self::generateScript() . '</script>');
             } elseif ($format === 'js') {
-                static::writeOutput(static::generateScript());
+                self::writeOutput(self::generateScript());
             }
-            static::resetStatic();
+            self::reset();
         }
-    }
-
-    public function close()
-    {
-        self::resetStatic();
-    }
-
-    public function reset()
-    {
-        self::resetStatic();
     }
 
     /**
      * Forget all logged records
      */
-    public static function resetStatic()
+    public static function reset()
     {
-        static::$records = array();
+        self::$records = array();
     }
 
     /**
@@ -143,18 +133,18 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
     private static function generateScript()
     {
         $script = array();
-        foreach (static::$records as $record) {
-            $context = static::dump('Context', $record['context']);
-            $extra = static::dump('Extra', $record['extra']);
+        foreach (self::$records as $record) {
+            $context = self::dump('Context', $record['context']);
+            $extra = self::dump('Extra', $record['extra']);
 
             if (empty($context) && empty($extra)) {
-                $script[] = static::call_array('log', static::handleStyles($record['formatted']));
+                $script[] = self::call_array('log', self::handleStyles($record['formatted']));
             } else {
                 $script = array_merge($script,
-                    array(static::call_array('groupCollapsed', static::handleStyles($record['formatted']))),
+                    array(self::call_array('groupCollapsed', self::handleStyles($record['formatted']))),
                     $context,
                     $extra,
-                    array(static::call('groupEnd'))
+                    array(self::call('groupEnd'))
                 );
             }
         }
@@ -164,22 +154,21 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
 
     private static function handleStyles($formatted)
     {
-        $args = array();
+        $args = array(self::quote('font-weight: normal'));
         $format = '%c' . $formatted;
         preg_match_all('/\[\[(.*?)\]\]\{([^}]*)\}/s', $format, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
 
         foreach (array_reverse($matches) as $match) {
+            $args[] = self::quote(self::handleCustomStyles($match[2][0], $match[1][0]));
             $args[] = '"font-weight: normal"';
-            $args[] = static::quote(static::handleCustomStyles($match[2][0], $match[1][0]));
 
             $pos = $match[0][1];
             $format = substr($format, 0, $pos) . '%c' . $match[1][0] . '%c' . substr($format, $pos + strlen($match[0][0]));
         }
 
-        $args[] = static::quote('font-weight: normal');
-        $args[] = static::quote($format);
+        array_unshift($args, self::quote($format));
 
-        return array_reverse($args);
+        return $args;
     }
 
     private static function handleCustomStyles($style, $string)
@@ -209,13 +198,13 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
         if (empty($dict)) {
             return $script;
         }
-        $script[] = static::call('log', static::quote('%c%s'), static::quote('font-weight: bold'), static::quote($title));
+        $script[] = self::call('log', self::quote('%c%s'), self::quote('font-weight: bold'), self::quote($title));
         foreach ($dict as $key => $value) {
             $value = json_encode($value);
             if (empty($value)) {
-                $value = static::quote('');
+                $value = self::quote('');
             }
-            $script[] = static::call('log', static::quote('%s: %o'), static::quote($key), $value);
+            $script[] = self::call('log', self::quote('%s: %o'), self::quote($key), $value);
         }
 
         return $script;
@@ -231,7 +220,7 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
         $args = func_get_args();
         $method = array_shift($args);
 
-        return static::call_array($method, $args);
+        return self::call_array($method, $args);
     }
 
     private static function call_array($method, array $args)

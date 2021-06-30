@@ -36,7 +36,7 @@ class RedisHandler extends AbstractProcessingHandler
      * @param string                $key     The key name to push records to
      * @param int                   $level   The minimum logging level at which this handler will be triggered
      * @param bool                  $bubble  Whether the messages that are handled can bubble up the stack or not
-     * @param int|false             $capSize Number of entries to limit list size to
+     * @param int                   $capSize Number of entries to limit list size to
      */
     public function __construct($redis, $key, $level = Logger::DEBUG, $bubble = true, $capSize = false)
     {
@@ -73,8 +73,7 @@ class RedisHandler extends AbstractProcessingHandler
     protected function writeCapped(array $record)
     {
         if ($this->redisClient instanceof \Redis) {
-            $mode = defined('\Redis::MULTI') ? \Redis::MULTI : 1;
-            $this->redisClient->multi($mode)
+            $this->redisClient->multi()
                 ->rpush($this->redisKey, $record["formatted"])
                 ->ltrim($this->redisKey, -$this->capSize, -1)
                 ->exec();

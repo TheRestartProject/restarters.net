@@ -15,12 +15,9 @@ use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\SlackWebhookHandler;
-use Monolog\Handler\WhatFailureGroupHandler;
 
 class LogManager implements LoggerInterface
 {
-    use ParsesLogConfiguration;
-
     /**
      * The application instance.
      *
@@ -41,6 +38,22 @@ class LogManager implements LoggerInterface
      * @var array
      */
     protected $customCreators = [];
+
+    /**
+     * The Log levels.
+     *
+     * @var array
+     */
+    protected $levels = [
+        'debug' => Monolog::DEBUG,
+        'info' => Monolog::INFO,
+        'notice' => Monolog::NOTICE,
+        'warning' => Monolog::WARNING,
+        'error' => Monolog::ERROR,
+        'critical' => Monolog::CRITICAL,
+        'alert' => Monolog::ALERT,
+        'emergency' => Monolog::EMERGENCY,
+    ];
 
     /**
      * Create a new Log manager instance.
@@ -121,7 +134,7 @@ class LogManager implements LoggerInterface
     protected function tap($name, Logger $logger)
     {
         foreach ($this->configurationFor($name)['tap'] ?? [] as $tap) {
-            [$class, $arguments] = $this->parseTap($tap);
+            list($class, $arguments) = $this->parseTap($tap);
 
             $this->app->make($class)->__invoke($logger, ...explode(',', $arguments));
         }
@@ -217,10 +230,6 @@ class LogManager implements LoggerInterface
             return $this->channel($channel)->getHandlers();
         })->all();
 
-        if ($config['ignore_exceptions'] ?? false) {
-            $handlers = [new WhatFailureGroupHandler($handlers)];
-        }
-
         return new Monolog($this->parseChannel($config), $handlers);
     }
 
@@ -237,7 +246,7 @@ class LogManager implements LoggerInterface
                 new StreamHandler(
                     $config['path'], $this->level($config),
                     $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-                ), $config
+                )
             ),
         ]);
     }
@@ -254,7 +263,7 @@ class LogManager implements LoggerInterface
             $this->prepareHandler(new RotatingFileHandler(
                 $config['path'], $config['days'] ?? 7, $this->level($config),
                 $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-            ), $config),
+            )),
         ]);
     }
 
@@ -275,10 +284,8 @@ class LogManager implements LoggerInterface
                 $config['emoji'] ?? ':boom:',
                 $config['short'] ?? false,
                 $config['context'] ?? true,
-                $this->level($config),
-                $config['bubble'] ?? true,
-                $config['exclude_fields'] ?? []
-            ), $config),
+                $this->level($config)
+            )),
         ]);
     }
 
@@ -292,8 +299,8 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
-                $this->app['config']['app.name'], $config['facility'] ?? LOG_USER, $this->level($config)
-            ), $config),
+                $this->app['config']['app.name'], $config['facility'] ?? LOG_USER, $this->level($config))
+            ),
         ]);
     }
 
@@ -307,8 +314,8 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new ErrorLogHandler(
-                $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config)
-            )),
+                $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config))
+            ),
         ]);
     }
 
@@ -329,10 +336,7 @@ class LogManager implements LoggerInterface
             );
         }
 
-        $with = array_merge(
-            $config['with'] ?? [],
-            $config['handler_with'] ?? []
-        );
+        $with = array_merge($config['with'] ?? [], $config['handler_with'] ?? []);
 
         return new Monolog($this->parseChannel($config), [$this->prepareHandler(
             $this->app->make($config['handler'], $with), $config
@@ -385,13 +389,37 @@ class LogManager implements LoggerInterface
     }
 
     /**
-     * Get fallback log channel name.
+     * Extract the log channel from the given configuration.
      *
+     * @param  array  $config
      * @return string
      */
-    protected function getFallbackChannelName()
+    protected function parseChannel(array $config)
     {
-        return $this->app->bound('env') ? $this->app->environment() : 'production';
+        if (! isset($config['name'])) {
+            return $this->app->bound('env') ? $this->app->environment() : 'production';
+        }
+
+        return $config['name'];
+    }
+
+    /**
+     * Parse the string level into a Monolog constant.
+     *
+     * @param  array  $config
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function level(array $config)
+    {
+        $level = $config['level'] ?? 'debug';
+
+        if (isset($this->levels[$level])) {
+            return $this->levels[$level];
+        }
+
+        throw new InvalidArgumentException('Invalid log level.');
     }
 
     /**
@@ -450,7 +478,7 @@ class LogManager implements LoggerInterface
      */
     public function emergency($message, array $context = [])
     {
-        $this->driver()->emergency($message, $context);
+        return $this->driver()->emergency($message, $context);
     }
 
     /**
@@ -466,7 +494,7 @@ class LogManager implements LoggerInterface
      */
     public function alert($message, array $context = [])
     {
-        $this->driver()->alert($message, $context);
+        return $this->driver()->alert($message, $context);
     }
 
     /**
@@ -481,7 +509,7 @@ class LogManager implements LoggerInterface
      */
     public function critical($message, array $context = [])
     {
-        $this->driver()->critical($message, $context);
+        return $this->driver()->critical($message, $context);
     }
 
     /**
@@ -495,7 +523,7 @@ class LogManager implements LoggerInterface
      */
     public function error($message, array $context = [])
     {
-        $this->driver()->error($message, $context);
+        return $this->driver()->error($message, $context);
     }
 
     /**
@@ -511,7 +539,7 @@ class LogManager implements LoggerInterface
      */
     public function warning($message, array $context = [])
     {
-        $this->driver()->warning($message, $context);
+        return $this->driver()->warning($message, $context);
     }
 
     /**
@@ -524,7 +552,7 @@ class LogManager implements LoggerInterface
      */
     public function notice($message, array $context = [])
     {
-        $this->driver()->notice($message, $context);
+        return $this->driver()->notice($message, $context);
     }
 
     /**
@@ -539,7 +567,7 @@ class LogManager implements LoggerInterface
      */
     public function info($message, array $context = [])
     {
-        $this->driver()->info($message, $context);
+        return $this->driver()->info($message, $context);
     }
 
     /**
@@ -552,7 +580,7 @@ class LogManager implements LoggerInterface
      */
     public function debug($message, array $context = [])
     {
-        $this->driver()->debug($message, $context);
+        return $this->driver()->debug($message, $context);
     }
 
     /**
@@ -566,7 +594,7 @@ class LogManager implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
-        $this->driver()->log($level, $message, $context);
+        return $this->driver()->log($level, $message, $context);
     }
 
     /**

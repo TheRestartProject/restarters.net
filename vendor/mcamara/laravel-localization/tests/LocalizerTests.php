@@ -25,7 +25,7 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         ];
     }
 
-    public function setUp(): void
+    public function setUp()
     {
         parent::setUp();
     }
@@ -87,41 +87,6 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
     {
         parent::refreshApplication();
         $this->setRoutes($locale);
-    }
-
-    /**
-     * Create fake request
-     * @param  [type] $method     [description]
-     * @param  [type] $content    [description]
-     * @param  string $uri        [description]
-     * @param  array  $server     [description]
-     * @param  array  $parameters [description]
-     * @param  array  $cookies    [description]
-     * @param  array  $files      [description]
-     * @return [type]             [description]
-     */
-    protected function createRequest(
-        $uri = '/test',
-        $method = 'GET',
-        $parameters = [],
-        $cookies = [],
-        $files = [],
-        $server = ['CONTENT_TYPE' => 'application/json'],
-        $content = null
-    )
-    {
-        $request = new \Illuminate\Http\Request;
-        return $request->createFromBase(
-            \Symfony\Component\HttpFoundation\Request::create(
-                $uri,
-                'GET',
-                [],
-                [],
-                [],
-                $server,
-                $content
-            )
-        );
     }
 
     /**
@@ -322,34 +287,6 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         $this->assertEquals(
             $this->test_url.'es/test?a=1',
             app('laravellocalization')->getLocalizedURL('es', $this->test_url.'test?a=1')
-        );
-    }
-
-    public function testGetLocalizedURLWithQueryStringAndhideDefaultLocaleInURL()
-    {
-        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
-         app()['request'] = $this->createRequest(
-            $uri = 'en/about?q=2'
-        );
-        $laravelLocalization = new \Mcamara\LaravelLocalization\LaravelLocalization();
-        $laravelLocalization->transRoute('LaravelLocalization::routes.about');
-
-        $this->assertEquals(
-            $this->test_url . 'about?q=2',
-            $laravelLocalization->getLocalizedURL()
-        );
-    }
-
-    public function testGetLocalizedURLWithQueryStringAndNotTranslatedRoute()
-    {
-         app()['request'] = $this->createRequest(
-            $uri = 'en/about?q=2'
-        );
-        $laravelLocalization = new \Mcamara\LaravelLocalization\LaravelLocalization();
-
-        $this->assertEquals(
-            $this->test_url . 'en/about?q=2',
-            $laravelLocalization->getLocalizedURL()
         );
     }
 
@@ -589,21 +526,6 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         $this->assertEquals(
             $this->test_url.'en/view/1',
             app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view', ['id' => 1])
-        );
-    }
-
-    public function testLocalizedParameterFromTranslateUrl()
-    {
-        $model = new ModelWithTranslatableRoutes();
-
-        $this->assertEquals(
-            $this->test_url.'en/view/company',
-            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view', ['id' => $model])
-        );
-
-        $this->assertEquals(
-            $this->test_url.'es/ver/empresa',
-            app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view', ['id' => $model])
         );
     }
 
@@ -864,20 +786,4 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         $this->assertEquals($must_resolve_to, $language);
     }
 
-    public function testSetLocaleWithMapping()
-    {
-        app('config')->set('laravellocalization.localesMapping', [
-            'en' => 'custom',
-        ]);
-
-        $this->assertEquals('custom', app('laravellocalization')->setLocale('custom'));
-        $this->assertEquals('en', app('laravellocalization')->getCurrentLocale());
-
-        $this->assertTrue(app('laravellocalization')->checkLocaleInSupportedLocales('en'));
-        $this->assertTrue(app('laravellocalization')->checkLocaleInSupportedLocales('custom'));
-
-        $this->assertEquals('http://localhost/custom/some-route', app('laravellocalization')->localizeURL('some-route', 'en'));
-        $this->assertEquals('http://localhost/custom/some-route', app('laravellocalization')->localizeURL('some-route', 'custom'));
-        $this->assertEquals('http://localhost/custom', app('laravellocalization')->localizeURL('http://localhost/custom', 'en'));
-    }
 }

@@ -11,39 +11,22 @@
 
 namespace Symfony\Component\Translation;
 
-use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Contracts\Translation\TranslatorTrait;
-
 /**
  * IdentityTranslator does not translate anything.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterface
+class IdentityTranslator implements TranslatorInterface
 {
-    use TranslatorTrait {
-        trans as private doTrans;
-        setLocale as private doSetLocale;
-    }
-
     private $selector;
-
-    public function __construct(MessageSelector $selector = null)
-    {
-        $this->selector = $selector;
-
-        if (__CLASS__ !== static::class) {
-            @trigger_error(sprintf('Calling "%s()" is deprecated since Symfony 4.2.', __METHOD__), \E_USER_DEPRECATED);
-        }
-    }
+    private $locale;
 
     /**
-     * {@inheritdoc}
+     * @param MessageSelector|null $selector The message selector for pluralization
      */
-    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    public function __construct(MessageSelector $selector = null)
     {
-        return $this->doTrans($id, $parameters, $domain, $locale);
+        $this->selector = $selector ?: new MessageSelector();
     }
 
     /**
@@ -51,27 +34,30 @@ class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterfa
      */
     public function setLocale($locale)
     {
-        $this->doSetLocale($locale);
+        $this->locale = $locale;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @deprecated since Symfony 4.2, use the trans() method instead with a %count% parameter
      */
-    public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
+    public function getLocale()
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%%count%%" parameter.', __METHOD__), \E_USER_DEPRECATED);
-
-        if ($this->selector) {
-            return strtr($this->selector->choose((string) $id, $number, $locale ?: $this->getLocale()), $parameters);
-        }
-
-        return $this->trans($id, ['%count%' => $number] + $parameters, $domain, $locale);
+        return $this->locale ?: \Locale::getDefault();
     }
 
-    private function getPluralizationRule(float $number, string $locale): int
+    /**
+     * {@inheritdoc}
+     */
+    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
-        return PluralizationRules::get($number, $locale, false);
+        return strtr((string) $id, $parameters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    {
+        return strtr($this->selector->choose((string) $id, (int) $number, $locale ?: $this->getLocale()), $parameters);
     }
 }

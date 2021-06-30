@@ -71,9 +71,7 @@ class CallbackEvent extends Event
         parent::callBeforeCallbacks($container);
 
         try {
-            $response = is_object($this->callback)
-                        ? $container->call([$this->callback, '__invoke'], $this->parameters)
-                        : $container->call($this->callback, $this->parameters);
+            $response = $container->call($this->callback, $this->parameters);
         } finally {
             $this->removeMutex();
 

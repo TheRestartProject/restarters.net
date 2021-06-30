@@ -5,8 +5,6 @@ namespace League\Flysystem;
 use League\Flysystem\Util\MimeType;
 use LogicException;
 
-use function strcmp;
-
 class Util
 {
     /**
@@ -104,7 +102,8 @@ class Util
     public static function normalizeRelativePath($path)
     {
         $path = str_replace('\\', '/', $path);
-        $path =  static::removeFunkyWhiteSpace($path);
+        $path = static::removeFunkyWhiteSpace($path);
+
         $parts = [];
 
         foreach (explode('/', $path) as $part) {
@@ -128,22 +127,21 @@ class Util
             }
         }
 
-        $path = implode('/', $parts);
-
-        return $path;
+        return implode('/', $parts);
     }
 
     /**
-     * Rejects unprintable characters and invalid unicode characters.
+     * Removes unprintable characters and invalid unicode characters.
      *
      * @param string $path
      *
      * @return string $path
      */
-    protected static function removeFunkyWhiteSpace($path)
-    {
-        if (preg_match('#\p{C}+#u', $path)) {
-            throw CorruptedPathDetected::forPath($path);
+    protected static function removeFunkyWhiteSpace($path) {
+        // We do this check in a loop, since removing invalid unicode characters
+        // can lead to new characters being created.
+        while (preg_match('#\p{C}+|^\./#u', $path)) {
+            $path = preg_replace('#\p{C}+|^\./#u', '', $path);
         }
 
         return $path;
@@ -177,7 +175,7 @@ class Util
     /**
      * Guess MIME Type based on the path of the file and it's content.
      *
-     * @param string          $path
+     * @param string $path
      * @param string|resource $content
      *
      * @return string|null MIME Type or NULL if no extension detected
@@ -206,7 +204,7 @@ class Util
         $listedDirectories = [];
 
         foreach ($listing as $object) {
-            [$directories, $listedDirectories] = static::emulateObjectDirectories($object, $directories, $listedDirectories);
+            list($directories, $listedDirectories) = static::emulateObjectDirectories($object, $directories, $listedDirectories);
         }
 
         $directories = array_diff(array_unique($directories), array_unique($listedDirectories));
@@ -268,15 +266,11 @@ class Util
      *
      * @param resource $resource
      *
-     * @return int|null stream size
+     * @return int stream size
      */
     public static function getStreamSize($resource)
     {
         $stat = fstat($resource);
-
-        if ( ! is_array($stat) || ! isset($stat['size'])) {
-            return null;
-        }
 
         return $stat['size'];
     }
@@ -296,13 +290,13 @@ class Util
             $listedDirectories[] = $object['path'];
         }
 
-        if ( ! isset($object['dirname']) || trim($object['dirname']) === '') {
+        if (empty($object['dirname'])) {
             return [$directories, $listedDirectories];
         }
 
         $parent = $object['dirname'];
 
-        while (isset($parent) && trim($parent) !== '' && ! in_array($parent, $directories)) {
+        while ( ! empty($parent) && ! in_array($parent, $directories)) {
             $directories[] = $parent;
             $parent = static::dirname($parent);
         }

@@ -24,7 +24,7 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * The binding registrar instance.
      *
-     * @var \Illuminate\Contracts\Routing\BindingRegistrar
+     * @var BindingRegistrar
      */
     protected $bindingRegistrar;
 
@@ -48,7 +48,6 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $channel
      * @return mixed
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
     protected function verifyUserCanAccessChannel($request, $channel)
@@ -94,7 +93,6 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  callable|string  $callback
      * @return \ReflectionParameter[]
-     *
      * @throws \Exception
      */
     protected function extractParameters($callback)
@@ -113,7 +111,6 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  string  $callback
      * @return \ReflectionParameter[]
-     *
      * @throws \Exception
      */
     protected function extractParametersFromClass($callback)
@@ -183,7 +180,6 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  mixed  $value
      * @param  array  $callbackParameters
      * @return mixed
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
     protected function resolveImplicitBindingIfPossible($key, $value, $callbackParameters)

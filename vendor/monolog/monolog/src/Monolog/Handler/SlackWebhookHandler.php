@@ -13,7 +13,6 @@ namespace Monolog\Handler;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Logger;
-use Monolog\Utils;
 use Monolog\Handler\Slack\SlackRecord;
 
 /**
@@ -71,11 +70,6 @@ class SlackWebhookHandler extends AbstractProcessingHandler
         return $this->slackRecord;
     }
 
-    public function getWebhookUrl()
-    {
-        return $this->webhookUrl;
-    }
-
     /**
      * {@inheritdoc}
      *
@@ -84,7 +78,7 @@ class SlackWebhookHandler extends AbstractProcessingHandler
     protected function write(array $record)
     {
         $postData = $this->slackRecord->getSlackData($record);
-        $postString = Utils::jsonEncode($postData);
+        $postString = json_encode($postData);
 
         $ch = curl_init();
         $options = array(

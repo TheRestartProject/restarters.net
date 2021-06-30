@@ -18,7 +18,7 @@ use Raven_Client;
 
 /**
  * Handler to send messages to a Sentry (https://github.com/getsentry/sentry) server
- * using sentry-php (https://github.com/getsentry/sentry-php)
+ * using raven-php (https://github.com/getsentry/raven-php)
  *
  * @author Marc Abramowitz <marc@marc-abramowitz.com>
  */
@@ -27,7 +27,7 @@ class RavenHandler extends AbstractProcessingHandler
     /**
      * Translates Monolog log levels to Raven log levels.
      */
-    protected $logLevels = array(
+    private $logLevels = array(
         Logger::DEBUG     => Raven_Client::DEBUG,
         Logger::INFO      => Raven_Client::INFO,
         Logger::NOTICE    => Raven_Client::INFO,
@@ -42,7 +42,7 @@ class RavenHandler extends AbstractProcessingHandler
      * @var string should represent the current version of the calling
      *             software. Can be any string (git commit, version number)
      */
-    protected $release;
+    private $release;
 
     /**
      * @var Raven_Client the client object that sends the message to the server
@@ -50,19 +50,17 @@ class RavenHandler extends AbstractProcessingHandler
     protected $ravenClient;
 
     /**
-     * @var FormatterInterface The formatter to use for the logs generated via handleBatch()
+     * @var LineFormatter The formatter to use for the logs generated via handleBatch()
      */
     protected $batchFormatter;
 
     /**
      * @param Raven_Client $ravenClient
      * @param int          $level       The minimum logging level at which this handler will be triggered
-     * @param bool         $bubble      Whether the messages that are handled can bubble up the stack or not
+     * @param Boolean      $bubble      Whether the messages that are handled can bubble up the stack or not
      */
     public function __construct(Raven_Client $ravenClient, $level = Logger::DEBUG, $bubble = true)
     {
-        @trigger_error('The Monolog\Handler\RavenHandler class is deprecated. You should rather upgrade to the sentry/sentry 2.x and use Sentry\Monolog\Handler, see https://github.com/getsentry/sentry-php/blob/master/src/Monolog/Handler.php', E_USER_DEPRECATED);
-
         parent::__construct($level, $bubble);
 
         $this->ravenClient = $ravenClient;
@@ -86,7 +84,7 @@ class RavenHandler extends AbstractProcessingHandler
 
         // the record with the highest severity is the "main" one
         $record = array_reduce($records, function ($highest, $record) {
-            if (null === $highest || $record['level'] > $highest['level']) {
+            if ($record['level'] > $highest['level']) {
                 return $record;
             }
 
@@ -182,7 +180,7 @@ class RavenHandler extends AbstractProcessingHandler
         }
 
         if (isset($record['context']['exception']) && ($record['context']['exception'] instanceof \Exception || (PHP_VERSION_ID >= 70000 && $record['context']['exception'] instanceof \Throwable))) {
-            $options['message'] = $record['formatted'];
+            $options['extra']['message'] = $record['formatted'];
             $this->ravenClient->captureException($record['context']['exception'], $options);
         } else {
             $this->ravenClient->captureMessage($record['formatted'], array(), $options);
@@ -218,7 +216,7 @@ class RavenHandler extends AbstractProcessingHandler
      */
     protected function getExtraParameters()
     {
-        return array('contexts', 'checksum', 'release', 'event_id');
+        return array('checksum', 'release', 'event_id');
     }
 
     /**

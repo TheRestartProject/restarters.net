@@ -17,8 +17,8 @@ use Symfony\Component\Process\Process;
 /**
  * WindowsPipes implementation uses temporary files as handles.
  *
- * @see https://bugs.php.net/51800
- * @see https://bugs.php.net/65650
+ * @see https://bugs.php.net/bug.php?id=51800
+ * @see https://bugs.php.net/bug.php?id=65650
  *
  * @author Romain Neutron <imprec@gmail.com>
  *
@@ -26,13 +26,12 @@ use Symfony\Component\Process\Process;
  */
 class WindowsPipes extends AbstractPipes
 {
-    private $files = [];
-    private $fileHandles = [];
-    private $lockHandles = [];
-    private $readBytes = [
+    private $files = array();
+    private $fileHandles = array();
+    private $readBytes = array(
         Process::STDOUT => 0,
         Process::STDERR => 0,
-    ];
+    );
     private $haveReadSupport;
 
     public function __construct($input, bool $haveReadSupport)
@@ -43,41 +42,36 @@ class WindowsPipes extends AbstractPipes
             // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
             // Workaround for this problem is to use temporary files instead of pipes on Windows platform.
             //
-            // @see https://bugs.php.net/51800
-            $pipes = [
+            // @see https://bugs.php.net/bug.php?id=51800
+            $pipes = array(
                 Process::STDOUT => Process::OUT,
                 Process::STDERR => Process::ERR,
-            ];
+            );
+            $tmpCheck = false;
             $tmpDir = sys_get_temp_dir();
             $lastError = 'unknown reason';
             set_error_handler(function ($type, $msg) use (&$lastError) { $lastError = $msg; });
             for ($i = 0;; ++$i) {
                 foreach ($pipes as $pipe => $name) {
                     $file = sprintf('%s\\sf_proc_%02X.%s', $tmpDir, $i, $name);
-
-                    if (!$h = fopen($file.'.lock', 'w')) {
-                        if (file_exists($file.'.lock')) {
-                            continue 2;
+                    if (file_exists($file) && !unlink($file)) {
+                        continue 2;
+                    }
+                    $h = fopen($file, 'xb');
+                    if (!$h) {
+                        $error = $lastError;
+                        if ($tmpCheck || $tmpCheck = unlink(tempnam(false, 'sf_check_'))) {
+                            continue;
                         }
                         restore_error_handler();
-                        throw new RuntimeException('A temporary file could not be opened to write the process output: '.$lastError);
+                        throw new RuntimeException(sprintf('A temporary file could not be opened to write the process output: %s', $error));
                     }
-                    if (!flock($h, \LOCK_EX | \LOCK_NB)) {
+                    if (!$h || !$this->fileHandles[$pipe] = fopen($file, 'rb')) {
                         continue 2;
                     }
-                    if (isset($this->lockHandles[$pipe])) {
-                        flock($this->lockHandles[$pipe], \LOCK_UN);
-                        fclose($this->lockHandles[$pipe]);
+                    if (isset($this->files[$pipe])) {
+                        unlink($this->files[$pipe]);
                     }
-                    $this->lockHandles[$pipe] = $h;
-
-                    if (!($h = fopen($file, 'w')) || !fclose($h) || !$h = fopen($file, 'r')) {
-                        flock($this->lockHandles[$pipe], \LOCK_UN);
-                        fclose($this->lockHandles[$pipe]);
-                        unset($this->lockHandles[$pipe]);
-                        continue 2;
-                    }
-                    $this->fileHandles[$pipe] = $h;
                     $this->files[$pipe] = $file;
                 }
                 break;
@@ -88,50 +82,41 @@ class WindowsPipes extends AbstractPipes
         parent::__construct($input);
     }
 
-    public function __sleep()
-    {
-        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
-    }
-
-    public function __wakeup()
-    {
-        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-    }
-
     public function __destruct()
     {
         $this->close();
+        $this->removeFiles();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDescriptors(): array
+    public function getDescriptors()
     {
         if (!$this->haveReadSupport) {
             $nullstream = fopen('NUL', 'c');
 
-            return [
-                ['pipe', 'r'],
+            return array(
+                array('pipe', 'r'),
                 $nullstream,
                 $nullstream,
-            ];
+            );
         }
 
-        // We're not using pipe on Windows platform as it hangs (https://bugs.php.net/51800)
-        // We're not using file handles as it can produce corrupted output https://bugs.php.net/65650
+        // We're not using pipe on Windows platform as it hangs (https://bugs.php.net/bug.php?id=51800)
+        // We're not using file handles as it can produce corrupted output https://bugs.php.net/bug.php?id=65650
         // So we redirect output within the commandline and pass the nul device to the process
-        return [
-            ['pipe', 'r'],
-            ['file', 'NUL', 'w'],
-            ['file', 'NUL', 'w'],
-        ];
+        return array(
+            array('pipe', 'r'),
+            array('file', 'NUL', 'w'),
+            array('file', 'NUL', 'w'),
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFiles(): array
+    public function getFiles()
     {
         return $this->files;
     }
@@ -139,11 +124,11 @@ class WindowsPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function readAndWrite(bool $blocking, bool $close = false): array
+    public function readAndWrite($blocking, $close = false)
     {
         $this->unblock();
         $w = $this->write();
-        $read = $r = $e = [];
+        $read = $r = $e = array();
 
         if ($blocking) {
             if ($w) {
@@ -160,11 +145,8 @@ class WindowsPipes extends AbstractPipes
                 $read[$type] = $data;
             }
             if ($close) {
-                ftruncate($fileHandle, 0);
                 fclose($fileHandle);
-                flock($this->lockHandles[$type], \LOCK_UN);
-                fclose($this->lockHandles[$type]);
-                unset($this->fileHandles[$type], $this->lockHandles[$type]);
+                unset($this->fileHandles[$type]);
             }
         }
 
@@ -174,7 +156,7 @@ class WindowsPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function haveReadSupport(): bool
+    public function haveReadSupport()
     {
         return $this->haveReadSupport;
     }
@@ -182,7 +164,7 @@ class WindowsPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function areOpen(): bool
+    public function areOpen()
     {
         return $this->pipes && $this->fileHandles;
     }
@@ -193,12 +175,22 @@ class WindowsPipes extends AbstractPipes
     public function close()
     {
         parent::close();
-        foreach ($this->fileHandles as $type => $handle) {
-            ftruncate($handle, 0);
+        foreach ($this->fileHandles as $handle) {
             fclose($handle);
-            flock($this->lockHandles[$type], \LOCK_UN);
-            fclose($this->lockHandles[$type]);
         }
-        $this->fileHandles = $this->lockHandles = [];
+        $this->fileHandles = array();
+    }
+
+    /**
+     * Removes temporary files.
+     */
+    private function removeFiles()
+    {
+        foreach ($this->files as $filename) {
+            if (file_exists($filename)) {
+                @unlink($filename);
+            }
+        }
+        $this->files = array();
     }
 }

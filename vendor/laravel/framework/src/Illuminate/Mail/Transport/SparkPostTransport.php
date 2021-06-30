@@ -22,7 +22,7 @@ class SparkPostTransport extends Transport
     protected $key;
 
     /**
-     * The SparkPost transmission options.
+     * Transmission options.
      *
      * @var array
      */
@@ -54,7 +54,7 @@ class SparkPostTransport extends Transport
 
         $message->setBcc([]);
 
-        $response = $this->client->request('POST', $this->getEndpoint(), [
+        $response = $this->client->post($this->getEndpoint(), [
             'headers' => [
                 'Authorization' => $this->key,
             ],

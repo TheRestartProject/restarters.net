@@ -1,9 +1,25 @@
 <?php
+/*
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the MIT license. For more information, see
+ * <http://www.doctrine-project.org>.
+ */
 
 namespace Doctrine\DBAL\Schema;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-
 use function array_map;
 use function crc32;
 use function dechex;
@@ -20,10 +36,16 @@ use function substr;
  *
  * This encapsulation hack is necessary to keep a consistent state of the database schema. Say we have a list of tables
  * array($tableName => Table($tableName)); if you want to rename the table, you have to make sure
+ *
+ * @link   www.doctrine-project.org
+ * @since  2.0
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 abstract class AbstractAsset
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $_name;
 
     /**
@@ -31,9 +53,11 @@ abstract class AbstractAsset
      *
      * @var string|null
      */
-    protected $_namespace;
+    protected $_namespace = null;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $_quoted = false;
 
     /**
@@ -47,15 +71,13 @@ abstract class AbstractAsset
     {
         if ($this->isIdentifierQuoted($name)) {
             $this->_quoted = true;
-            $name          = $this->trimQuotes($name);
+            $name = $this->trimQuotes($name);
         }
-
-        if (strpos($name, '.') !== false) {
-            $parts            = explode('.', $name);
+        if (strpos($name, ".") !== false) {
+            $parts = explode(".", $name);
             $this->_namespace = $parts[0];
-            $name             = $parts[1];
+            $name = $parts[1];
         }
-
         $this->_name = $name;
     }
 
@@ -68,7 +90,7 @@ abstract class AbstractAsset
      */
     public function isInDefaultNamespace($defaultNamespaceName)
     {
-        return $this->_namespace === $defaultNamespaceName || $this->_namespace === null;
+        return $this->_namespace == $defaultNamespaceName || $this->_namespace === null;
     }
 
     /**
@@ -87,14 +109,14 @@ abstract class AbstractAsset
      * The shortest name is stripped of the default namespace. All other
      * namespaced elements are returned as full-qualified names.
      *
-     * @param string|null $defaultNamespaceName
+     * @param string $defaultNamespaceName
      *
      * @return string
      */
     public function getShortestName($defaultNamespaceName)
     {
         $shortestName = $this->getName();
-        if ($this->_namespace === $defaultNamespaceName) {
+        if ($this->_namespace == $defaultNamespaceName) {
             $shortestName = $this->_name;
         }
 
@@ -117,8 +139,8 @@ abstract class AbstractAsset
     public function getFullQualifiedName($defaultNamespaceName)
     {
         $name = $this->getName();
-        if (! $this->_namespace) {
-            $name = $defaultNamespaceName . '.' . $name;
+        if ( ! $this->_namespace) {
+            $name = $defaultNamespaceName . "." . $name;
         }
 
         return strtolower($name);
@@ -143,7 +165,7 @@ abstract class AbstractAsset
      */
     protected function isIdentifierQuoted($identifier)
     {
-        return isset($identifier[0]) && ($identifier[0] === '`' || $identifier[0] === '"' || $identifier[0] === '[');
+        return (isset($identifier[0]) && ($identifier[0] == '`' || $identifier[0] == '"' || $identifier[0] == '['));
     }
 
     /**
@@ -166,7 +188,7 @@ abstract class AbstractAsset
     public function getName()
     {
         if ($this->_namespace) {
-            return $this->_namespace . '.' . $this->_name;
+            return $this->_namespace . "." . $this->_name;
         }
 
         return $this->_name;
@@ -176,17 +198,19 @@ abstract class AbstractAsset
      * Gets the quoted representation of this asset but only if it was defined with one. Otherwise
      * return the plain unquoted value as inserted.
      *
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     *
      * @return string
      */
     public function getQuotedName(AbstractPlatform $platform)
     {
         $keywords = $platform->getReservedKeywordsList();
-        $parts    = explode('.', $this->getName());
+        $parts = explode(".", $this->getName());
         foreach ($parts as $k => $v) {
-            $parts[$k] = $this->_quoted || $keywords->isKeyword($v) ? $platform->quoteIdentifier($v) : $v;
+            $parts[$k] = ($this->_quoted || $keywords->isKeyword($v)) ? $platform->quoteIdentifier($v) : $v;
         }
 
-        return implode('.', $parts);
+        return implode(".", $parts);
     }
 
     /**
@@ -196,15 +220,15 @@ abstract class AbstractAsset
      * however building idents automatically for foreign keys, composite keys or such can easily create
      * very long names.
      *
-     * @param string[] $columnNames
-     * @param string   $prefix
-     * @param int      $maxSize
+     * @param array  $columnNames
+     * @param string $prefix
+     * @param int    $maxSize
      *
      * @return string
      */
-    protected function _generateIdentifierName($columnNames, $prefix = '', $maxSize = 30)
+    protected function _generateIdentifierName($columnNames, $prefix='', $maxSize=30)
     {
-        $hash = implode('', array_map(static function ($column) {
+        $hash = implode("", array_map(function ($column) {
             return dechex(crc32($column));
         }, $columnNames));
 

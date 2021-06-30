@@ -26,7 +26,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function defaults(array $defaults): self
+    final public function defaults(array $defaults)
     {
         $this->route->addDefaults($defaults);
 
@@ -38,7 +38,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function requirements(array $requirements): self
+    final public function requirements(array $requirements)
     {
         $this->route->addRequirements($requirements);
 
@@ -50,21 +50,9 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function options(array $options): self
+    final public function options(array $options)
     {
         $this->route->addOptions($options);
-
-        return $this;
-    }
-
-    /**
-     * Whether paths should accept utf8 encoding.
-     *
-     * @return $this
-     */
-    final public function utf8(bool $utf8 = true): self
-    {
-        $this->route->addOptions(['utf8' => $utf8]);
 
         return $this;
     }
@@ -74,7 +62,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function condition(string $condition): self
+    final public function condition(string $condition)
     {
         $this->route->setCondition($condition);
 
@@ -86,7 +74,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function host(string $pattern): self
+    final public function host(string $pattern)
     {
         $this->route->setHost($pattern);
 
@@ -101,7 +89,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function schemes(array $schemes): self
+    final public function schemes(array $schemes)
     {
         $this->route->setSchemes($schemes);
 
@@ -116,7 +104,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function methods(array $methods): self
+    final public function methods(array $methods)
     {
         $this->route->setMethods($methods);
 
@@ -130,33 +118,9 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function controller($controller): self
+    final public function controller($controller)
     {
-        $this->route->addDefaults(['_controller' => $controller]);
-
-        return $this;
-    }
-
-    /**
-     * Adds the "_locale" entry to defaults.
-     *
-     * @return $this
-     */
-    final public function locale(string $locale): self
-    {
-        $this->route->addDefaults(['_locale' => $locale]);
-
-        return $this;
-    }
-
-    /**
-     * Adds the "_format" entry to defaults.
-     *
-     * @return $this
-     */
-    final public function format(string $format): self
-    {
-        $this->route->addDefaults(['_format' => $format]);
+        $this->route->addDefaults(array('_controller' => $controller));
 
         return $this;
     }

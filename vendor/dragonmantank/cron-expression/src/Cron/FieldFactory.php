@@ -44,7 +44,7 @@ class FieldFactory
                     break;
                 default:
                     throw new InvalidArgumentException(
-                        ($position + 1) . ' is not a valid position'
+                        $position . ' is not a valid position'
                     );
             }
         }

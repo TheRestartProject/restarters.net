@@ -77,14 +77,14 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Remove all items from the cache.
      *
-     * @return bool
+     * @return void
      */
     public function flush()
     {
         $this->deleteForeverKeys();
         $this->deleteStandardKeys();
 
-        return parent::flush();
+        parent::flush();
     }
 
     /**

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use Symfony\Contracts\Service\ResetInterface;
-
 /**
  * Resets provided services.
  *
@@ -21,7 +19,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @internal
  */
-class ServicesResetter implements ResetInterface
+class ServicesResetter
 {
     private $resettableServices;
     private $resetMethods;
@@ -35,9 +33,7 @@ class ServicesResetter implements ResetInterface
     public function reset()
     {
         foreach ($this->resettableServices as $id => $service) {
-            foreach ((array) $this->resetMethods[$id] as $resetMethod) {
-                $service->$resetMethod();
-            }
+            $service->{$this->resetMethods[$id]}();
         }
     }
 }

@@ -13,51 +13,41 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * EventDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.4
  */
 class EventDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     protected $dispatcher;
-    private $requestStack;
-    private $currentRequest;
 
-    public function __construct(EventDispatcherInterface $dispatcher = null, RequestStack $requestStack = null)
+    public function __construct(EventDispatcherInterface $dispatcher = null)
     {
         $this->dispatcher = $dispatcher;
-        $this->requestStack = $requestStack;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $this->currentRequest = $this->requestStack && $this->requestStack->getMasterRequest() !== $request ? $request : null;
-        $this->data = [
-            'called_listeners' => [],
-            'not_called_listeners' => [],
-            'orphaned_events' => [],
-        ];
+        $this->data = array(
+            'called_listeners' => array(),
+            'not_called_listeners' => array(),
+            'orphaned_events' => array(),
+        );
     }
 
     public function reset()
     {
-        $this->data = [];
+        $this->data = array();
 
-        if ($this->dispatcher instanceof ResetInterface) {
+        if ($this->dispatcher instanceof TraceableEventDispatcherInterface) {
             $this->dispatcher->reset();
         }
     }
@@ -65,12 +55,12 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     public function lateCollect()
     {
         if ($this->dispatcher instanceof TraceableEventDispatcherInterface) {
-            $this->setCalledListeners($this->dispatcher->getCalledListeners($this->currentRequest));
-            $this->setNotCalledListeners($this->dispatcher->getNotCalledListeners($this->currentRequest));
+            $this->setCalledListeners($this->dispatcher->getCalledListeners());
+            $this->setNotCalledListeners($this->dispatcher->getNotCalledListeners());
         }
 
         if ($this->dispatcher instanceof TraceableEventDispatcher) {
-            $this->setOrphanedEvents($this->dispatcher->getOrphanedEvents($this->currentRequest));
+            $this->setOrphanedEvents($this->dispatcher->getOrphanedEvents());
         }
 
         $this->data = $this->cloneVar($this->data);
@@ -102,6 +92,8 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * Sets the not called listeners.
+     *
+     * @param array $listeners
      *
      * @see TraceableEventDispatcher
      */

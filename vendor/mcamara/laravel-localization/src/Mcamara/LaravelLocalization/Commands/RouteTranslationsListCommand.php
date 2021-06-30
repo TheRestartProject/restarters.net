@@ -28,6 +28,11 @@ class RouteTranslationsListCommand extends RouteListCommand
      */
     public function handle()
     {
+        if (count($this->routes) == 0) {
+            $this->error("Your application doesn't have any routes.");
+            return;
+        }
+
         $locale = $this->argument('locale');
 
         if ( ! $this->isSupportedLocale($locale)) {
@@ -35,18 +40,18 @@ class RouteTranslationsListCommand extends RouteListCommand
             return;
         }
 
-        $this->loadFreshApplicationRoutes($locale);
+        $this->routes = $this->getFreshApplicationRoutes($locale);
 
-        parent::handle();
+        $this->displayRoutes($this->getRoutes());
     }
 
     /**
-     * Boot a fresh copy of the application and replace the router/routes.
+     * Boot a fresh copy of the application and get the routes.
      *
      * @param string $locale
-     * @return void
+     * @return \Illuminate\Routing\RouteCollection
      */
-    protected function loadFreshApplicationRoutes($locale)
+    protected function getFreshApplicationRoutes($locale)
     {
         $app = require $this->getBootstrapPath() . '/app.php';
 
@@ -58,7 +63,7 @@ class RouteTranslationsListCommand extends RouteListCommand
 
         putenv("{$key}=");
 
-        $this->router = $app['router'];
+        return $app['router']->getRoutes();
     }
 
     /**

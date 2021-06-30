@@ -1,14 +1,15 @@
 <?php
-
 /**
- * League.Csv (https://csv.thephpleague.com)
- *
- * (c) Ignace Nyamagana Butera <nyamsprod@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
+* This file is part of the League.csv library
+*
+* @license http://opensource.org/licenses/MIT
+* @link https://github.com/thephpleague/csv/
+* @version 9.1.4
+* @package League.csv
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 declare(strict_types=1);
 
 namespace League\Csv;
@@ -17,21 +18,27 @@ use IteratorIterator;
 use Traversable;
 
 /**
- * Map value from an iterator before yielding.
+ * Map value from an iterator before yielding
  *
+ * @package  League.csv
+ * @since    3.3.0
+ * @author   Ignace Nyamagana Butera <nyamsprod@gmail.com>
  * @internal used internally to modify CSV content
  */
-final class MapIterator extends IteratorIterator
+class MapIterator extends IteratorIterator
 {
     /**
-     * The callback to apply on all InnerIterator current value.
+     * The callback to apply on all InnerIterator current value
      *
      * @var callable
      */
-    private $callable;
+    protected $callable;
 
     /**
-     * New instance.
+     * The Constructor
+     *
+     * @param Traversable $iterator
+     * @param callable    $callable
      */
     public function __construct(Traversable $iterator, callable $callable)
     {
@@ -40,10 +47,10 @@ final class MapIterator extends IteratorIterator
     }
 
     /**
-     * @return mixed The value of the current element.
+     * {@inheritdoc}
      */
     public function current()
     {
-        return ($this->callable)(parent::current(), parent::key());
+        return ($this->callable)(parent::current(), $this->key());
     }
 }

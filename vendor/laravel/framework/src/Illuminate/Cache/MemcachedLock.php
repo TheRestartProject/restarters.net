@@ -2,7 +2,9 @@
 
 namespace Illuminate\Cache;
 
-class MemcachedLock extends Lock
+use Illuminate\Contracts\Cache\Lock as LockContract;
+
+class MemcachedLock extends Lock implements LockContract
 {
     /**
      * The Memcached instance.

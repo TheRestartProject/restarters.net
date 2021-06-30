@@ -9,14 +9,13 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 abstract class Relation
 {
-    use ForwardsCalls, Macroable {
+    use Macroable {
         __call as macroCall;
     }
 
@@ -308,22 +307,6 @@ abstract class Relation
     }
 
     /**
-     * Get the name of the "where in" method for eager loading.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  string  $key
-     * @return string
-     */
-    protected function whereInMethod(Model $model, $key)
-    {
-        return $model->getKeyName() === last(explode('.', $key))
-                    && $model->getIncrementing()
-                    && in_array($model->getKeyType(), ['int', 'integer'])
-                        ? 'whereIntegerInRaw'
-                        : 'whereIn';
-    }
-
-    /**
      * Set or get the morph map for polymorphic relations.
      *
      * @param  array|null  $map
@@ -383,7 +366,7 @@ abstract class Relation
             return $this->macroCall($method, $parameters);
         }
 
-        $result = $this->forwardCallTo($this->query, $method, $parameters);
+        $result = $this->query->{$method}(...$parameters);
 
         if ($result === $this->query) {
             return $this;

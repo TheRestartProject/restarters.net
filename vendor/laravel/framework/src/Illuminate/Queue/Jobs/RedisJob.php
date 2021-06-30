@@ -120,7 +120,7 @@ class RedisJob extends Job implements JobContract
     /**
      * Get the underlying Redis factory implementation.
      *
-     * @return \Illuminate\Queue\RedisQueue
+     * @return \Illuminate\Contracts\Redis\Factory
      */
     public function getRedisQueue()
     {

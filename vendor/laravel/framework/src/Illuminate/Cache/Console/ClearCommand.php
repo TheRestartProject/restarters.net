@@ -60,19 +60,15 @@ class ClearCommand extends Command
      */
     public function handle()
     {
-        $this->laravel['events']->dispatch(
+        $this->laravel['events']->fire(
             'cache:clearing', [$this->argument('store'), $this->tags()]
         );
 
-        $successful = $this->cache()->flush();
+        $this->cache()->flush();
 
         $this->flushFacades();
 
-        if (! $successful) {
-            return $this->error('Failed to clear cache. Make sure you have the appropriate permissions.');
-        }
-
-        $this->laravel['events']->dispatch(
+        $this->laravel['events']->fire(
             'cache:cleared', [$this->argument('store'), $this->tags()]
         );
 
@@ -127,7 +123,7 @@ class ClearCommand extends Command
     protected function getArguments()
     {
         return [
-            ['store', InputArgument::OPTIONAL, 'The name of the store you would like to clear'],
+            ['store', InputArgument::OPTIONAL, 'The name of the store you would like to clear.'],
         ];
     }
 
@@ -139,7 +135,7 @@ class ClearCommand extends Command
     protected function getOptions()
     {
         return [
-            ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear', null],
+            ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear.', null],
         ];
     }
 }

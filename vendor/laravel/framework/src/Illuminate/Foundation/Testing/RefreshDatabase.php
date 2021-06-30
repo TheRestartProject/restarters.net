@@ -25,9 +25,9 @@ trait RefreshDatabase
      */
     protected function usingInMemoryDatabase()
     {
-        $default = config('database.default');
-
-        return config("database.connections.$default.database") === ':memory:';
+        return config('database.connections')[
+            config('database.default')
+        ]['database'] == ':memory:';
     }
 
     /**

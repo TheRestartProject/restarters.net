@@ -11,18 +11,18 @@
 
 namespace Jaybizzle\CrawlerDetect;
 
+use Jaybizzle\CrawlerDetect\Fixtures\Headers;
 use Jaybizzle\CrawlerDetect\Fixtures\Crawlers;
 use Jaybizzle\CrawlerDetect\Fixtures\Exclusions;
-use Jaybizzle\CrawlerDetect\Fixtures\Headers;
 
 class CrawlerDetect
 {
     /**
      * The user agent.
      *
-     * @var string|null
+     * @var null
      */
-    protected $userAgent;
+    protected $userAgent = null;
 
     /**
      * Headers that contain a user agent.
@@ -86,14 +86,14 @@ class CrawlerDetect
         $this->compiledExclusions = $this->compileRegex($this->exclusions->getAll());
 
         $this->setHttpHeaders($headers);
-        $this->setUserAgent($userAgent);
+        $this->userAgent = $this->setUserAgent($userAgent);
     }
 
     /**
      * Compile the regex patterns into one regex string.
      *
      * @param array
-     *
+     * 
      * @return string
      */
     public function compileRegex($patterns)
@@ -138,7 +138,7 @@ class CrawlerDetect
     /**
      * Set the user agent.
      *
-     * @param string|null $userAgent
+     * @param string $userAgent
      */
     public function setUserAgent($userAgent)
     {
@@ -150,7 +150,7 @@ class CrawlerDetect
             }
         }
 
-        return $this->userAgent = $userAgent;
+        return $userAgent;
     }
 
     /**
@@ -162,17 +162,21 @@ class CrawlerDetect
      */
     public function isCrawler($userAgent = null)
     {
-        $agent = trim(preg_replace(
-            "/{$this->compiledExclusions}/i",
-            '',
-            $userAgent ?: $this->userAgent
-        ));
+        $agent = $userAgent ?: $this->userAgent;
 
-        if ($agent === '') {
+        $agent = preg_replace('/'.$this->compiledExclusions.'/i', '', $agent);
+
+        if (strlen(trim($agent)) == 0) {
             return false;
         }
 
-        return (bool) preg_match("/{$this->compiledRegex}/i", $agent, $this->matches);
+        $result = preg_match('/'.$this->compiledRegex.'/i', trim($agent), $matches);
+
+        if ($matches) {
+            $this->matches = $matches;
+        }
+
+        return (bool) $result;
     }
 
     /**

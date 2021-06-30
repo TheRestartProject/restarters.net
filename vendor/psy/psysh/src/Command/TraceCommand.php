@@ -74,8 +74,6 @@ HELP
         $this->filter->bind($input);
         $trace = $this->getBacktrace(new \Exception(), $input->getOption('num'), $input->getOption('include-psy'));
         $output->page($trace, ShellOutput::NUMBER_LINES);
-
-        return 0;
     }
 
     /**

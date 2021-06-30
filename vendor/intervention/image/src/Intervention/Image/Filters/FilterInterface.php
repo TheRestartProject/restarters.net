@@ -2,8 +2,6 @@
 
 namespace Intervention\Image\Filters;
 
-use Intervention\Image\Image;
-
 interface FilterInterface
 {
     /**
@@ -12,5 +10,5 @@ interface FilterInterface
      * @param  \Intervention\Image\Image $image
      * @return \Intervention\Image\Image
      */
-    public function applyFilter(Image $image);
+    public function applyFilter(\Intervention\Image\Image $image);
 }

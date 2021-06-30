@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Imagick\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class InsertCommand extends AbstractCommand
+class InsertCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Insert another image into given image

@@ -25,7 +25,7 @@ class Profile
     /**
      * @var DataCollectorInterface[]
      */
-    private $collectors = [];
+    private $collectors = array();
 
     private $ip;
     private $method;
@@ -41,7 +41,7 @@ class Profile
     /**
      * @var Profile[]
      */
-    private $children = [];
+    private $children = array();
 
     public function __construct(string $token)
     {
@@ -99,7 +99,7 @@ class Profile
     /**
      * Returns the IP.
      *
-     * @return string|null The IP
+     * @return string The IP
      */
     public function getIp()
     {
@@ -119,7 +119,7 @@ class Profile
     /**
      * Returns the request method.
      *
-     * @return string|null The request method
+     * @return string The request method
      */
     public function getMethod()
     {
@@ -134,16 +134,13 @@ class Profile
     /**
      * Returns the URL.
      *
-     * @return string|null The URL
+     * @return string The URL
      */
     public function getUrl()
     {
         return $this->url;
     }
 
-    /**
-     * @param string $url
-     */
     public function setUrl($url)
     {
         $this->url = $url;
@@ -180,7 +177,7 @@ class Profile
     }
 
     /**
-     * @return int|null
+     * @return int
      */
     public function getStatusCode()
     {
@@ -204,7 +201,7 @@ class Profile
      */
     public function setChildren(array $children)
     {
-        $this->children = [];
+        $this->children = array();
         foreach ($children as $child) {
             $this->addChild($child);
         }
@@ -265,7 +262,7 @@ class Profile
      */
     public function setCollectors(array $collectors)
     {
-        $this->collectors = [];
+        $this->collectors = array();
         foreach ($collectors as $collector) {
             $this->addCollector($collector);
         }
@@ -291,11 +288,8 @@ class Profile
         return isset($this->collectors[$name]);
     }
 
-    /**
-     * @return array
-     */
     public function __sleep()
     {
-        return ['token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time', 'statusCode'];
+        return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time', 'statusCode');
     }
 }

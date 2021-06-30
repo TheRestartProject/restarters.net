@@ -26,9 +26,6 @@ final class TransactionIsolationLevel
      */
     public const SERIALIZABLE = 4;
 
-    /**
-     * @codeCoverageIgnore
-     */
     private function __construct()
     {
     }

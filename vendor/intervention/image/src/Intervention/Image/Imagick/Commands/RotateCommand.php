@@ -2,10 +2,9 @@
 
 namespace Intervention\Image\Imagick\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
 use Intervention\Image\Imagick\Color;
 
-class RotateCommand extends AbstractCommand
+class RotateCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Rotates image counter clockwise

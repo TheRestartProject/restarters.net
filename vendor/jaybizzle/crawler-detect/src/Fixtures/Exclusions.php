@@ -62,11 +62,10 @@ class Exclusions extends AbstractProvider
         ' \.NET[\d\.]*',
         'cubot',
         '; M bot',
-        '; CRONO',
         '; B bot',
         '; IDbot',
         '; ID bot',
         '; POWER BOT',
-        'OCTOPUS-CORE',
+        ';', // Remove the following characters ;
     );
 }

@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Gd\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class ContrastCommand extends AbstractCommand
+class ContrastCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Changes contrast of image

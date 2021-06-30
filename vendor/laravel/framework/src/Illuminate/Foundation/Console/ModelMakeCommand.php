@@ -37,7 +37,7 @@ class ModelMakeCommand extends GeneratorCommand
     public function handle()
     {
         if (parent::handle() === false && ! $this->option('force')) {
-            return false;
+            return;
         }
 
         if ($this->option('all')) {
@@ -71,7 +71,7 @@ class ModelMakeCommand extends GeneratorCommand
 
         $this->call('make:factory', [
             'name' => "{$factory}Factory",
-            '--model' => $this->qualifyClass($this->getNameInput()),
+            '--model' => $this->argument('name'),
         ]);
     }
 
@@ -150,13 +150,13 @@ class ModelMakeCommand extends GeneratorCommand
 
             ['factory', 'f', InputOption::VALUE_NONE, 'Create a new factory for the model'],
 
-            ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists'],
+            ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists.'],
 
-            ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
+            ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
 
-            ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
+            ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model.'],
 
-            ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
+            ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller.'],
         ];
     }
 }

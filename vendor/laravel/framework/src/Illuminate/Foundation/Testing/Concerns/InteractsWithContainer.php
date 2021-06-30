@@ -2,9 +2,6 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Closure;
-use Mockery;
-
 trait InteractsWithContainer
 {
     /**
@@ -31,29 +28,5 @@ trait InteractsWithContainer
         $this->app->instance($abstract, $instance);
 
         return $instance;
-    }
-
-    /**
-     * Mock an instance of an object in the container.
-     *
-     * @param  string  $abstract
-     * @param  \Closure|null  $mock
-     * @return object
-     */
-    protected function mock($abstract, Closure $mock = null)
-    {
-        return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args())));
-    }
-
-    /**
-     * Spy an instance of an object in the container.
-     *
-     * @param  string  $abstract
-     * @param  \Closure|null  $mock
-     * @return object
-     */
-    protected function spy($abstract, Closure $mock = null)
-    {
-        return $this->instance($abstract, Mockery::spy(...array_filter(func_get_args())));
     }
 }

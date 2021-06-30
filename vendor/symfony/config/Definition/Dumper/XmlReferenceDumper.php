@@ -27,12 +27,12 @@ class XmlReferenceDumper
 {
     private $reference;
 
-    public function dump(ConfigurationInterface $configuration, string $namespace = null)
+    public function dump(ConfigurationInterface $configuration, $namespace = null)
     {
         return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree(), $namespace);
     }
 
-    public function dumpNode(NodeInterface $node, string $namespace = null)
+    public function dumpNode(NodeInterface $node, $namespace = null)
     {
         $this->reference = '';
         $this->writeNode($node, 0, true, $namespace);
@@ -49,7 +49,7 @@ class XmlReferenceDumper
 
         // xml remapping
         if ($node->getParent()) {
-            $remapping = array_filter($node->getParent()->getXmlRemappings(), function (array $mapping) use ($rootName) {
+            $remapping = array_filter($node->getParent()->getXmlRemappings(), function ($mapping) use ($rootName) {
                 return $rootName === $mapping[1];
             });
 
@@ -155,8 +155,7 @@ class XmlReferenceDumper
                 }
 
                 if ($child instanceof BaseNode && $child->isDeprecated()) {
-                    $deprecation = $child->getDeprecation($child->getName(), $node->getPath());
-                    $comments[] = sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
+                    $comments[] = sprintf('Deprecated (%s)', $child->getDeprecationMessage($child->getName(), $node->getPath()));
                 }
 
                 if ($child instanceof EnumNode) {

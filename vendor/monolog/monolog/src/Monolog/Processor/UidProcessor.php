@@ -11,14 +11,12 @@
 
 namespace Monolog\Processor;
 
-use Monolog\ResettableInterface;
-
 /**
  * Adds a unique identifier into records
  *
  * @author Simon Mönch <sm@webfactory.de>
  */
-class UidProcessor implements ProcessorInterface, ResettableInterface
+class UidProcessor
 {
     private $uid;
 
@@ -28,8 +26,7 @@ class UidProcessor implements ProcessorInterface, ResettableInterface
             throw new \InvalidArgumentException('The uid length must be an integer between 1 and 32');
         }
 
-
-        $this->uid = $this->generateUid($length);
+        $this->uid = substr(hash('md5', uniqid('', true)), 0, $length);
     }
 
     public function __invoke(array $record)
@@ -45,15 +42,5 @@ class UidProcessor implements ProcessorInterface, ResettableInterface
     public function getUid()
     {
         return $this->uid;
-    }
-
-    public function reset()
-    {
-        $this->uid = $this->generateUid(strlen($this->uid));
-    }
-
-    private function generateUid($length)
-    {
-        return substr(hash('md5', uniqid('', true)), 0, $length);
     }
 }

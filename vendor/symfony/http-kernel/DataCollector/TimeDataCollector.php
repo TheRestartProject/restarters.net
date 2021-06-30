@@ -15,12 +15,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+ * TimeDataCollector.
  *
- * @final since Symfony 4.4
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class TimeDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -35,10 +34,8 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
 
     /**
      * {@inheritdoc}
-     *
-     * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         if (null !== $this->kernel) {
             $startTime = $this->kernel->getStartTime();
@@ -46,12 +43,11 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
             $startTime = $request->server->get('REQUEST_TIME_FLOAT');
         }
 
-        $this->data = [
+        $this->data = array(
             'token' => $response->headers->get('X-Debug-Token'),
             'start_time' => $startTime * 1000,
-            'events' => [],
-            'stopwatch_installed' => class_exists(Stopwatch::class, false),
-        ];
+            'events' => array(),
+        );
     }
 
     /**
@@ -59,7 +55,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
      */
     public function reset()
     {
-        $this->data = [];
+        $this->data = array();
 
         if (null !== $this->stopwatch) {
             $this->stopwatch->reset();
@@ -80,7 +76,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * Sets the request events.
      *
-     * @param StopwatchEvent[] $events The request events
+     * @param array $events The request events
      */
     public function setEvents(array $events)
     {
@@ -94,7 +90,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * Gets the request events.
      *
-     * @return StopwatchEvent[] The request events
+     * @return array The request events
      */
     public function getEvents()
     {
@@ -136,19 +132,11 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * Gets the request time.
      *
-     * @return float
+     * @return int The time
      */
     public function getStartTime()
     {
         return $this->data['start_time'];
-    }
-
-    /**
-     * @return bool whether or not the stopwatch component is installed
-     */
-    public function isStopwatchInstalled()
-    {
-        return $this->data['stopwatch_installed'];
     }
 
     /**

@@ -2,10 +2,9 @@
 
 namespace Intervention\Image\Imagick\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
 use Intervention\Image\Imagick\Color;
 
-class PixelCommand extends AbstractCommand
+class PixelCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Draws one pixel to a given image

@@ -2,12 +2,9 @@
 
 namespace Intervention\Image\Imagick;
 
-use Intervention\Image\AbstractDecoder;
-use Intervention\Image\Exception\NotReadableException;
-use Intervention\Image\Exception\NotSupportedException;
 use Intervention\Image\Image;
 
-class Decoder extends AbstractDecoder
+class Decoder extends \Intervention\Image\AbstractDecoder
 {
     /**
      * Initiates new image from path in filesystem
@@ -48,7 +45,7 @@ class Decoder extends AbstractDecoder
      */
     public function initFromGdResource($resource)
     {
-        throw new NotSupportedException(
+        throw new \Intervention\Image\Exception\NotSupportedException(
             'Imagick driver is unable to init from GD resource.'
         );
     }
@@ -87,7 +84,7 @@ class Decoder extends AbstractDecoder
             $core->readImageBlob($binary);
 
         } catch (\ImagickException $e) {
-            throw new NotReadableException(
+            throw new \Intervention\Image\Exception\NotReadableException(
                 "Unable to read image from binary data.",
                 0,
                 $e

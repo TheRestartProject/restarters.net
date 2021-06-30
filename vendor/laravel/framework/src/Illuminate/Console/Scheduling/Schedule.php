@@ -53,7 +53,7 @@ class Schedule
      * Add a new callback event to the schedule.
      *
      * @param  string|callable  $callback
-     * @param  array  $parameters
+     * @param  array   $parameters
      * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
     public function call($callback, array $parameters = [])
@@ -88,18 +88,15 @@ class Schedule
      *
      * @param  object|string  $job
      * @param  string|null  $queue
-     * @param  string|null  $connection
      * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
-    public function job($job, $queue = null, $connection = null)
+    public function job($job, $queue = null)
     {
-        return $this->call(function () use ($job, $queue, $connection) {
+        return $this->call(function () use ($job, $queue) {
             $job = is_string($job) ? resolve($job) : $job;
 
             if ($job instanceof ShouldQueue) {
-                dispatch($job)
-                    ->onConnection($connection ?? $job->connection)
-                    ->onQueue($queue ?? $job->queue);
+                dispatch($job)->onQueue($queue);
             } else {
                 dispatch_now($job);
             }

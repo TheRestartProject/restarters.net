@@ -32,13 +32,6 @@ class UrlGenerator implements UrlGeneratorContract
     protected $request;
 
     /**
-     * The asset root URL.
-     *
-     * @var string
-     */
-    protected $assetRoot;
-
-    /**
      * The forced URL root.
      *
      * @var string
@@ -46,7 +39,7 @@ class UrlGenerator implements UrlGeneratorContract
     protected $forcedRoot;
 
     /**
-     * The forced scheme for URLs.
+     * The forced schema for URLs.
      *
      * @var string
      */
@@ -60,9 +53,8 @@ class UrlGenerator implements UrlGeneratorContract
     protected $cachedRoot;
 
     /**
-     * A cached copy of the URL scheme for the current request.
+     * A cached copy of the URL schema for the current request.
      *
-     * @deprecated In 5.8, this will change to $cachedScheme
      * @var string|null
      */
     protected $cachedSchema;
@@ -114,13 +106,11 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  \Illuminate\Routing\RouteCollection  $routes
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $assetRoot
      * @return void
      */
-    public function __construct(RouteCollection $routes, Request $request, $assetRoot = null)
+    public function __construct(RouteCollection $routes, Request $request)
     {
         $this->routes = $routes;
-        $this->assetRoot = $assetRoot;
 
         $this->setRequest($request);
     }
@@ -204,7 +194,7 @@ class UrlGenerator implements UrlGeneratorContract
         // for passing the array of parameters to this URL as a list of segments.
         $root = $this->formatRoot($this->formatScheme($secure));
 
-        [$path, $query] = $this->extractQueryString($path);
+        list($path, $query) = $this->extractQueryString($path);
 
         return $this->format(
             $root, '/'.trim($path.'/'.$tail, '/')
@@ -239,9 +229,7 @@ class UrlGenerator implements UrlGeneratorContract
         // Once we get the root URL, we will check to see if it contains an index.php
         // file in the paths. If it does, we will remove it since it is not needed
         // for asset paths, but only for routes to endpoints in the application.
-        $root = $this->assetRoot
-                    ? $this->assetRoot
-                    : $this->formatRoot($this->formatScheme($secure));
+        $root = $this->formatRoot($this->formatScheme($secure));
 
         return $this->removeIndex($root).'/'.trim($path, '/');
     }
@@ -294,7 +282,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  bool|null  $secure
      * @return string
      */
-    public function formatScheme($secure = null)
+    public function formatScheme($secure)
     {
         if (! is_null($secure)) {
             return $secure ? 'https://' : 'http://';
@@ -312,11 +300,10 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $name
      * @param  array  $parameters
-     * @param  \DateTimeInterface|\DateInterval|int  $expiration
-     * @param  bool  $absolute
+     * @param  \DateTimeInterface|int  $expiration
      * @return string
      */
-    public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true)
+    public function signedRoute($name, $parameters = [], $expiration = null)
     {
         $parameters = $this->formatParameters($parameters);
 
@@ -329,44 +316,40 @@ class UrlGenerator implements UrlGeneratorContract
         $key = call_user_func($this->keyResolver);
 
         return $this->route($name, $parameters + [
-            'signature' => hash_hmac('sha256', $this->route($name, $parameters, $absolute), $key),
-        ], $absolute);
+            'signature' => hash_hmac('sha256', $this->route($name, $parameters), $key),
+        ]);
     }
 
     /**
      * Create a temporary signed route URL for a named route.
      *
      * @param  string  $name
-     * @param  \DateTimeInterface|\DateInterval|int  $expiration
+     * @param  \DateTimeInterface|int  $expiration
      * @param  array  $parameters
-     * @param  bool  $absolute
      * @return string
      */
-    public function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true)
+    public function temporarySignedRoute($name, $expiration, $parameters = [])
     {
-        return $this->signedRoute($name, $parameters, $expiration, $absolute);
+        return $this->signedRoute($name, $parameters, $expiration);
     }
 
     /**
      * Determine if the given request has a valid signature.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  bool  $absolute
      * @return bool
      */
-    public function hasValidSignature(Request $request, $absolute = true)
+    public function hasValidSignature(Request $request)
     {
-        $url = $absolute ? $request->url() : '/'.$request->path();
-
-        $original = rtrim($url.'?'.Arr::query(
+        $original = rtrim($request->url().'?'.http_build_query(
             Arr::except($request->query(), 'signature')
         ), '?');
 
-        $expires = $request->query('expires');
+        $expires = Arr::get($request->query(), 'expires');
 
         $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
 
-        return  hash_equals($signature, (string) $request->query('signature', '')) &&
+        return  hash_equals($signature, $request->query('signature', '')) &&
                ! ($expires && Carbon::now()->getTimestamp() > $expires);
     }
 
@@ -409,7 +392,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the URL to a controller action.
      *
-     * @param  string|array  $action
+     * @param  string  $action
      * @param  mixed   $parameters
      * @param  bool    $absolute
      * @return string
@@ -428,16 +411,12 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Format the given controller action.
      *
-     * @param  string|array  $action
+     * @param  string  $action
      * @return string
      */
     protected function formatAction($action)
     {
-        if (is_array($action)) {
-            $action = '\\'.implode('@', $action);
-        }
-
-        if ($this->rootNamespace && strpos($action, '\\') !== 0) {
+        if ($this->rootNamespace && ! (strpos($action, '\\') === 0)) {
             return $this->rootNamespace.'\\'.$action;
         } else {
             return trim($action, '\\');
@@ -508,19 +487,18 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $root
      * @param  string  $path
-     * @param  \Illuminate\Routing\Route|null  $route
      * @return string
      */
-    public function format($root, $path, $route = null)
+    public function format($root, $path)
     {
         $path = '/'.trim($path, '/');
 
         if ($this->formatHostUsing) {
-            $root = call_user_func($this->formatHostUsing, $root, $route);
+            $root = call_user_func($this->formatHostUsing, $root);
         }
 
         if ($this->formatPathUsing) {
-            $path = call_user_func($this->formatPathUsing, $path, $route);
+            $path = call_user_func($this->formatPathUsing, $path);
         }
 
         return trim($root.$path, '/');
@@ -579,14 +557,14 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Force the scheme for URLs.
      *
-     * @param  string  $scheme
+     * @param  string  $schema
      * @return void
      */
-    public function forceScheme($scheme)
+    public function forceScheme($schema)
     {
         $this->cachedSchema = null;
 
-        $this->forceScheme = $scheme.'://';
+        $this->forceScheme = $schema.'://';
     }
 
     /**

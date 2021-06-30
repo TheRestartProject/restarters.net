@@ -13,7 +13,7 @@ trait InteractsWithExceptionHandling
     /**
      * The original exception handler.
      *
-     * @var \Illuminate\Contracts\Debug\ExceptionHandler|null
+     * @var ExceptionHandler|null
      */
     protected $originalExceptionHandler;
 

@@ -25,7 +25,7 @@ final class RequestValueResolver implements ArgumentValueResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
+    public function supports(Request $request, ArgumentMetadata $argument)
     {
         return Request::class === $argument->getType() || is_subclass_of($argument->getType(), Request::class);
     }
@@ -33,7 +33,7 @@ final class RequestValueResolver implements ArgumentValueResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve(Request $request, ArgumentMetadata $argument)
     {
         yield $request;
     }

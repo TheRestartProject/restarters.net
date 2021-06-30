@@ -65,7 +65,7 @@ class QtFileLoader implements LoaderInterface
                 $translation = $translation->nextSibling;
             }
 
-            if (class_exists(FileResource::class)) {
+            if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
                 $catalogue->addResource(new FileResource($resource));
             }
         }

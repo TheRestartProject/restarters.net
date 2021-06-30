@@ -82,9 +82,8 @@ class RouteUrlGenerator
         // has been constructed, we'll make sure we don't have any missing parameters or we
         // will need to throw the exception to let the developers know one was not given.
         $uri = $this->addQueryString($this->url->format(
-            $root = $this->replaceRootParameters($route, $domain, $parameters),
-            $this->replaceRouteParameters($route->uri(), $parameters),
-            $route
+            $this->replaceRootParameters($route, $domain, $parameters),
+            $this->replaceRouteParameters($route->uri(), $parameters)
         ), $parameters);
 
         if (preg_match('/\{.*?\}/', $uri)) {
@@ -149,7 +148,7 @@ class RouteUrlGenerator
             return 'https://';
         }
 
-        return $this->url->formatScheme();
+        return $this->url->formatScheme(null);
     }
 
     /**
@@ -257,11 +256,11 @@ class RouteUrlGenerator
         // First we will get all of the string parameters that are remaining after we
         // have replaced the route wildcards. We'll then build a query string from
         // these string parameters then use it as a starting point for the rest.
-        if (count($parameters) === 0) {
+        if (count($parameters) == 0) {
             return '';
         }
 
-        $query = Arr::query(
+        $query = http_build_query(
             $keyed = $this->getStringParameters($parameters)
         );
 

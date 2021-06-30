@@ -3,14 +3,13 @@
 namespace Illuminate\Cookie;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Cookie\QueueingFactory as JarContract;
 
 class CookieJar implements JarContract
 {
-    use InteractsWithTime, Macroable;
+    use InteractsWithTime;
 
     /**
      * The default path (if specified).
@@ -63,7 +62,7 @@ class CookieJar implements JarContract
      */
     public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null)
     {
-        [$path, $domain, $secure, $sameSite] = $this->getPathAndDomain($path, $domain, $secure, $sameSite);
+        list($path, $domain, $secure, $sameSite) = $this->getPathAndDomain($path, $domain, $secure, $sameSite);
 
         $time = ($minutes == 0) ? 0 : $this->availableAt($minutes * 60);
 
@@ -177,7 +176,7 @@ class CookieJar implements JarContract
      */
     public function setDefaultPathAndDomain($path, $domain, $secure = false, $sameSite = null)
     {
-        [$this->path, $this->domain, $this->secure, $this->sameSite] = [$path, $domain, $secure, $sameSite];
+        list($this->path, $this->domain, $this->secure, $this->sameSite) = [$path, $domain, $secure, $sameSite];
 
         return $this;
     }

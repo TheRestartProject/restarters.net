@@ -54,15 +54,13 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function replaceUserNamespace($stub)
     {
-        $model = $this->userProviderModel();
-
-        if (! $model) {
+        if (! config('auth.providers.users.model')) {
             return $stub;
         }
 
         return str_replace(
             $this->rootNamespace().'User',
-            $model,
+            config('auth.providers.users.model'),
             $stub
         );
     }
@@ -92,7 +90,7 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $model = class_basename(trim($model, '\\'));
 
-        $dummyUser = class_basename($this->userProviderModel());
+        $dummyUser = class_basename(config('auth.providers.users.model'));
 
         $dummyModel = Str::camel($model) === 'user' ? 'model' : $model;
 
@@ -138,7 +136,7 @@ class PolicyMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to'],
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to.'],
         ];
     }
 }

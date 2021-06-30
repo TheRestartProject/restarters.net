@@ -7,6 +7,7 @@ use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * Functions used to create and wrap handlers with handler middleware.
@@ -38,7 +39,7 @@ final class Middleware
                             $cookieJar->extractCookies($request, $response);
                             return $response;
                         }
-                    );
+                );
             };
         };
     }
@@ -57,7 +58,7 @@ final class Middleware
                     return $handler($request, $options);
                 }
                 return $handler($request, $options)->then(
-                    function (ResponseInterface $response) use ($request) {
+                    function (ResponseInterface $response) use ($request, $handler) {
                         $code = $response->getStatusCode();
                         if ($code < 400) {
                             return $response;
@@ -182,7 +183,7 @@ final class Middleware
      *
      * @return callable Returns a function that accepts the next handler.
      */
-    public static function log(LoggerInterface $logger, MessageFormatter $formatter, $logLevel = 'info' /* \Psr\Log\LogLevel::INFO */)
+    public static function log(LoggerInterface $logger, MessageFormatter $formatter, $logLevel = LogLevel::INFO)
     {
         return function (callable $handler) use ($logger, $formatter, $logLevel) {
             return function ($request, array $options) use ($handler, $logger, $formatter, $logLevel) {

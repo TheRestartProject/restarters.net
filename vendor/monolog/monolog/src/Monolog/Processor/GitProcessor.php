@@ -19,7 +19,7 @@ use Monolog\Logger;
  * @author Nick Otter
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class GitProcessor implements ProcessorInterface
+class GitProcessor
 {
     private $level;
     private static $cache;
@@ -52,7 +52,7 @@ class GitProcessor implements ProcessorInterface
         }
 
         $branches = `git branch -v --no-abbrev`;
-        if ($branches && preg_match('{^\* (.+?)\s+([a-f0-9]{40})(?:\s|$)}m', $branches, $matches)) {
+        if (preg_match('{^\* (.+?)\s+([a-f0-9]{40})(?:\s|$)}m', $branches, $matches)) {
             return self::$cache = array(
                 'branch' => $matches[1],
                 'commit' => $matches[2],

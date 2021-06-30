@@ -16,7 +16,7 @@ namespace Monolog\Processor;
  *
  * @author Andreas Hörnicke
  */
-class ProcessIdProcessor implements ProcessorInterface
+class ProcessIdProcessor
 {
     /**
      * @param  array $record

@@ -3,9 +3,8 @@
 namespace Intervention\Image\Commands;
 
 use Closure;
-use Intervention\Image\Exception\InvalidArgumentException;
 
-class PolygonCommand extends AbstractCommand
+class PolygonCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Draw a polygon on given image
@@ -22,13 +21,13 @@ class PolygonCommand extends AbstractCommand
 
         // check if number if coordinates is even
         if ($vertices_count % 2 !== 0) {
-            throw new InvalidArgumentException(
+            throw new \Intervention\Image\Exception\InvalidArgumentException(
                 "The number of given polygon vertices must be even."
             );
         }
 
         if ($vertices_count < 6) {
-            throw new InvalidArgumentException(
+            throw new \Intervention\Image\Exception\InvalidArgumentException(
                 "You must have at least 3 points in your array."
             );
         }

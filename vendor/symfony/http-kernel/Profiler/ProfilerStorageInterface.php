@@ -14,14 +14,6 @@ namespace Symfony\Component\HttpKernel\Profiler;
 /**
  * ProfilerStorageInterface.
  *
- * This interface exists for historical reasons. The only supported
- * implementation is FileProfilerStorage.
- *
- * As the profiler must only be used on non-production servers, the file storage
- * is more than enough and no other implementations will ever be supported.
- *
- * @internal since 4.2
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface ProfilerStorageInterface
@@ -38,7 +30,7 @@ interface ProfilerStorageInterface
      *
      * @return array An array of tokens
      */
-    public function find($ip, $url, $limit, $method, $start = null, $end = null): array;
+    public function find($ip, $url, $limit, $method, $start = null, $end = null);
 
     /**
      * Reads data associated with the given token.
@@ -47,16 +39,16 @@ interface ProfilerStorageInterface
      *
      * @param string $token A token
      *
-     * @return Profile|null The profile associated with token
+     * @return Profile The profile associated with token
      */
-    public function read($token): ?Profile;
+    public function read($token);
 
     /**
      * Saves a Profile.
      *
      * @return bool Write operation successful
      */
-    public function write(Profile $profile): bool;
+    public function write(Profile $profile);
 
     /**
      * Purges all data from the database.

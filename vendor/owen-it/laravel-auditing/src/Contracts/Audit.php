@@ -2,6 +2,8 @@
 
 namespace OwenIt\Auditing\Contracts;
 
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+
 interface Audit
 {
     /**
@@ -21,16 +23,16 @@ interface Audit
     /**
      * Get the auditable model to which this Audit belongs.
      *
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function auditable();
+    public function auditable(): MorphTo;
 
     /**
      * User responsible for the changes.
      *
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function user();
+    public function user(): MorphTo;
 
     /**
      * Audit data resolver.

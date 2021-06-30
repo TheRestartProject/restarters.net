@@ -2,11 +2,10 @@
 
 namespace Intervention\Image\Gd\Shapes;
 
-use Intervention\Image\AbstractShape;
-use Intervention\Image\Gd\Color;
 use Intervention\Image\Image;
+use Intervention\Image\Gd\Color;
 
-class RectangleShape extends AbstractShape
+class RectangleShape extends \Intervention\Image\AbstractShape
 {
     /**
      * X-Coordinate of top-left point

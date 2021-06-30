@@ -2,10 +2,9 @@
 
 namespace Intervention\Image\Gd\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
 use Intervention\Image\Gd\Color;
 
-class PixelCommand extends AbstractCommand
+class PixelCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Draws one pixel to a given image

@@ -16,12 +16,10 @@ class Function_ extends Node\Stmt implements FunctionLike
     public $name;
     /** @var Node\Param[] Parameters */
     public $params;
-    /** @var null|Node\Identifier|Node\Name|Node\NullableType|Node\UnionType Return type */
+    /** @var null|Node\Identifier|Node\Name|Node\NullableType Return type */
     public $returnType;
     /** @var Node\Stmt[] Statements */
     public $stmts;
-    /** @var Node\AttributeGroup[] PHP attribute groups */
-    public $attrGroups;
 
     /**
      * Constructs a function node.
@@ -32,22 +30,20 @@ class Function_ extends Node\Stmt implements FunctionLike
      *                           'params'     => array(): Parameters
      *                           'returnType' => null   : Return type
      *                           'stmts'      => array(): Statements
-     *                           'attrGroups' => array(): PHP attribute groups
      * @param array  $attributes Additional attributes
      */
     public function __construct($name, array $subNodes = [], array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->byRef = $subNodes['byRef'] ?? false;
         $this->name = \is_string($name) ? new Node\Identifier($name) : $name;
         $this->params = $subNodes['params'] ?? [];
         $returnType = $subNodes['returnType'] ?? null;
         $this->returnType = \is_string($returnType) ? new Node\Identifier($returnType) : $returnType;
         $this->stmts = $subNodes['stmts'] ?? [];
-        $this->attrGroups = $subNodes['attrGroups'] ?? [];
     }
 
     public function getSubNodeNames() : array {
-        return ['attrGroups', 'byRef', 'name', 'params', 'returnType', 'stmts'];
+        return ['byRef', 'name', 'params', 'returnType', 'stmts'];
     }
 
     public function returnsByRef() : bool {
@@ -62,15 +58,11 @@ class Function_ extends Node\Stmt implements FunctionLike
         return $this->returnType;
     }
 
-    public function getAttrGroups() : array {
-        return $this->attrGroups;
-    }
-
     /** @return Node\Stmt[] */
     public function getStmts() : array {
         return $this->stmts;
     }
-
+    
     public function getType() : string {
         return 'Stmt_Function';
     }

@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Imagick\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class BackupCommand extends AbstractCommand
+class BackupCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Saves a backups of current state of image core

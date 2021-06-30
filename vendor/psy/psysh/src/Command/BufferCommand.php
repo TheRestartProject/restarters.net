@@ -56,8 +56,6 @@ HELP
         } else {
             $output->writeln($this->formatLines($buf), ShellOutput::NUMBER_LINES);
         }
-
-        return 0;
     }
 
     /**

@@ -22,9 +22,6 @@ final class DateIntervalUnit
 
     public const YEAR = 'YEAR';
 
-    /**
-     * @codeCoverageIgnore
-     */
     private function __construct()
     {
     }

@@ -1,93 +1,139 @@
 <?php
+/*
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the MIT license. For more information, see
+ * <http://www.doctrine-project.org>.
+ */
 
 namespace Doctrine\DBAL\Schema;
 
 use Doctrine\DBAL\Types\Type;
-use Doctrine\Deprecations\Deprecation;
-
+use const E_USER_DEPRECATED;
 use function array_merge;
 use function is_numeric;
 use function method_exists;
+use function sprintf;
+use function trigger_error;
 
 /**
  * Object representation of a database column.
+ *
+ * @link   www.doctrine-project.org
+ * @since  2.0
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class Column extends AbstractAsset
 {
-    /** @var Type */
+    /**
+     * @var Type
+     */
     protected $_type;
 
-    /** @var int|null */
-    protected $_length;
+    /**
+     * @var int|null
+     */
+    protected $_length = null;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $_precision = 10;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $_scale = 0;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $_unsigned = false;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $_fixed = false;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $_notnull = true;
 
-    /** @var string|null */
-    protected $_default;
+    /**
+     * @var string|null
+     */
+    protected $_default = null;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $_autoincrement = false;
 
-    /** @var mixed[] */
+    /**
+     * @var array
+     */
     protected $_platformOptions = [];
 
-    /** @var string|null */
-    protected $_columnDefinition;
+    /**
+     * @var string|null
+     */
+    protected $_columnDefinition = null;
 
-    /** @var string|null */
-    protected $_comment;
+    /**
+     * @var string|null
+     */
+    protected $_comment = null;
 
-    /** @var mixed[] */
+    /**
+     * @var array
+     */
     protected $_customSchemaOptions = [];
 
     /**
      * Creates a new Column.
      *
-     * @param string  $name
-     * @param mixed[] $options
+     * @param string $columnName
+     * @param Type   $type
+     * @param array  $options
      */
-    public function __construct($name, Type $type, array $options = [])
+    public function __construct($columnName, Type $type, array $options=[])
     {
-        $this->_setName($name);
+        $this->_setName($columnName);
         $this->setType($type);
         $this->setOptions($options);
     }
 
     /**
-     * @param mixed[] $options
+     * @param array $options
      *
      * @return Column
      */
     public function setOptions(array $options)
     {
         foreach ($options as $name => $value) {
-            $method = 'set' . $name;
-            if (! method_exists($this, $method)) {
+            $method = "set".$name;
+            if ( ! method_exists($this, $method)) {
                 // next major: throw an exception
-                Deprecation::trigger(
-                    'doctrine/dbal',
-                    'https://github.com/doctrine/dbal/pull/2846',
-                    'The "%s" column option is not supported,' .
-                    ' setting unknown options is deprecated and will cause an error in Doctrine DBAL 3.0',
+                @trigger_error(sprintf(
+                    'The "%s" column option is not supported,'.
+                    ' setting it is deprecated and will cause an error in Doctrine 3.0',
                     $name
-                );
+                ), E_USER_DEPRECATED);
 
                 continue;
             }
-
             $this->$method($value);
         }
 
@@ -95,6 +141,8 @@ class Column extends AbstractAsset
     }
 
     /**
+     * @param Type $type
+     *
      * @return Column
      */
     public function setType(Type $type)
@@ -127,7 +175,7 @@ class Column extends AbstractAsset
      */
     public function setPrecision($precision)
     {
-        if (! is_numeric($precision)) {
+        if (!is_numeric($precision)) {
             $precision = 10; // defaults to 10 when no valid precision is given.
         }
 
@@ -143,7 +191,7 @@ class Column extends AbstractAsset
      */
     public function setScale($scale)
     {
-        if (! is_numeric($scale)) {
+        if (!is_numeric($scale)) {
             $scale = 0;
         }
 
@@ -201,7 +249,7 @@ class Column extends AbstractAsset
     }
 
     /**
-     * @param mixed[] $platformOptions
+     * @param array $platformOptions
      *
      * @return Column
      */
@@ -302,7 +350,7 @@ class Column extends AbstractAsset
     }
 
     /**
-     * @return mixed[]
+     * @return array
      */
     public function getPlatformOptions()
     {
@@ -358,7 +406,7 @@ class Column extends AbstractAsset
     }
 
     /**
-     * @param string|null $comment
+     * @param string $comment
      *
      * @return Column
      */
@@ -411,7 +459,7 @@ class Column extends AbstractAsset
     }
 
     /**
-     * @param mixed[] $customSchemaOptions
+     * @param array $customSchemaOptions
      *
      * @return Column
      */
@@ -423,7 +471,7 @@ class Column extends AbstractAsset
     }
 
     /**
-     * @return mixed[]
+     * @return array
      */
     public function getCustomSchemaOptions()
     {
@@ -431,7 +479,7 @@ class Column extends AbstractAsset
     }
 
     /**
-     * @return mixed[]
+     * @return array
      */
     public function toArray()
     {

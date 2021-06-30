@@ -146,9 +146,10 @@ class QueueFake extends QueueManager implements Queue
      */
     protected function isChainOfObjects($chain)
     {
-        return ! collect($chain)->contains(function ($job) {
-            return ! is_object($job);
-        });
+        return collect($chain)->count() == collect($chain)
+                    ->filter(function ($job) {
+                        return is_object($job);
+                    })->count();
     }
 
     /**
@@ -325,16 +326,6 @@ class QueueFake extends QueueManager implements Queue
         foreach ($jobs as $job) {
             $this->push($job, $data, $queue);
         }
-    }
-
-    /**
-     * Get the jobs that have been pushed.
-     *
-     * @return array
-     */
-    public function pushedJobs()
-    {
-        return $this->jobs;
     }
 
     /**

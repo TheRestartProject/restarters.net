@@ -35,7 +35,7 @@ class DataPart extends TextPart
         if (null === $contentType) {
             $contentType = 'application/octet-stream';
         }
-        [$this->mediaType, $subtype] = explode('/', $contentType);
+        list($this->mediaType, $subtype) = explode('/', $contentType);
 
         parent::__construct($body, null, $subtype, $encoding);
 
@@ -46,16 +46,14 @@ class DataPart extends TextPart
 
     public static function fromPath(string $path, string $name = null, string $contentType = null): self
     {
+        // FIXME: if file is not readable, exception?
+
         if (null === $contentType) {
             $ext = strtolower(substr($path, strrpos($path, '.') + 1));
             if (null === self::$mimeTypes) {
                 self::$mimeTypes = new MimeTypes();
             }
             $contentType = self::$mimeTypes->getMimeTypes($ext)[0] ?? 'application/octet-stream';
-        }
-
-        if (false === is_readable($path)) {
-            throw new InvalidArgumentException(sprintf('Path "%s" is not readable.', $path));
         }
 
         if (false === $handle = @fopen($path, 'r', false)) {
@@ -153,13 +151,7 @@ class DataPart extends TextPart
         $r->setValue($this, $this->_headers);
         unset($this->_headers);
 
-        if (!\is_array($this->_parent)) {
-            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-        }
         foreach (['body', 'charset', 'subtype', 'disposition', 'name', 'encoding'] as $name) {
-            if (null !== $this->_parent[$name] && !\is_string($this->_parent[$name])) {
-                throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-            }
             $r = new \ReflectionProperty(TextPart::class, $name);
             $r->setAccessible(true);
             $r->setValue($this, $this->_parent[$name]);

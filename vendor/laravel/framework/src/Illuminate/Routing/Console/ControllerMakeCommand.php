@@ -150,8 +150,6 @@ class ControllerMakeCommand extends GeneratorCommand
      *
      * @param  string  $model
      * @return string
-     *
-     * @throws \InvalidArgumentException
      */
     protected function parseModel($model)
     {

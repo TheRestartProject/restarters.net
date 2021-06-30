@@ -8,7 +8,6 @@ use Illuminate\Mail\Markdown;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class MailChannel
 {
@@ -61,7 +60,7 @@ class MailChannel
 
         $this->mailer->send(
             $this->buildView($message),
-            array_merge($message->data(), $this->additionalMessageData($notification)),
+            $message->data(),
             $this->messageBuilder($notifiable, $notification, $message)
         );
     }
@@ -96,22 +95,6 @@ class MailChannel
         return [
             'html' => $this->markdown->render($message->markdown, $message->data()),
             'text' => $this->markdown->renderText($message->markdown, $message->data()),
-        ];
-    }
-
-    /**
-     * Get additional meta-data to pass along with the view data.
-     *
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @return array
-     */
-    protected function additionalMessageData($notification)
-    {
-        return [
-            '__laravel_notification' => get_class($notification),
-            '__laravel_notification_queued' => in_array(
-                ShouldQueue::class, class_implements($notification)
-            ),
         ];
     }
 

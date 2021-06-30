@@ -68,7 +68,8 @@ class Swift_Mime_SimpleHeaderFactory implements Swift_Mime_CharsetObserver
     /**
      * Create a new Date header using $dateTime.
      *
-     * @param string $name
+     * @param string                 $name
+     * @param DateTimeInterface|null $dateTime
      *
      * @return Swift_Mime_Header
      */

@@ -21,10 +21,10 @@ use Symfony\Component\VarDumper\Cloner\DumperInterface;
  */
 abstract class AbstractDumper implements DataDumperInterface, DumperInterface
 {
-    public const DUMP_LIGHT_ARRAY = 1;
-    public const DUMP_STRING_LENGTH = 2;
-    public const DUMP_COMMA_SEPARATOR = 4;
-    public const DUMP_TRAILING_COMMA = 8;
+    const DUMP_LIGHT_ARRAY = 1;
+    const DUMP_STRING_LENGTH = 2;
+    const DUMP_COMMA_SEPARATOR = 4;
+    const DUMP_TRAILING_COMMA = 8;
 
     public static $defaultOutput = 'php://output';
 
@@ -35,11 +35,11 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     protected $indentPad = '  ';
     protected $flags;
 
-    private $charset = '';
+    private $charset;
 
     /**
      * @param callable|resource|string|null $output  A line dumper callable, an opened stream or an output path, defaults to static::$defaultOutput
-     * @param string|null                   $charset The default character encoding to use for non-UTF8 strings
+     * @param string                        $charset The default character encoding to use for non-UTF8 strings
      * @param int                           $flags   A bit field of static::DUMP_* constants to fine tune dumps representation
      */
     public function __construct($output = null, string $charset = null, int $flags = 0)
@@ -70,10 +70,10 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
             $this->lineDumper = $output;
         } else {
             if (\is_string($output)) {
-                $output = fopen($output, 'w');
+                $output = fopen($output, 'wb');
             }
             $this->outputStream = $output;
-            $this->lineDumper = [$this, 'echoLine'];
+            $this->lineDumper = array($this, 'echoLine');
         }
 
         return $prev;
@@ -116,6 +116,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Dumps a Data object.
      *
+     * @param Data                               $data   A Data object
      * @param callable|resource|string|true|null $output A line dumper callable, an opened stream, an output path or true to return the dump
      *
      * @return string|null The dump as string when $output is true
@@ -125,12 +126,12 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
         $this->decimalPoint = localeconv();
         $this->decimalPoint = $this->decimalPoint['decimal_point'];
 
-        if ($locale = $this->flags & (self::DUMP_COMMA_SEPARATOR | self::DUMP_TRAILING_COMMA) ? setlocale(\LC_NUMERIC, 0) : null) {
-            setlocale(\LC_NUMERIC, 'C');
+        if ($locale = $this->flags & (self::DUMP_COMMA_SEPARATOR | self::DUMP_TRAILING_COMMA) ? setlocale(LC_NUMERIC, 0) : null) {
+            setlocale(LC_NUMERIC, 'C');
         }
 
         if ($returnDump = true === $output) {
-            $output = fopen('php://memory', 'r+');
+            $output = fopen('php://memory', 'r+b');
         }
         if ($output) {
             $prevOutput = $this->setOutput($output);
@@ -150,11 +151,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
                 $this->setOutput($prevOutput);
             }
             if ($locale) {
-                setlocale(\LC_NUMERIC, $locale);
+                setlocale(LC_NUMERIC, $locale);
             }
         }
-
-        return null;
     }
 
     /**
@@ -165,7 +164,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      */
     protected function dumpLine($depth)
     {
-        ($this->lineDumper)($this->line, $depth, $this->indentPad);
+        \call_user_func($this->lineDumper, $this->line, $depth, $this->indentPad);
         $this->line = '';
     }
 
@@ -186,13 +185,13 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Converts a non-UTF-8 string to UTF-8.
      *
-     * @param string|null $s The non-UTF-8 string to convert
+     * @param string $s The non-UTF-8 string to convert
      *
-     * @return string|null The string converted to UTF-8
+     * @return string The string converted to UTF-8
      */
     protected function utf8Encode($s)
     {
-        if (null === $s || preg_match('//u', $s)) {
+        if (preg_match('//u', $s)) {
             return $s;
         }
 

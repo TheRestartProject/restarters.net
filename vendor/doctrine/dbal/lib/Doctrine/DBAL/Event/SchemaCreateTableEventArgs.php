@@ -1,97 +1,130 @@
 <?php
+/*
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the MIT license. For more information, see
+ * <http://www.doctrine-project.org>.
+ */
 
 namespace Doctrine\DBAL\Event;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Table;
-
 use function array_merge;
-use function func_get_args;
 use function is_array;
 
 /**
- * Event Arguments used when SQL queries for creating tables are generated inside {@link AbstractPlatform}.
+ * Event Arguments used when SQL queries for creating tables are generated inside Doctrine\DBAL\Platform\AbstractPlatform.
+ *
+ * @link   www.doctrine-project.org
+ * @since  2.2
+ * @author Jan Sorgalla <jsorgalla@googlemail.com>
  */
 class SchemaCreateTableEventArgs extends SchemaEventArgs
 {
-    /** @var Table */
-    private $table;
-
-    /** @var mixed[][] */
-    private $columns;
-
-    /** @var mixed[] */
-    private $options;
-
-    /** @var AbstractPlatform */
-    private $platform;
-
-    /** @var string[] */
-    private $sql = [];
+    /**
+     * @var \Doctrine\DBAL\Schema\Table
+     */
+    private $_table;
 
     /**
-     * @param mixed[][] $columns
-     * @param mixed[]   $options
+     * @var array
+     */
+    private $_columns;
+
+    /**
+     * @var array
+     */
+    private $_options;
+
+    /**
+     * @var \Doctrine\DBAL\Platforms\AbstractPlatform
+     */
+    private $_platform;
+
+    /**
+     * @var array
+     */
+    private $_sql = [];
+
+    /**
+     * @param \Doctrine\DBAL\Schema\Table               $table
+     * @param array                                     $columns
+     * @param array                                     $options
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
      */
     public function __construct(Table $table, array $columns, array $options, AbstractPlatform $platform)
     {
-        $this->table    = $table;
-        $this->columns  = $columns;
-        $this->options  = $options;
-        $this->platform = $platform;
+        $this->_table    = $table;
+        $this->_columns  = $columns;
+        $this->_options  = $options;
+        $this->_platform = $platform;
     }
 
     /**
-     * @return Table
+     * @return \Doctrine\DBAL\Schema\Table
      */
     public function getTable()
     {
-        return $this->table;
+        return $this->_table;
     }
 
     /**
-     * @return mixed[][]
+     * @return array
      */
     public function getColumns()
     {
-        return $this->columns;
+        return $this->_columns;
     }
 
     /**
-     * @return mixed[]
+     * @return array
      */
     public function getOptions()
     {
-        return $this->options;
+        return $this->_options;
     }
 
     /**
-     * @return AbstractPlatform
+     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
      */
     public function getPlatform()
     {
-        return $this->platform;
+        return $this->_platform;
     }
 
     /**
-     * Passing multiple SQL statements as an array is deprecated. Pass each statement as an individual argument instead.
+     * @param string|array $sql
      *
-     * @param string|string[] $sql
-     *
-     * @return SchemaCreateTableEventArgs
+     * @return \Doctrine\DBAL\Event\SchemaCreateTableEventArgs
      */
     public function addSql($sql)
     {
-        $this->sql = array_merge($this->sql, is_array($sql) ? $sql : func_get_args());
+        if (is_array($sql)) {
+            $this->_sql = array_merge($this->_sql, $sql);
+        } else {
+            $this->_sql[] = $sql;
+        }
 
         return $this;
     }
 
     /**
-     * @return string[]
+     * @return array
      */
     public function getSql()
     {
-        return $this->sql;
+        return $this->_sql;
     }
 }

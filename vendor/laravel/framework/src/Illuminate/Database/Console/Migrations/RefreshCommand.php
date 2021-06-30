@@ -42,26 +42,28 @@ class RefreshCommand extends Command
 
         $path = $this->input->getOption('path');
 
+        $force = $this->input->getOption('force');
+
         // If the "step" option is specified it means we only want to rollback a small
         // number of migrations before migrating again. For example, the user might
         // only rollback and remigrate the latest four migrations instead of all.
         $step = $this->input->getOption('step') ?: 0;
 
         if ($step > 0) {
-            $this->runRollback($database, $path, $step);
+            $this->runRollback($database, $path, $step, $force);
         } else {
-            $this->runReset($database, $path);
+            $this->runReset($database, $path, $force);
         }
 
         // The refresh command is essentially just a brief aggregate of a few other of
         // the migration commands and just provides a convenient wrapper to execute
         // them in succession. We'll also see if we need to re-seed the database.
-        $this->call('migrate', array_filter([
+        $this->call('migrate', [
             '--database' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
-            '--force' => true,
-        ]));
+            '--force' => $force,
+        ]);
 
         if ($this->needsSeeding()) {
             $this->runSeeder($database);
@@ -73,18 +75,19 @@ class RefreshCommand extends Command
      *
      * @param  string  $database
      * @param  string  $path
-     * @param  int  $step
+     * @param  bool  $step
+     * @param  bool  $force
      * @return void
      */
-    protected function runRollback($database, $path, $step)
+    protected function runRollback($database, $path, $step, $force)
     {
-        $this->call('migrate:rollback', array_filter([
+        $this->call('migrate:rollback', [
             '--database' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
             '--step' => $step,
-            '--force' => true,
-        ]));
+            '--force' => $force,
+        ]);
     }
 
     /**
@@ -92,16 +95,17 @@ class RefreshCommand extends Command
      *
      * @param  string  $database
      * @param  string  $path
+     * @param  bool  $force
      * @return void
      */
-    protected function runReset($database, $path)
+    protected function runReset($database, $path, $force)
     {
-        $this->call('migrate:reset', array_filter([
+        $this->call('migrate:reset', [
             '--database' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
-            '--force' => true,
-        ]));
+            '--force' => $force,
+        ]);
     }
 
     /**
@@ -122,11 +126,11 @@ class RefreshCommand extends Command
      */
     protected function runSeeder($database)
     {
-        $this->call('db:seed', array_filter([
+        $this->call('db:seed', [
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'DatabaseSeeder',
-            '--force' => true,
-        ]));
+            '--force' => $this->option('force'),
+        ]);
     }
 
     /**
@@ -137,19 +141,19 @@ class RefreshCommand extends Command
     protected function getOptions()
     {
         return [
-            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
+            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
 
-            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
+            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
-            ['path', null, InputOption::VALUE_OPTIONAL, 'The path to the migrations files to be executed'],
+            ['path', null, InputOption::VALUE_OPTIONAL, 'The path to the migrations files to be executed.'],
 
-            ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
+            ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths.'],
 
-            ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run'],
+            ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
 
-            ['seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder'],
+            ['seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder.'],
 
-            ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted & re-run'],
+            ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted & re-run.'],
         ];
     }
 }

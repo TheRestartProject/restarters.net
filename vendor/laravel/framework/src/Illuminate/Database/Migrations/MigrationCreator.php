@@ -42,7 +42,6 @@ class MigrationCreator
      * @param  string  $table
      * @param  bool    $create
      * @return string
-     *
      * @throws \Exception
      */
     public function create($name, $path, $table = null, $create = false)

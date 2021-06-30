@@ -3,7 +3,6 @@
 namespace Intervention\Image;
 
 use Closure;
-use Intervention\Image\Exception\InvalidArgumentException;
 
 class Size
 {
@@ -105,7 +104,7 @@ class Size
     public function resize($width, $height, Closure $callback = null)
     {
         if (is_null($width) && is_null($height)) {
-            throw new InvalidArgumentException(
+            throw new \Intervention\Image\Exception\InvalidArgumentException(
                 "Width or height needs to be defined."
             );
         }
@@ -155,7 +154,7 @@ class Size
             }
 
             if ($constraint->isFixed(Constraint::ASPECTRATIO)) {
-                $h = max(1, intval(round($this->width / $constraint->getSize()->getRatio())));
+                $h = intval(round($this->width / $constraint->getSize()->getRatio()));
 
                 if ($constraint->isFixed(Constraint::UPSIZE)) {
                     $this->height = ($h > $max_height) ? $max_height : $h;
@@ -191,7 +190,7 @@ class Size
             }
 
             if ($constraint->isFixed(Constraint::ASPECTRATIO)) {
-                $w = max(1, intval(round($this->height * $constraint->getSize()->getRatio())));
+                $w = intval(round($this->height * $constraint->getSize()->getRatio()));
 
                 if ($constraint->isFixed(Constraint::UPSIZE)) {
                     $this->width = ($w > $max_width) ? $max_width : $w;

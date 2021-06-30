@@ -72,7 +72,7 @@ class FirePHPHandler extends AbstractProcessingHandler
      *
      * @see createHeader()
      * @param  array  $record
-     * @return array
+     * @return string
      */
     protected function createRecordHeader(array $record)
     {
@@ -158,7 +158,7 @@ class FirePHPHandler extends AbstractProcessingHandler
     /**
      * Verifies if the headers are accepted by the current user agent
      *
-     * @return bool
+     * @return Boolean
      */
     protected function headersAccepted()
     {

@@ -3,8 +3,6 @@
 namespace Intervention\Image;
 
 use Closure;
-use Intervention\Image\Exception\MissingDependencyException;
-use Intervention\Image\Exception\NotSupportedException;
 
 class ImageManager
 {
@@ -92,7 +90,7 @@ class ImageManager
             return $imagecache->get($lifetime, $returnObj);
         }
 
-        throw new MissingDependencyException(
+        throw new \Intervention\Image\Exception\MissingDependencyException(
             "Please install package intervention/imagecache before running this function."
         );
     }
@@ -112,7 +110,7 @@ class ImageManager
                 return new $driverclass;
             }
 
-            throw new NotSupportedException(
+            throw new \Intervention\Image\Exception\NotSupportedException(
                 "Driver ({$drivername}) could not be instantiated."
             );
         }
@@ -121,7 +119,7 @@ class ImageManager
             return $this->config['driver'];
         }
 
-        throw new NotSupportedException(
+        throw new \Intervention\Image\Exception\NotSupportedException(
             "Unknown driver type."
         );
     }
@@ -134,7 +132,7 @@ class ImageManager
     private function checkRequirements()
     {
         if ( ! function_exists('finfo_buffer')) {
-            throw new MissingDependencyException(
+            throw new \Intervention\Image\Exception\MissingDependencyException(
                 "PHP Fileinfo extension must be installed/enabled to use Intervention Image."
             );
         }

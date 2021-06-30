@@ -33,16 +33,16 @@ class FunctionExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getFunctionTranslators(): array
+    public function getFunctionTranslators()
     {
-        return [
-            'nth-child' => [$this, 'translateNthChild'],
-            'nth-last-child' => [$this, 'translateNthLastChild'],
-            'nth-of-type' => [$this, 'translateNthOfType'],
-            'nth-last-of-type' => [$this, 'translateNthLastOfType'],
-            'contains' => [$this, 'translateContains'],
-            'lang' => [$this, 'translateLang'],
-        ];
+        return array(
+            'nth-child' => array($this, 'translateNthChild'),
+            'nth-last-child' => array($this, 'translateNthLastChild'),
+            'nth-of-type' => array($this, 'translateNthOfType'),
+            'nth-last-of-type' => array($this, 'translateNthLastOfType'),
+            'contains' => array($this, 'translateContains'),
+            'lang' => array($this, 'translateLang'),
+        );
     }
 
     /**
@@ -51,9 +51,9 @@ class FunctionExtension extends AbstractExtension
     public function translateNthChild(XPathExpr $xpath, FunctionNode $function, bool $last = false, bool $addNameTest = true): XPathExpr
     {
         try {
-            [$a, $b] = Parser::parseSeries($function->getArguments());
+            list($a, $b) = Parser::parseSeries($function->getArguments());
         } catch (SyntaxErrorException $e) {
-            throw new ExpressionErrorException(sprintf('Invalid series: "%s".', implode('", "', $function->getArguments())), 0, $e);
+            throw new ExpressionErrorException(sprintf('Invalid series: %s', implode(', ', $function->getArguments())), 0, $e);
         }
 
         $xpath->addStarPrefix();
@@ -86,7 +86,7 @@ class FunctionExtension extends AbstractExtension
             $expr .= ' - '.$b;
         }
 
-        $conditions = [sprintf('%s %s 0', $expr, $sign)];
+        $conditions = array(sprintf('%s %s 0', $expr, $sign));
 
         if (1 !== $a && -1 !== $a) {
             $conditions[] = sprintf('(%s) mod %d = 0', $expr, $a);
@@ -164,7 +164,7 @@ class FunctionExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
+    public function getName()
     {
         return 'function';
     }

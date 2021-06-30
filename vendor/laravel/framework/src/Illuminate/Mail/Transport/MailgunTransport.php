@@ -22,7 +22,7 @@ class MailgunTransport extends Transport
     protected $key;
 
     /**
-     * The Mailgun email domain.
+     * The Mailgun domain.
      *
      * @var string
      */
@@ -33,7 +33,7 @@ class MailgunTransport extends Transport
      *
      * @var string
      */
-    protected $endpoint;
+    protected $url;
 
     /**
      * Create a new Mailgun transport instance.
@@ -41,15 +41,12 @@ class MailgunTransport extends Transport
      * @param  \GuzzleHttp\ClientInterface  $client
      * @param  string  $key
      * @param  string  $domain
-     * @param  string|null  $endpoint
      * @return void
      */
-    public function __construct(ClientInterface $client, $key, $domain, $endpoint = null)
+    public function __construct(ClientInterface $client, $key, $domain)
     {
         $this->key = $key;
         $this->client = $client;
-        $this->endpoint = $endpoint ?? 'api.mailgun.net';
-
         $this->setDomain($domain);
     }
 
@@ -64,11 +61,7 @@ class MailgunTransport extends Transport
 
         $message->setBcc([]);
 
-        $this->client->request(
-            'POST',
-            "https://{$this->endpoint}/v3/{$this->domain}/messages.mime",
-            $this->payload($message, $to)
-        );
+        $this->client->post($this->url, $this->payload($message, $to));
 
         $this->sendPerformed($message);
 
@@ -168,6 +161,8 @@ class MailgunTransport extends Transport
      */
     public function setDomain($domain)
     {
+        $this->url = 'https://api.mailgun.net/v3/'.$domain.'/messages.mime';
+
         return $this->domain = $domain;
     }
 }

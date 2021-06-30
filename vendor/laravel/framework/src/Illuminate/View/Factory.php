@@ -5,7 +5,6 @@ namespace Illuminate\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
@@ -14,8 +13,7 @@ use Illuminate\Contracts\View\Factory as FactoryContract;
 
 class Factory implements FactoryContract
 {
-    use Macroable,
-        Concerns\ManagesComponents,
+    use Concerns\ManagesComponents,
         Concerns\ManagesEvents,
         Concerns\ManagesLayouts,
         Concerns\ManagesLoops,
@@ -103,7 +101,7 @@ class Factory implements FactoryContract
      * Get the evaluated view contents for the given view.
      *
      * @param  string  $path
-     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
+     * @param  array   $data
      * @param  array   $mergeData
      * @return \Illuminate\Contracts\View\View
      */
@@ -120,7 +118,7 @@ class Factory implements FactoryContract
      * Get the evaluated view contents for the given view.
      *
      * @param  string  $view
-     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
+     * @param  array   $data
      * @param  array   $mergeData
      * @return \Illuminate\Contracts\View\View
      */
@@ -144,7 +142,7 @@ class Factory implements FactoryContract
      * Get the first view that actually exists from the given list.
      *
      * @param  array  $views
-     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
+     * @param  array   $data
      * @param  array   $mergeData
      * @return \Illuminate\Contracts\View\View
      *
@@ -168,7 +166,7 @@ class Factory implements FactoryContract
      *
      * @param  bool  $condition
      * @param  string  $view
-     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
+     * @param  array   $data
      * @param  array   $mergeData
      * @return string
      */
@@ -244,7 +242,7 @@ class Factory implements FactoryContract
      *
      * @param  string  $view
      * @param  string  $path
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @param  array  $data
      * @return \Illuminate\Contracts\View\View
      */
     protected function viewInstance($view, $path, $data)

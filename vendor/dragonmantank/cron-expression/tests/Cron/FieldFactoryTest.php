@@ -32,11 +32,10 @@ class FieldFactoryTest extends TestCase
 
     /**
      * @covers \Cron\FieldFactory::getField
+     * @expectedException InvalidArgumentException
      */
     public function testValidatesFieldPosition()
     {
-        $this->expectException(\InvalidArgumentException::class);
-
         $f = new FieldFactory();
         $f->getField(-1);
     }

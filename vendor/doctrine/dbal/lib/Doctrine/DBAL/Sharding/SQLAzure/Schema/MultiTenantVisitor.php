@@ -1,16 +1,31 @@
 <?php
+/*
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the MIT license. For more information, see
+ * <http://www.doctrine-project.org>.
+ */
 
 namespace Doctrine\DBAL\Sharding\SQLAzure\Schema;
 
+use Doctrine\DBAL\Schema\Visitor\Visitor;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
-use Doctrine\DBAL\Schema\Index;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Sequence;
-use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Schema\Visitor\Visitor;
-use RuntimeException;
-
+use Doctrine\DBAL\Schema\Index;
 use function in_array;
 
 /**
@@ -32,17 +47,23 @@ use function in_array;
  *   SQLAzure throws errors when you try to create IDENTIY columns on federated
  *   tables.
  *
- * @deprecated
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class MultiTenantVisitor implements Visitor
 {
-    /** @var string[] */
+    /**
+     * @var array
+     */
     private $excludedTables = [];
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $tenantColumnName;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $tenantColumnType = 'integer';
 
     /**
@@ -54,13 +75,13 @@ class MultiTenantVisitor implements Visitor
     private $distributionName;
 
     /**
-     * @param string[]    $excludedTables
+     * @param array       $excludedTables
      * @param string      $tenantColumnName
      * @param string|null $distributionName
      */
     public function __construct(array $excludedTables = [], $tenantColumnName = 'tenant_id', $distributionName = null)
     {
-        $this->excludedTables   = $excludedTables;
+        $this->excludedTables = $excludedTables;
         $this->tenantColumnName = $tenantColumnName;
         $this->distributionName = $distributionName ?: $tenantColumnName;
     }
@@ -75,12 +96,12 @@ class MultiTenantVisitor implements Visitor
         }
 
         $table->addColumn($this->tenantColumnName, $this->tenantColumnType, [
-            'default' => "federation_filtering_value('" . $this->distributionName . "')",
+            'default' => "federation_filtering_value('". $this->distributionName ."')",
         ]);
 
         $clusteredIndex = $this->getClusteredIndex($table);
 
-        $indexColumns   = $clusteredIndex->getColumns();
+        $indexColumns = $clusteredIndex->getColumns();
         $indexColumns[] = $this->tenantColumnName;
 
         if ($clusteredIndex->isPrimary()) {
@@ -94,25 +115,22 @@ class MultiTenantVisitor implements Visitor
     }
 
     /**
-     * @param Table $table
+     * @param \Doctrine\DBAL\Schema\Table $table
      *
-     * @return Index
+     * @return \Doctrine\DBAL\Schema\Index
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     private function getClusteredIndex($table)
     {
         foreach ($table->getIndexes() as $index) {
             if ($index->isPrimary() && ! $index->hasFlag('nonclustered')) {
                 return $index;
-            }
-
-            if ($index->hasFlag('clustered')) {
+            } elseif ($index->hasFlag('clustered')) {
                 return $index;
             }
         }
-
-        throw new RuntimeException('No clustered index found on table ' . $table->getName());
+        throw new \RuntimeException("No clustered index found on table " . $table->getName());
     }
 
     /**

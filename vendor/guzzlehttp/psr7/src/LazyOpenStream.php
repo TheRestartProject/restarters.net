@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Psr7;
 
 use Psr\Http\Message\StreamInterface;
@@ -7,8 +6,6 @@ use Psr\Http\Message\StreamInterface;
 /**
  * Lazily reads or writes to a file that is opened only after an IO operation
  * take place on the stream.
- *
- * @final
  */
 class LazyOpenStream implements StreamInterface
 {
@@ -17,7 +14,7 @@ class LazyOpenStream implements StreamInterface
     /** @var string File to open */
     private $filename;
 
-    /** @var string */
+    /** @var string $mode */
     private $mode;
 
     /**
@@ -37,6 +34,6 @@ class LazyOpenStream implements StreamInterface
      */
     protected function createStream()
     {
-        return Utils::streamFor(Utils::tryFopen($this->filename, $this->mode));
+        return stream_for(try_fopen($this->filename, $this->mode));
     }
 }

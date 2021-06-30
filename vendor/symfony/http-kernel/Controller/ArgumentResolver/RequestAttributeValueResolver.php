@@ -25,7 +25,7 @@ final class RequestAttributeValueResolver implements ArgumentValueResolverInterf
     /**
      * {@inheritdoc}
      */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
+    public function supports(Request $request, ArgumentMetadata $argument)
     {
         return !$argument->isVariadic() && $request->attributes->has($argument->getName());
     }
@@ -33,7 +33,7 @@ final class RequestAttributeValueResolver implements ArgumentValueResolverInterf
     /**
      * {@inheritdoc}
      */
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve(Request $request, ArgumentMetadata $argument)
     {
         yield $request->attributes->get($argument->getName());
     }

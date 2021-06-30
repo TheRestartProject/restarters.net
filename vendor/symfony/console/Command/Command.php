@@ -37,17 +37,17 @@ class Command
     private $application;
     private $name;
     private $processTitle;
-    private $aliases = [];
+    private $aliases = array();
     private $definition;
     private $hidden = false;
-    private $help = '';
-    private $description = '';
+    private $help;
+    private $description;
     private $ignoreValidationErrors = false;
     private $applicationDefinitionMerged = false;
     private $applicationDefinitionMergedWithArgs = false;
     private $code;
-    private $synopsis = [];
-    private $usages = [];
+    private $synopsis = array();
+    private $usages = array();
     private $helperSet;
 
     /**
@@ -55,7 +55,7 @@ class Command
      */
     public static function getDefaultName()
     {
-        $class = static::class;
+        $class = \get_called_class();
         $r = new \ReflectionProperty($class, 'defaultName');
 
         return $class === $r->class ? static::$defaultName : null;
@@ -105,7 +105,7 @@ class Command
     /**
      * Gets the helper set.
      *
-     * @return HelperSet|null A HelperSet instance
+     * @return HelperSet A HelperSet instance
      */
     public function getHelperSet()
     {
@@ -115,7 +115,7 @@ class Command
     /**
      * Gets the application instance for this command.
      *
-     * @return Application|null An Application instance
+     * @return Application An Application instance
      */
     public function getApplication()
     {
@@ -150,7 +150,7 @@ class Command
      * execute() method, you set the code to execute by passing
      * a Closure to the setCode() method.
      *
-     * @return int 0 if everything went fine, or an exit code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @throws LogicException When this abstract method is not implemented
      *
@@ -223,7 +223,7 @@ class Command
         if (null !== $this->processTitle) {
             if (\function_exists('cli_set_process_title')) {
                 if (!@cli_set_process_title($this->processTitle)) {
-                    if ('Darwin' === \PHP_OS) {
+                    if ('Darwin' === PHP_OS) {
                         $output->writeln('<comment>Running "cli_set_process_title" as an unprivileged user is not supported on MacOS.</comment>', OutputInterface::VERBOSITY_VERY_VERBOSE);
                     } else {
                         cli_set_process_title($this->processTitle);
@@ -250,13 +250,9 @@ class Command
         $input->validate();
 
         if ($this->code) {
-            $statusCode = ($this->code)($input, $output);
+            $statusCode = \call_user_func($this->code, $input, $output);
         } else {
             $statusCode = $this->execute($input, $output);
-
-            if (!\is_int($statusCode)) {
-                @trigger_error(sprintf('Return value of "%s::execute()" should always be of the type int since Symfony 4.4, %s returned.', static::class, \gettype($statusCode)), \E_USER_DEPRECATED);
-            }
         }
 
         return is_numeric($statusCode) ? (int) $statusCode : 0;
@@ -281,14 +277,7 @@ class Command
         if ($code instanceof \Closure) {
             $r = new \ReflectionFunction($code);
             if (null === $r->getClosureThis()) {
-                set_error_handler(static function () {});
-                try {
-                    if ($c = \Closure::bind($code, $this)) {
-                        $code = $c;
-                    }
-                } finally {
-                    restore_error_handler();
-                }
+                $code = \Closure::bind($code, $this);
             }
         }
 
@@ -312,13 +301,14 @@ class Command
 
         $this->definition->addOptions($this->application->getDefinition()->getOptions());
 
-        $this->applicationDefinitionMerged = true;
-
         if ($mergeArgs) {
             $currentArguments = $this->definition->getArguments();
             $this->definition->setArguments($this->application->getDefinition()->getArguments());
             $this->definition->addArguments($currentArguments);
+        }
 
+        $this->applicationDefinitionMerged = true;
+        if ($mergeArgs) {
             $this->applicationDefinitionMergedWithArgs = true;
         }
     }
@@ -350,10 +340,6 @@ class Command
      */
     public function getDefinition()
     {
-        if (null === $this->definition) {
-            throw new LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', static::class));
-        }
-
         return $this->definition;
     }
 
@@ -375,12 +361,10 @@ class Command
     /**
      * Adds an argument.
      *
-     * @param string               $name        The argument name
-     * @param int|null             $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param string               $description A description text
-     * @param string|string[]|null $default     The default value (for InputArgument::OPTIONAL mode only)
-     *
-     * @throws InvalidArgumentException When argument mode is not valid
+     * @param string $name        The argument name
+     * @param int    $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param string $description A description text
+     * @param mixed  $default     The default value (for InputArgument::OPTIONAL mode only)
      *
      * @return $this
      */
@@ -394,13 +378,11 @@ class Command
     /**
      * Adds an option.
      *
-     * @param string                    $name        The option name
-     * @param string|array|null         $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param int|null                  $mode        The option mode: One of the InputOption::VALUE_* constants
-     * @param string                    $description A description text
-     * @param string|string[]|bool|null $default     The default value (must be null for InputOption::VALUE_NONE)
-     *
-     * @throws InvalidArgumentException If option mode is invalid or incompatible
+     * @param string $name        The option name
+     * @param string $shortcut    The shortcut (can be null)
+     * @param int    $mode        The option mode: One of the InputOption::VALUE_* constants
+     * @param string $description A description text
+     * @param mixed  $default     The default value (must be null for InputOption::VALUE_NONE)
      *
      * @return $this
      */
@@ -440,6 +422,8 @@ class Command
      * This feature should be used only when creating a long process command,
      * like a daemon.
      *
+     * PHP 5.5+ or the proctitle PECL library is required
+     *
      * @param string $title The process title
      *
      * @return $this
@@ -454,7 +438,7 @@ class Command
     /**
      * Returns the command name.
      *
-     * @return string|null
+     * @return string The command name
      */
     public function getName()
     {
@@ -538,16 +522,15 @@ class Command
     public function getProcessedHelp()
     {
         $name = $this->name;
-        $isSingleCommand = $this->application && $this->application->isSingleCommand();
 
-        $placeholders = [
+        $placeholders = array(
             '%command.name%',
             '%command.full_name%',
-        ];
-        $replacements = [
+        );
+        $replacements = array(
             $name,
-            $isSingleCommand ? $_SERVER['PHP_SELF'] : $_SERVER['PHP_SELF'].' '.$name,
-        ];
+            $_SERVER['PHP_SELF'].' '.$name,
+        );
 
         return str_replace($placeholders, $replacements, $this->getHelp() ?: $this->getDescription());
     }
@@ -564,7 +547,7 @@ class Command
     public function setAliases($aliases)
     {
         if (!\is_array($aliases) && !$aliases instanceof \Traversable) {
-            throw new InvalidArgumentException('$aliases must be an array or an instance of \Traversable.');
+            throw new InvalidArgumentException('$aliases must be an array or an instance of \Traversable');
         }
 
         foreach ($aliases as $alias) {

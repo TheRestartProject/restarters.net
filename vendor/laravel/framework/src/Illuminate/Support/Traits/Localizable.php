@@ -2,33 +2,30 @@
 
 namespace Illuminate\Support\Traits;
 
-use Illuminate\Container\Container;
-
 trait Localizable
 {
     /**
      * Run the callback with the given locale.
      *
-     * @param  string   $locale
-     * @param  \Closure $callback
-     * @return mixed
+     * @param  string  $locale
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
+     * @param  \Closure  $callback
+     * @return bool
      */
-    public function withLocale($locale, $callback)
+    public function withLocale($locale, $translator, $callback)
     {
-        if (! $locale) {
+        if (! $locale || ! $translator) {
             return $callback();
         }
 
-        $app = Container::getInstance();
-
-        $original = $app->getLocale();
+        $original = $translator->getLocale();
 
         try {
-            $app->setLocale($locale);
+            $translator->setLocale($locale);
 
             return $callback();
         } finally {
-            $app->setLocale($original);
+            $translator->setLocale($original);
         }
     }
 }

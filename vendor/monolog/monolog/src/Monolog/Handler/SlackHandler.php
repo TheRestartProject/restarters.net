@@ -13,7 +13,6 @@ namespace Monolog\Handler;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Logger;
-use Monolog\Utils;
 use Monolog\Handler\Slack\SlackRecord;
 
 /**
@@ -76,11 +75,6 @@ class SlackHandler extends SocketHandler
         return $this->slackRecord;
     }
 
-    public function getToken()
-    {
-        return $this->token;
-    }
-
     /**
      * {@inheritdoc}
      *
@@ -119,7 +113,7 @@ class SlackHandler extends SocketHandler
         $dataArray['token'] = $this->token;
 
         if (!empty($dataArray['attachments'])) {
-            $dataArray['attachments'] = Utils::jsonEncode($dataArray['attachments']);
+            $dataArray['attachments'] = json_encode($dataArray['attachments']);
         }
 
         return $dataArray;

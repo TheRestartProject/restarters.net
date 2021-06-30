@@ -9,6 +9,7 @@ use function sprintf;
 
 /**
  * Base class for cache provider implementations.
+ *
  */
 abstract class CacheProvider implements Cache, FlushableCache, ClearableCache, MultiOperationCache
 {
@@ -171,7 +172,7 @@ abstract class CacheProvider implements Cache, FlushableCache, ClearableCache, M
      *
      * @return string The namespaced id.
      */
-    private function getNamespacedId(string $id): string
+    private function getNamespacedId(string $id) : string
     {
         $namespaceVersion = $this->getNamespaceVersion();
 
@@ -181,7 +182,7 @@ abstract class CacheProvider implements Cache, FlushableCache, ClearableCache, M
     /**
      * Returns the namespace cache key.
      */
-    private function getNamespaceCacheKey(): string
+    private function getNamespaceCacheKey() : string
     {
         return sprintf(self::DOCTRINE_NAMESPACE_CACHEKEY, $this->namespace);
     }
@@ -189,7 +190,7 @@ abstract class CacheProvider implements Cache, FlushableCache, ClearableCache, M
     /**
      * Returns the namespace version.
      */
-    private function getNamespaceVersion(): int
+    private function getNamespaceVersion() : int
     {
         if ($this->namespaceVersion !== null) {
             return $this->namespaceVersion;
@@ -204,9 +205,8 @@ abstract class CacheProvider implements Cache, FlushableCache, ClearableCache, M
     /**
      * Default implementation of doFetchMultiple. Each driver that supports multi-get should owerwrite it.
      *
-     * @param string[] $keys Array of keys to retrieve from cache
-     *
-     * @return mixed[] Array of values retrieved for the given keys.
+     * @param array $keys Array of keys to retrieve from cache
+     * @return array Array of values retrieved for the given keys.
      */
     protected function doFetchMultiple(array $keys)
     {
@@ -245,9 +245,9 @@ abstract class CacheProvider implements Cache, FlushableCache, ClearableCache, M
     /**
      * Default implementation of doSaveMultiple. Each driver that supports multi-put should override it.
      *
-     * @param mixed[] $keysAndValues Array of keys and values to save in cache
-     * @param int     $lifetime      The lifetime. If != 0, sets a specific lifetime for these
-     *                               cache entries (0 => infinite lifeTime).
+     * @param array $keysAndValues Array of keys and values to save in cache
+     * @param int   $lifetime      The lifetime. If != 0, sets a specific lifetime for these
+     *                             cache entries (0 => infinite lifeTime).
      *
      * @return bool TRUE if the operation was successful, FALSE if it wasn't.
      */
@@ -281,7 +281,7 @@ abstract class CacheProvider implements Cache, FlushableCache, ClearableCache, M
     /**
      * Default implementation of doDeleteMultiple. Each driver that supports multi-delete should override it.
      *
-     * @param string[] $keys Array of keys to delete from cache
+     * @param array $keys Array of keys to delete from cache
      *
      * @return bool TRUE if the operation was successful, FALSE if it wasn't
      */
@@ -319,7 +319,7 @@ abstract class CacheProvider implements Cache, FlushableCache, ClearableCache, M
     /**
      * Retrieves cached information from the data store.
      *
-     * @return mixed[]|null An associative array with server's statistics if available, NULL otherwise.
+     * @return array|null An associative array with server's statistics if available, NULL otherwise.
      */
     abstract protected function doGetStats();
 }

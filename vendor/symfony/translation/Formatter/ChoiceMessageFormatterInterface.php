@@ -13,8 +13,6 @@ namespace Symfony\Component\Translation\Formatter;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
- *
- * @deprecated since Symfony 4.2, use MessageFormatterInterface::format() with a %count% parameter instead
  */
 interface ChoiceMessageFormatterInterface
 {
@@ -28,5 +26,5 @@ interface ChoiceMessageFormatterInterface
      *
      * @return string
      */
-    public function choiceFormat($message, $number, $locale, array $parameters = []);
+    public function choiceFormat($message, $number, $locale, array $parameters = array());
 }

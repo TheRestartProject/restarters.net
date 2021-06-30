@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Gd\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class GammaCommand extends AbstractCommand
+class GammaCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Applies gamma correction to a given image

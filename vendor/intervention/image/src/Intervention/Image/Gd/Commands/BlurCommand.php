@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Gd\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class BlurCommand extends AbstractCommand
+class BlurCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Applies blur effect on image

@@ -2,8 +2,6 @@
 
 namespace Intervention\Image\Gd;
 
-use Intervention\Image\Exception\NotReadableException;
-use Intervention\Image\Exception\NotSupportedException;
 use Intervention\Image\Image;
 
 class Decoder extends \Intervention\Image\AbstractDecoder
@@ -17,7 +15,7 @@ class Decoder extends \Intervention\Image\AbstractDecoder
     public function initFromPath($path)
     {
         if ( ! file_exists($path)) {
-            throw new NotReadableException(
+            throw new \Intervention\Image\Exception\NotReadableException(
                 "Unable to find file ({$path})."
             );
         }
@@ -48,7 +46,7 @@ class Decoder extends \Intervention\Image\AbstractDecoder
             case 'image/webp':
             case 'image/x-webp':
                 if ( ! function_exists('imagecreatefromwebp')) {
-                    throw new NotReadableException(
+                    throw new \Intervention\Image\Exception\NotReadableException(
                         "Unsupported image type. GD/PHP installation does not support WebP format."
                     );
                 }
@@ -56,13 +54,13 @@ class Decoder extends \Intervention\Image\AbstractDecoder
                 break;
 
             default:
-                throw new NotReadableException(
+                throw new \Intervention\Image\Exception\NotReadableException(
                     "Unsupported image type. GD driver is only able to decode JPG, PNG, GIF or WebP files."
                 );
         }
 
         if (empty($core)) {
-            throw new NotReadableException(
+            throw new \Intervention\Image\Exception\NotReadableException(
                 "Unable to decode image from file ({$path})."
             );
         }
@@ -96,7 +94,7 @@ class Decoder extends \Intervention\Image\AbstractDecoder
      */
     public function initFromImagick(\Imagick $object)
     {
-        throw new NotSupportedException(
+        throw new \Intervention\Image\Exception\NotSupportedException(
             "Gd driver is unable to init from Imagick object."
         );
     }
@@ -112,7 +110,7 @@ class Decoder extends \Intervention\Image\AbstractDecoder
         $resource = @imagecreatefromstring($binary);
 
         if ($resource === false) {
-             throw new NotReadableException(
+             throw new \Intervention\Image\Exception\NotReadableException(
                 "Unable to init from given binary data."
             );
         }

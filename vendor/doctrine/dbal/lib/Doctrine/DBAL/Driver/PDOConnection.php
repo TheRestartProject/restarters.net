@@ -1,61 +1,65 @@
 <?php
+/*
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the MIT license. For more information, see
+ * <http://www.doctrine-project.org>.
+ */
 
 namespace Doctrine\DBAL\Driver;
 
-use Doctrine\DBAL\Driver\Connection as ConnectionInterface;
-use Doctrine\DBAL\Driver\PDO\Exception;
-use Doctrine\DBAL\Driver\PDO\Statement;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\Deprecations\Deprecation;
 use PDO;
-use PDOException;
-use PDOStatement;
-
-use function assert;
+use function count;
+use function func_get_args;
 
 /**
  * PDO implementation of the Connection interface.
  * Used by all PDO-based drivers.
  *
- * @deprecated Use {@link Connection} instead
+ * @since 2.0
  */
-class PDOConnection extends PDO implements ConnectionInterface, ServerInfoAwareConnection
+class PDOConnection extends PDO implements Connection, ServerInfoAwareConnection
 {
-    use PDOQueryImplementation;
-
     /**
-     * @internal The connection can be only instantiated by its driver.
+     * @param string      $dsn
+     * @param string|null $user
+     * @param string|null $password
+     * @param array|null  $options
      *
-     * @param string       $dsn
-     * @param string|null  $user
-     * @param string|null  $password
-     * @param mixed[]|null $options
-     *
-     * @throws PDOException In case of an error.
+     * @throws PDOException in case of an error.
      */
-    public function __construct($dsn, $user = null, $password = null, ?array $options = null)
+    public function __construct($dsn, $user = null, $password = null, array $options = null)
     {
         try {
-            parent::__construct($dsn, (string) $user, (string) $password, (array) $options);
-            $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, [Statement::class, []]);
+            parent::__construct($dsn, $user, $password, $options);
+            $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, ['Doctrine\DBAL\Driver\PDOStatement', []]);
             $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $exception) {
-            throw Exception::new($exception);
+        } catch (\PDOException $exception) {
+            throw new PDOException($exception);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function exec($sql)
+    public function exec($statement)
     {
         try {
-            $result = parent::exec($sql);
-            assert($result !== false);
-
-            return $result;
-        } catch (PDOException $exception) {
-            throw Exception::new($exception);
+            return parent::exec($statement);
+        } catch (\PDOException $exception) {
+            throw new PDOException($exception);
         }
     }
 
@@ -68,29 +72,50 @@ class PDOConnection extends PDO implements ConnectionInterface, ServerInfoAwareC
     }
 
     /**
-     * @param string          $sql
-     * @param array<int, int> $driverOptions
-     *
-     * @return PDOStatement
+     * {@inheritdoc}
      */
-    public function prepare($sql, $driverOptions = [])
+    public function prepare($prepareString, $driverOptions = [])
     {
         try {
-            $statement = parent::prepare($sql, $driverOptions);
-            assert($statement instanceof PDOStatement);
-
-            return $statement;
-        } catch (PDOException $exception) {
-            throw Exception::new($exception);
+            return parent::prepare($prepareString, $driverOptions);
+        } catch (\PDOException $exception) {
+            throw new PDOException($exception);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function quote($value, $type = ParameterType::STRING)
+    public function query()
     {
-        return parent::quote($value, $type);
+        $args = func_get_args();
+        $argsCount = count($args);
+
+        try {
+            if ($argsCount == 4) {
+                return parent::query($args[0], $args[1], $args[2], $args[3]);
+            }
+
+            if ($argsCount == 3) {
+                return parent::query($args[0], $args[1], $args[2]);
+            }
+
+            if ($argsCount == 2) {
+                return parent::query($args[0], $args[1]);
+            }
+
+            return parent::query($args[0]);
+        } catch (\PDOException $exception) {
+            throw new PDOException($exception);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function quote($input, $type = ParameterType::STRING)
+    {
+        return parent::quote($input, $type);
     }
 
     /**
@@ -98,15 +123,7 @@ class PDOConnection extends PDO implements ConnectionInterface, ServerInfoAwareC
      */
     public function lastInsertId($name = null)
     {
-        try {
-            if ($name === null) {
-                return parent::lastInsertId();
-            }
-
-            return parent::lastInsertId($name);
-        } catch (PDOException $exception) {
-            throw Exception::new($exception);
-        }
+        return parent::lastInsertId($name);
     }
 
     /**
@@ -114,28 +131,6 @@ class PDOConnection extends PDO implements ConnectionInterface, ServerInfoAwareC
      */
     public function requiresQueryForServerVersion()
     {
-        Deprecation::triggerIfCalledFromOutside(
-            'doctrine/dbal',
-            'https://github.com/doctrine/dbal/pull/4114',
-            'ServerInfoAwareConnection::requiresQueryForServerVersion() is deprecated and removed in DBAL 3.'
-        );
-
         return false;
-    }
-
-    /**
-     * @param mixed ...$args
-     */
-    private function doQuery(...$args): PDOStatement
-    {
-        try {
-            $stmt = parent::query(...$args);
-        } catch (PDOException $exception) {
-            throw Exception::new($exception);
-        }
-
-        assert($stmt instanceof PDOStatement);
-
-        return $stmt;
     }
 }

@@ -98,7 +98,7 @@ class Kernel implements KernelContract
      */
     protected function defineConsoleSchedule()
     {
-        $this->app->singleton(Schedule::class, function () {
+        $this->app->singleton(Schedule::class, function ($app) {
             return new Schedule;
         });
 
@@ -354,7 +354,7 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Render the given exception.
+     * Report the exception to the exception handler.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @param  \Exception  $e

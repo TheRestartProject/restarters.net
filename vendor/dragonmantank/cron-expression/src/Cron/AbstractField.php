@@ -31,9 +31,7 @@ abstract class AbstractField implements FieldInterface
      */
     protected $rangeEnd;
 
-    /**
-     * Constructor
-     */
+
     public function __construct()
     {
         $this->fullRange = range($this->rangeStart, $this->rangeEnd);
@@ -206,18 +204,12 @@ abstract class AbstractField implements FieldInterface
         return $values;
     }
 
-    /**
-     * Convert literal
-     *
-     * @param string $value
-     * @return string
-     */
     protected function convertLiterals($value)
     {
         if (count($this->literals)) {
             $key = array_search($value, $this->literals);
             if ($key !== false) {
-                return (string) $key;
+                return $key;
             }
         }
 

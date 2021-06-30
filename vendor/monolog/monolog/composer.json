@@ -26,8 +26,10 @@
         "php-amqplib/php-amqplib": "~2.4",
         "swiftmailer/swiftmailer": "^5.3|^6.0",
         "php-console/php-console": "^3.1.3",
-        "phpstan/phpstan": "^0.12.59"
+        "phpunit/phpunit-mock-objects": "2.3.0",
+        "jakub-onderka/php-parallel-lint": "0.9"
     },
+    "_": "phpunit/phpunit-mock-objects required in 2.3.0 due to https://github.com/sebastianbergmann/phpunit-mock-objects/issues/223 - needs hhvm 3.8+ on travis",
     "suggest": {
         "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
         "sentry/sentry": "Allow sending log messages to a Sentry server",
@@ -50,9 +52,15 @@
     "provide": {
         "psr/log-implementation": "1.0.0"
     },
-    "scripts": {
-        "test": "vendor/bin/phpunit",
-        "phpstan": "vendor/bin/phpstan analyse"
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
+        }
     },
-    "lock": false
+    "scripts": {
+        "test": [
+            "parallel-lint . --exclude vendor",
+            "phpunit"
+        ]
+    }
 }

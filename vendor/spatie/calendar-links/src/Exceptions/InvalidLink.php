@@ -2,21 +2,13 @@
 
 namespace Spatie\CalendarLinks\Exceptions;
 
-use DateTimeInterface;
-use InvalidArgumentException;
+use DateTime;
+use Exception;
 
-class InvalidLink extends InvalidArgumentException
+class InvalidLink extends Exception
 {
-    private const DATETIME_FORMAT = 'Y-m-d H:i:s';
-
-    /** @deprecated Will be removed in 2.0, please use {@see InvalidLink::negativeDateRange} instead */
-    public static function invalidDateRange(DateTimeInterface $to, DateTimeInterface $from): self
+    public static function invalidDateRange(DateTime $to, DateTime $from): self
     {
-        return new self("TO time (`{$to->format(self::DATETIME_FORMAT)}`) must be greater than FROM time (`{$from->format(self::DATETIME_FORMAT)}`)");
-    }
-
-    public static function negativeDateRange(DateTimeInterface $from, DateTimeInterface $to): self
-    {
-        return new self("TO time (`{$to->format(self::DATETIME_FORMAT)}`) must be greater than FROM time (`{$from->format(self::DATETIME_FORMAT)}`)");
+        return new self("`{$to->format('YMD His')}` must be greater than `{$from->format('YMD His')}`");
     }
 }

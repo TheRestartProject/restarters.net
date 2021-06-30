@@ -1,96 +1,75 @@
 <?php
-
 /**
- * League.Csv (https://csv.thephpleague.com)
- *
- * (c) Ignace Nyamagana Butera <nyamsprod@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
+* This file is part of the League.csv library
+*
+* @license http://opensource.org/licenses/MIT
+* @link https://github.com/thephpleague/csv/
+* @version 9.1.4
+* @package League.csv
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 declare(strict_types=1);
 
 namespace League\Csv;
 
-use function array_reduce;
-use function implode;
-use function preg_match;
-use function preg_quote;
-use function str_replace;
-use function strlen;
-use const PHP_VERSION_ID;
-use const SEEK_CUR;
-use const STREAM_FILTER_WRITE;
+use Traversable;
+use TypeError;
 
 /**
- * A class to insert records into a CSV Document.
+ * A class to insert records into a CSV Document
+ *
+ * @package League.csv
+ * @since   4.0.0
+ * @author  Ignace Nyamagana Butera <nyamsprod@gmail.com>
  */
 class Writer extends AbstractCsv
 {
-    protected const STREAM_FILTER_MODE = STREAM_FILTER_WRITE;
-
     /**
-     * callable collection to format the record before insertion.
+     * callable collection to format the record before insertion
      *
      * @var callable[]
      */
     protected $formatters = [];
 
     /**
-     * callable collection to validate the record before insertion.
+     * callable collection to validate the record before insertion
      *
      * @var callable[]
      */
     protected $validators = [];
 
     /**
-     * newline character.
+     * newline character
      *
      * @var string
      */
     protected $newline = "\n";
 
     /**
-     * Insert records count for flushing.
+     * Insert records count for flushing
      *
      * @var int
      */
     protected $flush_counter = 0;
 
     /**
-     * Buffer flush threshold.
+     * Buffer flush threshold
      *
      * @var int|null
      */
     protected $flush_threshold;
 
     /**
-     * Regular expression used to detect if RFC4180 formatting is necessary.
-     *
-     * @var string
-     */
-    protected $rfc4180_regexp;
-
-    /**
-     * double enclosure for RFC4180 compliance.
-     *
-     * @var string
-     */
-    protected $rfc4180_enclosure;
-
-    /**
      * {@inheritdoc}
      */
-    protected function resetProperties(): void
-    {
-        $characters = preg_quote($this->delimiter, '/').'|'.preg_quote($this->enclosure, '/');
-        $this->rfc4180_regexp = '/[\s|'.$characters.']/x';
-        $this->rfc4180_enclosure = $this->enclosure.$this->enclosure;
-    }
+    protected $stream_filter_mode = STREAM_FILTER_WRITE;
 
     /**
-     * Returns the current newline sequence characters.
+     * Returns the current newline sequence characters
+     *
+     * @return string
      */
     public function getNewline(): string
     {
@@ -98,7 +77,7 @@ class Writer extends AbstractCsv
     }
 
     /**
-     * Get the flush threshold.
+     * Get the flush threshold
      *
      * @return int|null
      */
@@ -108,12 +87,20 @@ class Writer extends AbstractCsv
     }
 
     /**
-     * Adds multiple records to the CSV document.
+     * Adds multiple records to the CSV document
      *
      * @see Writer::insertOne
+     *
+     * @param Traversable|array $records a multidimensional array or a Traversable object
+     *
+     * @return int
      */
-    public function insertAll(iterable $records): int
+    public function insertAll($records): int
     {
+        if (!\is_iterable($records)) {
+            throw new TypeError(sprintf('%s() expects argument passed to be iterable, %s given', __METHOD__, gettype($records)));
+        }
+
         $bytes = 0;
         foreach ($records as $record) {
             $bytes += $this->insertOne($record);
@@ -126,91 +113,45 @@ class Writer extends AbstractCsv
     }
 
     /**
-     * Adds a single record to a CSV document.
+     * Adds a single record to a CSV document
      *
-     * A record is an array that can contains scalar types values, NULL values
-     * or objects implementing the __toString method.
+     * @param array $record An array containing
+     *                      - scalar types values,
+     *                      - NULL values,
+     *                      - or objects implementing the __toString() method.
      *
      * @throws CannotInsertRecord If the record can not be inserted
+     *
+     * @return int
      */
     public function insertOne(array $record): int
     {
-        $method = 'addRecord';
-        if (70400 > PHP_VERSION_ID && '' === $this->escape) {
-            $method = 'addRFC4180CompliantRecord';
-        }
-
         $record = array_reduce($this->formatters, [$this, 'formatRecord'], $record);
         $this->validateRecord($record);
-        $bytes = $this->$method($record);
-        if (false === $bytes || 0 >= $bytes) {
-            throw CannotInsertRecord::triggerOnInsertion($record);
+        $bytes = $this->document->fputcsv($record, $this->delimiter, $this->enclosure, $this->escape);
+        if ('' !== (string) $bytes) {
+            return $bytes + $this->consolidate();
         }
 
-        return $bytes + $this->consolidate();
+        throw CannotInsertRecord::triggerOnInsertion($record);
     }
 
     /**
-     * Adds a single record to a CSV Document using PHP algorithm.
-     *
-     * @see https://php.net/manual/en/function.fputcsv.php
-     *
-     * @return int|false
-     */
-    protected function addRecord(array $record)
-    {
-        return $this->document->fputcsv($record, $this->delimiter, $this->enclosure, $this->escape);
-    }
-
-    /**
-     * Adds a single record to a CSV Document using RFC4180 algorithm.
-     *
-     * @see https://php.net/manual/en/function.fputcsv.php
-     * @see https://php.net/manual/en/function.fwrite.php
-     * @see https://tools.ietf.org/html/rfc4180
-     * @see http://edoceo.com/utilitas/csv-file-format
-     *
-     * String conversion is done without any check like fputcsv.
-     *
-     *     - Emits E_NOTICE on Array conversion (returns the 'Array' string)
-     *     - Throws catchable fatal error on objects that can not be converted
-     *     - Returns resource id without notice or error (returns 'Resource id #2')
-     *     - Converts boolean true to '1', boolean false to the empty string
-     *     - Converts null value to the empty string
-     *
-     * Fields must be delimited with enclosures if they contains :
-     *
-     *     - Embedded whitespaces
-     *     - Embedded delimiters
-     *     - Embedded line-breaks
-     *     - Embedded enclosures.
-     *
-     * Embedded enclosures must be doubled.
-     *
-     * The LF character is added at the end of each record to mimic fputcsv behavior
-     *
-     * @return int|false
-     */
-    protected function addRFC4180CompliantRecord(array $record)
-    {
-        foreach ($record as &$field) {
-            $field = (string) $field;
-            if (1 === preg_match($this->rfc4180_regexp, $field)) {
-                $field = $this->enclosure.str_replace($this->enclosure, $this->rfc4180_enclosure, $field).$this->enclosure;
-            }
-        }
-        unset($field);
-
-        return $this->document->fwrite(implode($this->delimiter, $record)."\n");
-    }
-
-    /**
-     * Format a record.
+     * Format a record
      *
      * The returned array must contain
      *   - scalar types values,
      *   - NULL values,
      *   - or objects implementing the __toString() method.
+     *
+     * @param array $record An array containing
+     *                      - scalar types values,
+     *                      - NULL values,
+     *                      - implementing the __toString() method.
+     *
+     * @param callable $formatter
+     *
+     * @return array
      */
     protected function formatRecord(array $record, callable $formatter): array
     {
@@ -218,11 +159,16 @@ class Writer extends AbstractCsv
     }
 
     /**
-     * Validate a record.
+     * Validate a record
+     *
+     * @param array $record An array containing
+     *                      - scalar types values,
+     *                      - NULL values
+     *                      - or objects implementing __toString() method.
      *
      * @throws CannotInsertRecord If the validation failed
      */
-    protected function validateRecord(array $record): void
+    protected function validateRecord(array $record)
     {
         foreach ($this->validators as $name => $validator) {
             if (true !== $validator($record)) {
@@ -232,16 +178,16 @@ class Writer extends AbstractCsv
     }
 
     /**
-     * Apply post insertion actions.
+     * Apply post insertion actions
+     *
+     * @return int
      */
     protected function consolidate(): int
     {
         $bytes = 0;
         if ("\n" !== $this->newline) {
             $this->document->fseek(-1, SEEK_CUR);
-            /** @var int $newlineBytes */
-            $newlineBytes = $this->document->fwrite($this->newline, strlen($this->newline));
-            $bytes =  $newlineBytes - 1;
+            $bytes = $this->document->fwrite($this->newline, strlen($this->newline)) - 1;
         }
 
         if (null === $this->flush_threshold) {
@@ -258,7 +204,11 @@ class Writer extends AbstractCsv
     }
 
     /**
-     * Adds a record formatter.
+     * Adds a record formatter
+     *
+     * @param callable $formatter
+     *
+     * @return static
      */
     public function addFormatter(callable $formatter): self
     {
@@ -268,7 +218,12 @@ class Writer extends AbstractCsv
     }
 
     /**
-     * Adds a record validator.
+     * Adds a record validator
+     *
+     * @param callable $validator
+     * @param string   $validator_name the validator name
+     *
+     * @return static
      */
     public function addValidator(callable $validator, string $validator_name): self
     {
@@ -278,7 +233,11 @@ class Writer extends AbstractCsv
     }
 
     /**
-     * Sets the newline sequence.
+     * Sets the newline sequence
+     *
+     * @param string $newline
+     *
+     * @return static
      */
     public function setNewline(string $newline): self
     {
@@ -288,20 +247,26 @@ class Writer extends AbstractCsv
     }
 
     /**
-     * Set the flush threshold.
+     * Set the flush threshold
      *
-     * @param ?int $threshold
+     * @param int|null $threshold
      *
-     * @throws InvalidArgument if the threshold is a integer lesser than 1
+     * @throws Exception if the threshold is a integer lesser than 1
+     *
+     * @return static
      */
-    public function setFlushThreshold(?int $threshold): self
+    public function setFlushThreshold($threshold): self
     {
         if ($threshold === $this->flush_threshold) {
             return $this;
         }
 
+        if (!is_nullable_int($threshold)) {
+            throw new TypeError(sprintf(__METHOD__.'() expects 1 Argument to be null or an integer %s given', gettype($threshold)));
+        }
+
         if (null !== $threshold && 1 > $threshold) {
-            throw InvalidArgument::dueToInvalidThreshold($threshold, __METHOD__);
+            throw new Exception(__METHOD__.'() expects 1 Argument to be null or a valid integer greater or equal to 1');
         }
 
         $this->flush_threshold = $threshold;

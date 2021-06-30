@@ -43,8 +43,6 @@ class Dotenv
     /**
      * Load environment file in given directory.
      *
-     * @throws \Dotenv\Exception\InvalidPathException|\Dotenv\Exception\InvalidFileException
-     *
      * @return array
      */
     public function load()
@@ -54,8 +52,6 @@ class Dotenv
 
     /**
      * Load environment file in given directory, suppress InvalidPathException.
-     *
-     * @throws \Dotenv\Exception\InvalidFileException
      *
      * @return array
      */
@@ -71,8 +67,6 @@ class Dotenv
 
     /**
      * Load environment file in given directory.
-     *
-     * @throws \Dotenv\Exception\InvalidPathException|\Dotenv\Exception\InvalidFileException
      *
      * @return array
      */
@@ -104,8 +98,6 @@ class Dotenv
      * Actually load the data.
      *
      * @param bool $overload
-     *
-     * @throws \Dotenv\Exception\InvalidPathException|\Dotenv\Exception\InvalidFileException
      *
      * @return array
      */

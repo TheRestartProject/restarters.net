@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Psr7;
 
 use Psr\Http\Message\StreamInterface;
@@ -8,8 +7,6 @@ use Psr\Http\Message\StreamInterface;
  * Reads from multiple streams, one after the other.
  *
  * This is a read-only stream decorator.
- *
- * @final
  */
 class AppendStream implements StreamInterface
 {
@@ -19,6 +16,7 @@ class AppendStream implements StreamInterface
     private $seekable = true;
     private $current = 0;
     private $pos = 0;
+    private $detached = false;
 
     /**
      * @param StreamInterface[] $streams Streams to decorate. Each stream must
@@ -64,7 +62,7 @@ class AppendStream implements StreamInterface
 
     public function getContents()
     {
-        return Utils::copyToString($this);
+        return copy_to_string($this);
     }
 
     /**
@@ -75,7 +73,6 @@ class AppendStream implements StreamInterface
     public function close()
     {
         $this->pos = $this->current = 0;
-        $this->seekable = true;
 
         foreach ($this->streams as $stream) {
             $stream->close();
@@ -85,24 +82,14 @@ class AppendStream implements StreamInterface
     }
 
     /**
-     * Detaches each attached stream.
-     *
-     * Returns null as it's not clear which underlying stream resource to return.
+     * Detaches each attached stream
      *
      * {@inheritdoc}
      */
     public function detach()
     {
-        $this->pos = $this->current = 0;
-        $this->seekable = true;
-
-        foreach ($this->streams as $stream) {
-            $stream->detach();
-        }
-
-        $this->streams = [];
-
-        return null;
+        $this->close();
+        $this->detached = true;
     }
 
     public function tell()

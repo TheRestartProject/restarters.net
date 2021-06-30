@@ -160,7 +160,7 @@ trait ConditionallyLoadsAttributes
         }
 
         if ($this->resource->{$relationship} === null) {
-            return;
+            return null;
         }
 
         return value($value);
@@ -176,28 +176,14 @@ trait ConditionallyLoadsAttributes
      */
     protected function whenPivotLoaded($table, $value, $default = null)
     {
-        return $this->whenPivotLoadedAs('pivot', ...func_get_args());
-    }
-
-    /**
-     * Execute a callback if the given pivot table with a custom accessor has been loaded.
-     *
-     * @param  string  $accessor
-     * @param  string  $table
-     * @param  mixed  $value
-     * @param  mixed  $default
-     * @return \Illuminate\Http\Resources\MissingValue|mixed
-     */
-    protected function whenPivotLoadedAs($accessor, $table, $value, $default = null)
-    {
-        if (func_num_args() === 3) {
+        if (func_num_args() === 2) {
             $default = new MissingValue;
         }
 
         return $this->when(
-            $this->resource->$accessor &&
-            ($this->resource->$accessor instanceof $table ||
-            $this->resource->$accessor->getTable() === $table),
+            $this->resource->pivot &&
+            ($this->resource->pivot instanceof $table ||
+             $this->resource->pivot->getTable() === $table),
             ...[$value, $default]
         );
     }

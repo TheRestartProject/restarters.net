@@ -1,139 +1,113 @@
 <?php
+/*
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the MIT license. For more information, see
+ * <http://www.doctrine-project.org>.
+ */
 
 namespace Doctrine\DBAL\Types;
 
-use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\Deprecations\Deprecation;
-
-use function array_map;
+use Doctrine\DBAL\DBALException;
+use function end;
+use function explode;
 use function get_class;
 use function str_replace;
-use function strrpos;
-use function substr;
 
 /**
  * The base class for so-called Doctrine mapping types.
  *
  * A Type object is obtained by calling the static {@link getType()} method.
+ *
+ * @author Roman Borschel <roman@code-factory.org>
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @since  2.0
  */
 abstract class Type
 {
-    /** @deprecated Use {@see Types::BIGINT} instead. */
-    public const BIGINT = Types::BIGINT;
+    const TARRAY = 'array';
+    const SIMPLE_ARRAY = 'simple_array';
+    const JSON_ARRAY = 'json_array';
+    const JSON = 'json';
+    const BIGINT = 'bigint';
+    const BOOLEAN = 'boolean';
+    const DATETIME = 'datetime';
+    const DATETIME_IMMUTABLE = 'datetime_immutable';
+    const DATETIMETZ = 'datetimetz';
+    const DATETIMETZ_IMMUTABLE = 'datetimetz_immutable';
+    const DATE = 'date';
+    const DATE_IMMUTABLE = 'date_immutable';
+    const TIME = 'time';
+    const TIME_IMMUTABLE = 'time_immutable';
+    const DECIMAL = 'decimal';
+    const INTEGER = 'integer';
+    const OBJECT = 'object';
+    const SMALLINT = 'smallint';
+    const STRING = 'string';
+    const TEXT = 'text';
+    const BINARY = 'binary';
+    const BLOB = 'blob';
+    const FLOAT = 'float';
+    const GUID = 'guid';
+    const DATEINTERVAL = 'dateinterval';
 
-    /** @deprecated Use {@see Types::BINARY} instead. */
-    public const BINARY = Types::BINARY;
-
-    /** @deprecated Use {@see Types::BLOB} instead. */
-    public const BLOB = Types::BLOB;
-
-    /** @deprecated Use {@see Types::BOOLEAN} instead. */
-    public const BOOLEAN = Types::BOOLEAN;
-
-    /** @deprecated Use {@see Types::DATE_MUTABLE} instead. */
-    public const DATE = Types::DATE_MUTABLE;
-
-    /** @deprecated Use {@see Types::DATE_IMMUTABLE} instead. */
-    public const DATE_IMMUTABLE = Types::DATE_IMMUTABLE;
-
-    /** @deprecated Use {@see Types::DATEINTERVAL} instead. */
-    public const DATEINTERVAL = Types::DATEINTERVAL;
-
-    /** @deprecated Use {@see Types::DATETIME_MUTABLE} instead. */
-    public const DATETIME = Types::DATETIME_MUTABLE;
-
-    /** @deprecated Use {@see Types::DATETIME_IMMUTABLE} instead. */
-    public const DATETIME_IMMUTABLE = Types::DATETIME_IMMUTABLE;
-
-    /** @deprecated Use {@see Types::DATETIMETZ_MUTABLE} instead. */
-    public const DATETIMETZ = Types::DATETIMETZ_MUTABLE;
-
-    /** @deprecated Use {@see Types::DATETIMETZ_IMMUTABLE} instead. */
-    public const DATETIMETZ_IMMUTABLE = Types::DATETIMETZ_IMMUTABLE;
-
-    /** @deprecated Use {@see Types::DECIMAL} instead. */
-    public const DECIMAL = Types::DECIMAL;
-
-    /** @deprecated Use {@see Types::FLOAT} instead. */
-    public const FLOAT = Types::FLOAT;
-
-    /** @deprecated Use {@see Types::GUID} instead. */
-    public const GUID = Types::GUID;
-
-    /** @deprecated Use {@see Types::INTEGER} instead. */
-    public const INTEGER = Types::INTEGER;
-
-    /** @deprecated Use {@see Types::JSON} instead. */
-    public const JSON = Types::JSON;
-
-    /** @deprecated Use {@see Types::JSON_ARRAY} instead. */
-    public const JSON_ARRAY = Types::JSON_ARRAY;
-
-    /** @deprecated Use {@see Types::OBJECT} instead. */
-    public const OBJECT = Types::OBJECT;
-
-    /** @deprecated Use {@see Types::SIMPLE_ARRAY} instead. */
-    public const SIMPLE_ARRAY = Types::SIMPLE_ARRAY;
-
-    /** @deprecated Use {@see Types::SMALLINT} instead. */
-    public const SMALLINT = Types::SMALLINT;
-
-    /** @deprecated Use {@see Types::STRING} instead. */
-    public const STRING = Types::STRING;
-
-    /** @deprecated Use {@see Types::ARRAY} instead. */
-    public const TARRAY = Types::ARRAY;
-
-    /** @deprecated Use {@see Types::TEXT} instead. */
-    public const TEXT = Types::TEXT;
-
-    /** @deprecated Use {@see Types::TIME_MUTABLE} instead. */
-    public const TIME = Types::TIME_MUTABLE;
-
-    /** @deprecated Use {@see Types::TIME_IMMUTABLE} instead. */
-    public const TIME_IMMUTABLE = Types::TIME_IMMUTABLE;
+    /**
+     * Map of already instantiated type objects. One instance per type (flyweight).
+     *
+     * @var array
+     */
+    private static $_typeObjects = [];
 
     /**
      * The map of supported doctrine mapping types.
+     *
+     * @var array
      */
-    private const BUILTIN_TYPES_MAP = [
-        Types::ARRAY                => ArrayType::class,
-        Types::ASCII_STRING         => AsciiStringType::class,
-        Types::BIGINT               => BigIntType::class,
-        Types::BINARY               => BinaryType::class,
-        Types::BLOB                 => BlobType::class,
-        Types::BOOLEAN              => BooleanType::class,
-        Types::DATE_MUTABLE         => DateType::class,
-        Types::DATE_IMMUTABLE       => DateImmutableType::class,
-        Types::DATEINTERVAL         => DateIntervalType::class,
-        Types::DATETIME_MUTABLE     => DateTimeType::class,
-        Types::DATETIME_IMMUTABLE   => DateTimeImmutableType::class,
-        Types::DATETIMETZ_MUTABLE   => DateTimeTzType::class,
-        Types::DATETIMETZ_IMMUTABLE => DateTimeTzImmutableType::class,
-        Types::DECIMAL              => DecimalType::class,
-        Types::FLOAT                => FloatType::class,
-        Types::GUID                 => GuidType::class,
-        Types::INTEGER              => IntegerType::class,
-        Types::JSON                 => JsonType::class,
-        Types::JSON_ARRAY           => JsonArrayType::class,
-        Types::OBJECT               => ObjectType::class,
-        Types::SIMPLE_ARRAY         => SimpleArrayType::class,
-        Types::SMALLINT             => SmallIntType::class,
-        Types::STRING               => StringType::class,
-        Types::TEXT                 => TextType::class,
-        Types::TIME_MUTABLE         => TimeType::class,
-        Types::TIME_IMMUTABLE       => TimeImmutableType::class,
+    private static $_typesMap = [
+        self::TARRAY => ArrayType::class,
+        self::SIMPLE_ARRAY => SimpleArrayType::class,
+        self::JSON_ARRAY => JsonArrayType::class,
+        self::JSON => JsonType::class,
+        self::OBJECT => ObjectType::class,
+        self::BOOLEAN => BooleanType::class,
+        self::INTEGER => IntegerType::class,
+        self::SMALLINT => SmallIntType::class,
+        self::BIGINT => BigIntType::class,
+        self::STRING => StringType::class,
+        self::TEXT => TextType::class,
+        self::DATETIME => DateTimeType::class,
+        self::DATETIME_IMMUTABLE => DateTimeImmutableType::class,
+        self::DATETIMETZ => DateTimeTzType::class,
+        self::DATETIMETZ_IMMUTABLE => DateTimeTzImmutableType::class,
+        self::DATE => DateType::class,
+        self::DATE_IMMUTABLE => DateImmutableType::class,
+        self::TIME => TimeType::class,
+        self::TIME_IMMUTABLE => TimeImmutableType::class,
+        self::DECIMAL => DecimalType::class,
+        self::FLOAT => FloatType::class,
+        self::BINARY => BinaryType::class,
+        self::BLOB => BlobType::class,
+        self::GUID => GuidType::class,
+        self::DATEINTERVAL => DateIntervalType::class,
     ];
 
-    /** @var TypeRegistry|null */
-    private static $typeRegistry;
-
     /**
-     * @internal Do not instantiate directly - use {@see Type::addType()} method instead.
+     * Prevents instantiation and forces use of the factory method.
      */
-    final public function __construct()
+    final private function __construct()
     {
     }
 
@@ -141,8 +115,8 @@ abstract class Type
      * Converts a value from its PHP representation to its database representation
      * of this type.
      *
-     * @param mixed            $value    The value to convert.
-     * @param AbstractPlatform $platform The currently used database platform.
+     * @param mixed                                     $value    The value to convert.
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform The currently used database platform.
      *
      * @return mixed The database representation of the value.
      */
@@ -155,8 +129,8 @@ abstract class Type
      * Converts a value from its database representation to its PHP representation
      * of this type.
      *
-     * @param mixed            $value    The value to convert.
-     * @param AbstractPlatform $platform The currently used database platform.
+     * @param mixed                                     $value    The value to convert.
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform The currently used database platform.
      *
      * @return mixed The PHP representation of the value.
      */
@@ -168,30 +142,26 @@ abstract class Type
     /**
      * Gets the default length of this type.
      *
-     * @deprecated Rely on information provided by the platform instead.
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
      *
      * @return int|null
+     *
+     * @todo Needed?
      */
     public function getDefaultLength(AbstractPlatform $platform)
     {
-        Deprecation::trigger(
-            'doctrine/dbal',
-            'https://github.com/doctrine/dbal/pull/3255',
-            'Type::getDefaultLength() is deprecated, use AbstractPlatform directly.'
-        );
-
         return null;
     }
 
     /**
-     * Gets the SQL declaration snippet for a column of this type.
+     * Gets the SQL declaration snippet for a field of this type.
      *
-     * @param mixed[]          $column   The column definition
-     * @param AbstractPlatform $platform The currently used database platform.
+     * @param array                                     $fieldDeclaration The field declaration.
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform         The currently used database platform.
      *
      * @return string
      */
-    abstract public function getSQLDeclaration(array $column, AbstractPlatform $platform);
+    abstract public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform);
 
     /**
      * Gets the name of this type.
@@ -202,54 +172,45 @@ abstract class Type
      */
     abstract public function getName();
 
-    final public static function getTypeRegistry(): TypeRegistry
-    {
-        if (self::$typeRegistry === null) {
-            self::$typeRegistry = self::createTypeRegistry();
-        }
-
-        return self::$typeRegistry;
-    }
-
-    private static function createTypeRegistry(): TypeRegistry
-    {
-        $instances = [];
-
-        foreach (self::BUILTIN_TYPES_MAP as $name => $class) {
-            $instances[$name] = new $class();
-        }
-
-        return new TypeRegistry($instances);
-    }
-
     /**
      * Factory method to create type instances.
      * Type instances are implemented as flyweights.
      *
      * @param string $name The name of the type (as returned by getName()).
      *
-     * @return Type
+     * @return \Doctrine\DBAL\Types\Type
      *
-     * @throws Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
     public static function getType($name)
     {
-        return self::getTypeRegistry()->get($name);
+        if ( ! isset(self::$_typeObjects[$name])) {
+            if ( ! isset(self::$_typesMap[$name])) {
+                throw DBALException::unknownColumnType($name);
+            }
+            self::$_typeObjects[$name] = new self::$_typesMap[$name]();
+        }
+
+        return self::$_typeObjects[$name];
     }
 
     /**
      * Adds a custom type to the type map.
      *
-     * @param string             $name      The name of the type. This should correspond to what getName() returns.
-     * @param class-string<Type> $className The class name of the custom type.
+     * @param string $name      The name of the type. This should correspond to what getName() returns.
+     * @param string $className The class name of the custom type.
      *
      * @return void
      *
-     * @throws Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
     public static function addType($name, $className)
     {
-        self::getTypeRegistry()->register($name, new $className());
+        if (isset(self::$_typesMap[$name])) {
+            throw DBALException::typeExists($name);
+        }
+
+        self::$_typesMap[$name] = $className;
     }
 
     /**
@@ -261,29 +222,37 @@ abstract class Type
      */
     public static function hasType($name)
     {
-        return self::getTypeRegistry()->has($name);
+        return isset(self::$_typesMap[$name]);
     }
 
     /**
      * Overrides an already defined type to use a different implementation.
      *
-     * @param string             $name
-     * @param class-string<Type> $className
+     * @param string $name
+     * @param string $className
      *
      * @return void
      *
-     * @throws Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
     public static function overrideType($name, $className)
     {
-        self::getTypeRegistry()->override($name, new $className());
+        if ( ! isset(self::$_typesMap[$name])) {
+            throw DBALException::typeNotFound($name);
+        }
+
+        if (isset(self::$_typeObjects[$name])) {
+            unset(self::$_typeObjects[$name]);
+        }
+
+        self::$_typesMap[$name] = $className;
     }
 
     /**
      * Gets the (preferred) binding type for values of this type that
      * can be used when binding parameters to prepared statements.
      *
-     * This method should return one of the {@link ParameterType} constants.
+     * This method should return one of the {@link \Doctrine\DBAL\ParameterType} constants.
      *
      * @return int
      */
@@ -296,39 +265,21 @@ abstract class Type
      * Gets the types array map which holds all registered types and the corresponding
      * type class
      *
-     * @return string[]
+     * @return array
      */
     public static function getTypesMap()
     {
-        return array_map(
-            static function (Type $type): string {
-                return get_class($type);
-            },
-            self::getTypeRegistry()->getMap()
-        );
+        return self::$_typesMap;
     }
 
     /**
-     * @deprecated Relying on string representation is discouraged and will be removed in DBAL 3.0.
-     *
      * @return string
      */
     public function __toString()
     {
-        Deprecation::trigger(
-            'doctrine/dbal',
-            'https://github.com/doctrine/dbal/pull/3258',
-            'Type::__toString() is deprecated, use Type::getName() or get_class($type) instead.'
-        );
+        $e = explode('\\', get_class($this));
 
-        $type     = static::class;
-        $position = strrpos($type, '\\');
-
-        if ($position !== false) {
-            $type = substr($type, $position);
-        }
-
-        return str_replace('Type', '', $type);
+        return str_replace('Type', '', end($e));
     }
 
     /**
@@ -349,7 +300,8 @@ abstract class Type
     /**
      * Modifies the SQL expression (identifier, parameter) to convert to a database value.
      *
-     * @param string $sqlExpr
+     * @param string                                    $sqlExpr
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
      *
      * @return string
      */
@@ -361,8 +313,8 @@ abstract class Type
     /**
      * Modifies the SQL expression (identifier, parameter) to convert to a PHP value.
      *
-     * @param string           $sqlExpr
-     * @param AbstractPlatform $platform
+     * @param string                                    $sqlExpr
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
      *
      * @return string
      */
@@ -374,7 +326,9 @@ abstract class Type
     /**
      * Gets an array of database types that map to this Doctrine type.
      *
-     * @return string[]
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     *
+     * @return array
      */
     public function getMappedDatabaseTypes(AbstractPlatform $platform)
     {
@@ -386,6 +340,8 @@ abstract class Type
      * reverse schema engineering can't tell them apart. You need to mark
      * one of those types as commented, which will have Doctrine use an SQL
      * comment to typehint the actual Doctrine Type.
+     *
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
      *
      * @return bool
      */

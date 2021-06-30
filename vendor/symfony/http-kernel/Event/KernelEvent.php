@@ -27,8 +27,10 @@ class KernelEvent extends Event
     private $requestType;
 
     /**
-     * @param int $requestType The request type the kernel is currently processing; one of
-     *                         HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST
+     * @param HttpKernelInterface $kernel      The kernel in which this event was thrown
+     * @param Request             $request     The request the kernel is currently processing
+     * @param int                 $requestType The request type the kernel is currently processing; one of
+     *                                         HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST
      */
     public function __construct(HttpKernelInterface $kernel, Request $request, ?int $requestType)
     {

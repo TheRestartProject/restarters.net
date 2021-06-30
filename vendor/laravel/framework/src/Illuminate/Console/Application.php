@@ -80,7 +80,7 @@ class Application extends SymfonyApplication implements ApplicationContract
             $input = $input ?: new ArgvInput
         );
 
-        $this->events->dispatch(
+        $this->events->fire(
             new Events\CommandStarting(
                 $commandName, $input, $output = $output ?: new ConsoleOutput
             )
@@ -88,7 +88,7 @@ class Application extends SymfonyApplication implements ApplicationContract
 
         $exitCode = parent::run($input, $output);
 
-        $this->events->dispatch(
+        $this->events->fire(
             new Events\CommandFinished($commandName, $input, $output, $exitCode)
         );
 
@@ -259,7 +259,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     }
 
     /**
-     * Get the default input definition for the application.
+     * Get the default input definitions for the applications.
      *
      * This is used to add the --env option to every available command.
      *

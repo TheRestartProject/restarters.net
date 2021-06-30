@@ -2,8 +2,6 @@
 
 namespace Intervention\Image\Commands;
 
-use Intervention\Image\Exception\InvalidArgumentException;
-
 class Argument
 {
     /**
@@ -68,7 +66,7 @@ class Argument
     public function required()
     {
         if ( ! array_key_exists($this->key, $this->command->arguments)) {
-            throw new InvalidArgumentException(
+            throw new \Intervention\Image\Exception\InvalidArgumentException(
                 sprintf("Missing argument %d for %s", $this->key + 1, $this->getCommandName())
             );
         }
@@ -83,59 +81,61 @@ class Argument
      */
     public function type($type)
     {
-        $valid = true;
+        $fail = false;
+
         $value = $this->value();
 
-        if ($value === null) {
+        if (is_null($value)) {
             return $this;
         }
 
         switch (strtolower($type)) {
+
             case 'bool':
             case 'boolean':
-                $valid = \is_bool($value);
-                $message = '%s accepts only boolean values as argument %d.';
+                $fail =  ! is_bool($value);
+                $message = sprintf('%s accepts only boolean values as argument %d.', $this->getCommandName(), $this->key + 1);
                 break;
+
             case 'int':
             case 'integer':
-                $valid = \is_int($value);
-                $message = '%s accepts only integer values as argument %d.';
+                $fail =  ! is_integer($value);
+                $message = sprintf('%s accepts only integer values as argument %d.', $this->getCommandName(), $this->key + 1);
                 break;
+
             case 'num':
             case 'numeric':
-                $valid = is_numeric($value);
-                $message = '%s accepts only numeric values as argument %d.';
+                $fail =  ! is_numeric($value);
+                $message = sprintf('%s accepts only numeric values as argument %d.', $this->getCommandName(), $this->key + 1);
                 break;
+
             case 'str':
             case 'string':
-                $valid = \is_string($value);
-                $message = '%s accepts only string values as argument %d.';
+                $fail =  ! is_string($value);
+                $message = sprintf('%s accepts only string values as argument %d.', $this->getCommandName(), $this->key + 1);
                 break;
+
             case 'array':
-                $valid = \is_array($value);
-                $message = '%s accepts only array as argument %d.';
+                $fail =  ! is_array($value);
+                $message = sprintf('%s accepts only array as argument %d.', $this->getCommandName(), $this->key + 1);
                 break;
+
             case 'closure':
-                $valid = is_a($value, '\Closure');
-                $message = '%s accepts only Closure as argument %d.';
+                $fail =  ! is_a($value, '\Closure');
+                $message = sprintf('%s accepts only Closure as argument %d.', $this->getCommandName(), $this->key + 1);
                 break;
+
             case 'digit':
-                $valid = $this->isDigit($value);
-                $message = '%s accepts only integer values as argument %d.';
+                $fail = ! $this->isDigit($value);
+                $message = sprintf('%s accepts only integer values as argument %d.', $this->getCommandName(), $this->key + 1);
                 break;
         }
 
-        if (! $valid) {
-            $commandName = $this->getCommandName();
-            $argument = $this->key + 1;
+        if ($fail) {
 
-            if (isset($message)) {
-                $message = sprintf($message, $commandName, $argument);
-            } else {
-                $message = sprintf('Missing argument for %d.', $argument);
-            }
+            $message = isset($message) ? $message : sprintf("Missing argument for %d.", $this->key);
 
-            throw new InvalidArgumentException(
+            throw new \Intervention\Image\Exception\InvalidArgumentException(
                 $message
             );
         }
@@ -160,7 +160,7 @@ class Argument
         $omega = max($x, $y);
 
         if ($value < $alpha || $value > $omega) {
-            throw new InvalidArgumentException(
+            throw new \Intervention\Image\Exception\InvalidArgumentException(
                 sprintf('Argument %d must be between %s and %s.', $this->key, $x, $y)
             );
         }
@@ -182,7 +182,7 @@ class Argument
         }
 
         if ($v < $value) {
-            throw new InvalidArgumentException(
+            throw new \Intervention\Image\Exception\InvalidArgumentException(
                 sprintf('Argument %d must be at least %s.', $this->key, $value)
             );
         }
@@ -204,7 +204,7 @@ class Argument
         }
 
         if ($v > $value) {
-            throw new InvalidArgumentException(
+            throw new \Intervention\Image\Exception\InvalidArgumentException(
                 sprintf('Argument %d may not be greater than %s.', $this->key, $value)
             );
         }

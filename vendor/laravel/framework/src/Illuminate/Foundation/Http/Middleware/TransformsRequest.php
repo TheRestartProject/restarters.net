@@ -43,7 +43,7 @@ class TransformsRequest
 
         if ($request->isJson()) {
             $this->cleanParameterBag($request->json());
-        } elseif ($request->request !== $request->query) {
+        } else {
             $this->cleanParameterBag($request->request);
         }
     }

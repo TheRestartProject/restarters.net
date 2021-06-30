@@ -46,7 +46,7 @@ class CacheManager implements FactoryContract
     }
 
     /**
-     * Get a cache store instance by name, wrapped in a repository.
+     * Get a cache store instance by name.
      *
      * @param  string|null  $name
      * @return \Illuminate\Contracts\Cache\Repository
@@ -62,7 +62,7 @@ class CacheManager implements FactoryContract
      * Get a cache driver instance.
      *
      * @param  string|null  $driver
-     * @return \Illuminate\Contracts\Cache\Repository
+     * @return mixed
      */
     public function driver($driver = null)
     {
@@ -124,7 +124,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the APC cache driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Cache\Repository
+     * @return \Illuminate\Cache\ApcStore
      */
     protected function createApcDriver(array $config)
     {
@@ -136,7 +136,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the array cache driver.
      *
-     * @return \Illuminate\Cache\Repository
+     * @return \Illuminate\Cache\ArrayStore
      */
     protected function createArrayDriver()
     {
@@ -147,7 +147,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the file cache driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Cache\Repository
+     * @return \Illuminate\Cache\FileStore
      */
     protected function createFileDriver(array $config)
     {
@@ -158,7 +158,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the Memcached cache driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Cache\Repository
+     * @return \Illuminate\Cache\MemcachedStore
      */
     protected function createMemcachedDriver(array $config)
     {
@@ -177,7 +177,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the Null cache driver.
      *
-     * @return \Illuminate\Cache\Repository
+     * @return \Illuminate\Cache\NullStore
      */
     protected function createNullDriver()
     {
@@ -188,7 +188,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the Redis cache driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Cache\Repository
+     * @return \Illuminate\Cache\RedisStore
      */
     protected function createRedisDriver(array $config)
     {
@@ -203,7 +203,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the database cache driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Cache\Repository
+     * @return \Illuminate\Cache\DatabaseStore
      */
     protected function createDatabaseDriver(array $config)
     {
@@ -279,28 +279,9 @@ class CacheManager implements FactoryContract
     }
 
     /**
-     * Unset the given driver instances.
-     *
-     * @param  array|string|null  $name
-     * @return $this
-     */
-    public function forgetDriver($name = null)
-    {
-        $name = $name ?? $this->getDefaultDriver();
-
-        foreach ((array) $name as $cacheName) {
-            if (isset($this->stores[$cacheName])) {
-                unset($this->stores[$cacheName]);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * Register a custom driver creator Closure.
      *
-     * @param  string  $driver
+     * @param  string    $driver
      * @param  \Closure  $callback
      * @return $this
      */
@@ -315,7 +296,7 @@ class CacheManager implements FactoryContract
      * Dynamically call the default driver instance.
      *
      * @param  string  $method
-     * @param  array  $parameters
+     * @param  array   $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

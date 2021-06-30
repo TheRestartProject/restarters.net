@@ -2,9 +2,7 @@
 
 namespace Intervention\Image\Imagick\Commands;
 
-use Intervention\Image\Commands\AbstractCommand;
-
-class FlipCommand extends AbstractCommand
+class FlipCommand extends \Intervention\Image\Commands\AbstractCommand
 {
     /**
      * Mirrors an image
