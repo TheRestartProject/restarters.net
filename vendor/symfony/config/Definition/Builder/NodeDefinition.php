@@ -28,7 +28,7 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $defaultValue;
     protected $default = false;
     protected $required = false;
-    protected $deprecationMessage = null;
+    protected $deprecation = [];
     protected $merge;
     protected $allowEmptyValue = true;
     protected $nullEquivalent;
@@ -59,11 +59,9 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets info message.
      *
-     * @param string $info The info text
-     *
      * @return $this
      */
-    public function info($info)
+    public function info(string $info)
     {
         return $this->attribute('info', $info);
     }
@@ -83,12 +81,11 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets an attribute on the node.
      *
-     * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return $this
      */
-    public function attribute($key, $value)
+    public function attribute(string $key, $value)
     {
         $this->attributes[$key] = $value;
 
@@ -112,7 +109,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return NodeInterface
      */
-    public function getNode($forceRootNode = false)
+    public function getNode(bool $forceRootNode = false)
     {
         if ($forceRootNode) {
             $this->parent = null;
@@ -164,16 +161,35 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets the node as deprecated.
      *
-     * You can use %node% and %path% placeholders in your message to display,
-     * respectively, the node name and its complete path.
+     * @param string $package The name of the composer package that is triggering the deprecation
+     * @param string $version The version of the package that introduced the deprecation
+     * @param string $message the deprecation message to use
      *
-     * @param string $message Deprecation message
+     * You can use %node% and %path% placeholders in your message to display,
+     * respectively, the node name and its complete path
      *
      * @return $this
      */
-    public function setDeprecated($message = 'The child node "%node%" at path "%path%" is deprecated.')
+    public function setDeprecated(/* string $package, string $version, string $message = 'The child node "%node%" at path "%path%" is deprecated.' */)
     {
-        $this->deprecationMessage = $message;
+        $args = \func_get_args();
+
+        if (\func_num_args() < 2) {
+            trigger_deprecation('symfony/config', '5.1', 'The signature of method "%s()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.', __METHOD__);
+
+            $message = $args[0] ?? 'The child node "%node%" at path "%path%" is deprecated.';
+            $package = $version = '';
+        } else {
+            $package = (string) $args[0];
+            $version = (string) $args[1];
+            $message = (string) ($args[2] ?? 'The child node "%node%" at path "%path%" is deprecated.');
+        }
+
+        $this->deprecation = [
+            'package' => $package,
+            'version' => $version,
+            'message' => $message,
+        ];
 
         return $this;
     }
@@ -289,11 +305,9 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param bool $deny Whether the overwriting is forbidden or not
-     *
      * @return $this
      */
-    public function cannotBeOverwritten($deny = true)
+    public function cannotBeOverwritten(bool $deny = true)
     {
         $this->merge()->denyOverwrite($deny);
 
@@ -359,12 +373,8 @@ abstract class NodeDefinition implements NodeParentInterface
     public function setPathSeparator(string $separator)
     {
         if ($this instanceof ParentNodeDefinitionInterface) {
-            if (method_exists($this, 'getChildNodeDefinitions')) {
-                foreach ($this->getChildNodeDefinitions() as $child) {
-                    $child->setPathSeparator($separator);
-                }
-            } else {
-                @trigger_error(sprintf('Not implementing the "%s::getChildNodeDefinitions()" method in "%s" is deprecated since Symfony 4.1.', ParentNodeDefinitionInterface::class, static::class), \E_USER_DEPRECATED);
+            foreach ($this->getChildNodeDefinitions() as $child) {
+                $child->setPathSeparator($separator);
             }
         }
 

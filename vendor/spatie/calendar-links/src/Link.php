@@ -2,17 +2,16 @@
 
 namespace Spatie\CalendarLinks;
 
-use DateTime;
-use Spatie\CalendarLinks\Generators\Ics;
-use Spatie\CalendarLinks\Generators\Yahoo;
-use Spatie\CalendarLinks\Generators\Google;
-use Spatie\CalendarLinks\Generators\WebOutlook;
 use Spatie\CalendarLinks\Exceptions\InvalidLink;
+use Spatie\CalendarLinks\Generators\Google;
+use Spatie\CalendarLinks\Generators\Ics;
+use Spatie\CalendarLinks\Generators\WebOutlook;
+use Spatie\CalendarLinks\Generators\Yahoo;
 
 /**
  * @property-read string $title
- * @property-read \DateTime $from
- * @property-read \DateTime $to
+ * @property-read \DateTimeInterface|\DateTime|\DateTimeImmutable $from
+ * @property-read \DateTimeInterface|\DateTime|\DateTimeImmutable $to
  * @property-read string $description
  * @property-read string $address
  * @property-read bool $allDay
@@ -37,36 +36,47 @@ class Link
     /** @var string */
     protected $address;
 
-    public function __construct(string $title, DateTime $from, DateTime $to, bool $allDay = false)
+    public function __construct(string $title, \DateTimeInterface $from, \DateTimeInterface $to, bool $allDay = false)
     {
         $this->title = $title;
         $this->allDay = $allDay;
 
         if ($to < $from) {
-            throw InvalidLink::invalidDateRange($from, $to);
+            throw InvalidLink::negativeDateRange($from, $to);
         }
 
         $this->from = clone $from;
         $this->to = clone $to;
-
-        if ($this->allDay) {
-            $this->from = clone $from;
-            $this->to = clone $from;
-        }
     }
 
     /**
      * @param string $title
-     * @param \DateTime $from
-     * @param \DateTime $to
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param bool $allDay
      *
      * @return static
      * @throws InvalidLink
      */
-    public static function create(string $title, DateTime $from, DateTime $to, bool $allDay = false)
+    public static function create(string $title, \DateTimeInterface $from, \DateTimeInterface $to, bool $allDay = false)
     {
         return new static($title, $from, $to, $allDay);
+    }
+
+    /**
+     * @param string $title
+     * @param \DateTimeInterface|\DateTime|\DateTimeImmutable $fromDate
+     * @param int $numberOfDays
+     *
+     * @return Link
+     * @throws InvalidLink
+     */
+    public static function createAllDay(string $title, \DateTimeInterface $fromDate, int $numberOfDays = 1): self
+    {
+        $from = (clone $fromDate)->modify('midnight');
+        $to = (clone $from)->modify("+$numberOfDays days");
+
+        return new self($title, $from, $to, true);
     }
 
     /**
@@ -93,24 +103,29 @@ class Link
         return $this;
     }
 
-    public function google(): string
+    public function formatWith(Generator $generator): string
     {
-        return (new Google())->generate($this);
+        return $generator->generate($this);
     }
 
-    public function ics(): string
+    public function google(): string
     {
-        return (new Ics())->generate($this);
+        return $this->formatWith(new Google());
+    }
+
+    public function ics(array $options = []): string
+    {
+        return $this->formatWith(new Ics($options));
     }
 
     public function yahoo(): string
     {
-        return (new Yahoo())->generate($this);
+        return $this->formatWith(new Yahoo());
     }
 
     public function webOutlook(): string
     {
-        return (new WebOutlook())->generate($this);
+        return $this->formatWith(new WebOutlook());
     }
 
     public function __get($property)

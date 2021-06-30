@@ -21,9 +21,9 @@ use Symfony\Component\Console\Exception\LogicException;
  */
 class InputArgument
 {
-    const REQUIRED = 1;
-    const OPTIONAL = 2;
-    const IS_ARRAY = 4;
+    public const REQUIRED = 1;
+    public const OPTIONAL = 2;
+    public const IS_ARRAY = 4;
 
     private $name;
     private $mode;
@@ -98,7 +98,7 @@ class InputArgument
 
         if ($this->isArray()) {
             if (null === $default) {
-                $default = array();
+                $default = [];
             } elseif (!\is_array($default)) {
                 throw new LogicException('A default value for an array argument must be an array.');
             }

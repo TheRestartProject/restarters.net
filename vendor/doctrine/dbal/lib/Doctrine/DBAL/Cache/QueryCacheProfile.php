@@ -1,25 +1,10 @@
 <?php
-/*
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * This software consists of voluntary contributions made by many individuals
- * and is licensed under the MIT license. For more information, see
- * <http://www.doctrine-project.org>.
- */
 
 namespace Doctrine\DBAL\Cache;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\DBAL\Types\Type;
+
 use function hash;
 use function serialize;
 use function sha1;
@@ -31,19 +16,13 @@ use function sha1;
  */
 class QueryCacheProfile
 {
-    /**
-     * @var Cache|null
-     */
+    /** @var Cache|null */
     private $resultCacheDriver;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $lifetime = 0;
 
-    /**
-     * @var string|null
-     */
+    /** @var string|null */
     private $cacheKey;
 
     /**
@@ -90,16 +69,16 @@ class QueryCacheProfile
     /**
      * Generates the real cache key from query, params, types and connection parameters.
      *
-     * @param string $query
-     * @param array  $params
-     * @param array  $types
-     * @param array  $connectionParams
+     * @param string                                                               $sql
+     * @param array<int, mixed>|array<string, mixed>                               $params
+     * @param array<int, Type|int|string|null>|array<string, Type|int|string|null> $types
+     * @param array<string, mixed>                                                 $connectionParams
      *
-     * @return array
+     * @return string[]
      */
-    public function generateCacheKeys($query, $params, $types, array $connectionParams = [])
+    public function generateCacheKeys($sql, $params, $types, array $connectionParams = [])
     {
-        $realCacheKey = 'query=' . $query .
+        $realCacheKey = 'query=' . $sql .
             '&params=' . serialize($params) .
             '&types=' . serialize($types) .
             '&connectionParams=' . hash('sha256', serialize($connectionParams));
@@ -115,8 +94,7 @@ class QueryCacheProfile
     }
 
     /**
-     *
-     * @return \Doctrine\DBAL\Cache\QueryCacheProfile
+     * @return QueryCacheProfile
      */
     public function setResultCacheDriver(Cache $cache)
     {
@@ -126,7 +104,7 @@ class QueryCacheProfile
     /**
      * @param string|null $cacheKey
      *
-     * @return \Doctrine\DBAL\Cache\QueryCacheProfile
+     * @return QueryCacheProfile
      */
     public function setCacheKey($cacheKey)
     {
@@ -136,7 +114,7 @@ class QueryCacheProfile
     /**
      * @param int $lifetime
      *
-     * @return \Doctrine\DBAL\Cache\QueryCacheProfile
+     * @return QueryCacheProfile
      */
     public function setLifetime($lifetime)
     {
