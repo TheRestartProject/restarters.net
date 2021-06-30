@@ -798,6 +798,7 @@ class GroupController extends Controller
 
         if (FixometerHelper::hasRole(Auth::user(), 'Administrator') && $group->canDelete()) {
             $r = $group->delete($id);
+            $r = true;
             if ( ! $r) {
                 return redirect('/user/forbidden');
             } else {

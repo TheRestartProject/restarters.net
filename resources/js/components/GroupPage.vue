@@ -1,7 +1,7 @@
 <template>
   <div v-if="group">
     <div class="alert alert-success" v-if="haveLeft" v-html="translatedHaveLeft" />
-    <GroupHeading :idgroups="idgroups" :canedit="canedit" :ingroup="ingroup" @left="haveLeft = true" />
+    <GroupHeading :idgroups="idgroups" :canedit="canedit" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete" :ingroup="ingroup" @left="haveLeft = true" />
 
     <div class="d-flex flex-wrap">
       <div class="w-xs-100 w-md-50">
