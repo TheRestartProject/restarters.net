@@ -790,19 +790,23 @@ class GroupController extends Controller
         ]);
     }
 
-    // TODO: is this alive?
     public function delete($id)
     {
-        if (FixometerHelper::hasRole($this->user, 'Administrator')) {
-            $r = $this->Group->delete($id);
+        $group = Group::where('idgroups', $id)->first();
+
+        $name = $group->name;
+
+        if (FixometerHelper::hasRole(Auth::user(), 'Administrator') && $group->canDelete()) {
+            $r = $group->delete($id);
             if ( ! $r) {
-                $response = 'd:err';
+                return redirect('/user/forbidden');
             } else {
-                $response = 'd:ok';
+                return redirect("/group")->with('success', __('groups.delete_succeeded', [
+                    'name' => $name
+                ]));
             }
-            header('Location: /group/index/'.$response);
         } else {
-            header('Location: /user/forbidden');
+            return redirect('/user/forbidden');
         }
     }
 
