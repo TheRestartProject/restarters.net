@@ -1,37 +1,20 @@
 <?php
-/*
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * This software consists of voluntary contributions made by many individuals
- * and is licensed under the MIT license. For more information, see
- * <http://www.doctrine-project.org>.
- */
 
 namespace Doctrine\DBAL\Platforms;
 
 use Doctrine\DBAL\Schema\Sequence;
-use const PREG_OFFSET_CAPTURE;
+
 use function preg_match;
 use function preg_match_all;
 use function substr_count;
+
+use const PREG_OFFSET_CAPTURE;
 
 /**
  * Platform to ensure compatibility of Doctrine with Microsoft SQL Server 2012 version.
  *
  * Differences to SQL Server 2008 and before are that sequences are introduced,
  * and support for the new OFFSET... FETCH syntax for result pagination has been added.
- *
- * @author Steve Müller <st.mueller@dzh-online.de>
  */
 class SQLServer2012Platform extends SQLServer2008Platform
 {
@@ -85,9 +68,9 @@ class SQLServer2012Platform extends SQLServer2008Platform
     /**
      * {@inheritdoc}
      */
-    public function getSequenceNextValSQL($sequenceName)
+    public function getSequenceNextValSQL($sequence)
     {
-        return 'SELECT NEXT VALUE FOR ' . $sequenceName;
+        return 'SELECT NEXT VALUE FOR ' . $sequence;
     }
 
     /**
@@ -118,29 +101,18 @@ class SQLServer2012Platform extends SQLServer2008Platform
         }
 
         // Queries using OFFSET... FETCH MUST have an ORDER BY clause
-        // Find the position of the last instance of ORDER BY and ensure it is not within a parenthetical statement
-        // but can be in a newline
-        $matches = [];
-        $matchesCount = preg_match_all("/[\\s]+order\\s+by\\s/im", $query, $matches, PREG_OFFSET_CAPTURE);
-        $orderByPos = false;
-        if ($matchesCount > 0) {
-            $orderByPos = $matches[0][($matchesCount - 1)][1];
-        }
-
-        if ($orderByPos === false
-            || substr_count($query, "(", $orderByPos) - substr_count($query, ")", $orderByPos)
-        ) {
+        if ($this->shouldAddOrderBy($query)) {
             if (preg_match('/^SELECT\s+DISTINCT/im', $query)) {
                 // SQL Server won't let us order by a non-selected column in a DISTINCT query,
                 // so we have to do this madness. This says, order by the first column in the
                 // result. SQL Server's docs say that a nonordered query's result order is non-
                 // deterministic anyway, so this won't do anything that a bunch of update and
                 // deletes to the table wouldn't do anyway.
-                $query .= " ORDER BY 1";
+                $query .= ' ORDER BY 1';
             } else {
                 // In another DBMS, we could do ORDER BY 0, but SQL Server gets angry if you
                 // use constant expressions in the order by list.
-                $query .= " ORDER BY (SELECT 0)";
+                $query .= ' ORDER BY (SELECT 0)';
             }
         }
 
@@ -151,12 +123,43 @@ class SQLServer2012Platform extends SQLServer2008Platform
         // This looks somewhat like MYSQL, but limit/offset are in inverse positions
         // Supposedly SQL:2008 core standard.
         // Per TSQL spec, FETCH NEXT n ROWS ONLY is not valid without OFFSET n ROWS.
-        $query .= " OFFSET " . (int) $offset . " ROWS";
+        $query .= ' OFFSET ' . (int) $offset . ' ROWS';
 
         if ($limit !== null) {
-            $query .= " FETCH NEXT " . (int) $limit . " ROWS ONLY";
+            $query .= ' FETCH NEXT ' . (int) $limit . ' ROWS ONLY';
         }
 
         return $query;
+    }
+
+    /**
+     * @param string $query
+     */
+    private function shouldAddOrderBy($query): bool
+    {
+        // Find the position of the last instance of ORDER BY and ensure it is not within a parenthetical statement
+        // but can be in a newline
+        $matches      = [];
+        $matchesCount = preg_match_all('/[\\s]+order\\s+by\\s/im', $query, $matches, PREG_OFFSET_CAPTURE);
+        if ($matchesCount === 0) {
+            return true;
+        }
+
+        // ORDER BY instance may be in a subquery after ORDER BY
+        // e.g. SELECT col1 FROM test ORDER BY (SELECT col2 from test ORDER BY col2)
+        // if in the searched query ORDER BY clause was found where
+        // number of open parentheses after the occurrence of the clause is equal to
+        // number of closed brackets after the occurrence of the clause,
+        // it means that ORDER BY is included in the query being checked
+        while ($matchesCount > 0) {
+            $orderByPos          = $matches[0][--$matchesCount][1];
+            $openBracketsCount   = substr_count($query, '(', $orderByPos);
+            $closedBracketsCount = substr_count($query, ')', $orderByPos);
+            if ($openBracketsCount === $closedBracketsCount) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

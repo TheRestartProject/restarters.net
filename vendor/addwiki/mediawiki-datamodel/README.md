@@ -14,4 +14,4 @@ Issue tracker: https://phabricator.wikimedia.org/project/profile/1490/
 
 Use composer to install the library and all its dependencies:
 
-    composer require "addwiki/mediawiki-datamodel:~0.7.0"
+    composer require "addwiki/mediawiki-datamodel:~0.8.0"

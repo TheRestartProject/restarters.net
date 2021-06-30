@@ -100,19 +100,19 @@
       }
 
       if ($upcoming_events_in_area) {
-        foreach ($upcoming_events_in_area as $event) {
+          foreach ($upcoming_events_in_area as $event) {
             $e = \App\Http\Controllers\PartyController::expandEvent($event, $group, $emissionRatio);
-            $e['nearby'] = TRUE;
-            $expanded_events[] = $e;
-        }
+              $e['nearby'] = TRUE;
+              $expanded_events[] = $e;
+          }
       }
 
       if ($upcoming_events_all) {
-        foreach ($upcoming_events_all as $event) {
+          foreach ($upcoming_events_all as $event) {
             $e = \App\Http\Controllers\PartyController::expandEvent($event, $group, $emissionRatio);
-            $e['all'] = TRUE;
-            $expanded_events[] = $e;
-        }
+              $e['all'] = TRUE;
+              $expanded_events[] = $e;
+          }
       }
 
       ?>
