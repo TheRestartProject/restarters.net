@@ -23,6 +23,12 @@
         <b-dropdown-item :href="'/group/join/' + idgroups" v-else>
           {{ __('groups.join_group_button') }}
         </b-dropdown-item>
+        <b-dropdown-item @click="deleteGroup" v-if="canSeeDelete && canPerformDelete">
+          {{ __('groups.delete_group') }}
+        </b-dropdown-item>
+        <b-dropdown-item v-if="canSeeDelete && !canPerformDelete" disabled>
+          {{ __('groups.delete_group') }}
+        </b-dropdown-item>
       </b-dropdown>
     </div>
     <div v-else>
@@ -42,6 +48,9 @@
       </b-dropdown>
     </div>
     <ConfirmModal :key="'leavegroupmodal-' + idgroups" ref="confirmLeave" @confirm="leaveConfirmed" :message="__('groups.leave_group_confirm')" />
+    <ConfirmModal :key="'deletegroupmodal-' + idgroups" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('groups.delete_group_confirm', {
+      name: group.name
+    })" />
   </div>
 </template>
 <script>
@@ -55,6 +64,21 @@ export default {
     idgroups: {
       type: Number,
       required: true
+    },
+    canSeeDelete: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    canPerformDelete: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+  },
+  computed: {
+    group() {
+      return this.$store.getters['groups/get'](this.idgroups)
     }
   },
   methods: {
@@ -67,6 +91,12 @@ export default {
       })
 
       this.$emit('left')
+    },
+    deleteGroup() {
+      this.$refs.confirmDelete.show()
+    },
+    async deleteConfirmed() {
+      window.location = '/group/delete/' + this.idgroups
     }
   }
 }

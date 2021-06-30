@@ -41,31 +41,8 @@
           }
 
           $can_edit_group = FixometerHelper::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
-
-          function expandVolunteer($volunteers) {
-              $ret = [];
-
-              foreach ($volunteers as $volunteer) {
-                  $volunteer['volunteer'] = $volunteer->volunteer;
-
-                  if ($volunteer['volunteer']) {
-                      $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-
-                      foreach ($volunteer['userSkills'] as $skill) {
-                          // Force expansion
-                          $skill->skillName->skill_name;
-                      }
-
-                      $volunteer['fullName'] = $volunteer->name;
-                      $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
-                      $ret[] = $volunteer;
-                  }
-              }
-
-              return $ret;
-          }
-
-          $expanded_volunteers = expandVolunteer($view_group->allConfirmedVolunteers);
+          $can_see_delete = FixometerHelper::hasRole( $user, 'Administrator');
+          $can_perform_delete = $can_see_delete && $group->canDelete();
 
           $expanded_events = [];
 
@@ -185,13 +162,14 @@
               :cluster-stats="{{ json_encode($cluster_stats, JSON_INVALID_UTF8_IGNORE) }}"
               :top-devices="{{ json_encode($top, JSON_INVALID_UTF8_IGNORE) }}"
               :events="{{ json_encode($expanded_events, JSON_INVALID_UTF8_IGNORE) }}"
-              :volunteers="{{ json_encode($expanded_volunteers, JSON_INVALID_UTF8_IGNORE) }}"
+              :volunteers="{{ json_encode($view_group->allConfirmedVolunteers, JSON_INVALID_UTF8_IGNORE) }}"
               :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+              :can-see-delete="{{ $can_see_delete ? 'true' : 'false' }}"
+              :can-perform-delete="{{ $can_perform_delete ? 'true' : 'false' }}"
               calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
               calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
               :ingroup="{{ $in_group ? 'true' : 'false' }}"
               api-token="{{ $api_token }}"
-              :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
           />
       </div>
   </div>

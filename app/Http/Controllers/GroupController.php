@@ -88,10 +88,10 @@ class GroupController extends Controller
         }
 
         return view('group.index', [
-            'your_groups' => $your_groups,
+            'your_groups' => $this->expandGroups($your_groups),
             'your_groups_uniques' => $your_groups_uniques,
-            'groups_near_you' => $groups_near_you,
-            'groups' => $groups,
+            'groups_near_you' => $this->expandGroups($groups_near_you),
+            'groups' => $this->expandGroups($groups),
             'your_area' => $user->location,
             'tab' => $tab,
             'network' => $network,
@@ -260,6 +260,29 @@ class GroupController extends Controller
         ]);
     }
 
+    private function expandVolunteers($volunteers) {
+        $ret = [];
+
+        foreach ($volunteers as $volunteer) {
+            $volunteer['volunteer'] = $volunteer->volunteer;
+
+            if ($volunteer['volunteer']) {
+                $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+
+                foreach ($volunteer['userSkills'] as $skill) {
+                    // Force expansion
+                    $skill->skillName->skill_name;
+                }
+
+                $volunteer['fullName'] = $volunteer->name;
+                $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                $ret[] = $volunteer;
+            }
+        }
+
+        return $ret;
+    }
+
     public function view($groupid)
     {
         if (isset($_GET['action']) && isset($_GET['code'])) {
@@ -407,6 +430,7 @@ class GroupController extends Controller
 
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
         $view_group = Group::find($groupid);
+        $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers);
 
         $hasPendingInvite = ! empty(UserGroups::where('group', $groupid)
         ->where('user', $user->id)
@@ -766,20 +790,53 @@ class GroupController extends Controller
         ]);
     }
 
-    // TODO: is this alive?
     public function delete($id)
     {
-        if (FixometerHelper::hasRole($this->user, 'Administrator')) {
-            $r = $this->Group->delete($id);
+        $group = Group::where('idgroups', $id)->first();
+
+        $name = $group->name;
+
+        if (FixometerHelper::hasRole(Auth::user(), 'Administrator') && $group->canDelete()) {
+            $r = $group->delete($id);
+            $r = true;
             if ( ! $r) {
-                $response = 'd:err';
+                return redirect('/user/forbidden');
             } else {
-                $response = 'd:ok';
+                return redirect("/group")->with('success', __('groups.delete_succeeded', [
+                    'name' => $name
+                ]));
             }
-            header('Location: /group/index/'.$response);
         } else {
-            header('Location: /user/forbidden');
+            return redirect('/user/forbidden');
         }
+    }
+
+    private function expandGroups($groups) {
+        $ret = [];
+
+        if ($groups) {
+            foreach ($groups as $group) {
+                $group_image = $group->groupImage;
+
+                $event = $group->getNextUpcomingEvent();
+
+                $ret[] = [
+                    'idgroups' => $group['idgroups'],
+                    'name' => $group['name'],
+                    'image' => (is_object($group_image) && is_object($group_image->image)) ?
+                        asset('uploads/mid_'.$group_image->image->path) : null,
+                    'location' => rtrim($group['location']),
+                    'next_event' => $event ? $event['event_date'] : null,
+                    'all_restarters_count' => $group->all_restarters_count,
+                    'all_hosts_count' => $group->all_hosts_count,
+                    'networks' => array_pluck($group->networks, 'id'),
+                    'country' => $group->country,
+                    'group_tags' => $group->group_tags()->get()->pluck('id')
+                ];
+            }
+        }
+
+        return $ret;
     }
 
     // TODO: is this alive?

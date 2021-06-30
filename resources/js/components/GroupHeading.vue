@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex justify-content-between mb-3">
       <h1 class="d-block d-md-none">{{ __('groups.groups') }}</h1>
-      <GroupActions :idgroups="idgroups" class="d-block d-md-none" @left="$emit('left')" />
+      <GroupActions :idgroups="idgroups" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete" class="d-block d-md-none" @left="$emit('left')" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
       <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
@@ -18,7 +18,7 @@
               <b>{{ group.location }}</b> <br />
               <ExternalLink v-if="group.website" :href="group.website">{{ __('groups.website') }}</ExternalLink>
             </div>
-            <GroupActions :idgroups="idgroups" class="d-none d-md-block" @left="$emit('left')" />
+            <GroupActions :idgroups="idgroups" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete" class="d-none d-md-block" @left="$emit('left')" />
           </div>
         </div>
       </div>
@@ -38,7 +38,17 @@ export default {
     idgroups: {
       type: Number,
       required: true
-    }
+    },
+    canSeeDelete: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    canPerformDelete: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   computed: {
     groupImage() {
