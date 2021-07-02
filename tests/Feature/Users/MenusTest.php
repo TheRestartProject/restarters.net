@@ -40,8 +40,7 @@ class MenusTest extends TestCase
             [
                 'Restarter',
                 [
-                    0 => 'Reporting',
-                    1 => 'General'
+                    0 => 'General'
                 ]
             ]
         ];
