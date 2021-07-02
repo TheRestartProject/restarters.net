@@ -37,7 +37,14 @@ class PhpExecutableFinder
     {
         if ($php = getenv('PHP_BINARY')) {
             if (!is_executable($php)) {
-                return false;
+                $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v';
+                if ($php = strtok(exec($command.' '.escapeshellarg($php)), \PHP_EOL)) {
+                    if (!is_executable($php)) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
             }
 
             return $php;
@@ -47,8 +54,8 @@ class PhpExecutableFinder
         $args = $includeArgs && $args ? ' '.implode(' ', $args) : '';
 
         // PHP_BINARY return the current sapi executable
-        if (PHP_BINARY && \in_array(\PHP_SAPI, array('cli', 'cli-server', 'phpdbg'), true)) {
-            return PHP_BINARY.$args;
+        if (\PHP_BINARY && \in_array(\PHP_SAPI, ['cgi-fcgi', 'cli', 'cli-server', 'phpdbg'], true)) {
+            return \PHP_BINARY.$args;
         }
 
         if ($php = getenv('PHP_PATH')) {
@@ -65,11 +72,11 @@ class PhpExecutableFinder
             }
         }
 
-        if (@is_executable($php = PHP_BINDIR.('\\' === \DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
+        if (@is_executable($php = \PHP_BINDIR.('\\' === \DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
             return $php;
         }
 
-        $dirs = array(PHP_BINDIR);
+        $dirs = [\PHP_BINDIR];
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dirs[] = 'C:\xampp\php\\';
         }
@@ -84,7 +91,7 @@ class PhpExecutableFinder
      */
     public function findArguments()
     {
-        $arguments = array();
+        $arguments = [];
         if ('phpdbg' === \PHP_SAPI) {
             $arguments[] = '-qrr';
         }

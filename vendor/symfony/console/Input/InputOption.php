@@ -21,10 +21,25 @@ use Symfony\Component\Console\Exception\LogicException;
  */
 class InputOption
 {
-    const VALUE_NONE = 1;
-    const VALUE_REQUIRED = 2;
-    const VALUE_OPTIONAL = 4;
-    const VALUE_IS_ARRAY = 8;
+    /**
+     * Do not accept input for the option (e.g. --yell). This is the default behavior of options.
+     */
+    public const VALUE_NONE = 1;
+
+    /**
+     * A value must be passed when the option is used (e.g. --iterations=5 or -i5).
+     */
+    public const VALUE_REQUIRED = 2;
+
+    /**
+     * The option may or may not have a value (e.g. --yell or --yell=loud).
+     */
+    public const VALUE_OPTIONAL = 4;
+
+    /**
+     * The option accepts multiple values (e.g. --dir=/foo --dir=/bar).
+     */
+    public const VALUE_IS_ARRAY = 8;
 
     private $name;
     private $shortcut;
@@ -34,7 +49,7 @@ class InputOption
 
     /**
      * @param string                    $name        The option name
-     * @param string|array              $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param string|array|null         $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
      * @param int|null                  $mode        The option mode: One of the VALUE_* constants
      * @param string                    $description A description text
      * @param string|string[]|bool|null $default     The default value (must be null for self::VALUE_NONE)
@@ -89,7 +104,7 @@ class InputOption
     /**
      * Returns the option shortcut.
      *
-     * @return string The shortcut
+     * @return string|null The shortcut
      */
     public function getShortcut()
     {
@@ -161,7 +176,7 @@ class InputOption
 
         if ($this->isArray()) {
             if (null === $default) {
-                $default = array();
+                $default = [];
             } elseif (!\is_array($default)) {
                 throw new LogicException('A default value for an array option must be an array.');
             }

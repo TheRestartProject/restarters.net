@@ -98,42 +98,34 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets whether to add default values for this array if it has not been
      * defined in any of the configuration files.
-     *
-     * @param bool $boolean
      */
-    public function setAddIfNotSet($boolean)
+    public function setAddIfNotSet(bool $boolean)
     {
-        $this->addIfNotSet = (bool) $boolean;
+        $this->addIfNotSet = $boolean;
     }
 
     /**
      * Sets whether false is allowed as value indicating that the array should be unset.
-     *
-     * @param bool $allow
      */
-    public function setAllowFalse($allow)
+    public function setAllowFalse(bool $allow)
     {
-        $this->allowFalse = (bool) $allow;
+        $this->allowFalse = $allow;
     }
 
     /**
      * Sets whether new keys can be defined in subsequent configurations.
-     *
-     * @param bool $allow
      */
-    public function setAllowNewKeys($allow)
+    public function setAllowNewKeys(bool $allow)
     {
-        $this->allowNewKeys = (bool) $allow;
+        $this->allowNewKeys = $allow;
     }
 
     /**
      * Sets if deep merging should occur.
-     *
-     * @param bool $boolean
      */
-    public function setPerformDeepMerging($boolean)
+    public function setPerformDeepMerging(bool $boolean)
     {
-        $this->performDeepMerging = (bool) $boolean;
+        $this->performDeepMerging = $boolean;
     }
 
     /**
@@ -142,16 +134,16 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @param bool $boolean To allow extra keys
      * @param bool $remove  To remove extra keys
      */
-    public function setIgnoreExtraKeys($boolean, $remove = true)
+    public function setIgnoreExtraKeys(bool $boolean, bool $remove = true)
     {
-        $this->ignoreExtraKeys = (bool) $boolean;
+        $this->ignoreExtraKeys = $boolean;
         $this->removeExtraKeys = $this->ignoreExtraKeys && $remove;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
     }
@@ -203,11 +195,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * Finalizes the value of this node.
-     *
-     * @param mixed $value
-     *
-     * @return mixed The finalised value
+     * {@inheritdoc}
      *
      * @throws UnsetKeyException
      * @throws InvalidConfigurationException if the node doesn't have enough children
@@ -215,13 +203,19 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected function finalizeValue($value)
     {
         if (false === $value) {
-            throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: "%s".', $this->getPath(), json_encode($value)));
+            throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: %s.', $this->getPath(), json_encode($value)));
         }
 
         foreach ($this->children as $name => $child) {
             if (!\array_key_exists($name, $value)) {
                 if ($child->isRequired()) {
-                    $ex = new InvalidConfigurationException(sprintf('The child node "%s" at path "%s" must be configured.', $name, $this->getPath()));
+                    $message = sprintf('The child config "%s" under "%s" must be configured', $name, $this->getPath());
+                    if ($child->getInfo()) {
+                        $message .= sprintf(': %s', $child->getInfo());
+                    } else {
+                        $message .= '.';
+                    }
+                    $ex = new InvalidConfigurationException($message);
                     $ex->setPath($this->getPath());
 
                     throw $ex;
@@ -235,7 +229,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
 
             if ($child->isDeprecated()) {
-                @trigger_error($child->getDeprecationMessage($name, $this->getPath()), \E_USER_DEPRECATED);
+                $deprecation = $child->getDeprecation($name, $this->getPath());
+                trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
             }
 
             try {
@@ -249,16 +244,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * Validates the type of the value.
-     *
-     * @param mixed $value
-     *
-     * @throws InvalidTypeException
+     * {@inheritdoc}
      */
     protected function validateType($value)
     {
         if (!\is_array($value) && (!$this->allowFalse || false !== $value)) {
-            $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected array, but got %s', $this->getPath(), \gettype($value)));
+            $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected "array", but got "%s"', $this->getPath(), get_debug_type($value)));
             if ($hint = $this->getInfo()) {
                 $ex->addHint($hint);
             }
@@ -269,11 +260,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * Normalizes the value.
-     *
-     * @param mixed $value The value to normalize
-     *
-     * @return mixed The normalized value
+     * {@inheritdoc}
      *
      * @throws InvalidConfigurationException
      */
@@ -336,11 +323,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Remaps multiple singular values to a single plural value.
      *
-     * @param array $value The source values
-     *
      * @return array The remapped values
      */
-    protected function remapXml($value)
+    protected function remapXml(array $value)
     {
         foreach ($this->xmlRemappings as [$singular, $plural]) {
             if (!isset($value[$singular])) {
@@ -355,12 +340,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * Merges values together.
-     *
-     * @param mixed $leftSide  The left side to merge
-     * @param mixed $rightSide The right side to merge
-     *
-     * @return mixed The merged values
+     * {@inheritdoc}
      *
      * @throws InvalidConfigurationException
      * @throws \RuntimeException

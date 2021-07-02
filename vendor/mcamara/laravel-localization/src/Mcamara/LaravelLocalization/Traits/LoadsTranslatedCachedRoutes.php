@@ -22,9 +22,9 @@ trait LoadsTranslatedCachedRoutes
     {
         $localization = $this->getLaravelLocalization();
 
-        $localization->setLocale();
-
-        $locale = $localization->getCurrentLocale();
+        // compute $locale from url.
+        // It is null if url does not contain locale.
+        $locale = $localization->setLocale();
 
         $localeKeys = $localization->getSupportedLanguagesKeys();
 
@@ -58,8 +58,7 @@ trait LoadsTranslatedCachedRoutes
     {
         $path = $this->getDefaultCachedRoutePath();
 
-        $localeSegment = request()->segment(1);
-        if ( ! $localeSegment || ! in_array($localeSegment, $localeKeys)) {
+        if ( ! $locale || ! in_array($locale, $localeKeys)) {
             return $path;
         }
 
@@ -74,6 +73,14 @@ trait LoadsTranslatedCachedRoutes
     protected function getDefaultCachedRoutePath()
     {
         return $this->app->getCachedRoutesPath();
+    }
+
+    /**
+     * @return string|null
+     */
+    protected function getLocaleFromRequest()
+    {
+        return request()->segment(1);
     }
 
     /**
