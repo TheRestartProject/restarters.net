@@ -714,7 +714,7 @@ class UserController extends Controller
 
 
     // TODO: is this alive?
-    // I don't recall admins being able to create users.
+    // I don't recall admins being able to create users.  But it is in a route.
     public function create()
     {
         $user = Auth::user();
@@ -996,18 +996,6 @@ class UserController extends Controller
         }
     }
 
-    // TODO: is this alive?
-    // I don't think so.  The error message 'Nope' was a classic
-    // that I only recall being visible anywhere in the pre-2018 codebase.
-    public function forbidden()
-    {
-        $this->set('title', 'Nope.');
-        return view('users.forbidden', [
-        'title' => 'Nope.',
-        ]);
-    }
-
-
     public function profile($id = null)
     {
         $Auth = new Auth($url);
@@ -1076,18 +1064,6 @@ class UserController extends Controller
                     header('Location: /user/all?msg=no');
                 }
             }
-        }
-    }
-
-    // TODO: is this alive?
-    // It feels like old code to me.
-    public function lng($lang)
-    {
-        global $fixometer_languages;
-        if (in_array($lang, array_keys($fixometer_languages))) {
-            $expire = time() + (60 * 60 * 24 * 365 * 10);
-            setcookie(LANGUAGE_COOKIE, $lang, $expire, '/', $_SERVER['HTTP_HOST']);
-            header('Location: /user/login');
         }
     }
 
