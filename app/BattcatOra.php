@@ -58,12 +58,14 @@ d.`repair_status` as `repair_status`,
 TRIM(d.`problem`) as `problem`,
 d.`language` as `language`,
 TRIM(d.`translation`) as `translation`,
-COUNT(o.`id_ords`) as `opinions_count`
+COUNT(o.`id_ords`) as `opinions`,
+COUNT(DISTINCT o.fault_type_id) as `faults`
 FROM `devices_battcat_ora` d
 LEFT JOIN `devices_faults_batteries_ora_opinions` o ON o.`id_ords` = d.`id_ords`
 WHERE 1 %s
 GROUP BY d.`id_ords`
-HAVING `opinions_count` < 3
+HAVING (`opinions` = 2 AND `faults` = 2)
+OR (`opinions` < 2)
 ORDER BY rand()
 LIMIT 1;
 ";
