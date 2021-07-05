@@ -924,7 +924,8 @@ class UserController extends Controller
                 } else {
                     $response['success'] = 'User updated!';
                     if (FixometerHelper::hasRole($user, 'Host')) {
-                          header('Location: /host?action=ue&code=200');
+                          // Use @ for phpunit tests.
+                          @header('Location: /host?action=ue&code=200');
                     }
                 }
 

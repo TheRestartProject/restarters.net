@@ -38,9 +38,6 @@ class ProfileTest extends TestCase
         $response->assertSee(__('profile.my_skills'));
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testEdit() {
         $user1 = factory(User::class)->states('Restarter')->create();
         $user2 = factory(User::class)->states('Restarter')->create();
@@ -101,9 +98,6 @@ class ProfileTest extends TestCase
         $response->assertSee('Edit User');
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testEditBadPassword() {
         $user1 = factory(User::class)->states('Restarter')->create();
         $host = factory(User::class)->states('Host')->create();
