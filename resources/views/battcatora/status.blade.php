@@ -51,12 +51,57 @@
             @lang('battcatora.status.task_completed')!
         </div>
         @endif
-        @if (isset($status))
-        @if (!$complete)
+        @if (isset($status) && !$complete)
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col">
                 <div class="row justify-content-center">
                     <strong>{{ $status['progress'][0]->total }}% @lang('battcatora.status.progress')</strong>
+                </div>
+            </div>
+        </div>
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
+            <div class="col">
+                <div class="row justify-content-center">
+                    <strong>{{ $status['total_opinions'][0]->total }} @lang('battcatora.status.opinions')</strong>
+                </div>
+            </div>
+        </div>
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
+            <div class="col text-smaller">
+                <div class="row justify-content-center">
+                    <p><strong>@lang('battcatora.status.items_majority_opinions') : {{ $status['total_recats'][0]->total }} </strong></p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <div class="row badge-pill badge-light">
+                            <div class="col col-3">
+                                @lang('battcatora.status.number_of_records')
+                            </div>
+                            <div class="col">
+                                @lang('battcatora.status.winning_opinion')
+                            </div>
+                            <div class="col col-2">
+                                @lang('devices.repair_status')
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col">
+                        @foreach($status['list_recats'] as $row)
+                        <div class="row border border-grey">
+                            <div class="col col-3">
+                                {{ $row->total }}
+                            </div>
+                            <div class="col">
+                                @lang($row->winning_opinion)
+                            </div>
+                            <div class="col col-2">
+                                @lang($row->repair_status)
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
@@ -79,117 +124,6 @@
             </div>
         </div>
         <!-- test -->
-        <!-- <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
-            <div class="col text-smaller">
-                <div class="row justify-content-center">
-                    <p><strong>@lang('battcatora.status.items_opinions')</strong></p>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="col">
-                        <p class="badge-pill badge-light"><span>@lang('battcatora.status.total')</span></p>
-                        <p>
-                            {{ $status['total_devices'][0]->total }}
-                        </p>
-                    </div>
-                    <div class="col">
-                        <p class="badge-pill badge-light"><span>@lang('battcatora.status.items_3_opinions')</span></p>
-                        <p>
-                            {{ $status['total_opinions_3'][0]->total }}
-                        </p>
-                    </div>
-                    <div class="col">
-                        <p class="badge-pill badge-light"><span>@lang('battcatora.status.items_2_opinions')</span></p>
-                        <p>
-                            {{ $status['total_opinions_2'][0]->total }}
-                        </p>
-                    </div>
-                    <div class="col">
-                        <p class="badge-pill badge-light"><span>@lang('battcatora.status.items_1_opinion')</span></p>
-                        <p>
-                            {{ $status['total_opinions_1'][0]->total }}
-                        </p>
-                    </div>
-                    <div class="col">
-                        <p class="badge-pill badge-light"><span>@lang('battcatora.status.items_0_opinions')</span></p>
-                        <p>
-                            {{ $status['total_opinions_0'][0]->total }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        @endif
-        <!-- <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
-            <div class="col text-smaller">
-                <div class="row justify-content-center">
-                    <p><strong>@lang('battcatora.status.items_majority_opinions') : {{ $status['total_recats'][0]->total }} </strong></p>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="col">
-                        <div class="row badge-pill badge-light">
-                            <div class="col col-3">
-                                @lang('battcatora.status.number_of_records')
-                            </div>
-                            <div class="col">
-                                @lang('battcatora.status.winning_opinion')
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="col">
-                        @foreach($status['list_recats'] as $row)
-                        <div class="row border border-grey">
-                            <div class="col col-3">
-                                {{ $row->total }}
-                            </div>
-                            <div class="col">
-                                @lang($row->winning_opinion)
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        @endif
-        @if (!$complete)
-        <!-- <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
-            <div class="col text-smaller">
-                <div class="row justify-content-center">
-                    <p><strong>@lang('battcatora.status.items_split_opinions') : {{ $status['total_splits'][0]->total }}</strong></p>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="col">
-                        <div class="row badge-pill badge-light">
-                            <div class="col col-7">
-                                @lang('battcatora.status.opinions')
-                            </div>
-                            <div class="col">
-                                @lang('battcatora.status.problem')
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row justify-content-center small">
-                    <div class="col">
-                        @foreach($status['list_splits'] as $row)
-                        <div class="row border border-grey">
-                            <div class="col col-7 text-small text-wrap">
-                                @php($tmp = explode(',',$row->opinions))
-                                @foreach($tmp as $opinion)
-                                @lang($opinion)<br>
-                                @endforeach
-                            </div>
-                            <div class="col text-small text-wrap text-break">
-                                {{ $row->problem }}
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div> -->
         @endif
     </div>
     <div id="ora-partnership" class="mt-8 mb-4">

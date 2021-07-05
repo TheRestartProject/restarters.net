@@ -65,27 +65,6 @@ class UserController extends Controller
         'user' => $user,
         'skills' => $skills,
         ]);
-      // return view('admin.index', [
-      //   'user' => $user,
-      //   'grouplist' => null,
-      //   'upcomingparties' => null,
-      //   'allparties' => null,
-      //   'upcomingparties' => null,
-      //   'waste_year_data' => null,
-      //   'clusters' => null,
-      // ]);
-      // }
-      // elseif(FixometerHelper::hasRole($user, 'Host')){
-      // header('Location: /host');
-      // return view('user.profile-new', [//user.profile
-      //   'user' => $user,
-      // ]);
-      // }
-      // else {
-      // return view('user.profile-new', [//user.profile
-      //   'user' => $user,
-      // ]);
-      // }
     }
 
     public function getProfileEdit($id = null)
@@ -494,25 +473,6 @@ class UserController extends Controller
                     'recovery_expires' => $data['recovery_expires'],
                     ]);
 
-                    // send email to User
-                    // $message = "<p>Hi,</p>" .
-                    //          "<p>You've requested to recover your password for the " . env('APP_NAME') . ".</p>" .
-                    //          "<hr/>" .
-                    //          "<p>Please click on this link to recover your password: <a href=\"" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "\">" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "</a>.</p>" .
-                    //          "<p>If the link doesn't work, please copy and paste it in the address bar of your browser.</p>" .
-                    //          "<p>The link will be active for the next 24 hours.</p>" .
-                    //          "<hr/>" .
-                    //          "<p>If you have any issues, or if you did <strong>not</strong> ask to recover your password, please contact <a href='mailto:" . env('SUPPORT_CONTACT_EMAIL') . "'>" . env('SUPPORT_CONTACT_EMAIL') . "</a>.</p>" .
-                    // "<p>Thanks for using the " . env('APP_NAME') . "!</p>" .
-                    // "<p><em>The Restart Project</em></p>";
-                    // $subject = env('APP_NAME') . ": Password recovery";
-                    // $headers = "From: " . env('APP_EMAIL') . "\r\n";
-                    // $headers .= "MIME-Version: 1.0\r\n";
-                    // $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-                    // $headers .= "Bcc: " . env('SUPPORT_CONTACT_EMAIL') . "\r\n";
-                    //
-                    // $sender = mail($email, $subject, $message, $headers);
-
                     User::find($id)->notify(new ResetPassword([
                       'url' => env('APP_URL') . "/user/reset?recovery=" . $data['recovery']
                     ]));
@@ -753,6 +713,8 @@ class UserController extends Controller
     }
 
 
+    // TODO: is this alive?
+    // I don't recall admins being able to create users.
     public function create()
     {
         $user = Auth::user();
@@ -1034,6 +996,9 @@ class UserController extends Controller
         }
     }
 
+    // TODO: is this alive?
+    // I don't think so.  The error message 'Nope' was a classic
+    // that I only recall being visible anywhere in the pre-2018 codebase.
     public function forbidden()
     {
         $this->set('title', 'Nope.');
@@ -1081,7 +1046,6 @@ class UserController extends Controller
 
     public function logout()
     {
-
         Auth::logout();
         return redirect('/login');
     }
@@ -1115,6 +1079,8 @@ class UserController extends Controller
         }
     }
 
+    // TODO: is this alive?
+    // It feels like old code to me.
     public function lng($lang)
     {
         global $fixometer_languages;

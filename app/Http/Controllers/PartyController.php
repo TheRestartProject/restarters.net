@@ -1272,6 +1272,7 @@ class PartyController extends Controller
         return redirect()->back()->with('warning', 'Sorry, but the image can\'t be deleted');
     }
 
+    // TODO: is this alive?
     public function emailHosts()
     {
         if (env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
@@ -1331,6 +1332,9 @@ class PartyController extends Controller
     }
 
 
+    // TODO: is this alive?
+    // It looks like recent-ish code, but I recall James mentioned recently that
+    // he couldn't delete events.  Perhaps it's disappeared from the interface?
     /**
      * Called via AJAX.
      * @param id The event id.
@@ -1361,6 +1365,7 @@ class PartyController extends Controller
         return redirect('/party')->with('success', 'Event has been deleted');
     }
 
+    // TODO: is this alive?
     public function noDataEntered()
     {
         return redirect('/party');

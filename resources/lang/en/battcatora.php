@@ -31,7 +31,7 @@ return array(
         'items_opinions' => 'Items / opinions',
         'items_split_opinions' => 'Items with split opinions',
         'number_of_records' => 'Number of records',
-        'opinions' => 'Opinions',
+        'opinions' => 'opinions',
         'problem' => 'Problem',
         'progress' => 'complete',
         'status' => 'Status',

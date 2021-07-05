@@ -790,6 +790,7 @@ class GroupController extends Controller
         ]);
     }
 
+    // TODO: is this alive?
     public function delete($id)
     {
         if (FixometerHelper::hasRole($this->user, 'Administrator')) {
@@ -805,6 +806,7 @@ class GroupController extends Controller
         }
     }
 
+    // TODO: is this alive?
     public function deleteImage($group_id, $id, $path)
     {
         $user = Auth::user();
@@ -927,6 +929,7 @@ class GroupController extends Controller
         }
     }
 
+    // TODO: is this alive?
     public function imageUpload(Request $request, $id)
     {
         try {
@@ -1003,6 +1006,8 @@ class GroupController extends Controller
         return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
     }
 
+    // TODO: is this alive?
+    // It's still in the action menu, but I don't believe it has been updated recently.
     public function volunteersNearby($groupid)
     {
         if (isset($_GET['action']) && isset($_GET['code'])) {

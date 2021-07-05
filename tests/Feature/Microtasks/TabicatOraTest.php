@@ -17,7 +17,7 @@ class TabicatOraTest extends TestCase
         TabicatOra::truncate();
         DB::table('devices_tabicat_ora')->truncate();
         DB::table('devices_faults_tablets_ora_adjudicated')->truncate();
-        DB::table('fault_types_mobiles')->truncate();
+        DB::table('fault_types_tablets')->truncate();
     }
 
     /** @test */
@@ -375,7 +375,7 @@ class TabicatOraTest extends TestCase
                 0 => [
                     'id_ords' => $data[2]['id_ords'],
                     'all_crowd_opinions_count' => 3,
-                    'opinions' => 'Other,Screen,Unknown',
+                    'opinions' => 'Other,Poor data,Screen',
                 ],
             ],
             'progress' => 63,
@@ -432,7 +432,7 @@ class TabicatOraTest extends TestCase
             ],
             25 => [
                 'id' => 25,
-                'title' => 'Unknown',
+                'title' => 'Poor data',
                 'description' => 'Not enough info to determine the main fault',
                 'regex' => '',
             ],
@@ -445,8 +445,8 @@ class TabicatOraTest extends TestCase
         ];
 
         foreach ($fault_types as $row) {
-            DB::table('fault_types_mobiles')->insert($row);
-            $this->assertDatabaseHas('fault_types_mobiles', ['id' => $row['id']]);
+            DB::table('fault_types_tablets')->insert($row);
+            $this->assertDatabaseHas('fault_types_tablets', ['id' => $row['id']]);
         };
         return $fault_types;
     }

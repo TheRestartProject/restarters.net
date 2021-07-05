@@ -255,6 +255,9 @@ class DeviceController extends Controller
         }
     }
 
+    // TODO: is this alive?
+    // We have ajaxCreate.  
+    // The user of header('Location') redirect suggests old code to me.
     public function create()
     {
         $user = Auth::user();
@@ -705,9 +708,4 @@ class DeviceController extends Controller
     {
         $request->session()->put('column_preferences', $request->input('column_preferences'));
     }
-
-    // public function test() {
-  //   $g = new Device;
-  //   dd($g->export());
-  // }
 }
