@@ -996,75 +996,10 @@ class UserController extends Controller
         }
     }
 
-    public function profile($id = null)
-    {
-        $Auth = new Auth($url);
-        if (!$Auth->isLoggedIn()) {
-            header('Location: /user/login');
-        } else {
-            $user = $Auth->getProfile();
-            $this->set('user', $user);
-            $this->set('header', true);
-            $profile =  $this->User->profilePage($id);
-
-      //load profile
-            $this->set('profile', $profile);
-            $this->set('title', $profile->name);
-      // Load statistics
-            $Groups  = new Group;
-            $Parties = new Party;
-            $Devices = new Device;
-
-
-            $this->set('devices', $Devices->ofThisUser($id));
-            $this->set('parties', $Parties->ofThisUser($id));
-            $this->set('groups', $Groups->ofThisUser($id));
-
-            return view('users.profile', [
-            'user' => $user,
-            'header' => true,
-            'profile' => $profile,
-            'title' => $profile->name,
-            'devices' => $Devices->ofThisUser($id),
-            'parties' => $Parties->ofThisUser($id),
-            'groups' =>  $Groups->ofThisUser($id),
-            ]);
-        }
-    }
-
     public function logout()
     {
         Auth::logout();
         return redirect('/login');
-    }
-
-    public function delete()
-    {
-        $Auth = new Auth($url);
-        if (!$Auth->isLoggedIn()) {
-            header('Location: /user/login');
-        } else {
-            $user = $Auth->getProfile();
-            $this->set('user', $user);
-            $this->set('header', true);
-
-      // Administrators can edit users.
-            if ((FixometerHelper::hasRole($user, 'Administrator') || hasRole($user, 'Host') &&
-                $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST))) {
-                $id = (int)$_POST['id'];
-                $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
-
-              // Delete Session
-              //$session = new Session;
-              //$session->destroySession($id);
-
-                if ($this->User->delete($id)) {
-                      header('Location: /user/all?msg=ok');
-                } else {
-                    header('Location: /user/all?msg=no');
-                }
-            }
-        }
     }
 
     public function getRegister($hash = null)
