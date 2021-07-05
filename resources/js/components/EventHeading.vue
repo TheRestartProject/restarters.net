@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex justify-content-between mb-3">
       <h1 class="d-block d-md-none">{{ __('events.events') }}</h1>
-      <EventActions :idevents="idevents" :canedit="canedit" :in-group="inGroup" :attending="attending" class="d-block d-md-none" />
+      <EventActions :idevents="idevents" :canedit="canedit" :in-group="inGroup" :is-attending="isAttending" class="d-block d-md-none" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
       <div class="layout mt-4 mb-3 mb-md-3">
@@ -32,7 +32,7 @@
                 </b>
               </div>
             </div>
-            <EventActions :idevents="idevents" :canedit="canedit" :in-group="inGroup" :attending="attending" class="d-none d-md-block" />
+            <EventActions :idevents="idevents" :canedit="canedit" :in-group="inGroup" :is-attending="isAttending" class="d-none d-md-block" />
           </div>
         </div>
       </div>
@@ -59,10 +59,10 @@ export default {
       required: false,
       default: false
     },
-    attending: {
-      type: Object,
+    isAttending: {
+      type: Boolean,
       required: false,
-      default: null
+      default: false
     },
     inGroup: {
       type: Boolean,

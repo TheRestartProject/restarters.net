@@ -13,6 +13,9 @@ export default {
     volunteerCount() {
       return this.event && this.event.volunteers ? this.event.volunteers : 0
     },
+    approved() {
+      return this.event && this.event.approved
+    },
     upcoming() {
       let ret = false;
 

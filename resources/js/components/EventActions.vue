@@ -20,16 +20,19 @@
           </b-dropdown-item>
         </div>
         <div v-else>
-          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="attending && upcoming">
+          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="isAttending && upcoming && approved">
+            {{ __('events.invite_volunteers') }}
+          </b-dropdown-item>
+          <b-dropdown-item v-b-tooltip.hover id="invite-when-approved" data-toggle="modal" v-else-if="isAttending && upcoming" :title="__('events.invite_when_approved')" disabled>
             {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
           <b-dropdown-item :href="'/party/join/' + idevents" v-else>
             {{ __('events.RSVP') }}
           </b-dropdown-item>
+          <b-dropdown-item :href="'/group/join/' + event.the_group.idgroups" v-if="!inGroup">
+            {{ __('events.follow_group') }}
+          </b-dropdown-item>
         </div>
-        <b-dropdown-item :href="'/group/join/' + event.the_group.idgroups" v-if="!inGroup">
-          {{ __('events.follow_group') }}
-        </b-dropdown-item>
       </div>
       <div v-else>
         <b-dropdown-item data-toggle="modal" data-target="#event-share-stats" v-if="finished">
@@ -68,10 +71,10 @@ export default {
       required: false,
       default: false
     },
-    attending: {
-      type: Object,
+    isAttending: {
+      type: Boolean,
       required: false,
-      default: null
+      default: false
     },
     inGroup: {
       type: Boolean,

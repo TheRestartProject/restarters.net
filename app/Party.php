@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 use FixometerHelper;
+use Auth;
 
 class Party extends Model implements Auditable
 {
@@ -380,25 +381,31 @@ class Party extends Model implements Auditable
     * Laravel specific code
     */
 
-    public function scopeUpcomingEvents($query, $by_event = false)
+    public function scopeUpcomingEvents($query)
     {
-      if( $by_event ) {
-        return $this->join('groups', 'groups.idgroups', '=', 'events.group')
-                     ->join('events_users', 'events_users.event', '=', 'events.idevents')
-                     ->whereNotNull('events.wordpress_post_id')
-                     ->whereDate('event_date', '>=', date('Y-m-d'))
-                     ->select('events.*')
-                     ->groupBy('idevents')
-                     ->orderBy('event_date', 'ASC');
-      }
-
-      return $this->join('groups', 'groups.idgroups', '=', 'events.group')
+      // We want to show approved events (wordpress_post_id IS NOT NULL), or where we are a host (e.g. because
+      // we created it, or if we are a network coordinator/admin.
+      $ret = $this->join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-            ->whereNotNull('events.wordpress_post_id')
+            ->leftJoin('events_users', function($join) {
+                $join->on('events_users.event', '=', 'events.idevents');
+                $join->where('events_users.user', '=', Auth::user()->id);
+            })
+            ->leftJoin('users', 'users.id', '=', 'events_users.user')
+            ->where(function($query) {
+              $query
+                  ->whereNotNull('events.wordpress_post_id')
+                  ->orWhere('events_users.role', '=', Role::HOST)
+                  ->orWhere('users_groups.role', '=', Role::HOST)
+                  ->orWhereIn('users.role', [ Role::NETWORK_COORDINATOR, Role::ADMINISTRATOR ]);
+             })
             ->whereDate('event_date', '>=', date('Y-m-d'))
             ->select('events.*')
             ->groupBy('idevents')
             ->orderBy('event_date', 'ASC');
+
+        #error_log("Query " . $ret->toSql() . " with " . Auth::user()->id . " and " . date('Y-m-d'));
+        return $ret;
     }
 
     /**
