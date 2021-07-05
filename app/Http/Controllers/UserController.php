@@ -913,7 +913,6 @@ class UserController extends Controller
                     $ug->createUsersGroups($id, $sent_groups);
                 }
 
-
                 if (isset($_FILES) && !empty($_FILES)) {
                     $file = new FixometerFile;
                     $file->upload('profile', 'image', $id, env('TBL_USERS'), false, true);

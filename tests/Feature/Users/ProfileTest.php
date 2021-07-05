@@ -39,6 +39,7 @@ class ProfileTest extends TestCase
     }
 
     public function testEdit() {
+        $GLOBALS['_FILES'] = [];
         $user1 = factory(User::class)->states('Restarter')->create();
         $user2 = factory(User::class)->states('Restarter')->create();
         $host = factory(User::class)->states('Host')->create();
@@ -99,6 +100,7 @@ class ProfileTest extends TestCase
     }
 
     public function testEditBadPassword() {
+        $GLOBALS['_FILES'] = [];
         $user1 = factory(User::class)->states('Restarter')->create();
         $host = factory(User::class)->states('Host')->create();
 
