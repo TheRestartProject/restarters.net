@@ -1,8 +1,4 @@
 <style>
-    body {
-        text-align: center !important;
-    }
-
     h1 {
         font-family: 'Asap' !important;
         font-weight: bold !important;
@@ -58,37 +54,8 @@
         align-items: center;
     }
 
-    .repair-status {
-        padding: 3px;
-    }
-
     .battcat .btn {
         font-family: 'Open Sans';
-    }
-
-    .btn-fault-option {
-        background-color: #eee;
-        color: #000;
-        margin-bottom: 6px;
-    }
-
-    .btn-fault-selected {
-        border: 2px #111 solid;
-    }
-
-    .btn-fault-poordata {
-        background-color: #F45B69;
-        color: #fff;
-    }
-
-    .span-endoflife {
-        background-color: #F45B69;
-        color: #fff;
-    }
-
-    .span-repairable {
-        background-color: #DFA800;
-        color: #fff;
     }
 
     #btn-info-open {

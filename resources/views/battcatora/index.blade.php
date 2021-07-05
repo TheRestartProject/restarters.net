@@ -72,80 +72,102 @@
     @endif
 
     @if ($fault)
-    <div class="row row-compressed align-items-left">
-        <h2 class="col-12 text-left">@lang('battcatora.task.subtitle')</h2>
-    </div>
-    <div class="row p-3 mb-4 mx-1 mx-sm-0">
-        <div class="col-12">
-            <div class="row device">
-                <div class="device-meta col-4">
-                    <ul>
-                        <li><span class="source">@lang('battcatora.task.source'): {{ $fault->partner }}</span></li>
-                        <li><span class="category">@lang($fault->product_category)</span></li>
-                        @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
-                        <li><span class="brand">{{ $fault->brand }}</span></li>
-                        @endif
-                        @if ($fault->repair_status == "Repairable")
-                        <li><span class="repair-status span-repairable">@lang($fault->repair_status)</span></li>
-                        @else
-                        <li><span class="repair-status span-endoflife">@lang($fault->repair_status)</span></li>
-                        @endif
-                    </ul>
-                </div>
-                @if ($fault->language == $locale )
-                <div class="device-problem col-8">
-                    <p class="text-center">{{ $fault->problem }}</p>
-                </div>
-                @else
-                <div class="device-problem col-7">
-                    <p class="text-center">{{ $fault->problem }}</p>
-                </div>
-                <div class="device-problem col-1">
-                    <p>
-                        <button id="btn-translate" class="btn-sm btn-outline-light">
-                            <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text={{ $fault->problem }}" target="_blank">
-                                @lang('battcatora.task.translate')
-                            </a>
-                        </button>
-                    </p>
-                </div>
-                @endif
-            </div>
-            <form id="log-task" action="" method="POST">
-                @csrf
-                <div class="container fault-type">
-                    <div class="row options">
-                        <div class="col p-3">
-                            @if ($fault->repair_status == "Repairable")
-                            <p><span class="question">@lang('battcatora.task.question-repairable')</span></p>
-                            @else
-                            <p><span class="question">@lang('battcatora.task.question-endoflife')</span></p>
-                            @endif
-                            <div class="container">
-                                <input type="hidden" id="id-ords" name="id-ords" value="{{ $fault->id_ords }}">
-                                <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
-                                <p class="confirm hide">
-                                    <button class="btn-md btn-info btn-rounded" id="change">@lang('battcatora.task.go_with') "<span id="fault-type-new" data-fid=""></span>"</button>
-                                </p>
-                                <div class="container options mb-3">
-                                    <div class="buttons">
-                                        @foreach($fault->faulttypes as $fault_type)
-                                        @if ($fault_type->title !== "Poor data")
-                                        <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
-                                        @else
-                                        <button class="btn btn-sm btn-fault-option btn-fault-poordata btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
-                                        @endif
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <div class="row row-compressed align-items-left">
+            <h2 class="col-12 text-left">@lang('battcatora.task.subtitle')</h2>
+        </div>
+        @php( $status_class = $fault->repair_status == "Repairable" ? "repairable" : "endoflife" )
+    <div class="battcat-layout battcat-layout-{{ $status_class }}">
+        <div class="task-step" id="step1">
+            <div class="task-step-help" id="step1-help">
+                <div class="task-step-help-text">
+                    <div class="number">1</div>
+                    <div><strong>Read the information about the broken device.</strong></span>
                     </div>
                 </div>
-            </form>
-            <button type="submit" name="fetch" id="fetch" class="btn btn-md btn-warning btn-rounded my-4">
-                <span class="">@lang('battcatora.task.fetch_another')</span>
-            </button>
+                <div>
+                    <p style="font-size: smaller">Someone brought this broken device to a community repair event.</p>
+                </div>
+            </div>
+            <div class="task-step-info panel" id="step1-info">
+                <div class="row text-left">
+                    <div class="col-12 col-md-4">
+                        <span class="label">Device:</span> <span class="category">@lang($fault->product_category)</span>
+                    </div>
+                    @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
+                        <div class="col-12 col-md-4">
+                            <span class="label">Brand:</span> <span class="brand">{{ $fault->brand }}</span>
+                        </div>
+                    @endif
+                    <div class="col-12 col-md-4">
+                        <span class="label">Status:</span> <span class="repair-status span-{{ $status_class }}">@lang($fault->repair_status)</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <br/>
+                        <div class="label">Description of problem:</div>
+                        <p class="text-left">{{ $fault->problem }}</p>
+                    </div>
+                    </div>
+                    @if ($fault->language !== $locale )
+                    <div class="row">
+                        <div class="col">
+                            <p>
+                                <button id="btn-translate" class="btn-sm btn-outline-light">
+                                    <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text={{ $fault->problem }}" target="_blank">
+                                        @lang('battcatora.task.translate')
+                                    </a>
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+                    @endif
+            </div>
+        </div>
+        <div class="task-step" id="step2">
+            <div class="task-step-help" id="step2-help">
+                <div class="task-step-help-text">
+                    <div class="number">2</div>
+                    <div>
+                        <strong>
+                            @if ($fault->repair_status == "Repairable")
+                                @lang('battcatora.task.question-repairable')
+                            @else
+                                @lang('battcatora.task.question-endoflife')
+                            @endif
+                        </strong>
+                    </div>
+                </div>
+                <div>
+                <p style="font-size: smaller">Select the option that best fits the problem described above.</p>
+                </div>
+            </div>
+            <div id="step2-info" class="panel text-center">
+                <form id="log-task" action="" method="POST">
+                @csrf
+                    <div class="fault-type">
+                        <div class="options">
+                                    <input type="hidden" id="id-ords" name="id-ords" value="{{ $fault->id_ords }}">
+                                    <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
+                                    <p class="confirm hide">
+                                        <button class="btn-md btn-primary" id="change">@lang('battcatora.task.go_with') "<span id="fault-type-new" data-fid=""></span>"</button>
+                                    </p>
+                                    <div class="options mb-3">
+                                        <div class="buttons">
+                                            @foreach($fault->faulttypes as $fault_type)
+                                                <button class="btn btn-md btn-fault-option btn-rounded" data-fname="{{ $fault_type->title }}" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                        </div>
+                    </div>
+                </form>
+                <div>
+                <button type="submit" name="fetch" id="fetch" class="btn btn-primary">
+                    <span class="">@lang('battcatora.task.fetch_another')</span>
+                </button>
+                </div>
+            </div>
         </div>
     </div>
     @endif
@@ -197,9 +219,7 @@
         function doOption(e) {
             [...document.querySelectorAll('.btn-fault-option')].forEach(elem => {
                 elem.classList.remove('btn-fault-selected');
-
             });
-            document.querySelector('.btn-fault-poordata').classList.remove('btn-fault-selected');
             e.target.classList.add('btn-fault-selected');
             document.getElementById('fault-type-new').innerText = e.target.innerText;
             document.getElementById('fault-type-new').dataset.fid = e.target.dataset.fid;
