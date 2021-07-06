@@ -45,55 +45,55 @@
             </div>
         </div>
 
-    <a id="btn-cta-open" data-toggle="modal" data-target="#taskctaModal" class="hide">cta</a>
-    <a id="btn-survey-open" data-toggle="modal" data-target="#tasksurveyModal" class="hide">survey</a>
+        <a id="btn-cta-open" data-toggle="modal" data-target="#taskctaModal" class="hide">cta</a>
+        <a id="btn-survey-open" data-toggle="modal" data-target="#tasksurveyModal" class="hide">survey</a>
 
-    @if($errors->any())
-    <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 text-center">
-        {{$errors->first()}}
-    </div>
-    @endif
+        @if($errors->any())
+        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 text-center">
+            {{$errors->first()}}
+        </div>
+        @endif
 
-    @if ($fault)
+        @if ($fault)
         @php( $status_class = $fault->repair_status == "Repairable" ? "repairable" : "endoflife" )
-    <div class="battcat-layout battcat-layout-{{ $status_class }}">
-        <div class="task-step" id="step1">
-            <div class="task-step-help" id="step1-help">
-                <div class="task-step-help-text">
-                    <div class="number">1</div>
-                    <div><strong>Read the information about the broken device.</strong></span>
-                    </div>
-                </div>
-                <div>
-                    <p>Someone brought this broken device to a community repair event.</p>
-                </div>
-            </div>
-            <div class="task-step-info panel" id="step1-info">
-                <div class="row text-left">
-                    <div class="col-12 col-md-4">
-                        <span class="label">Device:</span> <span class="category">@lang($fault->product_category)</span>
-                    </div>
-                    @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
-                        <div class="col-12 col-md-4">
-                            <span class="label">Brand:</span> <span class="brand">{{ $fault->brand }}</span>
+        <div class="battcat-layout battcat-layout-{{ $status_class }}">
+            <div class="task-step" id="step1">
+                <div class="task-step-help" id="step1-help">
+                    <div class="task-step-help-text">
+                        <div class="number">1</div>
+                        <div><strong>@lang('battcatora.task.step1')</strong></span>
                         </div>
-                    @endif
-                    <div class="col-12 col-md-4">
-                        <span class="label">Status:</span> <span class="repair-status span-{{ $status_class }}">@lang($fault->repair_status)</span>
+                    </div>
+                    <div>
+                        <p>@lang('battcatora.task.step1-extra')</p>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col">
-                        <br/>
-                        <div class="label">Description of problem:</div>
-                        <p class="text-left">{{ $fault->problem }}</p>
+                <div class="task-step-info panel" id="step1-info">
+                    <div class="row text-left">
+                        <div class="col-12 col-md-4">
+                            <span class="label">@lang('battcatora.task.device'):</span> <span class="category">@lang($fault->product_category)</span>
+                        </div>
+                        @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
+                        <div class="col-12 col-md-4">
+                            <span class="label">@lang('battcatora.task.brand'):</span> <span class="brand">{{ $fault->brand }}</span>
+                        </div>
+                        @endif
+                        <div class="col-12 col-md-4">
+                            <span class="label">@lang('battcatora.task.status'):</span> <span class="repair-status span-{{ $status_class }}">@lang($fault->repair_status)</span>
+                        </div>
                     </div>
+                    <div class="row">
+                        <div class="col">
+                            <br />
+                            <div class="label">@lang('battcatora.task.problem'):</div>
+                            <p class="text-left">{{ $fault->problem }}</p>
+                        </div>
                     </div>
                     @if ($fault->language !== $locale )
                     <div class="row">
                         <div class="col">
                             <p>
-                                <button id="btn-translate" class="btn-sm btn-outline-light">
+                                <button id="btn-translate" class="btn-sm btn-primary">
                                     <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text={{ $fault->problem }}" target="_blank">
                                         @lang('battcatora.task.translate')
                                     </a>
@@ -102,65 +102,65 @@
                         </div>
                     </div>
                     @endif
+                </div>
             </div>
-        </div>
-        <div class="task-step" id="step2">
-            <div class="task-step-help" id="step2-help">
-                <div class="task-step-help-text">
-                    <div class="number">2</div>
-                    <div>
-                        <strong>
-                            @if ($fault->repair_status == "Repairable")
+            <div class="task-step" id="step2">
+                <div class="task-step-help" id="step2-help">
+                    <div class="task-step-help-text">
+                        <div class="number">2</div>
+                        <div>
+                            <strong>
+                                @if ($fault->repair_status == "Repairable")
                                 @lang('battcatora.task.question-repairable')
-                            @else
+                                @else
                                 @lang('battcatora.task.question-endoflife')
-                            @endif
-                        </strong>
-                    </div>
-                </div>
-                <div>
-                <p>Select the option that best fits the problem described above.</p>
-                </div>
-            </div>
-            <div id="step2-info" class="panel text-center">
-                <form id="log-task" action="" method="POST">
-                @csrf
-                    <div class="fault-type">
-                        <div class="options">
-                                    <input type="hidden" id="id-ords" name="id-ords" value="{{ $fault->id_ords }}">
-                                    <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
-                                    <p class="confirm hide">
-                                        <button class="btn-md btn-primary" id="change">@lang('battcatora.task.go_with') "<span id="fault-type-new" data-fid=""></span>"</button>
-                                    </p>
-                                    <div class="options mb-3">
-                                        <div class="buttons">
-                                            @foreach($fault->faulttypes as $fault_type)
-                                                <button class="btn btn-md btn-fault-option btn-rounded" data-fname="{{ $fault_type->title }}" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
-                                            @endforeach
-                                        </div>
-                                    </div>
+                                @endif
+                            </strong>
                         </div>
                     </div>
-                </form>
-                <div>
-                <button type="submit" name="fetch" id="fetch" class="btn btn-primary">
-                    <span class="">@lang('battcatora.task.fetch_another')</span>
-                </button>
+                    <div>
+                        <p>@lang('battcatora.task.step2-extra')</p>
+                    </div>
+                </div>
+                <div id="step2-info" class="panel text-center">
+                    <form id="log-task" action="" method="POST">
+                        @csrf
+                        <div class="fault-type">
+                            <div class="options">
+                                <input type="hidden" id="id-ords" name="id-ords" value="{{ $fault->id_ords }}">
+                                <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
+                                <p class="confirm hide">
+                                    <button class="btn-md btn-primary" id="change">@lang('battcatora.task.go_with') "<span id="fault-type-new" data-fid=""></span>"</button>
+                                </p>
+                                <div class="options mb-3">
+                                    <div class="buttons">
+                                        @foreach($fault->faulttypes as $fault_type)
+                                        <button class="btn btn-md btn-fault-option btn-rounded" data-fname="{{ $fault_type->title }}" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div>
+                        <button type="submit" name="fetch" id="fetch" class="btn btn-primary">
+                            <span class="">@lang('battcatora.task.fetch_another')</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    @endif
-    <div id="ora-partnership" class="mt-8 mb-4">
-        <hr />
-        <p class="mb-1">@lang('battcatora.branding.powered_by')</p>
-        <a href="https://openrepair.org" target="_blank">
-            <img src="{{ asset('images/battcatora/ora-logo.png') }}" alt="Open Repair Alliance logo" />
-        </a>
-    </div>
-    @include('battcatora/info-modal')
-    @include('battcatora/task-survey-modal')
-    @include('partials/task-cta-ora-modal')
+        @endif
+        <div id="ora-partnership" class="mt-8 mb-4">
+            <hr />
+            <p class="mb-1">@lang('battcatora.branding.powered_by')</p>
+            <a href="https://openrepair.org" target="_blank">
+                <img src="{{ asset('images/battcatora/ora-logo.png') }}" alt="Open Repair Alliance logo" />
+            </a>
+        </div>
+        @include('battcatora/info-modal')
+        @include('battcatora/task-survey-modal')
+        @include('partials/task-cta-ora-modal')
 </section>
 
 @endsection

@@ -156,3 +156,11 @@
     color: #222;
     text-decoration: underline;
 }
+
+button#fetch,
+button#change,
+button#btn-translate,
+{
+    text-transform: none;
+    letter-spacing: 1px;
+}
