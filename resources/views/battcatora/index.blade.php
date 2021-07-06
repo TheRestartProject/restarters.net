@@ -37,30 +37,13 @@
                 </a>
             </div>
         </div>
-        @if (!$signpost)
-        <!-- <div class="row row-compressed align-items-left">
+        <div class="d-none d-md-block row row-compressed align-items-left">
             <div class="col-12 text-left strapline">
                 <p>@lang('battcatora.task.strapline')
-                    <a href="javascript:void(0);" id="a-info-open" data-toggle="modal" data-target="#battcatoraInfoModal">@lang('battcatora.task.learn_more')</a>
+                    <a href="javascript:void(0);" id="a-info-open" data-toggle="modal" data-target="#battcatoraInfoModal">@lang('battcatora.task.learn_more')</a>.
                 </p>
             </div>
-        </div> -->
-        @elseif ($signpost < 5) <div class="row row-compressed information-alert banner alert-secondary align-items-left signpost">
-            <div class="col-1 text-left">
-                <img class="d-none d-sm-block" src="{{ asset('/images/battcatora/signpost.png') }}" alt="i" />
-            </div>
-            <div class="col-11 text-left">
-                <h5>@lang('battcatora.task.did_you_know')</h5>
-                <p>@lang('battcatora.task.signpost_' . $signpost)</p>
-            </div>
-    </div>
-    @else
-    <div class="row row-compressed align-items-left">
-        <div class="col-12 text-center">
-            <p>@lang('battcatora.task.signpost_' . $signpost)</p>
         </div>
-    </div>
-    @endif
 
     <a id="btn-cta-open" data-toggle="modal" data-target="#taskctaModal" class="hide">cta</a>
     <a id="btn-survey-open" data-toggle="modal" data-target="#tasksurveyModal" class="hide">survey</a>
@@ -72,9 +55,6 @@
     @endif
 
     @if ($fault)
-        <div class="row row-compressed align-items-left">
-            <h2 class="col-12 text-left">@lang('battcatora.task.subtitle')</h2>
-        </div>
         @php( $status_class = $fault->repair_status == "Repairable" ? "repairable" : "endoflife" )
     <div class="battcat-layout battcat-layout-{{ $status_class }}">
         <div class="task-step" id="step1">
@@ -85,7 +65,7 @@
                     </div>
                 </div>
                 <div>
-                    <p style="font-size: smaller">Someone brought this broken device to a community repair event.</p>
+                    <p>Someone brought this broken device to a community repair event.</p>
                 </div>
             </div>
             <div class="task-step-info panel" id="step1-info">
@@ -139,7 +119,7 @@
                     </div>
                 </div>
                 <div>
-                <p style="font-size: smaller">Select the option that best fits the problem described above.</p>
+                <p>Select the option that best fits the problem described above.</p>
                 </div>
             </div>
             <div id="step2-info" class="panel text-center">

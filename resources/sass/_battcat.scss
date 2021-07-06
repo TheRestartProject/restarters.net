@@ -17,13 +17,13 @@
         display: grid;
         grid-template-columns: 1fr;
         grid-template-rows: auto auto;
-
-        grid-gap: 1.5em;
-
-        margin-bottom: 2em;
+        grid-gap: 0;
+        margin-top: 2em;
 
         @include media-breakpoint-up(md) {
+            grid-gap: 1.5em;
             margin-bottom: 0;
+            margin-top: 1em;
             grid-template-columns: 1fr 3fr;
         }
     }
@@ -133,4 +133,26 @@
     &:hover {
         background-color: #19A5B9;
     }
+}
+
+#ora-partnership {
+    text-align: center;
+
+    hr {
+        width: 50%;
+    }
+
+    p {
+        font-size: medium;
+        font-weight: bold;
+    }
+
+    img {
+        width: 300px;
+    }
+}
+
+#a-info-open {
+    color: #222;
+    text-decoration: underline;
 }

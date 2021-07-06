@@ -100,16 +100,4 @@
         font-weight: bold;
     }
 
-    #ora-partnership hr {
-        width: 50%;
-    }
-
-    #ora-partnership p {
-        font-size: medium;
-        font-weight: bold;
-    }
-
-    #ora-partnership img {
-        width: 300px;
-    }
 </style>

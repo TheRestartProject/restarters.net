@@ -10,7 +10,7 @@ return array(
         'translate' => 'Translate',
         'go_with' => 'Go with',
         'source' => 'Source',
-        'strapline' => 'Simply read the information about the broken device and select the type of fault described from the list underneath.',
+        'strapline' => 'We\'ve collected data on lots of broken battery-powered devices from community repair events. We need your help to learn how they broke so we know how to make them easier to fix in the future.',
         'learn_more' => 'Learn more',
         'did_you_know' => 'Did you know?',
         'signpost_1' => 'An average tablet produces the equivalent of 150 kg of CO2 during its life. But because it takes lots of precious materials and intensive manufacturing to make each tablet, over 75% of that impact occurs before it’s switched on for the first time.',
