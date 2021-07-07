@@ -88,10 +88,10 @@ class LoginController extends Controller
     protected function validateLogin(Request $request)
     {
         $this->validate($request, [
-            $this->username() => 'required|email',
-            'password' => 'required|string',
-            'my_name'   => 'honeypot',
-            'my_time'   => 'required|honeytime:1'
+                $this->username() => 'required|email',
+                'password' => 'required|string',
+                'my_name' => 'honeypot',
+                'my_time' => 'required|honeytime:1'
         ]);
     }
 
