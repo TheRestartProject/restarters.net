@@ -38,7 +38,9 @@ class DeleteEventTests extends TestCase
         Event::fake();
 
         // arrange
-        $admin = factory(User::class)->states('Administrator')->create();
+        $admin = factory(User::class)->states('Administrator')->create([
+                                                                           'api_token' => '1234',
+                                                                       ]);
         $this->actingAs($admin);
 
         $event = factory(Party::class)->create();
@@ -51,6 +53,12 @@ class DeleteEventTests extends TestCase
         $response->assertRedirect('/party/');
         $this->assertSoftDeleted('events', ['idevents' => $event['idevents']]);
         Event::assertDispatched(\App\Events\EventDeleted::class);
+
+        // Check that viewing the stats for a deleted event behaves gracefully.
+        $response = $this->get("/api/party/{$event->idevents}/stats?api_token=1234");
+        $this->assertEquals([
+                         'message' => "Invalid party id {$event['idevents']}"
+                     ], json_decode($response->getContent(), TRUE));
     }
 
     /** @test */
