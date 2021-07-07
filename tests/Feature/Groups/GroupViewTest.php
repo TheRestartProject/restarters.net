@@ -3,6 +3,7 @@
 namespace Tests\Feature\Groups;
 
 use App\Role;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class GroupViewTest extends TestCase {
@@ -21,5 +22,14 @@ class GroupViewTest extends TestCase {
                 ':events' => '[]',
             ]
         ]);
+    }
+
+    /**
+     * @expectedException
+     */
+    public function testInvalidGroup() {
+        $this->loginAsTestUser(Role::RESTARTER);
+        $this->expectException(NotFoundHttpException::class);
+        $this->get("/group/view/undefined");
     }
 }
