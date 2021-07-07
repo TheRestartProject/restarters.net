@@ -29,6 +29,7 @@ class BattcatOraController extends Controller
             $user = $this->_anon();
         }
         // if survey is being submitted
+        $thankyou = FALSE;
         if ($request->has('task-survey')) {
             $inputs = $request->all();
             unset($inputs['_token']);
@@ -47,6 +48,7 @@ class BattcatOraController extends Controller
                 logger('MicrotaskSurvey error on insert.');
                 logger(print_r($insert, 1));
             }
+            $thankyou = 'guest';
         }
 
         $this->Model = new BattcatOra;
@@ -73,6 +75,8 @@ class BattcatOraController extends Controller
                 if ($user->id == 0) {
                     // guest is redirected to modal survey
                     return redirect()->action('BattcatOraController@survey');
+                } else {
+                    $thankyou = 'user';
                 }
             }
         }
@@ -86,6 +90,7 @@ class BattcatOraController extends Controller
             'title' => 'BattCat',
             'fault' => $fault,
             'user' => $user,
+            'thankyou' => $thankyou,
             'locale' => $this->_getUserLocale(),
         ]);
     }
