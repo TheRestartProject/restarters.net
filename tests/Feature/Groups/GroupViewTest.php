@@ -24,9 +24,6 @@ class GroupViewTest extends TestCase {
         ]);
     }
 
-    /**
-     * @expectedException
-     */
     public function testInvalidGroup() {
         $this->loginAsTestUser(Role::RESTARTER);
         $this->expectException(NotFoundHttpException::class);
