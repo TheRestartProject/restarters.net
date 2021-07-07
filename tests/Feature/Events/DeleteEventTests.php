@@ -19,6 +19,7 @@ use DB;
 use Carbon\Carbon;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Mockery;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
@@ -59,6 +60,10 @@ class DeleteEventTests extends TestCase
         $this->assertEquals([
                          'message' => "Invalid party id {$event['idevents']}"
                      ], json_decode($response->getContent(), TRUE));
+
+        // Check that getting the outbound info behaves gracefully.
+        $this->expectException(NotFoundHttpException::class);
+        $this->get("/outbound/info/party/{$event->idevents}");
     }
 
     /** @test */
