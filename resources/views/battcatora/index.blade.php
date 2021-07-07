@@ -45,7 +45,6 @@
             </div>
         </div>
 
-        <a id="btn-cta-open" data-toggle="modal" data-target="#taskctaModal" class="hide">cta</a>
         <a id="btn-survey-open" data-toggle="modal" data-target="#tasksurveyModal" class="hide">survey</a>
 
         @if($errors->any())
@@ -160,7 +159,6 @@
         </div>
         @include('battcatora/info-modal')
         @include('battcatora/task-survey-modal')
-        @include('partials/task-cta-ora-modal')
 </section>
 
 @endsection
@@ -231,10 +229,6 @@
 
         function fetchNew() {
             window.location.replace(window.location.href);
-        }
-
-        if (window.location.href.indexOf('cta') != -1) {
-            document.getElementById('btn-cta-open').click();
         }
 
         if (window.location.href.indexOf('survey') != -1) {
