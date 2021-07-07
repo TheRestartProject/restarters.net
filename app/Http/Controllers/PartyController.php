@@ -784,7 +784,6 @@ class PartyController extends Controller
 
                 return redirect()->back()->with($flashData);
             } catch (\Exception $e) {
-                error_log("Failed");
                 $flashData['danger'] = 'Failed to join this event';
                 return redirect()->back()->with($flashData);
             }
