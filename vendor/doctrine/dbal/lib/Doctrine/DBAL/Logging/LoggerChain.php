@@ -1,54 +1,47 @@
 <?php
-/*
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * This software consists of voluntary contributions made by many individuals
- * and is licensed under the MIT license. For more information, see
- * <http://www.doctrine-project.org>.
- */
 
 namespace Doctrine\DBAL\Logging;
 
+use Doctrine\Deprecations\Deprecation;
+
 /**
  * Chains multiple SQLLogger.
- *
- * @link   www.doctrine-project.org
- * @since  2.2
- * @author Christophe Coevoet <stof@notk.org>
  */
 class LoggerChain implements SQLLogger
 {
-    /**
-     * @var \Doctrine\DBAL\Logging\SQLLogger[]
-     */
+    /** @var SQLLogger[] */
     private $loggers = [];
+
+    /**
+     * @param SQLLogger[] $loggers
+     */
+    public function __construct(array $loggers = [])
+    {
+        $this->loggers = $loggers;
+    }
 
     /**
      * Adds a logger in the chain.
      *
-     * @param \Doctrine\DBAL\Logging\SQLLogger $logger
+     * @deprecated Inject list of loggers via constructor instead
      *
      * @return void
      */
     public function addLogger(SQLLogger $logger)
     {
+        Deprecation::trigger(
+            'doctrine/dbal',
+            'https://github.com/doctrine/dbal/pull/3572',
+            'LoggerChain::addLogger() is deprecated, use LoggerChain constructor instead.'
+        );
+
         $this->loggers[] = $logger;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function startQuery($sql, array $params = null, array $types = null)
+    public function startQuery($sql, ?array $params = null, ?array $types = null)
     {
         foreach ($this->loggers as $logger) {
             $logger->startQuery($sql, $params, $types);

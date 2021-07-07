@@ -3,6 +3,10 @@
 namespace PhpParser\Node\Stmt;
 
 use PhpParser\Node;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Name;
+use PhpParser\Node\NullableType;
+use PhpParser\Node\UnionType;
 
 class Property extends Node\Stmt
 {
@@ -10,22 +14,30 @@ class Property extends Node\Stmt
     public $flags;
     /** @var PropertyProperty[] Properties */
     public $props;
+    /** @var null|Identifier|Name|NullableType|UnionType Type declaration */
+    public $type;
+    /** @var Node\AttributeGroup[] PHP attribute groups */
+    public $attrGroups;
 
     /**
      * Constructs a class property list node.
      *
-     * @param int                $flags      Modifiers
-     * @param PropertyProperty[] $props      Properties
-     * @param array              $attributes Additional attributes
+     * @param int                                                $flags      Modifiers
+     * @param PropertyProperty[]                                 $props      Properties
+     * @param array                                              $attributes Additional attributes
+     * @param null|string|Identifier|Name|NullableType|UnionType $type       Type declaration
+     * @param Node\AttributeGroup[]                              $attrGroups PHP attribute groups
      */
-    public function __construct(int $flags, array $props, array $attributes = []) {
-        parent::__construct($attributes);
+    public function __construct(int $flags, array $props, array $attributes = [], $type = null, array $attrGroups = []) {
+        $this->attributes = $attributes;
         $this->flags = $flags;
         $this->props = $props;
+        $this->type = \is_string($type) ? new Identifier($type) : $type;
+        $this->attrGroups = $attrGroups;
     }
 
     public function getSubNodeNames() : array {
-        return ['flags', 'props'];
+        return ['attrGroups', 'flags', 'type', 'props'];
     }
 
     /**
@@ -64,7 +76,7 @@ class Property extends Node\Stmt
     public function isStatic() : bool {
         return (bool) ($this->flags & Class_::MODIFIER_STATIC);
     }
-    
+
     public function getType() : string {
         return 'Stmt_Property';
     }

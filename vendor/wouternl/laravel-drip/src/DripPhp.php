@@ -81,9 +81,9 @@ Class DripPhp implements DripInterface
         // when there's no json that's an error
         $campaigns = empty($raw_json)
         ? false
-        : empty($raw_json['campaigns'])
+        : (empty($raw_json['campaigns'])
         ? array()
-        : $raw_json['campaigns'];
+        : $raw_json['campaigns']);
 
         return $campaigns;
     }
@@ -119,9 +119,9 @@ Class DripPhp implements DripInterface
         // when there's no json that's an error
         $campaigns = empty($raw_json)
         ? false
-        : empty($raw_json['campaigns'])
+        : (empty($raw_json['campaigns'])
         ? array()
-        : $raw_json['campaigns'];
+        : $raw_json['campaigns']);
 
         return $campaigns;
     }
@@ -142,11 +142,45 @@ Class DripPhp implements DripInterface
 
         $data = empty($raw_json)
         ? false
-        : empty($raw_json['accounts'])
+        : (empty($raw_json['accounts'])
         ? array()
-        : $raw_json['accounts'];
+        : $raw_json['accounts']);
 
         return $data;
+    }
+
+    /**
+     * Sends a request to delete a subscriber, either by email or id.
+     *
+     * @param $params
+     * @return array|bool
+     * @throws Exception
+     */
+    public  function deleteSubscriber($params) {
+        if (empty($params['account_id'])) {
+            $params['account_id'] = $this->account_id;
+        }
+
+        $idOrEmail = null;
+        if (isset($params['email'])) {
+            $idOrEmail = $params['email'];
+        } elseif(isset($params['id'])) {
+            $idOrEmail = $params['id'];
+        }
+
+        if(is_null($idOrEmail)) {
+            throw new Exception('Missing id or email');
+        }
+
+        $account_id = $params['account_id'];
+        unset($params['account_id']); // clear it from the params
+
+        $api_action = "/$account_id/subscribers/$idOrEmail";
+        $url = $this->api_end_point . $api_action;
+
+        $res = $this->makeRequest($url, [], self::DELETE);
+
+        return isset($res['http_code']) && $res['http_code'] == '204';
     }
 
     /**
@@ -176,9 +210,60 @@ Class DripPhp implements DripInterface
 
         $data = empty($raw_json)
         ? false
-        : empty($raw_json['subscribers'])
+        : (empty($raw_json['subscribers'])
         ? array()
-        : $raw_json['subscribers'][0];
+        : $raw_json['subscribers'][0]);
+
+        return $data;
+    }
+
+    /**
+    * Create or update orders
+    *
+    * @param array $params
+    * @param array/bool $account
+    */
+    public function createOrUpdateOrders($params) {
+        if (empty($params['account_id'])) {
+            $params['account_id'] = $this->account_id;
+        }
+
+        $account_id = $params['account_id'];
+        unset($params['account_id']); // clear it from the params
+        
+        foreach ($params as $order) {
+            $idOrEmail = null;
+            if (isset($order['email'])) {
+                $idOrEmail = $order['email'];
+            } elseif (isset($order['id'])) {
+                $idOrEmail = $order['id'];
+            }
+
+            if (is_null($idOrEmail)) {
+                throw new Exception('Missing id or email');
+            }
+
+            if (empty($order['amount'])) {
+                throw new Exception("Amount not specified");
+            }
+        }
+
+        $api_action = "/$account_id/orders";
+        $url = $this->api_end_point . $api_action;
+
+        // The API wants the params to be JSON encoded
+        $req_params = array('orders' => $params);
+
+        $res = $this->makeRequest($url, $req_params, self::POST);
+        if (!empty($res['buffer'])) {
+            $raw_json = json_decode($res['buffer'], true);
+        }
+
+        $data = empty($raw_json)
+        ? false
+        : (empty($raw_json['orders'])
+        ? array()
+        : $raw_json['orders'][0]);
 
         return $data;
     }
@@ -219,9 +304,9 @@ Class DripPhp implements DripInterface
 
         $data = empty($raw_json)
         ? false
-        : empty($raw_json['subscribers'])
+        : (empty($raw_json['subscribers'])
         ? array()
-        : $raw_json['subscribers'][0];
+        : $raw_json['subscribers'][0]);
 
         return $data;
     }
@@ -269,9 +354,9 @@ Class DripPhp implements DripInterface
 
         $data = empty($raw_json)
         ? false
-        : empty($raw_json['subscribers'])
+        : (empty($raw_json['subscribers'])
         ? array()
-        : $raw_json['subscribers'][0];
+        : $raw_json['subscribers'][0]);
 
         return $data;
     }
@@ -315,9 +400,9 @@ Class DripPhp implements DripInterface
 
         $data = empty($raw_json)
         ? false
-        : empty($raw_json['subscribers'])
+        : (empty($raw_json['subscribers'])
         ? array()
-        : $raw_json['subscribers'][0];
+        : $raw_json['subscribers'][0]);
 
         return $data;
     }
