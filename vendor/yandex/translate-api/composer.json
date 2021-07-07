@@ -1,0 +1,20 @@
+{
+  "name": "yandex/translate-api",
+  "description": "Client for Yandex.Translate API",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Nikita Gusakov",
+      "email": "dev@nkt.me"
+    }
+  ],
+  "require": {
+    "php": ">=5.3",
+    "ext-curl": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Yandex\\Translate\\": "src"
+    }
+  }
+}

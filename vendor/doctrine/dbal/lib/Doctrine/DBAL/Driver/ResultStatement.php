@@ -1,33 +1,19 @@
 <?php
-/*
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * This software consists of voluntary contributions made by many individuals
- * and is licensed under the MIT license. For more information, see
- * <http://www.doctrine-project.org>.
- */
 
 namespace Doctrine\DBAL\Driver;
 
+use PDO;
+use Traversable;
+
 /**
  * Interface for the reading part of a prepare statement only.
- *
- * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
-interface ResultStatement extends \Traversable
+interface ResultStatement extends Traversable
 {
     /**
      * Closes the cursor, enabling the statement to be executed again.
+     *
+     * @deprecated Use Result::free() instead.
      *
      * @return bool TRUE on success or FALSE on failure.
      */
@@ -45,7 +31,9 @@ interface ResultStatement extends \Traversable
     /**
      * Sets the fetch mode to use while iterating this statement.
      *
-     * @param int   $fetchMode The fetch mode must be one of the {@link \Doctrine\DBAL\FetchMode} constants.
+     * @deprecated Use one of the fetch- or iterate-related methods.
+     *
+     * @param int   $fetchMode The fetch mode must be one of the {@link FetchMode} constants.
      * @param mixed $arg2
      * @param mixed $arg3
      *
@@ -56,9 +44,11 @@ interface ResultStatement extends \Traversable
     /**
      * Returns the next row of a result set.
      *
+     * @deprecated Use fetchNumeric(), fetchAssociative() or fetchOne() instead.
+     *
      * @param int|null $fetchMode         Controls how the next row will be returned to the caller.
-     *                                    The value must be one of the {@link \Doctrine\DBAL\FetchMode} constants,
-     *                                    defaulting to {@link \Doctrine\DBAL\FetchMode::MIXED}.
+     *                                    The value must be one of the {@link FetchMode} constants,
+     *                                    defaulting to {@link FetchMode::MIXED}.
      * @param int      $cursorOrientation For a ResultStatement object representing a scrollable cursor,
      *                                    this value determines which row will be returned to the caller.
      *                                    This value must be one of the \PDO::FETCH_ORI_* constants,
@@ -78,38 +68,43 @@ interface ResultStatement extends \Traversable
      * @return mixed The return value of this method on success depends on the fetch mode. In all cases, FALSE is
      *               returned on failure.
      */
-    public function fetch($fetchMode = null, $cursorOrientation = \PDO::FETCH_ORI_NEXT, $cursorOffset = 0);
+    public function fetch($fetchMode = null, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0);
 
     /**
      * Returns an array containing all of the result set rows.
      *
-     * @param int|null   $fetchMode     Controls how the next row will be returned to the caller.
-     *                                  The value must be one of the {@link \Doctrine\DBAL\FetchMode} constants,
-     *                                  defaulting to {@link \Doctrine\DBAL\FetchMode::MIXED}.
-     * @param int|null   $fetchArgument This argument has a different meaning depending on the value of the $fetchMode parameter:
-     *                                  * {@link \Doctrine\DBAL\FetchMode::COLUMN}:
-     *                                    Returns the indicated 0-indexed column.
-     *                                  * {@link \Doctrine\DBAL\FetchMode::CUSTOM_OBJECT}:
-     *                                    Returns instances of the specified class, mapping the columns of each row
-     *                                    to named properties in the class.
-     *                                  * \PDO::FETCH_FUNC: Returns the results of calling the specified function, using each row's
-     *                                    columns as parameters in the call.
-     * @param array|null $ctorArgs      Controls how the next row will be returned to the caller.
-     *                                  The value must be one of the {@link \Doctrine\DBAL\FetchMode} constants,
-     *                                  defaulting to {@link \Doctrine\DBAL\FetchMode::MIXED}.
+     * @deprecated Use fetchAllNumeric(), fetchAllAssociative() or fetchFirstColumn() instead.
      *
-     * @return array
+     * @param int|null        $fetchMode     Controls how the next row will be returned to the caller.
+     *                                       The value must be one of the {@link FetchMode} constants,
+     *                                       defaulting to {@link FetchMode::MIXED}.
+     * @param int|string|null $fetchArgument This argument has a different meaning depending on the value
+     *                                       of the $fetchMode parameter:
+     *                                       * {@link FetchMode::COLUMN}:
+     *                                         Returns the indicated 0-indexed column.
+     *                                       * {@link FetchMode::CUSTOM_OBJECT}:
+     *                                         Returns instances of the specified class, mapping the columns of each row
+     *                                         to named properties in the class.
+     *                                       * {@link PDO::FETCH_FUNC}: Returns the results of calling
+     *                                         the specified function, using each row's
+     *                                         columns as parameters in the call.
+     * @param mixed[]|null    $ctorArgs      Controls how the next row will be returned to the caller.
+     *                                       The value must be one of the {@link FetchMode} constants,
+     *                                       defaulting to {@link FetchMode::MIXED}.
+     *
+     * @return mixed[]
      */
     public function fetchAll($fetchMode = null, $fetchArgument = null, $ctorArgs = null);
 
     /**
      * Returns a single column from the next row of a result set or FALSE if there are no more rows.
      *
-     * @param int $columnIndex 0-indexed number of the column you wish to retrieve from the row.
-     *                         If no value is supplied, PDOStatement->fetchColumn()
-     *                         fetches the first column.
+     * @deprecated Use fetchOne() instead.
      *
-     * @return string|boolean A single column in the next row of a result set, or FALSE if there are no more rows.
+     * @param int $columnIndex 0-indexed number of the column you wish to retrieve from the row.
+     *                         If no value is supplied, fetches the first column.
+     *
+     * @return mixed|false A single column in the next row of a result set, or FALSE if there are no more rows.
      */
     public function fetchColumn($columnIndex = 0);
 }
