@@ -20,12 +20,8 @@ return array(
         'strapline' => 'We\'ve collected data on lots of broken battery-powered devices from community repair events. We need your help to learn how they broke so we know how to make them easier to fix in the future.',
         'learn_more' => 'Learn more',
         'did_you_know' => 'Did you know?',
-        'signpost_1' => 'An average tablet produces the equivalent of 150 kg of CO2 during its life. But because it takes lots of precious materials and intensive manufacturing to make each tablet, over 75% of that impact occurs before it’s switched on for the first time.',
-        'signpost_2' => 'Repairing a device extends its life, reduces its overall environmental impact and lowers demand for new products. In fact, if we used every computer in Europe for one year longer, we could divert 3 million tonnes of CO2e.',
-        'signpost_3' => 'The European Union is planning to include tablets and smartphones in Ecodesign rules by 2022. This will give us the chance to call for the Right to Repair these devices. Rules decided by the EU could also be used to influence laws in other places, including the UK.',
-        'signpost_4' => '"We want to tell policymakers why tablets break and how they could be made easier to fix. Community repair groups around the world have been recording this information, and by trying BattCat, you are helping us analyse it."',
-        'signpost_5' => 'Thank you! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Please take our survey</a>',
-        'signpost_6' => 'Thank you for helping! Every fault you categorise makes this data more useful. Why not <a href="../">join our community</a> too?',
+        'thankyou_user' => 'Thank you! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Please take our survey</a>',
+        'thankyou_guest' => 'Thank you for helping! Every fault you categorise makes this data more useful. Why not <a href="../">join our community</a> too?',
     ),
     'status' =>
     array(

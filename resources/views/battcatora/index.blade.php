@@ -44,6 +44,15 @@
                 </p>
             </div>
         </div>
+        @if ($thankyou)
+        <div class="row row-compressed information-alert banner alert-secondary align-items-left thankyou">
+            <div class="row row-compressed align-items-left">
+                <div class="col-12 text-center">
+                    <p>@lang('battcatora.task.thankyou_' . $thankyou)</p>
+                </div>
+            </div>
+        </div>
+        @endif
 
         <a id="btn-survey-open" data-toggle="modal" data-target="#tasksurveyModal" class="hide">survey</a>
 
