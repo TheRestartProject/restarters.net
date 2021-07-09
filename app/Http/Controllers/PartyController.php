@@ -425,10 +425,9 @@ class PartyController extends Controller
             $data['event_date'] = FixometerHelper::dbDateNoTime($data['event_date']);
 
             if ( ! empty($data['location'])) {
-                $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($data['location']).'&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE');
-                $json = json_decode($json);
+                $results = $this->geocoder->geocode($data['location']);
 
-                if ( empty($json->results) ) {
+                if ( empty($results) ) {
                   $response['danger'] = 'Party could not be saved. Address not found.';
                   $party = $Party->findThis($id)[0];
                   $audits = Party::findOrFail($id)->audits;
@@ -452,10 +451,8 @@ class PartyController extends Controller
                   ]);
                 }
 
-                if (is_object($json) && ! empty($json->{'results'})) {
-                    $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
-                    $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
-                }
+                $latitude = $results['latitude'];
+                $longitude = $results['longitude'];
             } else {
                 $latitude = null;
                 $longitude = null;
