@@ -48,7 +48,6 @@
     }
 
     .device-problem {
-        /* padding-top: 2%; */
         display: flex;
         justify-content: center;
         align-items: center;
@@ -99,6 +98,13 @@
         display: inline-block;
         font-size: 1rem;
         font-weight: bold;
+    }
+
+    .progress {
+        font-size: small;
+        height: 26px;
+        border: 2px solid #19A4B9;
+        border-radius: 15px;
     }
 
 </style>
