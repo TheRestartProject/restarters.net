@@ -191,7 +191,7 @@ Style Guide
         <div class="panel-foo">
             <button class="btn btn-primary">primary button</button>
             <pre><code>{{ '<button class="btn btn-primary">primary button</button>' }}</code></pre>
-            <button class="btn btn-warning btn-sm">small primary button</button>
+            <button class="btn btn-primary btn-sm">small primary button</button>
             <pre><code>{{ '<button class="btn btn-primary btn-sm">small primary button</button>' }}</code></pre>
             <button class="btn btn-outline-primary">outlined primary button</button>
             <pre><code>{{ '<button class="btn btn-outline-primary">outlined primary button</button>' }}</code></pre>
