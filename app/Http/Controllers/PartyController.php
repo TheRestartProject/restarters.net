@@ -1248,36 +1248,6 @@ class PartyController extends Controller
         return redirect()->back()->with('warning', 'Sorry, but the image can\'t be deleted');
     }
 
-    // TODO: is this alive?
-    public function emailHosts()
-    {
-        if (env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
-            //Get all events and hosts
-            $event_users = EventsUsers::where('role', 3);
-            $event_ids = $event_users->pluck('event')->toArray();
-            $all_events = Party::whereIn('idevents', $event_ids)
-            ->where('event_date', '=', date('Y-m-d', strtotime('-1 day')))
-            ->get();
-
-            foreach ($all_events as $event) {
-                $host_ids = $event_users->where('event', $event->idevents)->pluck('user')->toArray();
-
-                if ( ! empty($host_ids)) {
-                    $hosts = User::whereIn('id', $host_ids)->get();
-
-                    //Send Emails to Admins notifying event creation
-                    $arr = [
-                        'event_venue' => $event->venue,
-                        'event_url' => url('/party/view/'.$event->idevents),
-                        'preferences' => url('/profile/edit'),
-                    ];
-
-                    Notification::send($hosts, new EventDevices($arr));
-                }
-            }
-        }
-    }
-
     /*
     *
     * This sends an email to all user except the host logged in an email to ask for contributions
@@ -1339,12 +1309,6 @@ class PartyController extends Controller
         Log::info("Event deleted");
 
         return redirect('/party')->with('success', 'Event has been deleted');
-    }
-
-    // TODO: is this alive?
-    public function noDataEntered()
-    {
-        return redirect('/party');
     }
 
     /**
