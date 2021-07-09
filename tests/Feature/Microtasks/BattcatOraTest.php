@@ -87,7 +87,7 @@ class BattcatOraTest extends TestCase
         $this->assertTrue(is_array($result), 'fetch_battcatora_record: result is not array');
         $this->assertEquals(1, count($result), 'fetch_battcatora_record: wrong result count');
         $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_battcatora_record: id_ords is null');
-//        $this->assertTrue(in_array($result[0]->id_ords, $expect), 'fetch_battcatora_record: invalid id_ords');
+        $this->assertTrue(in_array($result[0]->id_ords, $expect), 'fetch_battcatora_record: invalid id_ords');
     }
 
     /** @test */
