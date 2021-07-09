@@ -1,0 +1,90 @@
+# This is a Docker Compose development environment for Restarters.  It creates:
+# - a web server on localhost:8001 which serves up restarters.  Admin user is jane@bloggs.net/passw0rd.
+# - phpMyAdmin on localhost:8002.  Use host restarters_db, user root/s3cr3t
+# - Mailhog on localhost:8025.
+#
+# Start using: docker-compose up -d
+#
+# The web server won't be available for a couple of minutes after that finishes - it will be doing a composer
+# install and artisan migrate.
+version: '3'
+services:
+
+  restarters:
+    depends_on:
+      - restarters_db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: php:7.4
+    container_name: restarters
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8001:80"
+    environment:
+      SERVICE_NAME: restarters
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      # We share the current folder into /var/www.  This means code changes on the host will get picked up
+      # by the client.
+      - ./:/var/www
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - app-network
+
+  restarters_db:
+    image: mysql:5.7.33
+    container_name: restarters_db
+    restart: unless-stopped
+    tty: true
+    expose:
+      - "3306"
+    environment:
+      MYSQL_DATABASE: restarters_db
+      MYSQL_ROOT_PASSWORD: s3cr3t
+      MYSQL_USER: restarters
+      MYSQL_PASSWORD: s3cr3t
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - app-network
+
+  phpmyadmin:
+    depends_on:
+      - restarters_db
+    image: phpmyadmin
+    container_name: restarters_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - 8002:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=restarters_db
+#      - PMA_USER=root
+#      - PMA_PASSWORD=s3cr3t
+    networks:
+      - app-network
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: restarters_mailhog
+    logging:
+      driver: 'none'  # disable saving logs
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
