@@ -102,7 +102,7 @@ LIMIT 1;
 
         $result = DB::select("
 SELECT
-ROUND((r2.opinions/r2.batteries)*100) as total
+ROUND((r2.opinions/r2.batteries)*100,1) as total
 FROM (
 SELECT
 COUNT(*) AS opinions,
