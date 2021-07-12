@@ -37,7 +37,7 @@ RUN sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
 RUN sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=/g' .env
 
 # Change the Discourse host to point at the one defined in docker-compose
-RUN sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http://restarters_discourse:3000/g' .env
+RUN sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse:3000/g' .env
 
 # Generate keys
 RUN php artisan key:generate
