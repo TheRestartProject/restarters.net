@@ -21,9 +21,9 @@ class BasicTest extends TestCase {
                 ':current-user-quests' => '0',
                 ':current-user-contributions' => '0',
                 ':topics' => '[]',
-                'see-all-topics-link' => env('DISCOURSE_URL') . 't/tag/workbench/l/latest',
+                'see-all-topics-link' => env('DISCOURSE_URL') . '/tag/workbench/l/latest',
                 ':is-logged-in' => 'true',
-                'discourse-base-url' => env('DISCOURSE_URL') . 't',
+                'discourse-base-url' => env('DISCOURSE_URL') . '',
             ]
         ]);
     }
