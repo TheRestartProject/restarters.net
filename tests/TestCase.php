@@ -91,10 +91,8 @@ abstract class TestCase extends BaseTestCase
 
     public function loginAsTestUser($role = Role::RESTARTER) {
         // This is testing the external interface, whereas actingAs() wouldn't be.
-        $atts = $this->userAttributes($role);
-        $atts['_token'] = csrf_token();
-
-        $response = $this->post('/user/register/',  $atts);
+        $response = $this->post('/user/register/', $this->userAttributes($role));
+        
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
 

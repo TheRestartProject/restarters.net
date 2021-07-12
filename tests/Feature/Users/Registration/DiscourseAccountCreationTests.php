@@ -47,26 +47,29 @@ class DiscourseAccountCreationTests extends TestCase
     /** @test */
     public function user_registration_discourse_sync()
     {
-        $this->setDiscourseTestEnvironment();
+        // We might not have Discourse integration enabled, e.g. when running on Circle.
+        if (env('FEATURE__DISCOURSE_INTEGRATION')) {
+            $this->setDiscourseTestEnvironment();
 
-        $atts = $this->userAttributes();
-        $response = $this->post('/user/register/', $atts);
-        $response->assertStatus(302);
-        $response->assertRedirect('dashboard');
+            $atts = $this->userAttributes();
+            $response = $this->post('/user/register/', $atts);
+            $response->assertStatus(302);
+            $response->assertRedirect('dashboard');
 
-        $id = User::latest()->first()->id;
-        $this->assertNotNull($id);
+            $id = User::latest()->first()->id;
+            $this->assertNotNull($id);
 
-        // Query Discourse to check the user exists there.
-        $endpoint = "/users/by-external/$id.json";
+            // Query Discourse to check the user exists there.
+            $endpoint = "/users/by-external/$id.json";
 
-        $client = app('discourse-client');
-        $response = $client->request(
-            'GET',
-            $endpoint
-        );
+            $client = app('discourse-client');
+            $response = $client->request(
+                'GET',
+                $endpoint
+            );
 
-        $json = json_decode($response->getBody()->getContents(), true);
-        $this->assertEquals($atts['name'], $json['user']['username']);
+            $json = json_decode($response->getBody()->getContents(), true);
+            $this->assertEquals($atts['name'], $json['user']['username']);
+        }
     }
 }
