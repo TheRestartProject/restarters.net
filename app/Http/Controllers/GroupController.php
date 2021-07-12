@@ -962,7 +962,7 @@ class GroupController extends Controller
         }
     }
 
-    // TODO: is this alive?
+    // TODO: is this alive?  Not completely clear, but it is referenced from a route.
     public function imageUpload(Request $request, $id)
     {
         try {

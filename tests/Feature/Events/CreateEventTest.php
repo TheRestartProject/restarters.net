@@ -136,6 +136,31 @@ class CreateEventTest extends TestCase
     }
 
     /** @test */
+    public function a_host_can_duplicate_an_event() {
+        $this->withoutExceptionHandling();
+
+        // arrange
+        $host = factory(User::class)->states('Host')->create();
+        $this->actingAs($host);
+
+        $group = factory(Group::class)->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        // act
+        $party = factory(Party::class)->create([
+           'group' => $group->idgroups,
+           'latitude'=>'1',
+           'longitude'=>'1'
+       ]);
+
+        // Duplicate it - should bring up the page to add a new event, with some info from the first one.
+        $response = $this->get('/party/duplicate/' . $party->idevents);
+        $response->assertSee(__('events.add_new_event'));
+        $response->assertSee($party->description);
+    }
+
+    /** @test */
     public function emails_sent_when_created()
     {
         $this->withoutExceptionHandling();

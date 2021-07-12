@@ -9,6 +9,10 @@
  * file that was distributed with this source code.
  */
 
+<<<<<<< HEAD
+<<<<<<< HEAD:vendor/symfony/http-client/Chunk/LastChunk.php
+=======
+>>>>>>> master
 namespace Symfony\Component\HttpClient\Chunk;
 
 /**
@@ -25,4 +29,18 @@ class LastChunk extends DataChunk
     {
         return true;
     }
+<<<<<<< HEAD
+=======
+namespace Symfony\Component\Config\Definition\Builder;
+
+/**
+ * An interface that must be implemented by all node parents.
+ *
+ * @author Victor Berchet <victor@suumit.com>
+ */
+interface NodeParentInterface
+{
+>>>>>>> master:vendor/symfony/config/Definition/Builder/NodeParentInterface.php
+=======
+>>>>>>> master
 }

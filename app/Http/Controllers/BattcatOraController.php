@@ -29,6 +29,7 @@ class BattcatOraController extends Controller
             $user = $this->_anon();
         }
         // if survey is being submitted
+        $thankyou = FALSE;
         if ($request->has('task-survey')) {
             $inputs = $request->all();
             unset($inputs['_token']);
@@ -47,10 +48,10 @@ class BattcatOraController extends Controller
                 logger('MicrotaskSurvey error on insert.');
                 logger(print_r($insert, 1));
             }
+            $thankyou = 'guest';
         }
 
         $this->Model = new BattcatOra;
-        $signpost = FALSE;
         // if opinion is being submitted
         if ($request->has('id-ords')) {
             if (!(is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
@@ -70,27 +71,14 @@ class BattcatOraController extends Controller
                 logger(print_r($insert, 1));
             }
             $submits = $this->_getSubmits($request, $user);
-            if ($submits < 5) {
-                $signpost = $submits;
-            } else if ($submits == 5) {
+            if ($submits == 5) {
                 if ($user->id == 0) {
                     // guest is redirected to modal survey
                     return redirect()->action('BattcatOraController@survey');
                 } else {
-                    // logged-in user gets an extra signpost
-                    $signpost = $submits;
+                    $thankyou = 'user';
                 }
             }
-        }
-        // final "thank you" signpost after survey whether submitted or not
-        if ($request->session()->get('battcatora.redirected_from_survey', FALSE)) {
-            $request->session()->put('battcatora.redirected_from_survey', FALSE);
-            $signpost = 6;
-        }
-        // no signpost when showing survey
-        if ($request->session()->get('battcatora.redirect_to_survey', FALSE)) {
-            $request->session()->put('battcatora.redirect_to_survey', FALSE);
-            $request->session()->put('battcatora.redirected_from_survey', TRUE);
         }
         $fault = $this->_fetchRecord($request);
         if (!$fault) {
@@ -102,7 +90,7 @@ class BattcatOraController extends Controller
             'title' => 'BattCat',
             'fault' => $fault,
             'user' => $user,
-            'signpost' => $signpost,
+            'thankyou' => $thankyou,
             'locale' => $this->_getUserLocale(),
         ]);
     }
@@ -132,7 +120,8 @@ class BattcatOraController extends Controller
         ]);
     }
 
-    protected function getCategories() {
+    protected function getCategories()
+    {
         return [
             'Battery/charger/adapter',
             'Decorative or safety lights',
@@ -167,18 +156,6 @@ class BattcatOraController extends Controller
             'Vacuum',
             'Watch/clock',
         ];
-    }
-
-    /**
-     * Fetch "call to action".
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function cta(Request $request)
-    {
-        return $this->index($request);
     }
 
     /**
