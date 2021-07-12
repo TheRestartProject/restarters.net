@@ -47,8 +47,10 @@ class DiscourseAccountCreationTests extends TestCase
     /** @test */
     public function user_registration_discourse_sync()
     {
-        // We might not have Discourse integration enabled, e.g. when running on Circle.
-        if (env('FEATURE__DISCOURSE_INTEGRATION')) {
+        // We might not have Discourse integration enabled, e.g. when running on Circle.  This is a hacky way of
+        // checking that.  If we turn off FEATURE__DISCOURSE_INTEGRATION then we get errors when loading the
+        // provider, which seem tricky to solve.
+        if (!env('CIRCLECI')) {
             $this->setDiscourseTestEnvironment();
 
             $atts = $this->userAttributes();
