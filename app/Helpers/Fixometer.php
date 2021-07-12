@@ -811,7 +811,17 @@ class FixometerHelper
         $stats = [];
         if (\Cache::has('all_stats')) {
             $stats = \Cache::get('all_stats');
-        } else {
+
+            // We've seen a Sentry problem which I can only see happening if there was invalid data in the cache.
+            if (!array_key_exists('allparties', $stats) ||
+                !array_key_exists('co2Total', $stats) ||
+                !array_key_exists('device_count_status', $stats)
+            ) {
+                $stats = [];
+            }
+        }
+
+        if ($stats == []) {
             $stats['allparties'] = $Party->ofThisGroup('admin', true, false);
             $stats['co2Total'] = $Device->getWeights();
             $stats['device_count_status'] = $Device->statusCount();
