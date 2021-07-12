@@ -12400,14 +12400,6 @@
             "symfony/polyfill-php80": "^1.15",
             "symfony/service-contracts": "^1.0|^2"
         },
->>>>>>> master
-        "provide": {
-            "php-http/async-client-implementation": "*",
-            "php-http/client-implementation": "*",
-            "psr/http-client-implementation": "1.0",
-            "symfony/http-client-implementation": "2.4"
-<<<<<<< HEAD
-        },
         "require-dev": {
             "amphp/amp": "^2.5",
             "amphp/http-client": "^4.2.1",
@@ -12431,7 +12423,6 @@
             },
             "exclude-from-classmap": [
                 "/Tests/"
-=======
         },
         "require-dev": {
             "amphp/amp": "^2.5",
