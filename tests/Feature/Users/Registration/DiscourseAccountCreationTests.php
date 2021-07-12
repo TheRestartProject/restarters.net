@@ -17,6 +17,8 @@ class DiscourseAccountCreationTests extends TestCase
     /** @test */
     public function user_registration_triggers_user_registered_event()
     {
+        $this->setDiscourseTestEnvironment();
+
         Event::fake();
 
         // Register should redirect to dashboard page.
@@ -30,11 +32,11 @@ class DiscourseAccountCreationTests extends TestCase
     /** @test */
     public function user_registration_triggers_discourse_sync_attempt()
     {
+        $this->setDiscourseTestEnvironment();
+
         $this->instance(DiscourseUserEventSubscriber::class, Mockery::mock(DiscourseUserEventSubscriber::class, function ($mock) {
             $mock->shouldReceive('onUserRegistered')->once();
         }));
-
-        config(['restarters.features.discourse_integration' => true]);
 
         $response = $this->post('/user/register/',  $this->userAttributes());
 
@@ -42,15 +44,29 @@ class DiscourseAccountCreationTests extends TestCase
         $response->assertRedirect('dashboard');
     }
 
-    // TODO This would need a test Discourse instance inside the CircleCI environment.
-    public function user_registration_discourse_sync_attempt()
+    /** @test */
+    public function user_registration_discourse_sync()
     {
-        config(['restarters.features.discourse_integration' => true]);
-        config(['discourse-api.base_url' => 'https://talk.restarters.dev']);
-        config(['discourse-api.sso_secret' => 'XXX']); // change XXX to sso secret when testing against test Discourse instance.
-        config(['discourse-api.api_key' => 'XXX']); // change XXX when testing against test Discourse instance.
-        config(['discourse-api.api_username' => 'neil']);
+        $this->setDiscourseTestEnvironment();
 
-        $response = $this->post('/user/register/', $this->userAttributes());
+        $atts = $this->userAttributes();
+        $response = $this->post('/user/register/', $atts);
+        $response->assertStatus(302);
+        $response->assertRedirect('dashboard');
+
+        $id = User::latest()->first()->id;
+        $this->assertNotNull($id);
+
+        // Query Discourse to check the user exists there.
+        $endpoint = "/users/by-external/$id.json";
+
+        $client = app('discourse-client');
+        $response = $client->request(
+            'GET',
+            $endpoint
+        );
+
+        $json = json_decode($response->getBody()->getContents(), true);
+        $this->assertEquals($atts['name'], $json['user']['username']);
     }
 }

@@ -1,13 +1,30 @@
 # This is a Docker Compose development environment for Restarters.  It creates:
 # - a web server on http://localhost:8001 which serves up restarters.  Admin user is jane@bloggs.net/passw0rd.
 # - phpMyAdmin on http://localhost:8002.  Use host restarters_db, user root/s3cr3t
-# - Discourse on http://localhost:8003.
+# - Discourse on http://localhost:8003.  User is someuser/mustbetencharacters.
+#   TODO This is stock Discourse - no theme.  Would be nice to have the theme, but that doesn't matter so far as
+#   testing the integration.
 # - Mailhog on http://localhost:8025.
 #
 # Start using: docker-compose up -d
 #
 # The web server won't be available for a couple of minutes after that finishes - it will be doing a composer
 # install and artisan migrate. Discourse takes quite a few minutes to finish initialising.
+#
+# Once Discourse is up then log in, and:
+# - Go to http://localhost:8003/admin/api/keys/new and create an API key for all users with all scope.
+#   Put it in .env as DISCOURSE_APIKEY.
+# - Go to http://localhost:8003/admin/site_settings/category/login?filter= and
+#   - enable discourse connect
+#   - set the discourse connect url to http://restarters/discourse/sso
+#   - set the discourse connect secret to ASDF (should match DISCOURSE_SECRET in .env).
+# TODO This part is not yet automated.
+
+# Then:
+# - log in to the restarters container using: docker exec -it restarters bash
+# - run UT using: php vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml.
+# TODO This isn't a very convenient way to do run tests.  Would be good to enable SSH on the Restarter container so
+# that JetBrains and other IDEs can trigger the running of tests.
 version: '3'
 services:
 
@@ -111,7 +128,7 @@ services:
     image: docker.io/bitnami/discourse:2
     container_name: restarters_discourse
     ports:
-      - '8003:3000'
+      - '8003:80'
     volumes:
       - 'discourse_data:/bitnami/discourse'
     depends_on:
@@ -122,6 +139,7 @@ services:
       - DISCOURSE_USERNAME=someuser
       - DISCOURSE_PASSWORD=mustbetencharacters
       - DISCOURSE_HOST=localhost:8003
+      - DISCOURSE_PORT_NUMBER=80
       - DISCOURSE_DATABASE_HOST=postgresql
       - DISCOURSE_DATABASE_PORT_NUMBER=5432
       - DISCOURSE_DATABASE_USER=bn_discourse
