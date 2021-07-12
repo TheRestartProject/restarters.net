@@ -1,3 +1,4 @@
+# This is the docker for restarters.  It's used from docker-compose.
 FROM circleci/php:7.4-node-browsers
 
 # Copy composer.lock and composer.json from the codebase to where we will install and run.
@@ -34,6 +35,9 @@ RUN sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
 
 # Turn off session domain, which causes problems in a Docker environment.
 RUN sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=/g' .env
+
+# Change the Discourse host to point at the one defined in docker-compose
+RUN sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http://restarters_discourse:3000/g' .env
 
 # Generate keys
 RUN php artisan key:generate
