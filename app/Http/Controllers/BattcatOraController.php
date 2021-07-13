@@ -90,7 +90,7 @@ class BattcatOraController extends Controller
             'title' => 'BattCat',
             'fault' => $fault,
             'user' => $user,
-            'progress' => $progress > 1 ? $progress : 0,
+            'progress' => 20, // $progress > 1 ? $progress : 0,
             'thankyou' => $thankyou,
             'locale' => $this->_getUserLocale(),
         ]);

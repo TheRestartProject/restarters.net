@@ -163,7 +163,7 @@
             <strong>@lang('battcatora.task.progress_title')</strong>
             <br>@lang('battcatora.task.progress_subtitle')
             <div class="progress">
-                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width:{{ $progress }}%;" aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100">{{ $progress }}%</div>
+                <div class="progress-bar" role="progressbar" style="width:{{ $progress }}%;" aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100">{{ $progress }}%</div>
             </div>
         </div>
         <hr>
