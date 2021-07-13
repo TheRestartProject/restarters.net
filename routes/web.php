@@ -407,4 +407,5 @@ Route::get('/test/check-auth', function () {
 Route::prefix('test')->group(function () {
     Route::get('/', 'TestController@index');
     Route::get('/styles', 'TestController@styles');
+    Route::get('/styles/find', 'TestController@stylesFind');
 });
