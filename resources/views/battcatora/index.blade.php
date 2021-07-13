@@ -11,7 +11,7 @@
 <meta name="keywords" content="BattCat, batteries, community events, Restart Parties, Repair Cafés, repair data, Right to Repair, Open Repair Alliance, The Restart Project, Open Repair Data">
 <meta property="og:title" content="BattCat">
 <meta property="og:description" content="Help analyse faults caused by batteries in devices brought to events such as Repair Cafés and Restart Parties, and contribute to the current push for Right to Repair!">
-<meta property="og:image" content="{{ asset('/images/battcatora/og-battcat-toolbox-new.png') }}">
+<meta property="og:image" content="{{ asset('/images/battcatora/og-battcat-toolbox.png') }}">
 <meta property="og:url" content="https://restarters.net/battcat/">
 <meta property="og:type" content="website">
 @endsection
