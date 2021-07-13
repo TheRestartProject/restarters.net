@@ -159,8 +159,15 @@
             </div>
         </div>
         @endif
+        <div id="progress" class="mt-8 mb-4">
+            <strong>@lang('battcatora.task.progress_title')</strong>
+            <br>@lang('battcatora.task.progress_subtitle')
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width:{{ $progress }}%;" aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100">{{ $progress }}%</div>
+            </div>
+        </div>
+        <hr>
         <div id="ora-partnership" class="mt-8 mb-4">
-            <hr />
             <p class="mb-1">@lang('battcatora.branding.powered_by')</p>
             <a href="https://openrepair.org" target="_blank">
                 <img src="{{ asset('images/battcatora/ora-logo.png') }}" alt="Open Repair Alliance logo" />
@@ -174,6 +181,7 @@
 
 @section('scripts')
 <script>
+
     document.addEventListener(`DOMContentLoaded`, async () => {
 
         [...document.querySelectorAll('.btn-fault-option')].forEach(elem => {

@@ -22,6 +22,8 @@ return array(
         'did_you_know' => 'Did you know?',
         'thankyou_user' => 'Thank you! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Please take our survey</a>',
         'thankyou_guest' => 'Thank you for helping! Every fault you categorise makes this data more useful. Why not <a href="../">join our community</a> too?',
+        'progress_title' => 'Our progress',
+        'progress_subtitle' => 'The percentage of devices we have classified so far',
     ),
     'status' =>
     array(

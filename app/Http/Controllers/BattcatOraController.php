@@ -84,12 +84,13 @@ class BattcatOraController extends Controller
         if (!$fault) {
             return redirect()->action('BattcatOraController@status')->withSuccess('done');
         }
-
+        $progress = $this->Model->fetchProgress()[0]->total;
         $fault->faulttypes = $this->Model->fetchFaultTypes($fault->repair_status);
         return view('battcatora.index', [
             'title' => 'BattCat',
             'fault' => $fault,
             'user' => $user,
+            'progress' => $progress > 1 ? $progress : 0,
             'thankyou' => $thankyou,
             'locale' => $this->_getUserLocale(),
         ]);
