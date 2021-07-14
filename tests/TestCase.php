@@ -91,7 +91,8 @@ abstract class TestCase extends BaseTestCase
 
     public function loginAsTestUser($role = Role::RESTARTER) {
         // This is testing the external interface, whereas actingAs() wouldn't be.
-        $response = $this->post('/user/register/',  $this->userAttributes($role));
+        $response = $this->post('/user/register/', $this->userAttributes($role));
+        
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
 
@@ -184,5 +185,10 @@ abstract class TestCase extends BaseTestCase
         }
 
         $this->assertTrue($foundSome);
+    }
+
+    public function setDiscourseTestEnvironment() {
+        // TODO I feel this isn't really necessary.
+        config(['restarters.features.discourse_integration' => true]);
     }
 }

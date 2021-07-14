@@ -108,7 +108,7 @@ class SyncDiscourseUsernames extends Command
 
     protected function retrieveDiscourseUsersJson($apiPage)
     {
-        $endpoint = 'https://talk.restarters.net/admin/users/list/all.json?show_emails=true&page='.$apiPage.'&api_key='.$this->discourseApiKey.'&api_username='.$this->discourseApiUser;
+        $endpoint = env('DISCOURSE_URL') . '/admin/users/list/all.json?show_emails=true&page='.$apiPage.'&api_key='.$this->discourseApiKey.'&api_username='.$this->discourseApiUser;
 
         return file_get_contents($endpoint);
     }

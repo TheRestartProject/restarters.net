@@ -118,8 +118,10 @@ class DiscourseUserEventSubscriber
             ]
         );
 
-        if ( ! $response->getStatusCode() === 200) {
-            Log::error('Could not sync '.$user->id.' to Discourse: '.$response->getReasonPhrase());
+        if ($response->getStatusCode() !== 200) {
+            Log::error('Could not sync user '.$user->id.' to Discourse: '.$response->getReasonPhrase());
+        } else {
+            Log::debug('Sync ' . $user->id . ' to Discourse OK');
         }
     }
 

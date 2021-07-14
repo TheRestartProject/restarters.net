@@ -25,9 +25,9 @@ class BasicTest extends TestCase {
                 ':upcoming-events' => '[]',
                 ':past-events' => 'null',
                 ':topics' => '[]',
-                'see-all-topics-link' => 'https://talk.restarters.net/latest',
+                'see-all-topics-link' => env('DISCOURSE_URL') . '/latest',
                 ':is-logged-in' => 'true',
-                'discourse-base-url' => 'https://talk.restarters.net',
+                'discourse-base-url' => env('DISCOURSE_URL'),
                 ':new-groups' => '0',
             ]
         ]);
