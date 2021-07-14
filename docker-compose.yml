@@ -6,7 +6,11 @@
 #   testing the integration.
 # - Mailhog on http://localhost:8025.
 #
-# Start using: docker-compose up -d
+# Start using: docker-compose up -d.
+#
+# If you want to remove everything to free up disk space or force a complete rebuild (e.g. as a sanity check
+# after changing this configuration):
+# - docker-compose down -v --rmi all --remove-orphans
 #
 # The web server won't be available for a couple of minutes after that finishes - it will be doing a composer
 # install and artisan migrate. Discourse takes quite a few minutes to finish initialising.
@@ -16,13 +20,14 @@
 #   Put it in .env as DISCOURSE_APIKEY.
 # - Go to http://localhost:8003/admin/site_settings/category/login?filter= and
 #   - enable discourse connect
-#   - set the discourse connect url to http://restarters/discourse/sso
-#   - set the discourse connect secret to ASDF (should match DISCOURSE_SECRET in .env).
+#   - enable discourse connect provider
+#   - set the discourse connect url to http://localhost:8001/discourse/sso
+#   - set the discourse connect secret to mustbetencharacters (should match DISCOURSE_SECRET in .env).
 # TODO This part is not yet automated.
 
 # Then:
 # - log in to the restarters container using: docker exec -it restarters bash
-# - run UT using: php vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml.
+# - run UT using: export DB_TEST_HOST=restarters_db; php vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml.
 # TODO This isn't a very convenient way to do run tests.  Would be good to enable SSH on the Restarter container so
 # that JetBrains and other IDEs can trigger the running of tests.
 version: '3'
@@ -60,7 +65,7 @@ services:
     expose:
       - "3306"
     environment:
-      MYSQL_DATABASE: restarters_db
+      MYSQL_DATABASE: restarters_db_test
       MYSQL_ROOT_PASSWORD: s3cr3t
       MYSQL_USER: restarters
       MYSQL_PASSWORD: s3cr3t
@@ -179,7 +184,6 @@ networks:
 volumes:
   dbdata:
     driver: local
-
   postgresql_data:
     driver: local
   redis_data:

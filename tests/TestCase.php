@@ -188,9 +188,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     public function setDiscourseTestEnvironment() {
-        // This matches the config in docker-compose.
+        // TODO I feel this isn't really necessary.
         config(['restarters.features.discourse_integration' => true]);
-        config(['discourse-api.base_url' => 'http://restarters_discourse']);
-        config(['discourse-api.api_username' => 'user']);
     }
 }

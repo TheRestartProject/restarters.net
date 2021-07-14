@@ -32,15 +32,17 @@ RUN wget https://getcomposer.org/composer-1.phar
 
 # Point at the DB server
 RUN sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
+RUN sed -i 's/DB_DATABASE=.*$/DB_HOST=restarters_db_test/g' .env
 
 # Turn off session domain, which causes problems in a Docker environment.
 RUN sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=/g' .env
 
 # Change the Discourse host to point at the one defined in docker-compose
-RUN sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse:3000/g' .env
+RUN sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse:80/g' .env
 
-# Generate keys
-RUN php artisan key:generate
+# Change the database environment used for automated tests.
+RUN sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=/g' phpunit.xml
+RUN sed -i 's/DB_TEST_HOST=.*$/DB_TEST_HOST=restarters_db/g' phpunit.xml
 
 # Expose port 9000, which is our PHP FPM port referenced from nginx.conf.
 EXPOSE 9000
