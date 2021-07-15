@@ -338,11 +338,17 @@ class GroupController extends Controller
             $gids[] = $group->idgroups;
         }
 
+        $group = null;
+
         if ((isset($groupid) && is_numeric($groupid)) || in_array($groupid, $gids)) {
             $group = Group::where('idgroups', $groupid)->first();
-        } else {
+        } else if (count($groups)) {
             $group = $groups[0];
             unset($groups[0]);
+        }
+
+        if (!$group) {
+            return abort(404, 'Invalid group.');
         }
 
         $groupStats = $group->getGroupStats($this->EmissionRatio);

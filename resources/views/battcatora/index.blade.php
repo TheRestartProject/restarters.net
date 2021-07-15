@@ -11,7 +11,7 @@
 <meta name="keywords" content="BattCat, batteries, community events, Restart Parties, Repair Cafés, repair data, Right to Repair, Open Repair Alliance, The Restart Project, Open Repair Data">
 <meta property="og:title" content="BattCat">
 <meta property="og:description" content="Help analyse faults caused by batteries in devices brought to events such as Repair Cafés and Restart Parties, and contribute to the current push for Right to Repair!">
-<meta property="og:image" content="{{ asset('/images/battcatora/og-battcat-toolbox-new.png') }}">
+<meta property="og:image" content="{{ asset('/images/battcatora/og-battcat-toolbox.png') }}">
 <meta property="og:url" content="https://restarters.net/battcat/">
 <meta property="og:type" content="website">
 @endsection
@@ -25,10 +25,10 @@
 <section class="battcat">
     <div class="container mt-1 mt-sm-2">
         <div class="row row-compressed align-items-center">
-            <div class="col-5">
-                <h1>BattCat</h1>
+            <div class="col-12 col-md-9 order-12 order-md-1 mt-2 mt-md-0">
+                <h1>BattCat: categorise battery problems</h1>
             </div>
-            <div class="col-7 text-right">
+            <div class="col-12 col-md-3 order-1 order-md-12 text-right">
                 <a id="btn-info-open" data-toggle="modal" data-target="#battcatoraInfoModal" class="btn btn-primary ml-2">
                     @lang('battcatora.about')
                 </a>
@@ -37,7 +37,7 @@
                 </a>
             </div>
         </div>
-        <div class="d-none d-md-block row row-compressed align-items-left">
+        <div class="d-none row row-compressed align-items-left">
             <div class="col-12 text-left strapline">
                 <p>@lang('battcatora.task.strapline')
                     <a href="javascript:void(0);" id="a-info-open" data-toggle="modal" data-target="#battcatoraInfoModal">@lang('battcatora.task.learn_more')</a>.
@@ -159,8 +159,15 @@
             </div>
         </div>
         @endif
+        <div id="progress" class="mt-8 mb-4">
+            <strong>@lang('battcatora.task.progress_title')</strong>
+            <br>@lang('battcatora.task.progress_subtitle')
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width:{{ $progress }}%;" aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100">{{ $progress }}%</div>
+            </div>
+        </div>
+        <hr>
         <div id="ora-partnership" class="mt-8 mb-4">
-            <hr />
             <p class="mb-1">@lang('battcatora.branding.powered_by')</p>
             <a href="https://openrepair.org" target="_blank">
                 <img src="{{ asset('images/battcatora/ora-logo.png') }}" alt="Open Repair Alliance logo" />
@@ -174,6 +181,7 @@
 
 @section('scripts')
 <script>
+
     document.addEventListener(`DOMContentLoaded`, async () => {
 
         [...document.querySelectorAll('.btn-fault-option')].forEach(elem => {

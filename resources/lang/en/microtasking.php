@@ -30,7 +30,7 @@ return array (
     'battcat' =>
     array (
       'title' => 'Help Now!  BattCat',
-      'description' => '<p>We see lots of devices at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with tablets with BattCat!</p> <p>The repair data in BattCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'description' => '<p>We see lots of devices at community repair events where the problem lies with the battery. But what\'s causing the batteries to fail and what could make them easier to fix or replace? Help us figure out the most common barriers we see with BattCat!</p> <p>The repair data in BattCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Get involved',
     ),
     'title' => 'Help Now!  MobiFix',
@@ -41,6 +41,7 @@ return array (
       'title' => 'Help Now!  TabiCat',
       'description' => '<p>We see lots of tablets at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with tablets with TabiCat!</p> <p>The repair data in TabiCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Get involved',
+      'short_description' => 'Why do tablets fail, and what are the barriers to their repair?',
     ),
     'mobifixora' =>
     array (
@@ -59,7 +60,7 @@ return array (
       'title' => 'Help Now!  PrintCat',
       'description' => '<p>We see lots of printers at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with printers with PrintCat!</p>  <p>The repair data in PrintCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href=“:url”>Open Repair Alliance</a>.</p>',
       'get_involved' => 'Get involved',
-      'short_description' => 'Help us figure out the most common issues we see with printers with PrintCat!',
+      'short_description' => 'Poor prints?  Help us figure out the most common issues we see with printers.',
     ),
   ),
   'discussion' =>

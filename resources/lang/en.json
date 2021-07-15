@@ -128,5 +128,18 @@
     "PC accessory": "PC accessory",
     "Sewing machine": "Sewing machine",
     "Small home electrical": "Small home electrical",
-    "Watch/clock": "Watch/clock"
+    "Watch/clock": "Watch/clock",
+    "Battery is not the main problem": "Battery is not the main problem",
+    "Battery not readily available": "Battery not readily available",
+    "Built-in or soldered battery, cannot remove": "Built-in or soldered battery, cannot remove",
+    "Charger not readily available": "Charger not readily available",
+    "Clean battery contacts": "Clean battery contacts",
+    "Damaged while replacing battery": "Damaged while replacing battery",
+    "Difficult to remove battery": "Difficult to remove battery",
+    "Fix connectors or casing": "Fix connectors or casing",
+    "Fix the charging port": "Fix the charging port",
+    "Unrepairable corrosion or leakage": "Unrepairable corrosion or leakage",
+    "New battery too expensive": "New battery too expensive",
+    "Replace the charger or charging cable": "Replace the charger or charging cable",
+    "Replace with new battery": "Replace with new battery"
 }

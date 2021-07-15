@@ -139,4 +139,36 @@ class NetworkTest extends TestCase
         // assert
         $this->assertTrue($coordinator->isCoordinatorOf($network));
     }
+
+    /** @test */
+    public function network_stats_can_be_queried() {
+        $network = factory(Network::class)->create();
+        $coordinator = factory(User::class)->states('NetworkCoordinator')->create([
+                                                                                      'api_token' => '1234',
+                                                                                  ]);
+
+        $group = factory(Group::class)->create();
+        $group->name = 'Hackney Fixers';
+        $group->save();
+
+        $network->addGroup($group);
+
+        $network->addCoordinator($coordinator);
+        $this->actingAs($coordinator);
+
+        $response = $this->get("/api/networks/{$network->id}/stats?api_token=1234");
+        $stats = json_decode($response->getContent(), TRUE);
+        $this->assertEquals($stats, [
+            'pax' => 0,
+            'hours' => 0,
+            'parties' => 0,
+            'co2' => 0,
+            'waste' => 0,
+            'ewaste' => 0,
+            'unpowered_waste' => 0,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 0
+        ]);
+    }
 }
