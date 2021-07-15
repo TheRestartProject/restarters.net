@@ -162,7 +162,7 @@ final class Versions
   'wouternl/laravel-drip' => '1.2.4@f9d96140ba62f4ddb4df909e20931e897e0edd54',
   'yandex/translate-api' => '1.5.2@c99e69cde3e688fc0f99c4d8a21585226a8e1938',
   'zendframework/zend-diactoros' => '2.2.1@de5847b068362a88684a55b0dbb40d85986cfa52',
-  'laravel/laravel' => 'dev-production@cfb0c24aa7cab8701c1a9ca76cc302f5a29966be',
+  'laravel/laravel' => 'dev-production@982c728252048c10770f14d9ce404cfdcb63f356',
 );
 
     private function __construct()
