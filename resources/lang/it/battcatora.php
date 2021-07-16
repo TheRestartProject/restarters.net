@@ -30,6 +30,7 @@ return array (
     'step1' => 'Leggi le informazioni sul dispositivo rotto.',
     'step1-extra' => 'Un volontario ha cercato di riparare questo dispositivo ad un Restart Party e ha scritto questa descrizione.',
     'step2-extra' => 'Seleziona l\'opzione che meglio si adatta al problema descritto sopra.',
+    'title' => 'BattCat: classificare i problemi con le batterie',
   ),
   'status' => 
   array (

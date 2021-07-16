@@ -30,6 +30,7 @@ return array (
     'step1' => 'Lee la información sobre el dispositivo roto.',
     'step1-extra' => 'Un voluntario intentó arreglar este dispositivo en un evento de reparación y escribió esta descripción.',
     'step2-extra' => 'Seleccione la opción que mejor se ajuste al problema descrito.',
+    'title' => 'BattCat: clasificar los problemas de las baterías',
   ),
   'status' => 
   array (

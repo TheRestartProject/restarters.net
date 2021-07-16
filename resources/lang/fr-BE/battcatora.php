@@ -30,6 +30,7 @@ return array (
     'step1' => 'Lisez les informations concernant l\'appareil cassé.',
     'step1-extra' => 'Un volontaire a essayé de réparer cet appareil dans un Repair Café et a écrit cette description.',
     'step2-extra' => 'Sélectionnez l\'option qui correspond le mieux au problème décrit ci-dessus.',
+    'title' => 'BattCat: catégoriser les problèmes de batterie',
   ),
   'status' => 
   array (

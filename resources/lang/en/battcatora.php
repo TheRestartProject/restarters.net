@@ -3,7 +3,6 @@
 return array (
   'task' => 
   array (
-    'title' => 'BattCat: categorise battery problems',
     'subtitle' => 'A volunteer tried to fix this device at a community repair event and wrote this description.',
     'question-endoflife' => 'What prevented this device from being repaired?',
     'question-repairable' => 'What are the next steps?',
@@ -31,6 +30,7 @@ return array (
     'thankyou_guest' => 'Thank you for helping! Every fault you categorise makes this data more useful. Why not <a href="../">join our community</a> too?',
     'progress_title' => 'Our progress',
     'progress_subtitle' => 'The percentage of devices we have classified so far',
+    'title' => 'BattCat: categorise battery problems',
   ),
   'status' => 
   array (
