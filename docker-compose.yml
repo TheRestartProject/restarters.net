@@ -40,6 +40,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: php:7.4
+    user: root
     container_name: restarters
     restart: unless-stopped
     tty: true

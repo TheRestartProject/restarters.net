@@ -3,8 +3,8 @@
 #
 # We install composer dependencies in here rather than during the build step so that if we switch branches
 # and restart the container, it works.
-rm -r vendor
-php composer.phar install
+rm -rf vendor
+php composer.phar install --no-dev
 php artisan migrate
 npm install
 npm rebuild node-sass
