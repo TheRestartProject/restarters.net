@@ -64,4 +64,6 @@ return array (
   'suitable_help' => 'Montrer les réparations où les commentaires ont été marqués comme utiles pour des futures tentatives de réparations',
   'uploaded_photos' => 'Photos téléchargées',
   'useful_repair_info' => 'Source d\'information',
+
+  'itemtype_sewing_machine' => 'machine à coudre - translation file'
 );

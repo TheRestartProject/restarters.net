@@ -34,7 +34,7 @@
         </template>
         <template slot="cell(item_type)" slot-scope="data">
           <span v-if="data.item.item_type">
-            {{ data.item.item_type }}
+            {{ translateItem(data.item.item_type) }}
           </span>
           <em v-else class="text-muted">
             [Missing]
@@ -400,6 +400,22 @@ export default {
       this.$root.$emit('bv::refresh::table', this.tableId)
 
       row.toggleDetails()
+    },
+    typeKey(itemtype) {
+      return itemtype.replace(' ', '_').toLowerCase()
+    },
+    translateItem(itemtype) {
+      console.log("Translate", itemtype)
+      const transName = 'devices.itemtype_' + this.typeKey(itemtype)
+
+      console.log("Check for", transName)
+      if (this.$lang.has(transName)) {
+        console.log("Translation exists")
+        return this.$lang.get(transName)
+      } else {
+        console.log("No translation")
+        return itemtype
+      }
     }
   }
 }
