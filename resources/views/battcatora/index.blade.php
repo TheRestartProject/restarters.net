@@ -26,7 +26,7 @@
     <div class="container mt-1 mt-sm-2">
         <div class="row row-compressed align-items-center">
             <div class="col-12 col-md-9 order-12 order-md-1 mt-2 mt-md-0">
-                <h1>BattCat: categorise battery problems</h1>
+                <h1>@lang('battcatora.task.title')</h1>
             </div>
             <div class="col-12 col-md-3 order-1 order-md-12 text-right">
                 <a id="btn-info-open" data-toggle="modal" data-target="#battcatoraInfoModal" class="btn btn-primary ml-2">
