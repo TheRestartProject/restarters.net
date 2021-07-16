@@ -6,6 +6,8 @@
 #   testing the integration.
 # - Mailhog on http://localhost:8025.
 #
+# TODO If your host is Linux, this probably only works if you run as root.
+#
 # Start using: docker-compose up -d.
 #
 # If you want to remove everything to free up disk space or force a complete rebuild (e.g. as a sanity check
