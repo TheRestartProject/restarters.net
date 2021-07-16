@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     suggestions() {
-      return this.itemTypes.map(i => i.item_type)
+      return this.itemTypes.map(i => this.translateItem(i.item_type))
     },
     notASuggestion() {
       if (!this.currentType) {
@@ -81,7 +81,7 @@ export default {
     }
   },
   mounted() {
-    this.currentType = this.type
+    this.currentType = this.translateItem(this.type)
   },
   watch: {
     type(newVal) {
@@ -91,6 +91,22 @@ export default {
   methods: {
     input(e) {
       this.$emit('update:type', e)
+    },
+    typeKey(itemtype) {
+      return itemtype.replace(' ', '_').toLowerCase()
+    },
+    translateItem(itemtype) {
+      console.log("Translate", itemtype)
+      const transName = 'devices.itemtype_' + this.typeKey(itemtype)
+
+      console.log("Check for", transName)
+      if (this.$lang.has(transName)) {
+        console.log("Translation exists")
+        return this.$lang.get(transName)
+      } else {
+        console.log("No translation")
+        return itemtype
+      }
     }
   }
 }

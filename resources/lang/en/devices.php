@@ -123,4 +123,6 @@ return array (
   'tooltip_type_unpowered' => 'Add as much information about the type of item here as you can (e.g. \'Sofa\' or \'Denim jeans\')',
   'unknown_item_type' => 'You\'re creating a new item type. Are you sure an existing item type is not suitable?',
   'unknown_brand' => 'You\'re creating a new brand. Are you sure an existing brand is not suitable?',
+
+  'itemtype_hacking_jacket' => 'veste de piratage!'
 );

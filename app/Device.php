@@ -30,7 +30,7 @@ class Device extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'item_type', 'model', 'age', 'problem', 'notes', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type'];
+    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'item_type', 'model', 'age', 'problem', 'notes', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type', 'itemtype_id'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -708,6 +708,8 @@ AND devices.event = events.idevents ';
 
     public static function getItemTypes() {
         // List the item types
+        // TODO Turn this into a join on the itemtypes table?
+        // TODO Can we get away with returning all of them for performance, or do we need an API?
         $types = DB::table('devices')->whereNotNull('item_type')->select('item_type', DB::raw('COUNT(*) as count'))->groupBy('item_type')->orderBy('count', 'desc')->get()->toArray();
         return $types;
     }
