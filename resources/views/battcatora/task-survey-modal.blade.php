@@ -54,54 +54,54 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content microtask">
             <div class="modal-header">
-                <h5 class="modal-title" style="width:100%" id="tasksurveyModalLabel">@lang('tabicatora.survey.header1')</h5>
+                <h5 class="modal-title" style="width:100%" id="tasksurveyModalLabel">@lang('battcatora.survey.header1')</h5>
             </div>
-            <form id="form-survey" action="/tabicat" method="POST">
+            <form id="form-survey" action="/battcat" method="POST">
                 @csrf
                 <input type="hidden" name="task-survey" value="">
                 <div class="modal-body">
-                    <p class="modal-subtitle" style="width:100%" id="tasksurveyModalLabel">@lang('tabicatora.survey.header2')</p>
+                    <p class="modal-subtitle" style="width:100%" id="tasksurveyModalLabel">@lang('battcatora.survey.header2')</p>
                     <div class="row">
                         <div class="col survey">
-                            <p id="error" class="hide alert information-alert banner alert-secondary">@lang('tabicatora.survey.invalid')</p>
+                            <p id="error" class="hide alert information-alert banner alert-secondary">@lang('battcatora.survey.invalid')</p>
                             <div id="q1" class="row mb-3 survey-question">
-                                <h5 class="text-center font-weight-bolder">@lang('tabicatora.survey.q1')</h5>
+                                <h5 class="text-center font-weight-bolder">@lang('battcatora.survey.q1')</h5>
                                 <ul class="list-inline">
-                                    <li class="list-inline-item"><input type="radio" name="q1" value="1">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a1')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q1" value="2">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a2')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q1" value="3">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a3')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q1" value="4">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a4')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q1" value="5">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a5')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q1" value="1">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a1')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q1" value="2">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a2')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q1" value="3">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a3')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q1" value="4">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a4')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q1" value="5">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a5')</label></li>
                                 </ul>
                             </div>
                             <div id="q2" class="row mb-3 survey-question">
-                                <h5 class="text-center font-weight-bolder">@lang('tabicatora.survey.q2')</h5>
+                                <h5 class="text-center font-weight-bolder">@lang('battcatora.survey.q2')</h5>
                                 <ul class="list-inline">
-                                    <li class="list-inline-item"><input type="radio" name="q2" value="1">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a1')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q2" value="2">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a2')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q2" value="3">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a3')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q2" value="4">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a4')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q2" value="5">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a5')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q2" value="1">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a1')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q2" value="2">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a2')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q2" value="3">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a3')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q2" value="4">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a4')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q2" value="5">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a5')</label></li>
                                 </ul>
                             </div>
                             <div id="q3" class="row mb-3 survey-question">
-                                <h5 class="text-center font-weight-bolder">@lang('tabicatora.survey.q3')</h5>
+                                <h5 class="text-center font-weight-bolder">@lang('battcatora.survey.q3')</h5>
                                 <ul class="list-inline">
-                                    <li class="list-inline-item"><input type="radio" name="q3" value="1">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a1')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q3" value="2">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a2')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q3" value="3">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a3')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q3" value="4">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a4')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q3" value="5">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a5')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q3" value="1">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a1')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q3" value="2">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a2')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q3" value="3">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a3')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q3" value="4">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a4')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q3" value="5">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a5')</label></li>
                                 </ul>
                             </div>
                             <div id="q4" class="row mb-3 survey-question">
-                                <h5 class="text-center font-weight-bolder">@lang('tabicatora.survey.q4')</h5>
+                                <h5 class="text-center font-weight-bolder">@lang('battcatora.survey.q4')</h5>
                                 <ul class="list-inline">
-                                    <li class="list-inline-item"><input type="radio" name="q4" value="1">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a1')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q4" value="2">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a2')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q4" value="3">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a3')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q4" value="4">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a4')</label></li>
-                                    <li class="list-inline-item"><input type="radio" name="q4" value="5">&nbsp;<label class="font-weight-normal">@lang('tabicatora.survey.a5')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q4" value="1">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a1')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q4" value="2">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a2')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q4" value="3">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a3')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q4" value="4">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a4')</label></li>
+                                    <li class="list-inline-item"><input type="radio" name="q4" value="5">&nbsp;<label class="font-weight-normal">@lang('battcatora.survey.a5')</label></li>
                                 </ul>
                             </div>
                         </div>
@@ -109,11 +109,11 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                     <p class="buttons">
-                        <a href="javascript:void(0);" id="btn-send-survey" class="btn btn-md btn-rounded">@lang('tabicatora.survey.send')</a>
-                        <button id="btn-skip-survey" type="button" class="btn btn-md btn-rounded">@lang('tabicatora.survey.skip')</button>
+                        <a href="javascript:void(0);" id="btn-send-survey" class="btn btn-md btn-rounded">@lang('battcatora.survey.send')</a>
+                        <button id="btn-skip-survey" type="button" class="btn btn-md btn-rounded">@lang('battcatora.survey.skip')</button>
                     </p>
                 </div>
-                <p>@lang('tabicatora.survey.footer')</p>
+                <p>@lang('battcatora.survey.footer')</p>
             </form>
         </div>
     </div>

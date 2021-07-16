@@ -10,14 +10,16 @@
             <hr>
             <h2>{{ __('microtasking.volunteering.open_quests') }}</h2>
 
-            <div class="open-quests" v-for="quest in openQuests">
-            <h3>{{ quest.name }} {{ quest.emoji }}</h3>
-            <div class="open-quest">
-                <p>{{ quest.shortintro }}</p>
-                <div class="try-open-quest">
-                    <a :href="quest.slug" class="btn btn-primary btn-open-quest" >{{__('microtasking.volunteering.try_quest', { questname: quest.name })}}</a>
+            <div class="open-quests">
+                <div class="open-quest" v-for="quest in openQuests">
+                    <h3>{{ quest.name }} {{ quest.emoji }}</h3>
+                    <div class="open-quest-body">
+                        <p>{{ quest.shortintro }}</p>
+                        <div class="try-open-quest">
+                            <a :href="quest.slug" class="btn btn-primary btn-open-quest" >{{__('microtasking.volunteering.try_quest', { questname: quest.name })}}</a>
+                        </div>
+                    </div>
                 </div>
-            </div>
             </div>
 
             <hr>
@@ -102,6 +104,12 @@ export default {
       // we will likely have a 'quests' table.
       return [
         {
+          name: 'TabiCat',
+          emoji: '🐾',
+          slug: 'tabicat',
+          shortintro: this.$lang.get('microtasking.cta.tabicat.short_description')
+        },
+        {
           name: 'PrintCat',
           emoji: '🐾',
           slug: 'printcat',
@@ -128,12 +136,16 @@ export default {
     }
 }
 
+/deep/ .open-quest {
+    margin-top: 30px;
+}
+
 /deep/ h3 {
     font-size: 1.1em;
     font-weight: bold;
 }
 
-/deep/ .open-quest {
+/deep/ .open-quest-body {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
@@ -146,7 +158,14 @@ export default {
     .try-open-quest {
         place-self: start right;
 
+        @include media-breakpoint-up(md) {
+            width: 100%;
+            display: block;
+        }
+
         a {
+            width: auto;
+            display: block;
             align-self: center;
         }
     }

@@ -82,7 +82,7 @@ class BattcatOraTest extends TestCase
         $exclude = [];
         $locale = '';
         $opinions = $this->_setup_opinions($data);
-        $expect = ['restart_9918', 'restart_17002', 'rcint_3689'];
+        $expect = $opinions['not_enough_opinions'];
         $result = $BattcatOra->fetchFault($exclude, $locale);
         $this->assertTrue(is_array($result), 'fetch_battcatora_record: result is not array');
         $this->assertEquals(1, count($result), 'fetch_battcatora_record: wrong result count');
@@ -164,21 +164,6 @@ class BattcatOraTest extends TestCase
 
     protected function _setup_devices()
     {
-        /**
-         * anstiftung
-         * Fixit Clinic
-         * Repair Café International
-         * Repair Cafe Wales
-         * The Restart Project
-         *
-SELECT *
-FROM devices_battcat_ora
-WHERE data_provider = 'The Restart Project'
-AND repair_status = 'Repairable'
-AND brand > ''
-AND year_of_manufacture <> '????'
-AND LENGTH(problem) < 20
-         */
         $data = [
             [
                 'id_ords' => 'anstiftung_502',
@@ -386,18 +371,20 @@ AND LENGTH(problem) < 20
 
         // $data[7] : no opinions
 
+        $not_enough_opinions = [
+            $data[5]['id_ords'],
+            $data[6]['id_ords'],
+            $data[7]['id_ords'],
+        ];
+
         /*
         % progress towards completion
-        total number of opinions given (this replaces the current ‘Items / opinions’ section
+        total number of opinions given (this replaces the previous quest's ‘Items / opinions’ section
         a table of items with majority opinions for each of end-of-life and repairable statuses
         */
         $status = [
             'total_devices' => 8,
             'total_opinions' => 17,
-            // 'total_opinions_3' => 4,
-            // 'total_opinions_2' => 2,
-            // 'total_opinions_1' => 1,
-            // 'total_opinions_0' => 1,
             'total_recats' => 4,
             'list_recats' => [
                 0 => [
@@ -409,21 +396,14 @@ AND LENGTH(problem) < 20
                     'total' => 1,
                 ],
             ],
-            // 'total_splits' => 1,
-            // 'list_splits' => [
-            //     0 => [
-            //         'id_ords' => $data[2]['id_ords'],
-            //         'all_crowd_opinions_count' => 3,
-            //         'opinions' => 'Other,Poor data,Replace with new battery',
-            //     ],
-            // ],
-            'progress' => 63,
+            'progress' => 50,
         ];
 
         return [
             'status' => $status,
             'opinions' => $opinions,
             'updates' => $updates,
+            'not_enough_opinions' => $not_enough_opinions,
         ];
     }
 
