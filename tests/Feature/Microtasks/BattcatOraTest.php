@@ -396,7 +396,7 @@ class BattcatOraTest extends TestCase
                     'total' => 1,
                 ],
             ],
-            'progress' => 63,
+            'progress' => 50,
         ];
 
         return [

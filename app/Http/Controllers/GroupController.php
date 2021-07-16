@@ -338,11 +338,17 @@ class GroupController extends Controller
             $gids[] = $group->idgroups;
         }
 
+        $group = null;
+
         if ((isset($groupid) && is_numeric($groupid)) || in_array($groupid, $gids)) {
             $group = Group::where('idgroups', $groupid)->first();
-        } else {
+        } else if (count($groups)) {
             $group = $groups[0];
             unset($groups[0]);
+        }
+
+        if (!$group) {
+            return abort(404, 'Invalid group.');
         }
 
         $groupStats = $group->getGroupStats($this->EmissionRatio);
@@ -806,22 +812,6 @@ class GroupController extends Controller
         }
     }
 
-    // TODO: is this alive?
-    public function deleteImage($group_id, $id, $path)
-    {
-        $user = Auth::user();
-
-        $is_host_of_group = FixometerHelper::userHasEditGroupPermission($group_id, $user->id);
-        if (FixometerHelper::hasRole($user, 'Administrator') || $is_host_of_group) {
-            $Image = new FixometerFile;
-            $Image->deleteImage($id, $path);
-
-            return redirect()->back()->with('message', 'Thank you, the image has been deleted');
-        }
-
-        return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
-    }
-
     public static function stats($id, $format = 'row')
     {
         $footprintRatioCalculator = new FootprintRatioCalculator();
@@ -929,7 +919,7 @@ class GroupController extends Controller
         }
     }
 
-    // TODO: is this alive?
+    // TODO: is this alive?  Not completely clear, but it is referenced from a route.
     public function imageUpload(Request $request, $id)
     {
         try {
