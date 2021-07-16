@@ -1,12 +1,6 @@
 # This is the docker for restarters.  It's used from docker-compose.
 FROM circleci/php:7.4-node-browsers
 
-# Copy composer.lock and composer.json from the codebase to where we will install and run.
-COPY composer.lock composer.json /var/www/
-
-# Copy default env too.
-COPY .env.example /var/www/.env
-
 # Set working directory to where we will run.
 WORKDIR /var/www
 
@@ -21,8 +15,14 @@ RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
 RUN sudo docker-php-ext-configure gd --with-jpeg
 RUN sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl gd zip
 
-# Copy the code, and change the permissions at the same time.
+# Copy the code
 COPY . /var/www/
+
+# Copy composer.lock and composer.json from the codebase to where we will install and run.
+COPY composer.lock composer.json /var/www/
+
+# Copy default env too.
+COPY .env.example /var/www/.env
 
 # Grant permissions to /var/www so we can put files in it.
 RUN sudo chown -R circleci:circleci /var/www
@@ -32,7 +32,7 @@ RUN wget https://getcomposer.org/composer-1.phar
 
 # Point at the DB server
 RUN sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
-RUN sed -i 's/DB_DATABASE=.*$/DB_HOST=restarters_db_test/g' .env
+RUN sed -i 's/DB_DATABASE=.*$/DB_DATABASE=restarters_db_test/g' .env
 
 # Turn off session domain, which causes problems in a Docker environment.
 RUN sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=/g' .env
