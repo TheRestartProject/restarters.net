@@ -193,4 +193,12 @@ return array (
   'online' => 'En ligne',
   'other_events' => 'Autres événements',
   'duplicate_event' => 'Dupliquer événement',
+  'discourse_invite' => 'Nous vous avons ajouté à un fil de discussion pour cet événement.',
+  'field_venue_placeholder' => 'Entrer une adresse',
+  'field_venue_use_group' => 'Utiliser l\'adresse du Repair Café',
+  'search_country_placeholder' => 'Pays',
+  'search_end_placeholder' => 'De...',
+  'search_start_placeholder' => 'À...',
+  'search_title_placeholder' => 'Recherche un titre...',
+  'talk_thread' => 'Voir la conversation de l\'événement',
 );

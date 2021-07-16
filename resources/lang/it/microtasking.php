@@ -8,15 +8,22 @@ return array (
       'description' => '<p>Vediamo molte stampanti agli eventi di riparazione della comunità. Ma perché si rompono e cosa potrebbe renderle più facili da riparare? Aiutaci a capire i problemi più comuni che vediamo con le stampanti con PrintCat!</p> <p>I dati di riparazione in PrintCat provengono da tutto il mondo, attraverso i partner della <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Partecipa',
       'title' => 'Aiutaci adesso! PrintCat',
-      'short_description' => 'Aiutaci a capire i problemi più comuni che vediamo con le stampanti con PrintCat!',
+      'short_description' => 'Aiutaci a capire i problemi più comuni che vediamo con le stampanti.',
     ),
     'tabicat' => 
     array (
       'description' => '<p>Vediamo molti tablet agli eventi di riparazione comunitaria. Ma perché si rompono e cosa potrebbe renderli più facili da riparare? Aiutaci a capire i problemi più comuni che vediamo con i tablet con TabiCat!</p> <p>I dati di riparazione provengono da tutto il mondo, attraverso i partner della <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Partecipa',
       'title' => 'Aiutaci adesso! TabiCat',
+      'short_description' => 'Perché i tablet falliscono e quali sono le barriere per ripararli?',
     ),
     'title' => 'Aiutaci adesso! MobiFix',
+    'battcat' => 
+    array (
+      'description' => '<p>Vediamo molti dispositivi rotti agli eventi di riparazione che hanno un problema con la batteria. Ma cosa causa il guasto delle batterie e cosa potrebbe renderle più facili da riparare o sostituire? Aiutaci a capire i problemi più comuni che vediamo con le batterie con BattCat!</p> <p>I dati sulle riparazioni in BattCat provengono da tutto il mondo, attraverso i partner della <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'get_involved' => 'Partecipa',
+      'title' => 'Aiutaci adesso! BattCat',
+    ),
   ),
   'discussion' => 
   array (
