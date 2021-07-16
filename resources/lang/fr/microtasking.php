@@ -48,7 +48,7 @@ return array (
     'content' => 'Nous collectons les données lors d\'évènements locaux de réparation. Mais les données brutes ont besoin de vous pour devenir des preuves solides pour de meilleurs produits. Avec votre aide, nous pouvons changer le système</p> <p>C\'est un moyen facile de faire changer les choses, que vous puissiez nous rejoindre lors d\'événements de réparation ou non. Rejoignez-nous, et contribuez en consacrant autant de temps et de ressources intellectuelles que vous pouvez. La plupart des tâches sont accessibles pour les personnes n\'ayant pas de bagage technique. Et nous sommes là pour vous aider.',
     'join' => 'Rejoindre',
     'my_contributions' => 'Mes contributions',
-    'my_quests' => ':value quests',
+    'my_quests' => ':value recherches',
     'number_of_quests' => 'Nombre de recherches',
     'number_of_tasks' => 'Nombre de tâches',
     'title' => 'Bénévoles de partout',
