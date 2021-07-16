@@ -446,6 +446,15 @@ export default {
   }
 }
 
+/deep/ td[aria-colindex="6"] {
+  // Hack so we can get the cell warning full height.
+  height: 1px;
+
+  div {
+    height: 100%
+  }
+}
+
 .minHeight {
   min-height: 330px;
 }
