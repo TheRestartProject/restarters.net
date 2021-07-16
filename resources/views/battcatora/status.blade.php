@@ -105,25 +105,6 @@
                 </div>
             </div>
         </div>
-        <!-- test -->
-        <div class="row justify-content-center">
-            <p><strong>** ORDS product category language tester **</strong></p>
-        </div>
-        <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
-            <div class="col">
-                @foreach($categories as $row)
-                <div class="row border border-grey">
-                    <div class="col">
-                        {{ $row }}
-                    </div>
-                    <div class="col">
-                        @lang($row)
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-        <!-- test -->
         @endif
     </div>
     <div id="ora-partnership" class="mt-8 mb-4">
