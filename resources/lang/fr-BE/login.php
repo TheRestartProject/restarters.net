@@ -16,4 +16,6 @@ return array (
   'stat_4' => 'Événements<br>réalisés',
   'lead' => 'Bienvenue dans la communauté',
   'login_title' => 'Connexion',
+  'join_title' => 'Rejoindre Restarters',
+  'join_title_short' => 'Rejoindre',
 );

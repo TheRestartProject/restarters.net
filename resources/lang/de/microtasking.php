@@ -8,6 +8,7 @@ return array (
       'description' => '<p>Wir sehen bei Reparaturveranstaltungen viele Tablets. Aber warum gehen diese kaputt und was könnte sie leichter reparierbar machen? Hilf uns, mit TabiCat die häufigsten Defekte zu finden, die wir bei Tablets sehen.</p><p>Die Reparaturdaten in TabiCat kommen aus der ganzen Welt, von Partnern der <a target="_blank" style="color:#212529;text-decoration:underline" href=“:url”>Open Repair Alliance</a>.</p>',
       'get_involved' => 'Mach mit',
       'title' => 'Hilf jetzt! TabiCat',
+      'short_description' => 'Warum fallen Tablets aus und was sind die Hindernisse bei der Reparatur?',
     ),
     'mobifixora' => 
     array (
@@ -27,6 +28,12 @@ return array (
       'get_involved' => 'Mach mit',
       'title' => 'Hilf jetzt! PrintCat',
       'short_description' => 'Hilf uns, mit PrintCat die häufigsten Defekte zu finden, die wir bei Druckern sehen!',
+    ),
+    'battcat' => 
+    array (
+      'description' => '<p>Wir sehen bei Reparaturveranstaltungen viele kaputte Geräte, die ein Problem mit Batterie oder Akku haben. Aber was ist die Ursache für das Versagen der Akkus und wie könnte man sie leichter reparieren oder ersetzen? Helfen Sie uns mit BattCat, die häufigsten Probleme von Akkus herauszufinden!</p> <p>Die Reparaturdaten in BattCat stammen aus der ganzen Welt, von Partnern der <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'get_involved' => 'Mach mit',
+      'title' => 'Hilf jetzt! BattCat',
     ),
   ),
   'discussion' => 
@@ -53,7 +60,7 @@ return array (
 Dies ist ein einfacher Weg, um Gutes zu tun, ganz egal ob du bei Reparaturveranstaltungen dabei sein kannst. Mach mit, und investiere so viel Zeit und Aufmerksamkeit wie du möchtest. Die meisten Aufgaben sind auch für technisch nicht versierte Menschen machbar. Und wir können euch jederzeit unterstützen.',
     'join' => 'Mitmachen',
     'my_contributions' => 'Meine Beiträge',
-    'my_quests' => ':value Projekte',
+    'my_quests' => ':value quests',
     'number_of_quests' => 'Anzahl der Herausforderungen',
     'number_of_tasks' => 'Anzahl der Aufgaben',
     'title' => 'Hilf von überall mit',

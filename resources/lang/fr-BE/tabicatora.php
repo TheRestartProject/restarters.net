@@ -23,7 +23,8 @@ return array (
   array (
     'status' => 'Statut',
     'items_opinions' => 'Articles / opinions',
-    'items_with_majority_opinions ' => 'Articles avec des opinions majoritaires',
+    'items_with_split_opinions' => 'Appareils avec des opinions divergentes',
+    'items_with_majority_opinions ' => 'Appareils avec des opinions majoritaires',
     'with_3_opinions' => 'avec 3 avis',
     'with_2_opinions' => 'avec 2 avis',
     'with_1_opinion' => 'avec 1 avis',
