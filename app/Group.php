@@ -244,15 +244,15 @@ class Group extends Model implements Auditable
         return rtrim($this->location);
     }
 
-    public function canDelete() {
+    public function canDelete()
+    {
         // Groups are deletable unless they have an event with a device.
         $ret = TRUE;
 
-        $allPastEvents = Party::pastEvents()
-            ->where('events.group', $this->idgroups)
+        $allEvents = Party::where('events.group', $this->idgroups)
             ->get();
 
-        foreach ($allPastEvents as $event) {
+        foreach ($allEvents as $event) {
             $footprintRatioCalculator = new FootprintRatioCalculator();
             $emissionRatio = $footprintRatioCalculator->calculateRatio();
             $stats = $event->getEventStats($emissionRatio);
