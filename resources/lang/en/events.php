@@ -201,5 +201,5 @@ return array (
   'search_country_placeholder' => 'Country...',
   'search_start_placeholder' => 'From...',
   'search_end_placeholder' => 'To...',
-  'invite_when_approved' => 'You can only invite volunteers when this even has been approved'
+  'invite_when_approved' => 'You can only invite volunteers when this event has been approved'
 );
