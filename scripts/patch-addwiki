@@ -1,0 +1,2 @@
+#!/bin/bash
+sed -i "/private function getClient/c\public function getClient\(\) {" vendor/addwiki/mediawiki-api-base/src/MediawikiApi.php
