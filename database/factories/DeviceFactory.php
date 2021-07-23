@@ -51,6 +51,14 @@ $factory->state(App\Device::class, 'end', function (Faker $faker) {
     ];
 });
 
+$factory->state(App\Device::class, 'unknown', function (Faker $faker) {
+    return [
+        'category' => 111,
+        'category_creation' => 111,
+        'repair_status' => 0,
+    ];
+});
+
 $factory->state(App\Device::class, 'misccat', function (Faker $faker) {
     return [
         'category' => 46,
