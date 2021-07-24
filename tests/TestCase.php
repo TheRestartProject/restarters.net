@@ -6,6 +6,7 @@ use App\Audits;
 use App\Brands;
 use App\Category;
 use App\Device;
+use App\DeviceBarrier;
 use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
@@ -43,6 +44,7 @@ abstract class TestCase extends BaseTestCase
         EventsUsers::truncate();
         Party::truncate();
         UserGroups::truncate();
+        DeviceBarrier::truncate();
         Device::truncate();
         GroupNetwork::truncate();
         Category::truncate();

@@ -12,17 +12,13 @@ use Tests\TestCase;
 
 class DeviceStatsTest extends TestCase
 {
-
-    private $_emissionRatio;
-    private $_displacement;
+    private $_displacementFactor;
 
     public function setUp()
     {
         parent::setUp();
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $this->_emissionRatio = $footprintRatioCalculator->calculateRatio();
         $Device = new Device;
-        $this->_displacement = $Device->displacement;
+        $this->_displacementFactor = $Device->displacement;
     }
 
     /** @test */
@@ -75,8 +71,8 @@ class DeviceStatsTest extends TestCase
             'category' => 4,
             'category_creation' => 4,
         ]);
-        $expect = round((14.4 / (4 + 0.0)),1);
-        $result = round($footprintRatioCalculator->calculateRatio(),1);
+        $expect = round((14.4 / (4 + 0.0)), 1);
+        $result = round($footprintRatioCalculator->calculateRatio(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
 
         // add a powered misc device
@@ -84,7 +80,7 @@ class DeviceStatsTest extends TestCase
             'category' => 46,
             'category_creation' => 46,
         ]);
-        $result = round($footprintRatioCalculator->calculateRatio(),1);
+        $result = round($footprintRatioCalculator->calculateRatio(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
 
         // add an upowered non-misc device
@@ -92,8 +88,8 @@ class DeviceStatsTest extends TestCase
             'category' => 5,
             'category_creation' => 5,
         ]);
-        $expect = round(((14.4 + 15.5) / ((4 + 0.0) + (5 + 0.0))),1);
-        $result = round($footprintRatioCalculator->calculateRatio(),1);
+        $expect = round(((14.4 + 15.5) / ((4 + 0.0) + (5 + 0.0))), 1);
+        $result = round($footprintRatioCalculator->calculateRatio(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
 
         // add an upowered misc device
@@ -101,17 +97,17 @@ class DeviceStatsTest extends TestCase
             'category' => 50,
             'category_creation' => 50,
         ]);
-        $result = round($footprintRatioCalculator->calculateRatio(),1);
+        $result = round($footprintRatioCalculator->calculateRatio(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
 
         // calculate ratio for powered only
-        $expect = round((14.4 / (4 + 0.0)),1);
-        $result = round($footprintRatioCalculator->calculateRatioPowered(),1);
+        $expect = round((14.4 / (4 + 0.0)), 1);
+        $result = round($footprintRatioCalculator->calculateRatioPowered(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
 
         // calculate ratio for unpowered only
-        $expect = round((15.5 / (5 + 0.0)),1);
-        $result = round($footprintRatioCalculator->calculateRatioUnpowered(),1);
+        $expect = round((15.5 / (5 + 0.0)), 1);
+        $result = round($footprintRatioCalculator->calculateRatioUnpowered(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
     }
 
@@ -241,25 +237,29 @@ class DeviceStatsTest extends TestCase
     /** @test */
     public function an_unpowered_non_fixed_device_has_no_waste_diverted()
     {
-        $device = factory(Device::class)->states('repairable')->create([
+        $device1 = factory(Device::class)->states('repairable')->create([
+            'category' => 111,
+            'category_creation' => 111,
+        ]);
+        $device2 = factory(Device::class)->states('end')->create([
+            'category' => 222,
+            'category_creation' => 222,
+        ]);
+        $device3 = factory(Device::class)->states('unknown')->create([
             'category' => 333,
             'category_creation' => 333,
         ]);
-        $result = $device->co2Diverted($this->_emissionRatio, $this->_displacement);
+
+        $emissionRatio = $this->_getEmissionRatio();
+        $displacement = $this->_getDisplacementFactor();
+
+        $result = $device1->co2Diverted($emissionRatio, $displacement);
         $this->assertEquals(0, $result, "co2Diverted = 0");
 
-        $device = factory(Device::class)->states('end')->create([
-            'category' => 333,
-            'category_creation' => 333,
-        ]);
-        $result = $device->co2Diverted($this->_emissionRatio, $this->_displacement);
+        $result = $device2->co2Diverted($emissionRatio, $displacement);
         $this->assertEquals(0, $result, "co2Diverted = 0");
 
-        $device = factory(Device::class)->states('unknown')->create([
-            'category' => 333,
-            'category_creation' => 333,
-        ]);
-        $result = $device->co2Diverted($this->_emissionRatio, $this->_displacement);
+        $result = $device3->co2Diverted($emissionRatio, $displacement);
         $this->assertEquals(0, $result, "co2Diverted = 0");
     }
 
@@ -270,7 +270,9 @@ class DeviceStatsTest extends TestCase
             'category' => 46,
             'category_creation' => 46,
         ]);
-        $result = $device->co2Diverted($this->_emissionRatio, $this->_displacement);
+        $emissionRatio = $this->_getEmissionRatio();
+        $displacement = $this->_getDisplacementFactor();
+        $result = $device->co2Diverted($emissionRatio, $displacement);
         $this->assertEquals(0, $result, "co2Diverted = 0");
     }
 
@@ -282,8 +284,10 @@ class DeviceStatsTest extends TestCase
             'category_creation' => 46,
             'estimate' => 123,
         ]);
-        $expect = 123 * $this->_emissionRatio;
-        $result = $device->co2Diverted($this->_emissionRatio, $this->_displacement);
+        $emissionRatio = $this->_getEmissionRatio();
+        $displacement = $this->_getDisplacementFactor();
+        $expect = 123 * $emissionRatio;
+        $result = $device->co2Diverted($emissionRatio, $displacement);
         $this->assertEquals($expect, $result, "co2Diverted = $expect");
     }
 
@@ -294,8 +298,10 @@ class DeviceStatsTest extends TestCase
             'category' => 333,
             'category_creation' => 333,
         ]);
-        $expect = $device->deviceCategory->footprint * $this->_displacement;
-        $result = $device->co2Diverted($this->_emissionRatio, $this->_displacement);
+        $emissionRatio = $this->_getEmissionRatio();
+        $displacement = $this->_getDisplacementFactor();
+        $expect = $device->deviceCategory->footprint * $displacement;
+        $result = $device->co2Diverted($emissionRatio, $displacement);
         $this->assertEquals($expect, $result, "co2Diverted = $expect");
     }
 
@@ -306,7 +312,9 @@ class DeviceStatsTest extends TestCase
             'category' => 50,
             'category_creation' => 50,
         ]);
-        $result = $device->co2Diverted($this->_emissionRatio, $this->_displacement);
+        $emissionRatio = $this->_getEmissionRatio();
+        $displacement = $this->_getDisplacementFactor();
+        $result = $device->co2Diverted($emissionRatio, $displacement);
         $this->assertEquals(0, $result, "co2Diverted = 0");
     }
 
@@ -318,8 +326,10 @@ class DeviceStatsTest extends TestCase
             'category_creation' => 50,
             'estimate' => 456,
         ]);
-        $expect = 456 * $this->_emissionRatio;
-        $result = $device->co2Diverted($this->_emissionRatio, $this->_displacement);
+        $emissionRatio = $this->_getEmissionRatio();
+        $displacement = $this->_getDisplacementFactor();
+        $expect = 456 * $emissionRatio;
+        $result = $device->co2Diverted($emissionRatio, $displacement);
         $this->assertEquals($expect, $result, "co2Diverted = $expect");
     }
 
@@ -333,8 +343,21 @@ class DeviceStatsTest extends TestCase
             'category' => 555,
             'category_creation' => 555,
         ]);
-        $expect = $device->deviceCategory->footprint * $this->_displacement;
-        $result = $device->co2Diverted($this->_emissionRatio, $this->_displacement);
+        $emissionRatio = $this->_getEmissionRatio();
+        $displacement = $this->_getDisplacementFactor();
+        $expect = $device->deviceCategory->footprint * $displacement;
+        $result = $device->co2Diverted($emissionRatio, $displacement);
         $this->assertEquals($expect, $result, "co2Diverted = $expect");
+    }
+
+    private function _getEmissionRatio()
+    {
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        return $footprintRatioCalculator->calculateRatio();
+    }
+
+    private function _getDisplacementFactor()
+    {
+        return $this->_displacementFactor;
     }
 }
