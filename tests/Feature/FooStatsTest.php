@@ -10,7 +10,7 @@ use App\Helpers\FootprintRatioCalculator;
 use DB;
 use Tests\TestCase;
 
-class DeviceStatsTest extends TestCase
+class FooStatsTest extends TestCase
 {
     private $_displacementFactor;
     private $_id_misc_powered;
@@ -113,6 +113,8 @@ class DeviceStatsTest extends TestCase
         $expect = round((15.5 / (5 + 0.0)), 1);
         $result = round($footprintRatioCalculator->calculateRatioUnpowered(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
+
+        //getEventStats($emissionRatio);
     }
 
     /** WASTE TESTS */
