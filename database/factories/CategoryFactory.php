@@ -12,7 +12,6 @@ $factory->state(App\Category::class, 'Misc', function (Faker $faker) {
         'name' => 'Misc',
         'revision' => 1,
         'weight' => 1,
-        'footprint' => 1,
         'powered' => 1
     ];
 });
@@ -76,7 +75,8 @@ $factory->state(App\Category::class, 'MiscU', function (Faker $faker) {
         'idcategories' => env('MISC_CATEGORY_ID_UNPOWERED'),
         'name' => 'Misc',
         'revision' => 1,
-        'powered' => 0
+        'powered' => 0,
+        'weight' => 1,
     ];
 });
 

@@ -142,6 +142,52 @@ AND devices.event = events.idevents ';
         return DB::select(DB::raw($sql), $params);
     }
 
+    /** Proposed changed to getWeights() to handle unpowered lca data */
+    public function getWeightsNew($group = null)
+    {
+        $mp = env('MISC_CATEGORY_ID_POWERED');
+        $mu = env('MISC_CATEGORY_ID_UNPOWERED');
+        $rs = env('DEVICE_FIXED');
+
+        $sql =
+        "SELECT
+sum(case when (devices.category IN ($mp,$mu)) then (devices.estimate + 0.0) else categories.weight end) as `total_weights`,
+sum(case when (categories.powered = 1) then (case when (devices.category = $mp) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as ewaste,
+sum(case when (categories.powered = 0) then (case when (devices.category = $mu) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as unpowered_waste,
+sum(case when (categories.powered = 1) then
+        case when (devices.category = $mp) then (devices.estimate + 0.0) * @ratio else (categories.footprint * @displacement) end
+    else 0 end
+ ) as `total_footprints`
+
+FROM devices, categories, events,
+
+(select @displacement := :displacement) inner_tbl_displacement,
+
+(
+    select @ratio := ((sum(`categories`.`footprint`) * :displacement1) / sum(`categories`.`weight` + 0.0))
+    from `devices`, `categories`
+    where `categories`.`idcategories` = `devices`.`category`
+    and `devices`.`repair_status` = $rs
+    and `categories`.`idcategories` NOT IN ($mp,$mu)
+) inner_tbl_ratio
+
+WHERE devices.category = categories.idcategories and devices.repair_status = 1
+AND devices.event = events.idevents";
+
+        // Using two named parameters for displacement due to restriction of Laravel/MySQL.
+        // see e.g.: https://github.com/laravel/framework/issues/12715
+        $params = ['displacement' => $this->displacement, 'displacement1' => $this->displacement];
+
+        if ( ! is_null($group) && is_numeric($group)) {
+            $sql .= ' AND events.group = :group ';
+            $params['group'] = $group;
+
+            return DB::select(DB::raw($sql), $params);
+        }
+
+        return DB::select(DB::raw($sql), $params);
+    }
+
     public function getPartyWeights($party)
     {
         return DB::select(DB::raw('SELECT

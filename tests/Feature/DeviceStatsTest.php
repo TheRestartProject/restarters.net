@@ -45,7 +45,6 @@ class DeviceStatsTest extends TestCase
             'name' => 'powered misc',
             'powered' => 1,
             'weight' => 1,
-            'footprint' => 1,
         ]);
         factory(Category::class)->create([
             'idcategories' => 5,
@@ -61,7 +60,6 @@ class DeviceStatsTest extends TestCase
             'name' => 'unpowered misc',
             'powered' => 0,
             'weight' => 1,
-            'footprint' => 1,
         ]);
         DB::statement("SET foreign_key_checks=0");
         Device::truncate();
@@ -87,7 +85,7 @@ class DeviceStatsTest extends TestCase
         $result = round($footprintRatioCalculator->calculateRatio(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
 
-        // add an upowered non-misc device
+        // add an unpowered non-misc device
         factory(Device::class)->states('fixed')->create([
             'category' => 5,
             'category_creation' => 5,
@@ -96,7 +94,7 @@ class DeviceStatsTest extends TestCase
         $result = round($footprintRatioCalculator->calculateRatio(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
 
-        // add an upowered misc device
+        // add an unpowered misc device
         factory(Device::class)->states('fixed')->create([
             'category' => $this->_id_misc_unpowered,
             'category_creation' => $this->_id_misc_unpowered,
@@ -134,7 +132,7 @@ class DeviceStatsTest extends TestCase
             'category' => $this->_id_misc_powered,
             'category_creation' => $this->_id_misc_powered,
         ]);
-        $result = $device->ewasteDiverted();
+        $result = $device->ewasteDiverted(); // ERROR? Unpowered Misc weight is counted, powered Misc is not
         $this->assertEquals(0, $result, "ewasteDiverted = 0");
     }
 
@@ -187,18 +185,18 @@ class DeviceStatsTest extends TestCase
     }
 
     /** @test */
-    public function an_upowered_misc_device_without_estimate_has_no_waste_diverted()
+    public function an_unpowered_misc_device_without_estimate_has_waste_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_id_misc_unpowered,
             'category_creation' => $this->_id_misc_unpowered,
         ]);
-        $result = $device->unpoweredWasteDiverted();
-        $this->assertEquals(0, $result, "unpoweredWasteDiverted = 0");
+        $result = $device->unpoweredWasteDiverted(); // ERROR? Unpowered Misc weight is counted, powered Misc is not
+        $this->assertEquals(1, $result, "unpoweredWasteDiverted = 1");
     }
 
     /** @test */
-    public function an_upowered_misc_device_with_estimate_has_waste_diverted()
+    public function an_unpowered_misc_device_with_estimate_has_waste_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_id_misc_unpowered,
@@ -210,7 +208,7 @@ class DeviceStatsTest extends TestCase
     }
 
     /** @test */
-    public function an_upowered_non_misc_device_has_waste_diverted()
+    public function an_unpowered_non_misc_device_has_waste_diverted()
     {
         DB::table('categories')->where('idcategories', 555)->update([
             'weight' => 5,
@@ -310,7 +308,7 @@ class DeviceStatsTest extends TestCase
     }
 
     /** @test */
-    public function an_upowered_misc_device_with_no_estimate_has_no_c02_diverted()
+    public function an_unpowered_misc_device_with_no_estimate_has_no_c02_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_id_misc_unpowered,
@@ -323,7 +321,7 @@ class DeviceStatsTest extends TestCase
     }
 
     /** @test */
-    public function an_upowered_misc_device_with_estimate_has_c02_diverted()
+    public function an_unpowered_misc_device_with_estimate_has_c02_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_id_misc_unpowered,
@@ -338,7 +336,7 @@ class DeviceStatsTest extends TestCase
     }
 
     /** @test */
-    public function an_upowered_non_misc_device_has_c02_diverted()
+    public function an_unpowered_non_misc_device_has_c02_diverted()
     {
         DB::table('categories')->where('idcategories', 555)->update([
             'footprint' => 5.5,
@@ -353,6 +351,7 @@ class DeviceStatsTest extends TestCase
         $result = $device->co2Diverted($emissionRatio, $displacement);
         $this->assertEquals($expect, $result, "co2Diverted = $expect");
     }
+
 
     private function _getEmissionRatio()
     {
