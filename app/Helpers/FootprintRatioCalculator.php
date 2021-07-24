@@ -18,47 +18,53 @@ class FootprintRatioCalculator
 {
     public function calculateRatio()
     {
-        // TODO: parameterise repair_status value and id for misc category using env values.
-        $result = DB::select(DB::raw('
+        $mp = env('MISC_CATEGORY_ID_POWERED');
+        $mu = env('MISC_CATEGORY_ID_UNPOWERED');
+        $rs = env('DEVICE_FIXED');
+        $result = DB::select(DB::raw("
 select @ratio as `emission_ratio`
 from
 (select @ratio := sum(`categories`.`footprint`) / sum(`categories`.`weight` + 0.0)
 from `devices`, `categories`
 where `categories`.`idcategories` = `devices`.`category`
-and `devices`.`repair_status` = 1
-and `categories`.`idcategories` NOT IN (46,50)
-) inner_tbl'));
+and `devices`.`repair_status` = $rs
+and `categories`.`idcategories` NOT IN ($mp,$mu)
+) inner_tbl"));
 
         return $result[0]->emission_ratio;
     }
 
     public function calculateRatioPowered()
     {
-        $result = DB::select(DB::raw('
+        $mp = env('MISC_CATEGORY_ID_POWERED');
+        $rs = env('DEVICE_FIXED');
+        $result = DB::select(DB::raw("
 SELECT @ratio as `emission_ratio`
 FROM (
 SELECT @ratio := SUM(`categories`.`footprint`) / SUM(`categories`.`weight` + 0.0)
 FROM `devices`, `categories`
 WHERE `categories`.`idcategories` = `devices`.`category`
-AND `devices`.`repair_status` = 1
+AND `devices`.`repair_status` = $rs
 AND `categories`.`powered` = 1
-AND `categories`.`idcategories` != 46
-) inner_tbl'));
+AND `categories`.`idcategories` != $mp
+) inner_tbl"));
         return $result[0]->emission_ratio;
     }
 
     public function calculateRatioUnpowered()
     {
-        $result = DB::select(DB::raw('
+        $mu = env('MISC_CATEGORY_ID_UNPOWERED');
+        $rs = env('DEVICE_FIXED');
+        $result = DB::select(DB::raw("
 SELECT @ratio as `emission_ratio`
 FROM (
 SELECT @ratio := SUM(`categories`.`footprint`) / SUM(`categories`.`weight` + 0.0)
 FROM `devices`, `categories`
 WHERE `categories`.`idcategories` = `devices`.`category`
-AND `devices`.`repair_status` = 1
+AND `devices`.`repair_status` = $rs
 AND `categories`.powered = 0
-AND `categories`.`idcategories` != 50
-) inner_tbl'));
+AND `categories`.`idcategories` != $mu
+) inner_tbl"));
         return $result[0]->emission_ratio;
     }
 

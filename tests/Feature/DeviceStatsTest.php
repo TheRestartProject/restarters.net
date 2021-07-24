@@ -13,17 +13,23 @@ use Tests\TestCase;
 class DeviceStatsTest extends TestCase
 {
     private $_displacementFactor;
+    private $_id_misc_powered;
+    private $_id_misc_unpowered;
 
     public function setUp()
     {
         parent::setUp();
         $Device = new Device;
         $this->_displacementFactor = $Device->displacement;
+        $this->_id_misc_powered = env('MISC_CATEGORY_ID_POWERED');
+        $this->_id_misc_unpowered = env('MISC_CATEGORY_ID_UNPOWERED');
     }
 
     /** @test */
     public function emission_ratios_with_unpowered_lca_data()
     {
+        $mp = env('MISC_CATEGORY_ID_POWERED');
+        $mu = env('MISC_CATEGORY_ID_UNPOWERED');
         DB::statement("SET foreign_key_checks=0");
         Category::truncate();
         DB::statement("SET foreign_key_checks=1");
@@ -36,7 +42,7 @@ class DeviceStatsTest extends TestCase
             'footprint' => 14.4,
         ]);
         factory(Category::class)->create([
-            'idcategories' => 46,
+            'idcategories' => $this->_id_misc_powered,
             'revision' => 1,
             'name' => 'powered misc',
             'powered' => 1,
@@ -52,7 +58,7 @@ class DeviceStatsTest extends TestCase
             'footprint' => 15.5,
         ]);
         factory(Category::class)->create([
-            'idcategories' => 50,
+            'idcategories' => $this->_id_misc_unpowered,
             'revision' => 1,
             'name' => 'unpowered misc',
             'powered' => 0,
@@ -77,8 +83,8 @@ class DeviceStatsTest extends TestCase
 
         // add a powered misc device
         factory(Device::class)->states('fixed')->create([
-            'category' => 46,
-            'category_creation' => 46,
+            'category' => $this->_id_misc_powered,
+            'category_creation' => $this->_id_misc_powered,
         ]);
         $result = round($footprintRatioCalculator->calculateRatio(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
@@ -94,8 +100,8 @@ class DeviceStatsTest extends TestCase
 
         // add an upowered misc device
         factory(Device::class)->states('fixed')->create([
-            'category' => 50,
-            'category_creation' => 50,
+            'category' => $this->_id_misc_unpowered,
+            'category_creation' => $this->_id_misc_unpowered,
         ]);
         $result = round($footprintRatioCalculator->calculateRatio(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
@@ -127,8 +133,8 @@ class DeviceStatsTest extends TestCase
     public function a_powered_misc_device_without_estimate_has_no_waste_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
-            'category' => 46,
-            'category_creation' => 46,
+            'category' => $this->_id_misc_powered,
+            'category_creation' => $this->_id_misc_powered,
         ]);
         $result = $device->ewasteDiverted();
         $this->assertEquals(0, $result, "ewasteDiverted = 0");
@@ -138,8 +144,8 @@ class DeviceStatsTest extends TestCase
     public function a_powered_misc_device_with_estimate_has_waste_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
-            'category' => 46,
-            'category_creation' => 46,
+            'category' => $this->_id_misc_powered,
+            'category_creation' => $this->_id_misc_powered,
             'estimate' => 123
         ]);
         $result = $device->ewasteDiverted();
@@ -186,8 +192,8 @@ class DeviceStatsTest extends TestCase
     public function an_upowered_misc_device_without_estimate_has_no_waste_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
-            'category' => 50,
-            'category_creation' => 50,
+            'category' => $this->_id_misc_unpowered,
+            'category_creation' => $this->_id_misc_unpowered,
         ]);
         $result = $device->unpoweredWasteDiverted();
         $this->assertEquals(0, $result, "unpoweredWasteDiverted = 0");
@@ -197,8 +203,8 @@ class DeviceStatsTest extends TestCase
     public function an_upowered_misc_device_with_estimate_has_waste_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
-            'category' => 50,
-            'category_creation' => 50,
+            'category' => $this->_id_misc_unpowered,
+            'category_creation' => $this->_id_misc_unpowered,
             'estimate' => 456
         ]);
         $result = $device->unpoweredWasteDiverted();
@@ -267,8 +273,8 @@ class DeviceStatsTest extends TestCase
     public function a_powered_misc_device_with_no_estimate_has_no_c02_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
-            'category' => 46,
-            'category_creation' => 46,
+            'category' => $this->_id_misc_powered,
+            'category_creation' => $this->_id_misc_powered,
         ]);
         $emissionRatio = $this->_getEmissionRatio();
         $displacement = $this->_getDisplacementFactor();
@@ -280,8 +286,8 @@ class DeviceStatsTest extends TestCase
     public function a_powered_misc_device_with_estimate_has_c02_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
-            'category' => 46,
-            'category_creation' => 46,
+            'category' => $this->_id_misc_powered,
+            'category_creation' => $this->_id_misc_powered,
             'estimate' => 123,
         ]);
         $emissionRatio = $this->_getEmissionRatio();
@@ -309,8 +315,8 @@ class DeviceStatsTest extends TestCase
     public function an_upowered_misc_device_with_no_estimate_has_no_c02_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
-            'category' => 50,
-            'category_creation' => 50,
+            'category' => $this->_id_misc_unpowered,
+            'category_creation' => $this->_id_misc_unpowered,
         ]);
         $emissionRatio = $this->_getEmissionRatio();
         $displacement = $this->_getDisplacementFactor();
@@ -322,8 +328,8 @@ class DeviceStatsTest extends TestCase
     public function an_upowered_misc_device_with_estimate_has_c02_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
-            'category' => 50,
-            'category_creation' => 50,
+            'category' => $this->_id_misc_unpowered,
+            'category_creation' => $this->_id_misc_unpowered,
             'estimate' => 456,
         ]);
         $emissionRatio = $this->_getEmissionRatio();
