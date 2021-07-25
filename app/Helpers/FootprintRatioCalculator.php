@@ -34,6 +34,7 @@ and `categories`.`idcategories` NOT IN ($mp,$mu)
         return $result[0]->emission_ratio;
     }
 
+    // useful?
     public function calculateRatioPowered()
     {
         $mp = env('MISC_CATEGORY_ID_POWERED');
@@ -51,6 +52,7 @@ AND `categories`.`idcategories` != $mp
         return $result[0]->emission_ratio;
     }
 
+    // useful?
     public function calculateRatioUnpowered()
     {
         $mu = env('MISC_CATEGORY_ID_UNPOWERED');
