@@ -4,7 +4,7 @@
 # We install composer dependencies in here rather than during the build step so that if we switch branches
 # and restart the container, it works.
 rm -rf vendor
-php composer.phar install --no-dev
+php composer.phar install
 
 # Point at the DB server
 sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
