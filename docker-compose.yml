@@ -13,10 +13,10 @@
 # Then start using:
 # - docker-compose up -d
 #
-# The web server won't be available for a couple of minutes after that finishes - it will be doing a composer
-# install and artisan migrate. Discourse takes quite a few minutes to finish initialising.
+# The Restarters web server won't be available for a couple of minutes after that finishes - it will be doing a composer
+# install and artisan migrate. Discourse also takes quite a few minutes to finish initialising.
 #
-# Once Discourse is up then log in, and:
+# Once Discourse is up then log in using someuser/mustbetencharacters, and:
 # - Go to http://www.example.com:8003/admin/api/keys/new and create an API key for all users with all scope.
 #   Put it in .env as DISCOURSE_APIKEY.
 # - Go to http://www.example.com:8003/admin/site_settings/category/login?filter= and
@@ -30,7 +30,7 @@
 # - edit .env and set GOOGLE_API_CONSOLE_KEY to the dev key.
 # TODO This isn't checked in to the codebase, but once this works on Circle then we can put it in an env variable and edit it in via docker_run.sh.
 # - log in to the restarters container using: docker exec -it restarters bash
-# - run UT using: export DB_TEST_HOST=restarters_db; php vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml.
+# - run UT using: export DB_TEST_HOST=restarters_db; php vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml
 # TODO This isn't a very convenient way to do run tests.  Would be good to enable SSH on the Restarter container so
 # that JetBrains and other IDEs can trigger the running of tests.
 #
