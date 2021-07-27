@@ -24,9 +24,11 @@
 #   - enable discourse connect
 #   - enable discourse connect provider
 #   - set the discourse connect secret to mustbetencharacters (should match DISCOURSE_SECRET in .env).
-# TODO This part is not yet automated.
+# TODO This part is not yet automated and would need to be before we can run on CircleCI.
 
 # Then:
+# - edit .env and set GOOGLE_API_CONSOLE_KEY to the dev key.
+# TODO This isn't checked in to the codebase, but once this works on Circle then we can put it in an env variable and edit it in via docker_run.sh.
 # - log in to the restarters container using: docker exec -it restarters bash
 # - run UT using: export DB_TEST_HOST=restarters_db; php vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml.
 # TODO This isn't a very convenient way to do run tests.  Would be good to enable SSH on the Restarter container so

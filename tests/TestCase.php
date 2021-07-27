@@ -140,7 +140,6 @@ abstract class TestCase extends BaseTestCase
 
         $deviceAttributes['event_id'] = $idevents;
         $deviceAttributes['quantity'] = 1;
-        error_log("Device attributes " . var_export($deviceAttributes, TRUE));
 
         $response = $this->post('/device/create', $deviceAttributes);
         $iddevices = Device::latest()->first()->iddevices;

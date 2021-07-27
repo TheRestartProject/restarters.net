@@ -25,6 +25,8 @@ class DiscourseServiceProvider extends ServiceProvider
             return;
         }
 
+        // We use the retry middleware to work around Discourse throttling requests.  This is necessary for UT and
+        // could be necessary live under load.
         $this->app->bind('discourse-client', function ($app, $parameters) {
             $stack = HandlerStack::create();
             $stack->push(GuzzleRetryMiddleware::factory());
