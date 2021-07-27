@@ -85,6 +85,7 @@ abstract class TestCase extends BaseTestCase
         $userAttributes['my_time'] = Carbon::now();
         $userAttributes['consent_gdpr'] = true;
         $userAttributes['consent_future_data'] = true;
+        $userAttributes['wiki_sync_status'] = 0;
 
         return $userAttributes;
     }
