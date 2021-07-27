@@ -8,15 +8,22 @@ return array (
       'description' => '<p>Nous voyons beaucoup d\'imprimantes dans les Repair Cafés. Mais qu\'est-ce qui les fait tomber en panne et qu\'est-ce qui pourrait les rendre plus faciles à réparer? Aidez-nous à déterminer les problèmes les plus courants que nous rencontrons avec les imprimantes grâce à PrintCat!</p> <p>Les données de réparation dans PrintCat proviennent du monde entier, via des partenaires de la <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Participer',
       'title' => 'Aider maintenant! PrintCat',
-      'short_description' => 'Aidez-nous à déterminer les problèmes les plus courants que nous rencontrons avec les imprimantes grâce à PrintCat!',
+      'short_description' => 'Aidez-nous à déterminer les problèmes les plus courants que nous rencontrons avec les imprimantes.',
     ),
     'tabicat' => 
     array (
       'description' => '<p>Nous voyons beaucoup de tablettes lors des Repair Café. Mais qu\'est-ce qui les fait tomber en panne et qu\'est-ce qui pourrait les rendre plus faciles à réparer? Aidez-nous à comprendre les problèmes les plus courants que nous rencontrons avec les tablettes grâce à TabiCat!</p> <p>Les données de réparation dans TabiCat proviennent du monde entier, via les partenaires de l\'<a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Participer',
       'title' => 'Aider maintenant! TabiCat',
+      'short_description' => 'Pourquoi les tablettes échouent-elles, et quels sont les obstacles à leur réparation ?',
     ),
     'title' => 'Aider maintenant! MobiFix',
+    'battcat' => 
+    array (
+      'description' => '<p>Nous voyons beaucoup d\'appareils cassés, lors des événements de réparation communautaires, qui ont un problème de batterie. Mais qu\'est-ce qui cause la défaillance des batteries et qu\'est-ce qui pourrait les rendre plus faciles à réparer ou à remplacer ? Aidez-nous à comprendre les problèmes les plus courants que nous rencontrons avec les batteries grâce à BattCat !</p> <p>Les données de réparation dans BattCat proviennent du monde entier, via les partenaires de l\' <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'get_involved' => 'Participer',
+      'title' => 'Aider maintenant! BattCat',
+    ),
   ),
   'discussion' => 
   array (

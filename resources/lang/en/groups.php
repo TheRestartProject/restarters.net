@@ -75,6 +75,7 @@ return array (
   'edit_group' => 'Edit group',
   'edit_group_save_changes' => 'Save changes',
   'edit_group_text' => 'Go ahead and change or improve your group\'s profile.',
+  'delete_group' => 'Delete group',
   'groups_location_small' => 'I.e the place where the fixing happens!',
   'group_image' => 'Group image',
   'tag-1' => 'Tag 1',
@@ -184,5 +185,8 @@ return array (
   'groups_postcode_small' => '(Optional)',
   'duplicate' => 'That group name (:name) already exists.  If it\'s yours, please go to the Groups page using the menu and edit it.',
   'database_error' => 'Group could <strong>not</strong> be created. Something went wrong with the database.',
-  'create_failed' => 'Group could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.'
+  'create_failed' => 'Group could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.',
+  'delete_group' => 'Delete group',
+  'delete_group_confirm' => 'Please confirm that you want to delete :name.',
+  'delete_succeeded' => 'Group <strong>:name</strong> has been deleted.',
 );
