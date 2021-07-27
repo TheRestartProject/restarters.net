@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Helpers\FootprintRatioCalculator;
 use App\Network;
 
 use DB;
@@ -241,6 +242,27 @@ class Group extends Model implements Auditable
     public function getLocation()
     {
         return rtrim($this->location);
+    }
+
+    public function canDelete()
+    {
+        // Groups are deletable unless they have an event with a device.
+        $ret = TRUE;
+
+        $allEvents = Party::where('events.group', $this->idgroups)
+            ->get();
+
+        foreach ($allEvents as $event) {
+            $footprintRatioCalculator = new FootprintRatioCalculator();
+            $emissionRatio = $footprintRatioCalculator->calculateRatio();
+            $stats = $event->getEventStats($emissionRatio);
+
+            if ($stats['devices_powered'] || $stats['devices_unpowered']) {
+                $ret = FALSE;
+            }
+        }
+
+        return $ret;
     }
 
     public function getGroupStats($emissionRatio)

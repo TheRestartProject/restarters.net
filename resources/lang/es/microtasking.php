@@ -9,13 +9,14 @@ return array (
       'description' => '<p>Vemos muchas impresoras en los eventos de reparación de la comunidad. Pero, ¿qué está provocando que se rompan y qué podría facilitar su reparación? ¡Ayúdenos a descubrir los problemas más comunes que nos encontramos en las impresoras con PrintCat!</p><p>Los datos de reparación en PrintCat provienen de todo el mundo, a través de socios del <a target = "_ blank" style = "color: # 212529; text-decoration: underline "href =":url"> Open Repair Alliance </a>.</p>',
       'get_involved' => 'Participa',
       'title' => '¡Colabora! PrintCat',
-      'short_description' => '¡Ayúdenos a descubrir los problemas más comunes que nos encontramos en las impresoras con PrintCat!',
+      'short_description' => '¡Ayúdenos a descubrir los problemas más comunes que nos encontramos en las impresoras!',
     ),
     'tabicat' => 
     array (
       'description' => '<p>Nos llegan muchas tabletas en los eventos de reparación. Pero, ¿qué está provocando que se rompan y cómo se podría facilitar su reparación? ¡Ayúdanos a descubrir los problemas más comunes que afectan a las tabletas con TabiCat!</p><p>Los datos de reparación en TabiCat provienen de todo el mundo, a través de socios del <a target="_ blank" style="color: # 212529; text-decoration: underline" href =":url">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Participa',
       'title' => '¡Colabora! TabiCat',
+      'short_description' => '¿Por qué fallan las tabletas y cuáles son los obstáculos para repararlas?',
     ),
     'title' => '¡Colabora! MobiFix',
     'mobifixora' => 
@@ -27,6 +28,12 @@ return array (
     array (
       'get_involved' => 'Participa',
       'title' => '¡Colabora! MobiFix',
+    ),
+    'battcat' => 
+    array (
+      'description' => '<p>En los eventos de reparación vemos muchos dispositivos rotos que tienen un problema de batería. Pero, ¿qué es lo que hace que las baterías fallen y qué podría facilitar su reparación o sustitución? Ayúdanos a descubrir los problemas más comunes que vemos en las baterías con BattCat! </p> <p>Los datos de reparación en BattCat provienen de todo el mundo, a través de los socios de la <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Alianza de Reparación Abierta</a>.',
+      'get_involved' => 'Participa',
+      'title' => '¡Colabora! BattCat',
     ),
   ),
   'discussion' => 

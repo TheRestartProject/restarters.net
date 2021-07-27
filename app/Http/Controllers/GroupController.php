@@ -6,6 +6,7 @@ use App\Device;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Events\UserFollowedGroup;
+use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
 use App\GroupTags;
@@ -88,10 +89,10 @@ class GroupController extends Controller
         }
 
         return view('group.index', [
-            'your_groups' => $your_groups,
+            'your_groups' => $this->expandGroups($your_groups),
             'your_groups_uniques' => $your_groups_uniques,
-            'groups_near_you' => $groups_near_you,
-            'groups' => $groups,
+            'groups_near_you' => $this->expandGroups($groups_near_you),
+            'groups' => $this->expandGroups($groups),
             'your_area' => $user->location,
             'tab' => $tab,
             'network' => $network,
@@ -796,20 +797,69 @@ class GroupController extends Controller
         ]);
     }
 
-    // TODO: is this alive?
     public function delete($id)
     {
-        if (FixometerHelper::hasRole($this->user, 'Administrator')) {
-            $r = $this->Group->delete($id);
-            if ( ! $r) {
-                $response = 'd:err';
-            } else {
-                $response = 'd:ok';
+        $group = Group::where('idgroups', $id)->first();
+
+        $name = $group->name;
+
+        if (Auth::user()->hasRole('Administrator') && $group->canDelete()) {
+            // We know we can delete the group; if it has any past events they must be empty, so delete all
+            // events (including future).
+            $allEvents = Party::where('events.group', $id)->get();
+
+            foreach ($allEvents as $event) {
+                // Delete any users - these are not cascaded in the DB.
+                $users = EventsUsers::where('event', $event->idevents)->get();
+
+                foreach ($users as $user) {
+                    // Need to force delete to get rid of the row and avoid constraint violations.
+                    $user->forceDelete();
+                }
+
+                $event->forceDelete();
             }
-            header('Location: /group/index/'.$response);
+
+            $r = $group->delete($id);
+
+            if ( ! $r) {
+                return redirect('/user/forbidden');
+            } else {
+                return redirect("/group")->with('success', __('groups.delete_succeeded', [
+                    'name' => $name
+                ]));
+            }
         } else {
-            header('Location: /user/forbidden');
+            return redirect('/user/forbidden');
         }
+    }
+
+    private function expandGroups($groups) {
+        $ret = [];
+
+        if ($groups) {
+            foreach ($groups as $group) {
+                $group_image = $group->groupImage;
+
+                $event = $group->getNextUpcomingEvent();
+
+                $ret[] = [
+                    'idgroups' => $group['idgroups'],
+                    'name' => $group['name'],
+                    'image' => (is_object($group_image) && is_object($group_image->image)) ?
+                        asset('uploads/mid_'.$group_image->image->path) : null,
+                    'location' => rtrim($group['location']),
+                    'next_event' => $event ? $event['event_date'] : null,
+                    'all_restarters_count' => $group->all_restarters_count,
+                    'all_hosts_count' => $group->all_hosts_count,
+                    'networks' => array_pluck($group->networks, 'id'),
+                    'country' => $group->country,
+                    'group_tags' => $group->group_tags()->get()->pluck('id')
+                ];
+            }
+        }
+
+        return $ret;
     }
 
     public static function stats($id, $format = 'row')

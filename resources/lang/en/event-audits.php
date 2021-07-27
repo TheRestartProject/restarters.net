@@ -41,6 +41,7 @@ return array (
       'volunteers' => '<strong>Quantity of Volunteers</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
       'hours' => '<strong>Event Hours</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
       'wordpress_post_id' => '<strong>Wordpress post ID</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
+      'devices_updated_at' => '<strong>Event Devices Updated At</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
     ),
   ),
 );
