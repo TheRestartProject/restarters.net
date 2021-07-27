@@ -6,6 +6,7 @@ use App\Events\DeviceCreatedOrUpdated;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
+use App\Helpers\FootprintRatioCalculator;
 
 class Device extends Model implements Auditable
 {
@@ -142,41 +143,39 @@ AND devices.event = events.idevents ';
         return DB::select(DB::raw($sql), $params);
     }
 
-    /** Proposed changed to getWeights() to handle unpowered lca data */
+    /**
+     * Proposed changes to getWeights()
+     * calculate unpowered with lca data
+     * Misc weight/footprint values = 0 in categories table
+     * removal of hard-coded Misc ids
+     * separate emission calculations for powered/unpowered devices
+     * PENDING confirmation of assumptions
+     * SEE tests/Feature/FooStatsTest::get_weights_new()
+     * */
     public function getWeightsNew($group = null)
     {
-        $mp = env('MISC_CATEGORY_ID_POWERED');
-        $mu = env('MISC_CATEGORY_ID_UNPOWERED');
-        $rs = env('DEVICE_FIXED');
-
         $sql =
-        "SELECT
-sum(case when (devices.category IN ($mp,$mu)) then (devices.estimate + 0.0) else categories.weight end) as `total_weights`,
-sum(case when (categories.powered = 1) then (case when (devices.category = $mp) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as ewaste,
-sum(case when (categories.powered = 0) then (case when (devices.category = $mu) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as unpowered_waste,
-sum(case when (categories.powered = 1) then
-        case when (devices.category = $mp) then (devices.estimate + 0.0) * @ratio else (categories.footprint * @displacement) end
-    else 0 end
- ) as `total_footprints`
+        'SELECT
+
+sum(case when (categories.weight = 0) then (devices.estimate + 0.0) else categories.weight end) as total_weights,
+sum(case when (categories.powered = 1) then (case when (categories.weight = 0) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as powered_waste,
+sum(case when (categories.powered = 0) then (case when (categories.weight = 0) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as unpowered_waste,
+sum(case when (categories.powered = 1) then (case when (categories.weight = 0) then (devices.estimate + 0.0) * @eRatio else categories.footprint * @displacement end) else 0 end) as powered_footprint,
+sum(case when (categories.powered = 0) then (case when (categories.weight = 0) then (devices.estimate + 0.0) * @uRatio else categories.footprint * @displacement end) else 0 end) as unpowered_footprint
 
 FROM devices, categories, events,
 
 (select @displacement := :displacement) inner_tbl_displacement,
-
-(
-    select @ratio := ((sum(`categories`.`footprint`) * :displacement1) / sum(`categories`.`weight` + 0.0))
-    from `devices`, `categories`
-    where `categories`.`idcategories` = `devices`.`category`
-    and `devices`.`repair_status` = $rs
-    and `categories`.`idcategories` NOT IN ($mp,$mu)
-) inner_tbl_ratio
+(select @eRatio := :eRatio) inner_tbl_eratio,
+(select @uRatio := :uRatio) inner_tbl_uratio
 
 WHERE devices.category = categories.idcategories and devices.repair_status = 1
-AND devices.event = events.idevents";
+AND devices.event = events.idevents ';
 
-        // Using two named parameters for displacement due to restriction of Laravel/MySQL.
-        // see e.g.: https://github.com/laravel/framework/issues/12715
-        $params = ['displacement' => $this->displacement, 'displacement1' => $this->displacement];
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $eRatio = $footprintRatioCalculator->calculateRatioPowered();
+        $uRatio = $footprintRatioCalculator->calculateRatioUnpowered();
+        $params = ['displacement' => $this->displacement, 'eRatio' => $eRatio, 'uRatio' => $uRatio];
 
         if ( ! is_null($group) && is_numeric($group)) {
             $sql .= ' AND events.group = :group ';

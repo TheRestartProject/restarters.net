@@ -488,6 +488,8 @@ class FooStatsTest extends TestCase
     {
         $this->_setupCategoriesWithUnpoweredWeights();
 
+        DB::statement("UPDATE categories SET weight=0, footprint=0 WHERE idcategories IN (46,50)");
+
         // #1 add a single powered non-misc device
         $device = factory(Device::class)->states('fixed')->create([
             'category' => 4,
@@ -495,9 +497,10 @@ class FooStatsTest extends TestCase
         ]);
         $expect = [
             'total_weights' => 4,
-            'ewaste' => 4,
+            'powered_waste' => 4,
             'unpowered_waste' => 0,
-            'total_footprints' => 14.4 * $this->_displacementFactor,
+            'powered_footprint' => 14.4 * $this->_displacementFactor,
+            'unpowered_footprint' => 0,
         ];
         $result = $device->getWeightsNew();
         $this->assertIsArray($result);
@@ -513,9 +516,10 @@ class FooStatsTest extends TestCase
         ]);
         $expect = [
             'total_weights' => 4,
-            'ewaste' => 4, // ERROR? Unpowered Misc weight is counted, powered Misc is not
+            'powered_waste' => 4,
             'unpowered_waste' => 0,
-            'total_footprints' => 14.4 * $this->_displacementFactor,
+            'powered_footprint' => 14.4 * $this->_displacementFactor,
+            'unpowered_footprint' => 0,
         ];
         $result = $device->getWeightsNew();
         $this->assertIsArray($result);
@@ -531,9 +535,10 @@ class FooStatsTest extends TestCase
         ]);
         $expect = [
             'total_weights' => 9,
-            'ewaste' => 4, // ERROR? Unpowered Misc weight is counted, powered Misc is not
+            'powered_waste' => 4,
             'unpowered_waste' => 5,
-            'total_footprints' => 14.4 * $this->_displacementFactor,
+            'powered_footprint' => 14.4 * $this->_displacementFactor,
+            'unpowered_footprint' => 15.5 * $this->_displacementFactor,
         ];
         $result = $device->getWeightsNew();
         $this->assertIsArray($result);
@@ -549,9 +554,10 @@ class FooStatsTest extends TestCase
         ]);
         $expect = [
             'total_weights' => 9,
-            'ewaste' => 4, // ERROR? Unpowered Misc weight is counted, powered Misc is not
-            'unpowered_waste' => 5, // ERROR? Unpowered Misc weight is counted, powered Misc is not
-            'total_footprints' => 14.4 * $this->_displacementFactor,
+            'powered_waste' => 4,
+            'unpowered_waste' => 5,
+            'powered_footprint' => 14.4 * $this->_displacementFactor,
+            'unpowered_footprint' => 15.5 * $this->_displacementFactor,
         ];
         $result = $device->getWeightsNew();
         $this->assertIsArray($result);

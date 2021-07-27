@@ -44,7 +44,7 @@ class DeviceStatsTest extends TestCase
             'revision' => 1,
             'name' => 'powered misc',
             'powered' => 1,
-            'weight' => 1,
+            // 'weight' => 1,
         ]);
         factory(Category::class)->create([
             'idcategories' => 5,
@@ -59,7 +59,7 @@ class DeviceStatsTest extends TestCase
             'revision' => 1,
             'name' => 'unpowered misc',
             'powered' => 0,
-            'weight' => 1,
+            // 'weight' => 1,
         ]);
         DB::statement("SET foreign_key_checks=0");
         Device::truncate();
@@ -132,7 +132,7 @@ class DeviceStatsTest extends TestCase
             'category' => $this->_id_misc_powered,
             'category_creation' => $this->_id_misc_powered,
         ]);
-        $result = $device->ewasteDiverted(); // ERROR? Unpowered Misc weight is counted, powered Misc is not
+        $result = $device->ewasteDiverted();
         $this->assertEquals(0, $result, "ewasteDiverted = 0");
     }
 
@@ -185,14 +185,14 @@ class DeviceStatsTest extends TestCase
     }
 
     /** @test */
-    public function an_unpowered_misc_device_without_estimate_has_waste_diverted()
+    public function an_unpowered_misc_device_without_estimate_has_no_waste_diverted()
     {
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_id_misc_unpowered,
             'category_creation' => $this->_id_misc_unpowered,
         ]);
-        $result = $device->unpoweredWasteDiverted(); // ERROR? Unpowered Misc weight is counted, powered Misc is not
-        $this->assertEquals(1, $result, "unpoweredWasteDiverted = 1");
+        $result = $device->unpoweredWasteDiverted();
+        $this->assertEquals(0, $result, "unpoweredWasteDiverted = 0");
     }
 
     /** @test */

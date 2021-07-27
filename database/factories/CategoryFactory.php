@@ -76,7 +76,6 @@ $factory->state(App\Category::class, 'MiscU', function (Faker $faker) {
         'name' => 'Misc',
         'revision' => 1,
         'powered' => 0,
-        'weight' => 1,
     ];
 });
 
