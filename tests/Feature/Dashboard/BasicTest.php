@@ -21,7 +21,7 @@ class BasicTest extends TestCase {
                 'restarter' => 'true',
                 'network-coordinator' => 'false',
                 ':your-groups' => '[]',
-                ':nearby-groups' => 'null',
+                ':nearby-groups' => '[]',
                 ':upcoming-events' => '[]',
                 ':past-events' => 'null',
                 ':topics' => '[]',

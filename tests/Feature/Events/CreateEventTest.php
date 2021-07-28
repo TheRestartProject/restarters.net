@@ -110,12 +110,7 @@ class CreateEventTest extends TestCase
                     $response->assertSee('canModerate&quot;:false');
                 }
             } else {
-                $key = $url == '/party' ? ':initial-events' : ':events';
-                $this->assertVueProperties($response, [
-                    [
-                        $key => '[]'
-                    ]
-                ]);
+                $response->assertSee('requiresModeration&quot;:true');
             }
         }
     }
