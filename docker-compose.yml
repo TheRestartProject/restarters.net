@@ -1,5 +1,9 @@
 # This is a Docker Compose development environment for Restarters.  It:
-# - relies on you setting up www.example.com in your hosts file.  TODO this name could be better but needs some configuration.
+#
+# On the machine where you will be using your browser to access the Restarters / Discourse sites once set up on Docker,
+# add a record to your hosts file to point the domain www.example.com to the machine where you are installing Docker.
+# TODO this name could be better but needs some configuration.
+# Then you'll get:
 # - a web server on http://www.example.com:8001 which serves up restarters.  Admin user is jane@bloggs.net/passw0rd.
 # - phpMyAdmin on http://www.example.com:8002.  Use host restarters_db, user root/s3cr3t
 # - Discourse on http://www.example.com:8003.  User is someuser/mustbetencharacters; see below about hostname.
@@ -9,15 +13,15 @@
 #
 # TODO If your host is Linux, this probably only works if you run as root.
 #
-# First set www.example.com in your hosts file to whatever your host is - e.g. localhost or a VM.
-#
-# Then start using:
+# First set www.example.com in your hosts file as above. Then start using:
 # - docker-compose up -d
 #
 # The Restarters web server won't be available for a couple of minutes after that finishes - it will be doing a composer
 # install and artisan migrate. Discourse also takes quite a few minutes to finish initialising.
+# Run docker-compose logs to check for any obvious errors from docker-compose.
 #
-# Once Discourse is up then log in using someuser/mustbetencharacters, and:
+# Once Discourse is up then:
+# - Log in to http://restarters.docker:8003 using someuser/mustbetencharacters
 # - Go to http://www.example.com:8003/admin/api/keys/new and create an API key for all users with all scope.
 #   Put it in .env as DISCOURSE_APIKEY.
 # - Go to http://www.example.com:8003/admin/site_settings/category/login?filter= and
