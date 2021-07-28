@@ -381,34 +381,23 @@ class Party extends Model implements Auditable
     * Laravel specific code
     */
 
-    public function scopeUpcomingEvents($query, $by_event = false)
+    public function scopeUpcomingEvents($query)
     {
-      if( $by_event ) {
-        return $this->join('groups', 'groups.idgroups', '=', 'events.group')
-                     ->join('events_users', 'events_users.event', '=', 'events.idevents')
-                     ->where(function($query) {
-                         $query
-                         ->whereNotNull('events.wordpress_post_id')
-                         ->orWhere('events_users.role', '=', Role::HOST);
-                     })
-                     ->whereDate('event_date', '>=', date('Y-m-d'))
-                     ->select('events.*')
-                     ->groupBy('idevents')
-                     ->orderBy('event_date', 'ASC');
-      }
-
-      // We want to show approved events (wordpress_post_id IS NOT NULL) or where we are a host (e.g. because
-      // we created it.
+      // We want to show approved events (wordpress_post_id IS NOT NULL), or where we are a host (e.g. because
+      // we created it, or if we are a network coordinator/admin.
       $ret = $this->join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events_users', function($join) {
                 $join->on('events_users.event', '=', 'events.idevents');
                 $join->where('events_users.user', '=', Auth::user()->id);
             })
+            ->leftJoin('users', 'users.id', '=', 'events_users.user')
             ->where(function($query) {
               $query
                   ->whereNotNull('events.wordpress_post_id')
-                  ->orWhere('events_users.role', '=', Role::HOST);
+                  ->orWhere('events_users.role', '=', Role::HOST)
+                  ->orWhere('users_groups.role', '=', Role::HOST)
+                  ->orWhereIn('users.role', [ Role::NETWORK_COORDINATOR, Role::ADMINISTRATOR ]);
              })
             ->whereDate('event_date', '>=', date('Y-m-d'))
             ->select('events.*')
