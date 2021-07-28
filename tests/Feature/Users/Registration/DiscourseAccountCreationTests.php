@@ -72,6 +72,8 @@ class DiscourseAccountCreationTests extends TestCase
 
             $json = json_decode($response->getBody()->getContents(), true);
             $this->assertEquals($atts['name'], $json['user']['username']);
+        } else {
+            $this->assertTrue((TRUE));
         }
     }
 }
