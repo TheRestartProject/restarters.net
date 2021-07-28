@@ -15,9 +15,12 @@ class MisccatController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
+
+        return redirect()->action('MisccatController@status')->withSuccess('done');
+
         if (Auth::check()) {
             $user = Auth::user();
-        } else {            
+        } else {
             $user = Microtask::getAnonUserCta($request);
             if ($user->action) {
                 return redirect()->action('MisccatController@cta');
@@ -55,7 +58,7 @@ class MisccatController extends Controller {
     public function cta(Request $request) {
         return $this->index($request);
     }
-    
+
     public function status(Request $request) {
         if (Auth::check()) {
             $user = Auth::user();
@@ -70,5 +73,5 @@ class MisccatController extends Controller {
             'user' => $user,
         ]);
     }
-    
+
 }

@@ -6,6 +6,7 @@ use App\Faultcat;
 use App\Misccat;
 use App\Mobifix;
 use App\MobifixOra;
+use App\BattcatOra;
 use App\PrintcatOra;
 use App\TabicatOra;
 
@@ -27,7 +28,8 @@ class MicrotaskingController extends Controller
             new Mobifix,
             new MobifixOra,
             new PrintcatOra,
-            new TabicatOra
+            new TabicatOra,
+            new BattcatOra,
         ];
     }
 

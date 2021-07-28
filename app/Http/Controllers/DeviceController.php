@@ -255,87 +255,6 @@ class DeviceController extends Controller
         }
     }
 
-    public function create()
-    {
-        $user = Auth::user();
-
-        if (FixometerHelper::hasRole($user, 'Restarter')) {
-            header('Location: /user/forbidden');
-        } else {
-            $Events = new Party;
-            $Categories = new Category;
-
-            $UserEvents = $Events->ofThisUser($user->id);
-
-            if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST)) {
-                $error = array();
-                $data = array_filter($_POST);
-                $Device = new Device;
-
-                if (! FixometerHelper::verify($data['event'])) {
-                    $error['event'] = 'Please select a Restart party.';
-                }
-                if (! FixometerHelper::verify($data['category'])) {
-                    $error['category'] = 'Please select a category for this device';
-                }
-                if (! FixometerHelper::verify($data['repair_status'])) {
-                    $error['repair_status'] = 'Please select a repair status.';
-                }
-
-                if (! empty($error)) {
-                    $response['danger'] = 'The device repair has <strong>not</strong> been saved.';
-                } else {
-                    // add user id
-                    $data['repaired_by'] = $user->id;
-                    // add initial category (for backlogging upon revision)
-                    $data['category_creation'] = $data['category'];
-
-                    $insert = array(
-                        'event' => $data['event'],
-                        'category' => $data['category'],
-                        'category_creation' => $data['category'],
-                        'repair_status' => $data['repair_status'],
-                        'spare_parts' => $data['spare_parts'],
-                        'brand' => $data['brand'],
-                        'model' => $data['model'],
-                        'problem' => $data['problem'],
-                        'repaired_by' => $data['repaired_by'],
-                    );
-
-                    // save this!
-                    $insert = $Device->create($insert);
-                    if (! $insert) {
-                        $response['danger'] = 'Error while saving the device to the DB.';
-                    } else {
-                        $response['success'] = 'Device saved!';
-                        event(new DeviceCreatedOrUpdated($insert));
-                    }
-                }
-            }
-
-            if (! isset($error)) {
-                $error = null;
-            }
-
-            if (! isset($response)) {
-                $response = null;
-            }
-
-            if (! isset($data)) {
-                $data = null;
-            }
-
-            return view('device.create', [
-                'title' => 'New Device',
-                'categories' => $Categories->findAll(),
-                'events' => $UserEvents,
-                'response' => $response,
-                'udata' => $data,
-                'error' => $error,
-            ]);
-        }
-    }
-
     public function ajaxCreate(Request $request)
     {
         $rules = [
@@ -705,9 +624,4 @@ class DeviceController extends Controller
     {
         $request->session()->put('column_preferences', $request->input('column_preferences'));
     }
-
-    // public function test() {
-  //   $g = new Device;
-  //   dd($g->export());
-  // }
 }

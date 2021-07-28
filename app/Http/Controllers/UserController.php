@@ -65,27 +65,6 @@ class UserController extends Controller
         'user' => $user,
         'skills' => $skills,
         ]);
-      // return view('admin.index', [
-      //   'user' => $user,
-      //   'grouplist' => null,
-      //   'upcomingparties' => null,
-      //   'allparties' => null,
-      //   'upcomingparties' => null,
-      //   'waste_year_data' => null,
-      //   'clusters' => null,
-      // ]);
-      // }
-      // elseif(FixometerHelper::hasRole($user, 'Host')){
-      // header('Location: /host');
-      // return view('user.profile-new', [//user.profile
-      //   'user' => $user,
-      // ]);
-      // }
-      // else {
-      // return view('user.profile-new', [//user.profile
-      //   'user' => $user,
-      // ]);
-      // }
     }
 
     public function getProfileEdit($id = null)
@@ -494,25 +473,6 @@ class UserController extends Controller
                     'recovery_expires' => $data['recovery_expires'],
                     ]);
 
-                    // send email to User
-                    // $message = "<p>Hi,</p>" .
-                    //          "<p>You've requested to recover your password for the " . env('APP_NAME') . ".</p>" .
-                    //          "<hr/>" .
-                    //          "<p>Please click on this link to recover your password: <a href=\"" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "\">" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "</a>.</p>" .
-                    //          "<p>If the link doesn't work, please copy and paste it in the address bar of your browser.</p>" .
-                    //          "<p>The link will be active for the next 24 hours.</p>" .
-                    //          "<hr/>" .
-                    //          "<p>If you have any issues, or if you did <strong>not</strong> ask to recover your password, please contact <a href='mailto:" . env('SUPPORT_CONTACT_EMAIL') . "'>" . env('SUPPORT_CONTACT_EMAIL') . "</a>.</p>" .
-                    // "<p>Thanks for using the " . env('APP_NAME') . "!</p>" .
-                    // "<p><em>The Restart Project</em></p>";
-                    // $subject = env('APP_NAME') . ": Password recovery";
-                    // $headers = "From: " . env('APP_EMAIL') . "\r\n";
-                    // $headers .= "MIME-Version: 1.0\r\n";
-                    // $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-                    // $headers .= "Bcc: " . env('SUPPORT_CONTACT_EMAIL') . "\r\n";
-                    //
-                    // $sender = mail($email, $subject, $message, $headers);
-
                     User::find($id)->notify(new ResetPassword([
                       'url' => env('APP_URL') . "/user/reset?recovery=" . $data['recovery']
                     ]));
@@ -753,6 +713,8 @@ class UserController extends Controller
     }
 
 
+    // TODO: is this alive?
+    // I don't recall admins being able to create users.  But it is in a route.
     public function create()
     {
         $user = Auth::user();
@@ -897,7 +859,7 @@ class UserController extends Controller
     }
 
 
-    public function edit($id)
+    public function edit($id, Request $request)
     {
 
         global $fixometer_languages;
@@ -913,216 +875,108 @@ class UserController extends Controller
             $Groups = new Group;
             $Groups = $Groups->findAll();
 
-            if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
-                $data = $_POST;
-                $id = $_POST['id'];
+            $data = $request->post();
 
-                if (!FixometerHelper::hasRole($User->find($id), 'Administrator')) {
-                    $sent_groups = $data['groups'];
-                }
+            if (!FixometerHelper::hasRole($User->find($id), 'Administrator')) {
+                $sent_groups = $data['groups'];
+            }
 
-                $error = false;
-                // check for email in use
-                $editingUser = $User->find($id);
-                if ($editingUser->email !== $data['email'] && !$User->checkEmail($data['email'])) {
-                    $error['email'] = 'The email you entered is already in use in our database. Please use another one.';
-                }
+            $error = false;
+            // check for email in use
+            $editingUser = $User->find($id);
+            if ($editingUser->email !== $data['email'] && !$User->checkEmail($data['email'])) {
+                $error['email'] = 'The email you entered is already in use in our database. Please use another one.';
+            }
 
 
-                if (!empty($data['new-password'])) {
-                    if ($data['new-password'] !== $data['password-confirm']) {
-                        $error['password'] = 'The passwords are not identical!';
-                    } else {
-                        $data['password'] = crypt($data['new-password'], '$1$'.strrev(md5(env('APP_KEY'))));
-                    }
-                }
-
-                unset($data['new-password']);
-                unset($data['password-confirm']);
-
-                unset($data['groups']);
-                unset($data['profile']);
-                unset($data['id']);
-
-
-                if (!is_array($error)) {
-                    $u = $User->find($id)->update($data);
-
-                    $ug = new UserGroups;
-                    if (isset($sent_groups)) {
-                        $ug->createUsersGroups($id, $sent_groups);
-                    }
-
-
-                    if (isset($_FILES) && !empty($_FILES)) {
-                        $file = new FixometerFile;
-                        $file->upload('profile', 'image', $id, env('TBL_USERS'), false, true);
-                    }
-
-                    if (!$u) {
-                        $response['danger'] = 'Something went wrong. Please check the data and try again.';
-                    } else {
-                        $response['success'] = 'User updated!';
-                        if (FixometerHelper::hasRole($user, 'Host')) {
-                              header('Location: /host?action=ue&code=200');
-                        }
-                    }
-
-                    $userdata = User::find($id);
-
-                    $usergroups = array();
-                    $ugroups = $User->getUserGroups($id);
-                    foreach ($ugroups as $g) {
-                        $usergroups[] = $g->group;
-                    }
-
-                    $userdata->groups = $usergroups;
-
-                    return view('user.edit', [
-                    'title' => 'Edit User',
-                    'langs' => $fixometer_languages,
-                    'user' => $user,
-                    'header' => true,
-                    'response' => $response,
-                    'roles' => $Roles,
-                    'groups' => $Groups,
-                    'data' => $userdata,
-                    ]);
+            if (!empty($data['new-password'])) {
+                if ($data['new-password'] !== $data['password-confirm']) {
+                    $error['password'] = 'The passwords are not identical!';
                 } else {
-                    $userdata = User::find($id);
-
-                    $usergroups = array();
-                    $ugroups = $User->getUserGroups($id);
-                    foreach ($ugroups as $g) {
-                        $usergroups[] = $g->group;
-                    }
-
-                    $userdata->groups = $usergroups;
-
-                    return view('user.edit', [
-                    'title' => 'Edit User',
-                    'langs' => $fixometer_languages,
-                    'user' => $user,
-                    'header' => true,
-                    'error' => $error,
-                    'roles' => $Roles,
-                    'groups' => $Groups,
-                    'data' => $userdata,
-                    ]);
+                    $data['password'] = crypt($data['new-password'], '$1$'.strrev(md5(env('APP_KEY'))));
                 }
             }
 
-            $userdata = User::find($id);
+            unset($data['new-password']);
+            unset($data['password-confirm']);
 
-            $usergroups = array();
-            $ugroups = $User->getUserGroups($id);
-            foreach ($ugroups as $g) {
-                $usergroups[] = $g->group;
+            unset($data['groups']);
+            unset($data['profile']);
+            unset($data['id']);
+
+
+            if (!is_array($error)) {
+                $u = $User->find($id)->update($data);
+
+                $ug = new UserGroups;
+                if (isset($sent_groups)) {
+                    $ug->createUsersGroups($id, $sent_groups);
+                }
+
+                if (isset($_FILES) && !empty($_FILES)) {
+                    $file = new FixometerFile;
+                    $file->upload('profile', 'image', $id, env('TBL_USERS'), false, true);
+                }
+
+                if (!$u) {
+                    $response['danger'] = 'Something went wrong. Please check the data and try again.';
+                } else {
+                    $response['success'] = 'User updated!';
+                    if (FixometerHelper::hasRole($user, 'Host')) {
+                          // Use @ for phpunit tests.
+                          @header('Location: /host?action=ue&code=200');
+                    }
+                }
+
+                $userdata = User::find($id);
+
+                $usergroups = array();
+                $ugroups = $User->getUserGroups($id);
+                foreach ($ugroups as $g) {
+                    $usergroups[] = $g->group;
+                }
+
+                $userdata->groups = $usergroups;
+
+                return view('user.edit', [
+                'title' => 'Edit User',
+                'langs' => $fixometer_languages,
+                'user' => $user,
+                'header' => true,
+                'response' => $response,
+                'roles' => $Roles,
+                'groups' => $Groups,
+                'data' => $userdata,
+                ]);
+            } else {
+                $userdata = User::find($id);
+
+                $usergroups = array();
+                $ugroups = $User->getUserGroups($id);
+                foreach ($ugroups as $g) {
+                    $usergroups[] = $g->group;
+                }
+
+                $userdata->groups = $usergroups;
+
+                return view('user.edit', [
+                'title' => 'Edit User',
+                'langs' => $fixometer_languages,
+                'user' => $user,
+                'header' => true,
+                'error' => $error,
+                'roles' => $Roles,
+                'groups' => $Groups,
+                'data' => $userdata,
+                ]);
             }
-
-            $userdata->groups = $usergroups;
-
-            return view('user.edit', [
-            'title' => 'Edit User',
-            'langs' => $fixometer_languages,
-            'user' => $user,
-            'header' => true,
-            'roles' => $Roles,
-            'groups' => $Groups,
-            'data' => $userdata,
-            ]);
-        }
-    }
-
-    public function forbidden()
-    {
-        $this->set('title', 'Nope.');
-        return view('users.forbidden', [
-        'title' => 'Nope.',
-        ]);
-    }
-
-
-    public function profile($id = null)
-    {
-        $Auth = new Auth($url);
-        if (!$Auth->isLoggedIn()) {
-            header('Location: /user/login');
-        } else {
-            $user = $Auth->getProfile();
-            $this->set('user', $user);
-            $this->set('header', true);
-            $profile =  $this->User->profilePage($id);
-
-      //load profile
-            $this->set('profile', $profile);
-            $this->set('title', $profile->name);
-      // Load statistics
-            $Groups  = new Group;
-            $Parties = new Party;
-            $Devices = new Device;
-
-
-            $this->set('devices', $Devices->ofThisUser($id));
-            $this->set('parties', $Parties->ofThisUser($id));
-            $this->set('groups', $Groups->ofThisUser($id));
-
-            return view('users.profile', [
-            'user' => $user,
-            'header' => true,
-            'profile' => $profile,
-            'title' => $profile->name,
-            'devices' => $Devices->ofThisUser($id),
-            'parties' => $Parties->ofThisUser($id),
-            'groups' =>  $Groups->ofThisUser($id),
-            ]);
         }
     }
 
     public function logout()
     {
-
         Auth::logout();
         return redirect('/login');
-    }
-
-    public function delete()
-    {
-        $Auth = new Auth($url);
-        if (!$Auth->isLoggedIn()) {
-            header('Location: /user/login');
-        } else {
-            $user = $Auth->getProfile();
-            $this->set('user', $user);
-            $this->set('header', true);
-
-      // Administrators can edit users.
-            if ((FixometerHelper::hasRole($user, 'Administrator') || hasRole($user, 'Host') &&
-                $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST))) {
-                $id = (int)$_POST['id'];
-                $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
-
-              // Delete Session
-              //$session = new Session;
-              //$session->destroySession($id);
-
-                if ($this->User->delete($id)) {
-                      header('Location: /user/all?msg=ok');
-                } else {
-                    header('Location: /user/all?msg=no');
-                }
-            }
-        }
-    }
-
-    public function lng($lang)
-    {
-        global $fixometer_languages;
-        if (in_array($lang, array_keys($fixometer_languages))) {
-            $expire = time() + (60 * 60 * 24 * 365 * 10);
-            setcookie(LANGUAGE_COOKIE, $lang, $expire, '/', $_SERVER['HTTP_HOST']);
-            header('Location: /user/login');
-        }
     }
 
     public function getRegister($hash = null)

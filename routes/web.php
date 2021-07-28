@@ -66,12 +66,27 @@ Route::prefix('calendar')->group(function () {
 
 Route::get('workbench', 'MicrotaskingController@index')->name('workbench');
 
+Route::prefix('FaultCat')->group(function () {
+    Route::get('/', 'FaultcatController@index');
+    Route::post('/', 'FaultcatController@index');
+    Route::get('/status', 'FaultcatController@status');
+    Route::get('/demographics', 'FaultcatController@demographics');
+    Route::post('/demographics', 'FaultcatController@storeDemographics');
+});
+
 Route::prefix('faultcat')->group(function () {
     Route::get('/', 'FaultcatController@index');
     Route::post('/', 'FaultcatController@index');
     Route::get('/status', 'FaultcatController@status');
     Route::get('/demographics', 'FaultcatController@demographics');
     Route::post('/demographics', 'FaultcatController@storeDemographics');
+});
+
+Route::prefix('MiscCat')->group(function () {
+    Route::get('/', 'MisccatController@index');
+    Route::post('/', 'MisccatController@index');
+    Route::get('/cta', 'MisccatController@cta');
+    Route::get('/status', 'MisccatController@status');
 });
 
 Route::prefix('misccat')->group(function () {
@@ -133,6 +148,19 @@ Route::prefix('printcat')->group(function () {
     Route::post('/', 'PrintcatOraController@index');
     Route::get('/cta', 'PrintcatOraController@cta');
     Route::get('/status', 'PrintcatOraController@status');
+});
+
+Route::prefix('BattCat')->group(function () {
+    Route::get('/', 'BattcatOraController@index');
+    Route::post('/', 'BattcatOraController@index');
+    Route::get('/survey', 'BattcatOraController@survey');
+    Route::get('/status', 'BattcatOraController@status');
+});
+Route::prefix('battcat')->group(function () {
+    Route::get('/', 'BattcatOraController@index');
+    Route::post('/', 'BattcatOraController@index');
+    Route::get('/survey', 'BattcatOraController@survey');
+    Route::get('/status', 'BattcatOraController@status');
 });
 
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
@@ -234,6 +262,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/remove-volunteer/{group_id}/{user_id}', 'GroupController@getRemoveVolunteer');
         Route::get('/nearby/{id}', 'GroupController@volunteersNearby');
         Route::get('/nearbyinvite/{groupId}/{userId}', 'GroupController@inviteNearbyRestarter');
+        Route::get('/delete/{id}', 'GroupController@delete');
     });
 
     //Outbound Controller
@@ -374,4 +403,10 @@ Route::post('/set-cookie', 'InformationAlertCookieController');
 
 Route::get('/test/check-auth', function () {
     return new \App\Services\CheckAuthService;
+});
+
+Route::prefix('test')->group(function () {
+    Route::get('/', 'TestController@index');
+    Route::get('/styles', 'TestController@styles');
+    Route::get('/styles/find', 'TestController@stylesFind');
 });

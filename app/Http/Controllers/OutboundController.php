@@ -34,10 +34,20 @@ class OutboundController extends Controller
             // Get the data by type
             if (strtolower($type) == 'party') {
                 $event = Party::find($id);
+
+                if (!$event) {
+                    abort(404);
+                }
+
                 $eventStats = $event->getEventStats($EmissionRatio);
                 $co2 = $eventStats['co2'];
             } elseif (strtolower($type) == 'group') {
                 $group = Group::find($id);
+
+                if (!$group) {
+                    abort(404);
+                }
+
                 $groupStats = $group->getGroupStats($EmissionRatio);
                 $co2 = $groupStats['co2'];
             } elseif (strtolower($type) == 'group-tag') {

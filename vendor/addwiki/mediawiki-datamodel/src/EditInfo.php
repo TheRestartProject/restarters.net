@@ -16,6 +16,8 @@ class EditInfo {
 	//bot flags
 	const BOT = true;
 	const NOTBOT = false;
+	//maxlag flags
+	const OFFLAG = null;
 
 	/**
 	 * @var EditInfo::MINOR|self::NOTMINOR
@@ -26,6 +28,11 @@ class EditInfo {
 	 * @var EditInfo::BOT|self::NOTBOT
 	 */
 	protected $bot = false;
+	
+	/**
+	 * @var integer
+	 */
+	protected $maxlag = null;
 
 	/**
 	 * @var string
@@ -36,10 +43,11 @@ class EditInfo {
 	 * @param string $summary
 	 * @param bool $minor
 	 * @param bool $bot
+	 * @param int $maxlag
 	 *
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct( $summary = '', $minor = self::NOTMINOR, $bot = self::NOTBOT ) {
+	public function __construct( $summary = '', $minor = self::NOTMINOR, $bot = self::NOTBOT, $maxlag = self::OFFLAG ) {
 		if( !is_string( $summary ) ) {
 			throw new InvalidArgumentException( '$summary must be a string' );
 		}
@@ -49,10 +57,13 @@ class EditInfo {
 		if( !is_bool( $bot ) ) {
 			throw new InvalidArgumentException( '$bot must be a bool' );
 		}
-
+		if( !is_int( $maxlag ) && !is_null( $maxlag ) ) {
+			throw new InvalidArgumentException( '$maxlag must be an integer or null' );	
+		}
 		$this->summary = $summary;
 		$this->bot = $bot;
 		$this->minor = $minor;
+		$this->maxlag = $maxlag;
 	}
 
 	/**
@@ -67,6 +78,13 @@ class EditInfo {
 	 */
 	public function getMinor() {
 		return $this->minor;
+	}
+	
+	/**
+	 * @return integer|null
+	 */
+	public function getMaxlag() {
+		return $this->maxlag;
 	}
 
 	/**

@@ -27,14 +27,15 @@ return array (
   ),
   'cta' => 
   array (
-    'title' => 'Help Now!  MobiFix',
+    'title' => 'Help Now! MobiFix',
     'description' => 'We see lots of smartphones at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with smartphones with MobiFix!',
     'get_involved' => 'Get involved',
     'tabicat' => 
     array (
-      'title' => 'Help Now!  TabiCat',
+      'title' => 'Help Now! TabiCat',
       'description' => '<p>We see lots of tablets at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with tablets with TabiCat!</p> <p>The repair data in TabiCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Get involved',
+      'short_description' => 'Why do tablets fail, and what are the barriers to repairing them?',
     ),
     'mobifixora' => 
     array (
@@ -53,7 +54,13 @@ return array (
       'title' => 'Help Now!  PrintCat',
       'description' => '<p>We see lots of printers at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with printers with PrintCat!</p>  <p>The repair data in PrintCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href=“:url”>Open Repair Alliance</a>.</p>',
       'get_involved' => 'Get involved',
-      'short_description' => 'Help us figure out the most common issues we see with printers with PrintCat!',
+      'short_description' => 'Help us figure out the most common issues we see with printers.',
+    ),
+    'battcat' => 
+    array (
+      'title' => 'Help Now! BattCat',
+      'description' => '<p>We see lots of broken devices at community repair events that have a battery problem. But what\'s causing the batteries to fail and what could make them easier to fix or replace? Help us figure out the most common issues we see with batteries with BattCat!</p> <p>The repair data in BattCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'get_involved' => 'Get involved',
     ),
   ),
   'discussion' => 

@@ -171,6 +171,7 @@ return [
         wouterNL\Drip\DripServiceProvider::class,
         App\Providers\DiscourseServiceProvider::class,
         App\Providers\ScheduleServiceProvider::class,
+        Sentry\Laravel\ServiceProvider::class,
     ],
 
     /*

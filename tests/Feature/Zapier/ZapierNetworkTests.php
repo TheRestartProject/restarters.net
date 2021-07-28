@@ -26,7 +26,10 @@ class ZapierNetworkTests extends TestCase
     {
         parent::setUp();
 
-        Config::set('audit.console', true);
+        // Auditing package appears to no longer honour Config::set value.
+        // Setting AUDIT_CONSOLE_EVENTS in phpunit.xml.
+        // See: https://github.com/owen-it/laravel-auditing/issues/520
+        // Config::set('audit.console', true);
 
         DB::statement("SET foreign_key_checks=0");
         User::truncate();
@@ -52,7 +55,7 @@ class ZapierNetworkTests extends TestCase
         $this->actingAs($admin);
 
         $network = factory(Network::class)->create([
-            'shortname' => 'restart',
+            'shortname' => 'restarters',
             'include_in_zapier' => true,
         ]);
 
@@ -82,7 +85,7 @@ class ZapierNetworkTests extends TestCase
         $this->actingAs($admin);
 
         $network = factory(Network::class)->create([
-            'shortname' => 'restart',
+            'shortname' => 'restarters',
             'include_in_zapier' => false,
         ]);
 

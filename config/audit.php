@@ -143,5 +143,5 @@ return [
     |
     */
 
-    'console' => false,
+    'console' => env('AUDIT_CONSOLE_EVENTS', false),
 ];

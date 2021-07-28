@@ -8,6 +8,7 @@ use App\Mobifix;
 use App\MobifixOra;
 use App\PrintcatOra;
 use App\TabicatOra;
+use App\BattcatOra;
 use App\User;
 
 use DB;
@@ -30,6 +31,7 @@ class ContributionsTest extends TestCase
         MobifixOra::truncate();
         PrintcatOra::truncate();
         TabicatOra::truncate();
+        BattcatOra::truncate();
 
         $this->userWithContributions = factory(User::class)->state('Restarter')->create();
         $this->anotherUserWithContributions = factory(User::class)->state('Restarter')->create();
@@ -123,7 +125,7 @@ class ContributionsTest extends TestCase
 
         $this->assertVueProperties($response, [
             [
-                ':total-quests' => 6,
+                ':total-quests' => 7,
                 ':total-contributions' => 5
             ]
         ]);

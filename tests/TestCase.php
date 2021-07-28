@@ -49,6 +49,7 @@ abstract class TestCase extends BaseTestCase
         Category::truncate();
         Brands::truncate();
         GroupTags::truncate();
+        DB::statement('delete from audits');
         DB::delete('delete from user_network');
         DB::delete('delete from grouptags_groups');
         DB::table('notifications')->truncate();
@@ -87,6 +88,7 @@ abstract class TestCase extends BaseTestCase
         $userAttributes['consent_gdpr'] = true;
         $userAttributes['consent_future_data'] = true;
         $userAttributes['city'] = 'London';
+        $userAttributes['wiki_sync_status'] = 0;
 
         return $userAttributes;
     }
@@ -122,6 +124,37 @@ abstract class TestCase extends BaseTestCase
         return $idgroups;
     }
 
+    public function createEvent($idgroups, $date) {
+        // Create a party for the specific group.
+        $eventAttributes = factory(Party::class)->raw();
+        $eventAttributes['group'] = $idgroups;
+
+        $eventAttributes['event_date'] = date('Y-m-d', strtotime($date));
+
+        $response = $this->post('/party/create/', $eventAttributes);
+        $this->assertDatabaseHas('events', $eventAttributes);
+        $redirectTo = $response->getTargetUrl();
+        $p = strrpos($redirectTo, '/');
+        $idevents = substr($redirectTo, $p + 1);
+
+        return $idevents;
+    }
+
+    public function createDevice($idevents, $type) {
+        $deviceAttributes = factory(Device::class)->states($type)->raw();
+        error_log("Created");
+
+        $deviceAttributes['event_id'] = $idevents;
+        $deviceAttributes['quantity'] = 1;
+        error_log("Device attributes " . var_export($deviceAttributes, TRUE));
+
+        $response = $this->post('/device/create', $deviceAttributes);
+        $iddevices = Device::latest()->first()->iddevices;
+        $this->assertNotNull($iddevices);
+
+        return $iddevices;
+    }
+
     public function createJane() {
         $user = factory(User::class)->create([
             'name' => 'Jane Bloggs',
@@ -150,7 +183,9 @@ abstract class TestCase extends BaseTestCase
             foreach ($vue->children() as $child) {
                 $dom = simplexml_import_dom($child);
 
-                $props[] = current($dom->attributes());
+                $props[] = array_merge(current($dom->attributes()), [
+                    'VueComponent' => $vue->children()->first()->nodeName()
+                ]);
             }
         }
 

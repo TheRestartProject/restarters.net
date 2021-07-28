@@ -57,6 +57,12 @@ class ApiController extends Controller
 
         $event = Party::where('idevents', $partyId)->first();
 
+        if (!$event) {
+            return response()->json([
+                'message' => "Invalid party id $partyId"
+                                    ], 404);
+        }
+
         $eventStats = $event->getEventStats($emissionRatio);
 
         return response()

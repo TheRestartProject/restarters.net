@@ -66,6 +66,30 @@ class PartyController extends Controller
         $this->discourseService = $discourseService;
     }
 
+    public static function expandEvent($event, $group, $emissionRatio) {
+        $thisone = $event->getAttributes();
+
+        if (is_null($group)) {
+            // We are showing events for multiple groups and so we need to pass the relevant group, in order that
+            // we can show the group name and link to it.
+            $thisone['group'] = \App\Group::find($event->group);
+        }
+
+        $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
+        $thisone['allinvitedcount'] = $event->allInvited->count();
+
+        // TODO LATER Consider whether these stats should be in the event or passed into the store.
+        $thisone['stats'] = $event->getEventStats($emissionRatio);
+        $thisone['participants_count'] = $event->participants;
+        $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+
+        $thisone['isVolunteer'] = $event->isVolunteer();
+        $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
+        $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+
+        return $thisone;
+    }
+
     public function index($group_id = null)
     {
         if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
@@ -425,10 +449,9 @@ class PartyController extends Controller
             $data['event_date'] = FixometerHelper::dbDateNoTime($data['event_date']);
 
             if ( ! empty($data['location'])) {
-                $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($data['location']).'&key=AIzaSyDb1_XdeHbwLg-5Rr3EOHgutZfqaRp8THE');
-                $json = json_decode($json);
+                $results = $this->geocoder->geocode($data['location']);
 
-                if ( empty($json->results) ) {
+                if ( empty($results) ) {
                   $response['danger'] = 'Party could not be saved. Address not found.';
                   $party = $Party->findThis($id)[0];
                   $audits = Party::findOrFail($id)->audits;
@@ -452,10 +475,8 @@ class PartyController extends Controller
                   ]);
                 }
 
-                if (is_object($json) && ! empty($json->{'results'})) {
-                    $latitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lat;
-                    $longitude = $json->{'results'}[0]->{'geometry'}->{'location'}->lng;
-                }
+                $latitude = $results['latitude'];
+                $longitude = $results['longitude'];
             } else {
                 $latitude = null;
                 $longitude = null;
@@ -1248,35 +1269,6 @@ class PartyController extends Controller
         return redirect()->back()->with('warning', 'Sorry, but the image can\'t be deleted');
     }
 
-    public function emailHosts()
-    {
-        if (env('APP_ENV') != 'development' && env('APP_ENV') != 'local') {
-            //Get all events and hosts
-            $event_users = EventsUsers::where('role', 3);
-            $event_ids = $event_users->pluck('event')->toArray();
-            $all_events = Party::whereIn('idevents', $event_ids)
-            ->where('event_date', '=', date('Y-m-d', strtotime('-1 day')))
-            ->get();
-
-            foreach ($all_events as $event) {
-                $host_ids = $event_users->where('event', $event->idevents)->pluck('user')->toArray();
-
-                if ( ! empty($host_ids)) {
-                    $hosts = User::whereIn('id', $host_ids)->get();
-
-                    //Send Emails to Admins notifying event creation
-                    $arr = [
-                        'event_venue' => $event->venue,
-                        'event_url' => url('/party/view/'.$event->idevents),
-                        'preferences' => url('/profile/edit'),
-                    ];
-
-                    Notification::send($hosts, new EventDevices($arr));
-                }
-            }
-        }
-    }
-
     /*
     *
     * This sends an email to all user except the host logged in an email to ask for contributions
@@ -1307,6 +1299,9 @@ class PartyController extends Controller
     }
 
 
+    // TODO: is this alive?
+    // It looks like recent-ish code, but I recall James mentioned recently that
+    // he couldn't delete events.  Perhaps it's disappeared from the interface?
     /**
      * Called via AJAX.
      * @param id The event id.
@@ -1335,11 +1330,6 @@ class PartyController extends Controller
         Log::info("Event deleted");
 
         return redirect('/party')->with('success', 'Event has been deleted');
-    }
-
-    public function noDataEntered()
-    {
-        return redirect('/party');
     }
 
     /**
@@ -1410,7 +1400,7 @@ class PartyController extends Controller
          ->get();
 
          // If no parties are found, through 404 error
-         if (empty($parties)) {
+         if (!count($parties)) {
            return abort(404, 'No Events found.');
          }
 
