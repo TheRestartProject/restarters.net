@@ -1,6 +1,7 @@
-# This is a Docker Compose development environment for Restarters.  It creates:
-# - a web server on http://localhost:8001 which serves up restarters.  Admin user is jane@bloggs.net/passw0rd.
-# - phpMyAdmin on http://localhost:8002.  Use host restarters_db, user root/s3cr3t
+# This is a Docker Compose development environment for Restarters.  It:
+# - relies on you setting up www.example.com in your hosts file.  TODO this name could be better but needs some configuration.
+# - a web server on http://www.example.com:8001 which serves up restarters.  Admin user is jane@bloggs.net/passw0rd.
+# - phpMyAdmin on http://www.example.com:8002.  Use host restarters_db, user root/s3cr3t
 # - Discourse on http://www.example.com:8003.  User is someuser/mustbetencharacters; see below about hostname.
 #   TODO This is stock Discourse - no theme.  Would be nice to have the theme, but that doesn't matter so far as
 #   testing the integration.
