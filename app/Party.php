@@ -763,9 +763,11 @@ class Party extends Model implements Auditable
 
     public function isBeingAttendedBy($userId)
     {
-        return EventsUsers::where('event', $this->idevents)
-            ->where('user', $userId)
-            ->exists();
+        return EventsUsers::where([
+            [ 'event', '=', $this->idevents ],
+            [ 'user', '=', $userId ],
+            [ 'status', '=', 1]
+        ])->exists();
     }
 
     /**
