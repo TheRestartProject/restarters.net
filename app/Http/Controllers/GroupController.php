@@ -891,6 +891,11 @@ class GroupController extends Controller
             'parties' => 0,
             'co2' => 0,
             'waste' => 0,
+            'ewaste' => 0,
+            'unpowered_waste' => 0,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 0,
         ];
 
         // Loop through all groups and increase the values for groupStats

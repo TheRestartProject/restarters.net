@@ -94,6 +94,11 @@ class GroupByKeyTest extends TestCase
         $this->assertEquals(1, count($ret['past_parties']));
         $this->assertEquals($eventpast->idevents, $ret['past_parties'][0]['event_id']);
 
+        // Get stats
+        $response = $this->get('/api/group-tag/stats/' . $group->idgroups);
+        $stats = json_decode($response->getContent(), TRUE);
+        $this->assertEquals(1, $stats['parties']);
+
         // Get but exclude by date
         $response = $this->get('/api/1234/group/' . $group->idgroups . "/2000-01-02/2029-12-31");
         $ret = json_decode($response->getContent(), TRUE);
