@@ -48,6 +48,7 @@ abstract class TestCase extends BaseTestCase
         Category::truncate();
         Brands::truncate();
         GroupTags::truncate();
+        DB::statement('delete from audits');
         DB::delete('delete from user_network');
         DB::delete('delete from grouptags_groups');
         DB::table('notifications')->truncate();
