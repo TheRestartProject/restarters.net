@@ -6,6 +6,7 @@ use App\Device;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Events\UserFollowedGroup;
+use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
 use App\GroupTags;
@@ -802,9 +803,25 @@ class GroupController extends Controller
 
         $name = $group->name;
 
-        if (FixometerHelper::hasRole(Auth::user(), 'Administrator') && $group->canDelete()) {
+        if (Auth::user()->hasRole('Administrator') && $group->canDelete()) {
+            // We know we can delete the group; if it has any past events they must be empty, so delete all
+            // events (including future).
+            $allEvents = Party::where('events.group', $id)->get();
+
+            foreach ($allEvents as $event) {
+                // Delete any users - these are not cascaded in the DB.
+                $users = EventsUsers::where('event', $event->idevents)->get();
+
+                foreach ($users as $user) {
+                    // Need to force delete to get rid of the row and avoid constraint violations.
+                    $user->forceDelete();
+                }
+
+                $event->forceDelete();
+            }
+
             $r = $group->delete($id);
-            $r = true;
+
             if ( ! $r) {
                 return redirect('/user/forbidden');
             } else {
@@ -843,22 +860,6 @@ class GroupController extends Controller
         }
 
         return $ret;
-    }
-
-    // TODO: is this alive?
-    public function deleteImage($group_id, $id, $path)
-    {
-        $user = Auth::user();
-
-        $is_host_of_group = FixometerHelper::userHasEditGroupPermission($group_id, $user->id);
-        if (FixometerHelper::hasRole($user, 'Administrator') || $is_host_of_group) {
-            $Image = new FixometerFile;
-            $Image->deleteImage($id, $path);
-
-            return redirect()->back()->with('message', 'Thank you, the image has been deleted');
-        }
-
-        return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
     }
 
     public static function stats($id, $format = 'row')

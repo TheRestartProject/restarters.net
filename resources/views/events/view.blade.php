@@ -155,6 +155,8 @@
             $brand->brand_name;
             $expanded_brands[] = $brand;
           }
+
+          $event->approved = $event->wordpress_post_id !== null;
         ?>
         <div class="vue">
           <EventPage

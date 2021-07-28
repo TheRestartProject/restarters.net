@@ -5,8 +5,8 @@ namespace Tests\Feature\Groups;
 use App\Device;
 use App\Party;
 use App\Role;
-use Carbon\Carbon;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Carbon\Carbon;
 use Tests\TestCase;
 
 class GroupViewTest extends TestCase {
@@ -27,6 +27,12 @@ class GroupViewTest extends TestCase {
                 ':events' => '[]',
             ]
         ]);
+    }
+
+    public function testInvalidGroup() {
+        $this->loginAsTestUser(Role::RESTARTER);
+        $this->expectException(NotFoundHttpException::class);
+        $this->get("/group/view/undefined");
     }
 
     public function testCanDelete() {
@@ -76,10 +82,5 @@ class GroupViewTest extends TestCase {
                 ]
             ]);
         }
-
-    public function testInvalidGroup() {
-        $this->loginAsTestUser(Role::RESTARTER);
-        $this->expectException(NotFoundHttpException::class);
-        $this->get("/group/view/undefined");
     }
 }

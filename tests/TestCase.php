@@ -85,6 +85,7 @@ abstract class TestCase extends BaseTestCase
         $userAttributes['my_time'] = Carbon::now();
         $userAttributes['consent_gdpr'] = true;
         $userAttributes['consent_future_data'] = true;
+        $userAttributes['wiki_sync_status'] = 0;
 
         return $userAttributes;
     }
@@ -114,6 +115,37 @@ abstract class TestCase extends BaseTestCase
         $idgroups = substr($redirectTo, $p + 1);
 
         return $idgroups;
+    }
+
+    public function createEvent($idgroups, $date) {
+        // Create a party for the specific group.
+        $eventAttributes = factory(Party::class)->raw();
+        $eventAttributes['group'] = $idgroups;
+
+        $eventAttributes['event_date'] = date('Y-m-d', strtotime($date));
+
+        $response = $this->post('/party/create/', $eventAttributes);
+        $this->assertDatabaseHas('events', $eventAttributes);
+        $redirectTo = $response->getTargetUrl();
+        $p = strrpos($redirectTo, '/');
+        $idevents = substr($redirectTo, $p + 1);
+
+        return $idevents;
+    }
+
+    public function createDevice($idevents, $type) {
+        $deviceAttributes = factory(Device::class)->states($type)->raw();
+        error_log("Created");
+
+        $deviceAttributes['event_id'] = $idevents;
+        $deviceAttributes['quantity'] = 1;
+        error_log("Device attributes " . var_export($deviceAttributes, TRUE));
+
+        $response = $this->post('/device/create', $deviceAttributes);
+        $iddevices = Device::latest()->first()->iddevices;
+        $this->assertNotNull($iddevices);
+
+        return $iddevices;
     }
 
     public function createJane() {
