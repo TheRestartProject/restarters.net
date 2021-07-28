@@ -102,15 +102,6 @@ class DeviceStatsTest extends TestCase
         $result = round($footprintRatioCalculator->calculateRatio(), 1);
         $this->assertEquals($expect, $result, "calculateRatio = $expect");
 
-        // calculate ratio for powered only
-        $expect = round((14.4 / (4 + 0.0)), 1);
-        $result = round($footprintRatioCalculator->calculateRatioPowered(), 1);
-        $this->assertEquals($expect, $result, "calculateRatio = $expect");
-
-        // calculate ratio for unpowered only
-        $expect = round((15.5 / (5 + 0.0)), 1);
-        $result = round($footprintRatioCalculator->calculateRatioUnpowered(), 1);
-        $this->assertEquals($expect, $result, "calculateRatio = $expect");
     }
 
     /** WASTE TESTS */

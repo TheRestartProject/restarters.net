@@ -109,6 +109,7 @@ class Device extends Model implements Auditable
         return DB::select(DB::raw($sql));
     }
 
+    /** MOVING TO LcaStatsHelper */
     public function getWeights($group = null)
     {
         $sql =
@@ -143,50 +144,7 @@ AND devices.event = events.idevents ';
         return DB::select(DB::raw($sql), $params);
     }
 
-    /**
-     * Proposed changes to getWeights()
-     * calculate unpowered with lca data
-     * Misc weight/footprint values = 0 in categories table
-     * removal of hard-coded Misc ids
-     * separate emission calculations for powered/unpowered devices
-     * PENDING confirmation of assumptions
-     * SEE tests/Feature/FooStatsTest::get_weights_new()
-     * */
-    public function getWeightsNew($group = null)
-    {
-        $sql =
-        'SELECT
-
-sum(case when (categories.weight = 0) then (devices.estimate + 0.0) else categories.weight end) as total_weights,
-sum(case when (categories.powered = 1) then (case when (categories.weight = 0) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as powered_waste,
-sum(case when (categories.powered = 0) then (case when (categories.weight = 0) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as unpowered_waste,
-sum(case when (categories.powered = 1) then (case when (categories.weight = 0) then (devices.estimate + 0.0) * @eRatio else categories.footprint * @displacement end) else 0 end) as powered_footprint,
-sum(case when (categories.powered = 0) then (case when (categories.weight = 0) then (devices.estimate + 0.0) * @uRatio else categories.footprint * @displacement end) else 0 end) as unpowered_footprint
-
-FROM devices, categories, events,
-
-(select @displacement := :displacement) inner_tbl_displacement,
-(select @eRatio := :eRatio) inner_tbl_eratio,
-(select @uRatio := :uRatio) inner_tbl_uratio
-
-WHERE devices.category = categories.idcategories and devices.repair_status = 1
-AND devices.event = events.idevents ';
-
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $eRatio = $footprintRatioCalculator->calculateRatioPowered();
-        $uRatio = $footprintRatioCalculator->calculateRatioUnpowered();
-        $params = ['displacement' => $this->displacement, 'eRatio' => $eRatio, 'uRatio' => $uRatio];
-
-        if ( ! is_null($group) && is_numeric($group)) {
-            $sql .= ' AND events.group = :group ';
-            $params['group'] = $group;
-
-            return DB::select(DB::raw($sql), $params);
-        }
-
-        return DB::select(DB::raw($sql), $params);
-    }
-
+    /** REDUNDANT? */
     public function getPartyWeights($party)
     {
         return DB::select(DB::raw('SELECT
@@ -198,6 +156,7 @@ AND devices.event = events.idevents ';
             WHERE `d`.`repair_status` = 1 AND `c`.`idcategories` != 46 AND `e`.`idevents` = :id'), array('id' => $party));
     }
 
+    /** REDUNDANT? */
     public function getCounts()
     {
         return DB::select(DB::raw('SELECT
@@ -344,7 +303,7 @@ AND devices.event = events.idevents ';
             dd($e);
         }
     }
-
+    /** REDUNDANT */
     public function countCO2ByYear($group = null, $year = null)
     {
         $sql = 'SELECT
@@ -380,7 +339,7 @@ AND devices.event = events.idevents ';
             dd($e);
         }
     }
-
+    /** REDUNDANT */
     public function countWasteByYear($group = null, $year = null)
     {
         $sql = 'SELECT
@@ -416,7 +375,7 @@ AND devices.event = events.idevents ';
             dd($e);
         }
     }
-
+    /** REDUNDANT ? */
     public function findMostSeen($status = null, $cluster = null, $group = null)
     {
         $sql = 'SELECT COUNT(`d`.`category`) AS `counter`, `c`.`name` FROM `'.$this->table.'` AS `d`
@@ -511,7 +470,7 @@ AND devices.event = events.idevents ';
 
         return DB::select(DB::raw($sql));
     }
-
+    /** REDUNDANT? */
     public function guesstimates()
     {
         //Tested

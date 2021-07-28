@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Device;
 use App\DeviceBarrier;
 use App\Category;
-use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\LcaStatsHelper;
 
 use DB;
 use Tests\TestCase;
@@ -83,7 +83,7 @@ class FooStatsTest extends TestCase
         $emissionRatio = $this->_getEmissionRatio();
         $expect = [
             'co2' => (14.4 * $displacement),
-            'ewaste' => 4, // ERROR? Unpowered Misc weight is counted, powered Misc is not
+            'ewaste' => 4,
             'unpowered_waste' => 0,
             'fixed_devices' => 2,
             'fixed_powered' => 2,
@@ -111,7 +111,7 @@ class FooStatsTest extends TestCase
         $emissionRatio = $this->_getEmissionRatio();
         $expect = [
             'co2' => (14.4 * $displacement) + (9 * $emissionRatio * $displacement),
-            'ewaste' => 13, // ERROR? Unpowered Misc weight is counted, powered Misc is not
+            'ewaste' => 13,
             'unpowered_waste' => 0,
             'fixed_devices' => 3,
             'fixed_powered' => 3,
@@ -138,7 +138,7 @@ class FooStatsTest extends TestCase
         $emissionRatio = $this->_getEmissionRatio();
         $expect = [
             'co2' => (14.4 * $displacement) + (9 * $emissionRatio * $displacement),
-            'ewaste' => 13, // ERROR? Unpowered Misc weight is counted, powered Misc is not
+            'ewaste' => 13,
             'unpowered_waste' => 0,
             'fixed_devices' => 3,
             'fixed_powered' => 3,
@@ -201,13 +201,13 @@ class FooStatsTest extends TestCase
         $expect = [
             'co2' => 0,
             'ewaste' => 0,
-            'unpowered_waste' => 6, // ERROR? Unpowered Misc weight is counted, powered Misc is not
+            'unpowered_waste' => 5,
             'fixed_devices' => 2,
             'fixed_powered' => 0,
             'fixed_unpowered' => 2,
             'repairable_devices' => 0,
             'dead_devices' => 0,
-            'no_weight' => 0, // ERROR? Unpowered Misc weight is counted, powered Misc is not
+            'no_weight' => 1,
             'devices_powered' => 0,
             'devices_unpowered' => 2,
         ];
@@ -230,13 +230,13 @@ class FooStatsTest extends TestCase
         $expect = [
             'co2' => 0,
             'ewaste' => 0,
-            'unpowered_waste' => 15,
+            'unpowered_waste' => 14,
             'fixed_devices' => 3,
             'fixed_powered' => 0,
             'fixed_unpowered' => 3,
             'repairable_devices' => 0,
             'dead_devices' => 0,
-            'no_weight' => 0, // ERROR? Unpowered Misc weight is counted, powered Misc is not
+            'no_weight' => 1,
             'devices_powered' => 0,
             'devices_unpowered' => 3,
         ];
@@ -258,13 +258,13 @@ class FooStatsTest extends TestCase
         $expect = [
             'co2' => 0,
             'ewaste' => 0,
-            'unpowered_waste' => 15,
+            'unpowered_waste' => 14,
             'fixed_devices' => 3,
             'fixed_powered' => 0,
             'fixed_unpowered' => 3,
             'repairable_devices' => 1,
             'dead_devices' => 0,
-            'no_weight' => 0, // ERROR? Unpowered Misc weight is counted, powered Misc is not
+            'no_weight' => 1,
             'devices_powered' => 0,
             'devices_unpowered' => 4,
         ];
@@ -319,7 +319,7 @@ class FooStatsTest extends TestCase
         $emissionRatio = $this->_getEmissionRatio();
         $expect = [
             'co2' => 14.4 * $displacement,
-            'ewaste' => 4, // ERROR? Unpowered Misc weight is counted, powered Misc is not
+            'ewaste' => 4,
             'unpowered_waste' => 0,
             'fixed_devices' => 2,
             'fixed_powered' => 2,
@@ -376,13 +376,13 @@ class FooStatsTest extends TestCase
         $expect = [
             'co2' => 14.4 * $displacement,
             'ewaste' => 4,
-            'unpowered_waste' => 6,
+            'unpowered_waste' => 5,
             'fixed_devices' => 4,
             'fixed_powered' => 2,
             'fixed_unpowered' => 2,
             'repairable_devices' => 0,
             'dead_devices' => 0,
-            'no_weight' => 1, // ERROR? Unpowered Misc weight is counted, powered Misc is not
+            'no_weight' => 2,
             'devices_powered' => 2,
             'devices_unpowered' => 2,
         ];
@@ -449,8 +449,8 @@ class FooStatsTest extends TestCase
         ]);
         $expect = [
             'total_weights' => 4,
-            'ewaste' => 4, // ERROR? Powered Misc weight is not counted
-            'unpowered_waste' => 0, // ERROR? Unpowered Misc weight is usually counted, here it is not
+            'ewaste' => 4,
+            'unpowered_waste' => 0,
             'total_footprints' => 14.4 * $this->_displacementFactor,
         ];
         $result = $device->getWeights();
@@ -467,8 +467,8 @@ class FooStatsTest extends TestCase
         ]);
         $expect = [
             'total_weights' => 4,
-            'ewaste' => 4, // ERROR? Powered Misc weight is not counted
-            'unpowered_waste' => 0, // ERROR? Unpowered Misc weight is usually counted, here it is not
+            'ewaste' => 4,
+            'unpowered_waste' => 0,
             'total_footprints' => 14.4 * $this->_displacementFactor,
         ];
         $result = $device->getWeights();
@@ -502,7 +502,7 @@ class FooStatsTest extends TestCase
             'powered_footprint' => 14.4 * $this->_displacementFactor,
             'unpowered_footprint' => 0,
         ];
-        $result = $device->getWeightsNew();
+        $result = LcaStatsHelper::getWeights();
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
@@ -521,7 +521,7 @@ class FooStatsTest extends TestCase
             'powered_footprint' => 14.4 * $this->_displacementFactor,
             'unpowered_footprint' => 0,
         ];
-        $result = $device->getWeightsNew();
+        $result = LcaStatsHelper::getWeights();
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
@@ -540,7 +540,7 @@ class FooStatsTest extends TestCase
             'powered_footprint' => 14.4 * $this->_displacementFactor,
             'unpowered_footprint' => 15.5 * $this->_displacementFactor,
         ];
-        $result = $device->getWeightsNew();
+        $result = LcaStatsHelper::getWeights();
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
@@ -559,7 +559,7 @@ class FooStatsTest extends TestCase
             'powered_footprint' => 14.4 * $this->_displacementFactor,
             'unpowered_footprint' => 15.5 * $this->_displacementFactor,
         ];
-        $result = $device->getWeightsNew();
+        $result = LcaStatsHelper::getWeights();
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
@@ -574,11 +574,11 @@ class FooStatsTest extends TestCase
      */
 
     /**
+     * Device::countCO2ByYear() is REDUNDANT
      * Tests query in Device::countCO2ByYear() without unpowered lca data.
      * Note: it selects from a view that contains SQL that is duplicated in the footprint helper getRatio() query.
      * Note: countCO2ByYear() rounds the result to 0 places.
      */
-    /** @test */
     public function co2_by_year_without_unpowered_weights()
     {
         $this->_setupCategoriesWithoutUnpoweredWeights();
@@ -648,8 +648,58 @@ class FooStatsTest extends TestCase
         }
     }
 
+    /**
+     */
+    /** @test */
+    public function lcastats_helper_calculate_ratio()
+    {
+        $this->_setupCategoriesWithoutUnpoweredWeights();
+        factory(Device::class)->states('fixed')->create([
+            'category' => 4,
+            'category_creation' => 4,
+            'event' => 1,
+        ]);
+        factory(Device::class)->states('fixed')->create([
+            'category' => 5,
+            'category_creation' => 5,
+            'event' => 1,
+        ]);
+        $e = round(LcaStatsHelper::calculateEmissionRatioPowered(),1);
+        $expect = round((14.4) / (4),1);
+        $this->assertEquals($expect, round($e,1));
+        $u = round(LcaStatsHelper::calculateEmissionRatioUnpowered(),1);
+        $expect = 0;
+        $this->assertEquals($expect, $u);
+        $b = round(LcaStatsHelper::calculateEmissionRatio(),1);
+        $expect = round((14.4) / (4),1);
+        $this->assertEquals($expect, $b);
+
+
+        $this->_setupCategoriesWithUnpoweredWeights();
+        factory(Device::class)->states('fixed')->create([
+            'category' => 4,
+            'category_creation' => 4,
+            'event' => 1,
+        ]);
+        factory(Device::class)->states('fixed')->create([
+            'category' => 5,
+            'category_creation' => 5,
+            'event' => 1,
+        ]);
+        $e = round(LcaStatsHelper::calculateEmissionRatioPowered(),1);
+        $expect = round((14.4) / (4),1);
+        $this->assertEquals($expect, round($e,1));
+        $u = round(LcaStatsHelper::calculateEmissionRatioUnpowered(),1);
+        $expect = round((15.5) / (5),1);
+        $this->assertEquals($expect, $u);
+        $b = round(LcaStatsHelper::calculateEmissionRatio(),1);
+        $expect = round((14.4+15.5) / (4+5),1);
+        $this->assertEquals($expect, $b);
+
+    }
 
     /**
+     * Device::countWasteByYear() is REDUNDANT
      * Tests query in Device::countWasteByYear() without unpowered lca data.
      */
     /** @test */
@@ -657,7 +707,7 @@ class FooStatsTest extends TestCase
     {
         $this->_setupCategoriesWithoutUnpoweredWeights();
 
-        // #1 add a single powered non-misc device
+        // #1 add a powered non-misc device
         $device = factory(Device::class)->states('fixed')->create([
             'category' => 4,
             'category_creation' => 4,
@@ -680,7 +730,7 @@ class FooStatsTest extends TestCase
             'event' => 1,
         ]);
         $expect = [
-            'waste' => 5, // ERROR? Counted Misc powered weight?
+            'waste' => 4,
         ];
         $result = $device->countWasteByYear(1);
         $this->assertIsArray($result);
@@ -696,7 +746,7 @@ class FooStatsTest extends TestCase
             'event' => 1,
         ]);
         $expect = [
-            'waste' => 5, // ERROR? Counted Misc powered weight?
+            'waste' => 4,
         ];
         $result = $device->countWasteByYear(1);
         $this->assertIsArray($result);
@@ -712,7 +762,7 @@ class FooStatsTest extends TestCase
             'event' => 1,
         ]);
         $expect = [
-            'waste' => 5, // ERROR? Counted Misc powered weight?
+            'waste' => 4,
         ];
         $result = $device->countWasteByYear(1);
         $this->assertIsArray($result);
@@ -830,12 +880,9 @@ class FooStatsTest extends TestCase
 
     }
 
-
-
     private function _getEmissionRatio()
     {
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        return $footprintRatioCalculator->calculateRatio();
+        return LcaStatsHelper::calculateEmissionRatio();
     }
 
     private function _getDisplacementFactor()
@@ -861,7 +908,8 @@ class FooStatsTest extends TestCase
             'revision' => 1,
             'name' => 'powered misc',
             'powered' => 1,
-            'weight' => 1,
+            'weight' => 0,
+            'footprint' => 0,
         ]);
         factory(Category::class)->create([
             'idcategories' => 5,
@@ -876,7 +924,8 @@ class FooStatsTest extends TestCase
             'revision' => 1,
             'name' => 'unpowered misc',
             'powered' => 0,
-            'weight' => 1,
+            'weight' => 0,
+            'footprint' => 0,
         ]);
         DB::statement("SET foreign_key_checks=0");
         Device::truncate();
@@ -901,20 +950,25 @@ class FooStatsTest extends TestCase
             'idcategories' => $this->_id_misc_powered,
             'revision' => 1,
             'name' => 'powered misc',
-            'powered' => 1,
-            'weight' => 1,
+            'powered' => 0,
+            'weight' => 0,
+            'footprint' => 0,
         ]);
         factory(Category::class)->create([
             'idcategories' => 5,
             'revision' => 1,
             'name' => 'unpowered non-misc',
             'powered' => 0,
+            'weight' => 0,
+            'footprint' => 0,
         ]);
         factory(Category::class)->create([
             'idcategories' => $this->_id_misc_unpowered,
             'revision' => 1,
             'name' => 'unpowered misc',
             'powered' => 0,
+            'weight' => 0,
+            'footprint' => 0,
         ]);
         DB::statement("SET foreign_key_checks=0");
         Device::truncate();
