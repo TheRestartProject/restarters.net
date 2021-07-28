@@ -1400,7 +1400,7 @@ class PartyController extends Controller
          ->get();
 
          // If no parties are found, through 404 error
-         if (empty($parties)) {
+         if (!count($parties)) {
            return abort(404, 'No Events found.');
          }
 
