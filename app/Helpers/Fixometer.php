@@ -215,6 +215,7 @@ class FixometerHelper
                                 ->where('group', $groupId)
                                 ->where('user', $userId)
                                 ->where('role', 3)
+                                ->whereNull('deleted_at')
                                 ->first();
 
         if ( ! empty($user_group_association)) {
