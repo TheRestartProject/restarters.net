@@ -3,6 +3,11 @@
 #
 # We install composer dependencies in here rather than during the build step so that if we switch branches
 # and restart the container, it works.
+if [ ! -f .env ]
+then
+ cp .env.example .env
+fi
+
 rm -rf vendor
 php composer.phar install
 

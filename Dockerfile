@@ -21,12 +21,6 @@ COPY . /var/www/
 # Copy composer.lock and composer.json from the codebase to where we will install and run.
 COPY composer.lock composer.json /var/www/
 
-# Copy default env too.
-COPY .env.example /var/www/
-
-# Rename
-RUN sudo mv /var/www/.env.example /var/www/.env
-
 # Grant permissions to /var/www so we can put files in it.
 RUN sudo chown -R circleci:circleci /var/www
 
