@@ -30,6 +30,7 @@ return array (
     'step1' => 'Lesen Sie die Informationen über das defekte Gerät.',
     'step1-extra' => 'Ein Freiwilliger hat versucht, dieses Gerät bei einer Reparaturveranstaltung zu reparieren und diese Beschreibung verfasst.',
     'step2-extra' => 'Wählen Sie die Option, die am besten zu dem oben beschriebenen Problem passt.',
+    'title' => 'BattCat: Akkuprobleme kategorisieren',
   ),
   'status' => 
   array (

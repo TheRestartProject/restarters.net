@@ -52,9 +52,11 @@ class CreateEventTest extends TestCase
         $response->assertSee('You need to be a host of a group in order to create a new event listing');
     }
 
-
-    /** @test */
-    public function a_host_with_a_group_can_create_an_event()
+    /**
+     * @test
+     * @dataProvider roles
+     */
+    public function a_host_with_a_group_can_create_an_event($data)
     {
         $this->withoutExceptionHandling();
 
@@ -66,18 +68,72 @@ class CreateEventTest extends TestCase
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
-        // act
+        // Fetch the event create page.
         $response = $this->get('/party/create');
         $this->get('/party/create')->assertStatus(200);
 
+        // Create a party for the specific group.
         $eventAttributes = factory(Party::class)->raw();
-        $response = $this->post('/party/create/', $eventAttributes);
+        $eventAttributes['group'] = $group->idgroups;
 
-        // assert
-        $this->get('/party/view/' . Party::latest()->first()->idevents)->assertSee($eventAttributes['venue']);
+        // We want an upcoming event so that we can check it appears in various places.
+        $eventAttributes['event_date'] = date('Y-m-d', strtotime('tomorrow'));
+
+        $this->post('/party/create/', $eventAttributes);
         $this->assertDatabaseHas('events', $eventAttributes);
+
+        // Check that we can view the event, and that it shows the creation success message.
+        $this->get('/party/view/' . Party::latest()->first()->idevents)->
+            assertSee($eventAttributes['venue'])->
+            assertSee(__('events.created_success_message'));
+
+        // Now check whether the event shows/doesn't show correctly for different user roles.
+        list ($role, $seeEvent, $canModerate) = $data;
+
+        if ($role != 'Host') {
+            // Need to act as someone else.
+            $this->actingAs(factory(User::class)->states($role)->create());
+        }
+
+        // Check both the group page, and the top-level events page.
+        foreach (['/group/view/' . $group->idgroups, '/party'] as $url) {
+            $response = $this->get($url);
+
+            if ($seeEvent) {
+                // We should be able to see this upcoming event in the Vue properties.  We don't have a neat way
+                // of examining properties yet, so just look for the string.
+                $response->assertSee('requiresModeration&quot;:true');
+
+                if ($canModerate) {
+                    $response->assertSee('canModerate&quot;:true');
+                } else {
+                    $response->assertSee('canModerate&quot;:false');
+                }
+            } else {
+                $key = $url == '/party' ? ':initial-events' : ':events';
+                $this->assertVueProperties($response, [
+                    [
+                        $key => '[]'
+                    ]
+                ]);
+            }
+        }
     }
 
+    public function roles() {
+        return [
+            // Hosts can see but not moderate.
+            [ [ 'Host', TRUE, FALSE ] ],
+
+            // Nobody else can see the event in the list of events.
+            //
+            // Administrators and NetworkCoordinators arguably should be able to, but that's the current function.
+            // They will see it in the lists of events to moderate, but that's not what we are testing here.
+            [ [ 'Restarter', FALSE, FALSE  ] ],
+            [ [ 'Administrator', FALSE, FALSE  ] ],
+            [ [ 'NetworkCoordinator', FALSE, FALSE  ] ]
+        ];
+    }
 
     /** @test */
     public function a_host_can_duplicate_an_event() {
