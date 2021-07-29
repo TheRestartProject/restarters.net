@@ -77,7 +77,7 @@ return array (
     'a4' => 'Agree',
     'a5' => 'Strongly agree',
     'footer' => 'Pressing either button will take you back to BattCat',
-    'header1' => 'Thank you for helping us learn why tablets break.',
+    'header1' => 'Thank you!',
     'header2' => 'We are already planning future quests, just like this one. To make the next one even better, we have some quick questions for you.',
     'invalid' => 'Please answer all of the questions',
     'q1' => 'BattCat has increased my interest in repairing',

@@ -77,7 +77,7 @@ return array (
     'a4' => 'D\'accord',
     'a5' => 'Tout à fait d\'accord',
     'footer' => 'En appuyant sur l\'un ou l\'autre de ces boutons, vous retournerez à BattCat.',
-    'header1' => 'Merci de nous aider à comprendre pourquoi les tablettes se cassent.',
+    'header1' => 'Merci de nous aider',
     'header2' => 'Nous sommes déjà en train de planifier de futures quêtes, comme celle-ci. Pour que la prochaine soit encore meilleure, nous avons quelques questions rapides à vous poser.',
     'invalid' => 'Veuillez sélectionner chacune des questions',
     'q1' => 'BattCat a augmenté mon intérêt pour la réparation.',

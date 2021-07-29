@@ -77,7 +77,7 @@ return array (
     'a4' => 'D\'accordo',
     'a5' => 'Fortemente d\'accordo',
     'footer' => 'Premendo uno dei due pulsanti si torna a BattCat',
-    'header1' => 'Grazie per averci aiutato a capire perché i tablet si rompono.',
+    'header1' => 'Grazie!',
     'header2' => 'Stiamo pianificando missioni future, proprio come questa. Per renderle ancora migliori, abbiamo alcune domande.',
     'invalid' => 'Si prega di rispondere a ognuna delle domande',
     'q1' => 'BattCat ha aumentato il mio interesse nella riparazione',

@@ -77,7 +77,7 @@ return array (
     'a4' => 'Mee eens',
     'a5' => 'Sterk mee eens',
     'footer' => 'Als u op een van deze knoppen drukt, keert u terug naar BattCat',
-    'header1' => 'Bedankt om ons te helpen begrijpen waarom tabletten kapot gaan.',
+    'header1' => 'Bedankt!',
     'header2' => 'We plannen al toekomstige quests, net als deze. Om de volgende nog beter te maken, hebben we een paar korte vragen voor je.',
     'invalid' => 'Maak een keuze uit elk van de vragen',
     'q1' => 'BattCat heeft mijn interesse in repareren vergroot',

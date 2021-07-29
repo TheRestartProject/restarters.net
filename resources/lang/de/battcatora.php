@@ -77,7 +77,7 @@ return array (
     'a4' => 'Zustimmung',
     'a5' => 'Starke Zustimmung',
     'footer' => 'Wenn Sie eine der beiden Tasten drücken, gelangen Sie zurück zu BattCat',
-    'header1' => 'Vielen Dank, dass Sie uns geholfen haben, herauszufinden, warum Tablets kaputt gehen.',
+    'header1' => 'Vielen Dank!',
     'header2' => 'Wir planen bereits weitere zukünftige Quests wie diese. Um die nächsten noch besser zu machen, haben wir ein paar kurze Fragen für Sie.',
     'invalid' => 'Bitte wählen Sie aus jeder der Fragen',
     'q1' => 'BattCat hat mein Interesse am Reparieren gesteigert',

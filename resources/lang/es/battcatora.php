@@ -77,7 +77,7 @@ return array (
     'a4' => 'De acuerdo',
     'a5' => 'Muy de acuerdo',
     'footer' => 'Pulsando cualquiera de los dos botones volveras a BattCat',
-    'header1' => 'Gracias por ayudarnos a saber por qué se rompen las tabletas.',
+    'header1' => '¡Gracias!',
     'header2' => 'Estamos planeando futuras encuestas, como ésta. Para que la próxima sea aún mejor, tenemos algunas preguntas breves.',
     'invalid' => 'Por favor, elige una respuesta para cada una de las preguntas',
     'q1' => 'BattCat ha aumentado mi interés por la reparación',
