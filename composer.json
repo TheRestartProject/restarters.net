@@ -40,17 +40,18 @@
         "wouternl/laravel-drip": "^1.1"
     },
     "require-dev": {
-        "php-coveralls/php-coveralls": "^2.4",
         "barryvdh/laravel-debugbar": "^3.1",
+        "beyondcode/laravel-dump-server": "^1.0",
+        "caseyamcl/guzzle_retry_middleware": "^2.6",
+        "filp/whoops": "^2.0",
+        "fzaninotto/faker": "^1.4",
         "laravel/dusk": "^4.0",
         "mockery/mockery": "^1.2",
         "nunomaduro/collision": "^2.0",
+        "php-coveralls/php-coveralls": "^2.4",
         "phpunit/phpunit": "^7.0",
         "squizlabs/php_codesniffer": "^3.3",
-        "symfony/dom-crawler": "^5.2",
-        "fzaninotto/faker": "^1.4",
-        "beyondcode/laravel-dump-server": "^1.0",
-        "filp/whoops": "^2.0"
+        "symfony/dom-crawler": "^5.2"
     },
     "autoload": {
         "files": [
@@ -84,7 +85,8 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+	    "./scripts/patch-addwiki"
         ]
     },
     "config": {

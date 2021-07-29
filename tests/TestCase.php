@@ -30,6 +30,7 @@ abstract class TestCase extends BaseTestCase
     private $userCount = 0;
     private $groupCount = 0;
     private $DOM = null;
+    public $lastResponse = null;
 
     public function setUp()
     {
@@ -48,6 +49,7 @@ abstract class TestCase extends BaseTestCase
         Category::truncate();
         Brands::truncate();
         GroupTags::truncate();
+        DB::statement('delete from audits');
         DB::delete('delete from user_network');
         DB::delete('delete from grouptags_groups');
         DB::table('notifications')->truncate();
@@ -85,13 +87,16 @@ abstract class TestCase extends BaseTestCase
         $userAttributes['my_time'] = Carbon::now();
         $userAttributes['consent_gdpr'] = true;
         $userAttributes['consent_future_data'] = true;
+        $userAttributes['city'] = 'London';
+        $userAttributes['wiki_sync_status'] = 0;
 
         return $userAttributes;
     }
 
     public function loginAsTestUser($role = Role::RESTARTER) {
         // This is testing the external interface, whereas actingAs() wouldn't be.
-        $response = $this->post('/user/register/',  $this->userAttributes($role));
+        $response = $this->post('/user/register/', $this->userAttributes($role));
+        
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
 
@@ -99,21 +104,54 @@ abstract class TestCase extends BaseTestCase
         Auth::user()->role = $role;
     }
 
-    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.') {
-        $response = $this->post('/group/create',  [
+    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true) {
+        $idgroups = null;
+
+        $this->lastResponse = $this->post('/group/create',  [
             'name' => $name . $this->groupCount++,
             'website' => $website,
             'location' => $location,
             'free_text' => $text
         ]);
 
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
-        $p = strrpos($redirectTo, '/');
-        $idgroups = substr($redirectTo, $p + 1);
+        if ($assert) {
+            $this->assertTrue($this->lastResponse->isRedirection());
+            $redirectTo = $this->lastResponse->getTargetUrl();
+            $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
+            $p = strrpos($redirectTo, '/');
+            $idgroups = substr($redirectTo, $p + 1);
+        }
 
         return $idgroups;
+    }
+
+    public function createEvent($idgroups, $date) {
+        // Create a party for the specific group.
+        $eventAttributes = factory(Party::class)->raw();
+        $eventAttributes['group'] = $idgroups;
+
+        $eventAttributes['event_date'] = date('Y-m-d', strtotime($date));
+
+        $response = $this->post('/party/create/', $eventAttributes);
+        $this->assertDatabaseHas('events', $eventAttributes);
+        $redirectTo = $response->getTargetUrl();
+        $p = strrpos($redirectTo, '/');
+        $idevents = substr($redirectTo, $p + 1);
+
+        return $idevents;
+    }
+
+    public function createDevice($idevents, $type) {
+        $deviceAttributes = factory(Device::class)->states($type)->raw();
+
+        $deviceAttributes['event_id'] = $idevents;
+        $deviceAttributes['quantity'] = 1;
+
+        $response = $this->post('/device/create', $deviceAttributes);
+        $iddevices = Device::latest()->first()->iddevices;
+        $this->assertNotNull($iddevices);
+
+        return $iddevices;
     }
 
     public function createJane() {
@@ -159,12 +197,29 @@ abstract class TestCase extends BaseTestCase
             $val = preg_replace('/"created_at":".*"/', '"created_at":"TIMESTAMP"', $val);
             $val = preg_replace('/"updated_at":".*"/', '"updated_at":"TIMESTAMP"', $val);
         }
+
+        return $val;
     }
 
-    private function canonicaliseAndAssertSame($val1, $val2) {
+//    private function isJson($string) {
+//        json_decode($string);
+//        return json_last_error() === JSON_ERROR_NONE;
+//    }
+//
+    private function canonicaliseAndAssertSame($val1, $val2, $name) {
         $val1 = $this->canonicalise($val1);
         $val2 = $this->canonicalise($val2);
-        $this->assertSame($val1, $val2);
+
+        if ($this->isJson($val1) && $this->isJson($val2)) {
+            // We get nicer mismatch display if we compare the decoded JSON object rather than comparing the
+            // string encoding.
+            $dec1 = json_decode($val1, TRUE);
+            $dec2 = json_decode($val2, TRUE);
+
+            $this->assertSame($dec1, $dec2, $name);
+        } else {
+            $this->assertSame($val1, $val2, $name);
+        }
     }
 
     public function assertVueProperties($response, $expected) {
@@ -178,11 +233,16 @@ abstract class TestCase extends BaseTestCase
         for ($i = 0; $i < count($expected); $i++) {
             foreach ($expected[$i] as $key => $value) {
                 $this->assertArrayHasKey($key, $props[$i]);
-                $this->canonicaliseAndAssertSame($value, $props[$i][$key]);
+                $this->canonicaliseAndAssertSame($value, $props[$i][$key], $key);
                 $foundSome = TRUE;
             }
         }
 
         $this->assertTrue($foundSome);
+    }
+
+    public function setDiscourseTestEnvironment() {
+        // TODO I feel this isn't really necessary.
+        config(['restarters.features.discourse_integration' => true]);
     }
 }

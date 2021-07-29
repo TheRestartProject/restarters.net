@@ -75,6 +75,9 @@ Style Guide
                 <li><a href="https://getbootstrap.com/docs/4.1/utilities/colors/" target="_blank">Colors</a></li>
             </ul>
         </div>
+        <div class="panel-foo">
+            <p><a href="/test/styles/find">Usage</a></p>
+        </div>
     </div>
 
     <!-- text -->
@@ -268,8 +271,7 @@ Style Guide
             <button class="btn btn-dark btn-rounded">dark rounded button</button>
             <pre><code>{{ '<button class="btn btn-dark btn-rounded">dark rounded button</button>' }}</code></pre>
         </div>
-        <div
-         class="panel-foo">
+        <div class="panel-foo">
             <button class="btn-link">button link</button>
             <pre><code>{{ '<button class="btn-link">button link</button>' }}</code></pre>
             <button class="btn-view">button view</button>
@@ -505,6 +507,25 @@ Style Guide
 @section('scripts')
 <script>
     document.addEventListener(`DOMContentLoaded`, async () => {
+
+        /**
+         * List all the classes used on buttons for testing purposes.
+         * See the test controller.
+        */
+        function listClasses() {
+
+            var classes = ['buttons'];
+            const buttons = [];
+            [...document.querySelectorAll('.panel-foo button')].forEach(e => {
+                for(var i=0;i<e.classList.length;i++) {
+                    buttons.push(e.classList[i]);
+                }
+            });
+            classes['buttons'] = buttons.filter(function(item, pos, self) {
+                return self.indexOf(item) == pos;
+            })
+            console.log(classes);
+        }
 
         [...document.querySelectorAll('.nav-link-foo')].forEach(e1 => {
 

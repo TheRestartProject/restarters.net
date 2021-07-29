@@ -66,6 +66,30 @@ class PartyController extends Controller
         $this->discourseService = $discourseService;
     }
 
+    public static function expandEvent($event, $group, $emissionRatio) {
+        $thisone = $event->getAttributes();
+
+        if (is_null($group)) {
+            // We are showing events for multiple groups and so we need to pass the relevant group, in order that
+            // we can show the group name and link to it.
+            $thisone['group'] = \App\Group::find($event->group);
+        }
+
+        $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
+        $thisone['allinvitedcount'] = $event->allInvited->count();
+
+        // TODO LATER Consider whether these stats should be in the event or passed into the store.
+        $thisone['stats'] = $event->getEventStats($emissionRatio);
+        $thisone['participants_count'] = $event->participants;
+        $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+
+        $thisone['isVolunteer'] = $event->isVolunteer();
+        $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
+        $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+
+        return $thisone;
+    }
+
     public function index($group_id = null)
     {
         if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
@@ -1376,7 +1400,7 @@ class PartyController extends Controller
          ->get();
 
          // If no parties are found, through 404 error
-         if (empty($parties)) {
+         if (!count($parties)) {
            return abort(404, 'No Events found.');
          }
 
