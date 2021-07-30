@@ -785,7 +785,7 @@ class Fixometer
             $stats['allparties'] = $Party->ofThisGroup('admin', true, false);
             $stats['co2Total'] = $Device->getWeights();
             $stats['device_count_status'] = $Device->statusCount();
-            \Cache::put('all_stats', $stats, 120);
+            \Cache::put('all_stats', $stats, 7200);
         }
 
         return $stats;

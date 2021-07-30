@@ -30,7 +30,7 @@ class CachingWikiPageRetriever
 
             $pages_json = $decoded_json->query->random;
 
-            Cache::put($this->cacheKey, $pages_json, 60);
+            Cache::put($this->cacheKey, $pages_json, 3600);
         } catch (\Exception $ex) {
         }
 

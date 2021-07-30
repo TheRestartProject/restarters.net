@@ -39,7 +39,7 @@ class CachingRssRetriever
                 }
             }
 
-            Cache::put($this->cacheKey, $news_feed, 60);
+            Cache::put($this->cacheKey, $news_feed, 3600);
         } catch (\Exception $ex) {
         }
 

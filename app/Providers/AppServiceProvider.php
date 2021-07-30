@@ -56,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
                                 $total_talk_notifications++;
                             }
                         }
-                        Cache::put('talk_notification_'.Auth::user()->username, $total_talk_notifications, 10);
+                        Cache::put('talk_notification_'.Auth::user()->username, $total_talk_notifications, 600);
                     } else {
                         $total_talk_notifications = null;
                     }
