@@ -74,10 +74,11 @@ class InviteEventTest extends TestCase
         preg_match('/href="(\/party\/accept-invite.*?)"/', $response->getContent(), $matches);
         $invitation = $matches[1];
 
-        // ...but shouldn't show up in the list of events as we have not yet accepted.
+        // ...should show up in the list of events with an invitation as we have not yet accepted.
         $response = $this->get('/party');
         $events = $this->getVueProperties($response)[0][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":false'));
+        $this->assertNotFalse(strpos($events, '"invitation"'));
 
         // Now accept the invitation.
         $response = $this->get($invitation);
